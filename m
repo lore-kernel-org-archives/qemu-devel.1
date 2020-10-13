@@ -2,87 +2,115 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E19B7C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:55:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 951F2C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:02:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D34AE208D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:55:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B68420708
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:02:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eFvECloE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34AE208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dBhLrSbh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B68420708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35842 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSG5R-0006XH-MK
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 04:55:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32866)
+	id 1kSGCY-0001Jk-I4
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 05:02:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kSG4J-0005pJ-QA; Tue, 13 Oct 2020 04:54:03 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:33847)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kSG4G-00081u-Co; Tue, 13 Oct 2020 04:54:03 -0400
-Received: by mail-lj1-x243.google.com with SMTP id y16so18419851ljk.1;
- Tue, 13 Oct 2020 01:53:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=W8HStHR/Kr1IRrLZh9jOcNb2BMNfXksU4bFaXJfHnMs=;
- b=eFvECloEcSbjf+LOrJw5bLnu2ZihC64ntLk7dleD5H23f0K2jGPjEImm65ReNk1n8r
- RYdAatQqzQ8GkwmMsUlk610fcGjTt3zNCdcTK3fMWghwWZDUJYy4vzZx0K0x8YGUiywV
- 497tsm++MJvfDqCK8fyfQMDQTA1uq+BXXgM3Qm/EZlml2Q5bmeHMZF7K0XHe9cuRVrSF
- AY2OvdwoVstii6ig7mtiX95xO/3KbeqI7mUnanXp8AXGFMxRJLMRv2SBvqw01U5hON4m
- U2nLIs3s4/vZ+pFrtIml6A4ATERIowrVdgFG/i9EI2U8gq6gCe7J4z32+7g2Tkdo7t0g
- Mxbw==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSG7P-0007xF-3b
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 04:57:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSG7M-00004t-TD
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 04:57:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602579431;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=f7xC8daW8feq2LJMp5AREWIucg+D2WcTexpk34bJmzY=;
+ b=dBhLrSbha6Az5YL6KE90uoWdTaMe+UEt/KBqOOS0DttuhSfzTmeqxuI3pQ1sIsg3dKcC0A
+ m8TgoqKItubnSqaytD6YpQniOzfwP10U9wSEQZyq/95vS79rGTrtMEbwrfB/oeyWra5NRF
+ wP/71btIIHCumIbOE4O0rv5jFcdpD6M=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-286-Xe3qgV_yOg2-hZKypoAGZQ-1; Tue, 13 Oct 2020 04:57:08 -0400
+X-MC-Unique: Xe3qgV_yOg2-hZKypoAGZQ-1
+Received: by mail-wr1-f71.google.com with SMTP id b6so10514466wrn.17
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 01:57:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=W8HStHR/Kr1IRrLZh9jOcNb2BMNfXksU4bFaXJfHnMs=;
- b=rYNNfcXMi2x+7O2Grxdbm8z7rQo6quDFNyMHiSlCpTnM2lCoBBBrd5PE9kOrCqx30q
- lK3EPSUT9RvRPiSuJ7Maf4OTNtyZ+5SsqZzOZLG9xTMmptcFbOpdUQGZ/1xZHxn2rrgO
- 4aU8LWr6wmhPq0FmdiRnXD3BLEIvPt4nueT4nJAtZwk31pLz4sekjnID1zXPb5mKj2va
- apKHPck+D2oJ8J2sW/yVp8c+FUI5iVzL/mGTXimAfw1eQIuNqcEq1gKDfN9TVJsSOxdd
- 4r2SUYtm9DlbFS4c4lp7v08AiwnmbLxFNJHyxBWLmaFFlVW99tYEV5Q6+X1aoTYzROXm
- pafQ==
-X-Gm-Message-State: AOAM530Y4HCqMVZ0Nzyn6WoVavv0yXeuiAwszorYisx9rIlnrRximPa2
- UQF7yX0uTCb7M1rcTERj48Z+IPNirU03UOIsEPk=
-X-Google-Smtp-Source: ABdhPJzqJubpc2zRKC+alcobw9USHIWaEC6G43ZXg73AzWcTGX7osaehpVtXSyd7lYuuraG7SkW5rR2p0b48vgk6+Sk=
-X-Received: by 2002:a05:651c:1b6:: with SMTP id
- c22mr10574987ljn.447.1602579238235; 
- Tue, 13 Oct 2020 01:53:58 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=f7xC8daW8feq2LJMp5AREWIucg+D2WcTexpk34bJmzY=;
+ b=qpdq69cj5kDpT5h+/E0ZYwH477fJDKLvae226+e3hHYxk8e9VaHpPVKuv463nJp8yp
+ fmLDOeor4ZvPLgSGpl7hntlKC8eOBl0x/Xwfc5PjLbQ1YmPgppiXTj7M7DIj9qRpwhow
+ IcZjHbDwE5AYWzVrYfWe2f4MYpnN54Uo8e6m1vxsdynLBMtZGsisVUwsBiCPHZ2iIeSS
+ Gy4oCK/RQzQl/7dc4dlIriYWhrGooZ4N/YtjGTW8kg8plN2YZ0C8KGUmfnwgT1KmU7Om
+ Dnp4V//t1R5eQpDcKeYmhlhqR07rbaz7IAApgeXa5rwoHgWZoIDMWk1+sYdlh3W99IZe
+ 2Thw==
+X-Gm-Message-State: AOAM533TTl84BIaXqYMXU0qiOOJAoq8dEpeIfogIV/DA5mF5MEJ97zzk
+ ZIPAIukh8T6CtRVOLgsFJn4gQnu+LKPQ+qHRZU1/hAZYDZO7C7hvrZ8mDYdBDuZUfl3B05B5nNn
+ BCGFUv2R0lLWgIig=
+X-Received: by 2002:adf:e94b:: with SMTP id m11mr33770883wrn.35.1602579427052; 
+ Tue, 13 Oct 2020 01:57:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwgrlyBZKmbcZI3CrPy1KoxgOGlktg2zgpsENSU9SyLrSsUmwKvS0qsRtT3VdJW1N5upQrxJw==
+X-Received: by 2002:adf:e94b:: with SMTP id m11mr33770856wrn.35.1602579426788; 
+ Tue, 13 Oct 2020 01:57:06 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id c1sm28603304wru.49.2020.10.13.01.57.05
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 01:57:05 -0700 (PDT)
+Subject: Re: acceptance-system-fedora failures
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>, Kevin Wolf <kwolf@redhat.com>
+References: <4e191372-c332-8f69-85e2-1ff6ead0f40d@redhat.com>
+ <59d2a787-bcd4-7283-693b-09ea04c16dc6@redhat.com>
+ <6068346f-b034-9321-0eea-29233c23a300@redhat.com>
+ <78ce9ac1-d2a1-9dc0-bf38-f9ac34b2f203@ispras.ru>
+ <14ee7cc6-42ca-fd86-241b-ed85e26693f7@redhat.com> <878sci1dt0.fsf@linaro.org>
+ <d86c9425-dcb2-7fa7-1f6f-bd7b8dab53c1@ispras.ru>
+ <c5e6f7ea-93c4-a46a-dfee-7699c08c1060@redhat.com>
+ <4f4eee5e-e8cd-0595-cccc-8b648773c9ba@ispras.ru>
+ <43eac2fb-7325-9e9f-ce13-d0774638753f@redhat.com>
+ <20201008115018.GD4672@linux.fritz.box>
+ <a1230ec4-13ae-3a0b-5b8a-71c9c87250ac@ispras.ru>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d0e0d513-099d-2976-acbd-650a95a06a6d@redhat.com>
+Date: Tue, 13 Oct 2020 10:57:04 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201012233740.190-1-luoyonggang@gmail.com>
- <20201012233740.190-3-luoyonggang@gmail.com>
- <7431126f-cc78-57d3-fd78-bd21c5785927@redhat.com>
-In-Reply-To: <7431126f-cc78-57d3-fd78-bd21c5785927@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 13 Oct 2020 16:53:45 +0800
-Message-ID: <CAE2XoE_gYX9G7LS6q5GAMsAZAxpGe-M1nO=bei9+D5HKwhBnUw@mail.gmail.com>
-Subject: Re: [PATCH v7 2/4] gitignore: ignore a bit more
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Content-Type: multipart/alternative; boundary="00000000000038344105b1898ed2"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <a1230ec4-13ae-3a0b-5b8a-71c9c87250ac@ispras.ru>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,88 +124,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- QEMU Trivial <qemu-trivial@nongnu.org>, qemu-level <qemu-devel@nongnu.org>,
+Cc: Thomas Huth <thuth@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
  Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000038344105b1898ed2
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 10/9/20 12:37 PM, Pavel Dovgalyuk wrote:
+> On 08.10.2020 14:50, Kevin Wolf wrote:
+>> Am 08.10.2020 um 12:26 hat Philippe Mathieu-DaudÃ© geschrieben:
+>>> On 10/7/20 3:11 PM, Pavel Dovgalyuk wrote:
+>>>> On 07.10.2020 15:49, Philippe Mathieu-DaudÃ© wrote:
+>>>>> On 10/7/20 2:20 PM, Pavel Dovgalyuk wrote:
+>>>>>> On 07.10.2020 14:22, Alex BennÃ©e wrote:
+>>>>>>>
+>>>>>>> Philippe Mathieu-DaudÃ© <philmd@redhat.com> writes:
+>>>>>>>
+>>>>>>>> On 10/7/20 10:51 AM, Pavel Dovgalyuk wrote:
+>>>>>>>>> On 07.10.2020 11:23, Thomas Huth wrote:
+>>>>>>>>>> On 07/10/2020 09.13, Philippe Mathieu-DaudÃ© wrote:
+>>>>>>>>>> Thanks, that was helpful. ... and the winner is:
+>>>>>>>>>>
+>>>>>>>>>> Â Â Â Â Â Â  commitÂ Â  55adb3c45620c31f29978f209e2a44a08d34e2da
+>>>>>>>>>> Â Â Â Â Â Â  Author:Â  John Snow <jsnow@redhat.com>
+>>>>>>>>>> Â Â Â Â Â Â  Date:Â Â Â  Fri Jul 24 01:23:00 2020 -0400
+>>>>>>>>>> Â Â Â Â Â Â  Subject: ide: cancel pending callbacks on SRST
+>>>>>>>>>>
+>>>>>>>>>> ... starting with this commit, the tests starts failing. John, 
+>>>>>>>>>> any
+>>>>>>>>>> idea what
+>>>>>>>>>> might be causing this?
+>>>>>>>>>
+>>>>>>>>> This patch includes the following lines:
+>>>>>>>>>
+>>>>>>>>> +Â Â Â Â Â Â Â  aio_bh_schedule_oneshot(qemu_get_aio_context(),
+>>>>>>>>> +Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  
+>>>>>>>>> ide_bus_perform_srst, bus);
+>>>>>>>>>
+>>>>>>>>> replay_bh_schedule_oneshot_event should be used instead of this
+>>>>>>>>> function, because it synchronizes non-deterministic BHs.
+>>>>>>>>
+>>>>>>>> Why do we have 2 different functions? BH are already complex
+>>>>>>>> enough, and we need to also think about the replay API...
+>>>>>>>>
+>>>>>>>> What about the other cases such vhost-user (blk/net), virtio-blk?
+>>>>>>>
+>>>>>>> This does seem like something that should be wrapped up inside
+>>>>>>> aio_bh_schedule_oneshot itself or maybe we need a
+>>>>>>> aio_bh_schedule_transaction_oneshot to distinguish it from the other
+>>>>>>> uses the function has.
+>>>>>>>
+>>>>>>
+>>>>>> Maybe there should be two functions:
+>>>>>> - one for the guest modification
+>>>>>
+>>>>> aio_bh_schedule_oneshot_deterministic()?
+>>>>>
+>>>>>> - one for internal qemu things
+>>>>>
+>>>>> Not sure why there is a difference, BH are used to
+>>>>> avoid delaying the guest, so there always something
+>>>>> related to "guest modification".
+>>>>
+>>>> Not exactly. At least there is one non-related-to-guest case
+>>>> in monitor_init_qmp:
+>>>> Â Â Â Â Â Â Â  /*
+>>>> Â Â Â Â Â Â Â Â  * We can't call qemu_chr_fe_set_handlers() directly 
+>>>> here
+>>>> Â Â Â Â Â Â Â Â  * since chardev might be running in the monitor I/O
+>>>> Â Â Â Â Â Â Â Â  * thread.Â  Schedule a bottom half.
+>>>> Â Â Â Â Â Â Â Â  */
+>>>> Â Â Â Â Â Â Â  
+>>>> aio_bh_schedule_oneshot(iothread_get_aio_context(mon_iothread),
+>>>> Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  
+>>>> monitor_qmp_setup_handlers_bh, mon);
+>>>
+>>> I don't understand the documentation in docs/devel/replay.txt:
+>>>
+>>> ---
+>>> Bottom halves
+>>> =============
+>>>
+>>> Bottom half callbacks, that affect the guest state, should be invoked
+>>> through
+>>> replay_bh_schedule_event or replay_bh_schedule_oneshot_event functions.
+>>> Their invocations are saved in record mode and synchronized with the
+>>> existing
+>>> log in replay mode.
+>>> ---
+>>>
+>>> But then it is only used in block drivers, which are not
+>>> related to guest state:
+>>
+>> Pavel can tell you the details, but I think the idea was that you need
+>> to use this function not when the code calling it modifies guest state,
+>> but when the BH implementation can do so.
+>>
+>> In the case of generic callbacks like provided by the blk_aio_*()
+>> functions, we don't know whether this is the case, but it's generally
+>> device emulation code, so chances are relatively high that they do.
+>>
+>> I seem to remember that when reviewing the code that introduced
+>> replay_bh_schedule_event(), I was relatively sure that we didn't catch
+>> all necessary instances, but since it worked for Pavel and I didn't feel
+>> like getting too involved with replay code, we just merged it anyway.
+> 
+> That's right.
+> Block layer does not touch guest by itself.
+> But it includes callbacks that may invoke interrupts on finishing disk 
+> operations. That is why we synchronize these callbacks with vCPU through 
+> the replay layer.
 
-On Tue, Oct 13, 2020 at 4:38 PM Philippe Mathieu-Daud=C3=A9 <philmd@redhat.=
-com>
-wrote:
->
-> On 10/13/20 1:37 AM, Yonggang Luo wrote:
-> > Enable the creating multiple build directory at the source root.
-> > Ignore /meson/ and /roms/ for better search experience.
-> >
-> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> > ---
-> >   .gitignore | 4 +++-
-> >   1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/.gitignore b/.gitignore
-> > index b32bca1315..f78ee9f297 100644
-> > --- a/.gitignore
-> > +++ b/.gitignore
-> > @@ -1,5 +1,5 @@
-> >   /GNUmakefile
-> > -/build/
-> > +/build*/
-> >   *.pyc
-> >   .sdk
-> >   .stgit-*
-> > @@ -10,3 +10,5 @@ TAGS
-> >   *~
-> >   *.ast_raw
-> >   *.depend_raw
-> > +/meson/
-> > +/roms/**/*
->
-> Why?
-As I said, help for searching tool ignore it, meson and roms are thirdparty
-packages.
->
+Instead having to remember to use replay_bh_schedule_event when
+guest state is modified else the code is buggy, what about expecting
+replay used everywhere, and disabling its use when we know guest state
+is not modified?
 
+> 
+> Pavel Dovgalyuk
+> 
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000038344105b1898ed2
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Tue, Oct 13, 2020 at 4:38 PM Philippe Mathieu-D=
-aud=C3=A9 &lt;<a href=3D"mailto:philmd@redhat.com">philmd@redhat.com</a>&gt=
-; wrote:<br>&gt;<br>&gt; On 10/13/20 1:37 AM, Yonggang Luo wrote:<br>&gt; &=
-gt; Enable the creating multiple build directory at the source root.<br>&gt=
-; &gt; Ignore /meson/ and /roms/ for better search experience.<br>&gt; &gt;=
-<br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang=
-@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; ---<br>&gt; &gt; =C2=
-=A0 .gitignore | 4 +++-<br>&gt; &gt; =C2=A0 1 file changed, 3 insertions(+)=
-, 1 deletion(-)<br>&gt; &gt;<br>&gt; &gt; diff --git a/.gitignore b/.gitign=
-ore<br>&gt; &gt; index b32bca1315..f78ee9f297 100644<br>&gt; &gt; --- a/.gi=
-tignore<br>&gt; &gt; +++ b/.gitignore<br>&gt; &gt; @@ -1,5 +1,5 @@<br>&gt; =
-&gt; =C2=A0 /GNUmakefile<br>&gt; &gt; -/build/<br>&gt; &gt; +/build*/<br>&g=
-t; &gt; =C2=A0 *.pyc<br>&gt; &gt; =C2=A0 .sdk<br>&gt; &gt; =C2=A0 .stgit-*<=
-br>&gt; &gt; @@ -10,3 +10,5 @@ TAGS<br>&gt; &gt; =C2=A0 *~<br>&gt; &gt; =C2=
-=A0 *.ast_raw<br>&gt; &gt; =C2=A0 *.depend_raw<br>&gt; &gt; +/meson/<br>&gt=
-; &gt; +/roms/**/*<br>&gt;<br>&gt; Why?<br>As I said, help for searching to=
-ol ignore it, meson and roms are thirdparty packages.<br>&gt;<br><br><br>--=
-<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=
-=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggan=
-g Luo<br></div>
-
---00000000000038344105b1898ed2--
 
