@@ -2,110 +2,89 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7466C43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 13:34:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D118DC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 13:35:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15A1123975
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 13:34:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A3CB239A1
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 13:35:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eul3cIW6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15A1123975
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAO4+/7N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A3CB239A1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSKS7-00073w-2I
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 09:34:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44720)
+	id 1kSKSR-0007Yk-DT
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 09:35:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSKPr-0004KR-H0
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:32:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24706)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kSKR4-0005gF-3E
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:33:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27306)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSKPn-0001l6-Md
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:32:35 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kSKR1-0001sS-Ae
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:33:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602595950;
+ s=mimecast20190719; t=1602596025;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=AJCDN23uhinq4hyqQ/aLd65LLd0Pe4nC/XbwoMDCHh4=;
- b=eul3cIW6V6zdiaX5/NkkKr8QJFWCal5k7wb3MaA8YL4CYjpz+YMnBDhn5s6oOYGwG17pAe
- P9W+3+OXldFS2y17wb+EqCIuzpnmsCgii0e+186aTYm9EjSnZWXh0joBiB4Qm54MTTaCr3
- 6w939hcVL5p5diJQ11VJd9IpSjZiD5E=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-485-4SKbceRpPBGBCvZWYDWCCA-1; Tue, 13 Oct 2020 09:32:22 -0400
-X-MC-Unique: 4SKbceRpPBGBCvZWYDWCCA-1
-Received: by mail-wm1-f69.google.com with SMTP id c204so6773719wmd.5
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 06:32:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=AJCDN23uhinq4hyqQ/aLd65LLd0Pe4nC/XbwoMDCHh4=;
- b=NTMS+zK864yGocvZMcuiKyhemt4pBZ27jGohAV0wKL36fontqSso3Nma1g6Ptr420I
- 2vdIi/pLJSYS3fRV3hFCamhavpOwrzSAAw6NamfOvemlo5m5v+kRav6AHvZ78b7DHTBt
- FWIE0jOgFgttWrXfAqScneAoNSD5J0/j78Q6WrzTdlUtyYHuVPo2NDFwxBM/eC3gC8Ky
- oxJ/wUtfYD9brL0ACSmQbuMUlDoqv0f4jdLhhM+XRRzV7EioA3qLOYJFnlVvtEaJ/jpm
- VjyEpx+/F1snr733k8vQrrRV7AwQWtgFFZp4/WPc1KEc2/1AivsA8PUTFzBZ/AMyyrjt
- 7aAQ==
-X-Gm-Message-State: AOAM530Tc2gPhWG+PgwqT6YhQ2LU6wTm3UM/0e1o1IBCbdgSuq7yMhOf
- Jw53/nR+EmlOwFaai+DHsoPn0iOe2XGQrQd7LlsVyAYX0JZmraedbZMBSL+G/P1RfEQbHHUSPWj
- 66reacNaAL66tP74=
-X-Received: by 2002:a05:6000:1151:: with SMTP id
- d17mr38234443wrx.363.1602595941183; 
- Tue, 13 Oct 2020 06:32:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwvQwnSIdtfWSi40smjU8h/935RGRcKY8qAYMF0l691k1H7P7H93uqmdwZtSbK2Ueg/eCMvag==
-X-Received: by 2002:a05:6000:1151:: with SMTP id
- d17mr38234420wrx.363.1602595940961; 
- Tue, 13 Oct 2020 06:32:20 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id u15sm28248226wrm.77.2020.10.13.06.32.19
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 06:32:20 -0700 (PDT)
-Subject: Re: [PATCH 05/10] slirp: update for iOS resolv fix
-To: Joelle van Dyne <j@getutm.app>, qemu-devel@nongnu.org
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-6-j@getutm.app>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <c99464f7-6fd7-e81f-9037-50942706fc24@redhat.com>
-Date: Tue, 13 Oct 2020 15:32:19 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=r0BP+gQqKln20CsI1CX4LB5dICD1Ue1fbnsy7cjJaAs=;
+ b=hAO4+/7NaVQpRlN2bRW9ZoHBowkdnGzelxWJ+DzjIcT6Fhc4zM6ytiUDWHEkCWSdJcYVRb
+ 66SXxHFFASVy5X5UIHE0qR2NBXAkZbOr0j/jDafmn2aFRrtetunTuru5lIUTx2wUcAEioi
+ doARliiPnO5djLqoQABSf886w713rFM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-336-zrn7wZtlO5elQGKDf5torg-1; Tue, 13 Oct 2020 09:33:43 -0400
+X-MC-Unique: zrn7wZtlO5elQGKDf5torg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DD06876E3B;
+ Tue, 13 Oct 2020 13:33:42 +0000 (UTC)
+Received: from work-vm (ovpn-114-238.ams2.redhat.com [10.36.114.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 80E0160C0F;
+ Tue, 13 Oct 2020 13:33:40 +0000 (UTC)
+Date: Tue, 13 Oct 2020 14:33:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Bihong Yu <yubihong@huawei.com>
+Subject: Re: [PATCH v2 4/8] migration: Open brace '{' following struct go on
+ the same line
+Message-ID: <20201013133337.GD2920@work-vm>
+References: <1602508140-11372-1-git-send-email-yubihong@huawei.com>
+ <1602508140-11372-5-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201012232939.48481-6-j@getutm.app>
+In-Reply-To: <1602508140-11372-5-git-send-email-yubihong@huawei.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,64 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: zhengchuan@huawei.com, quintela@redhat.com, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/13/20 1:29 AM, Joelle van Dyne wrote:
-> From: osy <osy86@users.noreply.github.com>
-> 
-> We cannot access /etc/resolv.conf on iOS so libslirp is modified to use
-> libresolv instead.
-> 
-> Signed-off-by: Joelle van Dyne <j@getutm.app>
+* Bihong Yu (yubihong@huawei.com) wrote:
+> Signed-off-by: Bihong Yu <yubihong@huawei.com>
+> Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
+
+Yes, I think that line probably predates the coding standard :-)
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->   .gitmodules | 2 +-
->   meson.build | 2 ++
->   slirp       | 2 +-
->   3 files changed, 4 insertions(+), 2 deletions(-)
+>  migration/migration.h | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
 > 
-> diff --git a/.gitmodules b/.gitmodules
-> index 2bdeeacef8..f23e859210 100644
-> --- a/.gitmodules
-> +++ b/.gitmodules
-> @@ -51,7 +51,7 @@
->   	url = https://git.qemu.org/git/edk2.git
->   [submodule "slirp"]
->   	path = slirp
-> -	url = https://git.qemu.org/git/libslirp.git
-> +	url = https://github.com/utmapp/libslirp.git
-
-NAck.
-
-You can not take over the SLiRP project submodule that way.
-
-I suggest getting your SLiRP changes merged with mainstream
-instead, see:
-https://gitlab.freedesktop.org/slirp/libslirp#contributing
-
->   [submodule "roms/opensbi"]
->   	path = roms/opensbi
->   	url = 	https://git.qemu.org/git/opensbi.git
-> diff --git a/meson.build b/meson.build
-> index 32cf08619f..da96e296e0 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -996,6 +996,8 @@ if have_system
->       slirp_deps = []
->       if targetos == 'windows'
->         slirp_deps = cc.find_library('iphlpapi')
-> +    elif targetos == 'darwin'
-> +      slirp_deps = cc.find_library('resolv')
->       endif
->       slirp_conf = configuration_data()
->       slirp_conf.set('SLIRP_MAJOR_VERSION', meson.project_version().split('.')[0])
-> diff --git a/slirp b/slirp
-> index ce94eba204..452c389d82 160000
-> --- a/slirp
-> +++ b/slirp
-> @@ -1 +1 @@
-> -Subproject commit ce94eba2042d52a0ba3d9e252ebce86715e94275
-> +Subproject commit 452c389d8288f81ec9d59d983a047d4e54f3194e
+> diff --git a/migration/migration.h b/migration/migration.h
+> index deb411a..99784b4 100644
+> --- a/migration/migration.h
+> +++ b/migration/migration.h
+> @@ -124,8 +124,7 @@ struct MigrationClass {
+>      DeviceClass parent_class;
+>  };
+>  
+> -struct MigrationState
+> -{
+> +struct MigrationState {
+>      /*< private >*/
+>      DeviceState parent_obj;
+>  
+> -- 
+> 1.8.3.1
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
