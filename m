@@ -2,70 +2,91 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A37D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FDADC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:53:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 088AF252EA
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 088AF252EA
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id DB3B3252EA
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:53:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b12AEGea"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB3B3252EA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35908 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSNXz-0005BU-20
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:53:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57384)
+	id 1kSNYN-0005zZ-T3
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:53:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kSNWJ-0003zk-20; Tue, 13 Oct 2020 12:51:27 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52106
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kSNWE-0005oT-8R; Tue, 13 Oct 2020 12:51:26 -0400
-Received: from host86-158-109-18.range86-158.btcentralplus.com
- ([86.158.109.18] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kSNW7-0006cj-D7; Tue, 13 Oct 2020 17:51:22 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au
-References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
- <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
- <c882279b-a561-2c3a-a6b5-b27446fddb02@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <79df54b3-d9e5-145e-e277-24468b121ba0@ilande.co.uk>
-Date: Tue, 13 Oct 2020 17:51:10 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kSNWs-0004gX-EI
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:52:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49779)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kSNWp-0005qr-80
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:52:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602607917;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TgRZQv4uzOZgHe4XSDNMCc7waPz7PS1b9GOllbE28h8=;
+ b=b12AEGeaXS18yujKkTKNh7cz/qpujGjDnHGVEnXQ9w21C++hdvqwlvMldfL3XiqRaMf68i
+ Y8EbCA6BvbQuu4zavnDLc8txMX39OBzt3Zp4x6QkydkMsi41hGPeA1HJLX845x9Qm0CoKJ
+ 1QeYCdKm2G2VCuwRYPhWzSx0/U0jPXI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-97-I1Y5ExDvM1mXnEY3QniCPQ-1; Tue, 13 Oct 2020 12:51:45 -0400
+X-MC-Unique: I1Y5ExDvM1mXnEY3QniCPQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 07AAF18B638B;
+ Tue, 13 Oct 2020 16:51:44 +0000 (UTC)
+Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A0FCB10013D0;
+ Tue, 13 Oct 2020 16:51:41 +0000 (UTC)
+Date: Tue, 13 Oct 2020 17:51:38 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Claudio Fontana <cfontana@suse.de>
+Subject: Re: [PATCH v3 0/3] unbreak non-tcg builds
+Message-ID: <20201013165138.GT70612@redhat.com>
+References: <20201013143806.14321-1-cfontana@suse.de>
+ <cd8e9295-dcd0-18c4-e7a2-86bed74f967c@redhat.com>
+ <ed8d664d-9af7-f4c6-1b2d-e0569eb27ab7@suse.de>
 MIME-Version: 1.0
-In-Reply-To: <c882279b-a561-2c3a-a6b5-b27446fddb02@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+In-Reply-To: <ed8d664d-9af7-f4c6-1b2d-e0569eb27ab7@suse.de>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.158.109.18
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,114 +100,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>, Paolo Bonzini <pbonzini@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/10/2020 14:37, Philippe Mathieu-Daudé wrote:
-
-> On 10/13/20 1:49 PM, Mark Cave-Ayland wrote:
->> Currently an object link property is used to pass a reference to the Heathrow
->> PIC into the PCI host bridge so that grackle_init_irqs() can connect the PCI
->> IRQs to the PIC itself.
->>
->> This can be simplified by defining the PCI IRQs as qdev gpios and then wiring
->> up the PCI IRQs to the PIC in the Old World machine init function.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>   hw/pci-host/grackle.c | 19 ++-----------------
->>   hw/ppc/mac_oldworld.c |  7 +++++--
->>   2 files changed, 7 insertions(+), 19 deletions(-)
->>
->> diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
->> index 57c29b20af..b05facf463 100644
->> --- a/hw/pci-host/grackle.c
->> +++ b/hw/pci-host/grackle.c
->> @@ -28,7 +28,6 @@
->>   #include "hw/ppc/mac.h"
->>   #include "hw/qdev-properties.h"
->>   #include "hw/pci/pci.h"
->> -#include "hw/intc/heathrow_pic.h"
->>   #include "hw/irq.h"
->>   #include "qapi/error.h"
->>   #include "qemu/module.h"
->> @@ -41,7 +40,6 @@ struct GrackleState {
->>       PCIHostState parent_obj;
->>       uint32_t ofw_addr;
->> -    HeathrowState *pic;
->>       qemu_irq irqs[4];
->>       MemoryRegion pci_mmio;
->>       MemoryRegion pci_hole;
->> @@ -62,15 +60,6 @@ static void pci_grackle_set_irq(void *opaque, int irq_num, int 
->> level)
->>       qemu_set_irq(s->irqs[irq_num], level);
->>   }
->> -static void grackle_init_irqs(GrackleState *s)
->> -{
->> -    int i;
->> -
->> -    for (i = 0; i < ARRAY_SIZE(s->irqs); i++) {
->> -        s->irqs[i] = qdev_get_gpio_in(DEVICE(s->pic), 0x15 + i);
->> -    }
->> -}
->> -
->>   static void grackle_realize(DeviceState *dev, Error **errp)
->>   {
->>       GrackleState *s = GRACKLE_PCI_HOST_BRIDGE(dev);
->> @@ -85,7 +74,6 @@ static void grackle_realize(DeviceState *dev, Error **errp)
->>                                        0, 4, TYPE_PCI_BUS);
->>       pci_create_simple(phb->bus, 0, "grackle");
->> -    grackle_init_irqs(s);
->>   }
->>   static void grackle_init(Object *obj)
->> @@ -106,15 +94,12 @@ static void grackle_init(Object *obj)
->>       memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops,
->>                             DEVICE(obj), "pci-data-idx", 0x1000);
->> -    object_property_add_link(obj, "pic", TYPE_HEATHROW,
->> -                             (Object **) &s->pic,
->> -                             qdev_prop_allow_set_link_before_realize,
->> -                             0);
->> -
->>       sysbus_init_mmio(sbd, &phb->conf_mem);
->>       sysbus_init_mmio(sbd, &phb->data_mem);
->>       sysbus_init_mmio(sbd, &s->pci_hole);
->>       sysbus_init_mmio(sbd, &s->pci_io);
->> +
->> +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
->>   }
->>   static void grackle_pci_realize(PCIDevice *d, Error **errp)
->> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
->> index d6a76d06dc..05e46ee6fe 100644
->> --- a/hw/ppc/mac_oldworld.c
->> +++ b/hw/ppc/mac_oldworld.c
->> @@ -253,10 +253,9 @@ static void ppc_heathrow_init(MachineState *machine)
->>       /* Grackle PCI host bridge */
->>       dev = qdev_new(TYPE_GRACKLE_PCI_HOST_BRIDGE);
->>       qdev_prop_set_uint32(dev, "ofw-addr", 0x80000000);
->> -    object_property_set_link(OBJECT(dev), "pic", OBJECT(pic_dev),
->> -                             &error_abort);
->>       s = SYS_BUS_DEVICE(dev);
->>       sysbus_realize_and_unref(s, &error_fatal);
->> +
->>       sysbus_mmio_map(s, 0, GRACKLE_BASE);
->>       sysbus_mmio_map(s, 1, GRACKLE_BASE + 0x200000);
->>       /* PCI hole */
->> @@ -266,6 +265,10 @@ static void ppc_heathrow_init(MachineState *machine)
->>       memory_region_add_subregion(get_system_memory(), 0xfe000000,
->>                                   sysbus_mmio_get_region(s, 3));
->> +    for (i = 0; i < 4; i++) {
->> +        qdev_connect_gpio_out(dev, i, qdev_get_gpio_in(pic_dev, 0x15 + i));
+On Tue, Oct 13, 2020 at 06:47:42PM +0200, Claudio Fontana wrote:
+> On 10/13/20 4:55 PM, Philippe Mathieu-Daudé wrote:
+> > On 10/13/20 4:38 PM, Claudio Fontana wrote:
+> >> This series now unbreaks current non-tcg builds
+> >> (!CONFIG_TCG).
+> >>
+> >> tests Makefiles need to avoid relying on all non-native
+> >> archs binaries to be present,
+> >>
+> >> bios-tables-test needs to skip tests that are tcg-only,
+> >>
+> >> and notably the replay framework needs to consider that
+> >> it might not be functional (or its code present at all)
+> >> without TCG.
+> >>
+> >> Tested ok target x86_64-softmmu on x86_64 host with:
+> >>
+> >> ./configure --enable-tcg --disable-kvm
+> >> ./configure --enable-kvm --disable-tcg
+> >> ./configure --enable-tcg --enable-kvm
+> > 
+> > If you want to avoid these configurations to bitrot,
+> > consider covering them by adding Gitlab jobs :)))
+> > 
+> > 
 > 
-> If possible (follow up patch) please describe this 0x15 magic value.
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> That would be, providing a patch to  .travis.yml right?
 
-Thanks! Unfortunately I don't have any information about the source of the value, it 
-is currently just taken from grackle_init_irqs() above :(
+Adding more jobs to Travis is discouraged. GitLab CI is our preferred
+CI platform wherever possible. Others are only used where GitLab doesn't
+support the required feature.
 
 
-ATB,
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
-Mark.
 
