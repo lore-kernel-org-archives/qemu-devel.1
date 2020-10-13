@@ -2,110 +2,94 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6D91C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60087C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:20:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E38BD20708
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:20:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BA06D20708
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:20:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C4qNjWCM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E38BD20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gUiJHH9l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA06D20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57916 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSHQE-0004gl-LZ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:20:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52926)
+	id 1kSHQH-0004mJ-Kb
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:20:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSHOG-0003OM-Vn
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:18:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51359)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSHOC-0001lb-9l
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:18:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602584317;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=StQHRBhbEleOFjNm1Qm4eQcjyNBAT4H9PFvuOkFcM6c=;
- b=C4qNjWCMDYiLQbc+RerC4faL682XF40dfd3I0X/8ntap7mfzlqUyVGYYPjd4nQHy18iItu
- uXuAWWCGP6Gbq2oeA0kQeTfWXcq652MCCI8dSdGgfnYPAZodnDI907L4E/MAm1+ye4rLof
- KYukn4e799wW5SgvALCiWr1N/n78w7c=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-5Ci7cuKvNz62QyUGhf-f7A-1; Tue, 13 Oct 2020 06:18:35 -0400
-X-MC-Unique: 5Ci7cuKvNz62QyUGhf-f7A-1
-Received: by mail-wr1-f69.google.com with SMTP id v5so10704355wrr.0
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 03:18:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSHMi-0001ql-R1
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:17:08 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:52695)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSHMh-0001Xk-Dc
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:17:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id e23so13365440wme.2
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 03:17:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ED9ctdoCK+AGBSvVR1uFGDxKqs1IT3566nbTYT2S4dU=;
+ b=gUiJHH9lCnv092JZG1q+DiVMGUUI/yBceAi5fdFwl5AK5nslCepiV5eWId59Z5Qj7j
+ V1RDY3gJfGfgDzOlYyq6+LkNz5MWRmnq7lBEPZjy77hQWc4Aecpl9rqUKEjuyq6rJNF5
+ 4JJmCOu/epPASgU1Gt8G3e8+XKdCZHi4KRFxWIWhNKtr9p7vLND9H9SsWSNc5ip5ob+A
+ xFgfXcljMQ/zvVu2Bv2DcwcSwY6T/tEAJhnGV+eBh01Q48ID19fB24cgSV4cR0t0iwMc
+ TRQM+Z8C7Ajb7rIfx7NFn4i4oGRJIboUUVuctmyyXx1bhyLKkTSdZ3U3tJJ0PBkY1xjN
+ fCbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=StQHRBhbEleOFjNm1Qm4eQcjyNBAT4H9PFvuOkFcM6c=;
- b=ZW0FupBSkY+t8oZezyTo7mL+ogzC3UrEMHOunGiTnWln3cNq3F8oH4lCROaCYq8xMZ
- NQ/x3J3mywyrqwThHbd0R7uxYNMMRtiJsa0tT5Ks5U0oa9Vf72ZUeKCxZCtEfDI0jh/V
- vShthFUDvOQMM+dW5B/lY/Arap5ES24ORTz9GbPXmTRfhn1QFEw7oFvGQjgeoaELMczD
- LMZI7uYRUNBirWaCUsAAtTXnCskkYFxNA5PS8GiEKl118EO2+ksMr8CkY9V1/hBgBaZs
- xltX7VvJ54iSpKV0DNhBIGr0+Q0+Q5mRpkDm1rxQ4PLzcdaO7b3MCAuN+OA2UZu6ItXT
- q6QA==
-X-Gm-Message-State: AOAM531kgU0m7zH5gOQ7QG+XyyGClV/MKKS15XwLtYh7LaAm0Z0o6G1h
- 784NtaBdw+yVnb3UWtwRcw+IRovn3dZB4DhCVoWdJbxYoSdSe1WWkRoEt6Bb2CUjHh58JQR+ocz
- mxO4NcbnNouC7Xkw=
-X-Received: by 2002:a05:600c:2211:: with SMTP id
- z17mr14389913wml.169.1602584314667; 
- Tue, 13 Oct 2020 03:18:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwlGu3Q9Gq9lXqQ3tRyoX06ths/CyIn/4Obr0rrVQs3LnUOkUx1DZRu6omdGwEssCVS9xdMKA==
-X-Received: by 2002:a05:600c:2211:: with SMTP id
- z17mr14389901wml.169.1602584314454; 
- Tue, 13 Oct 2020 03:18:34 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ED9ctdoCK+AGBSvVR1uFGDxKqs1IT3566nbTYT2S4dU=;
+ b=G7hTMbMQuQTixuNiG95uqypilgyrPWN7yV2L2YDsf+deVwqWor8ikM1581P7crvhH7
+ voKcFRC6JUZr1c/fuTk0wqxdgIZscBjKPH8Gf3cuDHqxo+7PmvA3YFCzl/8iEHKOs5+e
+ ePWgkFgaTX7yG86v5Zf0wsMwub59cLU/Zug+A9HJOyg2+GMqU1jQKdsMjRc5+jri6f8A
+ vy7dm4mwl2+K6LHAsMFf36tSPDHZY2zefr+H434XnAOQe3m09jKpQtGlaF4v0lJEfgI9
+ teAtNTReOms59vhbaia3jO9grc6ramIY4KE5uyRBZ/8IQCSsyc/U7vOIk3J+Z6IFQT8c
+ 0WNg==
+X-Gm-Message-State: AOAM531VsVEy+Yeox16SJZdWwm8WclrZ/aIFVlsByv3wZLzQRc2fe2fl
+ tc856oqTotdX37l2pxpMsCMTVRe3JaE=
+X-Google-Smtp-Source: ABdhPJyvcVBc37GInC53OaSiZxCn/ySPIw8QyFGRg3EXVpt7Rvj0FcfEG8NpZISGCRRFhQoJrdmAtw==
+X-Received: by 2002:a1c:7708:: with SMTP id t8mr14554874wmi.6.1602584225769;
+ Tue, 13 Oct 2020 03:17:05 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id c16sm29252456wrx.31.2020.10.13.03.18.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 03:18:33 -0700 (PDT)
-Subject: Re: [PATCH] hw/core/qdev-properties-system: Rewrite
- set_pci_host_devaddr using GLib
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20201013100315.3554421-1-philmd@redhat.com>
- <20201013100737.GH70612@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <caddf42e-32cf-7d59-e54b-ad6e805681f9@redhat.com>
-Date: Tue, 13 Oct 2020 12:18:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by smtp.gmail.com with ESMTPSA id 4sm29499353wrn.48.2020.10.13.03.17.04
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 03:17:05 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 1/4] MAINTAINERS: Put myself forward for MIPS target
+Date: Tue, 13 Oct 2020 12:16:56 +0200
+Message-Id: <20201013101659.3557154-2-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201013101659.3557154-1-f4bug@amsat.org>
+References: <20201013101659.3557154-1-f4bug@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20201013100737.GH70612@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,150 +102,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Klaus Herman <kherman@inbox.lv>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: Chen Huacai <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/13/20 12:07 PM, Daniel P. Berrangé wrote:
-> On Tue, Oct 13, 2020 at 12:03:15PM +0200, Philippe Mathieu-Daudé wrote:
->> set_pci_host_devaddr() is hard to follow, thus bug-prone.
->> We indeed introduced a bug in commit bccb20c49df, as the
->> same line might be used to parse a bus (up to 0xff) or a
->> slot (up to 0x1f). Instead of making things worst, rewrite
->> using g_strsplit().
->>
->> Fixes: bccb20c49df ("Use qemu_strtoul() in set_pci_host_devaddr()")
->> Reported-by: Klaus Herman <kherman@inbox.lv>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>   hw/core/qdev-properties-system.c | 61 ++++++++++++++------------------
->>   1 file changed, 27 insertions(+), 34 deletions(-)
->>
->> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
->> index 49bdd125814..e6e081efd58 100644
->> --- a/hw/core/qdev-properties-system.c
->> +++ b/hw/core/qdev-properties-system.c
->> @@ -878,11 +878,11 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->>       DeviceState *dev = DEVICE(obj);
->>       Property *prop = opaque;
->>       PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
->> -    char *str, *p;
->> -    const char *e;
->> +    g_autofree char *str = NULL;
->> +    g_autofree char **col_s0 = NULL;
->> +    g_autofree char **dot_s = NULL;
-> 
-> These free the array, but not the array elements.
-> 
-> You need to use
-> 
->     g_auto(GStrv) col_s0 = NULL
-> 
-> GStrv is a typedef for char **, that exists solely so that there is
-> a typename against which g_auto can be used.
+To avoid the MIPS target being orphan, volunteer to keep an eye
+on it and put together pull requests.
 
-Ah I have been wondering how that part works.
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ MAINTAINERS | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-Thanks, I'll fix.
-
-> 
->> +    char **col_s;
->>       unsigned long val;
->> -    unsigned long dom = 0, bus = 0;
->> -    unsigned int slot = 0, func = 0;
->>   
->>       if (dev->realized) {
->>           qdev_prop_set_after_realize(dev, name, errp);
->> @@ -893,57 +893,50 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->>           return;
->>       }
->>   
->> -    p = str;
->> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e == p) {
->> +    col_s = col_s0 = g_strsplit(str, ":", 3);
->> +    if (!col_s || !col_s[0] || !col_s[1]) {
->>           goto inval;
->>       }
->> -    if (*e != ':') {
->> -        goto inval;
->> -    }
->> -    bus = val;
->>   
->> -    p = (char *)e + 1;
->> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
->> -        goto inval;
->> -    }
->> -    if (*e == ':') {
->> -        dom = bus;
->> -        bus = val;
->> -        p = (char *)e + 1;
->> -        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
->> +    /* domain */
->> +    if (col_s[2]) {
->> +        if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xffff) {
->>               goto inval;
->>           }
->> +        addr->domain = val;
->> +        col_s++;
->> +    } else {
->> +        addr->domain = 0;
->>       }
->> -    slot = val;
->>   
->> -    if (*e != '.') {
->> +    /* bus */
->> +    if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xff) {
->>           goto inval;
->>       }
->> -    p = (char *)e + 1;
->> -    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e == p) {
->> -        goto inval;
->> -    }
->> -    func = val;
->> +    addr->bus = val;
->>   
->> -    if (bus > 0xff) {
->> +    /* <slot>.<func> */
->> +    dot_s = g_strsplit(col_s[1], ".", 2);
->> +    if (!dot_s || !dot_s[0] || !dot_s[1]) {
->>           goto inval;
->>       }
->>   
->> -    if (*e) {
->> +    /* slot */
->> +    if (qemu_strtoul(dot_s[0], NULL, 16, &val) < 0 || val > 0x1f) {
->>           goto inval;
->>       }
->> +    addr->slot = val;
->>   
->> -    addr->domain = dom;
->> -    addr->bus = bus;
->> -    addr->slot = slot;
->> -    addr->function = func;
->> +    /* func */
->> +    if (qemu_strtoul(dot_s[1], NULL, 10, &val) < 0 || val > 7) {
->> +        goto inval;
->> +    }
->> +    addr->function = val;
->>   
->> -    g_free(str);
->>       return;
->>   
->>   inval:
->>       error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
->> -    g_free(str);
->>   }
->>   
->>   const PropertyInfo qdev_prop_pci_host_devaddr = {
->> -- 
->> 2.26.2
->>
-> 
-> Regards,
-> Daniel
-> 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 426f52c1f63..d59e5c05c10 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -221,10 +221,11 @@ F: hw/microblaze/
+ F: disas/microblaze.c
+ 
+ MIPS TCG CPUs
++M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+-S: Orphaned
++S: Odd Fixes
+ F: target/mips/
+ F: default-configs/*mips*
+ F: disas/*mips*
+@@ -2815,11 +2816,12 @@ F: tcg/i386/
+ F: disas/i386.c
+ 
+ MIPS TCG target
++M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+ R: Aurelien Jarno <aurelien@aurel32.net>
+ R: Huacai Chen <chenhc@lemote.com>
+ R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+ R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+-S: Orphaned
++S: Odd Fixes
+ F: tcg/mips/
+ 
+ PPC TCG target
+-- 
+2.26.2
 
 
