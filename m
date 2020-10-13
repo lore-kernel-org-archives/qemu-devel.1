@@ -2,87 +2,98 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 929DEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:54:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D5BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16B91252EC
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:54:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDADB25307
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:59:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="evN0HhNG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B91252EC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rN1o9EBg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDADB25307
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSNZ3-0006jC-3m
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:54:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57724)
+	id 1kSNdt-00006f-Ni
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:59:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSNXu-0005RJ-9Q
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:53:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59263)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSNXo-0005wW-3z
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:53:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602607979;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=lAG9V3GRwiHZjgvCGFKH0hGxXT9kGuK4agpvpBYZsiQ=;
- b=evN0HhNGl8bJ/TKQRaYeKK6D90nuux5o4ZBvPTJJTaME0DA1Q938oW9Rg9HZvQHWO/9wRK
- p8mncaRJFrezH0t1KbtztMjuKsavZv+8rqsU0CcIAuBuE87lZEjga9vF4pzEkFqKtrs5or
- ae8MowCCmukjvgXWsDo0UpdJ4oVNVqA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-20w6r-QXM5Sls0ZTgmsmFg-1; Tue, 13 Oct 2020 12:52:57 -0400
-X-MC-Unique: 20w6r-QXM5Sls0ZTgmsmFg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 065351084D65;
- Tue, 13 Oct 2020 16:52:56 +0000 (UTC)
-Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6E2BE610F3;
- Tue, 13 Oct 2020 16:52:49 +0000 (UTC)
-Date: Tue, 13 Oct 2020 17:52:46 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Darren Kenny <darren.kenny@oracle.com>
-Subject: Re: [PATCH] fuzz: Disable QEMU's signal handlers
-Message-ID: <20201013165246.GU70612@redhat.com>
-References: <20201013152920.448335-1-alxndr@bu.edu> <m2r1q2m5nm.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSNdD-0007zL-Rn
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:58:35 -0400
+Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35886)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSNdC-0006fl-C7
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:58:35 -0400
+Received: by mail-pj1-x1044.google.com with SMTP id a1so242286pjd.1
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:58:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=kjcdsLCEJCFzeMrTcX3WjkgAnDjuz9bXPb1/3p7Dwoc=;
+ b=rN1o9EBgVAlbdP950rNMWE+oFMxSUkYsQbgTEGl2hdhRTIAzfNXnemaCqTPxoq8XUK
+ ZuQx31NfM4A5U4nZIBlh0VAdUt7I676zLu3N8yqnP/P/D5HMFTRXGudKNthQ+UonPmFf
+ yH5yx40lO809dOKU00kJlDE5y02kClvoERCbXfOL+Nzb8zEYT4t7KwnaK2Cq6Jr5TitI
+ 1fLi8RXn5kPcLDg8ysGdEEoJ7x2GYuEHCSV+70/Tv640ynoZ6xpLtudbGadNFfthXeJz
+ WDD3hcK72jDX4POsA/tZ7MXjZLAWBwRmEGdlVpG8YBI+uCNMpd02ajcw1bSG2YQj/XqN
+ sm8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=kjcdsLCEJCFzeMrTcX3WjkgAnDjuz9bXPb1/3p7Dwoc=;
+ b=tjCzrwNgZK7FeIyzsYmnyNLPMgUDothx2ePGLMThnBHcGVDO5SNy3hzItuiLxypdyP
+ Ij2o8TDXudmgN2y45QwYbIaa7VcK1z4R1LgHFwcH8wr+25b+1plvwxVI1aTdSgNjJCkw
+ UH2loNSQhRozFAbxUBQK+fkb0qphDhQHcV+WACItTgvEmpSlc2kcDRrWsbtM/uA6wzhd
+ OR+luwJfxfyYgjd47eK6liPlGiTylGgJjeCD0UQic0Xv11xSWji6kAg/nhqJ5W+R3A71
+ ZWg8HFc0ciR4QktoShBbOTzYujD+879MyemAQDarNDl40R9UBJKzU9usUUFTeMr6U6yM
+ XyDA==
+X-Gm-Message-State: AOAM532FoksSlPHvxesLHIGCf0fWFypaGJJcgJSq+vTl9LJhm3ddvMeT
+ WvtbTG3N43c1FuGAiZKkuHFBlCEGz77IcP9P
+X-Google-Smtp-Source: ABdhPJzhpIdyaNUrN2O/SIeqjgz12MWbdzC9pdBWtPZ8UF7pnYGwA7ZKyawcXHnOk9z3k0M5lP+hAQ==
+X-Received: by 2002:a17:90a:bf05:: with SMTP id c5mr657235pjs.11.1602608312296; 
+ Tue, 13 Oct 2020 09:58:32 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id x25sm178339pfr.132.2020.10.13.09.58.30
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 09:58:31 -0700 (PDT)
+Subject: Re: [PATCH 06/10] target/arm: Implement v8.1M branch-future insns (as
+ NOPs)
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ <20201012153746.9996-7-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <a055900d-a7a9-e1f7-6354-fb8e518d6763@linaro.org>
+Date: Tue, 13 Oct 2020 09:58:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <m2r1q2m5nm.fsf@oracle.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20201012153746.9996-7-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,69 +106,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- qemu-devel@nongnu.org, Alexander Bulekov <alxndr@bu.edu>,
- Bandan Das <bsd@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 13, 2020 at 05:50:37PM +0100, Darren Kenny wrote:
-> Hi Alex,
+On 10/12/20 8:37 AM, Peter Maydell wrote:
+> v8.1M implements a new 'branch future' feature, which is a
+> set of instructions that request the CPU to perform a branch
+> "in the future", when it reaches a particular execution address.
+> In hardware, the expected implementation is that the information
+> about the branch location and destination is cached and then
+> acted upon when execution reaches the specified address.
+> However the architecture permits an implementation to discard
+> this cached information at any point, and so guest code must
+> always include a normal branch insn at the branch point as
+> a fallback. In particular, an implementation is specifically
+> permitted to treat all BF insns as NOPs (which is equivalent
+> to discarding the cached information immediately).
 > 
-> This mentions the use of atexit() to perform some cleanup, but I'm not
-> seeing that being added here, should it be?
+> For QEMU, implementing this caching of branch information
+> would be complicated and would not improve the speed of
+> execution at all, so we make the IMPDEF choice to implement
+> all BF insns as NOPs.
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 
-The reference to atexit is strange, because it says the only way to
-kill the fuzzer is SIGKILL, and that won't let atexit handlers run
-anyway.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> 
-> Thanks,
-> 
-> Darren.
-> 
-> On Tuesday, 2020-10-13 at 11:29:20 -04, Alexander Bulekov wrote:
-> > With the fuzzer, we never call main_loop_should_exit, since we manually
-> > call main_loop_wait. This means that the only way to terminate the
-> > fuzzer is with SIGKILL. Disable the signal handlers, so there are
-> > reasonable ways to terminate the fuzzer and use atexit() to clean-up
-> > after the fuzzer.
-> >
-> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> > ---
-> >  tests/qtest/fuzz/fuzz.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> >
-> > diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
-> > index d926c490c5..eb0070437f 100644
-> > --- a/tests/qtest/fuzz/fuzz.c
-> > +++ b/tests/qtest/fuzz/fuzz.c
-> > @@ -217,5 +217,13 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
-> >      /* re-enable the rcu atfork, which was previously disabled in qemu_init */
-> >      rcu_enable_atfork();
-> >  
-> > +    /*
-> > +     * Disable QEMU's signal handlers, since we manually control the main_loop,
-> > +     * and don't check for main_loop_should_exit
-> > +     */
-> > +    signal(SIGINT, SIG_DFL);
-> > +    signal(SIGHUP, SIG_DFL);
-> > +    signal(SIGTERM, SIG_DFL);
-> > +
-> >      return 0;
-> >  }
-> > -- 
-> > 2.28.0
-> 
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+r~
 
