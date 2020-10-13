@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4250CC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:58:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EF74C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:58:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC2462080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:58:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC2462080A
+	by mail.kernel.org (Postfix) with ESMTPS id C019B2080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:58:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C019B2080A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50042 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSIwS-0008Sn-N8
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44202)
+	id 1kSIxC-0000wV-NB
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:58:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44112)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpl-0007Em-K9; Tue, 13 Oct 2020 07:51:13 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:43121)
+ id 1kSIpd-0006x4-0N; Tue, 13 Oct 2020 07:51:05 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:40879)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpj-0004yq-OP; Tue, 13 Oct 2020 07:51:13 -0400
+ id 1kSIpa-0004x9-3C; Tue, 13 Oct 2020 07:51:04 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MYe6H-1kxStr1AHr-00VhdU; Tue, 13 Oct 2020 13:51:08 +0200
+ id 1MWjUc-1kzOZd2WjY-00X49P; Tue, 13 Oct 2020 13:50:57 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 12/14] target/sparc/int32_helper: Remove duplicated 'Tag
- Overflow' entry
-Date: Tue, 13 Oct 2020 13:50:50 +0200
-Message-Id: <20201013115052.133355-13-laurent@vivier.eu>
+Subject: [PULL 02/14] target/i386/cpu: Update comment that mentions Texinfo
+Date: Tue, 13 Oct 2020 13:50:40 +0200
+Message-Id: <20201013115052.133355-3-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013115052.133355-1-laurent@vivier.eu>
 References: <20201013115052.133355-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:nCNc9T18Be/d8Qh5C3QrpTMVnQZPU+9VitGm2C64Prae8UVty5r
- 1GM5RBumt5mlrX0Q1g+VQVcU4wAvdy+lYsUoIRR30PTmdlNPJouL4wN/o2ZEglCgzx5UhQp
- c4BNFlSfWaAeUwG4pE878ZiMVRbENB91iIL+DBNDkTA0I29APF5oe/ww579qZYzPr+GHu7N
- zut0fuXyYOmn5ooRoDhgg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:rGXvPaVQ8hI=:4xwJj5mpYOQIZESBxcXy7M
- Ix9XO+Ysg06c8qgjReihx68hlYUj8B9RhXVpIoENJuR2ipHi8PEpeq3L1ltog9aL87brvlKXs
- oT9ybv0debaSYMr5Di8pzzuexyx+YGQ5yq0Qhm3kHNMeVlo4c35nztARGIadhudL3r4v9TYt9
- CzXCGmbCKLfHQnW+AjA2w1ORWxDhyrfWFNgIG830RZKbJD5dONbfddh3VLuA7y+PNYNRhY0sl
- TeTyBLSkf5QIP5kTwPiSvdHyOpiCAad+O8VAxoxWpDQNaQOXydbboIOgNbjN/A1pStXiw8dUZ
- MWR4K4ZO5eTh4f1J57Osq+v0G5oAee1LmLSZqr3A5/mpBZdmNniFRqiF/Z9bcrHf6AVJdhCUf
- 1BhIQ6wtoR/6VYgkgJfnczadVSoC0lsNHQ6MmdQmh6QrtDl3RHr41f48x/FnLbQOjndkAy97w
- yHxajkqnnYFnmX8v3v74kn7ZyGBaAXaQ0ZYDh02j1+iYGk7/olkw2mSuxM9u3S+VdLPSEWI4G
- iHYDJX9QY+9sY+QnirNmIN34BDJXi89w602P9vOKcP32OPiizrvLUuYBlB74vr6jzWzUD8gQX
- emePB102gcZJ2u//IlwgRJppaFifxdCwVN8gp4SnsQTpCjZnfAxzimP2lsMxhLZi+gsTVeJzb
- T544QbAgb7SKEskLdlcjnuW5OqD6UiU24IeFZKj20VDViq24jw1SzC7wltxBFwN9xv/X0cgQF
- bnFHqDhPNK+p4oqcFTSemDZt64JecQp1UwuXgZHyAG3b7JZuN5518hxaM4a8U2EpltOc3SO96
- MZ2EGOWyvqM2pBdjRtcv2TCnSNOuCI6PhYSPXA9weUTEPSqLsFcVlJPL3N1vSDJGFqrnDvA
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:VT0tRzQgQqS3Xn0HZeurVsM0NOuomd8i+kDrc9WfR6rfSC0AD65
+ KBlMjcoY5E58Xcty1zGECxlCi8s2c595UvYVGDFNH0umsQdIJrFpbdTL0FP5v3NBFgQ+4h0
+ N9SiWL6Gkioww76ygNYNSrQtAJconPb6d09XCz/hpaAz6fCt/m+jmWNB3lUGiM3dWctllK1
+ O3Ignd1JhFvN5Ks8YPu2w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:hIZlfULOJxg=:fLkuQqNTb1EpEo+OnhFiSz
+ KpB/NQVx0vRNt4pm6N9vRBxfFYZG29B5+No+yZAs20lonUv8pBRGdnAsbPRUwM00lUEYmUNkh
+ NzNzxEHqbwyFKED3BU1mlwXIj2H46lWYayhOL3HhjXt+K9zAat9WQgC6G0JEf5qKVH7Deo5Nu
+ UNR93boD7E0aW0icFIHOUbVgISzloDu9q/WvqtRZCfNOwET3pwuhgOK1NHyB7gJ0EPnEt8L5N
+ YSGBdrz2zKnIPoLZ8uDdhTo5Oypn/e8n5wFT5C/X8rMOnQgfIK1of3yIfsCpxPacQ+SBx+/bv
+ SXkFmGR6FyGKCvS2l1NF0um2D9YjnHxTb2DKoNPVPTT7OMkLWT/3f7FguwBgEgdGoFE2GMu38
+ D/u3SW6X56J2Fe7A5ED9paQ/+JF9X62UNJcy8+r2j+IDEUnUWL6UvTNZNxpdaAj3GkF0HX4GS
+ GNYZJXBPT2OhnOndHf8ojTNkdEEEvCVLR1hdBPoaPsCJz9BCXsBEfGdyIAfzQyYdIDancn8Qc
+ sd9sRw6jpkx+cqiVf5vhHUuCisBZA8+/yGOyJdLcNQfluzIPgDJ6PBW6cORPaVIOB8V7EYDKr
+ g/tkIU6dh9bgEdby5ztVenP0Ee1New2BnL0mpHMAUth2j1qzghzFhuv5qRl961yhNHdeHwF51
+ WfWOo++pWwvDTD164QXtV4IQ8dAdsGUkmMcIdrg+iVHReqwLEJgm4odbflP5injV65gv9zUJY
+ U9UVC6sWMV+krRmZAPJX0uuff2yo+nLmzD58jcWj/v9aG09qQ/NwJ1OqyMGxsR1jksV5ZkEKQ
+ X6yz9nxlR7cswkAwOX5UbfOPT/X/XazenhZZoCvYkmeg4p6dHMOtx9px74SIlaUeqOPU/Ax
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:40:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:50:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -84,39 +83,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Michael Tokarev <mjt@tls.msk.ru>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Markus Armbruster <armbru@redhat.com>
 
-Commit 0b09be2b2f ("Nicer debug output for exceptions") added
-twice the same "Tag Overflow" entry, remove the extra one.
+Missed in commit 41fba1618b "docs/system: convert the documentation of
+deprecated features to rST."
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201011200112.3222822-1-f4bug@amsat.org>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200929075824.1517969-3-armbru@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/sparc/int32_helper.c | 1 -
- 1 file changed, 1 deletion(-)
+ target/i386/cpu.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/target/sparc/int32_helper.c b/target/sparc/int32_helper.c
-index 9a71e1abd871..ba63c739c1e8 100644
---- a/target/sparc/int32_helper.c
-+++ b/target/sparc/int32_helper.c
-@@ -50,7 +50,6 @@ static const char * const excp_names[0x80] = {
-     [TT_EXTINT | 0xd] = "External Interrupt 13",
-     [TT_EXTINT | 0xe] = "External Interrupt 14",
-     [TT_EXTINT | 0xf] = "External Interrupt 15",
--    [TT_TOVF] = "Tag Overflow",
-     [TT_CODE_ACCESS] = "Instruction Access Error",
-     [TT_DATA_ACCESS] = "Data Access Error",
-     [TT_DIV_ZERO] = "Division By Zero",
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index f37eb7b675f4..9eafbe369075 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -4127,7 +4127,8 @@ static PropValue tcg_default_props[] = {
+  * We resolve CPU model aliases using -v1 when using "-machine
+  * none", but this is just for compatibility while libvirt isn't
+  * adapted to resolve CPU model versions before creating VMs.
+- * See "Runnability guarantee of CPU models" at * qemu-deprecated.texi.
++ * See "Runnability guarantee of CPU models" at
++ * docs/system/deprecated.rst.
+  */
+ X86CPUVersion default_cpu_version = 1;
+ 
 -- 
 2.26.2
 
