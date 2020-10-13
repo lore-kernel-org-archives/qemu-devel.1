@@ -2,92 +2,94 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15B68C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:44:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B001C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:02:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 717ED20725
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:44:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59055206FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:02:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aeA+Ja8z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 717ED20725
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fho3pWYL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59055206FB
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35876 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSGqj-00073T-GD
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 05:44:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43536)
+	id 1kSH8Q-00035n-1P
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:02:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46632)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSGpQ-0006YR-L9
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:42:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36322)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kSH6u-0002YX-Dl
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:00:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56087)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSGpO-0005e1-GL
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:42:44 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kSH6r-0007X7-LV
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:00:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602582160;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=pHpfBvRnvdxcVWrRN1r6b7nQxNMLOyCYwg8NtxvOlWY=;
- b=aeA+Ja8zFHYes4EyRLwC5zFC5cctOE0HF1PnevIOvYWyATQYWlcK6hhk0HBR13Wl9NOLAY
- aung+5BvZUcamFCcIXRz3RmKGSIIfb1StZDATH8/uVeBY6SCBp4lUWyEZPx9Xnxt3FyJ/Y
- wKD4dlC0NKSKPZK3vycfcde34DCRMwM=
+ s=mimecast20190719; t=1602583244;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=YbwdHqlrRRYH7MNJtjs9dhnRF2oQrR7TupglR3DJQOw=;
+ b=Fho3pWYL8XS/HzZpbt2TY+98kb3eXrJHJ/TMTkR+yS2F09HibB/ZuALWDp86LnsaqTgM0p
+ hcu/Q4YkE7z2dKGUCV/R9q5aY/hsoVvbAg80yKktgSqdfY0OGSWj9L/Vb4bWn6ywHQzyz5
+ zNTdzzAIE4k1H4n7btkkQUG1igdtbNI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-278-NAtXICkzPc2SrZq4q_-oGw-1; Tue, 13 Oct 2020 05:42:39 -0400
-X-MC-Unique: NAtXICkzPc2SrZq4q_-oGw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-339-glvfoewAMRWQXlO2EwMbEA-1; Tue, 13 Oct 2020 06:00:42 -0400
+X-MC-Unique: glvfoewAMRWQXlO2EwMbEA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2BF9802B60;
- Tue, 13 Oct 2020 09:42:36 +0000 (UTC)
-Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 22CEB6EF41;
- Tue, 13 Oct 2020 09:42:18 +0000 (UTC)
-Date: Tue, 13 Oct 2020 10:42:16 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Subject: Re: [PATCH v4] introduce vfio-user protocol specification
-Message-ID: <20201013094216.GF70612@redhat.com>
-References: <1594984851-59327-1-git-send-email-thanos.makatos@nutanix.com>
- <1600180157-74760-1-git-send-email-thanos.makatos@nutanix.com>
- <20200924082132.GJ62770@stefanha-x1.localdomain>
- <MW2PR02MB37232E78343B164C2405AC248B350@MW2PR02MB3723.namprd02.prod.outlook.com>
- <20200929103743.GB181609@stefanha-x1.localdomain>
- <2E6DF2C2-A3C3-404D-BB2E-B53B3555EB66@oracle.com>
- <20200930142408.GA320669@stefanha-x1.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 94F92879511;
+ Tue, 13 Oct 2020 10:00:40 +0000 (UTC)
+Received: from localhost (ovpn-114-249.ams2.redhat.com [10.36.114.249])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EBAD819C71;
+ Tue, 13 Oct 2020 10:00:39 +0000 (UTC)
+Date: Tue, 13 Oct 2020 11:00:33 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Zhenyu Ye <yezhenyu2@huawei.com>
+Subject: Re: [PATCH v1 0/2] Add timeout mechanism to qmp actions
+Message-ID: <20201013100033.GB164611@stefanha-x1.localdomain>
+References: <20200810153811.GF14538@linux.fritz.box>
+ <c6d75e49-3e36-6a76-fdc8-cdf09e7c3393@huawei.com>
+ <20200914132738.GL579094@stefanha-x1.localdomain>
+ <7ad220bd-7ee5-1f66-b2e5-7dc57d72eb2e@huawei.com>
+ <20200917154415.GB839531@stefanha-x1.localdomain>
+ <20200917160054.GA2453251@dev>
+ <5a5822ec-f3bc-a247-2b5a-f764b941c820@huawei.com>
+ <20200918140628.GA2509473@dev>
+ <1ba06b0d-3fcf-3676-f9e0-52875851ff19@huawei.com>
+ <20200921111435.GA2524022@dev>
 MIME-Version: 1.0
-In-Reply-To: <20200930142408.GA320669@stefanha-x1.localdomain>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20200921111435.GA2524022@dev>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="yEPQxsgoJgBvi8ip"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,125 +103,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: "benjamin.walker@intel.com" <benjamin.walker@intel.com>,
- John G Johnson <john.g.johnson@oracle.com>,
- Swapnil Ingle <swapnil.ingle@nutanix.com>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "tina.zhang@intel.com" <tina.zhang@intel.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "james.r.harris@intel.com" <james.r.harris@intel.com>,
- "elena.ufimtseva@oracle.com" <elena.ufimtseva@oracle.com>,
- "Kanth.Ghatraju@oracle.com" <Kanth.Ghatraju@oracle.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- "marcandre.lureau@redhat.com" <marcandre.lureau@redhat.com>,
- "konrad.wilk@oracle.com" <konrad.wilk@oracle.com>,
- "yuvalkashtan@gmail.com" <yuvalkashtan@gmail.com>,
- "dgilbert@redhat.com" <dgilbert@redhat.com>,
- "ismael@linux.com" <ismael@linux.com>,
- "changpeng.liu@intel.com" <changpeng.liu@intel.com>,
- "tomassetti.andrea@gmail.com" <tomassetti.andrea@gmail.com>,
- "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>,
- "xiuchun.lu@intel.com" <xiuchun.lu@intel.com>,
- Thanos Makatos <thanos.makatos@nutanix.com>
+Cc: fam@euphon.net, Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, armbru@redhat.com,
+ pbonzini@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Sep 30, 2020 at 03:24:08PM +0100, Stefan Hajnoczi wrote:
-> On Tue, Sep 29, 2020 at 09:21:54AM -0700, John G Johnson wrote:
-> > > On Sep 29, 2020, at 3:37 AM, Stefan Hajnoczi <stefanha@redhat.com> wrote:
-> > > 
-> > > On Mon, Sep 28, 2020 at 09:58:37AM +0000, Thanos Makatos wrote:
-> > >>> It should be accompanied by a test in tests/. PCI-level testing APIS for
-> > >>> BARs, configuration space, interrupts, etc are available in
-> > >>> tests/qtest/libqos/pci.h. The test case needs to include a vfio-user
-> > >>> device backend interact with QEMU's vfio-user-pci implementation.
-> > >> 
-> > >> We plan to use a libmuser-based backend for testing. This, I suppose, will
-> > >> make libmuser a dependency of QEMU (either as a submodule or as a library),
-> > >> which for now can be disabled in the default configuration. Is this acceptable?
-> > > 
-> > > If there are no other dependencies and libmuser supports all host
-> > > operating systems that QEMU's -device vfio-user supports, then I think
-> > > it's a good idea to use libmuser for at least one in-tree test in QEMU.
-> > > 
-> > >>> Also please let us know who is working on what so additional people can
-> > >>> get involved in areas that need work!
-> > >> 
-> > >> Swapnil and I will be working on libmuser and the test in QEMU, John and
-> > >> the mp-qemu folks will be working on the patches for implementing
-> > >> --device vfio-user-pci.
-> > > 
-> > > Great!
-> > > 
-> > > John: Will mpqemu use libmuser to implement the remote PCI host
-> > > controller?
-> > > 
-> > 
-> > 
-> > 	The vfio-user-pci plan is to use libmuser on the server side.
-> 
-> Okay. Using libmuser in tests seems like a good choice in that case.
-> 
-> We'll need to figure out the details of how to do it because the
-> traditional shared library dependency approach is not well-suited to
-> in-development code. It would involve shipping libmuser distro packages
-> so QEMU's build system can declare a library dependency (with details
-> provided in a pkg-config file).
-> 
-> Here are approaches that are better for in-development libraries:
-> 1. Keep the libmuser code in qemu.git.
-> 2. A copy of libmuser in qemu.git with changes being sent upstream
->    (allows more flexibility in case QEMU-specific issues require
->    experimentation).
-> 3. Git submodules.
-> 
-> #1 if you're happy to use the QEMU development process for merging
-> libmuser code then it's easiest to officially host the code in qemu.git.
-> libmuser gets a subdirectory in the qemu.git tree and you (the
-> maintainers) send pull requests. A libmuser library build target
-> provides installable static and shared libraries so external
-> applications can link against libmuser too. The big advantage here is
-> that QEMU can instantly use the latest libmuser code changes.
-> 
-> #2 works best if the library is a small (just a few source files) with
-> no fancy build system requirements.
-> 
-> #3 is used in QEMU for several other components. Submodules are a pain
-> to sync (requires sending a qemu.git patch to move to a new commit ID),
-> so this isn't good for a dependency that moves quickly.
+--yEPQxsgoJgBvi8ip
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I don't think this is actually downside. If anything I think submodules
-I think it would actually let libmuser develop faster.
+On Mon, Sep 21, 2020 at 11:14:35AM +0000, Fam Zheng wrote:
+> On 2020-09-19 10:22, Zhenyu Ye wrote:
+> > On 2020/9/18 22:06, Fam Zheng wrote:
+> > >=20
+> > > I can see how blocking in a slow io_submit can cause trouble for main
+> > > thread. I think one way to fix it (until it's made truly async in new
+> > > kernels) is moving the io_submit call to thread pool, and wrapped in =
+a
+> > > coroutine, perhaps.
+> > >
+> >=20
+> > I'm not sure if any other operation will block the main thread, other
+> > than io_submit().
+>=20
+> Then that's a problem with io_submit which should be fixed. Or more
+> precisely, that is a long held lock that we should avoid in QEMU's event
+> loops.
+>=20
+> >=20
+> > > I'm not sure qmp timeout is a complete solution because we would stil=
+l
+> > > suffer from a blocked state for a period, in this exact situation bef=
+ore
+> > > the timeout.
+> >=20
+> > Anyway, the qmp timeout may be the last measure to prevent the VM
+> > soft lockup.=20
+>=20
+> Maybe, but I don't think baking such a workaround into the QMP API is a
+> good idea. No QMP command should be synchronously long running, so
+> having a timeout parameter is just a wrong design.
 
-QEMU is such a large project with high volume patches, that changes
-take a long time to merge, even when everything is working well.
+Sorry, I lost track of this on-going email thread.
 
-I think libmuser would have much faster development velocity if
-the bit flowing into qemu.git was only as the trivial submodule
-hash updates, as opposed to every single libmuser functional patch.
+Thanks for the backtrace. It shows the io_submit call is done while the
+AioContext lock is held. The monitor thread is waiting for the
+IOThread's AioContext lock. vcpus threads can get stuck waiting on the
+big QEMU lock (BQL) that is held by the monitor in the meantime.
 
-Maintaining libmuser as a standalone git repo avoids need for
-libmuser to tie itself to QEMU's release cycle or processes. In
-particular it means libmuser could opt to use a modern development
-workflow using a GitForge with merge requests, instead of the
-legacy email workflow.
+Please collect the kernel backtrace for io_submit so we can understand
+why multi-second io_submit latencies happen.
 
-Especially if we're considering libmuser to be consumed by non-QEMU
-codebases, then long term it almost certainly should be a standalone
-project. With this in mind, I think it will be better for libmuser
-to start off as a standalone project straight away, so it can build
-up its developer community organically, and not have people put off
-contributing by the QEMU firehose.
+I also suggest trying aio=3Dio_uring to check if Linux io_uring avoids the
+latency problem.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Stefan
+
+--yEPQxsgoJgBvi8ip
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+FesEACgkQnKSrs4Gr
+c8i3pAf/ezXLphSNBwped4Dm56Gzi/vmLqRAUuv7KZCjyEjjeu9+GMxpq+TvKDJ6
+NTw5WYCUP1EEbjB/JPPkDSDfMH0c1Z+zESY20fHMfQj72eIMtHfwZM4Tfq7JBgQ5
+70e8kTWTq5WjJCRp1q6RGBMPPSGdQkj3Y5vYOTRrG5PxAM/cKNvvaUiJkGwggKws
+cTpkHoa4MStm+SYq0BSq3xGZ4AslAQRLlY3eZTOKjOKo8HzY+P/FwUff+uRMyAeW
+4w+iFAWlOO/hWZodYSF8gg9cZZPxixASPatgybbrWC7yL9F5+u/94jkQMpgWWNR3
+oxBpHIz/6OfWntlJTTNV90qjKcxMaQ==
+=J1st
+-----END PGP SIGNATURE-----
+
+--yEPQxsgoJgBvi8ip--
 
 
