@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71C6DC43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 21:50:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D18C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 21:52:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF35920872
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 21:50:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E545520872
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 21:52:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="YXnQteqd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF35920872
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="EvyngeXf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E545520872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSSC9-0006lh-Rw
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 17:50:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47208)
+	id 1kSSE6-0000Wj-2j
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 17:52:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=5487bf209=dmitry.fomichev@wdc.com>)
- id 1kSS49-0005kY-U2; Tue, 13 Oct 2020 17:42:45 -0400
-Received: from esa3.hgst.iphmx.com ([216.71.153.141]:45657)
+ id 1kSS4I-0005ls-OR; Tue, 13 Oct 2020 17:42:54 -0400
+Received: from esa3.hgst.iphmx.com ([216.71.153.141]:45668)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=5487bf209=dmitry.fomichev@wdc.com>)
- id 1kSS46-0001p9-9f; Tue, 13 Oct 2020 17:42:41 -0400
+ id 1kSS4D-0001pq-3Y; Tue, 13 Oct 2020 17:42:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1602625358; x=1634161358;
+ t=1602625365; x=1634161365;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=HYiq0JK4dRwQV6ig2IjA1t2BEXwoUc+F9PcNVyweUws=;
- b=YXnQteqdImDjgJSDAgXUowp48JMG3Go8D8egOSjS9Ss1W+EGGxV2KQ3g
- Y0sX+IUebZFVc5LXtoLuYnOox+7vPT+0BY+WjNy1MCkg0aUlx3xb78Auh
- L6nJ7ZJOlfgThSYo+8LPAhXMHIOCoEm02VYH3Fg0y5HKKgZsCpryceDY4
- rU7BSCKyL1GLCD9xgEf5HMP+CGrX6HRyzM/MBdf3QAtQfoEJyxVZojVm7
- FlI1yZ4R4gUhg+cxVbZwTqK8p6FygXOR5ViROwNzv0Wux+k18ifu0FahV
- AW7BTa7wnOAKKnoY8EEPbqn+JrKkRVCQcQyuS2JYrJzAe1XOiDUTRDqMp A==;
-IronPort-SDR: ZbzC3cobtEbj8wUdkABcuXSyIrTQeUjF0bcLOkx+XDKn1vJK19x/VjrfHgAUJqOwOx9L2OQWiN
- rFj7kKlBc0zZjpKdqwAubjP/5mrwHkhIHwoLuU9JVnRn3Dy2pAo27urEH11k/3vY6IkGXuN3LC
- GENWPTEkFDajUYybuRAgc+cjYyzVbL7UGoDKjT6f9yFlYZmX252L+b+QZ6YvKSl614WqLWfQ28
- jKbnxh2CicRAO6I8xqVTL7ikhJaGRKB67nKKK/w6q0UWxhcAU8Vib63pzaSRVTcprDEPcEQE3l
- toQ=
-X-IronPort-AV: E=Sophos;i="5.77,371,1596470400"; d="scan'208";a="154185940"
+ bh=Jmy6lOf0uhPRj3UWh5BdGhIe9Lpks0HLFlW28E7Zylw=;
+ b=EvyngeXf0gRCNsfAxRoRid59TLEilYc/jbGlN73vX9I855yAEZ13ZvlD
+ ASokwTcZXi0sgPA3ISqhcUolvUW9QryJXhNag/Yt6crnrO9AxmIwsI+lw
+ B1dn2Jmw+88frTCJtuefh+B5cM+011u3LoIU1qNqWvJo00yGWHiKkSs7L
+ Kjjw9nj70cS889JKPDCOFqJmetzEOFb4m4mBNYP7JLsmnmfQOsdzGjd+c
+ dSrWeuh9QWK8ByxmVkHH2hlGZiRzrWsoBrtFp47B8teCtlADy7re6Ih9I
+ 09eB5SCORGl+JPFRovRqhcpAnKfa+DRJO2WE/l3Wwum2Nt8/Hchfgc1dy w==;
+IronPort-SDR: nepO8RAW8Qr71kyF8b5qliNdHOQ8x/uz5wJBGdf7apL7yW3fo3nNliIu9uip/IRhtgMocN4Nud
+ cppwdRfjGDT4xc2mtAfymsHVWazdRy8GpVms38jufMA0i9N8osqTMa94Gp4LDoC29wi6JLCKtL
+ TWmLg1hG0CakN60HIgypkAQfaHEXYMCazW10YSphuO0geSd+aulCAkh/jXmOhbCmPO+Vl3KRJJ
+ P4Awwfu4R1b/Ml8EPZJBJ3VXw9cITdsavWZq/T5qqySHhWFbsNeQcADbCn8ZK43w2zpp4AOYQW
+ a0M=
+X-IronPort-AV: E=Sophos;i="5.77,371,1596470400"; d="scan'208";a="154185945"
 Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 14 Oct 2020 05:42:37 +0800
-IronPort-SDR: uUm5oWQTKCbO13xx63WkqMsbjmulaubNm3lpwD2EABtfw4iX8lmbNXVfyvX/BYXgAXj3swnko8
- IfJYLXhm5pzDkpR81cntYt2nDZM4tlpwL9ykWdV17jbIIH1WfHxIQRlg2dV7ThCXFSzHK0CNT0
- 58meP3g/zdz2Jnzo+XYlQWIOa2gjwHSkyK8n8fj9gtz86NoZ7y6oW7QFCWxjq+r4aCjtMRwFSC
- vZNaIvTupyoTj12mzfydKN8l5Gb8cVkSDhwOs5jhgQrSKd3TDW1GaxUh152jVdgDoLswoqBPlP
- 293I5lTs29nuAqaLYaJStEsl
+ by ob1.hgst.iphmx.com with ESMTP; 14 Oct 2020 05:42:43 +0800
+IronPort-SDR: Lv3u0XX1CYqpEUqHnDjOh2F47HOxS37GGkCiWiuv2T23ghiPqqSsoskwrkYY2s17AKMmnTW9ko
+ utDA+ZNoc+1ToxfQm5eSTXqDE+fW7SKIVHLQv1mifh8TkiUYQ8LJ3DUFPvd5PTZhI+ebmAEBS1
+ CDL1c3l85VqlxCc0y7CdselMO4GkgLbwiAHq3DJMtwVDXJvEyjMkZabU8yGjjV7InYCFDjipkr
+ GYuyaX02j2djPhPI2H7YPXmVWfbViujt8mIGu9/XSLmrQuQwhW9I6MFdBmpl0Ys3OORZNcKpaM
+ D17Q+lpT1VhkkBfV6EZxAW4y
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 13 Oct 2020 14:29:10 -0700
-IronPort-SDR: EvFUMEPrO/1mkt6j+ljpg8Z8ju8ltTzQTtbc0sVUPxNaIc0vLJaIXNSpRHVo2YCkPZmsKuppw6
- Ty6UD7DzshCsu+v47/xUAs/J5lpfC70xa9MLqT3u2TXviDYj90LR7LoTnBuhVxpE2JSP4WKf3o
- jr+eVGRW+MS5lkWF13ul/RiKu1haFOqVSdLsSkhtw6Mb872MW1myMZE130c+PcIvoQQWtVM43x
- gTtTFHTT1WXpVBBCFvdOQUYf8ufhPs/mVBMQiUE80rTWbpgkB+xeBgiABuXDffD3KSIBwRTwfb
- oOA=
+ 13 Oct 2020 14:29:17 -0700
+IronPort-SDR: sDx5smsGZ+Sl6YcIw8XjQrL+ylFlfRjgVZ+mqavS+T8kMkSE3DK5lX//ZOUKy15NEV0ZoEkea9
+ ICxD4cM7GM8ziY4b95M4xjmWbM557Pda7i3D7eZNdM+q4Hr/ZZGr+sRGMrGcND/JFWyqOpMl3L
+ JA3z5nuyiCpqJ+VT4BYKXD98+d0HEXzEKXezC3UWBadAGDK1WmWB6ZgePrO0ZONUEsOAlce/kZ
+ fZFR0WNGm6VlBSJXNboGp71SjmyOdtL+UzmInaQaznr2qcnfuM5SOMa1W9brdLG7++6PNMIG8I
+ aww=
 WDCIronportException: Internal
 Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 13 Oct 2020 14:42:35 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 13 Oct 2020 14:42:41 -0700
 From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
  Kevin Wolf <kwolf@redhat.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
  Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v6 08/11] hw/block/nvme: Add injection of Offline/Read-Only
- zones
-Date: Wed, 14 Oct 2020 06:42:09 +0900
-Message-Id: <20201013214212.2152-9-dmitry.fomichev@wdc.com>
+Subject: [PATCH v6 11/11] hw/block/nvme: Merge nvme_write_zeroes() with
+ nvme_write()
+Date: Wed, 14 Oct 2020 06:42:12 +0900
+Message-Id: <20201013214212.2152-12-dmitry.fomichev@wdc.com>
 X-Mailer: git-send-email 2.21.0
 In-Reply-To: <20201013214212.2152-1-dmitry.fomichev@wdc.com>
 References: <20201013214212.2152-1-dmitry.fomichev@wdc.com>
@@ -117,141 +117,157 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-ZNS specification defines two zone conditions for the zones that no
-longer can function properly, possibly because of flash wear or other
-internal fault. It is useful to be able to "inject" a small number of
-such zones for testing purposes.
-
-This commit defines two optional device properties, "offline_zones"
-and "rdonly_zones". Users can assign non-zero values to these variables
-to specify the number of zones to be initialized as Offline or
-Read-Only. The actual number of injected zones may be smaller than the
-requested amount - Read-Only and Offline counts are expected to be much
-smaller than the total number of zones on a drive.
+nvme_write() now handles WRITE, WRITE ZEROES and ZONE_APPEND.
 
 Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
 ---
- hw/block/nvme-ns.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++
- hw/block/nvme-ns.h |  2 ++
- 2 files changed, 66 insertions(+)
+ hw/block/nvme.c       | 95 +++++++++++++------------------------------
+ hw/block/trace-events |  1 -
+ 2 files changed, 28 insertions(+), 68 deletions(-)
 
-diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
-index 255ded2b43..d050f97909 100644
---- a/hw/block/nvme-ns.c
-+++ b/hw/block/nvme-ns.c
-@@ -21,6 +21,7 @@
- #include "sysemu/sysemu.h"
- #include "sysemu/block-backend.h"
- #include "qapi/error.h"
-+#include "crypto/random.h"
- 
- #include "hw/qdev-properties.h"
- #include "hw/qdev-core.h"
-@@ -132,6 +133,32 @@ static int nvme_calc_zone_geometry(NvmeNamespace *ns, Error **errp)
-         return -1;
-     }
- 
-+    if (ns->params.zd_extension_size) {
-+        if (ns->params.zd_extension_size & 0x3f) {
-+            error_setg(errp,
-+                "zone descriptor extension size must be a multiple of 64B");
-+            return -1;
-+        }
-+        if ((ns->params.zd_extension_size >> 6) > 0xff) {
-+            error_setg(errp, "zone descriptor extension size is too large");
-+            return -1;
-+        }
-+    }
-+
-+    if (ns->params.max_open_zones < nz) {
-+        if (ns->params.nr_offline_zones > nz - ns->params.max_open_zones) {
-+            error_setg(errp, "offline_zones value %u is too large",
-+                ns->params.nr_offline_zones);
-+            return -1;
-+        }
-+        if (ns->params.nr_rdonly_zones >
-+            nz - ns->params.max_open_zones - ns->params.nr_offline_zones) {
-+            error_setg(errp, "rdonly_zones value %u is too large",
-+                ns->params.nr_rdonly_zones);
-+            return -1;
-+        }
-+    }
-+
-     return 0;
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 1186c16b50..1c164f1d80 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1529,53 +1529,7 @@ invalid:
+     return status | NVME_DNR;
  }
  
-@@ -140,7 +167,9 @@ static void nvme_init_zone_state(NvmeNamespace *ns)
-     uint64_t start = 0, zone_size = ns->zone_size;
-     uint64_t capacity = ns->num_zones * zone_size;
-     NvmeZone *zone;
-+    uint32_t rnd;
-     int i;
-+    uint16_t zs;
+-static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+-{
+-    NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+-    NvmeNamespace *ns = req->ns;
+-    uint64_t slba = le64_to_cpu(rw->slba);
+-    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
+-    NvmeZone *zone;
+-    uint64_t offset = nvme_l2b(ns, slba);
+-    uint32_t count = nvme_l2b(ns, nlb);
+-    BlockBackend *blk = ns->blkconf.blk;
+-    uint16_t status;
+-
+-    trace_pci_nvme_write_zeroes(nvme_cid(req), nvme_nsid(ns), slba, nlb);
+-
+-    status = nvme_check_bounds(n, ns, slba, nlb);
+-    if (status) {
+-        trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
+-        return status;
+-    }
+-
+-    if (ns->params.zoned) {
+-        zone = nvme_get_zone_by_slba(ns, slba);
+-
+-        status = nvme_check_zone_write(n, ns, zone, slba, nlb, false);
+-        if (status != NVME_SUCCESS) {
+-            goto invalid;
+-        }
+-
+-        status = nvme_auto_open_zone(ns, zone);
+-        if (status != NVME_SUCCESS) {
+-            goto invalid;
+-        }
+-
+-        req->cqe.result64 = nvme_advance_zone_wp(ns, zone, nlb);
+-    }
+-
+-    block_acct_start(blk_get_stats(blk), &req->acct, 0, BLOCK_ACCT_WRITE);
+-    req->aiocb = blk_aio_pwrite_zeroes(blk, offset, count,
+-                                       BDRV_REQ_MAY_UNMAP, nvme_rw_cb, req);
+-    return NVME_NO_COMPLETE;
+-
+-invalid:
+-    block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_WRITE);
+-    return status | NVME_DNR;
+-}
+-
+-static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool append)
++static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool append, bool wrz)
+ {
+     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
+     NvmeNamespace *ns = req->ns;
+@@ -1590,10 +1544,12 @@ static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool append)
+     trace_pci_nvme_write(nvme_cid(req), nvme_io_opc_str(rw->opcode),
+                          nvme_nsid(ns), nlb, data_size, slba);
  
-     ns->zone_array = g_malloc0(ns->zone_array_size);
-     if (ns->params.zd_extension_size) {
-@@ -167,6 +196,37 @@ static void nvme_init_zone_state(NvmeNamespace *ns)
-         zone->w_ptr = start;
-         start += zone_size;
+-    status = nvme_check_mdts(n, data_size);
+-    if (status) {
+-        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
+-        goto invalid;
++    if (!wrz) {
++        status = nvme_check_mdts(n, data_size);
++        if (status) {
++            trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
++            goto invalid;
++        }
      }
-+
-+    /* If required, make some zones Offline or Read Only */
-+
-+    for (i = 0; i < ns->params.nr_offline_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), NULL);
-+            rnd %= ns->num_zones;
-+        } while (rnd < ns->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_OFFLINE);
-+        } else {
-+            i--;
+ 
+     status = nvme_check_bounds(n, ns, slba, nlb);
+@@ -1628,21 +1584,26 @@ static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool append)
+ 
+     data_offset = nvme_l2b(ns, slba);
+ 
+-    status = nvme_map_dptr(n, data_size, req);
+-    if (status) {
+-        goto invalid;
+-    }
++    if (!wrz) {
++        status = nvme_map_dptr(n, data_size, req);
++        if (status) {
++            goto invalid;
 +        }
-+    }
-+
-+    for (i = 0; i < ns->params.nr_rdonly_zones; i++) {
-+        do {
-+            qcrypto_random_bytes(&rnd, sizeof(rnd), NULL);
-+            rnd %= ns->num_zones;
-+        } while (rnd < ns->params.max_open_zones);
-+        zone = &ns->zone_array[rnd];
-+        zs = nvme_get_zone_state(zone);
-+        if (zs != NVME_ZONE_STATE_OFFLINE &&
-+            zs != NVME_ZONE_STATE_READ_ONLY) {
-+            nvme_set_zone_state(zone, NVME_ZONE_STATE_READ_ONLY);
+ 
+-    data_offset = nvme_l2b(ns, slba);
+-
+-    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
+-                     BLOCK_ACCT_WRITE);
+-    if (req->qsg.sg) {
+-        req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
+-                                   BDRV_SECTOR_SIZE, nvme_rw_cb, req);
++        block_acct_start(blk_get_stats(blk), &req->acct, data_size,
++                         BLOCK_ACCT_WRITE);
++        if (req->qsg.sg) {
++            req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
++                                       BDRV_SECTOR_SIZE, nvme_rw_cb, req);
 +        } else {
-+            i--;
++            req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
++                                         nvme_rw_cb, req);
 +        }
-+    }
- }
+     } else {
+-        req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
+-                                     nvme_rw_cb, req);
++        block_acct_start(blk_get_stats(blk), &req->acct, 0, BLOCK_ACCT_WRITE);
++        req->aiocb = blk_aio_pwrite_zeroes(blk, data_offset, data_size,
++                                           BDRV_REQ_MAY_UNMAP, nvme_rw_cb,
++                                           req);
+     }
+     return NVME_NO_COMPLETE;
  
- static int nvme_zoned_init_ns(NvmeCtrl *n, NvmeNamespace *ns, int lba_index,
-@@ -360,6 +420,10 @@ static Property nvme_ns_props[] = {
-     DEFINE_PROP_UINT32("max_open", NvmeNamespace, params.max_open_zones, 0),
-     DEFINE_PROP_UINT32("zone_descr_ext_size", NvmeNamespace,
-                        params.zd_extension_size, 0),
-+    DEFINE_PROP_UINT32("offline_zones", NvmeNamespace,
-+                       params.nr_offline_zones, 0),
-+    DEFINE_PROP_UINT32("rdonly_zones", NvmeNamespace,
-+                       params.nr_rdonly_zones, 0),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
-index 2d70a13701..d65d8b0930 100644
---- a/hw/block/nvme-ns.h
-+++ b/hw/block/nvme-ns.h
-@@ -37,6 +37,8 @@ typedef struct NvmeNamespaceParams {
-     uint32_t max_active_zones;
-     uint32_t max_open_zones;
-     uint32_t zd_extension_size;
-+    uint32_t nr_offline_zones;
-+    uint32_t nr_rdonly_zones;
- } NvmeNamespaceParams;
- 
- typedef struct NvmeNamespace {
+@@ -2126,11 +2087,11 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
+     case NVME_CMD_FLUSH:
+         return nvme_flush(n, req);
+     case NVME_CMD_WRITE_ZEROES:
+-        return nvme_write_zeroes(n, req);
++        return nvme_write(n, req, false, true);
+     case NVME_CMD_ZONE_APPEND:
+-        return nvme_write(n, req, true);
++        return nvme_write(n, req, true, false);
+     case NVME_CMD_WRITE:
+-        return nvme_write(n, req, false);
++        return nvme_write(n, req, false, false);
+     case NVME_CMD_READ:
+         return nvme_read(n, req);
+     case NVME_CMD_ZONE_MGMT_SEND:
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index 7ee90a50c3..5a3cd4c5dc 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -43,7 +43,6 @@ pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opna
+ pci_nvme_read(uint16_t cid, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+ pci_nvme_write(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+ pci_nvme_rw_cb(uint16_t cid, const char *blkname) "cid %"PRIu16" blk '%s'"
+-pci_nvme_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
+ pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
+ pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
 -- 
 2.21.0
 
