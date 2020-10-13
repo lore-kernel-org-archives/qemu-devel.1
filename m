@@ -2,96 +2,64 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F16DC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:23:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69988C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:26:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 48805207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:23:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lr908fvi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 48805207C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id C48D9207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 08:26:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C48D9207C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSFar-0006sF-BQ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 04:23:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53158)
+	id 1kSFds-0008Pg-Iy
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 04:26:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSFZw-00069b-RP; Tue, 13 Oct 2020 04:22:40 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:36514)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSFZu-0003Df-PU; Tue, 13 Oct 2020 04:22:40 -0400
-Received: by mail-wm1-x342.google.com with SMTP id e2so20824271wme.1;
- Tue, 13 Oct 2020 01:22:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=h1E2HVic7xBh6Dv/vkSYBNUycLf7aL4E08DCiV+4DuM=;
- b=lr908fvi2z0y6gQ+AbecEGAqGgXHzH1C08STQnODk7S92Zp2drVW9wEQVMYog9SsoH
- KOyYRuPcqBNKMq9CuaLaZcy0tdKa7R0tNhOfbEsJQsd45lTWJfwCt3QJB2z+TM+qcTMP
- csxX0suMlg2NoU8tiUHuDMaADZ8+5EUSm3eQnVzYcBoq0DDEffDWsUQMgFrVhGpSAbKR
- CW3eC/IVUnKBEH4w6OkFgWua88l2rb34nxG3TFzex3RiYSpCLjAu0RnG3fSabY5TLAiq
- r9lK81JZeHFsfcoEzZ9zMXaLk24jNwrwRaDjlgKNqZHJAs0FAmmlqHi5X+3zFMlXsIea
- IkeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=h1E2HVic7xBh6Dv/vkSYBNUycLf7aL4E08DCiV+4DuM=;
- b=PCB9/JxkuL5RLKiS9kWQBC/bV6lZW6EW/mayYNt5oMhwxGXEVPCJBYZJFH8mUwhJDY
- BZQwfcfExKhyhAJgy0+BjdDYKfWcnV2jKSROV/S0iEyrFUIYjxFzTN9Vm7MYdFIcb39S
- 58yPLd4OVXmV+QPh4I/p2AAcCtdWkU9decCZXmuIic4Bgr6JYJcRB3lLF85i5FVO17hH
- QyWkNu6yKS+uBkQ1E+Tptf6LIPmhAqdEaoQVak5czhxVSBdtVOQK1EqsZiy+K7V/o+Ap
- 2t4vXAvnFO3LiSljvwbbOkKGycSrf/kW8RAEVbPM0BDb4RnpwcfgljbffJ+1lzRcQKhS
- p1uw==
-X-Gm-Message-State: AOAM531jJqSf954kDZQMJKkl62bKw4DF671+Y+rY9/7FKw6uSN7W5Tm0
- RuDYjvHE0+NegDQwCQ5Pj9Q=
-X-Google-Smtp-Source: ABdhPJx5rOBC8YVSo8jiyNaXxZyph+CyVmG0RQ7d0QuSB4gDJGORHNSd+ki7P9A2KMijMwtfYJYB9w==
-X-Received: by 2002:a1c:9e0e:: with SMTP id h14mr14258587wme.18.1602577355716; 
- Tue, 13 Oct 2020 01:22:35 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id z11sm27610905wrh.70.2020.10.13.01.22.33
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 01:22:34 -0700 (PDT)
-Subject: Re: [PATCH 07/10] tcg: implement bulletproof JIT
-To: Joelle van Dyne <j@getutm.app>, qemu-devel@nongnu.org
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-8-j@getutm.app>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <f836dc90-99bc-d3ce-dd33-e0d51bb4b979@amsat.org>
-Date: Tue, 13 Oct 2020 10:22:33 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSFbo-0007Ws-1M
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 04:24:36 -0400
+Received: from mx2.suse.de ([195.135.220.15]:33796)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSFbk-0003Mw-BR
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 04:24:35 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 363A6AECE;
+ Tue, 13 Oct 2020 08:24:31 +0000 (UTC)
+Subject: Re: [PATCH v2 3/3] replay: do not build if TCG is not available
+To: Paolo Bonzini <pbonzini@redhat.com>
+References: <20201012214527.1780-1-cfontana@suse.de>
+ <20201012214527.1780-4-cfontana@suse.de>
+ <22f05da9-311b-d8e7-0052-2163f9e6c1e8@redhat.com>
+ <0c9eb5ef-5817-06f6-f622-09cb9a22505e@suse.de>
+ <2fb23024-6a20-2d0e-19e9-21e648212308@redhat.com>
+From: Claudio Fontana <cfontana@suse.de>
+Message-ID: <8ebae20b-7d10-0cf0-6bb3-5dc62d40fc02@suse.de>
+Date: Tue, 13 Oct 2020 10:24:30 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201012232939.48481-8-j@getutm.app>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <2fb23024-6a20-2d0e-19e9-21e648212308@redhat.com>
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:21:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,78 +72,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- "open list:RISC-V TCG target" <qemu-riscv@nongnu.org>,
- Stefan Weil <sw@weilnetz.de>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- "open list:S390 TCG target" <qemu-s390x@nongnu.org>,
- "open list:AArch64 TCG target" <qemu-arm@nongnu.org>,
- Palmer Dabbelt <palmer@dabbelt.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Huacai Chen <chenhc@lemote.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Joelle,
-
-On 10/13/20 1:29 AM, Joelle van Dyne wrote:
-> From: osy <osy86@users.noreply.github.com>
+On 10/13/20 10:05 AM, Paolo Bonzini wrote:
+> On 13/10/20 09:56, Claudio Fontana wrote:
+>> Hi Paolo,
+>>
+>> On 10/13/20 12:29 AM, Paolo Bonzini wrote:
+>>> On 12/10/20 23:45, Claudio Fontana wrote:
+>>>> +    ctx = blk_get_aio_context(blk);
+>>>> +    if (!replay_bh_schedule_oneshot_event(ctx, error_callback_bh, acb)) {
+>>>> +        /* regular case without replay */
+>>>> +        aio_bh_schedule_oneshot(ctx, error_callback_bh, acb);
+>>>> +    }
+>>>
+>>> Why can't the stub just call aio_bh_schedule_oneshot?  
+>>
+>> Absolutely, it can, I just considered the option and dropped it in the end.
+>>
+>>> This makes the API even more complicated.
+>>
+>> In my view not really, the API just returns a boolean that tells you if the event was consumed or not.
 > 
-> On iOS, we cannot allocate RWX pages without special entitlements. As a
-> workaround, we can a RX region and then mirror map it to a separate RX
-> region. Then we can write to one region and execute from the other one.
+> The question to ask is, is there _any_ other way to use 
+> replay_bh_schedule_oneshot_event other than
 > 
-> To better keep track of pointers to RW/RX memory, we mark any tcg_insn_unit
-> pointers as `const` if they will never be written to. We also define a new
-> macro `TCG_CODE_PTR_RW` that returns a pointer to RW memory. Only the
-> difference between the two regions is stored in the TCG context.
-
-^ one change,
-
-v another change. Consider splitting in 2 patches to ease review.
-
+>     if (!replay_bh_schedule_oneshot_event(ctx, error_callback_bh, acb)) {
+>         aio_bh_schedule_oneshot(ctx, error_callback_bh, acb);
+>     }
 > 
-> To ensure cache coherency, we flush the data cache in the RW mapping and
-> then invalidate the instruction cache in the RX mapping (where applicable).
-> Because data cache flush is OS defined on some architectures, we do not
-> provide implementations for non iOS platforms (ARM/x86).
+> and I think there isn't.  Your point of avoiding functional code in the stubs
+> is also valid though.
 > 
-> Signed-off-by: Joelle van Dyne <j@getutm.app>
-> ---
->   accel/tcg/cpu-exec.c         |  7 +++-
->   accel/tcg/translate-all.c    | 78 ++++++++++++++++++++++++++++++++++--
->   configure                    |  1 +
->   docs/devel/ios.rst           | 40 ++++++++++++++++++
->   include/exec/exec-all.h      |  8 ++++
->   include/tcg/tcg.h            | 18 +++++++--
->   tcg/aarch64/tcg-target.c.inc | 48 +++++++++++++---------
->   tcg/aarch64/tcg-target.h     | 13 +++++-
->   tcg/arm/tcg-target.c.inc     | 33 ++++++++-------
->   tcg/arm/tcg-target.h         |  9 ++++-
->   tcg/i386/tcg-target.c.inc    | 28 ++++++-------
->   tcg/i386/tcg-target.h        | 24 ++++++++++-
->   tcg/mips/tcg-target.c.inc    | 64 +++++++++++++++++------------
->   tcg/mips/tcg-target.h        |  8 +++-
->   tcg/ppc/tcg-target.c.inc     | 55 ++++++++++++++++---------
->   tcg/ppc/tcg-target.h         |  8 +++-
->   tcg/riscv/tcg-target.c.inc   | 51 +++++++++++++----------
->   tcg/riscv/tcg-target.h       |  9 ++++-
->   tcg/s390/tcg-target.c.inc    | 25 ++++++------
->   tcg/s390/tcg-target.h        | 13 +++++-
->   tcg/sparc/tcg-target.c.inc   | 33 +++++++++------
->   tcg/sparc/tcg-target.h       |  8 +++-
->   tcg/tcg-ldst.c.inc           |  2 +-
->   tcg/tcg-pool.c.inc           |  9 +++--
->   tcg/tcg.c                    | 60 +++++++++++++++++----------
->   tcg/tci/tcg-target.c.inc     |  8 ++--
->   tcg/tci/tcg-target.h         |  9 ++++-
->   27 files changed, 481 insertions(+), 188 deletions(-)
->   create mode 100644 docs/devel/ios.rst
+> Perhaps you could have replay_bh_schedule_oneshot_event as you have it now, but
+> also add a wrapper (called for example replay_bh_schedule_oneshot) that takes
+> care of calling aio_bh_schedule_oneshot too.  But in my opinion the "if" has
 
-When posting big series, consider using scripts/git.orderfile.
 
-Regards,
+Hi Paolo, hmm,
 
-Phil.
+in my view the wrapper should not be "replay_" though,
+what about block_bh_schedule_oneshot_event, for example, where we would move the "if replay is built-in and enabled" logic from the replay framework?
+
+Also interesting note, replay code hooks all aio_bg_schedule_oneshot in block, with the exception of:
+
+nbd.c
+export/export.c
+
+Is this wanted?
+
+Ciao,
+
+Claudio
+
+
+> no place in block/io.c.
+> 
+> Paolo
+> 
+>> If people feel strongly that this is a wrong step, we can do the alternative and put production code inside the stubs, but it just seems wrong.
+>>
+>> Thanks!
+>>
+>> Ciao,
+>>
+>> Claudio
+>>
+> 
+
 
