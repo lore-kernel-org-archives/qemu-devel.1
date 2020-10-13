@@ -2,88 +2,91 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B17BEC43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 20:43:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67D80C3279D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 20:50:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06EEE20878
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 20:43:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD8EB20878
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 20:50:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ikyoT2Zh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06EEE20878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fDmDQmt+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD8EB20878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49034 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSR8e-0002OJ-0y
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 16:43:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58096)
+	id 1kSRFf-0006gL-Jw
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 16:50:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kSR4f-00078l-Al
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 16:39:09 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:43801)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSREi-0005hz-In
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 16:49:32 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:41303)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kSR4d-0001JZ-0k
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 16:39:09 -0400
-Received: by mail-ed1-x544.google.com with SMTP id dn5so837779edb.10
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 13:39:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=l83+7C5w6SrBLDoIP7sfm4KiVqcNwbJfo79YId+KRcM=;
- b=ikyoT2ZhlT+JzMcAyoVfSTQE3Otcvg+lYn3hQS+C/OeEW9dRi0pEoP/i1OWcryjgBY
- dFTcW3UjKmfujVgWpECsMNE2m6+gzbecOsC+mihsS8D68u42Gnx1m7/IlvOoIfzss9u5
- Sjf4rjqrel75LtbbNFBhU4lajnsWMYeO56LnTSdcBHE5Ulc0Aflv+0FQ94A9JEVW3J+o
- 2PoNHZ3LncXVP4xCt4BixID0kQl3qoZEpvRYKxW/L1S7WqW9U/cVdW0UM+EwVShFio3M
- cniWp4oRwtx52f/TpDV5KEmVPCr9PnlBO75CXQ+nhUjgBgFmFFbXBaExjbGDEbEs6QMv
- 67gA==
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSREh-0002ro-4e
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 16:49:32 -0400
+Received: by mail-wr1-x435.google.com with SMTP id s9so982573wro.8
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 13:49:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=EhjQJ3Lk1hM5zr931AA8dIZN0ufWPqWagPZmbrV77Zo=;
+ b=fDmDQmt+Y5PtWLW5oEchWmXhuD4V85YXMb8E7Yw7KUFK4lTBE07pVFqKCsG8UvS11Y
+ YrP3USbBM6eMjE0RIWiG+TUHPL41hEWpHKw/IVRWgYZHbhDVWI15BW2uRFFOlfa6lch/
+ LLrHT3iYkULVjeP1JnDlJbmLNvSM6sqpen50HJjGNyTJZil/kiG2iK2DzVsbv2vyg/FV
+ r+bmQj1lbDIK0NTIBbv3pRgPuS4S96Jc4TDmYsa0LYXE7WqfKJTo9nDrwK5G741CgA2n
+ DnDwk9iAV/xILSzyrk4R6xKOie6Ev8BnjwDQQLypKuPpsTyEYZIA6oW3rJtlb3AmSrSq
+ yang==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=l83+7C5w6SrBLDoIP7sfm4KiVqcNwbJfo79YId+KRcM=;
- b=MBTg2vT8Zz9xzxncUXf/nJLm15LC3TGDu90NnUkKDWQ+3knuPhYouvsbLX7OygsLGv
- 6Iw23/MiYSE1j/iis6UQMRBvMTEkbDoHn0DIP4aITd9PVCS8rwGw2znZq87XKFYh9vYL
- LXzt5SvFAfI6EdmiNHiBOPfQmJQjmKSU+gqCkQgOwITntG+xKtVqUG3l+n+PNFWHMPvG
- UuoJOGO66rhF8iMl3uPUIYJYVnSBqy+JvbJQgjR3NtZUr2Nv24FvFupZsySPv+F3NCbH
- Tm8FobpaMjgo+n+vytkvqzFHbKYG3l0PPCicU3qR8JGbO/LHPoG+SkJZ2e2sBdTRB0dO
- 2yvQ==
-X-Gm-Message-State: AOAM533OCNhG2o4FuxYUKK8FRIpkTPaQjP3G2g0dgzTxvoSRb+G5Sf6a
- 62NzpOii4skKXZv37PgmCbDAkUM8jd3Ci5iS42jh5g==
-X-Google-Smtp-Source: ABdhPJx41XYYfDhXmY7wzRTFXLns99/nfRSF7Wadj/4GkXKKJfAtvGoZNKKWHUX1kRGKnNIQMWujkqtF80pell2Nfy8=
-X-Received: by 2002:a50:9ea6:: with SMTP id a35mr1608685edf.52.1602621544584; 
- Tue, 13 Oct 2020 13:39:04 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=EhjQJ3Lk1hM5zr931AA8dIZN0ufWPqWagPZmbrV77Zo=;
+ b=XmI0uraF3SQFUyQYVFV1y3ImTszfWr+9NrnKY3rZABHLhMqDKjgNj25AI9dTOjZ9Sc
+ IPKtDpLefjIjiqa2IQYJdavldcu3LjnLdjk744tyKK5D1KKEAylm8Tf47XCOJ2VvWBFQ
+ KRXQpw1ZFrFg79jCropZ7yo0+H9QMqi74SyVYPJkkajRl5P15HL2CgiV2yzR2MxcbZQq
+ 9UdnOdOzpWb+hJ/k7w3O3cvmSs9ZPZjC2Rnfp9aVlp6A4Y7PlxDVmwMH5KhJt78Z/hnY
+ phYsSPJIwbNBJOAuPQKg7TBV8cPEBl/JE0Hkizw7f6dAZ2Ufw8uFoPVoT+7xfyg6d4h6
+ T7Eg==
+X-Gm-Message-State: AOAM530YbJx/aj5NPvkJIrpkdtOi4Wvl409FFeO2aPA2wQYiioRlp6r0
+ akqqnv1XKH1lUSUF205230sMlntXDVY=
+X-Google-Smtp-Source: ABdhPJwZHGE0zweD1ERrnftUQgOXGHjCd/lan5tI0eXBzBaQ0t4Kt2cGsvWT40Y+XSEJzVd6qQ7X2A==
+X-Received: by 2002:adf:cc82:: with SMTP id p2mr1625113wrj.177.1602622169239; 
+ Tue, 13 Oct 2020 13:49:29 -0700 (PDT)
+Received: from x1w.redhat.com (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id l3sm176460wmg.32.2020.10.13.13.49.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 13:49:28 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/3] hw/misc/mac_via: Factor generic via_irq_request() out
+Date: Tue, 13 Oct 2020 22:49:24 +0200
+Message-Id: <20201013204927.3660030-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
- <20201012153746.9996-10-peter.maydell@linaro.org>
- <dbba485a-b69e-9138-5db4-d146ceec3c3a@linaro.org>
-In-Reply-To: <dbba485a-b69e-9138-5db4-d146ceec3c3a@linaro.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 13 Oct 2020 21:38:53 +0100
-Message-ID: <CAFEAcA_v3f4meMrENphpXSHNz=dNBQDE0LA=_3DMjxvSKL6wnQ@mail.gmail.com>
-Subject: Re: [PATCH 09/10] target/arm: Implement FPSCR.LTPSIZE for M-profile
- LOB extension
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,50 +99,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Laurent Vivier <laurent@vivier.eu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 13 Oct 2020 at 21:06, Richard Henderson
-<richard.henderson@linaro.org> wrote:
-> I think these two sets of masking are confusing.
-> Perhaps usefully rearranged as
->
->     if (!fp16) {
->         val &= ~fz16;
->     }
->     vfp_set_fpscr_to_host(env, val);
->
->     if (!m-profile) {
->         vec_len = extract32(val, 16, 3);
->         vec_stride = extract32(val, 20, 2);
->     }
->     val &= 0xf7c80000;
->     if (lob) {
->         val |= 4 << 16;
->     }
->     fpscr = val;
-
-Yeah, probably cleaner.
-
-The other thing I wondered about is whether we should
-be setting vec_len/vec_stride for an A-profile CPU which
-doesn't implement the short-vector extension (ie where
-MVFR0.FPShVec is zero). But that gets a bit awkward: v8A
-allows an implementation to make Stride and Len be RAZ,
-but v7A didn't permit that and so I think we would need
-to distinguish:
- * has short-vector support (eg Cortex-A9)
- * v8A, can implement FPSCR.{Stride,Len} as RAZ/WI
- * no short-vector support, Stride/Len can be written
-   but the only effect is that some insns must UNDEF
-   (eg Cortex-A7)
-
-I think at the moment we currently provide short-vector
-support for everything, which is wrong but wrong in
-the direction that means more guest code runs...
-
-thanks
--- PMM
+The same logic is used in 4 different places:=0D
+- via1_irq_request()=0D
+- via2_irq_request()=0D
+- via1_VBL()=0D
+- via1_one_second()=0D
+=0D
+Extract the common function and reuse it.=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (3):=0D
+  hw/misc/mac_via: Make generic via_irq_request() from=0D
+    via1_irq_request()=0D
+  hw/misc/mac_via: Replace via2_irq_request() with via_irq_request()=0D
+  hw/misc/mac_via: Use via_irq_request() in via1_VBL(),=0D
+    via1_one_second()=0D
+=0D
+ hw/misc/mac_via.c | 59 +++++++++++++++--------------------------------=0D
+ 1 file changed, 18 insertions(+), 41 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
