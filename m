@@ -2,69 +2,89 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PLING_QUERY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06727C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 02:34:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A4CC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:31:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DEE1E208FE
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 02:34:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DEE1E208FE
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=c-sky.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5A58E20872
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 04:31:43 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hbSfxJ5C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A58E20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSA8y-0004S1-S9
-	for qemu-devel@archiver.kernel.org; Mon, 12 Oct 2020 22:34:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47712)
+	id 1kSByQ-0003bF-3i
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 00:31:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kSA80-00041d-KR
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 22:33:28 -0400
-Received: from smtp2200-217.mail.aliyun.com ([121.197.200.217]:59723)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhiwei_liu@c-sky.com>)
- id 1kSA7x-000267-AO
- for qemu-devel@nongnu.org; Mon, 12 Oct 2020 22:33:28 -0400
-X-Alimail-AntiSpam: AC=CONTINUE; BC=0.08248018|-1; CH=green;
- DM=|CONTINUE|false|;
- DS=CONTINUE|ham_regular_dialog|0.00223872-0.000249513-0.997512;
- FP=0|0|0|0|0|-1|-1|-1; HT=ay29a033018047199; MF=zhiwei_liu@c-sky.com; NM=1;
- PH=DS; RN=4; RT=4; SR=0; TI=SMTPD_---.IiOpxD5_1602556392; 
-Received: from 30.225.208.85(mailfrom:zhiwei_liu@c-sky.com
- fp:SMTPD_---.IiOpxD5_1602556392)
- by smtp.aliyun-inc.com(10.147.44.118);
- Tue, 13 Oct 2020 10:33:14 +0800
-Subject: Re: [PATCH v3 34/81] target/arm: Implement SVE2 WHILERW, WHILEWR
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20200918183751.2787647-1-richard.henderson@linaro.org>
- <20200918183751.2787647-35-richard.henderson@linaro.org>
-From: LIU Zhiwei <zhiwei_liu@c-sky.com>
-Message-ID: <29cce0a5-11f1-b433-021f-12b2e5ada005@c-sky.com>
-Date: Tue, 13 Oct 2020 10:33:14 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
+ id 1kSBxl-00037N-Ac
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:31:01 -0400
+Received: from mail-lf1-x12d.google.com ([2a00:1450:4864:20::12d]:37736)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
+ id 1kSBxj-00014T-LZ
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 00:31:01 -0400
+Received: by mail-lf1-x12d.google.com with SMTP id j30so18235092lfp.4
+ for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 21:30:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
+ b=hbSfxJ5CVGioEMU5n741pcODDKPoNH5SSgkekndiWv1TT4qukDXBS5vlebLXLizLhR
+ b4/xZNkOX8GUCTMfRcbFxVTmHfXDintMAv+I0dCZu8x10B0BeVAb1EK6iyIwsKelyB6W
+ 49HWvQPmRhTPe7czs0xYGmBuAxhIKguXdm6U/LkmhdQaXYY/6HK690XILw4aD60MQzPP
+ 2hX5naXiVNg0y+rLLAeVix/vfEo/6fwcLnJnfLFGi7Q59OdXMtQEC9mfQysKcWYV0z1R
+ 6Y+HGXCqylbL01C3ndpfSZsNs6QT594drgNLbt2xh6sWKUtdoaoXvp7rjDZ078WFKoIH
+ YX+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=uHznmbCYbnVYecu07LGVp8fB7JwZJ5KDqnd/eEunNDM=;
+ b=qIofGZ026SDzEb1KvMi8zmbqbCF1AirOUEJ2Lio/qC53Z6q6FeLKXi7d+29a7riSKA
+ DLh7behODpFfdLi/CsC/gooWu8VBhu4h89YPDcoi1ORdWB/VibfWomDhfD5Sl36uOQfH
+ Qoe7TJDgI+walDLYFGu/WbHS6tRbx54dIi8kRUFu14W2zIXcAH8Hs70+n8/r91TY/8kY
+ m7xtB6/j1VhvVzpD84dqRqxJG3s9lOL9emJLqEUD/DDzAnz5g+BMcva1nKayYWJ8TLxF
+ 6Jgyqah3+BCLw9lJFkeHYV+uxkgQ0jHeSOWSq4+41r6lNM2T5+7ltnfEm4c8GhAryX4b
+ SGXQ==
+X-Gm-Message-State: AOAM5309f8usMqoT3UfZ3VofFVrjeyRxs+Ox2k0pTT7jdtfowF3EdLWy
+ FpnWe7YpC19mLbwrIdl1rdTg8Cbnz4EJLEd0uJM=
+X-Google-Smtp-Source: ABdhPJw5ESgwC0DgMZ9wENbc2k3XxUS8EJuXNnfvWh0zkKlUw6sic73+LBqE6Y3TydBD4veYlUsxLM4tVDHZ9ncz+Gk=
+X-Received: by 2002:a19:c6cc:: with SMTP id w195mr2030275lff.24.1602563456727; 
+ Mon, 12 Oct 2020 21:30:56 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20200918183751.2787647-35-richard.henderson@linaro.org>
-Content-Type: multipart/alternative;
- boundary="------------5E405CD05CF4A1CA4EFAEDAA"
-Content-Language: en-US
-Received-SPF: none client-ip=121.197.200.217;
- envelope-from=zhiwei_liu@c-sky.com; helo=smtp2200-217.mail.aliyun.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 22:33:14
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, HTML_MESSAGE=0.001,
- NICE_REPLY_A=-0.001, SPF_HELO_NONE=0.001, SPF_NONE=0.001,
- UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
+ <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
+ <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
+ <20201012165428.GD26135@linux.intel.com>
+In-Reply-To: <20201012165428.GD26135@linux.intel.com>
+From: harry harry <hiharryharryharry@gmail.com>
+Date: Tue, 13 Oct 2020 00:30:39 -0400
+Message-ID: <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
+Subject: Re: Why guest physical addresses are not the same as the
+ corresponding host virtual addresses in QEMU/KVM? Thanks!
+To: Sean Christopherson <sean.j.christopherson@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::12d;
+ envelope-from=hiharryharryharry@gmail.com; helo=mail-lf1-x12d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ PLING_QUERY=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,262 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, alex.bennee@linaro.org
+Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
+ Maxim Levitsky <mlevitsk@redhat.com>, mathieu.tarral@protonmail.com,
+ stefanha@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a multi-part message in MIME format.
---------------5E405CD05CF4A1CA4EFAEDAA
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Hi Sean,
 
+Thank you very much for your thorough explanations. Please see my
+inline replies as follows. Thanks!
 
-
-On 2020/9/19 2:37, Richard Henderson wrote:
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-> ---
-> v2: Fix decodetree typo
-> ---
->   target/arm/sve.decode      |  3 ++
->   target/arm/translate-sve.c | 62 ++++++++++++++++++++++++++++++++++++++
->   2 files changed, 65 insertions(+)
+On Mon, Oct 12, 2020 at 12:54 PM Sean Christopherson
+<sean.j.christopherson@intel.com> wrote:
 >
-> diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-> index b7038f9f57..19d503e2f4 100644
-> --- a/target/arm/sve.decode
-> +++ b/target/arm/sve.decode
-> @@ -702,6 +702,9 @@ CTERM           00100101 1 sf:1 1 rm:5 001000 rn:5 ne:1 0000
->   # SVE integer compare scalar count and limit
->   WHILE           00100101 esz:2 1 rm:5 000 sf:1 u:1 lt:1 rn:5 eq:1 rd:4
->   
-> +# SVE2 pointer conflict compare
-> +WHILE_ptr       00100101 esz:2 1 rm:5 001 100 rn:5 rw:1 rd:4
-> +
->   ### SVE Integer Wide Immediate - Unpredicated Group
->   
->   # SVE broadcast floating-point immediate (unpredicated)
-> diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-> index f1bc4c63e6..d3241ce167 100644
-> --- a/target/arm/translate-sve.c
-> +++ b/target/arm/translate-sve.c
-> @@ -3227,6 +3227,68 @@ static bool trans_WHILE(DisasContext *s, arg_WHILE *a)
->       return true;
->   }
->   
-> +static bool trans_WHILE_ptr(DisasContext *s, arg_WHILE_ptr *a)
-> +{
-> +    TCGv_i64 op0, op1, diff, t1, tmax;
-> +    TCGv_i32 t2, t3;
-> +    TCGv_ptr ptr;
-> +    unsigned desc, vsz = vec_full_reg_size(s);
-> +
-> +    if (!dc_isar_feature(aa64_sve2, s)) {
-> +        return false;
-> +    }
-> +    if (!sve_access_check(s)) {
-> +        return true;
-> +    }
-> +
-> +    op0 = read_cpu_reg(s, a->rn, 1);
-> +    op1 = read_cpu_reg(s, a->rm, 1);
-> +
-> +    tmax = tcg_const_i64(vsz);
-> +    diff = tcg_temp_new_i64();
-> +
-> +    if (a->rw) {
-> +        /* WHILERW */
-> +        /* diff = abs(op1 - op0), noting that op0/1 are unsigned. */
-> +        t1 = tcg_temp_new_i64();
-> +        tcg_gen_sub_i64(diff, op0, op1);
-> +        tcg_gen_sub_i64(t1, op1, op0);
-> +        tcg_gen_movcond_i64(TCG_COND_LTU, diff, op0, op1, diff, t1);
-It should be:
+> No, the guest physical address spaces is not intrinsically tied to the host
+> virtual address spaces.  The fact that GPAs and HVAs are related in KVM is a
+> property KVM's architecture.  EPT/NPT has absolutely nothing to do with HVAs.
+>
+> As Maxim pointed out, KVM links a guest's physical address space, i.e. GPAs, to
+> the host's virtual address space, i.e. HVAs, via memslots.  For all intents and
+> purposes, this is an extra layer of address translation that is purely software
+> defined.  The memslots allow KVM to retrieve the HPA for a given GPA when
+> servicing a shadow page fault (a.k.a. EPT violation).
+>
+> When EPT is enabled, a shadow page fault due to an unmapped GPA will look like:
+>
+>  GVA -> [guest page tables] -> GPA -> EPT Violation VM-Exit
+>
+> The above walk of the guest page tables is done in hardware.  KVM then does the
+> following walks in software to retrieve the desired HPA:
+>
+>  GPA -> [memslots] -> HVA -> [host page tables] -> HPA
 
-tcg_gen_movcond_i64(TCG_COND_GTU, diff, op0, op1, diff, t1);
+Do you mean that GPAs are different from their corresponding HVAs when
+KVM does the walks (as you said above) in software?
 
-> +        tcg_temp_free_i64(t1);
-> +        /* If op1 == op0, diff == 0, and the condition is always true. */
-> +        tcg_gen_movcond_i64(TCG_COND_EQ, diff, op0, op1, tmax, diff);
-> +    } else {
-> +        /* WHILEWR */
-> +        tcg_gen_sub_i64(diff, op1, op0);
-> +        /* If op0 >= op1, diff <= 0, the condition is always true. */
-> +        tcg_gen_movcond_i64(TCG_COND_GEU, diff, op0, op1, tmax, diff);
-> +    }
-> +
-> +    /* Bound to the maximum.  */
-> +    tcg_gen_umin_i64(diff, diff, tmax);
-> +    tcg_temp_free_i64(tmax);
-> +
-> +    /* Since we're bounded, pass as a 32-bit type.  */
-> +    t2 = tcg_temp_new_i32();
-> +    tcg_gen_extrl_i64_i32(t2, diff);
-We should align count down to (1 << esz),
-
-tcg_gen_andi_i32(t2，~MAKE_64BIT_MASK(0, esz));
-
-Best Regards,
-Zhiwei
-> +    tcg_temp_free_i64(diff);
-> +
-> +    desc = (vsz / 8) - 2;
-> +    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a->esz);
-> +    t3 = tcg_const_i32(desc);
-> +
-> +    ptr = tcg_temp_new_ptr();
-> +    tcg_gen_addi_ptr(ptr, cpu_env, pred_full_reg_offset(s, a->rd));
-> +
-> +    gen_helper_sve_whilel(t2, ptr, t2, t3);
-> +    do_pred_flags(t2);
-> +
-> +    tcg_temp_free_ptr(ptr);
-> +    tcg_temp_free_i32(t2);
-> +    tcg_temp_free_i32(t3);
-> +    return true;
-> +}
-> +
->   /*
->    *** SVE Integer Wide Immediate - Unpredicated Group
->    */
-
-
---------------5E405CD05CF4A1CA4EFAEDAA
-Content-Type: text/html; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-  </head>
-  <body>
-    <br>
-    <br>
-    <div class="moz-cite-prefix">On 2020/9/19 2:37, Richard Henderson
-      wrote:<br>
-    </div>
-    <blockquote type="cite"
-      cite="mid:20200918183751.2787647-35-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">Signed-off-by: Richard Henderson <a class="moz-txt-link-rfc2396E" href="mailto:richard.henderson@linaro.org">&lt;richard.henderson@linaro.org&gt;</a>
----
-v2: Fix decodetree typo
----
- target/arm/sve.decode      |  3 ++
- target/arm/translate-sve.c | 62 ++++++++++++++++++++++++++++++++++++++
- 2 files changed, 65 insertions(+)
-
-diff --git a/target/arm/sve.decode b/target/arm/sve.decode
-index b7038f9f57..19d503e2f4 100644
---- a/target/arm/sve.decode
-+++ b/target/arm/sve.decode
-@@ -702,6 +702,9 @@ CTERM           00100101 1 sf:1 1 rm:5 001000 rn:5 ne:1 0000
- # SVE integer compare scalar count and limit
- WHILE           00100101 esz:2 1 rm:5 000 sf:1 u:1 lt:1 rn:5 eq:1 rd:4
- 
-+# SVE2 pointer conflict compare
-+WHILE_ptr       00100101 esz:2 1 rm:5 001 100 rn:5 rw:1 rd:4
-+
- ### SVE Integer Wide Immediate - Unpredicated Group
- 
- # SVE broadcast floating-point immediate (unpredicated)
-diff --git a/target/arm/translate-sve.c b/target/arm/translate-sve.c
-index f1bc4c63e6..d3241ce167 100644
---- a/target/arm/translate-sve.c
-+++ b/target/arm/translate-sve.c
-@@ -3227,6 +3227,68 @@ static bool trans_WHILE(DisasContext *s, arg_WHILE *a)
-     return true;
- }
- 
-+static bool trans_WHILE_ptr(DisasContext *s, arg_WHILE_ptr *a)
-+{
-+    TCGv_i64 op0, op1, diff, t1, tmax;
-+    TCGv_i32 t2, t3;
-+    TCGv_ptr ptr;
-+    unsigned desc, vsz = vec_full_reg_size(s);
-+
-+    if (!dc_isar_feature(aa64_sve2, s)) {
-+        return false;
-+    }
-+    if (!sve_access_check(s)) {
-+        return true;
-+    }
-+
-+    op0 = read_cpu_reg(s, a-&gt;rn, 1);
-+    op1 = read_cpu_reg(s, a-&gt;rm, 1);
-+
-+    tmax = tcg_const_i64(vsz);
-+    diff = tcg_temp_new_i64();
-+
-+    if (a-&gt;rw) {
-+        /* WHILERW */
-+        /* diff = abs(op1 - op0), noting that op0/1 are unsigned. */
-+        t1 = tcg_temp_new_i64();
-+        tcg_gen_sub_i64(diff, op0, op1);
-+        tcg_gen_sub_i64(t1, op1, op0);
-+        tcg_gen_movcond_i64(TCG_COND_LTU, diff, op0, op1, diff, t1);</pre>
-    </blockquote>
-    It should be:<br>
-    <pre>tcg_gen_movcond_i64(TCG_COND_GTU, diff, op0, op1, diff, t1);</pre>
-    <blockquote type="cite"
-      cite="mid:20200918183751.2787647-35-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-+        tcg_temp_free_i64(t1);
-+        /* If op1 == op0, diff == 0, and the condition is always true. */
-+        tcg_gen_movcond_i64(TCG_COND_EQ, diff, op0, op1, tmax, diff);
-+    } else {
-+        /* WHILEWR */
-+        tcg_gen_sub_i64(diff, op1, op0);
-+        /* If op0 &gt;= op1, diff &lt;= 0, the condition is always true. */
-+        tcg_gen_movcond_i64(TCG_COND_GEU, diff, op0, op1, tmax, diff);
-+    }
-+
-+    /* Bound to the maximum.  */
-+    tcg_gen_umin_i64(diff, diff, tmax);
-+    tcg_temp_free_i64(tmax);
-+
-+    /* Since we're bounded, pass as a 32-bit type.  */
-+    t2 = tcg_temp_new_i32();
-+    tcg_gen_extrl_i64_i32(t2, diff);</pre>
-    </blockquote>
-    We should align count down to (1 &lt;&lt; esz), <br>
-    <pre>tcg_gen_andi_i32(t2，~MAKE_64BIT_MASK(0, esz));
-
-</pre>
-    Best Regards,<br>
-    Zhiwei<br>
-    <blockquote type="cite"
-      cite="mid:20200918183751.2787647-35-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-+    tcg_temp_free_i64(diff);
-+
-+    desc = (vsz / 8) - 2;
-+    desc = deposit32(desc, SIMD_DATA_SHIFT, 2, a-&gt;esz);
-+    t3 = tcg_const_i32(desc);
-+
-+    ptr = tcg_temp_new_ptr();
-+    tcg_gen_addi_ptr(ptr, cpu_env, pred_full_reg_offset(s, a-&gt;rd));
-+
-+    gen_helper_sve_whilel(t2, ptr, t2, t3);</pre>
-    </blockquote>
-    <blockquote type="cite"
-      cite="mid:20200918183751.2787647-35-richard.henderson@linaro.org">
-      <pre class="moz-quote-pre" wrap="">
-+    do_pred_flags(t2);
-+
-+    tcg_temp_free_ptr(ptr);
-+    tcg_temp_free_i32(t2);
-+    tcg_temp_free_i32(t3);
-+    return true;
-+}
-+
- /*
-  *** SVE Integer Wide Immediate - Unpredicated Group
-  */
-</pre>
-    </blockquote>
-    <br>
-  </body>
-</html>
-
---------------5E405CD05CF4A1CA4EFAEDAA--
+Thanks,
+Harry
 
