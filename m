@@ -2,69 +2,89 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD286C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:14:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AF0DC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:28:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A71B52222A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:14:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A71B52222A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hisilicon.com
+	by mail.kernel.org (Postfix) with ESMTPS id 935D2223BD
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:28:18 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RvxmzsGH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 935D2223BD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47898 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSJC0-0004Hf-JS
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:14:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50902)
+	id 1kSJPd-00089H-Nx
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:28:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prime.zeng@hisilicon.com>)
- id 1kSJ9g-0003Ka-39; Tue, 13 Oct 2020 08:11:48 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:40882 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prime.zeng@hisilicon.com>)
- id 1kSJ9a-00080v-5I; Tue, 13 Oct 2020 08:11:47 -0400
-Received: from DGGEMM404-HUB.china.huawei.com (unknown [172.30.72.57])
- by Forcepoint Email with ESMTP id 37E67F9DAA1F706534B7;
- Tue, 13 Oct 2020 20:11:26 +0800 (CST)
-Received: from DGGEMM526-MBX.china.huawei.com ([169.254.8.75]) by
- DGGEMM404-HUB.china.huawei.com ([10.3.20.212]) with mapi id 14.03.0487.000;
- Tue, 13 Oct 2020 20:11:20 +0800
-From: "Zengtao (B)" <prime.zeng@hisilicon.com>
-To: fangying <fangying1@huawei.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>
-Subject: RE: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache topology
- support
-Thread-Topic: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache
- topology support
-Thread-Index: AQHWjKJl5HIXIntHik2XLwAv/zxi0qmVk/YA
-Date: Tue, 13 Oct 2020 12:11:20 +0000
-Message-ID: <678F3D1BB717D949B966B68EAEB446ED49E0BB94@dggemm526-mbx.china.huawei.com>
-References: <20200917032033.2020-1-fangying1@huawei.com>
-In-Reply-To: <20200917032033.2020-1-fangying1@huawei.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.74.221.187]
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kSJOW-0007IL-6X
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 08:27:09 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:33597)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kSJOQ-0001f3-Q4
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 08:27:07 -0400
+Received: by mail-wr1-x429.google.com with SMTP id b8so10587820wrn.0
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 05:27:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=h5VN4Q20awkDDa5DusJocR61578qcAgu0ciOdFIb8TI=;
+ b=RvxmzsGHeLjXHIiTudA27WRqWOs07OQMe/uNt4aiIB+SJvoXWepG2bZ7oko4UPsKBM
+ abZnLGBwfoBNMPxSqRW34UFHJpZKvdA+wmoHzUbpGeFfX10pvTR7Aafrq351B2yty7mZ
+ uRVYNQoCN0NqMplC9fYbn0QO8xVv0NH6cVR/Hd7bJpITbPAKH2DW6mx9WYPMWWatDQrv
+ DYYlRLMHPHJhHvtJ9jhLbKoQx0STzvT3DTLmuugNivnnmFH375PeLl03ZNj9xgR4qP/G
+ JxbToE2oE4bX+3WQw6IwhGfXbeElSsFvDhtgkyMfBnkGT8/fK1ALake1yhuPLDrnA1+v
+ 9PCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=h5VN4Q20awkDDa5DusJocR61578qcAgu0ciOdFIb8TI=;
+ b=mYlph3dnj/nKCfyB1qJx7lVQ8wT/zhZGardHB0WRnl3GDYcQcGZHMLzlwm+QqfzmgT
+ IBB+g7egOuqJhdwXnPIfGk8z/fgx0s478ohErbIPnXGnpM7W4Xp+R5W0/Si/vlJxPzB8
+ s9tj98DSPUSMeeqfDaTSuoSO195ME8SC7uITdUiMQXcHctI1uzu6DJ5jm2gPMJJvnzsL
+ 3Ct6GQd0WKlNP+vOoGubisDa0ykCywOo2ukN8/SOaoJPuLyB/BkqCoA68uAfGNXvr8T2
+ 0Zwz5C8R8FBDtSu/X+B/DsRcX+MOIUqZf3gY/PQo5xezFSB4kuVPuICNhRZiP9UHxLm+
+ DjAA==
+X-Gm-Message-State: AOAM530gtnbzou5JN+zWNh0cZ2oEKZY6V25r7aAqFDsqffd+zYtFtiFL
+ Ez621uNfsMoS40tpZ8QbKXAqQ11eeVEnqwpR
+X-Google-Smtp-Source: ABdhPJzHIcwg8pNyeApvLJUjCAELdSbsSeZRr9zyAZJYZrJKUfhgqiAaYQIPpvtGOIgXc/dlsVSZTQ==
+X-Received: by 2002:a5d:6345:: with SMTP id b5mr37073014wrw.288.1602592020817; 
+ Tue, 13 Oct 2020 05:27:00 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id i126sm28583582wmi.0.2020.10.13.05.26.59
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 05:27:00 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] accel/tcg: Add CPU_LOG_EXEC tracing for cpu_io_recompile()
+Date: Tue, 13 Oct 2020 13:26:58 +0100
+Message-Id: <20201013122658.4620-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.255;
- envelope-from=prime.zeng@hisilicon.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 08:11:26
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x429.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,110 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- "drjones@redhat.com" <drjones@redhat.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "Chenzhendong \(alex\)" <alex.chen@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "alistair.francis@wdc.com" <alistair.francis@wdc.com>,
- fangying <fangying1@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>,
- "valentin.schneider@arm.com" <valentin.schneider@arm.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc valentin
+When using -icount, it's useful for the CPU_LOG_EXEC logging
+to include information about when cpu_io_recompile() was
+called, because it alerts the reader of the log that the
+tracing of a previous TB execution may not actually
+correspond to an actually executed instruction. For instance
+if you're using -icount and also -singlestep then a guest
+instruction that makes an IO access appears in two
+"Trace" lines, once in a TB that triggers the cpu_io_recompile()
+and then again in the TB that actually executes.
 
-> -----Original Message-----
-> From: Qemu-devel
-> [mailto:qemu-devel-bounces+prime.zeng=3Dhisilicon.com@nongnu.org]
-> On Behalf Of Ying Fang
-> Sent: Thursday, September 17, 2020 11:20 AM
-> To: qemu-devel@nongnu.org
-> Cc: peter.maydell@linaro.org; drjones@redhat.com; Zhanghailiang;
-> Chenzhendong (alex); shannon.zhaosl@gmail.com;
-> qemu-arm@nongnu.org; alistair.francis@wdc.com; fangying;
-> imammedo@redhat.com
-> Subject: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache
-> topology support
->=20
-> An accurate cpu topology may help improve the cpu scheduler's
-> decision
-> making when dealing with multi-core system. So cpu topology
-> description
-> is helpful to provide guest with the right view. Cpu cache information
-> may
-> also have slight impact on the sched domain, and even userspace
-> software
-> may check the cpu cache information to do some optimizations. Thus
-> this patch
-> series is posted to provide cpu and cache topology support for arm.
->=20
-> To make the cpu topology consistent with MPIDR, an vcpu ioctl
+(This is a similar reason to why the "Stopped execution of
+TB chain before..." logging in cpu_tb_exec() is helpful
+when trying to track execution flow in the logs.)
 
-For aarch64, the cpu topology don't depends on the MPDIR.
-See https://patchwork.kernel.org/patch/11744387/=20
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ accel/tcg/translate-all.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-> KVM_ARM_SET_MP_AFFINITY is introduced so that userspace can set
-> MPIDR
-> according to the topology specified [1]. To describe the cpu topology
-> both fdt and ACPI are supported. To describe the cpu cache
-> information,
-> a default cache hierarchy is given and can be made configurable later.
-> The cpu topology is built according to processor hierarchy node
-> structure.
-> The cpu cache information is built according to cache type structure.
->=20
-> This patch series is partially based on the patches posted by Andrew
-> Jone
-> years ago [2], I jumped in on it since some OS vendor cooperative
-> partners
-> are eager for it. Thanks for Andrew's contribution. Please feel free to
-> reply
-> to me if there is anything improper.
->=20
-> [1] https://patchwork.kernel.org/cover/11781317
-> [2]
-> https://patchwork.ozlabs.org/project/qemu-devel/cover/2018070412
-> 4923.32483-1-drjones@redhat.com
->=20
-> Andrew Jones (2):
->   device_tree: add qemu_fdt_add_path
->   hw/arm/virt: DT: add cpu-map
->=20
-> Ying Fang (10):
->   linux headers: Update linux header with
-> KVM_ARM_SET_MP_AFFINITY
->   target/arm/kvm64: make MPIDR consistent with CPU Topology
->   target/arm/kvm32: make MPIDR consistent with CPU Topology
->   hw/arm/virt-acpi-build: distinguish possible and present cpus
->   hw/acpi/aml-build: add processor hierarchy node structure
->   hw/arm/virt-acpi-build: add PPTT table
->   target/arm/cpu: Add CPU cache description for arm
->   hw/arm/virt: add fdt cache information
->   hw/acpi/aml-build: build ACPI CPU cache topology information
->   hw/arm/virt-acpi-build: Enable CPU cache topology
->=20
->  device_tree.c                |  24 +++++++
->  hw/acpi/aml-build.c          |  68 +++++++++++++++++++
->  hw/arm/virt-acpi-build.c     |  99
-> +++++++++++++++++++++++++--
->  hw/arm/virt.c                | 128
-> ++++++++++++++++++++++++++++++++++-
->  include/hw/acpi/acpi-defs.h  |  14 ++++
->  include/hw/acpi/aml-build.h  |  11 +++
->  include/hw/arm/virt.h        |   1 +
->  include/sysemu/device_tree.h |   1 +
->  linux-headers/linux/kvm.h    |   3 +
->  target/arm/cpu.c             |  42 ++++++++++++
->  target/arm/cpu.h             |  27 ++++++++
->  target/arm/kvm32.c           |  46 ++++++++++---
->  target/arm/kvm64.c           |  46 ++++++++++---
->  13 files changed, 488 insertions(+), 22 deletions(-)
->=20
-> --
-> 2.23.0
->=20
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index d76097296df..4572b4901fb 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -2267,6 +2267,10 @@ void cpu_io_recompile(CPUState *cpu, uintptr_t retaddr)
+         tb_destroy(tb);
+     }
+ 
++    qemu_log_mask_and_addr(CPU_LOG_EXEC, tb->pc,
++                           "cpu_io_recompile: rewound execution of TB to "
++                           TARGET_FMT_lx "\n", tb->pc);
++
+     /* TODO: If env->pc != tb->pc (i.e. the faulting instruction was not
+      * the first in the TB) then we end up generating a whole new TB and
+      *  repeating the fault, which is horribly inefficient.
+-- 
+2.20.1
 
 
