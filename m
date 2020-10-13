@@ -7,64 +7,62 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 092D7C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:53:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F4FCC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:54:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5ADD52080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:53:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5ADD52080A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id F2BAB2080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:54:30 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2BAB2080A
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32954 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSIre-0000nH-99
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:53:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44114)
+	id 1kSIsv-0002Fx-Vr
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:54:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43634)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpe-0006yS-JD; Tue, 13 Oct 2020 07:51:06 -0400
-Received: from mout.kundenserver.de ([212.227.17.24]:57397)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSIoG-0005Rv-Rx; Tue, 13 Oct 2020 07:49:40 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:51566
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpa-0004xH-OH; Tue, 13 Oct 2020 07:51:05 -0400
-Received: from localhost.localdomain ([82.252.141.186]) by
- mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MkYsS-1k3SOc3l0A-00m0XR; Tue, 13 Oct 2020 13:50:57 +0200
-From: Laurent Vivier <laurent@vivier.eu>
-To: qemu-devel@nongnu.org
-Subject: [PULL 01/14] qemu-img-cmds.hx: Update comment that mentions Texinfo
-Date: Tue, 13 Oct 2020 13:50:39 +0200
-Message-Id: <20201013115052.133355-2-laurent@vivier.eu>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201013115052.133355-1-laurent@vivier.eu>
-References: <20201013115052.133355-1-laurent@vivier.eu>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSIoD-0004fQ-JV; Tue, 13 Oct 2020 07:49:40 -0400
+Received: from host86-158-109-18.range86-158.btcentralplus.com
+ ([86.158.109.18] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSIo8-0004jn-UM; Tue, 13 Oct 2020 12:49:37 +0100
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org, qemu-ppc@nongnu.org, david@gibson.dropbear.id.au,
+ f4bug@amsat.org
+Date: Tue, 13 Oct 2020 12:49:20 +0100
+Message-Id: <20201013114922.2946-2-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
+References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:7hJfZXYvKH7Q8vgDKY8yqrMF2E1WSKYdgFspLCZqZVgMwXepTi6
- tIh1a1lwgK/YeA7gfWMFuxVeZj255wBJqrWA+M1fM6GiapiV9IRc2YtoGVwrJjsNTRIXA6l
- Qz0sLl3fKdIR0ffcgW3h0Ggioq7MobEPyV6Y9rlRxNtr7K/sYZNHgcpl/Vb5WPruCyk8fVe
- KFKuDsgJd1S0ej7SRfoBg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:8eQJ/hbtFhM=:MIRGn0cvSV7LXrptDu+HCV
- lTh8fyF8xHAy/SRX+pejULmUvjmGT8pdLc9WaoLURhsKcz18F5bBCshPLQbLu1C/af/YEFIby
- /KFUTNgcvN+iW/rviHteP4luT61NQNAnwuLydI1TnZ/s105zBKPPjSdK7gDktibNViknzOZGv
- GQjJZybCujbA+m3kdTtR1gp0pTBU4sxycE15oU4crNlySgvs92lNYoKVSXFO/FuQAtilDoEyl
- J7DitJ5X98K+x6qIh9SdvinKPA+hsaDh4YvmB5EE/1ImFZiJkrivGhacQNOXFqyWh4fzFzLbD
- g/Po4cRIpu7CeNr8vCOoPsauQ4WJxDRc174DTpW2+QCP9ZTyOV3dRBTNnXO+HI6B3otfjH+u4
- 1GCVX9BE27BlJ0f/+/heR0g6nybTlY+OILhiApak+HibfVIw4f6V7Gc7Frj6w
-Received-SPF: none client-ip=212.227.17.24; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:51:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-SA-Exim-Connect-IP: 86.158.109.18
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PATCH v2 1/3] macio: don't reference serial_hd() directly within the
+ device
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,39 +75,94 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+Instead use qdev_prop_set_chr() to configure the ESCC serial chardevs at the
+Mac Old World and New World machine level.
 
-Missed in 3c95fdef94 "Update comments in .hx files that mention
-Texinfo".
+Also remove the now obsolete comment referring to the use of serial_hd() and
+the setting of user_creatable to false accordingly.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200929075824.1517969-2-armbru@redhat.com>
-Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- qemu-img-cmds.hx | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/misc/macio/macio.c | 4 ----
+ hw/ppc/mac_newworld.c | 6 ++++++
+ hw/ppc/mac_oldworld.c | 6 ++++++
+ 3 files changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index b89c019b76bf..cab82342358e 100644
---- a/qemu-img-cmds.hx
-+++ b/qemu-img-cmds.hx
-@@ -1,5 +1,5 @@
- HXCOMM Keep the list of subcommands sorted by name.
--HXCOMM Use DEFHEADING() to define headings in both help text and texi
-+HXCOMM Use DEFHEADING() to define headings in both help text and rST
- HXCOMM Text between SRST and ERST are copied to rST version and
- HXCOMM discarded from C version
- HXCOMM DEF(command, callback, arg_string) is used to construct
+diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
+index 679722628e..51368884d0 100644
+--- a/hw/misc/macio/macio.c
++++ b/hw/misc/macio/macio.c
+@@ -109,8 +109,6 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
+     qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
+     qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
+     qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
+-    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hd(0));
+-    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hd(1));
+     qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
+     qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
+     if (!qdev_realize(DEVICE(&s->escc), BUS(&s->macio_bus), errp)) {
+@@ -458,8 +456,6 @@ static void macio_class_init(ObjectClass *klass, void *data)
+     k->class_id = PCI_CLASS_OTHERS << 8;
+     device_class_set_props(dc, macio_properties);
+     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
+-    /* Reason: Uses serial_hds in macio_instance_init */
+-    dc->user_creatable = false;
+ }
+ 
+ static const TypeInfo macio_bus_info = {
+diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+index 4dfbeec0ca..6f5ef2e782 100644
+--- a/hw/ppc/mac_newworld.c
++++ b/hw/ppc/mac_newworld.c
+@@ -123,6 +123,7 @@ static void ppc_core99_init(MachineState *machine)
+     UNINHostState *uninorth_pci;
+     PCIBus *pci_bus;
+     PCIDevice *macio;
++    ESCCState *escc;
+     bool has_pmu, has_adb;
+     MACIOIDEState *macio_ide;
+     BusState *adb_bus;
+@@ -380,6 +381,11 @@ static void ppc_core99_init(MachineState *machine)
+     qdev_prop_set_bit(dev, "has-adb", has_adb);
+     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
+                              &error_abort);
++
++    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
++    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
++    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
++
+     pci_realize_and_unref(macio, pci_bus, &error_fatal);
+ 
+     /* We only emulate 2 out of 3 IDE controllers for now */
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index f8173934a2..d6a76d06dc 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -96,6 +96,7 @@ static void ppc_heathrow_init(MachineState *machine)
+     PCIBus *pci_bus;
+     PCIDevice *macio;
+     MACIOIDEState *macio_ide;
++    ESCCState *escc;
+     SysBusDevice *s;
+     DeviceState *dev, *pic_dev;
+     BusState *adb_bus;
+@@ -281,6 +282,11 @@ static void ppc_heathrow_init(MachineState *machine)
+     qdev_prop_set_uint64(dev, "frequency", tbfreq);
+     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
+                              &error_abort);
++
++    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
++    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
++    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
++
+     pci_realize_and_unref(macio, pci_bus, &error_fatal);
+ 
+     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
 -- 
-2.26.2
+2.20.1
 
 
