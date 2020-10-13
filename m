@@ -2,67 +2,99 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:41:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC318C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:41:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 668AA252BA
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:41:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 668AA252BA
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5BC14252BA
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:41:50 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="G9SaiOPm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BC14252BA
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSNMt-0006Kc-4M
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:41:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54820)
+	id 1kSNMz-0006Uj-9u
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:41:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSNLW-00052G-9K
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:40:19 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:63839)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSNLM-0004Lj-JE
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:40:16 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 6EE99747601;
- Tue, 13 Oct 2020 18:40:04 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E68A77475FA; Tue, 13 Oct 2020 18:40:03 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id E4E7C7475FF;
- Tue, 13 Oct 2020 18:40:03 +0200 (CEST)
-Date: Tue, 13 Oct 2020 18:40:03 +0200 (CEST)
-To: =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH 04/10] meson: option to build as shared library
-In-Reply-To: <20201013155757.GR70612@redhat.com>
-Message-ID: <9d737fc-809-b1b3-f42e-45d8cfbfbd6e@eik.bme.hu>
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-5-j@getutm.app> <20201013075104.GA70612@redhat.com>
- <e27acf2-4dbe-4674-78cc-67aa7b505c54@eik.bme.hu>
- <20201013144625.GP70612@redhat.com>
- <CA+E+eSBu_LOnQ=B+N7vm3H2zkBxey8z_T1V0JpSU8rZND6GRYQ@mail.gmail.com>
- <20201013155757.GR70612@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSNLh-0005Av-8X
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:40:29 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:46310)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSNLd-0004Ps-Pp
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:40:28 -0400
+Received: by mail-pl1-x644.google.com with SMTP id d6so99886plo.13
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:40:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=jZuOVfZXzmXfUNZZhGowe0arajdOtS7smUegqSksugA=;
+ b=G9SaiOPmJ12PQ3QSRrqsp6L+EolKTrwbjkx6wZQ7YuBNYTtt7ZlV2KEBTw3Gy683q9
+ ID5taL4KeeNWjEx/bUJrHszuMBwcpJ07arAMr3Nf2ZQbnqFARuPQ4y0UeaRAHPAOMe8X
+ nm2VmPvyd8los5ycYmGUYRNqT0nik7YtYsVXnfroh4mPZfdlTEP3OhAp4LzHBhEANkon
+ zLmo4mFAp1iY3PVgVhC6FenksKlonWYAGcF1eqtqppkATI7etiuYqpPed+/wOkMLFsGN
+ wL6zc0/9GGpHzGpfnJKswHPTYmiztI6KMtXPh1io0IfJR25Gkx2c2Qf0MwpJynq/4bUr
+ grWQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=jZuOVfZXzmXfUNZZhGowe0arajdOtS7smUegqSksugA=;
+ b=stCts4YVHBlZPyi60uFrbaVtoQbjsEskQZ14Lg/5aK9QU3VC1OUXU/c5X19NPQbKVn
+ 0WUFOtVfsfLR8lSvPsYBywL1M3bZSQfMTASOBev98N4lEtTUUNUXaUMcJEEuICZaM8z+
+ SrQ04fTqJFx5uTFagshA9zenPvL+368mIVrclBpLwJ56hf2o0xdjzrPycZIERgO7Xpp1
+ jAX+NkZihPF1xAaB/Inyn1bJoWbkjY2viFf07MhaY0rb+CBHzq7vDQzC7wqG/He9DIrU
+ Pp1M9+xDWG49bIACUc+OQ/aim6WsK/aBMQyBH0BHgIxgY+ZRsJOf1g2To/hokKK4FDtX
+ J6Lw==
+X-Gm-Message-State: AOAM533jzV0O1QWpN0olvdEVQDSaSzI2Q459L9igjm74sQDKmZK9Zz1W
+ /VgBFzDVbffsO75KkG9i3bULSzyq36kNmQBZ
+X-Google-Smtp-Source: ABdhPJxHwqv4VquVVp/8yQ8dobf7wdBqlgzdOOL4C7sOfrhMhB7vgqzU3nD//ZoXLOfiyKED4IurYg==
+X-Received: by 2002:a17:902:8307:b029:d3:89e2:7866 with SMTP id
+ bd7-20020a1709028307b02900d389e27866mr644910plb.42.1602607221979; 
+ Tue, 13 Oct 2020 09:40:21 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id 128sm132999pfd.110.2020.10.13.09.40.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 09:40:20 -0700 (PDT)
+Subject: Re: [PATCH 04/10] target/arm: Make the t32 insn[25:23]=111 group
+ non-overlapping
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ <20201012153746.9996-5-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <bad2de7a-68db-ad0a-0976-ebf475992e17@linaro.org>
+Date: Tue, 13 Oct 2020 09:40:19 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- BOUNDARY="3866299591-182845050-1602606743=:37098"
-Content-ID: <ee18c0a1-def-e6e5-bea5-a32d1a14fa95@eik.bme.hu>
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+In-Reply-To: <20201012153746.9996-5-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,71 +107,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joelle van Dyne <j@getutm.app>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 10/12/20 8:37 AM, Peter Maydell wrote:
+> The t32 decode has a group which represents a set of insns
+> which overlap with B_cond_thumb because they have [25:23]=111
+> (which is an invalid condition code field for the branch insn).
+> This group is currently defined using the {} overlap-OK syntax,
+> but it is almost entirely non-overlapping patterns. Switch
+> it over to use a non-overlapping group.
+> 
+> For this to be valid syntactically, CPS must move into the same
+> overlapping-group as the hint insns (CPS vs hints was the
+> only actual use of the overlap facility for the group).
+> 
+> The non-overlapping subgroup for CLREX/DSB/DMB/ISB/SB is no longer
+> necessary and so we can remove it (promoting those insns to
+> be members of the parent group).
+> 
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+> Just a minor bit of tidying that I did while I was trying to
+> work out whether the v8.1M loop/branch insns needed to go in
+> this group. (As it turns out, they don't.)
+> ---
+>  target/arm/t32.decode | 26 ++++++++++++--------------
+>  1 file changed, 12 insertions(+), 14 deletions(-)
 
---3866299591-182845050-1602606743=:37098
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
-Content-ID: <bdf0910-a96a-9e13-7434-eb87a1fb978f@eik.bme.hu>
+Nice cleanup, thanks.
 
-On Tue, 13 Oct 2020, Daniel P. Berrangé wrote:
-> On Tue, Oct 13, 2020 at 08:16:46AM -0700, Joelle van Dyne wrote:
->> I will start a separate conversation of UTM's license compatibility.
->>
->> Regarding the patch, would some sort of warning message in configure
->> (if building as a shared library) regarding the license be wise? Or
->> would it pollute the output logs?
->
-> I think there's also a more fundamental question of whether this is
-> a concept we actually want to support at all.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-Discussing other compelling reasons for doubt is OK, just wanted to avoid 
-having this dismissed on possible licensing problems only. I still think 
-it would be a good idea to support QEMU on iOS but due to the (mostly 
-security related) limitations of that platform some compromises my be 
-needed. Please consider it instead of being quick to decide to avoid these 
-problems by not taking the patches upstream which is a convenient solution 
-from QEMU viewpoint but not helping other projects. (Other platforms may 
-come up in the future with similar limitations that iOS has as more 
-desktop OSes also move in the same direction to increase security so these 
-may need to be handled anyway at one point, iOS is a good test case for 
-that.)
 
-> IIUC, this shared library just exposes a "qemu_main" method which
-> the external app has to jump into. IOW, the "char **argv" parameter
-> to qemu_main becomes the ELF library ABI.  Declaring this a shared
-> library interface is a non-negligible commitment for QEMU maintainers,
-> especially given that there is alot about QMEU's command line parsing
-> that maintainers do not like and wish to change.
-
-Given that libvirt uses the command line instead of a proper API 
-currently, this is not worse than that. If there was a better API or there 
-will be one in the future, the shared lib API can be changed the same way 
-as libvirt will need to be adapted for that but it's not reasonable to 
-demand these patches to come up with that API now. So for now this seems 
-to be acceptable and does not prevent cleaning it up later together with 
-the planned changes you mentioned. Compatibility for the command line will 
-have to be maintained until a better API is devised for use by other 
-software like libvirt and anyone intending to use it as dll so this does 
-not seem like added commitment.
-
-> There is a further question about whether we want to commit to an
-> architectural model where  fork() is not something we can use. A
-
-Does Windows support fork()? I think we're already committed to support 
-Windows so any solution you'll come up with will have the same problem 
-anyway. So I think this does not add additional restriction that we don't 
-already have either.
-
-Regards,
-BALATON Zoltan
---3866299591-182845050-1602606743=:37098--
+r~
 
