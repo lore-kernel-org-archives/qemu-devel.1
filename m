@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B44AC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:57:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76FCBC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:57:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D61062078A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:57:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D61062078A
+	by mail.kernel.org (Postfix) with ESMTPS id F3E112078A
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:57:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3E112078A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46442 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47832 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSEFP-0001jH-KA
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 02:57:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32886)
+	id 1kSEFf-0002Gw-UQ
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 02:57:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBZ-0004w9-6O; Tue, 13 Oct 2020 02:53:25 -0400
-Received: from mout.kundenserver.de ([212.227.126.187]:46741)
+ id 1kSEBd-00057e-Pl; Tue, 13 Oct 2020 02:53:29 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:53277)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBX-0000EC-Db; Tue, 13 Oct 2020 02:53:24 -0400
+ id 1kSEBb-0000G9-SK; Tue, 13 Oct 2020 02:53:29 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MTRIi-1ktg8I0xUy-00Tjrr; Tue, 13 Oct 2020 08:53:18 +0200
+ id 1M72wZ-1kY0Q00pcV-008cDc; Tue, 13 Oct 2020 08:53:23 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 02/15] target/i386/cpu: Update comment that mentions Texinfo
-Date: Tue, 13 Oct 2020 08:53:00 +0200
-Message-Id: <20201013065313.7349-3-laurent@vivier.eu>
+Subject: [PULL 08/15] softmmu/memory: Log invalid memory accesses
+Date: Tue, 13 Oct 2020 08:53:06 +0200
+Message-Id: <20201013065313.7349-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013065313.7349-1-laurent@vivier.eu>
 References: <20201013065313.7349-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:aOPdbd0/QNgignjlMKnrrE/N+IJOP3L7RsemEXgjbAaHm7hplkd
- gFTBnhMYeE6z6NvRQf6o+gcTaUFxPO9Y99Grb9qIUVRSQdoODs3J6wRUWgwyemD8aTukME9
- yz779Yf287RgXpxcqGR23dwBV0kwTP6SU+znz52fzaBy1Jin02h7w5FIGMWrBqKzh8hr36f
- Jx9cINej1mxTFE8zNBePA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:oX8jXPjBIdw=:LaIysuB9PRisQlZUiKUHq3
- 6LDYHKyKLzuV6bB3h4gZqJ9RrHAutOvGEhDWBrDQHcnLbIw4GCVNgMlHfAP3bgFd0odfvcR0z
- AZra7nasaPijSs3DYESqmvsb4/vDElZAvaXibsXFPjz5tE8UAYXOv6qKwS+LyJ6TLJAwy/pYg
- VpepBOZqf7S1wWG4d3hlhr4FUWbl0gMPPKvvB1JsfUkKpYwl6f1MHbiISl14mAMxlTFDNWPHf
- RdPwyiXVi71zJzVHNL+tyBlnys09BLCRBO2tqtN1RHHbepHGtjAtLYbgo0Gnzr/HLC/Ww6rYy
- ruZ20rPH6Bft91gWsqXGkarEH4ZuafR8WOw9nic+tjn8uMiZT49FLpzF1DtKFoSMV2eE9Kq5R
- xmbTcqwR0GFyBMIRsrB+/aomsZxC38mezVJsF3mUs+oqK6RkDxBlQUGoiAUL4yVr69D7ivuA4
- FZLBi26bLpzDlu2aPZ2W5eq4yBstv+LwVFcomLDLIZ3o7RrSMsOpmQ5zColBWhLTntf4/Esqr
- zPcoN9vMUVnpdXQeiwDgueKTjRr6AjP9dloVYIxDZIczqukqhxcVzBwk8tA6PSXQvmOpS3g3c
- 0P8S+/OApP81QvOmT5ysbWjiXIIc5FUiU5iCC3LYeTO6ZimiW8pOBEFbcOPWLUkJ93V6ynnMe
- c2VIVhgli5cORzUKJ7UxO7hclvTdCxRPMjSSJomZUoMhua5Hvhcain8aMepsGtFc5SeingnyB
- DZCbljwB5kIikTFbZ3ENxSQwERFNuWxycKdZwsOyPcrbgS4YLo4cfY3+gjhe4sFqvOo74+NZR
- fQKSD3+nhszIF/IRcFCR/MZCFrm3Jl19zgwPbvb7ZXMgp5JGh2ajQhQjPc04pQ58QPsBRU4
-Received-SPF: none client-ip=212.227.126.187; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:XTwvNwJbyUEKn1WplhLpWLhTNTvO0/iGkuPv4NR58+IJpx9ykHt
+ etcye7ynwKy25pehGzjHdzecwd1VlBemBHzUkaP8qeDu+5Urq+0p7jUrjqHu/z+dsvM5JER
+ YcHLJtFaMlEWNGmyAn4RhROSHFN9xa028tab39x0ZUJjwruoo0bhzq/3CdMxG/PcYNXPGe6
+ tFo0Msv/ShRE0C26w+zBg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:LxGsmFHT+fs=:9l2UJy4xeFxmzMeSr6CSX6
+ 2Re0uiEkl/6eMl7uM4bc22UA11HwrvDtnQY7/O1FtuFyvtRWAepW6++nyHV0UvTySVwkVbZpY
+ 8qxNTCgly0yJNEliTUK0ahq9AYpZnVMF+/c5KBBgkKFgt22JpqS9eFie5wB3xn0s6iY0aKfvu
+ O9vU3/DL5lpF+jvZam0ZNc13C7yM8GLXfe9FnDs8JuFSUDkdnKDEl3UjcI7S1L2EgZS2JmMTY
+ q3CTRDrgcQXNgaR9IlrtnHWZOFRNfhFkTvFWvZKo5w5besVYJA3K5KNBtxGnRuoVwdo2VwPTL
+ cgE+IBlBu6n/tUahg3U8kjWlwRoLp2pAlDoRugBLUFpYgFibAeLMgxhopBvY8tUbFq+meXlz7
+ l/H2zJy9XeRiIOLVWEKhLkiOKNN2sIpZ+BolIp/wq7KSInKiXYDjfa6xoQXCxShfXNDrWXloY
+ leGLP/0dS6eNgXXDBgA88MWH9sAxsgrMle4CvtYvvdOwciYLQ2qqpPNrNA3rcLKztlKersyfP
+ hcm9tjSxW2fBgg0qJvZE3LHkK+rxdoCh5eJAdg0VCS104mpnXJzOLTyRIX6jD1T4qCz8Mhvmw
+ TII4Jg8QQGdaeQXC1XEJTCD7fuyZG/iLavJJHh+XRqrXNG5wmNzW9y7MlfiEUvt+d/KYSgASE
+ HWHhkD2k6OMimT4kALcdOKdfT+F/Ng23OElXklxKWNHPrWK1QbiCvNmj6C3ppxr4cAr7mglSO
+ vNSgy9fb3AXLRiCJsSZRm0ea5ggxrw63x8xhj5mJso8ImmxX72akGB2epyMKCab4OdnG3WyWl
+ L+dD2xX6RxhV2ueiIugTh5WDkZzbpq/YfKLF9vIbC34C+tb890Yeyw1Sc/09ylaXtyBMPzL
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:53:21
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:53:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -85,39 +85,72 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: qemu-trivial@nongnu.org,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
+ "Michael S . Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Markus Armbruster <armbru@redhat.com>
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Missed in commit 41fba1618b "docs/system: convert the documentation of
-deprecated features to rST."
+Log invalid memory accesses with as GUEST_ERROR.
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20200929075824.1517969-3-armbru@redhat.com>
+This is particularly useful since commit 5d971f9e67 which reverted
+("memory: accept mismatching sizes in memory_region_access_valid").
+
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Message-Id: <20201005152725.2143444-1-philmd@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- target/i386/cpu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ softmmu/memory.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index f37eb7b675f4..9eafbe369075 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4127,7 +4127,8 @@ static PropValue tcg_default_props[] = {
-  * We resolve CPU model aliases using -v1 when using "-machine
-  * none", but this is just for compatibility while libvirt isn't
-  * adapted to resolve CPU model versions before creating VMs.
-- * See "Runnability guarantee of CPU models" at * qemu-deprecated.texi.
-+ * See "Runnability guarantee of CPU models" at
-+ * docs/system/deprecated.rst.
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index fa280a19f7f7..403ff3abc99b 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -14,6 +14,7 @@
   */
- X86CPUVersion default_cpu_version = 1;
  
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "qapi/error.h"
+ #include "cpu.h"
+ #include "exec/memory.h"
+@@ -1353,10 +1354,18 @@ bool memory_region_access_valid(MemoryRegion *mr,
+ {
+     if (mr->ops->valid.accepts
+         && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
++        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
++                                       "0x%" HWADDR_PRIX ", size %u, "
++                                       "region '%s', reason: rejected\n",
++                      addr, size, memory_region_name(mr));
+         return false;
+     }
+ 
+     if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
++        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
++                                       "0x%" HWADDR_PRIX ", size %u, "
++                                       "region '%s', reason: unaligned\n",
++                      addr, size, memory_region_name(mr));
+         return false;
+     }
+ 
+@@ -1367,6 +1376,13 @@ bool memory_region_access_valid(MemoryRegion *mr,
+ 
+     if (size > mr->ops->valid.max_access_size
+         || size < mr->ops->valid.min_access_size) {
++        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
++                                       "0x%" HWADDR_PRIX ", size %u, "
++                                       "region '%s', reason: invalid size "
++                                       "(min:%u max:%u)\n",
++                      addr, size, memory_region_name(mr),
++                      mr->ops->valid.min_access_size,
++                      mr->ops->valid.max_access_size);
+         return false;
+     }
+     return true;
 -- 
 2.26.2
 
