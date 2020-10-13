@@ -2,85 +2,70 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CBEC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:19:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13A9AC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:19:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A19FD208D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:19:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VfdWuM0j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A19FD208D5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 85DF3214DB
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 09:19:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85DF3214DB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54600 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55502 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSGSR-0001kn-GK
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 05:18:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37878)
+	id 1kSGSh-00027C-D5
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 05:19:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSGQ1-0000J0-9R
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:16:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27599)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kSGRp-0001IS-2I
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:18:21 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:33504)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSGPy-0002MB-A6
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:16:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602580583;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=OXhhvZ3LQRApe0mVvruLxKhtj3gtKIZ3FLyqtNCux1c=;
- b=VfdWuM0j533Lq+msT93vxf2SWeqhOMVESlxwqIE4hTLcQQFLRhORoZwUUAS+Vh+DGHKtvb
- MSsRn22ISdcUuKbWB97knF6eeRIZGJk1Af8x7njrnysVnEfjOab0it47ipNbDnjId9UwYo
- c9nRXZF3NwtxHPH7i6mLs3IrNdxdEGc=
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kSGRn-0002Wi-DU
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 05:18:20 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-377-VDFhP09BNdSs6EO5F7DbMA-1; Tue, 13 Oct 2020 05:16:22 -0400
-X-MC-Unique: VDFhP09BNdSs6EO5F7DbMA-1
+ us-mta-236-h4LzgKV7MXq4en4AxevSEA-1; Tue, 13 Oct 2020 05:18:16 -0400
+X-MC-Unique: h4LzgKV7MXq4en4AxevSEA-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2448984BA14
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:16:21 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 11F781A92A;
- Tue, 13 Oct 2020 09:16:17 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E46951750A; Tue, 13 Oct 2020 11:16:15 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DDA81020908
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:18:15 +0000 (UTC)
+Received: from bahia.lan (ovpn-112-78.ams2.redhat.com [10.36.112.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 15EF527CCA;
+ Tue, 13 Oct 2020 09:18:13 +0000 (UTC)
+Subject: [PATCH v2] Makefile: Add *.[ch].inc files to cscope/ctags/TAGS
+From: Greg Kurz <groug@kaod.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] qemu-edid: drop cast
-Date: Tue, 13 Oct 2020 11:16:15 +0200
-Message-Id: <20201013091615.14166-1-kraxel@redhat.com>
+Date: Tue, 13 Oct 2020 11:18:13 +0200
+Message-ID: <160258069310.900922.1495166540282536628.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-44.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 05:18:17
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,34 +78,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not needed and makes some compilers error out with:
+The code base has some C source and header files that don't get indexed
+because their name ends with .inc:
 
-qemu-edid.c:15:1: error: initializer element is not constant
+$ git ls-files "*.[ch].inc" | wc -l
+66
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Add them to the list.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+--
+v2: add the missing \( and \)
 ---
- qemu-edid.c | 2 +-
+ Makefile |    2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/qemu-edid.c b/qemu-edid.c
-index 1db3372b982c..1cd6a9517238 100644
---- a/qemu-edid.c
-+++ b/qemu-edid.c
-@@ -9,7 +9,7 @@
- #include "qemu/cutils.h"
- #include "hw/display/edid.h"
- 
--static qemu_edid_info info = (qemu_edid_info) {
-+static qemu_edid_info info = {
-     .prefx = 1024,
-     .prefy = 768,
- };
--- 
-2.27.0
+diff --git a/Makefile b/Makefile
+index c37e513431fe..3c5a0b0f7a11 100644
+--- a/Makefile
++++ b/Makefile
+@@ -190,7 +190,7 @@ distclean: clean ninja-distclean
+ =09rm -f linux-headers/asm
+ =09rm -Rf .sdk
+=20
+-find-src-path =3D find "$(SRC_PATH)/" -path "$(SRC_PATH)/meson" -prune -o =
+-name "*.[chsS]"
++find-src-path =3D find "$(SRC_PATH)/" -path "$(SRC_PATH)/meson" -prune -o =
+\( -name "*.[chsS]" -o -name "*.[ch].inc" \)
+=20
+ .PHONY: ctags
+ ctags:
+
 
 
