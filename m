@@ -2,62 +2,98 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2B69C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:31:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D17F1C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:33:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13151218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:31:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13151218AC
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6603C218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:33:33 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="soWFH3Mr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6603C218AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54794 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSSoz-0008Bl-Iu
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 18:31:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59214)
+	id 1kSSrM-0000xh-Au
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 18:33:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSSn5-0006hc-OE; Tue, 13 Oct 2020 18:29:07 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:29469)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSSn3-00085u-1W; Tue, 13 Oct 2020 18:29:07 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 0139074760B;
- Wed, 14 Oct 2020 00:29:00 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id C6FB6747608; Wed, 14 Oct 2020 00:28:59 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id C5844747600;
- Wed, 14 Oct 2020 00:28:59 +0200 (CEST)
-Date: Wed, 14 Oct 2020 00:28:59 +0200 (CEST)
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v7 8/8] mac_oldworld: Add SPD data to cover RAM
-In-Reply-To: <b78024b4-7d9b-9670-66af-24b6bc97a5a8@eik.bme.hu>
-Message-ID: <1a93fb66-7252-352-4954-208b78616a38@eik.bme.hu>
-References: <cover.1593456926.git.balaton@eik.bme.hu>
- <9f5f44878dc0f60b073201e657d6e4dcc940f68c.1593456926.git.balaton@eik.bme.hu>
- <5f4c18c1-80ff-f605-fdd7-7ae474443690@amsat.org>
- <b78024b4-7d9b-9670-66af-24b6bc97a5a8@eik.bme.hu>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSSpW-0000EO-QW
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 18:31:39 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:40310)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSSpU-000051-2n
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 18:31:37 -0400
+Received: by mail-pf1-x442.google.com with SMTP id w21so717205pfc.7
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 15:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:references:from:message-id:date:user-agent:mime-version
+ :in-reply-to:content-language:content-transfer-encoding;
+ bh=Xct8EB2JXJGbJ3zKytAaLNNDCzXsSOE2AkEo2n5lLUc=;
+ b=soWFH3Mr/4mmAuLL6ZtplFJY/h9isZh2f5fqwNZFtrhH+0aQA5paKpn1c+iWBENExf
+ jzuTkHbyg29lHM8GbUS2dTbkh+5iU3wWa7jE4D6pU7IGnY53b3SAW+X2RwSG95PlYLid
+ Oknkd5+9Hj1X2c/XioRVGnHtaZtYBUe7rAzMcev5iyXLjWxJaqXYTqLiFpBpU0351lJU
+ v7yiuimsvPUMBdyCgYS0MFuDxBr+j7bLWATgbR/V6Fiqyn6Zje3zk95NITZoCMXnIwDW
+ /EY74w62f0yq6JuZWw3izEiewJfRwcGbCD18O4+JywzIsOCoiv8i1k23mXC5ugoQgHw5
+ Jzlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Xct8EB2JXJGbJ3zKytAaLNNDCzXsSOE2AkEo2n5lLUc=;
+ b=g0TSmHr+ZZ9N7i3pZRpmpakTLJrTlsh0jTkrFJfVszP5AfYZdxAk/9lS86M6dSDpIU
+ GNV5T2cLiqi9uYn6faY+Y1qelc0c89RBBXgTUqkb7rrutf++JiVoswN2UGOxL5UpZT8u
+ XUKgpY8qsikolbu8EAnzaHME/BI71JcquBegCvL6j1aLdDrwiEB9Y5QPMk90o7oLYB1r
+ WWw0RgETevYWDRuoZ8eAoZL9v8onjRxdMTkSYHA4QXA8fhdq7q+PcUxqCHLCtrKa9Re/
+ /awnDa758sbwMUVEODhh+NEK2lHG4I+fb/tCJYYub9ASgeSFX1hJzs229HttokL5b1NX
+ b57g==
+X-Gm-Message-State: AOAM5320nFGcycMUfor7JCciRecC6dStUlcDRNpBB0hwaQUdVCoN3xvK
+ ijMU9zd8kHsgxdtXoyYfHKSzYpbCA5k9Ig==
+X-Google-Smtp-Source: ABdhPJyBBbq1caDu2kVOpDIacGYUb29bI34USsu9N25IxM2qH05UvbQCHDEq38dxXcyTy9L4ilBT5Q==
+X-Received: by 2002:a63:5f97:: with SMTP id t145mr1397852pgb.115.1602628292207; 
+ Tue, 13 Oct 2020 15:31:32 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id a4sm731440pgl.51.2020.10.13.15.31.31
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 15:31:31 -0700 (PDT)
+Subject: Re: [PATCH 07/10] target/arm: Implement v8.1M low-overhead-loop
+ instructions
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org
+References: <20201012153746.9996-1-peter.maydell@linaro.org>
+ <20201012153746.9996-8-peter.maydell@linaro.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ad79b081-211a-a591-4de1-7fb0096d331f@linaro.org>
+Date: Tue, 13 Oct 2020 15:31:29 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="3866299591-2146972407-1602628139=:80018"
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+In-Reply-To: <20201012153746.9996-8-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,41 +106,28 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On 10/12/20 8:37 AM, Peter Maydell wrote:
+> +    nextlabel = gen_new_label();
+> +    tcg_gen_brcondi_i32(TCG_COND_NE, cpu_R[a->rn], 0, nextlabel);
+> +    gen_jmp(s, read_pc(s) + a->imm);
+> +
+> +    gen_set_label(nextlabel);
+> +    tmp = load_reg(s, a->rn);
+> +    store_reg(s, 14, tmp);
+> +    gen_jmp(s, s->base.pc_next);
+> +    return true;
 
---3866299591-2146972407-1602628139=:80018
-Content-Type: text/plain; charset=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
+Oh, fwiw, with the tcg optimization patches just posted, this branch is better
+inverted.  That way the load of rn can be reused on the non-taken branch path.
 
-On Wed, 14 Oct 2020, BALATON Zoltan via wrote:
-> On Tue, 13 Oct 2020, Philippe Mathieu-Daudé wrote:
->> On 6/29/20 8:55 PM, BALATON Zoltan wrote:
->>> This patch is more complex as it should be which I intend to fix once
->>> agreement can be made on how to get back the necessary functionality
->>> removed by previous patches. See in this thread:
->>> https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg08710.html
->>> 
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> ---
->
-> I plan to rewrite this patch eliminating this part and un-breaking 
-> spd_data_generate() instead to allow it to signal an error again so we don't 
-> need to duplicate part of it here to avoid aborting. (You may remember the 
-> thread where this was discussed in, I don't have a link to it now.) So just
+Maybe sometime I'll try to propagate the data to the taken path, but that
+automatically requires extra memory allocation, so it'll be difficult to do
+that without a tcg slowdown.
 
-Oh, I actually have the link in the commit message... Maybe I should also 
-read what I write sometimes.
 
-Regards,
-BALATON Zoltan
---3866299591-2146972407-1602628139=:80018--
+r~
 
