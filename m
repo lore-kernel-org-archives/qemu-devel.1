@@ -7,60 +7,61 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CDAC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 07:03:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543A3C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 07:04:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E54D420797
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 07:03:50 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E54D420797
+	by mail.kernel.org (Postfix) with ESMTPS id E0D2220797
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 07:04:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0D2220797
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSELd-0001OQ-Qx
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 03:03:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33056)
+	id 1kSEM0-0001jp-Jr
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 03:04:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33030)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBs-0005k5-09; Tue, 13 Oct 2020 02:53:44 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:47483)
+ id 1kSEBk-0005Qw-Pk; Tue, 13 Oct 2020 02:53:36 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:33213)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBq-0000I1-9k; Tue, 13 Oct 2020 02:53:43 -0400
+ id 1kSEBi-0000HT-UD; Tue, 13 Oct 2020 02:53:36 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MtOT0-1kCKd52MQw-00umtZ; Tue, 13 Oct 2020 08:53:29 +0200
+ id 1MuluN-1kAyFa3K6N-00rlgu; Tue, 13 Oct 2020 08:53:26 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 15/15] meson.build: drop duplicate 'sparc64' entry
-Date: Tue, 13 Oct 2020 08:53:13 +0200
-Message-Id: <20201013065313.7349-16-laurent@vivier.eu>
+Subject: [PULL 11/15] hw/char/serial: remove duplicate .class_init in
+ serial_mm_info
+Date: Tue, 13 Oct 2020 08:53:09 +0200
+Message-Id: <20201013065313.7349-12-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013065313.7349-1-laurent@vivier.eu>
 References: <20201013065313.7349-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:y0Yp+Gd0K+6zJdPdrgiMojG/5KFVmFzm0M6k3ATbBCx3uBj419y
- BKJYEysUfe4et9AK9oqQp3aUZwtrciLFuKO46220htCsDFOkSFq8MIocc64RFs7rRP4v4sk
- hk0TdpD5pQlktJvxplIupKCYUvOzZBJ9k2RDGx8DRQIi9yyibnWsxCI+ERiNkh1wgdg+PMZ
- kHaxtFHzHWvrBUoStlJhg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:3kiei9YpVKo=:WkfQEgXt8LIHssHiN58ipV
- er3LiXpdoDO64Qc+9HbndSB5sKksVh9Nt5oUM1yHa9TcjQ+Kmsqa5gon7kxIlCXbyAplHkTwC
- kX8XEFuWpE08s10WrXuFWeWkmmGeb8piSg4r/L1izDaMZxjUXlYfs+NbWt57UPiDWFti7C6ry
- DwSNoDmEM33O4HBzlArgj1IfJSI0MQoUO9xEd5QPFcFJ080roBhClWwB3+Vf7CNMhkU+Y8vCn
- EI5CiQTfSed5VX/gVbWNhC59CShHzr0aQbZzKu32WNUUZAVbpxT4wN0pawnlyoc250ksimfAs
- i9eNg0kWN6YrenmdDSPlur9qN5opctLyjlNk089QXZTRDE2neZpS2uuMm4zFEq+08//VrJcWf
- OYBhkGM4hs0blCfEngd0M3iLrjph10/6ieJeOoLB0Iqt+OaVR/+6MQfO7BGEb8P0eyZNDD2+M
- oVAxUTzTRg4t7pWR1d9LgDyvauq2lKEvo6DHzhFc+i7H2YTxigzAFVOOmYwkP0TD54PNrMOO6
- TSUrjuQHIjTIpv4wEDThoEnkOlZ5LxEbMhbD4P2ZiugNh0P0u2ML875DB/SibIezpEacnwBCZ
- q0LhPY3hdRDDtQNj1pD+Ibbl03zFrFglnynHgsaIlcSnYAbXjMijEW3wV3cQZV3ZACVLaJE68
- YBsVzoVcPMai2j3Svz8xzSKoQ/PiaKnfUYRpUSwH7lxq3iLN1Tkwpnms193nIdawYxrKC515c
- dxge88kmtNc6Jjat1SFEkQrgwQYH966epVLqxO1FdjfFX/TGrrvTgAZWlqQkq9OdmMpWFq+M3
- iXx6QToflUMe45cXKq2r9/1VxOzy6atmIsPVyfyVHYfTnPY6Qq1yqQmGf3hiTad6ORfsGO7
+X-Provags-ID: V03:K1:deymScBIsP96b62FQfdXR1P7S5QpWc0kXxsLUrNgcoVURcCuhgW
+ QZcCBcCUfxK87jYYig7ML25m288gbs5vU30Un09qjtjp+LXpsABqXoAwdd/5prMqOQAyg0r
+ uBDFkbop1de+nHHPfVGXq1KLwpdhBo2qeJpXTk1Bt2BohBV7r6UnW0y7Hje7lwc0kR7Pvdu
+ yPiY2eIpt5tt9qq3DktFQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:B9Yf8OzXxs0=:CSSa6tG/hv5vkn62pYBCyO
+ DVgaaTxUdi/wrjQxdGg8tbv/5UDt9mycqYG9oHyyttrrAvTtiE68JZMrVnmJ2PQCcpWFJNEH6
+ OcaazVL4eAW7Y/EhKuzrVSQzA8lswrnnt0scFxO+SyfGX6DlBGgTfRiR0pOXYxiLpsgeBIlMs
+ D2xGfo0OuTyWrXHT54o0EMnUZkOJODp0Nq8AI3ozsk30Q+cNe5YZQ93OrLUQMooFQ0iF2354b
+ GZ3DmCVJsTMdwOiJeC8Myuzzr5P5z7nzer18PL8lo6BdksYPPEOR1z6namhT3Ulc1XhCF9hMs
+ rCgbZWbB2cuZtmmBOC2vw5rlDQmeYbYcAawuWJbZHIRNZUUU3aoWd6AI8hWzoMZX8NP3Ja8EQ
+ etZntlRY6ziiMvM/XnOV/2xJiTUP7HUVljspjch39kzKfIk82ByE/6fERXVEeBsodJ37+uUTY
+ AvpmIa6FwkFM9j2fLhoWKauXitesvo1lyRUPcR8YNTk7QygQ6cxNGAKZsMb7C8xvXJd1OXH4U
+ 4Ooxu5aN2k1JOMA25S+3+WxhYv7yDWhf6uHpWcOyh1ZDeZLVVI5hAnQHiOjQKnUEE3PuNTFWo
+ jfE3pHIzrjA74dg5I78OHSgxxkMmLZjKDrtyPpEyiDvhWUqAQZYbh3B6i2ybTdCGKId59sAnR
+ D4WA+fS6goKbjs1R08JyMwz+19/NVmCUpjp7G+X/ysQMz8g+sRRC8AP3aVVtPoBmx3dxux12r
+ tGcK5jfgSG+wMvJxs5ogp42a2zUBin3nz4nwMINBZ0Rva28r3i2D1UVE6dUwxe+f038JMs/Qy
+ dXOKORuZ0KgrpgW7F1DjMAN7INefjfXG5ImUGQkI53P0TRtHTPZXKvC4BIKPBvi7LqJ2aCj
 Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:53:26
@@ -83,38 +84,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>, Sergei Trofimovich <slyfox@gentoo.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Cc: Laurent Vivier <lvivier@redhat.com>, qemu-trivial@nongnu.org,
+ Michael Tokarev <mjt@tls.msk.ru>, Li Qiang <liq3ea@gmail.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Laurent Vivier <laurent@vivier.eu>,
+ Alistair Francis <alistair.francis@wdc.com>, marcandre.lureau@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Sergei Trofimovich <slyfox@gentoo.org>
+From: Laurent Vivier <lvivier@redhat.com>
 
-CC: Laurent Vivier <laurent@vivier.eu>
-CC: qemu-trivial@nongnu.org
+.class_init is already set to serial_mm_class_init.
+
+Remove the duplicate entry.
+
+Fixes: 17fd1a6490b1 ("serial-mm: add "regshift" property")
+Cc: marcandre.lureau@redhat.com
+Signed-off-by: Laurent Vivier <lvivier@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
-Message-Id: <20201012175719.2573367-1-slyfox@gentoo.org>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-Id: <20201009113843.60995-1-lvivier@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- meson.build | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/char/serial.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/meson.build b/meson.build
-index 17c89c87c626..392d326f4563 100644
---- a/meson.build
-+++ b/meson.build
-@@ -41,7 +41,7 @@ have_block = have_system or have_tools
- python = import('python').find_installation()
+diff --git a/hw/char/serial.c b/hw/char/serial.c
+index 4386adabd466..97f71879ff2a 100644
+--- a/hw/char/serial.c
++++ b/hw/char/serial.c
+@@ -1120,7 +1120,6 @@ static const TypeInfo serial_mm_info = {
+     .class_init = serial_mm_class_init,
+     .instance_init = serial_mm_instance_init,
+     .instance_size = sizeof(SerialMM),
+-    .class_init = serial_mm_class_init,
+ };
  
- supported_oses = ['windows', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'sunos', 'linux']
--supported_cpus = ['ppc', 'ppc64', 's390x', 'sparc64', 'riscv32', 'riscv64', 'x86', 'x86_64',
-+supported_cpus = ['ppc', 'ppc64', 's390x', 'riscv32', 'riscv64', 'x86', 'x86_64',
-   'arm', 'aarch64', 'mips', 'mips64', 'sparc', 'sparc64']
- 
- cpu = host_machine.cpu_family()
+ static void serial_register_types(void)
 -- 
 2.26.2
 
