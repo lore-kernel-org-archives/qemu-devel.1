@@ -2,103 +2,71 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9868AC43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:16:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE1B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:18:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1DE2124801
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:16:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="mcI/2z2r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DE2124801
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3145B247FE
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:18:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3145B247FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSL67-0007tK-0Z
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 10:16:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57644)
+	id 1kSL8W-0002TX-7y
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 10:18:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43992)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kSL4K-0006qj-Vv; Tue, 13 Oct 2020 10:14:28 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:33938)
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kSKNU-0002Kb-4A
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:30:08 -0400
+Received: from mga17.intel.com ([192.55.52.151]:9422)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david.edmondson@oracle.com>)
- id 1kSL4I-0007KV-I0; Tue, 13 Oct 2020 10:14:24 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09DEEGaH117774;
- Tue, 13 Oct 2020 14:14:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2020-01-29; bh=uj2LKtjKJJ7DdSEmRNUjqh5LCM5jLrVIpdPTZ9hXRBs=;
- b=mcI/2z2r2MwgPtnHH7RMbQquwRFK4tToyJMoeAest/rOVaIRtXYLTtHW7QlQXTQhNNe+
- nRgCHE1RB/5qdc3UI1E68r2raWNzIT89muqpzjvEPA2telGujD6j7NixC53ZOfeXxIJ0
- lHrpkgaPj8x3XVtduuQL3q7l/u7C32JDSZcd09i0AlToW40BjzticoDqOshuJ+tCKFMe
- YyI3v4cqaHnc39C2AsxlKJGT+PMnCJdRfJt+AU4u+7ce+xSSAJgEFCJJTJuQxJMy2dEl
- SGgD2LbjD5+IK0YFeJATbdcDQRB2kzFQKBxinmmK0LyEX2o6ikYqOTDXEKkRjACucgGG Qg== 
-Received: from aserp3020.oracle.com (aserp3020.oracle.com [141.146.126.70])
- by aserp2120.oracle.com with ESMTP id 3434wkjds5-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Tue, 13 Oct 2020 14:14:18 +0000
-Received: from pps.filterd (aserp3020.oracle.com [127.0.0.1])
- by aserp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09DEBDd9017151;
- Tue, 13 Oct 2020 14:14:18 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3020.oracle.com with ESMTP id 343puxym25-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 13 Oct 2020 14:14:18 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09DEEGJf015255;
- Tue, 13 Oct 2020 14:14:17 GMT
-Received: from disaster-area.hh.sledj.net (/81.187.26.238)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Tue, 13 Oct 2020 07:14:16 -0700
-Received: from localhost (disaster-area.hh.sledj.net [local])
- by disaster-area.hh.sledj.net (OpenSMTPD) with ESMTPA id babe4ce0;
- Tue, 13 Oct 2020 14:14:14 +0000 (UTC)
-From: David Edmondson <david.edmondson@oracle.com>
-To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org
-Subject: [PATCH] qmp-shell: Sort by key when pretty-printing
-Date: Tue, 13 Oct 2020 15:14:14 +0100
-Message-Id: <20201013141414.18398-1-david.edmondson@oracle.com>
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kSKNQ-0001Jw-Bz
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 09:30:07 -0400
+IronPort-SDR: iPXLLFImKTXsQNGXvAk/XSHp+5surRqa5eZSf85IQEONE5gY/GYoNZjLBYswqDfhLkuZaQ+m6M
+ SepkcwEhnDDw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9772"; a="145771654"
+X-IronPort-AV: E=Sophos;i="5.77,370,1596524400"; d="scan'208";a="145771654"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+ by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Oct 2020 06:29:56 -0700
+IronPort-SDR: j53Q7PLBtNpk6mVb+r+tsXFbb5Zdr5T2x1nvcyn7bRUqORCsz+byJ2DMAARHm/NiFfiEedDOol
+ hCW05/ZfElAA==
+X-IronPort-AV: E=Sophos;i="5.77,370,1596524400"; d="scan'208";a="299570231"
+Received: from clai3-mobl1.amr.corp.intel.com (HELO bwidawsk-mobl5.local)
+ ([10.252.133.61])
+ by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 13 Oct 2020 06:29:55 -0700
+From: Ben Widawsky <ben.widawsky@intel.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] pci: Disallow improper BAR registration for type 1
+Date: Tue, 13 Oct 2020 06:29:48 -0700
+Message-Id: <20201013132948.293629-1-ben.widawsky@intel.com>
 X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9772
- signatures=668681
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=932
- mlxscore=0 spamscore=0
- adultscore=0 suspectscore=0 phishscore=0 bulkscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010130107
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9772
- signatures=668681
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 mlxscore=0
- malwarescore=0 phishscore=0 suspectscore=0 impostorscore=0 clxscore=1011
- spamscore=0 priorityscore=1501 bulkscore=0 adultscore=0 mlxlogscore=949
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010130108
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=david.edmondson@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 10:14:19
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+Received-SPF: pass client-ip=192.55.52.151;
+ envelope-from=ben.widawsky@intel.com; helo=mga17.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 09:29:58
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Tue, 13 Oct 2020 10:17:54 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -110,33 +78,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Edmondson <david.edmondson@oracle.com>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Ben Widawsky <ben.widawsky@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If the user selects pretty-printing (-p) the contents of any
-dictionaries in the output are sorted by key.
+This patch informs future developers working on root complexes, root
+ports, or bridges that also wish to implement a BAR for those. PCI type
+1 headers only support 2 base address registers. It is incorrect and
+difficult to figure out what is wrong with the device when this mistake
+is made. With this, it is immediate and obvious what has gone wrong.
 
-Signed-off-by: David Edmondson <david.edmondson@oracle.com>
+Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
 ---
- scripts/qmp/qmp-shell | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/pci/pci.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/scripts/qmp/qmp-shell b/scripts/qmp/qmp-shell
-index c5eef06f3f..b4d06096ab 100755
---- a/scripts/qmp/qmp-shell
-+++ b/scripts/qmp/qmp-shell
-@@ -260,7 +260,7 @@ class QMPShell(qmp.QEMUMonitorProtocol):
-         indent = None
-         if self._pretty:
-             indent = 4
--        jsobj = json.dumps(qmp, indent=indent)
-+        jsobj = json.dumps(qmp, indent=indent, sort_keys=self._pretty)
-         print(str(jsobj))
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 3c8f10b461..55b0302c57 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1141,6 +1141,7 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+     uint32_t addr; /* offset in pci config space */
+     uint64_t wmask;
+     pcibus_t size = memory_region_size(memory);
++    uint8_t hdr_type;
  
-     def _execute_cmd(self, cmdline):
+     assert(region_num >= 0);
+     assert(region_num < PCI_NUM_REGIONS);
+@@ -1150,6 +1151,15 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+         exit(1);
+     }
+ 
++    hdr_type =
++        pci_dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
++    if (hdr_type == PCI_HEADER_TYPE_BRIDGE && region_num > 1) {
++        error_report("ERROR: PCI Type 1 header only has 2 BARs "
++                     "requested BAR=%d",
++                     region_num);
++        exit(1);
++    }
++
+     r = &pci_dev->io_regions[region_num];
+     r->addr = PCI_BAR_UNMAPPED;
+     r->size = size;
 -- 
 2.28.0
 
