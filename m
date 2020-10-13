@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C625C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:05:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 492EFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:07:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC1D22080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:05:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC1D22080A
+	by mail.kernel.org (Postfix) with ESMTPS id 91A472067D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:07:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 91A472067D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSJ3b-000709-Qu
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:05:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44190)
+	id 1kSJ5Z-0000hr-Gf
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:07:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44298)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpk-0007BJ-8T; Tue, 13 Oct 2020 07:51:12 -0400
-Received: from mout.kundenserver.de ([212.227.17.10]:60681)
+ id 1kSIpy-0007mv-EV; Tue, 13 Oct 2020 07:51:26 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51917)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIph-0004yK-SR; Tue, 13 Oct 2020 07:51:11 -0400
+ id 1kSIpw-00050A-8s; Tue, 13 Oct 2020 07:51:26 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1N4Q8u-1kIusg18S6-011U5R; Tue, 13 Oct 2020 13:51:04 +0200
+ id 1MNtny-1kqYsw1Nnc-00OIj1; Tue, 13 Oct 2020 13:51:10 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/14] hw/pci: Fix typo in PCI hot-plug error message
-Date: Tue, 13 Oct 2020 13:50:46 +0200
-Message-Id: <20201013115052.133355-9-laurent@vivier.eu>
+Subject: [PULL 14/14] meson.build: drop duplicate 'sparc64' entry
+Date: Tue, 13 Oct 2020 13:50:52 +0200
+Message-Id: <20201013115052.133355-15-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013115052.133355-1-laurent@vivier.eu>
 References: <20201013115052.133355-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:2LBmoiDVhBuO22eEYTNANL928DYxMfV6Z2wEE7rfy2/xdIIuH8/
- oE4cRSDTU8iBZRUI7aHXb6ktk7HBI2fGLrxQuoYkex8+RjkpmdGbOedxTSNFRtZV1Z6sTyQ
- JcJ+IwvDmjTZFT4bKYZ4jFT7J+cSlbtNxjHEG0tdqg56cKpR0wiHe7vC7zaViWeX+0ATC4i
- Y5OK2a99GEjZXjV6JJLvQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:D5CKPOjaWmY=:8Gb9mfsb5RSJZyyr4fAAov
- e0aSkjEFSoSF60honocHW0hUgh3EAnF1jkWWeNOizWJPNdiVC2lVNM/Cd6oeIxkPapUol71ic
- /u4G54BWqvQ2JkL/HRjtHLSaP94VwFmsT87jqNDhqH6q6TNE8ZMUbEkJrbqPKr2O/EdJ3gckD
- DaulDRveRVeEERDPPw2S/UhBdLtz5l9RQzgN2hHUazzj7JAMv3Aq2CsEA2C6fU726KbpPOzR/
- asoI7mg7TpbjRN4dEPcNQhaPMlM+GvlzaS62igISOrpJtixL2rx/GxdrDLv5p22xCeu5loUBx
- sup9qOWYsSfB9NdvLEjh2HDxysg4zYlfTrXxfnr8Hi3Sq2CMyym/ZPC336KhNFbBykCPxk6+g
- Fe9lCW1X7e73rNCZI2mnsb9BRHTpXBFbEj/o0ys5ohKHpQqfsb8iS2y/rz+MKKkvgev/UAX31
- bH67kKEcdJgeoyx3tfle0Ly0a5KunE1ABeYgbr3qp60wCfp75fapHl3ByDKRDHFoJahA0lXlZ
- xm81oSZYFn++AgZ6WJg1RjYx1RjElXBVZziZFH7NDonuxatKDdvmpco+0Kh2UXk3CJblpfo/m
- WEBruzI7ZqyLmd6KNFPJ5CXbukACG++Z5Om4C3e2pGtOiDXm6/0ypq2sa8y3A0oQagh5BUdIT
- TW1sfGIR/gR7Qj3jnHvj68PP9nFoY9RWTRPlHIQorEg0iINfdXyVd9ZzK/wQ2oJUIbva1JRIA
- rAYzb3GXskAnRKIVodT5A7M+HhkXqa/lhhbGSqS76DxR7eN3nwrfn2yhu8gVdoHgipmLv2Sxl
- IysqocwwcG51ExS/1jGNhebZ72lV+qnYu8RH04/0dNybt8fZ9nJQFwScVMHr7LydmnCkuis
-Received-SPF: none client-ip=212.227.17.10; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:jBEdeiOklT/eZ0CDQWnCxpX1YMzRpDwu1r6q/zXsIQOBnj9OvJM
+ zwLPhUCWGKS0rctwvfBDXpJC5up12co8CEaqRyyhrg9kbR06UvlekKPPggAeaQo6771gGnR
+ DqM/pQzh/s0ssyW3ksG3tJIq1u3T1U+W+9JbePER3t9G2CY1O7LvovqTVOmuJV1IMe3RA0M
+ bzngrhJksfIEMkQzAaZfA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:xOQSOvg/1Mo=:vGbXTggR2dxCf1UicioCo5
+ WSKiyHy9ZxDWEnNRixS+9wVpStI0jrwzIZuqJmlXGPlU9MndbxyoMEtC13sNsjJr6uiVmIqN4
+ v4B2sG9wCzLpkizhorZZ2kiOek1Mhf7UZV/d7wGvZ0qcxE23l0J22MggG6hykebd62wePlkKl
+ r4XFhYfEtvqNckpMQnzH+T/uJRnvleDkph+656ZD+3hfNHH4x5vdsKiYvLHq3la8rCWABvcpU
+ SXjcScBo5FUdlQ/s7wnLyiwwWYeGct+KKQ8V74H/KobrsTRAzTLqS1PRSYKCNnJ0oC0aQtxVD
+ yPnl5wLIyEWMeCLmId0QiaL1EVJcjggid3uKOnDbH+Em8xqJ5B92A6MJc+TW0ASpHdHlNwmb4
+ CMfmPBHIoF9qAlCGbEE82UguiGvGlDGsKUaRuIVtBIueS2H2Bvd9W4ONtfj9tK/QQS4Xp9q4F
+ bpbvJqLtHh4Oy4HuUBmiGDS0IXs20BSr9v8RZ2EsfJjhuCrirXtFXRi9fNBcdF72w6IPEsVV1
+ briL9//wdorT7K/cmh8iPTpLhN60HDBHKAdCCZaHftg7zALQE0JVCTUtzQQSkJfHLxSG8jHrC
+ f/9tuBKMxs9e9WKMmAP283sUQFdMfoK2Zf4JWMmU8Fj+XK9OTSz4qFy1ZzyIqC6+degjmCREX
+ w3GW07ELHzjJvOX4gRBsDEdEZlVV44ZdY1zhu/iNcrH81ax0HKttDASyvZR3edyHm/z7n07NT
+ JY/2Z5u6JyFTGQvuFegRHrh3LND3e2km6yzJtQugqpxSu21trLnUofYotmoQEe6Zau6niTZyv
+ 63chwLv2mueDxv1wb3Bh+N5Ho6shAoVzejDSemg/uLjUoYCsUPLRVMv6HTu48hEosrfsPg9
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:51:08
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:50:58
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,52 +83,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Julia Suvorova <jusual@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: qemu-trivial@nongnu.org, Michael Tokarev <mjt@tls.msk.ru>,
+ Laurent Vivier <laurent@vivier.eu>, Sergei Trofimovich <slyfox@gentoo.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Julia Suvorova <jusual@redhat.com>
+From: Sergei Trofimovich <slyfox@gentoo.org>
 
-'occupied' is spelled like 'ocuppied' in the message.
-
-Signed-off-by: Julia Suvorova <jusual@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201006133958.600932-1-jusual@redhat.com>
+CC: Laurent Vivier <laurent@vivier.eu>
+CC: qemu-trivial@nongnu.org
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Sergei Trofimovich <slyfox@gentoo.org>
+Message-Id: <20201012175719.2573367-1-slyfox@gentoo.org>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/pci/pci.c       | 2 +-
- hw/ppc/spapr_pci.c | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ meson.build | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/pci/pci.c b/hw/pci/pci.c
-index 3c8f10b4618a..100c9381c2f1 100644
---- a/hw/pci/pci.c
-+++ b/hw/pci/pci.c
-@@ -1036,7 +1036,7 @@ static PCIDevice *do_pci_register_device(PCIDevice *pci_dev,
-         return NULL;
-     } else if (dev->hotplugged &&
-                pci_get_function_0(pci_dev)) {
--        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-+        error_setg(errp, "PCI: slot %d function 0 already occupied by %s,"
-                    " new func %s cannot be exposed to guest.",
-                    PCI_SLOT(pci_get_function_0(pci_dev)->devfn),
-                    pci_get_function_0(pci_dev)->name,
-diff --git a/hw/ppc/spapr_pci.c b/hw/ppc/spapr_pci.c
-index 3999392b32c6..88ce87f130a5 100644
---- a/hw/ppc/spapr_pci.c
-+++ b/hw/ppc/spapr_pci.c
-@@ -1571,7 +1571,7 @@ static void spapr_pci_plug(HotplugHandler *plug_handler,
-      */
-     if (plugged_dev->hotplugged && bus->devices[PCI_DEVFN(slotnr, 0)] &&
-         PCI_FUNC(pdev->devfn) != 0) {
--        error_setg(errp, "PCI: slot %d function 0 already ocuppied by %s,"
-+        error_setg(errp, "PCI: slot %d function 0 already occupied by %s,"
-                    " additional functions can no longer be exposed to guest.",
-                    slotnr, bus->devices[PCI_DEVFN(slotnr, 0)]->name);
-         return;
+diff --git a/meson.build b/meson.build
+index 17c89c87c626..392d326f4563 100644
+--- a/meson.build
++++ b/meson.build
+@@ -41,7 +41,7 @@ have_block = have_system or have_tools
+ python = import('python').find_installation()
+ 
+ supported_oses = ['windows', 'freebsd', 'netbsd', 'openbsd', 'darwin', 'sunos', 'linux']
+-supported_cpus = ['ppc', 'ppc64', 's390x', 'sparc64', 'riscv32', 'riscv64', 'x86', 'x86_64',
++supported_cpus = ['ppc', 'ppc64', 's390x', 'riscv32', 'riscv64', 'x86', 'x86_64',
+   'arm', 'aarch64', 'mips', 'mips64', 'sparc', 'sparc64']
+ 
+ cpu = host_machine.cpu_family()
 -- 
 2.26.2
 
