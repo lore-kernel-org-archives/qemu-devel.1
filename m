@@ -2,86 +2,82 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97642C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69640C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 015E120E65
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6C78208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y68BWEmj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 015E120E65
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="igL4LoFl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6C78208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50416 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50920 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSI2P-00029t-R1
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:00:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59354)
+	id 1kSI2V-0002MP-Sr
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:00:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyD-0005R3-JQ
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22131)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyP-0005WB-Rp
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:56:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50633)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyB-0006CS-Mf
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:53 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyK-0006E9-Bx
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:56:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602586551;
+ s=mimecast20190719; t=1602586558;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xVc3GGMv7x6GEw87NBVu8Oks7IamHi9PmCdJMUyJJOM=;
- b=Y68BWEmjQAdTx7SjcFMBEaUXbi9j19/o589CSqbCkoOVkaYDnjUXS7JA5KsfcYHT/IcUAA
- BxVJuJy/W39F4uvBLckQAtAlQC/Ygrrevt6pcVUK476bP+O9m7uObBnUJ5clcpVps5zMDp
- N1AJOJbkBut248Ub10TYsm6q88R2UgE=
+ to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
+ references:references; bh=XF62iRFOOfTd6EN5BZ0SHkzCzlzIasMoV19lLSWcopE=;
+ b=igL4LoFlZoqgMYfziMPTTqgW5zVKg+NloEpmNF9A8AsphRGMMb8FOmnTNrL/en29RAwWk5
+ vkoodDUnlJjOsR5Cu2mnw9gkZL729q2rh1GCaH44iEnWFxLJgR5NUN3NzAAJteYNicjF1y
+ iVLCaZHoC4FD0yEZuh95wiBcJVeHa0k=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-XoXGtFVWPImIH2TJ-o7a4g-1; Tue, 13 Oct 2020 06:55:48 -0400
-X-MC-Unique: XoXGtFVWPImIH2TJ-o7a4g-1
+ us-mta-283-Dvn1APodN6mJzUScL0UtFg-1; Tue, 13 Oct 2020 06:55:56 -0400
+X-MC-Unique: Dvn1APodN6mJzUScL0UtFg-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF8EC86ABD6;
- Tue, 13 Oct 2020 10:55:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA08718829D3;
+ Tue, 13 Oct 2020 10:55:55 +0000 (UTC)
 Received: from thuth.com (ovpn-112-151.ams2.redhat.com [10.36.112.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8CC2E6EF59;
- Tue, 13 Oct 2020 10:55:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 25CA46EF67;
+ Tue, 13 Oct 2020 10:55:53 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 04/23] Acceptance tests: do not show canceled test logs on
- GitLab CI
-Date: Tue, 13 Oct 2020 12:55:08 +0200
-Message-Id: <20201013105527.20088-5-thuth@redhat.com>
+Subject: [PULL 09/23] Add a comment in bios-tables-test.c to clarify the
+ reason behind approach
+Date: Tue, 13 Oct 2020 12:55:13 +0200
+Message-Id: <20201013105527.20088-10-thuth@redhat.com>
 In-Reply-To: <20201013105527.20088-1-thuth@redhat.com>
 References: <20201013105527.20088-1-thuth@redhat.com>
-MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,39 +96,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cleber Rosa <crosa@redhat.com>
+From: Ani Sinha <ani@anisinha.ca>
 
-Tests resulting in "CANCEL" in Avocado are usually canceled on
-purpose, and are almost identical to "SKIP".  The logs for canceled
-tests are adding a lot of noise to the logs being shown on GitLab CI,
-and causing distraction from real failures.
+A comment is added in bios-tables-test.c that explains the reasoning
+behind the process of updating the ACPI table blobs when new tests are added
+or old tests are modified or code is committed that affect tests. The
+explanation would help future contributors follow the correct process when
+making code changes that affect ACPI tables.
 
-As a side note, this "after script" is scheduled for removal once the
-feature is implemented within Avocado itself.
-
-Reference: https://github.com/avocado-framework/avocado/issues/4266
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20201009205513.751968-3-crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Ani Sinha <ani@anisinha.ca>
+Acked-by: Igor Mammedov <imammedo@redhat.com>
+Message-Id: <20200929142501.1057-1-ani@anisinha.ca>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.yml | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tests/qtest/bios-tables-test.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 075c15d45c..14be45bbfe 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -63,7 +63,7 @@ include:
-       fi
-   after_script:
-     - cd build
--    - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP")]' | xargs cat
-+    - python3 -c 'import json; r = json.load(open("tests/results/latest/results.json")); [print(t["logfile"]) for t in r["tests"] if t["status"] not in ("PASS", "SKIP", "CANCEL")]' | xargs cat
-     - du -chs ${CI_PROJECT_DIR}/avocado-cache
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index e15f36c8c7..5647624492 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -11,7 +11,7 @@
+  */
  
- build-system-ubuntu:
+ /*
+- * How to add or update the tests:
++ * How to add or update the tests or commit changes that affect ACPI tables:
+  * Contributor:
+  * 1. add empty files for new tables, if any, under tests/data/acpi
+  * 2. list any changed files in tests/qtest/bios-tables-test-allowed-diff.h
+@@ -38,6 +38,11 @@
+  *      $(SRC_PATH)/tests/data/acpi/rebuild-expected-aml.sh
+  * 6. Now commit any changes to the expected binary, include diff from step 4
+  *    in commit log.
++ *    Expected binary updates needs to be a separate patch from the code that
++ *    introduces changes to ACPI tables. It lets the maintainer drop
++ *    and regenerate binary updates in case of merge conflicts. Further, a code
++ *    change is easily reviewable but a binary blob is not (without doing a
++ *    disassembly).
+  * 7. Before sending patches to the list (Contributor)
+  *    or before doing a pull request (Maintainer), make sure
+  *    tests/qtest/bios-tables-test-allowed-diff.h is empty - this will ensure
 -- 
 2.18.2
 
