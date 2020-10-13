@@ -2,99 +2,97 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 807E1C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:09:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7787C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:14:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFBF320E65
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:09:48 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="W5MWQbtN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFBF320E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id E30F720E65
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:14:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30F720E65
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49636 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSPgB-00067p-Nl
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:09:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33516)
+	id 1kSPki-0000w8-JV
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:14:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSPeI-0005QM-IV
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:07:50 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:51777)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSPeH-0005u1-4Z
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:07:50 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id a17so480192pju.1
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 12:07:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=TDs51atH4eIgDdH3rjjCtdaHC2R8L6bgkFqfRU3lOI0=;
- b=W5MWQbtNpdyNSKzcpUmnUuAix8eFvnvX0fcBv7UOzxB1rIfdn5TCsn7WoYlPucvgWH
- ak0N2mIpy0oBoi7nSEyp4hw7IMm/JNJelQzX0GT2S0n+oZIJM/O1ugkE4lBh0GtWZ06e
- 7YoKTpD25nvZTF5SExiADkmVa5Ox2OLXLAAbyOR7uEWEzKhHAC2eexoOLKxS/31HvuD7
- kaqQhVMg260jpIvy3jyVwqHhgHA6WhLSrjZUBFpzM0PyHheAeSQ7GwyIxSKGIKwxXePh
- Du7A4Mc+stk/VDB4xI/CmvgaLHYEPktYmlfVLfE5oOuqfDBBsC9XFU+X4lx3co0fReHd
- pJNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TDs51atH4eIgDdH3rjjCtdaHC2R8L6bgkFqfRU3lOI0=;
- b=R/xL8hm7yQ8lmzX5sIhWhlISt3v5zC+61GCW9C9cE064F0pfYu3s5jOqQnqQKahkyM
- x6vvJIpVbM9qi9oWqgVSkV7EzZuQ1d1sh0OJ0vwWW+rT6vb61kZ//94HyqXcPv+uRYS+
- /x/l8s1djTQBQj6fXrBafQqIvlY2B7Csr4Kn+k5Ai/7UEjinF6u1x9SFW43dB8i+gO+Q
- r9PRvCVUrViyT9Zn/yxGLazzQAThIGyHO4NLFIB1jBq/+j6KgQg6/b/gbtMtVbswHgY7
- C4lGLg0ZdYL5mHkQlPotxkObWGeFgENbr5R+ZUqH3dcPwDN2E90vNV3uFGAM1XfSJ3RZ
- 4I6g==
-X-Gm-Message-State: AOAM530fUwAxaapWAKcdiG5c1V17evcutRYfA15AtvB/3JV0CocdfOWd
- rlyuB1vfvbCV2xXNlts9Sh4gm0PEj3fQ0Q==
-X-Google-Smtp-Source: ABdhPJyxK2FXvumdnL2KqQl+ZrAwwO/6RwGELigrN9z4bZI3DnmyHWQMDnCPxHGPldm4WRUrLJm1Fw==
-X-Received: by 2002:a17:902:fe18:b029:d4:d4d7:782 with SMTP id
- g24-20020a170902fe18b02900d4d4d70782mr1140758plj.1.1602616067060; 
- Tue, 13 Oct 2020 12:07:47 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id w14sm383155pfu.87.2020.10.13.12.07.45
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 12:07:46 -0700 (PDT)
-Subject: Re: [PATCH 08/10] target/arm: Fix has_vfp/has_neon ID reg squashing
- for M-profile
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
- <20201012153746.9996-9-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <614adbe6-c16c-f18d-c444-a474e6b6f559@linaro.org>
-Date: Tue, 13 Oct 2020 12:07:44 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kSPfL-0005pD-N3; Tue, 13 Oct 2020 15:08:56 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:53897)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kSPfJ-0005yO-0w; Tue, 13 Oct 2020 15:08:55 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id 5446EAFE;
+ Tue, 13 Oct 2020 15:08:50 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Tue, 13 Oct 2020 15:08:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding; s=fm1; bh=lph34Y6i5P6gEjnalHg7A5kTvY
+ P+CPCWWvqsWL3bDhM=; b=E0RyBZU2Y2nENHzjuNUBo4DZBNkfH0yOWpY2vijCNF
+ MaN0Daq7LC6x4fXNIpl/tQ7+CKw15EasXBDgH6m7y5s04T8M8z/wq35EorTU75Sa
+ jfzC3UxQqX7p6DfAqGJLqTLsXGo8sgUJSShmWlwVvS+lrlYpkCccSx5PV7vzpnQN
+ W0IWFtv2VmQHV9anWd/pab5dvHRtHVUAkb3WpruLyWU1DYxT3Ln1qNLOPAxHz/Hm
+ pQDOgjrAOpGqd1wPmn+aqBLHGOjg3YDa+nLGsfKZNFy4iE1ZyejcqaE5k7zO/HYt
+ zweUWwkyV1ymGPEa8ctpkYklqqd5vNSJxhCfOkNm2Ecw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=lph34Y6i5P6gEjnal
+ Hg7A5kTvYP+CPCWWvqsWL3bDhM=; b=OiNLozwyRaYyX4BjkXEm93SWP5ndrx3rE
+ cTulS6IC/tnGWaFBP0qpy+dn7/Roig2HGUVBbe7u7gmfZ1kXxoYFiM3avb0ijIOI
+ eNnpIu672hfks4/RLuzkjszx0EXdlEL7ejXryZarFuFfqaMiPxTQe94rBn6YCeMm
+ t5IjHWhQ2BSlJj/DWbG1qDGBTUu6l0xbTF0FWms1gHj58VKY8Dprt8UbretmEtz3
+ ka9ElM1g0OsAQcKXIVSL756F+zQgkWNsXu16uCNh25vEuQ7DpUpr6FARmr624E9c
+ h6VLduNU127Tz6x/y9QDcWiXrUJWPcBKQ++G2QbsD22+hz9kTs61A==
+X-ME-Sender: <xms:QPuFX_fIorl4bb5eqQ3RPMLVrmgHS6aysln52YMbjSie4H04beoWOw>
+ <xme:QPuFX1OXhwhDcZbDzFTen8YxUB7_brthWKqS1Qzlx5MnrCet0Jxbgsik1IT7yRk6l
+ yGNsBjWYVzz33ljiOw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrheelgddufeehucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhsucfl
+ vghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtthgvrh
+ hnpefffeetleelhfdvuedtteelffevtdejhffhiefffeffhfehudevfefgteejkeegteen
+ ucffohhmrghinhepuhhtihhlihiirghtihhonhdrmhgrphenucfkphepkedtrdduieejrd
+ elkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
+ ohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:QPuFX4hYlOUG9sYyVHJRal1M-rW-jsd237mGQjAZmXSDKWdez83i7A>
+ <xmx:QPuFXw9O99nPi7upPHMkRRsVs5zpOE7vfk4bHoVC0Zcc8e-sWRma2g>
+ <xmx:QPuFX7t6hTLc7zZOQqtQj6Wu1EoggtE4Ox3iGba4nuQ_eC21paexbQ>
+ <xmx:QfuFX1LhFW-jhRjgWIjoLvuppWK2_z-O4-d-fYrTP1hKvvwL2OY7LQsVu7c>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 837F53280069;
+ Tue, 13 Oct 2020 15:08:47 -0400 (EDT)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] hw/block/nvme: add block utilization tracking
+Date: Tue, 13 Oct 2020 21:08:46 +0200
+Message-Id: <20201013190846.260841-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <20201012153746.9996-9-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
+ helo=wnew4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 15:08:51
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,36 +105,276 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/20 8:37 AM, Peter Maydell wrote:
-> In arm_cpu_realizefn(), if the CPU has VFP or Neon disabled then we
-> squash the ID register fields so that we don't advertise it to the
-> guest.  This code was written for A-profile and needs some tweaks to
-> work correctly on M-profile:
-> 
->  * A-profile only fields should not be zeroed on M-profile:
->    - MVFR0.FPSHVEC,FPTRAP
->    - MVFR1.SIMDLS,SIMDINT,SIMDSP,SIMDHP
->    - MVFR2.SIMDMISC
->  * M-profile only fields should be zeroed on M-profile:
->    - MVFR1.FP16
-> 
-> In particular, because MVFR1.SIMDHP on A-profile is the same field as
-> MVFR1.FP16 on M-profile this code was incorrectly disabling FP16
-> support on an M-profile CPU (where has_neon is always false).  This
-> isn't a visible bug yet because we don't have any M-profile CPUs with
-> FP16 support, but the change is necessary before we introduce any.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-> ---
->  target/arm/cpu.c | 29 ++++++++++++++++++-----------
->  1 file changed, 18 insertions(+), 11 deletions(-)
+From: Klaus Jensen <k.jensen@samsung.com>
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+This adds support for reporting the Deallocated or Unwritten Logical
+Block error (DULBE). This requires tracking the allocated/deallocated
+status of all logical blocks.
 
+Introduce a bitmap that does this. The bitmap is always intialized to
+all ones (aka, all blocks are allocated) on boot up. Blocks can then be
+specifically deallocated using Write Zeroes. This ensures that we can
+always guarantee zeroes to be returned from deallocated blocks.
 
-r~
+When the device gains support for persistent state, the intention is to
+remove the "allocated by default" behavior.
+
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ hw/block/nvme-ns.h    | 10 ++++++
+ include/block/nvme.h  |  5 +++
+ hw/block/nvme-ns.c    | 10 ++++++
+ hw/block/nvme.c       | 81 +++++++++++++++++++++++++++++++++++++++++++
+ hw/block/trace-events |  2 ++
+ 5 files changed, 108 insertions(+)
+
+diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+index 83734f4606e1..e91a83e2a03f 100644
+--- a/hw/block/nvme-ns.h
++++ b/hw/block/nvme-ns.h
+@@ -30,7 +30,17 @@ typedef struct NvmeNamespace {
+     int64_t      size;
+     NvmeIdNs     id_ns;
+ 
++    struct {
++        struct {
++            unsigned long *map;
++        } utilization;
++    } state;
++
+     NvmeNamespaceParams params;
++
++    struct {
++        uint32_t err_rec;
++    } features;
+ } NvmeNamespace;
+ 
+ static inline uint32_t nvme_nsid(NvmeNamespace *ns)
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 6de2d5aa75a9..2249d77c2129 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -686,6 +686,7 @@ enum NvmeStatusCodes {
+     NVME_E2E_REF_ERROR          = 0x0284,
+     NVME_CMP_FAILURE            = 0x0285,
+     NVME_ACCESS_DENIED          = 0x0286,
++    NVME_DULB                   = 0x0287,
+     NVME_MORE                   = 0x2000,
+     NVME_DNR                    = 0x4000,
+     NVME_NO_COMPLETE            = 0xffff,
+@@ -902,6 +903,9 @@ enum NvmeIdCtrlLpa {
+ #define NVME_AEC_NS_ATTR(aec)       ((aec >> 8) & 0x1)
+ #define NVME_AEC_FW_ACTIVATION(aec) ((aec >> 9) & 0x1)
+ 
++#define NVME_ERR_REC_TLER(err_rec)  (err_rec & 0xffff)
++#define NVME_ERR_REC_DULBE(err_rec) (err_rec & 0x10000)
++
+ enum NvmeFeatureIds {
+     NVME_ARBITRATION                = 0x1,
+     NVME_POWER_MANAGEMENT           = 0x2,
+@@ -1022,6 +1026,7 @@ enum NvmeNsIdentifierType {
+ 
+ 
+ #define NVME_ID_NS_NSFEAT_THIN(nsfeat)      ((nsfeat & 0x1))
++#define NVME_ID_NS_NSFEAT_DULBE(nsfeat)     ((nsfeat >> 2) & 0x1)
+ #define NVME_ID_NS_FLBAS_EXTENDED(flbas)    ((flbas >> 4) & 0x1)
+ #define NVME_ID_NS_FLBAS_INDEX(flbas)       ((flbas & 0xf))
+ #define NVME_ID_NS_MC_SEPARATE(mc)          ((mc >> 1) & 0x1)
+diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+index b69cdaf27e43..b221fe02cd13 100644
+--- a/hw/block/nvme-ns.c
++++ b/hw/block/nvme-ns.c
+@@ -47,6 +47,9 @@ static void nvme_ns_init(NvmeNamespace *ns)
+ 
+     lba_index = NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
+     ns->id_ns.lbaf[lba_index].ds = 31 - clz32(ns->blkconf.logical_block_size);
++
++    /* support DULBE */
++    id_ns->nsfeat |= 0x4;
+ }
+ 
+ static int nvme_ns_init_blk(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+@@ -86,6 +89,8 @@ static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp)
+ 
+ int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+ {
++    uint64_t nlbas;
++
+     if (nvme_ns_check_constraints(ns, errp)) {
+         return -1;
+     }
+@@ -95,6 +100,11 @@ int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Error **errp)
+     }
+ 
+     nvme_ns_init(ns);
++
++    nlbas = nvme_ns_nlbas(ns);
++    ns->state.utilization.map = bitmap_new(nlbas);
++    bitmap_fill(ns->state.utilization.map, nlbas);
++
+     if (nvme_register_namespace(n, ns, errp)) {
+         return -1;
+     }
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9d30ca69dcf1..b0cf328f8f2e 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -105,6 +105,7 @@ static const bool nvme_feature_support[NVME_FID_MAX] = {
+ 
+ static const uint32_t nvme_feature_cap[NVME_FID_MAX] = {
+     [NVME_TEMPERATURE_THRESHOLD]    = NVME_FEAT_CAP_CHANGE,
++    [NVME_ERROR_RECOVERY]           = NVME_FEAT_CAP_CHANGE | NVME_FEAT_CAP_NS,
+     [NVME_VOLATILE_WRITE_CACHE]     = NVME_FEAT_CAP_CHANGE,
+     [NVME_NUMBER_OF_QUEUES]         = NVME_FEAT_CAP_CHANGE,
+     [NVME_ASYNCHRONOUS_EVENT_CONF]  = NVME_FEAT_CAP_CHANGE,
+@@ -888,6 +889,38 @@ static inline uint16_t nvme_check_bounds(NvmeCtrl *n, NvmeNamespace *ns,
+     return NVME_SUCCESS;
+ }
+ 
++static inline uint16_t nvme_check_dulbe(NvmeNamespace *ns, uint64_t slba,
++                                        uint32_t nlb)
++{
++    uint64_t elba = slba + nlb;
++
++    if (find_next_zero_bit(ns->state.utilization.map, elba, slba) < elba) {
++        return NVME_DULB;
++    }
++
++    return NVME_SUCCESS;
++}
++
++static inline void nvme_allocate(NvmeNamespace *ns, uint64_t slba,
++                                 uint32_t nlb)
++{
++    if (!nvme_check_dulbe(ns, slba, nlb)) {
++        return;
++    }
++
++    trace_pci_nvme_allocate(nvme_nsid(ns), slba, nlb);
++
++    bitmap_set(ns->state.utilization.map, slba, nlb);
++}
++
++static inline void nvme_deallocate(NvmeNamespace *ns, uint64_t slba,
++                                   uint32_t nlb)
++{
++    trace_pci_nvme_deallocate(nvme_nsid(ns), slba, nlb);
++
++    bitmap_clear(ns->state.utilization.map, slba, nlb);
++}
++
+ static void nvme_rw_cb(void *opaque, int ret)
+ {
+     NvmeRequest *req = opaque;
+@@ -959,6 +992,8 @@ static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
+         return status;
+     }
+ 
++    nvme_deallocate(ns, slba, nlb);
++
+     block_acct_start(blk_get_stats(req->ns->blkconf.blk), &req->acct, 0,
+                      BLOCK_ACCT_WRITE);
+     req->aiocb = blk_aio_pwrite_zeroes(req->ns->blkconf.blk, offset, count,
+@@ -995,11 +1030,24 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req)
+         goto invalid;
+     }
+ 
++    if (acct == BLOCK_ACCT_READ) {
++        if (NVME_ERR_REC_DULBE(ns->features.err_rec)) {
++            status = nvme_check_dulbe(ns, slba, nlb);
++            if (status) {
++                goto invalid;
++            }
++        }
++    }
++
+     status = nvme_map_dptr(n, data_size, req);
+     if (status) {
+         goto invalid;
+     }
+ 
++    if (acct == BLOCK_ACCT_WRITE) {
++        nvme_allocate(ns, slba, nlb);
++    }
++
+     block_acct_start(blk_get_stats(blk), &req->acct, data_size, acct);
+     if (req->qsg.sg) {
+         if (acct == BLOCK_ACCT_WRITE) {
+@@ -1645,6 +1693,7 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+     uint8_t fid = NVME_GETSETFEAT_FID(dw10);
+     NvmeGetFeatureSelect sel = NVME_GETFEAT_SELECT(dw10);
+     uint16_t iv;
++    NvmeNamespace *ns;
+ 
+     static const uint32_t nvme_feature_default[NVME_FID_MAX] = {
+         [NVME_ARBITRATION] = NVME_ARB_AB_NOLIMIT,
+@@ -1707,6 +1756,18 @@ static uint16_t nvme_get_feature(NvmeCtrl *n, NvmeRequest *req)
+         }
+ 
+         return NVME_INVALID_FIELD | NVME_DNR;
++    case NVME_ERROR_RECOVERY:
++        if (!nvme_nsid_valid(n, nsid)) {
++            return NVME_INVALID_NSID | NVME_DNR;
++        }
++
++        ns = nvme_ns(n, nsid);
++        if (unlikely(!ns)) {
++            return NVME_INVALID_FIELD | NVME_DNR;
++        }
++
++        result = ns->features.err_rec;
++        goto out;
+     case NVME_VOLATILE_WRITE_CACHE:
+         result = n->features.vwc;
+         trace_pci_nvme_getfeat_vwcache(result ? "enabled" : "disabled");
+@@ -1846,6 +1907,26 @@ static uint16_t nvme_set_feature(NvmeCtrl *n, NvmeRequest *req)
+                                NVME_LOG_SMART_INFO);
+         }
+ 
++        break;
++    case NVME_ERROR_RECOVERY:
++        if (nsid == NVME_NSID_BROADCAST) {
++            for (int i = 1; i <= n->num_namespaces; i++) {
++                ns = nvme_ns(n, i);
++
++                if (!ns) {
++                    continue;
++                }
++
++                if (NVME_ID_NS_NSFEAT_DULBE(ns->id_ns.nsfeat)) {
++                    ns->features.err_rec = dw11;
++                }
++            }
++
++            break;
++        }
++
++        assert(ns);
++        ns->features.err_rec = dw11;
+         break;
+     case NVME_VOLATILE_WRITE_CACHE:
+         n->features.vwc = dw11 & 0x1;
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index cab9913b1f2d..f8d1d4f952f1 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -43,6 +43,8 @@ pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opna
+ pci_nvme_rw(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
+ pci_nvme_rw_cb(uint16_t cid, const char *blkname) "cid %"PRIu16" blk '%s'"
+ pci_nvme_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
++pci_nvme_allocate(uint32_t ns, uint64_t slba, uint32_t nlb) "nsid %"PRIu32" slba 0x%"PRIx64" nlb %"PRIu32""
++pci_nvme_deallocate(uint32_t ns, uint64_t slba, uint32_t nlb) "nsid %"PRIu32" slba 0x%"PRIx64" nlb %"PRIu32""
+ pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
+ pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
+ pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
+-- 
+2.28.0
+
 
