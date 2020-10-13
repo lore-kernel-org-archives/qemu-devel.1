@@ -2,102 +2,89 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB164C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:41:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 384F4C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:41:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81809208D5
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:41:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81809208D5
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 5DA78208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:41:29 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jihc14WS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DA78208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39688 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSPEK-00072q-Ra
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 14:41:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54100)
+	id 1kSPEl-000078-1s
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 14:41:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54694)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kSPA7-0005wx-Lu; Tue, 13 Oct 2020 14:36:39 -0400
-Received: from wnew2-smtp.messagingengine.com ([64.147.123.27]:47717)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kSPA4-0001nF-Vy; Tue, 13 Oct 2020 14:36:39 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id EEADD866;
- Tue, 13 Oct 2020 14:36:33 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Tue, 13 Oct 2020 14:36:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=T1qSasKgCj06jDZ9OW937SJ8QVT
- qWeKUSpbr0iYnz2I=; b=siiOsgfcuB2z+WwWloa92W41XIUFuC820pfiQPB+LX5
- kKNjNF/1P5tX0p8EGJLXyWSTDhxXfpYG/2nGGl0GDSmTXWKKckTwXACwQKsD8reP
- 19qEy7CgQ4v6ry5YMTUU+bN0iKohQ1Dc3lkHcFl5q11HwwfmqUd0jg3K6/wr9Mjz
- q58CUdMgJEFVNIF75vMfROSBbfR0PgMpEbzQsZC6BugZWrAiWKuT7VB4BCoYvOuS
- rnb6CVkw7fDM4x/ZhF10H/m1i+1zt6TXm1XAdtC62SQXdNOO/t5C8rkTo6Bu4/nt
- 2oUzh72+y84TzJoRDATvwiT/Ly4BNwvFgvhHLnhOv2Q==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=T1qSas
- KgCj06jDZ9OW937SJ8QVTqWeKUSpbr0iYnz2I=; b=XRao58v7wusffsQfCy2cF+
- 4CnQXm1d0ckW0sFdQJj9+HiAypUqW30x3KapiHVC7xzR6DqAPDUYx5iHhnQMh0lb
- pxN2k+ru599XUS+JZ3hm5nfh/EEhY7wTkPL8sSqGX4Z8LLDW1MjrGflAFZo7RWHO
- DurKnmhk/MEuY0KHNv5JuoOh6brQRJ28147FEDk6D5NmUVCGTH/ZDpGxZoS3AhGc
- FGomlkVCw+3KAD88FTdkBic2khKD5S+k9TqLcuD2zcbGwOKkheQDaAi0PNttb0QV
- cYz3/1NeEu5/RKgfnAwphMsFIzK0SlVIMQdcxYIGaG75iFIv480Wh+Axm9ICgEIQ
- ==
-X-ME-Sender: <xms:r_OFX1lRSDQq_3TN4Dm1qPBzVJzBFfsEngID0PLD1cwTk7Gg7dPrfg>
- <xme:r_OFXw214q83AUu8a3AMwURhdrgx7XKr2Ub02cxLtSAPoOuCAGlvOT7V2M2AVa-du
- P1YFICCs4jj1JuHIvM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrheelgdduvdelucetufdoteggodetrfdotf
- fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
- uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpedutdehleelvdetvdefueehgeevhfejueeliefhudfhiefffffhuddtkeekieek
- feenucffohhmrghinhepihhnfhhrrgguvggrugdrohhrghenucfkphepkedtrdduieejrd
- elkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhr
- ohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:r_OFX7ocjbf14I5kADIRyer45JXlwdP18Av6uNzpCsfzIuWhj8R2tg>
- <xmx:r_OFX1nDP_ujd8SA90dc-0WWcsmkXNcJm-_8hynct7WBjw7ctXaU7g>
- <xmx:r_OFXz3n98MyTm2CIsbcqmHmmPcEvrsY4HYlY0mxeECDiCS1BauAJA>
- <xmx:sPOFXz8l_BKh9dmG1xGciz9V6HYEnhmT-TszU1i9N1Rl-iiMAWf7sQOeQ1c>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id B2CC63064684;
- Tue, 13 Oct 2020 14:36:30 -0400 (EDT)
-Date: Tue, 13 Oct 2020 20:36:28 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 0/9] nvme qemu cleanups and fixes
-Message-ID: <20201013183628.GA204217@apples.localdomain>
-References: <20200930220414.562527-1-kbusch@kernel.org>
- <20201013090401.GC168093@apples.localdomain>
- <20201013174826.GA1049145@dhcp-10-100-145-180.wdl.wdc.com>
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kSPDN-00075T-JF
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:40:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21235)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kSPDK-000217-Jz
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:40:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602614395;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=JY17m7eYfkOy9ZG74oVKjHQe9Uk+Zn78NbM7+0HPZAU=;
+ b=Jihc14WSAoUXXrxakG009ZClPD/FdgbDTsFPdmrjDrubT11VirUOyk6WwwLTHSf9WwOnYD
+ dCiDHiHvf2jSbe9SpEyraaav5Y6zbg/56kJBou+rJcJIoqzUXEydaEXf33sU+sYQcMpa6g
+ O8TjZrKw0nkUdQ34FqDBTluI0L+tpP8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-400-qHcsI6ReOdurH5FMjugWBw-1; Tue, 13 Oct 2020 14:39:52 -0400
+X-MC-Unique: qHcsI6ReOdurH5FMjugWBw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7466802B67;
+ Tue, 13 Oct 2020 18:39:50 +0000 (UTC)
+Received: from [10.10.117.231] (ovpn-117-231.rdu2.redhat.com [10.10.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA10519C59;
+ Tue, 13 Oct 2020 18:39:49 +0000 (UTC)
+Subject: Re: ide: Linux reports drive diagnostic failures on boot
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel <qemu-devel@nongnu.org>, alxndr@bu.edu
+References: <4f9846b5-4112-9598-fb9a-be26e28f2759@ilande.co.uk>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <e1cccc73-efbf-1999-9d4a-d8b9e36be8bb@redhat.com>
+Date: Tue, 13 Oct 2020 14:39:49 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="HlL+5n6rz5pIUxbD"
-Content-Disposition: inline
-In-Reply-To: <20201013174826.GA1049145@dhcp-10-100-145-180.wdl.wdc.com>
-Received-SPF: pass client-ip=64.147.123.27; envelope-from=its@irrelevant.dk;
- helo=wnew2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 14:36:35
+In-Reply-To: <4f9846b5-4112-9598-fb9a-be26e28f2759@ilande.co.uk>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -111,87 +98,195 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Niklas Cassel <Niklas.Cassel@wdc.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/13/20 6:59 AM, Mark Cave-Ayland wrote:
+> During my latest OpenBIOS boot tests I've noticed the following IDE 
+> diagnostics failure message appearing in dmesg at Linux boot time when 
+> booting from CDROM on both SPARC64 and PPC:
+> 
 
---HlL+5n6rz5pIUxbD
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Sorry for the inconvenience.
 
-On Oct 13 10:48, Keith Busch wrote:
-> On Tue, Oct 13, 2020 at 11:04:01AM +0200, Klaus Jensen wrote:
-> > On Sep 30 15:04, Keith Busch wrote:
-> > > After going through the zns enabling, I notice the controller enabling
-> > > is not correct. Then I just continued maked more stuff. The series, I
-> > > think, contains some of the less controversial patches from the two
-> > > conflicting zns series, preceeded by some cleanups and fixes from me.
-> > >=20
-> > > If this is all fine, I took the liberty of porting the zns enabling to
-> > > it and made a public branch for consideration here:
-> > >=20
-> > >  http://git.infradead.org/qemu-nvme.git/shortlog/refs/heads/kb-zns=20
-> > >=20
-> > > Dmitry Fomichev (1):
-> > >   hw/block/nvme: report actual LBA data shift in LBAF
-> > >=20
-> > > Keith Busch (5):
-> > >   hw/block/nvme: remove pointless rw indirection
-> > >   hw/block/nvme: fix log page offset check
-> > >   hw/block/nvme: support per-namespace smart log
-> > >   hw/block/nvme: validate command set selected
-> > >   hw/block/nvme: support for admin-only command set
-> > >=20
-> > > Klaus Jensen (3):
-> > >   hw/block/nvme: reject io commands if only admin command set selected
-> > >   hw/block/nvme: add nsid to get/setfeat trace events
-> > >   hw/block/nvme: add trace event for requests with non-zero status co=
-de
-> > >=20
-> > >  hw/block/nvme-ns.c    |   5 ++
-> > >  hw/block/nvme.c       | 194 ++++++++++++++++++++--------------------=
---
-> > >  hw/block/trace-events |   6 +-
-> > >  include/block/nvme.h  |  11 +++
-> > >  4 files changed, 114 insertions(+), 102 deletions(-)
-> > >=20
-> > > --=20
-> > > 2.24.1
-> > >=20
-> > >=20
-> >=20
-> > These fixes all look good to me apart from the odd fixes that has been
-> > mentioned in the reviews. Since soft freeze is only two weeks away (Oct
-> > 27th), it would be nice to get this staged on nvme-next so we can get a
-> > pull sent off to Peter.
->=20
-> I've fixed up the comments mentioned and added the received reviews.
-> Since it was pretty trivial fixups and passes my basic santify tests, I
-> went ahead and pushed to nvme-next.
->=20
+> [    9.347342] scsi host0: pata_cmd64x
+> [    9.369055] scsi host1: pata_cmd64x
+> [    9.371622] ata1: PATA max UDMA/33 cmd 0x1fe02008000 ctl 
+> 0x1fe02008080 bmdma 0x1fe02008200 irq 8
+> [    9.372805] ata2: PATA max UDMA/33 cmd 0x1fe02008100 ctl 
+> 0x1fe02008180 bmdma 0x1fe02008208 irq 8
+> [    9.711740] ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
+> [    9.712591] ata2.00: Drive reports diagnostics failure. This may 
+> indicate a drive
+> [    9.713256] ata2.00: fault or invalid emulation. Contact drive vendor 
+> for information.
+> [    9.737677] ata2.00: configured for UDMA/33
+> [    9.790179] scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     
+> 2.5+ PQ: 0 ANSI: 5
+> [   10.381172] hme 0000:01:01.1 enp1s1f1: renamed from eth0
+> [   10.508819] sr 1:0:0:0: [sr0] scsi3-mmc drive: 4x/4x cd/rw xa/form2 tray
+> [   10.509805] cdrom: Uniform CD-ROM driver Revision: 3.20
+> 
+> 
+> A session with git bisect points to the following commit:
+> 
+> 55adb3c45620c31f29978f209e2a44a08d34e2da is the first bad commit
+> commit 55adb3c45620c31f29978f209e2a44a08d34e2da
+> Author: John Snow <jsnow@redhat.com>
+> Date:   Fri Jul 24 01:23:00 2020 -0400
+> 
+>      ide: cancel pending callbacks on SRST
+> 
+>      The SRST implementation did not keep up with the rest of IDE; it is
+>      possible to perform a weak reset on an IDE device to remove the 
+> BSY/DRQ
+>      bits, and then issue writes to the control/device registers which can
+>      cause chaos with the state machine.
+> 
+>      Fix that by actually performing a real reset.
+> 
+>      Reported-by: Alexander Bulekov <alxndr@bu.edu>
+>      Fixes: https://bugs.launchpad.net/qemu/+bug/1878253
+>      Fixes: https://bugs.launchpad.net/qemu/+bug/1887303
+>      Fixes: https://bugs.launchpad.net/qemu/+bug/1887309
+>      Signed-off-by: John Snow <jsnow@redhat.com>
+> 
+> :040000 040000 70a7c1cfbafb22fa815d3ae4d7ed075ac3918188 
+> 3f37762f20e9ca9d2874eaf819d7175a1dca1dd9 M      hw
+> 
+> 
+> John/Alexander: any chance you could take a look at this? The message 
+> above is really simple to reproduce under qemu-system-sparc64 using 
+> http://cdimage.debian.org/cdimage/ports/9.0/sparc64/iso-cd/debian-9.0-sparc64-NETINST-1.iso 
+> and the following command line:
+> 
+> ./qemu-system-sparc64 \
+>      -cdrom debian-9.0-sparc64-NETINST-1.iso \
+>      -m 256 \
+>      -nographic \
+>      -boot d
+> 
+> 
+> ATB,
+> 
+> Mark.
+> 
 
-Looks good, thanks!
+Shucks.
 
---HlL+5n6rz5pIUxbD
-Content-Type: application/pgp-signature; name="signature.asc"
+This patch happened because the old SRST code reset the IDE state 
+machine (cleared the status register) but then didn't cancel any of the 
+pending callbacks, so it was possible to shuffle the state machine off 
+the rails onto junk data. Obviously bad.
 
------BEGIN PGP SIGNATURE-----
+Now, SRST actually cancels the callbacks which I thought would have been 
+safe, but it's possible that doing a "real" reset here is touching more 
+registers than it ought to.
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+F86oACgkQTeGvMW1P
-DemCUwgAkMGgxVkmkdJ3aMJkorzaXsWHvoIg6De/nt/0zO+wqKT+NGfJg2C4o7b5
-TkJBLcCHTYcxnDJiN4nsVia5ZrA1dHgv+4SS4mWJ0orhNPKGevW0lAE9qgrNfT3J
-Hz81IIbeT8eOrdusXQhyOROujlToIcG20JgX/2G1sAL26H47g2RrpFx8/OrJDVr0
-fK0vAAW80kPcTLNdQKC4Dutgt3fuqenAYiUA0QIcW+mvlxsNnfJ4rXzvkrLBbGa6
-K8PwZO0uBMEieRMtevHwhJmWWhldzQ2B5FfEEi6tMt8ti1w13AGN2hDMctJj2f7O
-AH8UgWrSzMVM+0OkjDBiFRwMDzTuuA==
-=zwSt
------END PGP SIGNATURE-----
+Let's take a look at the linux source code ...
 
---HlL+5n6rz5pIUxbD--
+/* Let the user know. We don't want to disallow opens for 
+
+    rescue purposes, or in case the vendor is just a blithering 
+
+    idiot. Do this after the dev_config call as some controllers 
+
+    with buggy firmware may want to avoid reporting false device 
+
+    bugs */
+
+Ah, always a nice day to be called an idiot. Thank you for your service, 
+Alan Cox.
+
+This message gets printed when ATA_HORKAGE_DIAGNOSTIC is set. 
+libata-sff.c suggests this happens when the error register* comes back 
+0x00 after an SRST.
+
+(*I think that tf.feature is only feature on writes, but error on reads. 
+Same address.)
+
+Now, ide_reset -- which we use for initialization and resets both always 
+sets the error register to 0x00. libata thinks that 0x00 means a failed 
+diagnostics test, though.
+
+This ought to be covered by ATA8-APT. Section 9.2, Software reset protocol.
+
+Cliff notes:
+
+- Host writes to SRST and waits for 5 μs.
+- Both devices obey the SRST write, regardless of drive selection.
+- Each device clears their registers and sets BSY (within 400ns.)
+- Host clears SRST and waits for at least 2ms.
+- Host polls devices, waiting for BSY to be 0.
+
+
+device0 can set bit7 in the error register to 0 or 1, depending on the 
+presence or absence of device1 and how it behaves following a diagnostic 
+test.
+
+
+Device 1 is absent: bit7 is cleared.
+Device 1 is present:
+   - If PDIAG- is asserted, bit7 is cleared.
+   - If PDIAG- is not asserted within 31 seconds, bit7 is set.
+
+Then, ah:
+
+The EXECUTE DEVICE DIAGNOSTICS diagnostic code shall be placed in bits 
+(6:0) of the Error register (See Clause 0). The device shall set the 
+signature values (See Clause 0). The content of the Features register is 
+undefined.
+
+I got this pretty wrong. I'm seeing a few problems:
+
+1. I thought SRST was triggered on the falling edge, but that's not 
+entirely true. BSY should be set immediately and the SRST can begin as 
+soon as possible. The device does not seem to have any interaction with 
+the SRST bit being cleared from what I can tell.
+
+2. We aren't running the diagnostic command, actually. That should fix 
+this particular case. The old version of the code had an open-coded 
+version of this, but it wasn't clear at the time this is what it was doing.
+
+3. There are likely other things to handle relating to the 
+presence/absence of device1 that we have never done for either version 
+of the code.
+
+
+
+Try this patch:
+
+
+diff --git a/hw/ide/core.c b/hw/ide/core.c
+index 693b352d5e..98cea7ad45 100644
+--- a/hw/ide/core.c
++++ b/hw/ide/core.c
+@@ -2254,10 +2254,8 @@ static void ide_perform_srst(IDEState *s)
+      /* Cancel PIO callback, reset registers/signature, etc */
+      ide_reset(s);
+
+-    if (s->drive_kind == IDE_CD) {
+-        /* ATAPI drives do not set READY or SEEK */
+-        s->status = 0x00;
+-    }
++    /* perform diagnostic */
++    cmd_exec_dev_diagnostic(s, WIN_DIAGNOSE);
+  }
+
+  static void ide_bus_perform_srst(void *opaque)
+@@ -2282,9 +2280,7 @@ void ide_ctrl_write(void *opaque, uint32_t addr, 
+uint32_t val)
+
+      /* Device0 and Device1 each have their own control register,
+       * but QEMU models it as just one register in the controller. */
+-    if ((bus->cmd & IDE_CTRL_RESET) &&
+-        !(val & IDE_CTRL_RESET)) {
+-        /* SRST triggers on falling edge */
++    if (!(bus->cmd & IDE_CTRL_RESET) && (val & IDE_CTRL_RESET)) {
+          for (i = 0; i < 2; i++) {
+              s = &bus->ifs[i];
+              s->status |= BUSY_STAT;
+
+
 
