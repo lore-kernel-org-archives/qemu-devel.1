@@ -2,43 +2,46 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA857C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:22:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CACC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:22:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DA0220714
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:22:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DA0220714
+	by mail.kernel.org (Postfix) with ESMTPS id EFD1820714
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 19:22:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFD1820714
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38304 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38358 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSPsi-0008Lq-1b
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:22:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38114)
+	id 1kSPsj-0008NB-0Q
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 15:22:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSPrY-0007Lm-DY
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:21:32 -0400
-Received: from mx2.suse.de ([195.135.220.15]:39498)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSPrc-0007Mc-Iv
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:21:39 -0400
+Received: from mx2.suse.de ([195.135.220.15]:39580)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSPrU-0008EC-Ez
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:21:32 -0400
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSPrU-0008F1-Fu
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 15:21:36 -0400
 X-Virus-Scanned: by amavisd-new at test-mx.suse.de
 Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id EFAA4B031;
- Tue, 13 Oct 2020 19:21:25 +0000 (UTC)
+ by mx2.suse.de (Postfix) with ESMTP id 8978AB234;
+ Tue, 13 Oct 2020 19:21:26 +0000 (UTC)
 From: Claudio Fontana <cfontana@suse.de>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: [PATCH v4 0/3] unbreak non-tcg builds
-Date: Tue, 13 Oct 2020 21:21:20 +0200
-Message-Id: <20201013192123.22632-1-cfontana@suse.de>
+Subject: [PATCH v4 2/3] qtest: unbreak non-TCG builds in bios-tables-test
+Date: Tue, 13 Oct 2020 21:21:22 +0200
+Message-Id: <20201013192123.22632-3-cfontana@suse.de>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201013192123.22632-1-cfontana@suse.de>
+References: <20201013192123.22632-1-cfontana@suse.de>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
@@ -72,61 +75,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series now unbreaks current non-tcg builds
-(!CONFIG_TCG).
+the tests assume TCG is available, thus breaking
+for TCG-only tests, where only the TCG accelerator option
+is passed to the QEMU binary.
 
-tests Makefiles need to avoid relying on all non-native
-archs binaries to be present,
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ tests/qtest/bios-tables-test.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-bios-tables-test needs to skip tests that are tcg-only,
-
-and notably the replay framework needs to consider that
-it might not be functional (or its code present at all)
-without TCG.
-
-Tested ok target x86_64-softmmu on x86_64 host with:
-
-./configure --enable-tcg --disable-kvm
-./configure --enable-kvm --disable-tcg
-./configure --enable-tcg --enable-kvm
-
-running make check-qtest
-
-v3 => v4:
-* abandon attempts to avoid the code duplication and functional code
-in stubs, just providing the minimal changes to get things working.
-
-v2 => v3:
-
-* do not alter the replay api, provide a block wrapper
-instead to call into replay events handling
-or the normal call flow depending on whether replay events are enabled.
-
-v1: initial RFC
-
-Claudio Fontana (2):
-  qtest: unbreak non-TCG builds in bios-tables-test
-  replay: do not build if TCG is not available
-
-Paolo Bonzini (1):
-  tests/Makefile.include: unbreak non-tcg builds
-
- block/meson.build              |  3 +-
- migration/savevm.c             | 11 ++--
- net/meson.build                |  3 +-
- replay/meson.build             |  2 +-
- replay/replay-input.c          |  4 +-
- stubs/meson.build              |  1 -
- stubs/replay-user.c            |  9 ----
- stubs/replay.c                 | 98 ++++++++++++++++++++++++++++++++++
- tests/Makefile.include         |  2 +-
- tests/ptimer-test-stubs.c      |  5 --
- tests/qtest/bios-tables-test.c | 10 ++++
- tests/qtest/qmp-cmd-test.c     |  3 ++
- ui/input.c                     | 12 ++++-
- 13 files changed, 136 insertions(+), 27 deletions(-)
- delete mode 100644 stubs/replay-user.c
-
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index 5647624492..18f535d4e8 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -127,6 +127,9 @@ static void free_test_data(test_data *data)
+ {
+     int i;
+ 
++    if (!data->tables) {
++        return;
++    }
+     for (i = 0; i < data->tables->len; ++i) {
+         cleanup_table_descriptor(&g_array_index(data->tables, AcpiSdtTable, i));
+     }
+@@ -656,6 +659,13 @@ static void test_acpi_one(const char *params, test_data *data)
+     char *args;
+     bool use_uefi = data->uefi_fl1 && data->uefi_fl2;
+ 
++#ifndef CONFIG_TCG
++    if (data->tcg_only) {
++        g_test_skip("TCG disabled, skipping ACPI tcg_only test");
++        return;
++    }
++#endif /* CONFIG_TCG */
++
+     if (use_uefi) {
+         /*
+          * TODO: convert '-drive if=pflash' to new syntax (see e33763be7cd3)
 -- 
 2.26.2
 
