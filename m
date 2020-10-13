@@ -2,88 +2,90 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A675FC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:09:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 785BCC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:19:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13E4525239
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:09:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB01725283
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:19:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SLvTxGM0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13E4525239
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UWTrEiNP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB01725283
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54708 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33428 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSMrl-0004sS-0h
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44528)
+	id 1kSN1m-0008Bk-KK
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:19:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47106)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kSMqi-0003oc-Uh; Tue, 13 Oct 2020 12:08:28 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:34346)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kSMqh-0008Fm-D1; Tue, 13 Oct 2020 12:08:28 -0400
-Received: by mail-io1-xd42.google.com with SMTP id m17so23334259ioo.1;
- Tue, 13 Oct 2020 09:08:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=aZMdICbl3iEGIsjyKQ0WID5E+cOKAdofSZSZX3QlyK4=;
- b=SLvTxGM0NmIQpOyXJcTiS9cDoMCinJFHBklF1SDBAg33NRDRVoyvFQ7YQN2b237PnR
- 0pidYaE3urNu7KVBJYEhtZVtIIEH+xLjhwuA1S7wFhigEAed08uov9+QqNJcfBXNVWE4
- p5ni4jeVuyVL3MOvdQhjn2HS6ItRWGa77aBoI0auay0xdJYjNTwFPKq9tzarhJ9XQYnQ
- vb31aYaBMlE/q4eAB0ZQ2vsX0qlfJYqJWZVN+5dJcGIQnzzhdRRKC+o/bqAV7SRk6+5j
- ncRpH+p6nIi+nOOtnUHj9ZpIXnM/SEAJHspjKAvdCpT06sUGXqBA9YFoiZkb9j8tx1O2
- qDsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=aZMdICbl3iEGIsjyKQ0WID5E+cOKAdofSZSZX3QlyK4=;
- b=JdF+ov21/GmttR7qAmx8CMQt9/jAkspml+KwsSBLFdonZMJhEyJvdPoS576OjUV5Kf
- RTMBtdXheVVX1wWA2NPbihIxcFZ2YiNTXq0vwFm9WJCgLbh+s8q/r5UOQ9j16+gQSC1u
- e+N8wajNImuc7ySPngm0QNZvc3LpoZRXwVNP8zD0eaNc3uhZxSGsqdbD9z24pcMKiwcE
- YfKTsXI7OaEkA3uIbgMVQT3zCzp+KV5zK/JWmVyiPuqnaKqJi/vpP4bEACz4lbuqCAFd
- YlUyOD3lqW9HwkRM3GomA8DeWhPbsVAnecPssO8ccxNl7NVnFhQ4uUschD0y4jD7cctx
- yrUg==
-X-Gm-Message-State: AOAM532vbvNZn/MnU9m3BebvCiOjt2/kRQQBEGsz4noknu8Z/9Xo+rRS
- LanOS5px/GEsGpXh2USZ1tbBx3rOWRMznrLSXvU=
-X-Google-Smtp-Source: ABdhPJwrj5r8lWTHweSaNO8g2Ty1DnR3DC5Svy3w3BKXOqqaCYhpUHm/oSBIgAyyUDsGl8TCg6KQrFjCMTss1CRGnuY=
-X-Received: by 2002:a5e:9b11:: with SMTP id j17mr92377iok.176.1602605305750;
- Tue, 13 Oct 2020 09:08:25 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kSN11-0007lJ-97
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:19:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40514)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kSN0y-0001AU-2V
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:19:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602605942;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=jFiDNS3DZ69HU92lnaxY7ARpWX46HTIcqG3G7YeDcSs=;
+ b=UWTrEiNPKxzxsAR8H3X40WUWiJdapEJECB4X4uVIN+IZ3kQExFSy3fNY63QqZQz1mdlNJM
+ AHW0Qxn3plavhKoK6amQZp5LtzS2OvGPTM9rzqnSWp8ydYyPGltyzEPAsBCR/M2WdtKalB
+ dTHyU1WQUeakJD5vBv5kXZxZjYRzomQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-hpoINELbMC62_W4jyl57nQ-1; Tue, 13 Oct 2020 12:18:57 -0400
+X-MC-Unique: hpoINELbMC62_W4jyl57nQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A7D35914700;
+ Tue, 13 Oct 2020 16:18:55 +0000 (UTC)
+Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 25D9427BDC;
+ Tue, 13 Oct 2020 16:18:50 +0000 (UTC)
+Date: Tue, 13 Oct 2020 17:18:48 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: Re: [PATCH 06/10] coroutine: add libucontext as external library
+Message-ID: <20201013161848.GS70612@redhat.com>
+References: <20201012232939.48481-1-j@getutm.app>
+ <20201012232939.48481-7-j@getutm.app>
+ <20201013133135.GH164611@stefanha-x1.localdomain>
+ <ff84b94c-42ff-c1ba-cb28-644678c09a21@eik.bme.hu>
 MIME-Version: 1.0
-References: <29a8c766c7c4748d0f2711c3a0abb81208138c5e.1601652179.git.alistair.francis@wdc.com>
-In-Reply-To: <29a8c766c7c4748d0f2711c3a0abb81208138c5e.1601652179.git.alistair.francis@wdc.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 13 Oct 2020 08:56:48 -0700
-Message-ID: <CAKmqyKM9qvxaqL2L3Pj1VRptXHm5b=dFz+bCu=XmELNjGCB8bQ@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] riscv: Convert interrupt logs to use
- qemu_log_mask()
-To: Alistair Francis <alistair.francis@wdc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <ff84b94c-42ff-c1ba-cb28-644678c09a21@eik.bme.hu>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,74 +98,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Palmer Dabbelt <palmer@dabbelt.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 2, 2020 at 8:35 AM Alistair Francis
-<alistair.francis@wdc.com> wrote:
->
-> Currently we log interrupts and exceptions using the trace backend in
-> riscv_cpu_do_interrupt(). We also log exceptions using the interrupt log
-> mask (-d int) in riscv_raise_exception().
->
-> This patch converts riscv_cpu_do_interrupt() to log both interrupts and
-> exceptions with the interrupt log mask, so that both are printed when a
-> user runs QEMU with -d int.
->
-> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+On Tue, Oct 13, 2020 at 04:49:26PM +0200, BALATON Zoltan via wrote:
+> On Tue, 13 Oct 2020, Stefan Hajnoczi wrote:
+> > On Mon, Oct 12, 2020 at 04:29:35PM -0700, Joelle van Dyne wrote:
+> > > From: osy <osy86@users.noreply.github.com>
+> > > 
+> > > iOS does not support ucontext natively for aarch64 and the sigaltstack is
+> > > also unsupported (even worse, it fails silently, see:
+> > > https://openradar.appspot.com/13002712 )
+> > > 
+> > > As a workaround we include a library implementation of ucontext and add it
+> > > as a build option.
+> > > 
+> > > Signed-off-by: Joelle van Dyne <j@getutm.app>
+> > 
+> > Hi,
+> > Thanks for sending posting this!
+> > 
+> > Please indicate what license libucontext is under, that it is compatible
+> > with QEMU's overall GPL v2 license, and update QEMU license
+> 
+> https://github.com/utmapp/libucontext/blob/master/LICENSE
 
-Thanks!
+I don't recognise that license text as being an exact match for any
+common open source license.
 
-Applied to riscv-to-apply.next
+As best I can tell, it is closest to being yet another variant of the
+MIT license, of which there are ridiculously many
 
-Alistair
+  https://fedoraproject.org/wiki/Licensing:MIT
 
-> ---
->  target/riscv/cpu_helper.c | 8 +++++++-
->  target/riscv/op_helper.c  | 1 -
->  2 files changed, 7 insertions(+), 2 deletions(-)
->
-> diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-> index 904899054d..6c68239a46 100644
-> --- a/target/riscv/cpu_helper.c
-> +++ b/target/riscv/cpu_helper.c
-> @@ -895,7 +895,13 @@ void riscv_cpu_do_interrupt(CPUState *cs)
->      }
->
->      trace_riscv_trap(env->mhartid, async, cause, env->pc, tval,
-> -        riscv_cpu_get_trap_name(cause, async));
-> +                     riscv_cpu_get_trap_name(cause, async));
-> +
-> +    qemu_log_mask(CPU_LOG_INT,
-> +                  "%s: hart:"TARGET_FMT_ld", async:%d, cause:"TARGET_FMT=
-_lx", "
-> +                  "epc:0x"TARGET_FMT_lx", tval:0x"TARGET_FMT_lx", desc=
-=3D%s\n",
-> +                  __func__, env->mhartid, async, cause, env->pc, tval,
-> +                  riscv_cpu_get_trap_name(cause, async));
->
->      if (env->priv <=3D PRV_S &&
->              cause < TARGET_LONG_BITS && ((deleg >> cause) & 1)) {
-> diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-> index 9b9ada45a9..e987bd262f 100644
-> --- a/target/riscv/op_helper.c
-> +++ b/target/riscv/op_helper.c
-> @@ -29,7 +29,6 @@ void QEMU_NORETURN riscv_raise_exception(CPURISCVState =
-*env,
->                                            uint32_t exception, uintptr_t =
-pc)
->  {
->      CPUState *cs =3D env_cpu(env);
-> -    qemu_log_mask(CPU_LOG_INT, "%s: %d\n", __func__, exception);
->      cs->exception_index =3D exception;
->      cpu_loop_exit_restore(cs, pc);
->  }
-> --
-> 2.28.0
->
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
