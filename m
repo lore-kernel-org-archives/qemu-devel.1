@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EEDAC43467
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:01:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56789C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:02:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A43720870
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:01:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A43720870
+	by mail.kernel.org (Postfix) with ESMTPS id E0B3F206ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 12:02:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0B3F206ED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSIzk-0003vt-MJ
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:01:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44172)
+	id 1kSJ0g-0004wG-Os
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 08:02:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpi-00077k-Pj; Tue, 13 Oct 2020 07:51:10 -0400
-Received: from mout.kundenserver.de ([212.227.17.13]:53039)
+ id 1kSIpj-0007A6-Od; Tue, 13 Oct 2020 07:51:11 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:56663)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSIpg-0004y5-MY; Tue, 13 Oct 2020 07:51:10 -0400
+ id 1kSIph-0004yI-PS; Tue, 13 Oct 2020 07:51:11 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MLQgv-1kkFUK2LOl-00IYUu; Tue, 13 Oct 2020 13:51:03 +0200
+ id 1MDPuq-1kaaI30EOU-00ATrN; Tue, 13 Oct 2020 13:51:05 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/14] softmmu/memory: Log invalid memory accesses
-Date: Tue, 13 Oct 2020 13:50:45 +0200
-Message-Id: <20201013115052.133355-8-laurent@vivier.eu>
+Subject: [PULL 09/14] block/blkdebug: fix memory leak
+Date: Tue, 13 Oct 2020 13:50:47 +0200
+Message-Id: <20201013115052.133355-10-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013115052.133355-1-laurent@vivier.eu>
 References: <20201013115052.133355-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:MKWt9Cjs1s5YhAebDSyrKmmhvomsOesLPiiTLR6Rz83/CrEjixy
- GijrUoKj3bk0RlaOI4ZBXPZxgV3Lgo/QBiKJMjnMsdt6O1GHmZUMtWbnw+sQr7KzfFlXfYY
- unwVGQduZcHrVNnaMRTPFyKd/Ab7CteQrVsGU40Ig7/2ajRvk8F73RlgURIrifG5DL6Xhl7
- zTIH7elMfedL5U/b7vwcQ==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:n+8Yw940KKk=:NJPe6/w0qeHBXQXU/87HzT
- 9na+TmsdCUAwY3dpuyLy8PdPWIPNu+RamAGLM18qHPJFSgjXiN89+Fg4xpjGP2wzCWpE07gBw
- xQ0PC2Fyw6J9UYAWWvnRgVV1WUgyoxPN9rzAn8aNLTviAbAWFE2QJnjEQK5jpXk3w9kyxA1rh
- hxm6E+nvGwTAoloNrviASqi8OwGRsdru3rlCHNEwwnUqD70TwoDwFg9yFpKG2fxvDoXgwyoY7
- 8rBOr1uRowy23gf6oIv+noU05285QinxB54iRUimS/obv1GwqPT4Cs5TFyfPeR4JBKUHe3ymf
- khMHsjIAosphogDF6SsnIdBTPpDYSxesWRQsa/tqrVZSQ+mYWakWOnGqAqC195iqxRKyE3JUs
- BGjTihVAt5kvL7Pmjgk8irfqmJsffPhSAcaNRbbf9tsznWe8+FbJWcFs30srDjNm1lSDqCm44
- F+Tvhcm2d4cZvK632MTQlO/eXJbEOnPUGy2Krh8ShDOXvUs9hFAuHwQHjHI9e5ALwGMsviDcu
- B5yH72E57hMg06bdKM4SH0Hen1SeMBWv+p/8ePM6afWPm1Yp9DXHw8p7Z81UbjdjZnHvZTSKm
- hozG/T2YltsGjO4ih1zDX/v/HeB4gUwICaVoDfST+D8Q8a7u6yyDjIg4B93vqyAAVNsU0xnm3
- 3LJkINlnIVn/5i5oIYk+QqZaFQ6km2aW5AyC5r3wsDN7zYoc+wfwqX13YXi/6gFSxnUVSGSti
- 1x66I1D7/BZRNIlSP/M9kfrDVafciMmz9nr+Hfd0awOD7lA7dyDLH9Gmk7qx+ulNlUCQ3zfTV
- c7V/iwqedjXp+3FLjANWA/ViKdrFxVQ0a3oruhsmX/Qb+vmUzO7VkTL5dDbzMmVTOojBfrA
-Received-SPF: none client-ip=212.227.17.13; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:sXFJcObT6HydYI86ubWnhmwbL5VRqq6w5mYyPUT9X0c+XoSZesJ
+ ki/HYXs18sIOT5gKFSpY4Pkq8xbC/ydcpcXhjPvQH/Y3TfP02xlo6d5B9tE9pKCiU+R/VHg
+ KBICRPWN2sYPjceAylf33Xg1fLOZ/nuEkRXSu8inPyN8MZ5/MUY5LVNS01Zu8lHtiSJ+Mk0
+ oPz1uQXY5JO4pt5oxMKPw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:Choe0KraBmM=:4NazQIya4DsCzxILkh8r+M
+ V/D9yQKoLJ5VwnnE5F8AcNQnOxFggI9w6FzdbImZcW/gRR6BRV9N57wyegGIdMoG7HFoz6z96
+ RmNUXYPDjdVjDjTgNj82EQoAOCx0D9C9jfIhZt1g9WXPPEodISv4V+82rEAs67d07Y0GiQuwJ
+ wBQu1TqXlwQHHsPpV6ZZnxV9OLzuAOjGG7ezLoeNUMvPx1Vd+FhjftIyDJp/Cd830FYIn5SC9
+ DZhBvvTxnGLDZO4onaS9ICYNLgVATq1jF7vFC1rw+rIwmrGMiq/kffZ9bTp2ZdNxTtfklQJad
+ tm4jMZwyrEpIHFrevdFDhs1oa/euVdjSpHA2U+0svtw60bKV9lOwEfvzg/se9El1D6oozAs97
+ +eJROf7R6D8q1E5s/O1e6WZOdR36c/Xgllm9dNO8C9+BnEzzdWMtFhDP4Jr16JuzILd3Cmf6J
+ YBUWY6yktj45nJAAmgjUHUymOZ4g+Cy+YTFegz+BNZ4mzRZNtzxeD32OFRXCHmpDAkXClx2c9
+ rFTtM52VgJytRSdlyo96RleB0lkj3iJ1N5+LaBooRHtPeLhILjW4JENq5iIC/Do/3RfHERYQR
+ jjMQXRQktRL/hA5k5w3D5JFLwPGGUbxGwpk/gOyX7baYPldcdn9OJX87VR073av1AgN4EgBch
+ XipcDznMWcNdSN30BqJaGAszVu3cCSX2cc9ROnppaHgOBQ+3Js64ByTyhBE1exF6jhhto8E5R
+ ZPQ01gBvqI1NrWAok8nWJYBGpoF3axVBdOdx8jjWiNJkwadRQ7C880QdT5RB8kUgzwQt1au/L
+ Or2h//1V+KqzzmHKwGPQQAYwYDfnZTX+WJTaLVF40rYf7hj256qfMV9Bo16Q8L7l5Mm1SJ5
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:40:12
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 07:32:45
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -83,74 +82,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- "Michael S . Tsirkin" <mst@redhat.com>
+Cc: qemu-trivial@nongnu.org, Elena Afanasova <eafanasova@gmail.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+From: Elena Afanasova <eafanasova@gmail.com>
 
-Log invalid memory accesses with as GUEST_ERROR.
+Spotted by PVS-Studio
 
-This is particularly useful since commit 5d971f9e67 which reverted
-("memory: accept mismatching sizes in memory_region_access_valid").
-
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Message-Id: <20201005152725.2143444-1-philmd@redhat.com>
+Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
+Message-Id: <1e903f928eb3da332cc95e2a6f87243bd9fe66e4.camel@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- softmmu/memory.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ block/blkdebug.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index fa280a19f7f7..403ff3abc99b 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -14,6 +14,7 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qemu/log.h"
- #include "qapi/error.h"
- #include "cpu.h"
- #include "exec/memory.h"
-@@ -1353,10 +1354,18 @@ bool memory_region_access_valid(MemoryRegion *mr,
- {
-     if (mr->ops->valid.accepts
-         && !mr->ops->valid.accepts(mr->opaque, addr, size, is_write, attrs)) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: rejected\n",
-+                      addr, size, memory_region_name(mr));
-         return false;
-     }
- 
-     if (!mr->ops->valid.unaligned && (addr & (size - 1))) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: unaligned\n",
-+                      addr, size, memory_region_name(mr));
-         return false;
-     }
- 
-@@ -1367,6 +1376,13 @@ bool memory_region_access_valid(MemoryRegion *mr,
- 
-     if (size > mr->ops->valid.max_access_size
-         || size < mr->ops->valid.min_access_size) {
-+        qemu_log_mask(LOG_GUEST_ERROR, "Invalid access at addr "
-+                                       "0x%" HWADDR_PRIX ", size %u, "
-+                                       "region '%s', reason: invalid size "
-+                                       "(min:%u max:%u)\n",
-+                      addr, size, memory_region_name(mr),
-+                      mr->ops->valid.min_access_size,
-+                      mr->ops->valid.max_access_size);
-         return false;
-     }
-     return true;
+diff --git a/block/blkdebug.c b/block/blkdebug.c
+index eecbf3e5c479..54da719dd151 100644
+--- a/block/blkdebug.c
++++ b/block/blkdebug.c
+@@ -215,6 +215,7 @@ static int add_rule(void *opaque, QemuOpts *opts, Error **errp)
+                                  BLKDEBUG_IO_TYPE__MAX, &local_error);
+         if (local_error) {
+             error_propagate(errp, local_error);
++            g_free(rule);
+             return -1;
+         }
+         if (iotype != BLKDEBUG_IO_TYPE__MAX) {
 -- 
 2.26.2
 
