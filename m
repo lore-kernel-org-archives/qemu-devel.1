@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3DD3C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84B32C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:55:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9902078A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:55:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9902078A
+	by mail.kernel.org (Postfix) with ESMTPS id F3ED82078A
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:55:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3ED82078A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38232 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSEDB-0006ln-Um
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 02:55:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32908)
+	id 1kSEDO-00076W-0G
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 02:55:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBa-0004zj-Jp; Tue, 13 Oct 2020 02:53:26 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:51999)
+ id 1kSEBZ-0004y6-Mx; Tue, 13 Oct 2020 02:53:25 -0400
+Received: from mout.kundenserver.de ([212.227.126.130]:38947)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kSEBX-0000EH-LL; Tue, 13 Oct 2020 02:53:26 -0400
+ id 1kSEBX-0000EF-Cb; Tue, 13 Oct 2020 02:53:25 -0400
 Received: from localhost.localdomain ([82.252.141.186]) by
  mrelayeu.kundenserver.de (mreue009 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MXY2Z-1kyMxV49Z1-00Yyn6; Tue, 13 Oct 2020 08:53:19 +0200
+ id 1N2m7Q-1kKcMb27WW-0134cR; Tue, 13 Oct 2020 08:53:17 +0200
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/15] hw/rtc/twl92230: Silence warnings about missing
- fallthrough statements
-Date: Tue, 13 Oct 2020 08:53:01 +0200
-Message-Id: <20201013065313.7349-4-laurent@vivier.eu>
+Subject: [PULL 01/15] qemu-img-cmds.hx: Update comment that mentions Texinfo
+Date: Tue, 13 Oct 2020 08:52:59 +0200
+Message-Id: <20201013065313.7349-2-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201013065313.7349-1-laurent@vivier.eu>
 References: <20201013065313.7349-1-laurent@vivier.eu>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:ZtJvTo3dGjT6+a5UiQQYseHectvtReqizKvf8Wv6GDQoRyuzM9Y
- AcYsYLX+guxUGzgz1Dp0cQ9rTgBo91uQskMyZRdFNIMYFyeewfxQjUhi+qjy0xZSd6zJBRI
- h/LtwfDn6WIt//e4nbnyBwqBoR7l4Oti8rcBZQOXA/KmK/19Q322Z23aTz75gqk2EfDerYW
- 1/7R4OdYkNSMfHre3+UPg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:9WaF3tBctDA=:4+XCNH6GPQuOjSLF6mfa91
- 1Pc1r9D2RrsPW8fIe/0QsANQXbkTSITcbLhMxqNH8p7/qjw4oGeXSHQREHEzI7XTv1U04KMLU
- qHkaY9dYPFe+xmRVnm4VSM+GS3E9Au1xDHoOaKNKVRK7nviR00d2ej6olpqOziL6Z+dvl8P2m
- vriXwehxdAoOjbwVoUDRD7iAN4Pfu7hNY6K9Wtl76FaWs2peD27yC+DUQvxuvkWjKcMHyBjQ1
- OVnqU5TRXIUcvaxXsQ77MMPSDnlzMFTJE2X3X8yr/nXtWWIEc+GSeC6YlXsiKV7Qcl46hSLo+
- fWWqreiVRi6PGeyE5uYtuDqjb14wwG9Dqga+hJj2lm6IKWOdl6R13gnG+CacC05ueFdh2ziJU
- thcM7OtHyt6jIRw2/4kBjfQ1XuMLTzEi1T+pJbiEP7LvJyA6yofXP4MDeGqVinMv8xIHM1nOg
- Wr4BqT4JQ/hBqtnp87sVcZ6vqhOSq3a6pcZHudK7ub6T+ir4Uj834Gp7l+sxRSstZZLx9uMb3
- Z7RLH0QuSNakY5a3SD+CgICqdROD5LmJoUsHongn5iFtFtjqHm1HhYBx2hWSdpA7jbh6Ez/1D
- gBeRERGfXZZlZhVsBwGUCss03COOCmFKEZg0coQvucY7bTbRlmNmlg4VGpFnBs0eG5DvLxfoh
- PmJOxHoJx0drTTpSgl9k/4YFzHWfpwfdVNp0L21n5D669oiK/vPBqAAn72EGu3hsyGjXHLKGg
- Jd4rTdpL0rwCL2pyv4WkBMp0GwuFSrqMyXmLwQBSIgEA3ka8/W86Uo1YPHt8omWS4q13/+SAs
- k8edqdtG4k4z97E7qDrw5lCF5BJf1lDK4XSQ2qRFrRz09jYNyj+QGwt5qeW3fOZsG9rpjoq
+X-Provags-ID: V03:K1:9/2TaPVs7al+WnuZp+H12LjHAViYpMZ7YNXLDTtzwILLgfmE4E8
+ 0vH5w/K4lr15QfP6lnmAhf8hpaAFvlcNIE9GMe5tWtZK5s+Q/PoVGRgt/F5uKWWg/eGwtao
+ JBbDzFoyezbq/uZmCFHH9i/Vosz7/KjNmDsAPkdCVwlcXWiwHMWS25NQek/ivZdHDHTRXgr
+ iPtqccT4SC95HNHvMYRHw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:lbBWPb0gV7k=:BS8Ayd60zCkUFoZBIBicJA
+ nXjCfAYr6DJkOMZ9hHB6h3Q9w7evxye+QbI12YEX6UAgBYRXVX466bWJ7Vq2z65khk1REZizS
+ yo8FwZtEsVOI6fw53k4apAVEaMwDl3NYnIP+X7Y37jtVcuf0VP63o43KJ2fgNgO0V3DPZSYQ4
+ dS11Td843KrcresVpPPzIbbUx5kkKWXzHWSRSDYZpb1QflbHuj14ejy6KtykvvFRNhDXFSk0o
+ 0Pdf1zkYOB6Z8EGC0dW68lJpgdkFS8QqVS/XeNUwfgM5NPkfgTGbtx3hZa0uEbNOtUJ41HgLi
+ FYqCBwpgN7O1TasifY5SzTuNMMf4CPg1tc8LNN6j59VCdTKtPIBzTnRoihP1n1yVHvFsz2G0A
+ tCR027rFu06BBjmeJh6LXONLUsGWKFU2c4AK0lAC3PzSUGFKq82BBfYAQYMgR3J+RnAjBx9zZ
+ Sibc11JdcZm/Y9CTyowgcQVO16nIN7zGXDMif/7+aioKaNOxSwvwTWQ1nCqsl049AwXUA2tg/
+ DpX+DtC7yFeVpzQBoFUOVy7US2F6kUf/KnHxQc6YDI4FeyrR4d/VeEvQmEyQK6K1eRmvQQZI4
+ iUEsflWvA8DzqJwWipItMnm9LKquHLeAnmB8F2tfYdzBjf8PahB8Q/SsXOgdO5aVftCisKlj2
+ qNK3BVyXtyh8uT/qeLmPKm+VNDs7GUZnFooUsaQ7vie18GNfanR1gcVxx7vcvf8+055s0gX2Y
+ ftALUX2RCBwd9/Lwy2p8/IlXBLZAA8V9ENivoIIcbjN8Kn3NzxIDHfdoL4r2mKXVbbKH3CIYL
+ oY9EPYVfpIVXjaCfhteaasueLyHDk/7VDKfZYwpPccf2HoTXRgIBlsCtAMGFnU3cO0430Tg
 Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:53:22
@@ -83,125 +83,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Michael Tokarev <mjt@tls.msk.ru>,
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Michael Tokarev <mjt@tls.msk.ru>, Markus Armbruster <armbru@redhat.com>,
  Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Markus Armbruster <armbru@redhat.com>
 
-When compiling with -Werror=implicit-fallthrough, gcc complains about
-missing fallthrough annotations in this file. Looking at the code,
-the fallthrough is indeed wanted here, but instead of adding the
-annotations, it can be done more efficiently by simply calculating
-the offset with a subtraction instead of increasing a local variable
-one by one.
+Missed in 3c95fdef94 "Update comments in .hx files that mention
+Texinfo".
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20201001182121.187122-1-thuth@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20200929075824.1517969-2-armbru@redhat.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- hw/rtc/twl92230.c | 50 +++++++++++++++++++++++------------------------
- 1 file changed, 24 insertions(+), 26 deletions(-)
+ qemu-img-cmds.hx | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/rtc/twl92230.c b/hw/rtc/twl92230.c
-index f838913b378d..499f421932e6 100644
---- a/hw/rtc/twl92230.c
-+++ b/hw/rtc/twl92230.c
-@@ -271,37 +271,36 @@ static void menelaus_gpio_set(void *opaque, int line, int level)
- static uint8_t menelaus_read(void *opaque, uint8_t addr)
- {
-     MenelausState *s = (MenelausState *) opaque;
--    int reg = 0;
- 
-     switch (addr) {
-     case MENELAUS_REV:
-         return 0x22;
- 
--    case MENELAUS_VCORE_CTRL5: reg ++;
--    case MENELAUS_VCORE_CTRL4: reg ++;
--    case MENELAUS_VCORE_CTRL3: reg ++;
--    case MENELAUS_VCORE_CTRL2: reg ++;
-+    case MENELAUS_VCORE_CTRL5:
-+    case MENELAUS_VCORE_CTRL4:
-+    case MENELAUS_VCORE_CTRL3:
-+    case MENELAUS_VCORE_CTRL2:
-     case MENELAUS_VCORE_CTRL1:
--        return s->vcore[reg];
-+        return s->vcore[addr - MENELAUS_VCORE_CTRL1];
- 
--    case MENELAUS_DCDC_CTRL3: reg ++;
--    case MENELAUS_DCDC_CTRL2: reg ++;
-+    case MENELAUS_DCDC_CTRL3:
-+    case MENELAUS_DCDC_CTRL2:
-     case MENELAUS_DCDC_CTRL1:
--        return s->dcdc[reg];
--
--    case MENELAUS_LDO_CTRL8: reg ++;
--    case MENELAUS_LDO_CTRL7: reg ++;
--    case MENELAUS_LDO_CTRL6: reg ++;
--    case MENELAUS_LDO_CTRL5: reg ++;
--    case MENELAUS_LDO_CTRL4: reg ++;
--    case MENELAUS_LDO_CTRL3: reg ++;
--    case MENELAUS_LDO_CTRL2: reg ++;
-+        return s->dcdc[addr - MENELAUS_VCORE_CTRL1];
-+
-+    case MENELAUS_LDO_CTRL8:
-+    case MENELAUS_LDO_CTRL7:
-+    case MENELAUS_LDO_CTRL6:
-+    case MENELAUS_LDO_CTRL5:
-+    case MENELAUS_LDO_CTRL4:
-+    case MENELAUS_LDO_CTRL3:
-+    case MENELAUS_LDO_CTRL2:
-     case MENELAUS_LDO_CTRL1:
--        return s->ldo[reg];
-+        return s->ldo[addr - MENELAUS_LDO_CTRL1];
- 
--    case MENELAUS_SLEEP_CTRL2: reg ++;
-+    case MENELAUS_SLEEP_CTRL2:
-     case MENELAUS_SLEEP_CTRL1:
--        return s->sleep[reg];
-+        return s->sleep[addr - MENELAUS_SLEEP_CTRL1];
- 
-     case MENELAUS_DEVICE_OFF:
-         return 0;
-@@ -395,10 +394,10 @@ static uint8_t menelaus_read(void *opaque, uint8_t addr)
-     case MENELAUS_S2_PULL_DIR:
-         return s->pull[3];
- 
--    case MENELAUS_MCT_CTRL3: reg ++;
--    case MENELAUS_MCT_CTRL2: reg ++;
-+    case MENELAUS_MCT_CTRL3:
-+    case MENELAUS_MCT_CTRL2:
-     case MENELAUS_MCT_CTRL1:
--        return s->mmc_ctrl[reg];
-+        return s->mmc_ctrl[addr - MENELAUS_MCT_CTRL1];
-     case MENELAUS_MCT_PIN_ST:
-         /* TODO: return the real Card Detect */
-         return 0;
-@@ -418,7 +417,6 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
- {
-     MenelausState *s = (MenelausState *) opaque;
-     int line;
--    int reg = 0;
-     struct tm tm;
- 
-     switch (addr) {
-@@ -496,9 +494,9 @@ static void menelaus_write(void *opaque, uint8_t addr, uint8_t value)
-         s->ldo[7] = value & 3;
-         break;
- 
--    case MENELAUS_SLEEP_CTRL2: reg ++;
-+    case MENELAUS_SLEEP_CTRL2:
-     case MENELAUS_SLEEP_CTRL1:
--        s->sleep[reg] = value;
-+        s->sleep[addr - MENELAUS_SLEEP_CTRL1] = value;
-         break;
- 
-     case MENELAUS_DEVICE_OFF:
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index b89c019b76bf..cab82342358e 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -1,5 +1,5 @@
+ HXCOMM Keep the list of subcommands sorted by name.
+-HXCOMM Use DEFHEADING() to define headings in both help text and texi
++HXCOMM Use DEFHEADING() to define headings in both help text and rST
+ HXCOMM Text between SRST and ERST are copied to rST version and
+ HXCOMM discarded from C version
+ HXCOMM DEF(command, callback, arg_string) is used to construct
 -- 
 2.26.2
 
