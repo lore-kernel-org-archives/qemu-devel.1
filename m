@@ -7,76 +7,73 @@ X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 421D8C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:09:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55E55C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:11:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A4DCA2080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:09:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B8E32080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:11:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ee+IW49m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A4DCA2080A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TUJHNXm5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B8E32080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46470 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSHF5-0006w3-Ca
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:09:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49776)
+	id 1kSHGy-00083m-N0
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:11:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSHDf-0006Ty-Lf
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:07:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32096)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kSHG2-0007Wb-9M
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:10:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43166)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSHDd-0000Eb-PU
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:07:47 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kSHG0-0000UP-GF
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:10:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602583665;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ s=mimecast20190719; t=1602583811;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=p/IjdouMtbj9AyKFl1fX+EKkb1BAxPh+Rbp8KRc+Q+k=;
- b=Ee+IW49msYrIPUC9UAPAcQ0h1/41pCJZweXUDPL+NvKOa1oTriPWkrniR6GOHD/9DNCmKJ
- EIqRXCsuiuijAYfjHR8yqxrKmjHQrhlHCfFyf1LSF/yeL/69180n8NqkfmcEDe3qkztPmP
- EjhO27nNzV2KB/6Qh1WcXa5JJktcohA=
+ bh=20Tnhwv58I+CBp820CK39SUNm4kh2KWvpA7aQkNlgIY=;
+ b=TUJHNXm5ofk0Ih9Zz9aVtnDVK0oRDT7xzNxpdW92R18sTSMc2EG/MKkizdCevDlQCMP0Hq
+ 0KrVp+TX5cb+RydAAboK6z8L4BV8xFFHHIn0IjMQb8GcnuybEyZHlYYaJ2aN4eW9mIX4ml
+ V9EaiHoupudWc09aP8NXEvupuPgMeOM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-313-O3H9xJMvOHe6Xgzmac_rTw-1; Tue, 13 Oct 2020 06:07:43 -0400
-X-MC-Unique: O3H9xJMvOHe6Xgzmac_rTw-1
+ us-mta-539-8g-p5NIONciuG_CqfuPNjg-1; Tue, 13 Oct 2020 06:10:10 -0400
+X-MC-Unique: 8g-p5NIONciuG_CqfuPNjg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4529E879511;
- Tue, 13 Oct 2020 10:07:42 +0000 (UTC)
-Received: from redhat.com (ovpn-114-78.ams2.redhat.com [10.36.114.78])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AE9B619C71;
- Tue, 13 Oct 2020 10:07:40 +0000 (UTC)
-Date: Tue, 13 Oct 2020 11:07:37 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH] hw/core/qdev-properties-system: Rewrite
- set_pci_host_devaddr using GLib
-Message-ID: <20201013100737.GH70612@redhat.com>
-References: <20201013100315.3554421-1-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90B1886ABD2;
+ Tue, 13 Oct 2020 10:10:08 +0000 (UTC)
+Received: from work-vm (ovpn-114-238.ams2.redhat.com [10.36.114.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 569FF27BD2;
+ Tue, 13 Oct 2020 10:10:06 +0000 (UTC)
+Date: Tue, 13 Oct 2020 11:10:03 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Bihong Yu <yubihong@huawei.com>
+Subject: Re: [PATCH v2 3/8] migration: Add spaces around operator
+Message-ID: <20201013101003.GC2920@work-vm>
+References: <1602508140-11372-1-git-send-email-yubihong@huawei.com>
+ <1602508140-11372-4-git-send-email-yubihong@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201013100315.3554421-1-philmd@redhat.com>
+In-Reply-To: <1602508140-11372-4-git-send-email-yubihong@huawei.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,148 +96,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Klaus Herman <kherman@inbox.lv>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: zhengchuan@huawei.com, quintela@redhat.com, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, alex.chen@huawei.com, wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 13, 2020 at 12:03:15PM +0200, Philippe Mathieu-Daudé wrote:
-> set_pci_host_devaddr() is hard to follow, thus bug-prone.
-> We indeed introduced a bug in commit bccb20c49df, as the
-> same line might be used to parse a bus (up to 0xff) or a
-> slot (up to 0x1f). Instead of making things worst, rewrite
-> using g_strsplit().
-> 
-> Fixes: bccb20c49df ("Use qemu_strtoul() in set_pci_host_devaddr()")
-> Reported-by: Klaus Herman <kherman@inbox.lv>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+* Bihong Yu (yubihong@huawei.com) wrote:
+> Signed-off-by: Bihong Yu <yubihong@huawei.com>
+> Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
+
+Yes that's OK, I'm a bit sturprised we need the space afte rthe * in the
+VMStateDescription case, I wouldn't necessarily go and change them all.
+
+
+
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+
 > ---
->  hw/core/qdev-properties-system.c | 61 ++++++++++++++------------------
->  1 file changed, 27 insertions(+), 34 deletions(-)
+>  migration/migration.c    |  4 ++--
+>  migration/postcopy-ram.c |  2 +-
+>  migration/ram.c          |  2 +-
+>  migration/savevm.c       |  2 +-
+>  migration/vmstate.c      | 10 +++++-----
+>  5 files changed, 10 insertions(+), 10 deletions(-)
 > 
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index 49bdd125814..e6e081efd58 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -878,11 +878,11 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->      DeviceState *dev = DEVICE(obj);
->      Property *prop = opaque;
->      PCIHostDeviceAddress *addr = qdev_get_prop_ptr(dev, prop);
-> -    char *str, *p;
-> -    const char *e;
-> +    g_autofree char *str = NULL;
-> +    g_autofree char **col_s0 = NULL;
-> +    g_autofree char **dot_s = NULL;
-
-These free the array, but not the array elements.
-
-You need to use
-
-   g_auto(GStrv) col_s0 = NULL
-
-GStrv is a typedef for char **, that exists solely so that there is
-a typename against which g_auto can be used.
-
-> +    char **col_s;
->      unsigned long val;
-> -    unsigned long dom = 0, bus = 0;
-> -    unsigned int slot = 0, func = 0;
+> diff --git a/migration/migration.c b/migration/migration.c
+> index 0575ecb..e050f57 100644
+> --- a/migration/migration.c
+> +++ b/migration/migration.c
+> @@ -2478,8 +2478,8 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
+>       * Since we currently insist on matching page sizes, just sanity check
+>       * we're being asked for whole host pages.
+>       */
+> -    if (start & (our_host_ps-1) ||
+> -       (len & (our_host_ps-1))) {
+> +    if (start & (our_host_ps - 1) ||
+> +       (len & (our_host_ps - 1))) {
+>          error_report("%s: Misaligned page request, start: " RAM_ADDR_FMT
+>                       " len: %zd", __func__, start, len);
+>          mark_source_rp_bad(ms);
+> diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+> index 0a2f88a8..eea92bb 100644
+> --- a/migration/postcopy-ram.c
+> +++ b/migration/postcopy-ram.c
+> @@ -403,7 +403,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+>                       strerror(errno));
+>          goto out;
+>      }
+> -    g_assert(((size_t)testarea & (pagesize-1)) == 0);
+> +    g_assert(((size_t)testarea & (pagesize - 1)) == 0);
 >  
->      if (dev->realized) {
->          qdev_prop_set_after_realize(dev, name, errp);
-> @@ -893,57 +893,50 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->          return;
+>      reg_struct.range.start = (uintptr_t)testarea;
+>      reg_struct.range.len = pagesize;
+> diff --git a/migration/ram.c b/migration/ram.c
+> index 6ed4f9e..0aea78f 100644
+> --- a/migration/ram.c
+> +++ b/migration/ram.c
+> @@ -1563,7 +1563,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
+>          rs->last_req_rb = ramblock;
+>      }
+>      trace_ram_save_queue_pages(ramblock->idstr, start, len);
+> -    if (start+len > ramblock->used_length) {
+> +    if (start + len > ramblock->used_length) {
+>          error_report("%s request overrun start=" RAM_ADDR_FMT " len="
+>                       RAM_ADDR_FMT " blocklen=" RAM_ADDR_FMT,
+>                       __func__, start, len, ramblock->used_length);
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index d2e141f..9e95df1 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -521,7 +521,7 @@ static const VMStateDescription vmstate_configuration = {
+>          VMSTATE_VBUFFER_ALLOC_UINT32(name, SaveState, 0, NULL, len),
+>          VMSTATE_END_OF_LIST()
+>      },
+> -    .subsections = (const VMStateDescription*[]) {
+> +    .subsections = (const VMStateDescription * []) {
+>          &vmstate_target_page_bits,
+>          &vmstate_capabilites,
+>          &vmstate_uuid,
+> diff --git a/migration/vmstate.c b/migration/vmstate.c
+> index bafa890..e9d2aef 100644
+> --- a/migration/vmstate.c
+> +++ b/migration/vmstate.c
+> @@ -32,13 +32,13 @@ static int vmstate_n_elems(void *opaque, const VMStateField *field)
+>      if (field->flags & VMS_ARRAY) {
+>          n_elems = field->num;
+>      } else if (field->flags & VMS_VARRAY_INT32) {
+> -        n_elems = *(int32_t *)(opaque+field->num_offset);
+> +        n_elems = *(int32_t *)(opaque + field->num_offset);
+>      } else if (field->flags & VMS_VARRAY_UINT32) {
+> -        n_elems = *(uint32_t *)(opaque+field->num_offset);
+> +        n_elems = *(uint32_t *)(opaque + field->num_offset);
+>      } else if (field->flags & VMS_VARRAY_UINT16) {
+> -        n_elems = *(uint16_t *)(opaque+field->num_offset);
+> +        n_elems = *(uint16_t *)(opaque + field->num_offset);
+>      } else if (field->flags & VMS_VARRAY_UINT8) {
+> -        n_elems = *(uint8_t *)(opaque+field->num_offset);
+> +        n_elems = *(uint8_t *)(opaque + field->num_offset);
 >      }
 >  
-> -    p = str;
-> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xffff || e == p) {
-> +    col_s = col_s0 = g_strsplit(str, ":", 3);
-> +    if (!col_s || !col_s[0] || !col_s[1]) {
->          goto inval;
->      }
-> -    if (*e != ':') {
-> -        goto inval;
-> -    }
-> -    bus = val;
+>      if (field->flags & VMS_MULTIPLY_ELEMENTS) {
+> @@ -54,7 +54,7 @@ static int vmstate_size(void *opaque, const VMStateField *field)
+>      int size = field->size;
 >  
-> -    p = (char *)e + 1;
-> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-> -        goto inval;
-> -    }
-> -    if (*e == ':') {
-> -        dom = bus;
-> -        bus = val;
-> -        p = (char *)e + 1;
-> -        if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-> +    /* domain */
-> +    if (col_s[2]) {
-> +        if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xffff) {
->              goto inval;
+>      if (field->flags & VMS_VBUFFER) {
+> -        size = *(int32_t *)(opaque+field->size_offset);
+> +        size = *(int32_t *)(opaque + field->size_offset);
+>          if (field->flags & VMS_MULTIPLY) {
+>              size *= field->size;
 >          }
-> +        addr->domain = val;
-> +        col_s++;
-> +    } else {
-> +        addr->domain = 0;
->      }
-> -    slot = val;
->  
-> -    if (*e != '.') {
-> +    /* bus */
-> +    if (qemu_strtoul(col_s[0], NULL, 16, &val) < 0 || val > 0xff) {
->          goto inval;
->      }
-> -    p = (char *)e + 1;
-> -    if (qemu_strtoul(p, &e, 10, &val) < 0 || val > 7 || e == p) {
-> -        goto inval;
-> -    }
-> -    func = val;
-> +    addr->bus = val;
->  
-> -    if (bus > 0xff) {
-> +    /* <slot>.<func> */
-> +    dot_s = g_strsplit(col_s[1], ".", 2);
-> +    if (!dot_s || !dot_s[0] || !dot_s[1]) {
->          goto inval;
->      }
->  
-> -    if (*e) {
-> +    /* slot */
-> +    if (qemu_strtoul(dot_s[0], NULL, 16, &val) < 0 || val > 0x1f) {
->          goto inval;
->      }
-> +    addr->slot = val;
->  
-> -    addr->domain = dom;
-> -    addr->bus = bus;
-> -    addr->slot = slot;
-> -    addr->function = func;
-> +    /* func */
-> +    if (qemu_strtoul(dot_s[1], NULL, 10, &val) < 0 || val > 7) {
-> +        goto inval;
-> +    }
-> +    addr->function = val;
->  
-> -    g_free(str);
->      return;
->  
->  inval:
->      error_set_from_qdev_prop_error(errp, EINVAL, dev, prop, str);
-> -    g_free(str);
->  }
->  
->  const PropertyInfo qdev_prop_pci_host_devaddr = {
 > -- 
-> 2.26.2
+> 1.8.3.1
 > 
-
-Regards,
-Daniel
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
