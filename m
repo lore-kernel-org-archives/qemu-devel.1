@@ -2,65 +2,66 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 155EDC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7DA5C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A6AE2072C
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:58:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 38333208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 11:00:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U2a/AzSe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A6AE2072C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebI/x6sC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38333208D5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49490 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSI0m-0007yW-BS
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:58:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59362)
+	id 1kSI2F-0001nC-3Y
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 07:00:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyE-0005Ss-NC
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20716)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHy5-0005DI-BK
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42076)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHyC-0006Cy-VA
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:54 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSHy3-00066a-SF
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:55:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602586552;
+ s=mimecast20190719; t=1602586543;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WZNi60PkzXnVo03hFA412chnNkwkgy9iB/2oK7AGob8=;
- b=U2a/AzSeEOYWJdtZ9Okco72rBaelKIhHDteEH2FKmCE0pMxFoqU0dJSJhb2nN0lXY5/cBd
- 1gTCBuF9Z5wBMWGGsdcI/2Q/i5LPcUc/j4UqVm8QkO+1A0s9zwmMPSh2G/AGS5ld4adA+7
- fFIWgLP3NCppbrJt0HODWNXDiRrO9Cg=
+ bh=rhrLWCt8WUfXJc+Aa0an0d/gE2kysihj8DyuHjHMdLI=;
+ b=ebI/x6sCWyMyMraUSb+krWUoid8ln+XK61fHn7Z6Y6DMVRP8b+493DSyldtHFTKCcaquLd
+ 2SVLrlXXFRWX9HsPK1RJI5a+covVq5trTuaXbyAmFOOKg8xtG7sgDQ0Raf1dFkRF/HX78+
+ 7ldC/3KMaR74p+JBm7UqCk76LWFbzsQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-495-D6jz-QcXNF-jHtOPGldfKg-1; Tue, 13 Oct 2020 06:55:50 -0400
-X-MC-Unique: D6jz-QcXNF-jHtOPGldfKg-1
+ us-mta-489-Z29D8nHbP1WzdTzCd0Or_Q-1; Tue, 13 Oct 2020 06:55:39 -0400
+X-MC-Unique: Z29D8nHbP1WzdTzCd0Or_Q-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1DAF318829D3;
- Tue, 13 Oct 2020 10:55:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02A398030B6;
+ Tue, 13 Oct 2020 10:55:38 +0000 (UTC)
 Received: from thuth.com (ovpn-112-151.ams2.redhat.com [10.36.112.151])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 91D696EF41;
- Tue, 13 Oct 2020 10:55:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2025E6EF45;
+ Tue, 13 Oct 2020 10:55:34 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 05/23] Acceptance tests: show test report on GitLab CI
-Date: Tue, 13 Oct 2020 12:55:09 +0200
-Message-Id: <20201013105527.20088-6-thuth@redhat.com>
+Subject: [PULL 01/23] tests/qtest: Replace magic value by
+ NANOSECONDS_PER_SECOND definition
+Date: Tue, 13 Oct 2020 12:55:05 +0200
+Message-Id: <20201013105527.20088-2-thuth@redhat.com>
 In-Reply-To: <20201013105527.20088-1-thuth@redhat.com>
 References: <20201013105527.20088-1-thuth@redhat.com>
 MIME-Version: 1.0
@@ -99,36 +100,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Cleber Rosa <crosa@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Avocado will, by default, produce JUnit files.  Let's ask GitLab
-to present those in the web UI.
+Use self-explicit NANOSECONDS_PER_SECOND definition instead
+of a magic value.
 
-Signed-off-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20201009205513.751968-4-crosa@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201011194918.3219195-5-f4bug@amsat.org>
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- .gitlab-ci.yml | 5 +++++
- 1 file changed, 5 insertions(+)
+ tests/qtest/rtc-test.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-index 14be45bbfe..29e934fd53 100644
---- a/.gitlab-ci.yml
-+++ b/.gitlab-ci.yml
-@@ -53,6 +53,11 @@ include:
-     paths:
-       - ${CI_PROJECT_DIR}/avocado-cache
-     policy: pull-push
-+  artifacts:
-+    paths:
-+      - build/tests/results/latest/results.xml
-+    reports:
-+      junit: build/tests/results/latest/results.xml
-   before_script:
-     - mkdir -p ~/.config/avocado
-     - echo "[datadir.paths]" > ~/.config/avocado/avocado.conf
+diff --git a/tests/qtest/rtc-test.c b/tests/qtest/rtc-test.c
+index c7af34f6b1..402ce2c609 100644
+--- a/tests/qtest/rtc-test.c
++++ b/tests/qtest/rtc-test.c
+@@ -292,7 +292,7 @@ static void alarm_time(void)
+             break;
+         }
+ 
+-        clock_step(1000000000);
++        clock_step(NANOSECONDS_PER_SECOND);
+     }
+ 
+     g_assert(get_irq(RTC_ISA_IRQ));
 -- 
 2.18.2
 
