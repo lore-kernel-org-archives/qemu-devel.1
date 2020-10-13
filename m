@@ -2,92 +2,92 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,PLING_QUERY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B46E9C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:47:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BFF9C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:07:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF46B20E65
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 05:47:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37541206ED
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 06:07:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SxWu1uo/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF46B20E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dA+L6E0W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37541206ED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42524 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSD9a-0007EZ-0g
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 01:47:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50074)
+	id 1kSDT6-0002Sj-0c
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 02:07:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSD8v-0006oK-77
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 01:46:37 -0400
-Received: from mail-lf1-x135.google.com ([2a00:1450:4864:20::135]:40322)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSD8t-0001y6-LS
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 01:46:36 -0400
-Received: by mail-lf1-x135.google.com with SMTP id a9so20751803lfc.7
- for <qemu-devel@nongnu.org>; Mon, 12 Oct 2020 22:46:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=LNEUXpS8N0KH/JdbduSvZxs9jDcwwGBJIJ6K7iSuBN8=;
- b=SxWu1uo/+GACcMZnKaLVZg0uDlNg80M8Bee4oLpjJtbiJzuXmpqlx8g+1SqAB/M4LR
- pL3iUpsdNY98/Xxn13Qr7Dl4oi0A/3p3LDw3MRs4iUDCEmztdP7WmSpqxN9yX5VelSm4
- tit7lgKLWKCFsfXtPz6qc9NnfF1Sl+WcGR7KQ2I8xGp937eCF+XzuBVfKx+lJ9zBGYwr
- sQOiiHlDtLn7CXbEftcQ/8A7gBJOC5sJ3yACwM+BJ32ucGPIrLCgCJdVjW36K0xCJPlj
- 9gAt0b/cgbwdPkSw/QuGdgncBibFoVAtEoI+HLo0XDrhxHCL9hRQxRllc4eq6IDX8Yjl
- j+Ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=LNEUXpS8N0KH/JdbduSvZxs9jDcwwGBJIJ6K7iSuBN8=;
- b=POBFghh5J/RqAb/9ukZffbo6/BPSVxnATlJ0BG2MN4Fn3cH+D4p4aIlW6Kg4/gcNe7
- EIm8tzIFQR2EQrOV00qoxk/YAaoTosQJk8Xudt1PDLRTyz3tk+3eWmD0HrtqRbUDn88d
- xMy4jl7G29VaMXEMN6NDfmurbK9v/eYEurToVToor1/dYDTtOxYSYB+PlQiCc9mqGjIc
- WFV2qVshouzwi58eByHvhbOIWPKfisVWjk/jLQkfat1gDbOMyu5qtmnAbkXhynaxj4y4
- KI1JM4Sgv+Jq2TioAI9Cl5n/ff4FxD/y1+02EUOjiewvV0bMUKVjIy4UwRY6saECH4bR
- Z6SQ==
-X-Gm-Message-State: AOAM531063lQFiTpmA+Gq37pzrMi4TKTKdSbx8E1PVIsJy5nA7FmpnqR
- eMBih9sNRXgMC2Uf0InZLxY8yPB/rDLAxQVVBZI=
-X-Google-Smtp-Source: ABdhPJxwM5nJX6kyxU50rOQTjgBYavOyJr1SEug0ooYlBiLOXt/qh6akVbf4EmatmjsL5M3XoaemFpCo9LP2kz/ybIs=
-X-Received: by 2002:a19:4bd4:: with SMTP id y203mr3585959lfa.539.1602567993345; 
- Mon, 12 Oct 2020 22:46:33 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSDSR-0001t0-J1
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 02:06:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33823)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSDSN-0000Hw-Vi
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 02:06:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602569202;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=m9B273ARsnjWwBYBnn8AGceVkfb732hx8XQ++n9v7a8=;
+ b=dA+L6E0Ws4IzKJAwCpRnXH8MVI8H7gWgDxCbqzgGoWBbT615zqBOs/9sMT53QccKND+Wfn
+ yNleebus+GiV4ifdzIB2NEhGa0NLyqlZpfXA7qRQhVHu6DXCQzi8ZznLlL7MXkyyP5+/s9
+ Q2RJ8NL3WWo+fkpj1E/hZoArL4ABAq0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-311-XzCA9Qk-PnyPVWjPeueRBA-1; Tue, 13 Oct 2020 02:06:39 -0400
+X-MC-Unique: XzCA9Qk-PnyPVWjPeueRBA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D05D1054F8A;
+ Tue, 13 Oct 2020 06:06:38 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-151.ams2.redhat.com [10.36.112.151])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9E7E855789;
+ Tue, 13 Oct 2020 06:06:36 +0000 (UTC)
+Subject: Re: [PATCH] tests/migration: Allow longer timeouts
+From: Thomas Huth <thuth@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>,
+ qemu-devel@nongnu.org, lvivier@redhat.com, alex.bennee@linaro.org
+References: <20201008160330.130431-1-dgilbert@redhat.com>
+ <b2ca5be3-fa96-4ecd-32bc-26a2d27554bd@redhat.com>
+Message-ID: <bc76808c-f1e1-86f8-9aaf-7a8221288772@redhat.com>
+Date: Tue, 13 Oct 2020 08:06:35 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
- <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
- <CA+-xGqOm2sWbxR=3W1pWrZNLOt7EE5qiNWxMz=9=gmga15vD2w@mail.gmail.com>
- <20201012165428.GD26135@linux.intel.com>
- <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
- <20201013045245.GA11344@linux.intel.com>
- <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
-In-Reply-To: <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
-From: harry harry <hiharryharryharry@gmail.com>
-Date: Tue, 13 Oct 2020 01:46:16 -0400
-Message-ID: <CA+-xGqMMa-DB1SND5MRugusDafjNA9CVw-=OBK7q=CK1impmTQ@mail.gmail.com>
-Subject: Re: Why guest physical addresses are not the same as the
- corresponding host virtual addresses in QEMU/KVM? Thanks!
-To: Sean Christopherson <sean.j.christopherson@intel.com>
-Content-Type: multipart/alternative; boundary="000000000000f8cba105b186efbe"
-Received-SPF: pass client-ip=2a00:1450:4864:20::135;
- envelope-from=hiharryharryharry@gmail.com; helo=mail-lf1-x135.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+In-Reply-To: <b2ca5be3-fa96-4ecd-32bc-26a2d27554bd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, PLING_QUERY=0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,44 +100,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
- Maxim Levitsky <mlevitsk@redhat.com>, mathieu.tarral@protonmail.com,
- stefanha@redhat.com, pbonzini@redhat.com
+Cc: quintela@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f8cba105b186efbe
-Content-Type: text/plain; charset="UTF-8"
+On 12/10/2020 15.13, Thomas Huth wrote:
+> On 08/10/2020 18.03, Dr. David Alan Gilbert (git) wrote:
+>> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>>
+>> In travis, with gcov and gprof we're seeing timeouts; hopefully fix
+>> this by increasing the test timeouts a bit, but for xbzrle ensure it
+>> really does get a couple of cycles through to test the cache.
+>>
+>> I think the problem in travis is we have about 2 host CPU threads,
+>> in the test we have at least 3:
+>>    a) The vCPU thread (100% flat out)
+>>    b) The source migration thread
+>>    c) The destination migration thread
+>>
+>> if (b) & (c) are slow for any reason - gcov+gperf or a slow host -
+>> then they're sharing one host CPU thread so limit the migration
+>> bandwidth.
+>>
+>> Tested on my laptop with:
+>>    taskset -c 0,1 ./tests/qtest/migration-test -p /x86_64/migration
+>>
+>> Reported-by: Alex Bennée <alex.bennee@linaro.org>
+>> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>  tests/qtest/migration-test.c | 21 +++++++++++----------
+>>  1 file changed, 11 insertions(+), 10 deletions(-)
+> 
+> This seems to fix the gcov/gprof test indeed:
+> 
+>  https://travis-ci.com/github/huth/qemu/jobs/398270396
+> 
+> Thus:
+> 
+> Tested-by: Thomas Huth <thuth@redhat.com>
+> 
+> I'm also queuing this to my qtest-next branch (in case you don't plan a
+> migration pull request within the next days):
+> 
+>  https://gitlab.com/huth/qemu/-/commits/qtest-next/
 
-BTW, I assume the software logic for KVM to find the HPA with a given HVA
-(as you said like below) should be the same as the hardware logic in MMU
-to translate ``GPA -> [extended/nested page tables] -> HPA''.  If this is
-true, I cannot understand how KVM can find a correct HPA with an HVA (e.g.,
-array[0]'s HVA is not 0x0000000000000081 in the last email) that is
-different from its corresponding GPA.
+FYI, this patch fails to build on non-Linux systems:
 
-GPA -> [memslots] -> HVA -> [host page tables] -> HPA
+https://cirrus-ci.com/task/5951706225704960?command=main#L6076
 
---000000000000f8cba105b186efbe
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+The #define needs to be moved out of the #if defined(__linux__) block. I can
+fixup the patch here locally, but if you want to include it in your next
+migration pull request instead, you should do that, too.
 
-<div dir=3D"ltr"><div dir=3D"ltr">BTW, I assume the software logic for KVM =
-to find the HPA with a given HVA (as you said like below) should be the sam=
-e as the hardware logic in MMU to=C2=A0translate ``GPA -&gt; [extended/nest=
-ed page tables] -&gt; HPA&#39;&#39;.=C2=A0
+ Cheers,
+  Thomas
 
-If this is true, I cannot understand how KVM can=C2=A0find a correct HPA wi=
-th an HVA (e.g., array[0]&#39;s HVA is not 0x0000000000000081 in the last e=
-mail) that is different from its corresponding GPA.
-
-</div><div dir=3D"ltr"><br></div><div dir=3D"ltr">GPA -&gt; [memslots] -&gt=
-; HVA -&gt; [host page tables] -&gt; HPA<br></div><div dir=3D"ltr"><br></di=
-v><div dir=3D"ltr"><br></div><div></div><div class=3D"gmail_quote"><blockqu=
-ote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px=
- solid rgb(204,204,204);padding-left:1ex">
-</blockquote></div></div>
-
---000000000000f8cba105b186efbe--
 
