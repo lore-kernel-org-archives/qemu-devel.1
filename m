@@ -2,88 +2,97 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2AEC43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 23:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6FE5C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 23:13:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F206C22203
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 23:10:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7B06020B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 23:13:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eyqh2A30"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F206C22203
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="v5EYztbC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B06020B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSTRN-00053Z-3W
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 19:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37876)
+	id 1kSTU0-00089r-FG
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 19:13:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39046)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kSTMW-0006ZI-1z
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 19:05:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54424)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kSTMP-0003cC-Vo
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 19:05:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602630333;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3m5u6RznFsKtqBBV59KVWcpK1ey1DAx8fco18NzU/lc=;
- b=Eyqh2A308DywvqJ0Ji6mEuwi2gVAh4lsEWkbBx2Fuwqd3TDW0u3aPglH+45lb1h7SxG0H8
- LHfbTZGCFtBvgDXlXl/tNjY3yys3fpCrY9SjKs1lkEFPjZi7Qk885R+6NaH0SxBSY43DuT
- Vjdq6MUgb2ASxgsFNDmU+FGuEpU7vBc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-361-lX_C_LU4OYSt0zi8ng3Fjg-1; Tue, 13 Oct 2020 19:05:31 -0400
-X-MC-Unique: lX_C_LU4OYSt0zi8ng3Fjg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9D0EB56BE6;
- Tue, 13 Oct 2020 23:05:29 +0000 (UTC)
-Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 227BE76663;
- Tue, 13 Oct 2020 23:05:28 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/7] i386: Add default_version parameter to CPU version
- functions
-Date: Tue, 13 Oct 2020 19:04:54 -0400
-Message-Id: <20201013230457.150630-5-ehabkost@redhat.com>
-In-Reply-To: <20201013230457.150630-1-ehabkost@redhat.com>
-References: <20201013230457.150630-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSTSk-0007IS-GV
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 19:12:11 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:46036)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSTSa-0004KJ-Jr
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 19:12:09 -0400
+Received: by mail-pg1-x542.google.com with SMTP id y14so682345pgf.12
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 16:12:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=UjNLcc5zisJRAiP5K13I6Eo454zrEd/6/yuNT6MH5Us=;
+ b=v5EYztbCEzOVvWzlzgnRWMiHGxeLrKqhZIHKem0scReCqwY3AopCZ4rg+Ltqbd7bn/
+ ANnSyEwWJPkGv0ETRk80v6zw5M0vrvddsp/TZMyq/ugM1wxhrPyHIa3iiEuzB71RZ4qR
+ 82kf7CEaTQ40+yOnc9BGExHRAgzt4nAH3Qn77VWH0gpikGUiJqKmLU8B+fTYEQhYPYVc
+ nJITYpFHaPIZD7ydzNgtIhDGvXyxWpYu7CC0gTlMPqQgaQZz1Nki0IDsIZ2GLIVZx4R5
+ a7umaRDGiFF2LG5vci55v4vD0EUpuPGpsNRBoO0RGB40zRTtM7m6KnycIDnErwaLG7kj
+ L0OA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=UjNLcc5zisJRAiP5K13I6Eo454zrEd/6/yuNT6MH5Us=;
+ b=WavKXy3ukpxNxXR3JG/y1d/WIc7SqgdhaNUAl/xOY/V+KuPXmXy+CgHoNVRGSqNCaR
+ dLuDqoElaydScPv1VQLR+CXC1ehzoyG2ev6Q/4mJ60Gi9eRXTb60cv/DUfaAfNMoVu9C
+ UQAd5dJbHd4m8bUb4zLkljEsxLNCuPu4b1HCjV0dXTZRJD1Wul1b9OGCSmweqDgPw4x+
+ gV1fRwPyRDxMgQ9RWLaBEX0UQfLgc5nQmd/xREbQbc1VZ+AmxrMzybkwYNDEmcsHTdd0
+ TVvPp6AqE611oNBrSDIBx/SUsvPUw3PwtkuAAl0R8SuTwvWsKV9VKAM1xCimSjIbslew
+ x1Kg==
+X-Gm-Message-State: AOAM530/r+GormqFQ9wgx5QFH0Na9hHW6mjyK+D7n2ALUsjpf3Xzxaif
+ ti8WP7EGr3iLJecIYmIPtOi/ow==
+X-Google-Smtp-Source: ABdhPJxh0pCNQbOkZzhfwGyIOsAsRC8Ywy3wKNU+BMbU+S6MP1EH07QuFpGA48u5DOPIpGzM0OL9oA==
+X-Received: by 2002:a63:e26:: with SMTP id d38mr1508542pgl.247.1602630718904; 
+ Tue, 13 Oct 2020 16:11:58 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id j5sm327463pjb.56.2020.10.13.16.11.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 16:11:58 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] target/mips: Make the number of TLB entries a CPU
+ property
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Victor Kamensky <kamensky@cisco.com>
+References: <20201013132535.3599453-1-f4bug@amsat.org>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <7b059e2f-b868-82b3-3d96-bd4e93d36368@linaro.org>
+Date: Tue, 13 Oct 2020 16:11:56 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20201013132535.3599453-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 02:06:42
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,99 +105,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- David Hildenbrand <david@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Khem Raj <raj.khem@gmail.com>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Richard Henderson <rth@twiddle.net>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-s390x@nongnu.org,
- qemu-arm@nongnu.org, Cleber Rosa <crosa@redhat.com>,
- Jiri Denemark <jdenemar@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>,
- "Daniel P. Berrange" <berrange@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Richard Purdie <richard.purdie@linuxfoundation.org>,
+ Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently, the functions that resolve CPU model versions
-(x86_cpu_model_resolve_version(), x86_cpu_model_resolve_alias())
-need a machine to be initialized first.  Get rid of this
-requirement by making those functions get an explicit
-default_version argument.
+On 10/13/20 6:25 AM, Philippe Mathieu-Daudé wrote:
+> Yocto developers have expressed interest in running MIPS32
+> CPU with custom number of TLB:
+> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg03428.html
+> 
+> Help them by making the number of TLB entries a CPU property,
+> keeping our set of CPU definitions in sync with real hardware.
 
-No behavior changes are introduced by this patch, as all callers
-are being changed to use default_cpu_version as argument.
+You mean keeping the 34kf model within qemu in sync, rather than creating a
+nonsense model that doesn't exist.
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- target/i386/cpu.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+Question: is this cpu parameter useful for anything else?
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 2c8dd3fa32..c78b2abfb8 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -4158,11 +4158,12 @@ static X86CPUVersion x86_cpu_model_last_version(const X86CPUModel *model)
- }
- 
- /* Return the actual version being used for a specific CPU model */
--static X86CPUVersion x86_cpu_model_resolve_version(const X86CPUModel *model)
-+static X86CPUVersion x86_cpu_model_resolve_version(const X86CPUModel *model,
-+                                                   X86CPUVersion default_version)
- {
-     X86CPUVersion v = model->version;
-     if (v == CPU_VERSION_AUTO) {
--        v = default_cpu_version;
-+        v = default_version;
-     }
-     if (v == CPU_VERSION_LATEST) {
-         return x86_cpu_model_last_version(model);
-@@ -4171,14 +4172,15 @@ static X86CPUVersion x86_cpu_model_resolve_version(const X86CPUModel *model)
- }
- 
- /* Resolve CPU model alias to actual CPU model name */
--static char *x86_cpu_model_resolve_alias(const X86CPUModel *model)
-+static char *x86_cpu_model_resolve_alias(const X86CPUModel *model,
-+                                         X86CPUVersion default_version)
- {
-     X86CPUVersion version;
- 
-     if (!model->is_alias) {
-         return NULL;
-     }
--    version = x86_cpu_model_resolve_version(model);
-+    version = x86_cpu_model_resolve_version(model, default_version);
-     if (version <= 0) {
-         return NULL;
-     }
-@@ -5004,7 +5006,8 @@ static void x86_cpu_definition_entry(gpointer data, gpointer user_data)
-      * doesn't break compatibility with previous QEMU versions.
-      */
-     if (cc->model && default_cpu_version != CPU_VERSION_LEGACY) {
--        info->alias_of = x86_cpu_model_resolve_alias(cc->model);
-+        info->alias_of = x86_cpu_model_resolve_alias(cc->model,
-+                                                     default_cpu_version);
-         info->has_alias_of = !!info->alias_of;
-     }
- 
-@@ -5075,7 +5078,8 @@ static void x86_cpu_apply_props(X86CPU *cpu, PropValue *props)
- static void x86_cpu_apply_version_props(X86CPU *cpu, X86CPUModel *model)
- {
-     const X86CPUVersionDefinition *vdef;
--    X86CPUVersion version = x86_cpu_model_resolve_version(model);
-+    X86CPUVersion version = x86_cpu_model_resolve_version(model,
-+                                                          default_cpu_version);
- 
-     if (version == CPU_VERSION_LEGACY) {
-         return;
--- 
-2.28.0
+Because the ideal solution for a CI loop is to use one of the mips cpu models
+that has the hw page table walker (CP0C3_PW).  Having qemu being able to refill
+the tlb itself is massively faster.
 
+We do not currently implement a mips cpu that has the PW.  When I downloaded
+the document set in 2014, I only got the mips64-pra and neglected to get the
+mips32-pra.  So I don't actually know if the PW applies to mips32.  I do know
+that there's nothing in the kernel that ifdefs around it.
+
+So:
+
+(1) anyone know if the PW incompatible with mips32?
+(2) if not, was there any mips32 hw built with PW
+    that we could model?
+(3) if not, would a cpu parameter to force-enable PW
+    for any r2+ cpu be more useful that frobbing the
+    number of tlb entries?
+
+
+r~
 
