@@ -2,97 +2,98 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB087C43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DADDAC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:25:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3706424807
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:22:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2166E2481D
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 14:25:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cixx88vV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3706424807
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Bkb+SwgK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2166E2481D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56276 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSLBw-0005qr-31
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 10:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60000)
+	id 1kSLEt-0007dv-Rz
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 10:25:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33324)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kSLAe-0004kV-4E; Tue, 13 Oct 2020 10:20:56 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62620)
+ id 1kSLDm-000763-94; Tue, 13 Oct 2020 10:24:10 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:22482)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
- id 1kSLAb-0008Pn-5s; Tue, 13 Oct 2020 10:20:55 -0400
+ id 1kSLDg-0000ZE-Q2; Tue, 13 Oct 2020 10:24:09 -0400
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09DEH6Ic026973; Tue, 13 Oct 2020 10:20:24 -0400
+ 09DEH7PM026994; Tue, 13 Oct 2020 10:23:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=subject : to : cc :
  references : from : message-id : date : mime-version : in-reply-to :
  content-type : content-transfer-encoding; s=pp1;
- bh=TA5VzIJUEqOoa/xXdpjvfuixmjiDzGsGrBx3o5fR3I8=;
- b=cixx88vVjhu+lXPz57+tEiM8NUiRTZNal6LTM+8Ae32nux19h7fZL5ZF/YU3zq7TWX2r
- Gc/B6lqy7Jmxlg0odLkUwHITQzxUW4Wc4L1PFZzxaYNqz3nWwRlCAzUPQEztS+vL1J4k
- yNNy5CCz5aBCFkoi5hJ9QDbf1p71hCwSfUUdg+Ofpg5+R/HVrDjYLTRxVi01nw+jaGUx
- ouomwpnoRsCAITnqU4K4u6627yK9eYe9Pf4Ht4LirZ7eW5y6SlDNWXSLtLE1ztM/aOeC
- 8GZC/cc397iPioOFdsgUN+dZljGzZHNN9RQA46oMxtyQG1H+XsUeUELdf0gF8xwaU0Aw MQ== 
+ bh=H1S1kerjeTTNAye4XlqprncupS266Qgyv9WAmccDjG4=;
+ b=Bkb+SwgKuZTW0Y3whjNahe9tRQNKwRLuUjQrylAwqn7VqBtDpX//zStyNUbGpip3+IPg
+ 2hYPh+JCG1OgFlahqzRfUyZLoI8IxKzg/gUY+Fl2xttyeYuxFR5a3l0F9OMT+7q0gsMo
+ kTaP8ieQ2mZZcPAGEsfdA0z/y6yV9MXr4n/EtpW17P+b9KDFx3+P+yNssHmjeeNQLWD5
+ FkyMXhAE7Mn+LbXK9s67UIUw6XrEPddne/1MvJpZi2JXGdESzkKsdmqSkNbgjjC+5o7k
+ VmiBuXJ2GfpeWao7LHko5W1mOFmagq3jl6w5rURzT+ZqCrgm//3wPWb7tuVndGWwd/m3 Pw== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 345dnv8mnk-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 345dnv8rpk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 13 Oct 2020 10:20:24 -0400
+ Tue, 13 Oct 2020 10:23:47 -0400
 Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09DEHNou028329;
- Tue, 13 Oct 2020 10:20:23 -0400
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09DEHcS9029982;
+ Tue, 13 Oct 2020 10:23:46 -0400
 Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
  [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 345dnv8mmn-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 345dnv8rp1-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 13 Oct 2020 10:20:23 -0400
+ Tue, 13 Oct 2020 10:23:46 -0400
 Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09DEHojT023709;
- Tue, 13 Oct 2020 14:20:22 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma01dal.us.ibm.com with ESMTP id 3434k96498-1
+ by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09DEHnVh023609;
+ Tue, 13 Oct 2020 14:23:45 GMT
+Received: from b03cxnp08026.gho.boulder.ibm.com
+ (b03cxnp08026.gho.boulder.ibm.com [9.17.130.18])
+ by ppma01dal.us.ibm.com with ESMTP id 3434k9655d-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 13 Oct 2020 14:20:22 +0000
+ Tue, 13 Oct 2020 14:23:45 +0000
 Received: from b03ledav004.gho.boulder.ibm.com
  (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09DEKGd731654156
+ by b03cxnp08026.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09DENb0b39518572
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 13 Oct 2020 14:20:16 GMT
+ Tue, 13 Oct 2020 14:23:37 GMT
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 194C67806A;
- Tue, 13 Oct 2020 14:20:21 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 358287806B;
+ Tue, 13 Oct 2020 14:23:44 +0000 (GMT)
 Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id C76AF7806B;
- Tue, 13 Oct 2020 14:20:19 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 094E678060;
+ Tue, 13 Oct 2020 14:23:43 +0000 (GMT)
 Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
  by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 13 Oct 2020 14:20:19 +0000 (GMT)
-Subject: Re: [PATCH 08/10] hw/isa: Add the ISA_IRQ_NET_DEFAULT definition
-To: Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+ Tue, 13 Oct 2020 14:23:42 +0000 (GMT)
+Subject: Re: [PATCH 04/10] hw/isa: Add the ISA_IRQ_TPM_DEFAULT definition
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Gerd Hoffmann <kraxel@redhat.com>
 References: <20201011193229.3210774-1-f4bug@amsat.org>
- <20201011193229.3210774-9-f4bug@amsat.org>
- <20201013072359.t3q7q4ck3cggschm@sirius.home.kraxel.org>
+ <20201011193229.3210774-5-f4bug@amsat.org>
+ <20201013072028.lw2uuncabmme7vws@sirius.home.kraxel.org>
+ <70253a5e-d4cc-fb89-6235-cd53ee1bc18b@amsat.org>
 From: Stefan Berger <stefanb@linux.ibm.com>
-Message-ID: <be024734-2629-0200-5c55-fc20817ef33a@linux.ibm.com>
-Date: Tue, 13 Oct 2020 10:20:19 -0400
+Message-ID: <8333bb93-f4b6-dbe6-daa7-288d71b272bc@linux.ibm.com>
+Date: Tue, 13 Oct 2020 10:23:42 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201013072359.t3q7q4ck3cggschm@sirius.home.kraxel.org>
+In-Reply-To: <70253a5e-d4cc-fb89-6235-cd53ee1bc18b@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Content-Language: en-US
@@ -103,7 +104,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  malwarescore=0
  impostorscore=0 priorityscore=1501 bulkscore=0 adultscore=0 spamscore=0
- mlxlogscore=868 mlxscore=0 clxscore=1015 suspectscore=0 phishscore=0
+ mlxlogscore=999 mlxscore=0 clxscore=1015 suspectscore=0 phishscore=0
  lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2010130106
 Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
@@ -146,22 +147,35 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/13/20 3:23 AM, Gerd Hoffmann wrote:
-> On Sun, Oct 11, 2020 at 09:32:27PM +0200, Philippe Mathieu-DaudÃ© wrote:
->> The network devices use IRQ #9 by default. Add this
->> default definition to the IsaIrqNumber enum.
-> IRQ #9 seems to be sort-of standard for acpi.  Not sure whenever that is
-> actually written down somewhere.  IIRC in pre-ACPI days it was free
-> like irq #5.
+On 10/13/20 4:26 AM, Philippe Mathieu-Daudé wrote:
+> On 10/13/20 9:20 AM, Gerd Hoffmann wrote:
+>> On Sun, Oct 11, 2020 at 09:32:23PM +0200, Philippe 
+>> Mathieu-DaudÃƒÆ’Ã‚Â© wrote:
+>>> The TPM TIS device uses IRQ #5 by default. Add this
+>>> default definition to the IsaIrqNumber enum.
+>>
+>> IRQ 5 has no fixed assignment.  All kinds of add-on isa cards (sound,
+>> net) used to use irq #5 by default because that one wasn't assigned
+>> otherwise.  Seems these days tpm and ipmi use it ...
+>
+> Yes, I'll drop this patch.
 
-Best docu I could find was this one:
+I think this patch is good but maybe the name should be a different one. 
+Rather than having these numbers in the code you could maybe call it 
+something like this here, which makes grepping through the code a bit 
+easier:
 
-https://en.wikipedia.org/wiki/Interrupt_request_(PC_architecture)#Master_PIC
 
+     ISA_IRQ_IRQ5 =  5,
+
+Regards,
+
+    Stefan
 
 >
-> take care,
->    Gerd
+> Thanks,
 >
+> Phil.
+
 
 
