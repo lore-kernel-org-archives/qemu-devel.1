@@ -2,98 +2,70 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1D5BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2584AC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 17:00:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDADB25307
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 16:59:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rN1o9EBg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDADB25307
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 5557525308
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 17:00:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5557525308
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43548 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSNdt-00006f-Ni
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 12:59:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58846)
+	id 1kSNf4-0001Ag-4S
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 13:00:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSNdD-0007zL-Rn
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:58:35 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:35886)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSNdC-0006fl-C7
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 12:58:35 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id a1so242286pjd.1
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 09:58:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:references:from:message-id:date:user-agent:mime-version
- :in-reply-to:content-language:content-transfer-encoding;
- bh=kjcdsLCEJCFzeMrTcX3WjkgAnDjuz9bXPb1/3p7Dwoc=;
- b=rN1o9EBgVAlbdP950rNMWE+oFMxSUkYsQbgTEGl2hdhRTIAzfNXnemaCqTPxoq8XUK
- ZuQx31NfM4A5U4nZIBlh0VAdUt7I676zLu3N8yqnP/P/D5HMFTRXGudKNthQ+UonPmFf
- yH5yx40lO809dOKU00kJlDE5y02kClvoERCbXfOL+Nzb8zEYT4t7KwnaK2Cq6Jr5TitI
- 1fLi8RXn5kPcLDg8ysGdEEoJ7x2GYuEHCSV+70/Tv640ynoZ6xpLtudbGadNFfthXeJz
- WDD3hcK72jDX4POsA/tZ7MXjZLAWBwRmEGdlVpG8YBI+uCNMpd02ajcw1bSG2YQj/XqN
- sm8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=kjcdsLCEJCFzeMrTcX3WjkgAnDjuz9bXPb1/3p7Dwoc=;
- b=tjCzrwNgZK7FeIyzsYmnyNLPMgUDothx2ePGLMThnBHcGVDO5SNy3hzItuiLxypdyP
- Ij2o8TDXudmgN2y45QwYbIaa7VcK1z4R1LgHFwcH8wr+25b+1plvwxVI1aTdSgNjJCkw
- UH2loNSQhRozFAbxUBQK+fkb0qphDhQHcV+WACItTgvEmpSlc2kcDRrWsbtM/uA6wzhd
- OR+luwJfxfyYgjd47eK6liPlGiTylGgJjeCD0UQic0Xv11xSWji6kAg/nhqJ5W+R3A71
- ZWg8HFc0ciR4QktoShBbOTzYujD+879MyemAQDarNDl40R9UBJKzU9usUUFTeMr6U6yM
- XyDA==
-X-Gm-Message-State: AOAM532FoksSlPHvxesLHIGCf0fWFypaGJJcgJSq+vTl9LJhm3ddvMeT
- WvtbTG3N43c1FuGAiZKkuHFBlCEGz77IcP9P
-X-Google-Smtp-Source: ABdhPJzhpIdyaNUrN2O/SIeqjgz12MWbdzC9pdBWtPZ8UF7pnYGwA7ZKyawcXHnOk9z3k0M5lP+hAQ==
-X-Received: by 2002:a17:90a:bf05:: with SMTP id c5mr657235pjs.11.1602608312296; 
- Tue, 13 Oct 2020 09:58:32 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id x25sm178339pfr.132.2020.10.13.09.58.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 09:58:31 -0700 (PDT)
-Subject: Re: [PATCH 06/10] target/arm: Implement v8.1M branch-future insns (as
- NOPs)
-To: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org
-References: <20201012153746.9996-1-peter.maydell@linaro.org>
- <20201012153746.9996-7-peter.maydell@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <a055900d-a7a9-e1f7-6354-fb8e518d6763@linaro.org>
-Date: Tue, 13 Oct 2020 09:58:29 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSNdg-0008WD-2j; Tue, 13 Oct 2020 12:59:04 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:52128
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSNdd-0006h9-EX; Tue, 13 Oct 2020 12:59:03 -0400
+Received: from host86-158-109-18.range86-158.btcentralplus.com
+ ([86.158.109.18] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kSNdZ-0006gA-8i; Tue, 13 Oct 2020 17:59:02 +0100
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
+ <20201013114922.2946-4-mark.cave-ayland@ilande.co.uk>
+ <f8df313a-24ae-5544-e1a8-32cb7729f680@eik.bme.hu>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <f5ca9c69-c946-7f2e-0fc6-92a3136e63d1@ilande.co.uk>
+Date: Tue, 13 Oct 2020 17:58:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201012153746.9996-7-peter.maydell@linaro.org>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <f8df313a-24ae-5544-e1a8-32cb7729f680@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1044.google.com
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.158.109.18
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v2 3/3] uninorth: use qdev gpios for PCI IRQs
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,33 +78,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: david@gibson.dropbear.id.au, qemu-ppc@nongnu.org, f4bug@amsat.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/12/20 8:37 AM, Peter Maydell wrote:
-> v8.1M implements a new 'branch future' feature, which is a
-> set of instructions that request the CPU to perform a branch
-> "in the future", when it reaches a particular execution address.
-> In hardware, the expected implementation is that the information
-> about the branch location and destination is cached and then
-> acted upon when execution reaches the specified address.
-> However the architecture permits an implementation to discard
-> this cached information at any point, and so guest code must
-> always include a normal branch insn at the branch point as
-> a fallback. In particular, an implementation is specifically
-> permitted to treat all BF insns as NOPs (which is equivalent
-> to discarding the cached information immediately).
+On 13/10/2020 14:38, BALATON Zoltan via wrote:
+
+> On Tue, 13 Oct 2020, Mark Cave-Ayland wrote:
+>> Currently an object link property is used to pass a reference to the OpenPIC
+>> into the PCI host bridge so that pci_unin_init_irqs() can connect the PCI
+>> IRQs to the PIC itself.
+>>
+>> This can be simplified by defining the PCI IRQs as qdev gpios and then wiring
+>> up the PCI IRQs to the PIC in the New World machine init function.
+>>
+>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>> hw/pci-host/uninorth.c         | 45 +++++++---------------------------
+>> hw/ppc/mac_newworld.c          | 24 ++++++++++++------
+>> include/hw/pci-host/uninorth.h |  2 --
+>> 3 files changed, 25 insertions(+), 46 deletions(-)
+>>
+>> diff --git a/hw/pci-host/uninorth.c b/hw/pci-host/uninorth.c
+>> index 1ed1072eeb..0c0a9ecee1 100644
+>> --- a/hw/pci-host/uninorth.c
+>> +++ b/hw/pci-host/uninorth.c
+>> @@ -32,8 +32,6 @@
+>> #include "hw/pci-host/uninorth.h"
+>> #include "trace.h"
+>>
+>> -static const int unin_irq_line[] = { 0x1b, 0x1c, 0x1d, 0x1e };
+>> -
+>> static int pci_unin_map_irq(PCIDevice *pci_dev, int irq_num)
+>> {
+>>     return (irq_num + (pci_dev->devfn >> 3)) & 3;
+>> @@ -43,7 +41,7 @@ static void pci_unin_set_irq(void *opaque, int irq_num, int level)
+>> {
+>>     UNINHostState *s = opaque;
+>>
+>> -    trace_unin_set_irq(unin_irq_line[irq_num], level);
+>> +    trace_unin_set_irq(irq_num, level);
+>>     qemu_set_irq(s->irqs[irq_num], level);
+>> }
+>>
+>> @@ -112,15 +110,6 @@ static const MemoryRegionOps unin_data_ops = {
+>>     .endianness = DEVICE_LITTLE_ENDIAN,
+>> };
+>>
+>> -static void pci_unin_init_irqs(UNINHostState *s)
+>> -{
+>> -    int i;
+>> -
+>> -    for (i = 0; i < ARRAY_SIZE(s->irqs); i++) {
+>> -        s->irqs[i] = qdev_get_gpio_in(DEVICE(s->pic), unin_irq_line[i]);
+>> -    }
+>> -}
+>> -
+>> static char *pci_unin_main_ofw_unit_address(const SysBusDevice *dev)
+>> {
+>>     UNINHostState *s = UNI_NORTH_PCI_HOST_BRIDGE(dev);
+>> @@ -141,7 +130,6 @@ static void pci_unin_main_realize(DeviceState *dev, Error **errp)
+>>                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+>>
+>>     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-pci");
+>> -    pci_unin_init_irqs(s);
+>>
+>>     /* DEC 21154 bridge */
+>> #if 0
+>> @@ -172,15 +160,12 @@ static void pci_unin_main_init(Object *obj)
+>>                              "unin-pci-hole", &s->pci_mmio,
+>>                              0x80000000ULL, 0x10000000ULL);
+>>
+>> -    object_property_add_link(obj, "pic", TYPE_OPENPIC,
+>> -                             (Object **) &s->pic,
+>> -                             qdev_prop_allow_set_link_before_realize,
+>> -                             0);
+>> -
+>>     sysbus_init_mmio(sbd, &h->conf_mem);
+>>     sysbus_init_mmio(sbd, &h->data_mem);
+>>     sysbus_init_mmio(sbd, &s->pci_hole);
+>>     sysbus_init_mmio(sbd, &s->pci_io);
+>> +
+>> +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
+>> }
+>>
+>> static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
+>> @@ -196,7 +181,6 @@ static void pci_u3_agp_realize(DeviceState *dev, Error **errp)
+>>                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+>>
+>>     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "u3-agp");
+>> -    pci_unin_init_irqs(s);
+>> }
+>>
+>> static void pci_u3_agp_init(Object *obj)
+>> @@ -220,15 +204,12 @@ static void pci_u3_agp_init(Object *obj)
+>>                              "unin-pci-hole", &s->pci_mmio,
+>>                              0x80000000ULL, 0x70000000ULL);
+>>
+>> -    object_property_add_link(obj, "pic", TYPE_OPENPIC,
+>> -                             (Object **) &s->pic,
+>> -                             qdev_prop_allow_set_link_before_realize,
+>> -                             0);
+>> -
+>>     sysbus_init_mmio(sbd, &h->conf_mem);
+>>     sysbus_init_mmio(sbd, &h->data_mem);
+>>     sysbus_init_mmio(sbd, &s->pci_hole);
+>>     sysbus_init_mmio(sbd, &s->pci_io);
+>> +
+>> +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
+>> }
+>>
+>> static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
+>> @@ -244,7 +225,6 @@ static void pci_unin_agp_realize(DeviceState *dev, Error **errp)
+>>                                    PCI_DEVFN(11, 0), 4, TYPE_PCI_BUS);
+>>
+>>     pci_create_simple(h->bus, PCI_DEVFN(11, 0), "uni-north-agp");
+>> -    pci_unin_init_irqs(s);
+>> }
+>>
+>> static void pci_unin_agp_init(Object *obj)
+>> @@ -259,13 +239,10 @@ static void pci_unin_agp_init(Object *obj)
+>>     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+>>                           obj, "unin-agp-conf-data", 0x1000);
+>>
+>> -    object_property_add_link(obj, "pic", TYPE_OPENPIC,
+>> -                             (Object **) &s->pic,
+>> -                             qdev_prop_allow_set_link_before_realize,
+>> -                             0);
+>> -
+>>     sysbus_init_mmio(sbd, &h->conf_mem);
+>>     sysbus_init_mmio(sbd, &h->data_mem);
+>> +
+>> +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
+>> }
+>>
+>> static void pci_unin_internal_realize(DeviceState *dev, Error **errp)
+>> @@ -281,7 +258,6 @@ static void pci_unin_internal_realize(DeviceState *dev, Error 
+>> **errp)
+>>                                    PCI_DEVFN(14, 0), 4, TYPE_PCI_BUS);
+>>
+>>     pci_create_simple(h->bus, PCI_DEVFN(14, 0), "uni-north-internal-pci");
+>> -    pci_unin_init_irqs(s);
+>> }
+>>
+>> static void pci_unin_internal_init(Object *obj)
+>> @@ -296,13 +272,10 @@ static void pci_unin_internal_init(Object *obj)
+>>     memory_region_init_io(&h->data_mem, OBJECT(h), &pci_host_data_le_ops,
+>>                           obj, "unin-pci-conf-data", 0x1000);
+>>
+>> -    object_property_add_link(obj, "pic", TYPE_OPENPIC,
+>> -                             (Object **) &s->pic,
+>> -                             qdev_prop_allow_set_link_before_realize,
+>> -                             0);
+>> -
+>>     sysbus_init_mmio(sbd, &h->conf_mem);
+>>     sysbus_init_mmio(sbd, &h->data_mem);
+>> +
+>> +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
+>> }
+>>
+>> static void unin_main_pci_host_realize(PCIDevice *d, Error **errp)
+>> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+>> index 6f5ef2e782..7a8dc09c8d 100644
+>> --- a/hw/ppc/mac_newworld.c
+>> +++ b/hw/ppc/mac_newworld.c
+>> @@ -303,8 +303,6 @@ static void ppc_core99_init(MachineState *machine)
+>>         /* 970 gets a U3 bus */
+>>         /* Uninorth AGP bus */
+>>         dev = qdev_new(TYPE_U3_AGP_HOST_BRIDGE);
+>> -        object_property_set_link(OBJECT(dev), "pic", OBJECT(pic_dev),
+>> -                                 &error_abort);
+>>         sysbus_realize_and_unref(SYS_BUS_DEVICE(dev), &error_fatal);
+>>         uninorth_pci = U3_AGP_HOST_BRIDGE(dev);
+>>         s = SYS_BUS_DEVICE(dev);
+>> @@ -317,32 +315,38 @@ static void ppc_core99_init(MachineState *machine)
+>>         sysbus_mmio_map(s, 0, 0xf0800000);
+>>         sysbus_mmio_map(s, 1, 0xf0c00000);
+>>
+>> +        for (i = 0; i < 4; i++) {
 > 
-> For QEMU, implementing this caching of branch information
-> would be complicated and would not improve the speed of
-> execution at all, so we make the IMPDEF choice to implement
-> all BF insns as NOPs.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> Philippe had a series that replaced all these with PCI_NUM_IRQS or similar constant. 
+> Should you use that instead in new additions?
 
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+I'm not sure that's directly relevant here - my understanding was that PCI_NUM_IRQS 
+represents the number of IRQs on the device, not the PCI host bridge. Certainly it 
+could be argued that there is a 1:1 correspondence in this case, however I don't have 
+any documentation to support this so it doesn't feel right to make these values 
+directly equivalent.
+
+> This is probably not modelled faithfuly (the whole mac99 machine is a hack to get the 
+> most OSes run, not emulating an actual machine) but I wonder if it's correct to 
+> connect all these irqs for all the different busses to the same pic lines? Is that 
+> how it is on a real PowerMac3,1? (This is just a question not something that should 
+> be fixed in this patch which is a nice clean up anyway, this just made it more 
+> obvious to me what's happening so maybe we can find out a difference in emulation 
+> compared to real hardware that could be fixed in the future.)
+
+Yeah I spotted that too when I was writing the patch. In its current form it keeps 
+the existing behaviour as-is, but this is something that may be worth investigating 
+later. I'm not aware of any documentation explaining how the PCI/AGP bridges are 
+wired up on a Mac, so it might end up being a case of trawling through driver source 
+code to try and get some answers...
 
 
-r~
+ATB,
+
+Mark.
 
