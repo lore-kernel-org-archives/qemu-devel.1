@@ -2,62 +2,90 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02B1BC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:16:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19CB6C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:25:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4724C2177B
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:16:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4724C2177B
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 726AF21D6C
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 22:25:51 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NngB2bJr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 726AF21D6C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSSbE-0000FP-9V
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 18:16:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56010)
+	id 1kSSju-0003Wm-I4
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 18:25:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSSZp-0007lb-O5; Tue, 13 Oct 2020 18:15:26 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:54159)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSSZl-00068j-9K; Tue, 13 Oct 2020 18:15:25 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 547947475FF;
- Wed, 14 Oct 2020 00:15:16 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id F1C1D7475FE; Wed, 14 Oct 2020 00:15:15 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id EF4517475FA;
- Wed, 14 Oct 2020 00:15:15 +0200 (CEST)
-Date: Wed, 14 Oct 2020 00:15:15 +0200 (CEST)
-To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
-Subject: Re: [PATCH v7 8/8] mac_oldworld: Add SPD data to cover RAM
-In-Reply-To: <5f4c18c1-80ff-f605-fdd7-7ae474443690@amsat.org>
-Message-ID: <b78024b4-7d9b-9670-66af-24b6bc97a5a8@eik.bme.hu>
-References: <cover.1593456926.git.balaton@eik.bme.hu>
- <9f5f44878dc0f60b073201e657d6e4dcc940f68c.1593456926.git.balaton@eik.bme.hu>
- <5f4c18c1-80ff-f605-fdd7-7ae474443690@amsat.org>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSShr-0001lS-2S
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 18:23:43 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:54462)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSShj-0007Ad-0D
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 18:23:42 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id az3so271240pjb.4
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 15:23:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8JndH3BdmGbCuLudGuV5RxFx/lsC8iQrC57BjjstHyU=;
+ b=NngB2bJrhOuV54Qr83Sn30e+Qwpii3lv1WUkPROLhNXQVjTxDZ8PSlXa+7tR1tgbof
+ Qow+kDEc9z3+2Yy/Hjo1Crmsv8S48t77hRCHtC7Gv5r9szheIjPTBNMo32kNAKhBUw2G
+ JK+JOiXFZeXjjsJznpYzY/Qxy3XQFYLenoHsoZK5foFdv4SdtAMUHCuSF2mEPSGkNGD6
+ 1HVz1gXLcfNceECbzpSiLcG5Q4+Ci6SuxtFO7fl2PI7J+PiypVjPajUSGCmzcAjUNJtk
+ /OWilXicmV/tB64a71gPHUkEBAl2O18cSjMl4cLusInDU53JpxnhL8ONIfYCzXbDUWA7
+ 0vXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=8JndH3BdmGbCuLudGuV5RxFx/lsC8iQrC57BjjstHyU=;
+ b=pe0XRGgH+1ZK8HhkWru8H73us9hoTO/3iFq/Srdno6psLSgZ8ZrgjpjDkiOFgqD/lT
+ 895KNMG3RgWVqEAfjWA3o2Sc525/u4HUYhFvyR7gTYceuFuYOk8KHGGRmv6lvOfNI4q0
+ jhWjeQAHh6nN59E4sWT2ppsSZzx4g9jCyt9f1mbfqXr9g9bYgZepoUsxJpE4T5FUN8je
+ WSFF7zZHxBUbtUJevkFMMVsqAoUMHO3MWnKsYIdgESVpUutQOrRbkKyU03pb/HW3Acfl
+ bEsCBmgjx8HSP2HG4X+jymspfbTHKmFR5R9uyXI0+0mB4NU+maQ5Tjjsx3VWvWEQDdv4
+ dl5Q==
+X-Gm-Message-State: AOAM532OARfCjMsmJNvAv6gY6bzouvmfQ8d7LnkcLUdjUA731YsYk110
+ L/kE8F5DbjBjnux3CPKrJkrOR2QwNm0utg==
+X-Google-Smtp-Source: ABdhPJz810zZzSON3v3TVi7JLWhfVIY0CKZHBxg2RrrkoX4q44sW5D/YPtKo24Wiwuu6ZkryLfQ5KA==
+X-Received: by 2002:a17:90a:de90:: with SMTP id
+ n16mr441442pjv.215.1602627812888; 
+ Tue, 13 Oct 2020 15:23:32 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id cu5sm239899pjb.49.2020.10.13.15.23.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 15:23:32 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] tcg: optimize across branches
+Date: Tue, 13 Oct 2020 15:23:28 -0700
+Message-Id: <20201013222330.173525-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed; BOUNDARY="3866299591-80889855-1602625614=:80018"
-Content-ID: <b3c8f563-edab-1f84-50c7-6fd84b6f8bc2@eik.bme.hu>
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 18:15:16
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,137 +98,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Howard Spoelstra <hsp.cat7@gmail.com>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+In several cases, it's easy to optimize across a non-taken branch
+simply by *not* flushing the relevant tables.  This is true both
+for value propagation and register allocation.
 
---3866299591-80889855-1602625614=:80018
-Content-Type: text/plain; CHARSET=ISO-8859-15; format=flowed
-Content-Transfer-Encoding: 8BIT
-Content-ID: <61156365-ab5a-176-2980-e01c9d38ab51@eik.bme.hu>
+This comes up in quite a number of cases with arm, most simply in
+how conditional execution is implemented.  But it also came up in
+discussion of how to implement low-overhead looping for v8.1m.
 
-On Tue, 13 Oct 2020, Philippe Mathieu-Daudé wrote:
-> On 6/29/20 8:55 PM, BALATON Zoltan wrote:
->> OpenBIOS gets RAM size via fw_cfg but rhe original board firmware
->
-> Typo "the".
->
->> detects RAM using SPD data so generate and add SDP eeproms to cover as
->
-> EEPROMs?
->
->> much RAM as possible to describe with SPD (this may be less than the
->> actual ram_size due to SDRAM size constraints).
->> 
->> This patch is more complex as it should be which I intend to fix once
->> agreement can be made on how to get back the necessary functionality
->> removed by previous patches. See in this thread:
->> https://lists.nongnu.org/archive/html/qemu-devel/2020-06/msg08710.html
->> 
->> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->> ---
->>   hw/ppc/mac_oldworld.c | 19 ++++++++++++++++++-
->>   1 file changed, 18 insertions(+), 1 deletion(-)
->> 
->> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
->> index 6276973c95..6a27287c9f 100644
->> --- a/hw/ppc/mac_oldworld.c
->> +++ b/hw/ppc/mac_oldworld.c
->> @@ -34,6 +34,7 @@
->>   #include "hw/input/adb.h"
->>   #include "sysemu/sysemu.h"
->>   #include "net/net.h"
->> +#include "hw/i2c/smbus_eeprom.h"
->>   #include "hw/isa/isa.h"
->>   #include "hw/pci/pci.h"
->>   #include "hw/pci/pci_host.h"
->> @@ -104,6 +105,8 @@ static void ppc_heathrow_init(MachineState *machine)
->>       DriveInfo *hd[MAX_IDE_BUS * MAX_IDE_DEVS];
->>       void *fw_cfg;
->>       uint64_t tbfreq;
->> +    uint8_t *spd_data[3] = {};
->> +    I2CBus *i2c_bus;
->>         /* init CPUs */
->>       for (i = 0; i < smp_cpus; i++) {
->> @@ -121,8 +124,16 @@ static void ppc_heathrow_init(MachineState *machine)
->>                        "maximum 2047 MB", ram_size / MiB);
->>           exit(1);
->>       }
->> -
->>       memory_region_add_subregion(get_system_memory(), 0, machine->ram);
->> +    for (i = 0; i < 3; i++) {
->
-> 3 -> ARRAY_SIZE(spd_data)
->
->> +        int size_left = ram_size - i * 512 * MiB;
->> +        if (size_left > 0) {
->> +            uint32_t s = size_left / MiB;
->> +            s = (s > 512 ? 512 : s);
->
-> MIN()?
 
-Thanks for the review. (You forgot to cc Mark so maybe he missed the other 
-R-b tags but hopefully patchwork will pick these up.)
+r~
 
-I plan to rewrite this patch eliminating this part and un-breaking 
-spd_data_generate() instead to allow it to signal an error again so we 
-don't need to duplicate part of it here to avoid aborting. (You may 
-remember the thread where this was discussed in, I don't have a link to it 
-now.) So just disregard this one patch for now, I'll take your other 
-suggestions in account when submitting a rewritten version.
 
-This and the WIP CUDA i2c patches are not yet ready to be merged and you 
-had alternative suggestion for [v7,6/7] i2c: Match parameters of 
-i2c_start_transfer and i2c_send_recv, but was that ever merged? Do you 
-plan to resubmit or send a ping for that? It may have been lost somewhere 
-because I have those mails in my mailbox but could not find it in Patchew 
-or Patchwork.
+Richard Henderson (2):
+  tcg: Do not kill globals at conditional branches
+  tcg/optimize: Flush data at labels not TCG_OPF_BB_END
 
-Other than these 3 patches in the series others (1-5) should be OK and 
-hope most of those could be taken by Mark now in the upcoming Mac fixes 
-series to reduce the size of outstanding patches then I can fix up or 
-rewrite the remaining ones.
+ include/tcg/tcg-opc.h |  7 +++---
+ include/tcg/tcg.h     |  4 +++-
+ tcg/optimize.c        | 35 ++++++++++++++-------------
+ tcg/tcg.c             | 55 +++++++++++++++++++++++++++++++++++++++++--
+ 4 files changed, 78 insertions(+), 23 deletions(-)
 
-I'm still not sure what to do about the sign extension problem in 
-include/hw/elf_ops.h that was holding back patch 1 so if anyone has a 
-suggestion please tell me or feel free to propose any fix for it, I'm not 
-confident enough to break the elf loader.
+-- 
+2.25.1
 
-Regards,
-BALATON Zoltan
-
->> +            s = 1U << (31 - clz32(s));
->> +            spd_data[i] = spd_data_generate(SDR, s * MiB);
->> +        }
->> +    }
->>         /* allocate and load firmware ROM */
->>       memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
->> @@ -302,6 +313,12 @@ static void ppc_heathrow_init(MachineState *machine)
->>       macio_ide_init_drives(macio_ide, &hd[MAX_IDE_DEVS]);
->>         dev = DEVICE(object_resolve_path_component(OBJECT(macio), "cuda"));
->> +    i2c_bus = I2C_BUS(qdev_get_child_bus(dev, "i2c"));
->> +    for (i = 0; i < 3; i++) {
->
-> 3 -> ARRAY_SIZE(spd_data)
->
->> +        if (spd_data[i]) {
->> +            smbus_eeprom_init_one(i2c_bus, 0x50 + i, spd_data[i]);
->> +        }
->> +    }
->>       adb_bus = qdev_get_child_bus(dev, "adb.0");
->>       dev = qdev_new(TYPE_ADB_KEYBOARD);
->>       qdev_realize_and_unref(dev, adb_bus, &error_fatal);
->> 
->
->
->
---3866299591-80889855-1602625614=:80018--
 
