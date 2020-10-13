@@ -2,108 +2,91 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDC47C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:36:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0AFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0556F20878
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:36:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEC8F20870
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 10:36:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hxu1984y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0556F20878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F646NddO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEC8F20870
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40940 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSHf8-00025K-RS
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:36:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55854)
+	id 1kSHfh-00034R-Nl
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 06:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSHdd-0001Pv-5t
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:34:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60108)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSHda-0003kq-5c
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:34:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602585272;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VoguNjI7oBCF4ito9ca0lw6czC+f+FC3PWqdy4LBhOk=;
- b=Hxu1984y0DUREdigJPb6qDJWNKQQGyEffDzsCwZFlSvwvf+LvLInEw4JUUyXkF3psh7Zh0
- 5zff5D0VzCLWVJH3wdoE34lvsAwRyPlgeuTrJo3xla838+rk4U0Ooiz66M3Z+XXD9CSysF
- aZwMxWJFBVxZlav728ibs4JujYOMW1o=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-36-XwtVShsFPYSHmwElDXzlXQ-1; Tue, 13 Oct 2020 06:34:30 -0400
-X-MC-Unique: XwtVShsFPYSHmwElDXzlXQ-1
-Received: by mail-wm1-f72.google.com with SMTP id d197so5793751wmd.4
- for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 03:34:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kSHed-00027E-Me
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:35:41 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36221)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kSHeZ-0003rK-Ti
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 06:35:39 -0400
+Received: by mail-wr1-x443.google.com with SMTP id x7so14784370wrl.3
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 03:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=Rxq0YUJRRCjXNE+EXdh2OUkpg0FaXGP4WAIeZPZ2iAI=;
+ b=F646NddOxB2034Gv1d9nAVWy2VH3kJTfA90etQ/sigizEJpekMDX2c34J3jpykfAqH
+ i+5JHbT2uLaUt8XZxbKoz2G5veZtulkfofEvHJKMUEvFtXsziUOjbn1w2L0REJBzmu7b
+ qQ4VA17NtrHE4ZApPoD5lIBtcqqfeWUjLG/jnixSMBWQw4GBUtjOHtR+qJ4XhI1nugbS
+ dVXjgVUg4UYOgghnWtXw9qOZKzJ98UzpGZeqiq7GmA4O3vrcYfpLn88OHmcI7XhDtXHL
+ OvqW++VsTDBrAuOmIGGTNqjMhliAQopGnWGYl7AO+jI2+A60NZl3+t+6nKLyKSex5oiK
+ BJ6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=VoguNjI7oBCF4ito9ca0lw6czC+f+FC3PWqdy4LBhOk=;
- b=V0MsZY+CFdnYc3aPb40uUbeM6oPyUAV8Z+6iLQJuitcyC9FyF542aQhgdvZqmpl101
- JjamPUWzdnppbJrybGp/6B9smDCYMosmBkyxqt0P3f4dGRb6Nw9/4QJZ1m67Jg/TnyEk
- TmPfSjrGlnp+lWoZyj70KKvcFv50G1YRJbFrh+xEMe2A22YvigLdT99sYR5Qlnk8O3Ks
- MVP/YxUgCcknqXK9up+r88IrovAJATM9e9XMql2Wr/qukh65Q2WTlbbUZQCqY/EpYvdu
- XohsqkXaBS06lc44qoshXzwBZ55D6oyRDYmSP5bq5pZnMoKoY2Mze1YrdGd6VK9An3G7
- MtFA==
-X-Gm-Message-State: AOAM533JV7KFWuENgmvFrhCHuUEGw1ZogU6+Ky1/4zt+wSz8mj41f5NQ
- xwTxfG78urb0j4PuhoCSzUJUVV/ysG4o1nOli8yQYwkXjXrNVX5l5QFcpEDZB3wWAUzDsjKOXnh
- SZpJmrVJsLovmgo8=
-X-Received: by 2002:a1c:bd43:: with SMTP id n64mr14194480wmf.113.1602585268717; 
- Tue, 13 Oct 2020 03:34:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXxAhYHpQXHMAHqMNLnEgFO7iGslPWdKPALdTKqMPOCyGzdTryyT9Cc7ETObocvJFFMa7KbQ==
-X-Received: by 2002:a1c:bd43:: with SMTP id n64mr14194463wmf.113.1602585268523; 
- Tue, 13 Oct 2020 03:34:28 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id p4sm22652218wrf.67.2020.10.13.03.34.27
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 13 Oct 2020 03:34:27 -0700 (PDT)
-Subject: Re: [PATCH v3] hw/core/qdev-properties-system: Fix pci bus range in
- set_pci_host_devaddr()
-To: Klaus Herman <kherman@inbox.lv>, qemu-devel@nongnu.org
-References: <20201013092014.34059-1-kherman@inbox.lv>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9f1303e7-90f4-aeb4-a7e9-0088b9f3c741@redhat.com>
-Date: Tue, 13 Oct 2020 12:34:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=Rxq0YUJRRCjXNE+EXdh2OUkpg0FaXGP4WAIeZPZ2iAI=;
+ b=uEi4HY4385ChTVJMlAIKVDl3LwyEJD7NQ5j6awdZfCKgNG+2zccf+BgInfgpciEI0w
+ sdNivf2vG/GlOO7voGnqoiuFkLbEOSMjf0EbFUS78/tlMZ1ahWI/41QPwQkkmnPcOtNH
+ RyczFSnMR4pfjYjV7245equYdny2X+xNS6SlFQ5iMV54KQtXj9BYhqmLnMfPeVJk6eNn
+ YZ23t7mzQsc8oYNl9IbiyuphlnbjOBj9QnfoXR0Rabpb6DfEDOLLmVpQIC1+kFYtvlgm
+ i2rFQy1WMB4wZZBEbpU5SufVdj9hhAQMNWE3EOusW4ZCBlOOe2Y8tzcSyDnyZWwSGdBW
+ QZIg==
+X-Gm-Message-State: AOAM532OnIrXv25pLpmDgOHHB1yILkQQi4B+F+f0W1/TVdvEOoC15urk
+ 0MJlrEwTe81XdXH1sIaxCzyXtw==
+X-Google-Smtp-Source: ABdhPJweQo/mbqBPAoqEnCiFfSYl3Vx1poWF1bil2bNocvGSew0FivgWzOh5DJbgIGlDNsWWE4apLg==
+X-Received: by 2002:a5d:480a:: with SMTP id l10mr13930722wrq.279.1602585334076; 
+ Tue, 13 Oct 2020 03:35:34 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id x6sm27724713wmb.17.2020.10.13.03.35.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 13 Oct 2020 03:35:33 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH] target/arm: AArch32 VCVT fixed-point to float is always
+ round-to-nearest
+Date: Tue, 13 Oct 2020 11:35:32 +0100
+Message-Id: <20201013103532.13391-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20201013092014.34059-1-kherman@inbox.lv>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -116,38 +99,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/13/20 11:20 AM, Klaus Herman wrote:
-> Fixes: bccb20c49df ("hw/core/qdev-properties: Use qemu_strtoul() in set_pci_host_devaddr()")
-> Signed-off-by: Klaus Herman <kherman@inbox.lv>
-> ---
->   hw/core/qdev-properties-system.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
-> index 49bdd12..e3dca56 100644
-> --- a/hw/core/qdev-properties-system.c
-> +++ b/hw/core/qdev-properties-system.c
-> @@ -903,7 +903,7 @@ static void set_pci_host_devaddr(Object *obj, Visitor *v, const char *name,
->       bus = val;
->   
->       p = (char *)e + 1;
-> -    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0x1f || e == p) {
-> +    if (qemu_strtoul(p, &e, 16, &val) < 0 || val > 0xff || e == p) {
+For AArch32, unlike the VCVT of integer to float, which honours the
+rounding mode specified by the FPSCR, VCVT of fixed-point to float is
+always round-to-nearest. (AArch64 fixed-point-to-float conversions
+always honour the FPCR rounding mode.)
 
-As this is used to check both bus/slot range, I sent a different
-approach to fix this issue:
-https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg03604.html
+Implement this by providing _round_to_nearest versions of the
+relevant helpers which set the rounding mode temporarily when making
+the call to the underlying softfloat function.
 
->           goto inval;
->       }
->       if (*e == ':') {
-> 
+We only need to change the VFP VCVT instructions, because the
+standard- FPSCR value used by the Neon VCVT is always set to
+round-to-nearest, so we don't need to do the extra work of saving
+and restoring the rounding mode.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ target/arm/helper.h            | 13 +++++++++++++
+ target/arm/vfp_helper.c        | 23 ++++++++++++++++++++++-
+ target/arm/translate-vfp.c.inc | 24 ++++++++++++------------
+ 3 files changed, 47 insertions(+), 13 deletions(-)
+
+diff --git a/target/arm/helper.h b/target/arm/helper.h
+index 8defd7c8019..774d2cddb5c 100644
+--- a/target/arm/helper.h
++++ b/target/arm/helper.h
+@@ -213,6 +213,19 @@ DEF_HELPER_3(vfp_ultoh, f16, i32, i32, ptr)
+ DEF_HELPER_3(vfp_sqtoh, f16, i64, i32, ptr)
+ DEF_HELPER_3(vfp_uqtoh, f16, i64, i32, ptr)
+ 
++DEF_HELPER_3(vfp_shtos_round_to_nearest, f32, i32, i32, ptr)
++DEF_HELPER_3(vfp_sltos_round_to_nearest, f32, i32, i32, ptr)
++DEF_HELPER_3(vfp_uhtos_round_to_nearest, f32, i32, i32, ptr)
++DEF_HELPER_3(vfp_ultos_round_to_nearest, f32, i32, i32, ptr)
++DEF_HELPER_3(vfp_shtod_round_to_nearest, f64, i64, i32, ptr)
++DEF_HELPER_3(vfp_sltod_round_to_nearest, f64, i64, i32, ptr)
++DEF_HELPER_3(vfp_uhtod_round_to_nearest, f64, i64, i32, ptr)
++DEF_HELPER_3(vfp_ultod_round_to_nearest, f64, i64, i32, ptr)
++DEF_HELPER_3(vfp_shtoh_round_to_nearest, f16, i32, i32, ptr)
++DEF_HELPER_3(vfp_uhtoh_round_to_nearest, f16, i32, i32, ptr)
++DEF_HELPER_3(vfp_sltoh_round_to_nearest, f16, i32, i32, ptr)
++DEF_HELPER_3(vfp_ultoh_round_to_nearest, f16, i32, i32, ptr)
++
+ DEF_HELPER_FLAGS_2(set_rmode, TCG_CALL_NO_RWG, i32, i32, ptr)
+ 
+ DEF_HELPER_FLAGS_3(vfp_fcvt_f16_to_f32, TCG_CALL_NO_RWG, f32, f16, ptr, i32)
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 5666393ef79..abfdb6a8e23 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -393,12 +393,32 @@ float32 VFP_HELPER(fcvts, d)(float64 x, CPUARMState *env)
+     return float64_to_float32(x, &env->vfp.fp_status);
+ }
+ 
+-/* VFP3 fixed point conversion.  */
++/*
++ * VFP3 fixed point conversion. The AArch32 versions of fix-to-float
++ * must always round-to-nearest; the AArch64 ones honour the FPSCR
++ * rounding mode. (For AArch32 Neon the standard-FPSCR is set to
++ * round-to-nearest so either helper will work.) AArch32 float-to-fix
++ * must round-to-zero.
++ */
+ #define VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)            \
+ ftype HELPER(vfp_##name##to##p)(uint##isz##_t  x, uint32_t shift,      \
+                                      void *fpstp) \
+ { return itype##_to_##float##fsz##_scalbn(x, -shift, fpstp); }
+ 
++#define VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype)      \
++    ftype HELPER(vfp_##name##to##p##_round_to_nearest)(uint##isz##_t  x, \
++                                                     uint32_t shift,   \
++                                                     void *fpstp)      \
++    {                                                                  \
++        ftype ret;                                                     \
++        float_status *fpst = fpstp;                                    \
++        FloatRoundMode oldmode = fpst->float_rounding_mode;            \
++        fpst->float_rounding_mode = float_round_nearest_even;          \
++        ret = itype##_to_##float##fsz##_scalbn(x, -shift, fpstp);      \
++        fpst->float_rounding_mode = oldmode;                           \
++        return ret;                                                    \
++    }
++
+ #define VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype, ROUND, suff) \
+ uint##isz##_t HELPER(vfp_to##name##p##suff)(ftype x, uint32_t shift,      \
+                                             void *fpst)                   \
+@@ -412,6 +432,7 @@ uint##isz##_t HELPER(vfp_to##name##p##suff)(ftype x, uint32_t shift,      \
+ 
+ #define VFP_CONV_FIX(name, p, fsz, ftype, isz, itype)            \
+ VFP_CONV_FIX_FLOAT(name, p, fsz, ftype, isz, itype)              \
++VFP_CONV_FIX_FLOAT_ROUND(name, p, fsz, ftype, isz, itype)        \
+ VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,        \
+                          float_round_to_zero, _round_to_zero)    \
+ VFP_CONV_FLOAT_FIX_ROUND(name, p, fsz, ftype, isz, itype,        \
+diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
+index 28e0dba5f14..9b11b81f80d 100644
+--- a/target/arm/translate-vfp.c.inc
++++ b/target/arm/translate-vfp.c.inc
+@@ -3141,16 +3141,16 @@ static bool trans_VCVT_fix_hp(DisasContext *s, arg_VCVT_fix_sp *a)
+     /* Switch on op:U:sx bits */
+     switch (a->opc) {
+     case 0:
+-        gen_helper_vfp_shtoh(vd, vd, shift, fpst);
++        gen_helper_vfp_shtoh_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 1:
+-        gen_helper_vfp_sltoh(vd, vd, shift, fpst);
++        gen_helper_vfp_sltoh_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 2:
+-        gen_helper_vfp_uhtoh(vd, vd, shift, fpst);
++        gen_helper_vfp_uhtoh_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 3:
+-        gen_helper_vfp_ultoh(vd, vd, shift, fpst);
++        gen_helper_vfp_ultoh_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 4:
+         gen_helper_vfp_toshh_round_to_zero(vd, vd, shift, fpst);
+@@ -3200,16 +3200,16 @@ static bool trans_VCVT_fix_sp(DisasContext *s, arg_VCVT_fix_sp *a)
+     /* Switch on op:U:sx bits */
+     switch (a->opc) {
+     case 0:
+-        gen_helper_vfp_shtos(vd, vd, shift, fpst);
++        gen_helper_vfp_shtos_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 1:
+-        gen_helper_vfp_sltos(vd, vd, shift, fpst);
++        gen_helper_vfp_sltos_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 2:
+-        gen_helper_vfp_uhtos(vd, vd, shift, fpst);
++        gen_helper_vfp_uhtos_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 3:
+-        gen_helper_vfp_ultos(vd, vd, shift, fpst);
++        gen_helper_vfp_ultos_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 4:
+         gen_helper_vfp_toshs_round_to_zero(vd, vd, shift, fpst);
+@@ -3265,16 +3265,16 @@ static bool trans_VCVT_fix_dp(DisasContext *s, arg_VCVT_fix_dp *a)
+     /* Switch on op:U:sx bits */
+     switch (a->opc) {
+     case 0:
+-        gen_helper_vfp_shtod(vd, vd, shift, fpst);
++        gen_helper_vfp_shtod_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 1:
+-        gen_helper_vfp_sltod(vd, vd, shift, fpst);
++        gen_helper_vfp_sltod_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 2:
+-        gen_helper_vfp_uhtod(vd, vd, shift, fpst);
++        gen_helper_vfp_uhtod_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 3:
+-        gen_helper_vfp_ultod(vd, vd, shift, fpst);
++        gen_helper_vfp_ultod_round_to_nearest(vd, vd, shift, fpst);
+         break;
+     case 4:
+         gen_helper_vfp_toshd_round_to_zero(vd, vd, shift, fpst);
+-- 
+2.20.1
 
 
