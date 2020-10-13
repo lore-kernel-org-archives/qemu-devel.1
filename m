@@ -2,87 +2,98 @@ Return-Path: <SRS0=rz2F=DU=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 734DDC43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62C2BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:22:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C1560253B1
-	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8D25B208D5
+	for <qemu-devel@archiver.kernel.org>; Tue, 13 Oct 2020 18:22:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CU9L1dnI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1560253B1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XpJuFwO8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8D25B208D5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSOkL-0008OU-Gh
-	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 14:10:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49204)
+	id 1kSOwA-0002RM-HC
+	for qemu-devel@archiver.kernel.org; Tue, 13 Oct 2020 14:22:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kSOjM-0007be-2l
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:09:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29729)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
- id 1kSOjH-0006w7-3j
- for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:08:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602612533;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=vVnYd8w1GiyKi73VjbGybwSaZ+1w801n0cpHH/aHarQ=;
- b=CU9L1dnIMuAy+tEGijtDZh+wcGXZA7+D1c+T5c0tv6NwWx/irMgSQG+SwJKhzpDF0cy4DY
- v/0VGX5Sa0lgCiNfrnM1zgE+J6fP8gHG3VfdpAg/PMxQNKuaABNyA2RLd3uGojgAnXev+L
- AuHcg3bA0eRJJ1nMcIBRrIa7mA2abY8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-200-OcyazgRnMLK9utnZf7-gBw-1; Tue, 13 Oct 2020 14:08:49 -0400
-X-MC-Unique: OcyazgRnMLK9utnZf7-gBw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7555818C35A2;
- Tue, 13 Oct 2020 18:08:47 +0000 (UTC)
-Received: from kamzik.brq.redhat.com (unknown [10.40.192.133])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 783CA5576C;
- Tue, 13 Oct 2020 18:08:43 +0000 (UTC)
-Date: Tue, 13 Oct 2020 20:08:40 +0200
-From: Andrew Jones <drjones@redhat.com>
-To: "Zengtao (B)" <prime.zeng@hisilicon.com>
-Subject: Re: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache topology
- support
-Message-ID: <20201013180840.yzkncsw34xvwtoll@kamzik.brq.redhat.com>
-References: <20200917032033.2020-1-fangying1@huawei.com>
- <678F3D1BB717D949B966B68EAEB446ED49E0BB94@dggemm526-mbx.china.huawei.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSOvO-000207-Ia
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:21:28 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:56145)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSOvL-0008SI-Ej
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 14:21:25 -0400
+Received: by mail-wm1-x344.google.com with SMTP id a72so571647wme.5
+ for <qemu-devel@nongnu.org>; Tue, 13 Oct 2020 11:21:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=CbdIQbGBM1rpiQE+pM1z/uQvV2MF/t381pw7jFhwrPY=;
+ b=XpJuFwO88tu34hvZP+gNEfn1CVz/RdXYLXWG7qvT/KgsUMUFa8le2R/hA6OdG9aLLt
+ SaQu5Fpbk747p81oNV1r/6hSzyjh8OTrvofC3sx7gVM/5f4ZD+2tIMJk/lDZ3iD5dUSX
+ Y2i9cyohadJxOL8x0FYAsoMIM/P60h9IwkSFo2E236gZj1BX90JvW42gxxVTClKgcOYd
+ tgMZHgP/uo0QL3LB3eRD25uOrlIV6TC7vPtAE3sr5/+3LKBcaQFXVQZPxbxvlx39xLux
+ vlXjcKOscqkHwbtAfeEVczaKGu8IMPdyI6T0hdoAkslAoGTZij+J7hfQ/GHq0jICgU22
+ dxtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=CbdIQbGBM1rpiQE+pM1z/uQvV2MF/t381pw7jFhwrPY=;
+ b=p4dh7n0w7uxN6YJmB04Ci2kxwXz4+6AUGCR523/qgEHW48mLO4E7JnxASm9Qc7fqQF
+ coT+gvn0ntD8p5yaYSav3ahojs0yWHq3EJFqn3ZH2bGNjZxjvsVFW2hSFLjf817Nh8Uo
+ oCusg5oesIc2CVGUVkgNPzrW363xkDn03zs6Fvu0Sonh9eBir/um9TuwvSXRll/iERrM
+ zKZ66wNZqUoaHTj/hbXEUQMUwM9dqFt4ef3OOV2/rm04ryhFnlQjL68OH7bB23XRj4aL
+ H9T8B/EhE91+gsQrX3MFKPpKvvZI1NMdNaODLlNvog5ovireqY43XrM91f28GW1I8dDj
+ vfAQ==
+X-Gm-Message-State: AOAM531v5jPv2YTeNBhTDcJ9JOiGQoBfZvUeCZkop2TqlLQncWj1gC4f
+ VLRKqijlDoYkaOPgrkP0HNXEq5+WQ5U=
+X-Google-Smtp-Source: ABdhPJx+g8sT23bGCE9wYr8H6x6SnlwLqPSq1EjvTrJ9InucCv+eRSIlX5j+/AHOqX4QILkDGSbXkQ==
+X-Received: by 2002:a1c:e283:: with SMTP id z125mr1165728wmg.154.1602613281400; 
+ Tue, 13 Oct 2020 11:21:21 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id w5sm596477wmg.42.2020.10.13.11.21.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 13 Oct 2020 11:21:20 -0700 (PDT)
+Subject: Re: [PATCH] mac_via: fix init() and realize() behaviour
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, ehabkost@redhat.com,
+ laurent@vivier.eu, qemu-devel@nongnu.org
+References: <20201013162603.9485-1-mark.cave-ayland@ilande.co.uk>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f23abfe8-b84c-7738-1424-9189e3e887fe@amsat.org>
+Date: Tue, 13 Oct 2020 20:21:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <678F3D1BB717D949B966B68EAEB446ED49E0BB94@dggemm526-mbx.china.huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=drjones@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/13 03:04:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20201013162603.9485-1-mark.cave-ayland@ilande.co.uk>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,63 +106,146 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "Chenzhendong \(alex\)" <alex.chen@huawei.com>,
- "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
- "alistair.francis@wdc.com" <alistair.francis@wdc.com>,
- fangying <fangying1@huawei.com>, "imammedo@redhat.com" <imammedo@redhat.com>,
- "valentin.schneider@arm.com" <valentin.schneider@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 13, 2020 at 12:11:20PM +0000, Zengtao (B) wrote:
-> Cc valentin
-> 
-> > -----Original Message-----
-> > From: Qemu-devel
-> > [mailto:qemu-devel-bounces+prime.zeng=hisilicon.com@nongnu.org]
-> > On Behalf Of Ying Fang
-> > Sent: Thursday, September 17, 2020 11:20 AM
-> > To: qemu-devel@nongnu.org
-> > Cc: peter.maydell@linaro.org; drjones@redhat.com; Zhanghailiang;
-> > Chenzhendong (alex); shannon.zhaosl@gmail.com;
-> > qemu-arm@nongnu.org; alistair.francis@wdc.com; fangying;
-> > imammedo@redhat.com
-> > Subject: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache
-> > topology support
-> > 
-> > An accurate cpu topology may help improve the cpu scheduler's
-> > decision
-> > making when dealing with multi-core system. So cpu topology
-> > description
-> > is helpful to provide guest with the right view. Cpu cache information
-> > may
-> > also have slight impact on the sched domain, and even userspace
-> > software
-> > may check the cpu cache information to do some optimizations. Thus
-> > this patch
-> > series is posted to provide cpu and cache topology support for arm.
-> > 
-> > To make the cpu topology consistent with MPIDR, an vcpu ioctl
-> 
-> For aarch64, the cpu topology don't depends on the MPDIR.
-> See https://patchwork.kernel.org/patch/11744387/ 
->
+On 10/13/20 6:26 PM, Mark Cave-Ayland wrote:
+> The mac_via device does not currently follow the rules for init() and realize() in
+> regard to the mos6522 child devices. These child devices must be initialised using
+> object_initialize_child() within the mac_via init() function and then realized as
+> part of the mac_via realize() function. Move object_initialize_child() from
+> realize() to init() which is where the iniitalisation of child devices should occur.
 
-The topology should not be inferred from the MPIDR Aff fields,
-but MPIDR is the CPU identifier. When describing a topology
-with ACPI or DT the CPU elements in the topology description
-must map to actual CPUs. MPIDR is that mapping link. KVM
-currently determines what the MPIDR of a VCPU is. If KVM
-userspace is going to determine the VCPU topology, then it
-also needs control over the MPIDR values, otherwise it
-becomes quite messy trying to get the mapping right.
+Typo "initialisation".
 
-Thanks,
-drew
+> 
+> Similarly the realize() function creates alias properties to allow the VIA input
+> and output IRQs to be wired up to the interrupt controller during machine init, but
+> realize() should never alter object properties. Remove these aliases and instead
+> use object_resolve_path_component() to access the child objects from the mac_via
+> device.
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>   hw/m68k/q800.c    | 12 ++++++++----
+>   hw/misc/mac_via.c | 36 ++++++++++++------------------------
+>   2 files changed, 20 insertions(+), 28 deletions(-)
+> 
+> diff --git a/hw/m68k/q800.c b/hw/m68k/q800.c
+> index ce4b47c3e3..773d75c1f8 100644
+> --- a/hw/m68k/q800.c
+> +++ b/hw/m68k/q800.c
+> @@ -174,6 +174,7 @@ static void q800_init(MachineState *machine)
+>       SysBusESPState *sysbus_esp;
+>       ESPState *esp;
+>       SysBusDevice *sysbus;
+> +    MOS6522State *ms;
+
+As we often use 'ms' for MachineState* variable, maybe name
+this 'mos' or 'via'?
+Also you can use simply a Object*.
+
+>       BusState *adb_bus;
+>       NubusBus *nubus;
+>       GLUEState *irq;
+> @@ -226,9 +227,11 @@ static void q800_init(MachineState *machine)
+>       sysbus = SYS_BUS_DEVICE(via_dev);
+>       sysbus_realize_and_unref(sysbus, &error_fatal);
+>       sysbus_mmio_map(sysbus, 0, VIA_BASE);
+> -    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 0, pic[0]);
+> -    qdev_connect_gpio_out_named(DEVICE(sysbus), "irq", 1, pic[1]);
+>   
+> +    ms = MOS6522(object_resolve_path_component(OBJECT(via_dev), "via1"));
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(ms), 0, pic[0]);
+> +    ms = MOS6522(object_resolve_path_component(OBJECT(via_dev), "via2"));
+> +    sysbus_connect_irq(SYS_BUS_DEVICE(ms), 0, pic[1]);
+>   
+>       adb_bus = qdev_get_child_bus(via_dev, "adb.0");
+>       dev = qdev_new(TYPE_ADB_KEYBOARD);
+> @@ -300,11 +303,12 @@ static void q800_init(MachineState *machine)
+>   
+>       sysbus = SYS_BUS_DEVICE(dev);
+>       sysbus_realize_and_unref(sysbus, &error_fatal);
+> -    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(via_dev,
+> +    ms = MOS6522(object_resolve_path_component(OBJECT(via_dev), "via2"));
+> +    sysbus_connect_irq(sysbus, 0, qdev_get_gpio_in_named(DEVICE(ms),
+>                                                            "via2-irq",
+>                                                            VIA2_IRQ_SCSI_BIT));
+>       sysbus_connect_irq(sysbus, 1,
+> -                       qdev_get_gpio_in_named(via_dev, "via2-irq",
+> +                       qdev_get_gpio_in_named(DEVICE(ms), "via2-irq",
+>                                                 VIA2_IRQ_SCSI_DATA_BIT));
+>       sysbus_mmio_map(sysbus, 0, ESP_BASE);
+>       sysbus_mmio_map(sysbus, 1, ESP_PDMA);
+> diff --git a/hw/misc/mac_via.c b/hw/misc/mac_via.c
+> index 6db62dab7d..7c2c943d3f 100644
+> --- a/hw/misc/mac_via.c
+> +++ b/hw/misc/mac_via.c
+> @@ -1016,40 +1016,21 @@ static void mac_via_realize(DeviceState *dev, Error **errp)
+>       struct tm tm;
+>       int ret;
+>   
+> -    /* Init VIAs 1 and 2 */
+> -    object_initialize_child(OBJECT(dev), "via1", &m->mos6522_via1,
+> -                            TYPE_MOS6522_Q800_VIA1);
+> -
+> -    object_initialize_child(OBJECT(dev), "via2", &m->mos6522_via2,
+> -                            TYPE_MOS6522_Q800_VIA2);
+> -
+> -    /* Pass through mos6522 output IRQs */
+> -    ms = MOS6522(&m->mos6522_via1);
+> -    object_property_add_alias(OBJECT(dev), "irq[0]", OBJECT(ms),
+> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]");
+> -    ms = MOS6522(&m->mos6522_via2);
+> -    object_property_add_alias(OBJECT(dev), "irq[1]", OBJECT(ms),
+> -                              SYSBUS_DEVICE_GPIO_IRQ "[0]");
+> -
+> +    /* Realize VIAs */
+>       sysbus_realize(SYS_BUS_DEVICE(&m->mos6522_via1), &error_abort);
+>       sysbus_realize(SYS_BUS_DEVICE(&m->mos6522_via2), &error_abort);
+>   
+> -    /* Pass through mos6522 input IRQs */
+> -    qdev_pass_gpios(DEVICE(&m->mos6522_via1), dev, "via1-irq");
+> -    qdev_pass_gpios(DEVICE(&m->mos6522_via2), dev, "via2-irq");
+> -
+>       /* VIA 1 */
+> +    ms = MOS6522(&m->mos6522_via1);
+>       m->mos6522_via1.one_second_timer = timer_new_ms(QEMU_CLOCK_VIRTUAL,
+> -                                                     via1_one_second,
+> -                                                     &m->mos6522_via1);
+> -    m->mos6522_via1.VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL,
+> -                                              &m->mos6522_via1);
+> +                                                     via1_one_second, ms);
+> +    m->mos6522_via1.VBL_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, via1_VBL, ms);
+
+Unrelated to your patch, but doesn't this belong
+to mos6522_q800_via1_init()?
+
+>   
+>       qemu_get_timedate(&tm, 0);
+>       m->tick_offset = (uint32_t)mktimegm(&tm) + RTC_OFFSET;
+>   
+>       adb_register_autopoll_callback(adb_bus, adb_via_poll, m);
+> -    m->adb_data_ready = qdev_get_gpio_in_named(dev, "via1-irq",
+> +    m->adb_data_ready = qdev_get_gpio_in_named(DEVICE(ms), "via1-irq",
+>                                                  VIA1_IRQ_ADB_READY_BIT);
+>   
+>       if (m->blk) {
+> @@ -1080,6 +1061,13 @@ static void mac_via_init(Object *obj)
+>       SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+>       MacVIAState *m = MAC_VIA(obj);
+>   
+> +    /* Init VIAs 1 and 2 */
+> +    object_initialize_child(obj, "via1", &m->mos6522_via1,
+> +                            TYPE_MOS6522_Q800_VIA1);
+> +
+> +    object_initialize_child(obj, "via2", &m->mos6522_via2,
+> +                            TYPE_MOS6522_Q800_VIA2);
+> +
+>       /* MMIO */
+>       memory_region_init(&m->mmio, obj, "mac-via", 2 * VIA_SIZE);
+>       sysbus_init_mmio(sbd, &m->mmio);
+> 
 
 
