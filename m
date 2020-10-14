@@ -2,61 +2,90 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67910C43457
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 19:25:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11D60C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 19:26:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E631214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 19:25:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E631214D8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 60E7E214D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 19:26:55 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yk5e1+yx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60E7E214D8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSmOn-0002r6-DM
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 15:25:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42034)
+	id 1kSmQI-0005c2-3d
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 15:26:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSmN4-0001E3-1r
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 15:23:34 -0400
-Received: from mx2.suse.de ([195.135.220.15]:34290)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kSmN0-00022i-8n
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 15:23:33 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 0BA58B2A3;
- Wed, 14 Oct 2020 19:23:28 +0000 (UTC)
-From: Claudio Fontana <cfontana@suse.de>
-To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [PATCH v2 3/3] accel/tcg: rename tcg-cpus functions to match module
- name
-Date: Wed, 14 Oct 2020 21:23:24 +0200
-Message-Id: <20201014192324.6390-4-cfontana@suse.de>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201014192324.6390-1-cfontana@suse.de>
-References: <20201014192324.6390-1-cfontana@suse.de>
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kSmHj-0005hp-On
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 15:18:03 -0400
+Received: from mail-lj1-x235.google.com ([2a00:1450:4864:20::235]:44023)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kSmHg-0001Iv-LY
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 15:18:03 -0400
+Received: by mail-lj1-x235.google.com with SMTP id d24so582438ljg.10
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 12:18:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=CQS83vbG1jxkZ1KH3ztQUXv9qLLgtTxuh0GQi95jc/U=;
+ b=Yk5e1+yx5ibC65a/chZffBpMoI9TcPe5yoCB1WbHJY8WdyubA64YHlJBFDJNmlYleA
+ GjY8RYnjptMep4k0y5ggCMqstA+H63iXof61rzaeu4W6+Yrz6J4GkGqLa0yk4SpUiwqK
+ ZuDmsEmBbww3e3jcWM/n6znb5+9nUo5q3+SGzFhlMZlFXtebFgd7PzCHd4P0TtcBK8a3
+ dXjEYk8U4U8nQL+y8v9gxvKtRXPxNXiTSgUISCZneS5x8GlkBzYB5Te61YeL0xr3wHNp
+ cOklkbDroTYMiPGSMSFTYHpxbZB4riXAri9SqrWuYp6pdvSq1lNJerN0b1ZjB236N0+K
+ fikw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=CQS83vbG1jxkZ1KH3ztQUXv9qLLgtTxuh0GQi95jc/U=;
+ b=Vk/I66nHXfirMMjJvJy2pnPyJZSQiLjFnLhYz+OWeBfVDZfBii/RQ0X223/USuYsx0
+ We8UHyG7W23QgJHNWDrWa8fp8gPMsP83QwKiyB/gBvq2JSNKUS8PvCvXPtCXLVCmmahM
+ hdWgcRHHhhtHiejechlRgueCFzsn/2W5TWc28Lq1/QobjBgT7rjkmOigZ0kkoQ75F+vl
+ Tate0EVg1I1BdkOulxloJSvi82aTyqv6dn3eg80F+zyGGf2bJjN9Zdvg7gDUe7MaM/+1
+ mTeYg8ES31zVNY1FKQVTz+FBzYoHbsTvrB74HoyUCusByx92yoeThDZoqnzVcrRs0D9l
+ cPZA==
+X-Gm-Message-State: AOAM53341VYL14XGNX4KiN60J95iwqIerIfvgUjMPm3GkcupSlkmInRF
+ x0rxKjiWHvl+7CLjNdBa4Jtno82Y/av3cvY1KBE=
+X-Google-Smtp-Source: ABdhPJx8Yt3LEsm5Y3eu0FuANeCeYyk6KnoxHMft9sMD5MYPZGXXzdetCl1jx3hgNdrS5/Yz18OPaiNSpupy2e+TxwU=
+X-Received: by 2002:a2e:b5b3:: with SMTP id f19mr56371ljn.467.1602703078614;
+ Wed, 14 Oct 2020 12:17:58 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:21:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201014082149.26853-1-kraxel@redhat.com>
+ <20201014082149.26853-6-kraxel@redhat.com>
+ <391ba08ce827326c2706b0ebfd2801360d0b7512.camel@suse.com>
+In-Reply-To: <391ba08ce827326c2706b0ebfd2801360d0b7512.camel@suse.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Thu, 15 Oct 2020 03:17:46 +0800
+Message-ID: <CAE2XoE_nHHDOg-cxFyDFdBOS0ZTgvyxDJoDVeJwjuayM7+R7Rg@mail.gmail.com>
+Subject: Re: [PULL 5/9] configure: Fixes ncursesw detection under msys2/mingw
+ by convert them to meson
+To: Bruce Rogers <brogers@suse.com>
+Content-Type: multipart/alternative; boundary="000000000000ae6a0805b1a6637a"
+Received-SPF: pass client-ip=2a00:1450:4864:20::235;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x235.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -10
+X-Spam_score: -1.1
+X-Spam_bar: -
+X-Spam_report: (-1.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ FREEMAIL_REPLYTO=1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,436 +98,729 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org
+Reply-To: luoyonggang@gmail.com
+Cc: Stefan Weil <sw@weilnetz.de>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Claudio Fontana <cfontana@suse.de>
----
- accel/tcg/tcg-cpus-icount.c | 24 ++++++------
- accel/tcg/tcg-cpus-icount.h |  6 +--
- accel/tcg/tcg-cpus-mttcg.c  | 10 ++---
- accel/tcg/tcg-cpus-rr.c     | 74 ++++++++++++++++++-------------------
- accel/tcg/tcg-cpus-rr.h     |  2 +-
- accel/tcg/tcg-cpus.c        |  6 +--
- accel/tcg/tcg-cpus.h        |  6 +--
- 7 files changed, 64 insertions(+), 64 deletions(-)
+--000000000000ae6a0805b1a6637a
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/accel/tcg/tcg-cpus-icount.c b/accel/tcg/tcg-cpus-icount.c
-index 82dbe2cacf..9f45432275 100644
---- a/accel/tcg/tcg-cpus-icount.c
-+++ b/accel/tcg/tcg-cpus-icount.c
-@@ -36,7 +36,7 @@
- #include "tcg-cpus-icount.h"
- #include "tcg-cpus-rr.h"
- 
--static int64_t tcg_get_icount_limit(void)
-+static int64_t icount_get_limit(void)
- {
-     int64_t deadline;
- 
-@@ -68,37 +68,37 @@ static int64_t tcg_get_icount_limit(void)
-     }
- }
- 
--static void notify_aio_contexts(void)
-+static void icount_notify_aio_contexts(void)
- {
-     /* Wake up other AioContexts.  */
-     qemu_clock_notify(QEMU_CLOCK_VIRTUAL);
-     qemu_clock_run_timers(QEMU_CLOCK_VIRTUAL);
- }
- 
--void handle_icount_deadline(void)
-+void icount_handle_deadline(void)
- {
-     assert(qemu_in_vcpu_thread());
-     int64_t deadline = qemu_clock_deadline_ns_all(QEMU_CLOCK_VIRTUAL,
-                                                   QEMU_TIMER_ATTR_ALL);
- 
-     if (deadline == 0) {
--        notify_aio_contexts();
-+        icount_notify_aio_contexts();
-     }
- }
- 
--void prepare_icount_for_run(CPUState *cpu)
-+void icount_prepare_for_run(CPUState *cpu)
- {
-     int insns_left;
- 
-     /*
--     * These should always be cleared by process_icount_data after
-+     * These should always be cleared by icount_process_data after
-      * each vCPU execution. However u16.high can be raised
--     * asynchronously by cpu_exit/cpu_interrupt/tcg_handle_interrupt
-+     * asynchronously by cpu_exit/cpu_interrupt/tcg_cpus_handle_interrupt
-      */
-     g_assert(cpu_neg(cpu)->icount_decr.u16.low == 0);
-     g_assert(cpu->icount_extra == 0);
- 
--    cpu->icount_budget = tcg_get_icount_limit();
-+    cpu->icount_budget = icount_get_limit();
-     insns_left = MIN(0xffff, cpu->icount_budget);
-     cpu_neg(cpu)->icount_decr.u16.low = insns_left;
-     cpu->icount_extra = cpu->icount_budget - insns_left;
-@@ -106,11 +106,11 @@ void prepare_icount_for_run(CPUState *cpu)
-     replay_mutex_lock();
- 
-     if (cpu->icount_budget == 0 && replay_has_checkpoint()) {
--        notify_aio_contexts();
-+        icount_notify_aio_contexts();
-     }
- }
- 
--void process_icount_data(CPUState *cpu)
-+void icount_process_data(CPUState *cpu)
- {
-     /* Account for executed instructions */
-     icount_update(cpu);
-@@ -129,7 +129,7 @@ static void icount_handle_interrupt(CPUState *cpu, int mask)
- {
-     int old_mask = cpu->interrupt_request;
- 
--    tcg_handle_interrupt(cpu, mask);
-+    tcg_cpus_handle_interrupt(cpu, mask);
-     if (qemu_cpu_is_self(cpu) &&
-         !cpu->can_do_io
-         && (mask & ~old_mask) != 0) {
-@@ -139,7 +139,7 @@ static void icount_handle_interrupt(CPUState *cpu, int mask)
- 
- const CpusAccel tcg_cpus_icount = {
-     .create_vcpu_thread = rr_start_vcpu_thread,
--    .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
-+    .kick_vcpu_thread = rr_kick_vcpu_thread,
- 
-     .handle_interrupt = icount_handle_interrupt,
-     .get_virtual_clock = icount_get,
-diff --git a/accel/tcg/tcg-cpus-icount.h b/accel/tcg/tcg-cpus-icount.h
-index cbcf76b413..b695939dfa 100644
---- a/accel/tcg/tcg-cpus-icount.h
-+++ b/accel/tcg/tcg-cpus-icount.h
-@@ -10,8 +10,8 @@
- #ifndef TCG_CPUS_ICOUNT_H
- #define TCG_CPUS_ICOUNT_H
- 
--void handle_icount_deadline(void);
--void prepare_icount_for_run(CPUState *cpu);
--void process_icount_data(CPUState *cpu);
-+void icount_handle_deadline(void);
-+void icount_prepare_for_run(CPUState *cpu);
-+void icount_process_data(CPUState *cpu);
- 
- #endif /* TCG_CPUS_ICOUNT_H */
-diff --git a/accel/tcg/tcg-cpus-mttcg.c b/accel/tcg/tcg-cpus-mttcg.c
-index 619718c994..8fa76f4c04 100644
---- a/accel/tcg/tcg-cpus-mttcg.c
-+++ b/accel/tcg/tcg-cpus-mttcg.c
-@@ -42,7 +42,7 @@
-  * current CPUState for a given thread.
-  */
- 
--static void *tcg_cpu_thread_fn(void *arg)
-+static void *mttcg_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
- 
-@@ -68,7 +68,7 @@ static void *tcg_cpu_thread_fn(void *arg)
-         if (cpu_can_run(cpu)) {
-             int r;
-             qemu_mutex_unlock_iothread();
--            r = tcg_cpu_exec(cpu);
-+            r = tcg_cpus_exec(cpu);
-             qemu_mutex_lock_iothread();
-             switch (r) {
-             case EXCP_DEBUG:
-@@ -99,7 +99,7 @@ static void *tcg_cpu_thread_fn(void *arg)
-         qemu_wait_io_event(cpu);
-     } while (!cpu->unplug || cpu_can_run(cpu));
- 
--    qemu_tcg_destroy_vcpu(cpu);
-+    tcg_cpus_destroy(cpu);
-     qemu_mutex_unlock_iothread();
-     rcu_unregister_thread();
-     return NULL;
-@@ -126,7 +126,7 @@ static void mttcg_start_vcpu_thread(CPUState *cpu)
-     snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-              cpu->cpu_index);
- 
--    qemu_thread_create(cpu->thread, thread_name, tcg_cpu_thread_fn,
-+    qemu_thread_create(cpu->thread, thread_name, mttcg_cpu_thread_fn,
-                        cpu, QEMU_THREAD_JOINABLE);
- 
- #ifdef _WIN32
-@@ -138,5 +138,5 @@ const CpusAccel tcg_cpus_mttcg = {
-     .create_vcpu_thread = mttcg_start_vcpu_thread,
-     .kick_vcpu_thread = mttcg_kick_vcpu_thread,
- 
--    .handle_interrupt = tcg_handle_interrupt,
-+    .handle_interrupt = tcg_cpus_handle_interrupt,
- };
-diff --git a/accel/tcg/tcg-cpus-rr.c b/accel/tcg/tcg-cpus-rr.c
-index 31ec37915a..bb3bdf650b 100644
---- a/accel/tcg/tcg-cpus-rr.c
-+++ b/accel/tcg/tcg-cpus-rr.c
-@@ -37,7 +37,7 @@
- #include "tcg-cpus-icount.h"
- 
- /* Kick all RR vCPUs */
--void qemu_cpu_kick_rr_cpus(CPUState *unused)
-+void rr_kick_vcpu_thread(CPUState *unused)
- {
-     CPUState *cpu;
- 
-@@ -58,62 +58,62 @@ void qemu_cpu_kick_rr_cpus(CPUState *unused)
-  * idleness is complete.
-  */
- 
--static QEMUTimer *tcg_kick_vcpu_timer;
--static CPUState *tcg_current_rr_cpu;
-+static QEMUTimer *rr_kick_vcpu_timer;
-+static CPUState *rr_current_cpu;
- 
- #define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
- 
--static inline int64_t qemu_tcg_next_kick(void)
-+static inline int64_t rr_next_kick_time(void)
- {
-     return qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + TCG_KICK_PERIOD;
- }
- 
- /* Kick the currently round-robin scheduled vCPU to next */
--static void qemu_cpu_kick_rr_next_cpu(void)
-+static void rr_kick_next_cpu(void)
- {
-     CPUState *cpu;
-     do {
--        cpu = qatomic_mb_read(&tcg_current_rr_cpu);
-+        cpu = qatomic_mb_read(&rr_current_cpu);
-         if (cpu) {
-             cpu_exit(cpu);
-         }
--    } while (cpu != qatomic_mb_read(&tcg_current_rr_cpu));
-+    } while (cpu != qatomic_mb_read(&rr_current_cpu));
- }
- 
--static void kick_tcg_thread(void *opaque)
-+static void rr_kick_thread(void *opaque)
- {
--    timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
--    qemu_cpu_kick_rr_next_cpu();
-+    timer_mod(rr_kick_vcpu_timer, rr_next_kick_time());
-+    rr_kick_next_cpu();
- }
- 
--static void start_tcg_kick_timer(void)
-+static void rr_start_kick_timer(void)
- {
--    if (!tcg_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
--        tcg_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
--                                           kick_tcg_thread, NULL);
-+    if (!rr_kick_vcpu_timer && CPU_NEXT(first_cpu)) {
-+        rr_kick_vcpu_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
-+                                           rr_kick_thread, NULL);
-     }
--    if (tcg_kick_vcpu_timer && !timer_pending(tcg_kick_vcpu_timer)) {
--        timer_mod(tcg_kick_vcpu_timer, qemu_tcg_next_kick());
-+    if (rr_kick_vcpu_timer && !timer_pending(rr_kick_vcpu_timer)) {
-+        timer_mod(rr_kick_vcpu_timer, rr_next_kick_time());
-     }
- }
- 
--static void stop_tcg_kick_timer(void)
-+static void rr_stop_kick_timer(void)
- {
--    if (tcg_kick_vcpu_timer && timer_pending(tcg_kick_vcpu_timer)) {
--        timer_del(tcg_kick_vcpu_timer);
-+    if (rr_kick_vcpu_timer && timer_pending(rr_kick_vcpu_timer)) {
-+        timer_del(rr_kick_vcpu_timer);
-     }
- }
- 
--static void qemu_tcg_rr_wait_io_event(void)
-+static void rr_wait_io_event(void)
- {
-     CPUState *cpu;
- 
-     while (all_cpu_threads_idle()) {
--        stop_tcg_kick_timer();
-+        rr_stop_kick_timer();
-         qemu_cond_wait_iothread(first_cpu->halt_cond);
-     }
- 
--    start_tcg_kick_timer();
-+    rr_start_kick_timer();
- 
-     CPU_FOREACH(cpu) {
-         qemu_wait_io_event_common(cpu);
-@@ -124,13 +124,13 @@ static void qemu_tcg_rr_wait_io_event(void)
-  * Destroy any remaining vCPUs which have been unplugged and have
-  * finished running
-  */
--static void deal_with_unplugged_cpus(void)
-+static void rr_deal_with_unplugged_cpus(void)
- {
-     CPUState *cpu;
- 
-     CPU_FOREACH(cpu) {
-         if (cpu->unplug && !cpu_can_run(cpu)) {
--            qemu_tcg_destroy_vcpu(cpu);
-+            tcg_cpus_destroy(cpu);
-             break;
-         }
-     }
-@@ -146,7 +146,7 @@ static void deal_with_unplugged_cpus(void)
-  * elsewhere.
-  */
- 
--static void *tcg_rr_cpu_thread_fn(void *arg)
-+static void *rr_cpu_thread_fn(void *arg)
- {
-     CPUState *cpu = arg;
- 
-@@ -173,7 +173,7 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
-         }
-     }
- 
--    start_tcg_kick_timer();
-+    rr_start_kick_timer();
- 
-     cpu = first_cpu;
- 
-@@ -192,7 +192,7 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
-              * Run the timers here.  This is much more efficient than
-              * waking up the I/O thread and waiting for completion.
-              */
--            handle_icount_deadline();
-+            icount_handle_deadline();
-         }
- 
-         replay_mutex_unlock();
-@@ -203,7 +203,7 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
- 
-         while (cpu && cpu_work_list_empty(cpu) && !cpu->exit_request) {
- 
--            qatomic_mb_set(&tcg_current_rr_cpu, cpu);
-+            qatomic_mb_set(&rr_current_cpu, cpu);
-             current_cpu = cpu;
- 
-             qemu_clock_enable(QEMU_CLOCK_VIRTUAL,
-@@ -214,11 +214,11 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
- 
-                 qemu_mutex_unlock_iothread();
-                 if (icount_enabled()) {
--                    prepare_icount_for_run(cpu);
-+                    icount_prepare_for_run(cpu);
-                 }
--                r = tcg_cpu_exec(cpu);
-+                r = tcg_cpus_exec(cpu);
-                 if (icount_enabled()) {
--                    process_icount_data(cpu);
-+                    icount_process_data(cpu);
-                 }
-                 qemu_mutex_lock_iothread();
- 
-@@ -242,7 +242,7 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
-         } /* while (cpu && !cpu->exit_request).. */
- 
-         /* Does not need qatomic_mb_set because a spurious wakeup is okay.  */
--        qatomic_set(&tcg_current_rr_cpu, NULL);
-+        qatomic_set(&rr_current_cpu, NULL);
- 
-         if (cpu && cpu->exit_request) {
-             qatomic_mb_set(&cpu->exit_request, 0);
-@@ -256,8 +256,8 @@ static void *tcg_rr_cpu_thread_fn(void *arg)
-             qemu_notify_event();
-         }
- 
--        qemu_tcg_rr_wait_io_event();
--        deal_with_unplugged_cpus();
-+        rr_wait_io_event();
-+        rr_deal_with_unplugged_cpus();
-     }
- 
-     rcu_unregister_thread();
-@@ -281,7 +281,7 @@ void rr_start_vcpu_thread(CPUState *cpu)
-         /* share a single thread for all cpus with TCG */
-         snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
-         qemu_thread_create(cpu->thread, thread_name,
--                           tcg_rr_cpu_thread_fn,
-+                           rr_cpu_thread_fn,
-                            cpu, QEMU_THREAD_JOINABLE);
- 
-         single_tcg_halt_cond = cpu->halt_cond;
-@@ -301,7 +301,7 @@ void rr_start_vcpu_thread(CPUState *cpu)
- 
- const CpusAccel tcg_cpus_rr = {
-     .create_vcpu_thread = rr_start_vcpu_thread,
--    .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
-+    .kick_vcpu_thread = rr_kick_vcpu_thread,
- 
--    .handle_interrupt = tcg_handle_interrupt,
-+    .handle_interrupt = tcg_cpus_handle_interrupt,
- };
-diff --git a/accel/tcg/tcg-cpus-rr.h b/accel/tcg/tcg-cpus-rr.h
-index 2e5943eda9..54f6ae6e86 100644
---- a/accel/tcg/tcg-cpus-rr.h
-+++ b/accel/tcg/tcg-cpus-rr.h
-@@ -13,7 +13,7 @@
- #define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
- 
- /* Kick all RR vCPUs. */
--void qemu_cpu_kick_rr_cpus(CPUState *unused);
-+void rr_kick_vcpu_thread(CPUState *unused);
- 
- /* start the round robin vcpu thread */
- void rr_start_vcpu_thread(CPUState *cpu);
-diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
-index fa70237414..6510931c07 100644
---- a/accel/tcg/tcg-cpus.c
-+++ b/accel/tcg/tcg-cpus.c
-@@ -38,12 +38,12 @@
- 
- /* common functionality among all TCG variants */
- 
--void qemu_tcg_destroy_vcpu(CPUState *cpu)
-+void tcg_cpus_destroy(CPUState *cpu)
- {
-     cpu_thread_signal_destroyed(cpu);
- }
- 
--int tcg_cpu_exec(CPUState *cpu)
-+int tcg_cpus_exec(CPUState *cpu)
- {
-     int ret;
- #ifdef CONFIG_PROFILER
-@@ -64,7 +64,7 @@ int tcg_cpu_exec(CPUState *cpu)
- }
- 
- /* mask must never be zero, except for A20 change call */
--void tcg_handle_interrupt(CPUState *cpu, int mask)
-+void tcg_cpus_handle_interrupt(CPUState *cpu, int mask)
- {
-     g_assert(qemu_mutex_iothread_locked());
- 
-diff --git a/accel/tcg/tcg-cpus.h b/accel/tcg/tcg-cpus.h
-index 21419d1117..1be1493e7b 100644
---- a/accel/tcg/tcg-cpus.h
-+++ b/accel/tcg/tcg-cpus.h
-@@ -18,8 +18,8 @@ extern const CpusAccel tcg_cpus_mttcg;
- extern const CpusAccel tcg_cpus_icount;
- extern const CpusAccel tcg_cpus_rr;
- 
--void qemu_tcg_destroy_vcpu(CPUState *cpu);
--int tcg_cpu_exec(CPUState *cpu);
--void tcg_handle_interrupt(CPUState *cpu, int mask);
-+void tcg_cpus_destroy(CPUState *cpu);
-+int tcg_cpus_exec(CPUState *cpu);
-+void tcg_cpus_handle_interrupt(CPUState *cpu, int mask);
- 
- #endif /* TCG_CPUS_H */
--- 
-2.26.2
+If iconv installed then it's the meson's probme that didn't found the iconv
+properly
+On Thu, Oct 15, 2020 at 2:22 AM Bruce Rogers <brogers@suse.com> wrote:
+>
+> On Wed, 2020-10-14 at 10:21 +0200, Gerd Hoffmann wrote:
+> > From: Yonggang Luo <luoyonggang@gmail.com>
+> >
+> > The mingw pkg-config are showing following absolute path and contains
+> > : as the separator,
+> >
+> > -D_XOPEN_SOURCE=3D600 -D_POSIX_C_SOURCE=3D199506L -IC:/CI-
+> > Tools/msys64/mingw64/include/ncursesw:-I/usr/include/ncursesw:
+> > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=3D600 -D_POSIX_C_SOURCE=3D199506L -I=
+C
+> > -pipe -lncursesw -lgnurx -ltre -lintl -liconv
+> > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=3D600 -D_POSIX_C_SOURCE=3D199506L -I=
+C
+> > -lncursesw
+> > -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=3D600 -D_POSIX_C_SOURCE=3D199506L -I=
+C
+> > -lcursesw
+> > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw -pipe
+> > -lncursesw -lgnurx -ltre -lintl -liconv
+> > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw
+> > -lncursesw
+> > -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncursesw
+> > -lcursesw
+> > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx
+> > -ltre -lintl -liconv
+> > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lncursesw
+> > -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw
+> >
+> > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+> > Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> > Message-id: 20201012234348.1427-6-luoyonggang@gmail.com
+> > Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+> > ---
+> >  configure         | 118 +++-----------------------------------------
+> > --
+> >  meson_options.txt |   4 ++
+> >  meson.build       |  83 +++++++++++++++++++++++++++-----
+> >  ui/meson.build    |   2 +-
+> >  4 files changed, 83 insertions(+), 124 deletions(-)
+> >
+> > diff --git a/configure b/configure
+> > index 9a87685517ee..f839c2a557c3 100755
+> > --- a/configure
+> > +++ b/configure
+> > @@ -295,7 +295,8 @@ unset target_list_exclude
+> >
+> >  brlapi=3D""
+> >  curl=3D""
+> > -curses=3D""
+> > +iconv=3D"auto"
+> > +curses=3D"auto"
+> >  docs=3D""
+> >  fdt=3D"auto"
+> >  netmap=3D"no"
+> > @@ -1173,13 +1174,13 @@ for opt do
+> >    ;;
+> >    --disable-safe-stack) safe_stack=3D"no"
+> >    ;;
+> > -  --disable-curses) curses=3D"no"
+> > +  --disable-curses) curses=3D"disabled"
+> >    ;;
+> > -  --enable-curses) curses=3D"yes"
+> > +  --enable-curses) curses=3D"enabled"
+> >    ;;
+> > -  --disable-iconv) iconv=3D"no"
+> > +  --disable-iconv) iconv=3D"disabled"
+> >    ;;
+> > -  --enable-iconv) iconv=3D"yes"
+> > +  --enable-iconv) iconv=3D"enabled"
+> >    ;;
+> >    --disable-curl) curl=3D"no"
+> >    ;;
+> > @@ -3440,102 +3441,6 @@ EOF
+> >    fi
+> >  fi
+> >
+> > -##########################################
+> > -# iconv probe
+> > -if test "$iconv" !=3D "no" ; then
+> > -  cat > $TMPC << EOF
+> > -#include <iconv.h>
+> > -int main(void) {
+> > -  iconv_t conv =3D iconv_open("WCHAR_T", "UCS-2");
+> > -  return conv !=3D (iconv_t) -1;
+> > -}
+> > -EOF
+> > -  iconv_prefix_list=3D"/usr/local:/usr"
+> > -  iconv_lib_list=3D":-liconv"
+> > -  IFS=3D:
+> > -  for iconv_prefix in $iconv_prefix_list; do
+> > -    IFS=3D:
+> > -    iconv_cflags=3D"-I$iconv_prefix/include"
+> > -    iconv_ldflags=3D"-L$iconv_prefix/lib"
+> > -    for iconv_link in $iconv_lib_list; do
+> > -      unset IFS
+> > -      iconv_lib=3D"$iconv_ldflags $iconv_link"
+> > -      echo "looking at iconv in '$iconv_cflags' '$iconv_lib'" >>
+> > config.log
+> > -      if compile_prog "$iconv_cflags" "$iconv_lib" ; then
+> > -        iconv_found=3Dyes
+> > -        break
+> > -      fi
+> > -    done
+> > -    if test "$iconv_found" =3D yes ; then
+> > -      break
+> > -    fi
+> > -  done
+> > -  if test "$iconv_found" =3D "yes" ; then
+> > -    iconv=3Dyes
+> > -  else
+> > -    if test "$iconv" =3D "yes" ; then
+> > -      feature_not_found "iconv" "Install iconv devel"
+> > -    fi
+> > -    iconv=3Dno
+> > -  fi
+> > -fi
+> > -
+> > -##########################################
+> > -# curses probe
+> > -if test "$iconv" =3D "no" ; then
+> > -  # curses will need iconv
+> > -  curses=3Dno
+> > -fi
+> > -if test "$curses" !=3D "no" ; then
+> > -  if test "$mingw32" =3D "yes" ; then
+> > -    curses_inc_list=3D"$($pkg_config --cflags ncurses 2>/dev/null):"
+> > -    curses_lib_list=3D"$($pkg_config --libs ncurses 2>/dev/null):-
+> > lpdcurses"
+> > -  else
+> > -    curses_inc_list=3D"$($pkg_config --cflags ncursesw 2>/dev/null):-
+> > I/usr/include/ncursesw:"
+> > -    curses_lib_list=3D"$($pkg_config --libs ncursesw 2>/dev/null):-
+> > lncursesw:-lcursesw"
+> > -  fi
+> > -  curses_found=3Dno
+> > -  cat > $TMPC << EOF
+> > -#include <locale.h>
+> > -#include <curses.h>
+> > -#include <wchar.h>
+> > -int main(void) {
+> > -  wchar_t wch =3D L'w';
+> > -  setlocale(LC_ALL, "");
+> > -  resize_term(0, 0);
+> > -  addwstr(L"wide chars\n");
+> > -  addnwstr(&wch, 1);
+> > -  add_wch(WACS_DEGREE);
+> > -  return 0;
+> > -}
+> > -EOF
+> > -  IFS=3D:
+> > -  for curses_inc in $curses_inc_list; do
+> > -    # Make sure we get the wide character prototypes
+> > -    curses_inc=3D"-DNCURSES_WIDECHAR $curses_inc"
+> > -    IFS=3D:
+> > -    for curses_lib in $curses_lib_list; do
+> > -      unset IFS
+> > -      if compile_prog "$curses_inc" "$curses_lib" ; then
+> > -        curses_found=3Dyes
+> > -        break
+> > -      fi
+> > -    done
+> > -    if test "$curses_found" =3D yes ; then
+> > -      break
+> > -    fi
+> > -  done
+> > -  unset IFS
+> > -  if test "$curses_found" =3D "yes" ; then
+> > -    curses=3Dyes
+> > -  else
+> > -    if test "$curses" =3D "yes" ; then
+> > -      feature_not_found "curses" "Install ncurses devel"
+> > -    fi
+> > -    curses=3Dno
+> > -  fi
+> > -fi
+> > -
+> >  ##########################################
+> >  # curl probe
+> >  if test "$curl" !=3D "no" ; then
+> > @@ -6200,16 +6105,6 @@ if test "$have_x11" =3D "yes" && test
+> > "$need_x11" =3D "yes"; then
+> >    echo "X11_CFLAGS=3D$x11_cflags" >> $config_host_mak
+> >    echo "X11_LIBS=3D$x11_libs" >> $config_host_mak
+> >  fi
+> > -if test "$iconv" =3D "yes" ; then
+> > -  echo "CONFIG_ICONV=3Dy" >> $config_host_mak
+> > -  echo "ICONV_CFLAGS=3D$iconv_cflags" >> $config_host_mak
+> > -  echo "ICONV_LIBS=3D$iconv_lib" >> $config_host_mak
+> > -fi
+> > -if test "$curses" =3D "yes" ; then
+> > -  echo "CONFIG_CURSES=3Dy" >> $config_host_mak
+> > -  echo "CURSES_CFLAGS=3D$curses_inc" >> $config_host_mak
+> > -  echo "CURSES_LIBS=3D$curses_lib" >> $config_host_mak
+> > -fi
+> >  if test "$pipe2" =3D "yes" ; then
+> >    echo "CONFIG_PIPE2=3Dy" >> $config_host_mak
+> >  fi
+> > @@ -7181,6 +7076,7 @@ NINJA=3D${ninja:-$PWD/ninjatool} $meson setup \
+> >          -Dvnc=3D$vnc -Dvnc_sasl=3D$vnc_sasl -Dvnc_jpeg=3D$vnc_jpeg
+> > -Dvnc_png=3D$vnc_png \
+> >          -Dgettext=3D$gettext -Dxkbcommon=3D$xkbcommon -Du2f=3D$u2f \
+> >          -Dcapstone=3D$capstone -Dslirp=3D$slirp -Dfdt=3D$fdt \
+> > +        -Diconv=3D$iconv -Dcurses=3D$curses \
+> >          $cross_arg \
+> >          "$PWD" "$source_path"
+> >
+> > diff --git a/meson_options.txt b/meson_options.txt
+> > index 1d3c94840a90..e6cb1e589b4e 100644
+> > --- a/meson_options.txt
+> > +++ b/meson_options.txt
+> > @@ -32,6 +32,10 @@ option('cocoa', type : 'feature', value : 'auto',
+> >         description: 'Cocoa user interface (macOS only)')
+> >  option('mpath', type : 'feature', value : 'auto',
+> >         description: 'Multipath persistent reservation passthrough')
+> > +option('iconv', type : 'feature', value : 'auto',
+> > +       description: 'Font glyph conversion support')
+> > +option('curses', type : 'feature', value : 'auto',
+> > +       description: 'curses UI')
+> >  option('sdl', type : 'feature', value : 'auto',
+> >         description: 'SDL user interface')
+> >  option('sdl_image', type : 'feature', value : 'auto',
+> > diff --git a/meson.build b/meson.build
+> > index ad6c7c90c787..1a4a48249243 100644
+> > --- a/meson.build
+> > +++ b/meson.build
+> > @@ -426,6 +426,74 @@ if targetos =3D=3D 'linux' and have_tools and not
+> > get_option('mpath').disabled()
+> >    endif
+> >  endif
+> >
+> > +iconv =3D not_found
+> > +if not get_option('iconv').disabled()
+> > +  libiconv =3D cc.find_library('iconv',
+> > +                             required: false,
+> > +                             static: enable_static)
+> > +  if libiconv.found()
+> > +    if cc.links('''
+> > +      #include <iconv.h>
+> > +      int main(void) {
+> > +        iconv_t conv =3D iconv_open("WCHAR_T", "UCS-2");
+> > +        return conv !=3D (iconv_t) -1;
+> > +      }''', dependencies: [libiconv])
+> > +      iconv =3D declare_dependency(dependencies: [libiconv])
+> > +    endif
+> > +  endif
+> > +endif
+> > +if get_option('iconv').enabled() and not iconv.found()
+> > +  error('Cannot detect iconv API')
+> > +endif
+> > +
+> > +curses =3D not_found
+> > +if iconv.found() and not get_option('curses').disabled()
+> > +  curses_libname_list =3D ['ncursesw', 'ncurses', 'cursesw',
+> > 'pdcurses']
+> > +  curses_test =3D '''
+> > +    #include <locale.h>
+> > +    #include <curses.h>
+> > +    #include <wchar.h>
+> > +    int main(void) {
+> > +      wchar_t wch =3D L'w';
+> > +      setlocale(LC_ALL, "");
+> > +      resize_term(0, 0);
+> > +      addwstr(L"wide chars\n");
+> > +      addnwstr(&wch, 1);
+> > +      add_wch(WACS_DEGREE);
+> > +      return 0;
+> > +    }'''
+> > +  foreach curses_libname : curses_libname_list
+> > +      libcurses =3D dependency(curses_libname,
+> > +                             required: false,
+> > +                             method: 'pkg-config',
+> > +                             static: enable_static)
+> > +
+> > +      if not libcurses.found()
+> > +        dirs =3D ['/usr/include/ncursesw']
+> > +        if targetos =3D=3D 'windows'
+> > +          dirs =3D []
+> > +        endif
+> > +        libcurses =3D cc.find_library(curses_libname,
+> > +                                    required: false,
+> > +                                    dirs: dirs,
+> > +                                    static: enable_static)
+> > +      endif
+> > +      if libcurses.found()
+> > +        if cc.links(curses_test, dependencies: [libcurses])
+> > +          curses =3D declare_dependency(compile_args: '-
+> > DNCURSES_WIDECHAR', dependencies: [libcurses])
+> > +          break
+> > +        endif
+> > +      endif
+> > +  endforeach
+> > +endif
+> > +if get_option('curses').enabled() and not curses.found()
+> > +  if not iconv.found()
+> > +    error('Cannot detect iconv API')
+> > +  else
+> > +    error('Cannot detect curses API')
+> > +  endif
+> > +endif
+> > +
+> >  brlapi =3D not_found
+> >  if 'CONFIG_BRLAPI' in config_host
+> >    brlapi =3D declare_dependency(link_args:
+> > config_host['BRLAPI_LIBS'].split())
+> > @@ -504,16 +572,6 @@ if 'CONFIG_X11' in config_host
+> >    x11 =3D declare_dependency(compile_args:
+> > config_host['X11_CFLAGS'].split(),
+> >                             link_args:
+> > config_host['X11_LIBS'].split())
+> >  endif
+> > -curses =3D not_found
+> > -if 'CONFIG_CURSES' in config_host
+> > -  curses =3D declare_dependency(compile_args:
+> > config_host['CURSES_CFLAGS'].split(),
+> > -                              link_args:
+> > config_host['CURSES_LIBS'].split())
+> > -endif
+> > -iconv =3D not_found
+> > -if 'CONFIG_ICONV' in config_host
+> > -  iconv =3D declare_dependency(compile_args:
+> > config_host['ICONV_CFLAGS'].split(),
+> > -                             link_args:
+> > config_host['ICONV_LIBS'].split())
+> > -endif
+> >  vnc =3D not_found
+> >  png =3D not_found
+> >  jpeg =3D not_found
+> > @@ -622,6 +680,7 @@ config_host_data.set('CONFIG_COCOA',
+> > cocoa.found())
+> >  config_host_data.set('CONFIG_LIBUDEV', libudev.found())
+> >  config_host_data.set('CONFIG_MPATH', mpathpersist.found())
+> >  config_host_data.set('CONFIG_MPATH_NEW_API', mpathpersist_new_api)
+> > +config_host_data.set('CONFIG_CURSES', curses.found())
+> >  config_host_data.set('CONFIG_SDL', sdl.found())
+> >  config_host_data.set('CONFIG_SDL_IMAGE', sdl_image.found())
+> >  config_host_data.set('CONFIG_VNC', vnc.found())
+> > @@ -1905,8 +1964,8 @@ if config_host.has_key('CONFIG_NETTLE')
+> >  endif
+> >  summary_info +=3D
+> > {'libtasn1':          config_host.has_key('CONFIG_TASN1')}
+> >  summary_info +=3D
+> > {'PAM':               config_host.has_key('CONFIG_AUTH_PAM')}
+> > -summary_info +=3D {'iconv
+> > support':     config_host.has_key('CONFIG_ICONV')}
+> > -summary_info +=3D {'curses
+> > support':    config_host.has_key('CONFIG_CURSES')}
+> > +summary_info +=3D {'iconv support':     iconv.found()}
+> > +summary_info +=3D {'curses support':    curses.found()}
+> >  # TODO: add back version
+> >  summary_info +=3D {'virgl
+> > support':     config_host.has_key('CONFIG_VIRGL')}
+> >  summary_info +=3D {'curl
+> > support':      config_host.has_key('CONFIG_CURL')}
+> > diff --git a/ui/meson.build b/ui/meson.build
+> > index 8a080c38e325..78ad792ffb8d 100644
+> > --- a/ui/meson.build
+> > +++ b/ui/meson.build
+> > @@ -39,7 +39,7 @@ specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true:
+> > opengl)
+> >
+> >  ui_modules =3D {}
+> >
+> > -if config_host.has_key('CONFIG_CURSES')
+> > +if curses.found()
+> >    curses_ss =3D ss.source_set()
+> >    curses_ss.add(when: [curses, iconv], if_true: [files('curses.c'),
+> > pixman])
+> >    ui_modules +=3D {'curses' : curses_ss}
+>
+> I find that this change causes a configure failure when choosing either
+> --enable-iconv or --enable-curses as follows:
+>
+> ../configure --enable-curses results in
+> ../meson.build:491:4: ERROR: Problem encountered: Cannot detect iconv
+> API
+>
+> ../configure --enable-iconv results in
+> ../meson.build:446:2: ERROR: Problem encountered: Cannot detect iconv
+> API
+>
+> I haven't yet learned meson well enough to identify further what is
+> going wrong.
+>
+> Can someone take a look at what might be failing, or give me some clue
+> what I can check on or report on from my end which would be helpful to
+> resolve this?
+> I am running openSUSE Tumbleweed, by the way.
+>
+> Thanks,
+>
+> Bruce
+>
 
+
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--000000000000ae6a0805b1a6637a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br>If iconv installed then it&#39;s the meson&#39;s probm=
+e that didn&#39;t found the iconv properly<br>On Thu, Oct 15, 2020 at 2:22 =
+AM Bruce Rogers &lt;<a href=3D"mailto:brogers@suse.com">brogers@suse.com</a=
+>&gt; wrote:<br>&gt;<br>&gt; On Wed, 2020-10-14 at 10:21 +0200, Gerd Hoffma=
+nn wrote:<br>&gt; &gt; From: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang=
+@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt;<br>&gt; &gt; The min=
+gw pkg-config are showing following absolute path and contains<br>&gt; &gt;=
+ : as the separator,<br>&gt; &gt;<br>&gt; &gt; -D_XOPEN_SOURCE=3D600 -D_POS=
+IX_C_SOURCE=3D199506L -IC:/CI-<br>&gt; &gt; Tools/msys64/mingw64/include/nc=
+ursesw:-I/usr/include/ncursesw:<br>&gt; &gt; -DNCURSES_WIDECHAR -D_XOPEN_SO=
+URCE=3D600 -D_POSIX_C_SOURCE=3D199506L -IC<br>&gt; &gt; -pipe -lncursesw -l=
+gnurx -ltre -lintl -liconv<br>&gt; &gt; -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=
+=3D600 -D_POSIX_C_SOURCE=3D199506L -IC<br>&gt; &gt; -lncursesw<br>&gt; &gt;=
+ -DNCURSES_WIDECHAR -D_XOPEN_SOURCE=3D600 -D_POSIX_C_SOURCE=3D199506L -IC<b=
+r>&gt; &gt; -lcursesw<br>&gt; &gt; -DNCURSES_WIDECHAR /CI-Tools/msys64/ming=
+w64/include/ncursesw -pipe<br>&gt; &gt; -lncursesw -lgnurx -ltre -lintl -li=
+conv<br>&gt; &gt; -DNCURSES_WIDECHAR /CI-Tools/msys64/mingw64/include/ncurs=
+esw<br>&gt; &gt; -lncursesw<br>&gt; &gt; -DNCURSES_WIDECHAR /CI-Tools/msys6=
+4/mingw64/include/ncursesw<br>&gt; &gt; -lcursesw<br>&gt; &gt; -DNCURSES_WI=
+DECHAR -I/usr/include/ncursesw -pipe -lncursesw -lgnurx<br>&gt; &gt; -ltre =
+-lintl -liconv<br>&gt; &gt; -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lnc=
+ursesw<br>&gt; &gt; -DNCURSES_WIDECHAR -I/usr/include/ncursesw -lcursesw<br=
+>&gt; &gt;<br>&gt; &gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:l=
+uoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; &gt; Reviewed-b=
+y: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com">kraxel@redhat.com=
+</a>&gt;<br>&gt; &gt; Message-id: <a href=3D"mailto:20201012234348.1427-6-l=
+uoyonggang@gmail.com">20201012234348.1427-6-luoyonggang@gmail.com</a><br>&g=
+t; &gt; Signed-off-by: Gerd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.co=
+m">kraxel@redhat.com</a>&gt;<br>&gt; &gt; ---<br>&gt; &gt; =C2=A0configure =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 118 +++--------------------------------------=
+---<br>&gt; &gt; --<br>&gt; &gt; =C2=A0meson_options.txt | =C2=A0 4 ++<br>&=
+gt; &gt; =C2=A0meson.build =C2=A0 =C2=A0 =C2=A0 | =C2=A083 ++++++++++++++++=
++++++++++++-----<br>&gt; &gt; =C2=A0ui/meson.build =C2=A0 =C2=A0| =C2=A0 2 =
++-<br>&gt; &gt; =C2=A04 files changed, 83 insertions(+), 124 deletions(-)<b=
+r>&gt; &gt;<br>&gt; &gt; diff --git a/configure b/configure<br>&gt; &gt; in=
+dex 9a87685517ee..f839c2a557c3 100755<br>&gt; &gt; --- a/configure<br>&gt; =
+&gt; +++ b/configure<br>&gt; &gt; @@ -295,7 +295,8 @@ unset target_list_exc=
+lude<br>&gt; &gt; <br>&gt; &gt; =C2=A0brlapi=3D&quot;&quot;<br>&gt; &gt; =
+=C2=A0curl=3D&quot;&quot;<br>&gt; &gt; -curses=3D&quot;&quot;<br>&gt; &gt; =
++iconv=3D&quot;auto&quot;<br>&gt; &gt; +curses=3D&quot;auto&quot;<br>&gt; &=
+gt; =C2=A0docs=3D&quot;&quot;<br>&gt; &gt; =C2=A0fdt=3D&quot;auto&quot;<br>=
+&gt; &gt; =C2=A0netmap=3D&quot;no&quot;<br>&gt; &gt; @@ -1173,13 +1174,13 @=
+@ for opt do<br>&gt; &gt; =C2=A0 =C2=A0;;<br>&gt; &gt; =C2=A0 =C2=A0--disab=
+le-safe-stack) safe_stack=3D&quot;no&quot;<br>&gt; &gt; =C2=A0 =C2=A0;;<br>=
+&gt; &gt; - =C2=A0--disable-curses) curses=3D&quot;no&quot;<br>&gt; &gt; + =
+=C2=A0--disable-curses) curses=3D&quot;disabled&quot;<br>&gt; &gt; =C2=A0 =
+=C2=A0;;<br>&gt; &gt; - =C2=A0--enable-curses) curses=3D&quot;yes&quot;<br>=
+&gt; &gt; + =C2=A0--enable-curses) curses=3D&quot;enabled&quot;<br>&gt; &gt=
+; =C2=A0 =C2=A0;;<br>&gt; &gt; - =C2=A0--disable-iconv) iconv=3D&quot;no&qu=
+ot;<br>&gt; &gt; + =C2=A0--disable-iconv) iconv=3D&quot;disabled&quot;<br>&=
+gt; &gt; =C2=A0 =C2=A0;;<br>&gt; &gt; - =C2=A0--enable-iconv) iconv=3D&quot=
+;yes&quot;<br>&gt; &gt; + =C2=A0--enable-iconv) iconv=3D&quot;enabled&quot;=
+<br>&gt; &gt; =C2=A0 =C2=A0;;<br>&gt; &gt; =C2=A0 =C2=A0--disable-curl) cur=
+l=3D&quot;no&quot;<br>&gt; &gt; =C2=A0 =C2=A0;;<br>&gt; &gt; @@ -3440,102 +=
+3441,6 @@ EOF<br>&gt; &gt; =C2=A0 =C2=A0fi<br>&gt; &gt; =C2=A0fi<br>&gt; &g=
+t; <br>&gt; &gt; -##########################################<br>&gt; &gt; -=
+# iconv probe<br>&gt; &gt; -if test &quot;$iconv&quot; !=3D &quot;no&quot; =
+; then<br>&gt; &gt; - =C2=A0cat &gt; $TMPC &lt;&lt; EOF<br>&gt; &gt; -#incl=
+ude &lt;iconv.h&gt;<br>&gt; &gt; -int main(void) {<br>&gt; &gt; - =C2=A0ico=
+nv_t conv =3D iconv_open(&quot;WCHAR_T&quot;, &quot;UCS-2&quot;);<br>&gt; &=
+gt; - =C2=A0return conv !=3D (iconv_t) -1;<br>&gt; &gt; -}<br>&gt; &gt; -EO=
+F<br>&gt; &gt; - =C2=A0iconv_prefix_list=3D&quot;/usr/local:/usr&quot;<br>&=
+gt; &gt; - =C2=A0iconv_lib_list=3D&quot;:-liconv&quot;<br>&gt; &gt; - =C2=
+=A0IFS=3D:<br>&gt; &gt; - =C2=A0for iconv_prefix in $iconv_prefix_list; do<=
+br>&gt; &gt; - =C2=A0 =C2=A0IFS=3D:<br>&gt; &gt; - =C2=A0 =C2=A0iconv_cflag=
+s=3D&quot;-I$iconv_prefix/include&quot;<br>&gt; &gt; - =C2=A0 =C2=A0iconv_l=
+dflags=3D&quot;-L$iconv_prefix/lib&quot;<br>&gt; &gt; - =C2=A0 =C2=A0for ic=
+onv_link in $iconv_lib_list; do<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0unset IF=
+S<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0iconv_lib=3D&quot;$iconv_ldflags $icon=
+v_link&quot;<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0echo &quot;looking at iconv=
+ in &#39;$iconv_cflags&#39; &#39;$iconv_lib&#39;&quot; &gt;&gt;<br>&gt; &gt=
+; config.log<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0if compile_prog &quot;$icon=
+v_cflags&quot; &quot;$iconv_lib&quot; ; then<br>&gt; &gt; - =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0iconv_found=3Dyes<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0br=
+eak<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0fi<br>&gt; &gt; - =C2=A0 =C2=A0done<=
+br>&gt; &gt; - =C2=A0 =C2=A0if test &quot;$iconv_found&quot; =3D yes ; then=
+<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0break<br>&gt; &gt; - =C2=A0 =C2=A0fi<br=
+>&gt; &gt; - =C2=A0done<br>&gt; &gt; - =C2=A0if test &quot;$iconv_found&quo=
+t; =3D &quot;yes&quot; ; then<br>&gt; &gt; - =C2=A0 =C2=A0iconv=3Dyes<br>&g=
+t; &gt; - =C2=A0else<br>&gt; &gt; - =C2=A0 =C2=A0if test &quot;$iconv&quot;=
+ =3D &quot;yes&quot; ; then<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0feature_not_=
+found &quot;iconv&quot; &quot;Install iconv devel&quot;<br>&gt; &gt; - =C2=
+=A0 =C2=A0fi<br>&gt; &gt; - =C2=A0 =C2=A0iconv=3Dno<br>&gt; &gt; - =C2=A0fi=
+<br>&gt; &gt; -fi<br>&gt; &gt; -<br>&gt; &gt; -############################=
+##############<br>&gt; &gt; -# curses probe<br>&gt; &gt; -if test &quot;$ic=
+onv&quot; =3D &quot;no&quot; ; then<br>&gt; &gt; - =C2=A0# curses will need=
+ iconv<br>&gt; &gt; - =C2=A0curses=3Dno<br>&gt; &gt; -fi<br>&gt; &gt; -if t=
+est &quot;$curses&quot; !=3D &quot;no&quot; ; then<br>&gt; &gt; - =C2=A0if =
+test &quot;$mingw32&quot; =3D &quot;yes&quot; ; then<br>&gt; &gt; - =C2=A0 =
+=C2=A0curses_inc_list=3D&quot;$($pkg_config --cflags ncurses 2&gt;/dev/null=
+):&quot;<br>&gt; &gt; - =C2=A0 =C2=A0curses_lib_list=3D&quot;$($pkg_config =
+--libs ncurses 2&gt;/dev/null):-<br>&gt; &gt; lpdcurses&quot;<br>&gt; &gt; =
+- =C2=A0else<br>&gt; &gt; - =C2=A0 =C2=A0curses_inc_list=3D&quot;$($pkg_con=
+fig --cflags ncursesw 2&gt;/dev/null):-<br>&gt; &gt; I/usr/include/ncursesw=
+:&quot;<br>&gt; &gt; - =C2=A0 =C2=A0curses_lib_list=3D&quot;$($pkg_config -=
+-libs ncursesw 2&gt;/dev/null):-<br>&gt; &gt; lncursesw:-lcursesw&quot;<br>=
+&gt; &gt; - =C2=A0fi<br>&gt; &gt; - =C2=A0curses_found=3Dno<br>&gt; &gt; - =
+=C2=A0cat &gt; $TMPC &lt;&lt; EOF<br>&gt; &gt; -#include &lt;locale.h&gt;<b=
+r>&gt; &gt; -#include &lt;curses.h&gt;<br>&gt; &gt; -#include &lt;wchar.h&g=
+t;<br>&gt; &gt; -int main(void) {<br>&gt; &gt; - =C2=A0wchar_t wch =3D L&#3=
+9;w&#39;;<br>&gt; &gt; - =C2=A0setlocale(LC_ALL, &quot;&quot;);<br>&gt; &gt=
+; - =C2=A0resize_term(0, 0);<br>&gt; &gt; - =C2=A0addwstr(L&quot;wide chars=
+\n&quot;);<br>&gt; &gt; - =C2=A0addnwstr(&amp;wch, 1);<br>&gt; &gt; - =C2=
+=A0add_wch(WACS_DEGREE);<br>&gt; &gt; - =C2=A0return 0;<br>&gt; &gt; -}<br>=
+&gt; &gt; -EOF<br>&gt; &gt; - =C2=A0IFS=3D:<br>&gt; &gt; - =C2=A0for curses=
+_inc in $curses_inc_list; do<br>&gt; &gt; - =C2=A0 =C2=A0# Make sure we get=
+ the wide character prototypes<br>&gt; &gt; - =C2=A0 =C2=A0curses_inc=3D&qu=
+ot;-DNCURSES_WIDECHAR $curses_inc&quot;<br>&gt; &gt; - =C2=A0 =C2=A0IFS=3D:=
+<br>&gt; &gt; - =C2=A0 =C2=A0for curses_lib in $curses_lib_list; do<br>&gt;=
+ &gt; - =C2=A0 =C2=A0 =C2=A0unset IFS<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0if=
+ compile_prog &quot;$curses_inc&quot; &quot;$curses_lib&quot; ; then<br>&gt=
+; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0curses_found=3Dyes<br>&gt; &gt; - =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0break<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0fi<br>&gt;=
+ &gt; - =C2=A0 =C2=A0done<br>&gt; &gt; - =C2=A0 =C2=A0if test &quot;$curses=
+_found&quot; =3D yes ; then<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0break<br>&gt=
+; &gt; - =C2=A0 =C2=A0fi<br>&gt; &gt; - =C2=A0done<br>&gt; &gt; - =C2=A0uns=
+et IFS<br>&gt; &gt; - =C2=A0if test &quot;$curses_found&quot; =3D &quot;yes=
+&quot; ; then<br>&gt; &gt; - =C2=A0 =C2=A0curses=3Dyes<br>&gt; &gt; - =C2=
+=A0else<br>&gt; &gt; - =C2=A0 =C2=A0if test &quot;$curses&quot; =3D &quot;y=
+es&quot; ; then<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0feature_not_found &quot;=
+curses&quot; &quot;Install ncurses devel&quot;<br>&gt; &gt; - =C2=A0 =C2=A0=
+fi<br>&gt; &gt; - =C2=A0 =C2=A0curses=3Dno<br>&gt; &gt; - =C2=A0fi<br>&gt; =
+&gt; -fi<br>&gt; &gt; -<br>&gt; &gt; =C2=A0################################=
+##########<br>&gt; &gt; =C2=A0# curl probe<br>&gt; &gt; =C2=A0if test &quot=
+;$curl&quot; !=3D &quot;no&quot; ; then<br>&gt; &gt; @@ -6200,16 +6105,6 @@=
+ if test &quot;$have_x11&quot; =3D &quot;yes&quot; &amp;&amp; test<br>&gt; =
+&gt; &quot;$need_x11&quot; =3D &quot;yes&quot;; then<br>&gt; &gt; =C2=A0 =
+=C2=A0echo &quot;X11_CFLAGS=3D$x11_cflags&quot; &gt;&gt; $config_host_mak<b=
+r>&gt; &gt; =C2=A0 =C2=A0echo &quot;X11_LIBS=3D$x11_libs&quot; &gt;&gt; $co=
+nfig_host_mak<br>&gt; &gt; =C2=A0fi<br>&gt; &gt; -if test &quot;$iconv&quot=
+; =3D &quot;yes&quot; ; then<br>&gt; &gt; - =C2=A0echo &quot;CONFIG_ICONV=
+=3Dy&quot; &gt;&gt; $config_host_mak<br>&gt; &gt; - =C2=A0echo &quot;ICONV_=
+CFLAGS=3D$iconv_cflags&quot; &gt;&gt; $config_host_mak<br>&gt; &gt; - =C2=
+=A0echo &quot;ICONV_LIBS=3D$iconv_lib&quot; &gt;&gt; $config_host_mak<br>&g=
+t; &gt; -fi<br>&gt; &gt; -if test &quot;$curses&quot; =3D &quot;yes&quot; ;=
+ then<br>&gt; &gt; - =C2=A0echo &quot;CONFIG_CURSES=3Dy&quot; &gt;&gt; $con=
+fig_host_mak<br>&gt; &gt; - =C2=A0echo &quot;CURSES_CFLAGS=3D$curses_inc&qu=
+ot; &gt;&gt; $config_host_mak<br>&gt; &gt; - =C2=A0echo &quot;CURSES_LIBS=
+=3D$curses_lib&quot; &gt;&gt; $config_host_mak<br>&gt; &gt; -fi<br>&gt; &gt=
+; =C2=A0if test &quot;$pipe2&quot; =3D &quot;yes&quot; ; then<br>&gt; &gt; =
+=C2=A0 =C2=A0echo &quot;CONFIG_PIPE2=3Dy&quot; &gt;&gt; $config_host_mak<br=
+>&gt; &gt; =C2=A0fi<br>&gt; &gt; @@ -7181,6 +7076,7 @@ NINJA=3D${ninja:-$PW=
+D/ninjatool} $meson setup \<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+-Dvnc=3D$vnc -Dvnc_sasl=3D$vnc_sasl -Dvnc_jpeg=3D$vnc_jpeg<br>&gt; &gt; -Dv=
+nc_png=3D$vnc_png \<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0-Dgettex=
+t=3D$gettext -Dxkbcommon=3D$xkbcommon -Du2f=3D$u2f \<br>&gt; &gt; =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0-Dcapstone=3D$capstone -Dslirp=3D$slirp -Dfdt=3D=
+$fdt \<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0-Diconv=3D$iconv -Dcurses=
+=3D$curses \<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0$cross_arg \<br=
+>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&quot;$PWD&quot; &quot;$source=
+_path&quot;<br>&gt; &gt; <br>&gt; &gt; diff --git a/meson_options.txt b/mes=
+on_options.txt<br>&gt; &gt; index 1d3c94840a90..e6cb1e589b4e 100644<br>&gt;=
+ &gt; --- a/meson_options.txt<br>&gt; &gt; +++ b/meson_options.txt<br>&gt; =
+&gt; @@ -32,6 +32,10 @@ option(&#39;cocoa&#39;, type : &#39;feature&#39;, v=
+alue : &#39;auto&#39;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 description=
+: &#39;Cocoa user interface (macOS only)&#39;)<br>&gt; &gt; =C2=A0option(&#=
+39;mpath&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;,<br>&gt; &g=
+t; =C2=A0 =C2=A0 =C2=A0 =C2=A0 description: &#39;Multipath persistent reser=
+vation passthrough&#39;)<br>&gt; &gt; +option(&#39;iconv&#39;, type : &#39;=
+feature&#39;, value : &#39;auto&#39;,<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 d=
+escription: &#39;Font glyph conversion support&#39;)<br>&gt; &gt; +option(&=
+#39;curses&#39;, type : &#39;feature&#39;, value : &#39;auto&#39;,<br>&gt; =
+&gt; + =C2=A0 =C2=A0 =C2=A0 description: &#39;curses UI&#39;)<br>&gt; &gt; =
+=C2=A0option(&#39;sdl&#39;, type : &#39;feature&#39;, value : &#39;auto&#39=
+;,<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 description: &#39;SDL user inte=
+rface&#39;)<br>&gt; &gt; =C2=A0option(&#39;sdl_image&#39;, type : &#39;feat=
+ure&#39;, value : &#39;auto&#39;,<br>&gt; &gt; diff --git a/meson.build b/m=
+eson.build<br>&gt; &gt; index ad6c7c90c787..1a4a48249243 100644<br>&gt; &gt=
+; --- a/meson.build<br>&gt; &gt; +++ b/meson.build<br>&gt; &gt; @@ -426,6 +=
+426,74 @@ if targetos =3D=3D &#39;linux&#39; and have_tools and not<br>&gt;=
+ &gt; get_option(&#39;mpath&#39;).disabled()<br>&gt; &gt; =C2=A0 =C2=A0endi=
+f<br>&gt; &gt; =C2=A0endif<br>&gt; &gt; <br>&gt; &gt; +iconv =3D not_found<=
+br>&gt; &gt; +if not get_option(&#39;iconv&#39;).disabled()<br>&gt; &gt; + =
+=C2=A0libiconv =3D cc.find_library(&#39;iconv&#39;,<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 required: false,<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 s=
+tatic: enable_static)<br>&gt; &gt; + =C2=A0if libiconv.found()<br>&gt; &gt;=
+ + =C2=A0 =C2=A0if cc.links(&#39;&#39;&#39;<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0#include &lt;iconv.h&gt;<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0int main(=
+void) {<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0iconv_t conv =3D iconv_op=
+en(&quot;WCHAR_T&quot;, &quot;UCS-2&quot;);<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0return conv !=3D (iconv_t) -1;<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0}&#39;&#39;&#39;, dependencies: [libiconv])<br>&gt; &gt; + =C2=A0 =C2=
+=A0 =C2=A0iconv =3D declare_dependency(dependencies: [libiconv])<br>&gt; &g=
+t; + =C2=A0 =C2=A0endif<br>&gt; &gt; + =C2=A0endif<br>&gt; &gt; +endif<br>&=
+gt; &gt; +if get_option(&#39;iconv&#39;).enabled() and not iconv.found()<br=
+>&gt; &gt; + =C2=A0error(&#39;Cannot detect iconv API&#39;)<br>&gt; &gt; +e=
+ndif<br>&gt; &gt; +<br>&gt; &gt; +curses =3D not_found<br>&gt; &gt; +if ico=
+nv.found() and not get_option(&#39;curses&#39;).disabled()<br>&gt; &gt; + =
+=C2=A0curses_libname_list =3D [&#39;ncursesw&#39;, &#39;ncurses&#39;, &#39;=
+cursesw&#39;,<br>&gt; &gt; &#39;pdcurses&#39;]<br>&gt; &gt; + =C2=A0curses_=
+test =3D &#39;&#39;&#39;<br>&gt; &gt; + =C2=A0 =C2=A0#include &lt;locale.h&=
+gt;<br>&gt; &gt; + =C2=A0 =C2=A0#include &lt;curses.h&gt;<br>&gt; &gt; + =
+=C2=A0 =C2=A0#include &lt;wchar.h&gt;<br>&gt; &gt; + =C2=A0 =C2=A0int main(=
+void) {<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0wchar_t wch =3D L&#39;w&#39;;<br=
+>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0setlocale(LC_ALL, &quot;&quot;);<br>&gt; &=
+gt; + =C2=A0 =C2=A0 =C2=A0resize_term(0, 0);<br>&gt; &gt; + =C2=A0 =C2=A0 =
+=C2=A0addwstr(L&quot;wide chars\n&quot;);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=
+=A0addnwstr(&amp;wch, 1);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0add_wch(WACS_D=
+EGREE);<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0return 0;<br>&gt; &gt; + =C2=A0 =
+=C2=A0}&#39;&#39;&#39;<br>&gt; &gt; + =C2=A0foreach curses_libname : curses=
+_libname_list<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0libcurses =3D dependency(c=
+urses_libname,<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 required: false,<br>&g=
+t; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 method: &#39;pkg-config&#39;,<br>&gt; &g=
+t; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 static: enable_static)<br>&gt; &gt; +<br>&gt; &=
+gt; + =C2=A0 =C2=A0 =C2=A0if not libcurses.found()<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0dirs =3D [&#39;/usr/include/ncursesw&#39;]<br>&gt; &gt;=
+ + =C2=A0 =C2=A0 =C2=A0 =C2=A0if targetos =3D=3D &#39;windows&#39;<br>&gt; =
+&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dirs =3D []<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0endif<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0libcurs=
+es =3D cc.find_library(curses_libname,<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0required: false,<br>&gt; &gt; + =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0dirs: dirs,<br>&gt; &gt; + =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0static: enable_static)<br>&gt;=
+ &gt; + =C2=A0 =C2=A0 =C2=A0endif<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0if lib=
+curses.found()<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0if cc.links(curses=
+_test, dependencies: [libcurses])<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0curses =3D declare_dependency(compile_args: &#39;-<br>&gt; &gt; D=
+NCURSES_WIDECHAR&#39;, dependencies: [libcurses])<br>&gt; &gt; + =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0break<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0end=
+if<br>&gt; &gt; + =C2=A0 =C2=A0 =C2=A0endif<br>&gt; &gt; + =C2=A0endforeach=
+<br>&gt; &gt; +endif<br>&gt; &gt; +if get_option(&#39;curses&#39;).enabled(=
+) and not curses.found()<br>&gt; &gt; + =C2=A0if not iconv.found()<br>&gt; =
+&gt; + =C2=A0 =C2=A0error(&#39;Cannot detect iconv API&#39;)<br>&gt; &gt; +=
+ =C2=A0else<br>&gt; &gt; + =C2=A0 =C2=A0error(&#39;Cannot detect curses API=
+&#39;)<br>&gt; &gt; + =C2=A0endif<br>&gt; &gt; +endif<br>&gt; &gt; +<br>&gt=
+; &gt; =C2=A0brlapi =3D not_found<br>&gt; &gt; =C2=A0if &#39;CONFIG_BRLAPI&=
+#39; in config_host<br>&gt; &gt; =C2=A0 =C2=A0brlapi =3D declare_dependency=
+(link_args:<br>&gt; &gt; config_host[&#39;BRLAPI_LIBS&#39;].split())<br>&gt=
+; &gt; @@ -504,16 +572,6 @@ if &#39;CONFIG_X11&#39; in config_host<br>&gt; =
+&gt; =C2=A0 =C2=A0x11 =3D declare_dependency(compile_args:<br>&gt; &gt; con=
+fig_host[&#39;X11_CFLAGS&#39;].split(),<br>&gt; &gt; =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 link_args:<br>&gt; &gt; config_host[&#39;X11_LIBS&#39;].split())<br>&gt=
+; &gt; =C2=A0endif<br>&gt; &gt; -curses =3D not_found<br>&gt; &gt; -if &#39=
+;CONFIG_CURSES&#39; in config_host<br>&gt; &gt; - =C2=A0curses =3D declare_=
+dependency(compile_args:<br>&gt; &gt; config_host[&#39;CURSES_CFLAGS&#39;].=
+split(),<br>&gt; &gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0link_args:<br>&gt; &=
+gt; config_host[&#39;CURSES_LIBS&#39;].split())<br>&gt; &gt; -endif<br>&gt;=
+ &gt; -iconv =3D not_found<br>&gt; &gt; -if &#39;CONFIG_ICONV&#39; in confi=
+g_host<br>&gt; &gt; - =C2=A0iconv =3D declare_dependency(compile_args:<br>&=
+gt; &gt; config_host[&#39;ICONV_CFLAGS&#39;].split(),<br>&gt; &gt; - =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 link_args:<br>&gt; &gt; config_host[&#39;ICONV_LIBS&#39;]=
+.split())<br>&gt; &gt; -endif<br>&gt; &gt; =C2=A0vnc =3D not_found<br>&gt; =
+&gt; =C2=A0png =3D not_found<br>&gt; &gt; =C2=A0jpeg =3D not_found<br>&gt; =
+&gt; @@ -622,6 +680,7 @@ config_host_data.set(&#39;CONFIG_COCOA&#39;,<br>&g=
+t; &gt; cocoa.found())<br>&gt; &gt; =C2=A0config_host_data.set(&#39;CONFIG_=
+LIBUDEV&#39;, libudev.found())<br>&gt; &gt; =C2=A0config_host_data.set(&#39=
+;CONFIG_MPATH&#39;, mpathpersist.found())<br>&gt; &gt; =C2=A0config_host_da=
+ta.set(&#39;CONFIG_MPATH_NEW_API&#39;, mpathpersist_new_api)<br>&gt; &gt; +=
+config_host_data.set(&#39;CONFIG_CURSES&#39;, curses.found())<br>&gt; &gt; =
+=C2=A0config_host_data.set(&#39;CONFIG_SDL&#39;, sdl.found())<br>&gt; &gt; =
+=C2=A0config_host_data.set(&#39;CONFIG_SDL_IMAGE&#39;, sdl_image.found())<b=
+r>&gt; &gt; =C2=A0config_host_data.set(&#39;CONFIG_VNC&#39;, vnc.found())<b=
+r>&gt; &gt; @@ -1905,8 +1964,8 @@ if config_host.has_key(&#39;CONFIG_NETTLE=
+&#39;)<br>&gt; &gt; =C2=A0endif<br>&gt; &gt; =C2=A0summary_info +=3D<br>&gt=
+; &gt; {&#39;libtasn1&#39;: =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0config_host.h=
+as_key(&#39;CONFIG_TASN1&#39;)}<br>&gt; &gt; =C2=A0summary_info +=3D<br>&gt=
+; &gt; {&#39;PAM&#39;: =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 con=
+fig_host.has_key(&#39;CONFIG_AUTH_PAM&#39;)}<br>&gt; &gt; -summary_info +=
+=3D {&#39;iconv<br>&gt; &gt; support&#39;: =C2=A0 =C2=A0 config_host.has_ke=
+y(&#39;CONFIG_ICONV&#39;)}<br>&gt; &gt; -summary_info +=3D {&#39;curses<br>=
+&gt; &gt; support&#39;: =C2=A0 =C2=A0config_host.has_key(&#39;CONFIG_CURSES=
+&#39;)}<br>&gt; &gt; +summary_info +=3D {&#39;iconv support&#39;: =C2=A0 =
+=C2=A0 iconv.found()}<br>&gt; &gt; +summary_info +=3D {&#39;curses support&=
+#39;: =C2=A0 =C2=A0curses.found()}<br>&gt; &gt; =C2=A0# TODO: add back vers=
+ion<br>&gt; &gt; =C2=A0summary_info +=3D {&#39;virgl<br>&gt; &gt; support&#=
+39;: =C2=A0 =C2=A0 config_host.has_key(&#39;CONFIG_VIRGL&#39;)}<br>&gt; &gt=
+; =C2=A0summary_info +=3D {&#39;curl<br>&gt; &gt; support&#39;: =C2=A0 =C2=
+=A0 =C2=A0config_host.has_key(&#39;CONFIG_CURL&#39;)}<br>&gt; &gt; diff --g=
+it a/ui/meson.build b/ui/meson.build<br>&gt; &gt; index 8a080c38e325..78ad7=
+92ffb8d 100644<br>&gt; &gt; --- a/ui/meson.build<br>&gt; &gt; +++ b/ui/meso=
+n.build<br>&gt; &gt; @@ -39,7 +39,7 @@ specific_ss.add(when: [&#39;CONFIG_S=
+OFTMMU&#39;], if_true:<br>&gt; &gt; opengl)<br>&gt; &gt; <br>&gt; &gt; =C2=
+=A0ui_modules =3D {}<br>&gt; &gt; <br>&gt; &gt; -if config_host.has_key(&#3=
+9;CONFIG_CURSES&#39;)<br>&gt; &gt; +if curses.found()<br>&gt; &gt; =C2=A0 =
+=C2=A0curses_ss =3D ss.source_set()<br>&gt; &gt; =C2=A0 =C2=A0curses_ss.add=
+(when: [curses, iconv], if_true: [files(&#39;curses.c&#39;),<br>&gt; &gt; p=
+ixman])<br>&gt; &gt; =C2=A0 =C2=A0ui_modules +=3D {&#39;curses&#39; : curse=
+s_ss}<br>&gt;<br>&gt; I find that this change causes a configure failure wh=
+en choosing either<br>&gt; --enable-iconv or --enable-curses as follows:<br=
+>&gt;<br>&gt; ../configure --enable-curses results in<br>&gt; ../meson.buil=
+d:491:4: ERROR: Problem encountered: Cannot detect iconv<br>&gt; API<br>&gt=
+;<br>&gt; ../configure --enable-iconv results in<br>&gt; ../meson.build:446=
+:2: ERROR: Problem encountered: Cannot detect iconv<br>&gt; API<br>&gt;<br>=
+&gt; I haven&#39;t yet learned meson well enough to identify further what i=
+s<br>&gt; going wrong.<br>&gt;<br>&gt; Can someone take a look at what migh=
+t be failing, or give me some clue<br>&gt; what I can check on or report on=
+ from my end which would be helpful to<br>&gt; resolve this?<br>&gt; I am r=
+unning openSUSE Tumbleweed, by the way.<br>&gt;<br>&gt; Thanks,<br>&gt;<br>=
+&gt; Bruce<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=
+=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=
+=A0 =C2=A0 sincerely,<br>Yonggang Luo</div>
+
+--000000000000ae6a0805b1a6637a--
 
