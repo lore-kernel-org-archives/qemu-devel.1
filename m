@@ -2,70 +2,69 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F631C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:12:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48EFBC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:21:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AAE752173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:12:39 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="kMzruDYm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AAE752173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9221322227
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:21:03 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9221322227
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34354 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSkKM-0005GW-F9
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:12:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43540)
+	id 1kSkSU-0002Yo-66
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:21:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kSkDP-0006D2-5A; Wed, 14 Oct 2020 13:05:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55576)
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kSkQo-0001lN-2Y
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:19:19 -0400
+Received: from mga12.intel.com ([192.55.52.136]:55064)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kSkDL-00015P-Ur; Wed, 14 Oct 2020 13:05:26 -0400
-Received: from dhcp-10-100-145-180.wdl.wdc.com (unknown [199.255.45.60])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
- (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 7C4E52173E;
- Wed, 14 Oct 2020 17:05:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1602695116;
- bh=AMI8/UaIQqgv1jChKmenoZyj+FSl0r0Ybz7vyn2FTIY=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=kMzruDYmY/m42XguhQqIsmBKH7LRWC8+LSq3orWNM/wzd30JU4ZOJ+jE8hcTr/nsG
- bTIaxjBggtaOzSFdnDukKghV5hrW4sTaQCetEqzaA16qv1SuDDBimwF17qL/7dX1SA
- 00ATo58NJpejQ4Lsn2IN5yTlylkVd+RBlpGZ8Y4M=
-Date: Wed, 14 Oct 2020 10:05:13 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Klaus Jensen <its@irrelevant.dk>
-Subject: Re: [PATCH] hw/block/nvme: add block utilization tracking
-Message-ID: <20201014170513.GB1267726@dhcp-10-100-145-180.wdl.wdc.com>
-References: <20201013190846.260841-1-its@irrelevant.dk>
- <20201013210636.GA1049395@dhcp-10-100-145-180.wdl.wdc.com>
- <20201014084721.GB267924@apples.localdomain>
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kSkQk-0002mt-8d
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:19:17 -0400
+IronPort-SDR: 8d1geM8x2kXh+SDKn7pB0VfHyIGmqZnA4HrTIfT6bokoLBkCKG82PLx7y3L99KIteofqL913UR
+ wYoCESTw+TLg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9774"; a="145459485"
+X-IronPort-AV: E=Sophos;i="5.77,375,1596524400"; d="scan'208";a="145459485"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 Oct 2020 10:19:06 -0700
+IronPort-SDR: kaA1GFl4kDHVKz75dR3UklRjlRIj3EGgwtQwNVH9iejDpsxO3cr77kHp4KohBALUeAbSF5/+lO
+ HZxV3abT1Vuw==
+X-IronPort-AV: E=Sophos;i="5.77,375,1596524400"; d="scan'208";a="314234682"
+Received: from pankajk1-mobl.amr.corp.intel.com (HELO bwidawsk-mobl5.local)
+ ([10.252.132.199])
+ by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 Oct 2020 10:19:05 -0700
+From: Ben Widawsky <ben.widawsky@intel.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH RESEND] pci: Disallow improper BAR registration for type 1
+Date: Wed, 14 Oct 2020 10:18:53 -0700
+Message-Id: <20201014171853.71130-1-ben.widawsky@intel.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201014084721.GB267924@apples.localdomain>
-Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
- helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 13:05:16
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=192.55.52.136;
+ envelope-from=ben.widawsky@intel.com; helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 13:19:06
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,32 +77,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: Ben Widawsky <ben.widawsky@intel.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 14, 2020 at 10:47:21AM +0200, Klaus Jensen wrote:
-> On Oct 13 14:06, Keith Busch wrote:
-> 
-> > If we were going to support it here, wouldn't it make more sense to
-> > tie it to the filesystem's ability to support fallocate hole punch for
-> > the backing namespace, and check if the range is allocated with
-> > SEEK_HOLE?  Then you don't even need to track persistent state, and
-> > we're actually getting the genuine capability.
-> > 
-> 
-> Yes, this would be optimal, definitely. I think we have to rely on what
-> we can do with the QEMU block layer, so please see my v2 that uses
-> bdrv_block_status. I did do something like this initially, but was
-> unsure if we could live with the fact that block drivers such as qcow2
-> cannot honor a discard unless an entire cluster is discard/zeroed.
-> 
-> But see my commit message, I think we can work with it and still be in
-> compliance with the spec.
+This patch informs future developers working on root complexes, root
+ports, or bridges that also wish to implement a BAR for those. PCI type
+1 headers only support 2 base address registers. It is incorrect and
+difficult to figure out what is wrong with the device when this mistake
+is made. With this, it is immediate and obvious what has gone wrong.
 
-Yes, I think that's better, though I'm not familiar with that particular
-API. I definitely prefer implementing spec features in useful ways that
-work with other layers rather than faking it.
+Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
+---
+ hw/pci/pci.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
+
+diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+index 3c8f10b461..55b0302c57 100644
+--- a/hw/pci/pci.c
++++ b/hw/pci/pci.c
+@@ -1141,6 +1141,7 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+     uint32_t addr; /* offset in pci config space */
+     uint64_t wmask;
+     pcibus_t size = memory_region_size(memory);
++    uint8_t hdr_type;
+ 
+     assert(region_num >= 0);
+     assert(region_num < PCI_NUM_REGIONS);
+@@ -1150,6 +1151,15 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+         exit(1);
+     }
+ 
++    hdr_type =
++        pci_dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
++    if (hdr_type == PCI_HEADER_TYPE_BRIDGE && region_num > 1) {
++        error_report("ERROR: PCI Type 1 header only has 2 BARs "
++                     "requested BAR=%d",
++                     region_num);
++        exit(1);
++    }
++
+     r = &pci_dev->io_regions[region_num];
+     r->addr = PCI_BAR_UNMAPPED;
+     r->size = size;
+-- 
+2.28.0
+
 
