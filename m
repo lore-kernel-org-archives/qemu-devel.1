@@ -7,65 +7,66 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70436C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33534C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:11:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBDC020848
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:10:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBDC020848
+	by mail.kernel.org (Postfix) with ESMTPS id C1AE720848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:11:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C1AE720848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36412 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSfcD-0003DK-KU
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53990)
+	id 1kSfcu-0004EA-Er
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:11:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54010)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
- id 1kSfaR-0001m1-23
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:08:55 -0400
-Received: from mga02.intel.com ([134.134.136.20]:19469)
+ id 1kSfaW-0001wi-2Y
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:09:00 -0400
+Received: from mga03.intel.com ([134.134.136.65]:2248)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
- id 1kSfaO-0002rN-92
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:08:54 -0400
-IronPort-SDR: gs1aoHkZQp6Q1vB0Ieav/X2EOFS+5df1/VROJ2vRzHuq+kWL8J09EeJ3mOnR0C3D+nctRAast8
- ZlMnx921PSjQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="153033348"
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="153033348"
+ id 1kSfaU-0002rj-0V
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:08:59 -0400
+IronPort-SDR: tm5xqzGlHwIxbLsJRDXQ6+/w3oRH08McvEyy3lMJ/txnVmJHLOtQMZQO653I3Lco+UXkk7gLhy
+ G/q0ty2zXKhQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="166153446"
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="166153446"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2020 05:08:48 -0700
-IronPort-SDR: BsVcugjobaVBNfYBNqtEbpEdcTxBHJEifFKBszrwvPYIVblFbcAtiGhTJgECFJfaTSwIzMBzZA
- dWOwlMg1C3iQ==
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 14 Oct 2020 05:08:54 -0700
+IronPort-SDR: YB3U6vn3yl6hXMS1OdOfo1v/UzWk5JzdZfWxGuAdFw+qSCDByzuELIPkoQQ+qvQdef/m7fQ473
+ N3hItoHY7wJw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="463865092"
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="463865106"
 Received: from snr.bj.intel.com ([10.240.192.237])
- by orsmga004.jf.intel.com with ESMTP; 14 Oct 2020 05:08:46 -0700
+ by orsmga004.jf.intel.com with ESMTP; 14 Oct 2020 05:08:53 -0700
 From: Luwei Kang <luwei.kang@intel.com>
 To: pbonzini@redhat.com,
 	rth@twiddle.net,
 	ehabkost@redhat.com
-Subject: [PATCH 1/2] i386/cpu: Add the Intel PT capabilities checking before
- extend the CPUID level
-Date: Wed, 14 Oct 2020 16:04:42 +0800
-Message-Id: <20201014080443.23751-1-luwei.kang@intel.com>
+Subject: [PATCH 2/2] i386/cpu: Make the Intel PT LIP feature configurable
+Date: Wed, 14 Oct 2020 16:04:43 +0800
+Message-Id: <20201014080443.23751-2-luwei.kang@intel.com>
 X-Mailer: git-send-email 2.18.4
-Received-SPF: pass client-ip=134.134.136.20; envelope-from=luwei.kang@intel.com;
- helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 08:08:48
+In-Reply-To: <20201014080443.23751-1-luwei.kang@intel.com>
+References: <20201014080443.23751-1-luwei.kang@intel.com>
+Received-SPF: pass client-ip=134.134.136.65; envelope-from=luwei.kang@intel.com;
+ helo=mga03.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 08:08:55
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -52
+X-Spam_score: -5.3
+X-Spam_bar: -----
+X-Spam_report: (-5.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,104 +84,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current implementation will extend the CPUID level to 0x14 if
-Intel PT is enabled in the guest(in x86_cpu_expand_features()) and
-the Intel PT will be disabled if it can't pass the capabilities
-checking later(in x86_cpu_filter_features()). In this case, the
-level of CPUID will be still 0x14 and the CPUID values from leaf
-0xe to 0x14 are all zero.
+The current implementation will disable the guest Intel PT
+feature if the Intel PT LIP feature is supported on the host,
+but the LIP feature is comming soon(e.g. SnowRidge and later).
 
-This patch moves the capabilities checking before setting the
-level of the CPUID.
+This patch will make the guest LIP feature configurable and
+Intel PT feature can be enabled in guest when the guest LIP
+status same with the host.
 
 Signed-off-by: Luwei Kang <luwei.kang@intel.com>
 ---
- target/i386/cpu.c | 63 ++++++++++++++++++++++++-----------------------
- 1 file changed, 32 insertions(+), 31 deletions(-)
+ target/i386/cpu.c | 29 +++++++++++++++++++++++++++--
+ target/i386/cpu.h |  4 ++++
+ 2 files changed, 31 insertions(+), 2 deletions(-)
 
 diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 9eafbe3690..24644abfd4 100644
+index 24644abfd4..aeabdd5bd4 100644
 --- a/target/i386/cpu.c
 +++ b/target/i386/cpu.c
-@@ -6401,12 +6401,40 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+@@ -672,6 +672,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+ #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
+           /* missing:
+           CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
++#define TCG_14_0_ECX_FEATURES 0
  
-         /* Intel Processor Trace requires CPUID[0x14] */
-         if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT)) {
--            if (cpu->intel_pt_auto_level) {
--                x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
--            } else if (cpu->env.cpuid_min_level < 0x14) {
-+            uint32_t eax_0, ebx_0, ecx_0, eax_1, ebx_1;
-+
-+            eax_0 = kvm_arch_get_supported_cpuid(kvm_state, 0x14, 0, R_EAX);
-+            ebx_0 = kvm_arch_get_supported_cpuid(kvm_state, 0x14, 0, R_EBX);
-+            ecx_0 = kvm_arch_get_supported_cpuid(kvm_state, 0x14, 0, R_ECX);
-+            eax_1 = kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EAX);
-+            ebx_1 = kvm_arch_get_supported_cpuid(kvm_state, 0x14, 1, R_EBX);
-+
-+            if (eax_0 &&
-+               ((ebx_0 & INTEL_PT_MINIMAL_EBX) == INTEL_PT_MINIMAL_EBX) &&
-+               ((ecx_0 & INTEL_PT_MINIMAL_ECX) == INTEL_PT_MINIMAL_ECX) &&
-+               ((eax_1 & INTEL_PT_MTC_BITMAP) == INTEL_PT_MTC_BITMAP) &&
-+               ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) >=
-+                                           INTEL_PT_ADDR_RANGES_NUM) &&
-+               ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) ==
-+                    (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) &&
-+               !(ecx_0 & INTEL_PT_IP_LIP)) {
-+                if (cpu->intel_pt_auto_level) {
-+                    x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
-+                } else if (cpu->env.cpuid_min_level < 0x14) {
-+                    mark_unavailable_features(cpu, FEAT_7_0_EBX,
-+                        CPUID_7_0_EBX_INTEL_PT,
-+                        "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,+intel-pt,min-level=0x14\"");
-+                }
-+            } else {
-+               /*
-+                * Processor Trace capabilities aren't configurable, so if the
-+                * host can't emulate the capabilities we report on
-+                * cpu_x86_cpuid(), intel-pt can't be enabled on the current
-+                * host.
-+                */
-                 mark_unavailable_features(cpu, FEAT_7_0_EBX,
-                     CPUID_7_0_EBX_INTEL_PT,
--                    "Intel PT need CPUID leaf 0x14, please set by \"-cpu ...,+intel-pt,min-level=0x14\"");
-+                    "host Intel PT features doesn't satisfy the guest request.");
-             }
+ typedef enum FeatureWordType {
+    CPUID_FEATURE_WORD,
+@@ -1301,6 +1302,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
          }
+     },
  
-@@ -6466,33 +6494,6 @@ static void x86_cpu_filter_features(X86CPU *cpu, bool verbose)
-         uint64_t unavailable_features = requested_features & ~host_feat;
-         mark_unavailable_features(cpu, w, unavailable_features, prefix);
-     }
--
--    if ((env->features[FEAT_7_0_EBX] & CPUID_7_0_EBX_INTEL_PT) &&
--        kvm_enabled()) {
--        KVMState *s = CPU(cpu)->kvm_state;
--        uint32_t eax_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EAX);
--        uint32_t ebx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_EBX);
--        uint32_t ecx_0 = kvm_arch_get_supported_cpuid(s, 0x14, 0, R_ECX);
--        uint32_t eax_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EAX);
--        uint32_t ebx_1 = kvm_arch_get_supported_cpuid(s, 0x14, 1, R_EBX);
--
--        if (!eax_0 ||
--           ((ebx_0 & INTEL_PT_MINIMAL_EBX) != INTEL_PT_MINIMAL_EBX) ||
--           ((ecx_0 & INTEL_PT_MINIMAL_ECX) != INTEL_PT_MINIMAL_ECX) ||
--           ((eax_1 & INTEL_PT_MTC_BITMAP) != INTEL_PT_MTC_BITMAP) ||
--           ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) <
--                                           INTEL_PT_ADDR_RANGES_NUM) ||
--           ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) !=
--                (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) ||
--           (ecx_0 & INTEL_PT_IP_LIP)) {
--            /*
--             * Processor Trace capabilities aren't configurable, so if the
--             * host can't emulate the capabilities we report on
--             * cpu_x86_cpuid(), intel-pt can't be enabled on the current host.
--             */
--            mark_unavailable_features(cpu, FEAT_7_0_EBX, CPUID_7_0_EBX_INTEL_PT, prefix);
--        }
--    }
- }
++    [FEAT_14_0_ECX] = {
++        .type = CPUID_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, "intel-pt-lip",
++        },
++        .cpuid = {
++            .eax = 0x14,
++            .needs_ecx = true, .ecx = 0,
++            .reg = R_ECX,
++        },
++        .tcg_features = TCG_14_0_ECX_FEATURES,
++    },
++
+ };
  
- static void x86_cpu_realizefn(DeviceState *dev, Error **errp)
+ typedef struct FeatureMask {
+@@ -5743,6 +5764,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = INTEL_PT_MAX_SUBLEAF;
+             *ebx = INTEL_PT_MINIMAL_EBX;
+             *ecx = INTEL_PT_MINIMAL_ECX;
++            if (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP) {
++                *ecx |= CPUID_14_0_ECX_LIP;
++            }
+         } else if (count == 1) {
+             *eax = INTEL_PT_MTC_BITMAP | INTEL_PT_ADDR_RANGES_NUM;
+             *ebx = INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP;
+@@ -6416,8 +6440,9 @@ static void x86_cpu_expand_features(X86CPU *cpu, Error **errp)
+                ((eax_1 & INTEL_PT_ADDR_RANGES_NUM_MASK) >=
+                                            INTEL_PT_ADDR_RANGES_NUM) &&
+                ((ebx_1 & (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) ==
+-                    (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) &&
+-               !(ecx_0 & INTEL_PT_IP_LIP)) {
++                        (INTEL_PT_PSB_BITMAP | INTEL_PT_CYCLE_BITMAP)) &&
++               ((ecx_0 & CPUID_14_0_ECX_LIP) ==
++                        (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP))) {
+                 if (cpu->intel_pt_auto_level) {
+                     x86_cpu_adjust_level(cpu, &cpu->env.cpuid_min_level, 0x14);
+                 } else if (cpu->env.cpuid_min_level < 0x14) {
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 51c1d5f60a..1fcd93e39a 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -541,6 +541,7 @@ typedef enum FeatureWord {
+     FEAT_VMX_EPT_VPID_CAPS,
+     FEAT_VMX_BASIC,
+     FEAT_VMX_VMFUNC,
++    FEAT_14_0_ECX,
+     FEATURE_WORDS,
+ } FeatureWord;
+ 
+@@ -797,6 +798,9 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ /* AVX512 BFloat16 Instruction */
+ #define CPUID_7_1_EAX_AVX512_BF16       (1U << 5)
+ 
++/* Packets which contain IP payload have LIP values */
++#define CPUID_14_0_ECX_LIP              (1U << 31)
++
+ /* CLZERO instruction */
+ #define CPUID_8000_0008_EBX_CLZERO      (1U << 0)
+ /* Always save/restore FP error pointers */
 -- 
 2.18.4
 
