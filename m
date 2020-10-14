@@ -2,62 +2,138 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0FAC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:44:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C29CC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:48:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06A862222C
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:44:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A862222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
+	by mail.kernel.org (Postfix) with ESMTPS id BD41621582
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:48:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="Yvu71Fm6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD41621582
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36488 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSZa7-0006kh-UQ
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:44:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33920)
+	id 1kSZeA-0008Rp-Mw
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:48:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kSZZ0-0005uC-0k
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:43:02 -0400
-Received: from mail.ispras.ru ([83.149.199.84]:40544)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
- id 1kSZYw-0001NH-1K
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:43:01 -0400
-Received: from [192.168.0.183] (unknown [62.118.151.149])
- by mail.ispras.ru (Postfix) with ESMTPSA id 45F3B40A1DA0;
- Wed, 14 Oct 2020 05:42:52 +0000 (UTC)
-Subject: Re: [PATCH v4 3/3] replay: do not build if TCG is not available
-To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
-References: <20201013192123.22632-1-cfontana@suse.de>
- <20201013192123.22632-4-cfontana@suse.de>
-From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Message-ID: <281ee6ed-454b-1baf-343c-786421a48c8e@ispras.ru>
-Date: Wed, 14 Oct 2020 08:42:52 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kSZci-0007xe-4j
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:46:52 -0400
+Received: from mail-dm6nam12on2040.outbound.protection.outlook.com
+ ([40.107.243.40]:61301 helo=NAM12-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fnuv@xilinx.com>) id 1kSZcf-0002jB-4s
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:46:51 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Czjx1Z5uUdB1VU8TH6o//Bdb4aclAuMRQgM5PWX+OfwIo5CR9DEM27Hwn1wMnKAeCt1r3mv8geb19RzOK3WjRBNi3lGLAK0GHALAolSh2ZnMDFD3tumQpDY5uJIwBp6TnfKAbu6KubMtAPMO+Dx5qdbXHcb9cWK4rcMbC+yvXS2TLoiP+hnl//YZK+dpGlu89AusQbRwjIWrDcpEt7QFqq7RibUkfw1DbDMP6vXloGceYFsEbF28KbCLyUTgDln1o8xGp4ab8orwZuwdXS4Sdi5XGVkMZPBRrGNB7nz/OVx4D61rU9m0rACOLZXbD7NP+1RHFBvC3yUD2q6wZWjqUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JlEP77TEb8SF9MAjy5QJ6aGzR5r/P/0aoihL9r+yD6E=;
+ b=MZcqpsLac3HLC0yySooK3iQfWeupfPyk86NSssjDd4lMzYR4hkxFDlp1rlD/4hbh/Qsl/j2FDGnVul+WokB7U1knpsuIKelzDi6ZNK91t0Vz9eHH0WT+/dZVlOgSeCGgzNw5BFPwYFWhc/k458nytSklXNZMKmaMmDWkxRvN9g4v9doMQOnILjNLYStbM/SDtpDnCk0jvYzL7/p0SnZN3qPPsEhOvfdlsu+Wjb92T3uOb/EUK5wvWkzY0d6W3p/007cRzkvrWpXrrvUjZbai8I75HGa6vURNxFM5dok9zQ6fV1UvFIrH0Z8dGqG5r1uXYMVI28yNg0A2mTf2zk06qA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=nongnu.org smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JlEP77TEb8SF9MAjy5QJ6aGzR5r/P/0aoihL9r+yD6E=;
+ b=Yvu71Fm6TdP1Txw0irc0zGqgnPxQLTudIzcmxSe7J91BiZlX7UyC32YGPGSrHRtmEkYJtcSCg77LR6M1Hp5qcFrJhKZVO21pItLMdXvV1fGNpA+yH4Qfoa7kA9rgXBsNgR2+ogLQE9LtNNEhDkXX8/UANFsOLsUSDn4WgIyEYvQ=
+Received: from BL0PR05CA0009.namprd05.prod.outlook.com (2603:10b6:208:91::19)
+ by BN6PR02MB2594.namprd02.prod.outlook.com (2603:10b6:404:56::21)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Wed, 14 Oct
+ 2020 05:46:42 +0000
+Received: from BL2NAM02FT053.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:91:cafe::84) by BL0PR05CA0009.outlook.office365.com
+ (2603:10b6:208:91::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.11 via Frontend
+ Transport; Wed, 14 Oct 2020 05:46:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ BL2NAM02FT053.mail.protection.outlook.com (10.152.76.225) with Microsoft SMTP
+ Server id 15.20.3455.25 via Frontend Transport; Wed, 14 Oct 2020 05:46:41
+ +0000
+Received: from [149.199.38.66] (port=54699 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <fnu.vikram@xilinx.com>) id 1kSZbn-0001aa-75
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 22:45:55 -0700
+Received: from [127.0.0.1] (helo=localhost)
+ by smtp.xilinx.com with smtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>) id 1kSZcX-0001oH-7m
+ for qemu-devel@nongnu.org; Tue, 13 Oct 2020 22:46:41 -0700
+Received: from xsj-pvapsmtp01 (smtp-fallback.xilinx.com [149.199.38.66] (may
+ be forged))
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09E5kb8q003871; 
+ Tue, 13 Oct 2020 22:46:37 -0700
+Received: from [172.19.2.115] (helo=xsjfnuv50.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <fnu.vikram@xilinx.com>)
+ id 1kSZcT-0001nf-5m; Tue, 13 Oct 2020 22:46:37 -0700
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v11 2/4] xlnx-zynqmp: Connect Xilinx ZynqMP CAN controllers
+Date: Tue, 13 Oct 2020 22:46:35 -0700
+Message-Id: <1602654397-35162-3-git-send-email-fnu.vikram@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1602654397-35162-1-git-send-email-fnu.vikram@xilinx.com>
+References: <1602654397-35162-1-git-send-email-fnu.vikram@xilinx.com>
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
-In-Reply-To: <20201013192123.22632-4-cfontana@suse.de>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=83.149.199.84;
- envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:42:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 52acccfe-3b12-428a-8e93-08d8700486bf
+X-MS-TrafficTypeDiagnostic: BN6PR02MB2594:
+X-Microsoft-Antispam-PRVS: <BN6PR02MB25943E209963352E9BD2FD23BC050@BN6PR02MB2594.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:114;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 92fA99CDq4URCDpfcmZBE4ZlHSGjbJni51Diy2fkLk0EXoJ4lbAAseRjMEEF7b9viM7VHYRpYp/kuP2tna5sCVRNr8y4FZgnS53iCEK4jmv3FhJrx/tfNxGxzK2IXJuem9Jyqus/v6YmY+frBO/+z5bOeaVReQhqNlNBiOVJojk97rpT/0XoNj1YSk8rF3bLmRefudCkof//yz2i0G+hKwN5AhQ4m60pkq0R4i7WTz3IZYZFhC9nApWp9ZqqQjANMCx4Jep/dTms1SvVWrm23MFKmpF/pIAnXTaJSUYouRPJhkHq0nTC4O40aEt3LQexpvBe7myhXhEhNkNXdbL87qEkUmrsMOim6KN+n6wS/UsKLsgpsM+BHb0/wQneNKzXEVFjU20xrtnuOofo8iWhI2FfIRo5/8IwBxLz5Xy4xyo=
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(39850400004)(396003)(376002)(136003)(346002)(46966005)(5660300002)(356005)(426003)(336012)(107886003)(478600001)(70586007)(70206006)(7696005)(8676002)(82310400003)(2616005)(81166007)(9786002)(8936002)(83380400001)(82740400003)(6916009)(186003)(26005)(316002)(47076004)(4326008)(2906002)(36756003)(42866002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 05:46:41.5776 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52acccfe-3b12-428a-8e93-08d8700486bf
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT053.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN6PR02MB2594
+Received-SPF: pass client-ip=40.107.243.40; envelope-from=fnuv@xilinx.com;
+ helo=NAM12-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:46:47
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -70,344 +146,188 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Pavel Dovgalyuk <dovgaluk@ispras.ru>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: figlesia@xilinx.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13.10.2020 22:21, Claudio Fontana wrote:
-> this fixes non-TCG builds broken recently by replay reverse debugging.
-> 
-> stub the needed functions in stub/, including errors for hmp and qmp.
-> This includes duplicating some code in replay/, and puts the logic
-> for non-replay related events in the replay/ module (+ the stubs),
-> so this should be revisited in the future.
-> 
-> Surprisingly, only _one_ qtest was affected by this, ide-test.c, which
-> resulted in a buzz as the bh events were never delivered, and the bh
-> never executed.
-> 
-> Many other subsystems _should_ have been affected.
-> 
-> This fixes the immediate issue, however a better way to group replay
-> functionality to TCG-only code could be developed in the long term.
-> 
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->   block/meson.build          |  3 +-
->   migration/savevm.c         | 11 +++--
->   net/meson.build            |  3 +-
->   replay/meson.build         |  2 +-
->   replay/replay-input.c      |  4 +-
->   stubs/meson.build          |  1 -
->   stubs/replay-user.c        |  9 ----
->   stubs/replay.c             | 98 ++++++++++++++++++++++++++++++++++++++
->   tests/ptimer-test-stubs.c  |  5 --
->   tests/qtest/qmp-cmd-test.c |  3 ++
->   ui/input.c                 | 12 ++++-
->   11 files changed, 125 insertions(+), 26 deletions(-)
->   delete mode 100644 stubs/replay-user.c
-> 
-> diff --git a/block/meson.build b/block/meson.build
-> index 78e8b25232..01fe6f84d2 100644
-> --- a/block/meson.build
-> +++ b/block/meson.build
-> @@ -7,7 +7,6 @@ block_ss.add(files(
->     'backup-top.c',
->     'blkdebug.c',
->     'blklogwrites.c',
-> -  'blkreplay.c',
->     'blkverify.c',
->     'block-backend.c',
->     'block-copy.c',
-> @@ -42,6 +41,8 @@ block_ss.add(files(
->     'write-threshold.c',
->   ), zstd, zlib)
->   
-> +block_ss.add(when: 'CONFIG_TCG', if_true: files('blkreplay.c'))
-> +
->   block_ss.add(when: 'CONFIG_QCOW1', if_true: files('qcow.c'))
->   block_ss.add(when: 'CONFIG_VDI', if_true: files('vdi.c'))
->   block_ss.add(when: 'CONFIG_CLOOP', if_true: files('cloop.c'))
-> diff --git a/migration/savevm.c b/migration/savevm.c
-> index d2e141f7b1..d9181ca520 100644
-> --- a/migration/savevm.c
-> +++ b/migration/savevm.c
-> @@ -63,6 +63,7 @@
->   #include "migration/colo.h"
->   #include "qemu/bitmap.h"
->   #include "net/announce.h"
-> +#include "sysemu/tcg.h"
->   
->   const unsigned int postcopy_ram_discard_version = 0;
->   
-> @@ -2674,10 +2675,12 @@ int save_snapshot(const char *name, Error **errp)
->           return ret;
->       }
->   
-> -    if (!replay_can_snapshot()) {
-> -        error_setg(errp, "Record/replay does not allow making snapshot "
-> -                   "right now. Try once more later.");
-> -        return ret;
-> +    if (tcg_enabled()) {
-> +        if (!replay_can_snapshot()) {
-> +            error_setg(errp, "Record/replay does not allow making snapshot "
-> +                       "right now. Try once more later.");
-> +            return ret;
-> +        }
->       }
->   
->       if (!bdrv_all_can_snapshot(&bs)) {
-> diff --git a/net/meson.build b/net/meson.build
-> index 1c7e3a3cb9..1076b0a7ab 100644
-> --- a/net/meson.build
-> +++ b/net/meson.build
-> @@ -7,7 +7,6 @@ softmmu_ss.add(files(
->     'eth.c',
->     'filter-buffer.c',
->     'filter-mirror.c',
-> -  'filter-replay.c',
->     'filter-rewriter.c',
->     'filter.c',
->     'hub.c',
-> @@ -17,6 +16,8 @@ softmmu_ss.add(files(
->     'util.c',
->   ))
->   
-> +softmmu_ss.add(when: 'CONFIG_TCG', if_true: files('filter-replay.c'))
-> +
->   softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
->   softmmu_ss.add(when: slirp, if_true: files('slirp.c'))
->   softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
-> diff --git a/replay/meson.build b/replay/meson.build
-> index f91163fb1e..cb3207740a 100644
-> --- a/replay/meson.build
-> +++ b/replay/meson.build
-> @@ -1,4 +1,4 @@
-> -softmmu_ss.add(files(
-> +softmmu_ss.add(when: 'CONFIG_TCG', if_true: files(
->     'replay.c',
->     'replay-internal.c',
->     'replay-events.c',
-> diff --git a/replay/replay-input.c b/replay/replay-input.c
-> index 1147e3d34e..5d1fd92e79 100644
-> --- a/replay/replay-input.c
-> +++ b/replay/replay-input.c
-> @@ -124,7 +124,7 @@ void replay_input_event(QemuConsole *src, InputEvent *evt)
->       } else if (replay_mode == REPLAY_MODE_RECORD) {
->           replay_add_input_event(QAPI_CLONE(InputEvent, evt));
->       } else {
-> -        qemu_input_event_send_impl(src, evt);
-> +        g_assert_not_reached();
->       }
->   }
->   
-> @@ -135,6 +135,6 @@ void replay_input_sync_event(void)
->       } else if (replay_mode == REPLAY_MODE_RECORD) {
->           replay_add_input_sync_event();
->       } else {
-> -        qemu_input_event_sync_impl();
-> +        g_assert_not_reached();
->       }
->   }
-> diff --git a/stubs/meson.build b/stubs/meson.build
-> index 67f2a8c069..bbd2230d69 100644
-> --- a/stubs/meson.build
-> +++ b/stubs/meson.build
-> @@ -32,7 +32,6 @@ stub_ss.add(files('qtest.c'))
->   stub_ss.add(files('ram-block.c'))
->   stub_ss.add(files('ramfb.c'))
->   stub_ss.add(files('replay.c'))
-> -stub_ss.add(files('replay-user.c'))
->   stub_ss.add(files('runstate-check.c'))
->   stub_ss.add(files('set-fd-handler.c'))
->   stub_ss.add(files('sysbus.c'))
-> diff --git a/stubs/replay-user.c b/stubs/replay-user.c
-> deleted file mode 100644
-> index 2ad9e27203..0000000000
-> --- a/stubs/replay-user.c
-> +++ /dev/null
-> @@ -1,9 +0,0 @@
-> -#include "qemu/osdep.h"
-> -#include "sysemu/replay.h"
-> -#include "sysemu/sysemu.h"
-> -
-> -void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> -    QEMUBHFunc *cb, void *opaque)
-> -{
-> -    aio_bh_schedule_oneshot(ctx, cb, opaque);
-> -}
-> diff --git a/stubs/replay.c b/stubs/replay.c
-> index 45ebe77fb9..34b7975b2d 100644
-> --- a/stubs/replay.c
-> +++ b/stubs/replay.c
-> @@ -103,3 +103,101 @@ bool replay_reverse_continue(void)
->   {
->       return false;
->   }
-> +
-> +void replay_input_event(QemuConsole *src, InputEvent *evt)
-> +{
-> +}
-> +void replay_input_sync_event(void)
-> +{
-> +}
-> +void replay_bh_schedule_event(QEMUBH *bh)
-> +{
-> +    qemu_bh_schedule(bh);
-> +}
-> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
-> +     QEMUBHFunc *cb, void *opaque)
-> +{
-> +    aio_bh_schedule_oneshot(ctx, cb, opaque);
-> +}
-> +void replay_add_blocker(Error *reason)
-> +{
-> +}
-> +void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size)
-> +{
-> +}
-> +void replay_audio_out(size_t *played)
-> +{
-> +}
-> +void replay_breakpoint(void)
-> +{
-> +}
-> +bool replay_can_snapshot(void)
-> +{
-> +    return false;
-> +}
+Connect CAN0 and CAN1 on the ZynqMP.
 
-Shouldn't this one return true to enable snapshotting?
+Reviewed-by: Francisco Iglesias <francisco.iglesias@xilinx.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+---
+ include/hw/arm/xlnx-zynqmp.h |  8 ++++++++
+ hw/arm/xlnx-zcu102.c         | 20 ++++++++++++++++++++
+ hw/arm/xlnx-zynqmp.c         | 34 ++++++++++++++++++++++++++++++++++
+ 3 files changed, 62 insertions(+)
 
-
-> +void replay_configure(struct QemuOpts *opts)
-> +{
-> +}
-> +void replay_flush_events(void)
-> +{
-> +}
-> +void replay_gdb_attached(void)
-> +{
-> +}
-> +bool replay_running_debug(void)
-> +{
-> +    return false;
-> +}
-> +void replay_shutdown_request(ShutdownCause cause)
-> +{
-> +}
-> +void replay_start(void)
-> +{
-> +}
-> +void replay_vmstate_init(void)
-> +{
-> +}
-> +
-> +#include "monitor/monitor.h"
-> +#include "monitor/hmp.h"
-> +#include "qapi/qapi-commands-replay.h"
-> +#include "qapi/error.h"
-> +#include "qemu/error-report.h"
-> +
-> +void hmp_info_replay(Monitor *mon, const QDict *qdict)
-> +{
-> +    error_report("replay support not available");
-> +}
-> +void hmp_replay_break(Monitor *mon, const QDict *qdict)
-> +{
-> +    error_report("replay support not available");
-> +}
-> +void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
-> +{
-> +    error_report("replay support not available");
-> +}
-> +void hmp_replay_seek(Monitor *mon, const QDict *qdict)
-> +{
-> +    error_report("replay support not available");
-> +}
-> +ReplayInfo *qmp_query_replay(Error **errp)
-> +{
-> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-> +              "replay support not available");
-> +    return NULL;
-> +}
-> +void qmp_replay_break(int64_t icount, Error **errp)
-> +{
-> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-> +              "replay support not available");
-> +}
-> +void qmp_replay_delete_break(Error **errp)
-> +{
-> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-> +              "replay support not available");
-> +}
-> +void qmp_replay_seek(int64_t icount, Error **errp)
-> +{
-> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
-> +              "replay support not available");
-> +}
-> diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
-> index e935a1395e..7f801a4d09 100644
-> --- a/tests/ptimer-test-stubs.c
-> +++ b/tests/ptimer-test-stubs.c
-> @@ -122,8 +122,3 @@ void qemu_bh_delete(QEMUBH *bh)
->   {
->       g_free(bh);
->   }
-> -
-> -void replay_bh_schedule_event(QEMUBH *bh)
-> -{
-> -    bh->cb(bh->opaque);
-> -}
-> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
-> index 8a4c570e83..1c7186e53c 100644
-> --- a/tests/qtest/qmp-cmd-test.c
-> +++ b/tests/qtest/qmp-cmd-test.c
-> @@ -31,6 +31,9 @@ static int query_error_class(const char *cmd)
->   #ifndef CONFIG_SPICE
->           { "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND },
->   #endif
-> +#ifndef CONFIG_TCG
-> +        { "query-replay", ERROR_CLASS_COMMAND_NOT_FOUND },
-> +#endif
->   #ifndef CONFIG_VNC
->           { "query-vnc", ERROR_CLASS_GENERIC_ERROR },
->           { "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
-> diff --git a/ui/input.c b/ui/input.c
-> index 4791b089c7..8675e8ad09 100644
-> --- a/ui/input.c
-> +++ b/ui/input.c
-> @@ -375,7 +375,11 @@ void qemu_input_event_send(QemuConsole *src, InputEvent *evt)
->           return;
->       }
->   
-> -    replay_input_event(src, evt);
-> +    if (replay_events_enabled()) {
-> +        replay_input_event(src, evt);
-> +    } else {
-> +        qemu_input_event_send_impl(src, evt);
-> +    }
->   }
->   
->   void qemu_input_event_sync_impl(void)
-> @@ -401,7 +405,11 @@ void qemu_input_event_sync(void)
->           return;
->       }
->   
-> -    replay_input_sync_event();
-> +    if (replay_events_enabled()) {
-> +        replay_input_sync_event();
-> +    } else {
-> +        qemu_input_event_sync_impl();
-> +    }
->   }
->   
->   static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
-> 
+diff --git a/include/hw/arm/xlnx-zynqmp.h b/include/hw/arm/xlnx-zynqmp.h
+index 567d0db..6f45387 100644
+--- a/include/hw/arm/xlnx-zynqmp.h
++++ b/include/hw/arm/xlnx-zynqmp.h
+@@ -22,6 +22,7 @@
+ #include "hw/intc/arm_gic.h"
+ #include "hw/net/cadence_gem.h"
+ #include "hw/char/cadence_uart.h"
++#include "hw/net/xlnx-zynqmp-can.h"
+ #include "hw/ide/ahci.h"
+ #include "hw/sd/sdhci.h"
+ #include "hw/ssi/xilinx_spips.h"
+@@ -33,6 +34,7 @@
+ #include "hw/cpu/cluster.h"
+ #include "target/arm/cpu.h"
+ #include "qom/object.h"
++#include "net/can_emu.h"
+ 
+ #define TYPE_XLNX_ZYNQMP "xlnx,zynqmp"
+ OBJECT_DECLARE_SIMPLE_TYPE(XlnxZynqMPState, XLNX_ZYNQMP)
+@@ -41,6 +43,8 @@ OBJECT_DECLARE_SIMPLE_TYPE(XlnxZynqMPState, XLNX_ZYNQMP)
+ #define XLNX_ZYNQMP_NUM_RPU_CPUS 2
+ #define XLNX_ZYNQMP_NUM_GEMS 4
+ #define XLNX_ZYNQMP_NUM_UARTS 2
++#define XLNX_ZYNQMP_NUM_CAN 2
++#define XLNX_ZYNQMP_CAN_REF_CLK (24 * 1000 * 1000)
+ #define XLNX_ZYNQMP_NUM_SDHCI 2
+ #define XLNX_ZYNQMP_NUM_SPIS 2
+ #define XLNX_ZYNQMP_NUM_GDMA_CH 8
+@@ -92,6 +96,7 @@ struct XlnxZynqMPState {
+ 
+     CadenceGEMState gem[XLNX_ZYNQMP_NUM_GEMS];
+     CadenceUARTState uart[XLNX_ZYNQMP_NUM_UARTS];
++    XlnxZynqMPCANState can[XLNX_ZYNQMP_NUM_CAN];
+     SysbusAHCIState sata;
+     SDHCIState sdhci[XLNX_ZYNQMP_NUM_SDHCI];
+     XilinxSPIPS spi[XLNX_ZYNQMP_NUM_SPIS];
+@@ -112,6 +117,9 @@ struct XlnxZynqMPState {
+     bool virt;
+     /* Has the RPU subsystem?  */
+     bool has_rpu;
++
++    /* CAN bus. */
++    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
+ };
+ 
+ #endif
+diff --git a/hw/arm/xlnx-zcu102.c b/hw/arm/xlnx-zcu102.c
+index ad7fff9..4ef0c51 100644
+--- a/hw/arm/xlnx-zcu102.c
++++ b/hw/arm/xlnx-zcu102.c
+@@ -25,6 +25,7 @@
+ #include "sysemu/qtest.h"
+ #include "sysemu/device_tree.h"
+ #include "qom/object.h"
++#include "net/can_emu.h"
+ 
+ struct XlnxZCU102 {
+     MachineState parent_obj;
+@@ -34,6 +35,8 @@ struct XlnxZCU102 {
+     bool secure;
+     bool virt;
+ 
++    CanBusState *canbus[XLNX_ZYNQMP_NUM_CAN];
++
+     struct arm_boot_info binfo;
+ };
+ 
+@@ -125,6 +128,14 @@ static void xlnx_zcu102_init(MachineState *machine)
+     object_property_set_bool(OBJECT(&s->soc), "virtualization", s->virt,
+                              &error_fatal);
+ 
++    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
++        gchar *bus_name = g_strdup_printf("canbus%d", i);
++
++        object_property_set_link(OBJECT(&s->soc), bus_name,
++                                 OBJECT(s->canbus[i]), &error_fatal);
++        g_free(bus_name);
++    }
++
+     qdev_realize(DEVICE(&s->soc), NULL, &error_fatal);
+ 
+     /* Create and plug in the SD cards */
+@@ -208,6 +219,15 @@ static void xlnx_zcu102_machine_instance_init(Object *obj)
+     s->secure = false;
+     /* Default to virt (EL2) being disabled */
+     s->virt = false;
++    object_property_add_link(obj, "xlnx-zcu102.canbus0", TYPE_CAN_BUS,
++                             (Object **)&s->canbus[0],
++                             object_property_allow_set_link,
++                             0);
++
++    object_property_add_link(obj, "xlnx-zcu102.canbus1", TYPE_CAN_BUS,
++                             (Object **)&s->canbus[1],
++                             object_property_allow_set_link,
++                             0);
+ }
+ 
+ static void xlnx_zcu102_machine_class_init(ObjectClass *oc, void *data)
+diff --git a/hw/arm/xlnx-zynqmp.c b/hw/arm/xlnx-zynqmp.c
+index 7885bb1..8818472 100644
+--- a/hw/arm/xlnx-zynqmp.c
++++ b/hw/arm/xlnx-zynqmp.c
+@@ -81,6 +81,14 @@ static const int uart_intr[XLNX_ZYNQMP_NUM_UARTS] = {
+     21, 22,
+ };
+ 
++static const uint64_t can_addr[XLNX_ZYNQMP_NUM_CAN] = {
++    0xFF060000, 0xFF070000,
++};
++
++static const int can_intr[XLNX_ZYNQMP_NUM_CAN] = {
++    23, 24,
++};
++
+ static const uint64_t sdhci_addr[XLNX_ZYNQMP_NUM_SDHCI] = {
+     0xFF160000, 0xFF170000,
+ };
+@@ -243,6 +251,11 @@ static void xlnx_zynqmp_init(Object *obj)
+                                 TYPE_CADENCE_UART);
+     }
+ 
++    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
++        object_initialize_child(obj, "can[*]", &s->can[i],
++                                TYPE_XLNX_ZYNQMP_CAN);
++    }
++
+     object_initialize_child(obj, "sata", &s->sata, TYPE_SYSBUS_AHCI);
+ 
+     for (i = 0; i < XLNX_ZYNQMP_NUM_SDHCI; i++) {
+@@ -482,6 +495,23 @@ static void xlnx_zynqmp_realize(DeviceState *dev, Error **errp)
+                            gic_spi[uart_intr[i]]);
+     }
+ 
++    for (i = 0; i < XLNX_ZYNQMP_NUM_CAN; i++) {
++        object_property_set_int(OBJECT(&s->can[i]), "ext_clk_freq",
++                                XLNX_ZYNQMP_CAN_REF_CLK, &error_abort);
++
++        object_property_set_link(OBJECT(&s->can[i]), "canbus",
++                                 OBJECT(s->canbus[i]), &error_fatal);
++
++        sysbus_realize(SYS_BUS_DEVICE(&s->can[i]), &err);
++        if (err) {
++            error_propagate(errp, err);
++            return;
++        }
++        sysbus_mmio_map(SYS_BUS_DEVICE(&s->can[i]), 0, can_addr[i]);
++        sysbus_connect_irq(SYS_BUS_DEVICE(&s->can[i]), 0,
++                           gic_spi[can_intr[i]]);
++    }
++
+     object_property_set_int(OBJECT(&s->sata), "num-ports", SATA_NUM_PORTS,
+                             &error_abort);
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->sata), errp)) {
+@@ -619,6 +649,10 @@ static Property xlnx_zynqmp_props[] = {
+     DEFINE_PROP_BOOL("has_rpu", XlnxZynqMPState, has_rpu, false),
+     DEFINE_PROP_LINK("ddr-ram", XlnxZynqMPState, ddr_ram, TYPE_MEMORY_REGION,
+                      MemoryRegion *),
++    DEFINE_PROP_LINK("canbus0", XlnxZynqMPState, canbus[0], TYPE_CAN_BUS,
++                     CanBusState *),
++    DEFINE_PROP_LINK("canbus1", XlnxZynqMPState, canbus[1], TYPE_CAN_BUS,
++                     CanBusState *),
+     DEFINE_PROP_END_OF_LIST()
+ };
+ 
+-- 
+2.7.4
 
 
