@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F33FDC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:56:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5235DC43457
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:56:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 287BB22201
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:55:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A14552076D
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:56:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dv2sd3U+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 287BB22201
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YJ+sck6t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A14552076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kShG2-0007EA-NT
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:55:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55440)
+	id 1kShG4-0007Hl-EX
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:56:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kShEZ-0005ul-PV
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33662)
+ id 1kShEa-0005uy-Oy
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26006)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kShEW-0000bK-3c
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:27 -0400
+ id 1kShEW-0000bf-S6
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602683663;
+ s=mimecast20190719; t=1602683664;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UdMmzChhNjb/eG1hO3fWbW/KdazHZV6LFTFShoUppcs=;
- b=Dv2sd3U+dSvmG5e3VH8ruY+LaXt+rNqSPsSZz0CXuD84y9tBIWLPkL2Eqi7sjUYuhDIXj5
- s/dBFPROSmI53aij5l6JG6VLbsTgj9bng+m/AOFYyAT0B3JZXTekThCG7gZWFWAuqsFvfx
- S98uyHi4Il32f1/7msTmOGxr05G7PFo=
+ bh=nyXlG61ofguEsUwQVhnQMBDJF6A4CqiTQdIuGm+a+mw=;
+ b=YJ+sck6t4f61zYyTs6O8AKmq6kr4GSMLfGk3mLT4psOevPeZq/ErP8lsAU4LPfnCYdX4Y9
+ pC4FMDhsl9QhXxF7Pplh/FCW9frV6AKVtxObIezoYIdPJoRJv4ZmWQucvGvUf9wG1FRUF4
+ rHpwRfNh6RqCdOpsl5hoxq8IxpP2mjM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-319-akxwndfsN_ippupW3jnwkA-1; Wed, 14 Oct 2020 09:54:20 -0400
-X-MC-Unique: akxwndfsN_ippupW3jnwkA-1
+ us-mta-361-hDYz5-tCM66T-DztsUadzQ-1; Wed, 14 Oct 2020 09:54:21 -0400
+X-MC-Unique: hDYz5-tCM66T-DztsUadzQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF0911019625;
- Wed, 14 Oct 2020 13:54:19 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 526E41084D6A;
+ Wed, 14 Oct 2020 13:54:20 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1245B60C0F;
- Wed, 14 Oct 2020 13:54:18 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D158760C15;
+ Wed, 14 Oct 2020 13:54:19 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/7] make: run shell with pipefail
-Date: Wed, 14 Oct 2020 09:54:11 -0400
-Message-Id: <20201014135416.1290679-3-pbonzini@redhat.com>
+Subject: [PATCH 3/7] tests: add missing generated sources to testqapi
+Date: Wed, 14 Oct 2020 09:54:12 -0400
+Message-Id: <20201014135416.1290679-4-pbonzini@redhat.com>
 In-Reply-To: <20201014135416.1290679-1-pbonzini@redhat.com>
 References: <20201014135416.1290679-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -101,27 +101,55 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Without pipefail, it is possible to miss failures if the recipes
-include pipes.
+Ninja notices them due to a different order in visiting the graph.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/include/meson.build |  8 ++++----
+ tests/meson.build         | 14 ++++++++++++--
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index c37e513431..5e51e61c3b 100644
---- a/Makefile
-+++ b/Makefile
-@@ -14,6 +14,8 @@ SRC_PATH=.
- # we have explicit rules for everything
- MAKEFLAGS += -rR
+diff --git a/tests/include/meson.build b/tests/include/meson.build
+index fea3a6342f..9abba308fa 100644
+--- a/tests/include/meson.build
++++ b/tests/include/meson.build
+@@ -10,7 +10,7 @@ test_qapi_outputs_extra = [
+   'test-qapi-visit-sub-module.h',
+ ]
  
-+SHELL = /usr/bin/env bash -o pipefail
+-test_qapi_outputs_extra = custom_target('QAPI test (include)',
+-                                        output: test_qapi_outputs_extra,
+-                                        input: test_qapi_files,
+-                                        command: 'true')
++test_qapi_files_extra = custom_target('QAPI test (include)',
++                                      output: test_qapi_outputs_extra,
++                                      input: test_qapi_files,
++                                      command: 'true')
+diff --git a/tests/meson.build b/tests/meson.build
+index bf47a38c74..afeb6be689 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -56,8 +56,18 @@ test_qapi_files = custom_target('Test QAPI files',
+ # perhaps change qapi_gen to replace / with _, like Meson itself does?
+ subdir('include')
+ 
+-libtestqapi = static_library('testqapi', sources: [test_qapi_files, genh, test_qapi_outputs_extra])
+-testqapi = declare_dependency(link_with: libtestqapi)
++test_qapi_sources = []
++test_qapi_headers = []
++i = 0
++foreach o: test_qapi_files.to_list() + test_qapi_files_extra.to_list()
++  if o.full_path().endswith('.h')
++    test_qapi_headers += o
++  endif
++  test_qapi_sources += o
++endforeach
 +
- # Usage: $(call quiet-command,command and args,"NAME","args to print")
- # This will run "command and args", and either:
- #  if V=1 just print the whole command and args
++libtestqapi = static_library('testqapi', sources: [genh, test_qapi_sources])
++testqapi = declare_dependency(link_with: libtestqapi, sources: [genh, test_qapi_headers])
+ 
+ testblock = declare_dependency(dependencies: [block], sources: 'iothread.c')
+ 
 -- 
 2.26.2
 
