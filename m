@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02C07C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:58:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EB64C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:00:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CDC72222A
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:58:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 947432222A
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:00:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVctlaHt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDC72222A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ayJggQwD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 947432222A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kShIJ-0001ZZ-5n
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:58:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55492)
+	id 1kShKn-0003zC-CJ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:00:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55452)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kShEk-00062H-W4
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37714)
+ id 1kShEb-0005vZ-DU
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28131)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kShEi-0000cZ-Fn
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:38 -0400
+ id 1kShEZ-0000c7-GI
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:54:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602683671;
+ s=mimecast20190719; t=1602683666;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lCJpjDYY7IazZEzN20mTsezfBZWKPXF3Xne9zF2CIOo=;
- b=hVctlaHtGNNdgj6rABlf0LWfIxBb1TnXLB4X7J0z2ZK90yKp0dSRXMAjXMBZq/p2/rNIsI
- JtexIaZuSO1RiqEQvpITAQ9SUR6OJYu73giWZ6NsPZTzQrWsHR5BkisQMR9ilsPmsTTHSj
- Ilk2WtS0573rEisE5UpIo682dMbSpsI=
+ bh=n+PGM3zGIKZB3I79C4CK+uDL7NNIxjqsQYt+VZFCahc=;
+ b=ayJggQwDR3d1bCP0CjdebZjtBjdTV3mdrdQ4bxD6KlndA2vu0MnJc6j4t2+D5JW7f+QM9e
+ ESeXBuCoy8x/QYXsGI8TnbkYEa59KVEdScIxHDFf+Yhbi4GD9hXovnKEDE2wmE0KitbEjF
+ RADJk8ng6F9yXM5EKwI4e0b7V8OhwFU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-JvXgWKfSNHG_ANSivbaVUg-1; Wed, 14 Oct 2020 09:54:29 -0400
-X-MC-Unique: JvXgWKfSNHG_ANSivbaVUg-1
+ us-mta-388-wpxYsdknMdisubNtiRCn2A-1; Wed, 14 Oct 2020 09:54:24 -0400
+X-MC-Unique: wpxYsdknMdisubNtiRCn2A-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D45108CCB77;
- Wed, 14 Oct 2020 13:54:28 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 62D281084D63;
+ Wed, 14 Oct 2020 13:54:23 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D1636115F;
- Wed, 14 Oct 2020 13:54:26 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 74B8E60C15;
+ Wed, 14 Oct 2020 13:54:20 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 6/7] add ninja to dockerfiles, CI configurations and test VMs
-Date: Wed, 14 Oct 2020 09:54:15 -0400
-Message-Id: <20201014135416.1290679-7-pbonzini@redhat.com>
+Subject: [PATCH 4/7] configure: move QEMU_INCLUDES to meson
+Date: Wed, 14 Oct 2020 09:54:13 -0400
+Message-Id: <20201014135416.1290679-5-pbonzini@redhat.com>
 In-Reply-To: <20201014135416.1290679-1-pbonzini@redhat.com>
 References: <20201014135416.1290679-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -101,344 +101,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Confusingly, QEMU_INCLUDES is not used by configure tests.  Moving
+it to meson.build ensures that Windows paths are specified instead of
+the msys paths like /c/Users/...
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- .cirrus.yml                                |  6 +++---
- .travis.yml                                | 13 +++++++++++++
- tests/docker/dockerfiles/centos7.docker    |  1 +
- tests/docker/dockerfiles/centos8.docker    |  1 +
- tests/docker/dockerfiles/debian10.docker   |  1 +
- tests/docker/dockerfiles/fedora.docker     |  1 +
- tests/docker/dockerfiles/travis.docker     |  2 +-
- tests/docker/dockerfiles/ubuntu.docker     |  1 +
- tests/docker/dockerfiles/ubuntu1804.docker |  1 +
- tests/docker/dockerfiles/ubuntu2004.docker |  1 +
- tests/vm/centos                            |  2 +-
- tests/vm/centos.aarch64                    |  2 +-
- tests/vm/fedora                            |  2 +-
- tests/vm/freebsd                           |  1 +
- tests/vm/netbsd                            |  1 +
- tests/vm/openbsd                           |  1 +
- tests/vm/ubuntu.aarch64                    |  2 +-
- tests/vm/ubuntu.i386                       |  2 +-
- 18 files changed, 32 insertions(+), 9 deletions(-)
+ configure   | 20 --------------------
+ meson.build | 30 ++++++++++++++++++++++++++++--
+ 2 files changed, 28 insertions(+), 22 deletions(-)
 
-diff --git a/.cirrus.yml b/.cirrus.yml
-index 99d118239c..87f7b047d7 100644
---- a/.cirrus.yml
-+++ b/.cirrus.yml
-@@ -9,7 +9,7 @@ freebsd_12_task:
-   install_script:
-     - ASSUME_ALWAYS_YES=yes pkg bootstrap -f ;
-     - pkg install -y bash curl cyrus-sasl git glib gmake gnutls gsed
--          nettle perl5 pixman pkgconf png usbredir
-+          nettle perl5 pixman pkgconf png usbredir ninja
-   script:
-     - mkdir build
-     - cd build
-@@ -21,7 +21,7 @@ macos_task:
-   osx_instance:
-     image: catalina-base
-   install_script:
--    - brew install pkg-config python gnu-sed glib pixman make sdl2 bash
-+    - brew install pkg-config python gnu-sed glib pixman make sdl2 bash ninja
-   script:
-     - mkdir build
-     - cd build
-@@ -36,7 +36,7 @@ macos_xcode_task:
-     # this is an alias for the latest Xcode
-     image: catalina-xcode
-   install_script:
--    - brew install pkg-config gnu-sed glib pixman make sdl2 bash
-+    - brew install pkg-config gnu-sed glib pixman make sdl2 bash ninja
-   script:
-     - mkdir build
-     - cd build
-diff --git a/.travis.yml b/.travis.yml
-index 1054ec5d29..d7bfbb8bfe 100644
---- a/.travis.yml
-+++ b/.travis.yml
-@@ -49,6 +49,7 @@ addons:
-       - libvdeplug-dev
-       - libvte-2.91-dev
-       - libzstd-dev
-+      - ninja-build
-       - sparse
-       - uuid-dev
-       - gcovr
-@@ -177,6 +178,7 @@ jobs:
-       addons:
-         apt:
-           packages:
-+            - ninja-build
-             - python3-sphinx
-             - perl
+diff --git a/configure b/configure
+index b553288c5e..804b7115ab 100755
+--- a/configure
++++ b/configure
+@@ -536,8 +536,6 @@ QEMU_CFLAGS="-fno-strict-aliasing -fno-common -fwrapv $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wundef -Wwrite-strings -Wmissing-prototypes $QEMU_CFLAGS"
+ QEMU_CFLAGS="-Wstrict-prototypes -Wredundant-decls $QEMU_CFLAGS"
+ QEMU_CFLAGS="-D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE $QEMU_CFLAGS"
+-QEMU_INCLUDES="-iquote . -iquote ${source_path} -iquote ${source_path}/accel/tcg -iquote ${source_path}/include"
+-QEMU_INCLUDES="$QEMU_INCLUDES -iquote ${source_path}/disas/libvixl"
  
-@@ -211,6 +213,10 @@ jobs:
-     # gprof/gcov are GCC features
-     - name: "GCC gprof/gcov"
-       dist: bionic
-+      addons:
-+        apt:
-+          packages:
-+            - ninja-build
-       env:
-         - CONFIG="--enable-gprof --enable-gcov --disable-libssh
-                   --target-list=${MAIN_SOFTMMU_TARGETS}"
-@@ -281,6 +287,7 @@ jobs:
-             - liburcu-dev
-             - libusb-1.0-0-dev
-             - libvte-2.91-dev
-+            - ninja-build
-             - sparse
-             - uuid-dev
-       language: generic
-@@ -346,6 +353,7 @@ jobs:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+          - ninja-build
-           # Tests dependencies
-           - genisoimage
-       env:
-@@ -379,6 +387,7 @@ jobs:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+          - ninja-build
-           # Tests dependencies
-           - genisoimage
-       env:
-@@ -411,6 +420,7 @@ jobs:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+          - ninja-build
-           # Tests dependencies
-           - genisoimage
-       env:
-@@ -450,6 +460,7 @@ jobs:
-           - libzstd-dev
-           - nettle-dev
-           - xfslibs-dev
-+          - ninja-build
-           # Tests dependencies
-           - genisoimage
-       env:
-@@ -463,6 +474,7 @@ jobs:
-         apt_packages:
-           - libgcrypt20-dev
-           - libgnutls28-dev
-+          - ninja-build
-       env:
-         - CONFIG="--disable-containers --disable-system"
+ # Flags that are needed during configure but later taken care of by Meson
+ CONFIGURE_CFLAGS="-std=gnu99 -Wall"
+@@ -795,7 +793,6 @@ Linux)
+   audio_possible_drivers="oss alsa sdl pa"
+   linux="yes"
+   linux_user="yes"
+-  QEMU_INCLUDES="-isystem ${source_path}/linux-headers -Ilinux-headers $QEMU_INCLUDES"
+ ;;
+ esac
  
-@@ -493,6 +505,7 @@ jobs:
-           - libusb-1.0-0-dev
-           - libvdeplug-dev
-           - libvte-2.91-dev
-+          - ninja-build
-       env:
-         - TEST_CMD="make check-unit"
-         - CONFIG="--disable-containers --disable-tcg --enable-kvm
-diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/dockerfiles/centos7.docker
-index 46277773bf..8b273725ee 100644
---- a/tests/docker/dockerfiles/centos7.docker
-+++ b/tests/docker/dockerfiles/centos7.docker
-@@ -27,6 +27,7 @@ ENV PACKAGES \
-     mesa-libEGL-devel \
-     mesa-libgbm-devel \
-     nettle-devel \
-+    ninja-build \
-     perl-Test-Harness \
-     pixman-devel \
-     python3 \
-diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
-index e31d366fc1..b0eef13987 100644
---- a/tests/docker/dockerfiles/centos8.docker
-+++ b/tests/docker/dockerfiles/centos8.docker
-@@ -22,6 +22,7 @@ ENV PACKAGES \
-     make \
-     mesa-libEGL-devel \
-     nettle-devel \
-+    ninja-build \
-     perl-Test-Harness \
-     pixman-devel \
-     python36 \
-diff --git a/tests/docker/dockerfiles/debian10.docker b/tests/docker/dockerfiles/debian10.docker
-index 1e4188ba22..21cc671d71 100644
---- a/tests/docker/dockerfiles/debian10.docker
-+++ b/tests/docker/dockerfiles/debian10.docker
-@@ -26,6 +26,7 @@ RUN apt update && \
-         gettext \
-         git \
-         libncurses5-dev \
-+        ninja-build \
-         pkg-config \
-         psmisc \
-         python3 \
-diff --git a/tests/docker/dockerfiles/fedora.docker b/tests/docker/dockerfiles/fedora.docker
-index 85c975543d..ac79d95418 100644
---- a/tests/docker/dockerfiles/fedora.docker
-+++ b/tests/docker/dockerfiles/fedora.docker
-@@ -75,6 +75,7 @@ ENV PACKAGES \
-     mingw64-SDL2 \
-     ncurses-devel \
-     nettle-devel \
-+    ninja-build \
-     nss-devel \
-     numactl-devel \
-     perl \
-diff --git a/tests/docker/dockerfiles/travis.docker b/tests/docker/dockerfiles/travis.docker
-index 591282561b..cd1435a7e9 100644
---- a/tests/docker/dockerfiles/travis.docker
-+++ b/tests/docker/dockerfiles/travis.docker
-@@ -9,7 +9,7 @@ ENV LC_ALL en_US.UTF-8
- RUN sed -i "s/# deb-src/deb-src/" /etc/apt/sources.list
- RUN apt-get update
- RUN apt-get -y build-dep qemu
--RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-autoreconf gdb strace lsof net-tools gcovr
-+RUN apt-get -y install device-tree-compiler python3 python3-yaml dh-autoreconf gdb strace lsof net-tools gcovr ninja-build
- # Travis tools require PhantomJS / Neo4j / Maven accessible
- # in their PATH (QEMU build won't access them).
- ENV PATH /usr/local/phantomjs/bin:/usr/local/phantomjs:/usr/local/neo4j-3.2.7/bin:/usr/local/maven-3.5.2/bin:/usr/local/cmake-3.9.2/bin:/usr/local/clang-5.0.0/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-diff --git a/tests/docker/dockerfiles/ubuntu.docker b/tests/docker/dockerfiles/ubuntu.docker
-index b556ed17d2..b5ef7a8198 100644
---- a/tests/docker/dockerfiles/ubuntu.docker
-+++ b/tests/docker/dockerfiles/ubuntu.docker
-@@ -60,6 +60,7 @@ ENV PACKAGES \
-     libxen-dev \
-     libzstd-dev \
-     make \
-+    ninja-build \
-     python3-yaml \
-     python3-sphinx \
-     sparse \
-diff --git a/tests/docker/dockerfiles/ubuntu1804.docker b/tests/docker/dockerfiles/ubuntu1804.docker
-index a6a7617da6..9b0a19ba5e 100644
---- a/tests/docker/dockerfiles/ubuntu1804.docker
-+++ b/tests/docker/dockerfiles/ubuntu1804.docker
-@@ -48,6 +48,7 @@ ENV PACKAGES \
-     make \
-     python3-yaml \
-     python3-sphinx \
-+    ninja-build \
-     sparse \
-     xfslibs-dev
- RUN apt-get update && \
-diff --git a/tests/docker/dockerfiles/ubuntu2004.docker b/tests/docker/dockerfiles/ubuntu2004.docker
-index f4b9556b9e..17b37cda38 100644
---- a/tests/docker/dockerfiles/ubuntu2004.docker
-+++ b/tests/docker/dockerfiles/ubuntu2004.docker
-@@ -47,6 +47,7 @@ ENV PACKAGES flex bison \
-     libxen-dev \
-     libzstd-dev \
-     make \
-+    ninja-build \
-     python3-numpy \
-     python3-opencv \
-     python3-pil \
-diff --git a/tests/vm/centos b/tests/vm/centos
-index 0ad4ecf419..efe3dbbb36 100755
---- a/tests/vm/centos
-+++ b/tests/vm/centos
-@@ -42,7 +42,7 @@ class CentosVM(basevm.BaseVM):
-         self.wait_ssh()
-         self.ssh_root_check("touch /etc/cloud/cloud-init.disabled")
-         self.ssh_root_check("yum update -y")
--        self.ssh_root_check("yum install -y docker make git python3")
-+        self.ssh_root_check("yum install -y docker make ninja-build git python3")
-         self.ssh_root_check("systemctl enable docker")
-         self.ssh_root("poweroff")
-         self.wait()
-diff --git a/tests/vm/centos.aarch64 b/tests/vm/centos.aarch64
-index d5232ecdb8..e687b93e52 100755
---- a/tests/vm/centos.aarch64
-+++ b/tests/vm/centos.aarch64
-@@ -23,7 +23,7 @@ import aarch64vm
- DEFAULT_CONFIG = {
-     'cpu'          : "max",
-     'machine'      : "virt,gic-version=max",
--    'install_cmds' : "yum install -y make git python3 gcc gcc-c++ flex bison, "\
-+    'install_cmds' : "yum install -y make ninja-build git python3 gcc gcc-c++ flex bison, "\
-         "yum install -y glib2-devel pixman-devel zlib-devel, "\
-         "yum install -y perl-Test-Harness, "\
-         "alternatives --set python /usr/bin/python3, "\
-diff --git a/tests/vm/fedora b/tests/vm/fedora
-index b2b478fdbc..b977efe4a2 100755
---- a/tests/vm/fedora
-+++ b/tests/vm/fedora
-@@ -32,7 +32,7 @@ class FedoraVM(basevm.BaseVM):
-     pkgs = [
-         # tools
-         'git-core',
--        'gcc', 'binutils', 'make',
-+        'gcc', 'binutils', 'make', 'ninja-build',
+@@ -6918,22 +6915,6 @@ if test "$secret_keyring" = "yes" ; then
+   echo "CONFIG_SECRET_KEYRING=y" >> $config_host_mak
+ fi
  
-         # perl
-         'perl-Test-Harness',
-diff --git a/tests/vm/freebsd b/tests/vm/freebsd
-index 5f866e09c4..04ee793381 100755
---- a/tests/vm/freebsd
-+++ b/tests/vm/freebsd
-@@ -34,6 +34,7 @@ class FreeBSDVM(basevm.BaseVM):
-         "bzip2",
-         "python37",
-         "py37-setuptools",
-+        "ninja",
+-if test "$tcg_interpreter" = "yes"; then
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/tci $QEMU_INCLUDES"
+-elif test "$ARCH" = "sparc64" ; then
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/sparc $QEMU_INCLUDES"
+-elif test "$ARCH" = "s390x" ; then
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/s390 $QEMU_INCLUDES"
+-elif test "$ARCH" = "x86_64" || test "$ARCH" = "x32" ; then
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/i386 $QEMU_INCLUDES"
+-elif test "$ARCH" = "ppc64" ; then
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/ppc $QEMU_INCLUDES"
+-elif test "$ARCH" = "riscv32" || test "$ARCH" = "riscv64" ; then
+-  QEMU_INCLUDES="-I${source_path}/tcg/riscv $QEMU_INCLUDES"
+-else
+-  QEMU_INCLUDES="-iquote ${source_path}/tcg/${ARCH} $QEMU_INCLUDES"
+-fi
+-
+ echo "ROMS=$roms" >> $config_host_mak
+ echo "MAKE=$make" >> $config_host_mak
+ echo "PYTHON=$python" >> $config_host_mak
+@@ -6960,7 +6941,6 @@ echo "WINDRES=$windres" >> $config_host_mak
+ echo "CFLAGS_NOPIE=$CFLAGS_NOPIE" >> $config_host_mak
+ echo "QEMU_CFLAGS=$QEMU_CFLAGS" >> $config_host_mak
+ echo "QEMU_CXXFLAGS=$QEMU_CXXFLAGS" >> $config_host_mak
+-echo "QEMU_INCLUDES=$QEMU_INCLUDES" >> $config_host_mak
+ echo "GLIB_CFLAGS=$glib_cflags" >> $config_host_mak
+ echo "GLIB_LIBS=$glib_libs" >> $config_host_mak
+ echo "QEMU_LDFLAGS=$QEMU_LDFLAGS" >> $config_host_mak
+diff --git a/meson.build b/meson.build
+index 652c37cceb..a1146522e2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -93,9 +93,35 @@ add_project_arguments(config_host['QEMU_CXXFLAGS'].split(),
+                       native: false, language: 'cpp')
+ add_project_link_arguments(config_host['QEMU_LDFLAGS'].split(),
+                            native: false, language: ['c', 'cpp', 'objc'])
+-add_project_arguments(config_host['QEMU_INCLUDES'].split(),
+-                      language: ['c', 'cpp', 'objc'])
  
-         # gnu tools
-         "bash",
-diff --git a/tests/vm/netbsd b/tests/vm/netbsd
-index ffb65a89be..a9da255c5a 100755
---- a/tests/vm/netbsd
-+++ b/tests/vm/netbsd
-@@ -32,6 +32,7 @@ class NetBSDVM(basevm.BaseVM):
-         "xz",
-         "python37",
-         "py37-setuptools",
-+        "ninja",
++if targetos == 'linux'
++  add_project_arguments('-isystem', meson.current_source_dir() / 'linux-headers',
++                        '-isystem', 'linux-headers',
++                        language: ['c', 'cpp'])
++endif
++
++if 'CONFIG_TCG_INTERPRETER' in config_host
++  tcg_arch = 'tci'
++elif config_host['ARCH'] == 'sparc64'
++  tcg_arch = 'sparc'
++elif config_host['ARCH'] == 's390x'
++  tcg_arch = 's390'
++elif config_host['ARCH'] in ['x86_64', 'x32']
++  tcg_arch = 'i386'
++elif config_host['ARCH'] == 'ppc64'
++  tcg_arch = 'ppc'
++elif config_host['ARCH'] in ['riscv32', 'riscv64']
++  tcg_arch = 'riscv'
++else
++  tcg_arch = config_host['ARCH']
++endif
++add_project_arguments('-iquote', meson.current_source_dir() / 'tcg' / tcg_arch,
++                      '-iquote', '.',
++                      '-iquote', meson.current_source_dir(),
++                      '-iquote', meson.current_source_dir() / 'accel/tcg',
++                      '-iquote', meson.current_source_dir() / 'include',
++                      '-iquote', meson.current_source_dir() / 'disas/libvixl',
++                      language: ['c', 'cpp', 'objc'])
  
-         # gnu tools
-         "bash",
-diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-index 8356646f21..ad882a76a2 100755
---- a/tests/vm/openbsd
-+++ b/tests/vm/openbsd
-@@ -31,6 +31,7 @@ class OpenBSDVM(basevm.BaseVM):
-         "pkgconf",
-         "bzip2", "xz",
-         "py3-setuptools",
-+        "ninja",
- 
-         # gnu tools
-         "bash",
-diff --git a/tests/vm/ubuntu.aarch64 b/tests/vm/ubuntu.aarch64
-index 21d454c27f..b291945a7e 100755
---- a/tests/vm/ubuntu.aarch64
-+++ b/tests/vm/ubuntu.aarch64
-@@ -22,7 +22,7 @@ DEFAULT_CONFIG = {
-     'machine'      : "virt,gic-version=3",
-     'install_cmds' : "apt-get update,"\
-                      "apt-get build-dep -y --arch-only qemu,"\
--                     "apt-get install -y libfdt-dev pkg-config language-pack-en",
-+                     "apt-get install -y libfdt-dev pkg-config language-pack-en ninja-build",
-     # We increase beyond the default time since during boot
-     # it can take some time (many seconds) to log into the VM
-     # especially using softmmu.
-diff --git a/tests/vm/ubuntu.i386 b/tests/vm/ubuntu.i386
-index 5ce72610a6..47681b6f87 100755
---- a/tests/vm/ubuntu.i386
-+++ b/tests/vm/ubuntu.i386
-@@ -18,7 +18,7 @@ import ubuntuvm
- DEFAULT_CONFIG = {
-     'install_cmds' : "apt-get update,"\
-                      "apt-get build-dep -y qemu,"\
--                     "apt-get install -y libfdt-dev language-pack-en",
-+                     "apt-get install -y libfdt-dev language-pack-en ninja-build",
- }
- 
- class UbuntuX86VM(ubuntuvm.UbuntuVM):
+ link_language = meson.get_external_property('link_language', 'cpp')
+ if link_language == 'cpp'
 -- 
 2.26.2
 
