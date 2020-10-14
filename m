@@ -2,85 +2,130 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 467EBC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36270C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:15:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95CD12222C
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:12:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2E19D22248
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:15:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kI0AOCUq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95CD12222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fw0L7BuN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E19D22248
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSn8R-0003Hv-Iq
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:12:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50818)
+	id 1kSnAw-0004ty-4a
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:15:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kSn6n-0002IM-P2; Wed, 14 Oct 2020 16:10:49 -0400
-Received: from mail-lj1-x241.google.com ([2a00:1450:4864:20::241]:43877)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kSn6l-0007dl-Nl; Wed, 14 Oct 2020 16:10:49 -0400
-Received: by mail-lj1-x241.google.com with SMTP id d24so731563ljg.10;
- Wed, 14 Oct 2020 13:10:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=72SZ9cxwkRtG3NXL2bJ4mQ0D58nPjicBnNam220smc8=;
- b=kI0AOCUq7aEEbff5uNkOYDBvDDgmOGUnN6cBF8z/eo8ruHkgEzXhhYu4yEH5SutVMV
- aNvmMfHaF5B3zTbcntGgmcGLYHXJl/oj6kdpJ/Ebc+n3iLn9F+jRIB9iqYSMkbO5z2a6
- XetOlhAEZ/e8+Dby2qngsGSDnyXOcTwunLqpdCvZ1wTova4qQK51RHdMY/nyEIHZY3ng
- GKErvwLURxmEYULEFqY43z9Q0881Vpjlur9vUQlL8C3cmwsGeUnG27Lr1EfSg5BhVfRy
- izWidtsVZJh9ecgJ0O30nbo5XvF5Y8uwFfuUyHj87MAxYgJex5ciFIJoVy0TTD/3jsFg
- PYnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=72SZ9cxwkRtG3NXL2bJ4mQ0D58nPjicBnNam220smc8=;
- b=ioGa5vp/gEa8C1L0EHdsW/7h3QhtMGYanagKioF8NbxesWW+yjikB1F7qQNVHpD9Ny
- UoaDZFA2DIOduVOLPSRRqQZjlDcFPR+JywnMOx1PjtCcuQrC6aiaHZUm9tP7l/+LtbPw
- UWz0Tn1ez+uS5mRVWPs2FrAJYwCE3BTbC9SzJkhYSKFeAEpwHDyiSA/J3d9FiQgyb24X
- b9gpiYZgWrXhQS6yzw2ym3xlgJ08P8fpgrs5V7ozAWw7AGvkyvRAAugM7wgd1CNBLVVz
- gAXWsrFfrF9vfxG4e8cv66z8hQgtBJGmjCgj1T8c1AEYpf5n/nMM5GbyXILOOkaZL/wa
- 0zsA==
-X-Gm-Message-State: AOAM530qTDxLZWYKERjgpXbC+HfzPvMP/u464e8x72i0UxE38T5tJbar
- bbZqOzWLHWyP8zkPZgUbvK/aympjXXynIXH0syM=
-X-Google-Smtp-Source: ABdhPJy0sSudl1dMowxSfzUlgWYCGXYQnS4atzCvMbWQVbJjZ6RSPtp5KkfHPqdWuKDD8dFiKLSutZiLdsBkTwzh8bU=
-X-Received: by 2002:a2e:6a19:: with SMTP id f25mr139187ljc.386.1602706244232; 
- Wed, 14 Oct 2020 13:10:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kSn8r-0003nN-BU; Wed, 14 Oct 2020 16:12:57 -0400
+Received: from mail-eopbgr30121.outbound.protection.outlook.com
+ ([40.107.3.121]:25153 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kSn8n-00080Q-Iv; Wed, 14 Oct 2020 16:12:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cDXfSzmIAAVBkXuAbTnI2qBT9KtJl+hmARBHIg2WpX7r52WPu/4iCk24RXJ0HOSNAvv23LiF9OXEBatMQteigYD/3WExqDDPKxDgfijphNTKGAfuQT7tsDb8m7DM8mI1Ba7Hj5+4RuGnJo4kl4zq50wEk/6DRNbQBxqHIiwf/W5X0beRWfm/chjBbaE+hb4Hl0JNlbUsiMjVueD9KE69H/TShhdggDLTP/AaDbk1N+gH3EYNa4iGU/oUGVmqxLdpRYp073mlv1hBpTUZCt8tAwZm6MNM6MW6iPHe0WRxJrorB4N/+Kc15QoY7t77ByEFNV7DNbfak0SEvQUwIu6rtA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j+OrvYCbwUM7aDZUWCFZFpuaWWR1AjiE/vFzDMQAYC8=;
+ b=DMU1yiNMPDnj1TRJJGLmx4Wy2ltgOiPNBfahdaI4SG6qwJqIZgrPSwgOQVgTWNoln1zBH6PWMWmnwoWGOK5khvQ0eSOcpGkNkePAyzOkWk1Lj+w+lt9orlbFSgcDnFbxuELK1GFmYxHrq1cktB4IEPjaAiUB7AJX2CjMa3su4twpk42XI35v/N9D1ZUofSavPuHgG/TBnIcjhFU+NwUShfP+Pecb+euYhupJ8d0NrohWcSh/w7EUSv9rZW7L+3HUroiGeLLYwgQ2hibBQokcsDRBxWAScNhDnERAvCHUC7d1ZGAuMO3K5izQva0pUwXd0qmWLxdMm+7R1O6cnis7BA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j+OrvYCbwUM7aDZUWCFZFpuaWWR1AjiE/vFzDMQAYC8=;
+ b=fw0L7BuNKOAZ+Q8ecVAXl7Wyd/rWerCrFyvEqivzDkChS6mck0TxG7UoyMHY9fqruCaQVodpPDUJ6tde2kSMnBPNqWTYSkm70tLAZlU283MjnljwxioXkoGbqzHY2b2qbKFC9elUthv2frFLLGZLhvAcwLFwKVIApTarWGvvqT4=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
+ by HE1PR0802MB2522.eurprd08.prod.outlook.com (2603:10a6:3:dc::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.28; Wed, 14 Oct
+ 2020 19:57:41 +0000
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.021; Wed, 14 Oct 2020
+ 19:57:40 +0000
+Subject: Re: [PATCH v11 06/13] block: modify the comment for BDRV_REQ_PREFETCH
+ flag
+To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
+ vsementsov@virtuozzo.com
+References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1602524605-481160-7-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <092bf4f6-ef81-872f-4712-016f573f7188@redhat.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <87fc2f2e-4edb-496f-b48c-e535e237bad7@virtuozzo.com>
+Date: Wed, 14 Oct 2020 22:57:37 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <092bf4f6-ef81-872f-4712-016f573f7188@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [109.252.114.22]
+X-ClientProxiedBy: FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::7) To HE1PR0801MB2124.eurprd08.prod.outlook.com
+ (2603:10a6:3:89::22)
 MIME-Version: 1.0
-References: <20201014170159.26932-1-space.monkey.delivers@gmail.com>
- <20201014170159.26932-5-space.monkey.delivers@gmail.com>
- <b13721d7-241a-3d81-fa8d-5d7cc0e780b7@linaro.org>
-In-Reply-To: <b13721d7-241a-3d81-fa8d-5d7cc0e780b7@linaro.org>
-From: Alexey Baturo <baturo.alexey@gmail.com>
-Date: Wed, 14 Oct 2020 23:10:33 +0300
-Message-ID: <CAFukJ-DM1WJ1H6_FvSbgC8TpHmxjZFCMhSOopnfCF5mey9JaCQ@mail.gmail.com>
-Subject: Re: [PATCH 4/5] [RISCV_PM] Add address masking functions required for
- RISC-V Pointer Masking extension
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000005de7e205b1a720f6"
-Received-SPF: pass client-ip=2a00:1450:4864:20::241;
- envelope-from=baturo.alexey@gmail.com; helo=mail-lj1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.22) by
+ FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.11 via Frontend Transport; Wed, 14 Oct 2020 19:57:39 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 3b6ee5b7-de6b-4e36-7ce8-08d8707b6832
+X-MS-TrafficTypeDiagnostic: HE1PR0802MB2522:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0802MB2522944852D1CE7172729AA5F4050@HE1PR0802MB2522.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bAt2soYTI/0NJRPvp0tJE+uS5gE/k7hmZ7qn7XZmkPda3jROv0QoEmexPtXZaq8rNvJ0982xYeqndu4X9N6ul725bhHssbkRcWCa89KK+USP4aGLfRa0vo46+9aWrty3UEZlX3rq6EKeQ/bmnXdX+KLwIpUS3skDJruOScx+UF6ez9SoVe04FEyIZXwF8uma6EevtjEqc+R4p9huB7DEyqfUpCDQ5RhlVsqra77I4RAixtmqUfixKmXyzHjiKbQjO0Etg3oWDfDx4HhlCErtmpeKtHkUJpoiZwi+YMTI7SsUba2+x85xLhPu8KBvdYdz/tSSE5TYzQYVJJl0ArucrPQgKdfW3fabQT5Lt0eFz4/gzVRnJaNHgJ4GjZnGqRje
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(39840400004)(346002)(396003)(136003)(366004)(26005)(53546011)(316002)(6486002)(8936002)(44832011)(956004)(16526019)(186003)(2616005)(107886003)(2906002)(4326008)(6512007)(8676002)(52116002)(83380400001)(31696002)(478600001)(7416002)(31686004)(6506007)(86362001)(36756003)(5660300002)(66556008)(66946007)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: /jEUIb2k4YNypazqIut2ldVfL/KyGgOfiDaYVSRHBSWeFO0XebjnsniPude54aDw6Oh+p5zvi7GzaVKYgOccMMUG9QFDJdCeYgUXBIruGHiikG/O28DOHXjn6BlWyrNZATsJXoVxWrFUM0qB8A/0wS7G2Sm5MKEadKQ7YkZfgQzlCUKGLzJOgHEtgyQ4nEsTow575KHOiWlNHkoP3AotDA76Ai0Blu84V3sInqiTgA1y/hPOO4XXL6G/pseA/KrO81euY4JSsqtds+58LT5ZiIjK7sxObVL1cFSAcMAKMWiU3NDZCWokC3w12njjL/hCLwNqrKbKeIn52eiJwZK6WHY07g7XDAgrlo0NSRDWAygMpBZnkiYZJn3Stc7Dz1ooYOkIrWKksGkTxwFc6notc6wI1vA+hJQXtsXQ8QjkkdGTYjaKtCHqSTs892yrJiFrx+tr+svExviPr0KdbphYNzrXKXkz/0NyhW6vUoqDlDRu6i+jNWxjUEm+fY6LFgmiTUn2Iep+kQi32PYrAdRw1sKjnBZpCwpOwqpwajuW6o552XFzVeCIapQy4dEO8IpHJpzU0D61521pVRif+aurVzyxiwRsMo5/Xzplv36X5k0Q80/Npngcr9w6V9m5U9y1ayT2/D0ovg4Fi3vqU2Fqsg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b6ee5b7-de6b-4e36-7ce8-08d8707b6832
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 19:57:40.6141 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GDI9jJ9IePkK1AJl653Klo2zNMmH+WcSr6E7iBbkF7eozTHkubpUM10vl1BwhcDAlpslmYWjQxVsC5uy01E8TDOGonTt3P6KDplg3IHcG2Y=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2522
+Received-SPF: pass client-ip=40.107.3.121;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 16:12:50
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,259 +139,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- "space.monkey.delivers@gmail.com" <space.monkey.delivers@gmail.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- Anatoly Parshintsev <kupokupokupopo@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000005de7e205b1a720f6
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 14.10.2020 15:22, Max Reitz wrote:
+> On 12.10.20 19:43, Andrey Shinkevich wrote:
+>> Modify the comment for the flag BDRV_REQ_PREFETCH as we are going to
+>> use it alone and pass it to the COR-filter driver for further
+>> processing.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>   include/block/block.h | 7 ++++---
+>>   1 file changed, 4 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/include/block/block.h b/include/block/block.h
+>> index 981ab5b..2b7efd1 100644
+>> --- a/include/block/block.h
+>> +++ b/include/block/block.h
+>> @@ -71,9 +71,10 @@ typedef enum {
+>>       BDRV_REQ_NO_FALLBACK        = 0x100,
+>>   
+>>       /*
+>> -     * BDRV_REQ_PREFETCH may be used only together with BDRV_REQ_COPY_ON_READ
+>> -     * on read request and means that caller doesn't really need data to be
+>> -     * written to qiov parameter which may be NULL.
+>> +     * BDRV_REQ_PREFETCH may be used together with the BDRV_REQ_COPY_ON_READ
+>> +     * flag or when the COR-filter applied to read operations and means that
+> 
+> There’s some word missing here, but I’m not sure what it is...  At least
+> an “is” before “applied”.  Perhaps something like ”or when a COR filter
+> is involved (in read operations)” would be better.
+> 
+>> +     * caller doesn't really need data to be written to qiov parameter which
+> 
+> And this “written to” confused me for a second, because we’re reading
+> into qiov.  Technically, that means writing into the buffer, but, you know.
+> 
+> Could we rewrite the whole thing, perhaps?  Something like
+> 
+> “BDRV_REQ_PREFETCH makes sense only in the context of copy-on-read
+> (i.e., together with the BDRV_REQ_COPY_ON_READ flag or when there is a
+> COR filter), in which case it signals that the COR operation need not
+> read the data into memory (qiov), but only ensure it is copied to the
+> top layer (i.e., that COR is done).”
+> 
+> I don’t know.
+> 
+> Max
+> 
 
-> I suggest adding a stub version of this function to patch 5, and then
-swap patch 4 and patch 5.
-Thanks, will do.
+I would modify a little:
 
->This bakes in values from ENV without adding any way to verify that those
-values are still current.
-If I correctly get your idea, you're talking about the situation, when
-DisasContext was initialized with some values, which at some point got
-changed, so this could lead to incorrect address masking. I tried to handle
-this situation by dropping the translation cache in case different values
-are written in any of the PM CSRs, which I assumed would lead to refilling
-the DIsasContext structure.
-This is obviously not the best way to do it, since it may lead to
-performance degradation in some cases, so let me process your suggestion
-and try to implement it.
+“BDRV_REQ_PREFETCH makes sense only in the context of copy-on-read
+(i.e., together with the BDRV_REQ_COPY_ON_READ flag or when a COR
+filter is involved), in which case it signals that the COR operation
+need not read the data into memory (qiov) but only ensure they are
+copied to the top layer (i.e., that COR operation is done).”
 
-Thanks!
 
-=D1=81=D1=80, 14 =D0=BE=D0=BA=D1=82. 2020 =D0=B3. =D0=B2 22:19, Richard Hen=
-derson <richard.henderson@linaro.org
->:
-
-> On 10/14/20 10:01 AM, Alexey Baturo wrote:
-> > +static TCGv_i64 apply_pointer_masking(DisasContext *s, TCGv_i64 addr)
-> > +{
-> > +    gen_pm_adjust_address(s, addr, addr);
-> > +    return addr;
-> > +}
->
-> This function is unused in this patch, which means the series as a whole =
-is
-> non-bisectable.
->
-> Rather than merge the two, I suggest adding a stub version of this
-> function to
-> patch 5, and then swap patch 4 and patch 5.  So you will add uses of
-> apply_pointer_masking without actually implementing it yet.  Which should
-> be fine.
->
-> > @@ -800,8 +836,36 @@ static void riscv_tr_init_disas_context
-> >      } else {
-> >          ctx->virt_enabled =3D false;
-> >      }
-> > +    if (riscv_has_ext(env, RVJ)) {
-> > +        switch (env->priv) {
-> > +        case PRV_U:
-> > +            ctx->pm_enabled =3D get_field(env->mmte, UMTE_U_PM_ENABLE)=
-;
-> > +            ctx->pm_mask =3D env->upmmask;
-> > +            ctx->pm_base =3D env->upmbase;
-> > +            break;
-> > +        case PRV_S:
-> > +            ctx->pm_enabled =3D get_field(env->mmte, SMTE_S_PM_ENABLE)=
-;
-> > +            ctx->pm_mask =3D env->spmmask;
-> > +            ctx->pm_base =3D env->spmbase;
-> > +            break;
-> > +        case PRV_M:
-> > +            ctx->pm_enabled =3D get_field(env->mmte, MMTE_M_PM_ENABLE)=
-;
-> > +            ctx->pm_mask =3D env->mpmmask;
->
-> You can't read env like this.
->
-> This bakes in values from ENV without adding any way to verify that those
-> values are still current.
->
-> The one thing that you must bake into the generated code is the state of
-> PM_ENABLE.  Anything else would penalize normal risc-v emulation.
->
-> You do that in cpu_get_tb_cpu_state().  Allocate one bit to hold
-> the current state of the flag.  E.g.
->
-> FIELD(TB_FLAGS, PM_ENABLED, 9, 1)
->
-> then fill it in from the correct mmte bit for priv (which itself is
-> encoded by
-> cpu_mmu_index()).
->
-> Except for special cases, the mask and base variables cannot be placed in=
-to
-> TB_FLAGS.  For now, I think it's best to ignore the special cases and
-> implement
-> them all as tcg globals.  Which means that we do *not* bake in a particul=
-ar
-> value, but instead read the value from env at runtime.
->
-> So, in riscv_translate_init, you create new globals for each of the mask
-> and
-> base.  In riscv_tr_init_disas_context you examine priv (via mmu_index) an=
-d
-> assign one pair of the globals to DisasContext, so that you don't have to
-> keep
-> looking them up.
->
-> Then you have
->
-> static void gen_pm_adjust_address(DisasContext *s,
->                                   TCGv_i64 dst,
->                                   TCGv_i64 src)
-> {
->     if (s->pm_enabled =3D=3D 0) {
->         /* Load unmodified address */
->         tcg_gen_mov_i64(dst, src);
->     } else {
->         tcg_gen_andc_i64(dst, src, s->pm_mask);
->         tcg_gen_or_i64(dst, dst, s->pm_base);
->     }
-> }
->
->
-> r~
->
-
---0000000000005de7e205b1a720f6
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr">&gt; I suggest adding a stub version of this function to p=
-atch 5, and then swap patch 4 and patch 5.<div>Thanks, will do.</div><div><=
-br></div><div>&gt;This bakes in values from ENV without adding any way to v=
-erify that those values are still current.</div><div>If I correctly get you=
-r idea, you&#39;re talking about the situation, when DisasContext was initi=
-alized with some values, which at some point got changed, so this could lea=
-d to incorrect address masking. I tried to handle this situation by droppin=
-g the translation cache in case different values are written in any of the =
-PM CSRs, which I assumed would lead to refilling the DIsasContext structure=
-.</div><div>This is obviously not the best way to do it, since it may lead =
-to performance degradation in some cases, so let me process your suggestion=
- and try to implement it.</div><div><br></div><div>Thanks!</div></div><br><=
-div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=D1=81=D1=
-=80, 14 =D0=BE=D0=BA=D1=82. 2020 =D0=B3. =D0=B2 22:19, Richard Henderson &l=
-t;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderson@linaro.=
-org</a>&gt;:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">On =
-10/14/20 10:01 AM, Alexey Baturo wrote:<br>
-&gt; +static TCGv_i64 apply_pointer_masking(DisasContext *s, TCGv_i64 addr)=
-<br>
-&gt; +{<br>
-&gt; +=C2=A0 =C2=A0 gen_pm_adjust_address(s, addr, addr);<br>
-&gt; +=C2=A0 =C2=A0 return addr;<br>
-&gt; +}<br>
-<br>
-This function is unused in this patch, which means the series as a whole is=
-<br>
-non-bisectable.<br>
-<br>
-Rather than merge the two, I suggest adding a stub version of this function=
- to<br>
-patch 5, and then swap patch 4 and patch 5.=C2=A0 So you will add uses of<b=
-r>
-apply_pointer_masking without actually implementing it yet.=C2=A0 Which sho=
-uld be fine.<br>
-<br>
-&gt; @@ -800,8 +836,36 @@ static void riscv_tr_init_disas_context<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 } else {<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;virt_enabled =3D false;<br>
-&gt;=C2=A0 =C2=A0 =C2=A0 }<br>
-&gt; +=C2=A0 =C2=A0 if (riscv_has_ext(env, RVJ)) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 switch (env-&gt;priv) {<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case PRV_U:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_enabled =3D get_=
-field(env-&gt;mmte, UMTE_U_PM_ENABLE);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_mask =3D env-&gt=
-;upmmask;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_base =3D env-&gt=
-;upmbase;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case PRV_S:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_enabled =3D get_=
-field(env-&gt;mmte, SMTE_S_PM_ENABLE);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_mask =3D env-&gt=
-;spmmask;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_base =3D env-&gt=
-;spmbase;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 break;<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 case PRV_M:<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_enabled =3D get_=
-field(env-&gt;mmte, MMTE_M_PM_ENABLE);<br>
-&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ctx-&gt;pm_mask =3D env-&gt=
-;mpmmask;<br>
-<br>
-You can&#39;t read env like this.<br>
-<br>
-This bakes in values from ENV without adding any way to verify that those<b=
-r>
-values are still current.<br>
-<br>
-The one thing that you must bake into the generated code is the state of<br=
->
-PM_ENABLE.=C2=A0 Anything else would penalize normal risc-v emulation.<br>
-<br>
-You do that in cpu_get_tb_cpu_state().=C2=A0 Allocate one bit to hold<br>
-the current state of the flag.=C2=A0 E.g.<br>
-<br>
-FIELD(TB_FLAGS, PM_ENABLED, 9, 1)<br>
-<br>
-then fill it in from the correct mmte bit for priv (which itself is encoded=
- by<br>
-cpu_mmu_index()).<br>
-<br>
-Except for special cases, the mask and base variables cannot be placed into=
-<br>
-TB_FLAGS.=C2=A0 For now, I think it&#39;s best to ignore the special cases =
-and implement<br>
-them all as tcg globals.=C2=A0 Which means that we do *not* bake in a parti=
-cular<br>
-value, but instead read the value from env at runtime.<br>
-<br>
-So, in riscv_translate_init, you create new globals for each of the mask an=
-d<br>
-base.=C2=A0 In riscv_tr_init_disas_context you examine priv (via mmu_index)=
- and<br>
-assign one pair of the globals to DisasContext, so that you don&#39;t have =
-to keep<br>
-looking them up.<br>
-<br>
-Then you have<br>
-<br>
-static void gen_pm_adjust_address(DisasContext *s,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i64 dst,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 TCGv_i64 src)<br>
-{<br>
-=C2=A0 =C2=A0 if (s-&gt;pm_enabled =3D=3D 0) {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 /* Load unmodified address */<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_mov_i64(dst, src);<br>
-=C2=A0 =C2=A0 } else {<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_andc_i64(dst, src, s-&gt;pm_mask);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 tcg_gen_or_i64(dst, dst, s-&gt;pm_base);<br>
-=C2=A0 =C2=A0 }<br>
-}<br>
-<br>
-<br>
-r~<br>
-</blockquote></div>
-
---0000000000005de7e205b1a720f6--
+>> +     * may be NULL.
+>>        */
+>>       BDRV_REQ_PREFETCH  = 0x200,
+>>       /* Mask of valid flags */
+>>
+> 
+> 
 
