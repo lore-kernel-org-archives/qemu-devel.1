@@ -4,69 +4,69 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD3A9C43457
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C06E0C43467
 	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 08:23:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 16B3F214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 08:23:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1754421527
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 08:23:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fR39w5PL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16B3F214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Asd6f1fT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1754421527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSc4W-0001lQ-Ql
+	id 1kSc4W-0001ne-VS
 	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 04:23:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32860)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32930)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSc2s-0008V3-Jh
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 04:22:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49467)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSc2w-0008WK-Sg
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 04:22:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25018)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSc2p-0007ay-Rv
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 04:22:02 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kSc2q-0007aw-8B
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 04:22:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1602663718;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=f73Ck4DO9ri0tAJzjHrlzoIp9hcZEvu5GRRGi61o4Sk=;
- b=fR39w5PLcjFnZLeV/zPA5Md2vV615F7zv9fwKsKaoRUuzJxLnCQRHF8c2AAojVN+gJz+35
- DOhwOuu+YI9h+Squjkr5wsGqDiQOc/TOJTc//l/yApNpC3Nef+7hP8AheqsWMhr+Cl3UEH
- CWlUOz5yDxwAT9t+pzcafrlML4jOP2A=
+ bh=6VfFOvNeUB3poGAbVH2m77W30dHai+FCaZ0AIgehCXE=;
+ b=Asd6f1fTB0MWBw62fn7jHoJ+DTZfv7tVAVovfChN9I6zbpx18w4WYR76xUwhdheph2Wt93
+ y8KYXoiB9PofGJgCAL8gPXajw1VOuoZXIS7Cb3RJlysYznDb2BeOMwX7yF/JUa7Z7PZDZl
+ LKJqBG6ks4GStfSElALqgTH68ELFBhI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-389-OKaecRkUM-usv7IhGperBA-1; Wed, 14 Oct 2020 04:21:56 -0400
-X-MC-Unique: OKaecRkUM-usv7IhGperBA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-525-d0HQEm9WMsqlk1mxKLQHng-1; Wed, 14 Oct 2020 04:21:56 -0400
+X-MC-Unique: d0HQEm9WMsqlk1mxKLQHng-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 455B51006709;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D3818014D9;
  Wed, 14 Oct 2020 08:21:55 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0C13C76655;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 071286EF54;
  Wed, 14 Oct 2020 08:21:55 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 450ED43BFBB; Wed, 14 Oct 2020 10:21:50 +0200 (CEST)
+ id 56C8931E23; Wed, 14 Oct 2020 10:21:50 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 6/9] vnc-stubs: Allow -vnc none
-Date: Wed, 14 Oct 2020 10:21:46 +0200
-Message-Id: <20201014082149.26853-7-kraxel@redhat.com>
+Subject: [PULL 8/9] input-linux: Reset il->fd handler before closing it
+Date: Wed, 14 Oct 2020 10:21:48 +0200
+Message-Id: <20201014082149.26853-9-kraxel@redhat.com>
 In-Reply-To: <20201014082149.26853-1-kraxel@redhat.com>
 References: <20201014082149.26853-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,38 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Weil <sw@weilnetz.de>, Gerd Hoffmann <kraxel@redhat.com>,
- Jason Andryuk <jandryuk@gmail.com>
+Cc: Stefan Weil <sw@weilnetz.de>, Li Qiang <liq3ea@gmail.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Colin Xu <colin.xu@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jason Andryuk <jandryuk@gmail.com>
+From: Colin Xu <colin.xu@intel.com>
 
-Currently `-vnc none` is fatal when built with `--disable-vnc`.  Make
-vnc_parse accept "none", so QEMU still run without using vnc.
+If object-del input-linux object on-the-fly, instance finalize will
+close evdev fd without resetting it. However the main thread is still
+trying to lock_acquire/lock_release during ppoll, which leads to a very
+high CPU utilization.
 
-Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
-Message-id: 20201009014032.3507-1-jandryuk@gmail.com
+Signed-off-by: Colin Xu <colin.xu@intel.com>
+Reviewed-by: Li Qiang <liq3ea@gmail.com>
+Message-id: 20200925021808.26471-1-colin.xu@intel.com
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- ui/vnc-stubs.c | 3 +++
- 1 file changed, 3 insertions(+)
+ ui/input-linux.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/ui/vnc-stubs.c b/ui/vnc-stubs.c
-index 06c4ac6296eb..c6b737dcec67 100644
---- a/ui/vnc-stubs.c
-+++ b/ui/vnc-stubs.c
-@@ -12,6 +12,9 @@ int vnc_display_pw_expire(const char *id, time_t expires)
- };
- QemuOpts *vnc_parse(const char *str, Error **errp)
- {
-+    if (strcmp(str, "none") == 0) {
-+        return NULL;
-+    }
-     error_setg(errp, "VNC support is disabled");
-     return NULL;
- }
+diff --git a/ui/input-linux.c b/ui/input-linux.c
+index ab351a418701..34cc531190f9 100644
+--- a/ui/input-linux.c
++++ b/ui/input-linux.c
+@@ -418,6 +418,7 @@ static void input_linux_instance_finalize(Object *obj)
+ 
+     if (il->initialized) {
+         QTAILQ_REMOVE(&inputs, il, next);
++        qemu_set_fd_handler(il->fd, NULL, NULL, NULL);
+         close(il->fd);
+     }
+     g_free(il->evdev);
 -- 
 2.27.0
 
