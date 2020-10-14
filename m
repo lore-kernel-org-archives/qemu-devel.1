@@ -2,103 +2,95 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31332C43457
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED836C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:57:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A7EFC20878
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:57:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5412320848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:57:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCrCwrdO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7EFC20878
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YwPyZ1Dv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5412320848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSfPN-0004ss-EK
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:57:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49410)
+	id 1kSfPV-00052v-5b
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:57:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46898)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSfLa-0008TX-KV
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:53:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30739)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSfA5-0001Li-5H
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:41:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55728)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSfLW-0000VL-81
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:53:34 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSfA2-0007ha-FW
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:41:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602676409;
+ s=mimecast20190719; t=1602675695;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NZRNchyf6KqIGqa3qU7RafRDqVFOV3THBQqMLA8r2rk=;
- b=TCrCwrdOBwCXYU3tmqgO64CcdGA4Zu4aQX03ECiQOJGz7sYcD9Sg2muF91ExPNlQsih7MR
- mfh+aop6LFZLob2c4yP6yU4bzodP9Eg0K/UEfAbSSzSHqDc1It5AW6Dvi7sdP/j+Vm6RDa
- qfHqRP7k5GxCppMZfgg0i7ga77XyZ0g=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-187-Zgs9E0LlPZqmwQMcx9uycQ-1; Wed, 14 Oct 2020 07:53:27 -0400
-X-MC-Unique: Zgs9E0LlPZqmwQMcx9uycQ-1
-Received: by mail-wm1-f70.google.com with SMTP id c204so530001wmd.5
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 04:53:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=NZRNchyf6KqIGqa3qU7RafRDqVFOV3THBQqMLA8r2rk=;
- b=YFzJuem3PYjaQ86y5mkFlj2LI9RvC4OMbp5Rbfcg5JSS0nCU0ZQ+UUbRpfE4FCk6Vg
- Jl6+bT9KFcw+uy2MTotf0HXPxTGH4JV36rBtL+N13vOucRlE39mgrFxilmKJdLM0LrDL
- ufNqdJIh9HT+RFn8cP2Cp0tApZZuh1mHLchRhv3sv9FK6p4n6eAOI/geBPB1RsVYOHNH
- Bq4DyMiC4DFLVELrcjofVlbbqkZCj+KvNEpb2J0YK84jsjrRPCx+4EzBgRg9iOWhLUEi
- ZTPaRaHB3uSrOdngimCzufsl5mAk/yKa89xfaZFHNfHA/9+WQK6mfkKDpvVpJiCbFED9
- I+1g==
-X-Gm-Message-State: AOAM530DcX2YHPwlqz3zQZOkOM5Sr7keDTrZGAf+nFC5YTDE5f4mixQC
- r4t2EnvA021EOb8UbCgrhrHfSxsJd+3mXGesWyCY2Zh6yhYzYUQfN5Njfx9JOpdPZNCpx3ldvJC
- RoV0IvGVlKINL+gg=
-X-Received: by 2002:adf:fe09:: with SMTP id n9mr5290307wrr.144.1602676405575; 
- Wed, 14 Oct 2020 04:53:25 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxg5JvYw9Ikt1i2TBNxCpLvTcvfsn2s1ANx5vtPbSfyN3FzTJMj6EJUgvtZqLhXOksiVF2MWA==
-X-Received: by 2002:adf:fe09:: with SMTP id n9mr5290282wrr.144.1602676405322; 
- Wed, 14 Oct 2020 04:53:25 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 71sm4912323wrm.20.2020.10.14.04.53.24
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Oct 2020 04:53:24 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 6/9] util/vfio-helpers: Convert vfio_dump_mapping to trace
- events
-Date: Wed, 14 Oct 2020 13:52:50 +0200
-Message-Id: <20201014115253.25276-7-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201014115253.25276-1-philmd@redhat.com>
-References: <20201014115253.25276-1-philmd@redhat.com>
+ bh=dj1dvIMhtzuIH8rI+DC8ga2BdwuQid2++XXBYSk1g0I=;
+ b=YwPyZ1DvsEovKZ5Kw6Bk93Baz/ME9rBMb64sEh79MaRItgyhdlw+fgTB/RefD8iFlW4ixu
+ 3kaIDEmzNBK1R0DUvDpeDvvFHgS+VlIRW+mRMPInrckiHaM55lkkxzVtARhGuxkPDhV8H8
+ J7KeI+o8WTqsQtbDcQnSXLncMXhSy2I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-350-9aV7uyfSNQuUsgJI8rx91g-1; Wed, 14 Oct 2020 07:41:34 -0400
+X-MC-Unique: 9aV7uyfSNQuUsgJI8rx91g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87460876ED0;
+ Wed, 14 Oct 2020 11:41:32 +0000 (UTC)
+Received: from thuth.remote.csb (reserved-198-128.str.redhat.com
+ [10.33.198.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7F7E26EF67;
+ Wed, 14 Oct 2020 11:41:30 +0000 (UTC)
+Subject: Re: [PATCH v2 1/4] MAINTAINERS: Put myself forward for MIPS target
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org, Chen Huacai <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Aurelien Jarno <aurelien@aurel32.net>, Jiaxun Yang <jiaxun.yang@flygoat.com>
+References: <20201013101659.3557154-1-f4bug@amsat.org>
+ <20201013101659.3557154-2-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <f953ddb0-004e-2372-e2a9-6fbc3e773ff4@redhat.com>
+Date: Wed, 14 Oct 2020 13:41:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <20201013101659.3557154-2-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,71 +103,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The QEMU_VFIO_DEBUG definition is only modifiable at build-time.
-Trace events can be enabled at run-time. As we prefer the latter,
-convert qemu_vfio_dump_mappings() to use trace events instead
-of fprintf().
+On 13/10/2020 12.16, Philippe Mathieu-Daudé wrote:
+> To avoid the MIPS target being orphan, volunteer to keep an eye
+> on it and put together pull requests.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 426f52c1f63..d59e5c05c10 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -221,10 +221,11 @@ F: hw/microblaze/
+>  F: disas/microblaze.c
+>  
+>  MIPS TCG CPUs
+> +M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>  R: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> -S: Orphaned
+> +S: Odd Fixes
+>  F: target/mips/
+>  F: default-configs/*mips*
+>  F: disas/*mips*
+> @@ -2815,11 +2816,12 @@ F: tcg/i386/
+>  F: disas/i386.c
+>  
+>  MIPS TCG target
+> +M: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>  R: Aurelien Jarno <aurelien@aurel32.net>
+>  R: Huacai Chen <chenhc@lemote.com>
+>  R: Jiaxun Yang <jiaxun.yang@flygoat.com>
+>  R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
+> -S: Orphaned
+> +S: Odd Fixes
+>  F: tcg/mips/
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- util/vfio-helpers.c | 19 ++++---------------
- util/trace-events   |  1 +
- 2 files changed, 5 insertions(+), 15 deletions(-)
+It would be good to get some feedback from the people with the "R:" entries
+here, too ... but FWIW:
 
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index c24a510df82..73f7bfa7540 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -521,23 +521,12 @@ QEMUVFIOState *qemu_vfio_open_pci(const char *device, Error **errp)
-     return s;
- }
- 
--static void qemu_vfio_dump_mapping(IOVAMapping *m)
--{
--    if (QEMU_VFIO_DEBUG) {
--        printf("  vfio mapping %p %" PRIx64 " to %" PRIx64 "\n", m->host,
--               (uint64_t)m->size, (uint64_t)m->iova);
--    }
--}
--
- static void qemu_vfio_dump_mappings(QEMUVFIOState *s)
- {
--    int i;
--
--    if (QEMU_VFIO_DEBUG) {
--        printf("vfio mappings\n");
--        for (i = 0; i < s->nr_mappings; ++i) {
--            qemu_vfio_dump_mapping(&s->mappings[i]);
--        }
-+    for (int i = 0; i < s->nr_mappings; ++i) {
-+        trace_qemu_vfio_dump_mapping(s->mappings[i].host,
-+                                     s->mappings[i].iova,
-+                                     s->mappings[i].size);
-     }
- }
- 
-diff --git a/util/trace-events b/util/trace-events
-index 8598066acdb..7faad2a718c 100644
---- a/util/trace-events
-+++ b/util/trace-events
-@@ -80,6 +80,7 @@ qemu_mutex_unlock(void *mutex, const char *file, const int line) "released mutex
- qemu_vfio_dma_reset_temporary(void *s) "s %p"
- qemu_vfio_ram_block_added(void *s, void *p, size_t size) "s %p host %p size 0x%zx"
- qemu_vfio_ram_block_removed(void *s, void *p, size_t size) "s %p host %p size 0x%zx"
-+qemu_vfio_dump_mapping(void *host, uint64_t iova, size_t size) "vfio mapping %p to iova 0x%08" PRIx64 " size 0x%zx"
- qemu_vfio_find_mapping(void *s, void *p) "s %p host %p"
- qemu_vfio_new_mapping(void *s, void *host, size_t size, int index, uint64_t iova) "s %p host %p size 0x%zx index %d iova 0x%"PRIx64
- qemu_vfio_do_mapping(void *s, void *host, uint64_t iova, size_t size) "s %p host %p <-> iova 0x%"PRIx64 " size 0x%zx"
--- 
-2.26.2
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
 
