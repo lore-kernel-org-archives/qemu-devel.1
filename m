@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3641C43457
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7F6C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:48:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB2C1214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:46:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0C03214D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:48:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J67Z1YZd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB2C1214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F97SDQAj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C03214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSjui-0003Sj-Nc
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 12:46:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35664)
+	id 1kSjxK-0004o4-P0
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 12:48:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36164)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSjbu-0003dH-96
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:26:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26606)
+ id 1kSjeE-00069Z-0c
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:29:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26464)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSjbr-0004Xb-KY
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:26:41 -0400
+ id 1kSjeC-0004hm-5F
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:29:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602692798;
+ s=mimecast20190719; t=1602692943;
  h=from:from:reply-to:reply-to:subject:subject:date:date:
  message-id:message-id:to:to:cc:cc:mime-version:mime-version:
  content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wdpLwVLEiZQg59odWtFlz15nSGtaP213uYI91r2225U=;
- b=J67Z1YZdYxCGRDt6iOshQm5mX/nTJBnQfMKBjksmvR8imccLQX5sVdIHWJ0sAherR4kPI3
- dNHjkkex8bP2WvRiJB7/f92+IsGw8HWA4LZr5tubK/Vp7HZj5N7SYfEZXxfp6lYwywO7xz
- oRjXfTnlxVQvKvN5RkqCZgQasBLdovc=
+ bh=rCIoiLIR8wUajWkp7dp2D19rOwDnp+mWbGKkGieoglM=;
+ b=F97SDQAjBq0KbmEEn/gV3hvyyRVLORlq21tUwIklTV+nT7ZCKoGSBLDAw2xGtxeEI4kq0U
+ JF8mo+1aTb+sI0ZIthLxqoDqSJsWhaTb36ZD2XY5TK4EPIGFPDSD2jsVtlaQ1dCzvAZcg7
+ jBBw0jAEqkJcuOfvEYSLkGwNCpzWx20=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-362-n0k07izDO_icMd-aAbw3Wg-1; Wed, 14 Oct 2020 12:26:35 -0400
-X-MC-Unique: n0k07izDO_icMd-aAbw3Wg-1
+ us-mta-399-IG8juGrLMYuqQ4rDk3NcnA-1; Wed, 14 Oct 2020 12:28:59 -0400
+X-MC-Unique: IG8juGrLMYuqQ4rDk3NcnA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0D0821015CBC;
- Wed, 14 Oct 2020 16:26:34 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51C7557245;
+ Wed, 14 Oct 2020 16:28:58 +0000 (UTC)
 Received: from redhat.com (ovpn-113-137.ams2.redhat.com [10.36.113.137])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id A23D05D9CD;
- Wed, 14 Oct 2020 16:26:32 +0000 (UTC)
-Date: Wed, 14 Oct 2020 17:26:24 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 236475D9D5;
+ Wed, 14 Oct 2020 16:28:56 +0000 (UTC)
+Date: Wed, 14 Oct 2020 17:28:54 +0100
 From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 1/7] tests/Makefile.include: unbreak non-tcg builds
-Message-ID: <20201014162624.GK115189@redhat.com>
+Subject: Re: [PATCH 4/7] configure: move QEMU_INCLUDES to meson
+Message-ID: <20201014162854.GN115189@redhat.com>
 References: <20201014135416.1290679-1-pbonzini@redhat.com>
- <20201014135416.1290679-2-pbonzini@redhat.com>
+ <20201014135416.1290679-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201014135416.1290679-2-pbonzini@redhat.com>
+In-Reply-To: <20201014135416.1290679-5-pbonzini@redhat.com>
 User-Agent: Mutt/1.14.6 (2020-07-11)
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
@@ -76,16 +76,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,13 +105,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 14, 2020 at 09:54:10AM -0400, Paolo Bonzini wrote:
-> Remove from check-block the requirement that all TARGET_DIRS are built.
+On Wed, Oct 14, 2020 at 09:54:13AM -0400, Paolo Bonzini wrote:
+> Confusingly, QEMU_INCLUDES is not used by configure tests.  Moving
+> it to meson.build ensures that Windows paths are specified instead of
+> the msys paths like /c/Users/...
 > 
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 > ---
->  tests/Makefile.include | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  configure   | 20 --------------------
+>  meson.build | 30 ++++++++++++++++++++++++++++--
+>  2 files changed, 28 insertions(+), 22 deletions(-)
 
 Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
