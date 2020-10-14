@@ -2,92 +2,64 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80100C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9186BC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:56:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CB9822224E
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:54:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kz5O8yDE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB9822224E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id D26BB22250
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:55:59 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D26BB22250
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56624 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSnnV-0004yi-Ja
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:54:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59330)
+	id 1kSnoU-0005ro-Qt
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:55:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raj.khem@gmail.com>)
- id 1kSnmP-0004NC-A7
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:53:50 -0400
-Received: from mail-qk1-x744.google.com ([2607:f8b0:4864:20::744]:44301)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raj.khem@gmail.com>)
- id 1kSnmN-0004em-Ak
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:53:48 -0400
-Received: by mail-qk1-x744.google.com with SMTP id s14so640266qkg.11
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 13:53:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=OOffP6WU53cSRYprPaYe+4MOzYl6rNreJvFTR/B9x8c=;
- b=kz5O8yDEu9puy5XiS2hqQJMXKgSQEQM/An5kR8p4s+xUAIfMQWgRjnGyC0AyEMMOyX
- wW2zxlVLbAXwvho7gWv1zm/uLS3YIfID7FX+TnjDD8df7QGMUvLQ908tPG4GmcLtEUdr
- KKUinhOIlxRP1EbZBsYQuT4yNrtqyBT2rRG8s1hqy1kyf/GkDfK8Cb94dBja2hYVZTDk
- NsJ04ZFVVNIVm5qN63LGKveqfZ2gLyKP0pNmDnD4Zbgkc6UOICqG0KZ1OmrFLcAGW/2l
- PCrzbliqSd5v3vLdOpoJZy4qcLO033LyhLOXq8fe1gRA9kUVKgJG79Rh2pg01JkUTCRr
- rUFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=OOffP6WU53cSRYprPaYe+4MOzYl6rNreJvFTR/B9x8c=;
- b=dEgRvnxC4VqHg3C7A9tVqA2vAMZiUimphBPGTCkUDeGnHZST4io3jnG7/oA5A6zg5Y
- CrMfK3O16xIBWoO4cKX2NXxLhTmkCXTM51CA5gJFaP/EnpXO6lOfiRLbKFp4PmzZMmYO
- sko0EMjjipgNhs9Ste5cKEx1I0pghzRqO9mdUKZvhmGmxbFVz+IUps5IGGDOg05WdDc0
- wuv9BX3oGvXZSC/qMgI602SzHTLUW483QrnEEpX5tDa1POGdivmoCWEtj+hxmjuwwV7R
- UdjPzlrYY1Ad1DgNaVwuRW+76/EUYcUv8nY0vFpJzz+/OgfGO7iGGIaIml33b3/3jLVn
- Qujg==
-X-Gm-Message-State: AOAM532bYKHICTFVeDEUepcP/iUkZCbeuMrpi+IutN47PXTnBXeYvQ8A
- OmX8AjtynMuNnDHNx11LZKbQJpk50FdsNcItsjs=
-X-Google-Smtp-Source: ABdhPJwFCMtz6Pj58JsLT1gJRvbAWXj9txdrWzINralBG0s8BNUDHBFHl461pD7HgQX6OAdTMpZs0o1y459pQw0cRZo=
-X-Received: by 2002:a05:620a:c07:: with SMTP id l7mr965484qki.9.1602708824736; 
- Wed, 14 Oct 2020 13:53:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kSnne-0005FR-3k
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:55:06 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:47063)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kSnnZ-0004im-Vj
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:55:05 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id DF403747611;
+ Wed, 14 Oct 2020 22:54:50 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id C066A747610; Wed, 14 Oct 2020 22:54:50 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id BEACF74760D;
+ Wed, 14 Oct 2020 22:54:50 +0200 (CEST)
+Date: Wed, 14 Oct 2020 22:54:50 +0200 (CEST)
+To: Richard Henderson <richard.henderson@linaro.org>
+Subject: Re: [PATCH 07/10] tcg: implement bulletproof JIT
+In-Reply-To: <2ab5b15f-2372-9531-4ade-50dc12592d6c@linaro.org>
+Message-ID: <7372bc50-a0d4-4c4-fb6-c18f3ab327df@eik.bme.hu>
+References: <20201012232939.48481-1-j@getutm.app>
+ <20201012232939.48481-8-j@getutm.app>
+ <19c387d2-fc9-d1d0-849c-f8e8e270a97c@eik.bme.hu>
+ <CADmqK1sTLy8O58rVR116VJnAK2qYMLQvX2wYxpcix_1YkFvLug@mail.gmail.com>
+ <2ab5b15f-2372-9531-4ade-50dc12592d6c@linaro.org>
 MIME-Version: 1.0
-References: <20201013132535.3599453-1-f4bug@amsat.org>
- <BYAPR11MB30479E5264D94EF903E9FD92CD040@BYAPR11MB3047.namprd11.prod.outlook.com>
- <515ec755fd8d7219040283f0c27346d762ee3c29.camel@linuxfoundation.org>
- <ea0ed6c7-1e3a-f7ee-a962-b471555e362d@amsat.org>
- <BYAPR11MB30471BC8B9D3B5F3E678F547CD050@BYAPR11MB3047.namprd11.prod.outlook.com>
-In-Reply-To: <BYAPR11MB30471BC8B9D3B5F3E678F547CD050@BYAPR11MB3047.namprd11.prod.outlook.com>
-From: Khem Raj <raj.khem@gmail.com>
-Date: Wed, 14 Oct 2020 13:53:18 -0700
-Message-ID: <CAMKF1sokbfu1ox+nnZe0nJLid5_GnzZUeQEfWDmqmS4LY-RqNg@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/3] target/mips: Make the number of TLB entries a CPU
- property
-To: "Victor Kamensky (kamensky)" <kamensky@cisco.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::744;
- envelope-from=raj.khem@gmail.com; helo=mail-qk1-x744.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; format=flowed; charset=US-ASCII
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 16:54:51
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,112 +72,66 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
- Richard Purdie <richard.purdie@linuxfoundation.org>,
- Aurelien Jarno <aurelien@aurel32.net>, Richard Henderson <rth@twiddle.net>
+Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
+ Joelle van Dyne <j@getutm.app>, QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-On Wed, Oct 14, 2020 at 1:20 PM Victor Kamensky (kamensky)
-<kamensky@cisco.com> wrote:
+On Wed, 14 Oct 2020, Richard Henderson wrote:
+> On 10/14/20 9:03 AM, Joelle van Dyne wrote:
+>>>> static int encode_search(TranslationBlock *tb, uint8_t *block)
+>>>> {
+>>>> -    uint8_t *highwater = tcg_ctx->code_gen_highwater;
+>>>> -    uint8_t *p = block;
+>>>> +    uint8_t *highwater;
+>>>> +    uint8_t *p;
+>>>>     int i, j, n;
+>>>>
+>>>> +    highwater = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx,
+>>>> +                                           tcg_ctx->code_gen_highwater);
+>>>> +    p = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx, block);
+>>>
+>>> Why do you need explicit casts here? Can this be avoided by using
+>>> appropriate type or within the macro (I haven't checked this at all just
+>>> dislike casts as they can hide problems otherwise caught by the compiler).
+>> There's the choice between tcg_insn_unit * and uint8_t *. Since it's
+>> used much more widely in tcg-target.inc.c, it seemed like
+>> tcg_insn_unit * was a better choice.
 >
-> In order just to keep on the same thread, here is piece of information
-> I found:
+> False choice.  This is why tcg_ctx->code_gen_highwater is void*.
 >
-> I looked at "MIPS32=C2=AE 34Kf=E2=84=A2 Processor Core Datasheet" [1]
+>>>> +#if defined(CONFIG_IOS_JIT)
+>>>> +# define TCG_CODE_PTR_RW(s, code_ptr) \
+>>>> +    (tcg_insn_unit *)((uintptr_t)(code_ptr) + (s)->code_rw_mirror_diff)
 >
-> Page 8 in "Joint TLB (JTLB)" section says:
+> Better as
 >
-> "The JTLB is a fully associative TLB cache containing 16, 32,
-> or 64-dual-entries mapping up to 128 virtual pages to their
-> corresponding physical addresses."
->
-> So "34Kf-64tlb" cpu model I proposed turns out not to be "fictitious"
-> after all. Having 64 TLBs is all within this CPU spec. It is not clear
-> why original 34Kf model choose worst case scenario wrt
-> TLB numbers. Commit log where 34Kf was introduced does not
-> have much details.
+> static inline void *tcg_code_ptr_rw(TCGContext *s, void *rx)
+> {
+> #ifdef CONFIG_IOS_JIT
+>    return rx + s->code_rw_mirror_diff;
 
-thanks for digging this information from CPU specs. It seems using 64
-TLB as default might be a good option for 34Kf then
+This looks better but can you add to void *? I think some compilers may 
+complain about that so may need to cast here to uint8_t * then back to 
+void * but that's at least within this func or maybe declare rx as uint_t 
+* and return void *? Or is rx promoted to the type of 
+s->code_rw_mirror_diff and that avoids the warning? If the gcc and clang 
+versions we care about don't mind then it's simpler without a cast as you 
+suggest.
 
->
-> So IMO on 34Kf route we have the following choices:
->
-> 1) I can rephrase commit message and resubmit commit for
-> "34Kf-64tlb" cpu model, if it could be merged
->
-> 2) We can bump up number of TLBs to 64 in existing 34Kf model
-> since it is within the spec.
+Regards,
+BALATON Zoltan
 
-this looks a good option since it is with in specs and is backward compatib=
-le.
-
+> #else
+>    return rx;
+> #endif
+> }
 >
-> 3) Use Phil's series and tlb-entries cpu parameter would cover all
-
-I agree.
-
-> 3 variants of 16,32,64 TLBs allowed by 34Kf data sheet spec.
 >
-> Please see inline wrt asked '-cpu P5600' testing. Look for 'victor2>'
+> r~
 >
-> [1] https://s3-eu-west-1.amazonaws.com/downloads-mips/documents/MD00419-2=
-B-34Kf-DTS-01.20.pdf
 >
-> ________________________________________
-> From: Philippe Mathieu-Daud=C3=A9 <philippe.mathieu.daude@gmail.com> on b=
-ehalf of Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-> Sent: Wednesday, October 14, 2020 7:53 AM
-> To: Richard Purdie; Victor Kamensky (kamensky); qemu-devel@nongnu.org
-> Cc: Aleksandar Rikalo; Khem Raj; Aleksandar Markovic; Aurelien Jarno; Ric=
-hard Henderson
-> Subject: Re: [RFC PATCH 0/3] target/mips: Make the number of TLB entries =
-a CPU property
->
-> On 10/14/20 9:14 AM, Richard Purdie wrote:
-> > On Wed, 2020-10-14 at 01:36 +0000, Victor Kamensky (kamensky) wrote:
-> >> Thank you very much for looking at this. I gave a spin to
-> >> your 3 patch series in original setup, and as expected with
-> >> '-cpu 34Kf,tlb-entries=3D64' option it works great.
-> >>
-> >> If nobody objects, and your patches could be merged, we
-> >> would greatly appreciate it.
-> >
-> > Speaking as one of the Yocto Project maintainers, this is really
-> > helpful for us, thanks!
-> >
-> > qemumips is one of our slowest platforms for automated testing so this
-> > performance improvement helps a lot.
->
-> Could you try Richard's suggestion? Using '-cpu P5600' instead?
-> It is available in Linux since v5.8.
->
-> victor2> I've tried exact image that works on 34Kf and 34Kf-64tlb models
-> victor2> image with '-cpu P5600'. it does not boot: it dies in init (syst=
-emd).
-> victor2> I can look under gdb with qemu -s -S options, what is going on t=
-here
-> victor2> but it will take time.
-> victor2> If someone have some clues what might cause it please let
-> victor2> me know. Here is high level information about setup:
-> victor2>    - qemu version is 5.1.0
-> victor2>    - kernel base version is 5.8.9
-> victor2>    - systemd version is 1_246.6
-> victor2>    - user land CPU related build options "-meb -meb -mabi=3D32 -=
-mhard-float -march=3Dmips32r2 -mllsc -mips32r2"
->
-> Thanks,
-> Victor
->
-> >
-> > Cheers,
-> >
-> > Richard
-> >
-> >
 
