@@ -2,68 +2,83 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8C0FC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 22:20:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D71B7C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 22:35:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 04A94221FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 22:20:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 181EB2223F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 22:35:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="RFYk8mDT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 04A94221FF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=suse.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QQbUhGdw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 181EB2223F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59216 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSp8X-0002FN-HC
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 18:20:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48574)
+	id 1kSpMk-0004k2-Q4
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 18:35:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53072)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <brogers@suse.com>) id 1kSp7h-0001iG-8C
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 18:19:53 -0400
-Received: from mx2.suse.de ([195.135.220.15]:36474)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <brogers@suse.com>) id 1kSp7e-0007AC-Vw
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 18:19:52 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
- t=1602713989;
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kSpLR-000473-2o
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 18:34:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25236)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kSpLO-0000ym-Dn
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 18:34:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602714841;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=a3DWtcxXaYqEcWM479S+n7SxpXPhW9zzQIM70mXI4H8=;
- b=RFYk8mDT8d9WVbPGZIuzj6p7kROX/THQP6B4FcPfNgwwjsT+AbcdrevIjUhG5OihPtVCFz
- f/mQNFSz/JxVPP4rIvZOA6S/IPIpnbfLX9a7v7WM645+TTIn8iZy9EFq4Bg3RY1GfNBOLT
- CZS/jlV3GZKhQO3AAoW8nJwujjy1PMA=
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 09628ABD1;
- Wed, 14 Oct 2020 22:19:49 +0000 (UTC)
-From: Bruce Rogers <brogers@suse.com>
+ bh=woeTQQSZr/cu1o4jrDgLgB/Oqqh0DifIqwzLvJ+clUQ=;
+ b=QQbUhGdwpcUXe/Rovn6XipYBQeovTYseRYlhj/zoucEkzEgchgtrMaiJLby4jsc9hhlSk4
+ hiqhtbzR0om6CToV/fr8+HHnVBkFXyu9cBQ4rcO8/JT+DD1kLbwwFP2/kMkaAFu78wSNP+
+ AjfJk/8khHh9nYg/kvztuvlLQU9hsgc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-445-9QyxlXZyN4enP4EWiy7TtQ-1; Wed, 14 Oct 2020 18:33:59 -0400
+X-MC-Unique: 9QyxlXZyN4enP4EWiy7TtQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E6F738030D4;
+ Wed, 14 Oct 2020 22:33:57 +0000 (UTC)
+Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99AAA6EF53;
+ Wed, 14 Oct 2020 22:33:57 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] meson.build: don't condition iconv detection on library
- detection
-Date: Wed, 14 Oct 2020 16:19:39 -0600
-Message-Id: <20201014221939.196958-1-brogers@suse.com>
-X-Mailer: git-send-email 2.28.0
+Subject: [PATCH] docs: Print warning when running Sphinx 3.x and newer
+Date: Wed, 14 Oct 2020 18:33:56 -0400
+Message-Id: <20201014223356.324990-1-ehabkost@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=brogers@suse.com;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:21:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -77,49 +92,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, kraxel@redhat.com, Bruce Rogers <brogers@suse.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It isn't necessarily the case that use of iconv requires an additional
-library. For that reason we shouldn't conditionalize iconv detection on
-libiconv.found.
+This won't prevent the docs from being built, but will let people
+know Sphinx 3.x is not fully supported yet.
 
-Fixes: 5285e593c33 (configure: Fixes ncursesw detection under msys2/mingw by convert them to meson)
-
-Signed-off-by: Bruce Rogers <brogers@suse.com>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
 ---
- meson.build | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
+ docs/conf.py | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/meson.build b/meson.build
-index 1a4a482492..84c8ec9541 100644
---- a/meson.build
-+++ b/meson.build
-@@ -431,15 +431,13 @@ if not get_option('iconv').disabled()
-   libiconv = cc.find_library('iconv',
-                              required: false,
-                              static: enable_static)
--  if libiconv.found()
--    if cc.links('''
--      #include <iconv.h>
--      int main(void) {
--        iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
--        return conv != (iconv_t) -1;
--      }''', dependencies: [libiconv])
--      iconv = declare_dependency(dependencies: [libiconv])
--    endif
-+  if cc.links('''
-+    #include <iconv.h>
-+    int main(void) {
-+      iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
-+      return conv != (iconv_t) -1;
-+    }''', dependencies: [libiconv])
-+    iconv = declare_dependency(dependencies: [libiconv])
-   endif
- endif
- if get_option('iconv').enabled() and not iconv.found()
+diff --git a/docs/conf.py b/docs/conf.py
+index 00e1b750e2..1d92e65d12 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -40,6 +40,11 @@ if sys.version_info < (3,6):
+     raise ConfigError(
+         "QEMU requires a Sphinx that uses Python 3.6 or better\n")
+ 
++# Sphinx 3.x may be able to build the documents, but it may generate
++# warnings and/or the document may be formatted incorrectly
++if sphinx.version_info >= (3, 0):
++    sys.stderr.write('WARNING: Sphinx 3.x is not fully supported by QEMU\n')
++
+ # The per-manual conf.py will set qemu_docdir for a single-manual build;
+ # otherwise set it here if this is an entire-manual-set build.
+ # This is always the absolute path of the docs/ directory in the source tree.
 -- 
 2.28.0
 
