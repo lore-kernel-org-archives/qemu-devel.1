@@ -2,68 +2,68 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-14.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2A19C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:23:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4907C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:23:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2F262214D8
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:23:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E4B1D214D8
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:23:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QPQyfLuz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F262214D8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cT9r1lLY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E4B1D214D8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSZGD-0005y5-5T
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:23:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58598)
+	id 1kSZGI-0006Ei-Te
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:23:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSZEc-0004RA-Aw
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:21:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26307)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSZEg-0004Wt-8o
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:22:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60822)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSZEZ-0003Cn-CX
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:21:58 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSZEc-0003E1-Ar
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:22:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602652913;
+ s=mimecast20190719; t=1602652917;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=lgZ4/l7iK9uKRA3UFPJhayHUdNi0GQGC+XmmJ7KqE+4=;
- b=QPQyfLuzhloCDbCjuOMh5NM5Wl/1nyCx3KBjmrWUoPKMOyy4D1q+jfa/L47hiMwHt+0AEV
- GQuftKJDPFZloD2JYgpCP1D6uo+WpcEtnGJ67MG4cmaVswvbUFVecio5/IqisOUUsr3HOx
- 18Q/N9LHT6wQPSBrnQWd1RwL9JJknhw=
+ bh=4Dpk2RpeTq6xtTwjEJwy4Ga6woCutgZM9eq/ST2fUHg=;
+ b=cT9r1lLYJZ0WFpuawwXCfUNB6fftS5b5SxtuUs9I6+lA+qRdGPbdLLts/4RiNHB32qO3nk
+ fjNk1u2dlK3ruFnUutW4jXuqNFGI03HfOEIQicRZpoQHuN1bNzSoq2J5KzObJJ8aEQqn8R
+ tQUG0JlQymWWGPlD5ipiPL4TPDUwODM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-460-F_LLdyWDOQmL7eF0H1qUcA-1; Wed, 14 Oct 2020 01:21:51 -0400
-X-MC-Unique: F_LLdyWDOQmL7eF0H1qUcA-1
+ us-mta-212-OBZlP2evOhautls8AwxJeg-1; Wed, 14 Oct 2020 01:21:53 -0400
+X-MC-Unique: OBZlP2evOhautls8AwxJeg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3171D1084C84;
- Wed, 14 Oct 2020 05:21:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E460B101962E;
+ Wed, 14 Oct 2020 05:21:51 +0000 (UTC)
 Received: from localhost.localdomain.com (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 56A615D9CD;
- Wed, 14 Oct 2020 05:21:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5D5035D9CD;
+ Wed, 14 Oct 2020 05:21:50 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org,
  =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Peter Maydell <peter.maydell@linaro.org>
-Subject: [PATCH v3 2/4] Jobs based on custom runners: build environment docs
- and playbook
-Date: Wed, 14 Oct 2020 01:21:38 -0400
-Message-Id: <20201014052140.1146924-3-crosa@redhat.com>
+Subject: [PATCH v3 3/4] Jobs based on custom runners: docs and gitlab-runner
+ setup playbook
+Date: Wed, 14 Oct 2020 01:21:39 -0400
+Message-Id: <20201014052140.1146924-4-crosa@redhat.com>
 In-Reply-To: <20201014052140.1146924-1-crosa@redhat.com>
 References: <20201014052140.1146924-1-crosa@redhat.com>
 MIME-Version: 1.0
@@ -109,9 +109,10 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-To run basic jobs on custom runners, the environment needs to be
-properly set up.  The most common requirement is having the right
-packages installed.
+To have the jobs dispatched to custom runners, gitlab-runner must
+be installed, active as a service and properly configured.  The
+variables file and playbook introduced here should help with those
+steps.
 
 The playbook introduced here covers a number of different Linux
 distributions and FreeBSD, and are intended to provide a reproducible
@@ -119,287 +120,191 @@ environment.
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- docs/devel/ci.rst                      |  32 ++++
- scripts/ci/setup/build-environment.yml | 220 +++++++++++++++++++++++++
- scripts/ci/setup/inventory             |   2 +
- 3 files changed, 254 insertions(+)
- create mode 100644 scripts/ci/setup/build-environment.yml
- create mode 100644 scripts/ci/setup/inventory
+ docs/devel/ci.rst                  | 63 ++++++++++++++++++++++++++
+ scripts/ci/setup/.gitignore        |  1 +
+ scripts/ci/setup/gitlab-runner.yml | 72 ++++++++++++++++++++++++++++++
+ scripts/ci/setup/vars.yml.template | 13 ++++++
+ 4 files changed, 149 insertions(+)
+ create mode 100644 scripts/ci/setup/.gitignore
+ create mode 100644 scripts/ci/setup/gitlab-runner.yml
+ create mode 100644 scripts/ci/setup/vars.yml.template
 
 diff --git a/docs/devel/ci.rst b/docs/devel/ci.rst
-index 41a4bbddad..208b5e399b 100644
+index 208b5e399b..a234a5e24c 100644
 --- a/docs/devel/ci.rst
 +++ b/docs/devel/ci.rst
-@@ -52,3 +52,35 @@ As a general rule, those newly added contributed jobs should run as
- The precise minimum requirements and exact rules for machine
- configuration documentation/scripts, and the success rate of jobs are
- still to be defined.
+@@ -84,3 +84,66 @@ To run the playbook, execute::
+ 
+   cd scripts/ci/setup
+   ansible-playbook -i inventory build-environment.yml
 +
-+Machine Setup Howto
-+-------------------
++gitlab-runner setup and registration
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 +
-+For all Linux based systems, the setup can be mostly automated by the
-+execution of two Ansible playbooks.  Start by adding your machines to
-+the ``inventory`` file under ``scripts/ci/setup``, such as this::
++The gitlab-runner agent needs to be installed on each machine that
++will run jobs.  The association between a machine and a GitLab project
++happens with a registration token.  To find the registration token for
++your repository/project, navigate on GitLab's web UI to:
 +
-+  [local]
-+  fully.qualified.domain
-+  other.machine.hostname
++ * Settings (the gears like icon), then
++ * CI/CD, then
++ * Runners, and click on the "Expand" button, then
++ * Under "Set up a specific Runner manually", look for the value under
++   "Use the following registration token during setup"
 +
-+You may need to set some variables in the inventory file itself.  One
-+very common need is to tell Ansible to use a Python 3 interpreter on
-+those hosts.  This would look like::
++Copy the ``scripts/ci/setup/vars.yml.template`` file to
++``scripts/ci/setup/vars.yml``.  Then, set the
++``gitlab_runner_registration_token`` variable to the value obtained
++earlier.
 +
-+  [local]
-+  fully.qualified.domain ansible_python_interpreter=/usr/bin/python3
-+  other.machine.hostname ansible_python_interpreter=/usr/bin/python3
-+
-+Build environment
-+~~~~~~~~~~~~~~~~~
-+
-+The ``scripts/ci/setup/build-environment.yml`` Ansible playbook will
-+set up machines with the environment needed to perform builds and run
-+QEMU tests.  It covers a number of different Linux distributions and
-+FreeBSD.
++.. note:: gitlab-runner is not available from the standard location
++          for all OS and architectures combinations.  For some systems,
++          a custom build may be necessary.  Some builds are avaiable
++          at https://cleber.fedorapeople.org/gitlab-runner/ and this
++          URI may be used as a value on ``vars.yml``
 +
 +To run the playbook, execute::
 +
 +  cd scripts/ci/setup
-+  ansible-playbook -i inventory build-environment.yml
-diff --git a/scripts/ci/setup/build-environment.yml b/scripts/ci/setup/build-environment.yml
++  ansible-playbook -i inventory gitlab-runner.yml
++
++.. note:: there are currently limitations to gitlab-runner itself when
++          setting up a service under FreeBSD systems.  You will need to
++          perform steps 4 to 10 manually, as described at
++          https://docs.gitlab.com/runner/install/freebsd.html
++
++Following the registration, it's necessary to configure the runner tags,
++and optionally other configurations on the GitLab UI.  Navigate to:
++
++ * Settings (the gears like icon), then
++ * CI/CD, then
++ * Runners, and click on the "Expand" button, then
++ * "Runners activated for this project", then
++ * Click on the "Edit" icon (next to the "Lock" Icon)
++
++Under tags, add values matching the jobs a runner should run.  For a
++FreeBSD 12.1 x86_64 system, the tags should be set as::
++
++  freebsd12.1,x86_64
++
++Because the job definition at ``.gitlab-ci.d/custom-runners.yml``
++would contain::
++
++  freebsd-12.1-x86_64-all:
++   tags:
++   - freebsd_12.1
++   - x86_64
++
++It's also recommended to:
++
++ * increase the "Maximum job timeout" to something like ``2h``
++ * uncheck the "Run untagged jobs" check box
++ * give it a better Description
+diff --git a/scripts/ci/setup/.gitignore b/scripts/ci/setup/.gitignore
 new file mode 100644
-index 0000000000..0e8894bca9
+index 0000000000..f112d05dd0
 --- /dev/null
-+++ b/scripts/ci/setup/build-environment.yml
-@@ -0,0 +1,220 @@
++++ b/scripts/ci/setup/.gitignore
+@@ -0,0 +1 @@
++vars.yml
+\ No newline at end of file
+diff --git a/scripts/ci/setup/gitlab-runner.yml b/scripts/ci/setup/gitlab-runner.yml
+new file mode 100644
+index 0000000000..c2f52dad10
+--- /dev/null
++++ b/scripts/ci/setup/gitlab-runner.yml
+@@ -0,0 +1,72 @@
 +---
-+- name: Installation of basic packages to build QEMU
++- name: Installation of gitlab-runner
 +  hosts: all
++  vars_files:
++    - vars.yml
 +  tasks:
-+    - name: Install basic packages to build QEMU on Ubuntu 18.04/20.04
-+      apt:
-+        update_cache: yes
-+        # Originally from tests/docker/dockerfiles/ubuntu1804.docker
-+        pkg:
-+          - ccache
-+          - clang
-+          - gcc
-+          - gettext
-+          - git
-+          - glusterfs-common
-+          - libaio-dev
-+          - libattr1-dev
-+          - libbrlapi-dev
-+          - libbz2-dev
-+          - libcacard-dev
-+          - libcap-ng-dev
-+          - libcurl4-gnutls-dev
-+          - libdrm-dev
-+          - libepoxy-dev
-+          - libfdt-dev
-+          - libgbm-dev
-+          - libgtk-3-dev
-+          - libibverbs-dev
-+          - libiscsi-dev
-+          - libjemalloc-dev
-+          - libjpeg-turbo8-dev
-+          - liblzo2-dev
-+          - libncurses5-dev
-+          - libncursesw5-dev
-+          - libnfs-dev
-+          - libnss3-dev
-+          - libnuma-dev
-+          - libpixman-1-dev
-+          - librados-dev
-+          - librbd-dev
-+          - librdmacm-dev
-+          - libsasl2-dev
-+          - libsdl2-dev
-+          - libseccomp-dev
-+          - libsnappy-dev
-+          - libspice-protocol-dev
-+          - libssh-dev
-+          - libusb-1.0-0-dev
-+          - libusbredirhost-dev
-+          - libvdeplug-dev
-+          - libvte-2.91-dev
-+          - libzstd-dev
-+          - make
-+          - python3-yaml
-+          - python3-sphinx
-+          - sparse
-+          - xfslibs-dev
-+        state: present
++    - debug:
++        msg: 'Checking for a valid GitLab registration token'
++      failed_when: "gitlab_runner_registration_token == 'PLEASE_PROVIDE_A_VALID_TOKEN'"
++
++    - name: Checks the availability of official gitlab-runner builds in the archive
++      uri:
++        url: https://s3.amazonaws.com/gitlab-runner-downloads/v{{ gitlab_runner_version  }}/binaries/gitlab-runner-linux-386
++        method: HEAD
++        status_code:
++          - 200
++          - 403
++      register: gitlab_runner_available_archive
++
++    - name: Update base url
++      set_fact:
++        gitlab_runner_base_url: https://s3.amazonaws.com/gitlab-runner-downloads/v{{ gitlab_runner_version  }}/binaries/gitlab-runner-
++      when: gitlab_runner_available_archive.status == 200
++    - debug:
++        msg: Base gitlab-runner url is {{ gitlab_runner_base_url  }}
++
++    - name: Set OS name (FreeBSD)
++      set_fact:
++        gitlab_runner_os: freebsd
++      when: "ansible_facts['system'] == 'FreeBSD'"
++
++    - name: Create a group for the gitlab-runner service
++      group:
++        name: gitlab-runner
++
++    - name: Create a user for the gitlab-runner service
++      user:
++        user: gitlab-runner
++        group: gitlab-runner
++        comment: GitLab Runner
++        home: /home/gitlab-runner
++        shell: /bin/bash
++
++    - name: Remove the .bash_logout file when on Ubuntu systems
++      file:
++        path: /home/gitlab-runner/.bash_logout
++        state: absent
 +      when: "ansible_facts['distribution'] == 'Ubuntu'"
 +
-+    - name: Install packages to build QEMU on Ubuntu 18.04/20.04 on non-s390x
-+      apt:
-+        update_cache: yes
-+        pkg:
-+         - libspice-server-dev
-+         - libxen-dev
-+        state: present
-+      when:
-+        - "ansible_facts['distribution'] == 'Ubuntu'"
-+        - "ansible_facts['architecture'] != 's390x'"
++    - name: Downloads the matching gitlab-runner
++      get_url:
++        dest: /usr/local/bin/gitlab-runner
++        url: "{{ gitlab_runner_base_url }}{{ gitlab_runner_os }}-{{ gitlab_runner_arch }}"
++        owner: gitlab-runner
++        group: gitlab-runner
++        mode: u=rwx,g=rwx,o=rx
 +
-+    - name: Install basic packages to build QEMU on FreeBSD 12.x
-+      pkgng:
-+        # This matches the packages on .cirrus.yml under the freebsd_12_task
-+        name: bash,bison,curl,cyrus-sasl,git,glib,gmake,gnutls,gsed,nettle,perl5,pixman,pkgconf,png,usbredir
-+        state: present
-+      when: "ansible_facts['os_family'] == 'FreeBSD'"
++    - name: Register the gitlab-runner
++      command: "/usr/local/bin/gitlab-runner register --non-interactive --url {{ gitlab_runner_server_url }} --registration-token {{ gitlab_runner_registration_token }} --executor shell  --description '{{ ansible_facts[\"distribution\"] }} {{ ansible_facts[\"distribution_version\"] }} {{ ansible_facts[\"architecture\"] }} ({{ ansible_facts[\"os_family\"] }})'"
 +
-+    - name: Install basic packages to build QEMU on Fedora 30, 31 and 32
-+      dnf:
-+        # Originally from tests/docker/dockerfiles/fedora.docker
-+        name:
-+          - SDL2-devel
-+          - bc
-+          - brlapi-devel
-+          - bzip2
-+          - bzip2-devel
-+          - ccache
-+          - clang
-+          - cyrus-sasl-devel
-+          - dbus-daemon
-+          - device-mapper-multipath-devel
-+          - diffutils
-+          - findutils
-+          - gcc
-+          - gcc-c++
-+          - genisoimage
-+          - gettext
-+          - git
-+          - glib2-devel
-+          - glusterfs-api-devel
-+          - gnutls-devel
-+          - gtk3-devel
-+          - hostname
-+          - libaio-devel
-+          - libasan
-+          - libattr-devel
-+          - libblockdev-mpath-devel
-+          - libcap-ng-devel
-+          - libcurl-devel
-+          - libepoxy-devel
-+          - libfdt-devel
-+          - libiscsi-devel
-+          - libjpeg-devel
-+          - libpmem-devel
-+          - libpng-devel
-+          - librbd-devel
-+          - libseccomp-devel
-+          - libssh-devel
-+          - libubsan
-+          - libudev-devel
-+          - libusbx-devel
-+          - libxml2-devel
-+          - libzstd-devel
-+          - llvm
-+          - lzo-devel
-+          - make
-+          - mingw32-SDL2
-+          - mingw32-bzip2
-+          - mingw32-curl
-+          - mingw32-glib2
-+          - mingw32-gmp
-+          - mingw32-gnutls
-+          - mingw32-gtk3
-+          - mingw32-libjpeg-turbo
-+          - mingw32-libpng
-+          - mingw32-libtasn1
-+          - mingw32-nettle
-+          - mingw32-nsis
-+          - mingw32-pixman
-+          - mingw32-pkg-config
-+          - mingw64-SDL2
-+          - mingw64-bzip2
-+          - mingw64-curl
-+          - mingw64-glib2
-+          - mingw64-gmp
-+          - mingw64-gnutls
-+          - mingw64-gtk3
-+          - mingw64-libjpeg-turbo
-+          - mingw64-libpng
-+          - mingw64-libtasn1
-+          - mingw64-nettle
-+          - mingw64-pixman
-+          - mingw64-pkg-config
-+          - ncurses-devel
-+          - nettle-devel
-+          - nss-devel
-+          - numactl-devel
-+          - perl
-+          - perl-Test-Harness
-+          - pixman-devel
-+          - python3
-+          - python3-PyYAML
-+          - python3-numpy
-+          - python3-opencv
-+          - python3-pillow
-+          - python3-pip
-+          - python3-sphinx
-+          - python3-virtualenv
-+          - rdma-core-devel
-+          - snappy-devel
-+          - sparse
-+          - spice-server-devel
-+          - systemd-devel
-+          - systemtap-sdt-devel
-+          - tar
-+          - tesseract
-+          - tesseract-langpack-eng
-+          - usbredir-devel
-+          - virglrenderer-devel
-+          - vte291-devel
-+          - which
-+          - xen-devel
-+          - zlib-devel
-+        state: present
-+      when: "ansible_facts['distribution'] == 'Fedora'"
++    - name: Install the gitlab-runner service using its own functionality
++      command: /usr/local/bin/gitlab-runner install --user gitlab-runner --working-directory /home/gitlab-runner
++      register: gitlab_runner_install_service_result
++      failed_when: "gitlab_runner_install_service_result.rc != 0 and \"already exists\" not in gitlab_runner_install_service_result.stderr"
++      when: "ansible_facts['os_family'] != 'FreeBSD'"
 +
-+    - name: Install basic packages to build QEMU on CentOS 8
-+      dnf:
-+        # Originally from tests/docker/dockerfiles/centos8.docker
-+        name:
-+          - SDL-devel
-+          - bzip2
-+          - bzip2-devel
-+          - dbus-daemon
-+          - gcc
-+          - gcc-c++
-+          - genisoimage
-+          - gettext
-+          - git
-+          - glib2-devel
-+          - libaio-devel
-+          - libepoxy-devel
-+          - libgcrypt-devel
-+          - lzo-devel
-+          - make
-+          - mesa-libEGL-devel
-+          - nettle-devel
-+          - perl-Test-Harness
-+          - pixman-devel
-+          - python36
-+          - rdma-core-devel
-+          - spice-glib-devel
-+          - spice-server
-+          - tar
-+          - zlib-devel
-+        state: present
-+      when:
-+        - "ansible_facts['distribution'] == 'CentOS'"
-+        - "ansible_facts['distribution_major_version'] == '8'"
-diff --git a/scripts/ci/setup/inventory b/scripts/ci/setup/inventory
++    - name: Enable the gitlab-runner service
++      service:
++        name: gitlab-runner
++        state: started
++        enabled: yes
++      when: "ansible_facts['os_family'] != 'FreeBSD'"
+diff --git a/scripts/ci/setup/vars.yml.template b/scripts/ci/setup/vars.yml.template
 new file mode 100644
-index 0000000000..8bb7ba6b33
+index 0000000000..621435d030
 --- /dev/null
-+++ b/scripts/ci/setup/inventory
-@@ -0,0 +1,2 @@
-+[local]
-+localhost
++++ b/scripts/ci/setup/vars.yml.template
+@@ -0,0 +1,13 @@
++# The version of the gitlab-runner to use
++gitlab_runner_version: 13.1.1
++# The base location of gitlab-runner binaries, this will be suffixed by $OS-$ARCH
++gitlab_runner_base_url: https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-
++# The URL of the gitlab server to use, usually https://gitlab.com unless you're
++# using a private GitLab instance
++gitlab_runner_server_url: https://gitlab.com
++# Defaults to linux, checks can be used to change this
++gitlab_runner_os: linux
++# Defaults to amd64 (x86_64), checks can be used to change this
++gitlab_runner_arch: amd64
++# A unique token made available by GitLab to your project for registering runners
++gitlab_runner_registration_token: PLEASE_PROVIDE_A_VALID_TOKEN
 -- 
 2.25.4
 
