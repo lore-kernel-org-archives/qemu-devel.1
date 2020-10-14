@@ -2,84 +2,92 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3371C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E50DFC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00F2D2222F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4F68A2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:41:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aoGw4q5l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F2D2222F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cE/XEtK5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F68A2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57684 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSh0j-0003De-Td
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:40:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50726)
+	id 1kSh2C-0004vm-4Y
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:41:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kSgzh-0002DV-1G; Wed, 14 Oct 2020 09:39:05 -0400
-Received: from mail-pl1-x643.google.com ([2607:f8b0:4864:20::643]:36762)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kSgzf-0006vf-00; Wed, 14 Oct 2020 09:39:04 -0400
-Received: by mail-pl1-x643.google.com with SMTP id w21so1788085plq.3;
- Wed, 14 Oct 2020 06:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id;
- bh=sRtlPAI1V8wLrxSirkSZ/JV+HdhX3ELhryBZ8+gA0N0=;
- b=aoGw4q5l5+FWTHf6xUHUn80N1T23w7Oi776eBzlXP1l6W/ijaWBfkcLvOwB7RHTWFF
- JInozaugArupUdWDW8VwM/Ki1o0qCtWqA8aPcUSEWIt42q5x4QHlVLI/+bOz7m05nDOY
- XfA/443Md0VuJM9zI17sWq0ua29wsAM7Z3xH3TAoldAsIw3tUKGKtpyfe7Fi59yijWPj
- e1PUNzxPEFV5j2BCybepM1sVLGsamSulU8Uw8KNkkX/8mncn/TMyPsP5CUuJhQeN6/qN
- I8IHDzmHSl2EKB7CVrjvCzJC//6WFTVGcd9M9x6YpTle5bEDzWY/W7v3zGzrqYvFIROv
- 8tJg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id;
- bh=sRtlPAI1V8wLrxSirkSZ/JV+HdhX3ELhryBZ8+gA0N0=;
- b=sgl3QyjTKkO8MIaZxgxEIR7AiolWrQhQQfvim9JLYKDJtjaMt/URTCR573FQYK/bdW
- aDK/EPwiB2MnGli9V9v7o+mGG078blMp9y7YevjK5xEZeqIIWTLoNnB9yvOrAjbCpq2H
- 2Ub0o8c1RzIGpArmIlbcCrJzS2zUKH3d0kgskHXkxciygWacDVRQurZmV5sr4+18XwW0
- Mxf0zGqGgIfnEbd/kkgFa/dZe6Mp7+tTwDZQFDWT/2IbaWxiblMU/Dk5c4wHLISMG+Ng
- AIYk0DsIVhSKcycPeuRPWtxSXGttCoKqbK+glOYHdY52Y4oqjn19Aeu1UBzDKTIfBgbF
- T0vg==
-X-Gm-Message-State: AOAM532bhK7w6XTnQyE1tCmx4LUBIfnK+ILCtjrvMSus1DQsw/yPPehz
- tZ3iFtAbu30O92khJKECQqaYGeOE4t9B4Iuk
-X-Google-Smtp-Source: ABdhPJwGo4O8gMFLIpcVkizzNmw4WYU5+EpKYABF3+SkIgwdjYyEdGRnLERUsiYItH77MULkL0VX7w==
-X-Received: by 2002:a17:90b:11d1:: with SMTP id
- gv17mr3532011pjb.3.1602682740298; 
- Wed, 14 Oct 2020 06:39:00 -0700 (PDT)
-Received: from pulp100.localdomain ([103.199.158.131])
- by smtp.gmail.com with ESMTPSA id y137sm3521812pfc.77.2020.10.14.06.38.57
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Oct 2020 06:38:59 -0700 (PDT)
-From: Chetan Pant <chetan4windows@gmail.com>
-To: qemu-trivial@nongnu.org
-Subject: [PATCH 1/30] cryptodev: Fix Lesser GPL version number
-Date: Wed, 14 Oct 2020 13:37:22 +0000
-Message-Id: <20201014133722.14041-1-chetan4windows@gmail.com>
-X-Mailer: git-send-email 2.17.1
-Received-SPF: pass client-ip=2607:f8b0:4864:20::643;
- envelope-from=chetan4windows@gmail.com; helo=mail-pl1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSh0M-0002vH-LV
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:39:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22815)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSh0K-00070x-Tv
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:39:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602682783;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=e1A1zcYepOWAMprx4fwEoH0JbQYlc0S/K68cOtM9VYA=;
+ b=cE/XEtK5hmspB5+JfnJW7dKl/q330aOeOmUnB/fB+3/D6mRGc8GdMnSKL151RT9tSzXGhi
+ sV+6bWMdnRFuMLpoCv1dp2RD1AJRPNNrItyMHzgpsS0s7GLKuoEumNMUakrmrls+IHf303
+ EUr8PcpMcFzREeC4Zte8WJ9MP8PBaBU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-372-oztzwiJkNj68zGgD3jaA3g-1; Wed, 14 Oct 2020 09:39:42 -0400
+X-MC-Unique: oztzwiJkNj68zGgD3jaA3g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF2FD86ABDA;
+ Wed, 14 Oct 2020 13:39:40 +0000 (UTC)
+Received: from thuth.remote.csb (reserved-198-128.str.redhat.com
+ [10.33.198.128])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 252695C1C2;
+ Wed, 14 Oct 2020 13:39:38 +0000 (UTC)
+Subject: Re: [PATCH v2 4/4] MAINTAINERS: Move MIPS GIC timer files to Boston
+ board section
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201013101659.3557154-1-f4bug@amsat.org>
+ <20201013101659.3557154-5-f4bug@amsat.org>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <39fdf233-f4a2-5b13-c02f-e404a789d99c@redhat.com>
+Date: Wed, 14 Oct 2020 15:39:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
+MIME-Version: 1.0
+In-Reply-To: <20201013101659.3557154-5-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,120 +101,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: arei.gonglei@huawei.com, qemu-devel@nongnu.org,
- Chetan Pant <chetan4windows@gmail.com>
+Cc: Chen Huacai <zltjiangshi@gmail.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no "version 2" of the "Lesser" General Public License.
-It is either "GPL version 2.0" or "Lesser GPL version 2.1".
-This patch replaces all occurrences of "Lesser GPL version 2" with
-"Lesser GPL version 2.1" in comment section.
+On 13/10/2020 12.16, Philippe Mathieu-Daudé wrote:
+> The MIPS GIC timer is only used by the Boston board.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  MAINTAINERS | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 702f73823fc..62db288bfc4 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -233,11 +233,9 @@ F: docs/system/cpu-models-mips.rst.inc
+>  F: hw/intc/mips_gic.c
+>  F: hw/mips/
+>  F: hw/misc/mips_*
+> -F: hw/timer/mips_gictimer.c
+>  F: include/hw/intc/mips_gic.h
+>  F: include/hw/mips/
+>  F: include/hw/misc/mips_*
+> -F: include/hw/timer/mips_gictimer.h
+>  F: tests/tcg/mips/
+>  K: ^Subject:.*(?i)mips
+>  
+> @@ -1167,7 +1165,9 @@ S: Odd Fixes
+>  F: hw/core/loader-fit.c
+>  F: hw/mips/boston.c
+>  F: hw/pci-host/xilinx-pcie.c
+> +F: hw/timer/mips_gictimer.c
+>  F: include/hw/pci-host/xilinx-pcie.h
+> +F: include/hw/timer/mips_gictimer.h
 
-Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
----
- backends/cryptodev-builtin.c          | 2 +-
- backends/cryptodev-vhost-user.c       | 2 +-
- backends/cryptodev-vhost.c            | 2 +-
- backends/cryptodev.c                  | 2 +-
- include/sysemu/cryptodev-vhost-user.h | 2 +-
- include/sysemu/cryptodev-vhost.h      | 2 +-
- include/sysemu/cryptodev.h            | 2 +-
- 7 files changed, 7 insertions(+), 7 deletions(-)
+If I grep for mips_gictimer_init, it seems like this function is used from
+mips_gic_realize in hw/intc/mips_gic.c ... and mips_gic.c / TYPE_MIPS_GIC is
+also used from the malta board ... so are you really sure this is right? Or
+what did I miss?
 
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index c6edb1b..0671bf9 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -9,7 +9,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/backends/cryptodev-vhost-user.c b/backends/cryptodev-vhost-user.c
-index e1df073..bedb452 100644
---- a/backends/cryptodev-vhost-user.c
-+++ b/backends/cryptodev-vhost-user.c
-@@ -9,7 +9,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/backends/cryptodev-vhost.c b/backends/cryptodev-vhost.c
-index 8337c9a..8231e7f 100644
---- a/backends/cryptodev-vhost.c
-+++ b/backends/cryptodev-vhost.c
-@@ -10,7 +10,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-index 3f141f6..bf52476 100644
---- a/backends/cryptodev.c
-+++ b/backends/cryptodev.c
-@@ -9,7 +9,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/sysemu/cryptodev-vhost-user.h b/include/sysemu/cryptodev-vhost-user.h
-index 0d3421e..6071050 100644
---- a/include/sysemu/cryptodev-vhost-user.h
-+++ b/include/sysemu/cryptodev-vhost-user.h
-@@ -9,7 +9,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/sysemu/cryptodev-vhost.h b/include/sysemu/cryptodev-vhost.h
-index f42824f..e8cab13 100644
---- a/include/sysemu/cryptodev-vhost.h
-+++ b/include/sysemu/cryptodev-vhost.h
-@@ -10,7 +10,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/sysemu/cryptodev.h b/include/sysemu/cryptodev.h
-index b458aa4..f4d4057 100644
---- a/include/sysemu/cryptodev.h
-+++ b/include/sysemu/cryptodev.h
-@@ -9,7 +9,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
--- 
-2.17.1
+ Thomas
 
 
