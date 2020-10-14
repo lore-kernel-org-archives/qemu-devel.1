@@ -2,116 +2,130 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84F3CC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3409C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:37:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7ED320B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:34:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C64B20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 16:37:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JujqGILi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7ED320B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TyssIPXt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C64B20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33628 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSjj6-0002EP-OU
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 12:34:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36410)
+	id 1kSjlx-0004Be-Bd
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 12:37:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSjfS-0008UM-HX
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:30:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55156)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSjfQ-0004xr-Cd
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 12:30:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602693019;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=3ApGR2fP9YAEJs/eUmwSGxpCodfscgUg0ZQcJjaUYK4=;
- b=JujqGILiwz3GVDsrJ7cltZLwtBkXxrr3NWOF/AEqBc8Lq3/2B+7igK0k1G7NkAYMgJHBVz
- o8AG1IEGUC1jXjzjQeoR9+QZbYWf2Hq+QnlJNCrSNW4Af87n/ViN/ZqWz2zCv691PDWmDr
- E/gHH7F6knm7R9qdZefCeKdLEPb5o2Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-15-Ts58mpu7N1Op-Sh3-wWd_A-1; Wed, 14 Oct 2020 12:30:15 -0400
-X-MC-Unique: Ts58mpu7N1Op-Sh3-wWd_A-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BC9AF87951A;
- Wed, 14 Oct 2020 16:30:13 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.194.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2C7285D9CD;
- Wed, 14 Oct 2020 16:30:03 +0000 (UTC)
-Subject: Re: [PATCH v11 09/13] copy-on-read: skip non-guest reads if no copy
- needed
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSjU5-0003VA-LA; Wed, 14 Oct 2020 12:18:37 -0400
+Received: from mail-db8eur05on2117.outbound.protection.outlook.com
+ ([40.107.20.117]:42148 helo=EUR05-DB8-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSjU1-0003D8-GJ; Wed, 14 Oct 2020 12:18:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MlG9aKVZqmdOVLaKNSxx1U27GwaOmZ0zCuUReY5vcGB20o6rkEtZkAk8sQp0QZ6Ma7b9FglQaZD0dVb055l2FB+AAoV/UVUwXh9W9dnb1FQXP0/4q9whPhIAqhV+gPdugvMdGCCxp0pZ7WVwXCH8/sTVxjDYTWCQ3L9d07E9F4bphFPguVCI99QJ2QqaSdpFf0VyTPl3o0LjZhO1enx2Jxxy+FMRnX9rnEwh3ONLjso8UTiNsazFtNbkCGP1guLYVkRwLdaVX8BMvQ8RfcSml1fAcaZrtyhLC2C1yHV4pP2C5Mgxh5FAgyKHZDOGESof/HgmMmxf1NFUi03J341ccA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m3wfLbnhWAa5u5os4NJIqctnkHoc72E1hTNXuC6SIJY=;
+ b=JoxgORIZlLvIEWNxS6+XA+jAVWu9gqzqZHRNSam+IS4mkohlp1nKAwm2kbYSNzHCK9vRXBqcv9szAaiusF0O/qtLX9RSf5Hl0VFOAYIhPudy11aj3r5WDVZOuu4VJ9CzBbph8kZsfKNBDy94DIeECQ3w1NWyXX4sZ33llJV4LY02pZ9D/IERJQnQ5LGj5c0oOPUTM77YhUR/PBm5/d58YDGkjblW1Sqgy32aji5uOx8tTshBuZJWq81F46W+NoHWJq7TwbmxUpkXsKeSgGHQ9b7f6Smey0YipIH+/hUHHSeBUChi3HiVBVtfNApZx3VQRr+WEXc/sLxjn4u1ZnR8+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=m3wfLbnhWAa5u5os4NJIqctnkHoc72E1hTNXuC6SIJY=;
+ b=TyssIPXtpux+bWLGrnWZRdn1l6cBeCB7J6qzpIVeeEjtmSiK06rLah+ADuMLNdxe9YQy58vzX6NQGj/rkWnuJLTZZ0dOlifbmr9upVK1MYsAE1M+OmSIAlREME0uKE6xjFm0KRdimSeDanTIT5mijY4SSqhC9LOi9MmUFe7bcSE=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0802MB2612.eurprd08.prod.outlook.com (2603:10a6:203:99::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.22; Wed, 14 Oct
+ 2020 16:18:30 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Wed, 14 Oct 2020
+ 16:18:30 +0000
+Subject: Re: [PATCH v11 04/13] copy-on-read: pass overlay base node name to
+ COR driver
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ libvir-list@redhat.com, eblake@redhat.com, den@openvz.org
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-10-git-send-email-andrey.shinkevich@virtuozzo.com>
- <59ff1f29-149a-0870-b600-1a54f0421c05@redhat.com>
- <c363d263-1854-d766-e9d3-c8ae8008740f@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <bc862a74-6223-3c8d-d354-36f62bee2d3a@redhat.com>
-Date: Wed, 14 Oct 2020 18:30:02 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ <1602524605-481160-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <3c6699f3-e061-c2ae-c5e9-a12660405624@redhat.com>
+ <89965a42-cee0-a98c-f97a-a03b5d834418@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <b1892d3d-cef7-c804-09fe-1fe9db86a438@virtuozzo.com>
+Date: Wed, 14 Oct 2020 19:18:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
+In-Reply-To: <89965a42-cee0-a98c-f97a-a03b5d834418@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [185.215.60.122]
+X-ClientProxiedBy: AM0PR06CA0103.eurprd06.prod.outlook.com
+ (2603:10a6:208:fa::44) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <c363d263-1854-d766-e9d3-c8ae8008740f@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="TRKp5PkfI3KqgBKWI8KxECee6ti2vUore"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.122) by
+ AM0PR06CA0103.eurprd06.prod.outlook.com (2603:10a6:208:fa::44) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.21 via Frontend Transport; Wed, 14 Oct 2020 16:18:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 6cbdcc86-f57d-4055-d9ec-08d8705cca1e
+X-MS-TrafficTypeDiagnostic: AM5PR0802MB2612:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM5PR0802MB26129EBAB8E4D8B7FE05D4F9C1050@AM5PR0802MB2612.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: I8jOmDKCuakkRcKeWr7K8vU9E5KCQazFQRT8OtQXeyQOB0nVzPaugwpCHkxK7R27P2L0mAzv7Imz7usv/toZ/lrX8YSERULkOKSTySnJQtAZjfPTPXQ/BUYzFzIU8m197Nec9cyihW5USOCS/shVpRjWYoFH7AtheA8Nq0WysCEUH2JkMMLDag29vozTDsALCA8tAL+Ej0vHlC+TosYWS23W2ZfHizFehr6tebtnCIEDIshcU3Zu27KnX13dtKVNWt5D9nRMC7YAOr2orLJPBXUg4Zylz6phYuTV5akOYZlUiA0R/fqG2gS7o5kAWu33vWtxCaZYY879GZNcKGD45Jr0qwRcG5HO8gXU303+etaBLgRXDTLNC9kt85g7zTEq
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(39830400003)(136003)(346002)(366004)(376002)(8676002)(107886003)(478600001)(31686004)(110136005)(7416002)(4326008)(6486002)(66556008)(66476007)(36756003)(8936002)(5660300002)(66946007)(52116002)(16526019)(186003)(31696002)(86362001)(2616005)(53546011)(83380400001)(956004)(16576012)(316002)(2906002)(26005)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: KYPMPBx+cJcx2ekekiA1XqNqRuyOwvJ/ELG+Oe7o64OU7rO4fSu2JCu8Rckov+bHC7r6lQAId+t31qKS8MZ+eAVT461sVvPcjV3/nci5/fWw2IPyPUWS1NaHI+Pwep7x1BTAJF1bs73TgjiaQxa/HnMyQvXLPFR5tiYwqAI7wBqx4SClX+sLA/MhmfwtCB+O/JkUPcM9FnEn7LOmvuxIN674K0kVqJRCokTBFmpxlKuevooZ6QLoEuSSlJ0r8I8X9cQIkpxppplR/VSeucvEFwu9VOvEi/gSyTl50ahAujjAPq14nqd+urlsNm6cDUJ5UosoYfBShQjirBRuRJo/rQCM6BbT6cbZq3fC/RAQBg3wzCziiglldRyS/lH1An82bHTlG4kz9iElab4Wxcf6F9Gz1sTaY4Ahr6hiBS5rdDc7HfHX9wOFcKZcQva8j7khmCRsTjvbqGGcqIV7H1qC1Kc6kbroJhQKwCQvH/o3y8o21Lcnawkzdi1tURnJ8o1Ag9zzG0pI1/eRzZ50owIZfjhr2rcTPbY8obaLwKzIUujknhFfUy+9pAcEyp6PkVb5Z3K+7YWK145yG76guF2llCJk8vLoiShF9D0FmDFcksgrld28R79CquTIorm0AOgt7eSyrcQYQ9J0BFR9Sww17g==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6cbdcc86-f57d-4055-d9ec-08d8705cca1e
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 16:18:30.4770 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BqkTOhqhLinA1ZIItsPR1DzRNhw+dmgQyEZoTj11brmUPw1XXU4pfalQXGVcQxSxe++rmJXOh6Owrqv+ZPBlj3AveBezs76zI7sWm/Aumhg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2612
+Received-SPF: pass client-ip=40.107.20.117;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-DB8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 12:18:31
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -125,173 +139,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, libvir-list@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org,
- jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---TRKp5PkfI3KqgBKWI8KxECee6ti2vUore
-Content-Type: multipart/mixed; boundary="m2hiFrIm5y2dJ9zKwmaGbo0nZcptOTH62"
-
---m2hiFrIm5y2dJ9zKwmaGbo0nZcptOTH62
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
-
-On 14.10.20 17:22, Vladimir Sementsov-Ogievskiy wrote:
-> 14.10.2020 15:51, Max Reitz wrote:
+14.10.2020 19:08, Andrey Shinkevich wrote:
+> On 14.10.2020 14:09, Max Reitz wrote:
 >> On 12.10.20 19:43, Andrey Shinkevich wrote:
->>> If the flag BDRV_REQ_PREFETCH was set, pass it further to the
->>> COR-driver to skip unneeded reading. It can be taken into account for
->>> the COR-algorithms optimization. That check is being made during the
->>> block stream job by the moment.
+>>> We are going to use the COR-filter for a block-stream job.
+>>> To limit COR operations by the base node in the backing chain during
+>>> stream job, pass the name of overlay base node to the copy-on-read
+>>> driver as base node itself may change due to possible concurrent jobs.
+>>> The rest of the functionality will be implemented in the patch that
+>>> follows.
 >>>
 >>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 >>> ---
->>> =C2=A0 block/copy-on-read.c | 13 +++++++++----
->>> =C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 |=C2=A0 3 ++-
->>> =C2=A0 2 files changed, 11 insertions(+), 5 deletions(-)
->>>
+>>>   block/copy-on-read.c | 14 ++++++++++++++
+>>>   1 file changed, 14 insertions(+)
+>>
+>> Is there a reason why you didn’t add this option to QAPI (as part of a
+>> yet-to-be-created BlockdevOptionsCor)?  Because I’d really like it there.
+>>
+> 
+> I agree that passing a base overlay under the base option looks clumsy. We could pass the base node name and find its overlay ourselves here in cor_open(). In that case, we can use the existing QAPI.
+
+Actually, there is no existing QAPI: if you don't modify qapi/*.json, user is not able to pass the option through QAPI. It's still possible to pass the option through command-line, or when create the filter internally (like we are going to do in block-stream), but not through QAPI. So, it's better to make a new QAPI parameter, to make the new option available for QMP interface.
+
+> The reason I used the existing QAPI is to make it easier for a user to operate with the traditional options and to keep things simple. So, the user shouldn't think what overlay or above-base node to pass.
+> If we introduce the specific BlockdevOptionsCor, what other options may come with?
+> 
 >>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->>> index b136895..278a11a 100644
+>>> index bcccf0f..c578b1b 100644
 >>> --- a/block/copy-on-read.c
 >>> +++ b/block/copy-on-read.c
->>> @@ -148,10 +148,15 @@ static int coroutine_fn
->>> cor_co_preadv_part(BlockDriverState *bs,
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_co_prea=
-dv_part(bs->file, offset, n, qiov,
->>> qiov_offset,
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local_flags);
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
-urn ret;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!!(flags & BDRV_REQ_PRE=
-FETCH) &
+>>> @@ -24,19 +24,24 @@
+>>>   #include "block/block_int.h"
+>>>   #include "qemu/module.h"
+>>>   #include "qapi/error.h"
+>>> +#include "qapi/qmp/qerror.h"
+>>>   #include "qapi/qmp/qdict.h"
+>>>   #include "block/copy-on-read.h"
+>>>   typedef struct BDRVStateCOR {
+>>>       bool active;
+>>> +    BlockDriverState *base_overlay;
+>>>   } BDRVStateCOR;
+>>>   static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+>>>                       Error **errp)
+>>>   {
+>>> +    BlockDriverState *base_overlay = NULL;
+>>>       BDRVStateCOR *state = bs->opaque;
+>>> +    /* We need the base overlay node rather than the base itself */
+>>> +    const char *base_overlay_node = qdict_get_try_str(options, "base");
 >>
->> How about dropping the double negation and using a logical && instead of
->> the binary &?
+>> Shouldn’t it be called base-overlay or above-base then?
 >>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !(l=
-ocal_flags & BDRV_REQ_COPY_ON_READ)) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* =
-Skip non-guest reads if no copy needed */
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
+> 
+> The base_overlay identifier is used below as the pointer to BS. The base_overlay_node stands for the name of the node. I used that identifier to differ between the types. And the above_base has another meaning per block/stream.c - it can be a temporary filter with a JSON-name.
+> 
+>>>       bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
+>>>                                  BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
+>>> @@ -52,7 +57,16 @@ static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+>>>           ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
+>>>               bs->file->bs->supported_zero_flags);
+>>> +    if (base_overlay_node) {
+>>> +        qdict_del(options, "base");
+>>> +        base_overlay = bdrv_lookup_bs(NULL, base_overlay_node, errp);
 >>
->> Hm.=C2=A0 I would have just written the negated form
+>> I think this is a use-after-free.  The storage @base_overlay_node points
+>> to belongs to a QString, which is referenced only by @options; so
+>> deleting that element of @options should free that string.
 >>
->> (!(flags & BDRV_REQ_PREFETCH) || (local_flags & BDRV_REQ_COPY_ON_READ))
+>> Max
 >>
->> and put the =E2=80=9Cskip=E2=80=9D comment above that condition.
+> 
+> I will swap those two function calls (bdrv_lookup_bs(); qdict_del();).
+> Thank you.
+> 
+> Andrey
+> 
+>>> +        if (!base_overlay) {
+>>> +            error_setg(errp, QERR_BASE_NOT_FOUND, base_overlay_node);
+>>> +            return -EINVAL;
+>>> +        }
+>>> +    }
+>>>       state->active = true;
+>>> +    state->base_overlay = base_overlay;
+>>>       /*
+>>>        * We don't need to call bdrv_child_refresh_perms() now as the permissions
+>>>
 >>
->> (Since local_flags is initialized to flags, it can be written as a
->> single comparison, but that=E2=80=99s a matter of taste and I=E2=80=99m =
-not going to
->> recommend either over the other:
 >>
->> ((local_flags & (BDRV_REQ_PREFETCH | BDRV_REQ_COPY_ON_READ)) !=3D
->> BDRV_REQ_PREFETCH)
->>
->> )
->>
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
- =3D bdrv_co_preadv_part(bs->file, offset, n, qiov,
->>> qiov_offset,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0 local_flags);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
-(ret < 0) {
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 return ret;
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 offset +=
-=3D n;
->>> diff --git a/block/io.c b/block/io.c
->>> index 11df188..bff1808 100644
->>> --- a/block/io.c
->>> +++ b/block/io.c
->>> @@ -1512,7 +1512,8 @@ static int coroutine_fn
->>> bdrv_aligned_preadv(BdrvChild *child,
->>> =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 max_bytes =3D ROUND_UP(MAX(0, tot=
-al_bytes - offset), align);
->>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bytes <=3D max_bytes && bytes <=3D m=
-ax_transfer) {
->>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_driver_preadv(=
-bs, offset, bytes, qiov,
->>> qiov_offset, 0);
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_driver_preadv(=
-bs, offset, bytes, qiov, qiov_offset,
->>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags & bs->supported_read=
-_flags);
->=20
->=20
-> When BDRV_REQ_PREFETCH is passed, qiov may be (and generally should be)
-> NULL. This means, that we can't just drop the flag when call the driver
-> that doesn't support it.
-
-True. :/
-
-> Actually, if driver doesn't support the PREFETCH flag we should do nothin=
-g.
-
-Hm.  But at least in the case of COR, PREFETCH is not something that can
-be optimized to be a no-op (unless the COR is a no-op); it still denotes
-a command that must be executed.
-
-So if we can=E2=80=99t pass it to the driver, I don=E2=80=99t think we shou=
-ld do
-nothing, but to return an error.  Or maybe we could even assert that it
-isn=E2=80=99t set for drivers that don=E2=80=99t support it, because at lea=
-st right now
-such a case would just be a bug.
-
->> Ah, OK.=C2=A0 I see.=C2=A0 I expected this to be a separate patch.=C2=A0=
- I still wonder
->> why it isn=E2=80=99t.
->>
->=20
->=20
-> Could it be part of patch 07? I mean introduce new field
-> supported_read_flags and handle it in generic code in one patch, prior
-> to implementing support for it in COR driver.
-
-Sure.
-
-Max
 
 
---m2hiFrIm5y2dJ9zKwmaGbo0nZcptOTH62--
-
---TRKp5PkfI3KqgBKWI8KxECee6ti2vUore
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+HJ4oACgkQ9AfbAGHV
-z0C/0gf+MiPRKj9RRIGiNXo5vwxHvDb0a/3/RJhHmIHHV5FiXbRdYHkUgBxt/uyM
-xAe1tl/+6HUwjsH+67LP3AefmPSACJKKZgnw39s/p1wH0piyPVzNSxbJyrykoWzM
-jEcHTq84XiGruDExcqrsTob/KczHYJIg3m0WfCCQsAQ0fljgngrxCLM0GtUT8Zdq
-ueW+jlDlK/MKAFv8SxgC36dXM9q4VyhDVXPxtzHaIqQFfxuI71RXGPEc6XpuAIQx
-hZKNITa1RYcKmk2esN3zIOqAaTRJgHRuNabFh6Inf4OX+F6CmiorKhavVYcBzvD2
-HsIlZVwP4O98lIUVbla2ZuZRQgVFWQ==
-=WbMI
------END PGP SIGNATURE-----
-
---TRKp5PkfI3KqgBKWI8KxECee6ti2vUore--
-
+-- 
+Best regards,
+Vladimir
 
