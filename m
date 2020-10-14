@@ -2,104 +2,90 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 636B2C43457
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:40:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A556C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:42:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD97020878
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:40:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C65CA20B1F
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:42:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fF85xWHC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD97020878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Q1YoMIHD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C65CA20B1F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSbP3-0004dk-KR
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:40:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52596)
+	id 1kSbQk-0006W3-Kr
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:42:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1kSbLx-00029q-2c
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:37:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40837)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mlureau@redhat.com>)
- id 1kSbLs-0007Cr-BZ
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:37:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602661053;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iZ0W+f6KFy6m6bY9ZjShHhWsdwzCdSlJPxuFDFuKocU=;
- b=fF85xWHC3oURiTXn/FqDpmqDLBYvZ+iPlDeC7qun6cO9bafJhE9VUmWUOdueVifhu83bui
- oi/8i9aCitkJBgJl9ZnF//l1XVJ4nqC91CH14dov3Ber9F3A85yW9q+zQlycjOr9Zq79/z
- YL1tNmsJD6csQVTNmRRzvL4TYR2j9cQ=
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com
- [209.85.166.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-zCZGkKPjPpKMEhq5D2AQEw-1; Wed, 14 Oct 2020 03:37:31 -0400
-X-MC-Unique: zCZGkKPjPpKMEhq5D2AQEw-1
-Received: by mail-io1-f72.google.com with SMTP id t187so1790678iof.22
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 00:37:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=iZ0W+f6KFy6m6bY9ZjShHhWsdwzCdSlJPxuFDFuKocU=;
- b=m9OSdSjyJRbqC81Xr9QhKxuY9WF2t6QuPEAMrOetAjXjihga05gEZp9c8H9NVGsyrt
- ZtV0dfC2E9o5t9uHAjeGsagdTwbWHZX9ugkndpFcpeREj84xOdJG2+6i7fHe7/iIJrfP
- sWPilcyYcIN98/L8jb4Ckqtoc5wIFDDo7pGHUWayJJpeHTKVHKdPYZxvviqokdKy0gY/
- 2BaNJUoFkIVYZOl3LOKNfa0YK2sAopYc3nlYDtBlFE7ebvc8sXdW4rCN3wchMZhTeSeX
- x5VQymNBMXCPwCAL2apBBxNIeLIp15dCOB16JkPZiL0H8oRGPQY8yJmMlcAo7j2W27a/
- AiSQ==
-X-Gm-Message-State: AOAM532zl8aZ5JMDkdjGrZ9ecCYXUyEAs3PQpcOevNrFCa4FtHl6Zr6i
- wkLY/VGk6nzZiKl16WSvymQVJn7I2IU/oMvXd+bEnm26B+RTUlgtNlMhfrFnHb2+7IE4fSCC36v
- BuCIgrvNUb8zBVOA8gTv4KIt5hieeVoQ=
-X-Received: by 2002:a92:ba1c:: with SMTP id o28mr2724026ili.182.1602661050288; 
- Wed, 14 Oct 2020 00:37:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzfPD97gUMwkpampLtmTzkMRK8jlNeZ7l9+qg8oWCO4WHoBCA/+GC7zW02Hflc3Ywm6DQ5J522ut5vDcfk/zU0=
-X-Received: by 2002:a92:ba1c:: with SMTP id o28mr2724016ili.182.1602661049979; 
- Wed, 14 Oct 2020 00:37:29 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kSbNO-0003p6-Si
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:39:10 -0400
+Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:48952)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
+ id 1kSbNL-0007jU-3J
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:39:10 -0400
+Received: from myt5-23f0be3aa648.qloud-c.yandex.net
+ (myt5-23f0be3aa648.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id BB7AF2E0404;
+ Wed, 14 Oct 2020 10:39:03 +0300 (MSK)
+Received: from myt4-18a966dbd9be.qloud-c.yandex.net
+ (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
+ by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ WVGBVVrI8j-d2weaKgJ; Wed, 14 Oct 2020 10:39:03 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1602661143; bh=Rbmj6oGzgSGUvYRY0XmFy4V6ii6pTzhKoerYrs/boJw=;
+ h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
+ b=Q1YoMIHDaNWHPLXlL5SBD/Edzdz0EhXNvuAtNfrDwcrSZ4v9+k4UpLM0G7pWIApzE
+ IU6WqmLmnF/VFyrE/bKZTU/aZhBVIjzppDZrh2rgFffMZby12bOMxhYZBVbG/ZtfKx
+ wH4B+fdvaxFvhWT3V8LqKofVa4WmcyGMS67kOI/Y=
+Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
+ [2a02:6b8:b080:6605::1:7])
+ by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
+ v7QuAwcnB5-d2nqGbuu; Wed, 14 Oct 2020 10:39:02 +0300
+ (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+ (Client certificate not present)
+Date: Wed, 14 Oct 2020 10:39:01 +0300
+From: Dima Stepanov <dimastep@yandex-team.ru>
+To: Alexander Bulekov <alxndr@bu.edu>
+Subject: Re: [PATCH v1 1/2] fuzz: add virtio-blk fuzz target
+Message-ID: <20201014073855.GA5872@dimastep-nix>
+References: <cover.1602078083.git.dimastep@yandex-team.ru>
+ <0b922b854ac4121dd8574c3e9cd36c562f7d0a3c.1602078083.git.dimastep@yandex-team.ru>
+ <20201013153052.qzq6dhatcbpx33au@mozz.bu.edu>
+ <20201014072931.GA5631@dimastep-nix>
 MIME-Version: 1.0
-References: <20201013202502.335336-1-marcandre.lureau@redhat.com>
- <20201013202502.335336-3-marcandre.lureau@redhat.com>
- <af872421-2215-72e5-77a2-7d496325c413@redhat.com>
-In-Reply-To: <af872421-2215-72e5-77a2-7d496325c413@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>
-Date: Wed, 14 Oct 2020 11:37:19 +0400
-Message-ID: <CAMxuvazo_3pJzwCRkwjaLro2h=SR8xzJ3XFfDcFx_xtDfGOAtQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] qga: add ssh-{add,remove}-authorized-keys
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlureau@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mlureau@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201014072931.GA5631@dimastep-nix>
+User-Agent: Mutt/1.5.24 (2015-08-30)
+Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
+ envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -108,136 +94,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "P. Berrange, Daniel" <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: stefanha@gmail.com, qemu-devel@nongnu.org, yc-core@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi
-
-On Wed, Oct 14, 2020 at 1:14 AM Philippe Mathieu-Daud=C3=A9
-<philmd@redhat.com> wrote:
->
-> Hi Marc-Andr=C3=A9,
->
-> On 10/13/20 10:25 PM, marcandre.lureau@redhat.com wrote:
-> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> >
-> > Add new commands to add and remove SSH public keys from
-> > ~/.ssh/authorized_keys.
-> >
-> > I took a different approach for testing, including the unit tests right
-> > with the code. I wanted to overwrite the function to get the user
-> > details, I couldn't easily do that over QMP. Furthermore, I prefer
-> > having unit tests very close to the code, and unit files that are domai=
-n
-> > specific (commands-posix is too crowded already). Fwiw, that
->
-> FWIW
-
-ok
-
->
-> > coding/testing style is Rust-style (where tests can or should even be
-> > part of the documentation!).
-> >
-> > Fixes:
-> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1885332
-> >
-> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> > ---
+On Wed, Oct 14, 2020 at 10:29:41AM +0300, Dima Stepanov wrote:
+> On Tue, Oct 13, 2020 at 11:30:52AM -0400, Alexander Bulekov wrote:
+> > On 201007 1647, Dima Stepanov wrote:
+> > > The virtio-blk fuzz target sets up and fuzzes the available virtio-blk
+> > > queues. The implementation is based on two files:
+> > >   - tests/qtest/fuzz/virtio_scsi_fuzz.c
+> > >   - tests/qtest/virtio_blk_test.c
+> > > 
+> > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
+> > > ---
+> > >  tests/qtest/fuzz/meson.build       |   1 +
+> > >  tests/qtest/fuzz/virtio_blk_fuzz.c | 234 +++++++++++++++++++++++++++++++++++++
+> > >  2 files changed, 235 insertions(+)
+> > >  create mode 100644 tests/qtest/fuzz/virtio_blk_fuzz.c
+> > > 
+> > > diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
+> > > index b31ace7..3b923dc 100644
+> > > --- a/tests/qtest/fuzz/meson.build
+> > > +++ b/tests/qtest/fuzz/meson.build
+> > > @@ -5,6 +5,7 @@ specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c',
+> > >  specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
+> > >  specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
+> > >  specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
+> > > +specific_fuzz_ss.add(files('virtio_blk_fuzz.c'))
+> > 
+> > Hi Dima,
+> > For consistency, maybe
+> > specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio_blk_fuzz.c'))
+> Good point, will update it.
+> 
+> > 
 > ...
->
-> > diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> > index cec98c7e06..50e2854b45 100644
-> > --- a/qga/qapi-schema.json
-> > +++ b/qga/qapi-schema.json
-> > @@ -1306,3 +1306,35 @@
-> >   ##
-> >   { 'command': 'guest-get-devices',
-> >     'returns': ['GuestDeviceInfo'] }
-> > +
-> > +##
-> > +# @guest-ssh-add-authorized-keys:
-> > +#
-> > +# @username: the user account to add the authorized key
-> > +# @keys: the public keys to add (in OpenSSH format)
->
-> You use plural but the code only seems to add (remove) one key
-> at a time.
+> > > +
+> > > +static char *drive_create(void)
+> > > +{
+> > > +    int fd, ret;
+> > > +    char *t_path = g_strdup("/tmp/qtest.XXXXXX");
+> > > +
+> > > +    /* Create a temporary raw image */
+> > > +    fd = mkstemp(t_path);
+> > > +    g_assert_cmpint(fd, >=, 0);
+> > > +    ret = ftruncate(fd, TEST_IMAGE_SIZE);
+> > > +    g_assert_cmpint(ret, ==, 0);
+> > > +    close(fd);
+> > > +
+> > > +    g_test_queue_destroy(drive_destroy, t_path);
+> > > +    return t_path;
+> > > +}
+> > > +
+> > 
+> > I tested this out and it works with multi-process fuzzing under -jobs=4
+> > -workers=4 (this initialization happens after libfuzzer has already
+> > forked the processes). This seems like an interesting alternative to
+> > using fake null-co:// files. 
+> > I wonder if some state might leak as these disks are filled with fuzzer
+> > data.
+> Yes, i've also chosen between the fake null device and temporary file.
+> Tried this approach, just to see what will happen ). It seems to me that
+> slightly different paths can be triggered in this case and it is closer
+> to real usage.
+> But indeed, mb some state can leak, this is interesting.
+> 
+> > 
+> > Nit: these disk files remain after the fuzzer exists. It looks
+> > like the libfuzzer people suggest simply using atexit() to perform
+> > cleanup: https://reviews.llvm.org/D45762
+> > The is that the only way I have found to terminate the fuzzer is with
+> > SIGKILL, where atexit is skipped. QEMU installs some signal handlers in
+> > os-posix.c:os_setup_signal_handling to notify the main_loop that the
+> > qemu was killed. Since we replace qemu_main_loop by manually running
+> > main_loop_wait, we don't check main_loop_should_exit().
+> Got it! Thanks for sharing this is good to know ).
+> 
+> No other comments mixed in below.
+> 
+> Dima.
+> > 
+> > I sent a patch to disable QEMU's signal handlers for the fuzzer.
+> > Message-Id: <20201013152920.448335-1-alxndr@bu.edu>
+Sorry, i couldn't find a patch you've pointed out above. Could you share
+some link to it? Also, am i correct that it is a general change for the
+QEMU fuzzing, so all the fuzzing targets will automatically reuse it?
 
-Uh, what makes you believe that?
-
->
-> 'OpenSSH format' is confusing. From sshd(8):
->
->    Each line of the file contains one key (empty lines and lines
->    starting with a =E2=80=98#=E2=80=99 are ignored as comments).
->
->    Public keys consist of the following space-separated fields:
->
->      options, keytype, base64-encoded key, comment.
->
->    The options field is optional.
->
->    Note that lines in this file can be several hundred bytes long
->    (because of the size of the public key encoding) up to a limit
->    of 8 kilobytes, which permits RSA keys up to 16 kilobits.
->
->    The options (if present) consist of comma-separated option
->    specifications.  No spaces are permitted, except within double
->    quotes.
->
-> @openssh_authorized_key_line is ugly, maybe use @authorized_key
-> to make it clearer?
-
-Why? the name of the function already implies we are talking about
-authorized keys. The documentation says it's a public key in openssh
-format (the ones you expect in ~/.ssh/authorized_keys files)
-
-Yes the format isn't very well defined, so I did simple sanity checks.
-After all, people usually append keys with shell >>. I can't find a
-common command to do it with some checking.
-
-> > +#
-> > +# Append a public key to user $HOME/.ssh/authorized_keys on Unix syste=
-ms (not
-> > +# implemented for other systems).
->
-> Here "a key" singular, good.
-
-bad. it should be plural (everywhere else is plural, afaict)
-
->
-> > +#
-> > +# Returns: Nothing on success.
-> > +#
-> > +# Since: 5.2
-> > +##
-> > +{ 'command': 'guest-ssh-add-authorized-keys',
->
-> Here "keys" plural :/
->
-> > +  'data': { 'username': 'str', 'keys': ['str'] } }
-> > +
-> > +##
-> > +# @guest-ssh-remove-authorized-keys:
-> > +#
-> > +# @username: the user account to add the authorized key
-> > +# @keys: the public keys to remove (in OpenSSH format)
-> > +#
-> > +# Remove public keys from the user $HOME/.ssh/authorized_keys on Unix =
-systems
-> > +# (not implemented for other systems).
-> > +#
-> > +# Returns: Nothing on success.
-> > +#
-> > +# Since: 5.2
-> > +##
-> > +{ 'command': 'guest-ssh-remove-authorized-keys',
-> > +  'data': { 'username': 'str', 'keys': ['str'] } }
-> >
->
-
+> > 
+> > With an atexit() call to clean up the temporary images:
+> > Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
+> > 
+> > > +static void *virtio_blk_test_setup(GString *cmd_line, void *arg)
+> > > +{
+> > > +    char *tmp_path = drive_create();
+> > > +
+> > > +    g_string_append_printf(cmd_line,
+> > > +                           " -drive if=none,id=drive0,file=%s,"
+> > > +                           "format=raw,auto-read-only=off ",
+> > > +                           tmp_path);
+> > > +
+> > > +    return arg;
+> > > +}
+> > > +
+> > > +static void register_virtio_blk_fuzz_targets(void)
+> > > +{
+> > > +    fuzz_add_qos_target(&(FuzzTarget){
+> > > +                .name = "virtio-blk-fuzz",
+> > > +                .description = "Fuzz the virtio-blk virtual queues, forking "
+> > > +                                "for each fuzz run",
+> > > +                .pre_vm_init = &counter_shm_init,
+> > > +                .pre_fuzz = &virtio_blk_pre_fuzz,
+> > > +                .fuzz = virtio_blk_fork_fuzz,},
+> > > +                "virtio-blk",
+> > > +                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
+> > > +                );
+> > > +
+> > > +    fuzz_add_qos_target(&(FuzzTarget){
+> > > +                .name = "virtio-blk-flags-fuzz",
+> > > +                .description = "Fuzz the virtio-blk virtual queues, forking "
+> > > +                "for each fuzz run (also fuzzes the virtio flags)",
+> > > +                .pre_vm_init = &counter_shm_init,
+> > > +                .pre_fuzz = &virtio_blk_pre_fuzz,
+> > > +                .fuzz = virtio_blk_with_flag_fuzz,},
+> > > +                "virtio-blk",
+> > > +                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
+> > > +                );
+> > > +}
+> > > +
+> > > +fuzz_target_init(register_virtio_blk_fuzz_targets);
+> > > -- 
+> > > 2.7.4
+> > > 
 
