@@ -2,79 +2,89 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 804B0C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1577C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:53:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE27821D7F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:48:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E8FE122200
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:53:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nqpmb0yX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE27821D7F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nz6odthf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8FE122200
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSktP-0001lO-Ib
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:48:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51110)
+	id 1kSkxq-0003CL-Pl
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:53:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSkrw-0000qF-BX
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:47:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31273)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kSkx7-0002mn-50
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:52:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46020)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kSkro-0006Q0-BU
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:47:19 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kSkx5-0006uk-ER
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:52:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602697630;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=1oQqBIT22lKXATOu/Up5FCCaLkIDKG17nQafJgp9uqw=;
- b=Nqpmb0yXyXFa9djGdeRiSwMPOPUcUJbi12EG2brcQwci8t9bicmESv8pUUtyx4rCbo33hV
- qPtrp/zmx8JLxovkSqu4QyONsmfuJ1gP2pvJT+TgUwBFGP0/wYKQqzY1DPjh0IVfQdQC33
- hAPpNXG8MbioVO8LpqaGAxL7a2h2NLQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-441-ngEgC8-lMf2K2vCvp-cCLg-1; Wed, 14 Oct 2020 13:47:06 -0400
-X-MC-Unique: ngEgC8-lMf2K2vCvp-cCLg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C90B287950D;
- Wed, 14 Oct 2020 17:47:04 +0000 (UTC)
-Received: from redhat.com (ovpn-113-137.ams2.redhat.com [10.36.113.137])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id CF7A85C1BD;
- Wed, 14 Oct 2020 17:46:58 +0000 (UTC)
-Date: Wed, 14 Oct 2020 18:46:55 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Cleber Rosa <crosa@redhat.com>
-Subject: Re: [PATCH v3 4/4] Jobs based on custom runners: add job definitions
- for QEMU's machines
-Message-ID: <20201014174655.GW115189@redhat.com>
-References: <20201014052140.1146924-1-crosa@redhat.com>
- <20201014052140.1146924-5-crosa@redhat.com>
+ s=mimecast20190719; t=1602697957;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=/bmqIxOtbMfUIk+61Bjq8Nwme/nTjohMQdH9WjoEvk8=;
+ b=Nz6odthfnOAdEUpLBMUmtBOh0Vve5XDVmRv8px1gHW2ak6cx3Rhgl1psYdI5GeslqKUBqe
+ GoicAdFbcYPKjOSIVCIOhx3v1F7vgjOaWN7Q/MlDr90Zk2X99Bfrd82/gGRpGN3gVr5Tfy
+ g5FMzW3yk1KFHb4JSYBs8fB13xbiN9I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-TnmJgvJrPKW83fq3L7gIpQ-1; Wed, 14 Oct 2020 13:52:36 -0400
+X-MC-Unique: TnmJgvJrPKW83fq3L7gIpQ-1
+Received: by mail-wm1-f70.google.com with SMTP id s25so161804wmj.7
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 10:52:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=/bmqIxOtbMfUIk+61Bjq8Nwme/nTjohMQdH9WjoEvk8=;
+ b=DuTb0ssac831wf+KdIzpEo8Iaw1FHRgqZZh4vTZF6ahIGCCyQ7F4Ks3iOYVmzQLS2i
+ zeT5l9+y/HU0O4m+A7ZtSj9GqoyFADg9TzDqHTwoLFSVaPq4jvd4u7pudGAAcIffTnGM
+ ZCvs7Tgb+7qweXABB7B7dFh9gp9Pc39xY6CxXI/QovM9KC257jRuvrfALt/MEUC5cCp0
+ wRRYqQs3YJuzuLVRSUhSPT5dfzyBpZllWrifzQwgNT67+Vvv9FMzX8HZ6OzcQo/KwZeC
+ zgpfUh8xhIYFo64DjDD5TIqX8R8HxxG/vPN8vCxBFOV/j6aez1ZHfzR4v/uhBwy2eD/T
+ Jt0g==
+X-Gm-Message-State: AOAM532aL7EW+pMp2HQG7oFj0S7GZ3DNhvNssa4IO9tcPFEPHH6qf1x3
+ H0nJI7HcGiivnK3vRDykvixZH6OAkHo80yPY8ME1cyHQSWuLqSo/JtIjz/Q1/Tlql7rSfUMRDrZ
+ 3UruyFz3gKcfaMO8=
+X-Received: by 2002:adf:fcc3:: with SMTP id f3mr71222wrs.336.1602697954737;
+ Wed, 14 Oct 2020 10:52:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy5fsj+DBEw+rtTeqpEUpjdG+S263PS1xADCPbYn31dIgE1obGoill/d62NR1YdoG56TR4sAg==
+X-Received: by 2002:adf:fcc3:: with SMTP id f3mr71200wrs.336.1602697954466;
+ Wed, 14 Oct 2020 10:52:34 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id a3sm217883wmb.46.2020.10.14.10.52.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Oct 2020 10:52:33 -0700 (PDT)
+Date: Wed, 14 Oct 2020 13:52:29 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Ben Widawsky <ben.widawsky@intel.com>
+Subject: Re: [PATCH RESEND] pci: Disallow improper BAR registration for type 1
+Message-ID: <20201014135146-mutt-send-email-mst@kernel.org>
+References: <20201014171853.71130-1-ben.widawsky@intel.com>
 MIME-Version: 1.0
-In-Reply-To: <20201014052140.1146924-5-crosa@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201014171853.71130-1-ben.widawsky@intel.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,113 +107,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 14, 2020 at 01:21:40AM -0400, Cleber Rosa wrote:
-> The QEMU project has two machines (aarch64 and s390) that can be used
-> for jobs that do build and run tests.  This introduces those jobs,
-> which are a mapping of custom scripts used for the same purpose.
+On Wed, Oct 14, 2020 at 10:18:53AM -0700, Ben Widawsky wrote:
+> This patch informs future developers working on root complexes, root
+> ports, or bridges that also wish to implement a BAR for those. PCI type
+> 1 headers only support 2 base address registers. It is incorrect and
+> difficult to figure out what is wrong with the device when this mistake
+> is made. With this, it is immediate and obvious what has gone wrong.
 > 
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
+
+How about an assert + a comment?
+This is how we usually handle developer bugs. error_report is
+for user errors and similar issues ...
+
 > ---
->  .gitlab-ci.d/custom-runners.yml | 192 ++++++++++++++++++++++++++++++++
->  1 file changed, 192 insertions(+)
+>  hw/pci/pci.c | 10 ++++++++++
+>  1 file changed, 10 insertions(+)
 > 
-> diff --git a/.gitlab-ci.d/custom-runners.yml b/.gitlab-ci.d/custom-runners.yml
-> index 3004da2bda..5b51d1b336 100644
-> --- a/.gitlab-ci.d/custom-runners.yml
-> +++ b/.gitlab-ci.d/custom-runners.yml
-> @@ -12,3 +12,195 @@
->  # strategy.
->  variables:
->    GIT_SUBMODULE_STRATEGY: recursive
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 3c8f10b461..55b0302c57 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -1141,6 +1141,7 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+>      uint32_t addr; /* offset in pci config space */
+>      uint64_t wmask;
+>      pcibus_t size = memory_region_size(memory);
+> +    uint8_t hdr_type;
+>  
+>      assert(region_num >= 0);
+>      assert(region_num < PCI_NUM_REGIONS);
+> @@ -1150,6 +1151,15 @@ void pci_register_bar(PCIDevice *pci_dev, int region_num,
+>          exit(1);
+>      }
+>  
+> +    hdr_type =
+> +        pci_dev->config[PCI_HEADER_TYPE] & ~PCI_HEADER_TYPE_MULTI_FUNCTION;
+> +    if (hdr_type == PCI_HEADER_TYPE_BRIDGE && region_num > 1) {
+> +        error_report("ERROR: PCI Type 1 header only has 2 BARs "
+> +                     "requested BAR=%d",
+> +                     region_num);
+> +        exit(1);
+> +    }
 > +
-> +# All ubuntu-18.04 jobs should run successfully in an environment
-> +# setup by the scripts/ci/setup/build-environment.yml task
-> +# "Install basic packages to build QEMU on Ubuntu 18.04/20.04"
-> +ubuntu-18.04-s390x-all-linux-static:
-> + needs: []
-> + stage: build
-> + tags:
-> + - ubuntu_18.04
-> + - s390x
-> + rules:
-> + - if: '$CI_COMMIT_BRANCH =~ /^staging/'
-
-IIRC, in the previous v2 (or was it v1) we discussed changing this
-so that users who provide their own runners, don't have to always
-use the "staging" branch name.
-
-IIUC, the key thing is that we don't want the job running on the
-"master" or "stable-*" branches in the primary QEMU git. So could
-check
-
-   $CI_PROJECT_NAMESPACE == 'qemu-project'
-   &&
-   $CI_COMMIT_BRANCH !~ '^master$'
-   &&
-   $CI_COMMIT_BRANCH !~ '^stable-$'
-
-which would let it work on users forks no matter what branch names
-they use
-
-What happens to the job if the user doesn't have runners ? Is it
-simply skipped, or does the pipeline stall and get marked as failed ?
-
-If the jobs aren't auto-skiped, we would need to add an env variable
-
-   (
-   $CI_PROJECT_NAMESPACE == 'qemu-project'
-   &&
-   $CI_COMMIT_BRANCH !~ '^master$'
-   &&
-   $CI_COMMIT_BRANCH !~ '^stable-$'
-   )
-   ||
-   $QEMU_ENABLE_CUSTOM_RUNNERS == 'yes'
-
-and require the user to set the QEMU_ENABLE_CUSTOM_RUNNERS variable
-in the web UI for their fork
-
-That all said, I don't mind if you postpone this rules change to a
-followup patch.
-
-> + script:
-> + # --disable-libssh is needed because of https://bugs.launchpad.net/qemu/+bug/1838763
-
-This bug links to
-
-  https://bugs.launchpad.net/ubuntu/+source/libssh/+bug/1847514
-
-which is marked as fixed. So I'm thinking we can drop the --disable-libssh
-arg from all these jobs
-
-> + # --disable-glusterfs is needed because there's no static version of those libs in distro supplied packages
-> + - mkdir build
-> + - cd build
-> + - ../configure --enable-debug --static --disable-system --disable-glusterfs --disable-libssh
-> + - make --output-sync -j`nproc`
-> + - make --output-sync -j`nproc` check V=1
-> + - make --output-sync -j`nproc` check-tcg V=1
-
-
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+>      r = &pci_dev->io_regions[region_num];
+>      r->addr = PCI_BAR_UNMAPPED;
+>      r->size = size;
+> -- 
+> 2.28.0
 
 
