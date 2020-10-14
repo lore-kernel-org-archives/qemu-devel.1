@@ -7,52 +7,52 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C30EFC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:31:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF67C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 25415212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:31:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 25415212CC
+	by mail.kernel.org (Postfix) with ESMTPS id A107120878
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A107120878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52950 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSbFe-0001BA-Fn
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:31:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50920)
+	id 1kSbHU-000451-1k
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:33:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSbDB-0007pH-C7
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:37 -0400
-Received: from mga05.intel.com ([192.55.52.43]:54373)
+ id 1kSbD4-0007gi-9F
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:30 -0400
+Received: from mga05.intel.com ([192.55.52.43]:54366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSbD6-000450-3q
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:37 -0400
-IronPort-SDR: FN1WpYRJesRbsed6BaC5BUlZlJgxr0kD7F8KF8bZ/sdJ2BH384NjO7C3TLRuNJR5ZrSPrBr0S0
- UxeoAUAKLyqQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="250751930"
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="250751930"
+ id 1kSbD1-00041v-O1
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:29 -0400
+IronPort-SDR: o3hzt5hwvsxXPs6vnsFc4Tht9/agEqM7NG+g7Ib9xTugk0aojoWw4fYjpJzHBbwgE9oAZZO1br
+ XaIgmYKsrKeg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="250751922"
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="250751922"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2020 00:28:30 -0700
-IronPort-SDR: wM2xN6bU8DSzm0DFNzURyl3VsYDvE0YskC5lkOF2ed+WRLBl9m+1qDTjDGnZPblRic6gEY3L86
- xRJt5s7P5KXQ==
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="521323047"
+ 14 Oct 2020 00:28:25 -0700
+IronPort-SDR: jz81B8NYT74HL9y6waUCUwr5gv4gdvyjIKdmel80ynnMMbh+wrq0K6vZCXg18x2FKI01uIJoCa
+ URzbvfUEs0FQ==
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="521323034"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2020 00:28:28 -0700
+ 14 Oct 2020 00:28:24 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>,
 	qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH 05/10] colo-compare: fix missing compare_seq initialization
-Date: Wed, 14 Oct 2020 15:25:51 +0800
-Message-Id: <20201014072555.12515-6-chen.zhang@intel.com>
+Subject: [PATCH 02/10] Optimize seq_sorter function for colo-compare
+Date: Wed, 14 Oct 2020 15:25:48 +0800
+Message-Id: <20201014072555.12515-3-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201014072555.12515-1-chen.zhang@intel.com>
 References: <20201014072555.12515-1-chen.zhang@intel.com>
@@ -79,41 +79,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, Li Zhijian <lizhijian@cn.fujitsu.com>,
+Cc: Zhang Chen <chen.zhang@intel.com>, "Rao, Lei" <lei.rao@intel.com>,
  Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
+From: "Rao, Lei" <lei.rao@intel.com>
 
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+The seq of tcp has been filled in fill_pkt_tcp_info, it
+can be used directly here.
+
+Signed-off-by: leirao <lei.rao@intel.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Reviewed-by: Zhang Chen <chen.zhang@intel.com>
 ---
- net/colo.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ net/colo-compare.c | 6 +-----
+ 1 file changed, 1 insertion(+), 5 deletions(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index a6c66d829a..ef00609848 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -133,14 +133,11 @@ void reverse_connection_key(ConnectionKey *key)
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 3a45d64175..86980cef5e 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -196,11 +196,7 @@ static void colo_compare_inconsistency_notify(CompareState *s)
  
- Connection *connection_new(ConnectionKey *key)
+ static gint seq_sorter(Packet *a, Packet *b, gpointer data)
  {
--    Connection *conn = g_slice_new(Connection);
-+    Connection *conn = g_slice_new0(Connection);
+-    struct tcp_hdr *atcp, *btcp;
+-
+-    atcp = (struct tcp_hdr *)(a->transport_header);
+-    btcp = (struct tcp_hdr *)(b->transport_header);
+-    return ntohl(atcp->th_seq) - ntohl(btcp->th_seq);
++    return a->tcp_seq - b->tcp_seq;
+ }
  
-     conn->ip_proto = key->ip_proto;
-     conn->processing = false;
--    conn->offset = 0;
-     conn->tcp_state = TCPS_CLOSED;
--    conn->pack = 0;
--    conn->sack = 0;
-     g_queue_init(&conn->primary_list);
-     g_queue_init(&conn->secondary_list);
- 
+ static void fill_pkt_tcp_info(void *data, uint32_t *max_ack)
 -- 
 2.17.1
 
