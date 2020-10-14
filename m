@@ -7,59 +7,60 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4B5C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:05:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B1D9C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:06:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B50C920848
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:05:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62C2F20848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:06:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLeCAQXM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50C920848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iSu0uuOV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62C2F20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51956 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSfWh-0005cn-H8
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:05:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
+	id 1kSfXy-0007Ba-5o
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:06:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfTe-0002i7-RG
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:01:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39217)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfQ0-0006Jc-Uf
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:58:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27672)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfTb-0001qb-OZ
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:01:54 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfPu-00017J-H3
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:58:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602676908;
+ s=mimecast20190719; t=1602676681;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=88cI3uijKQZiNxTG1cOijQI5qui5yRPuLzRT4Tc/T3o=;
- b=PLeCAQXMlj8IhBh5yNrKRrMMXCCkh2Hf2a8ROydJLd1iMULgJ7lBA/UvlYjttQbFsEEgeX
- ddsTkoeX2bIMCMj2H0124xy7pow+X/GL+MIaEV2LlolCwlt6KdLStCqlxTK0pLOW7/PLJP
- yz2j/G38Y65gFueP+JjP58Z2kYSz/A4=
+ bh=JWNsx2Xojid0fgXYgxzECegIoEXfKwFz+umvD5SY4LQ=;
+ b=iSu0uuOVJet56yJcKC0ZWsoHvsXr6NVWexrUM/i2CJGdqakjQG2BX/J5oBRqJRkxQUJQpv
+ Od2RaKehSU7p6CVbofbiNVHYvcsI+UIXeZ7GHXjTnT8VZ8UiUUMkXOIn8me/f2GoVlpxNv
+ tL510KX8uesrwhGS4kJ3ct9CKn9vJJU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-61-ibejPOSWOeGm2P3CBFipwg-1; Wed, 14 Oct 2020 08:01:43 -0400
-X-MC-Unique: ibejPOSWOeGm2P3CBFipwg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-574-pDGVIQEQNK2RXe-FhXGDMA-1; Wed, 14 Oct 2020 07:57:59 -0400
+X-MC-Unique: pDGVIQEQNK2RXe-FhXGDMA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EC0D107465B;
- Wed, 14 Oct 2020 12:01:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 368EE64175;
+ Wed, 14 Oct 2020 11:57:58 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.194.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 44C635D9CD;
- Wed, 14 Oct 2020 12:01:38 +0000 (UTC)
-Subject: Re: [PATCH v11 05/13] copy-on-read: limit COR operations to base in
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 9C92355778;
+ Wed, 14 Oct 2020 11:57:48 +0000 (UTC)
+Subject: Re: [PATCH v11 04/13] copy-on-read: pass overlay base node name to
  COR driver
+From: Max Reitz <mreitz@redhat.com>
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Max Reitz <mreitz@redhat.com>
+ <1602524605-481160-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <3c6699f3-e061-c2ae-c5e9-a12660405624@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
  /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
@@ -84,30 +85,30 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <6dc38263-ad9c-f238-7197-68e920b6080d@redhat.com>
-Date: Wed, 14 Oct 2020 14:01:36 +0200
+Message-ID: <bbcb3d60-fbc2-b22c-2660-5e9d8dc4ce5e@redhat.com>
+Date: Wed, 14 Oct 2020 13:57:46 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <3c6699f3-e061-c2ae-c5e9-a12660405624@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ boundary="A9z3lyveoGkt8hS5559kBRX4FEI5v2CwW"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -130,123 +131,90 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw
-Content-Type: multipart/mixed; boundary="pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY"
+--A9z3lyveoGkt8hS5559kBRX4FEI5v2CwW
+Content-Type: multipart/mixed; boundary="O9WOYT3oyToRkS2qdlxfQBxlgbwVh025M"
 
---pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY
+--O9WOYT3oyToRkS2qdlxfQBxlgbwVh025M
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 12.10.20 19:43, Andrey Shinkevich wrote:
-> Limit COR operations by the base node in the backing chain when the
-> overlay base node name is given. It will be useful for a block stream
-> job when the COR-filter is applied. The overlay base node is passed as
-> the base itself may change due to concurrent commit jobs on the same
-> backing chain.
+On 14.10.20 13:09, Max Reitz wrote:
+> On 12.10.20 19:43, Andrey Shinkevich wrote:
+>> We are going to use the COR-filter for a block-stream job.
+>> To limit COR operations by the base node in the backing chain during
+>> stream job, pass the name of overlay base node to the copy-on-read
+>> driver as base node itself may change due to possible concurrent jobs.
+>> The rest of the functionality will be implemented in the patch that
+>> follows.
+>>
+>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>> ---
+>>  block/copy-on-read.c | 14 ++++++++++++++
+>>  1 file changed, 14 insertions(+)
 >=20
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->  block/copy-on-read.c | 39 +++++++++++++++++++++++++++++++++++++--
->  1 file changed, 37 insertions(+), 2 deletions(-)
+> Is there a reason why you didn=E2=80=99t add this option to QAPI (as part=
+ of a
+> yet-to-be-created BlockdevOptionsCor)?  Because I=E2=80=99d really like i=
+t there.
 >=20
-> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-> index c578b1b..dfbd6ad 100644
-> --- a/block/copy-on-read.c
-> +++ b/block/copy-on-read.c
-> @@ -122,8 +122,43 @@ static int coroutine_fn cor_co_preadv_part(BlockDriv=
-erState *bs,
->                                             size_t qiov_offset,
->                                             int flags)
->  {
-> -    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offse=
-t,
-> -                               flags | BDRV_REQ_COPY_ON_READ);
-> +    int64_t n =3D 0;
-> +    int64_t size =3D offset + bytes;
+>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+>> index bcccf0f..c578b1b 100644
+>> --- a/block/copy-on-read.c
+>> +++ b/block/copy-on-read.c
+>> @@ -24,19 +24,24 @@
+>>  #include "block/block_int.h"
+>>  #include "qemu/module.h"
+>>  #include "qapi/error.h"
+>> +#include "qapi/qmp/qerror.h"
+>>  #include "qapi/qmp/qdict.h"
+>>  #include "block/copy-on-read.h"
+>> =20
+>> =20
+>>  typedef struct BDRVStateCOR {
+>>      bool active;
+>> +    BlockDriverState *base_overlay;
+>>  } BDRVStateCOR;
+>> =20
+>> =20
+>>  static int cor_open(BlockDriverState *bs, QDict *options, int flags,
+>>                      Error **errp)
+>>  {
+>> +    BlockDriverState *base_overlay =3D NULL;
+>>      BDRVStateCOR *state =3D bs->opaque;
+>> +    /* We need the base overlay node rather than the base itself */
+>> +    const char *base_overlay_node =3D qdict_get_try_str(options, "base"=
+);
+>=20
+> Shouldn=E2=80=99t it be called base-overlay or above-base then?
 
-Just when I hit send I noticed that =E2=80=9Cend=E2=80=9D would be a more f=
-itting name
-for this variable.
-
-> +    int local_flags;
-> +    int ret;
-> +    BDRVStateCOR *state =3D bs->opaque;
-> +
-> +    if (!state->base_overlay) {
-> +        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_o=
-ffset,
-> +                                   flags | BDRV_REQ_COPY_ON_READ);
-> +    }
-> +
-> +    while (offset < size) {
-
-(because I got a bit confused looking at this)
-
-(Though dropping @size (or @end) and just checking when @bytes becomes 0
-should work, too.)
-
-> +        local_flags =3D flags;
-> +
-> +        /* In case of failure, try to copy-on-read anyway */
-> +        ret =3D bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
-> +        if (!ret) {
-> +            ret =3D bdrv_is_allocated_above(bdrv_cow_bs(bs->file->bs),
-> +                                          state->base_overlay, true, off=
-set,
-> +                                          n, &n);
-> +            if (ret) {
-> +                local_flags |=3D BDRV_REQ_COPY_ON_READ;
-> +            }
-> +        }
-
-Furthermore, I just noticed =E2=80=93 can the is_allocated functions not re=
-turn
-0 in @n, when @offset is a the EOF?  Is that something to look out for?
- (I=E2=80=99m not sure.)
+While reviewing patch 5, I realized this sould indeed be base-overlay
+(i.e. the next allocation-bearing layer above the base, not just a
+filter on top of base), but that should be noted somewhere, of course.
+Best would be the QAPI documentation for this option. O:)
 
 Max
 
-> +
-> +        ret =3D bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offs=
-et,
-> +                                  local_flags);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +
-> +        offset +=3D n;
-> +        qiov_offset +=3D n;
-> +        bytes -=3D n;
-> +    }
-> +
-> +    return 0;
->  }
-> =20
-> =20
->=20
 
+--O9WOYT3oyToRkS2qdlxfQBxlgbwVh025M--
 
-
---pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY--
-
---ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw
+--A9z3lyveoGkt8hS5559kBRX4FEI5v2CwW
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+G6KAACgkQ9AfbAGHV
-z0AQlAgAoY6VwV881pfGXy4iekBVJliHszTA1wptdNZ3m/INoJzcIf7Urk46fZqH
-hW5+TiZwKc3p1+6VFU9blxkngetd3gV2/yhvbmQItBHgGEI7MCSnnCmkJkW4mxcS
-Rrst6Jj1M4SxohnXRwLu/5eLiAvvo+YV+OYtQa19Jl8XWsLlt/+/HibW2yORqQdr
-UENsEXIHnk3AoASt++jKnHQ+oW57+0GUCnxnFQvq8hjPK6Y8VfPdKIqgsOcpGc2M
-3Et35Ao+BaPOkxO6IwzcbHtjmQWPHs6AgSM+oU73R1/xcPlkx6TPvjAiQeXd1vRq
-0xDkdN+YBrjBwqewZBxTscXPOFXWCw==
-=KhJm
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+G57oACgkQ9AfbAGHV
+z0Bp4Af5ARzirR19xTe3ha1EeP1S0ccFIYJ4JYMJTUhTeVTHISYe4rxvp6v51WVX
+aBVnoNeJNbH+4qCRYMpptitKaV6cflt+kzvbRnglyU1sTTR4ePmTB5j4cgZnRHHR
+bAD2awVUMZgAM6239zSM0LdjvSbsXt8HqThpyZV8p4RLZiWTezgGRa76BU/SYG+5
+lw2Mt6DjdrVWrWFVZ/NRwRN5oDCzUdTg5szpc3XAj6XZViRwYt7PvE3WJk+PVJ+O
+KImBUEc4154ZkJXaRFlBn26t46mGhxyNxR5/W9P3d4txWrKyefpRsL+FcITzf2I5
+6xAI4qhbU9xV9wymkOlqP4rWEfVYKw==
+=a6+i
 -----END PGP SIGNATURE-----
 
---ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw--
+--A9z3lyveoGkt8hS5559kBRX4FEI5v2CwW--
 
 
