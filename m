@@ -2,85 +2,89 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F1AC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:48:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946ABC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:49:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 45405212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:48:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D3CD5212CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:49:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ff8B6YZb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45405212CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AYuQ+2mY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D3CD5212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSi4c-0007rV-73
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:48:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36802)
+	id 1kSi5V-0000bv-T3
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:49:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40034)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kShnq-0005AO-4u
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:30:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26530)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kShnn-0005jj-Uj
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:30:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602685850;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Vstj7vGNjfOqePSSV4lvZPc8VeSSnsaaYnAy+pbjcGE=;
- b=Ff8B6YZboenbQruGHFYzJ8W8uST60BSMP/Aou7JACwK10nD9/UmKPzpLAq2r6ShJn6NppG
- Q89P+DcCjsqJ4E5DHgpGztM3mrB1zgAk50wONotd0VKuZl8rS4Dp55GTl7OcWm8/C53OJa
- C2R6CzyREM9h1KfUoQdT9XDZrAOGLGo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-474-UxN2da5fPma-GNcp7xGzGg-1; Wed, 14 Oct 2020 10:30:47 -0400
-X-MC-Unique: UxN2da5fPma-GNcp7xGzGg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8AA17802B72;
- Wed, 14 Oct 2020 14:30:44 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-117-231.rdu2.redhat.com [10.10.117.231])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0F80376649;
- Wed, 14 Oct 2020 14:30:42 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 11/15] python: move mypy.ini into setup.cfg
-Date: Wed, 14 Oct 2020 10:29:53 -0400
-Message-Id: <20201014142957.763624-12-jsnow@redhat.com>
-In-Reply-To: <20201014142957.763624-1-jsnow@redhat.com>
-References: <20201014142957.763624-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kSi0g-00042n-RN; Wed, 14 Oct 2020 10:44:10 -0400
+Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:34244)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kSi0a-0007Fs-I0; Wed, 14 Oct 2020 10:44:10 -0400
+Received: by mail-il1-x144.google.com with SMTP id p9so5460330ilr.1;
+ Wed, 14 Oct 2020 07:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zQzPKq16yu+wQNP+5HVfVrbp88hfbes34W28y1fwrAo=;
+ b=AYuQ+2mYdRPu4kBaT98NJpBbzyeGJGXyuSvjFBu64ETEJMduLeeTfWgZRyj9bM4lso
+ O/xN3atcuL6aFI8j2y7TyxnfFFpplbgpUP/a7eZu67wHa7O4q33Xwho0j5pfMCeWTAol
+ 5heSCbkjE2Nu0TY2Dhm9Gqslan9EgeG7+RYv5TVg1Klz1OSmcH1Bv0753OEt0RoG6dux
+ cMqO+YIADHkUB6ZO3zr+JgRBRG0fNAHQW4IObGpkdZ6zLro1XD/ypxy1geRFxqtqFwuM
+ fs/bWXg2H0dnsNsJRlSVumyy0e3ke9mL+04QnQ9AoFkrFySjooFJDn9yfssI0O4Kh3LF
+ BrGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zQzPKq16yu+wQNP+5HVfVrbp88hfbes34W28y1fwrAo=;
+ b=nlg/T+Fn+15x8YZCDkq4qYy+PEMat8I+qSoss1jgiGSaSIaM+xCRwG3eRxTWUWGKYx
+ fonY3UIdEYD7M9hK3FZSU/b7DHy1n5rwP0mCjM0d6lpdJUZ6C9k+ldRuM/+exiHXQrAw
+ gMptpLVdt2gSnBo8hja79+nwbDUDbWKD+tB1d+Z6zoScCr6RzMj2safgcylVh2NFTyjf
+ 9XPztappGmGXCiMjuaHRoYYQ2/bksxUnX1XclyDGY3DywTE63H+zvDtojzwpk6ZhgKIb
+ bjg6xOGbD6eTo5Bu4rIoTvliChOTfKbjbgPjCtJ3XauoFGx8/EDAEAz97V/bd8vL5L2l
+ UNSQ==
+X-Gm-Message-State: AOAM530RJwOHwSSHJPNhky7RMR5D88ZATbwK/lxy5lMca5dyGqfITJPz
+ QtFNSsdm1HWGh5iefdUBbOYXpXibq3Bxm85bSww=
+X-Google-Smtp-Source: ABdhPJy14nkx7JsiFDQ4qV3sjDpsWq6d+rt2RpyMeeyyDhymrS2um+tsis//zKWzgPLW8WJAuKaHvtmJmtMoqzyNf00=
+X-Received: by 2002:a92:c5c2:: with SMTP id s2mr4357767ilt.177.1602686643126; 
+ Wed, 14 Oct 2020 07:44:03 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201012153408.9747-1-peter.maydell@linaro.org>
+ <20201012153408.9747-13-peter.maydell@linaro.org>
+ <CAKmqyKO-bRg0WcoqXnt1oaKtgzKTdajwJ-U2YfZh=PzvP77xug@mail.gmail.com>
+ <CAKmqyKNpkFmXD+FJHXy4MGL03pUkXgWQLz6qPETB0TQBORwkFQ@mail.gmail.com>
+ <CAFEAcA_WqxjOFkSmhoNnJUax9u6O6+fk6S-shWWjYK91RBBv5w@mail.gmail.com>
+In-Reply-To: <CAFEAcA_WqxjOFkSmhoNnJUax9u6O6+fk6S-shWWjYK91RBBv5w@mail.gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 14 Oct 2020 07:32:25 -0700
+Message-ID: <CAKmqyKNdzaZksnYkO5jNTM1L85tA-GHxv4ZL-rr=0arZ+ZYKpQ@mail.gmail.com>
+Subject: Re: [PATCH for-5.1] hw/arm/netduino2,
+ netduinoplus2: Set system_clock_scale
+To: Peter Maydell <peter.maydell@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,59 +97,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Ben Widawsky <ben@bwidawsk.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Max Reitz <mreitz@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Rohit Shinde <rohit.shinde12194@gmail.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
- Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>
+Cc: qemu-arm <qemu-arm@nongnu.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-mypy supports reading its configuration values from a central project
-configuration file; do so.
+On Wed, Oct 14, 2020 at 5:39 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> On Wed, 14 Oct 2020 at 01:42, Alistair Francis <alistair23@gmail.com> wrote:
+> >
+> > On Tue, Oct 13, 2020 at 5:29 PM Alistair Francis <alistair23@gmail.com> wrote:
+> > >
+> > > On Mon, Oct 12, 2020 at 8:45 AM Peter Maydell <peter.maydell@linaro.org> wrote:
+> > > >
+> > > > The netduino2 and netduinoplus2 boards forgot to set the system_clock_scale
+> > > > global, which meant that if guest code used the systick timer in "use
+> > > > the processor clock" mode it would hang because time never advances.
+> > > >
+> > > > Set the global to match the documented CPU clock speed of these boards.
+> > > > Judging by the data sheet this is slightly simplistic because the
+> > > > SoC allows configuration of the SYSCLK source and frequency via the
+> > > > RCC (reset and clock control) module, but we don't model that.
+> > > >
+> > > > Fixes: https://bugs.launchpad.net/qemu/+bug/1876187
+> >
+> > Thanks for fixing this Peter.
+>
+> This is already in master (commit e7e5a9595ab) -- this email is
 
-Signed-off-by: John Snow <jsnow@redhat.com>
----
- python/mypy.ini  | 4 ----
- python/setup.cfg | 5 +++++
- 2 files changed, 5 insertions(+), 4 deletions(-)
- delete mode 100644 python/mypy.ini
+I thought I saw that in the bug report, but I just assumed it was
+pointing to a branch.
 
-diff --git a/python/mypy.ini b/python/mypy.ini
-deleted file mode 100644
-index 1a581c5f1e..0000000000
---- a/python/mypy.ini
-+++ /dev/null
-@@ -1,4 +0,0 @@
--[mypy]
--strict = True
--python_version = 3.6
--warn_unused_configs = True
-diff --git a/python/setup.cfg b/python/setup.cfg
-index 103371ad5e..13a7a8cd9c 100755
---- a/python/setup.cfg
-+++ b/python/setup.cfg
-@@ -21,6 +21,11 @@ packages = find_namespace:
- [flake8]
- extend-ignore = E722  # Pylint handles this, but smarter.
- 
-+[mypy]
-+strict = True
-+python_version = 3.6
-+warn_unused_configs = True
-+
- [pylint.messages control]
- # Disable the message, report, category or checker with the given id(s). You
- # can either give multiple identifiers separated by comma (,) or put this
--- 
-2.26.2
+> one of a set of stale patchmails I sent out by mistake on Monday
+> when I mangled a git send-email command. Sorry for the confusion.
 
+Strange. No worries.
+
+Alistair
+
+>
+> -- PMM
 
