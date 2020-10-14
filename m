@@ -2,87 +2,84 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0FEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5E8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:54:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B3AA212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:52:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EBE5212CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:54:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JKiGvbia"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3AA212CC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LKrjclpN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBE5212CC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56938 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSi99-0004ni-06
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:52:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37746)
+	id 1kSiAk-0006UC-Ak
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:54:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kShrE-0001BM-Kd
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:34:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57316)
+ id 1kShrD-00019e-Rb
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:34:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36684)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kShrB-00062Z-E9
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:34:24 -0400
+ id 1kShrA-00062L-Ag
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:34:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602686060;
+ s=mimecast20190719; t=1602686058;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=3tMEFGxyFYtBVTNUpmi0qNYLG6xfsDcVqxV2LYJGW48=;
- b=JKiGvbiatEd3mkxyQPUN3SQJj+Grk/6b30QoF4Tg9E7c0+solGhy41iQwKNxBUK5xKrFmu
- +PK8eOIuWb9UPa5l8i8FvFSvYfsJyKnBlA52Ua4BhW5u+ZmHPJUVEeHb758pcurcuwMhqF
- BdHsmGQr8/bBohX2aUnD+AzdcP2KeX4=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=YlDTGJCdcE2aBQBeoH5MxHN8ntqHufnRJv4kEbrBYms=;
+ b=LKrjclpNI9dzCfTkr6uHVFYnVvvhY+JHPpN06D4/u4uf91g9rxNaiZ/Z5p6Gow/kOEKMA+
+ Ex1tmizpz1YOFKy1jGy4dUzK1vY7q6+qObLl5HfYPNZWSbNMZKVdkCqw+l35nrx9keu5Co
+ KpDH0+Y4Vugl04tgjc1lVYNHaiCXLxU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-354-LO7Jy7b-MSqIiehE6WbZJg-1; Wed, 14 Oct 2020 10:34:17 -0400
-X-MC-Unique: LO7Jy7b-MSqIiehE6WbZJg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-377-s37DGvPYMsuSowVjX-XJQg-1; Wed, 14 Oct 2020 10:34:17 -0400
+X-MC-Unique: s37DGvPYMsuSowVjX-XJQg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C632FD688E;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B0D4802B6A;
  Wed, 14 Oct 2020 14:34:16 +0000 (UTC)
 Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9402360C0F;
- Wed, 14 Oct 2020 14:34:16 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CB7A66EF7B;
+ Wed, 14 Oct 2020 14:34:15 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 01/10] rng-egd: Register "chardev" as class property
-Date: Wed, 14 Oct 2020 10:34:06 -0400
-Message-Id: <20201014143415.240472-2-ehabkost@redhat.com>
-In-Reply-To: <20201014143415.240472-1-ehabkost@redhat.com>
-References: <20201014143415.240472-1-ehabkost@redhat.com>
+Subject: [PULL 00/10] machine + QOM queue, 2020-10-14
+Date: Wed, 14 Oct 2020 10:34:05 -0400
+Message-Id: <20201014143415.240472-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,52 +99,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Class properties make QOM introspection simpler and easier, as
-they don't require an object to be instantiated.
-
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
-Message-Id: <20200921221045.699690-4-ehabkost@redhat.com>
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
- backends/rng-egd.c | 9 ++-------
- 1 file changed, 2 insertions(+), 7 deletions(-)
-
-diff --git a/backends/rng-egd.c b/backends/rng-egd.c
-index 20198ff26e..4de142b9dc 100644
---- a/backends/rng-egd.c
-+++ b/backends/rng-egd.c
-@@ -135,12 +135,6 @@ static char *rng_egd_get_chardev(Object *obj, Error **errp)
-     return NULL;
- }
- 
--static void rng_egd_init(Object *obj)
--{
--    object_property_add_str(obj, "chardev",
--                            rng_egd_get_chardev, rng_egd_set_chardev);
--}
--
- static void rng_egd_finalize(Object *obj)
- {
-     RngEgd *s = RNG_EGD(obj);
-@@ -155,6 +149,8 @@ static void rng_egd_class_init(ObjectClass *klass, void *data)
- 
-     rbc->request_entropy = rng_egd_request_entropy;
-     rbc->opened = rng_egd_opened;
-+    object_class_property_add_str(klass, "chardev",
-+                                  rng_egd_get_chardev, rng_egd_set_chardev);
- }
- 
- static const TypeInfo rng_egd_info = {
-@@ -162,7 +158,6 @@ static const TypeInfo rng_egd_info = {
-     .parent = TYPE_RNG_BACKEND,
-     .instance_size = sizeof(RngEgd),
-     .class_init = rng_egd_class_init,
--    .instance_init = rng_egd_init,
-     .instance_finalize = rng_egd_finalize,
- };
- 
--- 
-2.28.0
+The following changes since commit 96292515c07e3a99f5a29540ed2f257b1ff75111=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-for-5.2=
+-pull-request' into staging (2020-10-13 14:06:22 +0100)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  git://github.com/ehabkost/qemu.git tags/machine-next-pull-request=0D
+=0D
+for you to fetch changes up to d9753cca6b0db724bc6d15e60cfad1705f800b96:=0D
+=0D
+  can-host-socketcan: Fix crash when 'if' option is not set (2020-10-13 15:=
+56:30 -0400)=0D
+=0D
+----------------------------------------------------------------=0D
+machine + QOM queue, 2020-10-14=0D
+=0D
+* Register some properties as class properties (Eduardo Habkost)=0D
+* authz-list-file: Fix crash when filename is not set (Eduardo Habkost)=0D
+* can-host-socketcan: Fix crash when 'if' option is not set (Eduardo Habkos=
+t)=0D
+=0D
+----------------------------------------------------------------=0D
+=0D
+Eduardo Habkost (10):=0D
+  rng-egd: Register "chardev" as class property=0D
+  rng-random: register "filename" as class property=0D
+  rng: Register "opened" as class property=0D
+  input-linux: Register properties as class properties=0D
+  input-barrier: Register properties as class properties=0D
+  i386: Register most CPU properties as class properties=0D
+  vga-pci: Register "big-endian-framebuffer" as class property=0D
+  vhost-user: Register "chardev" as class property=0D
+  authz-list-file: Fix crash when filename is not set=0D
+  can-host-socketcan: Fix crash when 'if' option is not set=0D
+=0D
+ authz/listfile.c        |  5 ++++=0D
+ backends/rng-egd.c      |  9 ++----=0D
+ backends/rng-random.c   |  8 ++---=0D
+ backends/rng.c          |  8 ++---=0D
+ backends/vhost-user.c   |  6 ++--=0D
+ hw/display/vga-pci.c    | 12 +++-----=0D
+ net/can/can_socketcan.c |  5 ++++=0D
+ target/i386/cpu.c       | 66 +++++++++++++++++++++--------------------=0D
+ ui/input-barrier.c      | 44 +++++++++++++--------------=0D
+ ui/input-linux.c        | 27 +++++++++--------=0D
+ 10 files changed, 97 insertions(+), 93 deletions(-)=0D
+=0D
+--=20=0D
+2.28.0=0D
+=0D
 
 
