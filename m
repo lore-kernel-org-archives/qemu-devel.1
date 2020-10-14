@@ -2,128 +2,99 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D5DC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 15:46:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8591C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 15:47:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6367F2222C
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 15:46:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 41F7A2222C
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 15:47:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ko6L+2ES"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6367F2222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hg6k+uO0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 41F7A2222C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSiyt-0006sZ-DA
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 11:46:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54504)
+	id 1kSizb-0007f1-9J
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 11:47:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54756)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kSiwk-0005Wr-3Z; Wed, 14 Oct 2020 11:44:10 -0400
-Received: from mail-eopbgr70121.outbound.protection.outlook.com
- ([40.107.7.121]:23364 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kSiwd-0007U7-D8; Wed, 14 Oct 2020 11:44:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iL4Aoa10c1AK/h/FWapuDgeeixqcp6ZZzV4Xnv/TlR9FQyEEL69cK1hSy/l4EOHlpbPEUX/B7JkBHGzdVncGMtOiVt4p5z6eaTHrLuV3kw4FiMqpw5g8m62F2lDOzBoxyGqmXjurJ7/yRd7B2huG2Ah/4V4h1HXDlEGzo0rYTgN8tkQh+D459hJVMMA+zt51vFboE6DPOTu6pJapVD0UdUuUWNGrVA/f0wF8m87n312dsUDbgyt3aJJ005eaRHT8KKgaT7hFKPvffPHj9Ly7qYXD0eq9j1ufnAVxZERfflnE53eJxFkyMSBBtMCKubHvAa6nXV2wUmNkO4PTawhWfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tUxDdmUCMXFa8yipkTMpvu9SRBGO2pNy00P52aw6NZQ=;
- b=CuG/afKk5M500gFyyQfrN8ttgEUNt6zDs1Y8SLIQNlqz6S4rQOtSlzTdLnV58rB9SFR3joBDFbwThDUxnavXth4rvhJCEyZA3tohtYYFfX5KqRf9f9cs4k8vTMRHJmMnBCnmrHqSww9lKQq7etEawG8lHC2K02x4eF38gMH/p34T5MJcHE1TwfrJPU0amFuuO0t0xYXUwr3hPQ2k8suNNd9AmCT+KE2HEggoSaGeHKvwsghAZ81DOugkUtwI0qy17fh8+MzOohdzTMlcf3JLsHKdoQK1Y+Y6Jjtne9q9HlA/h6NSMNjb8ndTdLbZbV68CGq7+YIgm+x+MmZOnjI5/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tUxDdmUCMXFa8yipkTMpvu9SRBGO2pNy00P52aw6NZQ=;
- b=ko6L+2ESHtp7os6oV+Nd7eCvIZPTfvmpWSjMwhWXAq/UgopJJu/LUQTuAkSKtTyzsPRsoCG+pmY2hZj6MXVw1AXgquE4SgFqFn0Gem/FpvfnNs7O+GORU5crjg/Cag3FaYYADepONiTNWhz/9MCRi+0cyMv7bBQSp5IfZli5iYs=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1651.eurprd08.prod.outlook.com (2603:10a6:203:39::21)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23; Wed, 14 Oct
- 2020 15:44:00 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Wed, 14 Oct 2020
- 15:44:00 +0000
-Subject: Re: [PATCH v11 11/13] stream: mark backing-file argument as deprecated
-To: Max Reitz <mreitz@redhat.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- libvir-list@redhat.com, eblake@redhat.com, den@openvz.org
-References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-12-git-send-email-andrey.shinkevich@virtuozzo.com>
- <c309607e-d6a0-7a7f-05e6-9e1beb388419@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <f8d6f6e3-f6eb-4ffa-1a2f-624c06462bbb@virtuozzo.com>
-Date: Wed, 14 Oct 2020 18:43:58 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.2
-In-Reply-To: <c309607e-d6a0-7a7f-05e6-9e1beb388419@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [185.215.60.122]
-X-ClientProxiedBy: AM0PR06CA0089.eurprd06.prod.outlook.com
- (2603:10a6:208:fa::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSiy5-0006Zq-4X
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 11:45:33 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:44531)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSiy3-0007gr-6l
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 11:45:32 -0400
+Received: by mail-pf1-x444.google.com with SMTP id f19so6790pfj.11
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 08:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=bekVVwx3fg5RyV2lzAVABqy3iI2WaUm9OTRp1uhf2Uo=;
+ b=hg6k+uO0U0vAdj8r5W5MdEloBMX3A3VeU4AZB0lODmE2OfD6srAIawlRPuZerUV6Ea
+ gv0pwHlaYYMmTA3t+MtO3AqQEb8Cq7Dcu6bNvAPgowuU3jJZ4stniwQ5HXP0vp+wexk6
+ jGxCEhi7L98BmhDpR6+jfmUB8QRjEgfgUa0fo92Z0QXXEVJ/j3PF9+EIf1nLac24lrTD
+ AbM4NDmqsXh47grRbGzp0c8w9SKxaMLDHQ08d8W0LZ7HW0WJSzS9e6xncERumcS+D9YE
+ R94iKppz3HglhQE8aABJaRL7beNySLciTp1KyWXkhMjFODxT7SKUVT9Z0MElEc0Dad50
+ 6OIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=bekVVwx3fg5RyV2lzAVABqy3iI2WaUm9OTRp1uhf2Uo=;
+ b=FgY4+vqzhfsujjfwlNHHmiZPiMPyOyUCnCzUdlEdvk14i5HFlWXB4bWz+IAb54LvvS
+ B8S045jfDyfosAbfiE3e3+tXq6JFFnZvKRYArdCgHu4nbwJkt7BVcic5GKQCPauNIqaF
+ qgtEx+vLxmrEj3Er90r2r7sAWy9gkZ1T+Xdp27DiLPhP5XmkdDGeUSAYm3GrZqo/9A5p
+ nlLUTJEwz92K4B0udwqp/P6Lp5OxD7KT9VeaQ9Qu3c9lDoYoGpe706MG6fb8MNxAufZJ
+ V6Rp9WjJhVBt3O1yJ72dKokbEmtUpWN2hu2cVFbLUVIUG7VFzf8wLuVjc7XimrpwOv/L
+ SmRQ==
+X-Gm-Message-State: AOAM533uK5s0JZJnuKzp5YlJKd9XqBU13cfWkIhjE50Z5vRNthJ8CgTs
+ koxW1digvSSekWcgc36CW5VZyw==
+X-Google-Smtp-Source: ABdhPJyhBCLjYPXrat9Hj/b/h7B5hxSrFg+VMwaeiDUv/CSryJFB1Y6GBoE+IXP8Bj1NAj+zfhjS4g==
+X-Received: by 2002:a63:ab07:: with SMTP id p7mr4358636pgf.326.1602690329555; 
+ Wed, 14 Oct 2020 08:45:29 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id t9sm3937411pgp.90.2020.10.14.08.45.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 14 Oct 2020 08:45:28 -0700 (PDT)
+Subject: Re: [PATCH V2 1/5] target/riscv: Add basic vmstate description of CPU
+To: Jiangyifei <jiangyifei@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+References: <20201010080623.768-1-jiangyifei@huawei.com>
+ <20201010080623.768-2-jiangyifei@huawei.com>
+ <0bc022ca-35f6-8579-51f1-65005e89a9a3@linaro.org>
+ <cbbaee32aaca498294e599ba7768279a@huawei.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <0d4fa7cd-b534-5635-302a-6ef0c4b8426a@linaro.org>
+Date: Wed, 14 Oct 2020 08:45:26 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.122) by
- AM0PR06CA0089.eurprd06.prod.outlook.com (2603:10a6:208:fa::30) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.21 via Frontend Transport; Wed, 14 Oct 2020 15:43:59 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a994d43f-ae18-4b8e-f310-08d87057f82a
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1651:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB1651F2B56C83D068CE3F84C3C1050@AM5PR0801MB1651.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1284;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YMQXdFZyiTiH6RKA/Rq3vOboV0DYmyAfzWHKMbMOWFUS1p+A7h8gvxE8W0hXfI84BZciEi92AQDcpETWvl9IrQELoGPcqr22klQTKtoYLvH9ToL2Oxu34MOJHKWENjetBJlbYx2TL0zeHgMdDsan4aLFcO/1Jf6+Q8kJBTIWzs8/pM1saSQNkVJfKww29p16pB5MPwMxIsJ89rH9H6zdUQNQqaZID0OeQoUA1QIIwFaGMpZsKdqU+aVRibg7qXbXbtGe9rp0j4OuP0ecGYNkarRMCxyLvLAiIz+Uo2+KQ5D6o+R+Dgv7MeNgK1yXF0LFyIZF5tl1yt44DL5Y2ZfqXHEKLdrtAL62heA+GlhDNCMPs0WdD092nuBhYRv9SPx3
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(346002)(39830400003)(376002)(136003)(366004)(16526019)(4326008)(6486002)(107886003)(31696002)(478600001)(16576012)(31686004)(186003)(8676002)(2906002)(36756003)(110136005)(26005)(5660300002)(66946007)(86362001)(2616005)(53546011)(956004)(316002)(8936002)(52116002)(66556008)(66476007)(7416002)(83380400001)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cdlrXmmb2p3wg/MXwuxKurRX644Q4k74fjR1LNkvykpK8FxRh+7aOnNXVtVYMvGE4i7X779sMbhaTPmYxDeKLGspzHLTFAnYdiTlCKq9bIeXBs8zLIa4+zDVHNV9oBb148VmmoIUgno1g7D5gLk3FkLgH8zOOOrIdnYxcqza88KXUvs7HHhCxX86tAV67XLs4BadEKWswb0vYUEfgeUkvUApNPtBrNiYf7UfY/5pBF23GK9ICojYJ3XLn6M3MpkhdfVxGPz/AdMUvLQrgNr2tvcf3onAvzalCU/+yF8C2lEGt90y54x/KEA2EGOsgUB0GCQF96C7Ls+Y/9qMQJnxg9RD3GBiMoYsDIAT8iSnf/qN26RGOj6pMCl8QeiFAmo2ianZxXtUCUSlmg33WjV8KwUJzn5eH4A/WCZtg6VaSi7cCmMvOcVVpjgBeMupKMNNd2gzZ9Ne0Foj0x5jv/zsC0CqFg7/YxZC+GPHe8iqtV13HtD/OZE0JrlUX/025KwLPlnhJW6fm/QMLQxrHAY1gvBSATm+8TTNAMlnyzANQxOqw6zUqEtyeBprLeYWFR/ozThV3edr0jlkR6NOOnPgkf4xyi9909PH0xbkdBKG/OT0KFgVzSRuK2lxzp2jRRycKJ6wBSVooUt05VsMUpUCjA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a994d43f-ae18-4b8e-f310-08d87057f82a
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 15:44:00.2568 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Jf9CGHUhyabnWBoADQ2HbfAXW7pdQ6P5cP2qhidFUVb/IGuGFTKqhhqnnCBxc6mqHNd/oeCMrJKqchBPJYnKFva/nSkWGKueZ7IOLD/Zyes=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1651
-Received-SPF: pass client-ip=40.107.7.121;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 11:44:01
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+In-Reply-To: <cbbaee32aaca498294e599ba7768279a@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,42 +108,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>,
+ "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>,
+ "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
+ "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>,
+ yinyipeng <yinyipeng1@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "Wubin \(H\)" <wu.wubin@huawei.com>, "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-14.10.2020 18:03, Max Reitz wrote:
-> On 12.10.20 19:43, Andrey Shinkevich wrote:
->> Whereas the block-stream job starts using a backing file name of the
->> base node overlay after the block-stream job completes, mark the QMP
->> 'backing-file' argument as deprecated.
+On 10/14/20 3:21 AM, Jiangyifei wrote:
+>> Would this be a good time to expand mstatus to uint64_t instead of
+>> target_ulong so that it can be saved as one unit and reduce some ifdefs in the
+>> code base?
 >>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   docs/system/deprecated.rst | 6 ++++++
->>   1 file changed, 6 insertions(+)
->>
->> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
->> index 8b3ab5b..7491fcf 100644
->> --- a/docs/system/deprecated.rst
->> +++ b/docs/system/deprecated.rst
->> @@ -285,6 +285,12 @@ details.
->>   The ``query-events`` command has been superseded by the more powerful
->>   and accurate ``query-qmp-schema`` command.
->>   
->> +``block-stream`` argument ``backing-file`` (since 5.2)
->> +'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
->> +
->> +The argument ``backing-file`` is deprecated. QEMU uses a backing file
->> +name of the base node overlay after the block-stream job completes.
->> +
+>> Similarly with some of the other status registers that are two halved for
+>> riscv32.
 > 
-> Hm, why?  I don’t see the problem with it.
-> 
+> I agree with you that it should be rearranged.
+> But I hope this series will focus on achieving migration.
+> Can I send another patch to rearrange it later?
 
-My wrong idea, sorry. I believed that the argument is unused when I were reviewing v10. But it actually become unused during the series and it is wrong.
+Well, that changes the bit layout for migration.
+While we could bump the version number, it seemed
+easier to change the representation first.
 
--- 
-Best regards,
-Vladimir
+
+r~
 
