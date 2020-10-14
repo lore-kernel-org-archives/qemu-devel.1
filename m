@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24D1EC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:03:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4B5C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:05:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7BDDE20848
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:03:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B50C920848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:05:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E66Zro+r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BDDE20848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PLeCAQXM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B50C920848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45910 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSfVX-0004Xg-GY
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:03:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
+	id 1kSfWh-0005cn-H8
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:05:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51658)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfRU-0008Bj-7Y
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:59:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36884)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfTe-0002i7-RG
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:01:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39217)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfRS-0001MP-9z
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 07:59:39 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSfTb-0001qb-OZ
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:01:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602676777;
+ s=mimecast20190719; t=1602676908;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=+ZtqrsPiMyhDOWZN5B/7QGP+FzOGG8xvRRXQKy291Pw=;
- b=E66Zro+r9yo1oFw7O93DuByvWsJsEclxwFm9arQHfIhRZm35Wg9z3/cVJiq+H11rOU3798
- l/c5tHkODxLczlz2T1d3Au6Ql7nDENKJSeUsULhBeoSKVau3RvYom3wstt/EgTlS0bIpPs
- Dm4jm3UAwrOWwQBzFOC0I6vZIFCF+y8=
+ bh=88cI3uijKQZiNxTG1cOijQI5qui5yRPuLzRT4Tc/T3o=;
+ b=PLeCAQXMlj8IhBh5yNrKRrMMXCCkh2Hf2a8ROydJLd1iMULgJ7lBA/UvlYjttQbFsEEgeX
+ ddsTkoeX2bIMCMj2H0124xy7pow+X/GL+MIaEV2LlolCwlt6KdLStCqlxTK0pLOW7/PLJP
+ yz2j/G38Y65gFueP+JjP58Z2kYSz/A4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-511-g08qSGGEMs2L0BLmKEZOgA-1; Wed, 14 Oct 2020 07:59:34 -0400
-X-MC-Unique: g08qSGGEMs2L0BLmKEZOgA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-61-ibejPOSWOeGm2P3CBFipwg-1; Wed, 14 Oct 2020 08:01:43 -0400
+X-MC-Unique: ibejPOSWOeGm2P3CBFipwg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 639D7101962B;
- Wed, 14 Oct 2020 11:59:33 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2EC0D107465B;
+ Wed, 14 Oct 2020 12:01:41 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.194.40])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 48E386EF7C;
- Wed, 14 Oct 2020 11:59:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 44C635D9CD;
+ Wed, 14 Oct 2020 12:01:38 +0000 (UTC)
 Subject: Re: [PATCH v11 05/13] copy-on-read: limit COR operations to base in
  COR driver
 To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
@@ -84,20 +84,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <a938ce00-70ee-7f6e-f4f6-08630c49e843@redhat.com>
-Date: Wed, 14 Oct 2020 13:59:22 +0200
+Message-ID: <6dc38263-ad9c-f238-7197-68e920b6080d@redhat.com>
+Date: Wed, 14 Oct 2020 14:01:36 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
 In-Reply-To: <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="y3Y89HR1TESSwbJiPPRjzy7rfphOR29WG"
+ boundary="ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
@@ -130,10 +130,10 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---y3Y89HR1TESSwbJiPPRjzy7rfphOR29WG
-Content-Type: multipart/mixed; boundary="7zIYIipchX0rNOmzBMTddVNCJhU8bVaC8"
+--ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw
+Content-Type: multipart/mixed; boundary="pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY"
 
---7zIYIipchX0rNOmzBMTddVNCJhU8bVaC8
+--pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
@@ -164,6 +164,11 @@ t,
 > -                               flags | BDRV_REQ_COPY_ON_READ);
 > +    int64_t n =3D 0;
 > +    int64_t size =3D offset + bytes;
+
+Just when I hit send I noticed that =E2=80=9Cend=E2=80=9D would be a more f=
+itting name
+for this variable.
+
 > +    int local_flags;
 > +    int ret;
 > +    BDRVStateCOR *state =3D bs->opaque;
@@ -175,58 +180,73 @@ ffset,
 > +    }
 > +
 > +    while (offset < size) {
+
+(because I got a bit confused looking at this)
+
+(Though dropping @size (or @end) and just checking when @bytes becomes 0
+should work, too.)
+
 > +        local_flags =3D flags;
 > +
 > +        /* In case of failure, try to copy-on-read anyway */
 > +        ret =3D bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
 > +        if (!ret) {
-
-In case of failure, a negative value is going to be returned, we won=E2=80=
-=99t
-go into this conditional block, and local_flags isn=E2=80=99t going to cont=
-ain
-BDRV_REQ_COPY_ON_READ.
-
-So the idea of CORing in case of failure sounds sound to me, but it
-doesn=E2=80=99t look like that=E2=80=99s done.
-
 > +            ret =3D bdrv_is_allocated_above(bdrv_cow_bs(bs->file->bs),
-
-I think this should either be bdrv_backing_chain_next() or we must rule
-out the possibility of bs->file->bs being a filter somewhere.  I think
-I=E2=80=99d prefer the former.
-
 > +                                          state->base_overlay, true, off=
 set,
 > +                                          n, &n);
 > +            if (ret) {
+> +                local_flags |=3D BDRV_REQ_COPY_ON_READ;
+> +            }
+> +        }
 
-=E2=80=9Cret =3D=3D 1 || ret < 0=E2=80=9D would be more explicit (and in li=
-ne with the =E2=80=9C!ret
-|| ret < 0=E2=80=9D probably needed above), but correct either way.
+Furthermore, I just noticed =E2=80=93 can the is_allocated functions not re=
+turn
+0 in @n, when @offset is a the EOF?  Is that something to look out for?
+ (I=E2=80=99m not sure.)
 
 Max
 
+> +
+> +        ret =3D bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offs=
+et,
+> +                                  local_flags);
+> +        if (ret < 0) {
+> +            return ret;
+> +        }
+> +
+> +        offset +=3D n;
+> +        qiov_offset +=3D n;
+> +        bytes -=3D n;
+> +    }
+> +
+> +    return 0;
+>  }
+> =20
+> =20
+>=20
 
---7zIYIipchX0rNOmzBMTddVNCJhU8bVaC8--
 
---y3Y89HR1TESSwbJiPPRjzy7rfphOR29WG
+
+--pdXmV3AcNWsgp0iyP3ZDdZILHaK3QjKmY--
+
+--ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+G6BoACgkQ9AfbAGHV
-z0CiHwf+KoxIB1Ldo9PHNVpp0z5CIdSvX/zl3yI/trCoCn/mYf87/EMr3uFYJ8rH
-vD51FTFTMZ8+Dn7JTZgYNhmH1EbAo27yTdTD4SUba2aa9vVLeWEgRL1wqbPZY/pJ
-Px0Ju2NkS16E++YKaYNIg20UoZGbSZgzI5d0JYjN6El5uqrDb9f9Mwf/Hk0z7Z9+
-GeHrya66KiN2YqsryQ7LQ+ULZDDIJYz6K4wheL54aXaulzReUoIVmjutyoh95ggl
-fDEyjPAEBYG0h561FSFOy07MtVV7GmFxYPKzDQURAtBXCzndeF1wwFHmQUDZpTUZ
-4KAe0+oUqkqa3zhoccFEGQZ3zRn7mw==
-=cp/7
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+G6KAACgkQ9AfbAGHV
+z0AQlAgAoY6VwV881pfGXy4iekBVJliHszTA1wptdNZ3m/INoJzcIf7Urk46fZqH
+hW5+TiZwKc3p1+6VFU9blxkngetd3gV2/yhvbmQItBHgGEI7MCSnnCmkJkW4mxcS
+Rrst6Jj1M4SxohnXRwLu/5eLiAvvo+YV+OYtQa19Jl8XWsLlt/+/HibW2yORqQdr
+UENsEXIHnk3AoASt++jKnHQ+oW57+0GUCnxnFQvq8hjPK6Y8VfPdKIqgsOcpGc2M
+3Et35Ao+BaPOkxO6IwzcbHtjmQWPHs6AgSM+oU73R1/xcPlkx6TPvjAiQeXd1vRq
+0xDkdN+YBrjBwqewZBxTscXPOFXWCw==
+=KhJm
 -----END PGP SIGNATURE-----
 
---y3Y89HR1TESSwbJiPPRjzy7rfphOR29WG--
+--ORo1HqaNwTkiG9vEV181JwuMUCss4W3nw--
 
 
