@@ -2,64 +2,88 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AFF6C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 21:10:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 728A5C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 21:15:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB4122068E
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 21:10:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4122068E
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9F36A2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 21:15:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GxYScqoA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F36A2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35592 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSo2Z-0001y6-K6
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 17:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34690)
+	id 1kSo6y-0003bi-Ha
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 17:15:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35770)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSo1F-0001Qr-Vu
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 17:09:09 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:21970)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kSo19-0006ff-GQ
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 17:09:07 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id AC6DC7475FE;
- Wed, 14 Oct 2020 23:08:59 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 81E147475FA; Wed, 14 Oct 2020 23:08:59 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 7E496746383;
- Wed, 14 Oct 2020 23:08:59 +0200 (CEST)
-Date: Wed, 14 Oct 2020 23:08:59 +0200 (CEST)
-To: Joelle van Dyne <j@getutm.app>
-Subject: Re: [PATCH 07/10] tcg: implement bulletproof JIT
-In-Reply-To: <CA+E+eSCUdR5tUT5x90iQ-h3cTiS4u=6MnfrGsP0Pj=F75FsnKA@mail.gmail.com>
-Message-ID: <1398d4f-211f-2757-e6d7-aa3c7f1b8bcb@eik.bme.hu>
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-8-j@getutm.app>
- <19c387d2-fc9-d1d0-849c-f8e8e270a97c@eik.bme.hu>
- <CADmqK1sTLy8O58rVR116VJnAK2qYMLQvX2wYxpcix_1YkFvLug@mail.gmail.com>
- <2ab5b15f-2372-9531-4ade-50dc12592d6c@linaro.org>
- <CA+E+eSCUdR5tUT5x90iQ-h3cTiS4u=6MnfrGsP0Pj=F75FsnKA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSo6F-00039V-1v
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 17:14:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51007)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSo68-0007TB-I1
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 17:14:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602710050;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0irtddWdIx0Ihh5L2K/7OGXY9ZD2grxjI4eo9FnXexU=;
+ b=GxYScqoAweC9WaIkZleovHKQxi1VyF06PBN+Z6kMiwNGA5noyq3pazMAL+Fas0TCPhNsT5
+ gso+7033+TanE76h+gBBOD6eWoxa6MslQZLdjvzxavT0oERnUcjvZsHZV+z9/456VMH6KD
+ AFSeJ10PiFaT+28ZByxge97kb6HkPc8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-525-10KvuxFIMoCgWcxuuY5cBg-1; Wed, 14 Oct 2020 17:14:03 -0400
+X-MC-Unique: 10KvuxFIMoCgWcxuuY5cBg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EE48464082;
+ Wed, 14 Oct 2020 21:14:01 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D787C5D9CD;
+ Wed, 14 Oct 2020 21:13:57 +0000 (UTC)
+Date: Wed, 14 Oct 2020 17:13:56 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Subject: Re: [PATCH v3 4/4] Jobs based on custom runners: add job definitions
+ for QEMU's machines
+Message-ID: <20201014211356.GA1199212@localhost.localdomain>
+References: <20201014052140.1146924-1-crosa@redhat.com>
+ <20201014052140.1146924-5-crosa@redhat.com>
+ <20201014174655.GW115189@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 16:54:51
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+In-Reply-To: <20201014174655.GW115189@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="n8g4imXOkfNTN/H1"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,87 +97,183 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, QEMU <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Erik Skultety <eskultet@redhat.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
+ Stefan Hajnoczi <stefanha@gmail.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+ Beraldo Leal <bleal@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-On Wed, 14 Oct 2020, Joelle van Dyne wrote:
-> Much of the code that uses the macro is like the following (from
-> aarch64/tcg-include.inc.c)
->
->        *TCG_CODE_PTR_RW(s, code_ptr) =
->            deposit32(*TCG_CODE_PTR_RW(s, code_ptr), 0, 26, offset);
->
-> Before the change, it was just *code_ptr. I'm saying the alternative
-> was to have to write "tcg_insn_unit *rw_code_ptr = (tcg_insn_unit
-> *)TCG_CODE_PTR_RW(s, code_ptr)" everywhere or else inline cast it.
-> Whereas making it return tcg_insn_unit * means only three instances of
-> casting to uint8_t *. Using void * means casting at every instance.
+--n8g4imXOkfNTN/H1
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-It's not C++ so void * does not need to be cast when assigned to some 
-other pointer.
-
-> Not opposed to using an inline function over a macro but "inline" is
-> not ANSI C. Not sure what this project thinks about that considering
-> the style checker prohibits C99 style comments. Personally I don't
-> care much.
-
-QEMU has some compiler dependencies, I think only some recent versions of 
-gcc and clang are supported and static inline is used elsewhere in the 
-code. Richard is an expert on TCG so you can take his advice.
-
-Regards,
-BALATON Zoltan
-
+On Wed, Oct 14, 2020 at 06:46:55PM +0100, Daniel P. Berrang=E9 wrote:
+> On Wed, Oct 14, 2020 at 01:21:40AM -0400, Cleber Rosa wrote:
+> > The QEMU project has two machines (aarch64 and s390) that can be used
+> > for jobs that do build and run tests.  This introduces those jobs,
+> > which are a mapping of custom scripts used for the same purpose.
+> >=20
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >  .gitlab-ci.d/custom-runners.yml | 192 ++++++++++++++++++++++++++++++++
+> >  1 file changed, 192 insertions(+)
+> >=20
+> > diff --git a/.gitlab-ci.d/custom-runners.yml b/.gitlab-ci.d/custom-runn=
+ers.yml
+> > index 3004da2bda..5b51d1b336 100644
+> > --- a/.gitlab-ci.d/custom-runners.yml
+> > +++ b/.gitlab-ci.d/custom-runners.yml
+> > @@ -12,3 +12,195 @@
+> >  # strategy.
+> >  variables:
+> >    GIT_SUBMODULE_STRATEGY: recursive
+> > +
+> > +# All ubuntu-18.04 jobs should run successfully in an environment
+> > +# setup by the scripts/ci/setup/build-environment.yml task
+> > +# "Install basic packages to build QEMU on Ubuntu 18.04/20.04"
+> > +ubuntu-18.04-s390x-all-linux-static:
+> > + needs: []
+> > + stage: build
+> > + tags:
+> > + - ubuntu_18.04
+> > + - s390x
+> > + rules:
+> > + - if: '$CI_COMMIT_BRANCH =3D~ /^staging/'
+>=20
+> IIRC, in the previous v2 (or was it v1) we discussed changing this
+> so that users who provide their own runners, don't have to always
+> use the "staging" branch name.
 >
-> -j
+
+Right, and what I got from that is that users can use a *prefix* as a
+flag to indicate that they want the extra set of jobs.
+
+> IIUC, the key thing is that we don't want the job running on the
+> "master" or "stable-*" branches in the primary QEMU git. So could
+> check
+>=20
+>    $CI_PROJECT_NAMESPACE =3D=3D 'qemu-project'
+>    &&
+>    $CI_COMMIT_BRANCH !~ '^master$'
+>    &&
+>    $CI_COMMIT_BRANCH !~ '^stable-$'
+>=20
+> which would let it work on users forks no matter what branch names
+> they use
+>=20
+> What happens to the job if the user doesn't have runners ? Is it
+> simply skipped, or does the pipeline stall and get marked as failed ?
 >
-> On Wed, Oct 14, 2020 at 1:35 PM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
->>
->> On 10/14/20 9:03 AM, Joelle van Dyne wrote:
->>>>> static int encode_search(TranslationBlock *tb, uint8_t *block)
->>>>> {
->>>>> -    uint8_t *highwater = tcg_ctx->code_gen_highwater;
->>>>> -    uint8_t *p = block;
->>>>> +    uint8_t *highwater;
->>>>> +    uint8_t *p;
->>>>>     int i, j, n;
->>>>>
->>>>> +    highwater = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx,
->>>>> +                                           tcg_ctx->code_gen_highwater);
->>>>> +    p = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx, block);
->>>>
->>>> Why do you need explicit casts here? Can this be avoided by using
->>>> appropriate type or within the macro (I haven't checked this at all just
->>>> dislike casts as they can hide problems otherwise caught by the compiler).
->>> There's the choice between tcg_insn_unit * and uint8_t *. Since it's
->>> used much more widely in tcg-target.inc.c, it seemed like
->>> tcg_insn_unit * was a better choice.
->>
->> False choice.  This is why tcg_ctx->code_gen_highwater is void*.
->>
->>>>> +#if defined(CONFIG_IOS_JIT)
->>>>> +# define TCG_CODE_PTR_RW(s, code_ptr) \
->>>>> +    (tcg_insn_unit *)((uintptr_t)(code_ptr) + (s)->code_rw_mirror_diff)
->>
->> Better as
->>
->> static inline void *tcg_code_ptr_rw(TCGContext *s, void *rx)
->> {
->> #ifdef CONFIG_IOS_JIT
->>     return rx + s->code_rw_mirror_diff;
->> #else
->>     return rx;
->> #endif
->> }
->>
->>
->> r~
+
+The pipeline gets "stuck" (literaly, that's the status name it gets).
+That's the main issue that made me believe that opting *in* (by using
+a common branch name prefix) was the simpler solution.
+
+> If the jobs aren't auto-skiped, we would need to add an env variable
+>=20
+>    (
+>    $CI_PROJECT_NAMESPACE =3D=3D 'qemu-project'
+>    &&
+>    $CI_COMMIT_BRANCH !~ '^master$'
+>    &&
+>    $CI_COMMIT_BRANCH !~ '^stable-$'
+>    )
+>    ||
+>    $QEMU_ENABLE_CUSTOM_RUNNERS =3D=3D 'yes'
+>=20
+> and require the user to set the QEMU_ENABLE_CUSTOM_RUNNERS variable
+> in the web UI for their fork
 >
+
+We can do that, but I think it's more than we need.  The odds that a
+user will have all of the same runners, and will be able to run all
+the extra jobs, are very very low IMO.  Right from the start, very few
+people have an s390 machine running Ubuntu 18.04.
+
+So, I believe that whenever a user pushes to a branch such as
+"staging-topic-foo", he will have to deal with some of the extra jobs
+(such as canceling the ones that will never run) anyway.  Having to
+deal with those on every single push, or alternatively having to turn
+on/off $QEMU_ENABLE_CUSTOM_RUNNERS doesn't the best experience to me.
+
+The "staging" prefix convention (with a better prefix name now or in
+the future?) seems to result in the best experience to me.
+
+> That all said, I don't mind if you postpone this rules change to a
+> followup patch.
 >
+
+OK, let me know if you agree with my explanation above, or if you
+really want to see a followup patch.
+
+> > + script:
+> > + # --disable-libssh is needed because of https://bugs.launchpad.net/qe=
+mu/+bug/1838763
+>=20
+> This bug links to
+>=20
+>   https://bugs.launchpad.net/ubuntu/+source/libssh/+bug/1847514
+>=20
+> which is marked as fixed. So I'm thinking we can drop the --disable-libss=
+h
+> arg from all these jobs
+>
+
+OK, I'll double check that and, if the fix is comfirmed beyond the bug
+tracker, I'll update it.
+
+Thanks!
+- Cleber.
+
+> > + # --disable-glusterfs is needed because there's no static version of =
+those libs in distro supplied packages
+> > + - mkdir build
+> > + - cd build
+> > + - ../configure --enable-debug --static --disable-system --disable-glu=
+sterfs --disable-libssh
+> > + - make --output-sync -j`nproc`
+> > + - make --output-sync -j`nproc` check V=3D1
+> > + - make --output-sync -j`nproc` check-tcg V=3D1
+>=20
+>=20
+>=20
+> Regards,
+> Daniel
+> --=20
+> |: https://berrange.com      -o-    https://www.flickr.com/photos/dberran=
+ge :|
+> |: https://libvirt.org         -o-            https://fstop138.berrange.c=
+om :|
+> |: https://entangle-photo.org    -o-    https://www.instagram.com/dberran=
+ge :|
+
+--n8g4imXOkfNTN/H1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+HahEACgkQZX6NM6Xy
+CfOisw//QBiT5TM+Psf3uWzHZuqtm+1KaOeMp0J4nAzzKqSf7bnCBqkYQuYnQkQn
+9t+Un91CLUvJbwXueuzYv0Jvy72zFdxrmsd3zn9PN+K1BRHa4eB34iVsG2/u+BDr
+UAS8wTOjHksRqXHOXQsDgYBU4SmdDXC4enU7hdfqstc9Mk7VGoOvct+g4XAVDtKn
+Lr2XezouLsjUbaESvovF/6OynoXhGruybNUMmoq/+TkEDIENBrlsE4lne8grebmM
+ua7J29EYEbwBax5BM/pZnq+0W1Q8MBvdnZ8B5Su5j9mrer2f+QFktITsgt5K+FEi
+Hq9MTSPYw1ukC9Dc6bhHPVl+c6fjB5oIKjwHpKI9IQM2CQT73VXIHrC03KLjuFs7
+y/vL165EGnC+g4aRZ6O/mr1B8udGrW4gl3KXIbX5E6ea1hps6/5j9ZFc3jsU7J7o
+vYoR5Wn5XEEATGukzUYS3IaTAykiloKUqCYWI2FaX3cdb7qLwx8DXy1UsFWjoxpH
+l/QRSJQC45q0ydBdD5MrLmMSAjnuX0zAfIWNXfi3cT41U5/fYsVqikZWBGWPwKM+
+vGzQjmFtfrS/A9FMlF39rTtaA6nTpfU3v/kCc+paRRNAH75lQRVrvuP1JuzblyXO
+Dc/L7I4Sh6h6/m8bJQZV4pJpFQo0Cnkhq2UwpMoSgIbhuR1PuWg=
+=YjFu
+-----END PGP SIGNATURE-----
+
+--n8g4imXOkfNTN/H1--
+
 
