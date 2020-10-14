@@ -2,93 +2,88 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6A49C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D28B8C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:22:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD96822227
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:21:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A31F2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:22:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eTdxB+TO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD96822227
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PxRcE9br"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A31F2173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSkT5-0003bs-Qn
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:21:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46438)
+	id 1kSkU0-0004ct-Ky
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:22:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46590)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kSkS8-0002iO-8n
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:20:41 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44978)
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kSkTK-0003zm-51
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:21:54 -0400
+Received: from mail-oi1-x242.google.com ([2607:f8b0:4864:20::242]:39660)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kSkS3-0002wl-TR
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:20:38 -0400
-Received: by mail-wr1-x441.google.com with SMTP id t9so4763863wrq.11
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 10:20:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=f2LAvOLCtg+gBBtP37v3rG4sVgYob1xV6cJ5nHPj0Rg=;
- b=eTdxB+TO87uCLfr61w4YTOYzcrq6932KBjV8kddHGjgZWaCu/eP9BSOQg3BYfhgxiZ
- B+iBS2iGH+m9tQWWlJ7e0/jbYElEn8xiNKduJV/fmYtA5uMIWnVNuOfGfQYimXHljojU
- TTnULG/YIAZm+fUS5uH3VUKdjoFxve7b0gM6T/T8tElGIIxxiNnimrqtZe6KQWuFjm2e
- OnL9THOmYySZKa1mkWd0vW+m9ygktJc8eRohI6Pt96/dxKUCMDxORmSg1k2O1V03j281
- kE1N/78ElMk94d7ccXhLyNkyfCQMbz1EOSX6X9y9KsM5hfok3do/5cx+VuMk4Uj6+sYe
- ZvTA==
+ (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
+ id 1kSkTI-00039z-95
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:21:53 -0400
+Received: by mail-oi1-x242.google.com with SMTP id c13so3999200oiy.6
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 10:21:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=xUw/ujGTJDuigT88eXSC9cYH2z8vhSXDZ6GG9hA21LE=;
+ b=PxRcE9brdW0OnXwGjJHPXSiarPbC+4Af6R+zynuq1eh+5+mY4bPOaoBUs6VZThClFW
+ V6Kb6Qs2A5KpeWc8x4NJGAwpQLJcZGfrt0moOJNUT5hwYld0r33yNO0QZyDYjYwMzlQP
+ bpkCCNglBqg7omz6uiee2WrT3djZG9rKGhZEHQze7vNhiQjbPg/1bXUkZz8yBkERqMRY
+ r+XK4N/L8WIdP3jMDOayqvA4orEo+yAIVBqTsDTNHysRCmpmcVuNN6phL3lOHwxtSFsk
+ U4+NA91Xt3llP4LE2dsj1HMvMXv8NyRqJ1ZN+0UvsPOlgSLfg8dQwqHMdnJnvU3A7XrN
+ Uvmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=f2LAvOLCtg+gBBtP37v3rG4sVgYob1xV6cJ5nHPj0Rg=;
- b=sPgMy5TKh4PWATUyf5jxCP73vczYytzAYuU7qIMDORt+7W+Mzig9ycRgvxDDGBy/an
- zgHO/v1NIi54CA5BRnqrZyVYjtciW28YbaFnsvCPWnw5A5kAtAuF5me2FvevOihjsEDv
- bTtHqWXrCSzKRajvY93XHWL/ZEP/DV1u5zBXZR+QvzxwqBEt0qFG5q+x3ZSlelctReJL
- b0tK/8jWFz4LDycFoLjE0FhuJOTGMwnIyf29IT4fpnRg2VJZqcLM3PMkivevbnn6wcu7
- OAOAM0WBwPvmdOEg5zqFrhEetYoXGgKZ83NoBxhXh0in+rISB/kExL8SEBupCEzW+yHr
- i/9A==
-X-Gm-Message-State: AOAM533LrGdLskJ00k538dhMVv50BKtvKL6DS4B4fZXyMmoCr4nvwGpE
- tt6wvBddPR+pYf9smMdmj5WfeA==
-X-Google-Smtp-Source: ABdhPJyWsb5xYuuoWa8qVf75WjF1I9GQBozPiX/j3Tik78VqnSX+Wm1CoMr7+oM8/TbViw5HK3TjJw==
-X-Received: by 2002:a5d:654d:: with SMTP id z13mr6800813wrv.6.1602696034309;
- Wed, 14 Oct 2020 10:20:34 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n2sm5789987wrt.82.2020.10.14.10.20.33
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Oct 2020 10:20:33 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 8D4A51FF7E;
- Wed, 14 Oct 2020 18:20:32 +0100 (BST)
-References: <20201013125027.41003-1-kwolf@redhat.com>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH] monitor: Fix order in monitor_cleanup()
-In-reply-to: <20201013125027.41003-1-kwolf@redhat.com>
-Date: Wed, 14 Oct 2020 18:20:32 +0100
-Message-ID: <878sc8yba7.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=xUw/ujGTJDuigT88eXSC9cYH2z8vhSXDZ6GG9hA21LE=;
+ b=gF7DvnXO5YdM4UuZ0aPQ2trc25JAkxC0oDWK9bzblGhdpiLRJHfEHV3Rjq+JUC5nIh
+ 3mAiqdSP+yVoTQg2sEl+aDqSi0jn7kwKpdT5ip8ioqk2RUME2EJg86Jtg+QT6mvMPESF
+ LE1xouM6eybEvwvUfZG9RopR4A95muFsJ2tkD9CDoPMxnd0qopo6aLLwFfVmxlgfEdMQ
+ e7A9Xo3U2gb79t22+9h/Pi2Fvq7vJwG1AtBJEShtRtq7i0w2Q0liNVyb1tVGH/IBn9Fz
+ YoK0ldKgx6g3KLBiLsAksuB9Q5CPqlyeRoYykDvqlAuqdnQHSdKMuWE2Mqr9TBXlNOET
+ 68Gg==
+X-Gm-Message-State: AOAM533FaIB3HhUMPy7iYNwaR+MMabomY7f1PZVNcSOfxrgevZDK2Kqj
+ UBB/W0epYkj487O6uQlrwyLbJjjxr5eaOWCrcmQ=
+X-Google-Smtp-Source: ABdhPJyHl1kJHMpLHXtbHUYVVd9d8tx+Bx17lo22nwAvynjkQb2w6t1GkssG6iMeYQFdXndOPVnuPK6phB34FVDv0DA=
+X-Received: by 2002:aca:724a:: with SMTP id p71mr236164oic.157.1602696110712; 
+ Wed, 14 Oct 2020 10:21:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
+References: <20200928131731.69684-1-chenjiajun8@huawei.com>
+ <20201006114801.6833a72d@redhat.com>
+ <CAFubqFtqXorzk6g9d3A3TFcPnE9eSJKsjfSCK5zwTNX6xtJ3kw@mail.gmail.com>
+ <20201014030340-mutt-send-email-mst@kernel.org>
+ <CAFubqFsax9YabyYLE0E=++gw_iZm5QjQr-OUG_4po7JO4pvQYw@mail.gmail.com>
+ <20201014121306-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20201014121306-mutt-send-email-mst@kernel.org>
+From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
+Date: Wed, 14 Oct 2020 13:21:39 -0400
+Message-ID: <CAFubqFvKdWzQi7ufyzz+SFEuQT6K++5foznobCYDRB8AAusnug@mail.gmail.com>
+Subject: Re: [PATCH] vhost-user: add separate memslot counter for vhost-user
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::242;
+ envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oi1-x242.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -103,45 +98,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: f4bug@amsat.org, qemu-devel@nongnu.org, armbru@redhat.com
+Cc: zhang.zhanghailiang@huawei.com, jasowang@redhat.com,
+ QEMU <qemu-devel@nongnu.org>, xiexiangyou@huawei.com,
+ =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ Jiajun Chen <chenjiajun8@huawei.com>, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Kevin Wolf <kwolf@redhat.com> writes:
-
-> We can only destroy Monitor objects after we're sure that they are not
-> in use by the dispatcher coroutine any more. This fixes crashes like the
-> following where we tried to destroy a monitor mutex while the dispatcher
-> coroutine still holds it:
+On Wed, Oct 14, 2020 at 12:26 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 >
->  (gdb) bt
->  #0  0x00007fe541cf4bc5 in raise () at /lib64/libc.so.6
->  #1  0x00007fe541cdd8a4 in abort () at /lib64/libc.so.6
->  #2  0x000055c24e965327 in error_exit (err=3D16, msg=3D0x55c24eead3a0 <__=
-func__.33> "qemu_mutex_destroy") at ../util/qemu-thread-posix.c:37
->  #3  0x000055c24e9654c3 in qemu_mutex_destroy (mutex=3D0x55c25133e0f0) at=
- ../util/qemu-thread-posix.c:70
->  #4  0x000055c24e7cfaf1 in monitor_data_destroy_qmp (mon=3D0x55c25133dfd0=
-) at ../monitor/qmp.c:439
->  #5  0x000055c24e7d23bc in monitor_data_destroy (mon=3D0x55c25133dfd0) at=
- ../monitor/monitor.c:615
->  #6  0x000055c24e7d253a in monitor_cleanup () at ../monitor/monitor.c:644
->  #7  0x000055c24e6cb002 in qemu_cleanup () at ../softmmu/vl.c:4549
->  #8  0x000055c24e0d259b in main (argc=3D24, argv=3D0x7ffff66b0d58, envp=
-=3D0x7ffff66b0e20) at ../softmmu/main.c:51
+> On Wed, Oct 14, 2020 at 12:11:34PM -0400, Raphael Norwitz wrote:
+> > On Wed, Oct 14, 2020 at 3:08 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > >
+> > > On Tue, Oct 13, 2020 at 08:58:59PM -0400, Raphael Norwitz wrote:
+> > > > On Tue, Oct 6, 2020 at 5:48 AM Igor Mammedov <imammedo@redhat.com> wrote:
+> > > > >
+> > > > > On Mon, 28 Sep 2020 21:17:31 +0800
+> > > > > Jiajun Chen <chenjiajun8@huawei.com> wrote:
+> > > > >
+> > > > > > Used_memslots is equal to dev->mem->nregions now, it is true for
+> > > > > > vhost kernel, but not for vhost user, which uses the memory regions
+> > > > > > that have file descriptor. In fact, not all of the memory regions
+> > > > > > have file descriptor.
+> > > > > > It is usefully in some scenarios, e.g. used_memslots is 8, and only
+> > > > > > 5 memory slots can be used by vhost user, it is failed to hot plug
+> > > > > > a new memory RAM because vhost_has_free_slot just returned false,
+> > > > > > but we can hot plug it safely in fact.
+> > > > >
+> > > > > I had an impression that all guest RAM has to be shared with vhost,
+> > > > > so combination of anon and fd based RAM couldn't work.
+> > > > > Am I wrong?
+> > > >
+> > > > I'm not sure about the kernel backend, but I've tested adding anon
+> > > > memory to a VM with a vhost-user-scsi device and it works (eventually
+> > > > the VM crashed, but I could see the guest recognized the anon RAM).
+> > > > The vhost-user code is designed to work with both. I'm not sure I see
+> > > > a use case, but if there is one, this would be a valid issue. Maybe
+> > > > Jiajun or Jianjay can elaborate.
+> > >
+> > > Hmm does not vhost-user skip all regions that do not have an fd?
+> > >
+> > >
+> > >         mr = vhost_user_get_mr_data(reg->userspace_addr, &offset, &fd);
+> > >         if (fd > 0) {
+> > >             if (track_ramblocks) {
+> > >                 assert(*fd_num < VHOST_MEMORY_BASELINE_NREGIONS);
+> > >                 trace_vhost_user_set_mem_table_withfd(*fd_num, mr->name,
+> > >                                                       reg->memory_size,
+> > >                                                       reg->guest_phys_addr,
+> > >                                                       reg->userspace_addr,
+> > >                                                       offset);
+> > >                 u->region_rb_offset[i] = offset;
+> > >                 u->region_rb[i] = mr->ram_block;
+> > >             } else if (*fd_num == VHOST_MEMORY_BASELINE_NREGIONS) {
+> > >                 error_report("Failed preparing vhost-user memory table msg");
+> > >                 return -1;
+> > >             }
+> > >             vhost_user_fill_msg_region(&region_buffer, reg, offset);
+> > >             msg->payload.memory.regions[*fd_num] = region_buffer;
+> > >             fds[(*fd_num)++] = fd;
+> > >         } else if (track_ramblocks) {
+> > >             u->region_rb_offset[i] = 0;
+> > >             u->region_rb[i] = NULL;
+> > >         }
+> > >
+> > >
+> > >
+> > > In your test, is it possible that you were lucky and guest did not send
+> > > any data from anon memory to the device?
+> >
+> > Yes - vhost-user skips the region and does not send anon memory to the
+> > device, but it does not fail the hot-add operation.
+> >
+> > In my test the fd > 0 check definitely failed and went on to add the
+> > memory without sending it to the backend. I understand why this can be
+> > problematic (it did eventually crash the VM), but it seems like we
+> > allow it as of today. I can't think of a valid reason why you would
+> > want anon and FD ram together, but I figured there may be a reason
+> > since the vhost-user code allows for it. Should we maybe block that
+> > path altogether instead of patching it up?
 >
-> Reported-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+>
+> Hmm where do we patch it up? Reason we might have non FD MRs is IIUC
+> due to things like IO regions...
 
-LGTM:
+The issue is that today such non FD MRs count towards the vhost-user
+max ramslots limit even though there is no good reason for them to. By
+"patching it up", I mean accepting this change, which makes it so that
+the vhost-user max ramslots limit only applies to FD RAM regions.
 
-Tested-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
-
-Who's tree is going to take it?
-
---=20
-Alex Benn=C3=A9e
+>
+>
+> > >
+> > >
+> > >
+> > > > >
+> > > > > >
+> > > > > > --
+> > > > > > ChangeList:
+> > > > > > v3:
+> > > > > > -make used_memslots a member of struct vhost_dev instead of a global static value
+> > > > > it's global resource, so why?
+> > > >
+> > > > I suggested it because I thought it made the code a little cleaner.
+> > > > I'm not opposed to changing it back, or having it stored at the
+> > > > vhost_user level.
+> > >
+>
 
