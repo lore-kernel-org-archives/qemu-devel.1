@@ -2,90 +2,114 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A556C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:42:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A50DEC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:59:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C65CA20B1F
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B857821582
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:59:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="Q1YoMIHD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C65CA20B1F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dGg1oXoU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B857821582
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSbQk-0006W3-Kr
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:42:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53204)
+	id 1kSbh7-0003yc-FZ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:59:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57208)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kSbNO-0003p6-Si
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:39:10 -0400
-Received: from forwardcorp1o.mail.yandex.net ([2a02:6b8:0:1a2d::193]:48952)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dimastep@yandex-team.ru>)
- id 1kSbNL-0007jU-3J
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:39:10 -0400
-Received: from myt5-23f0be3aa648.qloud-c.yandex.net
- (myt5-23f0be3aa648.qloud-c.yandex.net
- [IPv6:2a02:6b8:c12:3e29:0:640:23f0:be3a])
- by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id BB7AF2E0404;
- Wed, 14 Oct 2020 10:39:03 +0300 (MSK)
-Received: from myt4-18a966dbd9be.qloud-c.yandex.net
- (myt4-18a966dbd9be.qloud-c.yandex.net [2a02:6b8:c00:12ad:0:640:18a9:66db])
- by myt5-23f0be3aa648.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
- WVGBVVrI8j-d2weaKgJ; Wed, 14 Oct 2020 10:39:03 +0300
-Precedence: bulk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
- s=default; 
- t=1602661143; bh=Rbmj6oGzgSGUvYRY0XmFy4V6ii6pTzhKoerYrs/boJw=;
- h=In-Reply-To:Message-ID:Subject:To:From:References:Date:Cc;
- b=Q1YoMIHDaNWHPLXlL5SBD/Edzdz0EhXNvuAtNfrDwcrSZ4v9+k4UpLM0G7pWIApzE
- IU6WqmLmnF/VFyrE/bKZTU/aZhBVIjzppDZrh2rgFffMZby12bOMxhYZBVbG/ZtfKx
- wH4B+fdvaxFvhWT3V8LqKofVa4WmcyGMS67kOI/Y=
-Authentication-Results: myt5-23f0be3aa648.qloud-c.yandex.net;
- dkim=pass header.i=@yandex-team.ru
-Received: from dynamic-vpn.dhcp.yndx.net (dynamic-vpn.dhcp.yndx.net
- [2a02:6b8:b080:6605::1:7])
- by myt4-18a966dbd9be.qloud-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id
- v7QuAwcnB5-d2nqGbuu; Wed, 14 Oct 2020 10:39:02 +0300
- (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
- (Client certificate not present)
-Date: Wed, 14 Oct 2020 10:39:01 +0300
-From: Dima Stepanov <dimastep@yandex-team.ru>
-To: Alexander Bulekov <alxndr@bu.edu>
-Subject: Re: [PATCH v1 1/2] fuzz: add virtio-blk fuzz target
-Message-ID: <20201014073855.GA5872@dimastep-nix>
-References: <cover.1602078083.git.dimastep@yandex-team.ru>
- <0b922b854ac4121dd8574c3e9cd36c562f7d0a3c.1602078083.git.dimastep@yandex-team.ru>
- <20201013153052.qzq6dhatcbpx33au@mozz.bu.edu>
- <20201014072931.GA5631@dimastep-nix>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSbgU-0003YU-Pk
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:58:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58782)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSbgS-0004xV-9X
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:58:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602662331;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=psc0tXP/2uQj5R5dCGzzuUplUIdW0TOXOCJPz7ts3Z8=;
+ b=dGg1oXoUYSs7ZxWsyeZeYWk2mRhyAyN+nGyY1yalu4B1o/COf+iaVzPjqULiU849UEHOGt
+ RsYD5e2ZWuxeDbW4Dz5nh8Z2Q4I5HvdFsJm0d7GRp6RJYWq/X0Ea2uc7AOoFy0NxluAli9
+ Bpa3JBf8cRErXOptadZOhQxCZfkVEDU=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-404-J4s5_-lhOla07EGfMwdv2g-1; Wed, 14 Oct 2020 03:58:49 -0400
+X-MC-Unique: J4s5_-lhOla07EGfMwdv2g-1
+Received: by mail-wm1-f69.google.com with SMTP id l15so254137wmh.9
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 00:58:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=psc0tXP/2uQj5R5dCGzzuUplUIdW0TOXOCJPz7ts3Z8=;
+ b=qgaKL9pkW+eM20RAw3O0tyus0TA8dqzNsFJBok+5mwEyxuO64J7bD8X5K49tW+7Xh6
+ kCT9hP4tS44MTd7BEsXHG096Glw5yXdUP7qLog5LdSmRmOEUuLjyPACDmswB09lkAv5N
+ Q2jLiPpop7JlpRzRwfItGZMb6Gqx8jkBayiy1rJjxwcqNK1r5eY+ORgTyqu2O+ra1he+
+ bFzYDcG4I+qZwXp5gUR0AMP1O6Fhu1hQnyOwt8sBj/Ee4DiLKBmvPauH6lJv8N1sKQjs
+ rjyhwFNqqzMIjwGGy1lZjWq5d94nwSb3ZhjICKU9bK4lOHwTLuLiQ/v6MQXAAUmNLAla
+ L0JQ==
+X-Gm-Message-State: AOAM531wXCe0i7BZgIDxE9t8HuQKrd7JYbhMxpPtGJf3rFQ68MqlPOfB
+ fUOyopTcdWuzkSAqO4Tf0m0hLje0xFT9W8vvnwrDEStTJ6+P2nZzZ3twp8+waPYKJPK4vJlTrWH
+ x65ua43G5zphGlpc=
+X-Received: by 2002:adf:90c4:: with SMTP id i62mr3751132wri.98.1602662328216; 
+ Wed, 14 Oct 2020 00:58:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzKGIY3KKkIsTt2iiPQh651hEQZWNlLCnQ8vNyt9AEb13QU4xxMklUJRL8wuh7TTJCkRB55zw==
+X-Received: by 2002:adf:90c4:: with SMTP id i62mr3751102wri.98.1602662327835; 
+ Wed, 14 Oct 2020 00:58:47 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id y4sm3481280wrp.74.2020.10.14.00.58.46
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 14 Oct 2020 00:58:47 -0700 (PDT)
+Subject: Re: [RFC v1 1/2] accel/tcg: split CpusAccel into three TCG variants
+To: Claudio Fontana <cfontana@suse.de>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20201014073605.6155-1-cfontana@suse.de>
+ <20201014073605.6155-2-cfontana@suse.de>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <64b1e350-ed12-ffee-24a1-a6abfccc53ce@redhat.com>
+Date: Wed, 14 Oct 2020 09:58:45 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201014072931.GA5631@dimastep-nix>
-User-Agent: Mutt/1.5.24 (2015-08-30)
-Received-SPF: pass client-ip=2a02:6b8:0:1a2d::193;
- envelope-from=dimastep@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201014073605.6155-2-cfontana@suse.de>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -94,137 +118,277 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: stefanha@gmail.com, qemu-devel@nongnu.org, yc-core@yandex-team.ru
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 14, 2020 at 10:29:41AM +0300, Dima Stepanov wrote:
-> On Tue, Oct 13, 2020 at 11:30:52AM -0400, Alexander Bulekov wrote:
-> > On 201007 1647, Dima Stepanov wrote:
-> > > The virtio-blk fuzz target sets up and fuzzes the available virtio-blk
-> > > queues. The implementation is based on two files:
-> > >   - tests/qtest/fuzz/virtio_scsi_fuzz.c
-> > >   - tests/qtest/virtio_blk_test.c
-> > > 
-> > > Signed-off-by: Dima Stepanov <dimastep@yandex-team.ru>
-> > > ---
-> > >  tests/qtest/fuzz/meson.build       |   1 +
-> > >  tests/qtest/fuzz/virtio_blk_fuzz.c | 234 +++++++++++++++++++++++++++++++++++++
-> > >  2 files changed, 235 insertions(+)
-> > >  create mode 100644 tests/qtest/fuzz/virtio_blk_fuzz.c
-> > > 
-> > > diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
-> > > index b31ace7..3b923dc 100644
-> > > --- a/tests/qtest/fuzz/meson.build
-> > > +++ b/tests/qtest/fuzz/meson.build
-> > > @@ -5,6 +5,7 @@ specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c',
-> > >  specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
-> > >  specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
-> > >  specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
-> > > +specific_fuzz_ss.add(files('virtio_blk_fuzz.c'))
-> > 
-> > Hi Dima,
-> > For consistency, maybe
-> > specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio_blk_fuzz.c'))
-> Good point, will update it.
+On 10/14/20 9:36 AM, Claudio Fontana wrote:
+> split up the CpusAccel tcg_cpus into three TCG variants:
 > 
-> > 
-> ...
-> > > +
-> > > +static char *drive_create(void)
-> > > +{
-> > > +    int fd, ret;
-> > > +    char *t_path = g_strdup("/tmp/qtest.XXXXXX");
-> > > +
-> > > +    /* Create a temporary raw image */
-> > > +    fd = mkstemp(t_path);
-> > > +    g_assert_cmpint(fd, >=, 0);
-> > > +    ret = ftruncate(fd, TEST_IMAGE_SIZE);
-> > > +    g_assert_cmpint(ret, ==, 0);
-> > > +    close(fd);
-> > > +
-> > > +    g_test_queue_destroy(drive_destroy, t_path);
-> > > +    return t_path;
-> > > +}
-> > > +
-> > 
-> > I tested this out and it works with multi-process fuzzing under -jobs=4
-> > -workers=4 (this initialization happens after libfuzzer has already
-> > forked the processes). This seems like an interesting alternative to
-> > using fake null-co:// files. 
-> > I wonder if some state might leak as these disks are filled with fuzzer
-> > data.
-> Yes, i've also chosen between the fake null device and temporary file.
-> Tried this approach, just to see what will happen ). It seems to me that
-> slightly different paths can be triggered in this case and it is closer
-> to real usage.
-> But indeed, mb some state can leak, this is interesting.
+> tcg_cpus_rr (single threaded, round robin cpus)
+> tcg_cpus_icount (same as rr, but with instruction counting enabled)
+> tcg_cpus_mttcg (multi-threaded cpus)
 > 
-> > 
-> > Nit: these disk files remain after the fuzzer exists. It looks
-> > like the libfuzzer people suggest simply using atexit() to perform
-> > cleanup: https://reviews.llvm.org/D45762
-> > The is that the only way I have found to terminate the fuzzer is with
-> > SIGKILL, where atexit is skipped. QEMU installs some signal handlers in
-> > os-posix.c:os_setup_signal_handling to notify the main_loop that the
-> > qemu was killed. Since we replace qemu_main_loop by manually running
-> > main_loop_wait, we don't check main_loop_should_exit().
-> Got it! Thanks for sharing this is good to know ).
-> 
-> No other comments mixed in below.
-> 
-> Dima.
-> > 
-> > I sent a patch to disable QEMU's signal handlers for the fuzzer.
-> > Message-Id: <20201013152920.448335-1-alxndr@bu.edu>
-Sorry, i couldn't find a patch you've pointed out above. Could you share
-some link to it? Also, am i correct that it is a general change for the
-QEMU fuzzing, so all the fuzzing targets will automatically reuse it?
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> ---
+>   accel/tcg/meson.build       |   9 +-
+>   accel/tcg/tcg-all.c         |   8 +-
+>   accel/tcg/tcg-cpus-icount.c | 145 +++++++++++
+>   accel/tcg/tcg-cpus-icount.h |  20 ++
+>   accel/tcg/tcg-cpus-mttcg.c  | 118 +++++++++
+>   accel/tcg/tcg-cpus-mttcg.h  |  25 ++
+>   accel/tcg/tcg-cpus-rr.c     | 270 ++++++++++++++++++++
+>   accel/tcg/tcg-cpus-rr.h     |  23 ++
+>   accel/tcg/tcg-cpus.c        | 478 ++----------------------------------
+>   accel/tcg/tcg-cpus.h        |   9 +-
+>   softmmu/icount.c            |   2 +-
+>   11 files changed, 647 insertions(+), 460 deletions(-)
+>   create mode 100644 accel/tcg/tcg-cpus-icount.c
+>   create mode 100644 accel/tcg/tcg-cpus-icount.h
+>   create mode 100644 accel/tcg/tcg-cpus-mttcg.c
+>   create mode 100644 accel/tcg/tcg-cpus-mttcg.h
+>   create mode 100644 accel/tcg/tcg-cpus-rr.c
+>   create mode 100644 accel/tcg/tcg-cpus-rr.h
+...
 
-> > 
-> > With an atexit() call to clean up the temporary images:
-> > Reviewed-by: Alexander Bulekov <alxndr@bu.edu>
-> > 
-> > > +static void *virtio_blk_test_setup(GString *cmd_line, void *arg)
-> > > +{
-> > > +    char *tmp_path = drive_create();
-> > > +
-> > > +    g_string_append_printf(cmd_line,
-> > > +                           " -drive if=none,id=drive0,file=%s,"
-> > > +                           "format=raw,auto-read-only=off ",
-> > > +                           tmp_path);
-> > > +
-> > > +    return arg;
-> > > +}
-> > > +
-> > > +static void register_virtio_blk_fuzz_targets(void)
-> > > +{
-> > > +    fuzz_add_qos_target(&(FuzzTarget){
-> > > +                .name = "virtio-blk-fuzz",
-> > > +                .description = "Fuzz the virtio-blk virtual queues, forking "
-> > > +                                "for each fuzz run",
-> > > +                .pre_vm_init = &counter_shm_init,
-> > > +                .pre_fuzz = &virtio_blk_pre_fuzz,
-> > > +                .fuzz = virtio_blk_fork_fuzz,},
-> > > +                "virtio-blk",
-> > > +                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
-> > > +                );
-> > > +
-> > > +    fuzz_add_qos_target(&(FuzzTarget){
-> > > +                .name = "virtio-blk-flags-fuzz",
-> > > +                .description = "Fuzz the virtio-blk virtual queues, forking "
-> > > +                "for each fuzz run (also fuzzes the virtio flags)",
-> > > +                .pre_vm_init = &counter_shm_init,
-> > > +                .pre_fuzz = &virtio_blk_pre_fuzz,
-> > > +                .fuzz = virtio_blk_with_flag_fuzz,},
-> > > +                "virtio-blk",
-> > > +                &(QOSGraphTestOptions){.before = virtio_blk_test_setup}
-> > > +                );
-> > > +}
-> > > +
-> > > +fuzz_target_init(register_virtio_blk_fuzz_targets);
-> > > -- 
-> > > 2.7.4
-> > > 
+> diff --git a/accel/tcg/tcg-cpus-icount.c b/accel/tcg/tcg-cpus-icount.c
+> new file mode 100644
+> index 0000000000..43505e8f1f
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-icount.c
+> @@ -0,0 +1,145 @@
+> +/*
+> + * QEMU System Emulator
+
+"QEMU single threaded vCPUs implementation using instruction counting"?
+
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + * Copyright (c) 2014 Red Hat Inc.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+...
+
+> diff --git a/accel/tcg/tcg-cpus-icount.h b/accel/tcg/tcg-cpus-icount.h
+> new file mode 100644
+> index 0000000000..e2e25674c2
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-icount.h
+> @@ -0,0 +1,20 @@
+> +/*
+> + * Accelerator CPUS Interface
+
+Ditto.
+
+> + *
+> + * Copyright 2020 SUSE LLC
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef TCG_CPUS_ICOUNT_H
+> +#define TCG_CPUS_ICOUNT_H
+> +
+> +extern const CpusAccel tcg_cpus_icount;
+> +
+> +int64_t tcg_get_icount_limit(void);
+> +void handle_icount_deadline(void);
+> +void prepare_icount_for_run(CPUState *cpu);
+> +void process_icount_data(CPUState *cpu);
+> +
+> +#endif /* TCG_CPUS_ICOUNT_H */
+> diff --git a/accel/tcg/tcg-cpus-mttcg.c b/accel/tcg/tcg-cpus-mttcg.c
+> new file mode 100644
+> index 0000000000..2f5317d767
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-mttcg.c
+> @@ -0,0 +1,118 @@
+> +/*
+> + * QEMU System Emulator
+
+"QEMU multi-threaded vCPUs implementation"?
+
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + * Copyright (c) 2014 Red Hat Inc.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+...
+
+> diff --git a/accel/tcg/tcg-cpus-mttcg.h b/accel/tcg/tcg-cpus-mttcg.h
+> new file mode 100644
+> index 0000000000..c8966b2f8a
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-mttcg.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + * Accelerator CPUS Interface
+
+Ditto.
+
+> + *
+> + * Copyright 2020 SUSE LLC
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef TCG_CPUS_MTTCG_H
+> +#define TCG_CPUS_MTTCG_H
+> +
+> +extern const CpusAccel tcg_cpus_mttcg;
+> +
+> +/*
+> + * Multi-threaded TCG
+> + *
+> + * In the multi-threaded case each vCPU has its own thread. The TLS
+> + * variable current_cpu can be used deep in the code to find the
+> + * current CPUState for a given thread.
+> + */
+> +
+> +void *tcg_cpu_thread_fn(void *arg);
+> +
+> +#endif /* TCG_CPUS_MTTCG_H */
+> diff --git a/accel/tcg/tcg-cpus-rr.c b/accel/tcg/tcg-cpus-rr.c
+> new file mode 100644
+> index 0000000000..b8fd33d9d3
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-rr.c
+> @@ -0,0 +1,270 @@
+> +/*
+> + * QEMU System Emulator
+
+"QEMU single threaded (using round robin) vCPUs implementation"?
+
+> + *
+> + * Copyright (c) 2003-2008 Fabrice Bellard
+> + * Copyright (c) 2014 Red Hat Inc.
+> + *
+> + * Permission is hereby granted, free of charge, to any person obtaining a copy
+> + * of this software and associated documentation files (the "Software"), to deal
+> + * in the Software without restriction, including without limitation the rights
+> + * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+> + * copies of the Software, and to permit persons to whom the Software is
+> + * furnished to do so, subject to the following conditions:
+> + *
+> + * The above copyright notice and this permission notice shall be included in
+> + * all copies or substantial portions of the Software.
+> + *
+> + * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+> + * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+> + * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+> + * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+> + * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+> + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+> + * THE SOFTWARE.
+> + */
+...
+
+> diff --git a/accel/tcg/tcg-cpus-rr.h b/accel/tcg/tcg-cpus-rr.h
+> new file mode 100644
+> index 0000000000..155510cfd4
+> --- /dev/null
+> +++ b/accel/tcg/tcg-cpus-rr.h
+> @@ -0,0 +1,23 @@
+> +/*
+> + * Accelerator CPUS Interface
+
+Ditto.
+
+> + *
+> + * Copyright 2020 SUSE LLC
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef TCG_CPUS_RR_H
+> +#define TCG_CPUS_RR_H
+> +
+> +extern const CpusAccel tcg_cpus_rr;
+> +
+> +#define TCG_KICK_PERIOD (NANOSECONDS_PER_SECOND / 10)
+> +
+> +/* Kick all RR vCPUs. */
+> +void qemu_cpu_kick_rr_cpus(CPUState *unused);
+> +
+> +/* Single-threaded TCG */
+> +void *tcg_rr_cpu_thread_fn(void *arg);
+> +
+> +#endif /* TCG_CPUS_RR_H */
+...
+
+> diff --git a/accel/tcg/tcg-cpus.h b/accel/tcg/tcg-cpus.h
+> index 8b1d9d2abc..871e58507d 100644
+> --- a/accel/tcg/tcg-cpus.h
+> +++ b/accel/tcg/tcg-cpus.h
+> @@ -12,6 +12,13 @@
+>   
+>   #include "sysemu/cpus.h"
+>   
+> -extern const CpusAccel tcg_cpus;
+> +#include "tcg-cpus-rr.h"
+> +#include "tcg-cpus-icount.h"
+> +#include "tcg-cpus-mttcg.h"
+
+Why do we need to include the implementation declarations?
+
+> +
+> +void tcg_start_vcpu_thread(CPUState *cpu);
+> +void qemu_tcg_destroy_vcpu(CPUState *cpu);
+> +int tcg_cpu_exec(CPUState *cpu);
+> +void tcg_handle_interrupt(CPUState *cpu, int mask);
+>   
+>   #endif /* TCG_CPUS_H */
+> diff --git a/softmmu/icount.c b/softmmu/icount.c
+> index 020a201a01..dbcd8c3594 100644
+> --- a/softmmu/icount.c
+> +++ b/softmmu/icount.c
+> @@ -396,7 +396,7 @@ void icount_start_warp_timer(void)
+>   
+>   void icount_account_warp_timer(void)
+>   {
+> -    if (!icount_enabled() || !icount_sleep) {
+> +    if (!icount_sleep) {
+>           return;
+>       }
+>   
+> 
+
 
