@@ -2,57 +2,57 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,FROM_WSP_TRAIL,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,FROM_WSP_TRAIL,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ED3BC43457
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A010C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1AC85212CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1AC85212CC
+	by mail.kernel.org (Postfix) with ESMTPS id 576B120878
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 07:33:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 576B120878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60238 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSbHW-00047a-3I
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:33:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50896)
+	id 1kSbHZ-0004Er-AA
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 03:33:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50940)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSbD5-0007jM-Fh
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:31 -0400
-Received: from mga05.intel.com ([192.55.52.43]:54365)
+ id 1kSbDC-0007si-JK
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:38 -0400
+Received: from mga05.intel.com ([192.55.52.43]:54376)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSbD3-00041U-Oe
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:31 -0400
-IronPort-SDR: KINNilbLm2cmYAQ3nj9zMCCr3jq3a/VzMjddxAQVuLmb7v8kO/nQzV4QzYuaAx5z4HeDIW0kmR
- jlgnbmJx1b+A==
-X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="250751928"
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="250751928"
+ id 1kSbDA-00045B-A0
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 03:28:38 -0400
+IronPort-SDR: Pfdz0/L0digECfE7R1WO0jRqayXbC1Es5OnaJYp4Jkz1WyfHK7uNxVaaR8KFheaLZBGekWryWy
+ CPJGtucAgkXQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9773"; a="250751934"
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="250751934"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2020 00:28:28 -0700
-IronPort-SDR: y0rsCka7ZOivCmYZ0nQ8VYhSpxqZHAoRKgjMVeAFPO2aC7frjBXh86RaAInhtZ+NkOLBf5hD97
- Rhp/LeijCigg==
-X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="521323042"
+ 14 Oct 2020 00:28:33 -0700
+IronPort-SDR: GHdYy1iDyK/pthHhyzj2wb8H5V7zSFCq99PokzwOb31owNu7VzSz73Ri+rmxo23qbBN1p/lJyU
+ DunrOCT3Jtqg==
+X-IronPort-AV: E=Sophos;i="5.77,374,1596524400"; d="scan'208";a="521323057"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 14 Oct 2020 00:28:27 -0700
+ 14 Oct 2020 00:28:32 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>,
 	qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH 04/10] Fix the qemu crash when guest shutdown in COLO mode
-Date: Wed, 14 Oct 2020 15:25:50 +0800
-Message-Id: <20201014072555.12515-5-chen.zhang@intel.com>
+Subject: [PATCH 07/10] net/colo-compare.c: Fix compare_timeout format issue
+Date: Wed, 14 Oct 2020 15:25:53 +0800
+Message-Id: <20201014072555.12515-8-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201014072555.12515-1-chen.zhang@intel.com>
 References: <20201014072555.12515-1-chen.zhang@intel.com>
@@ -79,42 +79,69 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <chen.zhang@intel.com>, "Rao, Lei" <lei.rao@intel.com>,
- Zhang Chen <zhangckid@gmail.com>
+Cc: Zhang Chen <chen.zhang@intel.com>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Rao, Lei" <lei.rao@intel.com>
+From: Zhang Chen <chen.zhang@intel.com>
 
-In COLO mode, if the startup parameters of QEMU include "no-shutdown",
-QEMU will crash when the guest shutdown. The root cause is when the
-guest shutdown, the state of VM will switch COLO to SHUTDOWN. When do
-checkpoint again, the state will be changed to COLO. But the state
-switch is undefined in runstate_transitions_def, we should add it.
-This patch fixes the following:
-qemu-system-x86_64: invalid runstate transition: 'shutdown' -> 'colo'
-Aborted
+This parameter need compare with the return of qemu_clock_get_ms(),
+it is uinit64_t. So we need fix this issue here.
 
-Signed-off-by: leirao <lei.rao@intel.com>
+Reported-by: Derek Su <dereksu@qnap.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
+Reviewed-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 ---
- softmmu/vl.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/colo-compare.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 5a11a62f78..bafe7c5b70 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -632,6 +632,7 @@ static const RunStateTransition runstate_transitions_def[] = {
-     { RUN_STATE_SHUTDOWN, RUN_STATE_PAUSED },
-     { RUN_STATE_SHUTDOWN, RUN_STATE_FINISH_MIGRATE },
-     { RUN_STATE_SHUTDOWN, RUN_STATE_PRELAUNCH },
-+    { RUN_STATE_SHUTDOWN, RUN_STATE_COLO },
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 24c366eec0..f4814c5f09 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -120,7 +120,7 @@ struct CompareState {
+     SendCo out_sendco;
+     SendCo notify_sendco;
+     bool vnet_hdr;
+-    uint32_t compare_timeout;
++    uint64_t compare_timeout;
+     uint32_t expired_scan_cycle;
  
-     { RUN_STATE_DEBUG, RUN_STATE_SUSPENDED },
-     { RUN_STATE_RUNNING, RUN_STATE_SUSPENDED },
+     /*
+@@ -1075,9 +1075,9 @@ static void compare_get_timeout(Object *obj, Visitor *v,
+                                 Error **errp)
+ {
+     CompareState *s = COLO_COMPARE(obj);
+-    uint32_t value = s->compare_timeout;
++    uint64_t value = s->compare_timeout;
+ 
+-    visit_type_uint32(v, name, &value, errp);
++    visit_type_uint64(v, name, &value, errp);
+ }
+ 
+ static void compare_set_timeout(Object *obj, Visitor *v,
+@@ -1140,9 +1140,9 @@ static void set_max_queue_size(Object *obj, Visitor *v,
+                                Error **errp)
+ {
+     Error *local_err = NULL;
+-    uint32_t value;
++    uint64_t value;
+ 
+-    visit_type_uint32(v, name, &value, &local_err);
++    visit_type_uint64(v, name, &value, &local_err);
+     if (local_err) {
+         goto out;
+     }
+@@ -1390,7 +1390,7 @@ static void colo_compare_init(Object *obj)
+     object_property_add_str(obj, "notify_dev",
+                             compare_get_notify_dev, compare_set_notify_dev);
+ 
+-    object_property_add(obj, "compare_timeout", "uint32",
++    object_property_add(obj, "compare_timeout", "uint64",
+                         compare_get_timeout,
+                         compare_set_timeout, NULL, NULL);
+ 
 -- 
 2.17.1
 
