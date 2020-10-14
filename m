@@ -2,80 +2,101 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C41D9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3024DC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:43:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC6A821D81
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:32:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC6A821D81
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 6C60A21D81
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:43:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c8/OVvYa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C60A21D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43560 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSlZw-0005Lt-ML
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 14:32:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59630)
+	id 1kSlkA-0000dN-95
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 14:43:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33570)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kSlXy-0004TH-0M
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:30:47 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43696)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSlif-0008VG-UI
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:41:49 -0400
+Received: from mail-pj1-x102d.google.com ([2607:f8b0:4864:20::102d]:37953)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kSlXv-0003JA-OR
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:30:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kSlXt-00048x-JY
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 18:30:41 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 92CF82E8053
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 18:30:41 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kSlid-0004kU-FZ
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:41:49 -0400
+Received: by mail-pj1-x102d.google.com with SMTP id u3so249358pjr.3
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 11:41:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=i0vAYObnpIFH4p12o6pJGrseH5Je/UJA9BTxb3ZRME8=;
+ b=c8/OVvYakMGe4rmPIMuvQLaksWk1X4XPWEREM15eCaSyXATvd2zr45lm8Hb40xpcuB
+ mQOJxye1FsCIrQ45OCXof25odPVF/CUCJGR3Cpl8dUW2GBLAoRycm0yLrXhnZoHhMs87
+ +6M5cS02iFcdGHFW0uw9UajEb8p/42G1Svuf5/Iyq+OgQRQjLhxDlBBTAGsBIztWgj75
+ n5Z1idodHsYyMCT0XKqPPE+whHRkeRjjtdTy3pk22RvgCG4zP/Rb/slLLHmuhBT0HTma
+ Afi5FKS9m9oMpcW1O7bskYe8qj1h/78xre1AT4Ti4VoJLMozNZFOpHlNqcFGJTszGZuA
+ 0vNw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=i0vAYObnpIFH4p12o6pJGrseH5Je/UJA9BTxb3ZRME8=;
+ b=dyOzN1id3n4kikCFYAx19QAlf6hwTUGO/xJOA2aXaUf8KzlfUzdJ165ax2NKNOFkpD
+ adZKFnN+/3p5Kma24YAqNZZ7f1nTBM79hwOdhgH42b10zNl0NqGfza3Cxo3qHdZ8nBJH
+ Rslbz770l01FF509LspPdgtezLQo9zGiN+xa2lwbFDDoJZiznPdmgC1X4grr5kb6Vsjg
+ cz/jnGD4W5726gXDJRdSQkwSyq7ugix1Pko53b08nAdp7Aa4G/LX5McdkEn+3Ttwmtbn
+ vL24iQqQdWxDZU31TMRYf4PanQ5o/4p+waaIB3YpxWuuVRnVe+L4HX/jToSKOx7Tw5el
+ ZduQ==
+X-Gm-Message-State: AOAM533kKO2Z94REvBtSYhs2qpos4nLnO0S/v5P+LFP0jnEihNTEo5lD
+ wherUfdmv3o1lByeW3oLG9WnHA==
+X-Google-Smtp-Source: ABdhPJwlzouQwkpgLuppffpK7HIb87c+D8BnClYecn6cJF3B3RVOAPVimvpu1nIuAr/dy8ne7meBrA==
+X-Received: by 2002:a17:902:7c93:b029:d4:e1c3:bde0 with SMTP id
+ y19-20020a1709027c93b02900d4e1c3bde0mr359548pll.85.1602700905283; 
+ Wed, 14 Oct 2020 11:41:45 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id fy24sm227781pjb.35.2020.10.14.11.41.43
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 14 Oct 2020 11:41:44 -0700 (PDT)
+Subject: Re: [PATCH 3/5] [RISCV_PM] Print new PM CSRs in QEMU logs
+To: Alexey Baturo <baturo.alexey@gmail.com>
+References: <20201014170159.26932-1-space.monkey.delivers@gmail.com>
+ <20201014170159.26932-4-space.monkey.delivers@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <3395cef5-79d4-078a-29ad-48639e4cd56d@linaro.org>
+Date: Wed, 14 Oct 2020 11:41:42 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 14 Oct 2020 18:17:28 -0000
-From: Damian Tometzki <1899728@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Fix Released; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: pmaydell th-huth tometzki
-X-Launchpad-Bug-Reporter: Damian Tometzki (tometzki)
-X-Launchpad-Bug-Modifier: Damian Tometzki (tometzki)
-References: <160265051683.3148.7226301603216219676.malonedeb@soybean.canonical.com>
-Message-Id: <160269944894.29924.17811709952604858190.malone@gac.canonical.com>
-Subject: [Bug 1899728] Re: Qemu-5.1.0 build from source man entry not found
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
-X-Launchpad-Hash: ed27c52bd5c9fd4accbed54ed8a0af114226daf4
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 14:30:41
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201014170159.26932-4-space.monkey.delivers@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::102d;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x102d.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -84,65 +105,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1899728 <1899728@bugs.launchpad.net>
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ space.monkey.delivers@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hello together,
+On 10/14/20 10:01 AM, Alexey Baturo wrote:
+> +    if (riscv_has_ext(env, RVH)) {
 
-build with enable-docs and install the required packages now it works
-with man qemu.
+RVJ.
 
-Many thanks for you help
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mmte    ", env->mmte);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "upmbase ", env->upmbase);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "spmbase ", env->spmbase);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mpmbase ", env->mpmbase);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "upmmask ", env->upmmask);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "spmmask ", env->spmmask);
+> +        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mpmmask ", env->mpmmask);
 
-Problem resolved :-)
-
-Best regards
-Damian
+Probably you only want to dump the set that's current.
 
 
-** Changed in: qemu
-       Status: Incomplete =3D> Confirmed
-
-** Changed in: qemu
-       Status: Confirmed =3D> Fix Released
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1899728
-
-Title:
-  Qemu-5.1.0 build from source man entry not found
-
-Status in QEMU:
-  Fix Released
-
-Bug description:
-  Hello together,
-
-  i build qemu-5.1.0 from source on centos 8 withe the following
-  command:
-
-  ../configure --prefix=3D/usr --target-list=3Dx86_64-softmmu,x86_64-linux-
-  user
-
-  make -j4
-
-  make install
-
-  The build and the installation finished successfully. But when i try
-  the command
-
-  man qemu-system-x86_64
-
-  i got the message "No manual entry found". What i do wrong ?
-
-  Best regards
-  Damian
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1899728/+subscriptions
+r~
 
