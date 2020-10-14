@@ -2,99 +2,87 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69FB1C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:36:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BE9FC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:51:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 924BE22249
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:36:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B5F442224E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:51:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pXxwYuRV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 924BE22249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Caui0QiB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5F442224E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40228 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48538 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSnVU-0006Ol-Ce
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:36:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55884)
+	id 1kSnk1-0002PH-Dz
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:51:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58750)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSnUM-0005sO-RY
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:35:10 -0400
-Received: from mail-pj1-x1042.google.com ([2607:f8b0:4864:20::1042]:55287)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kSnUK-0002OK-In
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:35:10 -0400
-Received: by mail-pj1-x1042.google.com with SMTP id az3so392876pjb.4
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 13:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=PqvYyMnc/sGzizSKoiFDnUsc58ExRT7bydM2RItZLWo=;
- b=pXxwYuRVbZPwS2HSiFbtPa2rAe1Ver/Tq/ShbqqzXfdZLH0IACT9cH0qVilFf5jYCT
- QyrJknV90UAe3rvJ9N/WCSIMpMnSqLsNJDsT/vQ9ZF8+RMyuuB17Bm8KBsxWVF9N6UQC
- Y9kde1OdVPA2sEAfFFnJupXYkkQVyPuPxPRjpinE9zq87vWqYg9gCub8t/XUTgGGdiQd
- leCbg3qGCP+I49yQnRfdSfQjPGnUVX+C2Lr/SDHAXR5HZfglN4bqEKIbm9kq38OuUR5b
- mWZiVUhwoiPY3c6zgA0fFFgV9bLnBk5TPHqKACcSr7pCboohUsWQtEOE42z2LSQLdujz
- C5/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PqvYyMnc/sGzizSKoiFDnUsc58ExRT7bydM2RItZLWo=;
- b=FMko9tz3fXznieVZZgq4iFyaNH382WWsWSQO0X3MxvpflL6yonKSfqPZkZRT9KKBtw
- ITkN+BYltTjRB1aTleRdRcES8GReXOaT94LGuiX3StsLL2iqOdA5G503rbGszhY2C7Qh
- dZtCjBf1V2aKZVzrX0D98+/e0bECt/UDZYxJwc2yttK7bApfSh4j/SE4uM25rDvVDDM4
- Exs1AZaTGzqWtcJEBP/UGMwHtQ2aWTGCZK2GLcWBhGphnV4RbjuAw0QSIRVVF8BbRXEv
- +k82zlVcnzqqOQnzYvPkaLYs+bRgnZVV3OxOgr2arugPG1D96EkQLh8PcgFpzu7gqak4
- ZnpQ==
-X-Gm-Message-State: AOAM532OQfd7ClSf4Z9H2wiHP/QMBcTnYefiZa9n+P+uiDG17Ju1yxDn
- 3HY6jfYp6lN/EKbtXiqFDKct3hHfm6Mb+Q==
-X-Google-Smtp-Source: ABdhPJwpOjlvba31WtH2ILtnTDmJCoSFKMIGCwZbBZ1lVbh3YCH1P3uHI1EecF3lZ398MEyDJ6rekw==
-X-Received: by 2002:a17:90a:f001:: with SMTP id
- bt1mr888806pjb.116.1602707706568; 
- Wed, 14 Oct 2020 13:35:06 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id o15sm555700pfp.91.2020.10.14.13.35.05
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 14 Oct 2020 13:35:05 -0700 (PDT)
-Subject: Re: [PATCH 07/10] tcg: implement bulletproof JIT
-To: Joelle van Dyne <j@getutm.app>, BALATON Zoltan <balaton@eik.bme.hu>
-References: <20201012232939.48481-1-j@getutm.app>
- <20201012232939.48481-8-j@getutm.app>
- <19c387d2-fc9-d1d0-849c-f8e8e270a97c@eik.bme.hu>
- <CADmqK1sTLy8O58rVR116VJnAK2qYMLQvX2wYxpcix_1YkFvLug@mail.gmail.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <2ab5b15f-2372-9531-4ade-50dc12592d6c@linaro.org>
-Date: Wed, 14 Oct 2020 13:35:03 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSnil-0001Yf-N9
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:50:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43691)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSnij-0004GF-Ax
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 16:50:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602708597;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hiHLSh0wALJlg1vFSwcwDzYHnL6eQ/uuv2O6+1qPve8=;
+ b=Caui0QiBVQIbNCaF/hF5qrO4dDbvxmfYyewcGVP1GMcMtq1ziFceNskZe47W3P+AxSq/4a
+ jvF5YD3FNk4YjuWtMNavi0knTf9IQLSJ2V+TjDqWRrEaZyYIySsg0Rf6mU22Ww/7tbCBXv
+ N2nx9u9pTccz4+Jxo6BHnUprC7fCDn8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-364-OuWtbUNoM1eK2iDw2ek5xA-1; Wed, 14 Oct 2020 16:49:53 -0400
+X-MC-Unique: OuWtbUNoM1eK2iDw2ek5xA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7438E18A0764;
+ Wed, 14 Oct 2020 20:49:52 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id B7A4173665;
+ Wed, 14 Oct 2020 20:49:51 +0000 (UTC)
+Date: Wed, 14 Oct 2020 16:49:50 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 5/7] dockerfiles: enable Centos 8 PowerTools
+Message-ID: <20201014204950.GA1203215@localhost.localdomain>
+References: <20201014135416.1290679-1-pbonzini@redhat.com>
+ <20201014135416.1290679-6-pbonzini@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CADmqK1sTLy8O58rVR116VJnAK2qYMLQvX2wYxpcix_1YkFvLug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1042;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1042.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201014135416.1290679-6-pbonzini@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="IJpNTDwzlM2Ie8A6"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,49 +95,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU <qemu-devel@nongnu.org>
+Cc: alex.bennee@linaro.org, berrange@redhat.com, qemu-devel@nongnu.org,
+ peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/20 9:03 AM, Joelle van Dyne wrote:
->>> static int encode_search(TranslationBlock *tb, uint8_t *block)
->>> {
->>> -    uint8_t *highwater = tcg_ctx->code_gen_highwater;
->>> -    uint8_t *p = block;
->>> +    uint8_t *highwater;
->>> +    uint8_t *p;
->>>     int i, j, n;
->>>
->>> +    highwater = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx,
->>> +                                           tcg_ctx->code_gen_highwater);
->>> +    p = (uint8_t *)TCG_CODE_PTR_RW(tcg_ctx, block);
->>
->> Why do you need explicit casts here? Can this be avoided by using
->> appropriate type or within the macro (I haven't checked this at all just
->> dislike casts as they can hide problems otherwise caught by the compiler).
-> There's the choice between tcg_insn_unit * and uint8_t *. Since it's
-> used much more widely in tcg-target.inc.c, it seemed like
-> tcg_insn_unit * was a better choice.
+--IJpNTDwzlM2Ie8A6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-False choice.  This is why tcg_ctx->code_gen_highwater is void*.
+On Wed, Oct 14, 2020 at 09:54:14AM -0400, Paolo Bonzini wrote:
+> ninja is included in the CentOS PowerTools repository.
+>=20
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  tests/docker/dockerfiles/centos8.docker | 3 +++
+>  1 file changed, 3 insertions(+)
+>=20
+> diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/docke=
+rfiles/centos8.docker
+> index 0fc2697491..e31d366fc1 100644
+> --- a/tests/docker/dockerfiles/centos8.docker
+> +++ b/tests/docker/dockerfiles/centos8.docker
+> @@ -1,6 +1,9 @@
+>  FROM centos:8.1.1911
+> =20
+> +RUN dnf -y install dnf-plugins-core
+> +RUN dnf config-manager --set-enabled PowerTools
 
->>> +#if defined(CONFIG_IOS_JIT)
->>> +# define TCG_CODE_PTR_RW(s, code_ptr) \
->>> +    (tcg_insn_unit *)((uintptr_t)(code_ptr) + (s)->code_rw_mirror_diff)
+Since config-manager won't be used besides here, I think it's safe and
+cheaper to simply do:
 
-Better as
+   RUN sed -i /etc/yum.repos.d/CentOS-PowerTools.repo -e 's/^enabled=3D0/en=
+abled=3D1/'
 
-static inline void *tcg_code_ptr_rw(TCGContext *s, void *rx)
-{
-#ifdef CONFIG_IOS_JIT
-    return rx + s->code_rw_mirror_diff;
-#else
-    return rx;
-#endif
-}
+It's also a single command, reducing the number of layers.
 
+- Cleber.
 
-r~
+>  RUN dnf -y update
+> +
+>  ENV PACKAGES \
+>      SDL-devel \
+>      bzip2 \
+> --=20
+> 2.26.2
+>=20
+>=20
+>=20
+
+--IJpNTDwzlM2Ie8A6
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+HZFoACgkQZX6NM6Xy
+CfOmlxAApp/XGN9yKZy6xdpGLIvECdqPTnK6s4/7s0ZhXpwfpOPgZM2P+Gpc6a1+
+kYBW0Mc0A8T6Gla4dnj1vshUnAf2KnayGs94GbrATpPVqVnL0Be6Fjyb2kHWskHr
+x9nI+4K0/ZaWKTUaBMz64lySiyJJB/HhMF2rgxvwty7L3wKKGiOVYY8U7BA6RROo
+YNC281MnApVpYJHqcy1dgrN+5m8b681PG40Iz8pvQwDhIpKQ4rUWslKkTusJXsG5
+w8E2zNezA7f3X9KNvKua6aK0yF3fz1ppixp7kItNCDHXnghAuSaojzFbFVzOitUo
+RiI5o9mgWANzTgEXhx6kNcZjZrnDU69d3ONN3I5nG/78RD8IMaYRIsc335Bz3Q73
+lFLtQBh9msx2yYnEflc0UVTp89d9gngZaRlAcqu3Uc0FQBBwF3Vcy1Ly/mMCaXvx
+/h/Bw5excCwgHpcO4cbWOU7ebvBb4XD96tYvUqxPUsH4NRSv2jaTwhhW3/eFumeI
+fohjTjJnyh/mkNfb4zbhjUo1svgwFSGFPTtaHHPktyBpzemvfUnVYW7DWPdOBj8V
+z9i0UEEOi5+IMlT7SmajekbFb+FeEk3R3VFZekOCD2MetVOmIOrHap0rCIIYIYWQ
+Kesh9RO0wRMdrUfHLIrh6ppNjpyw7/fdrkux7/OMLC2gtAM514M=
+=MX2m
+-----END PGP SIGNATURE-----
+
+--IJpNTDwzlM2Ie8A6--
+
 
