@@ -2,85 +2,62 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225EEC433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D0FAC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:44:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 810322222C
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:43:45 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OScpa8t/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 810322222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 06A862222C
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 05:44:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06A862222C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=ispras.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSZZg-00060J-EF
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:43:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33642)
+	id 1kSZa7-0006kh-UQ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 01:44:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kSZY2-0005Uv-5l; Wed, 14 Oct 2020 01:42:04 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:33219)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kSZXv-00017X-Ms; Wed, 14 Oct 2020 01:42:01 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id c3so1689938ybl.0;
- Tue, 13 Oct 2020 22:41:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=EbRekD8cYxBeSOo53KhOrLUIIOG4ngy/n48+yXoVrhQ=;
- b=OScpa8t/7ymdHijqQYZKpAyeYZoWbwXhnGFspMLkVZjudxshUnXOCLXUDT5MRZD68l
- jtd3GsWvXGnXFK7TdghRLAGz2nvX55xHcIM19MQmizt8/d6PSW3HaVx3226TRq5GIonH
- DOlD3kNQwTUKKtuD9GmBTnetEuCZIZF0+4x7g2tshr92EHwph34Dm1NmdtSYyXXUi+3q
- 37TJqR4/Pc/Kb55LVeLuwHwjb6mxSgwgJ4LdJHO1F10BH0e1LuedGFPtVQY+sNypuiB7
- hgyqSIBs55uZbfW1hGTRjfkfAUH5lakTpD4vWG0TFagaA566DQYEeiuggtN876BuyCD7
- eZkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=EbRekD8cYxBeSOo53KhOrLUIIOG4ngy/n48+yXoVrhQ=;
- b=Ecmqm0mCFhtoxKrCN0CvmP51t2Kix+5jXan5ec3HjasvEaOwGlQrfkNtVR4LHHjedI
- XF9bbgHEMROMzfsDuT9ulCAY3yaGshqq0NPbu1N/Nhot7g1sEp0YLPomhM9zChrl0j25
- paTXVinIpFHNVcjxyoB+qQX8vrXEx6KyBbRxbp3guGDXWYSGX6+c71aAvTM4zw6Coi4f
- Jt2veyaynp9O+nNCB7X0HB7hRHMcDc2hQHvKpcUlJULDjI4+8+EAcGAKFaOK7XcFqM1w
- Xl0IOVjramq/OL3wYaDwsUU9N6b62uPLyBBJfn5JZ8VJsWg/Rhm4pmNv0u4nX0CZFNuM
- Xxmg==
-X-Gm-Message-State: AOAM531KLn/XeiCitID4LSfzuwIAIiQO93MJb33KWwi6dkvLFQK1PtIc
- o7Xi4JnTBd6LH/k0MVk35a5vsPsRnyzn2BMOfyE=
-X-Google-Smtp-Source: ABdhPJxsQdXhQ9dRjYSUhn2uCF1315Eg4ZNiAgNT+nMTw+w0VnqVVdk6Zw1xnF8DSlH9FcdyIAJLIEs+4KKjy6jGR+I=
-X-Received: by 2002:a25:c1c1:: with SMTP id r184mr281398ybf.517.1602654113271; 
- Tue, 13 Oct 2020 22:41:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kSZZ0-0005uC-0k
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:43:02 -0400
+Received: from mail.ispras.ru ([83.149.199.84]:40544)
+ by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <pavel.dovgalyuk@ispras.ru>)
+ id 1kSZYw-0001NH-1K
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 01:43:01 -0400
+Received: from [192.168.0.183] (unknown [62.118.151.149])
+ by mail.ispras.ru (Postfix) with ESMTPSA id 45F3B40A1DA0;
+ Wed, 14 Oct 2020 05:42:52 +0000 (UTC)
+Subject: Re: [PATCH v4 3/3] replay: do not build if TCG is not available
+To: Claudio Fontana <cfontana@suse.de>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20201013192123.22632-1-cfontana@suse.de>
+ <20201013192123.22632-4-cfontana@suse.de>
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Message-ID: <281ee6ed-454b-1baf-343c-786421a48c8e@ispras.ru>
+Date: Wed, 14 Oct 2020 08:42:52 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <20200928101146.12786-1-green.wan@sifive.com>
- <20200928101146.12786-3-green.wan@sifive.com>
-In-Reply-To: <20200928101146.12786-3-green.wan@sifive.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 14 Oct 2020 13:41:42 +0800
-Message-ID: <CAEUhbmXxRB55E4fMwyG6LUFS9Qz4Enme_Ht_K7ZchnLZfAT11g@mail.gmail.com>
-Subject: Re: [RFC PATCH v6 2/2] hw/misc/sifive_u_otp: Add backend drive support
-To: Green Wan <green.wan@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201013192123.22632-4-cfontana@suse.de>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=83.149.199.84;
+ envelope-from=pavel.dovgalyuk@ispras.ru; helo=mail.ispras.ru
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:42:53
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,162 +70,344 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair23@gmail.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
+ Pavel Dovgalyuk <dovgaluk@ispras.ru>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Sep 28, 2020 at 6:12 PM Green Wan <green.wan@sifive.com> wrote:
->
-> Add '-drive' support to OTP device. Allow users to assign a raw file
-> as OTP image.
->
-> test commands for 16k otp.img filled with zero:
->
-> dd if=/dev/zero of=./otp.img bs=1k count=16
-
-nits: please prefix the command with a leading "$ ", like
-
-$ dd if=/dev/zero of=./otp.img bs=1k count=16
-
-> ./qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none \
-> -kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf \
-> -d guest_errors -drive if=none,format=raw,file=otp.img
->
-> Signed-off-by: Green Wan <green.wan@sifive.com>
+On 13.10.2020 22:21, Claudio Fontana wrote:
+> this fixes non-TCG builds broken recently by replay reverse debugging.
+> 
+> stub the needed functions in stub/, including errors for hmp and qmp.
+> This includes duplicating some code in replay/, and puts the logic
+> for non-replay related events in the replay/ module (+ the stubs),
+> so this should be revisited in the future.
+> 
+> Surprisingly, only _one_ qtest was affected by this, ide-test.c, which
+> resulted in a buzz as the bh events were never delivered, and the bh
+> never executed.
+> 
+> Many other subsystems _should_ have been affected.
+> 
+> This fixes the immediate issue, however a better way to group replay
+> functionality to TCG-only code could be developed in the long term.
+> 
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
 > ---
->  hw/misc/sifive_u_otp.c         | 51 ++++++++++++++++++++++++++++++++++
->  include/hw/misc/sifive_u_otp.h |  2 ++
->  2 files changed, 53 insertions(+)
->
-> diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
-> index 685c1f8e07..f2585c1ed7 100644
-> --- a/hw/misc/sifive_u_otp.c
-> +++ b/hw/misc/sifive_u_otp.c
-> @@ -19,11 +19,14 @@
->   */
->
->  #include "qemu/osdep.h"
+>   block/meson.build          |  3 +-
+>   migration/savevm.c         | 11 +++--
+>   net/meson.build            |  3 +-
+>   replay/meson.build         |  2 +-
+>   replay/replay-input.c      |  4 +-
+>   stubs/meson.build          |  1 -
+>   stubs/replay-user.c        |  9 ----
+>   stubs/replay.c             | 98 ++++++++++++++++++++++++++++++++++++++
+>   tests/ptimer-test-stubs.c  |  5 --
+>   tests/qtest/qmp-cmd-test.c |  3 ++
+>   ui/input.c                 | 12 ++++-
+>   11 files changed, 125 insertions(+), 26 deletions(-)
+>   delete mode 100644 stubs/replay-user.c
+> 
+> diff --git a/block/meson.build b/block/meson.build
+> index 78e8b25232..01fe6f84d2 100644
+> --- a/block/meson.build
+> +++ b/block/meson.build
+> @@ -7,7 +7,6 @@ block_ss.add(files(
+>     'backup-top.c',
+>     'blkdebug.c',
+>     'blklogwrites.c',
+> -  'blkreplay.c',
+>     'blkverify.c',
+>     'block-backend.c',
+>     'block-copy.c',
+> @@ -42,6 +41,8 @@ block_ss.add(files(
+>     'write-threshold.c',
+>   ), zstd, zlib)
+>   
+> +block_ss.add(when: 'CONFIG_TCG', if_true: files('blkreplay.c'))
+> +
+>   block_ss.add(when: 'CONFIG_QCOW1', if_true: files('qcow.c'))
+>   block_ss.add(when: 'CONFIG_VDI', if_true: files('vdi.c'))
+>   block_ss.add(when: 'CONFIG_CLOOP', if_true: files('cloop.c'))
+> diff --git a/migration/savevm.c b/migration/savevm.c
+> index d2e141f7b1..d9181ca520 100644
+> --- a/migration/savevm.c
+> +++ b/migration/savevm.c
+> @@ -63,6 +63,7 @@
+>   #include "migration/colo.h"
+>   #include "qemu/bitmap.h"
+>   #include "net/announce.h"
+> +#include "sysemu/tcg.h"
+>   
+>   const unsigned int postcopy_ram_discard_version = 0;
+>   
+> @@ -2674,10 +2675,12 @@ int save_snapshot(const char *name, Error **errp)
+>           return ret;
+>       }
+>   
+> -    if (!replay_can_snapshot()) {
+> -        error_setg(errp, "Record/replay does not allow making snapshot "
+> -                   "right now. Try once more later.");
+> -        return ret;
+> +    if (tcg_enabled()) {
+> +        if (!replay_can_snapshot()) {
+> +            error_setg(errp, "Record/replay does not allow making snapshot "
+> +                       "right now. Try once more later.");
+> +            return ret;
+> +        }
+>       }
+>   
+>       if (!bdrv_all_can_snapshot(&bs)) {
+> diff --git a/net/meson.build b/net/meson.build
+> index 1c7e3a3cb9..1076b0a7ab 100644
+> --- a/net/meson.build
+> +++ b/net/meson.build
+> @@ -7,7 +7,6 @@ softmmu_ss.add(files(
+>     'eth.c',
+>     'filter-buffer.c',
+>     'filter-mirror.c',
+> -  'filter-replay.c',
+>     'filter-rewriter.c',
+>     'filter.c',
+>     'hub.c',
+> @@ -17,6 +16,8 @@ softmmu_ss.add(files(
+>     'util.c',
+>   ))
+>   
+> +softmmu_ss.add(when: 'CONFIG_TCG', if_true: files('filter-replay.c'))
+> +
+>   softmmu_ss.add(when: 'CONFIG_L2TPV3', if_true: files('l2tpv3.c'))
+>   softmmu_ss.add(when: slirp, if_true: files('slirp.c'))
+>   softmmu_ss.add(when: ['CONFIG_VDE', vde], if_true: files('vde.c'))
+> diff --git a/replay/meson.build b/replay/meson.build
+> index f91163fb1e..cb3207740a 100644
+> --- a/replay/meson.build
+> +++ b/replay/meson.build
+> @@ -1,4 +1,4 @@
+> -softmmu_ss.add(files(
+> +softmmu_ss.add(when: 'CONFIG_TCG', if_true: files(
+>     'replay.c',
+>     'replay-internal.c',
+>     'replay-events.c',
+> diff --git a/replay/replay-input.c b/replay/replay-input.c
+> index 1147e3d34e..5d1fd92e79 100644
+> --- a/replay/replay-input.c
+> +++ b/replay/replay-input.c
+> @@ -124,7 +124,7 @@ void replay_input_event(QemuConsole *src, InputEvent *evt)
+>       } else if (replay_mode == REPLAY_MODE_RECORD) {
+>           replay_add_input_event(QAPI_CLONE(InputEvent, evt));
+>       } else {
+> -        qemu_input_event_send_impl(src, evt);
+> +        g_assert_not_reached();
+>       }
+>   }
+>   
+> @@ -135,6 +135,6 @@ void replay_input_sync_event(void)
+>       } else if (replay_mode == REPLAY_MODE_RECORD) {
+>           replay_add_input_sync_event();
+>       } else {
+> -        qemu_input_event_sync_impl();
+> +        g_assert_not_reached();
+>       }
+>   }
+> diff --git a/stubs/meson.build b/stubs/meson.build
+> index 67f2a8c069..bbd2230d69 100644
+> --- a/stubs/meson.build
+> +++ b/stubs/meson.build
+> @@ -32,7 +32,6 @@ stub_ss.add(files('qtest.c'))
+>   stub_ss.add(files('ram-block.c'))
+>   stub_ss.add(files('ramfb.c'))
+>   stub_ss.add(files('replay.c'))
+> -stub_ss.add(files('replay-user.c'))
+>   stub_ss.add(files('runstate-check.c'))
+>   stub_ss.add(files('set-fd-handler.c'))
+>   stub_ss.add(files('sysbus.c'))
+> diff --git a/stubs/replay-user.c b/stubs/replay-user.c
+> deleted file mode 100644
+> index 2ad9e27203..0000000000
+> --- a/stubs/replay-user.c
+> +++ /dev/null
+> @@ -1,9 +0,0 @@
+> -#include "qemu/osdep.h"
+> -#include "sysemu/replay.h"
+> -#include "sysemu/sysemu.h"
+> -
+> -void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> -    QEMUBHFunc *cb, void *opaque)
+> -{
+> -    aio_bh_schedule_oneshot(ctx, cb, opaque);
+> -}
+> diff --git a/stubs/replay.c b/stubs/replay.c
+> index 45ebe77fb9..34b7975b2d 100644
+> --- a/stubs/replay.c
+> +++ b/stubs/replay.c
+> @@ -103,3 +103,101 @@ bool replay_reverse_continue(void)
+>   {
+>       return false;
+>   }
+> +
+> +void replay_input_event(QemuConsole *src, InputEvent *evt)
+> +{
+> +}
+> +void replay_input_sync_event(void)
+> +{
+> +}
+> +void replay_bh_schedule_event(QEMUBH *bh)
+> +{
+> +    qemu_bh_schedule(bh);
+> +}
+> +void replay_bh_schedule_oneshot_event(AioContext *ctx,
+> +     QEMUBHFunc *cb, void *opaque)
+> +{
+> +    aio_bh_schedule_oneshot(ctx, cb, opaque);
+> +}
+> +void replay_add_blocker(Error *reason)
+> +{
+> +}
+> +void replay_audio_in(size_t *recorded, void *samples, size_t *wpos, size_t size)
+> +{
+> +}
+> +void replay_audio_out(size_t *played)
+> +{
+> +}
+> +void replay_breakpoint(void)
+> +{
+> +}
+> +bool replay_can_snapshot(void)
+> +{
+> +    return false;
+> +}
+
+Shouldn't this one return true to enable snapshotting?
+
+
+> +void replay_configure(struct QemuOpts *opts)
+> +{
+> +}
+> +void replay_flush_events(void)
+> +{
+> +}
+> +void replay_gdb_attached(void)
+> +{
+> +}
+> +bool replay_running_debug(void)
+> +{
+> +    return false;
+> +}
+> +void replay_shutdown_request(ShutdownCause cause)
+> +{
+> +}
+> +void replay_start(void)
+> +{
+> +}
+> +void replay_vmstate_init(void)
+> +{
+> +}
+> +
+> +#include "monitor/monitor.h"
+> +#include "monitor/hmp.h"
+> +#include "qapi/qapi-commands-replay.h"
 > +#include "qapi/error.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/sysbus.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
->  #include "hw/misc/sifive_u_otp.h"
-> +#include "sysemu/blockdev.h"
-> +#include "sysemu/block-backend.h"
->
->  #define WRITTEN_BIT_ON 0x1
->
-> @@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
->          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
->              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
->              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
+> +#include "qemu/error-report.h"
 > +
-> +            /* read from backend */
-> +            if (s->blk) {
-> +                int32_t buf;
-> +
-> +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-> +                          SIFIVE_U_OTP_FUSE_WORD);
-> +                return buf;
-> +            }
-> +
->              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
->          } else {
->              return 0xff;
-> @@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
->              /* write bit data */
->              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
->
-> +            /* write to backend */
-> +            if (s->blk) {
-> +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &val32,
-> +                           SIFIVE_U_OTP_FUSE_WORD, 0);
-> +            }
-> +
->              /* update written bit */
->              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
->          }
-> @@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
->
->  static Property sifive_u_otp_properties[] = {
->      DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-> +    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
->  static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
->  {
->      SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> +    DriveInfo *dinfo;
->
->      memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
->                            TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
->      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> +
-> +    dinfo = drive_get_next(IF_NONE);
-> +    if (dinfo) {
-> +        int ret;
-> +        uint64_t perm;
-> +        int filesize;
-> +        BlockBackend *blk;
-> +
-> +        blk = blk_by_legacy_dinfo(dinfo);
-> +        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
-> +        if (blk_getlength(blk) < filesize) {
-> +            error_setg(errp, "OTP drive size < 16K");
-> +            return;
-> +        }
-> +
-> +        qdev_prop_set_drive_err(dev, "drive", blk, errp);
-> +
-> +        if (s->blk) {
-> +            perm = BLK_PERM_CONSISTENT_READ |
-> +                   (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
-> +            ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
-> +            if (ret < 0) {
-> +                return;
-> +            }
-> +
-> +            if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
-> +                error_setg(errp, "failed to read the initial flash content");
-> +            }
-> +        }
+> +void hmp_info_replay(Monitor *mon, const QDict *qdict)
+> +{
+> +    error_report("replay support not available");
+> +}
+> +void hmp_replay_break(Monitor *mon, const QDict *qdict)
+> +{
+> +    error_report("replay support not available");
+> +}
+> +void hmp_replay_delete_break(Monitor *mon, const QDict *qdict)
+> +{
+> +    error_report("replay support not available");
+> +}
+> +void hmp_replay_seek(Monitor *mon, const QDict *qdict)
+> +{
+> +    error_report("replay support not available");
+> +}
+> +ReplayInfo *qmp_query_replay(Error **errp)
+> +{
+> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +              "replay support not available");
+> +    return NULL;
+> +}
+> +void qmp_replay_break(int64_t icount, Error **errp)
+> +{
+> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +              "replay support not available");
+> +}
+> +void qmp_replay_delete_break(Error **errp)
+> +{
+> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +              "replay support not available");
+> +}
+> +void qmp_replay_seek(int64_t icount, Error **errp)
+> +{
+> +    error_set(errp, ERROR_CLASS_COMMAND_NOT_FOUND,
+> +              "replay support not available");
+> +}
+> diff --git a/tests/ptimer-test-stubs.c b/tests/ptimer-test-stubs.c
+> index e935a1395e..7f801a4d09 100644
+> --- a/tests/ptimer-test-stubs.c
+> +++ b/tests/ptimer-test-stubs.c
+> @@ -122,8 +122,3 @@ void qemu_bh_delete(QEMUBH *bh)
+>   {
+>       g_free(bh);
+>   }
+> -
+> -void replay_bh_schedule_event(QEMUBH *bh)
+> -{
+> -    bh->cb(bh->opaque);
+> -}
+> diff --git a/tests/qtest/qmp-cmd-test.c b/tests/qtest/qmp-cmd-test.c
+> index 8a4c570e83..1c7186e53c 100644
+> --- a/tests/qtest/qmp-cmd-test.c
+> +++ b/tests/qtest/qmp-cmd-test.c
+> @@ -31,6 +31,9 @@ static int query_error_class(const char *cmd)
+>   #ifndef CONFIG_SPICE
+>           { "query-spice", ERROR_CLASS_COMMAND_NOT_FOUND },
+>   #endif
+> +#ifndef CONFIG_TCG
+> +        { "query-replay", ERROR_CLASS_COMMAND_NOT_FOUND },
+> +#endif
+>   #ifndef CONFIG_VNC
+>           { "query-vnc", ERROR_CLASS_GENERIC_ERROR },
+>           { "query-vnc-servers", ERROR_CLASS_GENERIC_ERROR },
+> diff --git a/ui/input.c b/ui/input.c
+> index 4791b089c7..8675e8ad09 100644
+> --- a/ui/input.c
+> +++ b/ui/input.c
+> @@ -375,7 +375,11 @@ void qemu_input_event_send(QemuConsole *src, InputEvent *evt)
+>           return;
+>       }
+>   
+> -    replay_input_event(src, evt);
+> +    if (replay_events_enabled()) {
+> +        replay_input_event(src, evt);
+> +    } else {
+> +        qemu_input_event_send_impl(src, evt);
 > +    }
->  }
->
->  static void sifive_u_otp_reset(DeviceState *dev)
-> diff --git a/include/hw/misc/sifive_u_otp.h b/include/hw/misc/sifive_u_otp.h
-> index ebffbc1fa5..5d0d7df455 100644
-> --- a/include/hw/misc/sifive_u_otp.h
-> +++ b/include/hw/misc/sifive_u_otp.h
-> @@ -46,6 +46,7 @@
->
->  #define SIFIVE_U_OTP_PA_MASK        0xfff
->  #define SIFIVE_U_OTP_NUM_FUSES      0x1000
-> +#define SIFIVE_U_OTP_FUSE_WORD      4
->  #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
->
->  #define SIFIVE_U_OTP_REG_SIZE       0x1000
-> @@ -80,6 +81,7 @@ struct SiFiveUOTPState {
->      uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
->      /* config */
->      uint32_t serial;
-> +    BlockBackend *blk;
->  };
->
+>   }
+>   
+>   void qemu_input_event_sync_impl(void)
+> @@ -401,7 +405,11 @@ void qemu_input_event_sync(void)
+>           return;
+>       }
+>   
+> -    replay_input_sync_event();
+> +    if (replay_events_enabled()) {
+> +        replay_input_sync_event();
+> +    } else {
+> +        qemu_input_event_sync_impl();
+> +    }
+>   }
+>   
+>   static InputEvent *qemu_input_event_new_key(KeyValue *key, bool down)
+> 
 
-Please add the serial number initialization for the block backend as
-well in sifive_u_otp_reset().
-
-The logic should be something like testing offset 0x3f0 and 0x3f4
-numbers to see if they follow the rule: value 0x3f0 == ~(value 0x3f4).
-If not, the data should be initialized per the `serial` property from
-the QEMU object.
-
-Regards,
-Bin
 
