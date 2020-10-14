@@ -2,93 +2,62 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E50DFC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:41:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F182EC433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:42:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F68A2173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:41:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cE/XEtK5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F68A2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7CAD92173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 13:42:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CAD92173E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33746 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSh2C-0004vm-4Y
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:41:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50908)
+	id 1kSh2X-0005BM-5h
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 09:42:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSh0M-0002vH-LV
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:39:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22815)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSh0K-00070x-Tv
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:39:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602682783;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=e1A1zcYepOWAMprx4fwEoH0JbQYlc0S/K68cOtM9VYA=;
- b=cE/XEtK5hmspB5+JfnJW7dKl/q330aOeOmUnB/fB+3/D6mRGc8GdMnSKL151RT9tSzXGhi
- sV+6bWMdnRFuMLpoCv1dp2RD1AJRPNNrItyMHzgpsS0s7GLKuoEumNMUakrmrls+IHf303
- EUr8PcpMcFzREeC4Zte8WJ9MP8PBaBU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-372-oztzwiJkNj68zGgD3jaA3g-1; Wed, 14 Oct 2020 09:39:42 -0400
-X-MC-Unique: oztzwiJkNj68zGgD3jaA3g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AF2FD86ABDA;
- Wed, 14 Oct 2020 13:39:40 +0000 (UTC)
-Received: from thuth.remote.csb (reserved-198-128.str.redhat.com
- [10.33.198.128])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 252695C1C2;
- Wed, 14 Oct 2020 13:39:38 +0000 (UTC)
-Subject: Re: [PATCH v2 4/4] MAINTAINERS: Move MIPS GIC timer files to Boston
- board section
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201013101659.3557154-1-f4bug@amsat.org>
- <20201013101659.3557154-5-f4bug@amsat.org>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <39fdf233-f4a2-5b13-c02f-e404a789d99c@redhat.com>
-Date: Wed, 14 Oct 2020 15:39:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kSh1T-0004LG-P4
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:40:55 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:59257)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kSh1R-0007I1-CG
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 09:40:54 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 09EDeNR6023389
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Wed, 14 Oct 2020 09:40:27 -0400
+Date: Wed, 14 Oct 2020 09:40:23 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH] fuzz: Disable QEMU's signal handlers
+Message-ID: <20201014134023.l3ubsuvn3hpgnkvd@mozz.bu.edu>
+References: <20201013152920.448335-1-alxndr@bu.edu> <m2r1q2m5nm.fsf@oracle.com>
+ <20201013165246.GU70612@redhat.com> <m2lfg9maw9.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20201013101659.3557154-5-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <m2lfg9maw9.fsf@oracle.com>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 09:40:52
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -22
+X-Spam_score: -2.3
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.3 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.282, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,51 +70,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Huacai <zltjiangshi@gmail.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Bandan Das <bsd@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/10/2020 12.16, Philippe Mathieu-Daudé wrote:
-> The MIPS GIC timer is only used by the Boston board.
+On 201014 1009, Darren Kenny wrote:
+> On Tuesday, 2020-10-13 at 17:52:46 +01, Daniel P. Berrangé wrote:
+> > On Tue, Oct 13, 2020 at 05:50:37PM +0100, Darren Kenny wrote:
+> >> Hi Alex,
+> >> 
+> >> This mentions the use of atexit() to perform some cleanup, but I'm not
+> >> seeing that being added here, should it be?
+> >
+> > The reference to atexit is strange, because it says the only way to
+> > kill the fuzzer is SIGKILL, and that won't let atexit handlers run
+> > anyway.
+> >
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->  MAINTAINERS | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+> OK, I understand the context now, it is in reference to Dima's patchset:
 > 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 702f73823fc..62db288bfc4 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -233,11 +233,9 @@ F: docs/system/cpu-models-mips.rst.inc
->  F: hw/intc/mips_gic.c
->  F: hw/mips/
->  F: hw/misc/mips_*
-> -F: hw/timer/mips_gictimer.c
->  F: include/hw/intc/mips_gic.h
->  F: include/hw/mips/
->  F: include/hw/misc/mips_*
-> -F: include/hw/timer/mips_gictimer.h
->  F: tests/tcg/mips/
->  K: ^Subject:.*(?i)mips
->  
-> @@ -1167,7 +1165,9 @@ S: Odd Fixes
->  F: hw/core/loader-fit.c
->  F: hw/mips/boston.c
->  F: hw/pci-host/xilinx-pcie.c
-> +F: hw/timer/mips_gictimer.c
->  F: include/hw/pci-host/xilinx-pcie.h
-> +F: include/hw/timer/mips_gictimer.h
+> - https://lore.kernel.org/qemu-devel/cover.1602078083.git.dimastep@yandex-team.ru/
+> 
+> Where Alex suggested using atexit() to clean up the left over files from
+> the test.
+> 
+> And with regard to SIGKILL, I believe it is that today, before Alex's
+> patch that is the only way to stop the fuzzer running - which I can
+> attest to since I've found it hard to stop in the past :)
+> 
+> Resetting these signal handlers to the default behaviour would allow the
+> process to be terminated and an atexit() used, as Alex mentioned.
+> 
+> Alex, if you could clarify the commit message, then I feel this does
+> make sent to change in the fuzz testing code, so:
+> 
 
-If I grep for mips_gictimer_init, it seems like this function is used from
-mips_gic_realize in hw/intc/mips_gic.c ... and mips_gic.c / TYPE_MIPS_GIC is
-also used from the malta board ... so are you really sure this is right? Or
-what did I miss?
+Yes - sorry about the confusion.
+-Alex
 
- Thomas
-
+> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+> 
+> Thanks,
+> 
+> Darren.
+> 
+> >> 
+> >> Thanks,
+> >> 
+> >> Darren.
+> >> 
+> >> On Tuesday, 2020-10-13 at 11:29:20 -04, Alexander Bulekov wrote:
+> >> > With the fuzzer, we never call main_loop_should_exit, since we manually
+> >> > call main_loop_wait. This means that the only way to terminate the
+> >> > fuzzer is with SIGKILL. Disable the signal handlers, so there are
+> >> > reasonable ways to terminate the fuzzer and use atexit() to clean-up
+> >> > after the fuzzer.
+> >> >
+> >> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> >> > ---
+> >> >  tests/qtest/fuzz/fuzz.c | 8 ++++++++
+> >> >  1 file changed, 8 insertions(+)
+> >> >
+> >> > diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+> >> > index d926c490c5..eb0070437f 100644
+> >> > --- a/tests/qtest/fuzz/fuzz.c
+> >> > +++ b/tests/qtest/fuzz/fuzz.c
+> >> > @@ -217,5 +217,13 @@ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp)
+> >> >      /* re-enable the rcu atfork, which was previously disabled in qemu_init */
+> >> >      rcu_enable_atfork();
+> >> >  
+> >> > +    /*
+> >> > +     * Disable QEMU's signal handlers, since we manually control the main_loop,
+> >> > +     * and don't check for main_loop_should_exit
+> >> > +     */
+> >> > +    signal(SIGINT, SIG_DFL);
+> >> > +    signal(SIGHUP, SIG_DFL);
+> >> > +    signal(SIGTERM, SIG_DFL);
+> >> > +
+> >> >      return 0;
+> >> >  }
+> >> > -- 
+> >> > 2.28.0
+> >> 
+> >
+> > Regards,
+> > Daniel
+> > -- 
+> > |: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+> > |: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+> > |: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
