@@ -2,131 +2,87 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	GAPPY_SUBJECT,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36270C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:15:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BD81C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:16:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E19D22248
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:15:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 532932222C
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 20:16:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fw0L7BuN"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E19D22248
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JL1K5CMY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532932222C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48474 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50894 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSnAw-0004ty-4a
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:15:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51220)
+	id 1kSnCX-00062D-50
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 16:16:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kSn8r-0003nN-BU; Wed, 14 Oct 2020 16:12:57 -0400
-Received: from mail-eopbgr30121.outbound.protection.outlook.com
- ([40.107.3.121]:25153 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kSn8n-00080Q-Iv; Wed, 14 Oct 2020 16:12:56 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cDXfSzmIAAVBkXuAbTnI2qBT9KtJl+hmARBHIg2WpX7r52WPu/4iCk24RXJ0HOSNAvv23LiF9OXEBatMQteigYD/3WExqDDPKxDgfijphNTKGAfuQT7tsDb8m7DM8mI1Ba7Hj5+4RuGnJo4kl4zq50wEk/6DRNbQBxqHIiwf/W5X0beRWfm/chjBbaE+hb4Hl0JNlbUsiMjVueD9KE69H/TShhdggDLTP/AaDbk1N+gH3EYNa4iGU/oUGVmqxLdpRYp073mlv1hBpTUZCt8tAwZm6MNM6MW6iPHe0WRxJrorB4N/+Kc15QoY7t77ByEFNV7DNbfak0SEvQUwIu6rtA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j+OrvYCbwUM7aDZUWCFZFpuaWWR1AjiE/vFzDMQAYC8=;
- b=DMU1yiNMPDnj1TRJJGLmx4Wy2ltgOiPNBfahdaI4SG6qwJqIZgrPSwgOQVgTWNoln1zBH6PWMWmnwoWGOK5khvQ0eSOcpGkNkePAyzOkWk1Lj+w+lt9orlbFSgcDnFbxuELK1GFmYxHrq1cktB4IEPjaAiUB7AJX2CjMa3su4twpk42XI35v/N9D1ZUofSavPuHgG/TBnIcjhFU+NwUShfP+Pecb+euYhupJ8d0NrohWcSh/w7EUSv9rZW7L+3HUroiGeLLYwgQ2hibBQokcsDRBxWAScNhDnERAvCHUC7d1ZGAuMO3K5izQva0pUwXd0qmWLxdMm+7R1O6cnis7BA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j+OrvYCbwUM7aDZUWCFZFpuaWWR1AjiE/vFzDMQAYC8=;
- b=fw0L7BuNKOAZ+Q8ecVAXl7Wyd/rWerCrFyvEqivzDkChS6mck0TxG7UoyMHY9fqruCaQVodpPDUJ6tde2kSMnBPNqWTYSkm70tLAZlU283MjnljwxioXkoGbqzHY2b2qbKFC9elUthv2frFLLGZLhvAcwLFwKVIApTarWGvvqT4=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0802MB2522.eurprd08.prod.outlook.com (2603:10a6:3:dc::20)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.28; Wed, 14 Oct
- 2020 19:57:41 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.021; Wed, 14 Oct 2020
- 19:57:40 +0000
-Subject: Re: [PATCH v11 06/13] block: modify the comment for BDRV_REQ_PREFETCH
- flag
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
- vsementsov@virtuozzo.com
-References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <092bf4f6-ef81-872f-4712-016f573f7188@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <87fc2f2e-4edb-496f-b48c-e535e237bad7@virtuozzo.com>
-Date: Wed, 14 Oct 2020 22:57:37 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <092bf4f6-ef81-872f-4712-016f573f7188@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [109.252.114.22]
-X-ClientProxiedBy: FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::7) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
+ id 1kSnA6-0004kD-H2; Wed, 14 Oct 2020 16:14:14 -0400
+Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:37618)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
+ id 1kSnA4-0008Dw-8t; Wed, 14 Oct 2020 16:14:14 -0400
+Received: by mail-lf1-x141.google.com with SMTP id j30so896302lfp.4;
+ Wed, 14 Oct 2020 13:14:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pJJ5wVt0lCxb9PaF07erlTCzDN1vQl9gDqXy4uftNL0=;
+ b=JL1K5CMYTR1baa+CSwpz7e/KWf5Z7A6Vd7phT+p+RdzGEQx7yIupP8G580hJoNdUTW
+ +a+S5RkLJsrY/EO78An7UmAEg7pU2gOuKslWbjGNuAF85AbokNEdNTC77QJCgDRzIk81
+ Abw1HC7SKv0Wbd8cGhUkdqIAo8FHjb1EkyVMVV4ko4CBINwPQhe/xikXz81eEwIE0WqF
+ QXrQxv7S9VDaEPkzsJtL1WRwrDy96tRcyXDU+eqpBBE0/ZQQz/hoNywIkMw9D/TGxv2v
+ kvfrbZeZ49NugG30BowRABePP+9A36f6E/pfO1k4jtQ+Hw/V+MC1DU3HAtjN/7enqWoj
+ 3YUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pJJ5wVt0lCxb9PaF07erlTCzDN1vQl9gDqXy4uftNL0=;
+ b=DsU398INMHcx4+cMaMbyggdzmc7bxq3sQ/y063G5SO4XDzV3EX5ZVSk6HR1zzd0N+G
+ KJmqcxu3n7/xCukW0HqzYQhSrw+RDg1Trg4RKn0LgLcBMn2jtw5m6UftF8hdtX5+6mVz
+ XRqT79Ak1UoIsvu8VVEFmtMVS0Z4DMkA6mMN6u9CrUSCsiOUt52ivlA6RODwz9PhU4mT
+ YMI9uAvjKJMn4wTQUISnWpF9rCNUTvG+QA7cNo2jiTUVeI1ey1aI1wtLY49ikD+vux1o
+ PfCNR9YvDRSxP0U+Wa+xec+gXzvjyX1VJgoniVyj0Vgc+kYs13dtIaVuv6iWX85x8VEd
+ p+jA==
+X-Gm-Message-State: AOAM532vLljbZ1p9XgK2Kf816wTLAsRni6KM8y9zDojeglGdHdlig6r2
+ X5hbH2YM2x3KDzvJxRjdv7HelYq4H8FnbOo2daY=
+X-Google-Smtp-Source: ABdhPJw/S081ag8Lqmupg3uJOSf4dZgpMx4nloHlBTidr1IHBbWheHjPgqzJrLoe0D2X33OgODUuJEAKV261VB3WCgw=
+X-Received: by 2002:a19:8191:: with SMTP id c139mr268970lfd.333.1602706450077; 
+ Wed, 14 Oct 2020 13:14:10 -0700 (PDT)
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- FR2P281CA0020.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.11 via Frontend Transport; Wed, 14 Oct 2020 19:57:39 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3b6ee5b7-de6b-4e36-7ce8-08d8707b6832
-X-MS-TrafficTypeDiagnostic: HE1PR0802MB2522:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0802MB2522944852D1CE7172729AA5F4050@HE1PR0802MB2522.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bAt2soYTI/0NJRPvp0tJE+uS5gE/k7hmZ7qn7XZmkPda3jROv0QoEmexPtXZaq8rNvJ0982xYeqndu4X9N6ul725bhHssbkRcWCa89KK+USP4aGLfRa0vo46+9aWrty3UEZlX3rq6EKeQ/bmnXdX+KLwIpUS3skDJruOScx+UF6ez9SoVe04FEyIZXwF8uma6EevtjEqc+R4p9huB7DEyqfUpCDQ5RhlVsqra77I4RAixtmqUfixKmXyzHjiKbQjO0Etg3oWDfDx4HhlCErtmpeKtHkUJpoiZwi+YMTI7SsUba2+x85xLhPu8KBvdYdz/tSSE5TYzQYVJJl0ArucrPQgKdfW3fabQT5Lt0eFz4/gzVRnJaNHgJ4GjZnGqRje
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(39840400004)(346002)(396003)(136003)(366004)(26005)(53546011)(316002)(6486002)(8936002)(44832011)(956004)(16526019)(186003)(2616005)(107886003)(2906002)(4326008)(6512007)(8676002)(52116002)(83380400001)(31696002)(478600001)(7416002)(31686004)(6506007)(86362001)(36756003)(5660300002)(66556008)(66946007)(66476007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: /jEUIb2k4YNypazqIut2ldVfL/KyGgOfiDaYVSRHBSWeFO0XebjnsniPude54aDw6Oh+p5zvi7GzaVKYgOccMMUG9QFDJdCeYgUXBIruGHiikG/O28DOHXjn6BlWyrNZATsJXoVxWrFUM0qB8A/0wS7G2Sm5MKEadKQ7YkZfgQzlCUKGLzJOgHEtgyQ4nEsTow575KHOiWlNHkoP3AotDA76Ai0Blu84V3sInqiTgA1y/hPOO4XXL6G/pseA/KrO81euY4JSsqtds+58LT5ZiIjK7sxObVL1cFSAcMAKMWiU3NDZCWokC3w12njjL/hCLwNqrKbKeIn52eiJwZK6WHY07g7XDAgrlo0NSRDWAygMpBZnkiYZJn3Stc7Dz1ooYOkIrWKksGkTxwFc6notc6wI1vA+hJQXtsXQ8QjkkdGTYjaKtCHqSTs892yrJiFrx+tr+svExviPr0KdbphYNzrXKXkz/0NyhW6vUoqDlDRu6i+jNWxjUEm+fY6LFgmiTUn2Iep+kQi32PYrAdRw1sKjnBZpCwpOwqpwajuW6o552XFzVeCIapQy4dEO8IpHJpzU0D61521pVRif+aurVzyxiwRsMo5/Xzplv36X5k0Q80/Npngcr9w6V9m5U9y1ayT2/D0ovg4Fi3vqU2Fqsg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3b6ee5b7-de6b-4e36-7ce8-08d8707b6832
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 19:57:40.6141 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GDI9jJ9IePkK1AJl653Klo2zNMmH+WcSr6E7iBbkF7eozTHkubpUM10vl1BwhcDAlpslmYWjQxVsC5uy01E8TDOGonTt3P6KDplg3IHcG2Y=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2522
-Received-SPF: pass client-ip=40.107.3.121;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR03-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 16:12:50
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20201014170159.26932-1-space.monkey.delivers@gmail.com>
+ <20201014170159.26932-6-space.monkey.delivers@gmail.com>
+ <a4c7ff19-0b5b-263b-51da-80b5caea8f27@linaro.org>
+In-Reply-To: <a4c7ff19-0b5b-263b-51da-80b5caea8f27@linaro.org>
+From: Alexey Baturo <baturo.alexey@gmail.com>
+Date: Wed, 14 Oct 2020 23:13:58 +0300
+Message-ID: <CAFukJ-Am8XsbeUW-=_GgvDN3PNXp_FLDUCZtQzZ1JWFE8woNhA@mail.gmail.com>
+Subject: Re: [PATCH 5/5] [RISCV_PM] Support pointer masking for RISC-V for
+ i/c/f/d/a types of instructions
+To: Richard Henderson <richard.henderson@linaro.org>
+Content-Type: multipart/alternative; boundary="000000000000a2dc3205b1a72cca"
+Received-SPF: pass client-ip=2a00:1450:4864:20::141;
+ envelope-from=baturo.alexey@gmail.com; helo=mail-lf1-x141.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ GAPPY_SUBJECT=0.1, HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -139,71 +95,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ "open list:All patches CC here" <qemu-devel@nongnu.org>,
+ "space.monkey.delivers@gmail.com" <space.monkey.delivers@gmail.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.10.2020 15:22, Max Reitz wrote:
-> On 12.10.20 19:43, Andrey Shinkevich wrote:
->> Modify the comment for the flag BDRV_REQ_PREFETCH as we are going to
->> use it alone and pass it to the COR-filter driver for further
->> processing.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   include/block/block.h | 7 ++++---
->>   1 file changed, 4 insertions(+), 3 deletions(-)
->>
->> diff --git a/include/block/block.h b/include/block/block.h
->> index 981ab5b..2b7efd1 100644
->> --- a/include/block/block.h
->> +++ b/include/block/block.h
->> @@ -71,9 +71,10 @@ typedef enum {
->>       BDRV_REQ_NO_FALLBACK        = 0x100,
->>   
->>       /*
->> -     * BDRV_REQ_PREFETCH may be used only together with BDRV_REQ_COPY_ON_READ
->> -     * on read request and means that caller doesn't really need data to be
->> -     * written to qiov parameter which may be NULL.
->> +     * BDRV_REQ_PREFETCH may be used together with the BDRV_REQ_COPY_ON_READ
->> +     * flag or when the COR-filter applied to read operations and means that
-> 
-> There’s some word missing here, but I’m not sure what it is...  At least
-> an “is” before “applied”.  Perhaps something like ”or when a COR filter
-> is involved (in read operations)” would be better.
-> 
->> +     * caller doesn't really need data to be written to qiov parameter which
-> 
-> And this “written to” confused me for a second, because we’re reading
-> into qiov.  Technically, that means writing into the buffer, but, you know.
-> 
-> Could we rewrite the whole thing, perhaps?  Something like
-> 
-> “BDRV_REQ_PREFETCH makes sense only in the context of copy-on-read
-> (i.e., together with the BDRV_REQ_COPY_ON_READ flag or when there is a
-> COR filter), in which case it signals that the COR operation need not
-> read the data into memory (qiov), but only ensure it is copied to the
-> top layer (i.e., that COR is done).”
-> 
-> I don’t know.
-> 
-> Max
-> 
+--000000000000a2dc3205b1a72cca
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-I would modify a little:
+> The if is redundant, since that will have been done in
+cpu_get_tb_cpu_state while assigning pm_enabled.
+I totally agree here, however I tried to do explicit checks, so this
+functionality is available only if a special option is supplied.
+But if you think that's too much and I could do just mov(dst, src) in case
+PM is disabled, I'd gladly fix that.
 
-“BDRV_REQ_PREFETCH makes sense only in the context of copy-on-read
-(i.e., together with the BDRV_REQ_COPY_ON_READ flag or when a COR
-filter is involved), in which case it signals that the COR operation
-need not read the data into memory (qiov) but only ensure they are
-copied to the top layer (i.e., that COR operation is done).”
+> I suggest you drop apply_pointer_masking and just use
+gen_pm_adjust_address.
+Sure, will do.
+
+Thanks!
 
 
->> +     * may be NULL.
->>        */
->>       BDRV_REQ_PREFETCH  = 0x200,
->>       /* Mask of valid flags */
->>
-> 
-> 
+
+=D1=81=D1=80, 14 =D0=BE=D0=BA=D1=82. 2020 =D0=B3. =D0=B2 22:24, Richard Hen=
+derson <richard.henderson@linaro.org
+>:
+
+> On 10/14/20 10:01 AM, Alexey Baturo wrote:
+> > +    if (has_ext(ctx, RVJ)) {
+> > +        src1 =3D apply_pointer_masking(ctx, src1);
+> > +    }
+>
+> The if is redundant, since that will have been done in cpu_get_tb_cpu_sta=
+te
+> while assigning pm_enabled.
+>
+> The test for pm_enabled is in gen_pm_adjust_address.
+>
+> The final thing is that the API for apply_pointer_masking is misleading.
+> Here,
+> it appears as if you are allocating a new temporary and assigning it to
+> src1.
+> Which is not the case.
+>
+> I suggest you drop apply_pointer_masking and just use
+> gen_pm_adjust_address.
+>
+>
+> r~
+>
+
+--000000000000a2dc3205b1a72cca
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr">&gt; The if is redundant, since that will have been done i=
+n cpu_get_tb_cpu_state while assigning pm_enabled.<div>I totally agree here=
+, however I tried to do explicit checks, so this functionality is available=
+ only if a special option is supplied.</div><div>But if you think that&#39;=
+s too much and I could do just mov(dst, src) in case PM is disabled, I&#39;=
+d gladly=C2=A0fix that.</div><div><br></div><div>&gt; I suggest you drop ap=
+ply_pointer_masking and just use gen_pm_adjust_address.</div><div>Sure, wil=
+l do.</div><div><br></div><div>Thanks!</div><div><br></div><div><br></div><=
+/div><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">=
+=D1=81=D1=80, 14 =D0=BE=D0=BA=D1=82. 2020 =D0=B3. =D0=B2 22:24, Richard Hen=
+derson &lt;<a href=3D"mailto:richard.henderson@linaro.org">richard.henderso=
+n@linaro.org</a>&gt;:<br></div><blockquote class=3D"gmail_quote" style=3D"m=
+argin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left=
+:1ex">On 10/14/20 10:01 AM, Alexey Baturo wrote:<br>
+&gt; +=C2=A0 =C2=A0 if (has_ext(ctx, RVJ)) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 src1 =3D apply_pointer_masking(ctx, src1)=
+;<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+<br>
+The if is redundant, since that will have been done in cpu_get_tb_cpu_state=
+<br>
+while assigning pm_enabled.<br>
+<br>
+The test for pm_enabled is in gen_pm_adjust_address.<br>
+<br>
+The final thing is that the API for apply_pointer_masking is misleading.=C2=
+=A0 Here,<br>
+it appears as if you are allocating a new temporary and assigning it to src=
+1.<br>
+Which is not the case.<br>
+<br>
+I suggest you drop apply_pointer_masking and just use gen_pm_adjust_address=
+.<br>
+<br>
+<br>
+r~<br>
+</blockquote></div>
+
+--000000000000a2dc3205b1a72cca--
 
