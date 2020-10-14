@@ -2,101 +2,124 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36519C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1AEAC433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:54:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6515220848
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:53:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6515220848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id A7B3B20848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:54:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Jtc7uWOF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7B3B20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47282 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSfLF-0007nM-Sz
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:53:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45388)
+	id 1kSfMT-00010R-Hm
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:54:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kSf0O-0003IH-GW; Wed, 14 Oct 2020 07:31:40 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:50849)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSfKw-0007yc-1n; Wed, 14 Oct 2020 07:52:54 -0400
+Received: from mail-eopbgr30135.outbound.protection.outlook.com
+ ([40.107.3.135]:29250 helo=EUR03-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kSf0M-0006ad-5R; Wed, 14 Oct 2020 07:31:40 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.nyi.internal (Postfix) with ESMTP id F0CF9580305;
- Wed, 14 Oct 2020 07:31:36 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Wed, 14 Oct 2020 07:31:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=j+/vggxd/oMEg
- t1OV2/4ICDw5596Kcso6Bfe/BQ/RCY=; b=N18hKPyF/aS2bVsYO63vWQRwyAjqO
- kKJEYn8HumWJOZ/pYNXHIWBmVo/0OxbAQLAEpGc82GIgDSxMvMAKk77+P/wr2Vxy
- TNMo04X+vrGN9LfkqdPviw/g8RuTvriH2t3d9t5/9Zx4C7cuEyEQh06QU7G7CZ+m
- RbUid+JWT+HCiPOk5C+B4JMeTB/n/Lx8T8uWzP8cFSJF5JrkxRbLk1a87faJOfsY
- 08M9hN23wcXbExuNQ4qG2PBSYoCrR6vJtKqX3zfEwclIbBu1Z5D+XcpCdIFGD06P
- DPENVnO9Sjt4dVkWhudeWtA5upHUai30E5mErA1HowljDb/yKS1fIFEYQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=j+/vggxd/oMEgt1OV2/4ICDw5596Kcso6Bfe/BQ/RCY=; b=l62vxpbT
- yAaHvQ8VV7kdrp0xxiIPYffFvjWWwIuGhhEUE4aXUHy+2FALTF4ZQlP6kJmenwP2
- rQo+EcPo2aGpEMbNiNZQdGbTdcynB0FzNBrsSk7Wtjm6VkQZ0x43qCMbd0951ZDj
- whd5mfoynykPE9etq1fGtknWpGnf5147F2VrHyycXQ/64NmC5IGbgOV447KLhL+2
- wAT0PQjfVpGkJu80iT2zeL8ARmGlUkAWvgQ9KVeLs1SZURgtl6uVv9K67he1AqVV
- SLRBKxW8phkHDpcZuEg98X7j0fAVqwydn2YDXDbbzWm9Ijr7zRgzyLbvUaXax/0s
- /kwTA7QCB0bPOQ==
-X-ME-Sender: <xms:mOGGX-88OMBpbl_9Fhdx2fxjmwz0mu29pUVycMvIqUkcKSBo11IKWA>
- <xme:mOGGX-vH-hSprauAucROu0STCuzLTx4f-PrAyn_fwSi3hLdASV_vTNg6v_FRUrQko
- UA2MosPuhiC7cexy98>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedriedugdegudcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeefjeejjeffleefuefhffdtvdfggedujedvvdfftddvhfegjeekheeuhfejjeeu
- necuffhomhgrihhnpehrvghsohhurhgtvghsrdgrtghtihhvvgdprhgvshhouhhrtggvsh
- drohhpvghnnecukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihii
- vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrd
- gukh
-X-ME-Proxy: <xmx:mOGGX0CZaEzcYUB57TBwlQiAIHT08FEHZPlbeNqBxFPpVw4uCAqgeg>
- <xmx:mOGGX2csHI7n7sDcfyyhhoJpzumNaIR7atS_vJzxig1hljhh7CCxAg>
- <xmx:mOGGXzM2G0_LuU186vqTB4rCry8nhCVByjr9I2_fwbZmlPY6lk2dZw>
- <xmx:mOGGX_C7eibp1eBrHuUspHN9W19fWjucyFZJ8vZxfQQmsNXv1Ke91w>
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 7179F3064674;
- Wed, 14 Oct 2020 07:31:35 -0400 (EDT)
-From: Klaus Jensen <its@irrelevant.dk>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v3 8/9] hw/block/nvme: track and enforce zone resources
-Date: Wed, 14 Oct 2020 13:31:21 +0200
-Message-Id: <20201014113122.388849-9-its@irrelevant.dk>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201014113122.388849-1-its@irrelevant.dk>
-References: <20201014113122.388849-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kSfKr-0000Rm-RX; Wed, 14 Oct 2020 07:52:52 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oMqgRHyKeesi2eBFOCCxglM1vTH0BZbJ5GDKfm4nU/1zAWi/7fUIXT2X+5z5+Q7hFDgZYaVeIkfgtnLV4KlvFPkFTXcsyYNGWSlxPzNZPSCP9CLkR6jC7o64SVBA4f3x4kSvV4x1pmIz5UhVG9I9SpZapmpTlbbFs3EJ4WG+wJaOZPtpQlFXcmgOHL+vukgvO5pCvkb1bXsDWUhAB5lSkDXCQMhnl/LKuwMj1fNI7t4hCtGvuvBui72ltsi8hUhJUCbXh1vL7nolt2NiGScW4CGAeueEB1dWIIjtVOz4JOrNtHEytgkNy/9Zqx6M4X1/TQdeGfNQ9mKO0S52UKdlGQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vLVz5NCilUKafIf7zZgW6IF7GrRcUz5DshLT8YeJ4O4=;
+ b=X7aSgvulmjm2zv0iwqJZcr6yE9ddUO+IKpI/cLMi+I5fTVxgSkvfC2/SDJFOAf0IGREB/gejM6hyZcwe3vv3ucmEyQOoDBh6WQ5eM0PMdQBoOgwyIGmNLuOsRynBO0RiVUxSRdt6RcwnCKHb5KwJj9K01vsdlNRzfWQun/qvHxNO+fBuf2fdyKDQS1BnokhvgwvfVsKFfUlcVaOfWnjGiDmb+Pfg/8MKGNgUnY4ZC/doavpxqMtnW7gqHlTJng7+xxLW3OnCgcnq0L8ZLOFX/uAcl7PfxQTogOvN8eQAePMR75HsDUk+8uE7QcK4cR2771ljI8fuW3mlSYzj77G95A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vLVz5NCilUKafIf7zZgW6IF7GrRcUz5DshLT8YeJ4O4=;
+ b=Jtc7uWOFONETZWjjfhyM6chZIj97g0n045m+sVCYtoHTQBOAIG18s0IpJDyb+E9W/jDCKQXiSrTxqSWKN5wyOMzjy/vmw3Acu4WnKdTmB6S30gvLQN6tzGLxxB11Uj05axIdtwiHU3k7iHVAWpZTGGW/Dwih9UomTGpJXe4B6Qw=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1649.eurprd08.prod.outlook.com (2603:10a6:203:38::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Wed, 14 Oct
+ 2020 11:52:43 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Wed, 14 Oct 2020
+ 11:52:43 +0000
+Subject: Re: [PATCH v4 2/7] nbd: Add new qemu:allocation-depth metadata context
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, rjones@redhat.com,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+References: <20201009215533.1194742-1-eblake@redhat.com>
+ <20201009215533.1194742-3-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <85c7c5bf-a6cd-77d0-3dba-3e0df0e9570d@virtuozzo.com>
+Date: Wed, 14 Oct 2020 14:52:41 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
+In-Reply-To: <20201009215533.1194742-3-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.122]
+X-ClientProxiedBy: AM0PR03CA0045.eurprd03.prod.outlook.com (2603:10a6:208::22)
+ To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
- helo=new3-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 07:31:27
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.122) by
+ AM0PR03CA0045.eurprd03.prod.outlook.com (2603:10a6:208::22) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.21 via Frontend Transport; Wed, 14 Oct 2020 11:52:42 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 30ee5d4e-54db-4aa8-e0c2-08d87037a8be
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1649:
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB16497B3536D2E4CB6512F706C1050@AM5PR0801MB1649.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TpW+r0l7EecGGrMnEsy5rUEXIjEqDTzAhezsEaji38I6TYNO63XatIjeIa9/WCIQSPjA7JwR88hAtK8TqGa7UbYINmLzaic1Nev9vp0GiWf1lm+rVnJcY7CGRGvPavDMRxkN2StDvvumhaVERQrosuZdRBixVFY+O1Rjt2V6uAQ5uISKu8dyr+Yt42aAhLGaMZeVP2B0zFHTrZV34NsVQT1rm4URjheXIaQpCDKiNxqSNAAoszZzzZzMCeVQI2e9tGdogAyGLBXp/szCMyM6TDtLLYLVJDUAcLAvgONRz3HVVAXeOtRsLWcoIRpV2Vp8XqURV+mT7OfgXSfyJ8VjRdCH4OIQ755pmEzSCaaIOrDtOyiijtTvWYpf4sqkTsuv
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(136003)(39840400004)(366004)(346002)(376002)(396003)(83380400001)(86362001)(52116002)(4326008)(16576012)(8676002)(8936002)(2906002)(5660300002)(16526019)(2616005)(26005)(186003)(316002)(31696002)(36756003)(6486002)(66476007)(478600001)(66556008)(31686004)(956004)(66946007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: enpaWgD2UdGu/Ypg4JIyOVB07Dkk4zVcVSKizuHBXm+0dyC6OEh/JdxOsdzDWdp6Q6mg/CNz9SRr7wGFXfV0Act19W2TJfkjmbAkZGvp5Yw3UO/NKCNcI+aMMB3yRWajd/++8PUK7DVxGA8mDo+krfSo5fvdoaQtykTuFkD3e1otbWouypqRdbPgrPghl46loyYnej7CYig0D7e4dvvw7eqAFDMv2ulF99LW4CrY+oRZx7/SXvxO0CoGrGBZPboveDESyDodkhpYvhBYj16Z9k5t/1LxQ+UWOokvz2yLYdhCXGQKupxX5dtavTJHWJSzajTN9r7PGd+z6fx/ntHzMznQIy+n/ImzyxbFMiN+kdEItg3Ergv8+Uqv22LF7ojAMLN9tdxyXHyQuLvhhWalv8WDL/36MRDgVzndsFcxxe1EsRt5UwfXMFc84Rs1gWLjI2Q/uaLQR6MQeAgwbaVUrlXhSf0jplFV9tboGS0C2KiBrUrjfTlb6IBbnhUv4aQj+r6ILP7XHeK1lNscsQXBd9fbyxhlJbpbs+YESph8dzF4W5XTcp3YRkXQD2X8CQYmf02DzgLDR1dUfdw6EGBdn8jcundPubcwd0sPOSuidrSY/DUsTS2/NXO8edKu01BzDy8aZiigoV0UOCmJrn2cnQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 30ee5d4e-54db-4aa8-e0c2-08d87037a8be
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 11:52:43.0315 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wvVWlMey7OqIc4LdrTKgvJEseZpW78qfU3H3Gyf34EeduDiYSU+D2UHRfKHs+uv5cAehBTneaqYSHU+d2r5Pki+pNFWznFNudO0Ta6r9IKI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1649
+Received-SPF: pass client-ip=40.107.3.135;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 07:52:44
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,257 +132,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+10.10.2020 00:55, Eric Blake wrote:
+> 'qemu-img map' provides a way to determine which extents of an image
+> come from the top layer vs. inherited from a backing chain.  This is
+> useful information worth exposing over NBD.  There is a proposal to
+> add a QMP command block-dirty-bitmap-populate which can create a dirty
+> bitmap that reflects allocation information, at which point the
+> qemu:dirty-bitmap:NAME metadata context can expose that information
+> via the creation of a temporary bitmap, but we can shorten the effort
+> by adding a new qemu:allocation-depth metadata context that does the
+> same thing without an intermediate bitmap (this patch does not
+> eliminate the need for that proposal, as it will have other uses as
+> well).
+> 
+> For this patch, I just encoded a tri-state value (unallocated, from
+> this layer, from any of the backing layers); an obvious extension
+> would be to provide the actual depth in bits 31-4 while keeping bits
+> 1-0 as a tri-state (leaving bits 3-2 unused, for ease of reading depth
+> from a hex number).  But adding this extension would require
+> bdrv_is_allocated_above to return a depth number.
+> 
+> While documenting things, remember that although the NBD protocol has
+> NBD_OPT_SET_META_CONTEXT, the rest of its documentation refers to
+> 'metadata context', which is a more apt description of what is
+> actually being used by NBD_CMD_BLOCK_STATUS: the user is requesting
+> metadata by passing one or more context names.  So I also touched up
+> some existing wording to prefer the term 'metadata context' where it
+> makes sense.
+> 
+> Note that this patch does not actually enable any way to request a
+> server to enable this context; that will come in the next patch.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
 
-Track number of open/active resources.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
----
- docs/specs/nvme.txt  |  6 ++++
- hw/block/nvme-ns.h   |  7 +++++
- include/block/nvme.h |  2 ++
- hw/block/nvme-ns.c   | 25 +++++++++++++++--
- hw/block/nvme.c      | 66 +++++++++++++++++++++++++++++++++++++++++++-
- 5 files changed, 102 insertions(+), 4 deletions(-)
+> ---
+>   docs/interop/nbd.txt | 27 ++++++++++---
 
-diff --git a/docs/specs/nvme.txt b/docs/specs/nvme.txt
-index 80cb34406255..03bb4d9516b4 100644
---- a/docs/specs/nvme.txt
-+++ b/docs/specs/nvme.txt
-@@ -14,6 +14,12 @@ The nvme device (-device nvme) emulates an NVM Express Controller.
-      zns.zcap; if the zone capacity is a power of two, the zone size will be
-      set to that, otherwise it will default to the next power of two.
- 
-+  `zns.mar`; Specifies the number of active resources available. This is a 0s
-+     based value.
-+
-+  `zns.mor`; Specifies the number of open resources available. This is a 0s
-+     based value.
-+
- 
- Reference Specifications
- ------------------------
-diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
-index a273e7f7ed4b..3d0269eef6f0 100644
---- a/hw/block/nvme-ns.h
-+++ b/hw/block/nvme-ns.h
-@@ -28,6 +28,8 @@ typedef struct NvmeNamespaceParams {
-         uint64_t zcap;
-         uint64_t zsze;
-         uint8_t  zdes;
-+        uint32_t mar;
-+        uint32_t mor;
-     } zns;
- } NvmeNamespaceParams;
- 
-@@ -58,6 +60,11 @@ typedef struct NvmeNamespace {
-         NvmeZone           *zones;
-         NvmeZoneDescriptor *zd;
-         uint8_t            *zde;
-+
-+        struct {
-+            uint32_t open;
-+            uint32_t active;
-+        } resources;
-     } zns;
- } NvmeNamespace;
- 
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index aecefefd43b6..4ca5f3fb15eb 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -775,6 +775,8 @@ enum NvmeStatusCodes {
-     NVME_ZONE_IS_READ_ONLY      = 0x01ba,
-     NVME_ZONE_IS_OFFLINE        = 0x01bb,
-     NVME_ZONE_INVALID_WRITE     = 0x01bc,
-+    NVME_TOO_MANY_ACTIVE_ZONES  = 0x01bd,
-+    NVME_TOO_MANY_OPEN_ZONES    = 0x01be,
-     NVME_INVALID_ZONE_STATE_TRANSITION = 0x01bf,
-     NVME_WRITE_FAULT            = 0x0280,
-     NVME_UNRECOVERED_READ       = 0x0281,
-diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
-index 0922b67dd6d8..a01cc5eeb445 100644
---- a/hw/block/nvme-ns.c
-+++ b/hw/block/nvme-ns.c
-@@ -92,8 +92,8 @@ static void nvme_ns_init_zoned(NvmeNamespace *ns)
-         ns->zns.zde = g_malloc0_n(ns->zns.num_zones, nvme_ns_zdes_bytes(ns));
-     }
- 
--    id_ns_zns->mar = 0xffffffff;
--    id_ns_zns->mor = 0xffffffff;
-+    id_ns_zns->mar = cpu_to_le32(ns->params.zns.mar);
-+    id_ns_zns->mor = cpu_to_le32(ns->params.zns.mor);
- }
- 
- static void nvme_ns_init(NvmeNamespace *ns)
-@@ -130,6 +130,11 @@ static void nvme_ns_init(NvmeNamespace *ns)
- 
- void nvme_ns_zns_init_zone_state(NvmeNamespace *ns)
- {
-+    ns->zns.resources.active = ns->params.zns.mar != 0xffffffff ?
-+        ns->params.zns.mar + 1 : ns->zns.num_zones;
-+    ns->zns.resources.open = ns->params.zns.mor != 0xffffffff ?
-+        ns->params.zns.mor + 1 : ns->zns.num_zones;
-+
-     for (int i = 0; i < ns->zns.num_zones; i++) {
-         NvmeZone *zone = &ns->zns.zones[i];
-         zone->zd = &ns->zns.zd[i];
-@@ -148,9 +153,15 @@ void nvme_ns_zns_init_zone_state(NvmeNamespace *ns)
-             if (nvme_wp(zone) == nvme_zslba(zone) &&
-                 !(zone->zd->za & NVME_ZA_ZDEV)) {
-                 nvme_zs_set(zone, NVME_ZS_ZSE);
-+                break;
-             }
- 
--            break;
-+            if (ns->zns.resources.active) {
-+                ns->zns.resources.active--;
-+                break;
-+            }
-+
-+            /* fallthrough */
- 
-         case NVME_ZS_ZSIO:
-         case NVME_ZS_ZSEO:
-@@ -207,6 +218,12 @@ static int nvme_ns_check_constraints(NvmeNamespace *ns, Error **errp)
-             return -1;
-         }
- 
-+        if (ns->params.zns.mor > ns->params.zns.mar) {
-+            error_setg(errp, "maximum open resources (zns.mor) must be less "
-+                       "than or equal to maximum active resources (zns.mar)");
-+            return -1;
-+        }
-+
-         break;
- 
-     default:
-@@ -272,6 +289,8 @@ static Property nvme_ns_props[] = {
-     DEFINE_PROP_UINT64("zns.zcap", NvmeNamespace, params.zns.zcap, 0),
-     DEFINE_PROP_UINT64("zns.zsze", NvmeNamespace, params.zns.zsze, 0),
-     DEFINE_PROP_UINT8("zns.zdes", NvmeNamespace, params.zns.zdes, 0),
-+    DEFINE_PROP_UINT32("zns.mar", NvmeNamespace, params.zns.mar, 0xffffffff),
-+    DEFINE_PROP_UINT32("zns.mor", NvmeNamespace, params.zns.mor, 0xffffffff),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 947554c48b35..cc637b3a68e9 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1119,6 +1119,40 @@ static uint16_t nvme_zrm_transition(NvmeNamespace *ns, NvmeZone *zone,
- 
-     switch (from) {
-     case NVME_ZS_ZSE:
-+        switch (to) {
-+        case NVME_ZS_ZSF:
-+        case NVME_ZS_ZSRO:
-+        case NVME_ZS_ZSO:
-+            break;
-+
-+        case NVME_ZS_ZSC:
-+            if (!ns->zns.resources.active) {
-+                return NVME_TOO_MANY_ACTIVE_ZONES;
-+            }
-+
-+            ns->zns.resources.active--;
-+
-+            break;
-+
-+        case NVME_ZS_ZSIO:
-+        case NVME_ZS_ZSEO:
-+            if (!ns->zns.resources.active) {
-+                return NVME_TOO_MANY_ACTIVE_ZONES;
-+            }
-+
-+            if (!ns->zns.resources.open) {
-+                return NVME_TOO_MANY_OPEN_ZONES;
-+            }
-+
-+            ns->zns.resources.active--;
-+            ns->zns.resources.open--;
-+
-+            break;
-+
-+        default:
-+            return NVME_INVALID_ZONE_STATE_TRANSITION | NVME_DNR;
-+        }
-+
-         break;
- 
-     case NVME_ZS_ZSIO:
-@@ -1137,7 +1171,13 @@ static uint16_t nvme_zrm_transition(NvmeNamespace *ns, NvmeZone *zone,
-         case NVME_ZS_ZSEO:
-         case NVME_ZS_ZSF:
-         case NVME_ZS_ZSRO:
-+            ns->zns.resources.active++;
-+
-+            /* fallthrough */
-+
-         case NVME_ZS_ZSC:
-+            ns->zns.resources.open++;
-+
-             break;
- 
-         default:
-@@ -1160,8 +1200,18 @@ static uint16_t nvme_zrm_transition(NvmeNamespace *ns, NvmeZone *zone,
- 
-         case NVME_ZS_ZSF:
-         case NVME_ZS_ZSRO:
-+            ns->zns.resources.active++;
-+
-+            break;
-+
-         case NVME_ZS_ZSIO:
-         case NVME_ZS_ZSEO:
-+            if (!ns->zns.resources.open) {
-+                return NVME_TOO_MANY_OPEN_ZONES;
-+            }
-+
-+            ns->zns.resources.open--;
-+
-             break;
- 
-         default:
-@@ -1492,7 +1542,7 @@ static uint16_t nvme_zone_mgmt_send_all(NvmeCtrl *n, NvmeRequest *req)
-     NvmeZoneManagementSendCmd *send = (NvmeZoneManagementSendCmd *) &req->cmd;
-     NvmeNamespace *ns = req->ns;
-     NvmeZone *zone;
--    int *countp = NULL;
-+    int count, *countp = NULL;
-     uint16_t status = NVME_SUCCESS;
- 
-     trace_pci_nvme_zone_mgmt_send_all(nvme_cid(req), nvme_nsid(ns), send->zsa);
-@@ -1541,6 +1591,20 @@ static uint16_t nvme_zone_mgmt_send_all(NvmeCtrl *n, NvmeRequest *req)
-         break;
- 
-     case NVME_CMD_ZONE_MGMT_SEND_OPEN:
-+        count = 0;
-+
-+        for (int i = 0; i < ns->zns.num_zones; i++) {
-+            zone = &ns->zns.zones[i];
-+
-+            if (nvme_zs(zone) == NVME_ZS_ZSC) {
-+                count++;
-+            }
-+        }
-+
-+        if (count > ns->zns.resources.open) {
-+            return NVME_TOO_MANY_OPEN_ZONES;
-+        }
-+
-         for (int i = 0; i < ns->zns.num_zones; i++) {
-             zone = &ns->zns.zones[i];
- 
+[..]
+
+> +In the allocation depth context, bits 0 and 1 form a tri-state value:
+> +
+> +    bits 0-1: 00: NBD_STATE_DEPTH_UNALLOC, the extent is unallocated
+> +              01: NBD_STATE_DEPTH_LOCAL, the extent is allocated in the
+> +                  top level of the image
+
+Hmm. I always thought that "image" == file, so backing chain is a chain of images,
+not a several levels of one image. If it is so, than it should be "the top level image".
+And "levels of the image" may designate internal qcow2 snapshots unrelated here..
+
+
 -- 
-2.28.0
-
+Best regards,
+Vladimir
 
