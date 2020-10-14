@@ -2,92 +2,120 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB34AC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B93C3C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 055F62173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:08:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F41132173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 17:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gE/m1QUy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055F62173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="LNzbUjsN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41132173E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSkGP-0000z1-Uc
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:08:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42772)
+	id 1kSkIa-0002iv-TX
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 13:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kSkAS-0002wk-F2; Wed, 14 Oct 2020 13:02:24 -0400
-Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:33982)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kSkAQ-0000oS-7v; Wed, 14 Oct 2020 13:02:24 -0400
-Received: by mail-ej1-x636.google.com with SMTP id u8so5905611ejg.1;
- Wed, 14 Oct 2020 10:02:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zFyZNYmAPArqhKYRpQMjMOqOT5NmoiPhEcUqJQQcYQk=;
- b=gE/m1QUyEmKdywtM8EbIWZtOVoHFejvrzoBafQSlzcuGEYOaO0sh0CVaQZ6Xn+1ZQV
- v50OcseiKW+edfOHKkJ93W+dnat5LAXj0ndrBabL85UV9qP5hcO1k1gDOyPQWUYLfC0x
- JSUqn4tRQXr/S6gUX2WlLmQepu1jqTxnIvwMNQ2FzI6yDAfu60plCfYAnLJ9npUdipIK
- 7CV9thMdMJYCNgOdsrDi+WhR3JpmYhzdvwHR/umqZQgz3/yCABZzVeCDW7EG2mJP0IQp
- utY5ulYnt3jreCZzf7NQB32sK94aj1KtZKHx6/RsOmig+YbaVBEi9OlCuiScTH0j8sOr
- e6Xw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zFyZNYmAPArqhKYRpQMjMOqOT5NmoiPhEcUqJQQcYQk=;
- b=MC6R7bc+IeVKSMCteXuagSkQSOigiRPx77rqO4GeulsN3+5EFKvk5TJrpMtAGBL9x7
- DP4jzAz3CQrP4Or9jDrGCjfNyzXmdBGx7rkQNNmmZ2M3H4vfMaIqY8osPEO2tNpcg2of
- u4dzq71j3BvrilDyZpmRXGKCVtUkTiYJVenbz10/R0EaoAY2IsYfRu3nVtEpOhGgwlpV
- E9QdktLvr7KlC+n+6xegAjtDGxpcdrJGmJg3+UmSKl35RmsUyBjakN2zT0tTcVy80az9
- WRVYHatQ5N1f7aI3+9pBCzJ1OW1GarJk6T6JZQFptPj5mSmhlAbPmZl4pRrO7MC5MpgB
- YtCg==
-X-Gm-Message-State: AOAM5313wBkJYyiu9iv3dPMp3tlk7AXJmOU0bcDaYsulc/2f6EKFwLUj
- WeT00QukARehSSkafza7VxA=
-X-Google-Smtp-Source: ABdhPJzu0Qv5lT2zB6NWJoBg4UF7BfJ6oU/ALvfVIe5lFIDTAw/ZWksfo39aKdrlcS1LCO8zsai3/Q==
-X-Received: by 2002:a17:906:4b1a:: with SMTP id
- y26mr6243534eju.350.1602694940384; 
- Wed, 14 Oct 2020 10:02:20 -0700 (PDT)
-Received: from neptune.lab ([46.39.229.194])
- by smtp.googlemail.com with ESMTPSA id g3sm76012edy.12.2020.10.14.10.02.18
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Oct 2020 10:02:19 -0700 (PDT)
-From: Alexey Baturo <baturo.alexey@gmail.com>
-X-Google-Original-From: Alexey Baturo <space.monkey.delivers@gmail.com>
-To: 
-Subject: [PATCH 4/5] [RISCV_PM] Add address masking functions required for
- RISC-V Pointer Masking extension
-Date: Wed, 14 Oct 2020 20:01:58 +0300
-Message-Id: <20201014170159.26932-5-space.monkey.delivers@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201014170159.26932-1-space.monkey.delivers@gmail.com>
-References: <20201014170159.26932-1-space.monkey.delivers@gmail.com>
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kSkEr-0007Ja-8W
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:06:58 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:31418
+ helo=mx0a-001b2d01.pphosted.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kSkEk-0001MC-SA
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 13:06:56 -0400
+Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09EH2BFZ093860; Wed, 14 Oct 2020 13:06:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=mime-version :
+ content-type : content-transfer-encoding : date : from : to : cc : subject
+ : in-reply-to : references : message-id; s=pp1;
+ bh=/ekw97GJ15FvCjknLRIt0cKXeefOFDicrbKEKcAms9U=;
+ b=LNzbUjsNtsnMs8pFPwN63a8ppC1IhKumHDQFtnAkinv2zrqwv8Q4vyra+5BAT6A7B0Zc
+ 1B/hHydh743NlBA3IxwUK6MrOaMYD7Pz3afnY7qNPWyA/LudqWQQren+caZMnEm0AUYx
+ ICKsJ0ZTIQndgQPDC6XcDZafD0sI0Mw+zuSp0txO4p027YHmldLPgXY3YwRW2VS3bBn3
+ RG5/LnZZi3uLXQyxfpwYL2vgFO4mOzFqQZNkS6qaxd1dSSE0kq+4XkIKwVnEps1etsCf
+ Sge0VDSCfvpGHo6Y4gOs9IDCAcUfDIBgUKtzlaZi7QIEc1+EV8LmOTCnCyZypOUi01FI 2Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3464fu23ns-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 14 Oct 2020 13:06:47 -0400
+Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09EH2GcG094404;
+ Wed, 14 Oct 2020 13:06:46 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 3464fu23n8-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 14 Oct 2020 13:06:46 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09EH2aYu010414;
+ Wed, 14 Oct 2020 17:06:45 GMT
+Received: from b01cxnp22035.gho.pok.ibm.com (b01cxnp22035.gho.pok.ibm.com
+ [9.57.198.25]) by ppma02wdc.us.ibm.com with ESMTP id 3434k9tw57-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 14 Oct 2020 17:06:45 +0000
+Received: from b01ledav001.gho.pok.ibm.com (b01ledav001.gho.pok.ibm.com
+ [9.57.199.106])
+ by b01cxnp22035.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09EH6jkt52035994
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 14 Oct 2020 17:06:45 GMT
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 6DDC228058;
+ Wed, 14 Oct 2020 17:06:45 +0000 (GMT)
+Received: from b01ledav001.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id AAB182805A;
+ Wed, 14 Oct 2020 17:06:44 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
+ by b01ledav001.gho.pok.ibm.com (Postfix) with ESMTP;
+ Wed, 14 Oct 2020 17:06:44 +0000 (GMT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::636;
- envelope-from=baturo.alexey@gmail.com; helo=mail-ej1-x636.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Wed, 14 Oct 2020 13:06:44 -0400
+From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+To: Brijesh Singh <brijesh.singh@amd.com>
+Subject: Re: [PATCH v4] sev: add sev-inject-launch-secret
+In-Reply-To: <3928c2fe-670a-9686-9778-444bf3191484@amd.com>
+References: <20201014151739.4722-1-tobin@linux.ibm.com>
+ <3928c2fe-670a-9686-9778-444bf3191484@amd.com>
+Message-ID: <11157957f48e313f2b638ec3530625a5@linux.vnet.ibm.com>
+X-Sender: tobin@linux.ibm.com
+User-Agent: Roundcube Webmail/1.0.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-14_08:2020-10-14,
+ 2020-10-14 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0 adultscore=0
+ spamscore=0 bulkscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1015
+ mlxscore=0 malwarescore=0 mlxlogscore=999 phishscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010140117
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=tobin@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 13:06:49
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,122 +129,270 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: baturo.alexey@gmail.com,
- "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>,
- space.monkey.delivers@gmail.com, Alistair Francis <Alistair.Francis@wdc.com>,
- Anatoly Parshintsev <kupokupokupopo@gmail.com>,
- Palmer Dabbelt <palmer@dabbelt.com>
+Cc: thomas.lendacky@amd.com, berrange@redhat.com, jejb@linux.ibm.com,
+ tobin@ibm.com, qemu-devel@nongnu.org, dgilbert@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Anatoly Parshintsev <kupokupokupopo@gmail.com>
-
-Signed-off-by: Anatoly Parshintsev <kupokupokupopo@gmail.com>
----
- target/riscv/translate.c | 65 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 65 insertions(+)
-
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 79dca2291b..338a967e0c 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -63,6 +63,10 @@ typedef struct DisasContext {
-     uint16_t vlen;
-     uint16_t mlen;
-     bool vl_eq_vlmax;
-+    /* PointerMasking extension */
-+    uint8_t pm_enabled;
-+    target_ulong pm_mask;
-+    target_ulong pm_base;
- } DisasContext;
- 
- #ifdef TARGET_RISCV64
-@@ -90,6 +94,38 @@ static inline bool has_ext(DisasContext *ctx, uint32_t ext)
-     return ctx->misa & ext;
- }
- 
-+/* Generates address adjustment for PointerMasking */
-+static void gen_pm_adjust_address(DisasContext *s,
-+                                  TCGv_i64      dst,
-+                                  TCGv_i64      src)
-+{
-+    if (s->pm_enabled == 0) {
-+        /* Load unmodified address */
-+        tcg_gen_mov_i64(dst, src);
-+    } else {
-+        TCGv_i64 mask_neg = tcg_const_i64(~s->pm_mask);
-+        TCGv_i64 base     = tcg_const_i64(s->pm_base);
-+        /* calculate (addr & ~mask) */
-+        TCGv res1 = tcg_temp_new();
-+        tcg_gen_and_tl(res1, mask_neg, src);
-+        /* calculate (1) | (base) */
-+        TCGv res2 = tcg_temp_new();
-+        tcg_gen_or_tl(res2, res1, base);
-+        /* move result to dst */
-+        tcg_gen_mov_i64(dst, res2);
-+        /* free allocated temps */
-+        tcg_temp_free(res1);
-+        tcg_temp_free(res2);
-+        tcg_temp_free_i64(mask_neg);
-+        tcg_temp_free_i64(base);
-+    }
-+}
-+
-+static TCGv_i64 apply_pointer_masking(DisasContext *s, TCGv_i64 addr)
-+{
-+    gen_pm_adjust_address(s, addr, addr);
-+    return addr;
-+}
- /*
-  * RISC-V requires NaN-boxing of narrower width floating point values.
-  * This applies when a 32-bit value is assigned to a 64-bit FP register.
-@@ -800,8 +836,36 @@ static void riscv_tr_init_disas_context(DisasContextBase *dcbase, CPUState *cs)
-     } else {
-         ctx->virt_enabled = false;
-     }
-+    if (riscv_has_ext(env, RVJ)) {
-+        switch (env->priv) {
-+        case PRV_U:
-+            ctx->pm_enabled = get_field(env->mmte, UMTE_U_PM_ENABLE);
-+            ctx->pm_mask = env->upmmask;
-+            ctx->pm_base = env->upmbase;
-+            break;
-+        case PRV_S:
-+            ctx->pm_enabled = get_field(env->mmte, SMTE_S_PM_ENABLE);
-+            ctx->pm_mask = env->spmmask;
-+            ctx->pm_base = env->spmbase;
-+            break;
-+        case PRV_M:
-+            ctx->pm_enabled = get_field(env->mmte, MMTE_M_PM_ENABLE);
-+            ctx->pm_mask = env->mpmmask;
-+            ctx->pm_base = env->mpmbase;
-+            break;
-+        default:
-+            assert(0 && "Unreachable");
-+        }
-+    } else {
-+        ctx->pm_enabled = 0;
-+        ctx->pm_mask = 0;
-+        ctx->pm_base = 0;
-+    }
- #else
-     ctx->virt_enabled = false;
-+    ctx->pm_enabled = 0;
-+    ctx->pm_mask = 0;
-+    ctx->pm_base = 0;
- #endif
-     ctx->misa = env->misa;
-     ctx->frm = -1;  /* unknown rounding mode */
-@@ -932,3 +996,4 @@ void riscv_translate_init(void)
-     load_val = tcg_global_mem_new(cpu_env, offsetof(CPURISCVState, load_val),
-                              "load_val");
- }
-+
--- 
-2.20.1
-
+On 2020-10-14 11:42, Brijesh Singh wrote:
+> On 10/14/20 10:17 AM, tobin@linux.ibm.com wrote:
+>> From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+>> 
+>> AMD SEV allows a guest owner to inject a secret blob
+>> into the memory of a virtual machine. The secret is
+>> encrypted with the SEV Transport Encryption Key and
+>> integrity is guaranteed with the Transport Integrity
+>> Key. Although QEMU facilitates the injection of the
+>> launch secret, it cannot access the secret.
+>> 
+>> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+>> ---
+>>  include/monitor/monitor.h |  3 ++
+>>  include/sysemu/sev.h      |  2 ++
+>>  monitor/misc.c            |  8 +++---
+>>  qapi/misc-target.json     | 18 ++++++++++++
+>>  target/i386/monitor.c     |  7 +++++
+>>  target/i386/sev-stub.c    |  5 ++++
+>>  target/i386/sev.c         | 60 
+>> +++++++++++++++++++++++++++++++++++++++
+>>  target/i386/trace-events  |  1 +
+>>  8 files changed, 100 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+>> index 348bfad3d5..af3887bb71 100644
+>> --- a/include/monitor/monitor.h
+>> +++ b/include/monitor/monitor.h
+>> @@ -4,6 +4,7 @@
+>>  #include "block/block.h"
+>>  #include "qapi/qapi-types-misc.h"
+>>  #include "qemu/readline.h"
+>> +#include "include/exec/hwaddr.h"
+>> 
+>>  typedef struct MonitorHMP MonitorHMP;
+>>  typedef struct MonitorOptions MonitorOptions;
+>> @@ -37,6 +38,8 @@ void monitor_flush(Monitor *mon);
+>>  int monitor_set_cpu(Monitor *mon, int cpu_index);
+>>  int monitor_get_cpu_index(Monitor *mon);
+>> 
+>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
+>> **errp);
+>> +
+>>  void monitor_read_command(MonitorHMP *mon, int show_prompt);
+>>  int monitor_read_password(MonitorHMP *mon, ReadLineFunc 
+>> *readline_func,
+>>                            void *opaque);
+>> diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+>> index 98c1ec8d38..7ab6e3e31d 100644
+>> --- a/include/sysemu/sev.h
+>> +++ b/include/sysemu/sev.h
+>> @@ -18,4 +18,6 @@
+>> 
+>>  void *sev_guest_init(const char *id);
+>>  int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
+>> +int sev_inject_launch_secret(const char *hdr, const char *secret,
+>> +                             uint64_t gpa, Error **errp);
+>>  #endif
+>> diff --git a/monitor/misc.c b/monitor/misc.c
+>> index 4a859fb24a..f1ade245d5 100644
+>> --- a/monitor/misc.c
+>> +++ b/monitor/misc.c
+>> @@ -667,10 +667,10 @@ static void hmp_physical_memory_dump(Monitor 
+>> *mon, const QDict *qdict)
+>>      memory_dump(mon, count, format, size, addr, 1);
+>>  }
+>> 
+>> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
+>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error 
+>> **errp)
+>>  {
+>>      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
+>> -                                                 addr, 1);
+>> +                                                 addr, size);
+>> 
+>>      if (!mrs.mr) {
+>>          error_setg(errp, "No memory is mapped at address 0x%" 
+>> HWADDR_PRIx, addr);
+>> @@ -694,7 +694,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict 
+>> *qdict)
+>>      MemoryRegion *mr = NULL;
+>>      void *ptr;
+>> 
+>> -    ptr = gpa2hva(&mr, addr, &local_err);
+>> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
+>>      if (local_err) {
+>>          error_report_err(local_err);
+>>          return;
+>> @@ -770,7 +770,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict 
+>> *qdict)
+>>      void *ptr;
+>>      uint64_t physaddr;
+>> 
+>> -    ptr = gpa2hva(&mr, addr, &local_err);
+>> +    ptr = gpa2hva(&mr, addr, 1, &local_err);
+>>      if (local_err) {
+>>          error_report_err(local_err);
+>>          return;
+>> diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+>> index 1e561fa97b..4486a543ae 100644
+>> --- a/qapi/misc-target.json
+>> +++ b/qapi/misc-target.json
+>> @@ -201,6 +201,24 @@
+>>  { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+>>    'if': 'defined(TARGET_I386)' }
+>> 
+>> +##
+>> +# @sev-inject-launch-secret:
+>> +#
+>> +# This command injects a secret blob into memory of SEV guest.
+>> +#
+>> +# @packet-header: the launch secret packet header encoded in base64
+>> +#
+>> +# @secret: the launch secret data to be injected encoded in base64
+>> +#
+>> +# @gpa: the guest physical address where secret will be injected.
+>> +#
+>> +# Since: 5.2
+>> +#
+>> +##
+>> +{ 'command': 'sev-inject-launch-secret',
+>> +  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' 
+>> },
+>> +  'if': 'defined(TARGET_I386)' }
+>> +
+>>  ##
+>>  # @dump-skeys:
+>>  #
+>> diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+>> index 7abae3c8df..f9d4951465 100644
+>> --- a/target/i386/monitor.c
+>> +++ b/target/i386/monitor.c
+>> @@ -728,3 +728,10 @@ SevCapability *qmp_query_sev_capabilities(Error 
+>> **errp)
+>>  {
+>>      return sev_get_capabilities(errp);
+>>  }
+>> +
+>> +void qmp_sev_inject_launch_secret(const char *packet_hdr,
+>> +                                  const char *secret, uint64_t gpa,
+>> +                                  Error **errp)
+>> +{
+>> +    sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
+>> +}
+>> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+>> index 88e3f39a1e..2d2ee54cc6 100644
+>> --- a/target/i386/sev-stub.c
+>> +++ b/target/i386/sev-stub.c
+>> @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+>>      error_setg(errp, "SEV is not available in this QEMU");
+>>      return NULL;
+>>  }
+>> +int sev_inject_launch_secret(const char *hdr, const char *secret,
+>> +                             uint64_t gpa)
+>> +{
+>> +    return 1;
+>> +}
+>> diff --git a/target/i386/sev.c b/target/i386/sev.c
+>> index 93c4d60b82..5275a624b3 100644
+>> --- a/target/i386/sev.c
+>> +++ b/target/i386/sev.c
+>> @@ -29,6 +29,8 @@
+>>  #include "trace.h"
+>>  #include "migration/blocker.h"
+>>  #include "qom/object.h"
+>> +#include "exec/address-spaces.h"
+>> +#include "monitor/monitor.h"
+>> 
+>>  #define TYPE_SEV_GUEST "sev-guest"
+>>  OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+>> @@ -785,6 +787,64 @@ sev_encrypt_data(void *handle, uint8_t *ptr, 
+>> uint64_t len)
+>>      return 0;
+>>  }
+>> 
+>> +int sev_inject_launch_secret(const char *packet_hdr, const char 
+>> *secret,
+>> +                             uint64_t gpa, Error **errp)
+>> +{
+>> +    struct kvm_sev_launch_secret input;
+>> +    g_autofree guchar *data = NULL, *hdr = NULL;
+>> +    int error, ret = 1;
+>> +    void *hva;
+>> +    gsize hdr_sz = 0, data_sz = 0;
+>> +    MemoryRegion *mr = NULL;
+>> +
+>> +    /* secret can be injected only in this state */
+>> +    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
+>> +        error_setg(errp, "SEV: Not in correct state. (LSECRET) %x",
+>> +                     sev_guest->state);
+>> +        return 1;
+>> +    }
+> 
+> 
+> Should we be checking the sev_guest variable is assigned before the
+> state check ? This will prevent an assert() if user calls the
+> sev_inject_launch_secret on non-SEV guest.
+> 
+> 
+Probably a good idea.
+>> +
+>> +    hdr = g_base64_decode(packet_hdr, &hdr_sz);
+>> +    if (!hdr || !hdr_sz) {
+>> +        error_setg(errp, "SEV: Failed to decode sequence header");
+>> +        return 1;
+>> +    }
+>> +
+>> +    data = g_base64_decode(secret, &data_sz);
+>> +    if (!data || !data_sz) {
+>> +        error_setg(errp, "SEV: Failed to decode data");
+>> +        return 1;
+>> +    }
+>> +
+>> +    hva = gpa2hva(&mr, gpa, data_sz, errp);
+>> +    if (!hva) {
+>> +        error_prepend(errp, "SEV: Failed to calculate guest address: 
+>> ");
+>> +        return 1;
+>> +    }
+>> +
+>> +    input.hdr_uaddr = (uint64_t)(unsigned long)hdr;
+>> +    input.hdr_len = hdr_sz;
+>> +
+>> +    input.trans_uaddr = (uint64_t)(unsigned long)data;
+>> +    input.trans_len = data_sz;
+>> +
+>> +    input.guest_uaddr = (uint64_t)(unsigned long)hva;
+>> +    input.guest_len = data_sz;
+>> +
+>> +    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
+>> +                                input.trans_uaddr, input.trans_len);
+>> +
+>> +    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
+>> +                    &input, &error);
+>> +    if (ret) {
+>> +        error_setg(errp, "SEV: failed to inject secret ret=%d 
+>> fw_error=%d '%s'",
+>> +                     ret, error, fw_error_to_str(error));
+>> +        return ret;
+>> +    }
+>> +
+>> +    return 0;
+>> +}
+>> +
+>>  static void
+>>  sev_register_types(void)
+>>  {
+>> diff --git a/target/i386/trace-events b/target/i386/trace-events
+>> index 789c700d4a..9f299e94a2 100644
+>> --- a/target/i386/trace-events
+>> +++ b/target/i386/trace-events
+>> @@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void 
+>> *pdh) "policy 0x%x session
+>>  kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 
+>> 0x%" PRIu64
+>>  kvm_sev_launch_measurement(const char *value) "data %s"
+>>  kvm_sev_launch_finish(void) ""
+>> +kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, 
+>> int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len 
+>> %d"
 
