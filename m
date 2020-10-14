@@ -2,88 +2,113 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 163C9C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 920F3C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:42:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4546A20848
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7AA9820848
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 12:42:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="doG+Nmg3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4546A20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUmZ9t+E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7AA9820848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57836 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSg5f-0001Ry-52
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:41:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33558)
+	id 1kSg7E-0002kW-Eg
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 08:42:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33748)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kSg4S-0000g8-RX
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:39:56 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:45572)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kSg4Q-00074O-55
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:39:56 -0400
-Received: by mail-ej1-x642.google.com with SMTP id dt13so4561673ejb.12
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 05:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=0Tikf6X+wx5WDdPE8qGQIsJ1PjPO9vo57cY7mn/bJS0=;
- b=doG+Nmg3I+PLqB/wxooowpDYV2m9bBtSEU9F9VyTjT0105enGw1wQC01lq4pgzHk+Q
- HfA4iENbX0pGThVBUnJd80aniDJ1siAj+G2bp7vBpv6bc/fDS3sq+nBIC6NrIBV2eDAJ
- HgJX5QpQOKsw5vZDa2zoclG7y3IPIZmoP2AIhDt0Oo0X8OGPzMvkiP6GomKix6Wt4xCW
- mS9R31R7VVGWyoG5F9GKHpwf2Q5qGqfoJiORBxbnnm03dHCTN3dQDp21F0vzQFIVAp6R
- JbVIfhbfBab6GT2ejPO7Nl/Y81Dm9puZ5D44M8vFqmPtnYiy7rlHSwt2cdtei7UTIN/2
- u0vw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=0Tikf6X+wx5WDdPE8qGQIsJ1PjPO9vo57cY7mn/bJS0=;
- b=DFBMkwOt61DcoK9CUuAKzzMwsKfcG+zGMUeDQOesKmPt/cErW+ZuaZU/r3Suh83XYX
- DBX7nDjn2kjjW6lA23EeL6cMSdPL9WQexck3NGJgwzRmdoOMwhCp+do0mF1r45Wl29Oz
- uQ6WM0ZWyd1V1KEQfMtSLU/p2cOoDtsOSN+UPrXgviw/d+PkFviI5ZihBdGW/Z6GvQ6n
- MAOh4NsWYYL8Wn/7tjG+Dswi8TscypZ7o7z+WLgHVXteabauAQ/KGbhNLEBI2e8LpPlW
- YGAymwdiSHVJyIiwbSQECdsqQeMONjUy4Z2ax014IrDS6NWA3dd3Ml+0BtwbEVva4ccC
- tLvA==
-X-Gm-Message-State: AOAM530R1LgAos0p7/NxygJ1QzmBXIw9wVoTbvO9oS+lOJPCwmBT0P8G
- 4kheZmN2XMWdXKSV8vMqt4taI9aZE4AgfPjH50SzbQ==
-X-Google-Smtp-Source: ABdhPJxMbNu0PfVnnf758kOpLKoWtOqM3PFUTcpJmqNQxM2qD+xAT7WFC/teU4qfoBRulEiazqaUq8KzT8T4ggEfaDY=
-X-Received: by 2002:a17:906:ce21:: with SMTP id
- sd1mr5139718ejb.4.1602679189139; 
- Wed, 14 Oct 2020 05:39:49 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSg5E-0001FD-89
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:40:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20909)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kSg58-0007Jd-OW
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 08:40:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602679237;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+ bh=WMzLPs/AsJtR7K/FaS5FuQ9ZPcohwRT+b5bXRL2aEe0=;
+ b=HUmZ9t+Eu2/JDcuW360c+Y7W2C9LLN59b2xuSB9j643N4h+n8gHrywooBkVyUvVgkE/xv4
+ pDw7/2QIM3fCxEhX/1uwLouihJZNdVdvPj8ke79Q53Nv+Bxxrc8gsS8lBV/GpHW9V9habV
+ IgpcbuLo/usgbQ8WqW/Sro859BAOY/w=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-133-Gljg43HLPG6sigAUT4Yneg-1; Wed, 14 Oct 2020 08:40:33 -0400
+X-MC-Unique: Gljg43HLPG6sigAUT4Yneg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C3FC3835BB8;
+ Wed, 14 Oct 2020 12:40:31 +0000 (UTC)
+Received: from dresden.str.redhat.com (unknown [10.40.194.40])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5FA2419C4F;
+ Wed, 14 Oct 2020 12:40:22 +0000 (UTC)
+Subject: Re: [PATCH v11 08/13] copy-on-read: add support for BDRV_REQ_PREFETCH
+ to COR-filter
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1602524605-481160-9-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Max Reitz <mreitz@redhat.com>
+Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
+ mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
+ /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
+ U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
+ mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
+ awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
+ AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
+ CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
+ B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
+ 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
+ AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
+ 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
+ 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
+ BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
+ xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
+ W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
+ DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
+ 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
+ ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
+ sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
+ alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
+ /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
+ bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
+ R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
+Message-ID: <14b5dbdb-2ee7-bc27-3757-00f49ce6e530@redhat.com>
+Date: Wed, 14 Oct 2020 14:40:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-References: <20201012153408.9747-1-peter.maydell@linaro.org>
- <20201012153408.9747-13-peter.maydell@linaro.org>
- <CAKmqyKO-bRg0WcoqXnt1oaKtgzKTdajwJ-U2YfZh=PzvP77xug@mail.gmail.com>
- <CAKmqyKNpkFmXD+FJHXy4MGL03pUkXgWQLz6qPETB0TQBORwkFQ@mail.gmail.com>
-In-Reply-To: <CAKmqyKNpkFmXD+FJHXy4MGL03pUkXgWQLz6qPETB0TQBORwkFQ@mail.gmail.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Wed, 14 Oct 2020 13:39:37 +0100
-Message-ID: <CAFEAcA_WqxjOFkSmhoNnJUax9u6O6+fk6S-shWWjYK91RBBv5w@mail.gmail.com>
-Subject: Re: [PATCH for-5.1] hw/arm/netduino2,
- netduinoplus2: Set system_clock_scale
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <1602524605-481160-9-git-send-email-andrey.shinkevich@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="wIkYO5ypS0fwJMz0rknKmunR5PgnTOJTS"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,35 +122,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 14 Oct 2020 at 01:42, Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Tue, Oct 13, 2020 at 5:29 PM Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Mon, Oct 12, 2020 at 8:45 AM Peter Maydell <peter.maydell@linaro.org> wrote:
-> > >
-> > > The netduino2 and netduinoplus2 boards forgot to set the system_clock_scale
-> > > global, which meant that if guest code used the systick timer in "use
-> > > the processor clock" mode it would hang because time never advances.
-> > >
-> > > Set the global to match the documented CPU clock speed of these boards.
-> > > Judging by the data sheet this is slightly simplistic because the
-> > > SoC allows configuration of the SYSCLK source and frequency via the
-> > > RCC (reset and clock control) module, but we don't model that.
-> > >
-> > > Fixes: https://bugs.launchpad.net/qemu/+bug/1876187
->
-> Thanks for fixing this Peter.
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--wIkYO5ypS0fwJMz0rknKmunR5PgnTOJTS
+Content-Type: multipart/mixed; boundary="LmTMuJAXCTNYwHUKDuVyXKvTfbEdLrzkF"
 
-This is already in master (commit e7e5a9595ab) -- this email is
-one of a set of stale patchmails I sent out by mistake on Monday
-when I mangled a git send-email command. Sorry for the confusion.
+--LmTMuJAXCTNYwHUKDuVyXKvTfbEdLrzkF
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: quoted-printable
 
--- PMM
+On 12.10.20 19:43, Andrey Shinkevich wrote:
+> Add support for the BDRV_REQ_PREFETCH flag to the supported_write_flags
+
+s/write/read/
+
+> of the COR-filter.
+>=20
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+> ---
+>  block/copy-on-read.c | 1 +
+>  1 file changed, 1 insertion(+)
+>=20
+> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+> index dfbd6ad..b136895 100644
+> --- a/block/copy-on-read.c
+> +++ b/block/copy-on-read.c
+> @@ -50,6 +50,7 @@ static int cor_open(BlockDriverState *bs, QDict *option=
+s, int flags,
+>          return -EINVAL;
+>      }
+> =20
+> +    bs->supported_read_flags =3D BDRV_REQ_PREFETCH;
+>      bs->supported_write_flags =3D BDRV_REQ_WRITE_UNCHANGED |
+>          (BDRV_REQ_FUA & bs->file->bs->supported_write_flags);
+
+Then we mustn=E2=80=99t let cor_co_preadv_part() pass the flag on to
+bdrv_co_preadv_part() unless BDRV_REQ_COPY_ON_READ is set, too.  I
+suspect the following patch is going to do that, but in the meantime the
+code is wrong.
+
+Perhaps just swap both patches?
+
+And by the way, I=E2=80=99m also missing a patch that makes the block layer
+evaluate supported_read_flags and e.g. strip BDRV_REQ_PREFETCH if it
+isn=E2=80=99t supported, before it gets passed to such a block driver.
+
+Max
+
+
+--LmTMuJAXCTNYwHUKDuVyXKvTfbEdLrzkF--
+
+--wIkYO5ypS0fwJMz0rknKmunR5PgnTOJTS
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+G8bQACgkQ9AfbAGHV
+z0APvgf9GEFngSS1GzYwGcNCWmexO/jji88uuYgDwvfTHb8jN76QJbLiz09qsLmk
+yHGxvGoO2NAxLbX21sC3/QPcHuqWEM+eIbN1Oi2u30vzew+tNQZ/v+RvFZvmUWxw
+rMa97JYTZXpGXqvyAU3QHpVDVCFyuGLCEVahDEKX8AiUcUHtV+GGUuPw57OepLPZ
+/bmgV47VKuT2HR+lo/43ezTdI2KIDryO87/x6nDT0UtKBTQdkTLkE6r8KOA8/1AS
+89PAAHYOvIp3LbQKhHpxoUHz1UHaun0rl5cXEjYXWQyQT59AHi13po3ApzPykR3F
+y3d9cPZD00pZYbvsWBFYdXH86RzI/w==
+=O7NZ
+-----END PGP SIGNATURE-----
+
+--wIkYO5ypS0fwJMz0rknKmunR5PgnTOJTS--
+
 
