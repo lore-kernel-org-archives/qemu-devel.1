@@ -4,88 +4,86 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E376C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1C4C433DF
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D68D21D81
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:07:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 680A021D81
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 18:08:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QF9uC4d7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D68D21D81
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N3lL6cHc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 680A021D81
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46512 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSlBE-0004H9-7m
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 14:07:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55536)
+	id 1kSlCk-0005je-AG
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 14:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSl9b-0002Zg-JZ
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:05:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23068)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSl8A-0000bV-TS
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:04:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21118)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSl9Z-0000Aq-3M
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:05:35 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSl86-0008O7-Eb
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 14:04:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602698731;
+ s=mimecast20190719; t=1602698641;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=331qvi+I05STX+RoSiSdzzBsuM674mUglChEtI+juMI=;
- b=QF9uC4d7gDVscMcpzRoL2xX4SJd5756o9i36d/kPhtBOKHNrAogBS/+ROkzZRqiy6+ZeI0
- 7JUbhTQf3uDIlKNhI/pptSPGV5QlCtcgJuzaGikmg9pYZhwIHTbl+5H37s+cjnqp1TtVew
- 2mLyRVaaITTY3ax1k1EEYEYv542sYxU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-26-tKHKAcNrMoCKtJp6jrkqug-1; Wed, 14 Oct 2020 14:05:30 -0400
-X-MC-Unique: tKHKAcNrMoCKtJp6jrkqug-1
-Received: by mail-wr1-f69.google.com with SMTP id b6so1732944wrn.17
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 11:05:29 -0700 (PDT)
+ bh=kYbezzmOgJSSdMY7a2ySbLpVNVK2KXCoCTs5dE4OZkM=;
+ b=N3lL6cHci3QeKv1n1gP+I9aMM0wEdGbibTAB3P2y9USdYISXoVkQH2/gxuUwK252nud0/u
+ pFJNRwwaj1OHjZfUNTX0VYWz4mIn83IstO0VQ/o5YNK9H8gHwSnKsUSmee58q0stJl9vEs
+ Ggm+MpIpwgl+oF++QZI5zCFDjBXILnw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-358-476ww3_yO2ajDZP_DPncEg-1; Wed, 14 Oct 2020 14:03:59 -0400
+X-MC-Unique: 476ww3_yO2ajDZP_DPncEg-1
+Received: by mail-wm1-f71.google.com with SMTP id u5so187895wme.3
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 11:03:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=331qvi+I05STX+RoSiSdzzBsuM674mUglChEtI+juMI=;
- b=On5fKt6Cf7JeTmDx7JDk1HpZ2/wM1MkvAK/RdBnqLgcd4ihMEzFYmDm2DbT9hCynQ9
- +oXVZzsBGtG7qp94CxH4GYbxzM70mUVO63KBMm3LP6Ur9ewiKu/cacPgLJOAstYlf/Fd
- mArL8cFJOHgQre1YLcdhjqf31jlKy582onN24J3CaD5iWyb4AV560HM5kE06EfyDWH9w
- J9hWoA/FRVQ1Uu7hUMRBY5V1i8cadqQ0QsNPEDsP5TqE3BTG5MmUi/kyKAC7TUmwqaqu
- a2ghqz6FAuOKnPaEkEhhGPtvi6uF/FP9fP4kNGRR8um4ybeWL5+5M388QskP8prIWg3X
- f+iA==
-X-Gm-Message-State: AOAM531e+bJZUtV827A8QOXbtxsqwUvf4XbZxmiqcbtOcbht40p2BvMU
- N+SfxzBhmcf94Ftg4Zr2oIEv/lXAEuftHgMzIJsH1Qjxzqwb0E3LAeHOxxxSn89JqVlCS9vmJ39
- 5Qcm9KIFCd2TiIeM=
-X-Received: by 2002:a05:600c:2189:: with SMTP id
- e9mr67900wme.153.1602698728856; 
- Wed, 14 Oct 2020 11:05:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzREtAoXnuwpdFv/QUh4K/N8hg8FjBMqu27QcslDB2I/Hss50aqvCivnNFiuefZBr3Wt7YNWA==
-X-Received: by 2002:a05:600c:2189:: with SMTP id
- e9mr67878wme.153.1602698728688; 
- Wed, 14 Oct 2020 11:05:28 -0700 (PDT)
+ bh=kYbezzmOgJSSdMY7a2ySbLpVNVK2KXCoCTs5dE4OZkM=;
+ b=NoAG96nTN30unIy5vBr8Z4GH9QXtVbmjvfEUkQpVyNkgdRdrQoSUx8ySeP6cJDQ2Vb
+ bXxqoOFfOHrnyx0xiZuXsjbUusKLB3PTobX9lRsOGUE0Yy1CvJZZcBc+6XY5L5SbWqjA
+ AEqFNBOD6NXjX8eS5O/XBKDaT3ITqKPoIhFoCjpc4r9RgVzczHRrdM4K7cjgFzoh/+8G
+ NZrK9hGeTLWKpxdyHW8TQmTh/LyGJubFIDIVj/MjueG0EZTaRxmJ5pdiPitodPslmw9Z
+ SVs1Y7w/K79WW0kxT0JQEuwWHOn9ikKYc0aSAbMUQm3ihpibMdqyICu/5hVi1sDE64SV
+ Y3tA==
+X-Gm-Message-State: AOAM531x8KEweGW8VoFTOS45krsopH6BNsmFT3MZHQapuROUcljHCzCD
+ cL3KZvx8I5KX6e3tcsO9t7j80rM4l3sYrLt1NTbNupUCwoSyTR5l8szECsnQu5kESJWVvnl3sHI
+ lvQJmeEPfHcK5Z+4=
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr94521wmh.156.1602698638564;
+ Wed, 14 Oct 2020 11:03:58 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfa6Cj9yXZA/smaQ4NZTDYJ8SBbDJSp6ZunAkGLIrqzqdO6yTBX7x/J97LpWFMpwjZ9VH6zw==
+X-Received: by 2002:a7b:c0d8:: with SMTP id s24mr94481wmh.156.1602698638200;
+ Wed, 14 Oct 2020 11:03:58 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id l3sm297501wmg.32.2020.10.14.11.05.27
+ by smtp.gmail.com with ESMTPSA id x64sm290093wmg.33.2020.10.14.11.03.56
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 14 Oct 2020 11:05:28 -0700 (PDT)
-Subject: Re: [PATCH v2 04/15] python: add directory structure README.rst files
+ Wed, 14 Oct 2020 11:03:57 -0700 (PDT)
+Subject: Re: [PATCH v2 01/15] python: create qemu.core package
 To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 References: <20201014142957.763624-1-jsnow@redhat.com>
- <20201014142957.763624-5-jsnow@redhat.com>
+ <20201014142957.763624-2-jsnow@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <7e0232fc-d5e1-f0aa-1701-bbc6d95522d3@redhat.com>
-Date: Wed, 14 Oct 2020 20:05:26 +0200
+Message-ID: <8e0c4840-43ad-5246-e507-3224398d674c@redhat.com>
+Date: Wed, 14 Oct 2020 20:03:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201014142957.763624-5-jsnow@redhat.com>
+In-Reply-To: <20201014142957.763624-2-jsnow@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -132,27 +130,57 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/14/20 4:29 PM, John Snow wrote:
-> Add short readmes to python/, python/qemu/, and python/qemu/core that
-> explain the directory hierarchy. These readmes are visible when browsing
-
-Maybe readmes -> READMEs
-
-Otherwise:
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-
-> the source on e.g. gitlab/github and are designed to help new
-> developers/users quickly make sense of the source tree.
+> move python/qemu/*.py to python/qemu/core/*.py and update import
+> directives across the tree.
 > 
-> They are not designed for inclusion in a published manual.
+> This is done to create a PEP420 namespace package, in which we may
+> create subpackages. To do this, the namespace directory ("qemu") should
+> not have any modules in it. Those files will go in a new 'core'
+> subpackage instead.
+> 
+> Bolster the core/__init__.py module, making the top-level classes and
+> functions from this package available directly inside the `qemu.core`
+> namespace.
+> 
+> This facilitates the convenient shorthand:
+> 
+>> from qemu.core import QEMUQtestMachine, QEMUMonitorProtocol
 > 
 > Signed-off-by: John Snow <jsnow@redhat.com>
 > ---
->   python/README.rst           | 27 +++++++++++++++++++++++++++
->   python/qemu/README.rst      |  8 ++++++++
->   python/qemu/core/README.rst |  9 +++++++++
->   3 files changed, 44 insertions(+)
->   create mode 100644 python/README.rst
->   create mode 100644 python/qemu/README.rst
->   create mode 100644 python/qemu/core/README.rst
+>   python/{qemu => }/.isort.cfg              |  0
+>   python/qemu/__init__.py                   | 11 ------
+>   python/qemu/{ => core}/.flake8            |  0
+>   python/qemu/core/__init__.py              | 44 +++++++++++++++++++++++
+>   python/qemu/{ => core}/accel.py           |  0
+>   python/qemu/{ => core}/console_socket.py  |  0
+>   python/qemu/{ => core}/machine.py         |  0
+>   python/qemu/{ => core}/pylintrc           |  0
+>   python/qemu/{ => core}/qmp.py             |  0
+>   python/qemu/{ => core}/qtest.py           |  0
+>   scripts/device-crash-test                 |  2 +-
+>   scripts/qmp/qemu-ga-client                |  2 +-
+>   scripts/qmp/qmp                           |  2 +-
+>   scripts/qmp/qmp-shell                     |  2 +-
+>   scripts/qmp/qom-fuse                      |  2 +-
+>   scripts/qmp/qom-get                       |  2 +-
+>   scripts/qmp/qom-list                      |  2 +-
+>   scripts/qmp/qom-set                       |  2 +-
+>   scripts/qmp/qom-tree                      |  2 +-
+>   scripts/render_block_graph.py             |  6 ++--
+>   scripts/simplebench/bench_block_job.py    |  4 +--
+>   tests/acceptance/avocado_qemu/__init__.py |  2 +-
+>   tests/acceptance/boot_linux.py            |  3 +-
+>   tests/acceptance/virtio_check_params.py   |  2 +-
+>   tests/acceptance/virtio_version.py        |  2 +-
+>   tests/migration/guestperf/engine.py       |  2 +-
+>   tests/qemu-iotests/235                    |  2 +-
+>   tests/qemu-iotests/297                    |  2 +-
+>   tests/qemu-iotests/300                    |  4 +--
+>   tests/qemu-iotests/iotests.py             |  4 +--
+>   tests/vm/basevm.py                        |  6 ++--
+>   31 files changed, 71 insertions(+), 41 deletions(-)
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
