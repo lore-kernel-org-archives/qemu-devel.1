@@ -2,72 +2,99 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42E84C433DF
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:22:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D070C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:35:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 82B3C20BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:22:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82B3C20BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 82CF620725
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 11:35:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 82CF620725
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSers-0000Lw-9g
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:22:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43588)
+	id 1kSf40-0005Fs-6e
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 07:35:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kSeql-0007m4-9W; Wed, 14 Oct 2020 07:21:43 -0400
-Received: from szxga01-in.huawei.com ([45.249.212.187]:2940 helo=huawei.com)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kSf0I-0003Ce-5P; Wed, 14 Oct 2020 07:31:34 -0400
+Received: from new3-smtp.messagingengine.com ([66.111.4.229]:54249)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kSeqh-0005GZ-RK; Wed, 14 Oct 2020 07:21:42 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 4B615E4C454520B105BC;
- Wed, 14 Oct 2020 19:21:26 +0800 (CST)
-Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.75]) by
- DGGEMM405-HUB.china.huawei.com ([10.3.20.213]) with mapi id 14.03.0487.000;
- Wed, 14 Oct 2020 19:21:16 +0800
-From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
-To: Max Reitz <mreitz@redhat.com>, "qemu-devel@nongnu.org"
- <qemu-devel@nongnu.org>, "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>
-Subject: RE: [PATCH v2] migration/block-dirty-bitmap: fix uninitialized
- variable warning
-Thread-Topic: [PATCH v2] migration/block-dirty-bitmap: fix uninitialized
- variable warning
-Thread-Index: AQHWoV0hzSMk/IMnP02jswbxivecYqmVFqSAgAEuwTCAAAyWgIAAjlMA
-Date: Wed, 14 Oct 2020 11:21:15 +0000
-Message-ID: <7412CDE03601674DA8197E2EBD8937E83B9B8CE0@dggemm531-mbx.china.huawei.com>
-References: <20201013123340.1850548-1-kuhn.chenqun@huawei.com>
- <561a0092-3723-a95a-0208-d53cb475a532@redhat.com>
- <7412CDE03601674DA8197E2EBD8937E83B9B6538@dggemm531-mbx.china.huawei.com>
- <5a6483ec-9cab-58d9-872c-48762e96f768@redhat.com>
-In-Reply-To: <5a6483ec-9cab-58d9-872c-48762e96f768@redhat.com>
-Accept-Language: en-US
-Content-Language: zh-CN
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [10.174.185.149]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kSf0E-0006XZ-GZ; Wed, 14 Oct 2020 07:31:33 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.nyi.internal (Postfix) with ESMTP id 368CE580191;
+ Wed, 14 Oct 2020 07:31:27 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Wed, 14 Oct 2020 07:31:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding; s=fm1; bh=7OjmeYYNxp5gG
+ fcnZDvOFvrWT/xn3J2K+mRdzwcuc04=; b=rrA8HxpWpJexXgxgg9AjHJZsqxtm1
+ S5d7cN1fR5FsxIbNAM7xm6E0AyoHhWRpZfKUhiqBwxr0ODoI6y2oXBku0tAdFoSQ
+ Ye95sFX2cwY+JSloL1bfXQE3PvUOGakC115fBU7hdLIDk4fgc8SchbBLugSNBUjR
+ +NetDGslEdql1/QJ6K4H2/YnX/nCdEWNtwWybUCXPpsz51g9I0tz977ND9wKJY5m
+ g6GRsmtX4ulrLgyYLrGtmqOg/sDWHBEg2w0tlpJeH2RulP6J27ieGAM1Ooje57KD
+ MiRmn9K0w93koKKos5D6VkJb1YJPxi7AAQT+p0eJ+g44WyjWxv+rKde8A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :in-reply-to:message-id:mime-version:references:subject:to
+ :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
+ fm1; bh=7OjmeYYNxp5gGfcnZDvOFvrWT/xn3J2K+mRdzwcuc04=; b=A954HoDO
+ E9dU6utE7gG6+r3b1T1W8UWIPWcsiSROzkBRWHxT4niJPMqq8DCrw32hseQNWSgM
+ holF8hTE4Xr+PoQT9b9kKarhlWgT8Hp2Zl/jMCaVEx4XoGJS0dmffdyHJN5t1uFp
+ pnPoAWz1uIjoTAofNqRw3Yl+/vSQVUR5oiotpCSvW4EBPz8PCofDhXdN/3uXuXUl
+ O5nLplUoe6zCFVTejTFZLKEXgcucUSdhtZwi7+S1s7Uvo9x6tE9hKrDOI23vTwsr
+ 4gqFdnW4efB+L3iWEwoGUgwOy+TEblHebdiQXn6uQOaLrix8yauj4MPZX6ThRsr9
+ Vmr6OQ0y6kv1pg==
+X-ME-Sender: <xms:juGGX6-lsETsXQ-qzYHaM2jgzTIMTQLuVwbYDYkA7K3GY9W0_N1JvA>
+ <xme:juGGX6vhW7sivhijHdPATArZnmsrAykE1HdqrDPgjKuJ6xGIAqDjRQvVYjDJ7XJhO
+ W4tosgUhXmeguSd3VQ>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedriedugdegudcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepueelteegieeuhffgkeefgfevjeeigfetkeeitdfgtdeifefhtdfhfeeuffevgfek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:juGGXwAQ453cwI-1AUG6uUWd9_ENrDWDyzY8isHbzIL2_0BnuNlN9w>
+ <xmx:juGGXyc88T5RG6ieSGHcnZBNpk7NGTAYOJuNIl-gXG0XS5qqo2KLmA>
+ <xmx:juGGX_Nq-QphCPqOkqyZP31t8oXyQR4vPYJFcDvGseQx1k4WfMZ7LQ>
+ <xmx:juGGX6cs_Z1WsQDcjXpCWER9w6heI-s3CuCrHOQ3PqZZnXpGO25u0Q>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 7CBC63064674;
+ Wed, 14 Oct 2020 07:31:25 -0400 (EDT)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 1/9] hw/block/nvme: add commands supported and effects log
+ page
+Date: Wed, 14 Oct 2020 13:31:14 +0200
+Message-Id: <20201014113122.388849-2-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201014113122.388849-1-its@irrelevant.dk>
+References: <20201014113122.388849-1-its@irrelevant.dk>
 MIME-Version: 1.0
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.187;
- envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 06:21:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=66.111.4.229; envelope-from=its@irrelevant.dk;
+ helo=new3-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 07:31:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -81,104 +108,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "fam@euphon.net" <fam@euphon.net>,
- "vsementsov@virtuozzo.com" <vsementsov@virtuozzo.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "qemu-block@nongnu.org" <qemu-block@nongnu.org>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "jsnow@redhat.com" <jsnow@redhat.com>, Li
- Qiang <liq3ea@gmail.com>, "dgilbert@redhat.com" <dgilbert@redhat.com>,
- Laurent Vivier <laurent@vivier.eu>, ganqixin <ganqixin@huawei.com>,
- Euler Robot <euler.robot@huawei.com>,
- "stefanha@redhat.com" <stefanha@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
+ Gollu Appalanaidu <anaidu.gollu@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBRZW11LWRldmVsDQo+IFttYWls
-dG86cWVtdS1kZXZlbC1ib3VuY2VzK2t1aG4uY2hlbnF1bj1odWF3ZWkuY29tQG5vbmdudS5vcmdd
-IE9uDQo+IEJlaGFsZiBPZiBNYXggUmVpdHoNCj4gU2VudDogV2VkbmVzZGF5LCBPY3RvYmVyIDE0
-LCAyMDIwIDU6MzYgUE0NCj4gVG86IENoZW5xdW4gKGt1aG4pIDxrdWhuLmNoZW5xdW5AaHVhd2Vp
-LmNvbT47IHFlbXUtZGV2ZWxAbm9uZ251Lm9yZzsNCj4gcWVtdS10cml2aWFsQG5vbmdudS5vcmcN
-Cj4gQ2M6IGZhbUBldXBob24ubmV0OyBnYW5xaXhpbiA8Z2FucWl4aW5AaHVhd2VpLmNvbT47DQo+
-IHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbTsgWmhhbmdoYWlsaWFuZw0KPiA8emhhbmcuemhhbmdo
-YWlsaWFuZ0BodWF3ZWkuY29tPjsgcWVtdS1ibG9ja0Bub25nbnUub3JnOw0KPiBxdWludGVsYUBy
-ZWRoYXQuY29tOyBMaSBRaWFuZyA8bGlxM2VhQGdtYWlsLmNvbT47IGRnaWxiZXJ0QHJlZGhhdC5j
-b207DQo+IExhdXJlbnQgVml2aWVyIDxsYXVyZW50QHZpdmllci5ldT47IHN0ZWZhbmhhQHJlZGhh
-dC5jb207IEV1bGVyIFJvYm90DQo+IDxldWxlci5yb2JvdEBodWF3ZWkuY29tPjsganNub3dAcmVk
-aGF0LmNvbQ0KPiBTdWJqZWN0OiBSZTogW1BBVENIIHYyXSBtaWdyYXRpb24vYmxvY2stZGlydHkt
-Yml0bWFwOiBmaXggdW5pbml0aWFsaXplZCB2YXJpYWJsZQ0KPiB3YXJuaW5nDQo+IA0KPiBPbiAx
-NC4xMC4yMCAwMzowMywgQ2hlbnF1biAoa3Vobikgd3JvdGU6DQo+ID4NCj4gPg0KPiA+PiAtLS0t
-LU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+PiBGcm9tOiBNYXggUmVpdHogW21haWx0bzptcmVp
-dHpAcmVkaGF0LmNvbV0NCj4gPj4gU2VudDogVHVlc2RheSwgT2N0b2JlciAxMywgMjAyMCAxMDo0
-NyBQTQ0KPiA+PiBUbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBodWF3ZWkuY29tPjsN
-Cj4gcWVtdS1kZXZlbEBub25nbnUub3JnOw0KPiA+PiBxZW11LXRyaXZpYWxAbm9uZ251Lm9yZw0K
-PiA+PiBDYzogdnNlbWVudHNvdkB2aXJ0dW96em8uY29tOyBzdGVmYW5oYUByZWRoYXQuY29tOyBm
-YW1AZXVwaG9uLm5ldDsNCj4gPj4gZWJsYWtlQHJlZGhhdC5jb207IGpzbm93QHJlZGhhdC5jb207
-IHF1aW50ZWxhQHJlZGhhdC5jb207DQo+ID4+IGRnaWxiZXJ0QHJlZGhhdC5jb207IFpoYW5naGFp
-bGlhbmcgPHpoYW5nLnpoYW5naGFpbGlhbmdAaHVhd2VpLmNvbT47DQo+ID4+IGdhbnFpeGluIDxn
-YW5xaXhpbkBodWF3ZWkuY29tPjsgcWVtdS1ibG9ja0Bub25nbnUub3JnOyBFdWxlciBSb2JvdA0K
-PiA+PiA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT47IExhdXJlbnQgVml2aWVyIDxsYXVyZW50QHZp
-dmllci5ldT47IExpDQo+ID4+IFFpYW5nIDxsaXEzZWFAZ21haWwuY29tPg0KPiA+PiBTdWJqZWN0
-OiBSZTogW1BBVENIIHYyXSBtaWdyYXRpb24vYmxvY2stZGlydHktYml0bWFwOiBmaXgNCj4gPj4g
-dW5pbml0aWFsaXplZCB2YXJpYWJsZSB3YXJuaW5nDQo+ID4+DQo+ID4+IE9uIDEzLjEwLjIwIDE0
-OjMzLCBDaGVuIFF1biB3cm90ZToNCj4gPj4+IEEgZGVmYXVsdCB2YWx1ZSBpcyBwcm92aWRlZCBm
-b3IgdGhlIHZhcmlhYmxlICdiaXRtYXBfbmFtZScgdG8gYXZvaWQNCj4gPj4+IGNvbXBpbGVyDQo+
-ID4+IHdhcm5pbmcuDQo+ID4+Pg0KPiA+Pj4gVGhlIGNvbXBpbGVyIHNob3cgd2FybmluZzoNCj4g
-Pj4+IG1pZ3JhdGlvbi9ibG9jay1kaXJ0eS1iaXRtYXAuYzoxMDkwOjEzOiB3YXJuaW5nOiDigJhi
-aXRtYXBfbmFtZeKAmQ0KPiA+Pj4gbWF5IGJlIHVzZWQgdW5pbml0aWFsaXplZCBpbiB0aGlzIGZ1
-bmN0aW9uIFstV21heWJlLXVuaW5pdGlhbGl6ZWRdDQo+ID4+PiAgICAgICAgZ19zdHJsY3B5KHMt
-PmJpdG1hcF9uYW1lLCBiaXRtYXBfbmFtZSwNCj4gPj4gc2l6ZW9mKHMtPmJpdG1hcF9uYW1lKSk7
-DQo+ID4+Pg0KPiA+Pg0KPiBefn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fg0KPiA+Pj4NCj4gPj4+IFJlcG9ydGVkLWJ5OiBFdWxlciBS
-b2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4gPj4+IFNpZ25lZC1vZmYtYnk6IENoZW4g
-UXVuIDxrdWhuLmNoZW5xdW5AaHVhd2VpLmNvbT4NCj4gPj4+IC0tLQ0KPiA+Pj4gQ2M6IFZsYWRp
-bWlyIFNlbWVudHNvdi1PZ2lldnNraXkgPHZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbT4NCj4gPj4+
-IENjOiBMYXVyZW50IFZpdmllciA8bGF1cmVudEB2aXZpZXIuZXU+DQo+ID4+PiBDYzogTGkgUWlh
-bmcgPGxpcTNlYUBnbWFpbC5jb20+DQo+ID4+PiAtLS0NCj4gPj4+ICBtaWdyYXRpb24vYmxvY2st
-ZGlydHktYml0bWFwLmMgfCA5ICsrLS0tLS0tLQ0KPiA+Pj4gIDEgZmlsZSBjaGFuZ2VkLCAyIGlu
-c2VydGlvbnMoKyksIDcgZGVsZXRpb25zKC0pDQo+ID4+DQo+ID4+IE5vIG9iamVjdGlvbnMsIHNl
-bWFudGljYWxseSwgYnV0Li4uDQo+ID4+DQo+ID4+PiBkaWZmIC0tZ2l0IGEvbWlncmF0aW9uL2Js
-b2NrLWRpcnR5LWJpdG1hcC5jDQo+ID4+PiBiL21pZ3JhdGlvbi9ibG9jay1kaXJ0eS1iaXRtYXAu
-YyBpbmRleCA1YmVmNzkzYWMwLi5iY2I3OWMwNGNlIDEwMDY0NA0KPiA+Pj4gLS0tIGEvbWlncmF0
-aW9uL2Jsb2NrLWRpcnR5LWJpdG1hcC5jDQo+ID4+PiArKysgYi9taWdyYXRpb24vYmxvY2stZGly
-dHktYml0bWFwLmMNCj4gPj4+IEBAIC0xMDY0LDE1ICsxMDY0LDEzIEBAIHN0YXRpYyBpbnQNCj4g
-ZGlydHlfYml0bWFwX2xvYWRfaGVhZGVyKFFFTVVGaWxlDQo+ID4+ICpmLCBEQk1Mb2FkU3RhdGUg
-KnMsDQo+ID4+PiAgICAgIGFzc2VydChub3RoaW5nIHx8IHMtPmNhbmNlbGxlZCB8fCAhIWFsaWFz
-X21hcCA9PQ0KPiA+Pj4gISFiaXRtYXBfYWxpYXNfbWFwKTsNCj4gPj4+DQo+ID4+PiAgICAgIGlm
-IChzLT5mbGFncyAmIERJUlRZX0JJVE1BUF9NSUdfRkxBR19CSVRNQVBfTkFNRSkgew0KPiA+Pj4g
-LSAgICAgICAgY29uc3QgY2hhciAqYml0bWFwX25hbWU7DQo+ID4+PiAtDQo+ID4+PiAgICAgICAg
-ICBpZiAoIXFlbXVfZ2V0X2NvdW50ZWRfc3RyaW5nKGYsIHMtPmJpdG1hcF9hbGlhcykpIHsNCj4g
-Pj4+ICAgICAgICAgICAgICBlcnJvcl9yZXBvcnQoIlVuYWJsZSB0byByZWFkIGJpdG1hcCBhbGlh
-cyBzdHJpbmciKTsNCj4gPj4+ICAgICAgICAgICAgICByZXR1cm4gLUVJTlZBTDsNCj4gPj4+ICAg
-ICAgICAgIH0NCj4gPj4+DQo+ID4+PiAtICAgICAgICBpZiAoIXMtPmNhbmNlbGxlZCkgew0KPiA+
-Pj4gLSAgICAgICAgICAgIGlmIChiaXRtYXBfYWxpYXNfbWFwKSB7DQo+ID4+PiArICAgICAgICBj
-b25zdCBjaGFyICpiaXRtYXBfbmFtZSA9IHMtPmJpdG1hcF9hbGlhczsNCj4gPj4NCj4gPj4gcWVt
-deKAmXMgY29kaW5nIHN0eWxlIG1hbmRhdGVzIGRlY2xhcmF0aW9ucyB0byBiZSBwbGFjZWQgYXQg
-dGhlDQo+ID4+IGJlZ2lubmluZyBvZiB0aGVpciBibG9jaywgc28gdGhlIGRlY2xhcmF0aW9uIGhh
-cyB0byBzdGF5IHdoZXJlIGl0IGlzLg0KPiA+PiAoUHV0dGluZyB0aGUgYXNzaWdubWVudCBoZXJl
-IGxvb2tzIHJlYXNvbmFibGUuKQ0KPiA+Pg0KPiA+IEhpIE1heCwNCj4gPiAgIERlY2xhcmF0aW9u
-IHZhcmlhYmxlcyBoZXJlIHRvIGVuc3VyZSB0aGF0IHRoZSBhYm92ZSBleGNlcHRpb25zKFVuYWJs
-ZSB0bw0KPiByZWFkIGJpdG1hcCBhbGlhcyBzdHJpbmcpIGFyZSBhdm9pZGVkLg0KPiA+IElmIHRo
-ZSBkZWNsYXJhdGlvbiBoYXMgdG8gc3RheSB3aGVyZSBpdCBpcywgaXMgdGhlcmUgYSBwb3NzaWJp
-bGl0eSB0aGF0IHRoZQ0KPiBhc3NpZ25tZW50IGZhaWxzPw0KPiANCj4gSSBkb27igJl0IHVuZGVy
-c3RhbmQgd2hhdCB5b3UgbWVhbi4gIA0KDQpJIHRoaW5rIG15IGRlc2NyaXB0aW9uIGlzIG5vdCBh
-Y2N1cmF0ZS4gRm9yZ2l2ZSBtZSBmb3IgYmVpbmcgYSBub24tbmF0aXZlIEVuZ2xpc2ggc3BlYWtl
-ci4NClRoZSB2YXJpYWJsZSAnYml0bWFwX25hbWUnIGFzc2lnbm1lbnQgbWF5YmUgZmFpbGVkIGF0
-IHRoZSBiZWdpbm5pbmcgb2YgdGhlIGJsb2NrLCBiZWNhdXNlIHJlYWRpbmcgdGhlICdzLT5iaXRt
-YXBfYWxpYXMnIG1heWJlIGZhaWxlZC4NCg0KPkEgZGVjbGFyYXRpb24gd2l0aG91dCBpbml0aWFs
-aXphdGlvbiBpc27igJl0DQo+IGFuZCBkb2VzbuKAmXQgY29udGFpbiBhbiBleHByZXNzaW9uLCBp
-dCBpc27igJl0IGV2ZW4gYSBzdGF0ZW1lbnQsIHNvIGl0IGhhcyBubyBzaWRlDQo+IGVmZmVjdHMu
-WzFdDQo+IA0KPiBQbGFjaW5nIHRoZSBkZWNsYXJhdGlvbiAod2l0aG91dCBhbiBpbml0aWFsaXph
-dGlvbikgYXQgdGhlIHRvcCBvZiB0aGUgYmxvY2sgbWFrZXMNCj4gbm8gc2VtYW50aWMgZGlmZmVy
-ZW5jZS4NCj4NCkkgc2VlIHdoYXQgeW91IG1lYW4uIFNlcGFyYXRlIHZhcmlhYmxlIGRlY2xhcmF0
-aW9ucyBmcm9tIHZhcmlhYmxlIGFzc2lnbm1lbnRzLg0KWW91J3JlIHJpZ2h0ISAgSSB3aWxsIHVw
-ZGF0ZSBpdCBsYXRlci4NCg0KVGhhbmtzLA0KQ2hlbiBRdW4NCj4gKEFzIEkgc2FpZCwgSeKAmWQg
-a2VlcCB0aGUgYXNzaWdubWVudCDigJxiaXRtYXBfbmFtZSA9IHMtPmJpdG1hcF9hbGlhc+KAnQ0K
-PiB3aGVyZSB5b3UgcHV0IGl0LiAgSSB0aGluayBpdCB3b3VsZCB0ZWNobmljYWxseSBhY3R1YWxs
-eSBiZSBjb3JyZWN0IHRvIHB1dCBpdCBpbnRvDQo+IHRoZSBkZWNsYXJhdGlvbiBhdCB0aGUgc3Rh
-cnQgb2YgdGhlIGJsb2NrIGFzIGFuIGluaXRpYWxpemVyLCBidXQgdGhhdCB3b3VsZCBsb29rDQo+
-IHdlaXJkLikNCj4gDQo+IE1heA0KPiANCj4gWzFdIEkgc3VwcG9zZSBleGNlcHRpb25zIGFwcGx5
-IGZvciB0eXBlcyB3aXRoIGNvbnN0cnVjdG9ycywgYnV0IHRob3NlIGRvbuKAmXQNCj4gZXhpc3Qg
-aW4gcGxhaW4gQy4NCg0K
+From: Gollu Appalanaidu <anaidu.gollu@samsung.com>
+
+This is to support for the Commands Supported and Effects log page. See
+NVM Express Spec 1.3d, sec. 5.14.1.5 ("Commands Supported and Effects")
+
+Signed-off-by: Gollu Appalanaidu <anaidu.gollu@samsung.com>
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ include/block/nvme.h | 25 +++++++++++++--
+ hw/block/nvme.c      | 74 +++++++++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 96 insertions(+), 3 deletions(-)
+
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 2249d77c2129..f71376072762 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -737,6 +737,24 @@ typedef struct QEMU_PACKED NvmeSmartLog {
+     uint8_t     reserved2[320];
+ } NvmeSmartLog;
+ 
++typedef struct QEMU_PACKED NvmeEffectsLog {
++    uint32_t acs[256];
++    uint32_t iocs[256];
++    uint8_t  rsvd2048[2048];
++} NvmeEffectsLog;
++
++enum {
++    NVME_EFFECTS_CSUPP      = 1 <<  0,
++    NVME_EFFECTS_LBCC       = 1 <<  1,
++    NVME_EFFECTS_NCC        = 1 <<  2,
++    NVME_EFFECTS_NIC        = 1 <<  3,
++    NVME_EFFECTS_CCC        = 1 <<  4,
++    NVME_EFFECTS_CSE_SINGLE = 1 << 16,
++    NVME_EFFECTS_CSE_MULTI  = 1 << 17,
++    NVME_EFFECTS_CSE_MASK   = 3 << 16,
++    NVME_EFFECTS_UUID_SEL   = 1 << 19,
++};
++
+ enum NvmeSmartWarn {
+     NVME_SMART_SPARE                  = 1 << 0,
+     NVME_SMART_TEMPERATURE            = 1 << 1,
+@@ -749,6 +767,7 @@ enum NvmeLogIdentifier {
+     NVME_LOG_ERROR_INFO     = 0x01,
+     NVME_LOG_SMART_INFO     = 0x02,
+     NVME_LOG_FW_SLOT_INFO   = 0x03,
++    NVME_LOG_EFFECTS        = 0x05,
+ };
+ 
+ typedef struct QEMU_PACKED NvmePSD {
+@@ -860,8 +879,9 @@ enum NvmeIdCtrlFrmw {
+ };
+ 
+ enum NvmeIdCtrlLpa {
+-    NVME_LPA_NS_SMART = 1 << 0,
+-    NVME_LPA_EXTENDED = 1 << 2,
++    NVME_LPA_NS_SMART     = 1 << 0,
++    NVME_LPA_EFFECTS_LOG  = 1 << 1,
++    NVME_LPA_EXTENDED     = 1 << 2,
+ };
+ 
+ #define NVME_CTRL_SQES_MIN(sqes) ((sqes) & 0xf)
+@@ -1068,5 +1088,6 @@ static inline void _nvme_check_size(void)
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNs) != 4096);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeSglDescriptor) != 16);
+     QEMU_BUILD_BUG_ON(sizeof(NvmeIdNsDescr) != 4);
++    QEMU_BUILD_BUG_ON(sizeof(NvmeEffectsLog) != 4096);
+ }
+ #endif
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index b4f47448575b..8d0d96f42e61 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -112,6 +112,46 @@ static const uint32_t nvme_feature_cap[NVME_FID_MAX] = {
+     [NVME_TIMESTAMP]                = NVME_FEAT_CAP_CHANGE,
+ };
+ 
++#define NVME_EFFECTS_ADMIN_INITIALIZER                 \
++    [NVME_ADM_CMD_DELETE_SQ]    = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_CREATE_SQ]    = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_GET_LOG_PAGE] = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_DELETE_CQ]    = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_CREATE_CQ]    = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_IDENTIFY]     = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_ABORT]        = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_SET_FEATURES] = NVME_EFFECTS_CSUPP | \
++                                  NVME_EFFECTS_CCC |   \
++                                  NVME_EFFECTS_NIC |   \
++                                  NVME_EFFECTS_NCC,    \
++    [NVME_ADM_CMD_GET_FEATURES] = NVME_EFFECTS_CSUPP,  \
++    [NVME_ADM_CMD_ASYNC_EV_REQ] = NVME_EFFECTS_CSUPP
++
++#define NVME_EFFECTS_NVM_INITIALIZER                   \
++    [NVME_CMD_FLUSH]            = NVME_EFFECTS_CSUPP | \
++                                  NVME_EFFECTS_LBCC,   \
++    [NVME_CMD_WRITE]            = NVME_EFFECTS_CSUPP | \
++                                  NVME_EFFECTS_LBCC,   \
++    [NVME_CMD_READ]             = NVME_EFFECTS_CSUPP,  \
++    [NVME_CMD_WRITE_ZEROES]     = NVME_EFFECTS_CSUPP | \
++                                  NVME_EFFECTS_LBCC
++
++static const NvmeEffectsLog nvme_effects_admin_only = {
++    .acs = {
++        NVME_EFFECTS_ADMIN_INITIALIZER,
++    },
++};
++
++static const NvmeEffectsLog nvme_effects = {
++    .acs = {
++        NVME_EFFECTS_ADMIN_INITIALIZER,
++    },
++
++    .iocs = {
++        NVME_EFFECTS_NVM_INITIALIZER,
++    },
++};
++
+ static void nvme_process_sq(void *opaque);
+ 
+ static uint16_t nvme_cid(NvmeRequest *req)
+@@ -1331,6 +1371,36 @@ static uint16_t nvme_error_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+                     DMA_DIRECTION_FROM_DEVICE, req);
+ }
+ 
++static uint16_t nvme_effects_log(NvmeCtrl *n, uint32_t buf_len, uint64_t off,
++                                 NvmeRequest *req)
++{
++    const NvmeEffectsLog *effects;
++
++    uint32_t trans_len;
++
++    if (off >= sizeof(NvmeEffectsLog)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
++    switch (NVME_CC_CSS(n->bar.cc)) {
++    case NVME_CC_CSS_ADMIN_ONLY:
++        effects = &nvme_effects_admin_only;
++        break;
++
++    case NVME_CC_CSS_NVM:
++        effects = &nvme_effects;
++        break;
++
++    default:
++        return NVME_INTERNAL_DEV_ERROR | NVME_DNR;
++    }
++
++    trans_len = MIN(sizeof(NvmeEffectsLog) - off, buf_len);
++
++    return nvme_dma(n, (uint8_t *)effects + off, trans_len,
++                    DMA_DIRECTION_FROM_DEVICE, req);
++}
++
+ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeRequest *req)
+ {
+     NvmeCmd *cmd = &req->cmd;
+@@ -1374,6 +1444,8 @@ static uint16_t nvme_get_log(NvmeCtrl *n, NvmeRequest *req)
+         return nvme_smart_info(n, rae, len, off, req);
+     case NVME_LOG_FW_SLOT_INFO:
+         return nvme_fw_log_info(n, len, off, req);
++    case NVME_LOG_EFFECTS:
++        return nvme_effects_log(n, len, off, req);
+     default:
+         trace_pci_nvme_err_invalid_log_page(nvme_cid(req), lid);
+         return NVME_INVALID_FIELD | NVME_DNR;
+@@ -2810,7 +2882,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
+     id->acl = 3;
+     id->aerl = n->params.aerl;
+     id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
+-    id->lpa = NVME_LPA_NS_SMART | NVME_LPA_EXTENDED;
++    id->lpa = NVME_LPA_NS_SMART | NVME_LPA_EXTENDED | NVME_LPA_EFFECTS_LOG;
+ 
+     /* recommended default value (~70 C) */
+     id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
+-- 
+2.28.0
+
 
