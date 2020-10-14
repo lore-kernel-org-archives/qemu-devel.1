@@ -2,130 +2,82 @@ Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D4FC433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:29:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11865C433E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:31:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D08922201
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:29:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5C8D0212CC
+	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 14:31:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ZcRpt231"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D08922201
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GpULQPud"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C8D0212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47920 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kShm7-00039L-1f
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:29:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35968)
+	id 1kShoo-0005r3-8N
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 10:31:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36370)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kShlS-0002cc-HW; Wed, 14 Oct 2020 10:28:26 -0400
-Received: from mail-eopbgr00139.outbound.protection.outlook.com
- ([40.107.0.139]:57535 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kShlP-0005Ge-Dx; Wed, 14 Oct 2020 10:28:25 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oTMKQ0290ZjO/X4SAskAsosi6dgJpBfC6H6wdsWCaLtNwTwAiYCZsGEUkkVkQwoLNW9G6YH//SItBn4+D043uOBPjcPxMpJJKjpgJMYRu5AOd5GvI42qhL20aA1YAGeihLU8O3w+Y0Sjv4+vvGy2BLSlEpzUOfpB0nkW1i6Wq6jTwL7AgC5BLIq6Y6xnh/DdLpVCyrE+i530oMo1YOA995yUJxXoqOo7Pt32dUQR+AIBEaTk1g0dWB7SIS1yOnl8UURcmxJv1C28iUtPN6v4f1XAns/4zTVVOjYIrF89AgNfoOBRbJmnwTgdC2WTLJaTHN4nE9a0JGD2KHwLj961NA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xyKYx+erT5eKovQq/1msetWzmKb9UH/esRDZ/7awZSk=;
- b=beDqxGYU7gDo+rKxyWS38zlL6ScFYrMvcrYOPU8x6KB2KTip/XcjXQL32quGhrVZRmEoeDfKVcEmyZrJjISadTSqGTy+PXuhQf1elHuxaj88OTqfgu+x04NcgF3nQz15QIgkLf5V5UD08HBPD/t6NgoRuHKbs4ODIqJQ2CXu2yFdFIUFx7lyFs2KjxOmwLbd7/2suW4NN4qrtP4NqGSfuw6vr/7ucl8sSqNL3b/9DRN0gi1/6MVOpz06FwRD0KSlsqavWJG4jgWDQIrzHNfAYhej+xkwcMqKHZ+8dD5yaoJwVwM4fmz6XIME5/Ebky4LhyhK9UIJFxc5rCs7jVbXOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xyKYx+erT5eKovQq/1msetWzmKb9UH/esRDZ/7awZSk=;
- b=ZcRpt231AgjN06P0GRimlBG4Zr3ImN2b/6myE+Girolbq/W1TGPib2E2En2DOUNTRNJ6AnqGjZOQpVMSlQnhz/jEERKlw2YFM3b0Yg8hHuvvFkWO4cd8itIfFuHGdxXGHqbfT+cHO9XLBlLPdYK6x2Xgny9N7BxIqnSRovP798U=
-Authentication-Results: virtuozzo.com; dkim=none (message not signed)
- header.d=none;virtuozzo.com; dmarc=none action=none
- header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0801MB1644.eurprd08.prod.outlook.com (2603:10a6:3:85::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.26; Wed, 14 Oct
- 2020 14:28:18 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.021; Wed, 14 Oct 2020
- 14:28:17 +0000
-Subject: Re: [PATCH v11 02/13] copy-on-read: add filter append/drop functions
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
- stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- libvir-list@redhat.com, eblake@redhat.com, den@openvz.org,
- vsementsov@virtuozzo.com
-References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-3-git-send-email-andrey.shinkevich@virtuozzo.com>
- <39aec06d-6dbd-a0e4-c3b8-d0f243864121@redhat.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <e88ba6fb-17ae-1539-1174-395bfee890de@virtuozzo.com>
-Date: Wed, 14 Oct 2020 17:28:14 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <39aec06d-6dbd-a0e4-c3b8-d0f243864121@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [109.252.114.22]
-X-ClientProxiedBy: AM4PR07CA0029.eurprd07.prod.outlook.com
- (2603:10a6:205:1::42) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kShnI-0004Bm-QE
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:30:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40631)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kShnE-0005SW-0a
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 10:30:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602685814;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=lV8gOC/4ZTH9hfr1s+24YNwoOwwWQqNonJV6a8e3tog=;
+ b=GpULQPudqDQnd1g46wurNHAGCH96CkeeQX0RJtJJaCDDTwskSaX9HkdsrWUwiL2wdip0M3
+ 7x9Gyco2gYrnZ3AyFw5fFpgmgD43f0DmmGhFmDhmw/bbuBUHpXQTNCRLRf7lZ6KwnMsZ0W
+ QD67qUEFRqxBNZOqszsdZX6PbycSH8I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-Ddy7zRlkM5m1Ekhrs8jvzA-1; Wed, 14 Oct 2020 10:30:10 -0400
+X-MC-Unique: Ddy7zRlkM5m1Ekhrs8jvzA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87C5F10866A8;
+ Wed, 14 Oct 2020 14:30:08 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-117-231.rdu2.redhat.com [10.10.117.231])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 857A476649;
+ Wed, 14 Oct 2020 14:29:58 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 00/15] python: create installable package
+Date: Wed, 14 Oct 2020 10:29:42 -0400
+Message-Id: <20201014142957.763624-1-jsnow@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- AM4PR07CA0029.eurprd07.prod.outlook.com (2603:10a6:205:1::42) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.11 via Frontend Transport; Wed, 14 Oct 2020 14:28:16 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4dd2d46f-ba1d-4a13-d5a9-08d8704d6459
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB1644:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0801MB1644BCC24BA298B55658C1D2F4050@HE1PR0801MB1644.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:8882;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NugbwZNQwJbvQbtmPAWe8RdAA5SfsEj7qw8uepn6A0IfQFWJW02pL+HyAOVvnOlJwzYF8MTZ12FJ//iGlKf45m101DalhvNRILj1Jm2aptOOJgQz7rlSAD8sHEBvhI6yiS1mBxWVs5eKv1KqHXpg64r8XQFDA8dvHXTxn+c/sNVTwz+uwupr38VvR4NIy/4AOqN9O5BA+d2HpcHiw1996te/gFGeSK87hxLFmh0eerOGLTcfe6a7q6WHYNFhm8ZnpH3AjqeQxP6lxEQ87tnH4C7g7nPbc2bQqFf7kWdR4PYslJUZPAwMS/1khJDRpDzfG2IWt2IQAIwj8vSyX31eCsct666Y/K9qqGAFca+oElsRXWTcPcz7+QOWSBEpvXit
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(346002)(366004)(396003)(376002)(136003)(36756003)(2906002)(31696002)(66946007)(6486002)(66476007)(83380400001)(66556008)(53546011)(5660300002)(26005)(6506007)(478600001)(316002)(8676002)(16526019)(8936002)(52116002)(956004)(6512007)(44832011)(107886003)(4326008)(2616005)(31686004)(86362001)(7416002)(186003)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: b8Qi88JNZVvnjdoKSmtd41BokL2u0hGeBlDCb24PiPtLmVukjeaMuma8ceewdriyMiCUCe7i5zJI2zAtoyvyRkRokzSjpFNlhbOXAEDdiBn42Yvs/9Klo967+ZLY4rAdYjfv1TRhmzTitz9GUJu1cpgEaZT7eqX6qnzFtjLjJNs4fnnMtNuDSl7zRTuwEKOPD2dkNs82OCxjHZJKJw2ke5m+U/w6f0YgDj4x1dmb0meCkrVjzdM23I9TOldnbl6lfTMmSCB5fA0iiKmzankzqP1/LqQHwdDtpbFVivxzPMFxgnjqmWNvnuXU+ucnnIjhooLm8ZZJuO2q7DREZOJzSjQFODyog+AlEaSkg+WtzUeTbUW2p9ow+ex+ubPNt8XCrgwnGCGAzEtWXjnNyfQNoaeQFzJRSWcurN39ANkjNdaxot7fcliwfJUqNmmGDB9+OU9MMw5oyGTIAuMFTSpCrKyqM2da9QEXCzZPLDAuciexJaAmw2HW84pMvw2ZZIHzEWLI7aKWuksw+bQC1Fs8mOgrcYt5pzK+muMK6rBtfuvREzgeR7wJcUHCOVje960saNlhzj8el2GW8m0KLyItID5wi22p8eUTfApTA6ZI3OO60tKaoFm4RpqE53qtp3qiv63efhJBdpVYnyyJwXprIA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4dd2d46f-ba1d-4a13-d5a9-08d8704d6459
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Oct 2020 14:28:17.3306 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 85zpRKTP4wb7I6berRCftwIwF6LDQWQTTE/VKFwdW1k0pOM+YzKFVqdDQ3br30llpByhCUWripJlxltFD5kWjZwhtVBxAu2Ye3Xmkew8MvY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1644
-Received-SPF: pass client-ip=40.107.0.139;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 10:28:19
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 03:37:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,145 +90,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Ben Widawsky <ben@bwidawsk.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Rohit Shinde <rohit.shinde12194@gmail.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ Fam Zheng <fam@euphon.net>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14.10.2020 13:44, Max Reitz wrote:
-> On 12.10.20 19:43, Andrey Shinkevich wrote:
->> Provide API for the COR-filter insertion/removal.
->> Also, drop the filter child permissions for an inactive state when the
->> filter node is being removed.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   block/copy-on-read.c | 88 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->>   block/copy-on-read.h | 35 +++++++++++++++++++++
->>   2 files changed, 123 insertions(+)
->>   create mode 100644 block/copy-on-read.h
->>
->> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->> index cb03e0f..bcccf0f 100644
->> --- a/block/copy-on-read.c
->> +++ b/block/copy-on-read.c
-> 
-> [...]
-> 
->> @@ -159,4 +188,63 @@ static void bdrv_copy_on_read_init(void)
->>       bdrv_register(&bdrv_copy_on_read);
->>   }
->>   
->> +
->> +BlockDriverState *bdrv_cor_filter_append(BlockDriverState *bs,
->> +                                         QDict *node_options,
->> +                                         int flags, Error **errp)
-> 
-> I had hoped you could make this a generic block layer function. :(
-> 
-> (Because it really is rather generic)
-> 
-> *shrug*
+Based-on: https://gitlab.com/jsnow/qemu/-/tree/python=0D
+=0D
+This series factors the python/qemu directory as an installable=0D
+module. It does not yet actually change the mechanics of how any other=0D
+python source in the tree actually consumes it (yet), beyond the import=0D
+path.=0D
+=0D
+The point of this series is primarily to formalize our dependencies on=0D
+mypy, flake8, isort, and pylint alongside versions that are known to=0D
+work. It also adds explicitly pinned versions of these dependencies that=0D
+should behave in a repeatable and known way for developers and CI=0D
+environments both.=0D
+=0D
+With the python tooling as a proper package, you can install this=0D
+package in editable or production mode to a virtual environment, your=0D
+local user environment, or your system packages. The primary benefit of=0D
+this is to gain access to QMP tooling regardless of CWD, without needing=0D
+to battle sys.path.=0D
+=0D
+For example: when developing, you may go to qemu/python/ and invoke=0D
+`pipenv shell` to activate a virtual environment that contains the qemu=0D
+packages.  This package will always reflect the current version of the=0D
+source files in the tree. When you are finished, you can simply exit the=0D
+shell to remove these packages from your python environment.=0D
+=0D
+When not developing, you could install a version of this package to your=0D
+environment outright to gain access to the QMP and QEMUMachine classes=0D
+for lightweight scripting and testing by using pip: "pip install [--user] .=
+"=0D
+=0D
+Finally, this package is formatted in such a way that it COULD be=0D
+uploaded to https://pypi.org/project/qemu and installed independently of=0D
+qemu.git with `pip install qemu`, but that button remains unpushed.=0D
+=0D
+TESTING THIS SERIES:=0D
+=0D
+CD to qemu/python first, and then:=0D
+=0D
+1. Try "pipenv shell" to get a venv with the package installed to it in=0D
+editable mode. Ctrl+d exits this venv shell. While in this shell, any=0D
+python script that uses "from qemu.core import ..." should work=0D
+correctly regardless of your CWD.=0D
+=0D
+2. Try "pipenv sync --dev" to create/update the venv with the=0D
+development packages without actually entering the venv. This should=0D
+install isort, mypy, flake8 and pylint to the venv.=0D
+=0D
+3. After the above sync, try "pipenv shell" again, and from the python=0D
+project root, try any of the following:=0D
+=0D
+  - pylint qemu=0D
+  - flake8 qemu=0D
+  - isort -c qemu=0D
+  - mypy qemu=0D
+=0D
+4. Leave any venv you are in, and from the project root, try the=0D
+following commands:=0D
+=0D
+  - pipenv run pylint qemu=0D
+  - pipenv run flake8 qemu=0D
+  - pipenv run isort -c qemu=0D
+  - pipenv run mypy qemu=0D
+=0D
+John Snow (15):=0D
+  python: create qemu.core package=0D
+  python: add qemu package installer=0D
+  python: add VERSION file=0D
+  python: add directory structure README.rst files=0D
+  python: Add pipenv support=0D
+  python: add pylint exceptions to __init__.py=0D
+  python: move pylintrc into setup.cfg=0D
+  python: add pylint to pipenv=0D
+  python: move flake8 config to setup.cfg=0D
+  python: Add flake8 to pipenv=0D
+  python: move mypy.ini into setup.cfg=0D
+  python: add mypy to pipenv=0D
+  python: move .isort.cfg into setup.cfg=0D
+  python/qemu: add isort to pipenv=0D
+  python/qemu: add qemu package itself to pipenv=0D
+=0D
+ python/PACKAGE.rst                        |  23 +++=0D
+ python/README.rst                         |  27 +++=0D
+ python/qemu/README.rst                    |   8 +=0D
+ python/qemu/core/README.rst               |   9 +=0D
+ python/Pipfile                            |  16 ++=0D
+ python/Pipfile.lock                       | 207 ++++++++++++++++++++++=0D
+ python/VERSION                            |   1 +=0D
+ python/mypy.ini                           |   4 -=0D
+ python/qemu/.flake8                       |   2 -=0D
+ python/qemu/.isort.cfg                    |   7 -=0D
+ python/qemu/__init__.py                   |  11 --=0D
+ python/qemu/core/__init__.py              |  47 +++++=0D
+ python/qemu/{ =3D> core}/accel.py           |   0=0D
+ python/qemu/{ =3D> core}/console_socket.py  |   0=0D
+ python/qemu/{ =3D> core}/machine.py         |   0=0D
+ python/qemu/{ =3D> core}/qmp.py             |   0=0D
+ python/qemu/{ =3D> core}/qtest.py           |   0=0D
+ python/{qemu/pylintrc =3D> setup.cfg}       |  66 +++----=0D
+ python/setup.py                           |  23 +++=0D
+ scripts/device-crash-test                 |   2 +-=0D
+ scripts/qmp/qemu-ga-client                |   2 +-=0D
+ scripts/qmp/qmp                           |   2 +-=0D
+ scripts/qmp/qmp-shell                     |   2 +-=0D
+ scripts/qmp/qom-fuse                      |   2 +-=0D
+ scripts/qmp/qom-get                       |   2 +-=0D
+ scripts/qmp/qom-list                      |   2 +-=0D
+ scripts/qmp/qom-set                       |   2 +-=0D
+ scripts/qmp/qom-tree                      |   2 +-=0D
+ scripts/render_block_graph.py             |   6 +-=0D
+ scripts/simplebench/bench_block_job.py    |   4 +-=0D
+ tests/acceptance/avocado_qemu/__init__.py |   2 +-=0D
+ tests/acceptance/boot_linux.py            |   3 +-=0D
+ tests/acceptance/virtio_check_params.py   |   2 +-=0D
+ tests/acceptance/virtio_version.py        |   2 +-=0D
+ tests/migration/guestperf/engine.py       |   2 +-=0D
+ tests/qemu-iotests/235                    |   2 +-=0D
+ tests/qemu-iotests/297                    |   2 +-=0D
+ tests/qemu-iotests/300                    |   4 +-=0D
+ tests/qemu-iotests/iotests.py             |   4 +-=0D
+ tests/vm/basevm.py                        |   6 +-=0D
+ 40 files changed, 424 insertions(+), 84 deletions(-)=0D
+ create mode 100644 python/PACKAGE.rst=0D
+ create mode 100644 python/README.rst=0D
+ create mode 100644 python/qemu/README.rst=0D
+ create mode 100644 python/qemu/core/README.rst=0D
+ create mode 100644 python/Pipfile=0D
+ create mode 100644 python/Pipfile.lock=0D
+ create mode 100644 python/VERSION=0D
+ delete mode 100644 python/mypy.ini=0D
+ delete mode 100644 python/qemu/.flake8=0D
+ delete mode 100644 python/qemu/.isort.cfg=0D
+ delete mode 100644 python/qemu/__init__.py=0D
+ create mode 100644 python/qemu/core/__init__.py=0D
+ rename python/qemu/{ =3D> core}/accel.py (100%)=0D
+ rename python/qemu/{ =3D> core}/console_socket.py (100%)=0D
+ rename python/qemu/{ =3D> core}/machine.py (100%)=0D
+ rename python/qemu/{ =3D> core}/qmp.py (100%)=0D
+ rename python/qemu/{ =3D> core}/qtest.py (100%)=0D
+ rename python/{qemu/pylintrc =3D> setup.cfg} (51%)=0D
+ mode change 100644 =3D> 100755=0D
+ create mode 100755 python/setup.py=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
-Actually, I did (and still can do) that for the 'append node' function 
-only but not for the 'drop node' one so far...
-
-diff --git a/block.c b/block.c
-index 11ab55f..f41e876 100644
---- a/block.c
-+++ b/block.c
-@@ -4669,6 +4669,55 @@ static void bdrv_delete(BlockDriverState *bs)
-      g_free(bs);
-  }
-
-+BlockDriverState *bdrv_insert_node(BlockDriverState *bs, QDict 
-*node_options,
-+                                   int flags, Error **errp)
-+{
-+    BlockDriverState *new_node_bs;
-+    Error *local_err = NULL;
-+
-+    new_node_bs =  bdrv_open(NULL, NULL, node_options, flags, errp);
-+    if (new_node_bs == NULL) {
-+        error_prepend(errp, "Could not create node: ");
-+        return NULL;
-+    }
-+
-+    bdrv_drained_begin(bs);
-+    bdrv_replace_node(bs, new_node_bs, &local_err);
-+    bdrv_drained_end(bs);
-+
-+    if (local_err) {
-+        bdrv_unref(new_node_bs);
-+        error_propagate(errp, local_err);
-+        return NULL;
-+    }
-+
-+    return new_node_bs;
-+}
-+
-+void bdrv_remove_node(BlockDriverState *bs)
-+{
-+    BdrvChild *child;
-+    BlockDriverState *inferior_bs;
-+
-+    child = bdrv_filter_or_cow_child(bs);
-+    if (!child) {
-+        return;
-+    }
-+    inferior_bs = child->bs;
-+
-+    /* Retain the BDS until we complete the graph change. */
-+    bdrv_ref(inferior_bs);
-+    /* Hold a guest back from writing while permissions are being reset. */
-+    bdrv_drained_begin(inferior_bs);
-+    /* Refresh permissions before the graph change. */
-+    bdrv_child_refresh_perms(bs, child, &error_abort);
-+    bdrv_replace_node(bs, inferior_bs, &error_abort);
-+
-+    bdrv_drained_end(inferior_bs);
-+    bdrv_unref(inferior_bs);
-+    bdrv_unref(bs);
-+}
-
-So, it is an intermediate solution in this patch of the series. I am 
-going to make both functions generic once Vladimir overhauls the QEMU 
-permission update system. Otherwise, the COR-filter node cannot be 
-removed from the backing chain gracefully.
-
-Thank you for your r-b. If the next version comes, I can move the 
-'append node' function only to the generic layer.
-
-Andrey
-
-> 
-> Reviewed-by: Max Reitz <mreitz@redhat.com>
-> 
->> +{
->> +    BlockDriverState *cor_filter_bs;
->> +    Error *local_err = NULL;
->> +
->> +    cor_filter_bs = bdrv_open(NULL, NULL, node_options, flags, errp);
->> +    if (cor_filter_bs == NULL) {
->> +        error_prepend(errp, "Could not create COR-filter node: ");
->> +        return NULL;
->> +    }
->> +
->> +    if (!qdict_get_try_str(node_options, "node-name")) {
->> +        cor_filter_bs->implicit = true;
->> +    }
->> +
->> +    bdrv_drained_begin(bs);
->> +    bdrv_replace_node(bs, cor_filter_bs, &local_err);
->> +    bdrv_drained_end(bs);
->> +
->> +    if (local_err) {
->> +        bdrv_unref(cor_filter_bs);
->> +        error_propagate(errp, local_err);
->> +        return NULL;
->> +    }
->> +
->> +    return cor_filter_bs;
->> +}
-> 
 
