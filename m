@@ -2,73 +2,110 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00061C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F3D3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:46:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CB9C22210
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B2E8B2224A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:46:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="g2RrJ7ar"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB9C22210
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSsti06Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B2E8B2224A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSzOA-00007E-Se
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 05:17:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35278)
+	id 1kSzq4-0007OA-Kn
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 05:46:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kSzN0-0007yy-AX
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:16:22 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:33293)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kSzMw-0005nC-69
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:16:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=joI/0vo6dI40RphK0P7GK/DUvk7XtA32rHLYiCQ9vRw=; b=g2RrJ7arfdvdtC9SCEDMDwWcMz
- UOaTgc3hFehrMutbuDb6ZQifCNvk66qP9ijWDokRF05miJlK0T6ITU+KvsLsHdED4EgSq4oKPrIvQ
- rqs66yMKNOiPlqcPGHGSJupZWsg99MU2c/QniOT2qQj4vlGkvUDFwAeV4CFUEuv+dlgjeUN9yu9jb
- of73mAsRThfclK0XEtUm0NUUhXK3GXOJpP67DNYVlckUjtyrumN3HQkUxDC6z/wQcWQhBXZD+I7EU
- 5+eXV9gtzwFVnNCYvSAzfC2nJCySDVbnKWB9bUIWEHfEdvDxV/baAe/weGI5pr/PEob0pDZyXnuFH
- IyfXYNmA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>,
- Thomas Huth <thuth@redhat.com>,
- Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
- Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v4 08/12] tests/9pfs: change qtest name prefix to synth
-Date: Thu, 15 Oct 2020 11:16:14 +0200
-Message-ID: <2397156.vWtGj3npeQ@silver>
-In-Reply-To: <20201014213816.2b8039f6@bahia.lan>
-References: <cover.1602182956.git.qemu_oss@crudebyte.com>
- <2321140.ujbB6vKeRS@silver> <20201014213816.2b8039f6@bahia.lan>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kSzog-0006pK-OK
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:44:58 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33253)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kSzod-0001oa-5x
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:44:57 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602755092;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=06XTVvif8IgugfV3OCRtYipMsAeuu8HctnxW0trMhz8=;
+ b=HSsti06ZtVUpkXDVZAMSZwyc4jtVhXSfh9gSTfCgfgnf3Fu/up4NFXcaSV6KX/7zRjZHc6
+ 1vecbSqS+1YhsAZsKhZCS8wp0JHC/7rP3RTaH7Z7s17uTU9KObncZQs7IFfmotoKdaR/ZF
+ rN8rjk1G3WCKC/r5Xlhz3CF+dWlOBPo=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-TPjH-dx8MoCVMiVxI1P1ig-1; Thu, 15 Oct 2020 05:44:50 -0400
+X-MC-Unique: TPjH-dx8MoCVMiVxI1P1ig-1
+Received: by mail-wr1-f69.google.com with SMTP id m20so1489719wrb.21
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 02:44:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=06XTVvif8IgugfV3OCRtYipMsAeuu8HctnxW0trMhz8=;
+ b=sDmvf5tC2fO4BzEOyE8+DM2XVoUjC7s/kXOLUxGa3GZR72ZB/Zshcno49ZSQI1tiqF
+ TA5dI+XeaObm+ap/U+VP/T9dfDyCaEn7N77R0g39HWikkTPFT3cuaZ7KCOERsAxZRiDp
+ Qww/2MvLs0/GKLyE/7sGSGdeU9GlfpmuiQi96tbBY28Ce88Rc4ow61hHbOEiz3E1QZGp
+ k97Xz7641aEE+JLiec8lyvnr9ExqXYx4794rHMe1Xu3MN1M1SS89IOAQUuaAsWRrchLt
+ dAq3kfxQ3B3aka3gkteypOvyHvTyYbTarI6PaodwdGtavVxsTEf20L4Yjzwh+9zt/pBF
+ zaGg==
+X-Gm-Message-State: AOAM533fFskO0PVpHlbc/z3zjjbJ2IWi2iHXY39dDbrbgAL6tdLqepky
+ rYvA5tdDi/TGoh1lGeaADh1DsnN9qPnwD6d29+qmlvJxWmu+LPhyVpL3rDnnxK+f+5S478mEcnJ
+ 3iz6mbgp57u0yNBs=
+X-Received: by 2002:adf:e6c4:: with SMTP id y4mr3442024wrm.423.1602755088808; 
+ Thu, 15 Oct 2020 02:44:48 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzvyRpnLguMPl3uFod/iWNqzHiRSU4NteLwTJxOGynDhkCBj3nP78JQZINzfJt212hjAGD1kg==
+X-Received: by 2002:adf:e6c4:: with SMTP id y4mr3441997wrm.423.1602755088559; 
+ Thu, 15 Oct 2020 02:44:48 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:2110:4ced:a13b:6857?
+ ([2001:b07:6468:f312:2110:4ced:a13b:6857])
+ by smtp.gmail.com with ESMTPSA id a5sm3550855wrt.80.2020.10.15.02.44.47
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 15 Oct 2020 02:44:47 -0700 (PDT)
+Subject: Re: [PATCH 0/7] build: replace ninjatool with ninja
+To: Howard Spoelstra <hsp.cat7@gmail.com>
+References: <20201014135416.1290679-1-pbonzini@redhat.com>
+ <CABLmASGJOFbYUhSAbKhc9s1G00Jh0vN--WaFPtaoHqsL2WuvbQ@mail.gmail.com>
+ <44d3eccf-3c64-82cd-b5b2-641de6960ab5@redhat.com>
+ <CABLmASE55n6h=fr8UrKOHdu1Z_P-46a9t4L0KaRxvvf0hob01w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <7b7446be-8334-c4db-4df4-677aab2e232c@redhat.com>
+Date: Thu, 15 Oct 2020 11:44:47 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 05:16:16
+In-Reply-To: <CABLmASE55n6h=fr8UrKOHdu1Z_P-46a9t4L0KaRxvvf0hob01w@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,52 +119,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mittwoch, 14. Oktober 2020 21:38:16 CEST Greg Kurz wrote:
-> On Wed, 14 Oct 2020 17:25:35 +0200
+On 15/10/20 09:39, Howard Spoelstra wrote:
 > 
-> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > On Donnerstag, 8. Oktober 2020 20:34:56 CEST Christian Schoenebeck wrote:
-> > > All existing 9pfs test cases are using the 'synth' fs driver so far,
-> > > which
-> > > means they are not accessing real files, but a purely simulated (in RAM
-> > > only) file system.
-> > > 
-> > > Let's make this clear by changing the prefix of the individual qtest
-> > > case
-> > > names from 'fs/' to 'synth/'. That way they'll be easily distinguishable
-> > > from upcoming new 9pfs test cases supposed to be using a different fs
-> > > driver.
-> > > 
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > ---
-> > > 
-> > >  tests/qtest/virtio-9p-test.c | 28 ++++++++++++++--------------
-> > >  1 file changed, 14 insertions(+), 14 deletions(-)
-> > 
-> > Queued patches 8 .. 12 on 9p.next:
-> > 
-> > https://github.com/cschoenebeck/qemu/commits/9p.next
 > 
-> Hi Chistian,
+> Thanks Paolo,
 > 
-> I could only have a quick glimpse at the patches and LGTM.
+> Then only the issue regarding the pcbios/optionrom stuff remains ;-)
 > 
-> Thanks for taking care.
-> 
-> Cheers,
-> 
-> --
-> Greg
->
+> make[1]: *** No rule to make target 'multiboot.bin', needed by 'all'.  Stop.
+> make: *** [Makefile:171: pc-bios/optionrom/all] Error 2
+> make: *** Waiting for unfinished jobs....
 
-Thanks, I appreciate it.
+It seems to work on cirrus CI: https://cirrus-ci.com/task/5383432727429120
 
-Best regards,
-Christian Schoenebeck
-
+Paolo
 
 
