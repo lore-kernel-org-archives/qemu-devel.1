@@ -1,90 +1,58 @@
-Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97149C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 23:08:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB33C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D6A542083B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 23:08:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L+dWu81t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6A542083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1314620789
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1314620789
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTCMe-00028s-Rw
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 19:08:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37662)
+	id 1kTDSk-0007Ek-3R
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:19:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1kTCLk-0001g1-52
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 19:07:56 -0400
-Received: from mail-ot1-x32e.google.com ([2607:f8b0:4864:20::32e]:44605)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
- id 1kTCLi-0005Vd-5i
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 19:07:55 -0400
-Received: by mail-ot1-x32e.google.com with SMTP id e20so743208otj.11
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 16:07:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=WWegH+VmKXH9VrYzIa1Caa5TpR1/wpyyytySNxn1gUk=;
- b=L+dWu81tdcoqcQJAkNzhjVjs6n3gw/N7hs48J2bUxr2lzCG5qn+c00sjOHavIk65O4
- 467Pxa+qLu5SFMqwjclZpkRnWeNFj6lr+f5/bM717zMibSKBPU64KoInQ0FGQwewovVb
- 5lCqUvUDEyc4grNPuertQoVRkOp61B2vG00CFJjX/eSLpc7VAAx3kwUIF3FqLBhB/bKX
- eNs7rPqpFs7CjcDyxjveyplAks6Ra9JlZ2DJxeA/L7R9P9WgwCPKjdbC4K2O+BN4PvEY
- WzQD/65NlaxsiH2HWHJoKmGO/rxgo02d7j2NasrcOXh3uMaeGdE9cmsf5k9qXh/JiTlJ
- p0XA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=WWegH+VmKXH9VrYzIa1Caa5TpR1/wpyyytySNxn1gUk=;
- b=Vs0huJvhPdnQOPY6/L2Hp8JDaD/vZO2QM1YQ3eDXhi08QfIEKeezwqrisS4iip7jpv
- 6S+TLgtW10XeXNrRmuGXiUCOFRa7FXQ8sbYxNsY3cdwmEXaIYfL4E7Af4OO8p+BjeeYo
- 2KqMQmfVmpUh96jAPDJdpcA84OU3myyVHVE53EO2SF3tKfq95k2h5h7weOmYdlej3McH
- wqsZWIECXeOLxpz4WFVj6yb/EQNcqWiExcNgqihz+IyWwEMTSWES38dusOyvf6DS8c83
- zM4AnekQvoD2Wzd3x14QPRWmJHV6wDKv5p8pe0ChyxjuJeJuu8gy3k5wnenU81gd7jBJ
- 5SVg==
-X-Gm-Message-State: AOAM531yCyZAtKYu1toxVS7CEzfQmciwBy4ofIfeRz0AMfX758we551F
- /YMX1Zt7+wKuNAhxOblxpm2RRJLCUQ/1+zxvMWI=
-X-Google-Smtp-Source: ABdhPJz5WR/TNuGlagV2uSKF3W6vXP9fivDjo/WV7bzZImR90fMVOQUzMuMt1h30N6al+Mf5/cJGZOSgWU0czmqlGbo=
-X-Received: by 2002:a9d:5d13:: with SMTP id b19mr586026oti.75.1602803272830;
- Thu, 15 Oct 2020 16:07:52 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTDRR-0005gx-Jc; Thu, 15 Oct 2020 20:17:53 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30048)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTDRM-0006vf-Kv; Thu, 15 Oct 2020 20:17:53 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 4D96C747626;
+ Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 01532747621; Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
+Message-Id: <d67bc8d914a366ca6822b5190c1308d31af5c9b3.1602805637.git.balaton@eik.bme.hu>
+In-Reply-To: <cover.1602805637.git.balaton@eik.bme.hu>
+References: <cover.1602805637.git.balaton@eik.bme.hu>
+Subject: [PATCH v8 4/5] mac_oldworld: Drop some variables
+Date: Fri, 16 Oct 2020 01:47:17 +0200
 MIME-Version: 1.0
-References: <20201014135416.1290679-1-pbonzini@redhat.com>
- <CABLmASGJOFbYUhSAbKhc9s1G00Jh0vN--WaFPtaoHqsL2WuvbQ@mail.gmail.com>
- <44d3eccf-3c64-82cd-b5b2-641de6960ab5@redhat.com>
- <CABLmASE55n6h=fr8UrKOHdu1Z_P-46a9t4L0KaRxvvf0hob01w@mail.gmail.com>
- <214e983c-b9e8-d03d-099e-d8fe506e6a7b@t-online.de>
-In-Reply-To: <214e983c-b9e8-d03d-099e-d8fe506e6a7b@t-online.de>
-From: Howard Spoelstra <hsp.cat7@gmail.com>
-Date: Fri, 16 Oct 2020 01:07:41 +0200
-Message-ID: <CABLmASHdvMG_XfV8sth=7=JFvr_mRAvKe94o-nb9YfZkrk54Eg@mail.gmail.com>
-Subject: Re: [PATCH 0/7] build: replace ninjatool with ninja
-To: =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>
-Content-Type: multipart/alternative; boundary="000000000000b8d2d005b1bdb7d8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::32e;
- envelope-from=hsp.cat7@gmail.com; helo=mail-ot1-x32e.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+To: qemu-devel@nongnu.org,
+    qemu-ppc@nongnu.org
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,125 +66,127 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Peter Maydell <peter.maydell@linaro.org>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
---000000000000b8d2d005b1bdb7d8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Values not used frequently enough may not worth putting in a local
+variable, especially with names almost as long as the original value
+because that does not improve readability, to the contrary it makes it
+harder to see what value is used. Drop a few such variables.
 
-On Thu, Oct 15, 2020 at 7:39 PM Volker R=C3=BCmelin <vr_qemu@t-online.de> w=
-rote:
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/ppc/mac_oldworld.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
->
-> >
-> > Thanks Paolo,
-> >
-> > Then only the issue regarding the pcbios/optionrom stuff remains ;-)
-> >
-> > make[1]: *** No rule to make target 'multiboot.bin', needed by 'all'.
-> Stop.
-> > make: *** [Makefile:171: pc-bios/optionrom/all] Error 2
-> > make: *** Waiting for unfinished jobs....
-> >
-> > Best,
-> > Howard
-> >
->
-> Hi Howard,
->
-> one solution for this issue is to uncomment the following line in
-> msys2_shell.cmd.
->
-> rem To activate windows native symlinks uncomment next line
-> set MSYS=3Dwinsymlinks:nativestrict
->
-> Then tell Windows 10 it's okay to create symlinks without elevated rights=
-.
-> Here is a link with a description how to do this.
-> https://www.joshkel.com/2018/01/18/symlinks-in-windows/
->
-> I think since commit bf708f3c4a "optionrom: simplify Makefile"
-> pc-bios/optionrom/Makefile in your build directory has to be a symbolic
-> link. Without 'set MSYS=3Dwinsymlinks:nativestrict' msys2 ln -s copies th=
-e
-> Makefile instead of creating a symbolic link.
->
->
-Thanks Volker!
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 5b30fa0739..13eb9bafa1 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
+ static void ppc_heathrow_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *kernel_filename = machine->kernel_filename;
+-    const char *kernel_cmdline = machine->kernel_cmdline;
+-    const char *initrd_filename = machine->initrd_filename;
+     const char *boot_device = machine->boot_order;
+     PowerPCCPU *cpu = NULL;
+     CPUPPCState *env = NULL;
+     char *filename;
+-    int linux_boot, i;
++    int i;
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+@@ -109,8 +106,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     void *fw_cfg;
+     uint64_t tbfreq;
+ 
+-    linux_boot = (kernel_filename != NULL);
+-
+     /* init CPUs */
+     for (i = 0; i < smp_cpus; i++) {
+         cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+@@ -147,7 +142,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         bios_addr = (target_ulong)bios_addr;
+ 
+         if (bios_size <= 0) {
+-            /* or load binary ROM image */
++            /* or if could not load ELF try loading a binary ROM image */
+             bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
+             bios_addr = PROM_BASE;
+         }
+@@ -160,7 +155,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    if (linux_boot) {
++    if (machine->kernel_filename) {
+         int bswap_needed;
+ 
+ #ifdef BSWAP_NEEDED
+@@ -169,29 +164,32 @@ static void ppc_heathrow_init(MachineState *machine)
+         bswap_needed = 0;
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+-        kernel_size = load_elf(kernel_filename, NULL,
++        kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL, NULL, NULL,
+                                NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+         if (kernel_size < 0)
+-            kernel_size = load_aout(kernel_filename, kernel_base,
++            kernel_size = load_aout(machine->kernel_filename, kernel_base,
+                                     ram_size - kernel_base, bswap_needed,
+                                     TARGET_PAGE_SIZE);
+         if (kernel_size < 0)
+-            kernel_size = load_image_targphys(kernel_filename,
++            kernel_size = load_image_targphys(machine->kernel_filename,
+                                               kernel_base,
+                                               ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            error_report("could not load kernel '%s'", kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+         /* load initrd */
+-        if (initrd_filename) {
+-            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
+-            initrd_size = load_image_targphys(initrd_filename, initrd_base,
++        if (machine->initrd_filename) {
++            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
++                                            KERNEL_GAP);
++            initrd_size = load_image_targphys(machine->initrd_filename,
++                                              initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+-                             initrd_filename);
++                             machine->initrd_filename);
+                 exit(1);
+             }
+             cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
+@@ -343,9 +341,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+-    if (kernel_cmdline) {
++    if (machine->kernel_cmdline) {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
+-        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
++        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
++                         machine->kernel_cmdline);
+     } else {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
+     }
+-- 
+2.21.3
 
-I changed the Windows policy and setting in msys2_shell.cmd. However, I had
-to edit ming64.ini to uncomment the MSYS=3Dwinsymlinks:nativestrict there a=
-s
-well to get things going.
-
-While it is great to have this fix, I can't say I'm really happy with the
-need to change the Windows policy and to have to fix msys2.
-
-The patches Mark referred to and to which I also pointed earlier did fix
-this problem without changing Windows/Msys2/Mingw64 settings.
-
-Best regards,
-Howard
-
---000000000000b8d2d005b1bdb7d8
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Thu, Oct 15, 2020 at 7:39 PM Volke=
-r R=C3=BCmelin &lt;<a href=3D"mailto:vr_qemu@t-online.de" target=3D"_blank"=
->vr_qemu@t-online.de</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quo=
-te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
-);padding-left:1ex"><br>
-&gt;<br>
-&gt; Thanks Paolo,<br>
-&gt;<br>
-&gt; Then only the issue regarding the pcbios/optionrom stuff remains ;-)<b=
-r>
-&gt;<br>
-&gt; make[1]: *** No rule to make target &#39;multiboot.bin&#39;, needed by=
- &#39;all&#39;.=C2=A0 Stop.<br>
-&gt; make: *** [Makefile:171: pc-bios/optionrom/all] Error 2<br>
-&gt; make: *** Waiting for unfinished jobs....<br>
-&gt;<br>
-&gt; Best,<br>
-&gt; Howard<br>
-&gt;<br>
-<br>
-Hi Howard,<br>
-<br>
-one solution for this issue is to uncomment the following line in msys2_she=
-ll.cmd.<br>
-<br>
-rem To activate windows native symlinks uncomment next line<br>
-set MSYS=3Dwinsymlinks:nativestrict<br>
-<br>
-Then tell Windows 10 it&#39;s okay to create symlinks without elevated righ=
-ts. Here is a link with a description how to do this.<br>
-<a href=3D"https://www.joshkel.com/2018/01/18/symlinks-in-windows/" rel=3D"=
-noreferrer" target=3D"_blank">https://www.joshkel.com/2018/01/18/symlinks-i=
-n-windows/</a><br>
-<br>
-I think since commit bf708f3c4a &quot;optionrom: simplify Makefile&quot; pc=
--bios/optionrom/Makefile in your build directory has to be a symbolic link.=
- Without &#39;set MSYS=3Dwinsymlinks:nativestrict&#39; msys2 ln -s copies t=
-he Makefile instead of creating a symbolic link.<br>
-<br></blockquote><div><br></div><div>Thanks Volker!</div><div><br> </div><d=
-iv>I changed the Windows policy and setting in msys2_shell.cmd. However, I =
-had to edit ming64.ini to uncomment the MSYS=3Dwinsymlinks:nativestrict the=
-re as well to get things going.=C2=A0</div><div><br></div><div>While it is =
-great to have this fix, I can&#39;t say I&#39;m really happy with the need =
-to change the Windows policy and to have to fix msys2.</div><div><br></div>=
-<div>The patches Mark referred to and to which I also pointed earlier did f=
-ix this problem without changing Windows/Msys2/Mingw64 settings.<br></div><=
-div><br></div><div>Best regards,</div><div>Howard<br></div><div><br></div><=
-div><br></div></div></div>
-
---000000000000b8d2d005b1bdb7d8--
 
