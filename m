@@ -2,104 +2,97 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41261C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:26:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF183C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:27:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 956EE20848
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:26:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CCD1C20872
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:27:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="Xl7rqD4t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 956EE20848
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bxo2PRHR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CCD1C20872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40316 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT7xN-0001ji-Hv
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 14:26:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33618)
+	id 1kT7y7-0002IT-J9
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 14:27:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1kT7dc-0000Dv-CK
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 14:06:05 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:53036)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1kT7dW-0002Sa-Du
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 14:06:01 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI4bpc127828;
- Thu, 15 Oct 2020 18:05:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references : in-reply-to :
- references; s=corp-2020-01-29;
- bh=Z6rMg6JdeOZnTBRFic2JLHTUM6e2QEvOj2NK72zqg9k=;
- b=Xl7rqD4tUWtIqWqTVVDl1cTBeGe+Tj+xp+L9XEMxOv1KOpbaYcPTkam7Q8me4fxbBM70
- azyvVEoh/NnzqrgZgfTsr9H8YDEnYkji1M06s/C50Q7e+HUyG/euJ2oRISUTJB6DSYvh
- x3veW8YSzt/lpSng7kLketNbAhT1cZv8CHq0q7nmE4J2iEYEaNwJtbthXLnBXXMRyeSV
- oXVJni10gW4AgqjatP7xOhi3vjGVaoiPztSee+mE8cJyfrj9bxPluG0DNTmSnq//s7WS
- 2eeI38em3VHwJHRvaJDRqIzZ1eYo1Nv5QPHNqlMiMz6IDPFLUYsuqPpO2UYu/U//9gWK uA== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2130.oracle.com with ESMTP id 346g8gkce1-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 15 Oct 2020 18:05:52 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI5e2V040335;
- Thu, 15 Oct 2020 18:05:51 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by userp3020.oracle.com with ESMTP id 344by5hj33-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 15 Oct 2020 18:05:51 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09FI5nSO032583;
- Thu, 15 Oct 2020 18:05:49 GMT
-Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 15 Oct 2020 11:05:49 -0700
-From: Jagannathan Raman <jag.raman@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v11 19/19] multi-process: add configure and usage information
-Date: Thu, 15 Oct 2020 14:05:12 -0400
-Message-Id: <c0c67a48b6ebba7ecb2661d4775c105d2753eebd.1602784930.git.jag.raman@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <cover.1602784930.git.jag.raman@oracle.com>
-References: <cover.1602784930.git.jag.raman@oracle.com>
-In-Reply-To: <cover.1602784930.git.jag.raman@oracle.com>
-References: <cover.1602784930.git.jag.raman@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9775
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
- spamscore=0
- suspectscore=1 mlxscore=0 malwarescore=0 adultscore=0 bulkscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010150121
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9775
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
- suspectscore=1
- priorityscore=1501 phishscore=0 clxscore=1015 spamscore=0 adultscore=0
- mlxscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010150121
-Received-SPF: pass client-ip=141.146.126.79; envelope-from=jag.raman@oracle.com;
- helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 11:04:16
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kT7hT-0005L4-BO; Thu, 15 Oct 2020 14:10:03 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35288)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kT7hR-0002kW-ET; Thu, 15 Oct 2020 14:10:02 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so4747100wrq.2;
+ Thu, 15 Oct 2020 11:10:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=J9GoQMqEWOq9Cqz3aBJf9K5ddKtc3fEhjQajnACJrPk=;
+ b=bxo2PRHRvzgVUMnOjETqwHQCGhVSV+JAEGkzMb3Es9K8Hk+gVVSyvrWNGLVwMWyj8h
+ S7sExRCTqnC/Hiy9CA6Sw4f17Vn/3UBanJkOpq/0h51Zn2khT4iiCqCEGN42gLjmlRYj
+ tGfcPA8Zt257M5tFVxscyZ6DEcd3MlU+E4QOFoAvPkO9OKOIfPTby6gq4MAkdFF1xozq
+ BWCv0eeF34p62Dz8toI5ZwDL2v8Wl7y0fq2S3kuLXMIqL5pUqBmPOoH8N62/wOf0S85K
+ JR3H3dvjr45rBh3Vg4f1s/yVMD5Lf5aetYMR4fwT5viItGoGWSg/PqODPRvWy8BPk0L6
+ RnWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=J9GoQMqEWOq9Cqz3aBJf9K5ddKtc3fEhjQajnACJrPk=;
+ b=D9G4BAL1fa4vWM5R5Ij8GAcB/aqDKp2ua4xKaTjA2NmyxFNh3P7X5TlMLAETgEQ6iW
+ hHpVhOYvzhRsHBSOSn7tflYeaHb0d3+XC/RymNWHoVJmCrUBXgQRjYsDtFI53+UD+sOI
+ an1j08voQ3cvOQFNYly0IKoO3nm3xWYBbCIDb7KTQm52AcTm0Qk1NhRLC51Jrt6IpyaY
+ +wt8hDdJGz0kL6sGlMy4LnmXciYmCzNpKH866hsJp9wHslyTAMa2KXWo2mIGMXdSCXqS
+ uhKeFdXtC1mgaBHYdDDJBKw4FiTGpzZZJqXrIwH5fmBfY4M5QQ5xLgzFvAXeOvK2izVf
+ betA==
+X-Gm-Message-State: AOAM530KKoz4ruYGVP2odY57TNNLOjmJI9ClImqsS3zJ/B990khSYUOc
+ U0XwbCfADFYOtQxpe8rGWzU=
+X-Google-Smtp-Source: ABdhPJz2OscdZTz5zE7UGRt6x/a8VILlM73OPN0yC0puXN/I4/qsmyNLbOhgkltwCNWM6EXbSYyVSg==
+X-Received: by 2002:a5d:6a4f:: with SMTP id t15mr5644171wrw.126.1602785398883; 
+ Thu, 15 Oct 2020 11:09:58 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j17sm32016wrw.68.2020.10.15.11.09.57
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 15 Oct 2020 11:09:58 -0700 (PDT)
+Subject: Re: [PATCH] hw/intc: Rename NIOS2 kconfig as ALTERA_IIC
+To: qemu-devel@nongnu.org, Sandra Loosemore <sandra@codesourcery.com>,
+ Julian Brown <julian@codesourcery.com>,
+ Andrew Jenner <andrew@codesourcery.com>
+References: <20201007130015.2531633-1-f4bug@amsat.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1d3635e5-f8d7-2336-910c-107e21a0cd32@amsat.org>
+Date: Thu, 15 Oct 2020 20:09:57 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
+MIME-Version: 1.0
+In-Reply-To: <20201007130015.2531633-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248, NICE_REPLY_A=-1.019,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,174 +105,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: elena.ufimtseva@oracle.com, fam@euphon.net, swapnil.ingle@nutanix.com,
- john.g.johnson@oracle.com, kraxel@redhat.com, jag.raman@oracle.com,
- quintela@redhat.com, mst@redhat.com, armbru@redhat.com,
- kanth.ghatraju@oracle.com, felipe@nutanix.com, thuth@redhat.com,
- ehabkost@redhat.com, konrad.wilk@oracle.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, stefanha@redhat.com, thanos.makatos@nutanix.com,
- rth@twiddle.net, kwolf@redhat.com, berrange@redhat.com, mreitz@redhat.com,
- ross.lagerwall@citrix.com, marcandre.lureau@gmail.com, pbonzini@redhat.com
+Cc: Marek Vasut <marex@denx.de>, qemu-trivial@nongnu.org,
+ Chris Wulff <crwulff@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+ping?
 
-Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
-Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- MAINTAINERS                |  2 ++
- docs/multi-process.rst     | 67 ++++++++++++++++++++++++++++++++++++++++++++++
- scripts/mpqemu-launcher.py | 49 +++++++++++++++++++++++++++++++++
- 3 files changed, 118 insertions(+)
- create mode 100644 docs/multi-process.rst
- create mode 100755 scripts/mpqemu-launcher.py
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 9a911e0..d12aba7 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -3118,6 +3118,8 @@ F: include/hw/pci/memory-sync.h
- F: hw/i386/remote-iohub.c
- F: include/hw/i386/remote-iohub.h
- F: docs/devel/multi-process.rst
-+F: scripts/mpqemu-launcher.py
-+F: scripts/mpqemu-launcher-perf-mode.py
- 
- Build and test automation
- -------------------------
-diff --git a/docs/multi-process.rst b/docs/multi-process.rst
-new file mode 100644
-index 0000000..c4b022c
---- /dev/null
-+++ b/docs/multi-process.rst
-@@ -0,0 +1,67 @@
-+Multi-process QEMU
-+==================
-+
-+This document describes how to configure and use multi-process qemu.
-+For the design document refer to docs/devel/qemu-multiprocess.
-+
-+1) Configuration
-+----------------
-+
-+To enable support for multi-process add --enable-mpqemu
-+to the list of options for the "configure" script.
-+
-+
-+2) Usage
-+--------
-+
-+Multi-process QEMU requires an orchestrator to launch. Please refer to a
-+light-weight python based orchestrator for mpqemu in
-+scripts/mpqemu-launcher.py to lauch QEMU in multi-process mode.
-+
-+Following is a description of command-line used to launch mpqemu.
-+
-+* Orchestrator:
-+
-+  - The Orchestrator creates a unix socketpair
-+
-+  - It launches the remote process and passes one of the
-+    sockets to it via command-line.
-+
-+  - It then launches QEMU and specifies the other socket as an option
-+    to the Proxy device object
-+
-+* Remote Process:
-+
-+  - QEMU can enter remote process mode by using the "remote" machine
-+    option.
-+
-+  - The orchestrator creates a "remote-object" with details about
-+    the device and the file descriptor for the device
-+
-+  - The remaining options are no different from how one launches QEMU with
-+    devices.
-+
-+  - Example command-line for the remote process is as follows:
-+
-+      /usr/bin/qemu-system-x86_64                                        \
-+      -machine x-remote                                                  \
-+      -device lsi53c895a,id=lsi0                                         \
-+      -drive id=drive_image2,file=/build/ol7-nvme-test-1.qcow2           \
-+      -device scsi-hd,id=drive2,drive=drive_image2,bus=lsi0.0,scsi-id=0  \
-+      -object x-remote-object,id=robj1,devid=lsi1,fd=4,
-+
-+* QEMU:
-+
-+  - Since parts of the RAM are shared between QEMU & remote process, a
-+    memory-backend-memfd is required to facilitate this, as follows:
-+
-+    -object memory-backend-memfd,id=mem,size=2G
-+
-+  - A "x-pci-proxy-dev" device is created for each of the PCI devices emulated
-+    in the remote process. A "socket" sub-option specifies the other end of
-+    unix channel created by orchestrator. The "id" sub-option must be specified
-+    and should be the same as the "id" specified for the remote PCI device
-+
-+  - Example commandline for QEMU is as follows:
-+
-+      -device x-pci-proxy-dev,id=lsi0,socket=3
-diff --git a/scripts/mpqemu-launcher.py b/scripts/mpqemu-launcher.py
-new file mode 100755
-index 0000000..6e0ef22
---- /dev/null
-+++ b/scripts/mpqemu-launcher.py
-@@ -0,0 +1,49 @@
-+#!/usr/bin/env python3
-+import socket
-+import os
-+import subprocess
-+import time
-+
-+PROC_QEMU='/usr/bin/qemu-system-x86_64'
-+
-+proxy, remote = socket.socketpair(socket.AF_UNIX, socket.SOCK_STREAM)
-+
-+remote_cmd = [ PROC_QEMU,                                                      \
-+               '-machine', 'x-remote',                                         \
-+               '-device', 'lsi53c895a,id=lsi1',                                \
-+               '-drive', 'id=drive_image1,file=/build/ol7-nvme-test-1.qcow2',  \
-+               '-device', 'scsi-hd,id=drive1,drive=drive_image1,bus=lsi1.0,'   \
-+                              'scsi-id=0',                                     \
-+               '-object',                                                      \
-+               'x-remote-object,id=robj1,devid=lsi1,fd='+str(remote.fileno()), \
-+               '-nographic',                                                   \
-+             ]
-+
-+proxy_cmd = [ PROC_QEMU,                                                       \
-+              '-name', 'OL7.4',                                                \
-+              '-machine', 'q35,accel=kvm',                                     \
-+              '-smp', 'sockets=1,cores=1,threads=1',                           \
-+              '-m', '2048',                                                    \
-+              '-object', 'memory-backend-memfd,id=sysmem-file,size=2G',        \
-+              '-numa', 'node,memdev=sysmem-file',                              \
-+              '-device', 'virtio-scsi-pci,id=virtio_scsi_pci0',                \
-+              '-drive', 'id=drive_image1,if=none,format=qcow2,'                \
-+                            'file=/home/ol7-hdd-1.qcow2',                      \
-+              '-device', 'scsi-hd,id=image1,drive=drive_image1,'               \
-+                             'bus=virtio_scsi_pci0.0',                         \
-+              '-boot', 'd',                                                    \
-+              '-vnc', ':0',                                                    \
-+              '-device', 'x-pci-proxy-dev,id=lsi1,fd='+str(proxy.fileno()),    \
-+            ]
-+
-+
-+pid = os.fork();
-+
-+if pid:
-+    # In Proxy
-+    print('Launching QEMU with Proxy object');
-+    process = subprocess.Popen(proxy_cmd, pass_fds=[proxy.fileno()])
-+else:
-+    # In remote
-+    print('Launching Remote process');
-+    process = subprocess.Popen(remote_cmd, pass_fds=[remote.fileno()])
--- 
-1.8.3.1
-
+On 10/7/20 3:00 PM, Philippe Mathieu-Daudé wrote:
+> The 'NIOS2' Kconfig symbol is used to select an generic interrupt
+> controller, and has not much to do with the Nios2 target.
+> Rename the symbol as 'ALTERA_IIC'.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>   hw/intc/Kconfig     | 3 +++
+>   hw/intc/meson.build | 2 +-
+>   hw/nios2/Kconfig    | 7 ++-----
+>   3 files changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/hw/intc/Kconfig b/hw/intc/Kconfig
+> index d07954086a..d940c09cde 100644
+> --- a/hw/intc/Kconfig
+> +++ b/hw/intc/Kconfig
+> @@ -73,3 +73,6 @@ config SIFIVE_CLINT
+>   
+>   config SIFIVE_PLIC
+>       bool
+> +
+> +config ALTERA_IIC
+> +    bool
+> diff --git a/hw/intc/meson.build b/hw/intc/meson.build
+> index 3f82cc230a..47c6726b8e 100644
+> --- a/hw/intc/meson.build
+> +++ b/hw/intc/meson.build
+> @@ -37,7 +37,7 @@ specific_ss.add(when: 'CONFIG_IBEX', if_true: files('ibex_plic.c'))
+>   specific_ss.add(when: 'CONFIG_IOAPIC', if_true: files('ioapic.c'))
+>   specific_ss.add(when: 'CONFIG_LOONGSON_LIOINTC', if_true: files('loongson_liointc.c'))
+>   specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_gic.c'))
+> -specific_ss.add(when: 'CONFIG_NIOS2', if_true: files('nios2_iic.c'))
+> +specific_ss.add(when: 'CONFIG_ALTERA_IIC', if_true: files('nios2_iic.c'))
+>   specific_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_intc.c'))
+>   specific_ss.add(when: 'CONFIG_OMPIC', if_true: files('ompic.c'))
+>   specific_ss.add(when: 'CONFIG_OPENPIC_KVM', if_true: files('openpic_kvm.c'))
+> diff --git a/hw/nios2/Kconfig b/hw/nios2/Kconfig
+> index b10ea640da..95e72186af 100644
+> --- a/hw/nios2/Kconfig
+> +++ b/hw/nios2/Kconfig
+> @@ -1,12 +1,9 @@
+>   config NIOS2_10M50
+>       bool
+> -    select NIOS2
+> +    select ALTERA_IIC
+>       select SERIAL
+>       select ALTERA_TIMER
+>   
+>   config NIOS2_GENERIC_NOMMU
+>       bool
+> -    select NIOS2
+> -
+> -config NIOS2
+> -    bool
+> +    select ALTERA_IIC
+> 
 
