@@ -7,64 +7,63 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9DB6C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:49:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:50:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3BCF22222B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:49:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EDC6E2222B
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:50:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="wtr72CB7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BCF22222B
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="355ibJgk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDC6E2222B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39330 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40408 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3dj-0007lB-Ut
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:49:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52906)
+	id 1kT3e2-0008EJ-Hn
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:50:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52824)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WV-0007fv-7Z
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:27 -0400
-Received: from mail-eopbgr750103.outbound.protection.outlook.com
- ([40.107.75.103]:37594 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WO-0007cU-RI
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:20 -0400
+Received: from mail-co1nam11on2103.outbound.protection.outlook.com
+ ([40.107.220.103]:1568 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WT-0000mT-4Z
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:26 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WM-0000mo-Lt
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:20 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DseWEtVhlFicVvxAXqJr9l4HkFgjYKWa8xBSphHH6TOfKKwCTAVdkdRZNMHjNMtGc7EULg1HsAvkPXOat72kWYSaNWzMHlVZV4OIZL6M4E42wpGw3RPYfS70CFxNLNO5nRmcGyhmmXcNPJ1v92klWSIJKn0SBoeVZnnbyeEahqGEL9YaZCkCinKiB8cF94yfncCagC6e0ku6sEN4UBg4iRI3OQuPlE55QrIkNPNAYeh9PkkAElz7VFFJdqluN0RTewZwD2wztdBvs36tbMaXnIzs/IACjqQMsljXJHMZS+BzraW4TjjpK12pw+ug2z9NghXUkavPmMfCvFHpXViPUw==
+ b=naLuXTNA0wqWaVu1WwPZUvvXrOFTtf5O5+CiCzJiYwguzitJvlhk9UD0xygrRHZIaJHoKP7KmRnnul9ds2wy7b0mS2HytfvxHIvbUGh0CaLBLvieX5JvAm8lvkW+0DLx8ehPz8SjrlWPjRdgjZhyzfcfAX5qqJcKk6/Xm1yS05g9dZVvJXrmltTQzGUUWYnlKA5IUhktLXWeK2V72egE0BrdNEXxY8oQr+43hT1Y2H4cdrss7c4IG066s+SO9vx7D6X1E+JKfpWnyzQcv9T7n8trKu7dWPRMJrlqbERp/9AWvi2j58O8caaII+qBlX1hzIW0DZvce0ZVi8NDEviQuQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WScjuUzY/vo2bUYGzpalJuKASEjOyJefrye5Ye3R9Ac=;
- b=Be0BfydF1U1hb22mE8kkvqa0c+lzmmJHP8UJSurJy42Lv0KBALAAP08yW8O84JuLaoMbwaAWXrH7KYPeEZ5LAZnqDfc9AVn+EthwTIvgC8FwO0qX5P+DMa4rE0m3C5gpdmkC253l5ZsTtcm5mAcNgiiVDYfPxohhFHB/lulgXfxGOBZmYSr9F9eldD88WVPKEhLZdoU8L9nv6XAL0GZQwt5odRfYeg2V3XYIHD/1GOxnduYEGIoUMuEux7BJd/O1TCPnm3iBYROOdHJFYEAIRMpRRyPXeeQHehrNwRLIxPENNmewMBdFXJTJGnqXZlpPXCyXA5xE+WFeQOum0LIi4g==
+ bh=UCBBGrfWvyFwZfMWdP1r2U1LXwYwMfU7hllKV3ukG2c=;
+ b=YU+AsaZjm0k0X6ifHR2xRTKaFwdh2y4M/IEQKlwNcCTTlXQc3Phoiuk/QfyhKVOgqon22ATeuqBuDVpN2Fzck+q4ZeyEXmYvtZv7WpY6NOs9UJqKUEbbW/9sq+GVLeaI+Jk3gtzzZPLa8D2N1FQLIKjVwbPEvj2Zd+mJj3PxdPiTde7AwQcJGQnMh8GaafsqbJN4XddvR4np7cIddw11AbkWSdAvcUw4JIJ2Ce9QdsF6Q5zBgLysK4LvepDSajoCR4wUWa7hbtXlu5YzDe58yXV2VPjkAyugb45BPyqySUj4h59XFKYvvGzNJKJDnnaB0GOEChLdQyq/wN7pzz8J0A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WScjuUzY/vo2bUYGzpalJuKASEjOyJefrye5Ye3R9Ac=;
- b=wtr72CB7W2fakUECBXAIpOFDSdXzWmtvvjTwJTcQDwxTWeXe6x6AoTFb3AxCduZ+1S7AXVctblfi78buMU3LzbvFVaXShTw6IR6eU3HKdOAQdnLaO076gFfqGaqr/OhylJd1sT64R8AlPL1RK1iImujHTDe7IpOrFEbhtV/OFM4=
+ bh=UCBBGrfWvyFwZfMWdP1r2U1LXwYwMfU7hllKV3ukG2c=;
+ b=355ibJgkQW+3Sr4/kEDZz1n974x7mXLXUrh9f5T4gfGsBew7vsAyR/fzBnBe33hwQD/P+8obu5J5B/Vrcdp+YqQcZnW7ii8aSG2A8ujBa+qNG2wlvWlOHAyV9AQZ3IHSj85OJ45e+RhQN85PJNVVMrY+gHNKEnolAyHQ9Hh4dPY=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SA0PR03MB5465.namprd03.prod.outlook.com (2603:10b6:806:b5::21)
+ by SA2PR03MB5721.namprd03.prod.outlook.com (2603:10b6:806:117::13)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Thu, 15 Oct
- 2020 13:42:08 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.30; Thu, 15 Oct
+ 2020 13:42:15 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3455.031; Thu, 15 Oct 2020
- 13:42:08 +0000
+ 13:42:15 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 10/16] scripts/oss-fuzz: Add script to reorder a
- general-fuzzer trace
-Date: Thu, 15 Oct 2020 09:41:30 -0400
-Message-Id: <20201015134137.205958-11-alxndr@bu.edu>
+Subject: [PATCH v4 14/16] fuzz: add general-fuzz configs for oss-fuzz
+Date: Thu, 15 Oct 2020 09:41:34 -0400
+Message-Id: <20201015134137.205958-15-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
 References: <20201015134137.205958-1-alxndr@bu.edu>
@@ -80,34 +79,34 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL1PR13CA0055.namprd13.prod.outlook.com (2603:10b6:208:257::30) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend
- Transport; Thu, 15 Oct 2020 13:42:06 +0000
+ Transport; Thu, 15 Oct 2020 13:42:14 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ddaf4fe6-4729-4f3d-1233-08d871101be7
-X-MS-TrafficTypeDiagnostic: SA0PR03MB5465:
+X-MS-Office365-Filtering-Correlation-Id: 6e848cf6-d599-4e42-4d10-08d87110203b
+X-MS-TrafficTypeDiagnostic: SA2PR03MB5721:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR03MB5465BA83283506A5AEA9BE12BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <SA2PR03MB572185F3AB34A62311DA5377BA020@SA2PR03MB5721.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:8273;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0n/JIjT84PRew0UV+Rugh+0txiA8OJrDP6WrtpXH+OjYV2BLhmTrFQAhjxMz57XDOeqvKwlLIO76USTu1QWIz4nA6raFy3upk5ee5NO89gSfoonqn/GiEJovS0kvprVWkox//LINDaDJBRY5AJViiMYnCftpMTbUbAQRTO9NIruecTSqnPvgUURrtCqGvghvIs+xq9wf1/ALO5R0Jx8/7dW0tAZTDAewz7tn7mq+51rUWZsp21git2n67reJm+YcOI3xdkCZvXasZkQ66McMQQqrKMH6oTMSDZub1yVFhlAyR1UHxhq2O5DCtzrm2/I+oUpFqnQeUlJSFYXUeeOf3PrmlE2QaHF5FhS1ODU22eksmBybeHVrTViWkTNSlbXV
+X-Microsoft-Antispam-Message-Info: eGeXTsxs6MLssZ17rtVvnVTVb5VDkrFZg7ceBk+O9KFigBotQ0XGR4zAcdiG3LVY3pAbc0ko60h7hc+G1G5C9jHO01yFZi5SFlRgGOApb1nNUn8fVDY7hlYMejcjLLJybJz4xbLZZ7YHdVsgYU07eT9Vrl4s98uykStiF4pcpNU4dLq1JDWMWq78JHpwmt5lPh5bW/WS5iO/ui8UAcI7vNuOlF+lgnqvyxz3QcOT1Wz02merfEYriER4BpTdHa7zOv5NQPlLtxtXunWpo/TjuFAJZ9T+XSo9BfgiOhkHdOIkcoOHkYePrYSbcaz3BUm9UqYSt6AcTEbtIunOI3+eIMtZruQ/WW8fOnbzyKvdogCnPF68AhgDEXFFay7Y1+Ey
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(5660300002)(54906003)(2616005)(8936002)(34490700002)(1076003)(66476007)(66946007)(6666004)(83380400001)(956004)(4326008)(6512007)(6486002)(8676002)(75432002)(6506007)(26005)(6916009)(52116002)(2906002)(86362001)(186003)(16526019)(786003)(316002)(66556008)(478600001)(36756003);
+ SFS:(4636009)(346002)(376002)(396003)(39860400002)(136003)(366004)(5660300002)(1076003)(34490700002)(26005)(6486002)(66556008)(6512007)(8676002)(86362001)(52116002)(6506007)(8936002)(66946007)(83380400001)(75432002)(4326008)(186003)(956004)(54906003)(16526019)(786003)(2906002)(478600001)(6666004)(36756003)(2616005)(66476007)(6916009)(316002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: Q0i0kexkOo5ujkeEA3dZs8Tz/Jlzead1cmO8WeyqGiD/RJmOlKCCSh7XSxpxyDOuheIuIp48kIDNrNEaOwKNxIVba4pbCjQyVi3+kGxEf1PP/QcfFM+mgoLxdcrpFxo1BMoqzMOnW++wY+PkrEVOgIEw5+e/FPwGWHCtJ1H7R0P53pw+g/4+uksfrvAix1mDbvK/5Kt600qmKmQnmuYVGbeMxV2xfQTv3r05k2b564pqb8hcWHGrBstwh66RKqSQastxXeu+HTsUs3sDABLgtTWqRFd/X532JQDCGT6+y64jdbQ5eMgFM2T9aqJKqqMx+7HAEh1OhQjU2Lj4GJJfoCj8PlY+MulNi3gmtBu/fdr6P5nGNfDbDwCKr79lK/y6LyrJo9+CYitvw6zFon5HpHoXgTEXaiHGgFrhiETFUnAGDO66BPv2TZruwfYu9jAFfupvZAx0iwyqyF9zupdCu0u3fjFRXv+5Lv4ossAWmfBEXzTIqFDqcHnkU26tsLiKc+ki1AljXA6ZkakoH5BDq3kbG7yyUfK10D8DFzzF7j0URv91alazo/0V3gALEV1S1dH9/mSUQJJ/Awfajh0fvMJXzEq4076urK157E3lVGrKDthqaTThvNgcCdXSqzjEIcobkuhaTTUDzt2WHTS69A==
+X-MS-Exchange-AntiSpam-MessageData: Q5fg4VKCE4ycd7zgiQxZnjKQmdFwqFCqCNisRw9C6wNMyw6mcbYXrEwbdq6GOvpw+qXUi1P4j0TMq57T72uAvj/T6f3kbVl6z4Gr/NTshNI8UAvr5qVrTdY+Q94ZE6YwFHidyJqKBvGgZ0XUUi55jIvRsy1uH2StasK5jJBeEXusPTD0YxBclczflcFwTQ4Xo4NEVUsZw5LJ8X06pTxVhxP36E05MBzn4Got1Oulc5UHLIMG1bq3KRI44EjPEF6tUBCUoz4ajnEYsIuq3dZ2TD1p5m9iCOiHxuVzx/+yUl3DLvmF1FbeqJV6nxqBCQNM95i9JLK4wuavh1Vi6XGOGc9d484cuiqsp7XJdSrkZjKcP6Gl3wxfyqLdzz0bxMCu83/YrfNk7pgN0HXgC4rs2rdcGOMkRr6bpkP9CR2KGrvtD3XdOKWGrbGKM+3BJP/tihNRuvF0w2iyW2tnfcv59qVoeQwRrJprjtJs9OG2bedo5VqPb+H1+sGPRrBLtROtwaowHZLzupF7JMic2ergqucmDA8fhmdsxYqLg4z24YU2C6mMaxkQ5nVgQptqq6OA/DeqOmY2v5avZWABft3A08nd2lKYOzvFZ82WffTrcGQmu63OH/D2mL5AV5dDlPEMHtVKeuUV9/QKHZmRbLugWg==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: ddaf4fe6-4729-4f3d-1233-08d871101be7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6e848cf6-d599-4e42-4d10-08d87110203b
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:07.6287 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:15.3734 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m1TA0zzZ/v3jx7+A3UQN4MBQZOYVTUQepXBqsL1WpwIfRA2vpl03QP1wfU6pavsV
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR03MB5465
-Received-SPF: pass client-ip=40.107.75.103; envelope-from=alxndr@bu.edu;
- helo=NAM02-BL2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:14
+X-MS-Exchange-CrossTenant-UserPrincipalName: p6TUi9sBBZ2Aeb2XEhvhZrJw17Z1oQ01S565ykIBb9P40jJr4MVYGF7cx828fonz
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR03MB5721
+Received-SPF: pass client-ip=40.107.220.103; envelope-from=alxndr@bu.edu;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:16
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -129,139 +128,222 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, dimastep@yandex-team.ru
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org, darren.kenny@oracle.com,
+ bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The general-fuzzer uses hooks to fulfill DMA requests just-in-time.
-This means that if we try to use QTEST_LOG=1 to build a reproducer, the
-DMA writes will be logged _after_ the in/out/read/write that triggered
-the DMA read. To work work around this, the general-fuzzer annotates
-these just-in time DMA fulfilments with a tag that we can use to
-discern them. This script simply iterates over a raw qtest
-trace (including log messages, errors, timestamps etc), filters it and
-re-orders it so that DMA fulfillments are placed directly _before_ the
-qtest command that will cause the DMA access.
+Predefine some general-fuzz configs. For each of these, we will create a
+separate FuzzTarget that can be selected through argv0 and, therefore,
+fuzzed on oss-fuzz.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- .../oss-fuzz/reorder_fuzzer_qtest_trace.py    | 103 ++++++++++++++++++
- 1 file changed, 103 insertions(+)
- create mode 100755 scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
 
-diff --git a/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
-new file mode 100755
-index 0000000000..be54de961d
+Maybe this isn't the best way to specify a list string-triples. I saw
+that some files use QLIT_QDICT for purposes that seem similar, however I
+don't think that plays well with multi-line strings. Does anyone have a
+better suggestion?
+
+ tests/qtest/fuzz/general_fuzz_configs.c | 140 ++++++++++++++++++++++++
+ tests/qtest/fuzz/general_fuzz_configs.h |  24 ++++
+ tests/qtest/fuzz/meson.build            |   2 +-
+ 3 files changed, 165 insertions(+), 1 deletion(-)
+ create mode 100644 tests/qtest/fuzz/general_fuzz_configs.c
+ create mode 100644 tests/qtest/fuzz/general_fuzz_configs.h
+
+diff --git a/tests/qtest/fuzz/general_fuzz_configs.c b/tests/qtest/fuzz/general_fuzz_configs.c
+new file mode 100644
+index 0000000000..5364976517
 --- /dev/null
-+++ b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
-@@ -0,0 +1,103 @@
-+#!/usr/bin/env python3
-+# -*- coding: utf-8 -*-
++++ b/tests/qtest/fuzz/general_fuzz_configs.c
+@@ -0,0 +1,140 @@
++/*
++ * General Virtual-Device Fuzzing Target Configs
++ *
++ * Copyright Red Hat Inc., 2020
++ *
++ * Authors:
++ *  Alexander Bulekov   <alxndr@bu.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+"""
-+Use this to convert qtest log info from a generic fuzzer input into a qtest
-+trace that you can feed into a standard qemu-system process. Example usage:
++#include "qemu/osdep.h"
 +
-+QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
-+        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
-+# .. Finds some crash
-+QTEST_LOG=1 FUZZ_SERIALIZE_QTEST=1 \
-+QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
-+        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
-+        /path/to/crash 2> qtest_log_output
-+scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py qtest_log_output > qtest_trace
-+./i386-softmmu/qemu-fuzz-i386 -machine q35,accel=qtest \
-+        -qtest stdin < qtest_trace
++#include "general_fuzz_configs.h"
 +
-+### Details ###
++/*
++ * Specify pre-defined general-fuzz configs here.
++ */
++GArray *get_general_fuzz_configs(void){
 +
-+Some fuzzer make use of hooks that allow us to populate some memory range, just
-+before a DMA read from that range. This means that the fuzzer can produce
-+activity that looks like:
-+    [start] read from mmio addr
-+    [end]   read from mmio addr
-+    [start] write to pio addr
-+        [start] fill a DMA buffer just in time
-+        [end]   fill a DMA buffer just in time
-+        [start] fill a DMA buffer just in time
-+        [end]   fill a DMA buffer just in time
-+    [end]   write to pio addr
-+    [start] read from mmio addr
-+    [end]   read from mmio addr
++    struct general_fuzz_config config;
++    GArray *configs = g_array_new(false, false, sizeof(general_fuzz_config));
 +
-+We annotate these "nested" DMA writes, so with QTEST_LOG=1 the QTest trace
-+might look something like:
-+[R +0.028431] readw 0x10000
-+[R +0.028434] outl 0xc000 0xbeef  # Triggers a DMA read from 0xbeef and 0xbf00
-+[DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
-+[DMA][R +0.034639] write 0xbf00 0x2 0xBBBB
-+[R +0.028431] readw 0xfc000
++    config.name = "virtio-net-pci-slirp";
++    config.args = "-M q35 -nodefaults "
++        "-device virtio-net,netdev=net0 -netdev user,id=net0";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+This script would reorder the above trace so it becomes:
-+readw 0x10000
-+write 0xbeef 0x2 0xAAAA
-+write 0xbf00 0x2 0xBBBB
-+outl 0xc000 0xbeef
-+readw 0xfc000
++    config.name = "virtio-blk";
++    config.args = "-machine q35 -device virtio-blk,drive=disk0 "
++        "-drive file=null-co://,id=disk0,if=none,format=raw";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+I.e. by the time, 0xc000 tries to read from DMA, those DMA buffers have already
-+been set up, removing the need for the DMA hooks. We can simply provide this
-+reordered trace via -qtest stdio to reproduce the input
++    config.name = "virtio-scsi";
++    config.args = "-machine q35 -device virtio-scsi,num_queues=8 "
++        "-device scsi-hd,drive=disk0 "
++        "-drive file=null-co://,id=disk0,if=none,format=raw";
++    config.objects = "scsi* virtio*";
++    g_array_append_val(configs, config);
 +
-+Note: this won't work for traces where the device tries to read from the same
-+DMA region twice in between MMIO/PIO commands. E.g:
-+    [R +0.028434] outl 0xc000 0xbeef
-+    [DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
-+    [DMA][R +0.034639] write 0xbeef 0x2 0xBBBB
++    config.name = "virtio-gpu";
++    config.args = "-machine q35 -nodefaults -device virtio-gpu";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+The fuzzer will annotate suspected double-fetches with [DOUBLE-FETCH]. This
-+script looks for these tags and warns the users that the resulting trace might
-+not reproduce the bug.
-+"""
++    config.name = "virtio-vga";
++    config.args = "-machine q35 -nodefaults -device virtio-vga";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+import sys
++    config.name = "virtio-rng";
++    config.args = "-machine q35 -nodefaults -device virtio-rng";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+__author__     = "Alexander Bulekov <alxndr@bu.edu>"
-+__copyright__  = "Copyright (C) 2020, Red Hat, Inc."
-+__license__    = "GPL version 2 or (at your option) any later version"
++    config.name = "virtio-balloon";
++    config.args = "-machine q35 -nodefaults -device virtio-balloon";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+__maintainer__ = "Alexander Bulekov"
-+__email__      = "alxndr@bu.edu"
++    config.name = "virtio-serial";
++    config.args = "-machine q35 -nodefaults -device virtio-serial";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
++    config.name = "virtio-mouse";
++    config.args = "-machine q35 -nodefaults -device virtio-mouse";
++    config.objects = "virtio*";
++    g_array_append_val(configs, config);
 +
-+def usage():
-+    sys.exit("Usage: {} /path/to/qtest_log_output".format((sys.argv[0])))
++    config.name = "e1000";
++    config.args = "-M q35 -nodefaults "
++        "-device e1000,netdev=net0 -netdev user,id=net0";
++    config.objects = "e1000";
++    g_array_append_val(configs, config);
 +
++    config.name = "e1000e";
++    config.args = "-M q35 -nodefaults "
++        "-device e1000e,netdev=net0 -netdev user,id=net0";
++    config.objects = "e1000e";
++    g_array_append_val(configs, config);
 +
-+def main(filename):
-+    with open(filename, "r") as f:
-+        trace = f.readlines()
++    config.name = "cirrus-vga";
++    config.args = "-machine q35 -nodefaults -device cirrus-vga";
++    config.objects = "cirrus*";
++    g_array_append_val(configs, config);
 +
-+    # Leave only lines that look like logged qtest commands
-+    trace[:] = [x.strip() for x in trace if "[R +" in x
-+                or "[S +" in x and "CLOSED" not in x]
++    config.name = "bochs-display";
++    config.args = "-machine q35 -nodefaults -device bochs-display";
++    config.objects = "bochs*";
++    g_array_append_val(configs, config);
 +
-+    for i in range(len(trace)):
-+        if i+1 < len(trace):
-+            if "[DMA]" in trace[i+1]:
-+                if "[DOUBLE-FETCH]" in trace[i+1]:
-+                    sys.stderr.write("Warning: Likely double fetch on line {}.\n"
-+                                     "There will likely be problems reproducing "
-+                                     "behavior with the "
-+                                     "resulting qtest trace\n\n".format(i+1))
-+                trace[i], trace[i+1] = trace[i+1], trace[i]
-+    for line in trace:
-+        print(line.split("]")[-1].strip())
++    config.name = "intel-hda";
++    config.args = "-machine q35 -nodefaults -device intel-hda,id=hda0 "
++        "-device hda-output,bus=hda0.0 -device hda-micro,bus=hda0.0 "
++        "-device hda-duplex,bus=hda0.0";
++    config.objects = "intel-hda";
++    g_array_append_val(configs, config);
 +
++    config.name = "ide-hd";
++    config.args = "-machine q35 -nodefaults "
++        "-drive file=null-co://,if=none,format=raw,id=disk0 "
++        "-device ide-hd,drive=disk0";
++    config.objects = "ahci*";
++    g_array_append_val(configs, config);
 +
-+if __name__ == '__main__':
-+    if len(sys.argv) == 1:
-+        usage()
-+    main(sys.argv[1])
++    config.name = "floppy";
++    config.args = "-machine pc -nodefaults -device floppy,id=floppy0 "
++        "-drive id=disk0,file=null-co://,file.read-zeroes=on,if=none "
++        "-device floppy,drive=disk0,drive-type=288";
++    config.objects = "fd* floppy*";
++    g_array_append_val(configs, config);
++
++    config.name = "xhci";
++    config.args = "-machine q35 -nodefaults"
++        "-drive file=null-co://,if=none,format=raw,id=disk0 "
++        "-device qemu-xhci,id=xhci -device usb-tablet,bus=xhci.0 "
++        "-device usb-bot -device usb-storage,drive=disk0 "
++        "-chardev null,id=cd0 -chardev null,id=cd1 "
++        "-device usb-braille,chardev=cd0 -device usb-ccid -device usb-ccid "
++        "-device usb-kbd -device usb-mouse -device usb-serial,chardev=cd1 "
++        "-device usb-tablet -device usb-wacom-tablet -device usb-audio";
++    config.objects = "*usb* *uhci* *xhci*";
++    g_array_append_val(configs, config);
++
++    config.name = "pc-i440fx";
++    config.args = "-machine pc";
++    config.objects = "*";
++    g_array_append_val(configs, config);
++
++    config.name = "pc-q35";
++    config.args = "-machine q35";
++    config.objects = "*";
++    g_array_append_val(configs, config);
++
++    return configs;
++}
+diff --git a/tests/qtest/fuzz/general_fuzz_configs.h b/tests/qtest/fuzz/general_fuzz_configs.h
+new file mode 100644
+index 0000000000..afea8dee92
+--- /dev/null
++++ b/tests/qtest/fuzz/general_fuzz_configs.h
+@@ -0,0 +1,24 @@
++/*
++ * General Virtual-Device Fuzzing Target Configs
++ *
++ * Copyright Red Hat Inc., 2020
++ *
++ * Authors:
++ *  Alexander Bulekov   <alxndr@bu.edu>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
++
++#ifndef GENERAL_FUZZ_CONFIGS_H
++#define GENERAL_FUZZ_CONFIGS_H
++
++#include "qemu/osdep.h"
++
++typedef struct general_fuzz_config {
++    const char *name, *args, *objects;
++} general_fuzz_config;
++
++GArray *get_general_fuzz_configs(void);
++
++#endif
+diff --git a/tests/qtest/fuzz/meson.build b/tests/qtest/fuzz/meson.build
+index a59de6aa8c..42f97555bf 100644
+--- a/tests/qtest/fuzz/meson.build
++++ b/tests/qtest/fuzz/meson.build
+@@ -5,7 +5,7 @@ specific_fuzz_ss.add(files('fuzz.c', 'fork_fuzz.c', 'qos_fuzz.c',
+ specific_fuzz_ss.add(when: 'CONFIG_I440FX', if_true: files('i440fx_fuzz.c'))
+ specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_NET', if_true: files('virtio_net_fuzz.c'))
+ specific_fuzz_ss.add(when: 'CONFIG_VIRTIO_SCSI', if_true: files('virtio_scsi_fuzz.c'))
+-specific_fuzz_ss.add(files('general_fuzz.c'))
++specific_fuzz_ss.add(files('general_fuzz.c', 'general_fuzz_configs.c'))
+ 
+ fork_fuzz = declare_dependency(
+   link_args: config_host['FUZZ_EXE_LDFLAGS'].split() +
 -- 
 2.28.0
 
