@@ -2,61 +2,115 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BF2FC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C09E3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:39:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D612218AC
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:39:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D612218AC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id 07C4A212CC
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:39:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QWa7cKca"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07C4A212CC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43402 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44014 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT4PE-0005LC-8i
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:39:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38956)
+	id 1kT4PR-0005ce-Vm
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:39:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38998)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT4OB-0004dY-2i
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:37:55 -0400
-Received: from relay68.bu.edu ([128.197.228.73]:40254)
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kT4OG-0004iH-Mi
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:38:00 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:3194)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT4O8-0008RA-M3
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:37:54 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 09FEaZBa008412
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Thu, 15 Oct 2020 10:36:38 -0400
-Date: Thu, 15 Oct 2020 10:36:35 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kT4OC-0008Ri-Nd
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:38:00 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09FEVLtt076294; Thu, 15 Oct 2020 10:37:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : mime-version : content-type :
+ content-transfer-encoding; s=pp1;
+ bh=MDuTS/y549hqA5SJuI3DNaE7Za5SAfUYdXaN/hHXlj4=;
+ b=QWa7cKcaroWXaEkw23Y6ZwZQAvsG0uCokdhOwlQ6mkmSBUX/lvJAFGq9D8PH35hAo4qY
+ Crr4s1HsrA5d00HhAIHLnCav1W1IRF0X+NKF3+JSp+z3Fa7+3a3MYok4LSXRtRZro8v7
+ R7LWAKsN0Hgl5r0pmaYggpdFATt/a7icAyg77q4Xg9H6AjKRtykPbdhnsnHHTOKCBHU2
+ DCMMP9rzH4khvhgvxapsN6YiJbF1yA8Hrjc+RHtodOM8GwlcxiCr1sxT72Qefph3BYIp
+ Kq1b4NT6I7CJwMwqvKt1pPSMlumo0Vx40ZF2lhryqXS4P4QTzUxwKvetZNse6bYw0Muk fA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 346nb8y1t2-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 15 Oct 2020 10:37:53 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09FEWHhd079519;
+ Thu, 15 Oct 2020 10:37:52 -0400
+Received: from ppma02dal.us.ibm.com (a.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.10])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 346nb8y1sn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 15 Oct 2020 10:37:52 -0400
+Received: from pps.filterd (ppma02dal.us.ibm.com [127.0.0.1])
+ by ppma02dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09FEHuAx010091;
+ Thu, 15 Oct 2020 14:37:52 GMT
+Received: from b01cxnp22034.gho.pok.ibm.com (b01cxnp22034.gho.pok.ibm.com
+ [9.57.198.24]) by ppma02dal.us.ibm.com with ESMTP id 3434ka53n4-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 15 Oct 2020 14:37:51 +0000
+Received: from b01ledav003.gho.pok.ibm.com (b01ledav003.gho.pok.ibm.com
+ [9.57.199.108])
+ by b01cxnp22034.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09FEbpxC34472208
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 15 Oct 2020 14:37:51 GMT
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 3035CB2067;
+ Thu, 15 Oct 2020 14:37:51 +0000 (GMT)
+Received: from b01ledav003.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id A3F38B205F;
+ Thu, 15 Oct 2020 14:37:50 +0000 (GMT)
+Received: from localhost.localdomain (unknown [9.65.217.166])
+ by b01ledav003.gho.pok.ibm.com (Postfix) with ESMTP;
+ Thu, 15 Oct 2020 14:37:50 +0000 (GMT)
+From: tobin@linux.ibm.com
 To: qemu-devel@nongnu.org
-Subject: Re: [PATCH v4 04/16] fuzz: Add DMA support to the generic-fuzzer
-Message-ID: <20201015143635.pl3ih7tcvmel4quy@mozz.bu.edu>
-References: <20201015134137.205958-1-alxndr@bu.edu>
- <20201015134137.205958-5-alxndr@bu.edu>
+Subject: [PATCH v5] sev: add sev-inject-launch-secret
+Date: Thu, 15 Oct 2020 10:37:13 -0400
+Message-Id: <20201015143713.14682-1-tobin@linux.ibm.com>
+X-Mailer: git-send-email 2.20.1 (Apple Git-117)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201015134137.205958-5-alxndr@bu.edu>
-Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
- helo=relay68.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:44:03
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.998, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
+ definitions=2020-10-15_08:2020-10-14,
+ 2020-10-15 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ bulkscore=0 suspectscore=1
+ mlxlogscore=999 phishscore=0 spamscore=0 priorityscore=1501
+ lowpriorityscore=0 adultscore=0 mlxscore=0 clxscore=1015 impostorscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010150099
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=tobin@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:16:15
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -26
+X-Spam_score: -2.7
+X-Spam_bar: --
+X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -69,342 +123,253 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, dimastep@yandex-team.ru
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
+ tobin@ibm.com, dgilbert@redhat.com,
+ Tobin Feldman-Fitzthum <tobin@linux.ibm.com>, pbonzini@redhat.com,
+ berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 201015 0941, Alexander Bulekov wrote:
-> When a virtual-device tries to access some buffer in memory over DMA, we
-> add call-backs into the fuzzer(next commit). The fuzzer checks verifies
-> that the DMA request maps to a physical RAM address and fills the memory
-> with fuzzer-provided data. The patterns that we use to fill this memory
-> are specified using add_dma_pattern and clear_dma_patterns operations.
-> 
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-> ---
->  tests/qtest/fuzz/general_fuzz.c | 230 ++++++++++++++++++++++++++++++++
->  1 file changed, 230 insertions(+)
-> 
-> diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
-> index ef754843ed..0fd42a16da 100644
-> --- a/tests/qtest/fuzz/general_fuzz.c
-> +++ b/tests/qtest/fuzz/general_fuzz.c
-> @@ -25,6 +25,7 @@
->  #include "exec/address-spaces.h"
->  #include "hw/qdev-core.h"
->  #include "hw/pci/pci.h"
-> +#include "hw/boards.h"
->  
->  /*
->   * SEPARATOR is used to separate "operations" in the fuzz input
-> @@ -38,12 +39,16 @@ enum cmds {
->      OP_WRITE,
->      OP_PCI_READ,
->      OP_PCI_WRITE,
-> +    OP_ADD_DMA_PATTERN,
-> +    OP_CLEAR_DMA_PATTERNS,
->      OP_CLOCK_STEP,
->  };
->  
->  #define DEFAULT_TIMEOUT_US 100000
->  #define USEC_IN_SEC 100000000
->  
-> +#define MAX_DMA_FILL_SIZE 0x10000
-> +
->  #define PCI_HOST_BRIDGE_CFG 0xcf8
->  #define PCI_HOST_BRIDGE_DATA 0xcfc
->  
-> @@ -56,6 +61,24 @@ static useconds_t timeout = 100000;
->  
->  static bool qtest_log_enabled;
->  
-> +/*
-> + * A pattern used to populate a DMA region or perform a memwrite. This is
-> + * useful for e.g. populating tables of unique addresses.
-> + * Example {.index = 1; .stride = 2; .len = 3; .data = "\x00\x01\x02"}
-> + * Renders as: 00 01 02   00 03 02   00 05 02   00 07 02 ...
-> + */
-> +typedef struct {
-> +    uint8_t index;      /* Index of a byte to increment by stride */
-> +    uint8_t stride;     /* Increment each index'th byte by this amount */
-> +    size_t len;
-> +    const uint8_t *data;
-> +} pattern;
-> +
-> +/* Avoid filling the same DMA region between MMIO/PIO commands ? */
-> +static bool avoid_double_fetches;
-> +
-> +static QTestState *qts_global; /* Need a global for the DMA callback */
-> +
->  /*
->   * List of memory regions that are children of QOM objects specified by the
->   * user for fuzzing.
-> @@ -84,6 +107,169 @@ static int get_io_address_cb(ram_addr_t start, ram_addr_t size,
->      return 0;
->  }
->  
-> +/*
-> + * List of dma regions populated since the last fuzzing command. Used to ensure
-> + * that we only write to each DMA address once, to avoid race conditions when
-> + * building reproducers.
-> + */
-> +static GArray *dma_regions;
-> +
-> +static GArray *dma_patterns;
-> +static int dma_pattern_index;
-> +
-> +void fuzz_dma_read_cb(size_t addr, size_t len, MemoryRegion *mr, bool is_write);
-> +
-> +/*
-> + * Allocate a block of memory and populate it with a pattern.
-> + */
-> +static void *pattern_alloc(pattern p, size_t len)
-> +{
-> +    int i;
-> +    uint8_t *buf = g_malloc(len);
-> +    uint8_t sum = 0;
-> +
-> +    for (i = 0; i < len; ++i) {
-> +        buf[i] = p.data[i % p.len];
-> +        if ((i % p.len) == p.index) {
-> +            buf[i] += sum;
-> +            sum += p.stride;
-> +        }
-> +    }
-> +    return buf;
-> +}
-> +
-> +static int memory_access_size(MemoryRegion *mr, unsigned l, hwaddr addr)
-> +{
-> +    unsigned access_size_max = mr->ops->valid.max_access_size;
-> +
-> +    /* Regions are assumed to support 1-4 byte accesses unless
-> +       otherwise specified.  */
-> +    if (access_size_max == 0) {
-> +        access_size_max = 4;
-> +    }
-> +
-> +    /* Bound the maximum access by the alignment of the address.  */
-> +    if (!mr->ops->impl.unaligned) {
-> +        unsigned align_size_max = addr & -addr;
-> +        if (align_size_max != 0 && align_size_max < access_size_max) {
-> +            access_size_max = align_size_max;
-> +        }
-> +    }
-> +
-> +    /* Don't attempt accesses larger than the maximum.  */
-> +    if (l > access_size_max) {
-> +        l = access_size_max;
-> +    }
-> +    l = pow2floor(l);
-> +
-> +    return l;
-> +}
-> +
-> +/*
-> + * Call-back for functions that perform DMA reads from guest memory. Confirm
-> + * that the region has not already been populated since the last loop in
-> + * general_fuzz(), avoiding potential race-conditions, which we don't have
-> + * a good way for reproducing right now.
-> + */
-> +void fuzz_dma_read_cb(size_t addr, size_t len, MemoryRegion *mr, bool is_write)
-> +{
-> +    /* Are we in the general-fuzzer or are we using another fuzz-target? */
-> +    if (!qts_global) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * Return immediately if:
-> +     * - We have no DMA patterns defined
-> +     * - The length of the DMA read request is zero
-> +     * - The DMA read is hitting an MR other than the machine's main RAM
-> +     * - The DMA request is not a read (what happens for a address_space_map
-> +     *   with is_write=True? Can the device use the same pointer to do reads?)
-> +     * - The DMA request hits past the bounds of our RAM
-> +     */
-> +    if (dma_patterns->len == 0
-> +        || len == 0
-> +        || mr != MACHINE(qdev_get_machine())->ram
-> +        || is_write
-> +        || addr > current_machine->ram_size) {
-> +        return;
-> +    }
-> +
-> +    /*
-> +     * If we overlap with any existing dma_regions, split the range and only
-> +     * populate the non-overlapping parts.
-> +     */
-> +    address_range region;
-> +    bool double_fetch = false;
-> +    for (int i = 0;
-> +         i < dma_regions->len && (avoid_double_fetches || qtest_log_enabled);
-> +         ++i) {
-> +        region = g_array_index(dma_regions, address_range, i);
-> +        if (addr < region.addr + region.size && addr + len > region.addr) {
-> +            double_fetch = true;
-> +            if (addr < region.addr
-> +                && avoid_double_fetches) {
-> +                fuzz_dma_read_cb(addr, region.addr - addr, mr, is_write);
-> +            }
-> +            if (addr + len > region.addr + region.size
-> +                && avoid_double_fetches) {
-> +                fuzz_dma_read_cb(region.addr + region.size,
-> +                        addr + len - (region.addr + region.size), mr, is_write);
-> +            }
-> +            return;
-> +        }
-> +    }
-> +
-> +    /* Cap the length of the DMA access to something reasonable */
-> +    len = MIN(len, MAX_DMA_FILL_SIZE);
-> +
-> +    address_range ar = {addr, len};
-> +    g_array_append_val(dma_regions, ar);
-> +    pattern p = g_array_index(dma_patterns, pattern, dma_pattern_index);
-> +    void *buf = pattern_alloc(p, ar.size);
-> +    hwaddr l, addr1;
-> +    MemoryRegion *mr1;
-> +    uint8_t *ram_ptr;
-> +    while (len > 0) {
-> +        l = len;
-> +        mr1 = address_space_translate(first_cpu->as,
-> +                                      addr, &addr1, &l, true,
-> +                                      MEMTXATTRS_UNSPECIFIED);
-> +
-> +        if (!(memory_region_is_ram(mr1) ||
-> +              memory_region_is_romd(mr1))) {
-> +            l = memory_access_size(mr1, l, addr1);
-> +        } else {
-> +            /* ROM/RAM case */
-> +            ram_ptr = qemu_map_ram_ptr(mr1->ram_block, addr1);
-> +            memcpy(ram_ptr, buf, l);
-> +            break;
-> +        }
-> +        len -= l;
-> +        buf += l;
-> +        addr += l;
-> +
-> +    }
-> +    if (qtest_log_enabled) {
-> +        /*
-> +         * With QTEST_LOG, use a normal, slow QTest memwrite. Prefix the log
-> +         * that will be written by qtest.c with a DMA tag, so we can reorder
-> +         * the resulting QTest trace so the DMA fills precede the last PIO/MMIO
-> +         * command.
-> +         */
-> +        fprintf(stderr, "[DMA] ");
-> +        if (double_fetch) {
-> +            fprintf(stderr, "[DOUBLE-FETCH] ");
-> +        }
-> +        fflush(stderr);
-> +        qtest_memwrite(qts_global, ar.addr, buf, ar.size);
-> +    }
-       ^^ This if statement should end  above the qtest_memwrite...
--Alex
-> +    g_free(buf);
-> +
-> +    /* Increment the index of the pattern for the next DMA access */
-> +    dma_pattern_index = (dma_pattern_index + 1) % dma_patterns->len;
-> +}
-> +
->  /*
->   * Here we want to convert a fuzzer-provided [io-region-index, offset] to
->   * a physical address. To do this, we iterate over all of the matched
-> @@ -346,6 +532,35 @@ static void op_pci_write(QTestState *s, const unsigned char * data, size_t len)
->      }
->  }
->  
-> +static void op_add_dma_pattern(QTestState *s,
-> +                               const unsigned char *data, size_t len)
-> +{
-> +    struct {
-> +        /*
-> +         * index and stride can be used to increment the index-th byte of the
-> +         * pattern by the value stride, for each loop of the pattern.
-> +         */
-> +        uint8_t index;
-> +        uint8_t stride;
-> +    } a;
-> +
-> +    if (len < sizeof(a) + 1) {
-> +        return;
-> +    }
-> +    memcpy(&a, data, sizeof(a));
-> +    pattern p = {a.index, a.stride, len - sizeof(a), data + sizeof(a)};
-> +    p.index = a.index % p.len;
-> +    g_array_append_val(dma_patterns, p);
-> +    return;
-> +}
-> +
-> +static void op_clear_dma_patterns(QTestState *s,
-> +                                  const unsigned char *data, size_t len)
-> +{
-> +    g_array_set_size(dma_patterns, 0);
-> +    dma_pattern_index = 0;
-> +}
-> +
->  static void op_clock_step(QTestState *s, const unsigned char *data, size_t len)
->  {
->      qtest_clock_step_next(s);
-> @@ -405,6 +620,8 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
->          [OP_WRITE]              = op_write,
->          [OP_PCI_READ]           = op_pci_read,
->          [OP_PCI_WRITE]          = op_pci_write,
-> +        [OP_ADD_DMA_PATTERN]    = op_add_dma_pattern,
-> +        [OP_CLEAR_DMA_PATTERNS] = op_clear_dma_patterns,
->          [OP_CLOCK_STEP]         = op_clock_step,
->      };
->      const unsigned char *cmd = Data;
-> @@ -434,6 +651,8 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
->              setitimer(ITIMER_VIRTUAL, &timer, NULL);
->          }
->  
-> +        op_clear_dma_patterns(s, NULL, 0);
-> +
->          while (cmd && Size) {
->              /* Get the length until the next command or end of input */
->              nextcmd = memmem(cmd, Size, SEPARATOR, strlen(SEPARATOR));
-> @@ -450,6 +669,7 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
->              /* Advance to the next command */
->              cmd = nextcmd ? nextcmd + sizeof(SEPARATOR) - 1 : nextcmd;
->              Size = Size - (cmd_len + sizeof(SEPARATOR) - 1);
-> +            g_array_set_size(dma_regions, 0);
->          }
->          _Exit(0);
->      } else {
-> @@ -464,6 +684,9 @@ static void usage(void)
->      printf("QEMU_FUZZ_ARGS= the command line arguments passed to qemu\n");
->      printf("QEMU_FUZZ_OBJECTS= "
->              "a space separated list of QOM type names for objects to fuzz\n");
-> +    printf("Optionally: QEMU_AVOID_DOUBLE_FETCH= "
-> +            "Try to avoid racy DMA double fetch bugs? %d by default\n",
-> +            avoid_double_fetches);
->      printf("Optionally: QEMU_FUZZ_TIMEOUT= Specify a custom timeout (us). "
->              "0 to disable. %d by default\n", timeout);
->      exit(0);
-> @@ -534,9 +757,16 @@ static void general_pre_fuzz(QTestState *s)
->      if (getenv("QTEST_LOG")) {
->          qtest_log_enabled = 1;
->      }
-> +    if (getenv("QEMU_AVOID_DOUBLE_FETCH")) {
-> +        avoid_double_fetches = 1;
-> +    }
->      if (getenv("QEMU_FUZZ_TIMEOUT")) {
->          timeout = g_ascii_strtoll(getenv("QEMU_FUZZ_TIMEOUT"), NULL, 0);
->      }
-> +    qts_global = s;
-> +
-> +    dma_regions = g_array_new(false, false, sizeof(address_range));
-> +    dma_patterns = g_array_new(false, false, sizeof(pattern));
->  
->      fuzzable_memoryregions = g_hash_table_new(NULL, NULL);
->      fuzzable_pci_devices   = g_ptr_array_new();
-> -- 
-> 2.28.0
-> 
+From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+
+AMD SEV allows a guest owner to inject a secret blob
+into the memory of a virtual machine. The secret is
+encrypted with the SEV Transport Encryption Key and
+integrity is guaranteed with the Transport Integrity
+Key. Although QEMU facilitates the injection of the
+launch secret, it cannot access the secret.
+
+Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ include/monitor/monitor.h |  3 ++
+ include/sysemu/sev.h      |  2 ++
+ monitor/misc.c            |  8 ++---
+ qapi/misc-target.json     | 18 +++++++++++
+ target/i386/monitor.c     |  7 +++++
+ target/i386/sev-stub.c    |  5 +++
+ target/i386/sev.c         | 65 +++++++++++++++++++++++++++++++++++++++
+ target/i386/trace-events  |  1 +
+ 8 files changed, 105 insertions(+), 4 deletions(-)
+
+diff --git a/include/monitor/monitor.h b/include/monitor/monitor.h
+index 348bfad3d5..af3887bb71 100644
+--- a/include/monitor/monitor.h
++++ b/include/monitor/monitor.h
+@@ -4,6 +4,7 @@
+ #include "block/block.h"
+ #include "qapi/qapi-types-misc.h"
+ #include "qemu/readline.h"
++#include "include/exec/hwaddr.h"
+ 
+ typedef struct MonitorHMP MonitorHMP;
+ typedef struct MonitorOptions MonitorOptions;
+@@ -37,6 +38,8 @@ void monitor_flush(Monitor *mon);
+ int monitor_set_cpu(Monitor *mon, int cpu_index);
+ int monitor_get_cpu_index(Monitor *mon);
+ 
++void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp);
++
+ void monitor_read_command(MonitorHMP *mon, int show_prompt);
+ int monitor_read_password(MonitorHMP *mon, ReadLineFunc *readline_func,
+                           void *opaque);
+diff --git a/include/sysemu/sev.h b/include/sysemu/sev.h
+index 98c1ec8d38..7ab6e3e31d 100644
+--- a/include/sysemu/sev.h
++++ b/include/sysemu/sev.h
+@@ -18,4 +18,6 @@
+ 
+ void *sev_guest_init(const char *id);
+ int sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len);
++int sev_inject_launch_secret(const char *hdr, const char *secret,
++                             uint64_t gpa, Error **errp);
+ #endif
+diff --git a/monitor/misc.c b/monitor/misc.c
+index 4a859fb24a..f1ade245d5 100644
+--- a/monitor/misc.c
++++ b/monitor/misc.c
+@@ -667,10 +667,10 @@ static void hmp_physical_memory_dump(Monitor *mon, const QDict *qdict)
+     memory_dump(mon, count, format, size, addr, 1);
+ }
+ 
+-static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
++void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp)
+ {
+     MemoryRegionSection mrs = memory_region_find(get_system_memory(),
+-                                                 addr, 1);
++                                                 addr, size);
+ 
+     if (!mrs.mr) {
+         error_setg(errp, "No memory is mapped at address 0x%" HWADDR_PRIx, addr);
+@@ -694,7 +694,7 @@ static void hmp_gpa2hva(Monitor *mon, const QDict *qdict)
+     MemoryRegion *mr = NULL;
+     void *ptr;
+ 
+-    ptr = gpa2hva(&mr, addr, &local_err);
++    ptr = gpa2hva(&mr, addr, 1, &local_err);
+     if (local_err) {
+         error_report_err(local_err);
+         return;
+@@ -770,7 +770,7 @@ static void hmp_gpa2hpa(Monitor *mon, const QDict *qdict)
+     void *ptr;
+     uint64_t physaddr;
+ 
+-    ptr = gpa2hva(&mr, addr, &local_err);
++    ptr = gpa2hva(&mr, addr, 1, &local_err);
+     if (local_err) {
+         error_report_err(local_err);
+         return;
+diff --git a/qapi/misc-target.json b/qapi/misc-target.json
+index 1e561fa97b..4486a543ae 100644
+--- a/qapi/misc-target.json
++++ b/qapi/misc-target.json
+@@ -201,6 +201,24 @@
+ { 'command': 'query-sev-capabilities', 'returns': 'SevCapability',
+   'if': 'defined(TARGET_I386)' }
+ 
++##
++# @sev-inject-launch-secret:
++#
++# This command injects a secret blob into memory of SEV guest.
++#
++# @packet-header: the launch secret packet header encoded in base64
++#
++# @secret: the launch secret data to be injected encoded in base64
++#
++# @gpa: the guest physical address where secret will be injected.
++#
++# Since: 5.2
++#
++##
++{ 'command': 'sev-inject-launch-secret',
++  'data': { 'packet-header': 'str', 'secret': 'str', 'gpa': 'uint64' },
++  'if': 'defined(TARGET_I386)' }
++
+ ##
+ # @dump-skeys:
+ #
+diff --git a/target/i386/monitor.c b/target/i386/monitor.c
+index 7abae3c8df..f9d4951465 100644
+--- a/target/i386/monitor.c
++++ b/target/i386/monitor.c
+@@ -728,3 +728,10 @@ SevCapability *qmp_query_sev_capabilities(Error **errp)
+ {
+     return sev_get_capabilities(errp);
+ }
++
++void qmp_sev_inject_launch_secret(const char *packet_hdr,
++                                  const char *secret, uint64_t gpa,
++                                  Error **errp)
++{
++    sev_inject_launch_secret(packet_hdr, secret, gpa, errp);
++}
+diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
+index 88e3f39a1e..2d2ee54cc6 100644
+--- a/target/i386/sev-stub.c
++++ b/target/i386/sev-stub.c
+@@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
+     error_setg(errp, "SEV is not available in this QEMU");
+     return NULL;
+ }
++int sev_inject_launch_secret(const char *hdr, const char *secret,
++                             uint64_t gpa)
++{
++    return 1;
++}
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 93c4d60b82..1546606811 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -29,6 +29,8 @@
+ #include "trace.h"
+ #include "migration/blocker.h"
+ #include "qom/object.h"
++#include "exec/address-spaces.h"
++#include "monitor/monitor.h"
+ 
+ #define TYPE_SEV_GUEST "sev-guest"
+ OBJECT_DECLARE_SIMPLE_TYPE(SevGuestState, SEV_GUEST)
+@@ -785,6 +787,69 @@ sev_encrypt_data(void *handle, uint8_t *ptr, uint64_t len)
+     return 0;
+ }
+ 
++int sev_inject_launch_secret(const char *packet_hdr, const char *secret,
++                             uint64_t gpa, Error **errp)
++{
++    struct kvm_sev_launch_secret input;
++    g_autofree guchar *data = NULL, *hdr = NULL;
++    int error, ret = 1;
++    void *hva;
++    gsize hdr_sz = 0, data_sz = 0;
++    MemoryRegion *mr = NULL;
++
++    if (!sev_guest) {
++        error_setg(errp, "SEV: SEV not enabled.");
++        return 1;
++    }
++
++    /* secret can be injected only in this state */
++    if (!sev_check_state(sev_guest, SEV_STATE_LAUNCH_SECRET)) {
++        error_setg(errp, "SEV: Not in correct state. (LSECRET) %x",
++                     sev_guest->state);
++        return 1;
++    }
++
++    hdr = g_base64_decode(packet_hdr, &hdr_sz);
++    if (!hdr || !hdr_sz) {
++        error_setg(errp, "SEV: Failed to decode sequence header");
++        return 1;
++    }
++
++    data = g_base64_decode(secret, &data_sz);
++    if (!data || !data_sz) {
++        error_setg(errp, "SEV: Failed to decode data");
++        return 1;
++    }
++
++    hva = gpa2hva(&mr, gpa, data_sz, errp);
++    if (!hva) {
++        error_prepend(errp, "SEV: Failed to calculate guest address: ");
++        return 1;
++    }
++
++    input.hdr_uaddr = (uint64_t)(unsigned long)hdr;
++    input.hdr_len = hdr_sz;
++
++    input.trans_uaddr = (uint64_t)(unsigned long)data;
++    input.trans_len = data_sz;
++
++    input.guest_uaddr = (uint64_t)(unsigned long)hva;
++    input.guest_len = data_sz;
++
++    trace_kvm_sev_launch_secret(gpa, input.guest_uaddr,
++                                input.trans_uaddr, input.trans_len);
++
++    ret = sev_ioctl(sev_guest->sev_fd, KVM_SEV_LAUNCH_SECRET,
++                    &input, &error);
++    if (ret) {
++        error_setg(errp, "SEV: failed to inject secret ret=%d fw_error=%d '%s'",
++                     ret, error, fw_error_to_str(error));
++        return ret;
++    }
++
++    return 0;
++}
++
+ static void
+ sev_register_types(void)
+ {
+diff --git a/target/i386/trace-events b/target/i386/trace-events
+index 789c700d4a..9f299e94a2 100644
+--- a/target/i386/trace-events
++++ b/target/i386/trace-events
+@@ -15,3 +15,4 @@ kvm_sev_launch_start(int policy, void *session, void *pdh) "policy 0x%x session
+ kvm_sev_launch_update_data(void *addr, uint64_t len) "addr %p len 0x%" PRIu64
+ kvm_sev_launch_measurement(const char *value) "data %s"
+ kvm_sev_launch_finish(void) ""
++kvm_sev_launch_secret(uint64_t hpa, uint64_t hva, uint64_t secret, int len) "hpa 0x%" PRIx64 " hva 0x%" PRIx64 " data 0x%" PRIx64 " len %d"
+-- 
+2.20.1 (Apple Git-117)
+
 
