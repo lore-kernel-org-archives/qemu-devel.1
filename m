@@ -2,80 +2,81 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B2C6C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 20:18:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A4E6C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 20:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FA742074A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 20:18:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5293B2074A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 20:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LQ9wA3ew"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FA742074A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jZ1aDZZY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5293B2074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35112 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT9hQ-0005IV-W0
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 16:18:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33870)
+	id 1kT9id-0006Nh-CR
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 16:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kT9dL-0002PY-Ow; Thu, 15 Oct 2020 16:13:55 -0400
-Received: from mail-pj1-x1044.google.com ([2607:f8b0:4864:20::1044]:51590)
+ id 1kT9dP-0002Wj-9f; Thu, 15 Oct 2020 16:13:59 -0400
+Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:40194)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kT9dK-0001tH-7z; Thu, 15 Oct 2020 16:13:55 -0400
-Received: by mail-pj1-x1044.google.com with SMTP id a17so60050pju.1;
- Thu, 15 Oct 2020 13:13:52 -0700 (PDT)
+ id 1kT9dN-0001tl-IE; Thu, 15 Oct 2020 16:13:58 -0400
+Received: by mail-pl1-x642.google.com with SMTP id d23so2219916pll.7;
+ Thu, 15 Oct 2020 13:13:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=lzkmOsgdiyDfkLzbjc8ow0qh97P5IHNxbPWiTbiz7Dg=;
- b=LQ9wA3ewA1vAVpRuL09SXwn44rsFDGRzbyoGyc9mzjqG4hDN7g9Pjpl0Twcqu817pQ
- vgb7jd2T8xuHkJb68cmS6vypDoCJJMi7ElIGl40ZrDabWR1b5PN9Q6m60kyVkVq9Sc82
- uCYU3t0zFs+5WGHI3pzY6KE3wS55wefKJGxGvOOGV+PbFE0qYFtjDfb4OyfdzM13I+/n
- AhxDZE8cZymwXtz4bscBce5yn4nLM7+h6e/T9qPyCfjZy/e8yHY46rsVH7puCRr5xBur
- w7SYQBUmdf8EmK7XghuVVo5SMfnvfFAQfGXprva8qunJ97ThRB9ZNBoDRffXt3JDb6RK
- 9xSQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=wF+RcJqzfCr+BV1mB/A5rZx8x6O9otAFA5Q++rjKL+g=;
+ b=jZ1aDZZYD84BXSo1DU71rum+u8oI/WJKl88cANj4QxKTh0fS41L1tZxu9wO39JzoUt
+ ecAISymJgk9TEOyX09Km7oiI6rXDewyujQGCJvh950OP+17ViGvE1xJvZ8Q3sMRXtiHM
+ aYg4ZbwNxK+8q8HVgaYl/RWi/7VhY2NI3pCjOE/CAo92bGCvxj/273wEdHH4oYX1jbR7
+ KCiM3xo8HUcU0yQs8PsyEm9n8bseLXm5bJM16F6rN2gGvUkhl7eixbse7K6IZsVE3h5H
+ PoXCxmQO5J+A3PLKw3N4N/jHnqCfKQv1V3IaC2ZtVVA4Y04/0bFGj4yt6Ec+Lt6aiEmC
+ 3F8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=lzkmOsgdiyDfkLzbjc8ow0qh97P5IHNxbPWiTbiz7Dg=;
- b=fZWJdtAfZvhFj+cqEKJlE/OWBqsmN5OEsPhHvJUMio57tJlXDWBUHTSp13cUf/PTdW
- c6kOFIGBJGmE5FAd5wHZ3wjUr8gT3YZ6hYKCqc6eYmVjCUw0TB2TXABwvwOelzrFrFv/
- oWvmccB9bnqLLbu3h8GZpEGkpZtndqDba5T2Pq8HAlpjlfw2U225oCRHWuCBL+FPg4Qa
- 3vP6umP4qVzoUs6qR+ISu5btISpRPrtWYqFGFSqqWbjHUEDOukHvod9uGIeQlWuOL406
- i6Eb8JJyCP7ynITGCN6xdibxsEVY1Y83Xj4zTEaPy2HCPSMt8nX7C7yM41y5xFYEkbpc
- ttDg==
-X-Gm-Message-State: AOAM533YIhh4Avfr6LkpbFydhl4wTYrpRStpWd6pfPVTLUfY+jDp1FPy
- kipAd7e1tnvp5XILtHONRhJezvWF9W8B4o42
-X-Google-Smtp-Source: ABdhPJzYY7csfQ9NUlcCyPzsR4nEtEF/ns398ecooW3OjZcLkPE85ygmttvMEFWLoKVDI/61dPGlOQ==
-X-Received: by 2002:a17:902:7042:b029:d5:c0e6:8e35 with SMTP id
- h2-20020a1709027042b02900d5c0e68e35mr247654plt.9.1602792831463; 
- Thu, 15 Oct 2020 13:13:51 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=wF+RcJqzfCr+BV1mB/A5rZx8x6O9otAFA5Q++rjKL+g=;
+ b=SSZHCejZgNZigbmKKcyhFEzZxSwjbQiSprB15IQWBIOOI6drXdq0Z7zLprKMzVFNT1
+ nnX26zFIzrkmsPxSjGFuxFBBMm69hkDWRIhl/DHZaLf+F8CdlG29/63uZ+MEXeUI/1Ti
+ XBSWuF01abM2CuoDrOMr+5GIlLqoTt2dbEbNfTpVNhtoHsItNhlZobdMlOrZZGx3i2h2
+ 8Y4Fw+bp/gmluEbFOmqsmlZMXGV0YGUsMKlcR0ZQwcEO/3FV77Hje+ef1OkKg4dVnmIk
+ 3xRL/1Y2Fei0ZeYoGL5aMBPzlEJSRVfaBata+Agm8HOCXnGl4fNLds7cgx8meYM62hAl
+ n+Nw==
+X-Gm-Message-State: AOAM531i5jx7/+8Qd9/w6TSFJAMcRNZCrJuchpJnBknxNHkjLVE3oiOn
+ Dgkuad/jrwWwdJEOzhfKyq8zaUyLB9Qhzrth
+X-Google-Smtp-Source: ABdhPJy4ShsPLizukGG1vwRprrxFfW2uFI6CFxux/FiCOC8H8wLe18xcgzjy/ZPJMrUiYyRrN6FEZw==
+X-Received: by 2002:a17:90a:46c2:: with SMTP id x2mr431480pjg.60.1602792834915; 
+ Thu, 15 Oct 2020 13:13:54 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id s20sm89922pfc.201.2020.10.15.13.13.48
+ by smtp.googlemail.com with ESMTPSA id s20sm89922pfc.201.2020.10.15.13.13.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Oct 2020 13:13:50 -0700 (PDT)
+ Thu, 15 Oct 2020 13:13:54 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 0/2] Fixes building nfs on msys2/mingw
-Date: Fri, 16 Oct 2020 04:13:33 +0800
-Message-Id: <20201015201335.357-1-luoyonggang@gmail.com>
+Subject: [PATCH v3 1/2] block: Fixes nfs compiling error on msys2/mingw
+Date: Fri, 16 Oct 2020 04:13:34 +0800
+Message-Id: <20201015201335.357-2-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20201015201335.357-1-luoyonggang@gmail.com>
+References: <20201015201335.357-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1044;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1044.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pl1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,21 +105,113 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Revise the commit message of=0D
-* block: enable libnfs on msys2/mingw in cirrus.yml=0D
-=0D
-V1-V2=0D
-Apply suggestion from  Peter Lieven=0D
-=0D
-Yonggang Luo (2):=0D
-  block: Fixes nfs compiling error on msys2/mingw=0D
-  block: enable libnfs on msys2/mingw in cirrus.yml=0D
-=0D
- .cirrus.yml |  1 +=0D
- block/nfs.c | 15 +++++++++++++++=0D
- 2 files changed, 16 insertions(+)=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+These compiling errors are fixed:
+../block/nfs.c:27:10: fatal error: poll.h: No such file or directory
+   27 | #include <poll.h>
+      |          ^~~~~~~~
+compilation terminated.
+
+../block/nfs.c:63:5: error: unknown type name 'blkcnt_t'
+   63 |     blkcnt_t st_blocks;
+      |     ^~~~~~~~
+../block/nfs.c: In function 'nfs_client_open':
+../block/nfs.c:550:27: error: 'struct _stat64' has no member named 'st_blocks'
+  550 |     client->st_blocks = st.st_blocks;
+      |                           ^
+../block/nfs.c: In function 'nfs_get_allocated_file_size':
+../block/nfs.c:751:41: error: 'struct _stat64' has no member named 'st_blocks'
+  751 |     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+      |                                         ^
+../block/nfs.c: In function 'nfs_reopen_prepare':
+../block/nfs.c:805:31: error: 'struct _stat64' has no member named 'st_blocks'
+  805 |         client->st_blocks = st.st_blocks;
+      |                               ^
+../block/nfs.c: In function 'nfs_get_allocated_file_size':
+../block/nfs.c:752:1: error: control reaches end of non-void function [-Werror=return-type]
+  752 | }
+      | ^
+
+On msys2/mingw, there is no st_blocks in struct _stat64 yet, we disable the usage of it
+on msys2/mingw, and create a typedef long long blkcnt_t; for further implementation
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ block/nfs.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/block/nfs.c b/block/nfs.c
+index f86e660374..cf8795fb49 100644
+--- a/block/nfs.c
++++ b/block/nfs.c
+@@ -24,7 +24,9 @@
+ 
+ #include "qemu/osdep.h"
+ 
++#if !defined(_WIN32)
+ #include <poll.h>
++#endif
+ #include "qemu/config-file.h"
+ #include "qemu/error-report.h"
+ #include "qapi/error.h"
+@@ -51,6 +53,10 @@
+ #define QEMU_NFS_MAX_PAGECACHE_SIZE (8388608 / NFS_BLKSIZE)
+ #define QEMU_NFS_MAX_DEBUG_LEVEL 2
+ 
++#if defined(_WIN32)
++typedef long long blkcnt_t;
++#endif
++
+ typedef struct NFSClient {
+     struct nfs_context *context;
+     struct nfsfh *fh;
+@@ -545,7 +551,9 @@ static int64_t nfs_client_open(NFSClient *client, BlockdevOptionsNfs *opts,
+     }
+ 
+     ret = DIV_ROUND_UP(st.st_size, BDRV_SECTOR_SIZE);
++#if !defined(_WIN32)
+     client->st_blocks = st.st_blocks;
++#endif
+     client->has_zero_init = S_ISREG(st.st_mode);
+     *strp = '/';
+     goto out;
+@@ -706,6 +714,7 @@ static int nfs_has_zero_init(BlockDriverState *bs)
+     return client->has_zero_init;
+ }
+ 
++#if !defined(_WIN32)
+ /* Called (via nfs_service) with QemuMutex held.  */
+ static void
+ nfs_get_allocated_file_size_cb(int ret, struct nfs_context *nfs, void *data,
+@@ -748,6 +757,7 @@ static int64_t nfs_get_allocated_file_size(BlockDriverState *bs)
+ 
+     return (task.ret < 0 ? task.ret : st.st_blocks * 512);
+ }
++#endif
+ 
+ static int coroutine_fn
+ nfs_file_co_truncate(BlockDriverState *bs, int64_t offset, bool exact,
+@@ -800,7 +810,9 @@ static int nfs_reopen_prepare(BDRVReopenState *state,
+                        nfs_get_error(client->context));
+             return ret;
+         }
++#if !defined(_WIN32)
+         client->st_blocks = st.st_blocks;
++#endif
+     }
+ 
+     return 0;
+@@ -869,7 +881,10 @@ static BlockDriver bdrv_nfs = {
+     .create_opts                    = &nfs_create_opts,
+ 
+     .bdrv_has_zero_init             = nfs_has_zero_init,
++/* libnfs does not provide the allocated filesize of a file on win32. */
++#if !defined(_WIN32)
+     .bdrv_get_allocated_file_size   = nfs_get_allocated_file_size,
++#endif
+     .bdrv_co_truncate               = nfs_file_co_truncate,
+ 
+     .bdrv_file_open                 = nfs_file_open,
+-- 
+2.28.0.windows.1
+
 
