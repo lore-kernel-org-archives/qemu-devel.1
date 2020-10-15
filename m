@@ -1,90 +1,78 @@
-Return-Path: <SRS0=kfsL=DV=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 156C8C433E7
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 23:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D545FC43457
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 01:59:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 508402072D
-	for <qemu-devel@archiver.kernel.org>; Wed, 14 Oct 2020 23:26:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QbrAY2F3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 508402072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1C5B422255
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 01:59:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C5B422255
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34162 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSq9m-0001GB-21
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 19:26:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38322)
+	id 1kSsYe-0002PT-OO
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 21:59:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSq8a-0000id-P0
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 19:24:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52969)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kSq8X-0008Bz-TI
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 19:24:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602717887;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UPNpdCyuBDgLyzGGvzszCj/88eVghs+UychuaVpG3ZE=;
- b=QbrAY2F3xNK1o+Bcz+Y/MoSR93OyLALjHGRKRbUeKRLXpoKFtuXPi80Fggcg0rc/KoCWzw
- 3te7TOY86ZzDW7tHbrtSsYSDz471L/L3PJIk3UCnYDP81xUtXfFFYu1g//4yMYqjS4yGbh
- SIjgukHkz5QWkJhu3d8H40hoCMyeBAI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-519-x99NccvjMjeHODDQe-YL4w-1; Wed, 14 Oct 2020 19:24:41 -0400
-X-MC-Unique: x99NccvjMjeHODDQe-YL4w-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F031107AD65;
- Wed, 14 Oct 2020 23:24:40 +0000 (UTC)
-Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
- [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id B09DF55798;
- Wed, 14 Oct 2020 23:24:32 +0000 (UTC)
-Date: Wed, 14 Oct 2020 19:24:30 -0400
-From: Cleber Rosa <crosa@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
-Subject: Re: [PATCH v3 4/4] Jobs based on custom runners: add job definitions
- for QEMU's machines
-Message-ID: <20201014232430.GB1203215@localhost.localdomain>
-References: <20201014052140.1146924-1-crosa@redhat.com>
- <20201014052140.1146924-5-crosa@redhat.com>
- <20201014174655.GW115189@redhat.com>
- <20201014211356.GA1199212@localhost.localdomain>
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kSsY4-0001vT-6F; Wed, 14 Oct 2020 21:59:20 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2941 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kSsY1-0001C6-Ul; Wed, 14 Oct 2020 21:59:19 -0400
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.56])
+ by Forcepoint Email with ESMTP id 46B0638D758FBDA6EFA6;
+ Thu, 15 Oct 2020 09:59:09 +0800 (CST)
+Received: from dggemm752-chm.china.huawei.com (10.1.198.58) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Thu, 15 Oct 2020 09:59:09 +0800
+Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
+ dggemm752-chm.china.huawei.com (10.1.198.58) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Thu, 15 Oct 2020 09:59:08 +0800
+Received: from dggpemm000001.china.huawei.com ([7.185.36.245]) by
+ dggpemm000001.china.huawei.com ([7.185.36.245]) with mapi id 15.01.1913.007;
+ Thu, 15 Oct 2020 09:59:08 +0800
+From: Jiangyifei <jiangyifei@huawei.com>
+To: Richard Henderson <richard.henderson@linaro.org>, "qemu-devel@nongnu.org"
+ <qemu-devel@nongnu.org>, "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>
+Subject: RE: [PATCH V3] target/riscv: raise exception to HS-mode at
+ get_physical_address
+Thread-Topic: [PATCH V3] target/riscv: raise exception to HS-mode at
+ get_physical_address
+Thread-Index: AQHWohNE6JEoJnOKqEGoroIi+CF7z6mXBQMAgADinAA=
+Date: Thu, 15 Oct 2020 01:59:08 +0000
+Message-ID: <cd12acc6aa7b4f1d84859f14200cf75d@huawei.com>
+References: <20201014101728.848-1-jiangyifei@huawei.com>
+ <ee4b99ec-5842-6638-ecff-54096ec0b0e8@linaro.org>
+In-Reply-To: <ee4b99ec-5842-6638-ecff-54096ec0b0e8@linaro.org>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.185.47]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-In-Reply-To: <20201014211356.GA1199212@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="+pHx0qQiF2pBVqBT"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 01:12:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.187;
+ envelope-from=jiangyifei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/14 21:59:10
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,79 +85,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Erik Skultety <eskultet@redhat.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
- Stefan Hajnoczi <stefanha@gmail.com>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Beraldo Leal <bleal@redhat.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>,
+ "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>,
+ "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
+ "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>,
+ yinyipeng <yinyipeng1@huawei.com>, "palmer@dabbelt.com" <palmer@dabbelt.com>,
+ "Wubin \(H\)" <wu.wubin@huawei.com>, "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---+pHx0qQiF2pBVqBT
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 14, 2020 at 05:14:01PM -0400, Cleber Rosa wrote:
-> On Wed, Oct 14, 2020 at 06:46:55PM +0100, Daniel P. Berrang=E9 wrote:
-> >=20
-> > This bug links to
-> >=20
-> >   https://bugs.launchpad.net/ubuntu/+source/libssh/+bug/1847514
-> >=20
-> > which is marked as fixed. So I'm thinking we can drop the --disable-lib=
-ssh
-> > arg from all these jobs
-> >
->=20
-> OK, I'll double check that and, if the fix is comfirmed beyond the bug
-> tracker, I'll update it.
->=20
-
-I was still able to reproduce the build failure with the latest packages.
-
-The last update on the bug, is very misleading, but there's a hint of
-its outcome:
-
----
-Martin Wimpress (flexiondotorg) on 2019-12-17
-tags:=09added: rls-bb-notfixing
-tags:=09removed: bionic
-no longer affects:=09libssh (Ubuntu Bionic)
----
-
-So, *notfixing* means it no longer affects that package on that
-distro? Right...
-
-Anyway, keeping this AS IS.
-
-Regards,
-- Cleber.
-
---+pHx0qQiF2pBVqBT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+HiKwACgkQZX6NM6Xy
-CfNWCg/+N4LbLYl24Zq/49hFhAYNPf3KiM7FXFmlpuaNcSqCeO5K2wwd+WT8p+rs
-BGw15IfQA2Akhgdr8dfD31Rl48pFIbkXPgYtGdxDnAe0fa9TprbuzLwsXByLTDhH
-Sk+TiBVCtWhr46r8SAbSKanMUSGpGy3jEnlf/ly6dgydMlsvaDUjsrSyWqz8bLh/
-BGkQtUUVPXj0UhfV/V/1C7ryjYGIwfGWw85rUqczABfoPMhUBm5s1tRRSrYSeWPM
-y/HJTC/ZLax9atGN2jnU+zBaMXRokjuHzCEjUSvfInx8RbE9QrzTLfAMScN/6Oos
-P4MX4RIDyxLTaaDpPDrwN/7FthamrBDRAWB0ZZ2CqqUFHjj/ImkYQgl0Gty1JLdO
-HfteQO8lvlndRRhXgW+2EVt7yruXGnbGQD9tVa5mKJwsl5+p5S/nosPU0/6zAUlg
-LOGEeFZIyNuQWnm5RmOpLHNLmdtMbf85y5XcNJUrP+nAdrbhrYOQmMqkZYYgCeXX
-StL6AMIvD3wiI4okN8b09StFTDwQdD+30fzVxmbjgSVRjcQi7Jqoxy8w/L7KqTzJ
-ymK7tSMziMffr64XpMgljaXTWRK91c5z6hBFqef9JiL/9+BTTRKoEz8vZ9Wj54Z3
-qmvY3MBPz95Ki49JckGR8UjJ6mt85Jis5erTWNfCES79Z3m0i40=
-=wxPS
------END PGP SIGNATURE-----
-
---+pHx0qQiF2pBVqBT--
-
+DQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFJpY2hhcmQgSGVuZGVyc29u
+IFttYWlsdG86cmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZ10NCj4gU2VudDogVGh1cnNkYXks
+IE9jdG9iZXIgMTUsIDIwMjAgNDoyMiBBTQ0KPiBUbzogSmlhbmd5aWZlaSA8amlhbmd5aWZlaUBo
+dWF3ZWkuY29tPjsgcWVtdS1kZXZlbEBub25nbnUub3JnOw0KPiBxZW11LXJpc2N2QG5vbmdudS5v
+cmcNCj4gQ2M6IHBhbG1lckBkYWJiZWx0LmNvbTsgQWxpc3RhaXIuRnJhbmNpc0B3ZGMuY29tOw0K
+PiBzYWdhcmtAZWVjcy5iZXJrZWxleS5lZHU7IGtiYXN0aWFuQG1haWwudW5pLXBhZGVyYm9ybi5k
+ZTsgWmhhbmd4aWFvZmVuZw0KPiAoRikgPHZpY3Rvci56aGFuZ3hpYW9mZW5nQGh1YXdlaS5jb20+
+OyBXdWJpbiAoSCkgPHd1Lnd1YmluQGh1YXdlaS5jb20+Ow0KPiBaaGFuZ2hhaWxpYW5nIDx6aGFu
+Zy56aGFuZ2hhaWxpYW5nQGh1YXdlaS5jb20+OyBkZW5na2FpIChBKQ0KPiA8ZGVuZ2thaTFAaHVh
+d2VpLmNvbT47IHlpbnlpcGVuZyA8eWlueWlwZW5nMUBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBS
+ZTogW1BBVENIIFYzXSB0YXJnZXQvcmlzY3Y6IHJhaXNlIGV4Y2VwdGlvbiB0byBIUy1tb2RlIGF0
+DQo+IGdldF9waHlzaWNhbF9hZGRyZXNzDQo+IA0KPiBPbiAxMC8xNC8yMCAzOjE3IEFNLCBZaWZl
+aSBKaWFuZyB3cm90ZToNCj4gPiArICAgICAgICAgICAgICAgIGlmIChmYXVsdF9wdGVfYWRkcikg
+ew0KPiA+ICsgICAgICAgICAgICAgICAgICAgICpmYXVsdF9wdGVfYWRkciA9IChiYXNlICsgaWR4
+ICogcHRlc2l6ZSkgPj4gMjsNCj4gDQo+IFRoZSBzaGlmdCBpcyB3cm9uZy4gIEl0IHNob3VsZCBi
+ZSBleGFjdGx5IGxpa2UuLi4NCj4gDQoNCldlIGhhdmUgdGVzdGVkIGluIHRoZSBWTSBtaWdyYXRp
+b24uDQoNCmZhdWx0X3B0ZV9hZGRyIHdpbGwgZXZlbnR1YWxseSBiZSBhc3NpZ25lZCB0byBodHZh
+bCByZWdpc3Rlci4NCg0KRGVzY3JpcHRpb24gb2YgaHR2YWwgcmVnaXN0ZXIgYWNjb3JkaW5nIHRv
+IHRoZSBzcGVjaWZpY2F0aW9uOg0KV2hlbiBhIGd1ZXN0LXBhZ2UtZmF1bHQgdHJhcCBpcyB0YWtl
+biBpbnRvIEhTLW1vZGUsIGh0dmFsIGlzIHdyaXR0ZW4gd2l0aCBlaXRoZXIgemVybw0Kb3IgdGhl
+IGd1ZXN0IHBoeXNpY2FsIGFkZHJlc3MgdGhhdCBmYXVsdGVkLCBzaGlmdGVkIHJpZ2h0IGJ5IDIg
+Yml0cy4NCg0KSW4gYWRkaXRpb24sIGZhdWx0X3B0ZV9hZGRyIGlzIG5hbWVkIGFmdGVyIGVudi0+
+Z3Vlc3RfcGh5c19mYXVsdF9hZGRyLCB3aGljaCBtYWtlcw0Kc2Vuc2UgaW4gYSBzZW5zZS4NCg0K
+WWlmZWkNCg0KPiA+ICsgICAgICAgICAgICAgICAgfQ0KPiA+ICsgICAgICAgICAgICAgICAgcmV0
+dXJuIFRSQU5TTEFURV9HX1NUQUdFX0ZBSUw7DQo+ID4gICAgICAgICAgICAgIH0NCj4gPg0KPiA+
+ICAgICAgICAgICAgICBwdGVfYWRkciA9IHZiYXNlICsgaWR4ICogcHRlc2l6ZTsNCj4gDQo+IC4u
+LiB0aGlzLg0KPiANCj4gDQo+IHJ+DQo=
 
