@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B382C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBCD3C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:52:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A96752223F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B10C22248
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:52:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="KLKrp7ag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A96752223F
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="fnIdjTmE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B10C22248
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3fl-0002Xc-Bc
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:52:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52924)
+	id 1kT3gP-0003JS-9d
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:52:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52870)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WW-0007gO-E5
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:28 -0400
-Received: from mail-eopbgr750112.outbound.protection.outlook.com
- ([40.107.75.112]:30180 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WS-0007fI-Fu
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:24 -0400
+Received: from mail-eopbgr750103.outbound.protection.outlook.com
+ ([40.107.75.103]:37594 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WT-0000kr-Pa
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:27 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WP-0000mT-Qz
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:23 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mnzRMn2AiJiP9B25sbvyg4e7w991keDReA2BhPQvrwfNvDV7gr+MjSjigGwRSnXYAoKeJYPKURlv6qLKOhLZdwA4P9KtXk3PspJVVnjKLCVBxA+EIx1n5+oSjX37IWev/e0+X17QCHLou+iiUjQSqswIE3xFA/IQP04cXqoxkZfd0LWJbdROhZFd7zV2QK/fzcRJbdTmoMrDOTo+imdhrQXfUBM4kdUHBbrK0fOrkAHEQR8Z08big9OBjdywLqscM+P+dsNV7tzRIaXWDKh7n51gmkoTUfiYNy/yM99VNmdWV7cIjCvD7kYKKCmleEhzC9PcdfvrTLxqauBmozQzZw==
+ b=htdh9hdCfoA0/HNfwbjcR8hzPbdbwGE6jesfSr6GKVOvEAGsN61BHj1YT5lFXTvrKndA+zipihUON5/azG1fKXg1FWB1gE+uwsBtEGcaYU+bD9I/0e6Ptr/w8YAevbanQtMuo4eYU0ZS1Pz+Tn4fuixkT60UFfPYpKasH1ZdfnuXHWXR9xfK31b8ctHZ3UMPJf/ID8pgwHliycL/laa589K+mm5mJo8hx/asaOKuIebT9tvQEAB2idWZO3yxv2V/4Md68Iv0i/3Mp+RMnev6pEEbf/4u6hAyBXPsUu47Pwc0hWusd+yp1nnGlIc+3WRb+9RArX3M1+z/CK+z6OqCmw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hEFUshzLvCD3WoaBe1HXg+kvAmJfN0iQC9/oKOMPCBY=;
- b=QSWplBEO14WM3IY9J3vc7fpzhb/rE2QBU7BuexnlotFFhlc8M4jl7aaqA9F7wNDGVSwVhx1iXQ3fgsj6bBoManY8LgTwENM+uAZTdMEd/6j2ZM0PtDjJsst0xzq+Clz4pBvI8rc6xAzl8ZloX5jeEBkLbf8eeMnmEIoNP9chCNq63LW6veTfMtfuVlAvFFVr59p+aETOOjflzRE9WUTFUpPFUEn6lc/Jqaiiafbr+UyE8YGGol4/PfnbhftYwE6DNsPjea3dmXSJRyXr1MhZqpX8tRjZpb8TVk+yxeYOSUD10F/f7lvOKz2BKQbhWghMUpM61WWkcmg5uA8MzFfR2g==
+ bh=9Oq3f7e7uOrwatNI1t5E8DKlQvhKHtRG10y754C+dYs=;
+ b=ANjYamRCxbcM14oXXHyTnrBMWbYAeLcmKYtoVZ+uJh0DYifMWuXWi8cAlT3Tfi+4nRhxLAIdCrERzOk4uDxj4ql/GmCYqJ8y1kAIlnL8JrQYAPY1yWjWSpWzcDY6zUZVkdRRzkdC0qqFpv4duBXFrtUFKjU7S922AWdJNXkNVLBSsCldFczkzWrKMfHyW7FBPHQJ6qsHWp6scJUJSLnLfV8vwDpIji8EiWctzBjSk4dxxRxxJX2ABpRxa1F1U7jgSSYDiLpeTdUIZ1SzxJVAsD/Ji88KOLgTT3zcEWil2qlSVFpL+lKNxkJZo6Npnx9TwkljEbhg85I6J5iSTY0YwA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hEFUshzLvCD3WoaBe1HXg+kvAmJfN0iQC9/oKOMPCBY=;
- b=KLKrp7agBYhm2tZ8UsJaoKjZ0NzUItBY9UyxcKHvxzwM77sq8+bwjE9YnfbmxDb6LLstOH4otSdhiZPK3O1rlzLoyfUHRJNkzNr7pP6yyDUOoC1YuEcdqtmJmM/nJUcU9tuNrsxX1EGm62KUC5mzy9SAAG6iSNDoWcLwpLh6nTE=
+ bh=9Oq3f7e7uOrwatNI1t5E8DKlQvhKHtRG10y754C+dYs=;
+ b=fnIdjTmEjXD6+HvWHzU+6txzgIxDFfhwBFUeNUmLw5dz2JqJaz5eLo+PSCw8CaE8XmbU9lcRbTuvhRLPL60OzLzOBYt1DJ+eJW6rhV0O4PaxE7z3ugxKLnj/OBvxo8+nAe1BO7cWHoWnEUtUE4lJ4kRDAEb4EJdvAor0rxjRrYU=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SA0PR03MB5465.namprd03.prod.outlook.com (2603:10b6:806:b5::21)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Thu, 15 Oct
- 2020 13:42:09 +0000
+ 2020 13:42:05 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3455.031; Thu, 15 Oct 2020
- 13:42:09 +0000
+ 13:42:04 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 11/16] scripts/oss-fuzz: Add crash trace minimization script
-Date: Thu, 15 Oct 2020 09:41:31 -0400
-Message-Id: <20201015134137.205958-12-alxndr@bu.edu>
+Subject: [PATCH v4 08/16] fuzz: add a DISABLE_PCI op to general-fuzzer
+Date: Thu, 15 Oct 2020 09:41:28 -0400
+Message-Id: <20201015134137.205958-9-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
 References: <20201015134137.205958-1-alxndr@bu.edu>
@@ -79,34 +79,34 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL1PR13CA0055.namprd13.prod.outlook.com (2603:10b6:208:257::30) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend
- Transport; Thu, 15 Oct 2020 13:42:08 +0000
+ Transport; Thu, 15 Oct 2020 13:42:03 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7742fc98-b48c-4141-8e53-08d871101cbe
+X-MS-Office365-Filtering-Correlation-Id: 5bd423aa-7062-4237-b235-08d871101a31
 X-MS-TrafficTypeDiagnostic: SA0PR03MB5465:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR03MB5465D5EA81C4A4AD7812E788BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1923;
+X-Microsoft-Antispam-PRVS: <SA0PR03MB54654538E6AF46B33B015668BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:49;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 9XwjS3phOsO/tHMStSQnPa8cSb+GKs15nIHnBcLNcgA9Sikq4qYiQb2qoVUdoGIRi5hHNiOtd7QElND7yW1YhtREbzJCFGlviWckmaHE5teJOu18a/D2RzgJJ8Q3vE7v/zbq7vfP78AgOtYDvotSyHbQNsXeBvQ3zsXPuzIoOWaIWCGhc0LfW9KCpdPUCkhNQ4JpUdJBPNvameDY9fq3Lq9KHpPYPE8wYeuyNRzxfAPMF/WfLf/1lODYcksq2cK5La6xnMzetWT5JFmtPUdtEl8n8KaK4AGreQL7hKlYwmimPiHX45QVf1HwO9LN88KKQQLLda6a3PqaYkMASWi9nmbjgxye5SYZD4eF+4UMwY2qJOcEOXeLKtZN5tZyneKd
+X-Microsoft-Antispam-Message-Info: Rj+UN48/3Kilwf9/mMvoo86AMw3DfJYMhGnhjgWS1M+Rkq8LhiH8aqhA/89R8gkAJfjCqxRti3owKeVHfwIcnKdYk0Y1Vl8zg00R3Ql7e93luaXtsOe1N/i+4FEX3l2HRbAolkN1grzfpiWnlS/qVjwG7fQdf6qeksbpy4P0wKMnznwa87Pvdugzp5nn3BpgE2gU9MF/hKQk06ZhC4XatMpNOx6kHaH6aeF4EM3Itgxa6GnmZKV22WqrCDtc6qgNsVp8tPmkeueShxqvDNUpu5zOYPpDUU+9yRb2TOl83NFZqHTJEKPhMW6dn9ORG1+I2/x9RyAsKfAogKM+siHIl/VMvfhAZv7/Gz9B6eDkD7CrAYEScs8IUnlWF6INbcO3
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
  SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(5660300002)(54906003)(2616005)(8936002)(34490700002)(1076003)(66476007)(66946007)(6666004)(83380400001)(956004)(4326008)(6512007)(6486002)(8676002)(75432002)(6506007)(26005)(6916009)(52116002)(2906002)(86362001)(186003)(16526019)(786003)(316002)(66556008)(478600001)(36756003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: A6n8foDwuxo25GJ43qIu+535KhVdH8ZFvrxYsiHgqs0M6SikCq/Lbi1ZVSGs7oJzoU8CeCWWKYBttq9ymYBcGbvJ2+nQWH+fW1q1KQWSSb/YrqKQ7V65DyffxW5hnBRPO04OWRq09yAMZW5GyCDGYzBduB9USPY293bfDsV6rcO8V/io9qkT13Trthtn98QSFN2sIcN8g+2db0A/30FRZeWmZ4vTACj7pde8BXDaph8cwtQAD8sDh4zd23/5EdUyuKbEPVpnFxfSFOO0gLpUdseASTH/EnArGZcZ59YXgA5kJngFjqfI8A2TeGK65pTfOxvOIOyY0M6NtpT1Tf5ARq88PbIeAuNHqCSak7yCS2s6ZYg2QJs4s6Q6Htf+OCpn6XmNQnIn6hn9gp6c2tYAXbcr9So0HnuRv/CZoP5Ss1h0nk+jhmRnkLoZZ/Bn8x21am6AeUB3DzXjvP83iMYNhIy+/47yCDEQFbYd2gE6BVG6C5fAZe+vFb9GC1iQQUILfnWofvHPf10BF0ZiRDfs/OXC0Jk0tUelykNeMJqWGr1MfgREA8WzjcMRcaz72MFmGp29P2HFbCtTZVH0Gr7OGTcmswQ3UuzKpMdYpt9O4lY34YmUBs+2l3dLz0XWsfcgI3PFsDuQhxW2pkm9lQ3PFg==
+X-MS-Exchange-AntiSpam-MessageData: WZAcZwZTCax/1LSQ1Xfo1ez9fcISFtba4oGN76WDWLaT/ohsLZmnm1ul7Ezwtw21cf+jDAPHXqHUUjcKvXpOJiHmj9F85eaFdHUCLHqaRTux5n3qIkfU7M637a6zWiywrAnRiELvNrwa+NKoTZR5oN/cXcOTCWBRRCEal16ehz2AYQsV4ATTOnEWbpYQUwhDO59k9zKGCM4YxFMAHomrTnEaP2mTxbR5FNf7630YIqeAp0EUR/pSAjSNxRePY9scSIoSBF+CULGFjdSpuXmK4I3zi95Yv67tpeS/3kSsLfpvcqcz5fPZ0s09Ywn3gmJrjOlwBvQBKB0VqPNbawsgs0bDUGeZDnJuUZWXzNV1RwTranGfzB7XUX/Ofdaa77PXURzLgCMBpC08yNOSda7ekmWyFFXi5T2DgeG2s+IWI/O/gnJNzHrBZrwaFTtuNNc1i1x77QAONN8ofL2VfRRjwwtaO0VENu8znp5RJZIFFbl3Fbq2ackD9U5qJCUwulvAmFBi+uka8QoBAdAZLNvNwf6nUyFStdFi8h5aoSIrD9kP/d8PDk9eEwM/Rx1N/l+YdgtVBauVo9ZOPEw60+slykATaivJQtznIM8VpgToOn8rASaO3uRGQhERc2huQKNkySjfD4iE0VPGb4P5KrmgtA==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7742fc98-b48c-4141-8e53-08d871101cbe
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5bd423aa-7062-4237-b235-08d871101a31
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:09.0639 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:04.7724 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P0K16U5QnDIaYTiGNHL3Q65FJJa/bo8IPpfAV+6BEjvuIkl19uyoh/xX6gHL0bhf
+X-MS-Exchange-CrossTenant-UserPrincipalName: zJISex3jgLi8QEa1NpALLUYMU6SjAANZSMo9l4obqoo1r5NYUE9ko6HFq9WuKXTk
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR03MB5465
-Received-SPF: pass client-ip=40.107.75.112; envelope-from=alxndr@bu.edu;
+Received-SPF: pass client-ip=40.107.75.103; envelope-from=alxndr@bu.edu;
  helo=NAM02-BL2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:14
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -128,188 +128,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, dimastep@yandex-team.ru
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org, darren.kenny@oracle.com,
+ bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Once we find a crash, we can convert it into a QTest trace. Usually this
-trace will contain many operations that are unneeded to reproduce the
-crash. This script tries to minimize the crashing trace, by removing
-operations and trimming QTest bufwrite(write addr len data...) commands.
+This new operation is used in the next commit, which concatenates two
+fuzzer-generated inputs. With this operation, we can prevent the second
+input from clobbering the PCI configuration performed by the first.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- scripts/oss-fuzz/minimize_qtest_trace.py | 157 +++++++++++++++++++++++
- 1 file changed, 157 insertions(+)
- create mode 100755 scripts/oss-fuzz/minimize_qtest_trace.py
+ tests/qtest/fuzz/general_fuzz.c | 13 +++++++++++--
+ 1 file changed, 11 insertions(+), 2 deletions(-)
 
-diff --git a/scripts/oss-fuzz/minimize_qtest_trace.py b/scripts/oss-fuzz/minimize_qtest_trace.py
-new file mode 100755
-index 0000000000..5e405a0d5f
---- /dev/null
-+++ b/scripts/oss-fuzz/minimize_qtest_trace.py
-@@ -0,0 +1,157 @@
-+#!/usr/bin/env python3
-+# -*- coding: utf-8 -*-
+diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
+index 0fd42a16da..11346e229a 100644
+--- a/tests/qtest/fuzz/general_fuzz.c
++++ b/tests/qtest/fuzz/general_fuzz.c
+@@ -39,6 +39,7 @@ enum cmds {
+     OP_WRITE,
+     OP_PCI_READ,
+     OP_PCI_WRITE,
++    OP_DISABLE_PCI,
+     OP_ADD_DMA_PATTERN,
+     OP_CLEAR_DMA_PATTERNS,
+     OP_CLOCK_STEP,
+@@ -116,6 +117,7 @@ static GArray *dma_regions;
+ 
+ static GArray *dma_patterns;
+ static int dma_pattern_index;
++static bool pci_disabled;
+ 
+ void fuzz_dma_read_cb(size_t addr, size_t len, MemoryRegion *mr, bool is_write);
+ 
+@@ -481,7 +483,7 @@ static void op_pci_read(QTestState *s, const unsigned char * data, size_t len)
+         uint8_t base;
+         uint8_t offset;
+     } a;
+-    if (len < sizeof(a) || fuzzable_pci_devices->len == 0) {
++    if (len < sizeof(a) || fuzzable_pci_devices->len == 0 || pci_disabled) {
+         return;
+     }
+     memcpy(&a, data, sizeof(a));
+@@ -511,7 +513,7 @@ static void op_pci_write(QTestState *s, const unsigned char * data, size_t len)
+         uint8_t offset;
+         uint32_t value;
+     } a;
+-    if (len < sizeof(a) || fuzzable_pci_devices->len == 0) {
++    if (len < sizeof(a) || fuzzable_pci_devices->len == 0 || pci_disabled) {
+         return;
+     }
+     memcpy(&a, data, sizeof(a));
+@@ -566,6 +568,11 @@ static void op_clock_step(QTestState *s, const unsigned char *data, size_t len)
+     qtest_clock_step_next(s);
+ }
+ 
++static void op_disable_pci(QTestState *s, const unsigned char *data, size_t len)
++{
++    pci_disabled = true;
++}
 +
-+"""
-+This takes a crashing qtest trace and tries to remove superflous operations
-+"""
-+
-+import sys
-+import os
-+import subprocess
-+import time
-+import struct
-+
-+QEMU_ARGS = None
-+QEMU_PATH = None
-+TIMEOUT = 5
-+CRASH_TOKEN = None
-+
-+write_suffix_lookup = {"b": (1, "B"),
-+                       "w": (2, "H"),
-+                       "l": (4, "L"),
-+                       "q": (8, "Q")}
-+
-+def usage():
-+    sys.exit("""\
-+Usage: QEMU_PATH="/path/to/qemu" QEMU_ARGS="args" {} input_trace output_trace
-+By default, will try to use the second-to-last line in the output to identify
-+whether the crash occred. Optionally, manually set a string that idenitifes the
-+crash by setting CRASH_TOKEN=
-+""".format((sys.argv[0])))
-+
-+def check_if_trace_crashes(trace, path):
-+    global CRASH_TOKEN
-+    with open(path, "w") as tracefile:
-+        tracefile.write("".join(trace))
-+
-+    rc = subprocess.Popen("timeout -s 9 {timeout}s {qemu_path} {qemu_args} 2>&1\
-+    < {trace_path}".format(timeout=TIMEOUT,
-+                           qemu_path=QEMU_PATH,
-+                           qemu_args=QEMU_ARGS,
-+                           trace_path=path),
-+                          shell=True,
-+                          stdin=subprocess.PIPE,
-+                          stdout=subprocess.PIPE)
-+    stdo = rc.communicate()[0]
-+    output = stdo.decode('unicode_escape')
-+    if rc.returncode == 137:    # Timed Out
-+        return False
-+    if len(output.splitlines()) < 2:
-+        return False
-+
-+    if CRASH_TOKEN is None:
-+        CRASH_TOKEN = output.splitlines()[-2]
-+
-+    return CRASH_TOKEN in output
-+
-+
-+def minimize_trace(inpath, outpath):
-+    global TIMEOUT
-+    with open(inpath) as f:
-+        trace = f.readlines()
-+    start = time.time()
-+    if not check_if_trace_crashes(trace, outpath):
-+        sys.exit("The input qtest trace didn't cause a crash...")
-+    end = time.time()
-+    print("Crashed in {} seconds".format(end-start))
-+    TIMEOUT = (end-start)*5
-+    print("Setting the timeout for {} seconds".format(TIMEOUT))
-+    print("Identifying Crashes by this string: {}".format(CRASH_TOKEN))
-+
-+    i = 0
-+    newtrace = trace[:]
-+    # For each line
-+    while i < len(newtrace):
-+        # 1.) Try to remove it completely and reproduce the crash. If it works,
-+        # we're done.
-+        prior = newtrace[i]
-+        print("Trying to remove {}".format(newtrace[i]))
-+        # Try to remove the line completely
-+        newtrace[i] = ""
-+        if check_if_trace_crashes(newtrace, outpath):
-+            i += 1
-+            continue
-+        newtrace[i] = prior
-+
-+        # 2.) Try to replace write{bwlq} commands with a write addr, len
-+        # command. Since this can require swapping endianness, try both LE and
-+        # BE options. We do this, so we can "trim" the writes in (3)
-+        if (newtrace[i].startswith("write") and not
-+            newtrace[i].startswith("write ")):
-+            suffix = newtrace[i].split()[0][-1]
-+            assert(suffix in write_suffix_lookup)
-+            addr = int(newtrace[i].split()[1], 16)
-+            value = int(newtrace[i].split()[2], 16)
-+            for endianness in ['<', '>']:
-+                data = struct.pack("{end}{size}".format(end=endianness,
-+                                   size=write_suffix_lookup[suffix][1]),
-+                                   value)
-+                newtrace[i] = "write {addr} {size} 0x{data}\n".format(
-+                    addr=hex(addr),
-+                    size=hex(write_suffix_lookup[suffix][0]),
-+                    data=data.hex())
-+                if(check_if_trace_crashes(newtrace, outpath)):
-+                    break
-+            else:
-+                newtrace[i] = prior
-+
-+        # 3.) If it is a qtest write command: write addr len data, try to split
-+        # it into two separate write commands. If splitting the write down the
-+        # middle does not work, try to move the pivot "left" and retry, until
-+        # there is no space left. The idea is to prune unneccessary bytes from
-+        # long writes, while accommodating arbitrary MemoryRegion access sizes
-+        # and alignments.
-+        if newtrace[i].startswith("write "):
-+            addr = int(newtrace[i].split()[1], 16)
-+            length = int(newtrace[i].split()[2], 16)
-+            data = newtrace[i].split()[3][2:]
-+            if length > 1:
-+                leftlength = int(length/2)
-+                rightlength = length - leftlength
-+                newtrace.insert(i+1, "")
-+                while leftlength > 0:
-+                    newtrace[i] = "write {addr} {size} 0x{data}\n".format(
-+                            addr=hex(addr),
-+                            size=hex(leftlength),
-+                            data=data[:leftlength*2])
-+                    newtrace[i+1] = "write {addr} {size} 0x{data}\n".format(
-+                            addr=hex(addr+leftlength),
-+                            size=hex(rightlength),
-+                            data=data[leftlength*2:])
-+                    if check_if_trace_crashes(newtrace, outpath):
-+                        break
-+                    else:
-+                        leftlength -= 1
-+                        rightlength += 1
-+                if check_if_trace_crashes(newtrace, outpath):
-+                    i -= 1
-+                else:
-+                    newtrace[i] = prior
-+                    del newtrace[i+1]
-+        i += 1
-+    check_if_trace_crashes(newtrace, outpath)
-+
-+
-+if __name__ == '__main__':
-+    if len(sys.argv) < 3:
-+        usage()
-+
-+    QEMU_PATH = os.getenv("QEMU_PATH")
-+    QEMU_ARGS = os.getenv("QEMU_ARGS")
-+    if QEMU_PATH is None or QEMU_ARGS is None:
-+        usage()
-+    # if "accel" not in QEMU_ARGS:
-+    #     QEMU_ARGS += " -accel qtest"
-+    CRASH_TOKEN = os.getenv("CRASH_TOKEN")
-+    QEMU_ARGS += " -qtest stdio -monitor none -serial none "
-+    minimize_trace(sys.argv[1], sys.argv[2])
+ static void handle_timeout(int sig)
+ {
+     if (qtest_log_enabled) {
+@@ -620,6 +627,7 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
+         [OP_WRITE]              = op_write,
+         [OP_PCI_READ]           = op_pci_read,
+         [OP_PCI_WRITE]          = op_pci_write,
++        [OP_DISABLE_PCI]        = op_disable_pci,
+         [OP_ADD_DMA_PATTERN]    = op_add_dma_pattern,
+         [OP_CLEAR_DMA_PATTERNS] = op_clear_dma_patterns,
+         [OP_CLOCK_STEP]         = op_clock_step,
+@@ -652,6 +660,7 @@ static void general_fuzz(QTestState *s, const unsigned char *Data, size_t Size)
+         }
+ 
+         op_clear_dma_patterns(s, NULL, 0);
++        pci_disabled = false;
+ 
+         while (cmd && Size) {
+             /* Get the length until the next command or end of input */
 -- 
 2.28.0
 
