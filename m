@@ -7,69 +7,68 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB913C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:10:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3287EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:13:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 21C7C22240
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:10:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 710B320878
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 18:13:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="L4LEuc4y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 21C7C22240
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="QE+6ltBY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 710B320878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT7i7-0006F4-Ub
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 14:10:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33500)
+	id 1kT7kN-0000AV-DA
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 14:13:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33502)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1kT7dQ-0008Pa-BV
+ id 1kT7dQ-0008Pq-JF
  for qemu-devel@nongnu.org; Thu, 15 Oct 2020 14:05:52 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:52870)
+Received: from userp2120.oracle.com ([156.151.31.85]:41308)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jag.raman@oracle.com>)
- id 1kT7dN-0002MS-MG
+ id 1kT7dO-0002MW-7F
  for qemu-devel@nongnu.org; Thu, 15 Oct 2020 14:05:52 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI5WpK128456;
- Thu, 15 Oct 2020 18:05:43 GMT
+Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI3rke104162;
+ Thu, 15 Oct 2020 18:05:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
  subject : date : message-id : in-reply-to : references : in-reply-to :
  references; s=corp-2020-01-29;
- bh=Wcwlop9HSfDveCXe0oyh5/0MRezO0jvRGPWDaiDyIH4=;
- b=L4LEuc4y5J49FC7GTYAo95VVq00NpdjGI23mFRmDHFx+CSX+3UcOCRRvXbIWLyX7I7DA
- HkCyNP1MrPkU1/khkMv4smrWI0Gt+T7zHHZ63pjbcqHokwJf1HW4DuFn5uD8HPMBljEB
- fyc4XySGp8npvcsvX5A2opwQ8nJS0/vwSH/LO2opHKf2dH1K4qg0UPv1By4VL/gVGzdC
- NfTe+r62eeR7BFC6ItUQ0y4IMi4HtRxSxAJNHlRjwXl5XdW5Emli0CGi7jA6ytKnmjZW
- nbJGA3GnX9QlJn1U/7W/7IQZIIFepTQoNEHxspm3ldP9JxvomU2/N9nS13r0I9q+3x1p oA== 
+ bh=UkVf3PdEUL8XKKQDI5QWSnJPy7kcYjL9UM1pQLEe22k=;
+ b=QE+6ltBYsqIVoRuGr1IqPq2w36ZaIBkzdmTvnJ7hbPYLRCIAnsV683joanL7dTFZ0vDz
+ r3XeW1xECKBBxBZ4+i4flxhwgSpFqiV/Q/67GS9Ny+7hkjzTUKXfnjI4js9zoeqq5YLR
+ KIWGV4ld0wqeAWOX8PSCICkKwb8T13RqPQyZoMuCzF5JdOudrpi9pFS8JASudy8nWCz/
+ DBQAwh7lKlbLfLkAKetFAFV/uo814Js04j85A2LCmZN6UMyyWINWt33r1903p/rgYTaU
+ ecMw+76eonNLnuy2HdixyvKFyaqFVJ6VfPZEPYmTLGrqlc6pjNHVVIokgNZkDUIE+wQ8 Xw== 
 Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by aserp2130.oracle.com with ESMTP id 346g8gkcd8-1
+ by userp2120.oracle.com with ESMTP id 343vaemhn3-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 15 Oct 2020 18:05:43 +0000
+ Thu, 15 Oct 2020 18:05:42 +0000
 Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI5dE4040121;
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09FI5edQ040338;
  Thu, 15 Oct 2020 18:05:42 GMT
 Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 344by5hhw7-1
+ by userp3020.oracle.com with ESMTP id 344by5hhpc-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
  Thu, 15 Oct 2020 18:05:42 +0000
 Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09FI5e56007934;
- Thu, 15 Oct 2020 18:05:40 GMT
+ by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09FI5TCH007873;
+ Thu, 15 Oct 2020 18:05:29 GMT
 Received: from jaraman-bur-1.us.oracle.com (/10.152.33.39)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 15 Oct 2020 11:05:40 -0700
+ with ESMTP ; Thu, 15 Oct 2020 11:05:28 -0700
 From: Jagannathan Raman <jag.raman@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v11 13/19] multi-process: PCI BAR read/write handling for
- proxy & remote endpoints
-Date: Thu, 15 Oct 2020 14:05:06 -0400
-Message-Id: <7a0fcb42667292ac6d455f24aef7fba33679a1ba.1602784930.git.jag.raman@oracle.com>
+Subject: [PATCH v11 05/19] multi-process: add qio channel function to transmit
+Date: Thu, 15 Oct 2020 14:04:58 -0400
+Message-Id: <599c6eb3f07b3ef16f29ad8fda005ddecc038566.1602784930.git.jag.raman@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <cover.1602784930.git.jag.raman@oracle.com>
 References: <cover.1602784930.git.jag.raman@oracle.com>
@@ -77,22 +76,22 @@ In-Reply-To: <cover.1602784930.git.jag.raman@oracle.com>
 References: <cover.1602784930.git.jag.raman@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9775
  signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=983
  spamscore=0
- suspectscore=1 mlxscore=0 malwarescore=0 adultscore=0 bulkscore=0
+ suspectscore=3 mlxscore=0 malwarescore=0 adultscore=0 bulkscore=0
  phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2010150121
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9775
  signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 impostorscore=0
- suspectscore=1
- priorityscore=1501 phishscore=0 clxscore=1015 spamscore=0 adultscore=0
- mlxscore=0 malwarescore=0 bulkscore=0 mlxlogscore=999 lowpriorityscore=0
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999
+ clxscore=1015
+ impostorscore=0 phishscore=0 malwarescore=0 bulkscore=0 priorityscore=1501
+ mlxscore=0 suspectscore=3 spamscore=0 adultscore=0 lowpriorityscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2010150121
-Received-SPF: pass client-ip=141.146.126.79; envelope-from=jag.raman@oracle.com;
- helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 11:04:16
+Received-SPF: pass client-ip=156.151.31.85; envelope-from=jag.raman@oracle.com;
+ helo=userp2120.oracle.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 14:05:35
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -43
 X-Spam_score: -4.4
@@ -125,288 +124,110 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Proxy device object implements handler for PCI BAR writes and reads.
-The handler uses BAR_WRITE/BAR_READ message to communicate to the
-remote process with the BAR address and value to be written/read.
-The remote process implements handler for BAR_WRITE/BAR_READ
-message.
+From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 
-Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+The entire array of the memory regions and file handlers.
+Will be used in the next patch.
+
 Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
+Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 ---
- hw/i386/remote-msg.c     | 87 ++++++++++++++++++++++++++++++++++++++++++++++++
- hw/pci/proxy.c           | 60 +++++++++++++++++++++++++++++++++
- include/hw/pci/proxy.h   | 10 ++++++
- include/io/mpqemu-link.h | 10 ++++++
- io/mpqemu-link.c         |  6 ++++
- 5 files changed, 173 insertions(+)
+ include/io/channel.h | 24 ++++++++++++++++++++++++
+ io/channel.c         | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 69 insertions(+)
 
-diff --git a/hw/i386/remote-msg.c b/hw/i386/remote-msg.c
-index 94937db..9b9ca7e 100644
---- a/hw/i386/remote-msg.c
-+++ b/hw/i386/remote-msg.c
-@@ -16,11 +16,14 @@
- #include "qapi/error.h"
- #include "sysemu/runstate.h"
- #include "hw/pci/pci.h"
-+#include "exec/memattrs.h"
+diff --git a/include/io/channel.h b/include/io/channel.h
+index 3c04f0e..6807506 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -773,5 +773,29 @@ void qio_channel_set_aio_fd_handler(QIOChannel *ioc,
+                                     IOHandler *io_read,
+                                     IOHandler *io_write,
+                                     void *opaque);
++/**
++ * qio_channel_writev_full_all:
++ * @ioc: the channel object
++ * @iov: the array of memory regions to write data from
++ * @niov: the length of the @iov array
++ * @fds: an array of file handles to send
++ * @nfds: number of file handles in @fds
++ * @errp: pointer to a NULL-initialized error object
++ *
++ *
++ * Behaves like qio_channel_writev_full but will attempt
++ * to send all data passed (file handles and memory regions).
++ * The function will wait for all requested data
++ * to be written, yielding from the current coroutine
++ * if required.
++ *
++ * Returns: 0 if all bytes were written, or -1 on error
++ */
++
++int qio_channel_writev_full_all(QIOChannel *ioc,
++                           const struct iovec *iov,
++                           size_t niov,
++                           int *fds, size_t nfds,
++                           Error **errp);
  
- static void process_config_write(QIOChannel *ioc, PCIDevice *dev,
-                                  MPQemuMsg *msg);
- static void process_config_read(QIOChannel *ioc, PCIDevice *dev,
-                                 MPQemuMsg *msg);
-+static void process_bar_write(QIOChannel *ioc, MPQemuMsg *msg, Error **errp);
-+static void process_bar_read(QIOChannel *ioc, MPQemuMsg *msg, Error **errp);
- 
- void coroutine_fn mpqemu_remote_msg_loop_co(void *data)
- {
-@@ -55,6 +58,12 @@ void coroutine_fn mpqemu_remote_msg_loop_co(void *data)
-         case PCI_CONFIG_READ:
-             process_config_read(com->ioc, pci_dev, &msg);
-             break;
-+        case BAR_WRITE:
-+            process_bar_write(com->ioc, &msg, &local_err);
-+            break;
-+        case BAR_READ:
-+            process_bar_read(com->ioc, &msg, &local_err);
-+            break;
-         default:
-             error_setg(&local_err,
-                        "Unknown command (%d) received for device %s (pid=%d)",
-@@ -122,3 +131,81 @@ static void process_config_read(QIOChannel *ioc, PCIDevice *dev,
-                      getpid());
-     }
- }
-+
-+static void process_bar_write(QIOChannel *ioc, MPQemuMsg *msg, Error **errp)
-+{
-+    BarAccessMsg *bar_access = &msg->data.bar_access;
-+    AddressSpace *as =
-+        bar_access->memory ? &address_space_memory : &address_space_io;
-+    MPQemuMsg ret = { 0 };
-+    MemTxResult res;
-+    uint64_t val;
-+    Error *local_err = NULL;
-+
-+    if (!is_power_of_2(bar_access->size) ||
-+       (bar_access->size > sizeof(uint64_t))) {
-+        ret.data.u64 = UINT64_MAX;
-+        goto fail;
-+    }
-+
-+    val = cpu_to_le64(bar_access->val);
-+
-+    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (void *)&val, bar_access->size, true);
-+
-+    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space write operation,"
-+                   " inaccessible address: %lx in pid %d.",
-+                   bar_access->addr, getpid());
-+        ret.data.u64 = -1;
-+    }
-+
-+fail:
-+    ret.cmd = RET_MSG;
-+    ret.size = sizeof(ret.data.u64);
-+
-+    mpqemu_msg_send(&ret, ioc, &local_err);
-+    if (local_err) {
-+        error_setg(errp, "Error while sending message to proxy "
-+                   "in remote process pid=%d", getpid());
-+    }
-+}
-+
-+static void process_bar_read(QIOChannel *ioc, MPQemuMsg *msg, Error **errp)
-+{
-+    BarAccessMsg *bar_access = &msg->data.bar_access;
-+    MPQemuMsg ret = { 0 };
-+    AddressSpace *as;
-+    MemTxResult res;
-+    uint64_t val = 0;
-+    Error *local_err = NULL;
-+
-+    as = bar_access->memory ? &address_space_memory : &address_space_io;
-+
-+    if (!is_power_of_2(bar_access->size) ||
-+       (bar_access->size > sizeof(uint64_t))) {
-+        val = UINT64_MAX;
-+        goto fail;
-+    }
-+
-+    res = address_space_rw(as, bar_access->addr, MEMTXATTRS_UNSPECIFIED,
-+                           (void *)&val, bar_access->size, false);
-+
-+    if (res != MEMTX_OK) {
-+        error_setg(errp, "Could not perform address space read operation,"
-+                   " inaccessible address: %lx in pid %d.",
-+                   bar_access->addr, getpid());
-+        val = UINT64_MAX;
-+    }
-+
-+fail:
-+    ret.cmd = RET_MSG;
-+    ret.data.u64 = le64_to_cpu(val);
-+    ret.size = sizeof(ret.data.u64);
-+
-+    mpqemu_msg_send(&ret, ioc, &local_err);
-+    if (local_err) {
-+        error_setg(errp, "Error while sending message to proxy "
-+                   "in remote process pid=%d", getpid());
-+    }
-+}
-diff --git a/hw/pci/proxy.c b/hw/pci/proxy.c
-index 27714fe..4ae4919 100644
---- a/hw/pci/proxy.c
-+++ b/hw/pci/proxy.c
-@@ -146,3 +146,63 @@ static void pci_proxy_dev_register_types(void)
+ #endif /* QIO_CHANNEL_H */
+diff --git a/io/channel.c b/io/channel.c
+index e4376eb..22c10c5 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -190,6 +190,51 @@ int qio_channel_writev_all(QIOChannel *ioc,
+     return ret;
  }
  
- type_init(pci_proxy_dev_register_types)
-+
-+static void send_bar_access_msg(PCIProxyDev *pdev, MemoryRegion *mr,
-+                                bool write, hwaddr addr, uint64_t *val,
-+                                unsigned size, bool memory)
++int qio_channel_writev_full_all(QIOChannel *ioc,
++                                const struct iovec *iov,
++                                size_t niov,
++                                int *fds, size_t nfds,
++                                Error **errp)
 +{
-+    MPQemuMsg msg = { 0 };
-+    long ret = -EINVAL;
-+    Error *local_err = NULL;
++    int ret = -1;
++    struct iovec *local_iov = g_new(struct iovec, niov);
++    struct iovec *local_iov_head = local_iov;
++    unsigned int nlocal_iov = niov;
 +
-+    msg.size = sizeof(BarAccessMsg);
-+    msg.data.bar_access.addr = mr->addr + addr;
-+    msg.data.bar_access.size = size;
-+    msg.data.bar_access.memory = memory;
++    nlocal_iov = iov_copy(local_iov, nlocal_iov,
++                          iov, niov,
++                          0, iov_size(iov, niov));
 +
-+    if (write) {
-+        msg.cmd = BAR_WRITE;
-+        msg.data.bar_access.val = *val;
-+    } else {
-+        msg.cmd = BAR_READ;
-+    }
-+
-+    ret = mpqemu_msg_send_and_await_reply(&msg, pdev, &local_err);
-+    if (local_err) {
-+        error_report_err(local_err);
-+    }
-+
-+    if (!write) {
-+        *val = ret;
-+    }
-+}
-+
-+static void proxy_bar_write(void *opaque, hwaddr addr, uint64_t val,
-+                            unsigned size)
-+{
-+    ProxyMemoryRegion *pmr = opaque;
-+
-+    send_bar_access_msg(pmr->dev, &pmr->mr, true, addr, &val, size,
-+                        pmr->memory);
-+}
-+
-+static uint64_t proxy_bar_read(void *opaque, hwaddr addr, unsigned size)
-+{
-+    ProxyMemoryRegion *pmr = opaque;
-+    uint64_t val;
-+
-+    send_bar_access_msg(pmr->dev, &pmr->mr, false, addr, &val, size,
-+                        pmr->memory);
-+
-+    return val;
-+}
-+
-+const MemoryRegionOps proxy_mr_ops = {
-+    .read = proxy_bar_read,
-+    .write = proxy_bar_write,
-+    .endianness = DEVICE_NATIVE_ENDIAN,
-+    .impl = {
-+        .min_access_size = 1,
-+        .max_access_size = 8,
-+    },
-+};
-diff --git a/include/hw/pci/proxy.h b/include/hw/pci/proxy.h
-index 923432a..e29c61b 100644
---- a/include/hw/pci/proxy.h
-+++ b/include/hw/pci/proxy.h
-@@ -16,8 +16,17 @@
- 
- #define PCI_PROXY_DEV(obj) \
-             OBJECT_CHECK(PCIProxyDev, (obj), TYPE_PCI_PROXY_DEV)
-+
- typedef struct PCIProxyDev PCIProxyDev;
- 
-+typedef struct ProxyMemoryRegion {
-+    PCIProxyDev *dev;
-+    MemoryRegion mr;
-+    bool memory;
-+    bool present;
-+    uint8_t type;
-+} ProxyMemoryRegion;
-+
- struct PCIProxyDev {
-     PCIDevice parent_dev;
-     char *fd;
-@@ -31,6 +40,7 @@ struct PCIProxyDev {
-     QemuMutex io_mutex;
-     QIOChannel *ioc;
-     Error *migration_blocker;
-+    ProxyMemoryRegion region[PCI_NUM_REGIONS];
- };
- 
- #endif /* PROXY_H */
-diff --git a/include/io/mpqemu-link.h b/include/io/mpqemu-link.h
-index 459d345..234ac82 100644
---- a/include/io/mpqemu-link.h
-+++ b/include/io/mpqemu-link.h
-@@ -36,6 +36,8 @@ typedef enum {
-     RET_MSG,
-     PCI_CONFIG_WRITE,
-     PCI_CONFIG_READ,
-+    BAR_WRITE,
-+    BAR_READ,
-     MPQEMU_CMD_MAX,
- } MPQemuCmd;
- 
-@@ -51,6 +53,13 @@ typedef struct {
-     int l;
- } ConfDataMsg;
- 
-+typedef struct {
-+    hwaddr addr;
-+    uint64_t val;
-+    unsigned size;
-+    bool memory;
-+} BarAccessMsg;
-+
- /**
-  * MPQemuMsg:
-  * @cmd: The remote command
-@@ -70,6 +79,7 @@ typedef struct {
-         uint64_t u64;
-         ConfDataMsg conf_data;
-         SyncSysmemMsg sync_sysmem;
-+        BarAccessMsg bar_access;
-     } data;
- 
-     int fds[REMOTE_MAX_FDS];
-diff --git a/io/mpqemu-link.c b/io/mpqemu-link.c
-index 5ef82da..7e297ef 100644
---- a/io/mpqemu-link.c
-+++ b/io/mpqemu-link.c
-@@ -284,6 +284,12 @@ bool mpqemu_msg_valid(MPQemuMsg *msg)
-             return false;
-         }
-         break;
-+    case BAR_WRITE:
-+    case BAR_READ:
-+        if ((msg->size != sizeof(BarAccessMsg)) || (msg->num_fds != 0)) {
-+            return false;
++    while (nlocal_iov > 0) {
++        ssize_t len;
++        len = qio_channel_writev_full(ioc, local_iov, nlocal_iov, fds,
++                                      nfds, errp);
++        if (len == QIO_CHANNEL_ERR_BLOCK) {
++            if (qemu_in_coroutine()) {
++                qio_channel_yield(ioc, G_IO_OUT);
++            } else {
++                qio_channel_wait(ioc, G_IO_OUT);
++            }
++            continue;
 +        }
-+        break;
-     default:
-         break;
-     }
++        if (len < 0) {
++            goto cleanup;
++        }
++
++        iov_discard_front(&local_iov, &nlocal_iov, len);
++
++        if (len > 0) {
++            fds = NULL;
++            nfds = 0;
++        }
++    }
++
++    ret = 0;
++ cleanup:
++    g_free(local_iov_head);
++    return ret;
++}
++
+ ssize_t qio_channel_readv(QIOChannel *ioc,
+                           const struct iovec *iov,
+                           size_t niov,
 -- 
 1.8.3.1
 
