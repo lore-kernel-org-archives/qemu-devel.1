@@ -2,58 +2,59 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEB33C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25E0AC43457
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1314620789
+	by mail.kernel.org (Postfix) with ESMTPS id 4F95D20795
 	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1314620789
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F95D20795
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58582 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTDSk-0007Ek-3R
+	id 1kTDSk-0007Dr-CP
 	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:19:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58788)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58752)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRR-0005gx-Jc; Thu, 15 Oct 2020 20:17:53 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30048)
+ id 1kTDRQ-0005gb-Fn; Thu, 15 Oct 2020 20:17:52 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:30046)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRM-0006vf-Kv; Thu, 15 Oct 2020 20:17:53 -0400
+ id 1kTDRM-0006vh-L2; Thu, 15 Oct 2020 20:17:51 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 4D96C747626;
+ by localhost (Postfix) with SMTP id 725C1747627;
  Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 01532747621; Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
-Message-Id: <d67bc8d914a366ca6822b5190c1308d31af5c9b3.1602805637.git.balaton@eik.bme.hu>
+ id F16CD747620; Fri, 16 Oct 2020 02:17:35 +0200 (CEST)
+Message-Id: <b4c714e03690deb6f94f80f7a5b2af47d90550ae.1602805637.git.balaton@eik.bme.hu>
 In-Reply-To: <cover.1602805637.git.balaton@eik.bme.hu>
 References: <cover.1602805637.git.balaton@eik.bme.hu>
-Subject: [PATCH v8 4/5] mac_oldworld: Drop some variables
+Subject: [PATCH v8 3/5] mac_oldworld: Drop a variable, use get_system_memory()
+ directly
 Date: Fri, 16 Oct 2020 01:47:17 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 To: qemu-devel@nongnu.org,
     qemu-ppc@nongnu.org
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:17:36
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,119 +74,45 @@ Sender: "Qemu-devel"
 Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
 From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-Values not used frequently enough may not worth putting in a local
-variable, especially with names almost as long as the original value
-because that does not improve readability, to the contrary it makes it
-harder to see what value is used. Drop a few such variables.
+Half of the occurances already use get_system_memory() directly
+instead of sysmem variable, convert the two other uses to
+get_system_memory() too which seems to be more common and drop the
+variable.
 
 Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
 Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/ppc/mac_oldworld.c | 35 +++++++++++++++++------------------
- 1 file changed, 17 insertions(+), 18 deletions(-)
+ hw/ppc/mac_oldworld.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
 diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 5b30fa0739..13eb9bafa1 100644
+index 0a40769b3e..5b30fa0739 100644
 --- a/hw/ppc/mac_oldworld.c
 +++ b/hw/ppc/mac_oldworld.c
-@@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
- static void ppc_heathrow_init(MachineState *machine)
- {
-     ram_addr_t ram_size = machine->ram_size;
--    const char *kernel_filename = machine->kernel_filename;
--    const char *kernel_cmdline = machine->kernel_cmdline;
--    const char *initrd_filename = machine->initrd_filename;
+@@ -87,7 +87,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     const char *kernel_cmdline = machine->kernel_cmdline;
+     const char *initrd_filename = machine->initrd_filename;
      const char *boot_device = machine->boot_order;
+-    MemoryRegion *sysmem = get_system_memory();
      PowerPCCPU *cpu = NULL;
      CPUPPCState *env = NULL;
      char *filename;
--    int linux_boot, i;
-+    int i;
-     MemoryRegion *bios = g_new(MemoryRegion, 1);
-     uint32_t kernel_base, initrd_base, cmdline_base = 0;
-     int32_t kernel_size, initrd_size;
-@@ -109,8 +106,6 @@ static void ppc_heathrow_init(MachineState *machine)
-     void *fw_cfg;
-     uint64_t tbfreq;
- 
--    linux_boot = (kernel_filename != NULL);
--
-     /* init CPUs */
-     for (i = 0; i < smp_cpus; i++) {
-         cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
-@@ -147,7 +142,7 @@ static void ppc_heathrow_init(MachineState *machine)
-         bios_addr = (target_ulong)bios_addr;
- 
-         if (bios_size <= 0) {
--            /* or load binary ROM image */
-+            /* or if could not load ELF try loading a binary ROM image */
-             bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
-             bios_addr = PROM_BASE;
-         }
-@@ -160,7 +155,7 @@ static void ppc_heathrow_init(MachineState *machine)
+@@ -129,12 +128,12 @@ static void ppc_heathrow_init(MachineState *machine)
          exit(1);
      }
  
--    if (linux_boot) {
-+    if (machine->kernel_filename) {
-         int bswap_needed;
+-    memory_region_add_subregion(sysmem, 0, machine->ram);
++    memory_region_add_subregion(get_system_memory(), 0, machine->ram);
  
- #ifdef BSWAP_NEEDED
-@@ -169,29 +164,32 @@ static void ppc_heathrow_init(MachineState *machine)
-         bswap_needed = 0;
- #endif
-         kernel_base = KERNEL_LOAD_ADDR;
--        kernel_size = load_elf(kernel_filename, NULL,
-+        kernel_size = load_elf(machine->kernel_filename, NULL,
-                                translate_kernel_address, NULL, NULL, NULL,
-                                NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
-         if (kernel_size < 0)
--            kernel_size = load_aout(kernel_filename, kernel_base,
-+            kernel_size = load_aout(machine->kernel_filename, kernel_base,
-                                     ram_size - kernel_base, bswap_needed,
-                                     TARGET_PAGE_SIZE);
-         if (kernel_size < 0)
--            kernel_size = load_image_targphys(kernel_filename,
-+            kernel_size = load_image_targphys(machine->kernel_filename,
-                                               kernel_base,
-                                               ram_size - kernel_base);
-         if (kernel_size < 0) {
--            error_report("could not load kernel '%s'", kernel_filename);
-+            error_report("could not load kernel '%s'",
-+                         machine->kernel_filename);
-             exit(1);
-         }
-         /* load initrd */
--        if (initrd_filename) {
--            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
--            initrd_size = load_image_targphys(initrd_filename, initrd_base,
-+        if (machine->initrd_filename) {
-+            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
-+                                            KERNEL_GAP);
-+            initrd_size = load_image_targphys(machine->initrd_filename,
-+                                              initrd_base,
-                                               ram_size - initrd_base);
-             if (initrd_size < 0) {
-                 error_report("could not load initial ram disk '%s'",
--                             initrd_filename);
-+                             machine->initrd_filename);
-                 exit(1);
-             }
-             cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
-@@ -343,9 +341,10 @@ static void ppc_heathrow_init(MachineState *machine)
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
-     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
-     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
--    if (kernel_cmdline) {
-+    if (machine->kernel_cmdline) {
-         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
--        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
-+        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
-+                         machine->kernel_cmdline);
-     } else {
-         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
-     }
+     /* allocate and load firmware ROM */
+     memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+                            &error_fatal);
+-    memory_region_add_subregion(sysmem, PROM_BASE, bios);
++    memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
+ 
+     if (!bios_name) {
+         bios_name = PROM_FILENAME;
 -- 
 2.21.3
 
