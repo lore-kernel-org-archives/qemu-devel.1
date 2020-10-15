@@ -7,81 +7,81 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C029BC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 22:50:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFCF7C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 22:50:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B2A620678
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 22:50:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 314E920678
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 22:50:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OOcDO187"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B2A620678
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mvBStUlO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 314E920678
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58110 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTC4O-0005A9-UG
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 18:50:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34152)
+	id 1kTC5H-0006Ja-6v
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 18:50:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTC2S-00036F-PQ
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 18:48:00 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:44537)
+ id 1kTC2O-0002yx-3m
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 18:47:56 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39744)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTC2R-0003K5-7P
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 18:48:00 -0400
-Received: by mail-wr1-x443.google.com with SMTP id t9so396611wrq.11
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 15:47:58 -0700 (PDT)
+ id 1kTC2M-0003IR-I8
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 18:47:55 -0400
+Received: by mail-wm1-x341.google.com with SMTP id d3so721727wma.4
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 15:47:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=hI/5y4MeSKHx09W0hvgXkHn2lpXMMKn63dsyc85sJAk=;
- b=OOcDO187Kywse0gJ47gEc3Ulm/0TkXthkUXSoA0/H0E64Q7GFotZFSBeZksl9i8Aq/
- BblEge7g0KvNCeVMG6JGE2XuKJyXgO79uQiJfVGRJbflZLXktQ7mShDqFfvwXiqvLvpS
- MKzpTX8grO9Ui52gJmZXDa2LFu4oZ3O7aoRMAGCOMZVkbhlhCdrmXNKrXwIy6iTpoQW1
- VFVdGt/qzXiVHHcvGwInO9XlmKjbfDri68RRJfZIlIwLHOc3IImQqhR0vE9lT5LCyKQq
- HsStF/7E7pl3Qn7DXCzNcpu33rVQB+md/CPmTqPapoEQ6uPMll1vDUPYle7Pq1aIebc4
- ixCg==
+ bh=orbtnIXME7eI8Z8OOzrxbeZteV0enZumXvxzAJ1ns40=;
+ b=mvBStUlOmmzXaP+CpCG4+QQweQYbgRyZVG54H4mOeypy+cHvOwS79ZtGgJdhNuIXPy
+ i0SqA+mgmKgkBCuTloksurggqoZc4MsUvHkK9oR0t7atK3WVzbnadZUFVI6oP4/VjXkj
+ dSj2FV/sBjEeBfqdZlgF6nndjWf7h9MZzrWUIP5Er6+fdMF+M8zSJB6SZG7yCMhuskXW
+ rjjNJyQkvbUjHoDYqzUafKFYWAzwi9OIHAPMarX7QA/cW5NDkK4/nNfgYO5Elbp7Anlj
+ sFHXufsWYwXGktYKZIaGPqOX/LqC8J3LbEZTafi0hI+euJdK1Ma8BQF/3cSshdDzMtv7
+ d3/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=hI/5y4MeSKHx09W0hvgXkHn2lpXMMKn63dsyc85sJAk=;
- b=gecwQLjA7Hwykt+TSVDaLbX1uoPZu0X8z/UgOjaFeHrCgDTLjg/6sYkKnlZYZRLVIQ
- uiiKcU2zBnIODq+jKUhIOZ3+yCxIcV1Ecl3gIS1BBHPVOS/FdrKig20REHvXbnZEamgm
- MjFmzC073AUvyR9SXpEPptBLV8/QvVghXCIYJvEK1R+AP3FXJg3Qr/vLcJCK4BS1Wv5r
- 5Vsd5AbU3p4BlXTy5xsA80L/8Y6U9GgMM23dnkNJ6ot6hmxTYjUX6iLOXJEzbLhjZg4i
- R2dD6TNzp64RherU+03mQGMNzVFJzvt5Pc9n63Z4ytIhuY/BJAtiZHvyMI3GK1XSHaKI
- s8xQ==
-X-Gm-Message-State: AOAM53104xSJenYAKp6GDI7THIVWRCt5i/BYGdAs/XpoOmoTiP5K5hSt
- 2i3xCQ/1ovfSG5UXfanijNEtDu1WiPM=
-X-Google-Smtp-Source: ABdhPJyD9FSYzToFbTDw6huJMQ2u8zji949WW91+A8e3B/7jp1WUu0KbrmO3ua5gCrBgsPh2Bu9FLQ==
-X-Received: by 2002:a5d:5548:: with SMTP id g8mr498499wrw.364.1602802077481;
- Thu, 15 Oct 2020 15:47:57 -0700 (PDT)
+ bh=orbtnIXME7eI8Z8OOzrxbeZteV0enZumXvxzAJ1ns40=;
+ b=Q/3Y07H/5x2sOxZj73KHXBj7QxFsZU1sz64CS4UxCLsv0TWsWH1GGhVV0KDeKlvkd1
+ iY0oyScHsbX8lYybzXxoaxseIy0I6FsdDmN0L80nRsxoqtX/SWJn+Bvvj932ofRQ3nXB
+ lfW1mOLNnqBvTSn/4SfSctFQ7fegr0FyfwL6hhzV/SoMA3o05zz/C4C6aIlmKC+W7LWP
+ BtC3cCn6T1GV5auyyidF4X8hekcVShYR2S1TT6ePkUi1kkTpaaK7GZ1YHeoLlaJf8kSL
+ lO+ZAMl1Hdpca7sR4yhaVoKbXMfaSAllOQ1vZ80cbezuyOW4LQOzn4wuWKc+hWV4UmY8
+ gJlA==
+X-Gm-Message-State: AOAM531CS7Q1XUbgo39y4U1W5XabvZzwlIxuPEPAW3BzDAiiXcEcSvDX
+ hkypuitl1d09ceL5yZSj8KnagFhPnrs=
+X-Google-Smtp-Source: ABdhPJyOElQWwN6Xa/oUeoSaKoZF6IqcPxOX/nbZ1AtYj55PAwuv+ggx4j2/mtINeO8LQ0+wX2iwig==
+X-Received: by 2002:a1c:bd43:: with SMTP id n64mr741934wmf.113.1602802072889; 
+ Thu, 15 Oct 2020 15:47:52 -0700 (PDT)
 Received: from localhost.localdomain
  (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id j134sm619347wmj.7.2020.10.15.15.47.56
+ by smtp.gmail.com with ESMTPSA id h4sm1094738wrv.11.2020.10.15.15.47.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Oct 2020 15:47:56 -0700 (PDT)
+ Thu, 15 Oct 2020 15:47:52 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org,
 	Victor Kamensky <kamensky@cisco.com>
-Subject: [RFC PATCH v2 2/4] target/mips: Store number of TLB entries in
- CPUMIPSState
-Date: Fri, 16 Oct 2020 00:47:44 +0200
-Message-Id: <20201015224746.540027-3-f4bug@amsat.org>
+Subject: [RFC PATCH v2 1/4] target/mips: Make cpu_mips_realize_env() propagate
+ Error
+Date: Fri, 16 Oct 2020 00:47:43 +0200
+Message-Id: <20201015224746.540027-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201015224746.540027-1-f4bug@amsat.org>
 References: <20201015224746.540027-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -114,75 +114,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As we want to make the number of TLB entries configurable,
-store it in CPUMIPSState. Introduce the init_tlb_entries()
-helper which initializes it from the CP0C1_MMU config content.
+To be able to propagate error to our caller, make
+cpu_mips_realize_env() take an Error argument and
+return a boolean value indicating an error is set or
+not, following the example documented since commit
+e3fe3988d7 ("error: Document Error API usage rules").
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/mips/cpu.h                |  1 +
- target/mips/translate.c          | 13 ++++++++++++-
- target/mips/translate_init.c.inc |  2 +-
- 3 files changed, 14 insertions(+), 2 deletions(-)
+ target/mips/internal.h  | 10 +++++++++-
+ target/mips/cpu.c       |  4 +++-
+ target/mips/translate.c |  4 +++-
+ 3 files changed, 15 insertions(+), 3 deletions(-)
 
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index 7cf7f5239f7..b84e9a8fcae 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -1140,6 +1140,7 @@ struct CPUMIPSState {
- #endif
+diff --git a/target/mips/internal.h b/target/mips/internal.h
+index 7f159a9230c..c2b2e79c515 100644
+--- a/target/mips/internal.h
++++ b/target/mips/internal.h
+@@ -206,7 +206,15 @@ void mips_tcg_init(void);
  
-     const mips_def_t *cpu_model;
-+    uint8_t tlb_entries;
-     void *irq[8];
-     QEMUTimer *timer; /* Internal timer */
-     struct MIPSITUState *itu;
+ /* TODO QOM'ify CPU reset and remove */
+ void cpu_state_reset(CPUMIPSState *s);
+-void cpu_mips_realize_env(CPUMIPSState *env);
++
++/**
++ * cpu_mips_realize_env: Realize CPUMIPSState
++ * @env: CPUMIPSState object
++ * @errp: pointer to error object
++ * On success, return %true.
++ * On failure, store an error through @errp and return %false.
++ */
++bool cpu_mips_realize_env(CPUMIPSState *env, Error **errp);
+ 
+ /* cp0_timer.c */
+ uint32_t cpu_mips_get_random(CPUMIPSState *env);
+diff --git a/target/mips/cpu.c b/target/mips/cpu.c
+index e86cd065483..117c748345e 100644
+--- a/target/mips/cpu.c
++++ b/target/mips/cpu.c
+@@ -147,7 +147,9 @@ static void mips_cpu_realizefn(DeviceState *dev, Error **errp)
+         return;
+     }
+ 
+-    cpu_mips_realize_env(&cpu->env);
++    if (!cpu_mips_realize_env(&cpu->env, errp)) {
++        return;
++    }
+ 
+     cpu_reset(cs);
+     qemu_init_vcpu(cs);
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 4c9b6216321..698bcee8915 100644
+index 398edf72898..4c9b6216321 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -31316,8 +31316,18 @@ void mips_tcg_init(void)
+@@ -31316,7 +31316,7 @@ void mips_tcg_init(void)
  
  #include "translate_init.c.inc"
  
-+static bool init_tlb_entries(CPUMIPSState *env, Error **errp)
-+{
-+    env->tlb_entries = 1 + extract32(env->cpu_model->CP0_Config1, CP0C1_MMU, 6);
-+
-+    return true;
-+}
-+
- bool cpu_mips_realize_env(CPUMIPSState *env, Error **errp)
+-void cpu_mips_realize_env(CPUMIPSState *env)
++bool cpu_mips_realize_env(CPUMIPSState *env, Error **errp)
  {
-+    if (!init_tlb_entries(env, errp)) {
-+        return false;
-+    }
      env->exception_base = (int32_t)0xBFC00000;
  
- #ifndef CONFIG_USER_ONLY
-@@ -31357,7 +31367,8 @@ void cpu_state_reset(CPUMIPSState *env)
- #ifdef TARGET_WORDS_BIGENDIAN
-     env->CP0_Config0 |= (1 << CP0C0_BE);
+@@ -31325,6 +31325,8 @@ void cpu_mips_realize_env(CPUMIPSState *env)
  #endif
--    env->CP0_Config1 = env->cpu_model->CP0_Config1;
-+    env->CP0_Config1 = deposit32(env->cpu_model->CP0_Config1, CP0C1_MMU, 6,
-+                                 env->tlb_entries - 1);
-     env->CP0_Config2 = env->cpu_model->CP0_Config2;
-     env->CP0_Config3 = env->cpu_model->CP0_Config3;
-     env->CP0_Config4 = env->cpu_model->CP0_Config4;
-diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
-index 637caccd890..a426463c434 100644
---- a/target/mips/translate_init.c.inc
-+++ b/target/mips/translate_init.c.inc
-@@ -946,7 +946,7 @@ static void fixed_mmu_init (CPUMIPSState *env, const mips_def_t *def)
+     fpu_init(env, env->cpu_model);
+     mvp_init(env, env->cpu_model);
++
++    return true;
+ }
  
- static void r4k_mmu_init (CPUMIPSState *env, const mips_def_t *def)
- {
--    env->tlb->nb_tlb = 1 + ((def->CP0_Config1 >> CP0C1_MMU) & 63);
-+    env->tlb->nb_tlb = env->tlb_entries;
-     env->tlb->map_address = &r4k_map_address;
-     env->tlb->helper_tlbwi = r4k_helper_tlbwi;
-     env->tlb->helper_tlbwr = r4k_helper_tlbwr;
+ bool cpu_supports_cps_smp(const char *cpu_type)
 -- 
 2.26.2
 
