@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AAE5C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A811C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:54:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1C702222B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C31B2223F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:54:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="J9ylmOmJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1C702222B
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="rb3ZGaYs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C31B2223F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49952 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3gr-0003sK-ML
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:53:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52966)
+	id 1kT3iF-0005fi-7o
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:54:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WZ-0007hq-2a
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:31 -0400
-Received: from mail-eopbgr750112.outbound.protection.outlook.com
- ([40.107.75.112]:30180 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WS-0007fG-F9
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:25 -0400
+Received: from mail-co1nam11on2103.outbound.protection.outlook.com
+ ([40.107.220.103]:1568 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WW-0000kr-TZ
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:30 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WP-0000mo-4o
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:22 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VDm0nanmSmdCWJYzDIwk8Hn0uA+tRXqIsj4820vjWcALfs5SXJ0Mx3qMYVbKk2Kix+d+eW1C4TZ6OEH3bb2XjakZRl2D62Xz6/bNpwRpIrJ5g6CsYbHODa7POixrxd9jNTlEp0jLmgoa2MoDEI/6xXCbNgstPZaJ0rGk7w58YnTJCF1xvsHA1J4ggmTPsyWPgfuOy95/xV0+82hFDhv1owM5y08W2du4CbPyf1GNYq/+AE+qCSqB7u8jc49qVqwVu2flDpT2Lo2g2Fhqmyu1OM3ySFh388QG9SGATFTy59Sj9L21bTPiVN7Ya+A7lGynwtliuVM64ta1IXUYOltmlg==
+ b=ajxqsyb20VuApc1wK2G4WAS/WaUYW4zd49Smid+BpeIMCQzhyaWKEnTC0+XkN3bHfve4uEum7WCt0JrDT+x//j0pIRuZlfxs4SGL4V+BiALD0I/mSjeuyLHqUJE1ttPTXjZNxNSXyN87rlnEGYlwhEwf3dmK9P7JKGEcSWc5aaBjeV179kTh3TlXMzlj0wDg6DQWepFxZT5Bxr9Zm9d8qC7Ce7aqwel8oWFdRTG5c5wPfw8eNeF6WbkkRzjinc6i7Qx80Q/sGAe+xciueZddA8wHljRCg8vb6Pm78Pj23fMlNjMdgUNDdRMM+i9Tf73QfAvG2TqeamRlA0spKIDzEQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ofhel/Y+zk6nPpUJhwyqcyc0WQlzkNTfewTkfViO8DY=;
- b=d6PeMqs70BfKY6wOYDk9zt0J42pefP52ti4utBkhdisnjOlHAkEorGpFtPvfMRqVMjCz50pYAa0JLUWGiIXjEA9d5LW/XmypsNTdkOciBvZ8sx6OJjq+7Y6wg6hf5x4kR1w/6TofV9lYEl9PHON2IAyMtcin7p7S3zUxIDCzVjnsFWwa6EkxJEdXhR4qeuuH1YhPDYlL6h+RIPtXlupJGl1riSypdpViUBmn5Gs/XZYjIlmHVuhL0cgF7kWtR/ICmnvxAv+A2AA8GoTaeR1Ao2zVWWggpIr73V0z09X3woG3Kc4T5Y8EeHusCwPoqZQEObXayd5KsXfxU9JX/wauBQ==
+ bh=EeziuHxjHP52juDKX0HNE8NWbHIDQemp1hX8ht7niK0=;
+ b=EthJQEprNnEZEc3eaufaoYdglE9aiOClzMnHpcNBtMIlds3Go2uBTit2Wu/gYMGeAlbjETeThrvZAfS6etrCTV/TRAJcYj1QLmCjcJKc6gQ9l57/4WiM+SaeO+zyk6otsSOcjEOifVGXL/wqT0UPh15lfCcKePg7oK7txO36rS5VA7Rl0A5fJpxWLCLB40QIX5d9QYlBntYFOyG9pWqCpciy+Vt1JG9LZ+BVfS0qCHPbmQKLqz/spGyTAush6bBb6HDTDLfma6u3mbSZstq8s/eo4ubg/Sgb5bFEqHm/v/pY3Mjh2ewpIC9OaUEkUIujS2+dEq8a+nCWpkSbfywzhw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Ofhel/Y+zk6nPpUJhwyqcyc0WQlzkNTfewTkfViO8DY=;
- b=J9ylmOmJw8CMAxF27UNc43Oih/u8slZXINsOzdquokahJKlBiofMRebWQoKVlpy0Mb8LQe9C+KIaQBByDIttdLKcLZSwwHj6GR8h8HXnX2K8R8vIdJJi1USlgNwOYVdStrbAZ9mHqjibsn4C9XkFQg8kfa0ho3XagUW4OGWkeLw=
+ bh=EeziuHxjHP52juDKX0HNE8NWbHIDQemp1hX8ht7niK0=;
+ b=rb3ZGaYs1H+DtcNNzOUXNng4xhuAIMQc6Vyun/SCdhCfr1Imln2zmLrUakdoMT0EpII8hrpoQdvRBt0w/tARAxrbk1K9ZdDqVC3+efb6178codkTxp+8Ljp1o3vOq78NdsLbSV6iGnKSvptJcnTpwFJbz/mZmjhDpoekvkpE2AI=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SA0PR03MB5465.namprd03.prod.outlook.com (2603:10b6:806:b5::21)
+ by SA2PR03MB5721.namprd03.prod.outlook.com (2603:10b6:806:117::13)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Thu, 15 Oct
- 2020 13:42:13 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.30; Thu, 15 Oct
+ 2020 13:42:18 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3455.031; Thu, 15 Oct 2020
- 13:42:13 +0000
+ 13:42:17 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 13/16] fuzz: add an "opaque" to the FuzzTarget struct
-Date: Thu, 15 Oct 2020 09:41:33 -0400
-Message-Id: <20201015134137.205958-14-alxndr@bu.edu>
+Subject: [PATCH v4 15/16] fuzz: register predefined general-fuzz configs
+Date: Thu, 15 Oct 2020 09:41:35 -0400
+Message-Id: <20201015134137.205958-16-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
 References: <20201015134137.205958-1-alxndr@bu.edu>
@@ -79,34 +79,34 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL1PR13CA0055.namprd13.prod.outlook.com (2603:10b6:208:257::30) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend
- Transport; Thu, 15 Oct 2020 13:42:12 +0000
+ Transport; Thu, 15 Oct 2020 13:42:16 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 580574b0-c5ff-4bcc-af68-08d871101f12
-X-MS-TrafficTypeDiagnostic: SA0PR03MB5465:
+X-MS-Office365-Filtering-Correlation-Id: ed71fd46-5670-4830-f9b9-08d8711021c5
+X-MS-TrafficTypeDiagnostic: SA2PR03MB5721:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR03MB54650A846E323629B5759615BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5797;
+X-Microsoft-Antispam-PRVS: <SA2PR03MB5721D90F002B77C0BAD57B16BA020@SA2PR03MB5721.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eQSnS1+sa4fqd2aM3sMRvEnp/1Vwrly+I+ZR/7qZk5tL3l0L83oNZ0qM660WVkh++yBy7OCV4ErmSi4IbIxYyL5ASkCGaIDuGUzgC7/eFJw0pAW/OHAFdj6L6CYhiPtqLTZcMJJR+iI4ATOoRdHhLwUGtZKHwScqAWWgOeUpQhvKMnqhDZk2yP7ld0cXPVX0QT8CZhCAFPRKRgb59nhlNIrtQ5g/fUkpkls03yc+5aTSPsDO5zIUwbs07dcSLEI9BB/vqIYQYM2uQ796uWxiG8/7FezAhRDbuH6hEjO/+AsX+7djqC+7iMf2V6asP24OVgm49feOwPrsq4YOZ5w2yFau3Xv6PY6Yl98NRMqqYcxrY3/ItqecG0u+JiyNMUjW
+X-Microsoft-Antispam-Message-Info: 1NTpWFmLF8Z78BhzeP9vAGmGWt/i3jCUFkaLNFnwsVZnc2akCp/dX0WEsFbLjFEyVCgvrnF57C3djMuXm3BOK7pX9syV22WEp6PhKI/lAtgFuD/dB7/x+ieSCYCMvq+D5VPBbIkBvz0sIOO5iVHwEd3ppzqXi8nMATXKPDN9gkIlwPm+ZbIw+gtnq9L2Qsu8ScKRQOhESeyUFx5P9AeKGKUWos57kr6u6cNVVoSqnoKLlKSHpcQ3iOj9XHqMF1S1fLrZZOUBwnUY9yJL+j6G+Tf6/qyXjHXCpXtV5FfvJlUu67zcHekldjJV9tSmMOQyYPi4OYFuWOg+fqQU+g+98b4t5oPG7wiyn1vvcODQ/39KhurN2NTaoK1QkuF4U8Ax
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(5660300002)(54906003)(4744005)(2616005)(8936002)(34490700002)(1076003)(66476007)(66946007)(6666004)(956004)(4326008)(6512007)(6486002)(8676002)(75432002)(6506007)(26005)(6916009)(52116002)(2906002)(86362001)(186003)(16526019)(786003)(316002)(66556008)(478600001)(36756003);
+ SFS:(4636009)(346002)(376002)(396003)(39860400002)(136003)(366004)(5660300002)(1076003)(34490700002)(26005)(6486002)(66556008)(6512007)(8676002)(86362001)(52116002)(6506007)(8936002)(66946007)(75432002)(4326008)(186003)(956004)(54906003)(16526019)(786003)(2906002)(478600001)(6666004)(36756003)(2616005)(66476007)(6916009)(316002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: NDQHs0jvtymtzDSLA31sc7UlAwrb3lwc9ERRlpZYY3VuSeNGHcyvI6Re6Hc/ZkXBD+xKac9iVu22ELmzjnx4/4jDRM6G8TqOngM6P7cm2ExlDrz1jaeKWja7bxw21G3wvqbmt17wPLTp8YchMhk62gRYJNPTvYqZhdmXaVbKVKfvlXuYvtba9TYCL4v9+wKmIwP62rsMQLmOv9ochaqaLSJ2mkRg/5a1N7Z/AbRYfh9l+uSqYzsMyfHpJ/7j50vL3wAJHnGuEUSB7t8Mfd3Hry10n+VZKkaw4oZ5TN0ipylBPbQGvSF+Ydw3ElwC2skxSS8Q0r9OLv2UucjnGqbt+BsXR0BZteocjP5XWh1/cTFZu050ODfpBxc08DikW6JTiHZxvOzz6BgX+y3oOa0tHewedOT4QomkOEeDELihuj3jlCw4IlSfBBxadzksc+viFwip0P9jpmEfMVrw0QE+mWgqE8WGN/KHEAzZF1Cclw5t126spW4XTYdKGE0v7hQAVH9EaSBzXhdSwhUK5vqM6TZZYJqehHAXYE07b9Z9kFxHLmsotzEZjfmN8Xr4QAtSQrAVLoCJ4+frqMUv8vRaonDc//WUOmyxYKdLH2wbIgsVCNGJWQoD9eNQqwPUB5ZSO0xQ60LP5paJrVleYL77Rg==
+X-MS-Exchange-AntiSpam-MessageData: 0x/C65gGzTXjZwq799ErSJ/Yrgm2h6h9DptrQf9hjRIj3Rx5fSLnKd3uf9Biz220Lo193b0iTLPPyeewC2+72G6i0sXR9k4f/qFmc06iY4zzga+RGguBLiBQtH2xb+PziW+gfsLqfXPeujAulWUsP4baW6Yl5zW5tEy8hbVwKouMeL7aW2jACBdwwr7C4XlgJSVIWK/H53yOLhrjM3dLsTKlfmXEp6w35e0yj6aGHvPzP3VS42M6Mn9RqqJpc4BbI8tS1Fes9f9IaiLAY3yKaNb1rAHHYHP5hrydy5t8/IG9B05aWaxiN1i6q8nnV7zS6EZTr/pkLpsB0XdshjF2B+/1kbmHOi7XM7M7Zo31WUPNkENNRKUs8nUDitL4DE5Gms/Ea9D+J2e7IDvQ4GBmVWxIcoeLar9OUEWjvW3eZ4KMA7l9uZIFrVGfnuuJdImKu1FkEFL7FAektCmkXg4yheZrIwDQeODwM9AX+/RA9T5qDyNKRAV5tB21mQR21PBb1WY3n8ELRRbmledU9hxplG8orix1c8hTXDkl9n7ilvPojalrnVwEGWH8Em7h8zywezlAou5aX/pdcjBye9wjgpLL5G/6EUdZ4o081KhpuTu5ciAohMUbkHJAFdvkCiDqPYJ9PcwjT4Yon4pGEyO+lQ==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 580574b0-c5ff-4bcc-af68-08d871101f12
+X-MS-Exchange-CrossTenant-Network-Message-Id: ed71fd46-5670-4830-f9b9-08d8711021c5
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:13.2795 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:17.6891 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1ceHqAsY2AxjF5JdovWVLMrEMt5PMmsDugQJkF4bHgalAH5vaLVvByUgAFwdGyaN
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR03MB5465
-Received-SPF: pass client-ip=40.107.75.112; envelope-from=alxndr@bu.edu;
- helo=NAM02-BL2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:04
+X-MS-Exchange-CrossTenant-UserPrincipalName: DKD3LIg49nlPc1D6pE/qF+80SUFpJ+Yy4/Bnp00YdYWJ21Pcv57NRLq8MGTc7wfQ
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR03MB5721
+Received-SPF: pass client-ip=40.107.220.103; envelope-from=alxndr@bu.edu;
+ helo=NAM11-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:16
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -136,30 +136,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It can be useful to register FuzzTargets that have nearly-identical
-initialization handlers (e.g. for using the same fuzzing code, with
-different configuration options). Add an opaque pointer to the
-FuzzTarget struct, so that FuzzTargets can hold some data, useful for
-storing target-specific configuration options, that can be read by the
-get_init_cmdline function.
+We call get_general_fuzz_configs, which fills an array with
+predefined {name, args, objects} triples. For each of these, we add a
+new FuzzTarget, that uses a small wrapper to set
+QEMU_FUZZ_{ARGS,OBJECTS} to the corresponding predefined values.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- tests/qtest/fuzz/fuzz.h | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qtest/fuzz/general_fuzz.c | 31 +++++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
 
-diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
-index ed9ce17154..08e9560a79 100644
---- a/tests/qtest/fuzz/fuzz.h
-+++ b/tests/qtest/fuzz/fuzz.h
-@@ -100,6 +100,7 @@ typedef struct FuzzTarget {
-                        uint8_t *out, size_t max_out_size,
-                        unsigned int seed);
+diff --git a/tests/qtest/fuzz/general_fuzz.c b/tests/qtest/fuzz/general_fuzz.c
+index 22884512a3..04c4550694 100644
+--- a/tests/qtest/fuzz/general_fuzz.c
++++ b/tests/qtest/fuzz/general_fuzz.c
+@@ -26,6 +26,7 @@
+ #include "hw/qdev-core.h"
+ #include "hw/pci/pci.h"
+ #include "hw/boards.h"
++#include "general_fuzz_configs.h"
  
-+    void *opaque;
- } FuzzTarget;
+ /*
+  * SEPARATOR is used to separate "operations" in the fuzz input
+@@ -902,6 +903,17 @@ static GString *general_fuzz_cmdline(FuzzTarget *t)
+     return cmd_line;
+ }
  
- void flush_events(QTestState *);
++static GString *general_fuzz_predefined_config_cmdline(FuzzTarget *t)
++{
++    general_fuzz_config *config;
++    g_assert(t->opaque);
++
++    config = t->opaque;
++    setenv("QEMU_FUZZ_ARGS", config->args, 1);
++    setenv("QEMU_FUZZ_OBJECTS", config->objects, 1);
++    return general_fuzz_cmdline(t);
++}
++
+ static void register_general_fuzz_targets(void)
+ {
+     fuzz_add_target(&(FuzzTarget){
+@@ -912,6 +924,25 @@ static void register_general_fuzz_targets(void)
+             .fuzz = general_fuzz,
+             .crossover = general_fuzz_crossover
+     });
++
++    GString *name;
++    general_fuzz_config *config;
++    GArray *predefined_configs = get_general_fuzz_configs();
++
++    for (int i = 0; i < predefined_configs->len; i++) {
++        config = &g_array_index(predefined_configs, general_fuzz_config, i);
++        name = g_string_new("general-fuzz");
++        g_string_append_printf(name, "-%s", config->name);
++        fuzz_add_target(&(FuzzTarget){
++                .name = name->str,
++                .description = "Predefined general-fuzz config.",
++                .get_init_cmdline = general_fuzz_predefined_config_cmdline,
++                .pre_fuzz = general_pre_fuzz,
++                .fuzz = general_fuzz,
++                .crossover = general_fuzz_crossover,
++                .opaque = config
++        });
++    }
+ }
+ 
+ fuzz_target_init(register_general_fuzz_targets);
 -- 
 2.28.0
 
