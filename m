@@ -2,92 +2,92 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1C7C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:17:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DC91C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:19:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF0B82076D
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:17:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6DB062076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:19:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgyLSzUT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0B82076D
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GR82TBZ7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB062076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49760 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT1GE-0004gv-S6
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 07:17:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41920)
+	id 1kT1I8-0006br-CM
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 07:19:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42734)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT18f-0001CC-SQ
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:09:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35965)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT1Ak-0001w4-RB
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:11:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30607)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT18b-0005Ye-KF
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:09:41 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT1Aj-0006Aw-3Q
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:11:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602760175;
+ s=mimecast20190719; t=1602760306;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=kWdD/fy1kJlA/xHpjqMh0Qz8/90w6OVAkY6x3PSbdGA=;
- b=YgyLSzUTx6spijLUo4cX+GQJ2TKrhLOF0P+Apwdu9+JDCbjtvbh6EjAx9OIz7zXNovrltq
- isCCCzmChM58xdz8YXDQyqIt1zWbDLI/Dl7D3RffaFPCZK2Xo1MHyGWhrVB/KYLcvpotid
- YF8nau+5L/6Vn5GHyQJN383pEAQc8W8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-yZpUNMpaOmywoELKvbwIgg-1; Thu, 15 Oct 2020 07:09:31 -0400
-X-MC-Unique: yZpUNMpaOmywoELKvbwIgg-1
-Received: by mail-wm1-f72.google.com with SMTP id p17so1572699wmi.7
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 04:09:31 -0700 (PDT)
+ bh=GDmWnrlKKHfBZ6olpkMo2Yl2ziMS5ygf4QWhtHU2UlU=;
+ b=GR82TBZ7/ujQp5VKe4RNzfL0Lj0far8mi0JC3oo8txiZ0LN5OKJLQUzlpXurSDWluMSd7c
+ T6NQtsqLFQGUt3EIENmdn8LKt+e7knK1ftVdCpAoYvgrgsWGsqz5z/jyjRmkbedO2/Yc1Q
+ cF06Wer7YohBBc1T8iMu5T0C/bUgyB8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-O5jfwUyoPL6txjX5PiJvEg-1; Thu, 15 Oct 2020 07:11:45 -0400
+X-MC-Unique: O5jfwUyoPL6txjX5PiJvEg-1
+Received: by mail-wm1-f70.google.com with SMTP id f26so1044544wml.1
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 04:11:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=kWdD/fy1kJlA/xHpjqMh0Qz8/90w6OVAkY6x3PSbdGA=;
- b=JoVDinQW7y27meFzY1jYv4S/OAQSNxz7Kjwyjtavgpy4X3q7U9JarcoXPWturwlUkk
- qqa+Qdn6E6GfSUoHF30HAA/0HK9vKjl/MlgtBDZh7QNLrJBJrVKRD+mj4LXX48QQfNO0
- kZvHSHyXmYHphRP7pmn7lvyeBdyTzvfMg7ORKJ9IhiAT3WrSr1iPZrVIrnLedxbRU0Ed
- 25hSzjcE1FjsWNhaFrICO4vVy1U5p8ZXhawmBdxjwcKoPnyPZLWHhQ8z8TVHcfqboUK1
- Tl8LpV/WSChCSM+WXCFJMax49u6tQyKq/ByPo7NLfdCvtW1TXMkT0Ry6RBZTtzPNxbBA
- X80g==
-X-Gm-Message-State: AOAM532J/uhlvwZgH7GvywgXRyIPJl8Ag+/1WRcKMnyL8E2o61HkPWrN
- gf28TjFaMz1CLiO0SQ6V2+TwYDB6A2EshAzEC4xBcTg7hmvLI4tFwATKkuD+C9RMJysnfkYuJKu
- e7fyd92rw+Um3WF0=
-X-Received: by 2002:a05:6000:10c6:: with SMTP id
- b6mr3837012wrx.10.1602760170439; 
- Thu, 15 Oct 2020 04:09:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwxz4HkHLD5/EJIJ02Rg8KZA8QjhWpGkRnP8HOJjyE8nnbmf+qDeNRxqX9lrS/63fi9vDDAcA==
-X-Received: by 2002:a05:6000:10c6:: with SMTP id
- b6mr3836984wrx.10.1602760170145; 
- Thu, 15 Oct 2020 04:09:30 -0700 (PDT)
+ bh=GDmWnrlKKHfBZ6olpkMo2Yl2ziMS5ygf4QWhtHU2UlU=;
+ b=ULGTGxFMQwT4CvHHUvh2WlVl8Rc/AF8flRxwXwbPsWOAPOTUZRe/TAQtSBDjV6LTf8
+ mWQ65M4U8FVAzYDvxK9+1MQI2gDNQH57UNCRM+IkQIlxXsAAsnzN6EzAhVM8xfTfruRO
+ eylUYd/yzg7713lMMaVto9RZ/BPHh41aZ76t2Kj/fnT1BoOBkWZe6H2gW23gHM+mRTfF
+ 6KDe6JvF+n0aUykQxbF5ejt6y3/sWO+Hs/da911DBsCuDW4cwDlIOVwmx7hDZ1UiEd7b
+ WYTHkScRaIx6nJlhKRN36C6f891GWNo//+2cFQHmR4mFbdwCetxU4/ywqZqCkjCYxszx
+ emSg==
+X-Gm-Message-State: AOAM532mB/Z4ttvuDFajA+TKSwvck3Myfcv01BksfQRote4ObWePJ7OB
+ iOrOgKNofkpLdyF9nBaJoqgtQ1QWJ2EafSV2GhDIJ0XQv20z6ZKtPKtIFIf5faK3g/DjAk2SXAV
+ xAyYu1YmSxH0uIKQ=
+X-Received: by 2002:a05:6000:1110:: with SMTP id
+ z16mr3986022wrw.71.1602760304083; 
+ Thu, 15 Oct 2020 04:11:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxJV2OYzlRbjH78GFwZIVgJCqpblYJqHkUJ6JNGcfjXf52LIT/jMwpn/koPERgk+eiMTVSebQ==
+X-Received: by 2002:a05:6000:1110:: with SMTP id
+ z16mr3985999wrw.71.1602760303886; 
+ Thu, 15 Oct 2020 04:11:43 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t5sm4377253wrb.21.2020.10.15.04.09.28
+ by smtp.gmail.com with ESMTPSA id x65sm4174070wmg.1.2020.10.15.04.11.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 15 Oct 2020 04:09:29 -0700 (PDT)
-Subject: Re: [PATCH 05/10] colo-compare: fix missing compare_seq initialization
+ Thu, 15 Oct 2020 04:11:43 -0700 (PDT)
+Subject: Re: [PATCH 07/10] net/colo-compare.c: Fix compare_timeout format issue
 To: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
  qemu-dev <qemu-devel@nongnu.org>
 References: <20201014072555.12515-1-chen.zhang@intel.com>
- <20201014072555.12515-6-chen.zhang@intel.com>
+ <20201014072555.12515-8-chen.zhang@intel.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <1591a864-b038-6366-b5db-cef9fce36d34@redhat.com>
-Date: Thu, 15 Oct 2020 13:09:28 +0200
+Message-ID: <938e4d0b-7820-cecc-d4d2-cce591dd4810@redhat.com>
+Date: Thu, 15 Oct 2020 13:11:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201014072555.12515-6-chen.zhang@intel.com>
+In-Reply-To: <20201014072555.12515-8-chen.zhang@intel.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -119,47 +119,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/14/20 9:25 AM, Zhang Chen wrote:
-> From: Li Zhijian <lizhijian@cn.fujitsu.com>
+> From: Zhang Chen <chen.zhang@intel.com>
 > 
+> This parameter need compare with the return of qemu_clock_get_ms(),
+> it is uinit64_t. So we need fix this issue here.
 
-Please include:
+Typo "uint64_t"
 
-Fixes: f449c9e549c ("colo: compare the packet based on the tcp sequence 
-number")
+Please add:
+
+Fixes: 9cc43c94b31 ("net/colo-compare.c: Expose "compare_timeout" to users")
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
-> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-> ---
->   net/colo.c | 5 +----
->   1 file changed, 1 insertion(+), 4 deletions(-)
 > 
-> diff --git a/net/colo.c b/net/colo.c
-> index a6c66d829a..ef00609848 100644
-> --- a/net/colo.c
-> +++ b/net/colo.c
-> @@ -133,14 +133,11 @@ void reverse_connection_key(ConnectionKey *key)
+> Reported-by: Derek Su <dereksu@qnap.com>
+> Signed-off-by: Zhang Chen <chen.zhang@intel.com>
+> Reviewed-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> ---
+>   net/colo-compare.c | 12 ++++++------
+>   1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/net/colo-compare.c b/net/colo-compare.c
+> index 24c366eec0..f4814c5f09 100644
+> --- a/net/colo-compare.c
+> +++ b/net/colo-compare.c
+> @@ -120,7 +120,7 @@ struct CompareState {
+>       SendCo out_sendco;
+>       SendCo notify_sendco;
+>       bool vnet_hdr;
+> -    uint32_t compare_timeout;
+> +    uint64_t compare_timeout;
+>       uint32_t expired_scan_cycle;
 >   
->   Connection *connection_new(ConnectionKey *key)
+>       /*
+> @@ -1075,9 +1075,9 @@ static void compare_get_timeout(Object *obj, Visitor *v,
+>                                   Error **errp)
 >   {
-> -    Connection *conn = g_slice_new(Connection);
-> +    Connection *conn = g_slice_new0(Connection);
+>       CompareState *s = COLO_COMPARE(obj);
+> -    uint32_t value = s->compare_timeout;
+> +    uint64_t value = s->compare_timeout;
 >   
->       conn->ip_proto = key->ip_proto;
->       conn->processing = false;
-> -    conn->offset = 0;
->       conn->tcp_state = TCPS_CLOSED;
-> -    conn->pack = 0;
-> -    conn->sack = 0;
->       g_queue_init(&conn->primary_list);
->       g_queue_init(&conn->secondary_list);
+> -    visit_type_uint32(v, name, &value, errp);
+> +    visit_type_uint64(v, name, &value, errp);
+>   }
+>   
+>   static void compare_set_timeout(Object *obj, Visitor *v,
+> @@ -1140,9 +1140,9 @@ static void set_max_queue_size(Object *obj, Visitor *v,
+>                                  Error **errp)
+>   {
+>       Error *local_err = NULL;
+> -    uint32_t value;
+> +    uint64_t value;
+>   
+> -    visit_type_uint32(v, name, &value, &local_err);
+> +    visit_type_uint64(v, name, &value, &local_err);
+>       if (local_err) {
+>           goto out;
+>       }
+> @@ -1390,7 +1390,7 @@ static void colo_compare_init(Object *obj)
+>       object_property_add_str(obj, "notify_dev",
+>                               compare_get_notify_dev, compare_set_notify_dev);
+>   
+> -    object_property_add(obj, "compare_timeout", "uint32",
+> +    object_property_add(obj, "compare_timeout", "uint64",
+>                           compare_get_timeout,
+>                           compare_set_timeout, NULL, NULL);
 >   
 > 
 
