@@ -2,44 +2,41 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 935F4C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 946CAC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:21:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3C29520789
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:19:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C29520789
+	by mail.kernel.org (Postfix) with ESMTPS id 1428120789
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:21:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1428120789
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59388 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTDT5-0007YE-7v
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58818)
+	id 1kTDUr-0001Ea-4c
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:21:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58804)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRW-0005kz-Ck; Thu, 15 Oct 2020 20:17:58 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30055)
+ id 1kTDRT-0005hM-35; Thu, 15 Oct 2020 20:17:55 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:30045)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRR-0006yK-81; Thu, 15 Oct 2020 20:17:58 -0400
+ id 1kTDRM-0006ve-MM; Thu, 15 Oct 2020 20:17:54 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 68EF074761F;
+ by localhost (Postfix) with SMTP id 0C11C747625;
  Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 0564A747622; Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
-Message-Id: <f14bcaf3cf129500710ba5289980a134086bd949.1602805637.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1602805637.git.balaton@eik.bme.hu>
-References: <cover.1602805637.git.balaton@eik.bme.hu>
-Subject: [PATCH v8 5/5] mac_oldworld: Change PCI address of macio to match
- real hardware
+ id E55DF74761F; Fri, 16 Oct 2020 02:17:35 +0200 (CEST)
+Message-Id: <cover.1602805637.git.balaton@eik.bme.hu>
+Subject: [PATCH v8 0/5] Mac Old World ROM experiment (ppc/mac_* clean ups and
+ loading binary ROM)
 Date: Fri, 16 Oct 2020 01:47:17 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -74,29 +71,26 @@ Sender: "Qemu-devel"
 Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
 From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-The board firmware expect these to be at fixed addresses and programs
-them without probing, this patch puts the macio device at the expected
-PCI address.
+This is the cut down version of the earlier series omitting unfinished
+patches that I plan to rework later and rebased to Mark's qemu-macppc
+branch. Compared to v7 the only change is the cast to (target_ulong)
+from (uint32_t) as requested by Mark in patch 1.
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/ppc/mac_oldworld.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+BALATON Zoltan
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 13eb9bafa1..bb563e8aab 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -288,7 +288,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
- 
-     /* MacIO */
--    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
-+    macio = pci_new(PCI_DEVFN(16, 0), TYPE_OLDWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
+BALATON Zoltan (5):
+  mac_oldworld: Allow loading binary ROM image
+  mac_newworld: Allow loading binary ROM image
+  mac_oldworld: Drop a variable, use get_system_memory() directly
+  mac_oldworld: Drop some variables
+  mac_oldworld: Change PCI address of macio to match real hardware
+
+ hw/ppc/mac.h          |  2 --
+ hw/ppc/mac_newworld.c | 22 ++++++++------
+ hw/ppc/mac_oldworld.c | 67 ++++++++++++++++++++++++-------------------
+ 3 files changed, 52 insertions(+), 39 deletions(-)
+
 -- 
 2.21.3
 
