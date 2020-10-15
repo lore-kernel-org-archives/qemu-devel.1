@@ -2,163 +2,89 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B18C43467
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8AFC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:37:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B19442222B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3051B2223F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:37:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EHG26iPf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B19442222B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Cvk4qSEd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3051B2223F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3Q1-0000IS-Mf
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:35:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50590)
+	id 1kT3Ri-0002g6-7c
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kT3P5-0007CN-2b; Thu, 15 Oct 2020 09:34:47 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:54872
- helo=mx0a-001b2d01.pphosted.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kT3P1-00086D-QZ; Thu, 15 Oct 2020 09:34:46 -0400
-Received: from pps.filterd (m0098413.ppops.net [127.0.0.1])
- by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09FDYUkA144909; Thu, 15 Oct 2020 09:34:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : from : to : cc
- : references : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=U3yT9RsMt2GB3zQwqEcqY9FVTsyLhQMoSBdoSHRcFQs=;
- b=EHG26iPfm7NoPu5Eqkqqsk18CYHsCiKAkvlUIYvQ5KVV40H/XiB9J0fr/R6FJLmdii08
- tZdMx8wkJiRYKVynd7OznfMRVLXbfDcR9HYhpfboBtA0UyqqmmLvd/X17i+v++RTXTds
- rrd5w1rYSoZ6nDp/loqNqiUB81CZCzLnxFB33wz3erCOAhjx9C14bnWTeMkNEhery6XK
- T2q3U/P4XNSydJ9+jHY2fWArGmF1TGBDRA/y3Dj846D5St2L5Q/AG+BuhwabIMcxIkIj
- U1543J69uTO2EQnPvp9tm+bBEwr5gR/oQR66ZpAwJTPT66QYxeaQOMynluR9CgtcVpiT 2Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 346q500qkc-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 15 Oct 2020 09:34:42 -0400
-Received: from m0098413.ppops.net (m0098413.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09FDYfdL146086;
- Thu, 15 Oct 2020 09:34:41 -0400
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.99])
- by mx0b-001b2d01.pphosted.com with ESMTP id 346q500qd9-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 15 Oct 2020 09:34:41 -0400
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
- by ppma04ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09FDVvcu019070;
- Thu, 15 Oct 2020 13:34:27 GMT
-Received: from b06cxnps3074.portsmouth.uk.ibm.com
- (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
- by ppma04ams.nl.ibm.com with ESMTP id 3434k7w9ef-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 15 Oct 2020 13:34:27 +0000
-Received: from d06av24.portsmouth.uk.ibm.com (mk.ibm.com [9.149.105.60])
- by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09FDYO6j31195482
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 15 Oct 2020 13:34:24 GMT
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 8E19B4203F;
- Thu, 15 Oct 2020 13:34:24 +0000 (GMT)
-Received: from d06av24.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 032A842041;
- Thu, 15 Oct 2020 13:34:24 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.83.122])
- by d06av24.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Thu, 15 Oct 2020 13:34:23 +0000 (GMT)
-Subject: Re: [PATCH] s390x/s390-virtio-ccw: Reset PCI devices during subsystem
- reset
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>, qemu-devel@nongnu.org
-References: <1602767767-32713-1-git-send-email-mjrosato@linux.ibm.com>
- <e9a29f3a-5f15-aa36-f9aa-314bc56a3507@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <d705b269-b001-f810-8629-7d64fb560ac5@de.ibm.com>
-Date: Thu, 15 Oct 2020 15:34:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kT3Q0-0000gt-4d
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:35:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51711)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kT3Px-0008JB-TH
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:35:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602768941;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2KO6fi08NfGByxXZfKo9I5VP3nl/DbBwbTw76hSITJQ=;
+ b=Cvk4qSEdOcz93FHN/d4KDLHwVPPNo3VF4x1rrieGsYrdPXA9fAestyjaXkE/CGMJyYK0F+
+ j23RvMBVSlzf8kofi+kkp7vxMgItDquD6Gs/NSLV7Wo5ESe+sZju4MFJZQp+SweFc3qRW6
+ 2R6ifkLj8kQOomXGrELivvpy5tCPZJ4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-393-t3pzo8Y2PzSqLcRVUCrWHg-1; Thu, 15 Oct 2020 09:35:31 -0400
+X-MC-Unique: t3pzo8Y2PzSqLcRVUCrWHg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 762AA5705E;
+ Thu, 15 Oct 2020 13:35:09 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D088A76663;
+ Thu, 15 Oct 2020 13:35:07 +0000 (UTC)
+Date: Thu, 15 Oct 2020 15:35:05 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Marc Zyngier <maz@kernel.org>
+Subject: Re: Kernel patch cases qemu live migration failed.
+Message-ID: <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
+References: <20201015040639.70C6D414009F@webmail.sinamail.sina.com.cn>
+ <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <e9a29f3a-5f15-aa36-f9aa-314bc56a3507@de.ibm.com>
+In-Reply-To: <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-15_08:2020-10-14,
- 2020-10-15 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- mlxscore=0 phishscore=0
- lowpriorityscore=0 malwarescore=0 priorityscore=1501 suspectscore=0
- spamscore=0 clxscore=1015 impostorscore=0 bulkscore=0 mlxlogscore=999
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010150092
-Received-SPF: pass client-ip=148.163.158.5;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:16:15
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.019,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -171,50 +97,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, pmorel@linux.ibm.com, david@redhat.com, cohuck@redhat.com,
- schnelle@linux.ibm.com, farman@linux.ibm.com, pasic@linux.ibm.com,
- qemu-s390x@nongnu.org, rth@twiddle.net
+Cc: kvmarm <kvmarm@lists.cs.columbia.edu>, xu910121@sina.com,
+ qemu-devel <qemu-devel@nongnu.org>, "Dave.Martin" <dave.martin@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 15.10.20 15:32, Christian Borntraeger wrote:
+On Thu, Oct 15, 2020 at 12:26:10PM +0100, Marc Zyngier wrote:
+> Hi
 > 
+> Please don't use my arm.com address anymore, nobody reads it...
 > 
-> On 15.10.20 15:16, Matthew Rosato wrote:
->> Currently, a subsystem reset event leaves PCI devices enabled, causing
->> issues post-reset in the guest (an example would be after a kexec).  These
->> devices need to be reset during a subsystem reset, allowing them to be
->> properly re-enabled afterwards.  Add the S390 PCI host bridge to the list
->> of qdevs to be reset during subsystem reset.
->>
->> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
->> Reviewed-by: Eric Farman <farman@linux.ibm.com>
+> On 2020-10-15 05:06, 张东旭 wrote:
+> > I'm so sorry for disturbing you.
+> > 
+> > When I apply this kernel patch：KVM: arm64/sve: System register
+> > context switch and access support
+> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64/kvm/sys_regs.c?id=73433762fcaeb9d59e84d299021c6b15466c96dd
 > 
-> Makese sense. 
-> Acked-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> This patch was only introduced in 5.2, and wasn't supposed to be
+> backported to anything else.
 
-A question. Is this a stable candidate?
+All upstream patches are backport candidates. Welcome to RHEL :-)
 
 > 
+> > qemu live migration will failed with messages：
+> >               ​qemu-kvm: Invalid value 233 expecting positive value
+> > <= 232
+> >               qemu-kvm: Failed to load cpu:cpreg_vmstate_array_len
+> > New version kernel  exclude ID_AA64ZFR0_EL1 register when host not
+> > support SVE feature,
+> > so qemu ioctl kvm(KVM_GET_REG_LIST) will not contain ID_AA64ZFR0_EL1
+> > register.
+> > 
+> > I'm using CentOS Linux kernel, old kernel version：4.18.0-80.11.el8
+> > (migration source)
+> >       new kernel version：4.18.0-147.5.el8 (migration destination)
+> > 
+> > CentOS linux kernel version 4.18.0-111.el8 applied this patch. So
+> > 4.18.0-147.5.el8 also applied this patch.
+> > 
+> > Migration source and destination hosts have the same hardware, just
+> > kernel version is different,
+> > and the hardware on either side of the migration not support SVE.
+> > 
+> > Is there some good suggestions，which can make sure old version
+> > kernel live migration to new version kernel with qemu?
 > 
->> ---
->>  hw/s390x/s390-virtio-ccw.c | 1 +
->>  1 file changed, 1 insertion(+)
->>
->> diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
->> index e52182f..2e90033 100644
->> --- a/hw/s390x/s390-virtio-ccw.c
->> +++ b/hw/s390x/s390-virtio-ccw.c
->> @@ -101,6 +101,7 @@ static const char *const reset_dev_types[] = {
->>      "s390-sclp-event-facility",
->>      "s390-flic",
->>      "diag288",
->> +    TYPE_S390_PCI_HOST_BRIDGE,
->>  };
->>  
->>  static void subsystem_reset(void)
->>
+> I['m afraid you should take this with your distribution of
+> choice, unless you can reproduce the problem with mainline kernels.
+
+I'll bet this reproduces when migrating from a mainline pre SVE register
+filtering kernel to a mainline that does the filtering. I don't have
+time to test that though.
+
+Thanks,
+drew
+
 
