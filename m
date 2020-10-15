@@ -2,74 +2,78 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09BE9C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:50:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91CC4C43457
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:50:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3965E22240
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F218D22240
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:50:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QpAUttVj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3965E22240
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0GsVqEK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F218D22240
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT6SK-0008Fu-6Y
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 12:50:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42688)
+	id 1kT6SM-0008Jy-Tb
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 12:50:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kT6NL-0004Lx-3T
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:45:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22690)
+ id 1kT6NQ-0004MT-5d
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:45:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40031)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kT6NI-0000Tj-9q
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:45:10 -0400
+ id 1kT6NN-0000U3-TT
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:45:15 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602780305;
+ s=mimecast20190719; t=1602780311;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=ieNGRzJXZMmGX78KrPngoN8zOUKAEvnJwNa2od2IgGY=;
- b=QpAUttVjeaocOrXPETRFrJGZ/mya4ek2KPdaDub4yTqVC8lRZ2VzN1uuDEEjYfhWfn9abe
- Dn8qpz2GxTcQOgmSmI8F9K2Tnvinnp5xa8zY/W19Q7sEViBxksZ93f/pK6q83tcqsnakY9
- 4hyxmM9cyJiw7174YBirQdSVz6/eS1A=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FjSWs2ueHTFAYbwmQwSRzeDlYFK9piLsfc+JOFi7X2Q=;
+ b=M0GsVqEKF43LjS0irsNtwgXsFk36Qbrp9jtA80vDn0v3h3vkdwbksXXxEDGZrdkd1nWexH
+ g0cNwNYNWPOeEItWkUFqM+flBppA/nlKMxpq3oSCpG9iDNgEyaH9XbQTTq1ivMBjVBMzqM
+ lPw7NRNLjgabp67ZZXGVEexMHUqKkOg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-TL24v3ZnPwm7D8Ox3A4UJg-1; Thu, 15 Oct 2020 12:45:04 -0400
-X-MC-Unique: TL24v3ZnPwm7D8Ox3A4UJg-1
+ us-mta-503-YwResHO9MY-tBZXT2_Af_A-1; Thu, 15 Oct 2020 12:45:08 -0400
+X-MC-Unique: YwResHO9MY-tBZXT2_Af_A-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BFBCB57089;
- Thu, 15 Oct 2020 16:45:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 624F05708A;
+ Thu, 15 Oct 2020 16:45:07 +0000 (UTC)
 Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6E1BD19C4F;
- Thu, 15 Oct 2020 16:45:02 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6FC8219C4F;
+ Thu, 15 Oct 2020 16:45:04 +0000 (UTC)
 From: Eduardo Habkost <ehabkost@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 0/9] x86 queue, 2020-10-15
-Date: Thu, 15 Oct 2020 12:44:52 -0400
-Message-Id: <20201015164501.462775-1-ehabkost@redhat.com>
+Subject: [PULL 2/9] i386/kvm: fix FEATURE_HYPERV_EDX value in
+ hyperv_passthrough case
+Date: Thu, 15 Oct 2020 12:44:54 -0400
+Message-Id: <20201015164501.462775-3-ehabkost@redhat.com>
+In-Reply-To: <20201015164501.462775-1-ehabkost@redhat.com>
+References: <20201015164501.462775-1-ehabkost@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
@@ -94,82 +98,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Richard Henderson <rth@twiddle.net>
+ Eduardo Habkost <ehabkost@redhat.com>, Zhenyu Wang <zhenyuw@linux.intel.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 57c98ea9acdcef5021f5671efa6475a5794a51c4=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/kraxel/tags/ui-20201014-pull-reques=
-t' into staging (2020-10-14 13:56:06 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  git://github.com/ehabkost/qemu.git tags/x86-next-pull-request=0D
-=0D
-for you to fetch changes up to 3e6a015cbd0f61c19cdc02d5ce74a3e60235cb9a:=0D
-=0D
-  i386: Mark Icelake-Client CPU models deprecated (2020-10-14 15:28:55 -040=
-0)=0D
-=0D
-----------------------------------------------------------------=0D
-x86 queue, 2020-10-15=0D
-=0D
-Cleanups:=0D
-* Drop x86_cpu_get_supported_feature_word() forward declaration=0D
-  (Vitaly Kuznetsov)=0D
-* Delete kvm_allows_irq0_override() (Eduardo Habkost)=0D
-* Correct documentation of kvm_irqchip_*() (Eduardo Habkost)=0D
-* Fix FEATURE_HYPERV_EDX value in hyperv_passthrough case (Zhenyu Wang)=0D
-=0D
-Deprecation:=0D
-* CPU model deprecation API (Robert Hoo)=0D
-* Mark Icelake-Client CPU models deprecated (Robert Hoo)=0D
-=0D
-Bug fixes:=0D
-* Remove core_id assert check in CPUID 0x8000001E (Babu Moger)=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-Babu Moger (1):=0D
-  target/i386: Remove core_id assert check in CPUID 0x8000001E=0D
-=0D
-Eduardo Habkost (4):=0D
-  i386/kvm: Require KVM_CAP_IRQ_ROUTING=0D
-  i386/kvm: Remove IRQ routing support checks=0D
-  i386/kvm: Delete kvm_allows_irq0_override()=0D
-  kvm: Correct documentation of kvm_irqchip_*()=0D
-=0D
-Robert Hoo (2):=0D
-  cpu: Introduce CPU model deprecation API=0D
-  i386: Mark Icelake-Client CPU models deprecated=0D
-=0D
-Vitaly Kuznetsov (1):=0D
-  i386: drop x86_cpu_get_supported_feature_word() forward declaration=0D
-=0D
-Zhenyu Wang (1):=0D
-  i386/kvm: fix FEATURE_HYPERV_EDX value in hyperv_passthrough case=0D
-=0D
- docs/system/deprecated.rst |  6 ++++++=0D
- qapi/machine-target.json   |  7 ++++++-=0D
- include/hw/core/cpu.h      |  3 +++=0D
- include/sysemu/kvm.h       | 19 +++++++++----------=0D
- target/i386/kvm_i386.h     |  1 -=0D
- hw/core/machine.c          | 12 ++++++++++--=0D
- hw/i386/fw_cfg.c           |  2 +-=0D
- hw/i386/kvm/apic.c         |  5 ++---=0D
- hw/i386/kvm/ioapic.c       | 33 ++++++++++++++++-----------------=0D
- hw/i386/microvm.c          |  2 +-=0D
- hw/i386/pc.c               |  2 +-=0D
- target/i386/cpu.c          | 32 +++++++++++++++++++++++---------=0D
- target/i386/kvm-stub.c     |  5 -----=0D
- target/i386/kvm.c          | 19 ++++++-------------=0D
- 14 files changed, 84 insertions(+), 64 deletions(-)=0D
-=0D
---=20=0D
-2.28.0=0D
-=0D
+From: Zhenyu Wang <zhenyuw@linux.intel.com>
+
+Fix typo to use correct edx value for FEATURE_HYPERV_EDX when
+hyperv_passthrough is enabled.
+
+Signed-off-by: Zhenyu Wang <zhenyuw@linux.intel.com>
+Message-Id: <20190820103030.12515-1-zhenyuw@linux.intel.com>
+Fixes: e48ddcc6ce13 ("i386/kvm: implement 'hv-passthrough' mode")
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ target/i386/kvm.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/i386/kvm.c b/target/i386/kvm.c
+index 8b12387d30..0098be7015 100644
+--- a/target/i386/kvm.c
++++ b/target/i386/kvm.c
+@@ -1214,7 +1214,7 @@ static int hyperv_handle_properties(CPUState *cs,
+         if (c) {
+             env->features[FEAT_HYPERV_EAX] = c->eax;
+             env->features[FEAT_HYPERV_EBX] = c->ebx;
+-            env->features[FEAT_HYPERV_EDX] = c->eax;
++            env->features[FEAT_HYPERV_EDX] = c->edx;
+         }
+         c = cpuid_find_entry(cpuid, HV_CPUID_ENLIGHTMENT_INFO, 0);
+         if (c) {
+-- 
+2.28.0
 
 
