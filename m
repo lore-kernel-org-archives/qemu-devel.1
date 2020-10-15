@@ -2,57 +2,59 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 764B5C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD48C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:20:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85F5B20759
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:20:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85F5B20759
+	by mail.kernel.org (Postfix) with ESMTPS id DD76920759
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:20:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD76920759
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTAfS-0005I2-8t
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 17:20:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45486)
+	id 1kTAfp-0005PY-RS
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 17:20:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45510)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kTAe8-0004Jt-9r
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:18:48 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:27988)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kTAeD-0004Ov-EU
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:18:53 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:43090)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kTAe6-0001Cz-Nz
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:18:48 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kTAeB-0001DU-T2
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:18:53 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-512-IfEXydzVMKe9jT1HNtmcYQ-1; Thu, 15 Oct 2020 17:18:42 -0400
-X-MC-Unique: IfEXydzVMKe9jT1HNtmcYQ-1
+ us-mta-176-yuWT6LbRNjSTn2sZ8uS0VQ-1; Thu, 15 Oct 2020 17:18:49 -0400
+X-MC-Unique: yuWT6LbRNjSTn2sZ8uS0VQ-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0172F1019625;
- Thu, 15 Oct 2020 21:18:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4E678030B3;
+ Thu, 15 Oct 2020 21:18:47 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-78.ams2.redhat.com [10.36.112.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 43914610F3;
- Thu, 15 Oct 2020 21:18:40 +0000 (UTC)
-Subject: [PATCH v2 3/5] spapr: Drop spapr_delete_vcpu() unused argument
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 35767610F3;
+ Thu, 15 Oct 2020 21:18:47 +0000 (UTC)
+Subject: [PATCH v2 4/5] spapr: Make spapr_cpu_core_unrealize() idempotent
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Thu, 15 Oct 2020 23:18:39 +0200
-Message-ID: <160279671929.1808373.10333672533575251075.stgit@bahia.lan>
+Date: Thu, 15 Oct 2020 23:18:46 +0200
+Message-ID: <160279672626.1808373.14142129300586424514.stgit@bahia.lan>
 In-Reply-To: <160279669833.1808373.9524145092720289601.stgit@bahia.lan>
 References: <160279669833.1808373.9524145092720289601.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
@@ -83,44 +85,99 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The 'sc' argument is unused. Drop it.
+spapr_cpu_core_realize() has a rollback path which partially duplicates
+the code of spapr_cpu_core_unrealize().
+
+Let's make spapr_cpu_core_unrealize() idempotent and call it instead. This
+requires to:
+- move the registration and unregistration of the reset handler around
+  but it is harmless,
+- allocate the array of vCPUs with g_new0() to be able to filter out
+  unused slots,
+- make sure to only unrealize vCPUs that have been already realized.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr_cpu_core.c |    6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_cpu_core.c |   41 +++++++++++++++++++++--------------------
+ 1 file changed, 21 insertions(+), 20 deletions(-)
 
 diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index e4aeb93c0299..45eb2121876e 100644
+index 45eb2121876e..317fb9934f58 100644
 --- a/hw/ppc/spapr_cpu_core.c
 +++ b/hw/ppc/spapr_cpu_core.c
-@@ -212,7 +212,7 @@ static void spapr_cpu_core_reset_handler(void *opaque)
-     spapr_cpu_core_reset(opaque);
- }
+@@ -227,15 +227,26 @@ static void spapr_cpu_core_unrealize(DeviceState *dev=
+)
+     CPUCore *cc =3D CPU_CORE(dev);
+     int i;
 =20
--static void spapr_delete_vcpu(PowerPCCPU *cpu, SpaprCpuCore *sc)
-+static void spapr_delete_vcpu(PowerPCCPU *cpu)
- {
-     SpaprCpuState *spapr_cpu =3D spapr_cpu_state(cpu);
-=20
-@@ -233,7 +233,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev)
-         spapr_unrealize_vcpu(sc->threads[i], sc);
+-    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
+-
+     for (i =3D 0; i < cc->nr_threads; i++) {
+-        spapr_unrealize_vcpu(sc->threads[i], sc);
++        if (sc->threads[i]) {
++            /*
++             * Since this we can get here from the error path of
++             * spapr_cpu_core_realize(), make sure we only unrealize
++             * vCPUs that have already been realized.
++             */
++            if (object_property_get_bool(OBJECT(sc->threads[i]), "realized=
+",
++                                         &error_abort)) {
++                spapr_unrealize_vcpu(sc->threads[i], sc);
++            }
++        }
      }
      for (i =3D 0; i < cc->nr_threads; i++) {
--        spapr_delete_vcpu(sc->threads[i], sc);
-+        spapr_delete_vcpu(sc->threads[i]);
+-        spapr_delete_vcpu(sc->threads[i]);
++        if (sc->threads[i]) {
++            spapr_delete_vcpu(sc->threads[i]);
++        }
      }
      g_free(sc->threads);
++    qemu_unregister_reset(spapr_cpu_core_reset_handler, sc);
  }
-@@ -345,7 +345,7 @@ err_unrealize:
+=20
+ static bool spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+@@ -322,32 +333,22 @@ static void spapr_cpu_core_realize(DeviceState *dev, =
+Error **errp)
+         return;
      }
- err:
-     while (--i >=3D 0) {
--        spapr_delete_vcpu(sc->threads[i], sc);
-+        spapr_delete_vcpu(sc->threads[i]);
+=20
+-    sc->threads =3D g_new(PowerPCCPU *, cc->nr_threads);
++    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
++    sc->threads =3D g_new0(PowerPCCPU *, cc->nr_threads);
+     for (i =3D 0; i < cc->nr_threads; i++) {
+         sc->threads[i] =3D spapr_create_vcpu(sc, i, errp);
+         if (!sc->threads[i]) {
+-            goto err;
++            spapr_cpu_core_unrealize(dev);
++            return;
+         }
      }
-     g_free(sc->threads);
+=20
+     for (j =3D 0; j < cc->nr_threads; j++) {
+         if (!spapr_realize_vcpu(sc->threads[j], spapr, sc, errp)) {
+-            goto err_unrealize;
++            spapr_cpu_core_unrealize(dev);
++            return;
+         }
+     }
+-
+-    qemu_register_reset(spapr_cpu_core_reset_handler, sc);
+-    return;
+-
+-err_unrealize:
+-    while (--j >=3D 0) {
+-        spapr_unrealize_vcpu(sc->threads[j], sc);
+-    }
+-err:
+-    while (--i >=3D 0) {
+-        spapr_delete_vcpu(sc->threads[i]);
+-    }
+-    g_free(sc->threads);
  }
+=20
+ static Property spapr_cpu_core_properties[] =3D {
 
 
 
