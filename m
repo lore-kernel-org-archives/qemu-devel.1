@@ -4,62 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F27CFC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:54:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58737C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:55:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 663E121D7F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:54:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9E3CD2227F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:55:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CMk37vwl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 663E121D7F
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J1NIM1ZN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E3CD2227F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44994 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT4eb-0001V3-4w
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:54:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42306)
+	id 1kT4fD-0002qC-JS
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:55:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT4a8-0004eY-Cf
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:50:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60070)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT4aA-0004jF-9N
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:50:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44144)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT4a6-0001iV-8s
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:50:15 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT4a8-0001jd-AB
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:50:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602773413;
+ s=mimecast20190719; t=1602773415;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=stV52gVCaiFh9WEkxR8O3GXle/EMo4IaLgXYIaMTEBY=;
- b=CMk37vwlSTuhjmoay41VL2KtBShYLdXYvquMkxPTo9sEo6fK7abHbvLniJvlHWl3JNknDk
- JMxQ0yyf7v41Lqxf8tt45NTNG3JeTovX9heOmabJUWfuH8ghnQbD3mazQHmg58DbPnUJZv
- HhfAYslW5AJq+B0RNapFapGLS1g+DFc=
+ bh=Y6DoE10Zmh8TnT++WrnJ2FwLyHCnk+WU0URUmUnUizs=;
+ b=J1NIM1ZNODG4QMigdtymHbIF0xRR3tLgixICWSWwKWbbLkNwL8Y9njNh9CIaBpPxxgV/4M
+ 89C5is1OmRZtsBFnbdiWpS8KplZ/Pq6Dluln2+B1LsMbYAw+iZEXKnqG5LwA+Ce7EEL366
+ pmaAqIx/UAqrqfeumy4GznCrz0QU2To=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-o8BrDN52Od2ZgcQiZSW3lQ-1; Thu, 15 Oct 2020 10:50:09 -0400
-X-MC-Unique: o8BrDN52Od2ZgcQiZSW3lQ-1
+ us-mta-50-sm13lk3uMy6r_PqKpjycJw-1; Thu, 15 Oct 2020 10:50:13 -0400
+X-MC-Unique: sm13lk3uMy6r_PqKpjycJw-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E9CEADC34;
- Thu, 15 Oct 2020 14:50:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20C1B108E1A2;
+ Thu, 15 Oct 2020 14:50:12 +0000 (UTC)
 Received: from merkur.redhat.com (ovpn-114-163.ams2.redhat.com [10.36.114.163])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5367160C07;
- Thu, 15 Oct 2020 14:50:07 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2CDF960C07;
+ Thu, 15 Oct 2020 14:50:11 +0000 (UTC)
 From: Kevin Wolf <kwolf@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PULL 06/10] qom: Add user_creatable_print_help_from_qdict()
-Date: Thu, 15 Oct 2020 16:49:48 +0200
-Message-Id: <20201015144952.388043-7-kwolf@redhat.com>
+Subject: [PULL 09/10] block: drop moderated sheepdog mailing list from
+ MAINTAINERS file
+Date: Thu, 15 Oct 2020 16:49:51 +0200
+Message-Id: <20201015144952.388043-10-kwolf@redhat.com>
 In-Reply-To: <20201015144952.388043-1-kwolf@redhat.com>
 References: <20201015144952.388043-1-kwolf@redhat.com>
 MIME-Version: 1.0
@@ -68,8 +69,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
@@ -98,75 +99,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds a function that, given a QDict of non-help options, prints
-help for user creatable objects.
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Reviewed-by: Eric Blake <eblake@redhat.com>
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
-Message-Id: <20201007164903.282198-4-kwolf@redhat.com>
+The sheepdog mailing list is setup to stop and queue messages from
+non-subscribers, pending moderator approval. Unfortunately it seems
+that the moderation queue is not actively dealt with. Even when messages
+are approved, the sender is never added to the whitelist, so every
+future mail from the same sender continues to get stopped for moderation.
+
+MAINTAINERS entries should be responsive and not unneccessarily block
+mails from QEMU contributors, so drop the sheepdog mailing list.
+
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20201002113243.2347710-2-berrange@redhat.com>
+Reviewed-by: Neal Gompa <ngompa13@gmail.com>
 Signed-off-by: Kevin Wolf <kwolf@redhat.com>
 ---
- include/qom/object_interfaces.h | 21 ++++++++++++++++++---
- qom/object_interfaces.c         |  9 +++++++++
- 2 files changed, 27 insertions(+), 3 deletions(-)
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/include/qom/object_interfaces.h b/include/qom/object_interfaces.h
-index f118fb516b..07d5cc8832 100644
---- a/include/qom/object_interfaces.h
-+++ b/include/qom/object_interfaces.h
-@@ -154,13 +154,28 @@ int user_creatable_add_opts_foreach(void *opaque,
-  * @type: the QOM type to be added
-  * @opts: options to create
-  *
-- * Prints help if requested in @opts.
-+ * Prints help if requested in @type or @opts. Note that if @type is neither
-+ * "help"/"?" nor a valid user creatable type, no help will be printed
-+ * regardless of @opts.
-  *
-- * Returns: true if @opts contained a help option and help was printed, false
-- * if no help option was found.
-+ * Returns: true if a help option was found and help was printed, false
-+ * otherwise.
-  */
- bool user_creatable_print_help(const char *type, QemuOpts *opts);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 47dd38a8cc..99ab02bbab 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2881,7 +2881,6 @@ F: block/rbd.c
+ Sheepdog
+ M: Liu Yuan <namei.unix@gmail.com>
+ L: qemu-block@nongnu.org
+-L: sheepdog@lists.wpkg.org
+ S: Odd Fixes
+ F: block/sheepdog.c
  
-+/**
-+ * user_creatable_print_help_from_qdict:
-+ * @args: options to create
-+ *
-+ * Prints help considering the other options given in @args (if "qom-type" is
-+ * given and valid, print properties for the type, otherwise print valid types)
-+ *
-+ * In contrast to user_creatable_print_help(), this function can't return that
-+ * no help was requested. It should only be called if we know that help is
-+ * requested and it will always print some help.
-+ */
-+void user_creatable_print_help_from_qdict(QDict *args);
-+
- /**
-  * user_creatable_del:
-  * @id: the unique ID for the object
-diff --git a/qom/object_interfaces.c b/qom/object_interfaces.c
-index 3fd1da157e..ed896fe764 100644
---- a/qom/object_interfaces.c
-+++ b/qom/object_interfaces.c
-@@ -279,6 +279,15 @@ bool user_creatable_print_help(const char *type, QemuOpts *opts)
-     return false;
- }
- 
-+void user_creatable_print_help_from_qdict(QDict *args)
-+{
-+    const char *type = qdict_get_try_str(args, "qom-type");
-+
-+    if (!type || !user_creatable_print_type_properites(type)) {
-+        user_creatable_print_types();
-+    }
-+}
-+
- bool user_creatable_del(const char *id, Error **errp)
- {
-     Object *container;
 -- 
 2.28.0
 
