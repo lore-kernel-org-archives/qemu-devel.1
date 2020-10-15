@@ -8,74 +8,77 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F2AC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87F47C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:24:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 040612225A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB4622225D
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:24:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OXVszxVL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 040612225A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ln+lu2dx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB4622225D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45956 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46862 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT57H-00028P-Os
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:24:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49852)
+	id 1kT57f-0002WE-Jv
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:24:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kT54h-0007Gr-D7; Thu, 15 Oct 2020 11:21:51 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:35983)
+ id 1kT54k-0007O2-JN; Thu, 15 Oct 2020 11:21:54 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:35028)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kT54f-00060E-J5; Thu, 15 Oct 2020 11:21:50 -0400
-Received: by mail-ed1-x543.google.com with SMTP id l16so3519930eds.3;
- Thu, 15 Oct 2020 08:21:48 -0700 (PDT)
+ id 1kT54i-00060Z-FP; Thu, 15 Oct 2020 11:21:54 -0400
+Received: by mail-ej1-x642.google.com with SMTP id p5so4220314ejj.2;
+ Thu, 15 Oct 2020 08:21:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aJ0KQb6Ozzm+TKAEStsx77t+LpGGqIZVP5UuxdMy3MY=;
- b=OXVszxVLFimgwpIqc1n0s1xqtuShZsq5Xrpbqa/ixMYQ/4Ow2UfcRIVTYuTWNZ7D7H
- g937XVt7oSZHMfzBC84e6Uy4m8iIb+m0b6Z+OB+tSacT5ZAe562W6qF0wBaDli22rVkM
- 0fIplViQQ0L2yy7U4MsCu04UZ8bY9cS9VjDvYlc3/SuN3C8GRP8R13sWAuhdyxJI6Bxx
- uc9VQQfWzKC9CHOiw5fKW64PyQ2qcZQ6pOaYIf0hSvPMlYrNfzZoMOOnk4HCBcTljtP+
- mcLYlGzSDI5rueElXo/JvE7n9QUK0Ijp7orF4WsicfeMcpA8BNaqUHlTb+Q/JniSjx3r
- iL3g==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=+5eiH3n+bCt0Dpm1Jhk3VQr3ezZvJ5rxkkrpSjvz9lY=;
+ b=Ln+lu2dx+lU+NvEyswVbTDCr4V5va6XwwXiGmFqMWPIdIHK3ONNdYpXcq1QDwNk04k
+ KSrVbBltKo3VCtHBTkdzHGaqq/MpcKryLInhTJBlHIMQWZoRS3Zjl4r0n4fw2/xEDFpi
+ ATqUxBTTpYp5fTsFek182sEVdfEw9u1bWU/9c3rXTV7F5pm3JUtc7iKRRyT8JCfTY+az
+ cUyFtQd6HozPh4wnbRKM0tieap/I/mbAnyJ0LQ4FMVZyN1mnAOZt8x4sxNsQcOv/uAjw
+ lqp724JRhxSKEVZvA2jAxfjNNVQnGBjf8UjWupLAczO7KMjna2wzkzfgBo0IjS38Q5l6
+ ikcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aJ0KQb6Ozzm+TKAEStsx77t+LpGGqIZVP5UuxdMy3MY=;
- b=r8QZlKDrgVE3zqOPSGbgR4xFStv43RsQe82ozMVwfk7T5Eu8z7n3f0o9yOJsTZOyLb
- Z1V+/fHsj9vD7XMWVFA47yC+SaAeZi004mjSzU/EAD8ZCe4v0uLfgM/9vaFtn7vZJ+31
- Z3HNrL+Ok9IvxK1W4SU3UeB8UBlX993TbVTxec3IZs2xhbuSNSIPlNUrTGVJt3QBoYKj
- jAPZG2DR7Gea/ZAWbTtnmOmEJtBELc6VD/LWBFY/RJqcZsL+q+iu59TDNOSlNTnxkVA3
- +wp4I7aT38dNluF3TwIF2i7jOUxYCUPL/X4PMeu/eRQLTkDv/1uDqRTEZXYqU6WzHM0Q
- iI7g==
-X-Gm-Message-State: AOAM5331+WaosFqm8pG6GEgVGmSpUs/57fHf20ipv7PFHejB2kRZYo/w
- tCD1ylneW3DBb1RBIOZSnds=
-X-Google-Smtp-Source: ABdhPJwjOE6fLykMsgqYNOifFoQZHHMaKuXVXgVVJtsxkKgnimUPMRtS4MdkOFb6f7NtaJrY19SP6g==
-X-Received: by 2002:aa7:c948:: with SMTP id h8mr4691523edt.171.1602775307533; 
- Thu, 15 Oct 2020 08:21:47 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=+5eiH3n+bCt0Dpm1Jhk3VQr3ezZvJ5rxkkrpSjvz9lY=;
+ b=P+A7lB7i7Cls8YTO6uF84yHT6iF+XoKU8N38IhGXKpCRA6tY5WBNyc2BQ/i2D5xmrF
+ xQdRKwcRLSUVz5TGMfmJoz3bBwfX1mWyKHWFrsHFQYlE9u9LtfNKclratQwKZJwNPJqo
+ GLRc93MZ4Ko0Qa4Dhij88DDPlwU/yUA3EozHVI80DFksOEcAU+3iuHdZ9wiWQvoGohRN
+ 07laacFM2FDcPh5OR1B6hK+yKim8gyM2mtg2WG/kGfWxKXPRyhoHKR9CHdUHTMyaSQ6c
+ MMmMezNS0tLYq/ghs9EM2cCqU4W4v03qUAgm42V76CdEhykUiZf2XPzqN3Vk2zPV7gjj
+ pilg==
+X-Gm-Message-State: AOAM530Y977XCkH5Pgf8EY5DUaKtFcKPifmyxxJjpCjqlnSe+nhm/uqI
+ c1L22UBSVMrnmFvu3Ju2jjI=
+X-Google-Smtp-Source: ABdhPJyFgLuvwbAAAxGGCLfbCpIpt/C9QOGd8OMEBNbrWLJBttspBXNrOIHYaYhXuXGzftDjqxAh2w==
+X-Received: by 2002:a17:906:f29a:: with SMTP id
+ gu26mr4731629ejb.363.1602775310793; 
+ Thu, 15 Oct 2020 08:21:50 -0700 (PDT)
 Received: from neptune.lab ([46.39.229.194])
- by smtp.googlemail.com with ESMTPSA id i5sm1819539ejv.54.2020.10.15.08.21.46
+ by smtp.googlemail.com with ESMTPSA id i5sm1819539ejv.54.2020.10.15.08.21.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Oct 2020 08:21:46 -0700 (PDT)
+ Thu, 15 Oct 2020 08:21:50 -0700 (PDT)
 From: Alexey Baturo <baturo.alexey@gmail.com>
 X-Google-Original-From: Alexey Baturo <space.monkey.delivers@gmail.com>
 To: 
-Subject: [PATCH v2 1/5] [RISCV_PM] Add J-extension into RISC-V
-Date: Thu, 15 Oct 2020 18:21:35 +0300
-Message-Id: <20201015152139.28903-1-space.monkey.delivers@gmail.com>
+Subject: [PATCH v2 3/5] [RISCV_PM] Print new PM CSRs in QEMU logs
+Date: Thu, 15 Oct 2020 18:21:37 +0300
+Message-Id: <20201015152139.28903-3-space.monkey.delivers@gmail.com>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201015152139.28903-1-space.monkey.delivers@gmail.com>
+References: <20201015152139.28903-1-space.monkey.delivers@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=baturo.alexey@gmail.com; helo=mail-ed1-x543.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=baturo.alexey@gmail.com; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,52 +110,39 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Alexey Baturo <space.monkey.delivers@gmail.com>
 ---
- target/riscv/cpu.c | 4 ++++
- target/riscv/cpu.h | 2 ++
- 2 files changed, 6 insertions(+)
+ target/riscv/cpu.c | 19 +++++++++++++++++++
+ 1 file changed, 19 insertions(+)
 
 diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 0bbfd7f457..fe6bab4a52 100644
+index d63031eb08..6ba3e98508 100644
 --- a/target/riscv/cpu.c
 +++ b/target/riscv/cpu.c
-@@ -438,6 +438,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-         if (cpu->cfg.ext_h) {
-             target_misa |= RVH;
-         }
-+        if (cpu->cfg.ext_j) {
-+            target_misa |= RVJ;
+@@ -255,6 +255,25 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "htval ", env->htval);
+         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mtval2 ", env->mtval2);
+     }
++    if (riscv_has_ext(env, RVJ)) {
++        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mmte    ", env->mmte);
++        switch (env->priv) {
++        case PRV_U:
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "upmbase ", env->upmbase);
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "upmmask ", env->upmmask);
++            break;
++        case PRV_S:
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "spmbase ", env->spmbase);
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "spmmask ", env->spmmask);
++            break;
++        case PRV_M:
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mpmbase ", env->mpmbase);
++            qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mpmmask ", env->mpmmask);
++            break;
++        default:
++            assert(0 && "Unreachable");
 +        }
-         if (cpu->cfg.ext_v) {
-             target_misa |= RVV;
-             if (!is_power_of_2(cpu->cfg.vlen)) {
-@@ -516,6 +519,7 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     /* This is experimental so mark with 'x-' */
-     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
-+    DEFINE_PROP_BOOL("x-j", RISCVCPU, cfg.ext_j, false),
-     DEFINE_PROP_BOOL("x-v", RISCVCPU, cfg.ext_v, false),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de275782e6..eca611a367 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -66,6 +66,7 @@
- #define RVS RV('S')
- #define RVU RV('U')
- #define RVH RV('H')
-+#define RVJ RV('J')
++    }
+ #endif
  
- /* S extension denotes that Supervisor mode exists, however it is possible
-    to have a core that support S mode but does not have an MMU and there
-@@ -277,6 +278,7 @@ struct RISCVCPU {
-         bool ext_s;
-         bool ext_u;
-         bool ext_h;
-+        bool ext_j;
-         bool ext_v;
-         bool ext_counters;
-         bool ext_ifencei;
+     for (i = 0; i < 32; i++) {
 -- 
 2.20.1
 
