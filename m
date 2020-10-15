@@ -2,95 +2,73 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6DD8C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D0DC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA26D20704
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nuviainc-com.20150623.gappssmtp.com header.i=@nuviainc-com.20150623.gappssmtp.com header.b="j9M9CI0B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA26D20704
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nuviainc.com
+	by mail.kernel.org (Postfix) with ESMTPS id E30D320757
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30D320757
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3zG-0005qn-Il
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:12:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60160)
+	id 1kT3zQ-00068N-TI
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:12:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1kT3xz-0004pp-FK
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:10:51 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:35201)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <graeme@nuviainc.com>)
- id 1kT3xx-0004i1-8F
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:10:51 -0400
-Received: by mail-wm1-x343.google.com with SMTP id q5so3852149wmq.0
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 07:10:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nuviainc-com.20150623.gappssmtp.com; s=20150623;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:content-transfer-encoding:in-reply-to;
- bh=G/aJJVHQ8/fi4jdi1B2ek6DYuKQ+3ktC2v9/rhdWNwg=;
- b=j9M9CI0B1j6p1BTFsnD6ejJzf7nwy17OPvHONsIrvKDFfEoMjlCPTygtAx2ZUUtaWr
- glEgLRJB7fUjrwm8aXIhGDSf/FBbWOSCit7oYIEe6nFsihPqtV3NXRiyY9y6RmMJw+aN
- sW49p2EJuWyLFEXK5vbqpf+Hyb26Muwnl/yaxhocc3NbIDNe5QrOCSxYUodHNpLwszuI
- DCWmYLzmsHeqWBYiPyvTkcjUHBkggrfk1Y6uxfeUllcjqVNKNj45WZh5gSEeQq3vGfss
- xsQMN4bHrDb/HsdHrcV6fzk5AgtQsIiE4CxIWn1EC1n5HXjiRxyaF5GT22R7T1MQce5c
- WP4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:content-transfer-encoding
- :in-reply-to;
- bh=G/aJJVHQ8/fi4jdi1B2ek6DYuKQ+3ktC2v9/rhdWNwg=;
- b=bWLbuirYF9+CzPzTIVzQ1AFvw/pXxbN2qaiN3QVs+tlZM3KubQLF0R/7Z3xA+wRit0
- 1TznFT7+bgTSYcaQ/ibmwDnz3Ie1M7rLYu4mCqRH7PQZJ4lTplZl8kD3lqhc57SJuRtO
- ejHUDINgFr9IdRF66UJ8LeofVQunUavh/NgErmBZff454uwK+a1mu80af0kZ7bP/8wHZ
- K4tD7mGlZ1h1/5GRmjEcWcXK8S2X8IsVmtTaztteUDQcf+2icKlJIFG437nNSJEE/WGH
- 6MNkACM3koHZQDRcwZPnYUZN7WdOisahcDEzXu8iRXm6b6XEjK1Q8rxDe/eaH/bJj/1B
- xOoA==
-X-Gm-Message-State: AOAM531R1DngPoRT3O3B0taEct/r5mJlb4GsC3yFumEtzfWFhz9xllkM
- cNMAwt7SmAADs8GMBDdLaam/qw==
-X-Google-Smtp-Source: ABdhPJzVoNcaYEKE2EmlC+PNBmk8addcmMyqUaTkUkGpyXX/A+SVskYx7Lp5NdgjGjBMFWjXCeJ7/Q==
-X-Received: by 2002:a1c:87:: with SMTP id 129mr4175292wma.103.1602771046516;
- Thu, 15 Oct 2020 07:10:46 -0700 (PDT)
-Received: from xora-monster ([2a02:8010:64d6::1d89])
- by smtp.gmail.com with ESMTPSA id o3sm4891300wru.15.2020.10.15.07.10.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Oct 2020 07:10:45 -0700 (PDT)
-Date: Thu, 15 Oct 2020 15:10:44 +0100
-From: Graeme Gregory <graeme@nuviainc.com>
-To: Shashi Mallela <shashi.mallela@linaro.org>
-Subject: Re: [PATCH v5 2/2] hw/arm/sbsa-ref: add SBSA watchdog device
-Message-ID: <20201015141044.loa6x4sv5552pe72@xora-monster>
-References: <20201013151631.30678-1-shashi.mallela@linaro.org>
- <20201013151631.30678-3-shashi.mallela@linaro.org>
- <20201014093119.inq2ut2srps2zfme@xora-monster>
- <CAC15JE2hMrzpWWF-bS-fshoYx+BPehwxqJi-7uMUXSOj+Uh3GQ@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kT3ra-0006ix-PP
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:04:14 -0400
+Resent-Date: Thu, 15 Oct 2020 10:04:14 -0400
+Resent-Message-Id: <E1kT3ra-0006ix-PP@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21787)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kT3rX-0003b4-ME
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:04:14 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1602770628; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=ZfUgMmuQnuo1mF4Xr9u+QtOkgMxZxHd6I/Q7PeL0+MpJHhpgxRU1YhM0wz6W3t9+dZHoCKoJY1GAtDcM7t3lrbiMPvD42yZC5t2Jrc9LbjsCXnKCAh8y59lO80oy0XfCKXAnUheFPjGqHbTB4z/x/qh4c89xkJ31KRt7wdspPNI=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1602770628;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=WjfhDwaCOtqHJx1r9cA3odpjcFRxWky1/r3ibrxZSQc=; 
+ b=IHM4LLZD+TBQN2Jr8SGkJDTEa5rIxsZcprr6BHKEuszH+W/mYWUdKyU3nlGgi09d4YJ4Neuu3cAFenJPhhVE+9ocR/4AbQ/afnjxkeBLuyqjcXdHb50gK/+00JaVbTISwUQBmStlmzYgW2cbAA0+Wm6JJlH/1wMNOBNz3JJJ3FI=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1602770627080526.9954151531865;
+ Thu, 15 Oct 2020 07:03:47 -0700 (PDT)
+Subject: Re: [PATCH v4 00/16] Add a General Virtual Device Fuzzer
+Message-ID: <160277062524.26906.4979961762086295021@66eaa9a8a123>
+In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAC15JE2hMrzpWWF-bS-fshoYx+BPehwxqJi-7uMUXSOj+Uh3GQ@mail.gmail.com>
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=graeme@nuviainc.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: alxndr@bu.edu
+Date: Thu, 15 Oct 2020 07:03:47 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 10:04:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,182 +82,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Leif Lindholm <leif@nuviainc.com>,
- qemu-devel@nongnu.org, qemu-arm@nongnu.org,
- =?utf-8?B?UmFkb3PFgmF3?= Biernacki <rad@semihalf.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: darren.kenny@oracle.com, qemu-devel@nongnu.org, f4bug@amsat.org,
+ alxndr@bu.edu, bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 14, 2020 at 01:04:43PM -0400, Shashi Mallela wrote:
-> This was added as a placeholder for the virt requirement suggested by Maxim
-> earlier.Agreed that this fdt otherwise has no significance for sbsa-ref
-> platform nor is being used by ACPI table created for wdt.
-> 
-> -Shashi
-> 
-> On Wed, 14 Oct 2020 at 05:31, Graeme Gregory <[1]graeme@nuviainc.com> wrote:
-> 
->     On Tue, Oct 13, 2020 at 11:16:31AM -0400, Shashi Mallela wrote:
->     > Included the newly implemented SBSA generic watchdog device model into
->     > SBSA platform
->     >
->     > Signed-off-by: Shashi Mallela <[2]shashi.mallela@linaro.org>
->     > ---
->     >  hw/arm/sbsa-ref.c | 50 +++++++++++++++++++++++++++++++++++++++++++++++
->     >  1 file changed, 50 insertions(+)
->     >
->     > diff --git a/hw/arm/sbsa-ref.c b/hw/arm/sbsa-ref.c
->     > index 9c3a893bedfd..97ed41607119 100644
->     > --- a/hw/arm/sbsa-ref.c
->     > +++ b/hw/arm/sbsa-ref.c
->     > @@ -30,6 +30,7 @@
->     >  #include "exec/hwaddr.h"
->     >  #include "kvm_arm.h"
->     >  #include "hw/arm/boot.h"
->     > +#include "hw/arm/fdt.h"
->     >  #include "hw/block/flash.h"
->     >  #include "hw/boards.h"
->     >  #include "hw/ide/internal.h"
->     > @@ -40,6 +41,7 @@
->     >  #include "hw/qdev-properties.h"
->     >  #include "hw/usb.h"
->     >  #include "hw/char/pl011.h"
->     > +#include "hw/watchdog/wdt_sbsa_gwdt.h"
->     >  #include "net/net.h"
->     >  #include "qom/object.h"
->     > 
->     > @@ -64,6 +66,9 @@ enum {
->     >      SBSA_GIC_DIST,
->     >      SBSA_GIC_REDIST,
->     >      SBSA_SECURE_EC,
->     > +    SBSA_GWDT,
->     > +    SBSA_GWDT_REFRESH,
->     > +    SBSA_GWDT_CONTROL,
->     >      SBSA_SMMU,
->     >      SBSA_UART,
->     >      SBSA_RTC,
->     > @@ -104,6 +109,8 @@ static const MemMapEntry sbsa_ref_memmap[] = {
->     >      [SBSA_GIC_DIST] =           { 0x40060000, 0x00010000 },
->     >      [SBSA_GIC_REDIST] =         { 0x40080000, 0x04000000 },
->     >      [SBSA_SECURE_EC] =          { 0x50000000, 0x00001000 },
->     > +    [SBSA_GWDT_REFRESH] =       { 0x50010000, 0x00001000 },
->     > +    [SBSA_GWDT_CONTROL] =       { 0x50011000, 0x00001000 },
->     >      [SBSA_UART] =               { 0x60000000, 0x00001000 },
->     >      [SBSA_RTC] =                { 0x60010000, 0x00001000 },
->     >      [SBSA_GPIO] =               { 0x60020000, 0x00001000 },
->     > @@ -133,6 +140,8 @@ static const int sbsa_ref_irqmap[] = {
->     >      [SBSA_SECURE_UART_MM] = 9,
->     >      [SBSA_AHCI] = 10,
->     >      [SBSA_EHCI] = 11,
->     > +    [SBSA_SMMU] = 12, /* ... to 15 */
->     > +    [SBSA_GWDT] = 16,
->     >  };
-
-I guess your patch was not based on master here? You should make sure
-you are rebased to the latest version before sending.
-
->     > 
->     >  static uint64_t sbsa_ref_cpu_mp_affinity(SBSAMachineState *sms, int idx)
->     > @@ -141,6 +150,30 @@ static uint64_t sbsa_ref_cpu_mp_affinity
->     (SBSAMachineState *sms, int idx)
->     >      return arm_cpu_mp_affinity(idx, clustersz);
->     >  }
->     > 
->     > +static void create_wdt_fdt(SBSAMachineState *sms)
->     > +{
->     > +    char *nodename;
->     > +    const char compat[] = "arm,sbsa-gwdt";
->     > +
->     > +    hwaddr rbase = sbsa_ref_memmap[SBSA_GWDT_REFRESH].base;
->     > +    hwaddr cbase = sbsa_ref_memmap[SBSA_GWDT_CONTROL].base;
->     > +    int irq = sbsa_ref_irqmap[SBSA_GWDT];
->     > +
->     > +    nodename = g_strdup_printf("/watchdog@%" PRIx64, rbase);
->     > +    qemu_fdt_add_subnode(sms->fdt, nodename);
->     > +
->     > +    qemu_fdt_setprop(sms->fdt, nodename, "compatible",
->     > +                             compat, sizeof(compat));
->     > +    qemu_fdt_setprop_sized_cells(sms->fdt, nodename, "reg",
->     > +                                 2, rbase, 2, SBSA_GWDT_RMMIO_SIZE,
->     > +                                 2, cbase, 2, SBSA_GWDT_CMMIO_SIZE);
->     > +    qemu_fdt_setprop_cells(sms->fdt, nodename, "interrupts",
->     > +                                GIC_FDT_IRQ_TYPE_PPI, irq,
->     > +                                GIC_FDT_IRQ_FLAGS_LEVEL_HI);
->     > +    qemu_fdt_setprop_cell(sms->fdt, nodename, "timeout-sec", 30);
->     > +    g_free(nodename);
->     > +}
->     > +
-> 
->     Is this actually used anywhere? I ask because SBSA-ref is not a FDT
->     booting machine and only uses FDT to transfer some dynamic info to
->     arm-tf/edk2 and is not a full description tree. Your ACPI patch in
->     edk2 certainly does not use this info.
-> 
-
-From your reply above I would propose this hunk and the call below are
-removed. If its needed to virt thats a seperate discussion which I think
-was already happening in another thread.
-
-FOSS style is for inline replies not top posting FYI
-
-Graeme
-
->     Graeme
-> 
-> 
->     >  /*
->     >   * Firmware on this machine only uses ACPI table to load OS, these
->     limited
->     >   * device tree nodes are just to let firmware know the info which varies
->     from
->     > @@ -219,6 +252,7 @@ static void create_fdt(SBSAMachineState *sms)
->     > 
->     >          g_free(nodename);
->     >      }
->     > +    create_wdt_fdt(sms);
->     >  }
->     > 
->     >  #define SBSA_FLASH_SECTOR_SIZE (256 * KiB)
->     > @@ -447,6 +481,20 @@ static void create_rtc(const SBSAMachineState *sms)
->     >      sysbus_create_simple("pl031", base, qdev_get_gpio_in(sms->gic,
->     irq));
->     >  }
->     > 
->     > +static void create_wdt(const SBSAMachineState *sms)
->     > +{
->     > +    hwaddr rbase = sbsa_ref_memmap[SBSA_GWDT_REFRESH].base;
->     > +    hwaddr cbase = sbsa_ref_memmap[SBSA_GWDT_CONTROL].base;
->     > +    DeviceState *dev = qdev_new(TYPE_WDT_SBSA_GWDT);
->     > +    SysBusDevice *s = SYS_BUS_DEVICE(dev);
->     > +    int irq = sbsa_ref_irqmap[SBSA_GWDT];
->     > +
->     > +    sysbus_realize_and_unref(s, &error_fatal);
->     > +    sysbus_mmio_map(s, 0, rbase);
->     > +    sysbus_mmio_map(s, 1, cbase);
->     > +    sysbus_connect_irq(s, 0, qdev_get_gpio_in(sms->gic, irq));
->     > +}
->     > +
->     >  static DeviceState *gpio_key_dev;
->     >  static void sbsa_ref_powerdown_req(Notifier *n, void *opaque)
->     >  {
->     > @@ -730,6 +778,8 @@ static void sbsa_ref_init(MachineState *machine)
->     > 
->     >      create_rtc(sms);
->     > 
->     > +    create_wdt(sms);
->     > +
->     >      create_gpio(sms);
->     > 
->     >      create_ahci(sms);
->     > --
->     > 2.18.4
->     >
->     >
-> 
-> 
-> References:
-> 
-> [1] mailto:graeme@nuviainc.com
-> [2] mailto:shashi.mallela@linaro.org
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAxNTEzNDEzNy4yMDU5
+NTgtMS1hbHhuZHJAYnUuZWR1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
+ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
+YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMTUxMzQxMzcuMjA1OTU4LTEt
+YWx4bmRyQGJ1LmVkdQpTdWJqZWN0OiBbUEFUQ0ggdjQgMDAvMTZdIEFkZCBhIEdlbmVyYWwgVmly
+dHVhbCBEZXZpY2UgRnV6emVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
+CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
+Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
+dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
+Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
+VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
+dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAg
+ICBwYXRjaGV3LzE2MDI3Njc3NjctMzI3MTMtMS1naXQtc2VuZC1lbWFpbC1tanJvc2F0b0BsaW51
+eC5pYm0uY29tIC0+IHBhdGNoZXcvMTYwMjc2Nzc2Ny0zMjcxMy0xLWdpdC1zZW5kLWVtYWlsLW1q
+cm9zYXRvQGxpbnV4LmlibS5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTAx
+NTEzNDEzNy4yMDU5NTgtMS1hbHhuZHJAYnUuZWR1IC0+IHBhdGNoZXcvMjAyMDEwMTUxMzQxMzcu
+MjA1OTU4LTEtYWx4bmRyQGJ1LmVkdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjAz
+MzIzYzIgc2NyaXB0cy9vc3MtZnV6ejogcmVtb3ZlIHRoZSBnZW5lcmFsLWZ1enogdGFyZ2V0CjNj
+NTliZDUgZnV6ejogcmVnaXN0ZXIgcHJlZGVmaW5lZCBnZW5lcmFsLWZ1enogY29uZmlncwowZDgw
+ZGIzIGZ1eno6IGFkZCBnZW5lcmFsLWZ1enogY29uZmlncyBmb3Igb3NzLWZ1enoKY2VhNzZkNCBm
+dXp6OiBhZGQgYW4gIm9wYXF1ZSIgdG8gdGhlIEZ1enpUYXJnZXQgc3RydWN0CjEwY2YzNzMgZnV6
+ejogQWRkIGluc3RydWN0aW9ucyBmb3IgdXNpbmcgZ2VuZXJhbC1mdXp6CjU0MGZlZDIgc2NyaXB0
+cy9vc3MtZnV6ejogQWRkIGNyYXNoIHRyYWNlIG1pbmltaXphdGlvbiBzY3JpcHQKMDU1MGRiMCBz
+Y3JpcHRzL29zcy1mdXp6OiBBZGQgc2NyaXB0IHRvIHJlb3JkZXIgYSBnZW5lcmFsLWZ1enplciB0
+cmFjZQoxMDZlODMwIGZ1eno6IGFkZCBhIGNyb3Nzb3ZlciBmdW5jdGlvbiB0byBnZW5lcmljLWZ1
+enplcgo5MDgzN2Y1IGZ1eno6IGFkZCBhIERJU0FCTEVfUENJIG9wIHRvIGdlbmVyYWwtZnV6emVy
+CmFkZjA0NGYgZnV6ejogQWRkIHN1cHBvcnQgZm9yIGN1c3RvbSBjcm9zc292ZXIgZnVuY3Rpb25z
+CjA4NTFjYjQgZnV6ejogQWRkIGZ1enplciBjYWxsYmFja3MgdG8gRE1BLXJlYWQgZnVuY3Rpb25z
+CjRhY2Y0NGIgZnV6ejogRGVjbGFyZSBETUEgUmVhZCBjYWxsYmFjayBmdW5jdGlvbgo4NmZlYzM0
+IGZ1eno6IEFkZCBETUEgc3VwcG9ydCB0byB0aGUgZ2VuZXJpYy1mdXp6ZXIKMjM3ZTlkNiBmdXp6
+OiBBZGQgUENJIGZlYXR1cmVzIHRvIHRoZSBnZW5lcmFsIGZ1enplcgo0MWU2ZDdiIGZ1eno6IEFk
+ZCBnZW5lcmFsIHZpcnR1YWwtZGV2aWNlIGZ1enplcgpiYTY4ZjM1IG1lbW9yeTogQWRkIEZsYXRW
+aWV3IGZvcmVhY2ggZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcg
+Y29tbWl0IGJhNjhmMzVlZDM1OCAobWVtb3J5OiBBZGQgRmxhdFZpZXcgZm9yZWFjaCBmdW5jdGlv
+bikKMi8xNiBDaGVja2luZyBjb21taXQgNDFlNmQ3YmI0MGQzIChmdXp6OiBBZGQgZ2VuZXJhbCB2
+aXJ0dWFsLWRldmljZSBmdXp6ZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
+bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE5OiAKbmV3IGZpbGUgbW9k
+ZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjI6IEZJTEU6IHRl
+c3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6Mjk5OgorICogU29tZSBjb21tYW5kcyBjYW4g
+YmUgdmFyaWFibGUtd2lkdGgsIHNvIHdlIHVzZSBhIHNlcGFyYXRvciwgU0VQQVJBVE9SLCB0byBz
+cGVjaWZ5CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzMwOiBGSUxFOiB0ZXN0
+cy9xdGVzdC9mdXp6L2dlbmVyYWxfZnV6ei5jOjMwNzoKKyAqICAgICAgU2ltcGx5LCBieSByZW1v
+dmluZyB0aGUgZmlyc3QgYnl0ZSwgd2UgZW5kIHVwIHdpdGggYSB2ZXJ5IGRpZmZlcmVudCBzZXF1
+ZW5jZToKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5ncywgNTE2IGxpbmVzIGNoZWNrZWQKClBh
+dGNoIDIvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xNiBDaGVja2luZyBjb21taXQg
+MjM3ZTlkNmU3MzRkIChmdXp6OiBBZGQgUENJIGZlYXR1cmVzIHRvIHRoZSBnZW5lcmFsIGZ1enpl
+cikKNC8xNiBDaGVja2luZyBjb21taXQgODZmZWMzNDNiMzdhIChmdXp6OiBBZGQgRE1BIHN1cHBv
+cnQgdG8gdGhlIGdlbmVyaWMtZnV6emVyKQpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRl
+ZCBpbiAuYyBmaWxlcwojODQ6IEZJTEU6IHRlc3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6
+MTIwOgordm9pZCBmdXp6X2RtYV9yZWFkX2NiKHNpemVfdCBhZGRyLCBzaXplX3QgbGVuLCBNZW1v
+cnlSZWdpb24gKm1yLCBib29sIGlzX3dyaXRlKTsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
+ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMDk6IEZJTEU6IHRlc3RzL3F0ZXN0
+L2Z1enovZ2VuZXJhbF9mdXp6LmM6MTQ1OgorICAgIC8qIFJlZ2lvbnMgYXJlIGFzc3VtZWQgdG8g
+c3VwcG9ydCAxLTQgYnl0ZSBhY2Nlc3NlcyB1bmxlc3MKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
+IHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMKIzExMDogRklMRTogdGVzdHMvcXRlc3QvZnV6ei9n
+ZW5lcmFsX2Z1enouYzoxNDY6CisgICAgLyogUmVnaW9ucyBhcmUgYXNzdW1lZCB0byBzdXBwb3J0
+IDEtNCBieXRlIGFjY2Vzc2VzIHVubGVzcworICAgICAgIG90aGVyd2lzZSBzcGVjaWZpZWQuICAq
+LwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0
+ZSBsaW5lCiMxMTA6IEZJTEU6IHRlc3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6MTQ2Ogor
+ICAgICAgIG90aGVyd2lzZSBzcGVjaWZpZWQuICAqLwoKdG90YWw6IDEgZXJyb3JzLCAzIHdhcm5p
+bmdzLCAyOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
+ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
+cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
+RVJTLgoKNS8xNiBDaGVja2luZyBjb21taXQgNGFjZjQ0YmE1NjMwIChmdXp6OiBEZWNsYXJlIERN
+QSBSZWFkIGNhbGxiYWNrIGZ1bmN0aW9uKQo2LzE2IENoZWNraW5nIGNvbW1pdCAwODUxY2I0Yjc4
+N2QgKGZ1eno6IEFkZCBmdXp6ZXIgY2FsbGJhY2tzIHRvIERNQS1yZWFkIGZ1bmN0aW9ucykKNy8x
+NiBDaGVja2luZyBjb21taXQgYWRmMDQ0ZjJiOWQyIChmdXp6OiBBZGQgc3VwcG9ydCBmb3IgY3Vz
+dG9tIGNyb3Nzb3ZlciBmdW5jdGlvbnMpCjgvMTYgQ2hlY2tpbmcgY29tbWl0IDkwODM3ZjVhODMx
+NSAoZnV6ejogYWRkIGEgRElTQUJMRV9QQ0kgb3AgdG8gZ2VuZXJhbC1mdXp6ZXIpCjkvMTYgQ2hl
+Y2tpbmcgY29tbWl0IDEwNmU4MzAxNWQ0MyAoZnV6ejogYWRkIGEgY3Jvc3NvdmVyIGZ1bmN0aW9u
+IHRvIGdlbmVyaWMtZnV6emVyKQoxMC8xNiBDaGVja2luZyBjb21taXQgMDU1MGRiMDkxNTJmIChz
+Y3JpcHRzL29zcy1mdXp6OiBBZGQgc2NyaXB0IHRvIHJlb3JkZXIgYSBnZW5lcmFsLWZ1enplciB0
+cmFjZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
+VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKV0FSTklO
+RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExNzogRklMRTogc2NyaXB0cy9vc3MtZnV6ei9y
+ZW9yZGVyX2Z1enplcl9xdGVzdF90cmFjZS5weTo5MToKKyAgICAgICAgICAgICAgICAgICAgc3lz
+LnN0ZGVyci53cml0ZSgiV2FybmluZzogTGlrZWx5IGRvdWJsZSBmZXRjaCBvbiBsaW5lIHt9Llxu
+IgoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMDMgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
+MTAvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
+IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
+LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTEvMTYgQ2hlY2tpbmcgY29tbWl0IDU0
+MGZlZDI2ZGM0MCAoc2NyaXB0cy9vc3MtZnV6ejogQWRkIGNyYXNoIHRyYWNlIG1pbmltaXphdGlv
+biBzY3JpcHQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
+TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRv
+dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzE2
+IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
+cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
+CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEyLzE2IENoZWNraW5nIGNvbW1pdCAxMGNmMzcz
+MTc2OGQgKGZ1eno6IEFkZCBpbnN0cnVjdGlvbnMgZm9yIHVzaW5nIGdlbmVyYWwtZnV6eikKMTMv
+MTYgQ2hlY2tpbmcgY29tbWl0IGNlYTc2ZDQyMzQwMCAoZnV6ejogYWRkIGFuICJvcGFxdWUiIHRv
+IHRoZSBGdXp6VGFyZ2V0IHN0cnVjdCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDBkODBkYjM1MWI3
+NyAoZnV6ejogYWRkIGdlbmVyYWwtZnV6eiBjb25maWdzIGZvciBvc3MtZnV6eikKV0FSTklORzog
+YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
+ZGF0aW5nPwojMTU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
+cm5pbmdzLCAxNzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTYgaGFzIHN0eWxlIHByb2JsZW1z
+LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
+dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
+VEFJTkVSUy4KMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDNjNTliZDViNjdkZiAoZnV6ejogcmVnaXN0
+ZXIgcHJlZGVmaW5lZCBnZW5lcmFsLWZ1enogY29uZmlncykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0
+IDAzMzIzYzIzNjE2YiAoc2NyaXB0cy9vc3MtZnV6ejogcmVtb3ZlIHRoZSBnZW5lcmFsLWZ1enog
+dGFyZ2V0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
+OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
+cy8yMDIwMTAxNTEzNDEzNy4yMDU5NTgtMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuY2hlY2twYXRj
+aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
+Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
+IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
 
