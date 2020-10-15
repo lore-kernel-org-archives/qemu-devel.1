@@ -2,87 +2,77 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C422EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E0FEC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:32:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E894F2067C
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:18:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64A77206DC
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:32:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jmWTm8m2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E894F2067C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zXkRc6Qm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64A77206DC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT8ll-0008Cn-O7
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 15:18:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48556)
+	id 1kT8zJ-0004RR-BX
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 15:32:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53282)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kT8do-0005Wo-AC
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 15:10:21 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38109)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kT8xH-0003ge-9r
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 15:30:28 -0400
+Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:35145)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kT8dk-00028Q-WA
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 15:10:19 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n18so5001066wrs.5
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 12:10:16 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kT8xE-0004sb-Td
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 15:30:26 -0400
+Received: by mail-ej1-x636.google.com with SMTP id p5so5297861ejj.2
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 12:30:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=XuqsUv8+oOYMycf5yguwrbKSNpueczwVPsJ2AWaTCLo=;
- b=jmWTm8m20Qi0fzw4eQimYzG4Xid1CIS2xwGJpPzFZ5YXwR9z7ycZdLEqYIX775FhkI
- zYGBdwxamYWcGSy0WhIkYgeC1xsvDIzTiMvWLyB9JkbrJJSgI7g6/5SMeXjT/nKLLRk/
- 4n6gh8sARYkma09aiK5IEgRz84RsKSSVXo+7qxxjlom5BbXuSeNQpogQLT2wvEXt0I7Q
- PPg28isO4WMP/OPqZi+M9MrXcyE06G9W/ntKFMSqBsvbi3Qvxjmen3hZ2HplJTKnjmQD
- lXRlg/Vj2ZBk8tB00WXj1T/qoP9fMIEheccmxeFyQ/mQ0EyDIGMzX3tliWVEIEmZAsCY
- 93Gg==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KLa6waaFMAt3yZmnyaIB2bKqan7xbz8NYq4Wce5QT8k=;
+ b=zXkRc6Qmi/HnUsxZ4ZaPFpM+8bUPAu+OF0ODjlPIAuAjpXTA3g3DKgw/Poocj3G+rp
+ QyiUQYubApXeXh0Vo9hyZNzz/fAjutTub9OPogUAu+M9e9Jh5s0OlWdP0yxDFDh5dBn9
+ AHf6e4Sf4YaaLk4Pp4DMGcCSBElBpFmHXmu+IUEMAoLoE8Tq/iEwPzYpE3yl9YsXZ0ez
+ hLJMPBki4qdGYW11uuUl/rhIFRxQRx9o7W00luc7568UBQ/CEy05lWzNKjbNGHgsRnj8
+ aIrXS4t+9AES0HZRNNHD+DZLy2wceOzF2TMBBWqz2TIyslzBfGIPN9Cv3BIMnkkPMqKb
+ md9w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=XuqsUv8+oOYMycf5yguwrbKSNpueczwVPsJ2AWaTCLo=;
- b=Z8rgfFoRx1XaMCqsmLaZ3cIsVPQouJ0XMj6ssvxJ5bp4mk2PE52UxbVX5UtW4G8xxS
- ocXG4S68Lhin0F8+lMN7LEkddw3WKBmLGCUUGHabU7U1cH8pke5AzCsrNq3NGwwHqJqI
- 4f3081C5ZrsQBmQIhhY1quKDf63cuaal9DtW0ahKfeMQzNnRuqYKvxRlqvfZQZAAJKZZ
- s0VL9qEimgVRPl5b7Y2Op3nG95aeg/GZnjLemY/9BItma1SzqIm2IPyAnVLon6lHd0x1
- BZ6Yarn6GmCsqF7evW/myJMChp2/eX2XGjxQmOyY4wQL+zC9unyGh2aAZZKYqnJu/E/i
- we2A==
-X-Gm-Message-State: AOAM5301aRoxzioeAvrv3AJRFUifcB7xw4k+3OulIN4HhaMPYIuLEwLY
- spOPTuH+zy3HCDC0dujzxS/Jlr6z+YoXlg==
-X-Google-Smtp-Source: ABdhPJyFdpveWhVFSAtFiQapZqoyvPnqypujVzY+to2rQQiDwOrCQe8TJSDGkSM3HjL3xjatev+ekw==
-X-Received: by 2002:adf:9043:: with SMTP id h61mr6090750wrh.237.1602789014710; 
- Thu, 15 Oct 2020 12:10:14 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id e25sm305829wra.71.2020.10.15.12.10.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 15 Oct 2020 12:10:13 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AF5391FF7E;
- Thu, 15 Oct 2020 20:10:12 +0100 (BST)
-References: <20200925152047.709901-1-richard.henderson@linaro.org>
- <20200925152047.709901-3-richard.henderson@linaro.org>
-User-agent: mu4e 1.5.5; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH v2 02/10] softfloat: Use int128.h for some operations
-In-reply-to: <20200925152047.709901-3-richard.henderson@linaro.org>
-Date: Thu, 15 Oct 2020 20:10:12 +0100
-Message-ID: <87mu0nwbjf.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KLa6waaFMAt3yZmnyaIB2bKqan7xbz8NYq4Wce5QT8k=;
+ b=U/7ZHcqv6fUm3S+ySLKb6q2z5ohYSIacV3NnjExURqkcL+K7O+6z7SDejOGHCYsiF+
+ jqvCt6DVdbi9zQeg1B+8hXCY3yVA0UJqWSEFKa/F9s0pYCYt2sBs9Re9+49pbz8XuaY/
+ +Kc4Gr+mYu4bPBSDttqMCHxHDLk7hOJN0Jh0SWr4ZWZOnTYRoPNG0JOllBNW3Y0YIPR0
+ IXaVnwSGngankjid6DnOEnY92bU0IndxIzdlcFAz3dP3eb7HKQoGCObxiHD+cBpsdgYZ
+ BF0uqtf08XW7hRKWyxxRo71hfri9SI7qtw8JY+/rgpR0zFPFTYG22nIEXxe6vZm99mJk
+ BEtw==
+X-Gm-Message-State: AOAM530S2v6aEfHfg2OAp41Oi41/rAcAxLv1J/vz2Ej6GChRy5wE63yC
+ fHCSHNKVeRBnS14RgTdjJwM0RJ3pE9QVxLF47SowSg==
+X-Google-Smtp-Source: ABdhPJy+8rZyXGJm5Y4DFkJbarxwu/vabG9fgWXloNSMl/+Aj9WKJ6bFlKu8EsAIXOM0mH3oJalpLoPoPABi58C1mIY=
+X-Received: by 2002:a17:906:7254:: with SMTP id
+ n20mr5973318ejk.382.1602790223097; 
+ Thu, 15 Oct 2020 12:30:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+References: <20201014143415.240472-1-ehabkost@redhat.com>
+In-Reply-To: <20201014143415.240472-1-ehabkost@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Oct 2020 20:30:11 +0100
+Message-ID: <CAFEAcA_ybt2U-j6byUXJhKaAxBkRv-rjqKugmhWij2qBJdGerg@mail.gmail.com>
+Subject: Re: [PULL 00/10] machine + QOM queue, 2020-10-14
+To: Eduardo Habkost <ehabkost@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::636;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,24 +94,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bharata@linux.ibm.com, qemu-devel@nongnu.org, david@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Richard Henderson <richard.henderson@linaro.org> writes:
-
-> Use our Int128, which wraps the compiler's __int128_t,
-> instead of open-coding left shifts and arithmetic.
-> We'd need to extend Int128 to have unsigned operations
-> to replace more than these three.
+On Wed, 14 Oct 2020 at 15:34, Eduardo Habkost <ehabkost@redhat.com> wrote:
 >
-> Reviewed-by: David Hildenbrand <david@redhat.com>
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+> The following changes since commit 96292515c07e3a99f5a29540ed2f257b1ff75111:
+>
+>   Merge remote-tracking branch 'remotes/vivier2/tags/trivial-branch-for-5.2-pull-request' into staging (2020-10-13 14:06:22 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/ehabkost/qemu.git tags/machine-next-pull-request
+>
+> for you to fetch changes up to d9753cca6b0db724bc6d15e60cfad1705f800b96:
+>
+>   can-host-socketcan: Fix crash when 'if' option is not set (2020-10-13 15:56:30 -0400)
+>
+> ----------------------------------------------------------------
+> machine + QOM queue, 2020-10-14
+>
+> * Register some properties as class properties (Eduardo Habkost)
+> * authz-list-file: Fix crash when filename is not set (Eduardo Habkost)
+> * can-host-socketcan: Fix crash when 'if' option is not set (Eduardo Habkost)
+>
+> ----------------------------------------------------------------
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
---=20
-Alex Benn=C3=A9e
+Applied, thanks.
+
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
+
+-- PMM
 
