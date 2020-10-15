@@ -2,92 +2,109 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 721A7C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:47:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DB01C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:52:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B26D121D7F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:47:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B199A22210
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:52:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kCExnQLT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B26D121D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDKKgpVv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B199A22210
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37042 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45200 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSx3A-0003s6-Nv
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 02:47:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55278)
+	id 1kSx8B-0007Uy-Ce
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 02:52:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57362)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSwuN-0005F4-Fs; Thu, 15 Oct 2020 02:38:39 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:45350)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kSwuL-0006sP-Nf; Thu, 15 Oct 2020 02:38:39 -0400
-Received: by mail-wr1-x442.google.com with SMTP id e17so1888432wru.12;
- Wed, 14 Oct 2020 23:38:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=BM7THxJfGf+b7XY8piPM2aMZEPnFkfmBjlshGc2heOo=;
- b=kCExnQLTOdy0eTaIM3es43d2RzUSgOtGsYf5YMDtMa53Jk9qpmPaP9jNjcD4Xaq7ix
- 0wXiX+pkxCJFS6KhtKAR34R2SIKnBX+0Acf+da9onS6U4PIKuVTK7/jmoazZdzCl2GJM
- 7BJZnxm6yWcb/FRqCx0aFBShLh7wzimn74tAwnQSQ5jPW6sHXuHbhhHFzJBxpBzEgLFD
- pDj4VuafWjTUTL2ASs/N+XNCpvFpDrjsEJIUMNTq2+1OhyIzXNSamGyaLT80nzRYzH/M
- NOOC2j0LnV8jtNtHd5GiqX0hSrU8hJLunNbJdzQX5sFO1TKYU+uZmoYeEK+jYtz3fJSx
- zw9A==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSx6d-0006NP-UP
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 02:51:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41770)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kSx6b-0002rc-Gm
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 02:51:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602744674;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=LzeqStK2SpvKHv6TcOGPcn7YA0BoRne86U2PxVkvtAw=;
+ b=LDKKgpVvpsh6VHRw0EMsxiJHOWYClLFP5utnjjepdipEVEZbH1ME56JywDAWH7tsiikc3J
+ cnfq2/r1gBGMuh5WDGAlsPpS/wG3Lj2bNix+BpOVkWiilgDKF8sCWSs11v4C8LqUSjkZMN
+ p7o4iKGX8NTOj9VDJkxzyVMsxWKo5+I=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-496-lVy5xbjyPe-QWBNqlwmJ8w-1; Thu, 15 Oct 2020 02:51:11 -0400
+X-MC-Unique: lVy5xbjyPe-QWBNqlwmJ8w-1
+Received: by mail-wm1-f71.google.com with SMTP id y83so1180898wmc.8
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 23:51:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=BM7THxJfGf+b7XY8piPM2aMZEPnFkfmBjlshGc2heOo=;
- b=eRixk0WQ3ygZzjKru7aSzZApMMXQEa95d1HK3NEsdkfKehpdaxDv1h7eGC3svNGjR2
- BKCruBQjs0fDY0KfiBkNLgmsXaPVDCiTrwpO3LxPXVRsJ8PWRIFXZ0Bs+lO+e3vBUYcw
- jUFfiYzjJwle9HAQit9E1oFbyNKUlsIYy7F2oQoporQo2Ry1zr/ixFH3uVQraVH0EAM1
- HOT7KGwBZ3Y4jicKXAnW+MEIxnHatBfiPR0PUqTaoL7BXsj6mDYU17Uwn4gZc4eUSEKM
- YV+fxkFudVohhQC2s8VXUhqQ7ouppOkycdC9gv6SjTV4PpjgKz9oTt8ZBBNjYAqTseKq
- mkkA==
-X-Gm-Message-State: AOAM533vHIQytUi1EOVt6Tc4EmYYoreZoWBks7ns1CgXaWneLjFYt38D
- jwl5VQLAAZ/u4GXH/vXZNEVNpKz/Rfo=
-X-Google-Smtp-Source: ABdhPJxW35CEtaaKI0Vm0aC6ms9AcSUfON2lrko+9RFZWnaQt+mc1unGPGms/S316mMm0yx9daZHJQ==
-X-Received: by 2002:adf:b30c:: with SMTP id j12mr2424804wrd.82.1602743915849; 
- Wed, 14 Oct 2020 23:38:35 -0700 (PDT)
-Received: from localhost.localdomain
- (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id 4sm2874292wrn.48.2020.10.14.23.38.35
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 14 Oct 2020 23:38:35 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 2/6] hw/sd/sdcard: Introduce the INVALID_ADDRESS definition
-Date: Thu, 15 Oct 2020 08:38:20 +0200
-Message-Id: <20201015063824.212980-3-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201015063824.212980-1-f4bug@amsat.org>
-References: <20201015063824.212980-1-f4bug@amsat.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=LzeqStK2SpvKHv6TcOGPcn7YA0BoRne86U2PxVkvtAw=;
+ b=cvn6xDR4d7rCpjsbWoVmQ+ljTNSZargd3ZvcAomfAeA2sb/NZX5L96d+15HXVJAdmR
+ 9XbluiHyy8WdrH2W7co0E0o5lPj40jaUU6RF8KtKdN+Jm8KC/mGETgUv2ONViCzENaDU
+ 2jiL4qiUl8z7N6t+TyxQUS8p/6y2NBPvWpdDTOd/tyUv/az2O77S9m7kdCfL7RCb3Dof
+ XIIM6AorW3uC9tnDse0ZftM6ZoCIDnyEC9NLMN+/ccrLKfQnSkIiQjk2CPCexDpRJe7K
+ 8Wdp2AXaabAd9GrdiYHaTz/WJ2H6yH7SJVI4VQZQv/w7VK/x8x1OJgRa3WX6AfbZ5YrP
+ SF5A==
+X-Gm-Message-State: AOAM533XEvuEUE6sCYVIpsuLQTrS7eYuEdHY9/u6QGyj1pdvSeof08Jf
+ vkyzoQXlp2orwvtS5O2Yvi879uXa47O4JPj4PYJb3P4mht0g/V8CsNHNWomW9psEpqczyZY0hcJ
+ KC4jbRzYyO5Avis0=
+X-Received: by 2002:a1c:4604:: with SMTP id t4mr2457686wma.95.1602744670325;
+ Wed, 14 Oct 2020 23:51:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMSameBwkGRbqM8Pg2y0wrdAPvrAeB3J5ezOW6xmTQ55M55fzS85CK4OQOxlS0hjPlWauhxA==
+X-Received: by 2002:a1c:4604:: with SMTP id t4mr2457672wma.95.1602744670117;
+ Wed, 14 Oct 2020 23:51:10 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id n5sm2934894wrm.2.2020.10.14.23.51.09
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 14 Oct 2020 23:51:09 -0700 (PDT)
+Subject: Re: [PATCH] meson.build: don't condition iconv detection on library
+ detection
+To: luoyonggang@gmail.com, Bruce Rogers <brogers@suse.com>
+References: <20201014221939.196958-1-brogers@suse.com>
+ <CAE2XoE_1T8cobLaZT=gCugHozV=todSvQynNYvQ-VxXVMKxc-w@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <bf846ef9-79d7-d388-d53a-9de605ce37e2@redhat.com>
+Date: Thu, 15 Oct 2020 08:51:08 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAE2XoE_1T8cobLaZT=gCugHozV=todSvQynNYvQ-VxXVMKxc-w@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,67 +117,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Cc: qemu-level <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-'0' is used as a value to indicate an invalid (or unset)
-address. Use a definition instead of a magic value.
+On 10/15/20 6:33 AM, 罗勇刚(Yonggang Luo) wrote:
+> 
+> 
+> On Thu, Oct 15, 2020 at 6:19 AM Bruce Rogers <brogers@suse.com 
+> <mailto:brogers@suse.com>> wrote:
+>  >
+>  > It isn't necessarily the case that use of iconv requires an additional
+>  > library. For that reason we shouldn't conditionalize iconv detection on
+>  > libiconv.found.
+>  >
+>  > Fixes: 5285e593c33 (configure: Fixes ncursesw detection under 
+> msys2/mingw by convert them to meson)
+>  >
+>  > Signed-off-by: Bruce Rogers <brogers@suse.com <mailto:brogers@suse.com>>
+>  > ---
+>  >  meson.build | 16 +++++++---------
+>  >  1 file changed, 7 insertions(+), 9 deletions(-)
+>  >
+>  > diff --git a/meson.build b/meson.build
+>  > index 1a4a482492..84c8ec9541 100644
+>  > --- a/meson.build
+>  > +++ b/meson.build
+>  > @@ -431,15 +431,13 @@ if not get_option('iconv').disabled()
+>  >    libiconv = cc.find_library('iconv',
+>  >                               required: false,
+>  >                               static: enable_static)
+>  > -  if libiconv.found()
+>  > -    if cc.links('''
+>  > -      #include <iconv.h>
+>  > -      int main(void) {
+>  > -        iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
+>  > -        return conv != (iconv_t) -1;
+>  > -      }''', dependencies: [libiconv])
+>  > -      iconv = declare_dependency(dependencies: [libiconv])
+>  > -    endif
+>  > +  if cc.links('''
+>  > +    #include <iconv.h>
+>  > +    int main(void) {
+>  > +      iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
+>  > +      return conv != (iconv_t) -1;
+>  > +    }''', dependencies: [libiconv])
+>  > +    iconv = declare_dependency(dependencies: [libiconv])
+>  >    endif
+>  >  endif
+>  >  if get_option('iconv').enabled() and not iconv.found()
+>  > --
+>  > 2.28.0
+>  >
+> Reviewed-by: Yonggang Luo<l 
+> <mailto:brogers@suse.com>uoyonggang@gmail.com <mailto:uoyonggang@gmail.com>>
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
- hw/sd/sd.c | 13 ++++++++-----
- 1 file changed, 8 insertions(+), 5 deletions(-)
+Something is certainly wrong here =)
+I suppose you meant:
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index 2606b969e34..30ae435d669 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -53,6 +53,8 @@
- 
- #define SDSC_MAX_CAPACITY   (2 * GiB)
- 
-+#define INVALID_ADDRESS     0
-+
- typedef enum {
-     sd_r0 = 0,    /* no response */
-     sd_r1,        /* normal response command */
-@@ -575,8 +577,8 @@ static void sd_reset(DeviceState *dev)
-     sd->wpgrps_size = sect;
-     sd->wp_groups = bitmap_new(sd->wpgrps_size);
-     memset(sd->function_group, 0, sizeof(sd->function_group));
--    sd->erase_start = 0;
--    sd->erase_end = 0;
-+    sd->erase_start = INVALID_ADDRESS;
-+    sd->erase_end = INVALID_ADDRESS;
-     sd->size = size;
-     sd->blk_len = 0x200;
-     sd->pwd_len = 0;
-@@ -750,7 +752,8 @@ static void sd_erase(SDState *sd)
-     uint64_t erase_end = sd->erase_end;
- 
-     trace_sdcard_erase(sd->erase_start, sd->erase_end);
--    if (!sd->erase_start || !sd->erase_end) {
-+    if (sd->erase_start == INVALID_ADDRESS
-+            || sd->erase_end == INVALID_ADDRESS) {
-         sd->card_status |= ERASE_SEQ_ERROR;
-         return;
-     }
-@@ -763,8 +766,8 @@ static void sd_erase(SDState *sd)
- 
-     erase_start = sd_addr_to_wpnum(erase_start);
-     erase_end = sd_addr_to_wpnum(erase_end);
--    sd->erase_start = 0;
--    sd->erase_end = 0;
-+    sd->erase_start = INVALID_ADDRESS;
-+    sd->erase_end = INVALID_ADDRESS;
-     sd->csd[14] |= 0x40;
- 
-     for (i = erase_start; i <= erase_end; i++) {
--- 
-2.26.2
+Reviewed-by:Yonggang Luo <luoyonggang@gmail.com>
+
+> 
+> --
+>           此致
+> 礼
+> 罗勇刚
+> Yours
+>      sincerely,
+> Yonggang Luo
 
 
