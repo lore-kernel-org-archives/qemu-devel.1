@@ -2,72 +2,89 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09EF4C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7635EC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:48:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1C48B206D9
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:43:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1C48B206D9
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id C8A82206DD
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 19:48:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e/VKTabF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A82206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT9A4-000118-LB
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 15:43:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56318)
+	id 1kT9Ec-0003Vf-HU
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 15:48:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kT99N-0000Nk-Uo; Thu, 15 Oct 2020 15:42:57 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:55914
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kT99L-0006b4-G0; Thu, 15 Oct 2020 15:42:57 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kT99F-0001vd-F7; Thu, 15 Oct 2020 20:42:52 +0100
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
- <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
- <c882279b-a561-2c3a-a6b5-b27446fddb02@amsat.org>
- <79df54b3-d9e5-145e-e277-24468b121ba0@ilande.co.uk>
- <91a24667-5f72-d3d9-8e47-6453268d2b78@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <4b25afd1-0ce5-0832-a3f0-1b58b3aa7b32@ilande.co.uk>
-Date: Thu, 15 Oct 2020 20:42:44 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kT9DB-0002DF-Nb; Thu, 15 Oct 2020 15:46:53 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:40274)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kT9DA-00079h-6I; Thu, 15 Oct 2020 15:46:53 -0400
+Received: by mail-wm1-x343.google.com with SMTP id k18so226077wmj.5;
+ Thu, 15 Oct 2020 12:46:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=UJwnR5BFRgHy/XAVLZ16OHrt0PFOaSx13ZcXPWkLQh0=;
+ b=e/VKTabFQ0C40GckiWwmcVfdMYe/UF8SZN9Edbd+DUygSPXcXoqEKxUOTHI1Qzq0zd
+ ZIKb54eQ4I80rKfId3JLKkfxObjylN535CqyNjCm41TRXMI3vDqpG6hprxyzk79pySR5
+ QxNX96aGiLVzkOEcWmaSexNbUMuqM+juBssI189TRSf0wCHOR61wIsOGZvchwwLgADtA
+ UR92sqADCyfHySNJdJyLXb0ivOmnFVHuuo8HTWonxdlb1v+cauMsB6wp/APAS5FWrPjM
+ FFjpF6Xiv4QlTC9x2eTs9vR7nWIdAAvQAplaoMGmJtrXVuHPsBCa2XJ68bZRF8a9DeWs
+ 0YtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=UJwnR5BFRgHy/XAVLZ16OHrt0PFOaSx13ZcXPWkLQh0=;
+ b=TXxykVu6u5aAjrCErzNY9GmzFkZYaS7gEsNEQjZpiR+fSn99Zs6gEd9Q8iPOJTXSAp
+ pxGt5Ta9hCDjO+3wXCwR8KNwGeNSmC/Cc9OCrx2ooQCY+NGkG0kaBWeclljslgdrE7Pg
+ Ui2eCAR16r2EmqmAbHpUmC4FUPgynjUN3vEKNzFpl+87o5qqsdTp0OtepaWhkvkepVcH
+ 7Lz6gvUNNAs5/06+6Fc1p7QTOQJVv1u6PkPsAEgBgqT1Qf4xDxm+tJtDtxQ5Y683+5ey
+ Nq0Oth7Wg8krw7HpBKIannneShmbDuCsYu8kidqIWRf0WGDaYKi9gZ3mhgl3acW6/siQ
+ QtpQ==
+X-Gm-Message-State: AOAM533es4pZghp4mJCoAzUWK/bsRDoymHn6/NXbzeQ5bt0fQW9UQIKs
+ TlA+akQHRVW1W4HhCrp/vxFKQJkfX2g=
+X-Google-Smtp-Source: ABdhPJybWxvDuaMNgtKZXH6DCmj3AIQTuKLFgiZyKJX2Mgg5f3cKz7Tda061gb4236ZhTB81vN4hMw==
+X-Received: by 2002:a1c:1f89:: with SMTP id f131mr302438wmf.10.1602791210048; 
+ Thu, 15 Oct 2020 12:46:50 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id i8sm104279wmd.14.2020.10.15.12.46.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 15 Oct 2020 12:46:49 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/2] hw/rtc/m48t59: Simplify m48t59_init()
+Date: Thu, 15 Oct 2020 21:46:45 +0200
+Message-Id: <20201015194647.477252-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <91a24667-5f72-d3d9-8e47-6453268d2b78@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-1.019,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.248,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.248,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,38 +97,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
+Cc: qemu-trivial@nongnu.org, Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ qemu-ppc@nongnu.org, Artyom Tarasenko <atar4qemu@gmail.com>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/10/2020 18:05, BALATON Zoltan via wrote:
-
-> Hello,
-> 
-> Not related to this patch but while you're at it could you please take those patches 
-> that are already reviewed by you from this series as well?
-> 
-> http://patchwork.ozlabs.org/project/qemu-devel/list/?series=186439
-> 
-> That would help cleaning up my tree and see which patches still need changes. Let me 
-> know if these need any rebasing and point me to the tree on which I should rebase 
-> them. Currently they apply to your screamer branch I think.
-
-I've queued the grackle/uninorth patches to my qemu-macppc branch, however when I try 
-to apply patches from the above series git fails with the following message:
-
-Applying: mac_oldworld: Drop a variable, use get_system_memory() directly
-error: sha1 information is lacking or useless (hw/ppc/mac_oldworld.c).
-error: could not build fake ancestor
-
-Any chance you can rebase and repost? I'm happy to take patches 3 and 4, and if my 
-suggestion of casting the return address via target_ulong works then I think 1 and 2 
-are also fine. The I2C stuff I can't really review, and weren't there still issues 
-with the SPD data in patch 8 reporting the wrong RAM size?
-
-
-ATB,
-
-Mark.
+Since v1:=0D
+- Do not remove mem_base in patch 1 (Laurent)=0D
+- Pass MemoryRegion* (new patch)=0D
+- Run check-qtest=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (2):=0D
+  hw/rtc/m48t59: Simplify m48t59_init() removing 'io_base' argument=0D
+  hw/rtc/m48t59: Simplify m48t59_init() passing MemoryRegion argument=0D
+=0D
+ include/hw/rtc/m48t59.h |  5 ++---=0D
+ hw/ppc/ppc405_boards.c  |  2 +-=0D
+ hw/rtc/m48t59.c         | 14 +++-----------=0D
+ hw/sparc/sun4m.c        |  3 ++-=0D
+ hw/sparc64/sun4u.c      |  7 ++-----=0D
+ 5 files changed, 10 insertions(+), 21 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
