@@ -7,60 +7,60 @@ X-Spam-Status: No, score=-3.2 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PLING_QUERY,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47901C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 03:45:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7900CC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 03:46:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A689D22245
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 03:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A78D222245
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 03:46:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qfZILCfx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A689D22245
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kKMdDH+i"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A78D222245
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSuCx-0006Np-JJ
-	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 23:45:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53280)
+	id 1kSuDp-0007MQ-QJ
+	for qemu-devel@archiver.kernel.org; Wed, 14 Oct 2020 23:46:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53622)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSuBi-0005tN-1D
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 23:44:22 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:39659)
+ id 1kSuCk-0006Si-3P
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 23:45:26 -0400
+Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:46834)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <hiharryharryharry@gmail.com>)
- id 1kSuBd-0003oh-HO
- for qemu-devel@nongnu.org; Wed, 14 Oct 2020 23:44:21 -0400
-Received: by mail-lj1-x242.google.com with SMTP id m16so1644633ljo.6
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 20:44:16 -0700 (PDT)
+ id 1kSuCi-0004Am-Hj
+ for qemu-devel@nongnu.org; Wed, 14 Oct 2020 23:45:25 -0400
+Received: by mail-lf1-x144.google.com with SMTP id v6so1828958lfa.13
+ for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 20:45:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
- b=qfZILCfxkUpQvE6YU3Z9UodjGZTM49N99Qs09Qi/4D5OgMHut9bruj5fsGafj+WSqd
- IzSk2arafb2CF6N468LF2DMB9Ru6VOsUrx9OcRJnPaGGsxkEQlQEFe5Iruz9ANnaL6qo
- bFrI68ljv6tVt4AR+c/yd/G4suzPxvqoS+5sfzfdLVbRfwnsTEhIx5p60B2AylA92DYL
- lKwZtP2S8JaHJAQeuulu5cQ2npU0PtTcVhmbsSsDcsjyI4LIW95dIePKGAen64iJDxMS
- 7/cvyDiaoN5ikqwUy82WUUjLha/tTcqc+TG96F+SsaIDxH6/WVUQR1Xu7K80mlEnsf3P
- mf3w==
+ :cc; bh=z9zMX2coYN8H3CBILNpr7q+Vk2fAdNTcRYoWO7ULwRE=;
+ b=kKMdDH+imlskdTjp+gjVXY1DrKt1Ep3Ytjb9qBpCPjUyBhxbCRiecmIslucxehpO4n
+ 94K6JKqf4UWSCahN3lwioeQ1xls6OR+ilsIPeQej9Otm8Zr6MrYAxTtSJwp0K6pzKYHU
+ L2y1CMmLkLgDHlFIA/AZ9NpRnJW6tranwh6+AYlOSR2COC8/lGkWHPJJM8q7TPU7HfmW
+ Pj+YaAK3TdiMtE7RrMsMD2MK0zu/h9FdyrISKIc7dH1knGMCNQVCCQu5+WskQsLcUxG/
+ /uAveQssjFvYZ2PW7294kGGKD89Mnw7fMO2Sgym2cJk8lQWa3ZcpqsVTe5NmNkbWpgWE
+ k1MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=HHTEFLARrai9jAcwvYx9rODqAnP/mRVKE4w7Ff4URe4=;
- b=bNrVGY+J1+aNFom47WQQ6BjQiuuYWxye0LDHmJ3Y/5jNtaThJTFHZbaIxpm3kPLder
- NXai/81c7FuhlR7f4LcBz1L+6If9/McLPJGz/o6Rhr3JTsBCURuJtR284laySEUUxyO4
- F5GP4ro2v8oMgRxRmyjmjpVgC4JYccDCOx5fTHETEW8KzGbF48B0E9Ru9ooyJfImbL3i
- /zFoNr1DORZyMlo7tY+wSOt9aS8sYRvvVLZcMX6YeSKxw05fL7FilQ4luk1ZCQtYSvBB
- 305vGzKBGBEUjEGPdJunKOZ4DLKEw9K12G22xVnYDQee69xWZikIvKANB6g9RRenxSVr
- 9GBg==
-X-Gm-Message-State: AOAM531arfS+Ni0tUoNqSOp+eB49CGJb/Tp25Mkf8h2jsp2s62pp08uw
- FzUDNtZC+b4VlZQeZqUDBrakyx9/65zdnQpeBOQ=
-X-Google-Smtp-Source: ABdhPJwrojk583U17UFreB26E6EJBzeY9pns7nnbhf5WVPSQWFljj9y5nCaSrAUUweCPWKFxAyW3SN3Koo6Xjpsvyx8=
-X-Received: by 2002:a2e:b006:: with SMTP id y6mr419563ljk.462.1602733454595;
- Wed, 14 Oct 2020 20:44:14 -0700 (PDT)
+ bh=z9zMX2coYN8H3CBILNpr7q+Vk2fAdNTcRYoWO7ULwRE=;
+ b=r8Ugc69FplhMs9Mje1SRQZc1JNtpKz/LPe1L5bFDKtasgQ9ZNJ2rj49gTyhiSVZ2KZ
+ mVFHkoaOJVBC7KlLm+Dln7oFmBBX02Xj+US2OYEAO+wZaYQMAWklXU7rKHHX1RzU8oLW
+ SRLm/nlXmpUFqx/F4taMPY1b35sKxOn6VJiF9eT1CYxwVOG5DSB2g3KvDcl1zI2rqx2H
+ BeLYrGRrxKz9Zr+WIumXTJ8wvSUamOrNw9kQioHYSogSWjPMoNvjyxAG8oE6nlmgfSs6
+ Xs2FoB2eDLFtUCcX31qsCzqoiVQ/SBbqdsV5LUqVrtuxsWGMCL6o2qFzX2GxJi0HlHFD
+ Xu/Q==
+X-Gm-Message-State: AOAM533t1k17M8Ys/Adbt5PI75wqOt+7noyEpHexfFJZDwCFsJmkM3F4
+ Fc1m2Dzg87qNdf2r4qdeRlGZ/Ma/atSggItDvTs=
+X-Google-Smtp-Source: ABdhPJxmhGw0f35E0C3XKDWPhs9gxr7BD5N3ErbxT6FYWhPozjavL7xvKRkSdQMsQ7Mb2VXX/bDxA/I2LFN3YqzxYxM=
+X-Received: by 2002:a19:4bd4:: with SMTP id y203mr330362lfa.539.1602733522366; 
+ Wed, 14 Oct 2020 20:45:22 -0700 (PDT)
 MIME-Version: 1.0
 References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
  <47ead258320536d00f9f32891da3810040875aff.camel@redhat.com>
@@ -69,19 +69,20 @@ References: <CA+-xGqMd4_58_+QKetjOsubBqrDnaYF+YWE3TC3kEcNGxPiPfg@mail.gmail.com>
  <CA+-xGqPkkiws0bxrzud_qKs3ZmKN9=AfN=JGephfGc+2rn6ybw@mail.gmail.com>
  <20201013045245.GA11344@linux.intel.com>
  <CA+-xGqO4DtUs3-jH+QMPEze2GrXwtNX0z=vVUVak5HOpPKaDxQ@mail.gmail.com>
- <20201013070329.GC11344@linux.intel.com>
- <CA+-xGqO37RzQDg5dnE_3NWMp6+u2L02GQDqoSr3RdedoMBugrg@mail.gmail.com>
- <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
-In-Reply-To: <626a8667-be00-96b7-f21d-1ec7648ee1e6@redhat.com>
+ <CA+-xGqMMa-DB1SND5MRugusDafjNA9CVw-=OBK7q=CK1impmTQ@mail.gmail.com>
+ <a163c2d8-d8a1-dc03-6230-a2e104e3b039@redhat.com>
+ <CA+-xGqOMKRh+_5vYXeLOiGnTMw4L_gUccqdQ+HGSOzuTosp6tw@mail.gmail.com>
+ <a4f3816dab09f4e28e33c66b8ff8273147415567.camel@redhat.com>
+In-Reply-To: <a4f3816dab09f4e28e33c66b8ff8273147415567.camel@redhat.com>
 From: harry harry <hiharryharryharry@gmail.com>
-Date: Wed, 14 Oct 2020 23:43:54 -0400
-Message-ID: <CA+-xGqMdVm1tqDMt9PTOxi80oEW_3pFiQaH+WvQfpZ9K1QJKDw@mail.gmail.com>
+Date: Wed, 14 Oct 2020 23:45:02 -0400
+Message-ID: <CA+-xGqME1C180HcEfOF2cxUtmH6ZeeGqbGYjfYrE7ke8DpuzUg@mail.gmail.com>
 Subject: Re: Why guest physical addresses are not the same as the
  corresponding host virtual addresses in QEMU/KVM? Thanks!
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=hiharryharryharry@gmail.com; helo=mail-lj1-x242.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::144;
+ envelope-from=hiharryharryharry@gmail.com; helo=mail-lf1-x144.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -19
@@ -105,17 +106,16 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kvm@vger.kernel.org, libvir-list@redhat.com, qemu-devel@nongnu.org,
  Sean Christopherson <sean.j.christopherson@intel.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, mathieu.tarral@protonmail.com,
- stefanha@redhat.com
+ mathieu.tarral@protonmail.com, stefanha@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Paolo and Sean,
+Hi Maxim,
 
-It is clear to me now. Thanks much for your reply and help.
+Thanks for your emphasis. It's much clearer.
 
-
-Best regards,
+Best,
 Harry
 
