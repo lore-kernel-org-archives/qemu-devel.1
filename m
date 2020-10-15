@@ -2,89 +2,103 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40FD2C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:41:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE24C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:42:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 622EC2076A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:41:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2CA520714
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 21:42:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l+iHqBCw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622EC2076A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fqAgvn6Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2CA520714
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTB03-0002MJ-OS
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 17:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48906)
+	id 1kTB15-0003HK-Ql
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 17:42:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTAyp-0001i7-Tz
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:40:13 -0400
-Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:41398)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTAym-0003Rn-UE
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:40:11 -0400
-Received: by mail-lj1-x242.google.com with SMTP id p15so327995ljj.8
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 14:40:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=5dpxu6V8QG1tXXq+mBUa87SxiirjEDAowgx3qURpbi0=;
- b=l+iHqBCw4n6PkAE+e/8IcRvKSwWeK7b+v9OU2y84vnvblyi+ux37tGPYzLZNTXFXIH
- 5kXoO/8A//HRQ80zmhYlAmLe5f2xi1LGwiOvaiV5ttUCwEkI/vUv/qLBBqnyHQ8Vr8Rm
- RubQuInerprRMIcbDHT/fiTzF+OCxXLYP8TGly+1oEQrHgHmSjYzOlvWTN7170a129Ar
- +UXLIIaepve9I9jV3jaIpm1ABWtLUdVmhQV3yfTP5ZbbGKlkivk2YBeMMesSmGSojKL+
- rg2VN+PT/SmUBKGnoimecH2ivAwATjoN7bI8sz6iujGo2JMgJoML0J9Oqp7b94bqR/f1
- jTVA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTB04-0002WT-7t
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:41:28 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28827)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTB01-0003j0-Hd
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 17:41:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602798083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=T/4Awa8HkjNeXy16CMVxMoHPpY8ytDUVR2Tlwb7RGew=;
+ b=fqAgvn6Y3VHCbglGSqI23BC77Gx93tYmaL6Lssgg08uhRc1fgjnKlhQ9PcBOXX/1lXkFLN
+ nyuI5+nbCqpErmX/39XvCNCqksu1EB0P8p8WONUG8EzTYLX4D1mpt8hZZDlgnxTAOECW3g
+ 8TUOiIi5ieD+BWuq23HBQIrroERlfR0=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-0uhx6LUsMQaaPqetgcRKEg-1; Thu, 15 Oct 2020 17:41:20 -0400
+X-MC-Unique: 0uhx6LUsMQaaPqetgcRKEg-1
+Received: by mail-ej1-f71.google.com with SMTP id p19so81389ejy.11
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 14:41:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=5dpxu6V8QG1tXXq+mBUa87SxiirjEDAowgx3qURpbi0=;
- b=hQsZm72QmqkO14T/5BHTsUTBx63Tvw+kpAwbgDtQxRQQILOdyw8MQ8DOgdpkJGdyb8
- qZJfNSSIvDss4VZSk+xHIWUezyqcmTKBzJDba9W8ldPhpFmfoW2nWvaY87oeAJycyEMo
- pglACIHfBH6zEHHEBqf5f4hfUsA39u1gjqMRRCkX8Sv1NR6Pgq9UuMgPU8n3UXblC8i/
- 07AUfxQkXfZLvwuJjERt3SJYGNs0pfcy6u8c0MabDLZUTskAnYzAz0fl/HmyIaV/T2YL
- olLYykHeW5f7neXY3/UQ7Ce3E3n78OResGU1DHiIJw9S7bzqHKd+vZFSuPV/c9yN2Zij
- FLCQ==
-X-Gm-Message-State: AOAM5305JdWeEHFvImfhufiPzdYzrKyrcqTZFAfdwozZRwXhAcLimwSJ
- Ad9egMwGmMLMMfnYEXXr0kn2ru8IHZ3yL/TS+Yk=
-X-Google-Smtp-Source: ABdhPJxc8ldd9KmuxwXsVRji4jTjIZuEfH1RKZ3yC+2MG/Yr8JKnhndNaOLYNjEiDILY7BbIo5EyRJK1t26PktkgmIc=
-X-Received: by 2002:a2e:9a17:: with SMTP id o23mr288092lji.242.1602798006829; 
- Thu, 15 Oct 2020 14:40:06 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=T/4Awa8HkjNeXy16CMVxMoHPpY8ytDUVR2Tlwb7RGew=;
+ b=kNFXqa7kwMItvRQpOHcDxBE9vpfcPLdLIzIYBSy9/c4TY58xlpKny3gA+wmNYNU15z
+ 7kyZNYKd5gSKv3feixTYOQUWTpfz4UF22FJUccWK/v0p0U+98tDEvUHUoJzEAMaGC7qt
+ uWqpXCYqDHHik4Rpo1ndniIOaj+bBS0Ln+UX+xOavJ6z1W86ODORb3g1PqdJrZSqHH7L
+ klHfjB6lf5E2K5hKUSqzZ2xrlm4JhvFwdL9YnUbz/8XHw5UTFe4C81KRFXqC498TbyCx
+ RXOib08uQ6MYtk+rx/inddLnOjrMP2ibOoYBhhQBNgsNzoWF0b+JkNGT//XBUwSs8eil
+ sWXQ==
+X-Gm-Message-State: AOAM530mg59SpVBdgpb/kvK6n7JKT1vuUY4FMoI9SsieHmnP0Q/MKikA
+ iVcNR5SL/PFpSu0rkzr3G7CuwS6+O+W3pBvI9J07q5tpSH62gk0DR+pCfB0pNv+WHhIRs8K/VGT
+ LW+yeEVX1TUOU2P3LolB6FFy0NFFO4/w=
+X-Received: by 2002:a17:906:cc83:: with SMTP id
+ oq3mr391375ejb.71.1602798079109; 
+ Thu, 15 Oct 2020 14:41:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwlu+G3gzPR+LVGtpt4iOWVCGv8f2worXuaTUKtRqBBr54A5TIjlSytIFPN0KNh6drgE1aRAUA+ZtcJR/zVe1Y=
+X-Received: by 2002:a17:906:cc83:: with SMTP id
+ oq3mr391350ejb.71.1602798078857; 
+ Thu, 15 Oct 2020 14:41:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201015201035.1964-1-luoyonggang@gmail.com>
- <20201015201035.1964-3-luoyonggang@gmail.com>
- <CABgObfYXes_WRnqkBs2-1cTQVRu5PMO1Wv9vguWxY_41aFzTfQ@mail.gmail.com>
-In-Reply-To: <CABgObfYXes_WRnqkBs2-1cTQVRu5PMO1Wv9vguWxY_41aFzTfQ@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Fri, 16 Oct 2020 05:39:55 +0800
-Message-ID: <CAE2XoE_X_Ep43MvFGtBPR934oKofnWZhYvTA2ajbWhvbFnPxKA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/4] configure: the docdir option should passed to
- meson as is.
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000d807de05b1bc7d24"
-Received-SPF: pass client-ip=2a00:1450:4864:20::242;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x242.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+References: <20201014135416.1290679-1-pbonzini@redhat.com>
+ <CABLmASGJOFbYUhSAbKhc9s1G00Jh0vN--WaFPtaoHqsL2WuvbQ@mail.gmail.com>
+ <44d3eccf-3c64-82cd-b5b2-641de6960ab5@redhat.com>
+ <CABLmASE55n6h=fr8UrKOHdu1Z_P-46a9t4L0KaRxvvf0hob01w@mail.gmail.com>
+ <214e983c-b9e8-d03d-099e-d8fe506e6a7b@t-online.de>
+ <3ea54584-e67c-579e-9f5f-900611d072a1@ilande.co.uk>
+In-Reply-To: <3ea54584-e67c-579e-9f5f-900611d072a1@ilande.co.uk>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 15 Oct 2020 23:41:07 +0200
+Message-ID: <CABgObfaWkeiLEuigNoL3pmK05fKMbyEjtPG3SV2B4p6ZxEiQDQ@mail.gmail.com>
+Subject: Re: [PATCH 0/7] build: replace ninjatool with ninja
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="00000000000023290205b1bc8267"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,101 +112,103 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Volker_R=C3=BCmelin?= <vr_qemu@t-online.de>,
+ qemu-devel <qemu-devel@nongnu.org>, Howard Spoelstra <hsp.cat7@gmail.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000d807de05b1bc7d24
+--00000000000023290205b1bc8267
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Grep  qemu_docdir and docdir  in configure, you will know why,  qemu_docdir
-not used at all in configure,
+Il gio 15 ott 2020, 20:49 Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+ha scritto:
 
-On Fri, Oct 16, 2020 at 5:24 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
+> Is there any reason why
+> https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06997.html still
+> can't be
+> merged?
 >
-> Why?
+
+Because it's not the right approach. There is no reason why building
+firmware cannot be done with cross compilers, so moving those directories
+to Meson (not because Meson can't handle them; more specifically, the issue
+is tying the firmware build to the QEMU build system) is going in the wrong
+direction.
+
+The "Canadian cross" scenario, where you build on Linux a mingw GCC but the
+compiler is s390, is not even enough to describe the complexity in the case
+of QEMU, because there are multiple firmware for different machines.
+
+However we already have all the infrastructure to do such builds, we just
+don't use it for the firmware. So, instead of the patch you recalled above,
+the tests/tcg machinery should be extended into something that can be
+reused for firmware. As an aside, orchestrating this multi-compiler part of
+the build is what the Makefiles will keep on handling for the foreseeable
+future. As an aside to the aside, tests/tcg is more than underdocumented
+and I forget everything about it 5 minutes after looking at it.
+
+This is not something that I will be able to work on anytime soon. But
+still I don't think that going in the wrong direction is a good idea, even
+if temporarily.
+
+Paolo
+
+
 >
-> Paolo
+> ATB,
 >
-> Il gio 15 ott 2020, 22:11 Yonggang Luo <luoyonggang@gmail.com> ha scritto=
-:
->>
->> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
->> ---
->>  configure | 3 +--
->>  1 file changed, 1 insertion(+), 2 deletions(-)
->>
->> diff --git a/configure b/configure
->> index f839c2a557..1ce31f97b4 100755
->> --- a/configure
->> +++ b/configure
->> @@ -971,7 +971,7 @@ for opt do
->>    ;;
->>    --with-suffix=3D*) qemu_suffix=3D"$optarg"
->>    ;;
->> -  --docdir=3D*) qemu_docdir=3D"$optarg"
->> +  --docdir=3D*) docdir=3D"$optarg"
->>    ;;
->>    --sysconfdir=3D*) sysconfdir=3D"$optarg"
->>    ;;
->> @@ -5770,7 +5770,6 @@ fi
->>  qemu_confdir=3D"$sysconfdir/$qemu_suffix"
->>  qemu_moddir=3D"$libdir/$qemu_suffix"
->>  qemu_datadir=3D"$datadir/$qemu_suffix"
->> -qemu_docdir=3D"$docdir/$qemu_suffix"
->>  qemu_localedir=3D"$datadir/locale"
->>  qemu_icondir=3D"$datadir/icons"
->>  qemu_desktopdir=3D"$datadir/applications"
->> --
->> 2.28.0.windows.1
->>
+> Mark.
+>
+>
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000d807de05b1bc7d24
+--00000000000023290205b1bc8267
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr">Grep=C2=A0
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il gio 15 ott 2020, 20:49 Mark Cave-Ayland &lt;<a href=
+=3D"mailto:mark.cave-ayland@ilande.co.uk">mark.cave-ayland@ilande.co.uk</a>=
+&gt; ha scritto:<br></div><blockquote class=3D"gmail_quote" style=3D"margin=
+:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">Is there any reaso=
+n why <br>
+<a href=3D"https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg06997.h=
+tml" rel=3D"noreferrer noreferrer" target=3D"_blank">https://lists.gnu.org/=
+archive/html/qemu-devel/2020-09/msg06997.html</a> still can&#39;t be <br>
+merged?<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D=
+"auto">Because it&#39;s not the right approach. There is no reason why buil=
+ding firmware cannot be done with cross compilers, so moving those director=
+ies to Meson (not because Meson can&#39;t handle them; more specifically, t=
+he issue is tying the firmware build to the QEMU build system) is going in =
+the wrong direction.</div><div dir=3D"auto"><br></div><div dir=3D"auto">The=
+ &quot;Canadian cross&quot; scenario, where you build on Linux a mingw GCC =
+but the compiler is s390, is not even enough to describe the complexity in =
+the case of QEMU, because there are multiple firmware for different machine=
+s.</div><div dir=3D"auto"><br></div><div dir=3D"auto">However we already ha=
+ve all the infrastructure to do such builds, we just don&#39;t use it for t=
+he firmware. So, instead of the patch you recalled above, the tests/tcg mac=
+hinery should be extended into something that can be reused for firmware. A=
+s an aside, orchestrating this multi-compiler part of the build is what the=
+ Makefiles will keep on handling for the foreseeable future. As an aside to=
+ the aside, tests/tcg is more than underdocumented and I forget everything =
+about it 5 minutes after looking at it.</div><div dir=3D"auto"><br></div><d=
+iv dir=3D"auto">This is not something that I will be able to work on anytim=
+e soon. But still I don&#39;t think that going in the wrong direction is a =
+good idea, even if temporarily.</div><div dir=3D"auto"><br></div><div dir=
+=3D"auto">Paolo</div><div dir=3D"auto"><br></div><div dir=3D"auto"><div cla=
+ss=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 =
+.8ex;border-left:1px #ccc solid;padding-left:1ex">
+<br>
+<br>
+ATB,<br>
+<br>
+Mark.<br>
+<br>
+</blockquote></div></div></div>
 
-qemu_docdir and docdir=C2=A0 in configure, you will know why,=C2=A0
+--00000000000023290205b1bc8267--
 
-qemu_docdir not used at all in configure,<div><br>On Fri, Oct 16, 2020 at 5=
-:24 AM Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@re=
-dhat.com</a>&gt; wrote:<br>&gt;<br>&gt; Why?<br>&gt;<br>&gt; Paolo<br>&gt;<=
-br>&gt; Il gio 15 ott 2020, 22:11 Yonggang Luo &lt;<a href=3D"mailto:luoyon=
-ggang@gmail.com">luoyonggang@gmail.com</a>&gt; ha scritto:<br>&gt;&gt;<br>&=
-gt;&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail=
-.com">luoyonggang@gmail.com</a>&gt;<br>&gt;&gt; ---<br>&gt;&gt; =C2=A0confi=
-gure | 3 +--<br>&gt;&gt; =C2=A01 file changed, 1 insertion(+), 2 deletions(=
--)<br>&gt;&gt;<br>&gt;&gt; diff --git a/configure b/configure<br>&gt;&gt; i=
-ndex f839c2a557..1ce31f97b4 100755<br>&gt;&gt; --- a/configure<br>&gt;&gt; =
-+++ b/configure<br>&gt;&gt; @@ -971,7 +971,7 @@ for opt do<br>&gt;&gt; =C2=
-=A0 =C2=A0;;<br>&gt;&gt; =C2=A0 =C2=A0--with-suffix=3D*) qemu_suffix=3D&quo=
-t;$optarg&quot;<br>&gt;&gt; =C2=A0 =C2=A0;;<br>&gt;&gt; - =C2=A0--docdir=3D=
-*) qemu_docdir=3D&quot;$optarg&quot;<br>&gt;&gt; + =C2=A0--docdir=3D*) docd=
-ir=3D&quot;$optarg&quot;<br>&gt;&gt; =C2=A0 =C2=A0;;<br>&gt;&gt; =C2=A0 =C2=
-=A0--sysconfdir=3D*) sysconfdir=3D&quot;$optarg&quot;<br>&gt;&gt; =C2=A0 =
-=C2=A0;;<br>&gt;&gt; @@ -5770,7 +5770,6 @@ fi<br>&gt;&gt; =C2=A0qemu_confdi=
-r=3D&quot;$sysconfdir/$qemu_suffix&quot;<br>&gt;&gt; =C2=A0qemu_moddir=3D&q=
-uot;$libdir/$qemu_suffix&quot;<br>&gt;&gt; =C2=A0qemu_datadir=3D&quot;$data=
-dir/$qemu_suffix&quot;<br>&gt;&gt; -qemu_docdir=3D&quot;$docdir/$qemu_suffi=
-x&quot;<br>&gt;&gt; =C2=A0qemu_localedir=3D&quot;$datadir/locale&quot;<br>&=
-gt;&gt; =C2=A0qemu_icondir=3D&quot;$datadir/icons&quot;<br>&gt;&gt; =C2=A0q=
-emu_desktopdir=3D&quot;$datadir/applications&quot;<br>&gt;&gt; --<br>&gt;&g=
-t; 2.28.0.windows.1<br>&gt;&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br=
->Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></div>
-
---000000000000d807de05b1bc7d24--
 
