@@ -2,112 +2,91 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C7FC1C433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:38:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7338BC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:40:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D63BE21D7F
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:38:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2CDB21D7F
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 06:40:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XarQQ9Bv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D63BE21D7F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lm3hEphK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2CDB21D7F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47630 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSwtl-0004Ys-UU
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 02:38:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54892)
+	id 1kSwvr-0006SW-QK
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 02:40:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kSwsN-0003sn-9A
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 02:36:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22858)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kSwsJ-0006D6-Qo
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 02:36:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602743790;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+7qH3UFHQZG+2tNBejFKcS/1FMjPkNChDpM4bd9TnS8=;
- b=XarQQ9BvdMx520d3tvXTBJlnKmlewztaM9dJQcI2EhB3CDWjbhvaHLVwCRWEylXpKwVcHj
- 3tKZlqjrS5TjezaCqLAnoNCsNmk69uvoY7DtAA/JGqheOHyEYyBXnR7IEywnwIwUXtpi0g
- QgZBXTbmftef9kv4DMSpa4eP3rMCdRc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-PeQUSUzJMpKllMexKk4EgA-1; Thu, 15 Oct 2020 02:36:29 -0400
-X-MC-Unique: PeQUSUzJMpKllMexKk4EgA-1
-Received: by mail-ed1-f72.google.com with SMTP id g8so889921eds.10
- for <qemu-devel@nongnu.org>; Wed, 14 Oct 2020 23:36:28 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSwuE-00051D-3X; Thu, 15 Oct 2020 02:38:30 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:54046)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kSwuC-0006p9-Gs; Thu, 15 Oct 2020 02:38:29 -0400
+Received: by mail-wm1-x343.google.com with SMTP id f21so1904890wml.3;
+ Wed, 14 Oct 2020 23:38:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=yn409OoAXAvtjvGSJ+WlHlOrgCSHZsY7uZz+Opq6+fM=;
+ b=lm3hEphKO6UmQRTPco6x8OQYJrsbxtR/EsgvWjB0v8p1xJ2E635S/raGOF7KOBpWIf
+ gIWm6FZ4mAf32uyOt2p2iNkBUYJE7Fw35O/prRt7/vHxrqUy23DvXhOTUCiUDXS5jc/c
+ Fhxh7+qYzQ0Rv6fbafRMABjYClk+5zSMTjmN2p6nsQfRNbbbPBUMV2Rj6Oon2mAFefPe
+ D+EdbwiICVj2aVhcX2AN5cU3vYEMZgeDUHY1pMSmFP3DB9b0HBLslf2cYVgBoKvypBtq
+ kNPWHAOkynuTjBMcTFWfpZ1rNfiwmAwbEijXYI4IJYmVaAHAC/I6InFsuF2VQqb7WsUf
+ eiWQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=+7qH3UFHQZG+2tNBejFKcS/1FMjPkNChDpM4bd9TnS8=;
- b=K1R+TzymD9PG4UKa27jEWpoHNen59AMfrSWQkCPggsxXHbGY2fklrO4wveV6VWCp69
- LQbkHbaWjjBGLuku/lEV5m/0f2CjNdZMYxddtKhDaKJuY5iRnL+LbMEM/EUGJzq3ez2u
- Uh8LIau06hVakitOTyPi+nC8xYWfZviFhKdWQmko/vLFJxqLLgoWjI8+qykQv1WstnHA
- QUwC38uWN0/+llVzcKbQ5kStSEYWGQEgpfLnn9bkVjRlCgpoyD+JIhJLVq5TFig9dGEP
- VEjQTRxngwns1ncH9hUDVDKD1S1PXrKTNab/aH5+AFu6dg5U84mFvw9RJf/Lz0FO8ifQ
- fTFA==
-X-Gm-Message-State: AOAM531cI/Bt76bftQ4fq1zDlqmIIMlU8Ptvh4QUjCgMo8+iK6oU7HQb
- gGOSEG9MByE8QfxIG63Uh30V/9zILqQSKoAH3jCNdQ18ofnD+dW6uhh80iUbZ2FrBQjggAVhtQd
- M0HygukLahCefkwU=
-X-Received: by 2002:a17:906:cc53:: with SMTP id
- mm19mr2820861ejb.514.1602743787903; 
- Wed, 14 Oct 2020 23:36:27 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwWIzo6Nt/Rygpg5drTNyqZ8ziFQzL8S0T+PT3Mu4oDOHbAO/gr77oF0t33RH23R/LIeuNSBQ==
-X-Received: by 2002:a17:906:cc53:: with SMTP id
- mm19mr2820844ejb.514.1602743787689; 
- Wed, 14 Oct 2020 23:36:27 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:83:5a63:f601:3a08?
- ([2001:b07:6468:f312:83:5a63:f601:3a08])
- by smtp.gmail.com with ESMTPSA id i4sm872020ejz.62.2020.10.14.23.36.26
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 14 Oct 2020 23:36:27 -0700 (PDT)
-Subject: Re: [PATCH 5/7] dockerfiles: enable Centos 8 PowerTools
-To: Cleber Rosa <crosa@redhat.com>
-References: <20201014135416.1290679-1-pbonzini@redhat.com>
- <20201014135416.1290679-6-pbonzini@redhat.com>
- <20201014204950.GA1203215@localhost.localdomain>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <854b88db-c95d-2d96-8848-8de762e4f97e@redhat.com>
-Date: Thu, 15 Oct 2020 08:36:26 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=yn409OoAXAvtjvGSJ+WlHlOrgCSHZsY7uZz+Opq6+fM=;
+ b=QFgftsNFimhIDmw4zy4pNjyL97Crc0HOeWLe3Y7IECei5m4d6hdQguukyfc7haiQcd
+ KeY/7y91yiP8Z1Vjz2Css3ibws41oQJlQIh3bBPJU/2fQKheVcjdijk08JHlmtDaHUCY
+ slcYpHRxHqFIRbZVSlG07+acPlqjW7WsmyMO2xlSIme5BqDY30magmAlvDI/Vsn5nEKQ
+ sTsrK8LODz5B2LKa7Gyv/Z1DHGnjSj/gYkJJyuKKZf/QNrMBXvDd7mIzVS/QZS3YMVpr
+ zCl4+AleTSjh1Z2qzvAUL+TemT1HFsHf68SvM0eAj/LswwzqAMYhX/12sbB3B26P3nHw
+ DAaQ==
+X-Gm-Message-State: AOAM530sGHLSg5P4G3qedRMHDJ+WV0sI0fJb48WOTqWKFhZrUBAosMru
+ fTTDDY7UOiq/w24+Y8tvCfJI0dQNbRk=
+X-Google-Smtp-Source: ABdhPJyYWY7WYV+kducPUmH7797Pup+kfb3y1NXg6mwix3LtS8S25eKfOwcKRd5yy8P3O64h02XF3A==
+X-Received: by 2002:a1c:59c3:: with SMTP id n186mr2320132wmb.32.1602743906515; 
+ Wed, 14 Oct 2020 23:38:26 -0700 (PDT)
+Received: from localhost.localdomain
+ (106.red-83-59-162.dynamicip.rima-tde.net. [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id j101sm3154244wrj.9.2020.10.14.23.38.25
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 14 Oct 2020 23:38:25 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 0/6] hw/sd/sdcard: Do not attempt to erase out of range
+ addresses
+Date: Thu, 15 Oct 2020 08:38:18 +0200
+Message-Id: <20201015063824.212980-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-In-Reply-To: <20201014204950.GA1203215@localhost.localdomain>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -120,40 +99,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org, berrange@redhat.com, qemu-devel@nongnu.org,
- peter.maydell@linaro.org
+Cc: Alexander Bulekov <alxndr@bu.edu>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/10/20 22:49, Cleber Rosa wrote:
-> On Wed, Oct 14, 2020 at 09:54:14AM -0400, Paolo Bonzini wrote:
->> ninja is included in the CentOS PowerTools repository.
->>
->> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>  tests/docker/dockerfiles/centos8.docker | 3 +++
->>  1 file changed, 3 insertions(+)
->>
->> diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/dockerfiles/centos8.docker
->> index 0fc2697491..e31d366fc1 100644
->> --- a/tests/docker/dockerfiles/centos8.docker
->> +++ b/tests/docker/dockerfiles/centos8.docker
->> @@ -1,6 +1,9 @@
->>  FROM centos:8.1.1911
->>  
->> +RUN dnf -y install dnf-plugins-core
->> +RUN dnf config-manager --set-enabled PowerTools
-> 
-> Since config-manager won't be used besides here, I think it's safe and
-> cheaper to simply do:
-> 
->    RUN sed -i /etc/yum.repos.d/CentOS-PowerTools.repo -e 's/^enabled=0/enabled=1/'
-> 
-> It's also a single command, reducing the number of layers.
-
-Yeah, I'm lazy. :)  I'll use Dan's suggestion.
-
-Paolo
-
+Yet another bug in the sdcard model found by libfuzzer:=0D
+https://bugs.launchpad.net/bugs/1895310=0D
+=0D
+Since RFC: Settled migration issue=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (6):=0D
+  hw/sd/sdcard: Add trace event for ERASE command (CMD38)=0D
+  hw/sd/sdcard: Introduce the INVALID_ADDRESS definition=0D
+  hw/sd/sdcard: Do not use legal address '0' for INVALID_ADDRESS=0D
+  hw/sd/sdcard: Reset both start/end addresses on error=0D
+  hw/sd/sdcard: Do not attempt to erase out of range addresses=0D
+  hw/sd/sdcard: Assert if accessing an illegal group=0D
+=0D
+ hw/sd/sd.c         | 30 ++++++++++++++++++++++--------=0D
+ hw/sd/trace-events |  2 +-=0D
+ 2 files changed, 23 insertions(+), 9 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
