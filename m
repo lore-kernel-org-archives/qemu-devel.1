@@ -2,84 +2,92 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE95FC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:06:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62ABDC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 01C7620663
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:06:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A6F1C20704
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:09:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="aYovgX3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C7620663
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QH4TnZ+l"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6F1C20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3tt-0000Ly-Oc
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:06:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55036)
+	id 1kT3wL-0003Rg-LR
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:09:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56668)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maz@kernel.org>) id 1kT3gO-0003nC-Nn
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:52:40 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33058)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <maz@kernel.org>) id 1kT3gM-00023i-Js
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:52:40 -0400
-Received: from disco-boy.misterjones.org (disco-boy.misterjones.org
- [51.254.78.96])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kT3n6-0003Fo-QZ
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:59:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41359)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kT3n0-0002y4-De
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:59:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602770368;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=y/L1jdMZ/q+33CEbeSraBlu82lsmzzZEW1iStj1226Q=;
+ b=QH4TnZ+l+wMFbLjYmmXdPuNsi3pbiRMauVYuD0Gk5DhQhPoe0HghXbKeuFPPqPkoG9J8Zg
+ Ie862DgX91AS3va+uQeFohf5BJzPuZHF2P+iaMk2KA0qRk0xaibYF8oz3tN6iiLwPZBOTj
+ w7ENlmVNp/Lpwgicl6ihU2KUNVn1LDU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-194-yY2vpd4-MNqDRkHbZ2CRTg-1; Thu, 15 Oct 2020 09:59:25 -0400
+X-MC-Unique: yY2vpd4-MNqDRkHbZ2CRTg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id C4B422222B;
- Thu, 15 Oct 2020 13:52:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1602769956;
- bh=xarXKYZ8s+xHzOaOdBDdrKmal0xGW3EEb9e3ttVwQAg=;
- h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
- b=aYovgX3/go3eG/ZbCmpQGRKnh9z5m7oWFIjx02kMEtmPXNzYE1JjO31kXpusbaeuU
- Rf2KrjwgM5OFSnhgQbmMevkh9IJM6bEp3jvhorN7Twx8caRis8VNIlFS2v5KmPH2vR
- 8Gzar2oZW80L6/oh0qW1Crk98JSJAYlz9/aCGkdE=
-Received: from disco-boy.misterjones.org ([51.254.78.96] helo=www.loen.fr)
- by disco-boy.misterjones.org with esmtpsa
- (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <maz@kernel.org>)
- id 1kT3gI-001OiW-M4; Thu, 15 Oct 2020 14:52:34 +0100
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4AC41A34861;
+ Thu, 15 Oct 2020 13:59:24 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-113-184.ams2.redhat.com [10.36.113.184])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A25D078819;
+ Thu, 15 Oct 2020 13:58:53 +0000 (UTC)
+Subject: Re: [PATCH v5] Add a comment in bios-tables-test.c to clarify the
+ reason behind approach
+To: Ani Sinha <ani@anisinha.ca>
+References: <20200929142501.1057-1-ani@anisinha.ca>
+ <105B94CB-1345-49FB-B296-F5236E448BC3@anisinha.ca>
+ <72e35a9d-21f4-095d-1ae9-9ed33842dd24@redhat.com>
+ <CAARzgwyJ2Cy286wWoo6G+mMZbGQRVyChxEQV++oLpVY+_MOU+g@mail.gmail.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <ccc5797e-e3d0-6f73-27c2-cdc6c0878320@redhat.com>
+Date: Thu, 15 Oct 2020 15:58:52 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8;
- format=flowed
-Content-Transfer-Encoding: 8bit
-Date: Thu, 15 Oct 2020 14:52:34 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-In-Reply-To: <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
-References: <20201015040639.70C6D414009F@webmail.sinamail.sina.com.cn>
- <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
- <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
-User-Agent: Roundcube Webmail/1.4.9
-Message-ID: <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
-X-Sender: maz@kernel.org
-X-SA-Exim-Connect-IP: 51.254.78.96
-X-SA-Exim-Rcpt-To: drjones@redhat.com, xu910121@sina.com, qemu-devel@nongnu.org,
- dave.martin@arm.com, kvmarm@lists.cs.columbia.edu
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org);
- SAEximRunCond expanded to false
-Received-SPF: pass client-ip=198.145.29.99; envelope-from=maz@kernel.org;
- helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:52:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <CAARzgwyJ2Cy286wWoo6G+mMZbGQRVyChxEQV++oLpVY+_MOU+g@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ NICE_REPLY_A=-1.019, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,69 +101,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kvmarm <kvmarm@lists.cs.columbia.edu>, xu910121@sina.com,
- qemu-devel <qemu-devel@nongnu.org>, "Dave.Martin" <dave.martin@arm.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ mst@redhat.com, qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-10-15 14:35, Andrew Jones wrote:
-> On Thu, Oct 15, 2020 at 12:26:10PM +0100, Marc Zyngier wrote:
->> Hi
->> 
->> Please don't use my arm.com address anymore, nobody reads it...
->> 
->> On 2020-10-15 05:06, 张东旭 wrote:
->> > I'm so sorry for disturbing you.
->> >
->> > When I apply this kernel patch：KVM: arm64/sve: System register
->> > context switch and access support
->> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/arch/arm64/kvm/sys_regs.c?id=73433762fcaeb9d59e84d299021c6b15466c96dd
->> 
->> This patch was only introduced in 5.2, and wasn't supposed to be
->> backported to anything else.
+On 15/10/2020 13.28, Ani Sinha wrote:
 > 
-> All upstream patches are backport candidates. Welcome to RHEL :-)
-
-Great! RHEL gets to keep the pieces! ;-)
-
 > 
->> 
->> > qemu live migration will failed with messages：
->> >               ​qemu-kvm: Invalid value 233 expecting positive value
->> > <= 232
->> >               qemu-kvm: Failed to load cpu:cpreg_vmstate_array_len
->> > New version kernel  exclude ID_AA64ZFR0_EL1 register when host not
->> > support SVE feature,
->> > so qemu ioctl kvm(KVM_GET_REG_LIST) will not contain ID_AA64ZFR0_EL1
->> > register.
->> >
->> > I'm using CentOS Linux kernel, old kernel version：4.18.0-80.11.el8
->> > (migration source)
->> >       new kernel version：4.18.0-147.5.el8 (migration destination)
->> >
->> > CentOS linux kernel version 4.18.0-111.el8 applied this patch. So
->> > 4.18.0-147.5.el8 also applied this patch.
->> >
->> > Migration source and destination hosts have the same hardware, just
->> > kernel version is different,
->> > and the hardware on either side of the migration not support SVE.
->> >
->> > Is there some good suggestions，which can make sure old version
->> > kernel live migration to new version kernel with qemu?
->> 
->> I['m afraid you should take this with your distribution of
->> choice, unless you can reproduce the problem with mainline kernels.
+> On Mon, Oct 12, 2020 at 19:43 Thomas Huth <thuth@redhat.com
+> <mailto:thuth@redhat.com>> wrote:
 > 
-> I'll bet this reproduces when migrating from a mainline pre SVE 
-> register
-> filtering kernel to a mainline that does the filtering. I don't have
-> time to test that though.
+>     On 12/10/2020 16.07, Ani Sinha wrote:
+>     > Request to queue this patch with the next pull.
+> 
+>     I can take it via qtest-next in case Michael / Igor do not plan to send a
+>     pull request any time soon.
+> 
+> 
+> Michael or Igor, care to comment?
 
-Probably. I'm not really sure where to find SVE HW though, other
-than emulation...
+FYI, patch got merged:
 
-         M.
--- 
-Jazz is not dead. It just smells funny...
+https://git.qemu.org/?p=qemu.git;a=commitdiff;h=07f5903c852de10fa7
+
+ Thomas
+
 
