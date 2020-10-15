@@ -2,90 +2,88 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6ED2CC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 07:59:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D876BC433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 08:02:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F123422243
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 07:59:58 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F123422243
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2FBC422243
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 08:02:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dv6Gm/PN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FBC422243
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56152 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSyB3-0004J6-R3
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 03:59:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43210)
+	id 1kSyDQ-0005xG-Pg
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 04:02:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSy9T-0002oh-PK
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 03:58:19 -0400
-Received: from mga11.intel.com ([192.55.52.93]:35193)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kSy9R-0002Iq-Qj
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 03:58:19 -0400
-IronPort-SDR: D+AS6VSy71REOInQD6NJ3pGmHdXJ4zBlKvmde0Z+Hsc0QbZTEyLaRnD38fNBR6CsPLmsmxij3E
- 2FokWxtGAdnw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9774"; a="162827543"
-X-IronPort-AV: E=Sophos;i="5.77,378,1596524400"; d="scan'208";a="162827543"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
- by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2020 00:58:15 -0700
-IronPort-SDR: G7DjIM2QngxKrbI3iu4Uc/CsmvpUesRZMME3P2v7HZnAv3rKASLbpR1DOVQl9L7fS9nn9Gyd2l
- jFUaI30P4/HQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.77,378,1596524400"; d="scan'208";a="520691442"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
- by fmsmga006.fm.intel.com with ESMTP; 15 Oct 2020 00:58:15 -0700
-Received: from shsmsx604.ccr.corp.intel.com (10.109.6.214) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 15 Oct 2020 00:58:14 -0700
-Received: from shsmsx605.ccr.corp.intel.com (10.109.6.215) by
- SHSMSX604.ccr.corp.intel.com (10.109.6.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Thu, 15 Oct 2020 15:58:12 +0800
-Received: from shsmsx605.ccr.corp.intel.com ([10.109.6.215]) by
- SHSMSX605.ccr.corp.intel.com ([10.109.6.215]) with mapi id 15.01.1713.004;
- Thu, 15 Oct 2020 15:58:12 +0800
-From: "Zhang, Chen" <chen.zhang@intel.com>
-To: Jason Wang <jasowang@redhat.com>, qemu-dev <qemu-devel@nongnu.org>
-Subject: RE: [PATCH 00/10] COLO project queued patches 20-Oct
-Thread-Topic: [PATCH 00/10] COLO project queued patches 20-Oct
-Thread-Index: AQHWofuZjvvdY5FZRE6KB5kr3NlE86mXxw4AgACGqZA=
-Date: Thu, 15 Oct 2020 07:58:12 +0000
-Message-ID: <f71889f9bb054cdd8c294028878c739c@intel.com>
-References: <20201014072555.12515-1-chen.zhang@intel.com>
- <7638dbe1-9095-28e2-0b5f-2eeaa5e3f98e@redhat.com>
-In-Reply-To: <7638dbe1-9095-28e2-0b5f-2eeaa5e3f98e@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-product: dlpe-windows
-dlp-version: 11.5.1.3
-dlp-reaction: no-action
-x-originating-ip: [10.239.127.36]
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kSyAQ-0004B3-9H
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 03:59:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26128)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kSyAO-0002cL-60
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 03:59:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602748755;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q90dOnDtuGlLKMitWRAnide2Q1s8O9XlaVDz2pAFfts=;
+ b=Dv6Gm/PNNRq4ocAYSvmXri/nywbe6nYWfSDChjQnTpzv0mN9hjdEKCjL+H9CuWo2bIIPzy
+ ubUl888XPce6MR+RS3vWg24CKm2YZurFRhXscdrbcoTjERTLxqS707lSIDLJZa6zx4q8gf
+ CF04Hs5YS5LocV+Z8q7tatR0S7TysiM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-549-DtxOuOK0NQKm15f8bBouQg-1; Thu, 15 Oct 2020 03:59:11 -0400
+X-MC-Unique: DtxOuOK0NQKm15f8bBouQg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 756D2D6880;
+ Thu, 15 Oct 2020 07:59:09 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.194.132])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id A59215D9CD;
+ Thu, 15 Oct 2020 07:59:03 +0000 (UTC)
+Date: Thu, 15 Oct 2020 09:59:00 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Ying Fang <fangying1@huawei.com>
+Subject: Re: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache topology
+ support
+Message-ID: <20201015075900.ukz3y6cl2vhwmctx@kamzik.brq.redhat.com>
+References: <20200917032033.2020-1-fangying1@huawei.com>
+ <678F3D1BB717D949B966B68EAEB446ED49E0BB94@dggemm526-mbx.china.huawei.com>
+ <20201013180840.yzkncsw34xvwtoll@kamzik.brq.redhat.com>
+ <7491ca46-92b2-09e0-67a8-55a90203b9cc@huawei.com>
 MIME-Version: 1.0
-Received-SPF: pass client-ip=192.55.52.93; envelope-from=chen.zhang@intel.com;
- helo=mga11.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 03:58:15
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_HI=-5,
+In-Reply-To: <7491ca46-92b2-09e0-67a8-55a90203b9cc@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,41 +97,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: "peter.maydell@linaro.org" <peter.maydell@linaro.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "Chenzhendong \(alex\)" <alex.chen@huawei.com>,
+ "shannon.zhaosl@gmail.com" <shannon.zhaosl@gmail.com>,
+ "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>,
+ "alistair.francis@wdc.com" <alistair.francis@wdc.com>,
+ "Zengtao \(B\)" <prime.zeng@hisilicon.com>,
+ "imammedo@redhat.com" <imammedo@redhat.com>,
+ "valentin.schneider@arm.com" <valentin.schneider@arm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogSmFzb24gV2FuZyA8amFz
-b3dhbmdAcmVkaGF0LmNvbT4NCj4gU2VudDogVGh1cnNkYXksIE9jdG9iZXIgMTUsIDIwMjAgMzo1
-NiBQTQ0KPiBUbzogWmhhbmcsIENoZW4gPGNoZW4uemhhbmdAaW50ZWwuY29tPjsgcWVtdS1kZXYg
-PHFlbXUtDQo+IGRldmVsQG5vbmdudS5vcmc+DQo+IENjOiBaaGFuZyBDaGVuIDx6aGFuZ2NraWRA
-Z21haWwuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIDAwLzEwXSBDT0xPIHByb2plY3QgcXVl
-dWVkIHBhdGNoZXMgMjAtT2N0DQo+IA0KPiANCj4gT24gMjAyMC8xMC8xNCDkuIvljYgzOjI1LCBa
-aGFuZyBDaGVuIHdyb3RlOg0KPiA+IEZyb206IFpoYW5nIENoZW4gPGNoZW4uemhhbmdAaW50ZWwu
-Y29tPg0KPiA+DQo+ID4gSGkgSmFzb24sIHRoaXMgc2VyaWVzIGluY2x1ZGUgbGF0ZXN0IENPTE8g
-cmVsYXRlZCBwYXRjaGVzLg0KPiA+IHBsZWFzZSBjaGVjayBhbmQgbWVyZ2UgaXQuDQo+ID4NCj4g
-PiBUaGFua3MNCj4gPiBaaGFuZyBDaGVuDQo+IA0KPiANCj4gSGk6DQo+IA0KPiBJIHdhbnQgdG8g
-bWVyZ2UgYnV0IEkgZG9uJ3QgZ2V0IHBhdGNoIDEwLzEwLg0KPiANCj4gSXMgdGhhdCBsb3N0IGR1
-cmluZyBwb3N0aW5nPw0KDQpPaCwgU29ycnkgSSBtaXNzZWQgaXQuDQpBbHJlYWR5IHJlc2VuZCBp
-dDoNCltQQVRDSCAxMC8xMF0gbmV0L2NvbG8tY29tcGFyZS5jOiBJbmNyZWFzZSBkZWZhdWx0IHF1
-ZXVlZCBwYWNrZXQgc2NhbiBmcmVxdWVuY3kNCg0KVGhhbmtzDQpDaGVuDQoNCj4gDQo+IFRoYW5r
-cw0KPiANCj4gDQo+ID4NCj4gPiBMaSBaaGlqaWFuICgyKToNCj4gPiAgICBjb2xvLWNvbXBhcmU6
-IGZpeCBtaXNzaW5nIGNvbXBhcmVfc2VxIGluaXRpYWxpemF0aW9uDQo+ID4gICAgY29sby1jb21w
-YXJlOiBjaGVjayBtYXJrIGluIG11dHVhbCBleGNsdXNpb24NCj4gPg0KPiA+IFBhbiBOZW5neXVh
-biAoMSk6DQo+ID4gICAgbmV0L2ZpbHRlci1yZXdyaXRlcjogZGVzdHJveSBnX2hhc2hfdGFibGUg
-aW4gY29sb19yZXdyaXRlcl9jbGVhbnVwDQo+ID4NCj4gPiBSYW8sIExlaSAoMyk6DQo+ID4gICAg
-T3B0aW1pemUgc2VxX3NvcnRlciBmdW5jdGlvbiBmb3IgY29sby1jb21wYXJlDQo+ID4gICAgUmVk
-dWNlIHRoZSB0aW1lIG9mIGNoZWNrcG9pbnQgZm9yIENPTE8NCj4gPiAgICBGaXggdGhlIHFlbXUg
-Y3Jhc2ggd2hlbiBndWVzdCBzaHV0ZG93biBpbiBDT0xPIG1vZGUNCj4gPg0KPiA+IFpoYW5nIENo
-ZW4gKDQpOg0KPiA+ICAgIG5ldC9jb2xvLWNvbXBhcmUuYzogRml4IGNvbXBhcmVfdGltZW91dCBm
-b3JtYXQgaXNzdWUNCj4gPiAgICBuZXQvY29sby1jb21wYXJlLmM6IENoYW5nZSB0aGUgdGltZXIg
-Y2xvY2sgdHlwZQ0KPiA+ICAgIG5ldC9jb2xvLWNvbXBhcmUuYzogQWRkIHNlY29uZGFyeSBvbGQg
-cGFja2V0IGRldGVjdGlvbg0KPiA+ICAgIG5ldC9jb2xvLWNvbXBhcmUuYzogSW5jcmVhc2UgZGVm
-YXVsdCBxdWV1ZWQgcGFja2V0IHNjYW4gZnJlcXVlbmN5DQo+ID4NCj4gPiAgIG1pZ3JhdGlvbi9y
-YW0uYyAgICAgICB8IDE0ICsrKysrKysrKystDQo+ID4gICBuZXQvY29sby1jb21wYXJlLmMgICAg
-fCA1NyArKysrKysrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0tLS0tLS0tLS0tDQo+ID4gICBu
-ZXQvY29sby5jICAgICAgICAgICAgfCAgNSArLS0tDQo+ID4gICBuZXQvZmlsdGVyLXJld3JpdGVy
-LmMgfCAgMiArKw0KPiA+ICAgc29mdG1tdS92bC5jICAgICAgICAgIHwgIDEgKw0KPiA+ICAgNSBm
-aWxlcyBjaGFuZ2VkLCA0NiBpbnNlcnRpb25zKCspLCAzMyBkZWxldGlvbnMoLSkNCj4gPg0KDQo=
+On Thu, Oct 15, 2020 at 10:07:16AM +0800, Ying Fang wrote:
+> 
+> 
+> On 10/14/2020 2:08 AM, Andrew Jones wrote:
+> > On Tue, Oct 13, 2020 at 12:11:20PM +0000, Zengtao (B) wrote:
+> > > Cc valentin
+> > > 
+> > > > -----Original Message-----
+> > > > From: Qemu-devel
+> > > > [mailto:qemu-devel-bounces+prime.zeng=hisilicon.com@nongnu.org]
+> > > > On Behalf Of Ying Fang
+> > > > Sent: Thursday, September 17, 2020 11:20 AM
+> > > > To: qemu-devel@nongnu.org
+> > > > Cc: peter.maydell@linaro.org; drjones@redhat.com; Zhanghailiang;
+> > > > Chenzhendong (alex); shannon.zhaosl@gmail.com;
+> > > > qemu-arm@nongnu.org; alistair.francis@wdc.com; fangying;
+> > > > imammedo@redhat.com
+> > > > Subject: [RFC PATCH 00/12] hw/arm/virt: Introduce cpu and cache
+> > > > topology support
+> > > > 
+> > > > An accurate cpu topology may help improve the cpu scheduler's
+> > > > decision
+> > > > making when dealing with multi-core system. So cpu topology
+> > > > description
+> > > > is helpful to provide guest with the right view. Cpu cache information
+> > > > may
+> > > > also have slight impact on the sched domain, and even userspace
+> > > > software
+> > > > may check the cpu cache information to do some optimizations. Thus
+> > > > this patch
+> > > > series is posted to provide cpu and cache topology support for arm.
+> > > > 
+> > > > To make the cpu topology consistent with MPIDR, an vcpu ioctl
+> > > 
+> > > For aarch64, the cpu topology don't depends on the MPDIR.
+> > > See https://patchwork.kernel.org/patch/11744387/
+> > > 
+> > 
+> > The topology should not be inferred from the MPIDR Aff fields,
+> 
+> MPIDR is abused by ARM OEM manufactures. It is only used as a
+> identifer for a specific cpu, not representation of the topology.
+
+Right, which is why I stated topology should not be inferred from
+it.
+
+> 
+> > but MPIDR is the CPU identifier. When describing a topology
+> > with ACPI or DT the CPU elements in the topology description
+> > must map to actual CPUs. MPIDR is that mapping link. KVM
+> > currently determines what the MPIDR of a VCPU is. If KVM
+> 
+> KVM currently assigns MPIDR with vcpu->vcpu_id which mapped
+> into affinity levels. See reset_mpidr in sys_regs.c
+
+I know, but how KVM assigns MPIDRs today is not really important
+to KVM userspace. KVM userspace shouldn't depend on a KVM
+algorithm, as it could change.
+
+> 
+> > userspace is going to determine the VCPU topology, then it
+> > also needs control over the MPIDR values, otherwise it
+> > becomes quite messy trying to get the mapping right.
+> If we are going to control MPIDR, shall we assign MPIDR with
+> vcpu_id or map topology hierarchy into affinity levels or any
+> other link schema ?
+>
+
+We can assign them to whatever we want, as long as they're
+unique and as long as Aff0 is assigned per the GIC requirements,
+e.g. GICv3 requires that Aff0 be from 0 to 0xf. Also, when
+pinning VCPUs to PCPUs we should ensure that MPIDRs with matching
+Aff3,Aff2,Aff1 fields should actually be peers with respect to
+the GIC.
+
+We shouldn't try to encode topology in the MPIDR in any way,
+so we might as well simply increment a counter to assign them,
+which could possibly be the same as the VCPU ID.
+
+Thanks,
+drew
+
 
