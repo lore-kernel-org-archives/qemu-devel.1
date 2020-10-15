@@ -2,87 +2,86 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7A1EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC2BC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:43:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0AD420723
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:42:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C84CE21D41
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:43:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PZBSzRfH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0AD420723
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="M95eddoZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C84CE21D41
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55740 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT5P3-00027d-W7
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:42:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55258)
+	id 1kT5Pd-0002ok-Kw
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:43:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52690)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT5Nr-0001Jc-Lj
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:41:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47248)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kT5Nm-00009e-Dq
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:41:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602776492;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=UPxtBuHlqNyWCKxhUQYfGvkpauJtaSJEq7HxeTZHi/M=;
- b=PZBSzRfHWfDQv2FtagnWaXvyQe7UdezPFfX6YBQaYKabye4ANh1wDPsAFFRds2S1KK7yCd
- VD9sx7jdiAPFOzppz0zR17o2RMDUw/oj2/gCW0eEzgPDKPSA16B1X593FCg+//6uC7uyAs
- RzlC7b/aLR2CTZh9Js8250nNKoA5g7Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-vvQ8a8XTNbiCJeqgcDsVFw-1; Thu, 15 Oct 2020 11:41:29 -0400
-X-MC-Unique: vvQ8a8XTNbiCJeqgcDsVFw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B6AE980364C;
- Thu, 15 Oct 2020 15:41:28 +0000 (UTC)
-Received: from merkur.fritz.box (ovpn-114-163.ams2.redhat.com [10.36.114.163])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8962455764;
- Thu, 15 Oct 2020 15:41:24 +0000 (UTC)
-Date: Thu, 15 Oct 2020 17:41:23 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2 02/20] fuse: Allow exporting BDSs via FUSE
-Message-ID: <20201015154123.GK4610@merkur.fritz.box>
-References: <20200922104932.46384-1-mreitz@redhat.com>
- <20200922104932.46384-3-mreitz@redhat.com>
- <20201015085703.GB4610@merkur.fritz.box>
- <2db9dbfe-137a-4cdc-08ab-aaa1aed26423@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kT5EH-0001UW-Bf
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:31:50 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:46150)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kT5ED-0007Nl-2p
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:31:43 -0400
+Received: by mail-ed1-x544.google.com with SMTP id 33so3470776edq.13
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 08:31:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=bBuKOmZ+1wb0rXNSIrM3zJXE++U/4YyR49GY80nl+44=;
+ b=M95eddoZJGH3LfLQ0bMzwIbjJ1Unudg9PVhR71I4PQPTy+E2K0/4ujW5CTV+pLVX9n
+ tNaSanX8zjEmq5tcXMMty7CDEIShhU4cqIge4ZCHTDHAfgHiWc8rYP8T2xbgO1oxa+gQ
+ 1igIuPbf+nVc4TyCgbzHRMpTfrLa1XXpgdIwZpgeFGhOUGshPWl9pFg20tJV5F64TScu
+ kDhCm4TsQspyAp9bxnCdc5l3+9F9hf/B7cg1O4HirS0K5oR1FOeQ7UZPlaZFUeTQOwN/
+ eKG3Uy8JaKjmdF8a2LkuJmzwrfs/j7SSJA6GqEcze+llrINhLcDsUwF0ummkQgVoSGlD
+ ZYSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to;
+ bh=bBuKOmZ+1wb0rXNSIrM3zJXE++U/4YyR49GY80nl+44=;
+ b=Mp386rEWf0K8V7URqwBFOFWc3+t7U4bbw0msvAEL9eNP69GGuX/KImIJ4fMFyK1n15
+ YQyd410G6UB/5Wx4I3sAcnGt+UeIGxxaUScrQLp5vWWusAZZFsIE4UjagosX5mhiZ0GO
+ hrrHerypD+3flKb/wBzhxzF7UKaslJl4MjEYr8GLqahTziZVvzJn+QztTTKIwFT9uCUp
+ YQLKGXTMEnrC55Mi+DMMnwbmwJfxaAG6DPXsU4hqykqLLMaV5spEwEJm9qATxyTBB1H1
+ kiEoGwxbP9Pt70MzCDkM7SrHvhmjrY8AsADjXhsVcjrvlmmCTFmWseEYDX5OWhpQMzjT
+ mB4A==
+X-Gm-Message-State: AOAM533QhfFq0skfaQQoZL9HwWm552SWX8BMyUkVj7Igmxo0QIilJUen
+ t3TxeL1KYPvUAQiY1dZTPxNriaftL/6MIMDazu5J7UWiFeYRrlve
+X-Google-Smtp-Source: ABdhPJwtwpufI9Zlr3xVaSsiUZmuiFIrGp27yPgejDE8V222zC6EZrOAjwf9NJGgPS/sTaFMCJ9jY+yv8nM3a9Kpyds=
+X-Received: by 2002:aa7:d79a:: with SMTP id s26mr4851319edq.251.1602775896953; 
+ Thu, 15 Oct 2020 08:31:36 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <2db9dbfe-137a-4cdc-08ab-aaa1aed26423@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="5mCyUwZo2JvN/JJP"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201015151829.14656-1-peter.maydell@linaro.org>
+ <20201015151829.14656-3-peter.maydell@linaro.org>
+In-Reply-To: <20201015151829.14656-3-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 15 Oct 2020 16:31:25 +0100
+Message-ID: <CAFEAcA-4qq=kknVKck_tGdFaj6F8QP9MCOiqvydLcs4F+tmffA@mail.gmail.com>
+Subject: Re: [PATCH 2/2] hw/timer/armv7m_systick: Rewrite to use ptimers
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,136 +94,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---5mCyUwZo2JvN/JJP
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Thu, 15 Oct 2020 at 16:18, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
+> clear-on-write counter. Our current implementation has various
+> bugs and dubious workarounds in it (for instance see
+> https://bugs.launchpad.net/qemu/+bug/1872237).
 
-Am 15.10.2020 um 16:46 hat Max Reitz geschrieben:
-> On 15.10.20 10:57, Kevin Wolf wrote:
-> > Am 22.09.2020 um 12:49 hat Max Reitz geschrieben:
-> >> block-export-add type=3Dfuse allows mounting block graph nodes via FUS=
-E on
-> >> some existing regular file.  That file should then appears like a raw
-> >> disk image, and accesses to it result in accesses to the exported BDS.
-> >>
-> >> Right now, we only implement the necessary block export functions to s=
-et
-> >> it up and shut it down.  We do not implement any access functions, so
-> >> accessing the mount point only results in errors.  This will be
-> >> addressed by a followup patch.
-> >>
-> >> We keep a hash table of exported mount points, because we want to be
-> >> able to detect when users try to use a mount point twice.  This is
-> >> because we invoke stat() to check whether the given mount point is a
-> >> regular file, but if that file is served by ourselves (because it is
-> >> already used as a mount point), then this stat() would have to be serv=
-ed
-> >> by ourselves, too, which is impossible to do while we (as the caller)
-> >> are waiting for it to settle.  Therefore, keep track of mount point
-> >> paths to at least catch the most obvious instances of that problem.
-> >>
-> >> Signed-off-by: Max Reitz <mreitz@redhat.com>
+...and 10 minutes after sending this I realized I'd forgotten
+to finish removing the no-longer-needed state struct fields.
+This should be squashed in:
 
-> >> +/**
-> >> + * Callback to be invoked when the FUSE session FD can be read from.
-> >> + * (This is basically the FUSE event loop.)
-> >> + */
-> >> +static void read_from_fuse_export(void *opaque)
-> >> +{
-> >> +    FuseExport *exp =3D opaque;
-> >> +    int ret;
-> >> +
-> >> +    blk_exp_ref(&exp->common);
-> >> +
-> >> +    ret =3D fuse_session_receive_buf(exp->fuse_session, &exp->fuse_bu=
-f);
-> >=20
-> > The fuse_session_loop() implementation seems to imply that we should
-> > retry on EINTR.
->=20
-> OK.  I see you=E2=80=99re digging into libfuse already. :)
+diff --git a/include/hw/timer/armv7m_systick.h
+b/include/hw/timer/armv7m_systick.h
+index 84496faaf96..d57e299fd89 100644
+--- a/include/hw/timer/armv7m_systick.h
++++ b/include/hw/timer/armv7m_systick.h
+@@ -26,8 +26,6 @@ struct SysTickState {
+     /*< public >*/
 
-Well, I have to review against something, and the documentation tends to
-be terse...
+     uint32_t control;
+-    uint32_t reload;
+-    int64_t tick;
+     ptimer_state *ptimer;
+     MemoryRegion iomem;
+     qemu_irq irq;
+diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
+index 2f192011eb0..5ac3a8a7e81 100644
+--- a/hw/timer/armv7m_systick.c
++++ b/hw/timer/armv7m_systick.c
+@@ -219,7 +219,6 @@ static const VMStateDescription vmstate_systick = {
+     .minimum_version_id = 2,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(control, SysTickState),
+-        VMSTATE_INT64(tick, SysTickState),
+         VMSTATE_PTIMER(ptimer, SysTickState),
+         VMSTATE_END_OF_LIST()
+     }
 
-> >> +    if (ret < 0) {
-> >> +        goto out;
-> >> +    }
-> >> +
-> >> +    fuse_session_process_buf(exp->fuse_session, &exp->fuse_buf);
-> >> +
-> >> +out:
-> >> +    blk_exp_unref(&exp->common);
-> >> +}
-> >> +
-> >> +static void fuse_export_shutdown(BlockExport *blk_exp)
-> >> +{
-> >> +    FuseExport *exp =3D container_of(blk_exp, FuseExport, common);
-> >> +
-> >> +    if (exp->fuse_session) {
-> >> +        fuse_session_exit(exp->fuse_session);
-> >> +
-> >> +        if (exp->mounted) {
-> >> +            fuse_session_unmount(exp->fuse_session);
-> >> +            exp->mounted =3D false;
-> >> +        }
-> >> +
-> >> +        if (exp->fd_handler_set_up) {
-> >> +            aio_set_fd_handler(exp->common.ctx,
-> >> +                               fuse_session_fd(exp->fuse_session), tr=
-ue,
-> >> +                               NULL, NULL, NULL, NULL);
-> >> +            exp->fd_handler_set_up =3D false;
-> >> +        }
-> >> +
-> >> +        fuse_session_destroy(exp->fuse_session);
-> >> +        exp->fuse_session =3D NULL;
-> >=20
-> > What happens if a request is still in flight?
-> >=20
-> > Oh, can't happen because the driver is fully synchronous after this
-> > series. Fair enough, making it asynchronous can come on top of it.
->=20
-> (I had multiple approaches of handling parallel requests, but none made
-> a substantial performance difference, which is why I left the driver in
-> the most simple form for this first proposal.)
-
-I think the more relevant part is that we'd block the guest or anything
-else running in the main loop while doing I/O.
-
-Not a problem if you spawn a new qemu-storage-daemon just for this FUSE
-export, but if you want to have multiple exports, or export from the
-system emulator, you probably don't want to have synchronous operations.
-
-Kevin
-
---5mCyUwZo2JvN/JJP
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEE3D3rFZqa+V09dFb+fwmycsiPL9YFAl+IbaIACgkQfwmycsiP
-L9b3Wg//c/3xzjBx3fytK7EQnGbo36NT36GvjcmDeodeL9X4QYHqwj/QZD2VPNiP
-ZM6HTTofhctO79qmLgC+9ndpD9Y7zqV4r1SYzAcigRubG2SIPWs6/VBI7H/9HEGc
-/cug8OWmFkRnKHbxTMpIIxI4LsjU3oqBwalzAo/K8Ebed+e3E8NY72jdc3hSGjqc
-01/yxnmN7bDuVFeZn9tCM64Oiib+i4JNSebAaR2B0Lb4k0dAJnRpOhnw474ejiZH
-ub1TQO2NBncrtEa0ybTR2dPcqrQK6LcGi5Y/oPWfnYIH8BGxq7MgtFxqXMOShyvJ
-H2Vd7vxM06vTr27hvGJCvx97hY4zSfSvBYbXd7bBOfDQaFhQMsPbSOBXoOc6o5W7
-Xx0I3xJtN9PGX2soOe7X5T6rlUe5fmkd8SBi0/35YvgRoFaSxqTsFxnn7Ky/LQEY
-smxAGYfhvlRs5hJXS688iAoFxejEahy1R3RWPZlS6InZMyMijOabZl+fVkHg9Ug5
-DrpJoM6FIJCM2Rus5BnMd7Nc25TvdtsqVJeGKHgYZUVuTWqKq0s4wr2UkTNbOIYE
-4v5suw6QLd+OFkY3+dkkZUi/zyKZPSd8pF7wTI6rsddFuMV7W9pxhsnvQqb6zIdj
-h4C2HwOXh53inztx89+CdqVXQ+nmUvl2qZCvm4dFsYwtSBJTMIY=
-=56Yj
------END PGP SIGNATURE-----
-
---5mCyUwZo2JvN/JJP--
-
+thanks
+-- PMM
 
