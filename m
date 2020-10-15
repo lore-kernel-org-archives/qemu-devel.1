@@ -2,85 +2,131 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC9B4C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 08:57:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A6B2C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:08:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 192AC20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 08:57:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C251E2222E
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:08:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WCrPpqBW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 192AC20BED
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="YFta6Qhp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C251E2222E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53542 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSz5B-0001Wm-Ub
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 04:57:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56042)
+	id 1kSzFL-0004op-GG
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 05:08:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57342)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kSz4Y-00011O-JA
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 04:57:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55061)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kSz4V-0002y6-Kn
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 04:57:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602752233;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=B/j9A8ZbZAmmA0NOXEwEIo3JstoucTwUXOOlUOxYZgs=;
- b=WCrPpqBWUgCE+ig17rWv6xuyNv9tC0JCQQ8Xmn384ueDBM8npvh1/TdbqZ2ckEiyAvxwOL
- sU0EbZHrbia3zLLac/bfTAXF09FoP0ZhUCmb0UHxH1JOjXFd9fY5h1DMCepRU5AukjyQVB
- 2gSGO8vOwNRlANv7fTT27y39RTQDpzw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-426-HFoUrmhIOVipew0PPDCIJQ-1; Thu, 15 Oct 2020 04:57:10 -0400
-X-MC-Unique: HFoUrmhIOVipew0PPDCIJQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 728A51007465;
- Thu, 15 Oct 2020 08:57:09 +0000 (UTC)
-Received: from merkur.fritz.box (ovpn-114-163.ams2.redhat.com [10.36.114.163])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 46A4F100238E;
- Thu, 15 Oct 2020 08:57:05 +0000 (UTC)
-Date: Thu, 15 Oct 2020 10:57:03 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH v2 02/20] fuse: Allow exporting BDSs via FUSE
-Message-ID: <20201015085703.GB4610@merkur.fritz.box>
-References: <20200922104932.46384-1-mreitz@redhat.com>
- <20200922104932.46384-3-mreitz@redhat.com>
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kSz8w-0002OE-Rv; Thu, 15 Oct 2020 05:01:52 -0400
+Received: from mail-am6eur05on2094.outbound.protection.outlook.com
+ ([40.107.22.94]:5760 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
+ id 1kSz8m-0003Xm-OQ; Thu, 15 Oct 2020 05:01:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=b0+GZZS2HUXoFYLsa/NUDK7uJ3iw1sySp+wqYvEA5Ldiq+W9L8mMe/Mx1XxqpJkU61Qq98MQwvUWG9ShLG0l/GnZj4cmy/nIdKU0FBiYL+OMjH8L6/5zFWmLWrUu782KyLda+ZJDlJOBGL1T91oPCtvB2zacFLzDDwMyfNWxO8fFUZ+bBOV1hA7TU2mowBgTk94wUw88NboOMaOHOlqCMeoD0qSM9BRhUMr3r55Wy1pm/lNfTJS+AA7buM8KrunIQXOW4DkLg1lalhl3XR08GLfPqMFzzrLjl66IUwDzLS7CWk5lv0Hs3Ka0ZXe4NFrbyKOAixwKLxzXpEJl8dvpZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EsWFo2zoZdabAWbYIYxBP82lUER2+BEoKR120hOeFCk=;
+ b=kA5lrgnrkIY83VjbE+zo/DIuZtPh0UXXfGQzPnikdpjPh5ESJUgDV6bNrIIEQeWREX0sVkjnrhw56FuRjNxRC1sw+PyqbdtdqoeW/LRrYyktTiKIYPeM10+mC3CHpAu1Nr2/BKCDNC3oRh0J7lv/kCehVvFy2TygwilvHSNZm1XtncIB4zRqlyLHJ2WCPkQiSKRxb311u8OivC27oENRV8KvdJRvKTKngY++8GhzO9JKAIU74zCnhxegwOike4OWNVOgrUGroU7E/ksAj0BevjT6oX8xZsNB/KLtNXw0I41hm9TOahZLTz33BngppcCEoSH0tLtSKcm2RgtDVgWf/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EsWFo2zoZdabAWbYIYxBP82lUER2+BEoKR120hOeFCk=;
+ b=YFta6QhphclusWb8Xe4TOUbl5LiRcFlzDzb0gBRYm02a+R+P8OSZFtbiQhfzb0tr8LAKHpBDHCDTRj1uHzeTxnwvPMMhNiU+vAGBJBtrnXg7/JPKeRyLcaynWuUDMIPlrN1YPmetQHot1Td3/o08ByvNc8EvhN6lfhHIhX33t2U=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
+ by HE1PR0801MB1642.eurprd08.prod.outlook.com (2603:10a6:3:86::14)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.23; Thu, 15 Oct
+ 2020 09:01:36 +0000
+Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
+ ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.021; Thu, 15 Oct 2020
+ 09:01:35 +0000
+Subject: Re: [PATCH v11 11/13] stream: mark backing-file argument as deprecated
+To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, kwolf@redhat.com, fam@euphon.net,
+ stefanha@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ libvir-list@redhat.com, eblake@redhat.com, den@openvz.org
+References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1602524605-481160-12-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <c309607e-d6a0-7a7f-05e6-9e1beb388419@redhat.com>
+ <f8d6f6e3-f6eb-4ffa-1a2f-624c06462bbb@virtuozzo.com>
+From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+Message-ID: <f8d16eaf-3106-dff7-faf6-cd54452e14a2@virtuozzo.com>
+Date: Thu, 15 Oct 2020 12:01:32 +0300
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
+ Gecko/20100101 Thunderbird/68.9.0
+In-Reply-To: <f8d6f6e3-f6eb-4ffa-1a2f-624c06462bbb@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [109.252.114.22]
+X-ClientProxiedBy: AM0PR01CA0105.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::46) To HE1PR0801MB2124.eurprd08.prod.outlook.com
+ (2603:10a6:3:89::22)
 MIME-Version: 1.0
-In-Reply-To: <20200922104932.46384-3-mreitz@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from Admins-MacBook-Pro.local (109.252.114.22) by
+ AM0PR01CA0105.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::46) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20 via Frontend
+ Transport; Thu, 15 Oct 2020 09:01:34 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: cf40e471-e09f-4f01-4300-08d870e8eb0f
+X-MS-TrafficTypeDiagnostic: HE1PR0801MB1642:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0801MB16426FA7B3768EDA4FD39413F4020@HE1PR0801MB1642.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5236;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EP12vhBpd7SDvnx0QgHpTO9T2NkmAi8q+srhlOSHEn9sAACx03Tst+kQJ2+K6JY/jXMQO350QhpLBO/BwTBsAzUSqaKiEvPYcNqmGDJm/+4qjKgxgKXIupvWfMztac5jxiW54Wa1NlYHi/Yzifl8pZZbm9g5qWxtypHZbQfnnX/mw6yfaG/qXhaeiBW+cfVWqZP4ZOdYl+fV7KD4EZGpEoh8mhcoe+eBN5rCiwtJAaPa/zSFH62qu7gva/abPjXrYxishypKXQaT0y+6gW58UdMxrgHJ9xSn9GDiSnnIdASWf7NBu3KdXPpP3vh1tt13E2WHwHdo2VaveSeioLzBQvUPMxmUIF6oHk8nzOdjvMvc3Ma/uW8QnEszl3A5ZzslSMbvKENBrWs920oOIN9WLqQH3M14W9y32SeHvpliciI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(376002)(136003)(396003)(346002)(39840400004)(31696002)(956004)(83380400001)(6506007)(478600001)(7416002)(52116002)(31686004)(44832011)(53546011)(36756003)(316002)(8676002)(26005)(6486002)(8936002)(4326008)(2616005)(186003)(16526019)(110136005)(6512007)(66556008)(86362001)(107886003)(66476007)(66946007)(2906002)(34490700002)(5660300002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: UJ6aHOC/Ze00lyFM2XXH2L/6+lf2j9ifJmp1wxv8HT49Wle/3ZUm4GXCClmBXeGmu25wAR5rfIu/BouIjn09rDjTRBPU2oTxi/rxKkb4Uw//G/GUEX83nRTAW1liHskMtHThENGIzuvcLzVGBf026pTDNIpiZ1FiAneVl2u9Brgl3wUrs5lQKjciitRlYm1k3WXXBhNelOEZp0MkHxq61KUsYzJxxsyi/uIho4nFbKq5WW8Rr9FjhmFstGRUw1Wk2fgbtfdTPqI50VtqaxoWfpXLmtCprOBianGKWg38yzvGx7BlziE7csTA8iH1i8GfxxzKHcsdH9SrfJ1VXrXPZIFxlhosTRdjIVo3YOagOqMGsdv4kbx0SIXVGtgPznyTO3bmohLnM1fs+1bJ0MAWRKsYatCA9VnVaa81fsiVXxvdhEq/0t4qJWvOSTbLgi0TqcZwRTfZwh5LTu1wEel4tkAjS6mY25C9hbbNVDhfaIY/U0Ky30u0ZMpsRI02OSYpLo0tq6ZpFsiZhVKLz9CX5dtNqTx3IQ5zFC38+D3cSh96Vt5IyR3Nu0gSFW1Akuyftejdda1zcYyA2fwK/zqr9fzhWdd7pEnHfrn2EHtwZ9c4jw9tXprrYhp0wr7Y0zgQ9+Siyv5k9nYbaDzzOaSOpA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: cf40e471-e09f-4f01-4300-08d870e8eb0f
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 09:01:35.4663 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3RpuZm/a00tI1908dYGIqMlT9wHsV7T2bmgsh8YNCjweYTMfHCxPtojjBed4YV9kb5/AsZ4SNJQGK1bQdf84MXeWWcj1MANODOicx8OV4Mc=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1642
+Received-SPF: pass client-ip=40.107.22.94;
+ envelope-from=andrey.shinkevich@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 05:01:38
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,466 +139,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 22.09.2020 um 12:49 hat Max Reitz geschrieben:
-> block-export-add type=fuse allows mounting block graph nodes via FUSE on
-> some existing regular file.  That file should then appears like a raw
-> disk image, and accesses to it result in accesses to the exported BDS.
+On 14.10.2020 18:43, Vladimir Sementsov-Ogievskiy wrote:
+> 14.10.2020 18:03, Max Reitz wrote:
+>> On 12.10.20 19:43, Andrey Shinkevich wrote:
+>>> Whereas the block-stream job starts using a backing file name of the
+>>> base node overlay after the block-stream job completes, mark the QMP
+>>> 'backing-file' argument as deprecated.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>>   docs/system/deprecated.rst | 6 ++++++
+>>>   1 file changed, 6 insertions(+)
+>>>
+>>> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+>>> index 8b3ab5b..7491fcf 100644
+>>> --- a/docs/system/deprecated.rst
+>>> +++ b/docs/system/deprecated.rst
+>>> @@ -285,6 +285,12 @@ details.
+>>>   The ``query-events`` command has been superseded by the more powerful
+>>>   and accurate ``query-qmp-schema`` command.
+>>> +``block-stream`` argument ``backing-file`` (since 5.2)
+>>> +'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+>>> +
+>>> +The argument ``backing-file`` is deprecated. QEMU uses a backing file
+>>> +name of the base node overlay after the block-stream job completes.
+>>> +
+>>
+>> Hm, why?  I don’t see the problem with it.
+>>
 > 
-> Right now, we only implement the necessary block export functions to set
-> it up and shut it down.  We do not implement any access functions, so
-> accessing the mount point only results in errors.  This will be
-> addressed by a followup patch.
+> My wrong idea, sorry. I believed that the argument is unused when I were 
+> reviewing v10. But it actually become unused during the series and it is 
+> wrong.
 > 
-> We keep a hash table of exported mount points, because we want to be
-> able to detect when users try to use a mount point twice.  This is
-> because we invoke stat() to check whether the given mount point is a
-> regular file, but if that file is served by ourselves (because it is
-> already used as a mount point), then this stat() would have to be served
-> by ourselves, too, which is impossible to do while we (as the caller)
-> are waiting for it to settle.  Therefore, keep track of mount point
-> paths to at least catch the most obvious instances of that problem.
-> 
-> Signed-off-by: Max Reitz <mreitz@redhat.com>
-> ---
->  qapi/block-export.json   |  24 +++-
->  include/block/fuse.h     |  30 +++++
->  block.c                  |   1 +
->  block/export/export.c    |   4 +
->  block/export/fuse.c      | 253 +++++++++++++++++++++++++++++++++++++++
->  block/export/meson.build |   1 +
->  6 files changed, 311 insertions(+), 2 deletions(-)
->  create mode 100644 include/block/fuse.h
->  create mode 100644 block/export/fuse.c
-> 
-> diff --git a/qapi/block-export.json b/qapi/block-export.json
-> index 0c045dfe7b..cb5bd54cbf 100644
-> --- a/qapi/block-export.json
-> +++ b/qapi/block-export.json
-> @@ -174,6 +174,21 @@
->  ##
->  { 'command': 'nbd-server-stop' }
->  
-> +##
-> +# @BlockExportOptionsFuse:
-> +#
-> +# Options for exporting a block graph node on some (file) mountpoint
-> +# as a raw image.
-> +#
-> +# @mountpoint: Path on which to export the block device via FUSE.
-> +#              This must point to an existing regular file.
-> +#
-> +# Since: 5.2
-> +##
-> +{ 'struct': 'BlockExportOptionsFuse',
-> +  'data': { 'mountpoint': 'str' },
-> +  'if': 'defined(CONFIG_FUSE)' }
-> +
->  ##
->  # @BlockExportType:
->  #
-> @@ -181,10 +196,13 @@
->  #
->  # @nbd: NBD export
->  #
-> +# @fuse: Fuse export (since: 5.2)
 
-s/Fuse/FUSE/?
+I missed searching for calls to the qmp_block_stream() in the QEMU 
+dinamically generated code. Will roll back.
 
-> +#
->  # Since: 4.2
->  ##
->  { 'enum': 'BlockExportType',
-> -  'data': [ 'nbd' ] }
-> +  'data': [ 'nbd',
-> +            { 'name': 'fuse', 'if': 'defined(CONFIG_FUSE)' } ] }
->  
->  ##
->  # @BlockExportOptions:
-> @@ -213,7 +231,9 @@
->              '*writethrough': 'bool' },
->    'discriminator': 'type',
->    'data': {
-> -      'nbd': 'BlockExportOptionsNbd'
-> +      'nbd': 'BlockExportOptionsNbd',
-> +      'fuse': { 'type': 'BlockExportOptionsFuse',
-> +                'if': 'defined(CONFIG_FUSE)' }
->     } }
->  
->  ##
-> diff --git a/include/block/fuse.h b/include/block/fuse.h
-> new file mode 100644
-> index 0000000000..ffa91fe364
-> --- /dev/null
-> +++ b/include/block/fuse.h
-> @@ -0,0 +1,30 @@
-> +/*
-> + * Present a block device as a raw image through FUSE
-> + *
-> + * Copyright (c) 2020 Max Reitz <mreitz@redhat.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; under version 2 or later of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#ifndef BLOCK_FUSE_H
-> +#define BLOCK_FUSE_H
-> +
-> +#ifdef CONFIG_FUSE
-> +
-> +#include "block/export.h"
-> +
-> +extern const BlockExportDriver blk_exp_fuse;
-> +
-> +#endif /* CONFIG_FUSE */
-> +
-> +#endif
-> diff --git a/block.c b/block.c
-> index acde53f92a..7bf45f6ede 100644
-> --- a/block.c
-> +++ b/block.c
-> @@ -26,6 +26,7 @@
->  #include "block/trace.h"
->  #include "block/block_int.h"
->  #include "block/blockjob.h"
-> +#include "block/fuse.h"
->  #include "block/nbd.h"
->  #include "block/qdict.h"
->  #include "qemu/error-report.h"
-> diff --git a/block/export/export.c b/block/export/export.c
-> index 64d39a6934..ba866d6ba7 100644
-> --- a/block/export/export.c
-> +++ b/block/export/export.c
-> @@ -16,6 +16,7 @@
->  #include "block/block.h"
->  #include "sysemu/block-backend.h"
->  #include "block/export.h"
-> +#include "block/fuse.h"
->  #include "block/nbd.h"
->  #include "qapi/error.h"
->  #include "qapi/qapi-commands-block-export.h"
-> @@ -24,6 +25,9 @@
->  
->  static const BlockExportDriver *blk_exp_drivers[] = {
->      &blk_exp_nbd,
-> +#ifdef CONFIG_FUSE
-> +    &blk_exp_fuse,
-> +#endif
->  };
->  
->  /* Only accessed from the main thread */
-> diff --git a/block/export/fuse.c b/block/export/fuse.c
-> new file mode 100644
-> index 0000000000..75f11d2514
-> --- /dev/null
-> +++ b/block/export/fuse.c
-> @@ -0,0 +1,253 @@
-> +/*
-> + * Present a block device as a raw image through FUSE
-> + *
-> + * Copyright (c) 2020 Max Reitz <mreitz@redhat.com>
-> + *
-> + * This program is free software; you can redistribute it and/or modify
-> + * it under the terms of the GNU General Public License as published by
-> + * the Free Software Foundation; under version 2 or later of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License
-> + * along with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#define FUSE_USE_VERSION 31
-> +
-> +#include "qemu/osdep.h"
-> +#include "block/aio.h"
-> +#include "block/block.h"
-> +#include "block/export.h"
-> +#include "block/fuse.h"
-> +#include "block/qapi.h"
-> +#include "qapi/error.h"
-> +#include "qapi/qapi-commands-block.h"
-> +#include "sysemu/block-backend.h"
-> +
-> +#include <fuse.h>
-> +#include <fuse_lowlevel.h>
-> +
-> +
-> +typedef struct FuseExport {
-> +    BlockExport common;
-> +
-> +    struct fuse_session *fuse_session;
-> +    struct fuse_buf fuse_buf;
-> +    bool mounted, fd_handler_set_up;
-> +
-> +    char *mountpoint;
-> +    bool writable;
-> +} FuseExport;
-> +
-> +static GHashTable *exports;
-> +static const struct fuse_lowlevel_ops fuse_ops;
-> +
-> +static void fuse_export_shutdown(BlockExport *exp);
-> +static void fuse_export_delete(BlockExport *exp);
-> +
-> +static void init_fuse(void);
-> +static int setup_fuse_export(FuseExport *exp, const char *mountpoint,
-> +                             Error **errp);
-> +static void read_from_fuse_export(void *opaque);
-> +
-> +static bool is_regular_file(const char *path, Error **errp);
-> +
-> +
-> +static int fuse_export_create(BlockExport *blk_exp,
-> +                              BlockExportOptions *blk_exp_args,
-> +                              Error **errp)
-> +{
-> +    FuseExport *exp = container_of(blk_exp, FuseExport, common);
-> +    BlockExportOptionsFuse *args = &blk_exp_args->u.fuse;
-> +    int ret;
-> +
-> +    assert(blk_exp_args->type == BLOCK_EXPORT_TYPE_FUSE);
-> +
-> +    init_fuse();
-> +
-> +    /*
-> +     * It is important to do this check before calling is_regular_file() --
-> +     * that function will do a stat(), which we would have to handle if we
-> +     * already exported something on @mountpoint.  But we cannot, because
-> +     * we are currently caught up here.
-> +     * (Note that ideally we would want to resolve relative paths here,
-> +     * but bdrv_make_absolute_filename() might do the wrong thing for
-> +     * paths that contain colons, and realpath() would resolve symlinks,
-> +     * which we do not want: The mount point is not going to be the
-> +     * symlink's destination, but the link itself.)
-> +     * So this will not catch all potential clashes, but hopefully at
-> +     * least the most common one of specifying exactly the same path
-> +     * string twice.
-> +     */
-> +    if (g_hash_table_contains(exports, args->mountpoint)) {
-> +        error_setg(errp, "There already is a FUSE export on '%s'",
-> +                   args->mountpoint);
-> +        ret = -EEXIST;
-> +        goto fail;
-> +    }
-
-I guess the proper solution would be to make block export creation
-asynchronous so that we can actually serve that request in the
-background.
-
-Something for another day...
-
-> +
-> +    if (!is_regular_file(args->mountpoint, errp)) {
-> +        ret = -EINVAL;
-> +        goto fail;
-> +    }
-> +
-> +    exp->mountpoint = g_strdup(args->mountpoint);
-> +    exp->writable = blk_exp_args->writable;
-> +
-> +    ret = setup_fuse_export(exp, args->mountpoint, errp);
-> +    if (ret < 0) {
-> +        goto fail;
-> +    }
-> +
-> +    g_hash_table_insert(exports, g_strdup(args->mountpoint), NULL);
-> +    return 0;
-> +
-> +fail:
-> +    fuse_export_shutdown(blk_exp);
-> +    fuse_export_delete(blk_exp);
-
-Why fuse_export_shutdown()? The only thing to possibly undo at
-this point is allocating exp->mountpoint, which is freed in
-fuse_export_delete().
-
-Or can setup_fuse_export() fail without cleaning up? I hope not.
-
-> +    return ret;
-> +}
-> +
-> +/**
-> + * Ensure that the global FUSE context is set up.
-> + */
-> +static void init_fuse(void)
-> +{
-> +    if (exports) {
-> +        return;
-> +    }
-> +
-> +    exports = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-> +}
-> +
-> +/**
-> + * Create exp->fuse_session and mount it.
-> + */
-> +static int setup_fuse_export(FuseExport *exp, const char *mountpoint,
-> +                             Error **errp)
-> +{
-> +    const char *fuse_argv[2];
-> +    struct fuse_args fuse_args;
-> +    int ret;
-> +
-> +    fuse_argv[0] = ""; /* Dummy program name */
-> +    fuse_argv[1] = NULL;
-> +    fuse_args = (struct fuse_args)FUSE_ARGS_INIT(1, (char **)fuse_argv);
-> +
-> +    exp->fuse_session = fuse_session_new(&fuse_args, &fuse_ops,
-> +                                         sizeof(fuse_ops), exp);
-> +    if (!exp->fuse_session) {
-> +        error_setg(errp, "Failed to set up FUSE session");
-> +        return -EIO;
-> +    }
-> +
-> +    ret = fuse_session_mount(exp->fuse_session, mountpoint);
-> +    if (ret < 0) {
-> +        error_setg(errp, "Failed to mount FUSE session to export");
-> +        return -EIO;
-
-Oh, it can. :-(
-
-I think it would be better to call fuse_export_shutdown() here so that
-the function doesn't change the state when it returns failure.
-
-> +    }
-> +    exp->mounted = true;
-> +
-> +    aio_set_fd_handler(exp->common.ctx,
-> +                       fuse_session_fd(exp->fuse_session), true,
-> +                       read_from_fuse_export, NULL, NULL, exp);
-> +    exp->fd_handler_set_up = true;
-> +
-> +    return 0;
-> +}
-> +
-> +/**
-> + * Callback to be invoked when the FUSE session FD can be read from.
-> + * (This is basically the FUSE event loop.)
-> + */
-> +static void read_from_fuse_export(void *opaque)
-> +{
-> +    FuseExport *exp = opaque;
-> +    int ret;
-> +
-> +    blk_exp_ref(&exp->common);
-> +
-> +    ret = fuse_session_receive_buf(exp->fuse_session, &exp->fuse_buf);
-
-The fuse_session_loop() implementation seems to imply that we should
-retry on EINTR.
-
-> +    if (ret < 0) {
-> +        goto out;
-> +    }
-> +
-> +    fuse_session_process_buf(exp->fuse_session, &exp->fuse_buf);
-> +
-> +out:
-> +    blk_exp_unref(&exp->common);
-> +}
-> +
-> +static void fuse_export_shutdown(BlockExport *blk_exp)
-> +{
-> +    FuseExport *exp = container_of(blk_exp, FuseExport, common);
-> +
-> +    if (exp->fuse_session) {
-> +        fuse_session_exit(exp->fuse_session);
-> +
-> +        if (exp->mounted) {
-> +            fuse_session_unmount(exp->fuse_session);
-> +            exp->mounted = false;
-> +        }
-> +
-> +        if (exp->fd_handler_set_up) {
-> +            aio_set_fd_handler(exp->common.ctx,
-> +                               fuse_session_fd(exp->fuse_session), true,
-> +                               NULL, NULL, NULL, NULL);
-> +            exp->fd_handler_set_up = false;
-> +        }
-> +
-> +        fuse_session_destroy(exp->fuse_session);
-> +        exp->fuse_session = NULL;
-
-What happens if a request is still in flight?
-
-Oh, can't happen because the driver is fully synchronous after this
-series. Fair enough, making it asynchronous can come on top of it.
-
-However, I think we should move fuse_session_unmount() and
-fuse_session_destroy() to .delete instead of .shutdown to avoid setting
-up a trap for whoever introduces async requests to the FUSE export.
-
-> +    }
-> +
-> +    if (exp->mountpoint) {
-> +        g_hash_table_remove(exports, exp->mountpoint);
-> +    }
-> +}
-> +
-> +static void fuse_export_delete(BlockExport *blk_exp)
-> +{
-> +    FuseExport *exp = container_of(blk_exp, FuseExport, common);
-> +
-> +    free(exp->fuse_buf.mem);
-> +    g_free(exp->mountpoint);
-> +}
-> +
-> +/**
-> + * Check whether @path points to a regular file.  If not, put an
-> + * appropriate message into *errp.
-> + */
-> +static bool is_regular_file(const char *path, Error **errp)
-> +{
-> +    struct stat statbuf;
-> +    int ret;
-> +
-> +    ret = stat(path, &statbuf);
-> +    if (ret < 0) {
-> +        error_setg_errno(errp, errno, "Failed to stat '%s'", path);
-> +        return false;
-> +    }
-> +
-> +    if (!S_ISREG(statbuf.st_mode)) {
-> +        error_setg(errp, "'%s' is not a regular file", path);
-> +        return false;
-> +    }
-> +
-> +    return true;
-> +}
-
-This is obviously racy (TOCTOU), but if I understand correctly, we use
-it only to provide a nicer error message than if fuse_session_mount()
-fails, so this is fine.
-
-> +static const struct fuse_lowlevel_ops fuse_ops = {
-> +};
-> +
-> +const BlockExportDriver blk_exp_fuse = {
-> +    .type               = BLOCK_EXPORT_TYPE_FUSE,
-> +    .instance_size      = sizeof(FuseExport),
-> +    .create             = fuse_export_create,
-> +    .delete             = fuse_export_delete,
-> +    .request_shutdown   = fuse_export_shutdown,
-> +};
-
-Kevin
-
+Andrey
 
