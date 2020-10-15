@@ -2,73 +2,59 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97D0DC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CA83C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:33:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E30D320757
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:12:21 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E30D320757
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 71BB620723
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 14:33:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71BB620723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3zQ-00068N-TI
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:12:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57868)
+	id 1kT4KI-000161-4h
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 10:33:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37612)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kT3ra-0006ix-PP
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:04:14 -0400
-Resent-Date: Thu, 15 Oct 2020 10:04:14 -0400
-Resent-Message-Id: <E1kT3ra-0006ix-PP@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21787)
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kT4Iq-0008EM-JS
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:32:24 -0400
+Received: from mx2.suse.de ([195.135.220.15]:56106)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kT3rX-0003b4-ME
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:04:14 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602770628; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=ZfUgMmuQnuo1mF4Xr9u+QtOkgMxZxHd6I/Q7PeL0+MpJHhpgxRU1YhM0wz6W3t9+dZHoCKoJY1GAtDcM7t3lrbiMPvD42yZC5t2Jrc9LbjsCXnKCAh8y59lO80oy0XfCKXAnUheFPjGqHbTB4z/x/qh4c89xkJ31KRt7wdspPNI=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602770628;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=WjfhDwaCOtqHJx1r9cA3odpjcFRxWky1/r3ibrxZSQc=; 
- b=IHM4LLZD+TBQN2Jr8SGkJDTEa5rIxsZcprr6BHKEuszH+W/mYWUdKyU3nlGgi09d4YJ4Neuu3cAFenJPhhVE+9ocR/4AbQ/afnjxkeBLuyqjcXdHb50gK/+00JaVbTISwUQBmStlmzYgW2cbAA0+Wm6JJlH/1wMNOBNz3JJJ3FI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1602770627080526.9954151531865;
- Thu, 15 Oct 2020 07:03:47 -0700 (PDT)
-Subject: Re: [PATCH v4 00/16] Add a General Virtual Device Fuzzer
-Message-ID: <160277062524.26906.4979961762086295021@66eaa9a8a123>
-In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
+ (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kT4In-0007cj-Kt
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 10:32:24 -0400
+X-Virus-Scanned: by amavisd-new at test-mx.suse.de
+Received: from relay2.suse.de (unknown [195.135.221.27])
+ by mx2.suse.de (Postfix) with ESMTP id 4C9EEB21E;
+ Thu, 15 Oct 2020 14:32:20 +0000 (UTC)
+From: Claudio Fontana <cfontana@suse.de>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [PATCH v3 2/3] accel/tcg: split tcg_start_vcpu_thread
+Date: Thu, 15 Oct 2020 16:32:16 +0200
+Message-Id: <20201015143217.29337-3-cfontana@suse.de>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201015143217.29337-1-cfontana@suse.de>
+References: <20201015143217.29337-1-cfontana@suse.de>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: alxndr@bu.edu
-Date: Thu, 15 Oct 2020 07:03:47 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 10:04:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
+ helo=mx2.suse.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/12 01:21:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,120 +68,298 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: darren.kenny@oracle.com, qemu-devel@nongnu.org, f4bug@amsat.org,
- alxndr@bu.edu, bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- dimastep@yandex-team.ru
+Cc: Claudio Fontana <cfontana@suse.de>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAxNTEzNDEzNy4yMDU5
-NTgtMS1hbHhuZHJAYnUuZWR1LwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
-ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
-YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMTUxMzQxMzcuMjA1OTU4LTEt
-YWx4bmRyQGJ1LmVkdQpTdWJqZWN0OiBbUEFUQ0ggdjQgMDAvMTZdIEFkZCBhIEdlbmVyYWwgVmly
-dHVhbCBEZXZpY2UgRnV6emVyCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNo
-CmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRy
-dWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMv
-Y2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoK
-VXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0
-dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFnIHVwZGF0ZV0gICAg
-ICBwYXRjaGV3LzE2MDI3Njc3NjctMzI3MTMtMS1naXQtc2VuZC1lbWFpbC1tanJvc2F0b0BsaW51
-eC5pYm0uY29tIC0+IHBhdGNoZXcvMTYwMjc2Nzc2Ny0zMjcxMy0xLWdpdC1zZW5kLWVtYWlsLW1q
-cm9zYXRvQGxpbnV4LmlibS5jb20KICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTAx
-NTEzNDEzNy4yMDU5NTgtMS1hbHhuZHJAYnUuZWR1IC0+IHBhdGNoZXcvMjAyMDEwMTUxMzQxMzcu
-MjA1OTU4LTEtYWx4bmRyQGJ1LmVkdQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3QnCjAz
-MzIzYzIgc2NyaXB0cy9vc3MtZnV6ejogcmVtb3ZlIHRoZSBnZW5lcmFsLWZ1enogdGFyZ2V0CjNj
-NTliZDUgZnV6ejogcmVnaXN0ZXIgcHJlZGVmaW5lZCBnZW5lcmFsLWZ1enogY29uZmlncwowZDgw
-ZGIzIGZ1eno6IGFkZCBnZW5lcmFsLWZ1enogY29uZmlncyBmb3Igb3NzLWZ1enoKY2VhNzZkNCBm
-dXp6OiBhZGQgYW4gIm9wYXF1ZSIgdG8gdGhlIEZ1enpUYXJnZXQgc3RydWN0CjEwY2YzNzMgZnV6
-ejogQWRkIGluc3RydWN0aW9ucyBmb3IgdXNpbmcgZ2VuZXJhbC1mdXp6CjU0MGZlZDIgc2NyaXB0
-cy9vc3MtZnV6ejogQWRkIGNyYXNoIHRyYWNlIG1pbmltaXphdGlvbiBzY3JpcHQKMDU1MGRiMCBz
-Y3JpcHRzL29zcy1mdXp6OiBBZGQgc2NyaXB0IHRvIHJlb3JkZXIgYSBnZW5lcmFsLWZ1enplciB0
-cmFjZQoxMDZlODMwIGZ1eno6IGFkZCBhIGNyb3Nzb3ZlciBmdW5jdGlvbiB0byBnZW5lcmljLWZ1
-enplcgo5MDgzN2Y1IGZ1eno6IGFkZCBhIERJU0FCTEVfUENJIG9wIHRvIGdlbmVyYWwtZnV6emVy
-CmFkZjA0NGYgZnV6ejogQWRkIHN1cHBvcnQgZm9yIGN1c3RvbSBjcm9zc292ZXIgZnVuY3Rpb25z
-CjA4NTFjYjQgZnV6ejogQWRkIGZ1enplciBjYWxsYmFja3MgdG8gRE1BLXJlYWQgZnVuY3Rpb25z
-CjRhY2Y0NGIgZnV6ejogRGVjbGFyZSBETUEgUmVhZCBjYWxsYmFjayBmdW5jdGlvbgo4NmZlYzM0
-IGZ1eno6IEFkZCBETUEgc3VwcG9ydCB0byB0aGUgZ2VuZXJpYy1mdXp6ZXIKMjM3ZTlkNiBmdXp6
-OiBBZGQgUENJIGZlYXR1cmVzIHRvIHRoZSBnZW5lcmFsIGZ1enplcgo0MWU2ZDdiIGZ1eno6IEFk
-ZCBnZW5lcmFsIHZpcnR1YWwtZGV2aWNlIGZ1enplcgpiYTY4ZjM1IG1lbW9yeTogQWRkIEZsYXRW
-aWV3IGZvcmVhY2ggZnVuY3Rpb24KCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMTYgQ2hlY2tpbmcg
-Y29tbWl0IGJhNjhmMzVlZDM1OCAobWVtb3J5OiBBZGQgRmxhdFZpZXcgZm9yZWFjaCBmdW5jdGlv
-bikKMi8xNiBDaGVja2luZyBjb21taXQgNDFlNmQ3YmI0MGQzIChmdXp6OiBBZGQgZ2VuZXJhbCB2
-aXJ0dWFsLWRldmljZSBmdXp6ZXIpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZp
-bGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE5OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMjI6IEZJTEU6IHRl
-c3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6Mjk5OgorICogU29tZSBjb21tYW5kcyBjYW4g
-YmUgdmFyaWFibGUtd2lkdGgsIHNvIHdlIHVzZSBhIHNlcGFyYXRvciwgU0VQQVJBVE9SLCB0byBz
-cGVjaWZ5CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzMwOiBGSUxFOiB0ZXN0
-cy9xdGVzdC9mdXp6L2dlbmVyYWxfZnV6ei5jOjMwNzoKKyAqICAgICAgU2ltcGx5LCBieSByZW1v
-dmluZyB0aGUgZmlyc3QgYnl0ZSwgd2UgZW5kIHVwIHdpdGggYSB2ZXJ5IGRpZmZlcmVudCBzZXF1
-ZW5jZToKCnRvdGFsOiAwIGVycm9ycywgMyB3YXJuaW5ncywgNTE2IGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDIvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
-ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
-bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMy8xNiBDaGVja2luZyBjb21taXQg
-MjM3ZTlkNmU3MzRkIChmdXp6OiBBZGQgUENJIGZlYXR1cmVzIHRvIHRoZSBnZW5lcmFsIGZ1enpl
-cikKNC8xNiBDaGVja2luZyBjb21taXQgODZmZWMzNDNiMzdhIChmdXp6OiBBZGQgRE1BIHN1cHBv
-cnQgdG8gdGhlIGdlbmVyaWMtZnV6emVyKQpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZvaWRl
-ZCBpbiAuYyBmaWxlcwojODQ6IEZJTEU6IHRlc3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6
-MTIwOgordm9pZCBmdXp6X2RtYV9yZWFkX2NiKHNpemVfdCBhZGRyLCBzaXplX3QgbGVuLCBNZW1v
-cnlSZWdpb24gKm1yLCBib29sIGlzX3dyaXRlKTsKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVz
-ZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMxMDk6IEZJTEU6IHRlc3RzL3F0ZXN0
-L2Z1enovZ2VuZXJhbF9mdXp6LmM6MTQ1OgorICAgIC8qIFJlZ2lvbnMgYXJlIGFzc3VtZWQgdG8g
-c3VwcG9ydCAxLTQgYnl0ZSBhY2Nlc3NlcyB1bmxlc3MKCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRz
-IHVzZSAqIG9uIHN1YnNlcXVlbnQgbGluZXMKIzExMDogRklMRTogdGVzdHMvcXRlc3QvZnV6ei9n
-ZW5lcmFsX2Z1enouYzoxNDY6CisgICAgLyogUmVnaW9ucyBhcmUgYXNzdW1lZCB0byBzdXBwb3J0
-IDEtNCBieXRlIGFjY2Vzc2VzIHVubGVzcworICAgICAgIG90aGVyd2lzZSBzcGVjaWZpZWQuICAq
-LwoKV0FSTklORzogQmxvY2sgY29tbWVudHMgdXNlIGEgdHJhaWxpbmcgKi8gb24gYSBzZXBhcmF0
-ZSBsaW5lCiMxMTA6IEZJTEU6IHRlc3RzL3F0ZXN0L2Z1enovZ2VuZXJhbF9mdXp6LmM6MTQ2Ogor
-ICAgICAgIG90aGVyd2lzZSBzcGVjaWZpZWQuICAqLwoKdG90YWw6IDEgZXJyb3JzLCAzIHdhcm5p
-bmdzLCAyOTkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xNiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBs
-ZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMg
-cmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlO
-RVJTLgoKNS8xNiBDaGVja2luZyBjb21taXQgNGFjZjQ0YmE1NjMwIChmdXp6OiBEZWNsYXJlIERN
-QSBSZWFkIGNhbGxiYWNrIGZ1bmN0aW9uKQo2LzE2IENoZWNraW5nIGNvbW1pdCAwODUxY2I0Yjc4
-N2QgKGZ1eno6IEFkZCBmdXp6ZXIgY2FsbGJhY2tzIHRvIERNQS1yZWFkIGZ1bmN0aW9ucykKNy8x
-NiBDaGVja2luZyBjb21taXQgYWRmMDQ0ZjJiOWQyIChmdXp6OiBBZGQgc3VwcG9ydCBmb3IgY3Vz
-dG9tIGNyb3Nzb3ZlciBmdW5jdGlvbnMpCjgvMTYgQ2hlY2tpbmcgY29tbWl0IDkwODM3ZjVhODMx
-NSAoZnV6ejogYWRkIGEgRElTQUJMRV9QQ0kgb3AgdG8gZ2VuZXJhbC1mdXp6ZXIpCjkvMTYgQ2hl
-Y2tpbmcgY29tbWl0IDEwNmU4MzAxNWQ0MyAoZnV6ejogYWRkIGEgY3Jvc3NvdmVyIGZ1bmN0aW9u
-IHRvIGdlbmVyaWMtZnV6emVyKQoxMC8xNiBDaGVja2luZyBjb21taXQgMDU1MGRiMDkxNTJmIChz
-Y3JpcHRzL29zcy1mdXp6OiBBZGQgc2NyaXB0IHRvIHJlb3JkZXIgYSBnZW5lcmFsLWZ1enplciB0
-cmFjZSkKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlO
-VEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMjI6IApuZXcgZmlsZSBtb2RlIDEwMDc1NQoKV0FSTklO
-RzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExNzogRklMRTogc2NyaXB0cy9vc3MtZnV6ei9y
-ZW9yZGVyX2Z1enplcl9xdGVzdF90cmFjZS5weTo5MToKKyAgICAgICAgICAgICAgICAgICAgc3lz
-LnN0ZGVyci53cml0ZSgiV2FybmluZzogTGlrZWx5IGRvdWJsZSBmZXRjaCBvbiBsaW5lIHt9Llxu
-IgoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMDMgbGluZXMgY2hlY2tlZAoKUGF0Y2gg
-MTAvMTYgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNl
-IGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVy
-LCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMTEvMTYgQ2hlY2tpbmcgY29tbWl0IDU0
-MGZlZDI2ZGM0MCAoc2NyaXB0cy9vc3MtZnV6ejogQWRkIGNyYXNoIHRyYWNlIG1pbmltaXphdGlv
-biBzY3JpcHQpCldBUk5JTkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMg
-TUFJTlRBSU5FUlMgbmVlZCB1cGRhdGluZz8KIzE3OiAKbmV3IGZpbGUgbW9kZSAxMDA3NTUKCnRv
-dGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgMTU3IGxpbmVzIGNoZWNrZWQKClBhdGNoIDExLzE2
-IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJv
-cnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2Vl
-CkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEyLzE2IENoZWNraW5nIGNvbW1pdCAxMGNmMzcz
-MTc2OGQgKGZ1eno6IEFkZCBpbnN0cnVjdGlvbnMgZm9yIHVzaW5nIGdlbmVyYWwtZnV6eikKMTMv
-MTYgQ2hlY2tpbmcgY29tbWl0IGNlYTc2ZDQyMzQwMCAoZnV6ejogYWRkIGFuICJvcGFxdWUiIHRv
-IHRoZSBGdXp6VGFyZ2V0IHN0cnVjdCkKMTQvMTYgQ2hlY2tpbmcgY29tbWl0IDBkODBkYjM1MWI3
-NyAoZnV6ejogYWRkIGdlbmVyYWwtZnV6eiBjb25maWdzIGZvciBvc3MtZnV6eikKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMTU6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKdG90YWw6IDAgZXJyb3JzLCAxIHdh
-cm5pbmdzLCAxNzIgbGluZXMgY2hlY2tlZAoKUGF0Y2ggMTQvMTYgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KMTUvMTYgQ2hlY2tpbmcgY29tbWl0IDNjNTliZDViNjdkZiAoZnV6ejogcmVnaXN0
-ZXIgcHJlZGVmaW5lZCBnZW5lcmFsLWZ1enogY29uZmlncykKMTYvMTYgQ2hlY2tpbmcgY29tbWl0
-IDAzMzIzYzIzNjE2YiAoc2NyaXB0cy9vc3MtZnV6ejogcmVtb3ZlIHRoZSBnZW5lcmFsLWZ1enog
-dGFyZ2V0KQo9PT0gT1VUUFVUIEVORCA9PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2Rl
-OiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9n
-cy8yMDIwMTAxNTEzNDEzNy4yMDU5NTgtMS1hbHhuZHJAYnUuZWR1L3Rlc3RpbmcuY2hlY2twYXRj
-aC8/dHlwZT1tZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0
-Y2hldyBbaHR0cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRv
-IHBhdGNoZXctZGV2ZWxAcmVkaGF0LmNvbQ==
+after the initial split into 3 tcg variants, we proceed to also
+split tcg_start_vcpu_thread.
+
+We actually split it in 2 this time, since the icount variant
+just uses the round robin function.
+
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+---
+ accel/tcg/tcg-all.c         |  5 ++++
+ accel/tcg/tcg-cpus-icount.c |  2 +-
+ accel/tcg/tcg-cpus-mttcg.c  | 29 +++++++++++++++++--
+ accel/tcg/tcg-cpus-mttcg.h  | 21 --------------
+ accel/tcg/tcg-cpus-rr.c     | 39 +++++++++++++++++++++++--
+ accel/tcg/tcg-cpus-rr.h     |  3 +-
+ accel/tcg/tcg-cpus.c        | 58 -------------------------------------
+ accel/tcg/tcg-cpus.h        |  1 -
+ 8 files changed, 71 insertions(+), 87 deletions(-)
+ delete mode 100644 accel/tcg/tcg-cpus-mttcg.h
+
+diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
+index e42a028043..1ac0b76515 100644
+--- a/accel/tcg/tcg-all.c
++++ b/accel/tcg/tcg-all.c
+@@ -105,6 +105,11 @@ static int tcg_init(MachineState *ms)
+     tcg_exec_init(s->tb_size * 1024 * 1024);
+     mttcg_enabled = s->mttcg_enabled;
+ 
++    /*
++     * Initialize TCG regions
++     */
++    tcg_region_init();
++
+     if (mttcg_enabled) {
+         cpus_register_accel(&tcg_cpus_mttcg);
+     } else if (icount_enabled()) {
+diff --git a/accel/tcg/tcg-cpus-icount.c b/accel/tcg/tcg-cpus-icount.c
+index d3af3afb6d..82dbe2cacf 100644
+--- a/accel/tcg/tcg-cpus-icount.c
++++ b/accel/tcg/tcg-cpus-icount.c
+@@ -138,7 +138,7 @@ static void icount_handle_interrupt(CPUState *cpu, int mask)
+ }
+ 
+ const CpusAccel tcg_cpus_icount = {
+-    .create_vcpu_thread = tcg_start_vcpu_thread,
++    .create_vcpu_thread = rr_start_vcpu_thread,
+     .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
+ 
+     .handle_interrupt = icount_handle_interrupt,
+diff --git a/accel/tcg/tcg-cpus-mttcg.c b/accel/tcg/tcg-cpus-mttcg.c
+index dac724fc85..f2b892a380 100644
+--- a/accel/tcg/tcg-cpus-mttcg.c
++++ b/accel/tcg/tcg-cpus-mttcg.c
+@@ -33,7 +33,6 @@
+ #include "hw/boards.h"
+ 
+ #include "tcg-cpus.h"
+-#include "tcg-cpus-mttcg.h"
+ 
+ /*
+  * In the multi-threaded case each vCPU has its own thread. The TLS
+@@ -41,7 +40,7 @@
+  * current CPUState for a given thread.
+  */
+ 
+-void *tcg_cpu_thread_fn(void *arg)
++static void *tcg_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+ 
+@@ -109,8 +108,32 @@ static void mttcg_kick_vcpu_thread(CPUState *cpu)
+     cpu_exit(cpu);
+ }
+ 
++static void mttcg_start_vcpu_thread(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++
++    g_assert(tcg_enabled());
++
++    parallel_cpus = (current_machine->smp.max_cpus > 1);
++
++    cpu->thread = g_malloc0(sizeof(QemuThread));
++    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++    qemu_cond_init(cpu->halt_cond);
++
++    /* create a thread per vCPU with TCG (MTTCG) */
++    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
++             cpu->cpu_index);
++
++    qemu_thread_create(cpu->thread, thread_name, tcg_cpu_thread_fn,
++                       cpu, QEMU_THREAD_JOINABLE);
++
++#ifdef _WIN32
++    cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++}
++
+ const CpusAccel tcg_cpus_mttcg = {
+-    .create_vcpu_thread = tcg_start_vcpu_thread,
++    .create_vcpu_thread = mttcg_start_vcpu_thread,
+     .kick_vcpu_thread = mttcg_kick_vcpu_thread,
+ 
+     .handle_interrupt = tcg_handle_interrupt,
+diff --git a/accel/tcg/tcg-cpus-mttcg.h b/accel/tcg/tcg-cpus-mttcg.h
+deleted file mode 100644
+index d1bd771f49..0000000000
+--- a/accel/tcg/tcg-cpus-mttcg.h
++++ /dev/null
+@@ -1,21 +0,0 @@
+-/*
+- * QEMU TCG Multi Threaded vCPUs implementation
+- *
+- * Copyright 2020 SUSE LLC
+- *
+- * This work is licensed under the terms of the GNU GPL, version 2 or later.
+- * See the COPYING file in the top-level directory.
+- */
+-
+-#ifndef TCG_CPUS_MTTCG_H
+-#define TCG_CPUS_MTTCG_H
+-
+-/*
+- * In the multi-threaded case each vCPU has its own thread. The TLS
+- * variable current_cpu can be used deep in the code to find the
+- * current CPUState for a given thread.
+- */
+-
+-void *tcg_cpu_thread_fn(void *arg);
+-
+-#endif /* TCG_CPUS_MTTCG_H */
+diff --git a/accel/tcg/tcg-cpus-rr.c b/accel/tcg/tcg-cpus-rr.c
+index ad50a3765f..f3b262bec7 100644
+--- a/accel/tcg/tcg-cpus-rr.c
++++ b/accel/tcg/tcg-cpus-rr.c
+@@ -144,7 +144,7 @@ static void deal_with_unplugged_cpus(void)
+  * elsewhere.
+  */
+ 
+-void *tcg_rr_cpu_thread_fn(void *arg)
++static void *tcg_rr_cpu_thread_fn(void *arg)
+ {
+     CPUState *cpu = arg;
+ 
+@@ -262,8 +262,43 @@ void *tcg_rr_cpu_thread_fn(void *arg)
+     return NULL;
+ }
+ 
++void rr_start_vcpu_thread(CPUState *cpu)
++{
++    char thread_name[VCPU_THREAD_NAME_SIZE];
++    static QemuCond *single_tcg_halt_cond;
++    static QemuThread *single_tcg_cpu_thread;
++
++    g_assert(tcg_enabled());
++    parallel_cpus = false;
++
++    if (!single_tcg_cpu_thread) {
++        cpu->thread = g_malloc0(sizeof(QemuThread));
++        cpu->halt_cond = g_malloc0(sizeof(QemuCond));
++        qemu_cond_init(cpu->halt_cond);
++
++        /* share a single thread for all cpus with TCG */
++        snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
++        qemu_thread_create(cpu->thread, thread_name,
++                           tcg_rr_cpu_thread_fn,
++                           cpu, QEMU_THREAD_JOINABLE);
++
++        single_tcg_halt_cond = cpu->halt_cond;
++        single_tcg_cpu_thread = cpu->thread;
++#ifdef _WIN32
++        cpu->hThread = qemu_thread_get_handle(cpu->thread);
++#endif
++    } else {
++        /* we share the thread */
++        cpu->thread = single_tcg_cpu_thread;
++        cpu->halt_cond = single_tcg_halt_cond;
++        cpu->thread_id = first_cpu->thread_id;
++        cpu->can_do_io = 1;
++        cpu->created = true;
++    }
++}
++
+ const CpusAccel tcg_cpus_rr = {
+-    .create_vcpu_thread = tcg_start_vcpu_thread,
++    .create_vcpu_thread = rr_start_vcpu_thread,
+     .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
+ 
+     .handle_interrupt = tcg_handle_interrupt,
+diff --git a/accel/tcg/tcg-cpus-rr.h b/accel/tcg/tcg-cpus-rr.h
+index 1936fd16ab..2e5943eda9 100644
+--- a/accel/tcg/tcg-cpus-rr.h
++++ b/accel/tcg/tcg-cpus-rr.h
+@@ -15,6 +15,7 @@
+ /* Kick all RR vCPUs. */
+ void qemu_cpu_kick_rr_cpus(CPUState *unused);
+ 
+-void *tcg_rr_cpu_thread_fn(void *arg);
++/* start the round robin vcpu thread */
++void rr_start_vcpu_thread(CPUState *cpu);
+ 
+ #endif /* TCG_CPUS_RR_H */
+diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
+index f2b9bbf99e..86fd09545a 100644
+--- a/accel/tcg/tcg-cpus.c
++++ b/accel/tcg/tcg-cpus.c
+@@ -35,67 +35,9 @@
+ #include "hw/boards.h"
+ 
+ #include "tcg-cpus.h"
+-#include "tcg-cpus-mttcg.h"
+-#include "tcg-cpus-rr.h"
+ 
+ /* common functionality among all TCG variants */
+ 
+-void tcg_start_vcpu_thread(CPUState *cpu)
+-{
+-    char thread_name[VCPU_THREAD_NAME_SIZE];
+-    static QemuCond *single_tcg_halt_cond;
+-    static QemuThread *single_tcg_cpu_thread;
+-    static int tcg_region_inited;
+-
+-    assert(tcg_enabled());
+-    /*
+-     * Initialize TCG regions--once. Now is a good time, because:
+-     * (1) TCG's init context, prologue and target globals have been set up.
+-     * (2) qemu_tcg_mttcg_enabled() works now (TCG init code runs before the
+-     *     -accel flag is processed, so the check doesn't work then).
+-     */
+-    if (!tcg_region_inited) {
+-        tcg_region_inited = 1;
+-        tcg_region_init();
+-        parallel_cpus = qemu_tcg_mttcg_enabled() && current_machine->smp.max_cpus > 1;
+-    }
+-
+-    if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
+-        cpu->thread = g_malloc0(sizeof(QemuThread));
+-        cpu->halt_cond = g_malloc0(sizeof(QemuCond));
+-        qemu_cond_init(cpu->halt_cond);
+-
+-        if (qemu_tcg_mttcg_enabled()) {
+-            /* create a thread per vCPU with TCG (MTTCG) */
+-            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
+-                 cpu->cpu_index);
+-
+-            qemu_thread_create(cpu->thread, thread_name, tcg_cpu_thread_fn,
+-                               cpu, QEMU_THREAD_JOINABLE);
+-
+-        } else {
+-            /* share a single thread for all cpus with TCG */
+-            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
+-            qemu_thread_create(cpu->thread, thread_name,
+-                               tcg_rr_cpu_thread_fn,
+-                               cpu, QEMU_THREAD_JOINABLE);
+-
+-            single_tcg_halt_cond = cpu->halt_cond;
+-            single_tcg_cpu_thread = cpu->thread;
+-        }
+-#ifdef _WIN32
+-        cpu->hThread = qemu_thread_get_handle(cpu->thread);
+-#endif
+-    } else {
+-        /* For non-MTTCG cases we share the thread */
+-        cpu->thread = single_tcg_cpu_thread;
+-        cpu->halt_cond = single_tcg_halt_cond;
+-        cpu->thread_id = first_cpu->thread_id;
+-        cpu->can_do_io = 1;
+-        cpu->created = true;
+-    }
+-}
+-
+ void qemu_tcg_destroy_vcpu(CPUState *cpu)
+ {
+     cpu_thread_signal_destroyed(cpu);
+diff --git a/accel/tcg/tcg-cpus.h b/accel/tcg/tcg-cpus.h
+index 279ba72e1f..b7ca954e13 100644
+--- a/accel/tcg/tcg-cpus.h
++++ b/accel/tcg/tcg-cpus.h
+@@ -18,7 +18,6 @@ extern const CpusAccel tcg_cpus_mttcg;
+ extern const CpusAccel tcg_cpus_icount;
+ extern const CpusAccel tcg_cpus_rr;
+ 
+-void tcg_start_vcpu_thread(CPUState *cpu);
+ void qemu_tcg_destroy_vcpu(CPUState *cpu);
+ int tcg_cpu_exec(CPUState *cpu);
+ void tcg_handle_interrupt(CPUState *cpu, int mask);
+-- 
+2.26.2
+
 
