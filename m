@@ -2,90 +2,73 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FB16C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:14:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00061C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:17:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 807BF2222E
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:14:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0CB9C22210
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 09:17:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y2VVyacb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 807BF2222E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="g2RrJ7ar"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CB9C22210
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kSzLS-00073g-BG
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 05:14:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33820)
+	id 1kSzOA-00007E-Se
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 05:17:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSzKn-0006UQ-GW
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:14:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27565)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kSzKk-0005DI-By
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:14:04 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602753240;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=i7W98Rmr4j4mY/yHy835QNdYKekY+ZmgrEWIZtvx8hM=;
- b=Y2VVyacbvY5lTjgsHCaQhJxwAnoCVO341IIuhUOtbiqhqw5v4QFQqbPTORiKalS9vMYSD/
- 51ZaDjbJgKOF3AAAzXmD998YqNaWXPAdiWt07ta6BhVXC9sAUebknFK1PclJyJ126Sn1k6
- F0seV9xlBIAN5ejwG/kTaF7/HocX5Sg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-139-A4DZlP2ENoSIzSW1eXq0jA-1; Thu, 15 Oct 2020 05:13:58 -0400
-X-MC-Unique: A4DZlP2ENoSIzSW1eXq0jA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2845981CAFC;
- Thu, 15 Oct 2020 09:13:57 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-212.ams2.redhat.com [10.36.112.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B01026FEE8;
- Thu, 15 Oct 2020 09:13:45 +0000 (UTC)
-Subject: Re: [PULL 00/10] migration queue
-To: Peter Xu <peterx@redhat.com>, Peter Maydell <peter.maydell@linaro.org>
-References: <20201008191046.272549-1-dgilbert@redhat.com>
- <CAFEAcA-U2BjAne57Zn7c4_J97NAZSYzzy6r59iVeGmtgfD3APg@mail.gmail.com>
- <20201014200138.GB133059@xz-x1>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <821ef4ae-1e66-02b9-d9ae-567005aa7c2f@redhat.com>
-Date: Thu, 15 Oct 2020 11:13:44 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kSzN0-0007yy-AX
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:16:22 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:33293)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kSzMw-0005nC-69
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 05:16:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=joI/0vo6dI40RphK0P7GK/DUvk7XtA32rHLYiCQ9vRw=; b=g2RrJ7arfdvdtC9SCEDMDwWcMz
+ UOaTgc3hFehrMutbuDb6ZQifCNvk66qP9ijWDokRF05miJlK0T6ITU+KvsLsHdED4EgSq4oKPrIvQ
+ rqs66yMKNOiPlqcPGHGSJupZWsg99MU2c/QniOT2qQj4vlGkvUDFwAeV4CFUEuv+dlgjeUN9yu9jb
+ of73mAsRThfclK0XEtUm0NUUhXK3GXOJpP67DNYVlckUjtyrumN3HQkUxDC6z/wQcWQhBXZD+I7EU
+ 5+eXV9gtzwFVnNCYvSAzfC2nJCySDVbnKWB9bUIWEHfEdvDxV/baAe/weGI5pr/PEob0pDZyXnuFH
+ IyfXYNmA==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ Daniel =?ISO-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Emanuele Giuseppe Esposito <e.emanuelegiuseppe@gmail.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v4 08/12] tests/9pfs: change qtest name prefix to synth
+Date: Thu, 15 Oct 2020 11:16:14 +0200
+Message-ID: <2397156.vWtGj3npeQ@silver>
+In-Reply-To: <20201014213816.2b8039f6@bahia.lan>
+References: <cover.1602182956.git.qemu_oss@crudebyte.com>
+ <2321140.ujbB6vKeRS@silver> <20201014213816.2b8039f6@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <20201014200138.GB133059@xz-x1>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 05:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,49 +82,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Juan Quintela <quintela@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert \(git\)" <dgilbert@redhat.com>, zhengchuan@huawei.com,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 14/10/2020 22.01, Peter Xu wrote:
-> On Sun, Oct 11, 2020 at 07:29:25PM +0100, Peter Maydell wrote:
->>> Migration:
->>>   Dirtyrate measurement API cleanup
->>>   Postcopy recovery fixes
->>>
->>> Virtiofsd:
->>>   Missing qemu_init_exec_dir call
->>>   Support for setting the group on socket creation
->>>   Stop a gcc warning
->>>   Avoid tempdir in sandboxing
->>
->> This seems to hang in 'make check' trying to run
->> tests/qtest/migration-test on s390x and ppc, ie
->> the big-endian hosts.
+On Mittwoch, 14. Oktober 2020 21:38:16 CEST Greg Kurz wrote:
+> On Wed, 14 Oct 2020 17:25:35 +0200
 > 
-> Hi, Peter,
+> Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+> > On Donnerstag, 8. Oktober 2020 20:34:56 CEST Christian Schoenebeck wrote:
+> > > All existing 9pfs test cases are using the 'synth' fs driver so far,
+> > > which
+> > > means they are not accessing real files, but a purely simulated (in RAM
+> > > only) file system.
+> > > 
+> > > Let's make this clear by changing the prefix of the individual qtest
+> > > case
+> > > names from 'fs/' to 'synth/'. That way they'll be easily distinguishable
+> > > from upcoming new 9pfs test cases supposed to be using a different fs
+> > > driver.
+> > > 
+> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> > > ---
+> > > 
+> > >  tests/qtest/virtio-9p-test.c | 28 ++++++++++++++--------------
+> > >  1 file changed, 14 insertions(+), 14 deletions(-)
+> > 
+> > Queued patches 8 .. 12 on 9p.next:
+> > 
+> > https://github.com/cschoenebeck/qemu/commits/9p.next
 > 
-> Do you know what's the page size on both platforms?
+> Hi Chistian,
+> 
+> I could only have a quick glimpse at the patches and LGTM.
+> 
+> Thanks for taking care.
+> 
+> Cheers,
+> 
+> --
+> Greg
+>
 
-s390x uses 4k page size by default. Only huge-pages are different.
+Thanks, I appreciate it.
 
-> I'm also trying to find a s390x host to give it a shot.  However I decided to
-> also ask this loud so it might be even faster.
+Best regards,
+Christian Schoenebeck
 
-Easiest way to test on s390x is likely to use Travis. If you have already an
-github or gitlab account, you can simply clone the qemu repository there and
-add Travis (from the Marketplace in Github, not sure how it exactly works
-with Gitlab) to your cloned repo. If you then push commits to a branch,
-Travis should trigger automatically, including runs on s390x, see e.g.:
-
- https://travis-ci.com/github/huth/qemu/jobs/399317194
-
- HTH,
-  Thomas
 
 
