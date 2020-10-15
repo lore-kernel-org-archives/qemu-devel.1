@@ -2,109 +2,95 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87A8EC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 17:23:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4616C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 17:25:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E67C422210
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 17:23:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19CF422210
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 17:25:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ML2gWhz1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E67C422210
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aVOgFiyf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19CF422210
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51874 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT6y4-0007Zp-MK
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 13:23:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49920)
+	id 1kT6zw-0000uN-22
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 13:25:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52596)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kT6oM-0000b7-OD
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 13:13:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31168)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kT6oK-0004Mi-VV
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 13:13:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602781984;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=+Dmrh7h21hXNYTr0lO7qAQYu1jlPXffv2TzrX/Xh//A=;
- b=ML2gWhz1ijQuLMayvf/fIhcJOJLft5VE9hBltt/JpXl/q+XyNFqE8feDCOFurR37BKXwbT
- GIyPM1H5AWQc3xb8B/QPvx+BpTHZwHS06+UH0l1m7GX1N0dSvMlBCMfox/XtplLJ8yihXa
- SWfKfVSYbsJpT0x21BFAbb6rvA1FtcQ=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-537-8Kk-aTFjMz-GaO79r3AshA-1; Thu, 15 Oct 2020 13:13:00 -0400
-X-MC-Unique: 8Kk-aTFjMz-GaO79r3AshA-1
-Received: by mail-wm1-f72.google.com with SMTP id f26so1476946wml.1
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 10:13:00 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kT6yF-00083P-Fp
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 13:23:19 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:38545)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kT6yD-0005ew-7x
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 13:23:18 -0400
+Received: by mail-pl1-x641.google.com with SMTP id p11so1979959pld.5
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 10:23:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=rvV8nPTH0XUu4R56Xw963w+XbAEG2bIZP3GDo9KDS4Y=;
+ b=aVOgFiyfCVjKfMBGoCeEGKP2x5RdS/nfZxHUuh3m59rtylOLnFtth4G+A8wvtxID2Y
+ LCxCKai1CCjOdT7moplXQQ68hTPBLMr5n4trneS2liJW04DUSJDZwfSgGN7x8A6P4+rN
+ WYO85ROFXwd4e3xKCXi0aplQq2ay1KRugQPgpL8z7GxYNpYsoo9JFKitePaHenX6ayZs
+ vAN8JJV9TbnnHAizheJjdzVGMaEVa3ZOyWJstGu+7KJGHfDcSCZ+KWSfZXaoYQ3n/+l9
+ fOytnaMZLZetJoxn3KLTAU9/gGa+nfqPPAMUFVTuUy96LbLlPHKbbeW3MHW12dVZgmRC
+ 4ngA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ h=x-gm-message-state:subject:from:to:cc:references:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=+Dmrh7h21hXNYTr0lO7qAQYu1jlPXffv2TzrX/Xh//A=;
- b=UZ6j8jDuFSXQghQFvWCYMdmHB492G+dMoP52FWYSwI5PKEbjpOXOjg2nuP83ljOqFv
- ds/xLGqDyf6pvV6GZS1nXS7EloxgUyer5KOmgs2pPnUw1KDiwr6DIvBSt5UC4CwvNTIB
- C+FuDf0Fhd6tu94kXdVw3QGasZmX+FamiSxPNBx4Y2I6Gg0zZ3MNwOsOQUYqCB4QaCS/
- 9S6JyWI86zB1uGVcKn2AdwwJTijyU03UTsmCyd3Guilv6vL+K6RWZLTnfr/Fl5d0BMFc
- So+UMyNq71ih8TBB1ZzIaMAiGs3Vk16l2RqhRhSaZ0b3I+z+wXquMyX1poR/SJA1CABh
- 8KlQ==
-X-Gm-Message-State: AOAM533LCbqwi2HrXX5lz7lvkHqeRMV6XRieGr4ssHh/30gA3C8mz+ZC
- jQPHMm5NveQHXHWN5a85t52fCf/lALsBvSwMoRKiToWIKryFpOWD52TjYa2nBAx5m+uwlCX658G
- 0QbyBItoWOE6235M=
-X-Received: by 2002:adf:9f0a:: with SMTP id l10mr4876431wrf.427.1602781979066; 
- Thu, 15 Oct 2020 10:12:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyF4b3vxXGNP/yc0A8pES14EYUKjew1ixM9pZhRZrg2/fiVFPnLFjXhIS9ACmiX4I3I8w8HZg==
-X-Received: by 2002:adf:9f0a:: with SMTP id l10mr4876409wrf.427.1602781978790; 
- Thu, 15 Oct 2020 10:12:58 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:2110:4ced:a13b:6857?
- ([2001:b07:6468:f312:2110:4ced:a13b:6857])
- by smtp.gmail.com with ESMTPSA id p4sm5666716wrf.67.2020.10.15.10.12.58
+ bh=rvV8nPTH0XUu4R56Xw963w+XbAEG2bIZP3GDo9KDS4Y=;
+ b=XlG4Nr7HnpRoT1LVstUn2eclFlehIBmbtbaApKPcKra+v1niGajIZdu6St/c7L8L6V
+ r5QSa8D3akf1nsT6odohilFUZSbyLtL7piObhEMzJwwtF9JVZA2qQ+qSD8n/u7nPJ8/j
+ 8YNqofzHyUHGviiiUiy5Lp28HKHSsriBS/xp/4DFra5BQwU6TYPpQDrO+fy+dGGBEwRj
+ 1DTJX60NtPpV6hrUDi9uBK2y/Fgy61BRNJ1aHF97e/mfwFsMADCI0tkrkd421ePju3n8
+ sgz7L1KRa+9JOX6Wgrfyr7ziY6wk+jNgC+Tz6NwDVR08AKj9pkLNbQZIeo/kMcl7EegY
+ n4Zg==
+X-Gm-Message-State: AOAM530bMaGr72fIxiT0hW7sywrXO6QdDAkTAzIU3FvxJxUPQtZVFdic
+ UEfX61TCgTjIvG60xj2wJg9mAA==
+X-Google-Smtp-Source: ABdhPJwFwviTyiXuJPHCyru6EuM19YEQI4tR7w4mkZ9kKoUhQhzCkWwKXy//xi7bzonf9NIzwvGdhA==
+X-Received: by 2002:a17:90a:67cb:: with SMTP id
+ g11mr5552656pjm.226.1602782595590; 
+ Thu, 15 Oct 2020 10:23:15 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id u25sm3833190pgl.31.2020.10.15.10.23.13
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 15 Oct 2020 10:12:58 -0700 (PDT)
-Subject: Re: [PATCH] meson.build: don't condition iconv detection on library
- detection
-To: Bruce Rogers <brogers@suse.com>, qemu-devel@nongnu.org
-References: <20201014221939.196958-1-brogers@suse.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <8ffbb4a4-9e87-bb36-505b-3a190f9aec96@redhat.com>
-Date: Thu, 15 Oct 2020 19:12:57 +0200
+ Thu, 15 Oct 2020 10:23:14 -0700 (PDT)
+Subject: Re: [PATCH v2 00/10] softfloat: Implement float128_muladd
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+References: <20200925152047.709901-1-richard.henderson@linaro.org>
+Message-ID: <32f5366f-ec30-a41d-1be8-c23eb9c1dd57@linaro.org>
+Date: Thu, 15 Oct 2020 10:23:12 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20201014221939.196958-1-brogers@suse.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20200925152047.709901-1-richard.henderson@linaro.org>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -30
 X-Spam_score: -3.1
 X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.019, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-1.019,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,54 +104,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, kraxel@redhat.com
+Cc: bharata@linux.ibm.com, alex.bennee@linaro.org, david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 15/10/20 00:19, Bruce Rogers wrote:
-> It isn't necessarily the case that use of iconv requires an additional
-> library. For that reason we shouldn't conditionalize iconv detection on
-> libiconv.found.
-> 
-> Fixes: 5285e593c33 (configure: Fixes ncursesw detection under msys2/mingw by convert them to meson)
-> 
-> Signed-off-by: Bruce Rogers <brogers@suse.com>
-> ---
->  meson.build | 16 +++++++---------
->  1 file changed, 7 insertions(+), 9 deletions(-)
-> 
-> diff --git a/meson.build b/meson.build
-> index 1a4a482492..84c8ec9541 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -431,15 +431,13 @@ if not get_option('iconv').disabled()
->    libiconv = cc.find_library('iconv',
->                               required: false,
->                               static: enable_static)
-> -  if libiconv.found()
-> -    if cc.links('''
-> -      #include <iconv.h>
-> -      int main(void) {
-> -        iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
-> -        return conv != (iconv_t) -1;
-> -      }''', dependencies: [libiconv])
-> -      iconv = declare_dependency(dependencies: [libiconv])
-> -    endif
-> +  if cc.links('''
-> +    #include <iconv.h>
-> +    int main(void) {
-> +      iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
-> +      return conv != (iconv_t) -1;
-> +    }''', dependencies: [libiconv])
-> +    iconv = declare_dependency(dependencies: [libiconv])
->    endif
->  endif
->  if get_option('iconv').enabled() and not iconv.found()
-> 
+Ping.
 
-Queued, thanks.
-
-Paolo
+On 9/25/20 8:20 AM, Richard Henderson wrote:
+> Plus assorted cleanups, passes tests/fp/fp-test.
+> 
+> Changes in v2:
+>   * Add UInt256 type (david)
+>   * Rewrite and inline shift256RightJamming.  This keeps the whole
+>     UInt256 in registers, avoiding long sequences of loads and stores.
+>   * Add x86_64 assembly for double shifts.  I don't know why the
+>     compiler can't recognize this pattern, but swapping values in
+>     and out of %cl (the only register in the base isa that can
+>     hold a variable shift) is really ugly.
+>   * Add ppc64 assembly.
+> 
+> 
+> r~
+> 
+> 
+> Richard Henderson (10):
+>   softfloat: Use mulu64 for mul64To128
+>   softfloat: Use int128.h for some operations
+>   softfloat: Tidy a * b + inf return
+>   softfloat: Add float_cmask and constants
+>   softfloat: Inline pick_nan_muladd into its caller
+>   softfloat: Implement float128_muladd
+>   softfloat: Use x86_64 assembly for {add,sub}{192,256}
+>   softfloat: Use x86_64 assembly for sh[rl]_double
+>   softfloat: Use aarch64 assembly for {add,sub}{192,256}
+>   softfloat: Use ppc64 assembly for {add,sub}{192,256}
+> 
+>  include/fpu/softfloat-macros.h | 109 +++---
+>  include/fpu/softfloat.h        |   2 +
+>  fpu/softfloat.c                | 620 ++++++++++++++++++++++++++++++---
+>  tests/fp/fp-test.c             |   2 +-
+>  tests/fp/wrap.c.inc            |  12 +
+>  5 files changed, 652 insertions(+), 93 deletions(-)
+> 
 
 
