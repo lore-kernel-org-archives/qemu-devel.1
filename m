@@ -2,118 +2,82 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A5EFC433DF
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:36:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F951C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1978C22248
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:36:16 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="F85Sz0La"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1978C22248
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 622A922248
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:36:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 622A922248
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44772 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT5Id-0005Nf-Om
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50330)
+	id 1kT5J7-0006IP-2j
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT55x-0000bx-2z
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:23:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45174)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT55v-00067u-G7
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:23:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602775386;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=i7Afng0mD3++Ez5X6lKP7UOBYKXt9907Pu/4PooO9EE=;
- b=F85Sz0LaoS7equkqNgWI8jSH8Q8S2xPmLUv/sgKNBc46Me3ZSGVXlUHWHvLTYYtVY0qjF9
- BRiJxsw5GlKsBQrhoZFCKJVoywv+h0MOkr7ksZjw7CLja36jY6j6NCK8e7PitaWMlX/9Ux
- sSFx6kgT6zF7pne+t9/W4C1tFDhLMLs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-odapbwAWPsGY_f831vWuEQ-1; Thu, 15 Oct 2020 11:23:03 -0400
-X-MC-Unique: odapbwAWPsGY_f831vWuEQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2C7E18C5200;
- Thu, 15 Oct 2020 15:23:02 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.194.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D5C6619C66;
- Thu, 15 Oct 2020 15:22:58 +0000 (UTC)
-Subject: Re: [PATCH v2 17/20] iotests: Give access to the qemu-storage-daemon
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200922104932.46384-1-mreitz@redhat.com>
- <20200922104932.46384-18-mreitz@redhat.com>
- <20201015112712.GE4610@merkur.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <8ee707ba-026f-c2ef-0cac-a8a9422f973b@redhat.com>
-Date: Thu, 15 Oct 2020 17:22:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kT5DQ-0000lj-Ir
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:30:52 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55890)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kT5DM-0007Hz-AM
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:30:52 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kT5DJ-000800-AG
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 15:30:45 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 31EFC2E80F1
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 15:30:45 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20201015112712.GE4610@merkur.fritz.box>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="rW3eMLFwnqJTrR3TG4RXlGcTkmPFCU64P"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.019, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 15 Oct 2020 15:23:03 -0000
+From: Peter Maydell <1872237@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=In Progress; importance=Undecided;
+ assignee=None; 
+X-Launchpad-Bug-Tags: arm
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: bcantrill pmaydell
+X-Launchpad-Bug-Reporter: Bryan Cantrill (bcantrill)
+X-Launchpad-Bug-Modifier: Peter Maydell (pmaydell)
+References: <158663515939.5446.1890827991506574310.malonedeb@chaenomeles.canonical.com>
+Message-Id: <160277538412.31706.9855716194668614666.malone@wampee.canonical.com>
+Subject: [Bug 1872237] Re: SysTick reload behavior emulated incorrectly
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
+X-Launchpad-Hash: c6104fa546b9c0e8ba498fccf3dfa1c24ddb60c4
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 11:30:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -122,74 +86,295 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Reply-To: Bug 1872237 <1872237@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---rW3eMLFwnqJTrR3TG4RXlGcTkmPFCU64P
-Content-Type: multipart/mixed; boundary="ijuiWoiXgmBKOpwVf6T9KLrYOnGAxPwI2"
+I believe this bug should be fixed by this patchset, which rewrites the sys=
+tick implementation to use a 'ptimer' down-counter instead of rolling its o=
+wn buggy version:
+https://patchew.org/QEMU/20201015151829.14656-1-peter.maydell@linaro.org/
 
---ijuiWoiXgmBKOpwVf6T9KLrYOnGAxPwI2
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
 
-On 15.10.20 13:27, Kevin Wolf wrote:
-> Am 22.09.2020 um 12:49 hat Max Reitz geschrieben:
->> Signed-off-by: Max Reitz <mreitz@redhat.com>
->> ---
->>  tests/qemu-iotests/check     | 11 +++++++++++
->>  tests/qemu-iotests/common.rc | 17 +++++++++++++++++
->>  2 files changed, 28 insertions(+)
->>
->> diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
->> index e14a1f354d..467a7cf1b7 100755
->> --- a/tests/qemu-iotests/check
->> +++ b/tests/qemu-iotests/check
->> @@ -644,6 +644,17 @@ if [ -z $QEMU_NBD_PROG ]; then
->>  fi
->>  export QEMU_NBD_PROG=3D"$(type -p "$QEMU_NBD_PROG")"
->> =20
->> +if [ -z "$QEMU_STGD_PROG" ]; then
->=20
-> No series without some bikeshedding:
->=20
-> This is the first time I see "QEMU_STGD" as a short form. Without the
-> subject line of the patch, I wouldn't be able to guess what it is.
->=20
-> If the full name ($QEMU_STORAGE_DAEMON_PROG) is too long, I think simply
-> $QSD_PROG would be an alternative, because "qsd" is what people already
-> use an as abbreviation.
+** Changed in: qemu
+       Status: New =3D> In Progress
 
-I asked myself for a second what this QEMU Street Day you=E2=80=99re referr=
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1872237
+
+Title:
+  SysTick reload behavior emulated incorrectly
+
+Status in QEMU:
+  In Progress
+
+Bug description:
+  QEMU's emuation of SysTick on ARM is incorrect with respect to reload
+  behavior.  This issue is described here, and also in a repository
+  dedicated to the issue:
+
+    https://github.com/oxidecomputer/qemu-systick-bug
+
+  =
+
+  (What follows is in Markdown, which I understand that Launchpad does
+  not support; see the repository linked above for a rendering of it.)
+
+  Take this Rust program:
+
+  ```rust
+  #![no_std]
+  #![no_main]
+
+  extern crate panic_semihosting;
+
+  use cortex_m_rt::entry;
+  use cortex_m_semihosting::hprintln;
+  use cortex_m::peripheral::syst::SystClkSource;
+  use cortex_m::peripheral::SYST;
+
+  fn delay(syst: &mut cortex_m::peripheral::SYST, ms: u32)
+  {
+      /*
+       * Configured for the LM3S6965, which has a default CPU clock of 12 M=
+hz
+       */
+      let reload =3D 12_000 * ms;
+
+      syst.set_reload(reload);
+      syst.clear_current();
+      syst.enable_counter();
+
+      hprintln!("waiting for {} ms (SYST_CVR=3D{}) ...",
+          ms, SYST::get_current()
+      ).unwrap();
+
+      while !syst.has_wrapped() {}
+
+      hprintln!("  ... done (SYST_CVR=3D{})\n",
+  SYST::get_current()).unwrap();
+
+      syst.disable_counter();
+  }
+
+  #[entry]
+  fn main() -> ! {
+      let p =3D cortex_m::Peripherals::take().unwrap();
+      let mut syst =3D p.SYST;
+
+      syst.set_clock_source(SystClkSource::Core);
+
+      loop {
+          delay(&mut syst, 1000);
+          delay(&mut syst, 100);
+      }
+  }
+  ```
+
+  This program should oscillate between waiting for one second and waiting
+  for 100 milliseconds.  Under hardware, this is more or less what it does
+  (depending on core clock frequency); e.g., from an STM32F4107 (connected =
+via
+  OCD and with semi-hosting enabled):
+
+  ```
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999902)
+
+  waiting for 100 ms (SYST_CVR=3D1199949) ...
+    ... done (SYST_CVR=3D1199897)
+
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999885)
+
+  waiting for 100 ms (SYST_CVR=3D1199949) ...
+    ... done (SYST_CVR=3D1199897)
+
+  waiting for 1000 ms (SYST_CVR=3D11999949) ...
+    ... done (SYST_CVR=3D11999885)
+
+  ```
+
+  Under QEMU, however, its behavior is quite different:
+
+  ```
+  $ cargo run
+      Finished dev [unoptimized + debuginfo] target(s) in 0.03s
+       Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb -nograp=
+hic -semihosting-config enable=3Don,target=3Dnative -kernel target/thumbv7m=
+-none-eabi/debug/qemu-systick-bug`
+  waiting for 1000 ms (SYST_CVR=3D11999658) ...
+    ... done (SYST_CVR=3D11986226)
+
+  waiting for 100 ms (SYST_CVR=3D0) ...
+    ... done (SYST_CVR=3D1186560)
+
+  waiting for 1000 ms (SYST_CVR=3D1185996) ...
+    ... done (SYST_CVR=3D11997350)
+
+  waiting for 100 ms (SYST_CVR=3D0) ...
+    ... done (SYST_CVR=3D1186581)
+  ```
+
+  In addition to the values being strangely wrong, the behavior is wrong:
+  the first wait correctly waits for 1000 ms -- but the subsequent wait
+  (which should be for 100 ms) is in fact 1000 ms, and the next wait (which
+  should be for 1000 ms) is in fact 100 ms.  (That is, it appears as if
+  the periods of the two delays have been switched.)
+
+  The problems is that the QEMU ARM emulation code does not reload SYST_CVR=
+ from
+  SYST_RVR if SYST_CSR.ENABLE is not set -- and moreover, that SYST_CVR is
+  not reloaded from SYST_RVR even when SYST_CSR.ENABLE becomes set.  This is
+  very explicit; from
+  <a
+  href=3D"https://github.com/qemu/qemu/blob/8bac3ba57eecc466b7e73dabf7d1932=
+8a59f684e/hw/timer/armv7m_systick.c#L42-L60">hw/timer/armv7m_systick.c</a>:
+
+  ```c
+  static void systick_reload(SysTickState *s, int reset)
+  {
+      /* The Cortex-M3 Devices Generic User Guide says that "When the
+       * ENABLE bit is set to 1, the counter loads the RELOAD value from the
+       * SYST RVR register and then counts down". So, we need to check the
+       * ENABLE bit before reloading the value.
+       */
+      trace_systick_reload();
+
+      if ((s->control & SYSTICK_ENABLE) =3D=3D 0) {
+          return;
+      }
+
+      if (reset) {
+          s->tick =3D qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+      }
+      s->tick +=3D (s->reload + 1) * systick_scale(s);
+      timer_mod(s->timer, s->tick);
+  }
+  ```
+
+  The statement in the code is stronger than the statement in the
+  <a href=3D"https://static.docs.arm.com/ddi0403/eb/DDI0403E_B_armv7m_arm.p=
+df">ARMv7-M Architecture Reference Manual</a> (sec B3.3.1):
+
+  > Writing to SYST_CVR clears both the register and the COUNTFLAG status
+  > bit to zero. This causes the SysTick logic to reload SYST_CVR from SYST=
+_RVR
+  > on the next timer clock. A write to SYST_CVR does not trigger the
+  > SysTick exception logic.
+
+  Note that this does not mention the behavior on a write to SYST_CVR when
+  SYST_CSR.ENABLE is not set -- and in particular, does *not* say that writ=
+es to
+  SYST_CVR will be ignored if SYST_CSR.ENABLE is not set.
+
+  Section 3.3.1 does go on to say:
+
+  > The SYST_CVR value is UNKNOWN on reset. Before enabling the SysTick cou=
+nter,u
+  > software must write the required counter value to SYST_RVR, and then wr=
+ite
+  > to SYST_CVR. This clears SYST_CVR to zero. When enabled, the counter =
+
+  > reloads the value from SYST_RVR, and counts down from that value, rathe=
+r]
+  > than from an arbitrary value.
+
+  (This is more or less what has been quoted in the implementation of
+  `systick_reload`, above.)  This note does **not** say, however, that writ=
+es
+  to SYST_CVR will be discarded when not enabled, but rather that the count=
 ing
-to is (I blame the [k] at the beginning of both ?SDs), but sure, why not.
+  will only begin (and the value in SYST_RVR loaded or reloaded) when
+  SYST_CSR.ENABLE becomes set.
 
-Max
+  While QEMU's behavior does not match that of the hardware (and is therefo=
+re
+  at some level malfunctioning), there is additional behavior that is very
+  clearly incorrect: once SYST_CSR.ENABLE is set, not only will SYST_CVR
+  continue to return 0 (that is, the counter will not be enabled),
+  SYST_CSR.COUNTFLAG will become set when the *old* value of SYST_RVR ticks
+  have elapsed!  This is wrong in both regards: if SYST_CVR is not counting
+  down, SYST_CSR.COUNTFLAG should never become set -- and it certainly
+  shouldn't match a value of SYST_RVR that has been overwritten in the
+  interim!
 
+  In terms of fixing this, it's helpful to understand the
+  <a
+  href=3D"https://lists.gnu.org/archive/html/qemu-devel/2015-05/msg01217.ht=
+ml">context
+  around this change</a>:
 
---ijuiWoiXgmBKOpwVf6T9KLrYOnGAxPwI2--
+  > Consider the following pseudo code to configure SYSTICK (The
+  > recommended programming sequence from "the definitive guide to the
+  > arm cortex-m3"):
+  >    SYSTICK Reload Value Register =3D 0xffff
+  >    SYSTICK Current Value Register =3D 0
+  >    SYSTICK Control and Status Register =3D 0x7
+  >
+  > The pseudo code "SYSTICK Current Value Register =3D 0" leads to invoking
+  > systick_reload(). As a consequence, the systick.tick member is updated
+  > and the systick timer starts to count down when the ENABLE bit of
+  > SYSTICK Control and Status Register is cleared.
+  >
+  > The worst case is that: during the system initialization, the reset
+  > value of the SYSTICK Control and Status Register is 0x00000000. =
 
---rW3eMLFwnqJTrR3TG4RXlGcTkmPFCU64P
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+  > When the code "SYSTICK Current Value Register =3D 0" is executed, the
+  > systick.tick member is accumulated with "(s->systick.reload + 1) *
+  > systick_scale(s)". The systick_scale() gets the external_ref_clock
+  > scale because the CLKSOURCE bit of the SYSTICK Control and Status
+  > Register is cleared. This is the incorrect behavior because of the
+  > code "SYSTICK Control and Status Register =3D 0x7". Actually, we want
+  > the processor clock instead of the external reference clock.
+  >
+  > This incorrect behavior defers the generation of the first interrupt. =
 
------BEGIN PGP SIGNATURE-----
+  >
+  > The patch fixes the above-mentioned issue by setting the systick.tick
+  > member and modifying the systick timer only if the ENABLE bit of
+  > the SYSTICK Control and Status Register is set.
+  >
+  > In addition, the Cortex-M3 Devices Generic User Guide mentioned that
+  > "When ENABLE is set to 1, the counter loads the RELOAD value from the
+  > SYST RVR register and then counts down". This patch adheres to the
+  > statement of the user guide.
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+IaVEACgkQ9AfbAGHV
-z0ByjQf9FKhwFgxjXo5jC00k8BK66aodd/TI914BH7vsZPSbGrjyjbU6zN5qN8xC
-TByQBeSdiUMos+kimXeYita+1NUMIoOcntq/VFHQRMjRmuPTTZ+HAGM3LCobm7c9
-aafAXIBiSo0YwqQTJ/HFWLm81EKZJPEooqW0jrJOAON1V4+68vaF1MCpguVqrBR7
-XBHpKrPXA/k3qQ7WcgZMyZ2/gW9RkLYgO98Youmsgbf3wCCNwuSrFCjCRg0PgDzw
-kKPG7e9uJE32TqCHi+f3IfK6Vi6H3SBxliYU5KQHpnV89uCUS1VXCTAxcmozkTU+
-OH2LPq5F4SfyrxYbxLR5xnoe1B3IZw==
-=xL8R
------END PGP SIGNATURE-----
+  This fix is simply incorrect -- or at the least, incomplete:
+  a write to SYST_CVR must clear any cached state
+  such that a subsequent write to SYST_CSR.ENABLE will correctly cause
+  a reload.  Here is a diff that solves the problem without re-introducing
+  the behavior that the original fix was trying to correct:
 
---rW3eMLFwnqJTrR3TG4RXlGcTkmPFCU64P--
+  ```diff
+  diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
+  index 74c58bcf24..3f7b267c2d 100644
+  --- a/hw/timer/armv7m_systick.c
+  +++ b/hw/timer/armv7m_systick.c
+  @@ -181,6 +181,15 @@ static MemTxResult systick_write(void *opaque, hwadd=
+r addr,
+           break;
+       case 0x8: /* SysTick Current Value.  Writes reload the timer.  */
+           systick_reload(s, 1);
+  +
+  +        if ((s->control & SYSTICK_ENABLE) =3D=3D 0) {
+  +            /*
+  +             * If we're not enabled, explicitly clear our tick value to
+  +             * assure that when we do become enabled, we correctly reloa=
+d.
+  +             */
+  +            s->tick =3D 0;
+  +        }
+  +
+           s->control &=3D ~SYSTICK_COUNTFLAG;
+           break;
+       default:
+  ```
 
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1872237/+subscriptions
 
