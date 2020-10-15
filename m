@@ -8,84 +8,86 @@ X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53015C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1C7C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:17:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81A372075B
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:16:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF0B82076D
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 11:17:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A8/Vyqgr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81A372075B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YgyLSzUT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF0B82076D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47382 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT1FD-0003ej-Ml
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 07:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43396)
+	id 1kT1GE-0004gv-S6
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 07:17:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41920)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT1D5-0002ek-7h
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:14:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41800)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT18f-0001CC-SQ
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:09:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35965)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT1D3-0006MT-Id
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:14:14 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kT18b-0005Ye-KF
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 07:09:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602760452;
+ s=mimecast20190719; t=1602760175;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=esQraE8Y/bNPkER3FVilbO9Rv53mg4avZhRLebUk/5g=;
- b=A8/Vyqgr/e9OSnOKm8jhfREnoa54S1IEQ0CZvHHVIGLBQCsSIbYqhZum0oXYfDVUJtaH06
- eWS7KLSsfxTaIvYjeSMb3LuzB4vXJ36INJ7mkPQ13W1MuDxAnwWXa7yQwOmvLJGnRab67J
- No/X4zEvGu3x80ElOhACnrrPPrLcwwA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-572-lRsPJ0X1PF2uLM8qbJy0nw-1; Thu, 15 Oct 2020 07:14:10 -0400
-X-MC-Unique: lRsPJ0X1PF2uLM8qbJy0nw-1
-Received: by mail-wm1-f71.google.com with SMTP id y83so1585798wmc.8
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 04:14:10 -0700 (PDT)
+ bh=kWdD/fy1kJlA/xHpjqMh0Qz8/90w6OVAkY6x3PSbdGA=;
+ b=YgyLSzUTx6spijLUo4cX+GQJ2TKrhLOF0P+Apwdu9+JDCbjtvbh6EjAx9OIz7zXNovrltq
+ isCCCzmChM58xdz8YXDQyqIt1zWbDLI/Dl7D3RffaFPCZK2Xo1MHyGWhrVB/KYLcvpotid
+ YF8nau+5L/6Vn5GHyQJN383pEAQc8W8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-74-yZpUNMpaOmywoELKvbwIgg-1; Thu, 15 Oct 2020 07:09:31 -0400
+X-MC-Unique: yZpUNMpaOmywoELKvbwIgg-1
+Received: by mail-wm1-f72.google.com with SMTP id p17so1572699wmi.7
+ for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 04:09:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=esQraE8Y/bNPkER3FVilbO9Rv53mg4avZhRLebUk/5g=;
- b=S6yAt6MbLGqcTb2mJmQABbNzgLszaaPCMnUlZkywaa0/jy7+RjJDQGTKeKEIKOf5or
- dWlIZgRltnbcf+2nApd9A+fHH468oYuyOpw3DHYrKLJFd78bvXGZAWxYvRS0xqRzAcIP
- EWeXv7zwba/lDI2dhttuailP1BIEyThcX4wB1Tch6SmuanBHgneCh2FPDwE7lgC8owOn
- nk4KXI8nmQwEAc1KvWbWJKoOFqB+FUT0Rm75JUPQBcESz7ObureIXNsUcYPm7d0wI20M
- V9pwn0K3RHh5L0M8cTzrk17m4nILLrvfier00+7iIJSeyvz7WB2WsY1jWBWiQfooRUYr
- 32fg==
-X-Gm-Message-State: AOAM530xyrxPVBbwoF9JWU+lwV6Y6loU51tstqOZr8BR7HIukQoEXfYN
- SfWDyp9g6nBH/KH7Pi1JBu3IVYvCOscLCo8pslK/qmZwvrzK8E1+p+zxnlCvtYNJ5RdH6EBcZQl
- 2U2pZhuPHLLWB/3c=
-X-Received: by 2002:a1c:60d5:: with SMTP id u204mr3610669wmb.46.1602760449604; 
- Thu, 15 Oct 2020 04:14:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTUqG28x5lucY4oFfdubtWtO8F/Nd/4VsJSArprgUjTQpnHwQBsgzwvUvk1fdBhPk12DwuPg==
-X-Received: by 2002:a1c:60d5:: with SMTP id u204mr3610653wmb.46.1602760449399; 
- Thu, 15 Oct 2020 04:14:09 -0700 (PDT)
+ bh=kWdD/fy1kJlA/xHpjqMh0Qz8/90w6OVAkY6x3PSbdGA=;
+ b=JoVDinQW7y27meFzY1jYv4S/OAQSNxz7Kjwyjtavgpy4X3q7U9JarcoXPWturwlUkk
+ qqa+Qdn6E6GfSUoHF30HAA/0HK9vKjl/MlgtBDZh7QNLrJBJrVKRD+mj4LXX48QQfNO0
+ kZvHSHyXmYHphRP7pmn7lvyeBdyTzvfMg7ORKJ9IhiAT3WrSr1iPZrVIrnLedxbRU0Ed
+ 25hSzjcE1FjsWNhaFrICO4vVy1U5p8ZXhawmBdxjwcKoPnyPZLWHhQ8z8TVHcfqboUK1
+ Tl8LpV/WSChCSM+WXCFJMax49u6tQyKq/ByPo7NLfdCvtW1TXMkT0Ry6RBZTtzPNxbBA
+ X80g==
+X-Gm-Message-State: AOAM532J/uhlvwZgH7GvywgXRyIPJl8Ag+/1WRcKMnyL8E2o61HkPWrN
+ gf28TjFaMz1CLiO0SQ6V2+TwYDB6A2EshAzEC4xBcTg7hmvLI4tFwATKkuD+C9RMJysnfkYuJKu
+ e7fyd92rw+Um3WF0=
+X-Received: by 2002:a05:6000:10c6:: with SMTP id
+ b6mr3837012wrx.10.1602760170439; 
+ Thu, 15 Oct 2020 04:09:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwxz4HkHLD5/EJIJ02Rg8KZA8QjhWpGkRnP8HOJjyE8nnbmf+qDeNRxqX9lrS/63fi9vDDAcA==
+X-Received: by 2002:a05:6000:10c6:: with SMTP id
+ b6mr3836984wrx.10.1602760170145; 
+ Thu, 15 Oct 2020 04:09:30 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id v4sm3862967wmg.35.2020.10.15.04.14.08
+ by smtp.gmail.com with ESMTPSA id t5sm4377253wrb.21.2020.10.15.04.09.28
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 15 Oct 2020 04:14:08 -0700 (PDT)
-Subject: Re: [PATCH 08/10] net/colo-compare.c: Change the timer clock type
+ Thu, 15 Oct 2020 04:09:29 -0700 (PDT)
+Subject: Re: [PATCH 05/10] colo-compare: fix missing compare_seq initialization
 To: Zhang Chen <chen.zhang@intel.com>, Jason Wang <jasowang@redhat.com>,
  qemu-dev <qemu-devel@nongnu.org>
 References: <20201014072555.12515-1-chen.zhang@intel.com>
- <20201014072555.12515-9-chen.zhang@intel.com>
+ <20201014072555.12515-6-chen.zhang@intel.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <9a9c1cf2-ed54-d10f-0929-131e48e71aa8@redhat.com>
-Date: Thu, 15 Oct 2020 13:14:07 +0200
+Message-ID: <1591a864-b038-6366-b5db-cef9fce36d34@redhat.com>
+Date: Thu, 15 Oct 2020 13:09:28 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201014072555.12515-9-chen.zhang@intel.com>
+In-Reply-To: <20201014072555.12515-6-chen.zhang@intel.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -117,59 +119,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhang Chen <zhangckid@gmail.com>
+Cc: Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/14/20 9:25 AM, Zhang Chen wrote:
-> From: Zhang Chen <chen.zhang@intel.com>
-> 
-> The virtual clock only runs during the emulation. It stops
-> when the virtual machine is stopped.
-> The host clock should be used for device models that emulate accurate
-> real time sources. It will continue to run when the virtual machine
-> is suspended. COLO need to know the host time here.
+> From: Li Zhijian <lizhijian@cn.fujitsu.com>
 > 
 
-Please add:
+Please include:
 
-Fixes: dd321ecfc2e ("colo-compare: Use IOThread to Check old packet 
-regularly and Process packets of the primary")
+Fixes: f449c9e549c ("colo: compare the packet based on the tcp sequence 
+number")
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> Reported-by: Derek Su <dereksu@qnap.com>
+> Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 > Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-> Reviewed-by: Li Zhijian <lizhijian@cn.fujitsu.com>
+> Reviewed-by: Zhang Chen <chen.zhang@intel.com>
 > ---
->   net/colo-compare.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+>   net/colo.c | 5 +----
+>   1 file changed, 1 insertion(+), 4 deletions(-)
 > 
-> diff --git a/net/colo-compare.c b/net/colo-compare.c
-> index f4814c5f09..61c95fe7e9 100644
-> --- a/net/colo-compare.c
-> +++ b/net/colo-compare.c
-> @@ -899,7 +899,7 @@ static void check_old_packet_regular(void *opaque)
+> diff --git a/net/colo.c b/net/colo.c
+> index a6c66d829a..ef00609848 100644
+> --- a/net/colo.c
+> +++ b/net/colo.c
+> @@ -133,14 +133,11 @@ void reverse_connection_key(ConnectionKey *key)
 >   
->       /* if have old packet we will notify checkpoint */
->       colo_old_packet_check(s);
-> -    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> +    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_HOST) +
->                 s->expired_scan_cycle);
->   }
->   
-> @@ -933,10 +933,10 @@ static void colo_compare_timer_init(CompareState *s)
+>   Connection *connection_new(ConnectionKey *key)
 >   {
->       AioContext *ctx = iothread_get_aio_context(s->iothread);
+> -    Connection *conn = g_slice_new(Connection);
+> +    Connection *conn = g_slice_new0(Connection);
 >   
-> -    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_VIRTUAL,
-> +    s->packet_check_timer = aio_timer_new(ctx, QEMU_CLOCK_HOST,
->                                   SCALE_MS, check_old_packet_regular,
->                                   s);
-> -    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_VIRTUAL) +
-> +    timer_mod(s->packet_check_timer, qemu_clock_get_ms(QEMU_CLOCK_HOST) +
->                 s->expired_scan_cycle);
->   }
+>       conn->ip_proto = key->ip_proto;
+>       conn->processing = false;
+> -    conn->offset = 0;
+>       conn->tcp_state = TCPS_CLOSED;
+> -    conn->pack = 0;
+> -    conn->sack = 0;
+>       g_queue_init(&conn->primary_list);
+>       g_queue_init(&conn->secondary_list);
 >   
 > 
 
