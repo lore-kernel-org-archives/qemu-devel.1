@@ -2,113 +2,88 @@ Return-Path: <SRS0=muvY=DW=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 86BCFC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:57:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD050C433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:58:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDD39206CA
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 362C2206CA
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 16:58:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CDROrxty"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDD39206CA
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JSFqTfB+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 362C2206CA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT6ZS-0007cO-PY
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 12:57:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
+	id 1kT6Zq-00007Y-RB
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 12:58:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44476)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT6Pf-0005x0-7c
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:47:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55449)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kT6VX-0003CM-4z
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:53:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41271)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT6Pd-0000oq-Hj
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:47:34 -0400
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kT6VT-0001XT-6m
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 12:53:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602780452;
+ s=mimecast20190719; t=1602780812;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=zi1qqGieAGNI/EdWl4UpVHHyCS9xYjvSJlcIwm7qrNY=;
- b=CDROrxtyi1pbo+2pHjkR5kgZm8HMA1csuELcMGLfphlxHcz/Xnsd10sy6xNYKy9n32JUl7
- ZHamonodqJJ3zBTQrzeTaPkFTDqTYnDeqVgWuxMzrdo/dK3q5ibq2xQMU47zT2Llk9rrdR
- HsVumVCZbD+o1uKNNjxdUFfAk9KYX/s=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=x6XqbdTmAAMKzjvPz+W9jXvLZtl93eke5o8q4430lAk=;
+ b=JSFqTfB+oAG94X2JiZCmQT8Yt5MqrU/UhdfDwmTI0jbfipHUoBfvpA7XtpJrFMuNSpwr2x
+ COYHPMrskwaIUePjP/p/1CP4br4Qpm28YkIpTWh278SnhSe0D4m3087T7dKCsaxHP4aXAx
+ TiWq27HPVJN2aM7eyRj1Xg6l+xfc3Hk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-131-ODahlaUcPhCQi5eKiaHoYQ-1; Thu, 15 Oct 2020 12:47:15 -0400
-X-MC-Unique: ODahlaUcPhCQi5eKiaHoYQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-536-yIO1wSHuPM63wJ_Hr4CRTg-1; Thu, 15 Oct 2020 12:53:29 -0400
+X-MC-Unique: yIO1wSHuPM63wJ_Hr4CRTg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF922876ECF;
- Thu, 15 Oct 2020 16:47:14 +0000 (UTC)
-Received: from dresden.str.redhat.com (unknown [10.40.194.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 8A1285D9D5;
- Thu, 15 Oct 2020 16:47:10 +0000 (UTC)
-Subject: Re: [PATCH v2 00/20] block/export: Allow exporting BDSs via FUSE
-To: Kevin Wolf <kwolf@redhat.com>
-References: <20200922104932.46384-1-mreitz@redhat.com>
- <20201015120101.GG4610@merkur.fritz.box>
-From: Max Reitz <mreitz@redhat.com>
-Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
- mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
- /PsMCFbpwsQR7oEy8eHHZwuGQsNpEtNC2G/L8Yka0BIBzv7dEgrPzIu+W3anZXQW4702+uES
- U29G8TP/NGfXRRHGlbBIH9KNUnOSUD2vRtpOLXkWsV5CN6vQFYgQfFvmp5ZpPeUe6xNplu8V
- mcTw8OSEDW/ZnxJc8TekCKZSpdzYoxfzjm7xGmZqB18VFwgJZlIibt1HE0EB4w5GsD7x5ekh
- awIe3RwoZgZDLQMdOitJ1tUc8aqaxvgA4tz6J6st8D8pS//m1gAoYJWGwwIVj1DjTYLtABEB
- AAG0HU1heCBSZWl0eiA8bXJlaXR6QHJlZGhhdC5jb20+iQFTBBMBCAA9AhsDBQkSzAMABQsJ
- CAcCBhUICQoLAgQWAgMBAh4BAheABQJVzie5FRhoa3A6Ly9rZXlzLmdudXBnLm5ldAAKCRD0
- B9sAYdXPQDcIB/9uNkbYEex1rHKz3mr12uxYMwLOOFY9fstP5aoVJQ1nWQVB6m2cfKGdcRe1
- 2/nFaHSNAzT0NnKz2MjhZVmcrpyd2Gp2QyISCfb1FbT82GMtXFj1wiHmPb3CixYmWGQUUh+I
- AvUqsevLA+WihgBUyaJq/vuDVM1/K9Un+w+Tz5vpeMidlIsTYhcsMhn0L9wlCjoucljvbDy/
- 8C9L2DUdgi3XTa0ORKeflUhdL4gucWoAMrKX2nmPjBMKLgU7WLBc8AtV+84b9OWFML6NEyo4
- 4cP7cM/07VlJK53pqNg5cHtnWwjHcbpGkQvx6RUx6F1My3y52vM24rNUA3+ligVEgPYBuQEN
- BFXOJlcBCADAmcVUNTWT6yLWQHvxZ0o47KCP8OcLqD+67T0RCe6d0LP8GsWtrJdeDIQk+T+F
- xO7DolQPS6iQ6Ak2/lJaPX8L0BkEAiMuLCKFU6Bn3lFOkrQeKp3u05wCSV1iKnhg0UPji9V2
- W5eNfy8F4ZQHpeGUGy+liGXlxqkeRVhLyevUqfU0WgNqAJpfhHSGpBgihUupmyUg7lfUPeRM
- DzAN1pIqoFuxnN+BRHdAecpsLcbR8sQddXmDg9BpSKozO/JyBmaS1RlquI8HERQoe6EynJhd
- 64aICHDfj61rp+/0jTIcevxIIAzW70IadoS/y3DVIkuhncgDBvGbF3aBtjrJVP+5ABEBAAGJ
- ASUEGAEIAA8FAlXOJlcCGwwFCRLMAwAACgkQ9AfbAGHVz0CbFwf9F/PXxQR9i4N0iipISYjU
- sxVdjJOM2TMut+ZZcQ6NSMvhZ0ogQxJ+iEQ5OjnIputKvPVd5U7WRh+4lF1lB/NQGrGZQ1ic
- alkj6ocscQyFwfib+xIe9w8TG1CVGkII7+TbS5pXHRxZH1niaRpoi/hYtgzkuOPp35jJyqT/
- /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
- bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
- R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <b5faf1fc-4693-4abe-85e7-3e28b0775eef@redhat.com>
-Date: Thu, 15 Oct 2020 18:47:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4B9BAF9A0;
+ Thu, 15 Oct 2020 16:53:28 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.63])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E526E60CD0;
+ Thu, 15 Oct 2020 16:53:23 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH 3/9] qapi: start building an 'if' predicate tree
+Date: Thu, 15 Oct 2020 20:52:49 +0400
+Message-Id: <20201015165255.1573897-4-marcandre.lureau@redhat.com>
+In-Reply-To: <20201015165255.1573897-1-marcandre.lureau@redhat.com>
+References: <20201015165255.1573897-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201015120101.GG4610@merkur.fritz.box>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature";
- boundary="9k4DmrumRbdzoGN5vYAzVu6jJURmfzUbs"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:38:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.019, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -121,103 +96,331 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: jsnow@redhat.com, Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---9k4DmrumRbdzoGN5vYAzVu6jJURmfzUbs
-Content-Type: multipart/mixed; boundary="s7BNyaBSAfEGrloEXRO5qgPSjiwLrLNNq"
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
---s7BNyaBSAfEGrloEXRO5qgPSjiwLrLNNq
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: quoted-printable
+The following patches are going to express conditions in some target
+language agostic way. For that, let's start building a predicate tree of
+configuration options.
 
-On 15.10.20 14:01, Kevin Wolf wrote:
-> Am 22.09.2020 um 12:49 hat Max Reitz geschrieben:
->> Based-on: <20200907182011.521007-1-kwolf@redhat.com>
->>           (=E2=80=9Cblock/export: Add infrastructure and QAPI for block =
-exports=E2=80=9D)
->>
->> (Though its patch 16 needs a s/=3D \&blk_exp_nbd/=3D drv/ on top.)
->>
->> v1: https://lists.nongnu.org/archive/html/qemu-block/2019-12/msg00451.ht=
-ml
->>
->> Branch: https://github.com/XanClic/qemu.git fuse-exports-v2
->> Branch: https://git.xanclic.moe/XanClic/qemu.git fuse-exports-v2
->>
->>
->> Hi,
->>
->> Ever since I found out that you can mount FUSE filesystems on regular
->> files (not just directories), I had the idea of adding FUSE block
->> exports to qemu where you can export block nodes as raw images.  The
->> best thing is that you=E2=80=99d be able to mount an image on itself, so
->> whatever format it may be in, qemu lets it appear as a raw image (and
->> you can then use regular tools like dd on it).
->>
->> The performance is quite bad so far, but we can always try to improve it
->> if the need arises.  For now I consider it mostly a cute feature to get
->> easy access to the raw contents of image files in any format (without
->> requiring root rights).
->>
->> In this version (as opposed to v1 linked above), I integrated the FUSE
->> export code into Kevin=E2=80=99s proposed common infrastructure for bloc=
-k
->> exports.
->=20
-> Patches 5-16, 19 and 20:
->=20
-> Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+The tree will be less expressive than full C macros expressions, and
+will be based only on identifier. For this reason, it will use have
+operations: 'all', 'any' and 'not'. ('and'/'or' have a connotation of
+expression operands)
 
-Thanks!
+For now, the documentation will use the C condition expression (as
+that's already what is exposed with defined(FOO), &&, || etc).
+Eventually, we may want to generate a more human friendly syntax later.
 
-So far, (just FYI,) I=E2=80=99ve tried to address your remarks, gathered th=
-em in
-a single fat commit, and pushed everything here:
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ docs/sphinx/qapidoc.py                 |  6 +--
+ scripts/qapi/common.py                 | 69 ++++++++++++++++++++------
+ tests/qapi-schema/doc-good.out         | 12 ++---
+ tests/qapi-schema/qapi-schema-test.out | 58 +++++++++++-----------
+ 4 files changed, 91 insertions(+), 54 deletions(-)
 
-https://github.com/XanClic/qemu/tree/fuse-exports-next
-
-(There=E2=80=99s also something about two bugs in fuse_fallocate(), where t=
-here
-are these two I/O loops (one for blk_pwrite_zeroes(), one for
-blk_pdiscard()), where I both forgot to increment @offset (alongside
-decrementing @length).  Oops.)
-
-(And I=E2=80=99ve renamed init_fuse() to init_exports_table(), because that=
- got
-really confusing with fuse_init().)
-
-I=E2=80=99ll split that up, squash it into the respective patches, and send=
- v3
-when I get back from PTO.
-
-Max
-
-
---s7BNyaBSAfEGrloEXRO5qgPSjiwLrLNNq--
-
---9k4DmrumRbdzoGN5vYAzVu6jJURmfzUbs
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+IfQwACgkQ9AfbAGHV
-z0BVGggArNojupnWswHKvl9xA+eW+dEW4mQ63zkS4Vf+87AoIprzTmR0qJmVXD3V
-H7kDaabbL31RUJ5boeuRMAu2Zxr1La6e6PB0Aom+YvWTWMOPGGcjxPrGljORJd2f
-gAvZI98rPv9gysM9snrRG/5QlABR6dc4S1AYOcwpZ7WOGL4SasIOS2DdVQTBjzN5
-nEI/QCNy0sYGDtL4uGhBlUsqdgDXpE0lMPKT7q6AbYrAhtT+V3oEKDL65fL2H8JJ
-TJyiCsAPGtzFEbAlWcW3fxlNj4VcfybYbXnZa2WN8tZ5aDVoy1990Zh0H9Qc4eIu
-Whb6xEW6i8G5XRi6pHpQiBsKioHvcw==
-=Royy
------END PGP SIGNATURE-----
-
---9k4DmrumRbdzoGN5vYAzVu6jJURmfzUbs--
+diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
+index db9520f37f..31b47e4745 100644
+--- a/docs/sphinx/qapidoc.py
++++ b/docs/sphinx/qapidoc.py
+@@ -112,12 +112,10 @@ class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
+     def _nodes_for_ifcond(self, ifcond, with_if=True):
+         """Return list of Text, literal nodes for the ifcond
+ 
+-        Return a list which gives text like ' (If: cond1, cond2, cond3)', where
+-        the conditions are in literal-text and the commas are not.
++        Return a list which gives text like ' (If: C-condition)'.
+         If with_if is False, we don't return the "(If: " and ")".
+         """
+-        condlist = intersperse([nodes.literal('', c) for c in ifcond.ifcond],
+-                               nodes.Text(', '))
++        condlist = [nodes.literal('', ifcond.gen_if())]
+         if not with_if:
+             return condlist
+ 
+diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+index 58ddec3bc5..29e0697c27 100644
+--- a/scripts/qapi/common.py
++++ b/scripts/qapi/common.py
+@@ -194,33 +194,72 @@ def guardend(name: str) -> str:
+                  name=c_fname(name).upper())
+ 
+ 
++class IfPredicate:
++    def cgen(self) -> str:
++        raise NotImplementedError()
++
++
++class IfOption(IfPredicate):
++    def __init__(self, option: str):
++        self.option = option
++
++    def cgen(self) -> str:
++        return self.option
++
++    def __repr__(self) -> str:
++        return repr(self.option)
++
++    def __eq__(self, other: object) -> bool:
++        if not isinstance(other, IfOption):
++            return False
++        return self.option == other.option
++
++
++class IfAll(IfPredicate):
++    def __init__(self, pred_list: Sequence[IfPredicate]):
++        self.pred_list = pred_list
++
++    def cgen(self) -> str:
++        return " && ".join([p.cgen() for p in self.pred_list])
++
++    def __bool__(self) -> bool:
++        return bool(self.pred_list)
++
++    def __repr__(self) -> str:
++        return f"IfAll({self.pred_list})"
++
++    def __eq__(self, other: object) -> bool:
++        if not isinstance(other, IfAll):
++            return False
++        return self.pred_list == other.pred_list
++
++
+ class IfCond:
+     def __init__(self, ifcond: Optional[Sequence[str]] = None):
+-        self.ifcond = ifcond or []
++        pred_list = [IfOption(opt) for opt in ifcond or []]
++        self.pred = IfAll(pred_list)
+ 
+     def __bool__(self) -> bool:
+-        return bool(self.ifcond)
++        return bool(self.pred)
+ 
+     def __repr__(self) -> str:
+-        return repr(self.ifcond)
++        return repr(self.pred)
+ 
+     def __eq__(self, other: object) -> bool:
+         if not isinstance(other, IfCond):
+             return NotImplemented
+-        return self.ifcond == other.ifcond
++        return self.pred == other.pred
+ 
+     def gen_if(self) -> str:
+-        ret = ''
+-        for ifc in self.ifcond:
+-            ret += mcgen('''
++        if self.pred:
++            return mcgen('''
+ #if %(cond)s
+-''', cond=ifc)
+-        return ret
++''', cond=self.pred.cgen())
++        return ""
+ 
+     def gen_endif(self) -> str:
+-        ret = ''
+-        for ifc in reversed(self.ifcond):
+-            ret += mcgen('''
+-#endif /* %(cond)s */
+-''', cond=ifc)
+-        return ret
++        if self.pred:
++            return mcgen('''
++#endif // %(cond)s
++''', cond=self.pred.cgen())
++        return ""
+diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+index 419284dae2..0d27323c47 100644
+--- a/tests/qapi-schema/doc-good.out
++++ b/tests/qapi-schema/doc-good.out
+@@ -12,15 +12,15 @@ enum QType
+ module doc-good.json
+ enum Enum
+     member one
+-        if ['defined(IFONE)']
++        if IfAll(['defined(IFONE)'])
+     member two
+-    if ['defined(IFCOND)']
++    if IfAll(['defined(IFCOND)'])
+     feature enum-feat
+ object Base
+     member base1: Enum optional=False
+ object Variant1
+     member var1: str optional=False
+-        if ['defined(IFSTR)']
++        if IfAll(['defined(IFSTR)'])
+         feature member-feat
+     feature variant1-feat
+ object Variant2
+@@ -29,7 +29,7 @@ object Object
+     tag base1
+     case one: Variant1
+     case two: Variant2
+-        if ['IFTWO']
++        if IfAll(['IFTWO'])
+     feature union-feat1
+ object q_obj_Variant1-wrapper
+     member data: Variant1 optional=False
+@@ -38,13 +38,13 @@ object q_obj_Variant2-wrapper
+ enum SugaredUnionKind
+     member one
+     member two
+-        if ['IFTWO']
++        if IfAll(['IFTWO'])
+ object SugaredUnion
+     member type: SugaredUnionKind optional=False
+     tag type
+     case one: q_obj_Variant1-wrapper
+     case two: q_obj_Variant2-wrapper
+-        if ['IFTWO']
++        if IfAll(['IFTWO'])
+     feature union-feat2
+ alternate Alternate
+     tag type
+diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+index 8868ca0dca..8ba658cd38 100644
+--- a/tests/qapi-schema/qapi-schema-test.out
++++ b/tests/qapi-schema/qapi-schema-test.out
+@@ -298,65 +298,65 @@ command __org.qemu_x-command q_obj___org.qemu_x-command-arg -> __org.qemu_x-Unio
+ object TestIfStruct
+     member foo: int optional=False
+     member bar: int optional=False
+-        if ['defined(TEST_IF_STRUCT_BAR)']
+-    if ['defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_STRUCT_BAR)'])
++    if IfAll(['defined(TEST_IF_STRUCT)'])
+ enum TestIfEnum
+     member foo
+     member bar
+-        if ['defined(TEST_IF_ENUM_BAR)']
+-    if ['defined(TEST_IF_ENUM)']
++        if IfAll(['defined(TEST_IF_ENUM_BAR)'])
++    if IfAll(['defined(TEST_IF_ENUM)'])
+ object q_obj_TestStruct-wrapper
+     member data: TestStruct optional=False
+ enum TestIfUnionKind
+     member foo
+     member union_bar
+-        if ['defined(TEST_IF_UNION_BAR)']
+-    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_UNION_BAR)'])
++    if IfAll(['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)'])
+ object TestIfUnion
+     member type: TestIfUnionKind optional=False
+     tag type
+     case foo: q_obj_TestStruct-wrapper
+     case union_bar: q_obj_str-wrapper
+-        if ['defined(TEST_IF_UNION_BAR)']
+-    if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_UNION_BAR)'])
++    if IfAll(['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)'])
+ object q_obj_TestIfUnionCmd-arg
+     member union_cmd_arg: TestIfUnion optional=False
+-    if ['defined(TEST_IF_UNION)']
++    if IfAll(['defined(TEST_IF_UNION)'])
+ command TestIfUnionCmd q_obj_TestIfUnionCmd-arg -> None
+     gen=True success_response=True boxed=False oob=False preconfig=False
+-    if ['defined(TEST_IF_UNION)']
++    if IfAll(['defined(TEST_IF_UNION)'])
+ alternate TestIfAlternate
+     tag type
+     case foo: int
+     case bar: TestStruct
+-        if ['defined(TEST_IF_ALT_BAR)']
+-    if ['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_ALT_BAR)'])
++    if IfAll(['defined(TEST_IF_ALT) && defined(TEST_IF_STRUCT)'])
+ object q_obj_TestIfAlternateCmd-arg
+     member alt_cmd_arg: TestIfAlternate optional=False
+-    if ['defined(TEST_IF_ALT)']
++    if IfAll(['defined(TEST_IF_ALT)'])
+ command TestIfAlternateCmd q_obj_TestIfAlternateCmd-arg -> None
+     gen=True success_response=True boxed=False oob=False preconfig=False
+-    if ['defined(TEST_IF_ALT)']
++    if IfAll(['defined(TEST_IF_ALT)'])
+ object q_obj_TestIfCmd-arg
+     member foo: TestIfStruct optional=False
+     member bar: TestIfEnum optional=False
+-        if ['defined(TEST_IF_CMD_BAR)']
+-    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_CMD_BAR)'])
++    if IfAll(['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'])
+ command TestIfCmd q_obj_TestIfCmd-arg -> UserDefThree
+     gen=True success_response=True boxed=False oob=False preconfig=False
+-    if ['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)']
++    if IfAll(['defined(TEST_IF_CMD)', 'defined(TEST_IF_STRUCT)'])
+ command TestCmdReturnDefThree None -> UserDefThree
+     gen=True success_response=True boxed=False oob=False preconfig=False
+ array TestIfEnumList TestIfEnum
+-    if ['defined(TEST_IF_ENUM)']
++    if IfAll(['defined(TEST_IF_ENUM)'])
+ object q_obj_TestIfEvent-arg
+     member foo: TestIfStruct optional=False
+     member bar: TestIfEnumList optional=False
+-        if ['defined(TEST_IF_EVT_BAR)']
+-    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
++        if IfAll(['defined(TEST_IF_EVT_BAR)'])
++    if IfAll(['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)'])
+ event TestIfEvent q_obj_TestIfEvent-arg
+     boxed=False
+-    if ['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)']
++    if IfAll(['defined(TEST_IF_EVT) && defined(TEST_IF_STRUCT)'])
+ object FeatureStruct0
+     member foo: int optional=False
+ object FeatureStruct1
+@@ -379,17 +379,17 @@ object FeatureStruct4
+ object CondFeatureStruct1
+     member foo: int optional=False
+     feature feature1
+-        if ['defined(TEST_IF_FEATURE_1)']
++        if IfAll(['defined(TEST_IF_FEATURE_1)'])
+ object CondFeatureStruct2
+     member foo: int optional=False
+     feature feature1
+-        if ['defined(TEST_IF_FEATURE_1)']
++        if IfAll(['defined(TEST_IF_FEATURE_1)'])
+     feature feature2
+-        if ['defined(TEST_IF_FEATURE_2)']
++        if IfAll(['defined(TEST_IF_FEATURE_2)'])
+ object CondFeatureStruct3
+     member foo: int optional=False
+     feature feature1
+-        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
++        if IfAll(['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)'])
+ enum FeatureEnum1
+     member eins
+     member zwei
+@@ -429,17 +429,17 @@ command test-command-features3 None -> None
+ command test-command-cond-features1 None -> None
+     gen=True success_response=True boxed=False oob=False preconfig=False
+     feature feature1
+-        if ['defined(TEST_IF_FEATURE_1)']
++        if IfAll(['defined(TEST_IF_FEATURE_1)'])
+ command test-command-cond-features2 None -> None
+     gen=True success_response=True boxed=False oob=False preconfig=False
+     feature feature1
+-        if ['defined(TEST_IF_FEATURE_1)']
++        if IfAll(['defined(TEST_IF_FEATURE_1)'])
+     feature feature2
+-        if ['defined(TEST_IF_FEATURE_2)']
++        if IfAll(['defined(TEST_IF_FEATURE_2)'])
+ command test-command-cond-features3 None -> None
+     gen=True success_response=True boxed=False oob=False preconfig=False
+     feature feature1
+-        if ['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)']
++        if IfAll(['defined(TEST_IF_COND_1)', 'defined(TEST_IF_COND_2)'])
+ event TEST-EVENT-FEATURES1 None
+     boxed=False
+     feature deprecated
+-- 
+2.28.0
 
 
