@@ -7,63 +7,60 @@ X-Spam-Status: No, score=-12.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49647C433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:52:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07BA4C433E7
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:58:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54E6822254
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:52:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3FC3922248
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 15:58:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b1uASh3i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54E6822254
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NbCqpvKg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3FC3922248
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT5Xr-0006Ls-Ft
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:51:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57594)
+	id 1kT5dp-00080D-6a
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 11:58:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT5WC-0005Kn-6t
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:50:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20431)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT5cW-0007FM-55
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:56:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56494)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT5W6-0001NI-SN
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:50:15 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kT5cT-0002Rd-Px
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 11:56:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602777005;
+ s=mimecast20190719; t=1602777404;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
- bh=TvhUwzny599fy2pKJv3NJLl2xvCRYC0S8/dQL97VZ6o=;
- b=b1uASh3itZYQxZ+pl7DrdXNixAyzWraM8Df1mBpBjWAlBxFbRHEaB5RjJokyOFzb9JFteD
- l/GE6ifD0Y8HJcpGn4lUE6a4/ggtKR2SIDjN/5jpNbIszGZTT6P3XIk5ISxkU7hOmWr/z4
- 5520afZ5XkX2Mpc/5FBXX1sfD+ObuG4=
+ bh=3Hiydog49W35cRls/qEUehaVmRWZqc38/b8HEvt+5yQ=;
+ b=NbCqpvKgzkwrGQyTaSaDc06vzZZAHxeZkbb96WFCYpJtYa2NzjMYbUDppU9e0uV780TA43
+ rMHCGm9xA+2e1AjhKh8Sc3+BIc80Z5eC9C5BiGV6X8A4C4gTK4ivbM7VNyneJdXG8CXub0
+ EbRMRzY9iAbJ2Es7k7dXe52KMMYU2Rk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-bIj53fVXP8u07Ot4RfyHCA-1; Thu, 15 Oct 2020 11:50:03 -0400
-X-MC-Unique: bIj53fVXP8u07Ot4RfyHCA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-360-RR-6OQNzPzqcfTW6jJXbWQ-1; Thu, 15 Oct 2020 11:56:42 -0400
+X-MC-Unique: RR-6OQNzPzqcfTW6jJXbWQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B2ED4109106A;
- Thu, 15 Oct 2020 15:50:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D38A810E2185;
+ Thu, 15 Oct 2020 15:56:40 +0000 (UTC)
 Received: from dresden.str.redhat.com (unknown [10.40.194.47])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C4FBB73661;
- Thu, 15 Oct 2020 15:49:52 +0000 (UTC)
-Subject: Re: [PATCH v11 09/13] copy-on-read: skip non-guest reads if no copy
- needed
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D5ADE10013C1;
+ Thu, 15 Oct 2020 15:56:31 +0000 (UTC)
+Subject: Re: [PATCH v11 05/13] copy-on-read: limit COR operations to base in
+ COR driver
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
 References: <1602524605-481160-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1602524605-481160-10-git-send-email-andrey.shinkevich@virtuozzo.com>
- <59ff1f29-149a-0870-b600-1a54f0421c05@redhat.com>
- <c363d263-1854-d766-e9d3-c8ae8008740f@virtuozzo.com>
- <bc862a74-6223-3c8d-d354-36f62bee2d3a@redhat.com>
- <cf5c632f-3edf-6526-c275-7c8c9d3460cd@virtuozzo.com>
+ <1602524605-481160-6-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <6dc38263-ad9c-f238-7197-68e920b6080d@redhat.com>
+ <7b649922-6c4d-7d5f-fb52-c97c1c34b7d8@virtuozzo.com>
 From: Max Reitz <mreitz@redhat.com>
 Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  mQENBFXOJlcBCADEyyhOTsoa/2ujoTRAJj4MKA21dkxxELVj3cuILpLTmtachWj7QW+TVG8U
@@ -89,20 +86,20 @@ Autocrypt: addr=mreitz@redhat.com; prefer-encrypt=mutual; keydata=
  /ELbqQTDAWcqtJhzxKLE/ugcOMK520dJDeb6x2xVES+S5LXby0D4juZlvUj+1fwZu+7Io5+B
  bkhSVPb/QdOVTpnz7zWNyNw+OONo1aBUKkhq2UIByYXgORPFnbfMY7QWHcjpBVw9MgC4tGeF
  R4bv+1nAMMxKmb5VvQCExr0eFhJUAHAhVg==
-Message-ID: <44883c53-23aa-786d-bf27-37a71103cef9@redhat.com>
-Date: Thu, 15 Oct 2020 17:49:50 +0200
+Message-ID: <80f81abd-c810-c3a1-48aa-b1d94bdfda32@redhat.com>
+Date: Thu, 15 Oct 2020 17:56:30 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <cf5c632f-3edf-6526-c275-7c8c9d3460cd@virtuozzo.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <7b649922-6c4d-7d5f-fb52-c97c1c34b7d8@virtuozzo.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
  protocol="application/pgp-signature";
- boundary="jgGkrZYTCkyVdcxzy8kr5Bky8Ted2Bb2i"
+ boundary="YFbTjZ9QxMVMuPBpTnRYvQGQ2tGvGNjP0"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 02:10:02
@@ -127,199 +124,135 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, fam@euphon.net, libvir-list@redhat.com,
- qemu-devel@nongnu.org, armbru@redhat.com, stefanha@redhat.com, den@openvz.org,
- jsnow@redhat.com
+Cc: kwolf@redhat.com, fam@euphon.net, vsementsov@virtuozzo.com,
+ libvir-list@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ stefanha@redhat.com, den@openvz.org, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---jgGkrZYTCkyVdcxzy8kr5Bky8Ted2Bb2i
-Content-Type: multipart/mixed; boundary="P2Zz7Z81tiseYjkhHzQyWl23xCi0Zv39o"
+--YFbTjZ9QxMVMuPBpTnRYvQGQ2tGvGNjP0
+Content-Type: multipart/mixed; boundary="HV32CcTo85vfOwUqWxgnEHCojFDxMqr92"
 
---P2Zz7Z81tiseYjkhHzQyWl23xCi0Zv39o
+--HV32CcTo85vfOwUqWxgnEHCojFDxMqr92
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: quoted-printable
 
-On 14.10.20 18:39, Vladimir Sementsov-Ogievskiy wrote:
-> 14.10.2020 19:30, Max Reitz wrote:
->> On 14.10.20 17:22, Vladimir Sementsov-Ogievskiy wrote:
->>> 14.10.2020 15:51, Max Reitz wrote:
->>>> On 12.10.20 19:43, Andrey Shinkevich wrote:
->>>>> If the flag BDRV_REQ_PREFETCH was set, pass it further to the
->>>>> COR-driver to skip unneeded reading. It can be taken into account for
->>>>> the COR-algorithms optimization. That check is being made during the
->>>>> block stream job by the moment.
->>>>>
->>>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->>>>> ---
->>>>> =C2=A0=C2=A0 block/copy-on-read.c | 13 +++++++++----
->>>>> =C2=A0=C2=A0 block/io.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 |=C2=A0 3 ++-
->>>>> =C2=A0=C2=A0 2 files changed, 11 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->>>>> index b136895..278a11a 100644
->>>>> --- a/block/copy-on-read.c
->>>>> +++ b/block/copy-on-read.c
->>>>> @@ -148,10 +148,15 @@ static int coroutine_fn
->>>>> cor_co_preadv_part(BlockDriverState *bs,
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0 -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv=
-_co_preadv_part(bs->file, offset, n, qiov,
->>>>> qiov_offset,
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 local_flags);
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret < 0) {
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-eturn ret;
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (!!(flags & BDRV_REQ_P=
-REFETCH) &
->>>>
->>>> How about dropping the double negation and using a logical &&
->>>> instead of
->>>> the binary &?
->>>>
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 !=
-(local_flags & BDRV_REQ_COPY_ON_READ)) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=
-* Skip non-guest reads if no copy needed */
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {
->>>>
->>>> Hm.=C2=A0 I would have just written the negated form
->>>>
->>>> (!(flags & BDRV_REQ_PREFETCH) || (local_flags & BDRV_REQ_COPY_ON_READ)=
-)
->>>>
->>>> and put the =E2=80=9Cskip=E2=80=9D comment above that condition.
->>>>
->>>> (Since local_flags is initialized to flags, it can be written as a
->>>> single comparison, but that=E2=80=99s a matter of taste and I=E2=80=99=
-m not going to
->>>> recommend either over the other:
->>>>
->>>> ((local_flags & (BDRV_REQ_PREFETCH | BDRV_REQ_COPY_ON_READ)) !=3D
->>>> BDRV_REQ_PREFETCH)
->>>>
->>>> )
->>>>
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 r=
-et =3D bdrv_co_preadv_part(bs->file, offset, n, qiov,
->>>>> qiov_offset,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+On 14.10.20 20:57, Andrey Shinkevich wrote:
+> On 14.10.2020 15:01, Max Reitz wrote:
+>> On 12.10.20 19:43, Andrey Shinkevich wrote:
+>>> Limit COR operations by the base node in the backing chain when the
+>>> overlay base node name is given. It will be useful for a block stream
+>>> job when the COR-filter is applied. The overlay base node is passed as
+>>> the base itself may change due to concurrent commit jobs on the same
+>>> backing chain.
+>>>
+>>> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
+>>> ---
+>>> =C2=A0 block/copy-on-read.c | 39 +++++++++++++++++++++++++++++++++++++-=
+-
+>>> =C2=A0 1 file changed, 37 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+>>> index c578b1b..dfbd6ad 100644
+>>> --- a/block/copy-on-read.c
+>>> +++ b/block/copy-on-read.c
+>>> @@ -122,8 +122,43 @@ static int coroutine_fn
+>>> cor_co_preadv_part(BlockDriverState *bs,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
 =A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 local_flags);
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 i=
-f (ret < 0) {
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 return ret;
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
->>>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 o=
-ffset +=3D n;
->>>>> diff --git a/block/io.c b/block/io.c
->>>>> index 11df188..bff1808 100644
->>>>> --- a/block/io.c
->>>>> +++ b/block/io.c
->>>>> @@ -1512,7 +1512,8 @@ static int coroutine_fn
->>>>> bdrv_aligned_preadv(BdrvChild *child,
->>>>> =C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 max_bytes =3D ROUND_UP(MA=
-X(0, total_bytes - offset), align);
->>>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (bytes <=3D max_bytes && byte=
-s <=3D max_transfer) {
->>>>> -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_driver_pread=
-v(bs, offset, bytes, qiov,
->>>>> qiov_offset, 0);
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D bdrv_driver_pread=
-v(bs, offset, bytes, qiov,
->>>>> qiov_offset,
->>>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 flags & bs->supported_r=
-ead_flags);
->>>
->>>
->>> When BDRV_REQ_PREFETCH is passed, qiov may be (and generally should be)
->>> NULL. This means, that we can't just drop the flag when call the driver
->>> that doesn't support it.
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 size_t qiov_offset,
+>>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int flags)
+>>> =C2=A0 {
+>=20
+> [...]
+>=20
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret=
+ =3D bdrv_is_allocated_above(bdrv_cow_bs(bs->file->bs),
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 state->base_overlay, true,
+>>> offset,
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 n, &n);
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if =
+(ret) {
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 local_flags |=3D BDRV_REQ_COPY_ON_READ;
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
+>>> +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }
 >>
->> True. :/
+>> Furthermore, I just noticed =E2=80=93 can the is_allocated functions not=
+ return
+>> 0 in @n, when @offset is a the EOF?=C2=A0 Is that something to look out =
+for?
+>> =C2=A0 (I=E2=80=99m not sure.)
 >>
->>> Actually, if driver doesn't support the PREFETCH flag we should do
->>> nothing.
+>> Max
 >>
->> Hm.=C2=A0 But at least in the case of COR, PREFETCH is not something tha=
-t can
->> be optimized to be a no-op (unless the COR is a no-op); it still denotes
->> a command that must be executed.
->>
->> So if we can=E2=80=99t pass it to the driver, I don=E2=80=99t think we s=
-hould do
->> nothing, but to return an error.=C2=A0 Or maybe we could even assert tha=
-t it
->> isn=E2=80=99t set for drivers that don=E2=80=99t support it, because at =
-least right now
->> such a case would just be a bug.
 >=20
-> Hmm. Reasonable..
->=20
-> So, let me summarize the cases:
->=20
-> 1. bdrv_co_preadv(.. , PREFETCH | COR)
->=20
-> =C2=A0 In this case generic layer should handle both flags and pass flags=
-=3D0
-> to driver
->=20
-> 2. bdrv_co_preadv(.., PREFETCH)
->=20
-> 2.1 driver supporst PREFETCH
-> =C2=A0 =C2=A0 OK, pass PREFETCH to driver, no problems
->=20
-> 2.2 driver doesn't support PREFETCH
->=20
-> =C2=A0 We can just abort() here, as the only source of PREFETCH without C=
-OR
-> would be
-> =C2=A0 stream job driver, which must read from COR filter.
->=20
-> =C2=A0 More generic solution is to allocate temporary buffer (at least if
-> qiov is NULL)
-> =C2=A0 and call underlying driver .preadv with flags=3D0 on that temporar=
-y
-> buffer. But
-> =C2=A0 just abort() is simpler and should work for now.
+> The check for EOF is managed earlier in the stream_run() for a
+> block-stream job. For other cases of using the COR-filter, the check for
+> EOF can be added to the cor_co_preadv_part().
+> I would be more than happy if we can escape the duplicated checking for
+> is_allocated in the block-stream. But how the stream_run() can stop
+> calling the blk_co_preadv() when EOF is reached if is_allocated removed
+> from it?
 
-Agreed.
+True.  Is it that bad to lose that optimization, though?  (And I would
+expect the case of a short backing file to be rather rare, too.)
+
+> May the cor_co_preadv_part() return EOF (or other error code)
+> to be handled by a caller if (ret =3D=3D 0 && n =3D=3D 0 && (flags &
+> BDRV_REQ_PREFETCH)?
+
+That sounds like a bad hack.  I=E2=80=99d rather keep the double is_allocat=
+ed().
+
+But what would be the problem with losing the short backing file
+optimization?  Just performance?  Or would we end up writing actual
+zeroes into the overlay past the end of the backing file?  Hm, probably
+not, if the COR filter would detect that case and handle it like stream
+does.
+
+So it seems only a question of performance to me, and I don=E2=80=99t think=
+ it
+would be that bad to in this rather rare case to have a bunch of useless
+is_allocated and is_allocated_above calls past the backing file=E2=80=99s E=
+OF.
+(Maybe I=E2=80=99m wrong, though.)
 
 Max
 
 
---P2Zz7Z81tiseYjkhHzQyWl23xCi0Zv39o--
+--HV32CcTo85vfOwUqWxgnEHCojFDxMqr92--
 
---jgGkrZYTCkyVdcxzy8kr5Bky8Ted2Bb2i
+--YFbTjZ9QxMVMuPBpTnRYvQGQ2tGvGNjP0
 Content-Type: application/pgp-signature; name="signature.asc"
 Content-Description: OpenPGP digital signature
 Content-Disposition: attachment; filename="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+Ib54ACgkQ9AfbAGHV
-z0CIygf/a5Z8Nhoj1hvxyznENOA2b3f5LBnNZJOayJyDoZM1+k09wEE3DokMwClT
-1j5jnchQ+CMKWA7Jl6Nhu1h6isqYLJ1BUHiF9xKpzzrI6G2pGGL3Ea19nlruKy4R
-SsM5DrQk9d09UT8LadnHvdk+nlNMlW5gRNvik26zenCYr1v98sCMnIdAMbgyH6B2
-QcuqRlqy9yW3gt1BSoe73lH5gKPNhFvGKBAg5lw0tofa0Xdc0rEopA2CVojU5swL
-4SWPYl+UPyJDLO19m0jfRmbpvNav4Q/yncWUjDcV3CVREV29E5Y/+uu6x4auyCRj
-bmMe+KvkHsUrEdAqyIYFIrF1WRh86A==
-=w7kd
+iQEzBAEBCAAdFiEEkb62CjDbPohX0Rgp9AfbAGHVz0AFAl+IcS4ACgkQ9AfbAGHV
+z0BJhQf8D+CD8Z/L1H0fR0ei7hStuHJZ0Lt1Xt/rVFuWta38UT2OJ3kALrvKrqXW
+lhozv/vvnQ9Rocp2lfvXrxkXHLsSI8gVD6C5tKLxtvMzcJA6dbg8rr7YfG1KbuGW
+qncAf1d7yIfRxrXU6bnvETu4u2vGfVIP7cTGis+dqXTdd8fQ50YEYV9hCvfUezpR
+eDMptgO7N7gDgSzfzEHU3+AeAiXn9/DLwmkrXwuIgMKzHKWxvVqc/IQcqeDiXTOx
+3ifPhlq/3AnSLGLR+AbkdKO4vvoIohSwufxzWxyTS8qYb3++4XsMQbVxbPk0ZNer
+4nHZZF2SA4fQ1i0ynSfRA7/foA/ftQ==
+=8Flk
 -----END PGP SIGNATURE-----
 
---jgGkrZYTCkyVdcxzy8kr5Bky8Ted2Bb2i--
+--YFbTjZ9QxMVMuPBpTnRYvQGQ2tGvGNjP0--
 
 
