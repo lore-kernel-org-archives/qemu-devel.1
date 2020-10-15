@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0949CC433E7
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92C1EC433DF
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:44:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 010492078A
-	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:44:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF0662078A
+	for <qemu-devel@archiver.kernel.org>; Thu, 15 Oct 2020 13:44:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="J1MBKlOh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 010492078A
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="0xkRr4m8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF0662078A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51690 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kT3YF-0000lK-RL
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:44:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52712)
+	id 1kT3YM-00010d-L9
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 09:44:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52832)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WC-0007Pq-Uw
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:08 -0400
-Received: from mail-eopbgr750112.outbound.protection.outlook.com
- ([40.107.75.112]:30180 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WP-0007dd-Ip
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:21 -0400
+Received: from mail-eopbgr750103.outbound.protection.outlook.com
+ ([40.107.75.103]:37594 helo=NAM02-BL2-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WA-0000kr-Li
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:08 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kT3WN-0000mT-Tc
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 09:42:21 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RiukT7eEzJShPo+E2naSnW/ArE/LqJfJUGHR0oHIofwJJDEoB91Q2w/Lh+nFqF/nuIY94pecDf/2pkrSHO/DsiFb4Lgl/aeqhFNrEb2UnylKXFmvp0BPytAJQocZk2aPzsW8Lvul29WBMZ4WH1dlLaOzzQ/k8mZKqU7DLx5Ucrdno2pU9vlX1uvdlKqooCl5dzOcwFHmxTz5mHP9MoMqOokQVFxWMcVUPylT2mff4mFlNzswc8YWhLBgj1/6ZXdbx7Fnl8eoZ8xpbvTgXuS2q2bPDUsuVxPa0sW2wob5Ujr3S0ffSJXSR29/lo6NnJ5B3b3aGjOkvMseIZkZMgk24Q==
+ b=WXLWSKGluLznXOybzjqOkZkCcwnV0Z+TpiseNwiZQF7kt8cyBIWlIVYCmSak+yOficOt569Z+2Xkapbb1ECOENjpb+KhKF6eOIUCIh0KZ6CIxeqIWnGhfPdVTdNySBTyiH134VP5Y7J+OKi90xcWfIb+mVSAVVhqwd8KSnQJ99kwf8eQznqNp5Kp1acOx4STOx/bty8nIvqPCNPHDMtaQmbhFHdHjSi8ikCqbNQddcVHAEA+vpni+FIjPaT56kQdvCCafC9pw8xUWin5xZXYoVBfBy0CsaS90d4NG2KDbgMw8Ny8iSzAifibbZlzbkVX6JijRPb0GXkqlBkaNq8KKw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MX056Rf6DSUltnR4J91NJYCtam/Fo4tFlIXd4RkYse8=;
- b=d0kqRn3VWl9oetMCZFG2bzEHxiHxuU9XV3AFcTFkAqD9d4zsASwzyTAbxHrb0wJxW9XmqjlFr+vt1B7Q7HqneJBojsJkkHDN53H4ZKq5HXCGJGvQFEWsosXIJRUn9I0c9NaT5N2qlupi3BEYoGiO7NeQPi2H10QAsXiweywHvFVNF7Mlt2V4ni2XQ+AofXAu/gwh3t03bztFb8R5l4Dsubi4nLgvgP4lgo11TUkoA9g+UE7h/LKotwZxh5g8ekYto0RG4vyPWYXPDK1cYGnKljDEs8CmFisPl8R8RQ8XnTkjc/CT05Cm7iHCOrLYKviUL69jnm8ZNFbwO+syarx3AA==
+ bh=TEdOBmV+jxI0q3dedgxQp2gssCkRU8p2it3ccaE/kOE=;
+ b=ap0WYRykBEUynOvzYcyFjBCa8cQ4sxJ1po3l8/dyJLPOkRoxVyY+P1sgHj+tSIQMIGU0fxGokwj6N8xSoCEoZl4HeTK57hcL58woq30a2KpqjRiiq2a1PLag+b/6vRfeP0eYmx9tMG8bNXB33ixOOGTKEw5yPBvwHIbgYISBXFqfKjPSqHTXS5x6IGYW+AKqU5uvB1GZ1a8jTKObkVkDNj1IaUpKw76ErTt7u5WmeD4xYfX0bftyLoD4J4TzqSAmFpJsTtVssRUzqWzfonLTM5xjXpxi9vR94Ud0wGkF1GO/Im+dTfzpNdHDn8JEOax/9Fq17hxCDHSp5PLbxU7mUQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MX056Rf6DSUltnR4J91NJYCtam/Fo4tFlIXd4RkYse8=;
- b=J1MBKlOhfJvURLAKex3Eoo/1B0sxoB7CQxbG0PyzwyrdHXnHt0WGZnXDY6B7x+Kr8GPYKP+5mcLq6GDIRfDngPofOlXqBkpatUsDJl1//74eu/29BDN86L2hQcYmB0mI/oe/1bRT/uiFDgQ+JdhQsqVTVfqvUxTj3RT+S96A1TY=
+ bh=TEdOBmV+jxI0q3dedgxQp2gssCkRU8p2it3ccaE/kOE=;
+ b=0xkRr4m84awGXBtUzoBjvqUmHABDVk28aSzAukoEhJKz47Jltv+ko/xXB2avOtCXoBH0vNit1eScDa/8mjAEW/j47XUTsRCVwmgDkAmZ/mUriKvu5/rlMC+bU4qHeEVQBrMMFBSTIr+zFsZuQX9fInz5kSLzsRyzAekc3El5XFo=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SA0PR03MB5465.namprd03.prod.outlook.com (2603:10b6:806:b5::21)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.21; Thu, 15 Oct
- 2020 13:41:51 +0000
+ 2020 13:42:03 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::61ae:93a8:b26c:77b8%4]) with mapi id 15.20.3455.031; Thu, 15 Oct 2020
- 13:41:51 +0000
+ 13:42:03 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v4 01/16] memory: Add FlatView foreach function
-Date: Thu, 15 Oct 2020 09:41:21 -0400
-Message-Id: <20201015134137.205958-2-alxndr@bu.edu>
+Subject: [PATCH v4 07/16] fuzz: Add support for custom crossover functions
+Date: Thu, 15 Oct 2020 09:41:27 -0400
+Message-Id: <20201015134137.205958-8-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201015134137.205958-1-alxndr@bu.edu>
 References: <20201015134137.205958-1-alxndr@bu.edu>
@@ -79,34 +79,34 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL1PR13CA0055.namprd13.prod.outlook.com (2603:10b6:208:257::30) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend
- Transport; Thu, 15 Oct 2020 13:41:50 +0000
+ Transport; Thu, 15 Oct 2020 13:42:01 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 42e37d5c-8523-4d87-0424-08d871101248
+X-MS-Office365-Filtering-Correlation-Id: f62925d3-7fb7-4a89-b332-08d8711018e5
 X-MS-TrafficTypeDiagnostic: SA0PR03MB5465:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SA0PR03MB546513FDC36D6A0EE19D6AC0BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2657;
+X-Microsoft-Antispam-PRVS: <SA0PR03MB5465FFA7B7307C8E066A4FA7BA020@SA0PR03MB5465.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: RdcR3w17suhEAQrqf2a5ZKg1O4TzwQmn2A6Ud6D4Nr2u4fdlJ8uEajrb2vNGrGjaqRiRt6fuERxsXO+cKiiX4rXd0NWaSdBNO775PahZlwTERiNEiG6MvO3eCb7Kkmdb06ncF4+IDdNt7+pjtwJrCkr3zY5CDvxVAhRrohVlsPWpHLTzYvK7L1eU1waQMIJIMNRQG44UHfhJh+qlM3FfxZIylhuMgkLUrfLcJhRHOypY91vgE1QRYen6P+LEQwfhACDnR/oCV4W+fQJInIN+eMvG3QPWRU/rbTjGhdL/yQSfYVLm0rqvykXLpnzTh0mb+582fNK5KJYIA4L6hMzyfZe/eqnSpufiZ98ElEXcCB7VJlT0OZZMZ24QZ2M4TZQo
+X-Microsoft-Antispam-Message-Info: cQyNYmESgtwDpfr9TrCRBMTgmvqELfOJqRvsBhfiQCHyetc3R0ZuUgiXKlLo2hEGQputnk9N3c4z0mze5XwJVo6f80ssgKt2KVXKzczUcqSMaIUOOYPeKHpvV5EHh/tYWjjPqCQo+oLsUREU80rT8AQwGYXmmK+6Dm74Ge57z3ncWxPoIWql6HlxZcsClHkHNl/DGVXBPjqd3mUIk3BvVYmCwmJ4k0B0m8OLa3OTV2k8SIlIKw5HjKaW8oII/EUdSokKFbM/7JDcpKOKaZYOXh/7Hi2BZ+b9eN1TQpi6i0rRjOPaCBpz6c5DMhZjk+c5wThsq+l6DI3rgMZs2J4ZbAL3BtU/wCBX9hJeJjgSlQlXI/YxjlCcDy0QCtnkPltJ
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(5660300002)(2616005)(8936002)(34490700002)(1076003)(66476007)(66946007)(6666004)(956004)(4326008)(6512007)(6486002)(8676002)(75432002)(6506007)(26005)(6916009)(52116002)(2906002)(86362001)(186003)(16526019)(786003)(316002)(66556008)(478600001)(36756003);
+ SFS:(4636009)(396003)(376002)(136003)(366004)(39860400002)(346002)(5660300002)(54906003)(2616005)(8936002)(34490700002)(1076003)(66476007)(66946007)(6666004)(956004)(4326008)(6512007)(6486002)(8676002)(75432002)(6506007)(26005)(6916009)(52116002)(2906002)(86362001)(186003)(16526019)(786003)(316002)(66556008)(478600001)(36756003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 5f842UzZcywj7M9YxC9pmmYTt43HlNMg3ew+rjU90qBFmPQnA6KZS3eIx2nkgqlEdvjfsclJNoqB1H2J6tQ5WdiYRG0NGUyEI1JAbu39B5XzvEXwNsoC5vXp7roachfa04vySqTsg8h5E9v9OPHCiyQmJrxdlKtON3/vtxjwEPNgD61FFweFzxvmRNyJUr63U40VNT6D69c/xF0yIURMjDSRv1gmJ0+UcOxKct/YIin70p5r7ilMF3lD8H+flyJjlZwBNk5ugC16oqGxArew2tGyDiCzmrfCK76wDijN8jmcoDGpoyGgIBfJp65fWU3lIu21GU/9JPhxrG3fwgtz6q1oi4vyQ1ROSFxDTUUvcfsqbUFNSvoaJ8jBI8FvDn4oNywXJhQC9Gw2b1V/2TakzZy7veNSQUMOww14+yWnSr2WmzhRMXv9Zihu3gun/jcJcWRYb5Vl2qn4zzj/kbNsRtDUZI4HBdYfTmCvM6vMUjYLCLcFkElc50kScAu2mD7MUdIBNXvxncvxVAesL/J62bmaM1RFVXfwdz1zb0tr2QnEw3E6di95yzZs3Hosn9hzK65UZR4hojHJ7wY6lLiipOZNSNmGn8u/RNE2JJ2Y/hA7GD1uW/qvIm+ZqKWKZWzbXAqGKfYPD3g1PAWdxh5ZeA==
+X-MS-Exchange-AntiSpam-MessageData: QGOXdT5udOQWJCFG1UcAy3aijHr3Wf6QX4hzh5hY9tjw/ejgsDYwmURX6yGtmKOMxDcYWCSEGuIwlqViVPUdQUAI9ehEsjI2TETbihGBhwE/aVB/nAo80GX2WPBqIljQXqVYR9S489ak+N/NPk3qU+90UEms5vjEcdlonnwH1Jjr8WT/QT/rFuxizc4cplE/9MY0OrcZ6M5ZE1BE2AYHiBzb7dcQplsTAt1yAqpGN1ddENXLiqcG4wNzZCJgf2i/rd0UBYTdVOO/c1bR+M2NMluxcf7uZJZ1IlZNhq/7WV8Z5g9iy4c2yQgZ+t4BzZL6nz9gCTauzz4dLsBHmLreWG607pbD7x44w20Hq3ZVlZgl9ANJZu6uuyXax8+scVPl1OAW/YVRs9adAhv70xBp4aXHGtvygTIAnYkA1Q7ABuUwHYOd/MZsYuha7ze3jTKB2IXYO4UJQ2OewUb8KYvxqcwRlYdg9TJUsHxOapy7fb17gzPnm7eDfUxzsRst7l7LW93kZwQxs1isHNE7nGXjEi/kxil8PT12ue9TbFOZ5QLtTLg2daf3YC9HzkzzHhyexmdVxt9MrRgia0bg0zdogeiiVxWk5V6SdA0SEUjx317Fi1ffKCrqFjUnGQ3C8iJE8ft4QdzNgbueiqhr1vQ+Fw==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42e37d5c-8523-4d87-0424-08d871101248
+X-MS-Exchange-CrossTenant-Network-Message-Id: f62925d3-7fb7-4a89-b332-08d8711018e5
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:41:51.5019 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Oct 2020 13:42:02.8994 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: x0NUB1TiCfeSIXguLzafEUm+h3WiAocTs33QL/IHslwUSERu8fn2FJs01seHp0/9
+X-MS-Exchange-CrossTenant-UserPrincipalName: pwx3B0tXPdx5ZgMxnS9rihcKmPNoGOdx5gU1XZ3ffmjrlNPI/DGD+sLtGQcIXdl8
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA0PR03MB5465
-Received-SPF: pass client-ip=40.107.75.112; envelope-from=alxndr@bu.edu;
+Received-SPF: pass client-ip=40.107.75.103; envelope-from=alxndr@bu.edu;
  helo=NAM02-BL2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 09:42:14
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -8
 X-Spam_score: -0.9
@@ -128,56 +128,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org, darren.kenny@oracle.com,
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org, darren.kenny@oracle.com,
  bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
  dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
----
- include/exec/memory.h | 5 +++++
- softmmu/memory.c      | 9 +++++++++
- 2 files changed, 14 insertions(+)
+libfuzzer supports a "custom crossover function". Libfuzzer often tries
+to blend two inputs to create a new interesting input. Sometimes, we
+have a better idea about how to blend inputs together. This change
+allows fuzzers to specify a custom function for blending two inputs
+together.
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 622207bde1..233655b29a 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -719,6 +719,11 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
-     return qatomic_rcu_read(&as->current_map);
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+---
+ tests/qtest/fuzz/fuzz.c | 13 +++++++++++++
+ tests/qtest/fuzz/fuzz.h | 27 +++++++++++++++++++++++++++
+ 2 files changed, 40 insertions(+)
+
+diff --git a/tests/qtest/fuzz/fuzz.c b/tests/qtest/fuzz/fuzz.c
+index d926c490c5..00fa5fd52f 100644
+--- a/tests/qtest/fuzz/fuzz.c
++++ b/tests/qtest/fuzz/fuzz.c
+@@ -118,6 +118,19 @@ static FuzzTarget *fuzz_get_target(char* name)
  }
  
-+typedef int (*flatview_cb)(ram_addr_t start,
-+                           ram_addr_t len,
-+                           const MemoryRegion*, void*);
-+
-+void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque);
  
- /**
-  * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 403ff3abc9..c46b0c6d65 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -656,6 +656,15 @@ static void render_memory_region(FlatView *view,
-     }
- }
- 
-+void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque)
++/* Sometimes called by libfuzzer to mutate two inputs into one */
++size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
++                                 const uint8_t *data2, size_t size2,
++                                 uint8_t *out, size_t max_out_size,
++                                 unsigned int seed)
 +{
-+    FlatRange *fr;
-+    FOR_EACH_FLAT_RANGE(fr, fv) {
-+        if (cb(fr->addr.start, fr->addr.size, fr->mr, opaque))
-+            break;
++    if (fuzz_target->crossover) {
++        return fuzz_target->crossover(data1, size1, data2, size2, out,
++                                      max_out_size, seed);
 +    }
++    return 0;
 +}
 +
- static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
+ /* Executed for each fuzzing-input */
+ int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size)
  {
-     while (mr->enabled) {
+diff --git a/tests/qtest/fuzz/fuzz.h b/tests/qtest/fuzz/fuzz.h
+index 8eb765edc8..ed9ce17154 100644
+--- a/tests/qtest/fuzz/fuzz.h
++++ b/tests/qtest/fuzz/fuzz.h
+@@ -77,6 +77,29 @@ typedef struct FuzzTarget {
+      */
+     void(*fuzz)(QTestState *, const unsigned char *, size_t);
+ 
++    /*
++     * The fuzzer can specify a "Custom Crossover" function for combining two
++     * inputs from the corpus. This function is sometimes called by libfuzzer
++     * when mutating inputs.
++     *
++     * data1: location of first input
++     * size1: length of first input
++     * data1: location of second input
++     * size1: length of second input
++     * out: where to place the resulting, mutated input
++     * max_out_size: the maximum length of the input that can be placed in out
++     * seed: the seed that should be used to make mutations deterministic, when
++     *       needed
++     *
++     * See libfuzzer's LLVMFuzzerCustomCrossOver API for more info.
++     *
++     * Can be NULL
++     */
++    size_t(*crossover)(const uint8_t *data1, size_t size1,
++                       const uint8_t *data2, size_t size2,
++                       uint8_t *out, size_t max_out_size,
++                       unsigned int seed);
++
+ } FuzzTarget;
+ 
+ void flush_events(QTestState *);
+@@ -91,6 +114,10 @@ void fuzz_qtest_set_serialize(bool option);
+  */
+ void fuzz_add_target(const FuzzTarget *target);
+ 
++size_t LLVMFuzzerCustomCrossOver(const uint8_t *data1, size_t size1,
++                                 const uint8_t *data2, size_t size2,
++                                 uint8_t *out, size_t max_out_size,
++                                 unsigned int seed);
+ int LLVMFuzzerTestOneInput(const unsigned char *Data, size_t Size);
+ int LLVMFuzzerInitialize(int *argc, char ***argv, char ***envp);
+ 
 -- 
 2.28.0
 
