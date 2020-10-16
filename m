@@ -2,71 +2,86 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5372DC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:27:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A662C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:47:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B7A8222201
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:27:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7A8222201
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id AB4DF20874
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:47:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIhaTvXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4DF20874
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54754 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTYBv-0003NO-9A
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 18:27:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50916)
+	id 1kTYVx-0000dR-JH
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 18:47:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kTY9r-0002n7-Eg; Fri, 16 Oct 2020 18:25:07 -0400
-Resent-Date: Fri, 16 Oct 2020 18:25:07 -0400
-Resent-Message-Id: <E1kTY9r-0002n7-Eg@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21714)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kTY9n-0005kd-BM; Fri, 16 Oct 2020 18:25:06 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602887085; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=dYRp6+Dmm+p5ai5RHl8fU5Q4jbYa8MJWiT8CtguxC6xffqw/ayEwshJfVyf7nuexhW3OMzebctKA2APX5W2JRjDT4qtUwvIMk/t/Dy26F1IjeWgvBo8Ogn6dTbg3YEisRahxBxKELFdOORXq6wkZ6b7jE+w9Xzyhsk952Wv3pW4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602887085;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=eArVvkxxsFYTpOO8WHqN4J3Hmgur5foxbcuuqGvM9qU=; 
- b=DLPfb2DQHShs+ySFpLjo8Kquuqm12L3QgeKLjaV2v7uplwrRJdpRCx2O/sq39NJj8LKmt0u/b7cy+z+fGnG7PXVLK4ML5cVgorASWlKCem4YyQjpZyFl7alaa2aMNxXRJM0Sk+mpg9a/NlaOPovozgji0tPTdxJUtt9opda5AHI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 160288708396225.45160864587251;
- Fri, 16 Oct 2020 15:24:43 -0700 (PDT)
-Subject: Re: [PATCH v3 0/5] RISC-V Pointer Masking implementation
-Message-ID: <160288708201.1194.259516710090656154@66eaa9a8a123>
-In-Reply-To: <20201016221138.10371-1-space.monkey.delivers@gmail.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kTYTj-0008F1-1O; Fri, 16 Oct 2020 18:45:39 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42460)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kTYTh-000089-4T; Fri, 16 Oct 2020 18:45:38 -0400
+Received: by mail-il1-x143.google.com with SMTP id l16so4397254ilj.9;
+ Fri, 16 Oct 2020 15:45:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=KfuBWLWEZfcCjhlU5SHPE8VPjxmLIxlIhcGyHYX1R00=;
+ b=HIhaTvXT6scy1QOyb6/hsV+AyAd3WFvOo16FxEpYriQNsrkYhQHdslomT/k+89huWw
+ +WyyvRNjBEO6gsf/GVJaE/yDzFiTb+QO/l0aSzICCRAy2hhnqq7EtgI4Rm6jemHWCKq8
+ 8cJvASZmL0iSdbUmyKD3MgcHi+Vh3r64LJTIaGPSGemqPoITekQ6z28qcMtZzzPdDXuX
+ RUS+DrhNbly3ZFYfV2r6lD6RxLnwP4+fPnIJ8cWbjh89S86w19/GAtWjX5gBB82p2ncg
+ 65X/Kftawxbd5S/1zUytFNYBK2Oai6C/FDUE9GpBOQWWW4b8jvDTYHB7RkQIxdNoBC8F
+ ZR0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=KfuBWLWEZfcCjhlU5SHPE8VPjxmLIxlIhcGyHYX1R00=;
+ b=aiaYsIyYQFN72foJExSHLloYEdyh8UnX57GtZfS0k67uQr/VU4wPZ27teyoZ6Rfun+
+ QpMG/OfPL5WtNfnM9ofra+Qaf52MeHdw3cUBTrH1NVVxoz3ccvSADWxv2XEcS1+zPq4g
+ praWADUJcGxVgBRMXXBUFwkalW+PpvB3nrZmcM4igRH6289HuRn1StsoQLv90bDEcDrG
+ IHOFz6VdVaOp5oe8GsVSRIlAagEDQFfA8vSrxDwlfu8VOElo/g2dCuSq2f01Xm1sbuUq
+ 8ofwQwTTVSDSKQ73zb8AkOKa4yHLGcYGFa31biKi95YbeglA7aeJUAeWCyj/xp5PL0cI
+ DAvA==
+X-Gm-Message-State: AOAM5310xLg/8HHugEkZXSL0d31yFWJS5ys3ak756T8zsBVhxZU5AVBI
+ UPgX9dqSrZri7Ayq/tTg/QJHn6XLFWN2eMoiR2w=
+X-Google-Smtp-Source: ABdhPJwqR1zVuBjCT2HRF+RFJuhF4QV8JoiVoUKbPFTuZnRggu8kZRC7DQb+DZIV0ptoHzb7+MgXfw7MX5a9xJnovGA=
+X-Received: by 2002:a05:6e02:1241:: with SMTP id
+ j1mr4639302ilq.267.1602888335575; 
+ Fri, 16 Oct 2020 15:45:35 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: baturo.alexey@gmail.com
-Date: Fri, 16 Oct 2020 15:24:43 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 18:25:00
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+References: <B96DF081-AEDD-470E-A99C-8A9536E0A8CE@hni.upb.de>
+ <CAKmqyKPnnLHuTvosMLs+4A8QqR-XvuxgRU33c0f1Q92LJ_x8CA@mail.gmail.com>
+ <7F36EF66-D48D-418C-94D2-AA66D86C38CA@hni.upb.de>
+In-Reply-To: <7F36EF66-D48D-418C-94D2-AA66D86C38CA@hni.upb.de>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 16 Oct 2020 15:33:56 -0700
+Message-ID: <CAKmqyKMO8oTg8DSHqYyX8eL4SkN5GTMiuO0+VmnRcJkY2daaQQ@mail.gmail.com>
+Subject: Re: HTIF tohost symbol size check always fails
+To: Peer Adelt <adelt@hni.upb.de>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,116 +95,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: baturo.alexey@gmail.com, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, space.monkey.delivers@gmail.com,
- Alistair.Francis@wdc.com, kupokupokupopo@gmail.com, palmer@dabbelt.com
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAxNjIyMTEzOC4xMDM3
-MS0xLXNwYWNlLm1vbmtleS5kZWxpdmVyc0BnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
-c2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxv
-dyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMTAx
-NjIyMTEzOC4xMDM3MS0xLXNwYWNlLm1vbmtleS5kZWxpdmVyc0BnbWFpbC5jb20KU3ViamVjdDog
-W1BBVENIIHYzIDAvNV0gUklTQy1WIFBvaW50ZXIgTWFza2luZyBpbXBsZW1lbnRhdGlvbgoKPT09
-IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAv
-ZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAK
-Z2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFj
-ayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4
-NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hl
-dy1wcm9qZWN0L3FlbXUKIC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMTAxNjIxMDc1
-NC44MTgyNTctMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnIC0+IHBhdGNoZXcvMjAyMDEw
-MTYyMTA3NTQuODE4MjU3LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwogKiBbbmV3IHRh
-Z10gICAgICAgICBwYXRjaGV3LzIwMjAxMDE2MjIxMTM4LjEwMzcxLTEtc3BhY2UubW9ua2V5LmRl
-bGl2ZXJzQGdtYWlsLmNvbSAtPiBwYXRjaGV3LzIwMjAxMDE2MjIxMTM4LjEwMzcxLTEtc3BhY2Uu
-bW9ua2V5LmRlbGl2ZXJzQGdtYWlsLmNvbQpTd2l0Y2hlZCB0byBhIG5ldyBicmFuY2ggJ3Rlc3Qn
-CmZiMjZiNjIgSW1wbGVtZW50IGFkZHJlc3MgbWFza2luZyBmdW5jdGlvbnMgcmVxdWlyZWQgZm9y
-IFJJU0MtViBQb2ludGVyIE1hc2tpbmcgZXh0ZW5zaW9uCjExMzVkNTMgU3VwcG9ydCBwb2ludGVy
-IG1hc2tpbmcgZm9yIFJJU0MtViBmb3IgaS9jL2YvZC9hIHR5cGVzIG9mIGluc3RydWN0aW9ucwo3
-NjBiODk0IFByaW50IG5ldyBQTSBDU1JzIGluIFFFTVUgbG9ncwpjNGM0ZTI3IFN1cHBvcnQgQ1NS
-cyByZXF1aXJlZCBmb3IgUklTQy1WIFBNIGV4dGVuc2lvbiBleGNlcHQgZm9yIG9uZXMgaW4gaHlw
-ZXJ2aXNvciBtb2RlCjU5ODE5NjEgQWRkIEotZXh0ZW5zaW9uIGludG8gUklTQy1WCgo9PT0gT1VU
-UFVUIEJFR0lOID09PQoxLzUgQ2hlY2tpbmcgY29tbWl0IDU5ODE5NjFmZGIwMCAoQWRkIEotZXh0
-ZW5zaW9uIGludG8gUklTQy1WKQoyLzUgQ2hlY2tpbmcgY29tbWl0IGM0YzRlMjdmZTkzNyAoU3Vw
-cG9ydCBDU1JzIHJlcXVpcmVkIGZvciBSSVNDLVYgUE0gZXh0ZW5zaW9uIGV4Y2VwdCBmb3Igb25l
-cyBpbiBoeXBlcnZpc29yIG1vZGUpCldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRp
-bmcgLyogb24gYSBzZXBhcmF0ZSBsaW5lCiMzMTogRklMRTogdGFyZ2V0L3Jpc2N2L2NwdS5oOjIz
-MDoKKyAgICAvKiBDU1JzIGZvciBQTQoKRVJST1I6IHRyYWlsaW5nIHdoaXRlc3BhY2UKIzE0Njog
-RklMRTogdGFyZ2V0L3Jpc2N2L2Nzci5jOjEyNTg6CisvKiBGdW5jdGlvbnMgdG8gYWNjZXNzIFBv
-aW50ZXIgTWFza2luZyBmZWF0dXJlIHJlZ2lzdGVycyAkCgpXQVJOSU5HOiBCbG9jayBjb21tZW50
-cyB1c2UgYSBsZWFkaW5nIC8qIG9uIGEgc2VwYXJhdGUgbGluZQojMTQ2OiBGSUxFOiB0YXJnZXQv
-cmlzY3YvY3NyLmM6MTI1ODoKKy8qIEZ1bmN0aW9ucyB0byBhY2Nlc3MgUG9pbnRlciBNYXNraW5n
-IGZlYXR1cmUgcmVnaXN0ZXJzIAoKRVJST1I6IGxpbmUgb3ZlciA5MCBjaGFyYWN0ZXJzCiMxNTM6
-IEZJTEU6IHRhcmdldC9yaXNjdi9jc3IuYzoxMjY1OgorICAgIC8qIElmIHByaXYgbHZscyBkaWZm
-ZXIgdGhhdCBtZWFucyB3ZSdyZSBhY2Nlc3NpbmcgY3NyIGZyb20gaGlnaGVyIHByaXYgbHZsLCBz
-byBhbGxvdyAqLwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzE3MjogRklMRTog
-dGFyZ2V0L3Jpc2N2L2Nzci5jOjEyODQ6CisgICAgLyogV2UncmUgaW4gc2FtZSBwcml2IGx2bCwg
-c28gd2UgYWxsb3cgdG8gbW9kaWZ5IGNzciBvbmx5IGlmIHBtX2N1cnJlbnQ9PTEgKi8KCkVSUk9S
-OiBsaW5lIG92ZXIgOTAgY2hhcmFjdGVycwojMTk0OiBGSUxFOiB0YXJnZXQvcmlzY3YvY3NyLmM6
-MTMwNjoKKyAgICAgICAgICAgICAgICAgICAgICAiTU1URTogV1BSSSB2aW9sYXRpb24gd3JpdHRl
-biAweCVseCB2cyBleHBlY3RlZCAweCVseFxuIiwgdmFsLCB3cHJpX3ZhbCk7CgpFUlJPUjogbGlu
-ZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzIyMDogRklMRTogdGFyZ2V0L3Jpc2N2L2Nzci5jOjEzMzI6
-CisgICAgICAgICAgICAgICAgICAgICAgIlNNVEU6IFdQUkkgdmlvbGF0aW9uIHdyaXR0ZW4gMHgl
-bHggdnMgZXhwZWN0ZWQgMHglbHhcbiIsIHZhbCwgd3ByaV92YWwpOwoKRVJST1I6IGxpbmUgb3Zl
-ciA5MCBjaGFyYWN0ZXJzCiMyNDk6IEZJTEU6IHRhcmdldC9yaXNjdi9jc3IuYzoxMzYxOgorICAg
-ICAgICAgICAgICAgICAgICAgICJVTVRFOiBXUFJJIHZpb2xhdGlvbiB3cml0dGVuIDB4JWx4IHZz
-IGV4cGVjdGVkIDB4JWx4XG4iLCB2YWwsIHdwcmlfdmFsKTsKCnRvdGFsOiA1IGVycm9ycywgMyB3
-YXJuaW5ncywgMzgyIGxpbmVzIGNoZWNrZWQKClBhdGNoIDIvNSBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2
-ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5U
-QUlORVJTLgoKMy81IENoZWNraW5nIGNvbW1pdCA3NjBiODk0NGFmNzggKFByaW50IG5ldyBQTSBD
-U1JzIGluIFFFTVUgbG9ncykKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyOiBG
-SUxFOiB0YXJnZXQvcmlzY3YvY3B1LmM6MjYyOgorICAgICAgICAgICAgcWVtdV9mcHJpbnRmKGYs
-ICIgJXMgIiBUQVJHRVRfRk1UX2x4ICJcbiIsICJ1cG1iYXNlICIsIGVudi0+dXBtYmFzZSk7CgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMjM6IEZJTEU6IHRhcmdldC9yaXNjdi9j
-cHUuYzoyNjM6CisgICAgICAgICAgICBxZW11X2ZwcmludGYoZiwgIiAlcyAiIFRBUkdFVF9GTVRf
-bHggIlxuIiwgInVwbW1hc2sgIiwgZW52LT51cG1tYXNrKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMyNjogRklMRTogdGFyZ2V0L3Jpc2N2L2NwdS5jOjI2NjoKKyAgICAgICAg
-ICAgIHFlbXVfZnByaW50ZihmLCAiICVzICIgVEFSR0VUX0ZNVF9seCAiXG4iLCAic3BtYmFzZSAi
-LCBlbnYtPnNwbWJhc2UpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzI3OiBG
-SUxFOiB0YXJnZXQvcmlzY3YvY3B1LmM6MjY3OgorICAgICAgICAgICAgcWVtdV9mcHJpbnRmKGYs
-ICIgJXMgIiBUQVJHRVRfRk1UX2x4ICJcbiIsICJzcG1tYXNrICIsIGVudi0+c3BtbWFzayk7CgpX
-QVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzA6IEZJTEU6IHRhcmdldC9yaXNjdi9j
-cHUuYzoyNzA6CisgICAgICAgICAgICBxZW11X2ZwcmludGYoZiwgIiAlcyAiIFRBUkdFVF9GTVRf
-bHggIlxuIiwgIm1wbWJhc2UgIiwgZW52LT5tcG1iYXNlKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMzMTogRklMRTogdGFyZ2V0L3Jpc2N2L2NwdS5jOjI3MToKKyAgICAgICAg
-ICAgIHFlbXVfZnByaW50ZihmLCAiICVzICIgVEFSR0VUX0ZNVF9seCAiXG4iLCAibXBtbWFzayAi
-LCBlbnYtPm1wbW1hc2spOwoKdG90YWw6IDAgZXJyb3JzLCA2IHdhcm5pbmdzLCAyNSBsaW5lcyBj
-aGVja2VkCgpQYXRjaCAzLzUgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYg
-YW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRo
-ZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KNC81IENoZWNraW5n
-IGNvbW1pdCAxMTM1ZDUzYTE1NjUgKFN1cHBvcnQgcG9pbnRlciBtYXNraW5nIGZvciBSSVNDLVYg
-Zm9yIGkvYy9mL2QvYSB0eXBlcyBvZiBpbnN0cnVjdGlvbnMpCjUvNSBDaGVja2luZyBjb21taXQg
-ZmIyNmI2MjkxNGE0IChJbXBsZW1lbnQgYWRkcmVzcyBtYXNraW5nIGZ1bmN0aW9ucyByZXF1aXJl
-ZCBmb3IgUklTQy1WIFBvaW50ZXIgTWFza2luZyBleHRlbnNpb24pCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiMxMTA6IEZJTEU6IHRhcmdldC9yaXNjdi90cmFuc2xhdGUuYzo5NjY6
-CisgICAgcG1fbWFza1tQUlZfVV0gPSB0Y2dfZ2xvYmFsX21lbV9uZXcoY3B1X2Vudiwgb2Zmc2V0
-b2YoQ1BVUklTQ1ZTdGF0ZSwgdXBtbWFzayksCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFj
-dGVycwojMTEyOiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJhbnNsYXRlLmM6OTY4OgorICAgIHBtX2Jh
-c2VbUFJWX1VdID0gdGNnX2dsb2JhbF9tZW1fbmV3KGNwdV9lbnYsIG9mZnNldG9mKENQVVJJU0NW
-U3RhdGUsIHVwbWJhc2UpLAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzExNDog
-RklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjk3MDoKKyAgICBwbV9tYXNrW1BSVl9TXSA9
-IHRjZ19nbG9iYWxfbWVtX25ldyhjcHVfZW52LCBvZmZzZXRvZihDUFVSSVNDVlN0YXRlLCBzcG1t
-YXNrKSwKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMxMTY6IEZJTEU6IHRhcmdl
-dC9yaXNjdi90cmFuc2xhdGUuYzo5NzI6CisgICAgcG1fYmFzZVtQUlZfU10gPSB0Y2dfZ2xvYmFs
-X21lbV9uZXcoY3B1X2Vudiwgb2Zmc2V0b2YoQ1BVUklTQ1ZTdGF0ZSwgc3BtYmFzZSksCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMTE4OiBGSUxFOiB0YXJnZXQvcmlzY3YvdHJh
-bnNsYXRlLmM6OTc0OgorICAgIHBtX21hc2tbUFJWX01dID0gdGNnX2dsb2JhbF9tZW1fbmV3KGNw
-dV9lbnYsIG9mZnNldG9mKENQVVJJU0NWU3RhdGUsIG1wbW1hc2spLAoKV0FSTklORzogbGluZSBv
-dmVyIDgwIGNoYXJhY3RlcnMKIzEyMDogRklMRTogdGFyZ2V0L3Jpc2N2L3RyYW5zbGF0ZS5jOjk3
-NjoKKyAgICBwbV9iYXNlW1BSVl9NXSA9IHRjZ19nbG9iYWxfbWVtX25ldyhjcHVfZW52LCBvZmZz
-ZXRvZihDUFVSSVNDVlN0YXRlLCBtcG1iYXNlKSwKCnRvdGFsOiAwIGVycm9ycywgNiB3YXJuaW5n
-cywgOTggbGluZXMgY2hlY2tlZAoKUGF0Y2ggNS81IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNl
-IHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBv
-cnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMu
-Cj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpU
-aGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzIwMjAx
-MDE2MjIxMTM4LjEwMzcxLTEtc3BhY2UubW9ua2V5LmRlbGl2ZXJzQGdtYWlsLmNvbS90ZXN0aW5n
-LmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNh
-bGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBm
-ZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On Fri, Oct 16, 2020 at 2:35 PM Peer Adelt <adelt@hni.upb.de> wrote:
+>
+> The solution was even easier: I forgot to load the proxy kernel. As soon as I replaced the command-line parameter "-kernel <ELF>" with "-kernel <PK> -append <ELF>", everything was working as expected.
+
+Even better, you can skip the proxy kernel.
+
+You can run:
+
+`-bios default -kernel <ELF>`
+
+Alistair
+
+>
+> Without your hint about my possibly misconfigured toolchain I would have probably continued to search for the error in the QEMU HTIF device. But in fact it was due to the wrong binary.
+>
+> Thanks a lot! :-)
+>
+> > On 16. Oct 2020, at 20:03, Alistair Francis <alistair23@gmail.com> wrote:
+> >
+> > On Fri, Oct 16, 2020 at 7:59 AM Peer Adelt <adelt@hni.upb.de> wrote:
+> >>
+> >> Hi,
+> >>
+> >> I have a problem with the RISC-V HTIF device.
+> >>
+> >> Every binary I have compiled for Spike on riscv32 fails with the following error message: "HTIF tohost must be 8 bytes"
+> >>
+> >> This happens regardless of which program I have translated for Spike. This is also the case with the official riscv-compliance tests, for example.
+> >>
+> >> The query "if (st_size != 8)" in the HTIF device always fails, because st_size seems to be always 0.
+> >>
+> >> To be able to reproduce it:
+> >> - QEMU GIT Hash: d0ed6a69d399ae193959225cdeaa9382746c91cc (tag "v5.1.0")
+> >
+> > I just checked with this hash and with the current master and on both
+> > I can run a ELF executable on the Spike machine for RV32.
+> >
+> >> - System: Mac OS 10.14.6 (Darwin Kernel Version 18.7.0)
+> >> - Compiler: Latest SiFive Build for GCC under OSX
+> >
+> > Maybe try using an official toolchain instead of a vendor fork.
+> >
+> > Alistair
+> >
+> >> - Command: qemu-system-riscv32 -M spike -nographic -bios none -kernel <ANY_SPIKE_ELF_FILE>
+> >>
+> >> Best regards,
+> >> Peer Adelt
+>
 
