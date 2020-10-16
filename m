@@ -2,89 +2,84 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A627C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 03:08:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 769EFC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 03:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0C4920789
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 03:08:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D98992087D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 03:10:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZvpeISgC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0C4920789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WJCW+fEC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D98992087D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49168 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTG6F-0006GR-D6
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 23:08:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39436)
+	id 1kTG8m-0007x5-Gs
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 23:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39710)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTG5U-0005pL-Ur
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 23:07:25 -0400
-Received: from mail-lj1-x229.google.com ([2a00:1450:4864:20::229]:42672)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTG5T-0002Hd-35
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 23:07:24 -0400
-Received: by mail-lj1-x229.google.com with SMTP id h20so905665lji.9
- for <qemu-devel@nongnu.org>; Thu, 15 Oct 2020 20:07:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=f+9O8rU+a2IuN+kOephSxO7+C3lpmlSBmV0Bvb1L6QI=;
- b=ZvpeISgCL9Lgs8Uo0aM54YBUq2mn/smrp3TLHapcPrDjM3uZD00Pm99UejW5KYzgO4
- wCIg9t3/dUE0+XHuZL1Nwzg3rC4eycci7mXkARn0quQKQuaCAZmXpOnToX5+K245/Q/W
- HHM58aQDrJmKLuG6BXdcxD1YA423nRLChcuZ4CN+zbS20QzfrkQA8ZAvNVhbNFKCz9P/
- J/ipU9uhj2EgHyyXUDaRus2RiZaFLTA+r8vDK7VYqfGg8QtALeroAaQ/Q3stK9P0Qemc
- p9e5vSMy2nov4SRrSMS/5KJpSPcHjWKs/YXbsDRjQCQhGuV2tvqMj69lAGjcdYEo28Nf
- 2ghw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=f+9O8rU+a2IuN+kOephSxO7+C3lpmlSBmV0Bvb1L6QI=;
- b=FS26aWYHN/6B56ksZGywUEa5v6NI4gKrwe3E1Zj9NCVcwjSmcm2bXry6umApbv1gvZ
- durSmVd6TTp7dncx/4rHLO9o7LmO42vWAxkcOMvuGFABA9NRYdH5/fqKtCmClrxm78oi
- CSkL+KkNbeioE5w6g1Jw6ylOgwFNfChwpgrwbU45qUwMUVe/uAt6H0pNksJH8OWp8TsL
- PAgQj/OkqW77THLfno4KlFwVIq73t3FQwkFeZkRlH3sV+J0bXTP+7fJLyzsJfl+U8cH2
- uiNLSGY6zILnTyEMipthPY7kGUC5TWLO5T3D0uRV+d99eKfdvXzYpT/fkkYHmyU7NsGU
- N8Fg==
-X-Gm-Message-State: AOAM53170sYZvL8XGxV08jkkPZGUTTmhtXz6JlM5U1gQ10qSGe92raho
- 1Msei0HAb86Xzte+b+7kCQ+XbyAThF4QWN6JHQM=
-X-Google-Smtp-Source: ABdhPJwVLi1lVNwjh+wC63Fv9fIDA2CQ52G5vzw+L751S3Of70oWapGnvf9t97lfVt0uSNASR7A7LpdtZcxcRf/6+ug=
-X-Received: by 2002:a2e:9a17:: with SMTP id o23mr677728lji.242.1602817641246; 
- Thu, 15 Oct 2020 20:07:21 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kTG7X-0006nH-H3
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 23:09:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56332)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kTG7Q-0002tM-So
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 23:09:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602817761;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=E8HbX5QjLUvwJ9BsUeae3ntLOMJglZce6F9CqEC3w8E=;
+ b=WJCW+fECifMXDUYA86bXsy9/ItskAl0FiWytpzKI3c7THe9G88t2TJH+1WLFs9ThVQIq8x
+ mtqiyox5L/gLHRNhCWYz7ZTG5wLmv5W8rFtiFMxzksvfkzuPTymG5fqD9GmjkGfSXNnzjL
+ 7NmC+LT8kTe55G4H2Xoa/AEA560MCAc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-48-wBz24efLOKmD7CSeSfU3uA-1; Thu, 15 Oct 2020 23:09:19 -0400
+X-MC-Unique: wBz24efLOKmD7CSeSfU3uA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 721DA803634;
+ Fri, 16 Oct 2020 03:09:18 +0000 (UTC)
+Received: from laptop.redhat.com (ovpn-13-176.pek2.redhat.com [10.72.13.176])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8F3FA6EF55;
+ Fri, 16 Oct 2020 03:09:13 +0000 (UTC)
+From: Cindy Lu <lulu@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	qemu-devel@nongnu.org
+Subject: [PATCH v2 1/2] vhost-vdpa: Add qemu_close in vhost_vdpa_cleanup
+Date: Fri, 16 Oct 2020 11:09:08 +0800
+Message-Id: <20201016030909.9522-1-lulu@redhat.com>
 MIME-Version: 1.0
-References: <20201015220626.418-1-luoyonggang@gmail.com>
- <20201015220626.418-2-luoyonggang@gmail.com>
- <CABgObfZHAVioVo9xr5ViyezkNA9wq0n+Xberin0+VhzsJShGRw@mail.gmail.com>
-In-Reply-To: <CABgObfZHAVioVo9xr5ViyezkNA9wq0n+Xberin0+VhzsJShGRw@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Fri, 16 Oct 2020 11:07:09 +0800
-Message-ID: <CAE2XoE_e_OsWX8G9qBLEghz69KTjgnWaJuvRyeVUKDF78OfSgw@mail.gmail.com>
-Subject: Re: [PATCH v4 1/4] docs: Fixes build docs on msys2/mingw
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000257b1005b1c11062"
-Received-SPF: pass client-ip=2a00:1450:4864:20::229;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x229.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 23:09:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,123 +92,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-stable@nongnu.org, Cindy Lu <lulu@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000257b1005b1c11062
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+fix the bug that fd will still open after the cleanup
 
-On Fri, Oct 16, 2020 at 6:19 AM Paolo Bonzini <pbonzini@redhat.com> wrote:
->
->
->
-> Il ven 16 ott 2020, 00:06 Yonggang Luo <luoyonggang@gmail.com> ha scritto=
-:
->>
->> meson didn't support running ../scripts/kernel-do directly
->
->
-> Can you explain why this matters? Meson does not look at docs/conf.py.
->
-> Paolo
->
->>
->> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
->> ---
->>  docs/conf.py             | 2 +-
->>  docs/sphinx/kerneldoc.py | 2 +-
->>  2 files changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/docs/conf.py b/docs/conf.py
->> index 00e1b750e2..e584f68393 100644
->> --- a/docs/conf.py
->> +++ b/docs/conf.py
->> @@ -241,7 +241,7 @@ texinfo_documents =3D [
->>  # We use paths starting from qemu_docdir here so that you can run
->>  # sphinx-build from anywhere and the kerneldoc extension can still
->>  # find everything.
->> -kerneldoc_bin =3D os.path.join(qemu_docdir, '../scripts/kernel-doc')
->> +kerneldoc_bin =3D ['perl', os.path.join(qemu_docdir,
-'../scripts/kernel-doc')]
->>  kerneldoc_srctree =3D os.path.join(qemu_docdir, '..')
->>  hxtool_srctree =3D os.path.join(qemu_docdir, '..')
->>  qapidoc_srctree =3D os.path.join(qemu_docdir, '..')
->> diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
->> index 3e87940206..3ac277d162 100644
->> --- a/docs/sphinx/kerneldoc.py
->> +++ b/docs/sphinx/kerneldoc.py
->> @@ -67,7 +67,7 @@ class KernelDocDirective(Directive):
->>
->>      def run(self):
->>          env =3D self.state.document.settings.env
->> -        cmd =3D [env.config.kerneldoc_bin, '-rst', '-enable-lineno']
->> +        cmd =3D env.config.kerneldoc_bin + ['-rst', '-enable-lineno']
-  meson use the conf directly
->>
->>          filename =3D env.config.kerneldoc_srctree + '/' +
-self.arguments[0]
+Signed-off-by: Cindy Lu <lulu@redhat.com>
+---
+ net/vhost-vdpa.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
->>          export_file_patterns =3D []
->> --
->> 2.28.0.windows.1
->>
+diff --git a/net/vhost-vdpa.c b/net/vhost-vdpa.c
+index bc0e0d2d35..0480b92102 100644
+--- a/net/vhost-vdpa.c
++++ b/net/vhost-vdpa.c
+@@ -144,6 +144,10 @@ static void vhost_vdpa_cleanup(NetClientState *nc)
+         g_free(s->vhost_net);
+         s->vhost_net = NULL;
+     }
++     if (s->vhost_vdpa.device_fd >= 0) {
++        qemu_close(s->vhost_vdpa.device_fd);
++        s->vhost_vdpa.device_fd = -1;
++    }
+ }
+ 
+ static bool vhost_vdpa_has_vnet_hdr(NetClientState *nc)
+-- 
+2.21.3
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000257b1005b1c11062
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Fri, Oct 16, 2020 at 6:19 AM Paolo Bonzini &lt;=
-<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
-r>&gt;<br>&gt;<br>&gt;<br>&gt; Il ven 16 ott 2020, 00:06 Yonggang Luo &lt;<=
-a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; ha sc=
-ritto:<br>&gt;&gt;<br>&gt;&gt; meson didn&#39;t support running ../scripts/=
-kernel-do directly<br>&gt;<br>&gt;<br>&gt; Can you explain why this matters=
-? Meson does not look at docs/conf.py.<br>&gt;<br>&gt; Paolo<br>&gt;<br>&gt=
-;&gt;<br>&gt;&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyong=
-gang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt;&gt; ---<br>&gt;&gt; =
-=C2=A0docs/conf.py =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 2 +-<br>&gt;=
-&gt; =C2=A0docs/sphinx/kerneldoc.py | 2 +-<br>&gt;&gt; =C2=A02 files change=
-d, 2 insertions(+), 2 deletions(-)<br>&gt;&gt;<br>&gt;&gt; diff --git a/doc=
-s/conf.py b/docs/conf.py<br>&gt;&gt; index 00e1b750e2..e584f68393 100644<br=
->&gt;&gt; --- a/docs/conf.py<br>&gt;&gt; +++ b/docs/conf.py<br>&gt;&gt; @@ =
--241,7 +241,7 @@ texinfo_documents =3D [<br>&gt;&gt; =C2=A0# We use paths s=
-tarting from qemu_docdir here so that you can run<br>&gt;&gt; =C2=A0# sphin=
-x-build from anywhere and the kerneldoc extension can still<br>&gt;&gt; =C2=
-=A0# find everything.<br>&gt;&gt; -kerneldoc_bin =3D os.path.join(qemu_docd=
-ir, &#39;../scripts/kernel-doc&#39;)<br>&gt;&gt; +kerneldoc_bin =3D [&#39;p=
-erl&#39;, os.path.join(qemu_docdir, &#39;../scripts/kernel-doc&#39;)]<br>&g=
-t;&gt; =C2=A0kerneldoc_srctree =3D os.path.join(qemu_docdir, &#39;..&#39;)<=
-br>&gt;&gt; =C2=A0hxtool_srctree =3D os.path.join(qemu_docdir, &#39;..&#39;=
-)<br>&gt;&gt; =C2=A0qapidoc_srctree =3D os.path.join(qemu_docdir, &#39;..&#=
-39;)<br>&gt;&gt; diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kernel=
-doc.py<br>&gt;&gt; index 3e87940206..3ac277d162 100644<br>&gt;&gt; --- a/do=
-cs/sphinx/kerneldoc.py<br>&gt;&gt; +++ b/docs/sphinx/kerneldoc.py<br>&gt;&g=
-t; @@ -67,7 +67,7 @@ class KernelDocDirective(Directive):<br>&gt;&gt;<br>&g=
-t;&gt; =C2=A0 =C2=A0 =C2=A0def run(self):<br>&gt;&gt; =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0env =3D self.state.document.settings.env<br>&gt;&gt; - =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0cmd =3D [env.config.kerneldoc_bin, &#39;-rst&#39;, &#39=
-;-enable-lineno&#39;]<br>&gt;&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0cmd =3D env.=
-config.kerneldoc_bin + [&#39;-rst&#39;, &#39;-enable-lineno&#39;]<div>=C2=
-=A0 meson use the conf directly=C2=A0<br>&gt;&gt;<br>&gt;&gt; =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0filename =3D env.config.kerneldoc_srctree + &#39;/&#39=
-; + self.arguments[0]<div><br>&gt;&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0ex=
-port_file_patterns =3D []<br>&gt;&gt; --<br>&gt;&gt; 2.28.0.windows.1<br>&g=
-t;&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=
-=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 s=
-incerely,<br>Yonggang Luo</div></div></div>
-
---000000000000257b1005b1c11062--
 
