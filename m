@@ -2,101 +2,89 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5112C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:31:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E51D5C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:36:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED3F520874
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:31:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BBEBA206A5
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:36:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhvpQeLP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED3F520874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="pBpUsDHE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBEBA206A5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=yandex-team.ru
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTRhy-0007o7-NV
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:31:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34436)
+	id 1kTRmm-0003WQ-WC
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:36:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36098)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTRgF-0006VV-LE; Fri, 16 Oct 2020 11:30:08 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:36097)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTRgA-0000x5-6g; Fri, 16 Oct 2020 11:30:04 -0400
-Received: by mail-wm1-x343.google.com with SMTP id e2so3406723wme.1;
- Fri, 16 Oct 2020 08:30:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=y5g+BH7DVSD2irXW2waBxyDNrN/jBd+UOdq2bgeeu4U=;
- b=lhvpQeLPwMk/DuRRcOEth+fBHDHmX0oPPGWJAraIYlKqEXyfrjXSYXvfe2vrkBndzF
- SKAsEwAgeHMFmkTK9ndFtNTiksXrWQnIsVTN3XERCohZjF65LBQRLIk4nPc7j1f94NSH
- nfeEXchH9JcuxoZDOmNwprWxDe/d5rXNp3MeN0cm45gIh5FwqLrjW5IKHilqkS75z+WG
- jXNd+Z1kkftITeyKyZnsgtC0KRV+UsAIvrB1Lr7mtv2jpleUA07560jkACII6y6d5X52
- IooTNElSsbqN+PY631vmU84LjBVmGTUS2PP6Hmow4m5BESUHlnF5RVRYWrz8iME7yPow
- oEEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=y5g+BH7DVSD2irXW2waBxyDNrN/jBd+UOdq2bgeeu4U=;
- b=To/LOWIEIwuReLSzJLAjYP8sEj6pFMaUrsBOfw+qWK/RpfoB5ri0/p2O3jVe8VoqYc
- QXp8NAqAWkHvqfX/miTCAKDfS9X4Lm1RqyG9bezlsmMcYUHEkxSeClJNOaCofcbHoqKa
- 922A6fvp2Yf+0D231xC7dQf9q1V9C2ZCIYSkaYGsSjHX4iwDGMhYVzfRDhnryUzLi9f0
- LxfxIDpfN8T/H2dwdc2APYSo7TOo6+4oVG7+hERh1PeB3Ay/RNR/e6VMISd2wgYAdwkm
- 74nCM/NklVQ4NQo8ahTXy3VpopsKS9WRMgallcyM2oYfMZvgzLdCV01rqTKCPkopAJHs
- uD1w==
-X-Gm-Message-State: AOAM532kRRNrgK989ea4ystkAFZy8VFw74BzlMyVH49EzKr90ZnkJRYK
- ZySsNHahsWoglYskP3THzX0=
-X-Google-Smtp-Source: ABdhPJyg1REd++MumCdf/6ZPVmNT70LOccWPt4/EuKuYu6aPrs/S+VO7YnxTJhFvmf6GBo5nrgvAjA==
-X-Received: by 2002:a05:600c:2707:: with SMTP id
- 7mr4480318wmm.147.1602862199181; 
- Fri, 16 Oct 2020 08:29:59 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id e25sm4354147wra.71.2020.10.16.08.29.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Oct 2020 08:29:58 -0700 (PDT)
-Subject: Re: [PATCH v6 0/7] hw/misc: Add LED device
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org, =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>
-References: <20200912134041.946260-1-f4bug@amsat.org>
- <3783cc00-8ec6-6174-dad6-331177b95724@amsat.org>
-Message-ID: <22a8256e-3d1d-832e-b8ac-e05e9e91f07e@amsat.org>
-Date: Fri, 16 Oct 2020 17:29:57 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kTRlI-0002JI-W7
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:35:23 -0400
+Received: from forwardcorp1o.mail.yandex.net ([95.108.205.193]:39272)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lekiravi@yandex-team.ru>)
+ id 1kTRlA-0001pk-Vv
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:35:17 -0400
+Received: from vla1-fdfb804fb3f3.qloud-c.yandex.net
+ (vla1-fdfb804fb3f3.qloud-c.yandex.net
+ [IPv6:2a02:6b8:c0d:3199:0:640:fdfb:804f])
+ by forwardcorp1o.mail.yandex.net (Yandex) with ESMTP id 1BA222E18DF;
+ Fri, 16 Oct 2020 18:34:52 +0300 (MSK)
+Received: from localhost (localhost [::1])
+ by vla1-fdfb804fb3f3.qloud-c.yandex.net (mxbackcorp/Yandex) with ESMTP id
+ Ax4yoH1BDo-YpwG2VaK; Fri, 16 Oct 2020 18:34:51 +0300
+Precedence: bulk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+ s=default; 
+ t=1602862491; bh=bBfGtT0UvvuZF2+jN0bhvobuh/XtrZCn/T41206DEYM=;
+ h=Subject:In-Reply-To:Cc:Date:References:To:From:Message-Id;
+ b=pBpUsDHEuD5cKNmAaHIW1Ps/9vzaVnxFKbKKDwFPM5CXDj4UBDXllS5Y7NIM2fWyq
+ opMQFSBL0SjMHzUYv5FvCYeToAy19Iy7yU6YK8Vascva+8LFnGGOUo7xdvHNC6Bodi
+ edoDE59kBJuSmxy+TKUleDrhNwcTbp6fDjOB8DLU=
+Authentication-Results: vla1-fdfb804fb3f3.qloud-c.yandex.net;
+ dkim=pass header.i=@yandex-team.ru
+X-Yandex-Sender-Uid: 1120000000161690
+X-Yandex-Avir: 1
+Received: from iva8-d077482f1536.qloud-c.yandex.net
+ (iva8-d077482f1536.qloud-c.yandex.net [2a02:6b8:c0c:2f26:0:640:d077:482f])
+ by iva4-81f2a0d63507.qloud-c.yandex.net with LMTP id Opngm2DAgQ-TwOqLAgR
+ for <lekiravi@yandex-team.ru>; Fri, 16 Oct 2020 18:34:41 +0300
+Received: by iva8-edafde7c849c.qloud-c.yandex.net with HTTP;
+ Fri, 16 Oct 2020 18:34:40 +0300
+From: Alexey Kirillov <lekiravi@yandex-team.ru>
+To: Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Jason Wang <jasowang@redhat.com>
+In-Reply-To: <20200921191912.105305-1-lekiravi@yandex-team.ru>
+References: <20200921191912.105305-1-lekiravi@yandex-team.ru>
+Subject: Re: [PATCH v4 0/4] Introducing QMP query-netdev command
 MIME-Version: 1.0
-In-Reply-To: <3783cc00-8ec6-6174-dad6-331177b95724@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+X-Mailer: Yamail [ http://yandex.ru ] 5.0
+Date: Fri, 16 Oct 2020 18:34:50 +0300
+Message-Id: <3241602862308@mail.yandex-team.ru>
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.253,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Received-SPF: pass client-ip=95.108.205.193;
+ envelope-from=lekiravi@yandex-team.ru; helo=forwardcorp1o.mail.yandex.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 11:34:52
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,51 +93,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Vincenzo Maffione <v.maffione@gmail.com>,
+ "yc-core@yandex-team.ru" <yc-core@yandex-team.ru>,
+ Samuel Thibault <samuel.thibault@ens-lyon.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Giuseppe Lettieri <g.lettieri@iet.unipi.it>, Luigi Rizzo <rizzo@iet.unipi.it>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Cédric,
+Ping again, as no progress since september 22.
 
-On 9/19/20 2:30 PM, Philippe Mathieu-Daudé wrote:
-> On 9/12/20 3:40 PM, Philippe Mathieu-Daudé wrote:
->> Hello,
->>
->> These patches are part of the GSoC unselected 'QEMU visualizer'
->> project.
->>
->> This series introduce a LED device that can be easily connected
->> to a GPIO output.
-> [...]
->> Philippe Mathieu-Daud=C3=A9 (7):
->>    hw/misc/led: Add a LED device
->>    hw/misc/led: Allow connecting from GPIO output
->>    hw/misc/led: Emit a trace event when LED intensity has changed
->>    hw/arm/aspeed: Add the 3 front LEDs drived by the PCA9552 #1
->>    hw/misc/mps2-fpgaio: Use the LED device
->>    hw/misc/mps2-scc: Use the LED device
->>    hw/arm/tosa: Replace fprintf() calls by LED devices
-> 
-> This series is now fully reviewed.
+http://patchwork.ozlabs.org/project/qemu-devel/list/?series=203284
 
-Since the Aspeed board is the main user, do you mind
-taking this series via your aspeed tree?
+21.09.2020, 22:19, "Alexey Kirillov" <lekiravi@yandex-team.ru>:
+> This patch series introduces a new QMP command "query-netdev" to get
+> information about currently attached backend network devices (netdevs).
+> Also, since the "info_str" field of "NetClientState" is now deprecated,
+> we no longer use it for netdevs, only for NIC/hubports.
+> The HMP command "info network" now also uses the new QMP command inside.
+>
+> Usage example:
+>
+> -> { "execute": "query-netdev" }
+> <- { "return": [
+>          {
+>              "listen": "127.0.0.1:90",
+>              "type": "socket",
+>              "peer-id": "hub0port1",
+>              "id": "__org.qemu.net1"
+>          },
+>          {
+>              "script": "/etc/qemu-ifup",
+>              "downscript": "/etc/qemu-ifdown",
+>              "ifname": "tap0",
+>              "type": "tap",
+>              "peer-id": "net5",
+>              "vnet_hdr": true,
+>              "id": "tap0"
+>          },
+>          {
+>              "ipv6": true,
+>              "ipv4": true,
+>              "host": "10.0.2.2",
+>              "ipv6-dns": "fec0::3",
+>              "ipv6-prefix": "fec0::",
+>              "net": "10.0.2.0/255.255.255.0",
+>              "ipv6-host": "fec0::2",
+>              "type": "user",
+>              "peer-id": "net0",
+>              "dns": "10.0.2.3",
+>              "hostfwd": [
+>                  {
+>                      "str": "tcp::20004-:22"
+>                  }
+>              ],
+>              "ipv6-prefixlen": 64,
+>              "id": "netdev0",
+>              "restrict": false
+>          }
+>      ]
+>    }
+>
+> v3->v4:
+> - Rename "query-netdevs" to "query-netdev".
+> - Copy netdev drivers to new QAPI enum "NetBackend".
+>
+> v2->v3:
+> - Remove NIC and hubports from query-netdevs.
+> - Remove several fields from NetdevInfo since they are unnecessary.
+> - Rename field @peer to @peer-id.
+> - Add support of vhost-vdpa.
+> - Keep "info_str" for NIC/hubports, but remove it for netdevs.
+>
+> v1->v2:
+> - Rewrite HMP "info network" to get information from results of QMP command.
+> - Remove obsolete field "info_str" from "NetClientState".
+>
+> Alexey Kirillov (4):
+>   qapi: net: Add query-netdev command
+>   tests: Add tests for query-netdev command
+>   hmp: Use QMP query-netdev in hmp_info_network
+>   net: Do not use legacy info_str for backends
+>
+>  include/net/net.h | 4 +-
+>  net/clients.h | 1 +
+>  net/hub.c | 4 +-
+>  net/hub.h | 2 +-
+>  net/l2tpv3.c | 21 +++-
+>  net/net.c | 213 +++++++++++++++++++++++++++++++-
+>  net/netmap.c | 13 ++
+>  net/slirp.c | 128 ++++++++++++++++++-
+>  net/socket.c | 91 ++++++++++----
+>  net/tap-win32.c | 10 +-
+>  net/tap.c | 107 ++++++++++++++--
+>  net/vde.c | 39 +++++-
+>  net/vhost-user.c | 20 ++-
+>  net/vhost-vdpa.c | 15 ++-
+>  qapi/net.json | 80 ++++++++++++
+>  tests/qtest/meson.build | 3 +
+>  tests/qtest/test-query-netdev.c | 115 +++++++++++++++++
+>  17 files changed, 807 insertions(+), 59 deletions(-)
+>  create mode 100644 tests/qtest/test-query-netdev.c
+>
+> --
+> 2.25.1
 
-> 
-> Peter, since so far only ARM boards use the LED device,
-> do you mind queuing it via your ARM tree?
-> 
-> Alternatively I can ask Paolo or send a pull request
-> myself is both of you think it is out of the scope of
-> your maintenance area.
-> 
-> Thanks,
-> 
-> Phil.
-> 
+
+-- 
+Alexey Kirillov
+Yandex.Cloud
 
