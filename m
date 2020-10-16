@@ -2,82 +2,83 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69220C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:19:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF45AC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:19:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A72E92080A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:19:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 545592080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:19:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ca7UD3pD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A72E92080A
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u+7npZBL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 545592080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35162 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35460 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTKxM-0001bZ-Df
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:19:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51316)
+	id 1kTKxP-0001j8-8l
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTKvP-0008Px-Nz
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:17:19 -0400
-Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:38630)
+ id 1kTKvR-0008RA-Vp
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:17:21 -0400
+Received: from mail-pf1-x435.google.com ([2607:f8b0:4864:20::435]:35484)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTKvO-0006F7-3h
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:17:19 -0400
-Received: by mail-pj1-x1031.google.com with SMTP id u3so1040925pjr.3
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 01:17:16 -0700 (PDT)
+ id 1kTKvP-0006G3-Nf
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:17:21 -0400
+Received: by mail-pf1-x435.google.com with SMTP id k8so1052168pfk.2
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 01:17:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mijvyCc2kGkUHOD2Ga/5m/xG1Qr5QuhpLzhPHuC/O4E=;
- b=ca7UD3pD5TavIseUkAV/ikLnYw/YFGCCXdZbv0oy8ZdkcnJ+eS1lrCOO3ZX8e90fCc
- ypRfL80CdFUHfiWZXvyv0cMNV3bQYDsi0vI2y9LEhtt6PmLpq0RoSQp3zInxTR3gH7IW
- KA9PVRJuaZ6Te6RXo0ScXoRfUdeLuRzcGJ0BLKLE9WZJ0h2tkkGsvl5SeBSSp83g7paJ
- ZJ/9c/K7oJCr/p00wCb0dYgee4ftMtwj8Vd25p3K20qGpFjbjU5lkeRDaIvpmGu2isUi
- SP/QSAHOflYKd4aMvtNZGI+APpX0ksqQmw6S4LIowIYr3abkVjz/bwjl+mMEbxkI4xuo
- JKrA==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=m0vpWTQi7lQcf+oIhIvda/slW9NTohrk35TKxPBDwEI=;
+ b=u+7npZBLxsGMiT2qF1qZx4SyyG2nO7QbWx1c8SMCZoQpxdBGvqPQzY+Dz7GVhz7ZUQ
+ U6znREGLqtgDJtPAOc8YDUYn0DOGGUlxRBy9B0CMOXC/Ld5K5mjXiSOp5EjcUP0t2LmE
+ ks759BP19GYuTOUeLYxuaJxE6Zc6JuCwgJ1ji7TrhUihgfVMZvtB4u0OvDaCgK8vCQfc
+ 7ZxSRAcmolofjFxKFrgxIGP53cEfzItDLQKoYvNMXURF266pP5TydLML8ECfMKFw8MW+
+ V8oWjb0rHY3dJ9MIEKhJdoapxTvCsKtrRE+s2OYA38DsGtHH5stqeNuYM9ThItqgxEFq
+ CAag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=mijvyCc2kGkUHOD2Ga/5m/xG1Qr5QuhpLzhPHuC/O4E=;
- b=Z7K8JC8fu9TRaRm8fgQkTabzMnGnjbbSRW3uxPZCIbi3WgQKz2GWWpPtlbmUeYr+Lg
- JqRS3q1fohsyHROIuafazabP8kPUu5VoL6vrx+3y/9+G4MFLrOoMMvVz7qYJ1ZLsOfEk
- DqoU98wQV0NDBi/4WwJs2spDzU4anL17FZINf+uqlLUqozoMzpRzbROXqpsCNYwsVkzK
- 2WvaMVIVO4O95CvOFBfYQ/AQfvVIBe5rrABpcANIjrFN7lDtd6yERP/bk1Lv87e7vuY+
- AJ3CmVlJ1INL0eMY7E2OArJEOCLud38EaZr/h21np7vh1Oku/SumbOllWYBQDuBYV9PK
- Sctw==
-X-Gm-Message-State: AOAM5322PWWfUE8O4NRDNmoxW/gJGqrwsJrhrnxTYfqNL+hnZ0k/xJUy
- yzTHxLmeE6YNSTmXvVLnPC83SCAsK8yd9kdY
-X-Google-Smtp-Source: ABdhPJy7CMXMFs0ufqRq3kBiPvr9cNZdK0+bYJHwie/QcR1B9YAJANHlGUrnPblzq02I/Sw2i3syiw==
-X-Received: by 2002:a17:90a:ba06:: with SMTP id
- s6mr2953383pjr.13.1602836235021; 
- Fri, 16 Oct 2020 01:17:15 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=m0vpWTQi7lQcf+oIhIvda/slW9NTohrk35TKxPBDwEI=;
+ b=thsq3d7VBB3xeVvHvLDzpggBuFpCgXNAiT/2V3LU+Bj2iaHg2/fYs75aUJ3IJMG6P5
+ cpFNgg+kOcKSM2rmabpxARf5lMrS4ABG7FYQiLGiGREV8cjjsKEIgmnI+pNg2nE1zbtV
+ Mp1a3oLjoQlao14axn4QC76YJxBiBgoXlFUTKAQPO8swXPQJDYsJ1op1MAGQbEGMx4pr
+ WYz1D8UaexgxgyNZxPnPg6+DK1GsBg/QWVM+/9j+PwsXNqPKpEevvuJyYpdPWsK0Kkgj
+ l7v0cvrW7cGRy/uCG+M2gwKdO2qzfEvUss2tqBZJ6fTkTtXqpzZ+hPzhKrn4fMqfux4i
+ i6Aw==
+X-Gm-Message-State: AOAM532Ek3qnVMSwWSVfCFevo+aZH+6ELVb5M7hSxoMbab0H1IWjF7eP
+ i0PzA0Eb0mnJcoO2K2Z9qUSe65R0rCAvEoaR
+X-Google-Smtp-Source: ABdhPJyi105GNHqDkjrPiNC2Kgrh/RVl/O8wxtAwRxemJU58Y6cPNFe9XISR1gtOxpqgJzJzaR1TkA==
+X-Received: by 2002:a63:e65:: with SMTP id 37mr2142418pgo.445.1602836237645;
+ Fri, 16 Oct 2020 01:17:17 -0700 (PDT)
 Received: from localhost.localdomain ([103.94.185.75])
- by smtp.googlemail.com with ESMTPSA id d2sm1940343pjx.4.2020.10.16.01.17.13
+ by smtp.googlemail.com with ESMTPSA id d2sm1940343pjx.4.2020.10.16.01.17.15
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Oct 2020 01:17:14 -0700 (PDT)
+ Fri, 16 Oct 2020 01:17:16 -0700 (PDT)
 From: Yonggang Luo <luoyonggang@gmail.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 0/4] Fixes docs building on msys2/mingw
-Date: Fri, 16 Oct 2020 16:16:54 +0800
-Message-Id: <20201016081658.1890-1-luoyonggang@gmail.com>
+Subject: [PATCH v5 1/4] docs: Fixes build docs on msys2/mingw
+Date: Fri, 16 Oct 2020 16:16:55 +0800
+Message-Id: <20201016081658.1890-2-luoyonggang@gmail.com>
 X-Mailer: git-send-email 2.28.0.windows.1
-Content-Type: text/plain; charset="utf-8"
+In-Reply-To: <20201016081658.1890-1-luoyonggang@gmail.com>
+References: <20201016081658.1890-1-luoyonggang@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
- envelope-from=luoyonggang@gmail.com; helo=mail-pj1-x1031.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::435;
+ envelope-from=luoyonggang@gmail.com; helo=mail-pf1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,48 +105,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-V4-V5=0D
-Revise * docs: Fixes build docs on msys2/mingw=0D
-For easier to review.=0D
-Revise * meson: Move the detection logic for sphinx to meson=0D
-According Paolo's suggestion with fixes.=0D
-=0D
-V3-V4=0D
-Quic fixes of=0D
-python style=0D
-if xxx:=0D
-=0D
-tested locally=0D
-=0D
-V2-V3=0D
-No need convert perl trick to python script anymore=0D
-after Paolo's removal of ninjatool.=0D
-Revise Meson: Move the detection logic for sphinx to meson=0D
-for pass other platform by letting SPHINX_ARGS to be empty=0D
-when build_docs are false=0D
-=0D
-v1 - v2=0D
-Also move the docs configure part from=0D
-configure to meson, this also fixed the pending=0D
-ninjatool removal caused issue that docs  can=0D
-not be build under msys2/mingw=0D
-=0D
-Yonggang Luo (4):=0D
-  docs: Fixes build docs on msys2/mingw=0D
-  configure: the docdir option should passed to meson as is.=0D
-  meson: Move the detection logic for sphinx to meson=0D
-  cirrus: Enable doc build on msys2/mingw=0D
-=0D
- .cirrus.yml                   |  6 +++-=0D
- configure                     | 62 +++--------------------------------=0D
- docs/meson.build              |  4 +--=0D
- docs/sphinx/kerneldoc.py      |  2 +-=0D
- meson.build                   | 52 +++++++++++++++++++++++++----=0D
- meson_options.txt             |  5 ++-=0D
- tests/qapi-schema/meson.build |  2 +-=0D
- 7 files changed, 64 insertions(+), 69 deletions(-)=0D
-=0D
--- =0D
-2.28.0.windows.1=0D
-=0D
+meson didn't support running ../scripts/kernel-do directly
+Add the perl as the first parameter
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+---
+ docs/sphinx/kerneldoc.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
+index 3e87940206..af130d0939 100644
+--- a/docs/sphinx/kerneldoc.py
++++ b/docs/sphinx/kerneldoc.py
+@@ -67,7 +67,7 @@ class KernelDocDirective(Directive):
+ 
+     def run(self):
+         env = self.state.document.settings.env
+-        cmd = [env.config.kerneldoc_bin, '-rst', '-enable-lineno']
++        cmd = ['perl', env.config.kerneldoc_bin, '-rst', '-enable-lineno']
+ 
+         filename = env.config.kerneldoc_srctree + '/' + self.arguments[0]
+         export_file_patterns = []
+-- 
+2.28.0.windows.1
+
 
