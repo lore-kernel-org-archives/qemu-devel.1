@@ -2,85 +2,96 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A662C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:47:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4856C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 23:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB4DF20874
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 22:47:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06C7322201
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 23:49:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HIhaTvXT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB4DF20874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GdXGz2Z+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06C7322201
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49762 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTYVx-0000dR-JH
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 18:47:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55130)
+	id 1kTZT6-00066H-Mb
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 19:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kTYTj-0008F1-1O; Fri, 16 Oct 2020 18:45:39 -0400
-Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:42460)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTZS7-0005b8-VP
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 19:48:03 -0400
+Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:45198)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kTYTh-000089-4T; Fri, 16 Oct 2020 18:45:38 -0400
-Received: by mail-il1-x143.google.com with SMTP id l16so4397254ilj.9;
- Fri, 16 Oct 2020 15:45:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=KfuBWLWEZfcCjhlU5SHPE8VPjxmLIxlIhcGyHYX1R00=;
- b=HIhaTvXT6scy1QOyb6/hsV+AyAd3WFvOo16FxEpYriQNsrkYhQHdslomT/k+89huWw
- +WyyvRNjBEO6gsf/GVJaE/yDzFiTb+QO/l0aSzICCRAy2hhnqq7EtgI4Rm6jemHWCKq8
- 8cJvASZmL0iSdbUmyKD3MgcHi+Vh3r64LJTIaGPSGemqPoITekQ6z28qcMtZzzPdDXuX
- RUS+DrhNbly3ZFYfV2r6lD6RxLnwP4+fPnIJ8cWbjh89S86w19/GAtWjX5gBB82p2ncg
- 65X/Kftawxbd5S/1zUytFNYBK2Oai6C/FDUE9GpBOQWWW4b8jvDTYHB7RkQIxdNoBC8F
- ZR0Q==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTZS6-0007hU-Aj
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 19:48:03 -0400
+Received: by mail-pl1-x644.google.com with SMTP id v12so2067704ply.12
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 16:48:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ZVW7yJ/13kjwcl8Wy0IS9kr1o+xMer4wX7nQcI21J4o=;
+ b=GdXGz2Z+VOcN05o17rt9PJJFiF2VGMNIu35mEFneyj/x5vRS5iV2+SjY0meyRqcMEX
+ k3BbfR0SfUiPg1SZk5QXP6hnZfzUzYeAf6oQEqdqy3n/XUzl5BvUabBlvudY1kQTQonw
+ EZsDoPqA3/Uso6nn9UOIGp75F+ULbTZqKQL4Cbo0NOcU+LHYDEMjjyPBfYlRKV6i5+Lr
+ +ykWL9SsVHx97QlCfEudwr/L/FjqpkXYacM7g9fZGjWyCpvgR+/eaXomdQ7X5wX6EXrq
+ vh9kP6Pv2xn9osCs4aiEPyf1MhY90lYsupHOPzT2Mg39prSmJmKSOzsJoRDUJ4DOL2pd
+ rXlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=KfuBWLWEZfcCjhlU5SHPE8VPjxmLIxlIhcGyHYX1R00=;
- b=aiaYsIyYQFN72foJExSHLloYEdyh8UnX57GtZfS0k67uQr/VU4wPZ27teyoZ6Rfun+
- QpMG/OfPL5WtNfnM9ofra+Qaf52MeHdw3cUBTrH1NVVxoz3ccvSADWxv2XEcS1+zPq4g
- praWADUJcGxVgBRMXXBUFwkalW+PpvB3nrZmcM4igRH6289HuRn1StsoQLv90bDEcDrG
- IHOFz6VdVaOp5oe8GsVSRIlAagEDQFfA8vSrxDwlfu8VOElo/g2dCuSq2f01Xm1sbuUq
- 8ofwQwTTVSDSKQ73zb8AkOKa4yHLGcYGFa31biKi95YbeglA7aeJUAeWCyj/xp5PL0cI
- DAvA==
-X-Gm-Message-State: AOAM5310xLg/8HHugEkZXSL0d31yFWJS5ys3ak756T8zsBVhxZU5AVBI
- UPgX9dqSrZri7Ayq/tTg/QJHn6XLFWN2eMoiR2w=
-X-Google-Smtp-Source: ABdhPJwqR1zVuBjCT2HRF+RFJuhF4QV8JoiVoUKbPFTuZnRggu8kZRC7DQb+DZIV0ptoHzb7+MgXfw7MX5a9xJnovGA=
-X-Received: by 2002:a05:6e02:1241:: with SMTP id
- j1mr4639302ilq.267.1602888335575; 
- Fri, 16 Oct 2020 15:45:35 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ZVW7yJ/13kjwcl8Wy0IS9kr1o+xMer4wX7nQcI21J4o=;
+ b=tGY9fo86a+EUbsanUZm46AfCCKAPxXBL3s2XfpjeeIrSZ+GEA4pH4Ta5C8uUZX+BPX
+ fJ6Gkb5YPAu/BKpT/+pZpS8vKzQysB2ZehPrr+SqTU6xXJwJClFhjkAuZYUirpZ3wFrS
+ l9FkUlJzpcOlfP1IwE5mSw6BW6KQ7rlmTyN+KgbtYcRdZbB90cGJqadnocAjPtVY8WR0
+ yzvGJIofyWEukY8ZqZZAsqVccbW3FabcIMmJ3RD2qRioF4qcs8nU9LR415ssFr7DGycx
+ WVE6n7OF+SgNCAcMO96VauwcIWCFAuJTrXWjlVnwhQOhHVSkOdFTolM/6Ie9VlRWirh1
+ 0mtg==
+X-Gm-Message-State: AOAM531e03QzEuQSc5kh5LmvVFcEkeQk97LPCQB9HuhLD4sPTfP984R5
+ teYi6Nr+VdRT4rXcEx4KCGOA0w==
+X-Google-Smtp-Source: ABdhPJwdYNfEYRMH75xIVG+RhBiRzP6bpP+bw5QuETN2OCuCyM9NTzb9f53lF8tujIqGINd27FBLYQ==
+X-Received: by 2002:a17:902:b107:b029:d2:ab87:c418 with SMTP id
+ q7-20020a170902b107b02900d2ab87c418mr6653395plr.40.1602892080647; 
+ Fri, 16 Oct 2020 16:48:00 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id t3sm3700794pgm.42.2020.10.16.16.47.59
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 16:47:59 -0700 (PDT)
+Subject: Re: [PATCH v3 5/5] [RISCV_PM] Implement address masking functions
+ required for RISC-V Pointer Masking extension
+To: Alexey Baturo <baturo.alexey@gmail.com>
+References: <20201016221138.10371-1-space.monkey.delivers@gmail.com>
+ <20201016221138.10371-6-space.monkey.delivers@gmail.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <ed0a6658-76a7-d9cc-574e-93b2fb8af6c7@linaro.org>
+Date: Fri, 16 Oct 2020 16:47:57 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <B96DF081-AEDD-470E-A99C-8A9536E0A8CE@hni.upb.de>
- <CAKmqyKPnnLHuTvosMLs+4A8QqR-XvuxgRU33c0f1Q92LJ_x8CA@mail.gmail.com>
- <7F36EF66-D48D-418C-94D2-AA66D86C38CA@hni.upb.de>
-In-Reply-To: <7F36EF66-D48D-418C-94D2-AA66D86C38CA@hni.upb.de>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 16 Oct 2020 15:33:56 -0700
-Message-ID: <CAKmqyKMO8oTg8DSHqYyX8eL4SkN5GTMiuO0+VmnRcJkY2daaQQ@mail.gmail.com>
-Subject: Re: HTIF tohost symbol size check always fails
-To: Peer Adelt <adelt@hni.upb.de>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+In-Reply-To: <20201016221138.10371-6-space.monkey.delivers@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.253,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,60 +106,24 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>
+Cc: qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, qemu-devel@nongnu.org,
+ space.monkey.delivers@gmail.com, Alistair.Francis@wdc.com,
+ kupokupokupopo@gmail.com, palmer@dabbelt.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 16, 2020 at 2:35 PM Peer Adelt <adelt@hni.upb.de> wrote:
->
-> The solution was even easier: I forgot to load the proxy kernel. As soon as I replaced the command-line parameter "-kernel <ELF>" with "-kernel <PK> -append <ELF>", everything was working as expected.
+On 10/16/20 3:11 PM, Alexey Baturo wrote:
+> From: Anatoly Parshintsev <kupokupokupopo@gmail.com>
+> 
+> Signed-off-by: Anatoly Parshintsev <kupokupokupopo@gmail.com>
+> ---
+>  target/riscv/cpu.h       | 19 +++++++++++++++++++
+>  target/riscv/translate.c | 34 ++++++++++++++++++++++++++++++++--
+>  2 files changed, 51 insertions(+), 2 deletions(-)
 
-Even better, you can skip the proxy kernel.
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-You can run:
-
-`-bios default -kernel <ELF>`
-
-Alistair
-
->
-> Without your hint about my possibly misconfigured toolchain I would have probably continued to search for the error in the QEMU HTIF device. But in fact it was due to the wrong binary.
->
-> Thanks a lot! :-)
->
-> > On 16. Oct 2020, at 20:03, Alistair Francis <alistair23@gmail.com> wrote:
-> >
-> > On Fri, Oct 16, 2020 at 7:59 AM Peer Adelt <adelt@hni.upb.de> wrote:
-> >>
-> >> Hi,
-> >>
-> >> I have a problem with the RISC-V HTIF device.
-> >>
-> >> Every binary I have compiled for Spike on riscv32 fails with the following error message: "HTIF tohost must be 8 bytes"
-> >>
-> >> This happens regardless of which program I have translated for Spike. This is also the case with the official riscv-compliance tests, for example.
-> >>
-> >> The query "if (st_size != 8)" in the HTIF device always fails, because st_size seems to be always 0.
-> >>
-> >> To be able to reproduce it:
-> >> - QEMU GIT Hash: d0ed6a69d399ae193959225cdeaa9382746c91cc (tag "v5.1.0")
-> >
-> > I just checked with this hash and with the current master and on both
-> > I can run a ELF executable on the Spike machine for RV32.
-> >
-> >> - System: Mac OS 10.14.6 (Darwin Kernel Version 18.7.0)
-> >> - Compiler: Latest SiFive Build for GCC under OSX
-> >
-> > Maybe try using an official toolchain instead of a vendor fork.
-> >
-> > Alistair
-> >
-> >> - Command: qemu-system-riscv32 -M spike -nographic -bios none -kernel <ANY_SPIKE_ELF_FILE>
-> >>
-> >> Best regards,
-> >> Peer Adelt
->
+r~
 
