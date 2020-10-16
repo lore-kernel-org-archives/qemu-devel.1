@@ -2,81 +2,91 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D18C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:32:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1224C43457
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:47:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6FFA4207C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:32:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FFA4207C4
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 213CA20848
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:47:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iPXzsDQe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 213CA20848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46840 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTJHt-0007eI-07
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 02:32:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52782)
+	id 1kTJW9-00034R-1c
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 02:47:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55216)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kTJGn-0007Cm-R4
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 02:31:18 -0400
-Received: from indium.canonical.com ([91.189.90.7]:57610)
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1kTJUQ-0002Mr-QY; Fri, 16 Oct 2020 02:45:22 -0400
+Received: from mail-ot1-x343.google.com ([2607:f8b0:4864:20::343]:45497)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kTJGd-0000pa-Lo
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 02:31:15 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kTJGZ-0004Ks-6P
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:31:03 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 2072F2E8134
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:31:03 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <hsp.cat7@gmail.com>)
+ id 1kTJUK-0005h2-Jo; Fri, 16 Oct 2020 02:45:22 -0400
+Received: by mail-ot1-x343.google.com with SMTP id f37so1465346otf.12;
+ Thu, 15 Oct 2020 23:45:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/dxLNljiXPEUpWUAlK93T0HnlADpqIRP5l661Y6trRE=;
+ b=iPXzsDQe340YKcWZHhlZe5xsptIWqvnWm2ASJ7KCM5G7jrOU5Llmb/qBebOZNmX49X
+ FiFalXjtU0hs6unMYQ4ByYwkLZAStH/jX5SYAe1SN3GNKBIoLNSvXOFMujNtIkauKBN0
+ alapqGFTLkNzB3aGfGYYXkzb4eVmXgeVMGaDzx4bKaehZbI+AODJ9Idrs4x14qpKkOgf
+ weC++W8M2/7p/ujNo3g1ES3udUL1hftkDW/lxbanBT51FNDX3qubNZObFp00AfhPRvHD
+ fftIBU47RwBEdkEzasDO/8bMzs0/SQbY6brGrYEHc+3jDU6N4vOaHWcl7WT6XT3wf0Rv
+ jJog==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/dxLNljiXPEUpWUAlK93T0HnlADpqIRP5l661Y6trRE=;
+ b=qee7YP0ridOfd5xmq1IL2Z7HyQZKuB15JBQ7gj81lAAKZfcUkjb7oMfX9a9jYZRCaH
+ pg9O+76YXgn6QUyPGy7BAYeI1Bpn2ujuvNnDUpSPD13yaZThR/fASVwNO/gSxaf1REk8
+ xGuxjglMwlpwQ4hP44h8/6cnECi6LxEulUWAH7h4+36J6dt0UbiMPe4e5I/BwfsgR5Do
+ nvg7i7pJifzaFhOrDfaXbcgQOPcjFGJofNyPO1TS71jQaiw3wOMHBOGfoAy/ky6EPxFf
+ QONEps3mgKs0Zb3qqZ5A0d8NIPUkgLfcO9DswXCB0W3VioJIZjCEwzRH8Sr+XMK7ufdg
+ Yfvg==
+X-Gm-Message-State: AOAM531H2NRP4YSdJc8LDZX9k1l2oI7AUvMMFYxmTEwFEAbe2j5/5x+P
+ j275i1RrggCEmEqTS9x4A6vvBgVJTFiMryTHX/A=
+X-Google-Smtp-Source: ABdhPJytqPmAJav63y/FS9klv1vY4fdJ7lsLpeIAhDypDw1h1pGzrJjdJD/O2FELNk5+zoyzgwyZFHiKNrrWcfGBmHU=
+X-Received: by 2002:a9d:649:: with SMTP id 67mr1589719otn.233.1602830714149;
+ Thu, 15 Oct 2020 23:45:14 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2020 06:16:28 -0000
-From: Andrej Krutak <1856834@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andree182 ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: Andrej Krutak (andree182)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <160282898811.30872.13701622178575310967.malone@wampee.canonical.com>
-Subject: [Bug 1856834] Re: PCI broken in qemu ppc e500 in v2.12.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
-X-Launchpad-Hash: aae68a34f272c06f0cbed2d470ff4fb1676f346d
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 02:31:03
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
+ <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
+ <20201016001803.GC7078@yekko.fritz.box>
+In-Reply-To: <20201016001803.GC7078@yekko.fritz.box>
+From: Howard Spoelstra <hsp.cat7@gmail.com>
+Date: Fri, 16 Oct 2020 08:45:02 +0200
+Message-ID: <CABLmASE+GzEhSgqqJmum+Xu7DkyQX6PtboKLhA4LyaOY7PYoSA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
+To: David Gibson <david@gibson.dropbear.id.au>
+Content-Type: multipart/alternative; boundary="0000000000005a20dd05b1c41b02"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::343;
+ envelope-from=hsp.cat7@gmail.com; helo=mail-ot1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,92 +95,309 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: qemu-ppc <qemu-ppc@nongnu.org>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Not even reverting the patch worked for me, and it's still broken on
-qemu 5.1.
+--0000000000005a20dd05b1c41b02
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-For example:
+On Fri, Oct 16, 2020 at 2:30 AM David Gibson <david@gibson.dropbear.id.au>
+wrote:
 
-~/OSS/qemu/ppc-softmmu/qemu-system-ppc -machine mpc8544ds -nographic
--cpu e500mc -serial mon:stdio -kernel zImage -initrd rootfs.ird -append
-'console=3DttyS0,115200' -device e1000,netdev=3Dmain -netdev
-hubport,hubid=3D0,id=3Dmain -net tap,ifname=3Dtap0 -device virtio-balloon-p=
-ci
--device virtio-rng-pci  -device virtio-blk-pci-transitional,drive=3Ddrive0
--drive file=3Ddisk,if=3Dnone,id=3Ddrive0,format=3Draw
+> On Tue, Oct 13, 2020 at 12:49:21PM +0100, Mark Cave-Ayland wrote:
+> > Currently an object link property is used to pass a reference to the
+> Heathrow
+> > PIC into the PCI host bridge so that grackle_init_irqs() can connect th=
+e
+> PCI
+> > IRQs to the PIC itself.
+> >
+> > This can be simplified by defining the PCI IRQs as qdev gpios and then
+> wiring
+> > up the PCI IRQs to the PIC in the Old World machine init function.
+> >
+> > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>
+> Applied to ppc-for-5.2.
+>
+> > ---
+> >  hw/pci-host/grackle.c | 19 ++-----------------
+> >  hw/ppc/mac_oldworld.c |  7 +++++--
+> >  2 files changed, 7 insertions(+), 19 deletions(-)
+> >
+> > diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c
+> > index 57c29b20af..b05facf463 100644
+> > --- a/hw/pci-host/grackle.c
+> > +++ b/hw/pci-host/grackle.c
+> > @@ -28,7 +28,6 @@
+> >  #include "hw/ppc/mac.h"
+> >  #include "hw/qdev-properties.h"
+> >  #include "hw/pci/pci.h"
+> > -#include "hw/intc/heathrow_pic.h"
+> >  #include "hw/irq.h"
+> >  #include "qapi/error.h"
+> >  #include "qemu/module.h"
+> > @@ -41,7 +40,6 @@ struct GrackleState {
+> >      PCIHostState parent_obj;
+> >
+> >      uint32_t ofw_addr;
+> > -    HeathrowState *pic;
+> >      qemu_irq irqs[4];
+> >      MemoryRegion pci_mmio;
+> >      MemoryRegion pci_hole;
+> > @@ -62,15 +60,6 @@ static void pci_grackle_set_irq(void *opaque, int
+> irq_num, int level)
+> >      qemu_set_irq(s->irqs[irq_num], level);
+> >  }
+> >
+> > -static void grackle_init_irqs(GrackleState *s)
+> > -{
+> > -    int i;
+> > -
+> > -    for (i =3D 0; i < ARRAY_SIZE(s->irqs); i++) {
+> > -        s->irqs[i] =3D qdev_get_gpio_in(DEVICE(s->pic), 0x15 + i);
+> > -    }
+> > -}
+> > -
+> >  static void grackle_realize(DeviceState *dev, Error **errp)
+> >  {
+> >      GrackleState *s =3D GRACKLE_PCI_HOST_BRIDGE(dev);
+> > @@ -85,7 +74,6 @@ static void grackle_realize(DeviceState *dev, Error
+> **errp)
+> >                                       0, 4, TYPE_PCI_BUS);
+> >
+> >      pci_create_simple(phb->bus, 0, "grackle");
+> > -    grackle_init_irqs(s);
+> >  }
+> >
+> >  static void grackle_init(Object *obj)
+> > @@ -106,15 +94,12 @@ static void grackle_init(Object *obj)
+> >      memory_region_init_io(&phb->data_mem, obj, &pci_host_data_le_ops,
+> >                            DEVICE(obj), "pci-data-idx", 0x1000);
+> >
+> > -    object_property_add_link(obj, "pic", TYPE_HEATHROW,
+> > -                             (Object **) &s->pic,
+> > -                             qdev_prop_allow_set_link_before_realize,
+> > -                             0);
+> > -
+> >      sysbus_init_mmio(sbd, &phb->conf_mem);
+> >      sysbus_init_mmio(sbd, &phb->data_mem);
+> >      sysbus_init_mmio(sbd, &s->pci_hole);
+> >      sysbus_init_mmio(sbd, &s->pci_io);
+> > +
+> > +    qdev_init_gpio_out(DEVICE(obj), s->irqs, ARRAY_SIZE(s->irqs));
+> >  }
+> >
+> >  static void grackle_pci_realize(PCIDevice *d, Error **errp)
+> > diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> > index d6a76d06dc..05e46ee6fe 100644
+> > --- a/hw/ppc/mac_oldworld.c
+> > +++ b/hw/ppc/mac_oldworld.c
+> > @@ -253,10 +253,9 @@ static void ppc_heathrow_init(MachineState *machin=
+e)
+> >      /* Grackle PCI host bridge */
+> >      dev =3D qdev_new(TYPE_GRACKLE_PCI_HOST_BRIDGE);
+> >      qdev_prop_set_uint32(dev, "ofw-addr", 0x80000000);
+> > -    object_property_set_link(OBJECT(dev), "pic", OBJECT(pic_dev),
+> > -                             &error_abort);
+> >      s =3D SYS_BUS_DEVICE(dev);
+> >      sysbus_realize_and_unref(s, &error_fatal);
+> > +
+> >      sysbus_mmio_map(s, 0, GRACKLE_BASE);
+> >      sysbus_mmio_map(s, 1, GRACKLE_BASE + 0x200000);
+> >      /* PCI hole */
+> > @@ -266,6 +265,10 @@ static void ppc_heathrow_init(MachineState *machin=
+e)
+> >      memory_region_add_subregion(get_system_memory(), 0xfe000000,
+> >                                  sysbus_mmio_get_region(s, 3));
+> >
+> > +    for (i =3D 0; i < 4; i++) {
+> > +        qdev_connect_gpio_out(dev, i, qdev_get_gpio_in(pic_dev, 0x15 +
+> i));
+> > +    }
+> > +
+> >      pci_bus =3D PCI_HOST_BRIDGE(dev)->bus;
+> >
+> >      pci_vga_init(pci_bus);
+>
+>
+> Hi,
 
-causes the linux kernel to freeze after probing the virtio_blk device:
+I see compilation of the current ppc-for-5.2 branch fail with:
 
-virtio_rng: probe of virtio1 failed with error -22
-virtio_blk virtio2: [vda] 131072 512-byte logical blocks (67.1 MB/64.0 MiB)
+../hw/pci-host/grackle.c: In function =E2=80=98grackle_realize=E2=80=99:
+../hw/pci-host/grackle.c:68:11: error: =E2=80=98GrackleState=E2=80=99 has n=
+o member named
+=E2=80=98pic=E2=80=99
+   68 |     if (!s->pic) {
+      |           ^~
+make: *** [Makefile.ninja:1741: libcommon.fa.p/hw_pci-host_grackle.c.o]
+Error 1
 
-Not specifying the virtio-blk-pci device makes the system boot, but
-still all but the first (e1000) PCI devices seem to not probe.
+Best,
+Howard
 
-It seems I can trace this behavior at least to version 2.4.1, probably
-even sooner (can't make my linux boot on those, so I'm unsure...).
+--0000000000005a20dd05b1c41b02
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
--- =
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Fri, Oct 16, 2020 at 2:30 AM David=
+ Gibson &lt;<a href=3D"mailto:david@gibson.dropbear.id.au">david@gibson.dro=
+pbear.id.au</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=
+=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
+-left:1ex">On Tue, Oct 13, 2020 at 12:49:21PM +0100, Mark Cave-Ayland wrote=
+:<br>
+&gt; Currently an object link property is used to pass a reference to the H=
+eathrow<br>
+&gt; PIC into the PCI host bridge so that grackle_init_irqs() can connect t=
+he PCI<br>
+&gt; IRQs to the PIC itself.<br>
+&gt; <br>
+&gt; This can be simplified by defining the PCI IRQs as qdev gpios and then=
+ wiring<br>
+&gt; up the PCI IRQs to the PIC in the Old World machine init function.<br>
+&gt; <br>
+&gt; Signed-off-by: Mark Cave-Ayland &lt;<a href=3D"mailto:mark.cave-ayland=
+@ilande.co.uk" target=3D"_blank">mark.cave-ayland@ilande.co.uk</a>&gt;<br>
+<br>
+Applied to ppc-for-5.2.<br>
+<br>
+&gt; ---<br>
+&gt;=C2=A0 hw/pci-host/grackle.c | 19 ++-----------------<br>
+&gt;=C2=A0 hw/ppc/mac_oldworld.c |=C2=A0 7 +++++--<br>
+&gt;=C2=A0 2 files changed, 7 insertions(+), 19 deletions(-)<br>
+&gt; <br>
+&gt; diff --git a/hw/pci-host/grackle.c b/hw/pci-host/grackle.c<br>
+&gt; index 57c29b20af..b05facf463 100644<br>
+&gt; --- a/hw/pci-host/grackle.c<br>
+&gt; +++ b/hw/pci-host/grackle.c<br>
+&gt; @@ -28,7 +28,6 @@<br>
+&gt;=C2=A0 #include &quot;hw/ppc/mac.h&quot;<br>
+&gt;=C2=A0 #include &quot;hw/qdev-properties.h&quot;<br>
+&gt;=C2=A0 #include &quot;hw/pci/pci.h&quot;<br>
+&gt; -#include &quot;hw/intc/heathrow_pic.h&quot;<br>
+&gt;=C2=A0 #include &quot;hw/irq.h&quot;<br>
+&gt;=C2=A0 #include &quot;qapi/error.h&quot;<br>
+&gt;=C2=A0 #include &quot;qemu/module.h&quot;<br>
+&gt; @@ -41,7 +40,6 @@ struct GrackleState {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 PCIHostState parent_obj;<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 uint32_t ofw_addr;<br>
+&gt; -=C2=A0 =C2=A0 HeathrowState *pic;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_irq irqs[4];<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 MemoryRegion pci_mmio;<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 MemoryRegion pci_hole;<br>
+&gt; @@ -62,15 +60,6 @@ static void pci_grackle_set_irq(void *opaque, int i=
+rq_num, int level)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 qemu_set_irq(s-&gt;irqs[irq_num], level);<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt; -static void grackle_init_irqs(GrackleState *s)<br>
+&gt; -{<br>
+&gt; -=C2=A0 =C2=A0 int i;<br>
+&gt; -<br>
+&gt; -=C2=A0 =C2=A0 for (i =3D 0; i &lt; ARRAY_SIZE(s-&gt;irqs); i++) {<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 s-&gt;irqs[i] =3D qdev_get_gpio_in(DEVICE=
+(s-&gt;pic), 0x15 + i);<br>
+&gt; -=C2=A0 =C2=A0 }<br>
+&gt; -}<br>
+&gt; -<br>
+&gt;=C2=A0 static void grackle_realize(DeviceState *dev, Error **errp)<br>
+&gt;=C2=A0 {<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 GrackleState *s =3D GRACKLE_PCI_HOST_BRIDGE(dev);<=
+br>
+&gt; @@ -85,7 +74,6 @@ static void grackle_realize(DeviceState *dev, Error =
+**errp)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00, 4, =
+TYPE_PCI_BUS);<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 pci_create_simple(phb-&gt;bus, 0, &quot;grackle&qu=
+ot;);<br>
+&gt; -=C2=A0 =C2=A0 grackle_init_irqs(s);<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 static void grackle_init(Object *obj)<br>
+&gt; @@ -106,15 +94,12 @@ static void grackle_init(Object *obj)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 memory_region_init_io(&amp;phb-&gt;data_mem, obj, =
+&amp;pci_host_data_le_ops,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 DEVICE(obj), &quot;pci-data-idx&quot;, 0x1000);=
+<br>
+&gt;=C2=A0 <br>
+&gt; -=C2=A0 =C2=A0 object_property_add_link(obj, &quot;pic&quot;, TYPE_HEA=
+THROW,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(Object **) &amp;s-&gt;pic,<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0qdev_prop_allow_set_link_before_realize,=
+<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A00);<br>
+&gt; -<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;phb-&gt;conf_mem);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;phb-&gt;data_mem);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;s-&gt;pci_hole);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_init_mmio(sbd, &amp;s-&gt;pci_io);<br>
+&gt; +<br>
+&gt; +=C2=A0 =C2=A0 qdev_init_gpio_out(DEVICE(obj), s-&gt;irqs, ARRAY_SIZE(=
+s-&gt;irqs));<br>
+&gt;=C2=A0 }<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 static void grackle_pci_realize(PCIDevice *d, Error **errp)<br>
+&gt; diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c<br>
+&gt; index d6a76d06dc..05e46ee6fe 100644<br>
+&gt; --- a/hw/ppc/mac_oldworld.c<br>
+&gt; +++ b/hw/ppc/mac_oldworld.c<br>
+&gt; @@ -253,10 +253,9 @@ static void ppc_heathrow_init(MachineState *machi=
+ne)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 /* Grackle PCI host bridge */<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 dev =3D qdev_new(TYPE_GRACKLE_PCI_HOST_BRIDGE);<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 qdev_prop_set_uint32(dev, &quot;ofw-addr&quot;, 0x=
+80000000);<br>
+&gt; -=C2=A0 =C2=A0 object_property_set_link(OBJECT(dev), &quot;pic&quot;, =
+OBJECT(pic_dev),<br>
+&gt; -=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
+ =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0&amp;error_abort);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 s =3D SYS_BUS_DEVICE(dev);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_realize_and_unref(s, &amp;error_fatal);<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_mmio_map(s, 0, GRACKLE_BASE);<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 sysbus_mmio_map(s, 1, GRACKLE_BASE + 0x200000);<br=
+>
+&gt;=C2=A0 =C2=A0 =C2=A0 /* PCI hole */<br>
+&gt; @@ -266,6 +265,10 @@ static void ppc_heathrow_init(MachineState *machi=
+ne)<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 memory_region_add_subregion(get_system_memory(), 0=
+xfe000000,<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 sysbus_mmio_get_region(s, =
+3));<br>
+&gt;=C2=A0 <br>
+&gt; +=C2=A0 =C2=A0 for (i =3D 0; i &lt; 4; i++) {<br>
+&gt; +=C2=A0 =C2=A0 =C2=A0 =C2=A0 qdev_connect_gpio_out(dev, i, qdev_get_gp=
+io_in(pic_dev, 0x15 + i));<br>
+&gt; +=C2=A0 =C2=A0 }<br>
+&gt; +<br>
+&gt;=C2=A0 =C2=A0 =C2=A0 pci_bus =3D PCI_HOST_BRIDGE(dev)-&gt;bus;<br>
+&gt;=C2=A0 <br>
+&gt;=C2=A0 =C2=A0 =C2=A0 pci_vga_init(pci_bus);<br>
+<br><br></blockquote><div>Hi,</div><div><br></div><div>I see compilation of=
+ the current ppc-for-5.2 branch fail with:</div><div><br></div><div>../hw/p=
+ci-host/grackle.c: In function =E2=80=98grackle_realize=E2=80=99:<br>../hw/=
+pci-host/grackle.c:68:11: error: =E2=80=98GrackleState=E2=80=99 has no memb=
+er named =E2=80=98pic=E2=80=99<br>=C2=A0 =C2=A068 | =C2=A0 =C2=A0 if (!s-&g=
+t;pic) {<br>=C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~<br=
+>make: *** [Makefile.ninja:1741: libcommon.fa.p/hw_pci-host_grackle.c.o] Er=
+ror 1</div><div><br></div><div>Best,</div><div>Howard<br></div></div></div>
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
-
-Title:
-  PCI broken in qemu ppc e500 in v2.12.0 and other versions
-
-Status in QEMU:
-  New
-
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
-
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
+--0000000000005a20dd05b1c41b02--
 
