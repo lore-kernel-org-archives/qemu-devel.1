@@ -2,93 +2,80 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5A27C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 10:26:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B6E6BC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 10:32:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFAD205F4
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 10:26:58 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D0kuAPg3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFAD205F4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9135B2067D
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 10:32:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9135B2067D
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35730 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43542 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTMwr-0000hH-JO
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 06:26:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56632)
+	id 1kTN2R-0004Sz-40
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 06:32:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTMux-0008JL-P9
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 06:24:59 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:42666)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kTN0c-0003FM-1U
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 06:30:50 -0400
+Received: from indium.canonical.com ([91.189.90.7]:35990)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTMuv-0004wQ-BT
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 06:24:59 -0400
-Received: by mail-ej1-x641.google.com with SMTP id h24so2348731ejg.9
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 03:24:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=duPu8sIgVJMec7hqGmUCR69i46WsG6gynAUf8/QCUXE=;
- b=D0kuAPg3bM5edRRpvU2WuipJ9PjmGkcammawg0XnV77XEHLlf7X6wEfI6vCBvxiLMr
- INsu3G3/FqJHc0CyHUJe5oDxDJ3LLO4p0OuBoEi4C/R7jS70vQceBWt+qFGS7mdX2Dh0
- xIMDVgsdU3oWt6MnHP/jIkIwnaHjQZ/4Ksr4e0g3POYb7m9vGGhA6i8QdXaXBE0TmlaJ
- vETWgjZ+I/43X1s+pu4b8aYVFFnjIkTwz/2+jvtr3azYA/yb8rsmQdouT24iAMBXT+Zh
- s/p77y75J0b5Zz8dJ4ZFlHG4SYTFcK6kURVl3qv1qhOroho1YVGHAzkaKmgAzkIwXrhQ
- Fxyw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=duPu8sIgVJMec7hqGmUCR69i46WsG6gynAUf8/QCUXE=;
- b=XMMysYCaSNpHVvGJ+zYbS8NiIYzt0jLm6L052ilP1ser++dgmCDuhNAMNvrEt7ocWK
- 6iNdNuT+nww1m+zIN5E03KuTo7+PnH3XFlq7TgY3RrmWSmtYZQs12YM0cOtIZBOSuZsQ
- ypx9pXajODXH11HfRAqHdDiwwhyp8xGXUBdj3uw1+nE5ONIlOE9JRpeAUA5/EWm6F0ri
- YJLT1ddi7BnlnJ6PaURhF3wrcdK46UpwblNT3L5zccDwya58MNMuzXuPLAlLRbcaKElF
- zYP5NMkySV5QKUGmMIUfFK4jcyi3j0tXil3l0niCX7RZxKS0OMFH9TcZEDW56YfC5el2
- rJSw==
-X-Gm-Message-State: AOAM530o9jmSb8XIoz9xv5JzVZn+6Toq35r/4wiiBYQb5Ekq5V5S0NHl
- wpUjEUMF8jYzvP7HrVlWwuHNkDyjsAuXWVUMxJw=
-X-Google-Smtp-Source: ABdhPJwyW6Ror9HHO0NLvzvIDirXb+q6La6FlheqTeO0yilck/qJ6Z/73lXZgy4WNAfoTFTXAtrVY7qE2vKYy2yyGxw=
-X-Received: by 2002:a17:906:7f8c:: with SMTP id
- f12mr3136656ejr.8.1602843894640; 
- Fri, 16 Oct 2020 03:24:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kTN0Z-0006Lu-CE
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 06:30:49 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kTN0W-0007HJ-Ax
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 10:30:44 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 492622E8130
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 10:30:44 +0000 (UTC)
 MIME-Version: 1.0
-References: <20201016100031.1557275-1-pbonzini@redhat.com>
-In-Reply-To: <20201016100031.1557275-1-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?=
- <philippe.mathieu.daude@gmail.com>
-Date: Fri, 16 Oct 2020 12:24:41 +0200
-Message-ID: <CAAdtpL6gX2_EAj1sK13orHi+h5bTiTOA5-gSsKD6Wrxwkxutbg@mail.gmail.com>
-Subject: Re: [PATCH] ci: include configure and meson logs in all jobs if
- configure fails
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000f875ec05b1c72ca4"
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Oct 2020 10:22:17 -0000
+From: vak <1900122@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: aarch64 docker ioctl video
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: khamenya
+X-Launchpad-Bug-Reporter: vak (khamenya)
+X-Launchpad-Bug-Modifier: vak (khamenya)
+Message-Id: <160284373799.25039.16464171690101536645.malonedeb@soybean.canonical.com>
+Subject: [Bug 1900122] [NEW] Unsupported ioctl: cmd=0xffffffff80685600 when
+ accessing /dev/video* in aarch64 guest
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="58bb2f3096f16f0e0acc917602669aecb4ffaf54"; Instance="production"
+X-Launchpad-Hash: f9729fa1a9e0e83a3e1e80f385af2ed2edd7a591
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 06:30:44
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -97,331 +84,282 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Reply-To: Bug 1900122 <1900122@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000f875ec05b1c72ca4
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Public bug reported:
 
-Le ven. 16 oct. 2020 12:05, Paolo Bonzini <pbonzini@redhat.com> a =C3=A9cri=
-t :
+**Description:**
+Any attempt to work with video in aarch64 architecture emulated on x86_64 l=
+eads currently to the error "Function not implemented". For example:
 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
->
+```
+# v4l2-ctl -l --verbose
+Failed to open /dev/video0: Function not implemented
 
-Reviewed-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+root@12dd9b6fcfcb:/# ll /dev/video*
+crw-rw---- 1 root video 81, 0 Oct 16 09:23 /dev/video0
+crw-rw---- 1 root video 81, 1 Oct 16 09:23 /dev/video1
 
----
->  .cirrus.yml    | 6 +++---
->  .gitlab-ci.yml | 6 +++---
->  .travis.yml    | 8 ++++----
->  3 files changed, 10 insertions(+), 10 deletions(-)
->
-> diff --git a/.cirrus.yml b/.cirrus.yml
-> index e099da0fec..81a2960b1a 100644
-> --- a/.cirrus.yml
-> +++ b/.cirrus.yml
-> @@ -13,7 +13,7 @@ freebsd_12_task:
->    script:
->      - mkdir build
->      - cd build
-> -    - ../configure --enable-werror || { cat config.log; exit 1; }
-> +    - ../configure --enable-werror || { cat config.log
-> meson-logs/meson-log.txt; exit 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
->      - gmake -j$(sysctl -n hw.ncpu) check V=3D1
->
-> @@ -27,7 +27,7 @@ macos_task:
->      - cd build
->      - ../configure --python=3D/usr/local/bin/python3 --enable-werror
->                     --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
-s'
-> -                   || { cat config.log; exit 1; }
-> +                   || { cat config.log meson-logs/meson-log.txt; exit 1;=
- }
->      - gmake -j$(sysctl -n hw.ncpu)
->      - gmake check V=3D1
->
-> @@ -41,7 +41,7 @@ macos_xcode_task:
->      - mkdir build
->      - cd build
->      - ../configure --extra-cflags=3D'-Wno-error=3Ddeprecated-declaration=
-s'
-> -                   --enable-werror --cc=3Dclang || { cat config.log; exi=
-t
-> 1; }
-> +                   --enable-werror --cc=3Dclang || { cat config.log
-> meson-logs/meson-log.txt; exit 1; }
->      - gmake -j$(sysctl -n hw.ncpu)
->      - gmake check V=3D1
->
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 8ffd415ca5..66ad7aa5c2 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -32,7 +32,7 @@ include:
->          ../configure --enable-werror $CONFIGURE_ARGS
-> --target-list=3D"$TARGETS" ;
->        else
->          ../configure --enable-werror $CONFIGURE_ARGS ;
-> -      fi
-> +      fi || { cat config.log meson-logs/meson-log.txt && exit 1; }
->      - make -j"$JOBS"
->      - if test -n "$MAKE_CHECK_ARGS";
->        then
-> @@ -229,7 +229,7 @@ build-tcg-disabled:
->    script:
->      - mkdir build
->      - cd build
-> -    - ../configure --disable-tcg --audio-drv-list=3D""
-> +    - ../configure --disable-tcg --audio-drv-list=3D"" || { cat config.l=
-og
-> meson-logs/meson-log.txt && exit 1; }
->      - make -j"$JOBS"
->      - make check-unit
->      - make check-qapi-schema
-> @@ -322,7 +322,7 @@ build-tci:
->      - mkdir build
->      - cd build
->      - ../configure --enable-tcg-interpreter
-> -        --target-list=3D"$(for tg in $TARGETS; do echo -n ${tg}'-softmmu=
- ';
-> done)"
-> +        --target-list=3D"$(for tg in $TARGETS; do echo -n ${tg}'-softmmu=
- ';
-> done)" || { cat config.log meson-logs/meson-log.txt && exit 1; }
->      - make -j"$JOBS"
->      - make run-tcg-tests-x86_64-softmmu
->      - make tests/qtest/boot-serial-test tests/qtest/cdrom-test
-> tests/qtest/pxe-test
-> diff --git a/.travis.yml b/.travis.yml
-> index d7bfbb8bfe..a3d78171ca 100644
-> --- a/.travis.yml
-> +++ b/.travis.yml
-> @@ -95,7 +95,7 @@ before_install:
->  # Configure step - may be overridden
->  before_script:
->    - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-> -  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log &&
-> exit 1; }
-> +  - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log
-> meson-logs/meson-log.txt && exit 1; }
->
->  # Main build & test - rarely overridden - controlled by TEST_CMD
->  script:
-> @@ -199,7 +199,7 @@ jobs:
->        compiler: clang
->        before_script:
->          - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-> -        - ${SRC_DIR}/configure ${CONFIG}
-> --extra-cflags=3D"-fsanitize=3Dundefined -Werror" || { cat config.log && =
-exit
-> 1; }
-> +        - ${SRC_DIR}/configure ${CONFIG}
-> --extra-cflags=3D"-fsanitize=3Dundefined -Werror" || { cat config.log
-> meson-logs/meson-log.txt && exit 1; }
->
->
->      - name: "Clang (other-softmmu)"
-> @@ -298,7 +298,7 @@ jobs:
->          - TEST_CMD=3D""
->        before_script:
->          - mkdir -p ${BUILD_DIR} && cd ${BUILD_DIR}
-> -        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags=3D"-g3 -O0
-> -fsanitize=3Dthread" || { cat config.log && exit 1; }
-> +        - ${SRC_DIR}/configure ${CONFIG} --extra-cflags=3D"-g3 -O0
-> -fsanitize=3Dthread" || { cat config.log meson-logs/meson-log.txt && exit=
- 1; }
->
->
->      # Run check-tcg against linux-user
-> @@ -530,7 +530,7 @@ jobs:
->          - ls -l ${SRC_DIR}/qemu-${QEMU_VERSION}.tar.bz2
->          - tar -xf ${SRC_DIR}/qemu-${QEMU_VERSION}.tar.bz2 && cd
-> qemu-${QEMU_VERSION}
->          - mkdir -p release-build && cd release-build
-> -        - ../configure ${BASE_CONFIG} ${CONFIG} || { cat config.log &&
-> exit 1; }
-> +        - ../configure ${BASE_CONFIG} ${CONFIG} || { cat config.log
-> meson-logs/meson-log.txt && exit 1; }
->          - make install
->    allow_failures:
->      - env: UNRELIABLE=3Dtrue
-> --
-> 2.26.2
->
->
->
+```
 
---000000000000f875ec05b1c72ca4
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+**Steps to reproduce the issue:**
 
-<div dir=3D"auto"><div><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D=
-"gmail_attr">Le ven. 16 oct. 2020 12:05, Paolo Bonzini &lt;<a href=3D"mailt=
-o:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; a =C3=A9crit=C2=A0:<br><=
-/div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-le=
-ft:1px #ccc solid;padding-left:1ex">Signed-off-by: Paolo Bonzini &lt;<a hre=
-f=3D"mailto:pbonzini@redhat.com" target=3D"_blank" rel=3D"noreferrer">pbonz=
-ini@redhat.com</a>&gt;<br></blockquote></div></div><div dir=3D"auto"><br></=
-div><div dir=3D"auto">Reviewed-by: Philippe Mathieu-Daud=C3=A9 &lt;<a href=
-=3D"mailto:f4bug@amsat.org">f4bug@amsat.org</a>&gt;<br></div><div dir=3D"au=
-to"><br></div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote clas=
-s=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;pad=
-ding-left:1ex">
----<br>
-=C2=A0.cirrus.yml=C2=A0 =C2=A0 | 6 +++---<br>
-=C2=A0.gitlab-ci.yml | 6 +++---<br>
-=C2=A0.travis.yml=C2=A0 =C2=A0 | 8 ++++----<br>
-=C2=A03 files changed, 10 insertions(+), 10 deletions(-)<br>
-<br>
-diff --git a/.cirrus.yml b/.cirrus.yml<br>
-index e099da0fec..81a2960b1a 100644<br>
---- a/.cirrus.yml<br>
-+++ b/.cirrus.yml<br>
-@@ -13,7 +13,7 @@ freebsd_12_task:<br>
-=C2=A0 =C2=A0script:<br>
-=C2=A0 =C2=A0 =C2=A0- mkdir build<br>
-=C2=A0 =C2=A0 =C2=A0- cd build<br>
--=C2=A0 =C2=A0 - ../configure --enable-werror || { cat config.log; exit 1; =
-}<br>
-+=C2=A0 =C2=A0 - ../configure --enable-werror || { cat config.log meson-log=
-s/meson-log.txt; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0- gmake -j$(sysctl -n hw.ncpu)<br>
-=C2=A0 =C2=A0 =C2=A0- gmake -j$(sysctl -n hw.ncpu) check V=3D1<br>
-<br>
-@@ -27,7 +27,7 @@ macos_task:<br>
-=C2=A0 =C2=A0 =C2=A0- cd build<br>
-=C2=A0 =C2=A0 =C2=A0- ../configure --python=3D/usr/local/bin/python3 --enab=
-le-werror<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 --ext=
-ra-cflags=3D&#39;-Wno-error=3Ddeprecated-declarations&#39;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|| { =
-cat config.log; exit 1; }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|| { =
-cat config.log meson-logs/meson-log.txt; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0- gmake -j$(sysctl -n hw.ncpu)<br>
-=C2=A0 =C2=A0 =C2=A0- gmake check V=3D1<br>
-<br>
-@@ -41,7 +41,7 @@ macos_xcode_task:<br>
-=C2=A0 =C2=A0 =C2=A0- mkdir build<br>
-=C2=A0 =C2=A0 =C2=A0- cd build<br>
-=C2=A0 =C2=A0 =C2=A0- ../configure --extra-cflags=3D&#39;-Wno-error=3Ddepre=
-cated-declarations&#39;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0--ena=
-ble-werror --cc=3Dclang || { cat config.log; exit 1; }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0--ena=
-ble-werror --cc=3Dclang || { cat config.log meson-logs/meson-log.txt; exit =
-1; }<br>
-=C2=A0 =C2=A0 =C2=A0- gmake -j$(sysctl -n hw.ncpu)<br>
-=C2=A0 =C2=A0 =C2=A0- gmake check V=3D1<br>
-<br>
-diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml<br>
-index 8ffd415ca5..66ad7aa5c2 100644<br>
---- a/.gitlab-ci.yml<br>
-+++ b/.gitlab-ci.yml<br>
-@@ -32,7 +32,7 @@ include:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0../configure --enable-werror $CONFIGURE_A=
-RGS --target-list=3D&quot;$TARGETS&quot; ;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0else<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0../configure --enable-werror $CONFIGURE_A=
-RGS ;<br>
--=C2=A0 =C2=A0 =C2=A0 fi<br>
-+=C2=A0 =C2=A0 =C2=A0 fi || { cat config.log meson-logs/meson-log.txt &amp;=
-&amp; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0- make -j&quot;$JOBS&quot;<br>
-=C2=A0 =C2=A0 =C2=A0- if test -n &quot;$MAKE_CHECK_ARGS&quot;;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0then<br>
-@@ -229,7 +229,7 @@ build-tcg-disabled:<br>
-=C2=A0 =C2=A0script:<br>
-=C2=A0 =C2=A0 =C2=A0- mkdir build<br>
-=C2=A0 =C2=A0 =C2=A0- cd build<br>
--=C2=A0 =C2=A0 - ../configure --disable-tcg --audio-drv-list=3D&quot;&quot;=
-<br>
-+=C2=A0 =C2=A0 - ../configure --disable-tcg --audio-drv-list=3D&quot;&quot;=
- || { cat config.log meson-logs/meson-log.txt &amp;&amp; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0- make -j&quot;$JOBS&quot;<br>
-=C2=A0 =C2=A0 =C2=A0- make check-unit<br>
-=C2=A0 =C2=A0 =C2=A0- make check-qapi-schema<br>
-@@ -322,7 +322,7 @@ build-tci:<br>
-=C2=A0 =C2=A0 =C2=A0- mkdir build<br>
-=C2=A0 =C2=A0 =C2=A0- cd build<br>
-=C2=A0 =C2=A0 =C2=A0- ../configure --enable-tcg-interpreter<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 --target-list=3D&quot;$(for tg in $TARGETS; do=
- echo -n ${tg}&#39;-softmmu &#39;; done)&quot;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 --target-list=3D&quot;$(for tg in $TARGETS; do=
- echo -n ${tg}&#39;-softmmu &#39;; done)&quot; || { cat config.log meson-lo=
-gs/meson-log.txt &amp;&amp; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0- make -j&quot;$JOBS&quot;<br>
-=C2=A0 =C2=A0 =C2=A0- make run-tcg-tests-x86_64-softmmu<br>
-=C2=A0 =C2=A0 =C2=A0- make tests/qtest/boot-serial-test tests/qtest/cdrom-t=
-est tests/qtest/pxe-test<br>
-diff --git a/.travis.yml b/.travis.yml<br>
-index d7bfbb8bfe..a3d78171ca 100644<br>
---- a/.travis.yml<br>
-+++ b/.travis.yml<br>
-@@ -95,7 +95,7 @@ before_install:<br>
-=C2=A0# Configure step - may be overridden<br>
-=C2=A0before_script:<br>
-=C2=A0 =C2=A0- mkdir -p ${BUILD_DIR} &amp;&amp; cd ${BUILD_DIR}<br>
--=C2=A0 - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log=
- &amp;&amp; exit 1; }<br>
-+=C2=A0 - ${SRC_DIR}/configure ${BASE_CONFIG} ${CONFIG} || { cat config.log=
- meson-logs/meson-log.txt &amp;&amp; exit 1; }<br>
-<br>
-=C2=A0# Main build &amp; test - rarely overridden - controlled by TEST_CMD<=
-br>
-=C2=A0script:<br>
-@@ -199,7 +199,7 @@ jobs:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0compiler: clang<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0before_script:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- mkdir -p ${BUILD_DIR} &amp;&amp; cd ${B=
-UILD_DIR}<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ${SRC_DIR}/configure ${CONFIG} --extra-cflag=
-s=3D&quot;-fsanitize=3Dundefined -Werror&quot; || { cat config.log &amp;&am=
-p; exit 1; }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ${SRC_DIR}/configure ${CONFIG} --extra-cflag=
-s=3D&quot;-fsanitize=3Dundefined -Werror&quot; || { cat config.log meson-lo=
-gs/meson-log.txt &amp;&amp; exit 1; }<br>
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0- name: &quot;Clang (other-softmmu)&quot;<br>
-@@ -298,7 +298,7 @@ jobs:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- TEST_CMD=3D&quot;&quot;<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0before_script:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- mkdir -p ${BUILD_DIR} &amp;&amp; cd ${B=
-UILD_DIR}<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ${SRC_DIR}/configure ${CONFIG} --extra-cflag=
-s=3D&quot;-g3 -O0 -fsanitize=3Dthread&quot; || { cat config.log &amp;&amp; =
-exit 1; }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ${SRC_DIR}/configure ${CONFIG} --extra-cflag=
-s=3D&quot;-g3 -O0 -fsanitize=3Dthread&quot; || { cat config.log meson-logs/=
-meson-log.txt &amp;&amp; exit 1; }<br>
-<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0# Run check-tcg against linux-user<br>
-@@ -530,7 +530,7 @@ jobs:<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- ls -l ${SRC_DIR}/qemu-${QEMU_VERSION}.t=
-ar.bz2<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- tar -xf ${SRC_DIR}/qemu-${QEMU_VERSION}=
-.tar.bz2 &amp;&amp; cd qemu-${QEMU_VERSION}<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- mkdir -p release-build &amp;&amp; cd re=
-lease-build<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ../configure ${BASE_CONFIG} ${CONFIG} || { c=
-at config.log &amp;&amp; exit 1; }<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 - ../configure ${BASE_CONFIG} ${CONFIG} || { c=
-at config.log meson-logs/meson-log.txt &amp;&amp; exit 1; }<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0- make install<br>
-=C2=A0 =C2=A0allow_failures:<br>
-=C2=A0 =C2=A0 =C2=A0- env: UNRELIABLE=3Dtrue<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div></div></div>
+I have a following setup:
 
---000000000000f875ec05b1c72ca4--
+Host Hardware: x86_64 equipped with a webcam (tried different webcams)
+Host OS: Ubuntu 20.04.1 =
+
+
+Guest Architecture: aarch64
+Guest OS: Ubuntu 20.04 (also tried 16.x and 18.x)
+
+Emulation: quemu-user-static (also tried binfmt)
+
+Guest OS is running via Docker + QEMU
+
+```
+=E2=9E=9C cat /proc/sys/fs/binfmt_misc/qemu-aarch64
+enabled
+interpreter /usr/bin/qemu-aarch64-static
+flags: F
+offset 0
+magic 7f454c460201010000000000000000000200b700
+mask ffffffffffffff00fffffffffffffffffeffffff
+```
+
+**Results received:**
+see desrciption.
+
+**Environment:**
+
+<!-- The host architecture is available for only x86_64 -->
+* QEMU version: (if you can know it):
+
+ipxe-qemu-256k-compat-efi-roms/focal,now 1.0.0+git-20150424.a25a16d-0ubuntu=
+4 all [installed,automatic]
+ipxe-qemu/focal-updates,now 1.0.0+git-20190109.133f4c4-0ubuntu3.2 all [inst=
+alled,automatic]
+qemu-block-extra/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automa=
+tic]
+qemu-kvm/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+qemu-system-common/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,auto=
+matic]
+qemu-system-data/focal-updates,now 1:4.2-3ubuntu6.7 all [installed,automati=
+c]
+qemu-system-gui/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automat=
+ic]
+qemu-system-x86/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automat=
+ic]
+qemu-user-binfmt/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automa=
+tic]
+qemu-user/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+qemu-utils/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automatic]
+qemu/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+
+* Container application: Docker
+
+**Output of `docker version`, `podman version` or `singularity
+version`**
+
+```
+=E2=9E=9C docker version
+Client: Docker Engine - Community
+ Version:           20.10.0-beta1
+ API version:       1.40
+ Go version:        go1.13.15
+ Git commit:        ac365d7
+ Built:             Tue Oct 13 18:15:22 2020
+ OS/Arch:           linux/amd64
+ Context:           default
+ Experimental:      true
+
+Server: Docker Engine - Community
+ Engine:
+  Version:          19.03.13
+  API version:      1.40 (minimum version 1.12)
+  Go version:       go1.13.15
+  Git commit:       4484c46d9d
+  Built:            Wed Sep 16 17:01:20 2020
+  OS/Arch:          linux/amd64
+  Experimental:     false
+ containerd:
+  Version:          1.4.1
+  GitCommit:        c623d1b36f09f8ef6536a057bd658b3aa8632828
+ runc:
+  Version:          1.0.0-rc92
+  GitCommit:        ff819c7e9184c13b7c2607fe6c30ae19403a7aff
+ docker-init:
+  Version:          0.18.0
+  GitCommit:        fec3683
+
+```
+
+Guest aarch64 runs in privileged mode:
+
+`docker run --privileged --device=3D/dev/video0:/dev/video0 --env
+DISPLAY=3Dunix$DISPLAY -v $XAUTH:/root/.Xauthority  -v
+/tmp/.X11-unix:/tmp/.X11-unix -it --rm arm64v8/ubuntu:20.04 bash`
+
+**Additional information:**
+I tried also binfmt way to register emulators. The output of `v4l-ctl` was =
+a little bit different:
+
+```
+# v4l2-ctl -l    =
+
+Unsupported ioctl: cmd=3D0xffffffff80685600
+Failed to open /dev/video0: Function not implemented
+
+```
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+
+** Tags: aarch64 docker ioctl video
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1900122
+
+Title:
+  Unsupported ioctl: cmd=3D0xffffffff80685600 when accessing /dev/video*
+  in aarch64 guest
+
+Status in QEMU:
+  New
+
+Bug description:
+  **Description:**
+  Any attempt to work with video in aarch64 architecture emulated on x86_64=
+ leads currently to the error "Function not implemented". For example:
+
+  ```
+  # v4l2-ctl -l --verbose
+  Failed to open /dev/video0: Function not implemented
+
+  root@12dd9b6fcfcb:/# ll /dev/video*
+  crw-rw---- 1 root video 81, 0 Oct 16 09:23 /dev/video0
+  crw-rw---- 1 root video 81, 1 Oct 16 09:23 /dev/video1
+
+  ```
+
+  **Steps to reproduce the issue:**
+
+  I have a following setup:
+
+  Host Hardware: x86_64 equipped with a webcam (tried different webcams)
+  Host OS: Ubuntu 20.04.1 =
+
+
+  Guest Architecture: aarch64
+  Guest OS: Ubuntu 20.04 (also tried 16.x and 18.x)
+
+  Emulation: quemu-user-static (also tried binfmt)
+
+  Guest OS is running via Docker + QEMU
+
+  ```
+  =E2=9E=9C cat /proc/sys/fs/binfmt_misc/qemu-aarch64
+  enabled
+  interpreter /usr/bin/qemu-aarch64-static
+  flags: F
+  offset 0
+  magic 7f454c460201010000000000000000000200b700
+  mask ffffffffffffff00fffffffffffffffffeffffff
+  ```
+
+  **Results received:**
+  see desrciption.
+
+  **Environment:**
+
+  <!-- The host architecture is available for only x86_64 -->
+  * QEMU version: (if you can know it):
+
+  ipxe-qemu-256k-compat-efi-roms/focal,now 1.0.0+git-20150424.a25a16d-0ubun=
+tu4 all [installed,automatic]
+  ipxe-qemu/focal-updates,now 1.0.0+git-20190109.133f4c4-0ubuntu3.2 all [in=
+stalled,automatic]
+  qemu-block-extra/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,auto=
+matic]
+  qemu-kvm/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+  qemu-system-common/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,au=
+tomatic]
+  qemu-system-data/focal-updates,now 1:4.2-3ubuntu6.7 all [installed,automa=
+tic]
+  qemu-system-gui/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,autom=
+atic]
+  qemu-system-x86/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,autom=
+atic]
+  qemu-user-binfmt/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,auto=
+matic]
+  qemu-user/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+  qemu-utils/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed,automatic]
+  qemu/focal-updates,now 1:4.2-3ubuntu6.7 amd64 [installed]
+
+  * Container application: Docker
+
+  **Output of `docker version`, `podman version` or `singularity
+  version`**
+
+  ```
+  =E2=9E=9C docker version
+  Client: Docker Engine - Community
+   Version:           20.10.0-beta1
+   API version:       1.40
+   Go version:        go1.13.15
+   Git commit:        ac365d7
+   Built:             Tue Oct 13 18:15:22 2020
+   OS/Arch:           linux/amd64
+   Context:           default
+   Experimental:      true
+
+  Server: Docker Engine - Community
+   Engine:
+    Version:          19.03.13
+    API version:      1.40 (minimum version 1.12)
+    Go version:       go1.13.15
+    Git commit:       4484c46d9d
+    Built:            Wed Sep 16 17:01:20 2020
+    OS/Arch:          linux/amd64
+    Experimental:     false
+   containerd:
+    Version:          1.4.1
+    GitCommit:        c623d1b36f09f8ef6536a057bd658b3aa8632828
+   runc:
+    Version:          1.0.0-rc92
+    GitCommit:        ff819c7e9184c13b7c2607fe6c30ae19403a7aff
+   docker-init:
+    Version:          0.18.0
+    GitCommit:        fec3683
+
+  ```
+
+  Guest aarch64 runs in privileged mode:
+
+  `docker run --privileged --device=3D/dev/video0:/dev/video0 --env
+  DISPLAY=3Dunix$DISPLAY -v $XAUTH:/root/.Xauthority  -v
+  /tmp/.X11-unix:/tmp/.X11-unix -it --rm arm64v8/ubuntu:20.04 bash`
+
+  **Additional information:**
+  I tried also binfmt way to register emulators. The output of `v4l-ctl` wa=
+s a little bit different:
+
+  ```
+  # v4l2-ctl -l    =
+
+  Unsupported ioctl: cmd=3D0xffffffff80685600
+  Failed to open /dev/video0: Function not implemented
+
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1900122/+subscriptions
 
