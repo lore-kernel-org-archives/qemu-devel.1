@@ -2,77 +2,77 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ADF0C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2AC6C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:01:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E15320878
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F24F72083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:01:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Yw+gV2tV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E15320878
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U52ix8zM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F24F72083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTOOq-00081a-Ij
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:59:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34516)
+	id 1kTOQh-0001T7-Ox
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 08:01:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODl-0000d6-GM
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52998)
+ id 1kTODg-0000Oh-2e
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28835)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODj-0002pv-5Y
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:29 -0400
+ id 1kTODc-0002nw-2d
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602848906;
+ s=mimecast20190719; t=1602848899;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=HeipnRw+CCcUnhB5ZvcAQPoGq1FWVAmpwzkSPi3R8aY=;
- b=Yw+gV2tVySQPydmVggt7pWxrjWJN75rDdTqsLkGYZcaftLU4OVnXP55hg33N+PSpnrQyTg
- Andm98hN6gfbspvAumSwob0VMlDvnndgAqOnN6ShFazPscFDQ+adK7owqmVl9/DFeMuv2Q
- sp81ZpqN6MWBPfVsy9mqZru1CuHlmGo=
+ bh=q9z/m4ESTg5T+PETE/Wuky1JefDySUw5SrCPfc7Rt9E=;
+ b=U52ix8zMLD4z+FvNjylkA87Ly3zA5fxToiuXzJ3vwQleHCi1UWSmU32SfxbfIwRakWC20X
+ 7iY36HOhCPHoFF15f+NiV9FncYgZ4ZiiAlZ8XSO+t7u+SfFGD/rkBF/N62n7FEReDa8thl
+ HcHT0t3NGi87o5CQ9O+VAsyndcnkzUs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-374-QfTQRPY1NrOzYkPKVSyh1w-1; Fri, 16 Oct 2020 07:48:22 -0400
-X-MC-Unique: QfTQRPY1NrOzYkPKVSyh1w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-416-DqwN_q79OTa-_BU6UlihbA-1; Fri, 16 Oct 2020 07:48:17 -0400
+X-MC-Unique: DqwN_q79OTa-_BU6UlihbA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E5076414E
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:48:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8988800683
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:48:16 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A8075C1BD
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:48:21 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 694F97667A;
+ Fri, 16 Oct 2020 11:48:16 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/22] meson: move SPHINX_ARGS references within "if build_docs"
-Date: Fri, 16 Oct 2020 07:48:09 -0400
-Message-Id: <20201016114814.1564523-18-pbonzini@redhat.com>
+Subject: [PULL 05/22] tests: add missing generated sources to testqapi
+Date: Fri, 16 Oct 2020 07:47:57 -0400
+Message-Id: <20201016114814.1564523-6-pbonzini@redhat.com>
 In-Reply-To: <20201016114814.1564523-1-pbonzini@redhat.com>
 References: <20201016114814.1564523-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 03:57:19
@@ -96,117 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Ninja notices them due to a different order in visiting the graph.
+
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- tests/qapi-schema/meson.build | 88 +++++++++++++++++------------------
- 1 file changed, 44 insertions(+), 44 deletions(-)
+ tests/include/meson.build |  8 ++++----
+ tests/meson.build         | 14 ++++++++++++--
+ 2 files changed, 16 insertions(+), 6 deletions(-)
 
-diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-index 1f222a7a13..304ef939bd 100644
---- a/tests/qapi-schema/meson.build
-+++ b/tests/qapi-schema/meson.build
-@@ -219,53 +219,53 @@ qapi_doc = custom_target('QAPI doc',
-                                     '-p', 'doc-good-', '@INPUT0@' ],
-                          depend_files: qapi_gen_depends)
+diff --git a/tests/include/meson.build b/tests/include/meson.build
+index fea3a6342f..9abba308fa 100644
+--- a/tests/include/meson.build
++++ b/tests/include/meson.build
+@@ -10,7 +10,7 @@ test_qapi_outputs_extra = [
+   'test-qapi-visit-sub-module.h',
+ ]
  
--# Test the document-comment document generation code by running a test schema
--# file through Sphinx's plain-text builder and comparing the result against
--# a golden reference. This is in theory susceptible to failures if Sphinx
--# changes its output, but the text output has historically been very stable
--# (no changes between Sphinx 1.6 and 3.0), so it is a better bet than
--# texinfo or HTML generation, both of which have had changes. We might
--# need to add more sophisticated logic here in future for some sort of
--# fuzzy comparison if future Sphinx versions produce different text,
--# but for now the simple comparison suffices.
--qapi_doc_out = custom_target('QAPI rST doc',
--                             output: ['doc-good.txt'],
--                             input: files('doc-good.json', 'doc-good.rst'),
--                             build_by_default: build_docs,
--                             depend_files: sphinx_extn_depends,
--                             # We use -E to suppress Sphinx's caching, because
--                             # we want it to always really run the QAPI doc
--                             # generation code. It also means we don't
--                             # clutter up the build dir with the cache.
--                             command: [SPHINX_ARGS,
--                                       '-b', 'text', '-E',
--                                       '-c', meson.source_root() / 'docs',
--                                       '-D', 'master_doc=doc-good',
--                                       meson.current_source_dir(),
--                                       meson.current_build_dir()])
-+if build_docs
-+  # Test the document-comment document generation code by running a test schema
-+  # file through Sphinx's plain-text builder and comparing the result against
-+  # a golden reference. This is in theory susceptible to failures if Sphinx
-+  # changes its output, but the text output has historically been very stable
-+  # (no changes between Sphinx 1.6 and 3.0), so it is a better bet than
-+  # texinfo or HTML generation, both of which have had changes. We might
-+  # need to add more sophisticated logic here in future for some sort of
-+  # fuzzy comparison if future Sphinx versions produce different text,
-+  # but for now the simple comparison suffices.
-+  qapi_doc_out = custom_target('QAPI rST doc',
-+                               output: ['doc-good.txt'],
-+                               input: files('doc-good.json', 'doc-good.rst'),
-+                               build_by_default: true,
-+                               depend_files: sphinx_extn_depends,
-+                               # We use -E to suppress Sphinx's caching, because
-+                               # we want it to always really run the QAPI doc
-+                               # generation code. It also means we don't
-+                               # clutter up the build dir with the cache.
-+                               command: [SPHINX_ARGS,
-+                                         '-b', 'text', '-E',
-+                                         '-c', meson.source_root() / 'docs',
-+                                         '-D', 'master_doc=doc-good',
-+                                         meson.current_source_dir(),
-+                                         meson.current_build_dir()])
+-test_qapi_outputs_extra = custom_target('QAPI test (include)',
+-                                        output: test_qapi_outputs_extra,
+-                                        input: test_qapi_files,
+-                                        command: 'true')
++test_qapi_files_extra = custom_target('QAPI test (include)',
++                                      output: test_qapi_outputs_extra,
++                                      input: test_qapi_files,
++                                      command: 'true')
+diff --git a/tests/meson.build b/tests/meson.build
+index bf47a38c74..afeb6be689 100644
+--- a/tests/meson.build
++++ b/tests/meson.build
+@@ -56,8 +56,18 @@ test_qapi_files = custom_target('Test QAPI files',
+ # perhaps change qapi_gen to replace / with _, like Meson itself does?
+ subdir('include')
  
--# Fix possible inconsistency in line endings in generated output and
--# in the golden reference (which could otherwise cause test failures
--# on Windows hosts). Unfortunately diff --strip-trailing-cr
--# is GNU-diff only. The odd-looking perl is because we must avoid
--# using an explicit '\' character in the command arguments to
--# a custom_target(), as Meson will unhelpfully replace it with a '/'
--# (https://github.com/mesonbuild/meson/issues/1564)
--qapi_doc_out_nocr = custom_target('QAPI rST doc newline-sanitized',
--                                  output: ['doc-good.txt.nocr'],
--                                  input: qapi_doc_out[0],
--                                  build_by_default: build_docs,
--                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
--                                  capture: true)
-+  # Fix possible inconsistency in line endings in generated output and
-+  # in the golden reference (which could otherwise cause test failures
-+  # on Windows hosts). Unfortunately diff --strip-trailing-cr
-+  # is GNU-diff only. The odd-looking perl is because we must avoid
-+  # using an explicit '\' character in the command arguments to
-+  # a custom_target(), as Meson will unhelpfully replace it with a '/'
-+  # (https://github.com/mesonbuild/meson/issues/1564)
-+  qapi_doc_out_nocr = custom_target('QAPI rST doc newline-sanitized',
-+                                    output: ['doc-good.txt.nocr'],
-+                                    input: qapi_doc_out[0],
-+                                    build_by_default: true,
-+                                    command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
-+                                    capture: true)
+-libtestqapi = static_library('testqapi', sources: [test_qapi_files, genh, test_qapi_outputs_extra])
+-testqapi = declare_dependency(link_with: libtestqapi)
++test_qapi_sources = []
++test_qapi_headers = []
++i = 0
++foreach o: test_qapi_files.to_list() + test_qapi_files_extra.to_list()
++  if o.full_path().endswith('.h')
++    test_qapi_headers += o
++  endif
++  test_qapi_sources += o
++endforeach
++
++libtestqapi = static_library('testqapi', sources: [genh, test_qapi_sources])
++testqapi = declare_dependency(link_with: libtestqapi, sources: [genh, test_qapi_headers])
  
--qapi_doc_ref_nocr = custom_target('QAPI rST doc reference newline-sanitized',
--                                  output: ['doc-good.ref.nocr'],
--                                  input: files('doc-good.txt'),
--                                  build_by_default: build_docs,
--                                  command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
--                                  capture: true)
-+  qapi_doc_ref_nocr = custom_target('QAPI rST doc reference newline-sanitized',
-+                                    output: ['doc-good.ref.nocr'],
-+                                    input: files('doc-good.txt'),
-+                                    build_by_default: true,
-+                                    command: ['perl', '-pe', '$x = chr 13; s/$x$//', '@INPUT@'],
-+                                    capture: true)
+ testblock = declare_dependency(dependencies: [block], sources: 'iothread.c')
  
--if build_docs
-   # "full_path()" needed here to work around
-   # https://github.com/mesonbuild/meson/issues/7585
-   test('QAPI rST doc', diff, args: ['-u', qapi_doc_ref_nocr[0].full_path(),
 -- 
 2.26.2
 
