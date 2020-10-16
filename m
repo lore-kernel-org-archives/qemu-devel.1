@@ -2,68 +2,88 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D03D3C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:37:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 86AF2C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:43:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CBEE20878
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:37:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CBEE20878
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9160A20866
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:43:12 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PldoFhK/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9160A20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41926 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48032 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTO3U-00066y-7i
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:37:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59720)
+	id 1kTO8d-0000VA-G2
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:43:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60552)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
- id 1kTO23-00057B-4I
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:36:24 -0400
-Received: from zxshcas2.zhaoxin.com ([203.148.12.82]:7046)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
- id 1kTO1s-0001Aq-59
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:36:22 -0400
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS2.zhaoxin.com
- (10.28.252.162) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 16 Oct
- 2020 19:29:44 +0800
-Received: from localhost.localdomain (124.64.17.66) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 16 Oct
- 2020 19:29:43 +0800
-From: FelixCuioc <FelixCui-oc@zhaoxin.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
- Eduardo Habkost <ehabkost@redhat.com>, Alex Williamson
- <alex.williamson@redhat.com>
-Subject: [PATCH 1/1] Skip flatview_simplify() for cpu vendor zhaoxin
-Date: Fri, 16 Oct 2020 07:29:33 -0400
-Message-ID: <20201016112933.14856-2-FelixCui-oc@zhaoxin.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201016112933.14856-1-FelixCui-oc@zhaoxin.com>
-References: <20201016112933.14856-1-FelixCui-oc@zhaoxin.com>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO4T-00073n-4l
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:38:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51186)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO4Q-0001aL-GV
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:38:52 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602848329;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2tTQjzuiyrFazkLpXaNa1Q+Rws4utGOaxQXqW9hy544=;
+ b=PldoFhK/GuWeFgJ1hn7PnejzO7G1z47fh1bG73emzj18hdDFN6FeY7T2r0JF3FIsIWcc7j
+ HzmzKdHYF1morZwA5UEFB+HTcfvLGmAOf5157UBfe4bytAtrH1ZttIx8MAPNVVFQSPFEGA
+ A3vsBf12xasAbfO5ELruKsUItViT9E0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-301-VsAUPDQQOYa9qFFy17DfXg-1; Fri, 16 Oct 2020 07:38:48 -0400
+X-MC-Unique: VsAUPDQQOYa9qFFy17DfXg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1CBD9835B58;
+ Fri, 16 Oct 2020 11:38:47 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CEBBB10013DB;
+ Fri, 16 Oct 2020 11:38:46 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id E8C3E9D0F; Fri, 16 Oct 2020 13:38:35 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 6/7] tests/acpi: update expected data files
+Date: Fri, 16 Oct 2020 13:38:34 +0200
+Message-Id: <20201016113835.17465-7-kraxel@redhat.com>
+In-Reply-To: <20201016113835.17465-1-kraxel@redhat.com>
+References: <20201016113835.17465-1-kraxel@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [124.64.17.66]
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-Received-SPF: pass client-ip=203.148.12.82;
- envelope-from=FelixCui-oc@zhaoxin.com; helo=ZXSHCAS2.zhaoxin.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 07:29:46
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:29:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,103 +96,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: TonyWWang-oc@zhaoxin.com, RockCui-oc@zhaoxin.com, qemu-devel@nongnu.org,
- CobeChen-oc@zhaoxin.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The issue here is that an assinged EHCI device accesses
-an adjacent mapping between the delete and add phases
-of the VFIO MemoryListener.
-We want to skip flatview_simplify() is to prevent EHCI
-device IOVA mappings from being unmapped.
-
-Signed-off-by: FelixCuioc <FelixCui-oc@zhaoxin.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- softmmu/memory.c  | 20 +++++++++++++++++++-
- target/i386/cpu.c |  7 +++++++
- target/i386/cpu.h |  3 +++
- 3 files changed, 29 insertions(+), 1 deletion(-)
+ tests/data/acpi/microvm/APIC.pcie | Bin 0 -> 110 bytes
+ 1 file changed, 0 insertions(+), 0 deletions(-)
 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 403ff3abc9..a998018d87 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -700,6 +700,22 @@ static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
-     return NULL;
- }
- 
-+static bool skip_simplify(void)
-+{
-+#ifdef I386_CPU_H
-+    char vendor[CPUID_VENDOR_SZ + 1] = { 0 };
-+    host_get_vendor(vendor);
-+    if (!strncmp(vendor, CPUID_VENDOR_VIA, strlen(CPUID_VENDOR_VIA))
-+        || !strncmp(vendor, CPUID_VENDOR_ZHAOXIN,
-+                  strlen(CPUID_VENDOR_ZHAOXIN))) {
-+        return true;
-+    }
-+    return false;
-+#else
-+    return false;
-+#endif
-+}
-+
- /* Render a memory topology into a list of disjoint absolute ranges. */
- static FlatView *generate_memory_topology(MemoryRegion *mr)
- {
-@@ -713,7 +729,9 @@ static FlatView *generate_memory_topology(MemoryRegion *mr)
-                              addrrange_make(int128_zero(), int128_2_64()),
-                              false, false);
-     }
--    flatview_simplify(view);
-+    if (!skip_simplify()) {
-+        flatview_simplify(view);
-+    }
- 
-     view->dispatch = address_space_dispatch_new(view);
-     for (i = 0; i < view->nr; i++) {
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 5d713c8528..6bda35a03e 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -1559,6 +1559,13 @@ void host_cpuid(uint32_t function, uint32_t count,
-     if (edx)
-         *edx = vec[3];
- }
-+void host_get_vendor(char *vendor)
-+{
-+  uint32_t eax, ebx, ecx, edx;
-+
-+  host_cpuid(0x0, 0, &eax, &ebx, &ecx, &edx);
-+  x86_cpu_vendor_words2str(vendor, ebx, edx, ecx);
-+}
- 
- void host_vendor_fms(char *vendor, int *family, int *model, int *stepping)
- {
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index 51c1d5f60a..e8e26e6a53 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -832,6 +832,8 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
- 
- #define CPUID_VENDOR_VIA   "CentaurHauls"
- 
-+#define CPUID_VENDOR_ZHAOXIN   "  Shanghai  "
-+
- #define CPUID_VENDOR_HYGON    "HygonGenuine"
- 
- #define IS_INTEL_CPU(env) ((env)->cpuid_vendor1 == CPUID_VENDOR_INTEL_1 && \
-@@ -1918,6 +1920,7 @@ void cpu_clear_apic_feature(CPUX86State *env);
- void host_cpuid(uint32_t function, uint32_t count,
-                 uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx);
- void host_vendor_fms(char *vendor, int *family, int *model, int *stepping);
-+void host_get_vendor(char *vendor);
- 
- /* helper.c */
- bool x86_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+diff --git a/tests/data/acpi/microvm/APIC.pcie b/tests/data/acpi/microvm/APIC.pcie
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..6c51081b50beb061c5f4e5baa134585d82db4c39 100644
+GIT binary patch
+literal 110
+zcmZ<^@N~{&U|?Xp@8s|75v<@85#a0y6k`O6f!H9Lf#JbFFwFr}2jnsGfW!{`1CdNz
+b3_Kt%FNnp<3uE!|!C3tKU=|D8f1pMH#A*!z
+
+literal 0
+HcmV?d00001
+
 -- 
-2.17.1
+2.27.0
 
 
