@@ -2,90 +2,87 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3408FC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:45:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B198C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:48:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 75D0E20848
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:45:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AF32C20848
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:48:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="if0B8eOu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75D0E20848
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZZUx+IDJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF32C20848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTQ32-0000cx-A2
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:45:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34000)
+	id 1kTQ5U-0002YK-Kz
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:48:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTQ1d-00009o-Sq
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:44:05 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:32918)
+ id 1kTQ2x-0000nM-52
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:45:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:43476)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTQ1c-0002ut-5e
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:44:05 -0400
-Received: by mail-wm1-x342.google.com with SMTP id z22so1634226wmi.0
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:44:03 -0700 (PDT)
+ id 1kTQ2v-000380-Bh
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:45:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id g12so2977526wrp.10
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:45:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=lku0K9dFVN76/FCimSI2p56+m6UmkyCzwYlJ5Pgs8fk=;
- b=if0B8eOuldokLeMkXD9cHQMjofhOvfrtYheVApgMucnS3lQJplN6PHlm/YQBWFFiLx
- nN6mrVxKQaIjW1f7M9zjJS92YUeIi1rdyhI5tkgbkJ46Y1uJFOfthUykz9nPn59edmbW
- dqw0riB2z1vi0x/gA1Amk2ugqocxT0F6YCe+45tVt2r/36HdTJRsjlZVQ0fEJHZZcL+/
- bpBt1MrSSWuUUcu9qvTjI1HodHDMmrhIGZJDBCB0sOeYQ9MpZBQX1FT/VkfjD6y7AJi7
- sd6O2NyOp9C9sqxI98EpvowBSTbv5DXttMIOzQCTeBjmWWqQ0yoFlzN8cVk3rdn4Ju/3
- Q8Dw==
+ bh=u3NPzuw3U1ysbxDrVVm46Y3+aVJ/RvOMe9jJtWXH0ws=;
+ b=ZZUx+IDJ3HBOaCZAiSwXo9QiZlFblXoEOwoGNI5wt9/UaAvbJWv9QjAv50oTBdvbkY
+ g/ZdA4B588AluwC465UpMjbtImyDOdKJ5k1MSC/6rXEdAfgHzrCWIjnLhiL3HTPotCuX
+ Z9GrJAjOWbHGVk+70Sp5B8S+d3mRC1u0XlSGzdI3wmvTemwb72MEzEZBG+7dknPh/Fig
+ bNPLMBQnQyOUMRJvA21DFRd/jfhq3p8QAojG1wBqQvufc9C4uMIh7SQOxzu1CvVyVKAD
+ LXkBK1Imynwdry2IQ1aTqISywr2VnHrH2JDNAsszNODGsCemXm9NYVVlfC/QYfbvRxkA
+ 1yTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=lku0K9dFVN76/FCimSI2p56+m6UmkyCzwYlJ5Pgs8fk=;
- b=APKyogJn7D7kKt6FY10KfFwdjBCqarYlXyippRP20XsnQkDiCBhxjVbpRzhCPd8ci4
- 0yVt15sqC5d2GRn0nA6niBQP9qGxDjWGb1Auby89/P6DjXMEYZ1nMVxMK50bs5lwhPQe
- PcQLi6cuhQWBcNi0qjA8L3HlIg0n4ZuRxOvg8c4A9LQu9XJSsC1FrbSK/Cs7uBLHVbPG
- dZ2O6swvlMK5BLyfJlJqzrh6dDfXK63YQ45QJ0Ei+9Yg7r48O5E1ymDY1Wgfj84t8LG+
- BKmyi6qi2soHIAN6VRNHMHQCPS+f4HoLukUWcY4GmI7xQq19dfpPY4kF63c4ypElp1pE
- mwSw==
-X-Gm-Message-State: AOAM53312dvQd5bD/OPfTjWcNnhyPz7m/RVict/EcTcwkBi5UgIvfWr8
- VA6aWiMmsS51HVjSk/yDg2k=
-X-Google-Smtp-Source: ABdhPJyLnPaFkuuB8ks53HFL5Sc0s3OC2sfP9s3vZUbHkkrGSJsMKtU8ttVdxcwwWJfZxxQgBxvMwQ==
-X-Received: by 2002:a1c:2601:: with SMTP id m1mr3718835wmm.12.1602855841526;
- Fri, 16 Oct 2020 06:44:01 -0700 (PDT)
+ bh=u3NPzuw3U1ysbxDrVVm46Y3+aVJ/RvOMe9jJtWXH0ws=;
+ b=ZjqzHB96ge0LhAGlTYcmBLC/NmImeuOcASukG7F0OnEHGjHQPoW+JKAl6qZTLj6j6+
+ sIMbro+n9wqyNlU1k1BrLNuHwiU6lNilISJxXzU04mtKURB/E7meaoVX9Vy1903j+pPO
+ xS96QvIqzYhCXVWPKoUwzel1Uh0BkIELQ40nQ2lWhvS++1bJ+xKtXOoVlSiql2Ef/kFt
+ JytpmZYFuPyPKUalYt2Ebp8/egQF/+5/KoW4XO6NJt8OXykWN+oPjsJZH3g73rm3OP7d
+ ueBXpgIqTMfj/6amVHFTBnYUK5UZdWoxqUDviGKY53Y2PrhteCkNNcNwMX4IILsbor08
+ Mi4A==
+X-Gm-Message-State: AOAM532FGtp6VijDtE7joC/lz8uPPdqEtXtPysybWfZztp9P2PUD3g0F
+ cgphusSKIe90ostNDZUrf7g=
+X-Google-Smtp-Source: ABdhPJyLfF2L2sdpF/UJHu6SnzAHxpy1liaJzmH2n+WlWVT7eeNnRe5MfGzAyUFXaIjUkpjYyJRZwg==
+X-Received: by 2002:adf:97dd:: with SMTP id t29mr4023932wrb.322.1602855922937; 
+ Fri, 16 Oct 2020 06:45:22 -0700 (PDT)
 Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
  [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id f5sm2814883wmh.16.2020.10.16.06.44.00
+ by smtp.gmail.com with ESMTPSA id w4sm2810227wmi.10.2020.10.16.06.45.21
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Oct 2020 06:44:00 -0700 (PDT)
-Subject: Re: [PATCH v2 4/4] MAINTAINERS: Move MIPS GIC timer files to Boston
- board section
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+ Fri, 16 Oct 2020 06:45:22 -0700 (PDT)
+Subject: Re: [PATCH v2 0/4] MAINTAINERS: Update MIPS sections
+To: qemu-devel@nongnu.org
 References: <20201013101659.3557154-1-f4bug@amsat.org>
- <20201013101659.3557154-5-f4bug@amsat.org>
- <39fdf233-f4a2-5b13-c02f-e404a789d99c@redhat.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <3dcb65f2-cd9e-79e6-4b33-f7c068296c05@amsat.org>
-Date: Fri, 16 Oct 2020 15:43:59 +0200
+Message-ID: <077a3f73-1743-4d2d-a27d-86eb8bcf28ea@amsat.org>
+Date: Fri, 16 Oct 2020 15:45:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <39fdf233-f4a2-5b13-c02f-e404a789d99c@redhat.com>
+In-Reply-To: <20201013101659.3557154-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -110,49 +107,30 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Chen Huacai <zltjiangshi@gmail.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>,
- Richard Henderson <rth@twiddle.net>
+ Richard Henderson <rth@twiddle.net>, Aurelien Jarno <aurelien@aurel32.net>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/14/20 3:39 PM, Thomas Huth wrote:
-> On 13/10/2020 12.16, Philippe Mathieu-Daudé wrote:
->> The MIPS GIC timer is only used by the Boston board.
->>
->> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
->> ---
->>   MAINTAINERS | 4 ++--
->>   1 file changed, 2 insertions(+), 2 deletions(-)
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 702f73823fc..62db288bfc4 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -233,11 +233,9 @@ F: docs/system/cpu-models-mips.rst.inc
->>   F: hw/intc/mips_gic.c
->>   F: hw/mips/
->>   F: hw/misc/mips_*
->> -F: hw/timer/mips_gictimer.c
->>   F: include/hw/intc/mips_gic.h
->>   F: include/hw/mips/
->>   F: include/hw/misc/mips_*
->> -F: include/hw/timer/mips_gictimer.h
->>   F: tests/tcg/mips/
->>   K: ^Subject:.*(?i)mips
->>   
->> @@ -1167,7 +1165,9 @@ S: Odd Fixes
->>   F: hw/core/loader-fit.c
->>   F: hw/mips/boston.c
->>   F: hw/pci-host/xilinx-pcie.c
->> +F: hw/timer/mips_gictimer.c
->>   F: include/hw/pci-host/xilinx-pcie.h
->> +F: include/hw/timer/mips_gictimer.h
+On 10/13/20 12:16 PM, Philippe Mathieu-Daudé wrote:
+> Volunteer to maintain MIPS TCG.
+> As discussed on list, Huacai will likely send a similar patch.
 > 
-> If I grep for mips_gictimer_init, it seems like this function is used from
-> mips_gic_realize in hw/intc/mips_gic.c ... and mips_gic.c / TYPE_MIPS_GIC is
-> also used from the malta board ... so are you really sure this is right? Or
-> what did I miss?
+> Few more adjustments (in particular around Boston board).
+> 
+> Based-on: <1602103041-32017-1-git-send-email-aleksandar.qemu.devel@gmail.com>
+> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg01974.html
+> 
+> v2:
+> - Squashed Paul email address change with Boston downgrade (Thomas)
+> 
+> Philippe Mathieu-Daudé (4):
+>    MAINTAINERS: Put myself forward for MIPS target
+>    MAINTAINERS: Remove duplicated Malta test entries
+>    MAINTAINERS: Downgrade MIPS Boston to 'Odd Fixes', fix Paul Burton
+>      mail
+>    MAINTAINERS: Move MIPS GIC timer files to Boston board section
 
-We have another Frankenstein :(
+Thanks, patches 1-3 applied to mips-next.
 
