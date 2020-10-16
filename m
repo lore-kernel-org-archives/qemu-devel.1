@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A947AC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:56:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B33C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:57:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FE622084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:56:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7385A2071A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:57:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DQ8RVIzm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FE622084C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fHDAKKb/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7385A2071A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39886 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTOLt-0003cw-5A
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:56:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34422)
+	id 1kTOMS-0004D9-Uk
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:57:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODh-0000Sx-SU
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32869)
+ id 1kTODj-0000XH-Dn
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54719)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODe-0002oY-1L
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:25 -0400
+ id 1kTODh-0002pT-Gu
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602848901;
+ s=mimecast20190719; t=1602848904;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wiPjYc6Em8HOqlNdKvEdGTuMiqk8PUd2qPFD0ObUZ7o=;
- b=DQ8RVIzmBca3eIe7Cgc6pXLrh9Qp3ahzigo/kChvbRESQgYu/2qzV4glXcb92lAKYH7jsM
- CVuIL/4wbIKLM77XyXoStaxgShhbsuMNK+2zEwRuPnAkA5/GacAdCEH+GeXxIVgHgE7apn
- 6y5RMfGTj8mXqhfbAGBcfVg6PUCCtzA=
+ bh=R9d7nggnhOKCBySbAsGTRQSXEaDv0OpKWuYrSEj57p0=;
+ b=fHDAKKb/Sa7p6vANB3z5QohC46634lUVe07CY6sEjSgtMhdYUA69FSD37QWVZtji7M0sWh
+ Ix3Lf2rE3ipmUsHQVdswCJeJwKblommqDhCY7/SVFBSL83jKHl4AHzYHmr10s8NrYn4JkJ
+ SZMODoqV8mn9eqVB1u4SymXMGWVjRMA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-FisGifmEPs2hwj0sseAaPQ-1; Fri, 16 Oct 2020 07:48:19 -0400
-X-MC-Unique: FisGifmEPs2hwj0sseAaPQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-42-_2qRoqinPQex0imQin3F8A-1; Fri, 16 Oct 2020 07:48:22 -0400
+X-MC-Unique: _2qRoqinPQex0imQin3F8A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 22BF91019626
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:48:18 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E70418A8235;
+ Fri, 16 Oct 2020 11:48:21 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E655B76640
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:48:17 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0B57C5C1BD;
+ Fri, 16 Oct 2020 11:48:20 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 09/22] build: cleanups to Makefile
-Date: Fri, 16 Oct 2020 07:48:01 -0400
-Message-Id: <20201016114814.1564523-10-pbonzini@redhat.com>
+Subject: [PULL 16/22] docs: Fix Sphinx configuration for msys2/mingw
+Date: Fri, 16 Oct 2020 07:48:08 -0400
+Message-Id: <20201016114814.1564523-17-pbonzini@redhat.com>
 In-Reply-To: <20201016114814.1564523-1-pbonzini@redhat.com>
 References: <20201016114814.1564523-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -96,118 +96,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Yonggang Luo <luoyonggang@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Group similar rules, add comments to "else" and "endif" lines,
-detect too-old config-host.mak before messing things up.
+From: Yonggang Luo <luoyonggang@gmail.com>
 
+Python doesn't support running ../scripts/kernel-doc directly.
+
+Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
+Message-Id: <20201015220626.418-2-luoyonggang@gmail.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- Makefile | 45 ++++++++++++++++++++++++++++-----------------
- 1 file changed, 28 insertions(+), 17 deletions(-)
+ docs/conf.py             | 2 +-
+ docs/sphinx/kerneldoc.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Makefile b/Makefile
-index 91c62a26c8..53d624a0be 100644
---- a/Makefile
-+++ b/Makefile
-@@ -30,13 +30,21 @@ UNCHECKED_GOALS := %clean TAGS cscope ctags dist \
-     help check-help print-% \
-     docker docker-% vm-help vm-test vm-build-%
+diff --git a/docs/conf.py b/docs/conf.py
+index 00e1b750e2..e584f68393 100644
+--- a/docs/conf.py
++++ b/docs/conf.py
+@@ -241,7 +241,7 @@ texinfo_documents = [
+ # We use paths starting from qemu_docdir here so that you can run
+ # sphinx-build from anywhere and the kerneldoc extension can still
+ # find everything.
+-kerneldoc_bin = os.path.join(qemu_docdir, '../scripts/kernel-doc')
++kerneldoc_bin = ['perl', os.path.join(qemu_docdir, '../scripts/kernel-doc')]
+ kerneldoc_srctree = os.path.join(qemu_docdir, '..')
+ hxtool_srctree = os.path.join(qemu_docdir, '..')
+ qapidoc_srctree = os.path.join(qemu_docdir, '..')
+diff --git a/docs/sphinx/kerneldoc.py b/docs/sphinx/kerneldoc.py
+index 3e87940206..3ac277d162 100644
+--- a/docs/sphinx/kerneldoc.py
++++ b/docs/sphinx/kerneldoc.py
+@@ -67,7 +67,7 @@ class KernelDocDirective(Directive):
  
-+all:
-+.PHONY: all clean distclean recurse-all dist msi FORCE
-+
-+# Don't try to regenerate Makefile or configure
-+# We don't generate any of them
-+Makefile: ;
-+configure: ;
-+
- # All following code might depend on configuration variables
- ifneq ($(wildcard config-host.mak),)
--# Put the all: rule here so that config-host.mak can contain dependencies.
--all:
- include config-host.mak
+     def run(self):
+         env = self.state.document.settings.env
+-        cmd = [env.config.kerneldoc_bin, '-rst', '-enable-lineno']
++        cmd = env.config.kerneldoc_bin + ['-rst', '-enable-lineno']
  
- git-submodule-update:
-+.git-submodule-status: git-submodule-update config-host.mak
-+Makefile: .git-submodule-status
- 
- .PHONY: git-submodule-update
- 
-@@ -84,9 +92,7 @@ Makefile.mtest: build.ninja scripts/mtest2make.py
- -include Makefile.mtest
- endif
- 
--Makefile: .git-submodule-status
--.git-submodule-status: git-submodule-update config-host.mak
--
-+# Ensure the build tree is okay.
- # Check that we're not trying to do an out-of-tree build from
- # a tree that's been used for an in-tree build.
- ifneq ($(realpath $(SRC_PATH)),$(realpath .))
-@@ -97,6 +103,20 @@ seems to have been used for an in-tree build. You can fix this by running \
- endif
- endif
- 
-+# force a rerun of configure if config-host.mak is too old or corrupted
-+ifeq ($(MESON),)
-+.PHONY: config-host.mak
-+x := $(shell rm -rf meson-private meson-info meson-logs)
-+endif
-+ifeq ($(NINJA),)
-+.PHONY: config-host.mak
-+x := $(shell rm -rf meson-private meson-info meson-logs)
-+endif
-+ifeq ($(wildcard build.ninja),)
-+.PHONY: config-host.mak
-+x := $(shell rm -rf meson-private meson-info meson-logs)
-+endif
-+
- config-host.mak: $(SRC_PATH)/configure $(SRC_PATH)/pc-bios $(SRC_PATH)/VERSION
- 	@echo $@ is out-of-date, running configure
- 	@if test -f meson-private/coredata.dat; then \
-@@ -114,15 +134,15 @@ plugins:
- 	$(call quiet-command,\
- 		$(MAKE) $(SUBDIR_MAKEFLAGS) -C contrib/plugins V="$(V)", \
- 		"BUILD", "example plugins")
--endif
-+endif # $(CONFIG_PLUGIN)
- 
--else
-+else # config-host.mak does not exist
- config-host.mak:
- ifneq ($(filter-out $(UNCHECKED_GOALS),$(MAKECMDGOALS)),$(if $(MAKECMDGOALS),,fail))
- 	@echo "Please call configure before running make!"
- 	@exit 1
- endif
--endif
-+endif # config-host.mak does not exist
- 
- # Only needed in case Makefile.ninja does not exist.
- .PHONY: ninja-clean ninja-distclean clean-ctlist
-@@ -131,20 +151,11 @@ ninja-clean::
- ninja-distclean::
- build.ninja: config-host.mak
- 
--# Don't try to regenerate Makefile or configure
--# We don't generate any of them
--Makefile: ;
--configure: ;
--
--.PHONY: all clean distclean install \
--	recurse-all dist msi FORCE
--
- SUBDIR_MAKEFLAGS=$(if $(V),,--no-print-directory --quiet)
- 
- include $(SRC_PATH)/tests/Makefile.include
- 
- all: recurse-all
--Makefile:
- 
- ROM_DIRS = $(addprefix pc-bios/, $(ROMS))
- ROM_DIRS_RULES=$(foreach t, all clean, $(addsuffix /$(t), $(ROM_DIRS)))
+         filename = env.config.kerneldoc_srctree + '/' + self.arguments[0]
+         export_file_patterns = []
 -- 
 2.26.2
 
