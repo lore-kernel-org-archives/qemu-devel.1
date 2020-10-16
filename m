@@ -2,76 +2,81 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,FROM_WSP_TRAIL,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C6FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:03:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 64D18C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:32:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70B89207C4
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:03:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B89207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6FFA4207C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:32:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6FFA4207C4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTIpc-00085o-CP
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 02:03:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44128)
+	id 1kTJHt-0007eI-07
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 02:32:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52782)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kTIhf-0006Vy-9j
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:59 -0400
-Received: from mga01.intel.com ([192.55.52.88]:36617)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kTIhc-0005C7-QZ
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:58 -0400
-IronPort-SDR: V/9QeNkcf4ecBV/F1v3snN1GDLfMvPHw/D8v8h4kG8Qf0D34xN+PFzgFYQJzcWSDFlApelfN9e
- qIeBav0sNKKg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9775"; a="184094679"
-X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="184094679"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2020 22:54:55 -0700
-IronPort-SDR: hpHyIrnXq9YyAgMkOSv9ez7tHdDO0t0at+K/Cxb1BL5ajsb8vUTv+rLspkYwv9nNlNtx+7Igud
- nlOxt1/cAWVQ==
-X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="464572875"
-Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
- by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2020 22:54:53 -0700
-From: Zhang Chen <chen.zhang@intel.com >
-To: Jason Wang <jasowang@redhat.com>,
-	qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH V2 10/10] net/colo-compare.c: Increase default queued packet
- scan frequency
-Date: Fri, 16 Oct 2020 13:52:08 +0800
-Message-Id: <20201016055208.7969-11-chen.zhang@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20201016055208.7969-1-chen.zhang@intel.com>
-References: <20201016055208.7969-1-chen.zhang@intel.com>
-Received-SPF: pass client-ip=192.55.52.88; envelope-from=chen.zhang@intel.com;
- helo=mga01.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 01:54:36
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -26
-X-Spam_score: -2.7
-X-Spam_bar: --
-X-Spam_report: (-2.7 / 5.0 requ) BAYES_00=-1.9, FROM_ADDR_WS=2.996,
- FROM_WSP_TRAIL=1, HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kTJGn-0007Cm-R4
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 02:31:18 -0400
+Received: from indium.canonical.com ([91.189.90.7]:57610)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kTJGd-0000pa-Lo
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 02:31:15 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kTJGZ-0004Ks-6P
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:31:03 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 2072F2E8134
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:31:03 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Fri, 16 Oct 2020 06:16:28 -0000
+From: Andrej Krutak <1856834@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: andree182 ecsdn laurent-vivier
+X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
+X-Launchpad-Bug-Modifier: Andrej Krutak (andree182)
+References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
+Message-Id: <160282898811.30872.13701622178575310967.malone@wampee.canonical.com>
+Subject: [Bug 1856834] Re: PCI broken in qemu ppc e500 in v2.12.0 and other
+ versions
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="781851f4dc11c93bc506eb54e6a0d35c919a1ce6"; Instance="production"
+X-Launchpad-Hash: aae68a34f272c06f0cbed2d470ff4fb1676f346d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 02:31:03
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.248, RCVD_IN_DNSWL_HI=-5,
  RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -80,36 +85,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Derek Su <dereksu@qnap.com>, Zhang Chen <chen.zhang@intel.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Zhang Chen <zhangckid@gmail.com>
+Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Zhang Chen <chen.zhang@intel.com>
+Not even reverting the patch worked for me, and it's still broken on
+qemu 5.1.
 
-In my test, use this default parameter looks better.
+For example:
 
-Signed-off-by: Zhang Chen <chen.zhang@intel.com>
----
- net/colo-compare.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+~/OSS/qemu/ppc-softmmu/qemu-system-ppc -machine mpc8544ds -nographic
+-cpu e500mc -serial mon:stdio -kernel zImage -initrd rootfs.ird -append
+'console=3DttyS0,115200' -device e1000,netdev=3Dmain -netdev
+hubport,hubid=3D0,id=3Dmain -net tap,ifname=3Dtap0 -device virtio-balloon-p=
+ci
+-device virtio-rng-pci  -device virtio-blk-pci-transitional,drive=3Ddrive0
+-drive file=3Ddisk,if=3Dnone,id=3Ddrive0,format=3Draw
 
-diff --git a/net/colo-compare.c b/net/colo-compare.c
-index 0c87fd9e33..337025b44f 100644
---- a/net/colo-compare.c
-+++ b/net/colo-compare.c
-@@ -52,7 +52,7 @@ static NotifierList colo_compare_notifiers =
- #define COLO_COMPARE_FREE_PRIMARY     0x01
- #define COLO_COMPARE_FREE_SECONDARY   0x02
- 
--#define REGULAR_PACKET_CHECK_MS 3000
-+#define REGULAR_PACKET_CHECK_MS 1000
- #define DEFAULT_TIME_OUT_MS 3000
- 
- /* #define DEBUG_COLO_PACKETS */
--- 
-2.17.1
+causes the linux kernel to freeze after probing the virtio_blk device:
 
+virtio_rng: probe of virtio1 failed with error -22
+virtio_blk virtio2: [vda] 131072 512-byte logical blocks (67.1 MB/64.0 MiB)
+
+Not specifying the virtio-blk-pci device makes the system boot, but
+still all but the first (e1000) PCI devices seem to not probe.
+
+It seems I can trace this behavior at least to version 2.4.1, probably
+even sooner (can't make my linux boot on those, so I'm unsure...).
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1856834
+
+Title:
+  PCI broken in qemu ppc e500 in v2.12.0 and other versions
+
+Status in QEMU:
+  New
+
+Bug description:
+  The same qemu -M mpc... command that works on qemu-system-ppc version
+  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
+  version 4.2.0release and 4.19dirtygit:
+
+  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
+ccel kvm is set.
+  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
+e (slower).
+
+  ends/freezes at:
+  nbd: registered device at major 43
+  =C2=A0vda:
+
+  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
+  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
+  with 2.8.0 official release from git/github that I compiled/built
+  myself. But both of the newer releases fail on the same exact machine
+  same config.
+
+  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
+ed weren't, ie gave
+  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
+bus=3D0,unit=3D0
+  (but I removed -drive if=3Dmtd since wasn't using it anyway)
+
+  I also tried on windows but I think virtio doesn't work on windows
+  hosts at all? On windows host it fails the same way, even version 2.12
+  as well as 4.1.10...
+
+  used:
+  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
+
+  (basically all steps the same on same exact system same config, yet
+  2.8.0 works fine whether apt-get installed or built from source while
+  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
+
+  In case newer qemu versions act weird on various kernels, I did try with =
+both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
+ compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
+_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
+ich is why I can't use -M ppce500 instead..)
+  tx
+  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
