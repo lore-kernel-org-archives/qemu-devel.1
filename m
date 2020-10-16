@@ -2,81 +2,76 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2DC4C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:00:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D0E0C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:01:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A121C20866
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:00:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A121C20866
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BC34420829
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:01:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=hni.uni-paderborn.de header.i=@hni.uni-paderborn.de header.b="P7YPgkFm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC34420829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=hni.upb.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTRDX-000539-66
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:00:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52336)
+	id 1kTREG-00063X-Qa
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:01:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kTR8z-0001hX-Lu
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:55:45 -0400
-Received: from indium.canonical.com ([91.189.90.7]:42892)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kTR8r-0004DB-UM
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:55:45 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kTR8q-0007e3-2w
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 14:55:36 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 0E29A2E8130
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 14:55:36 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+ (Exim 4.90_1) (envelope-from <adelt@hni.upb.de>)
+ id 1kTMii-0004TM-Cl; Fri, 16 Oct 2020 06:12:21 -0400
+Received: from zuban.uni-paderborn.de ([2001:638:502:c003::17]:47374)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <adelt@hni.upb.de>)
+ id 1kTMid-0002qF-EY; Fri, 16 Oct 2020 06:12:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=hni.uni-paderborn.de; s=20170601; h=To:Cc:Date:Message-Id:Subject:
+ Mime-Version:Content-Transfer-Encoding:Content-Type:From:Sender:Reply-To:
+ Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+ Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+ List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+ bh=NsyoKU5JYCFe/mYWFtpP8suMkzdEmg4/dVRmG7SLcZ0=; b=P7YPgkFmxPYO1jyDEEA9WQH4as
+ 2qJ+hAWbNwiktK0flNmwGmgjVpKNQ+rA0IEYAnYqf/7ESvonnz9tZpU7zSXSERJuFeu6lZ3mYANNj
+ 9qRKTdhZMdjI3tiJcT/s0x6AYeiq5RmgT6m42Gc7mk9RioX6WFic+LrF343dO2/YK3ms=;
+From: Peer Adelt <adelt@hni.upb.de>
+Content-Type: text/plain;
+	charset=us-ascii
 Content-Transfer-Encoding: quoted-printable
-Date: Fri, 16 Oct 2020 14:48:21 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1900155@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: ide
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: philmd
-X-Launchpad-Bug-Reporter: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-Message-Id: <160285970200.13301.15621205793966891788.malonedeb@wampee.canonical.com>
-Subject: [Bug 1900155] [NEW] MIPS Malta fails booting due to IDE error
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="58bb2f3096f16f0e0acc917602669aecb4ffaf54"; Instance="production"
-X-Launchpad-Hash: 34fa702619bbc31994507322c258d320c69a0acb
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 10:55:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Mime-Version: 1.0 (Mac OS X Mail 12.4 \(3445.104.15\))
+Subject: HTIF tohost symbol size check always fails
+Message-Id: <B96DF081-AEDD-470E-A99C-8A9536E0A8CE@hni.upb.de>
+Date: Fri, 16 Oct 2020 12:12:05 +0200
+To: qemu-riscv@nongnu.org
+X-Mailer: Apple Mail (2.3445.104.15)
+X-IMT-Spam-Score: 0.0 ()
+X-PMX-Version: 6.4.9.2830568, Antispam-Engine: 2.7.2.2107409,
+ Antispam-Data: 2020.10.16.100318, AntiVirus-Engine: 5.77.0,
+ AntiVirus-Data: 2020.9.28.5770001
+X-Sophos-SenderHistory: ip=37.24.125.142, fs=43337703, da=90452191, mc=238,
+ sc=1, hc=237, sp=0, fso=43337703, re=0, sd=0, hd=0
+X-IMT-Authenticated-Sender: uid=adelt,ou=People,o=upb,c=de
+Received-SPF: neutral client-ip=2001:638:502:c003::17;
+ envelope-from=adelt@hni.upb.de; helo=zuban.uni-paderborn.de
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -8
+X-Spam_score: -0.9
+X-Spam_bar: /
+X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_INVALID=0.1,
+ DKIM_SIGNED=0.1, SPF_HELO_NONE=0.001,
+ SPF_NEUTRAL=0.779 autolearn=no autolearn_force=no
 X-Spam_action: no action
+X-Mailman-Approved-At: Fri, 16 Oct 2020 10:59:29 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,180 +80,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1900155 <1900155@bugs.launchpad.net>
+Cc: qemu-devel@nongnu.org, sagark@eecs.berkeley.edu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+Hi,
 
-As of commit 3e407488349:
+I have a problem with the RISC-V HTIF device.=20
 
-$ avocado --show=3Dconsole run -t machine:malta tests/acceptance/boot_linux=
-_console.py    =
+Every binary I have compiled for Spike on riscv32 fails with the =
+following error message: "HTIF tohost must be 8 bytes"
 
-console: [    0.000000] Linux version 4.5.0-2-4kc-malta (debian-kernel@list=
-s.debian.org) (gcc version 5.3.1 20160519 (Debian 5.3.1-20) ) #1 Debian 4.5=
-.5-1 (2016-05-29)
-console: [    0.000000] earlycon: Early serial console at I/O port 0x3f8 (o=
-ptions '38400n8')
-console: [    0.000000] bootconsole [uart0] enabled
-console: [    0.000000] CPU0 revision is: 00019300 (MIPS 24Kc)
-console: [    0.000000] FPU revision is: 00739300
-console: [    0.000000] MIPS: machine is mti,malta
-[...]
-console: ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
-console: ata2.00: Drive reports diagnostics failure. This may indicate a dr=
-ive
-console: ata2.00: fault or invalid emulation. Contact drive vendor for info=
-rmation.
-console: ata2.00: configured for UDMA/33
-console: scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ PQ:=
- 0 ANSI: 5
-console: Freeing unused kernel memory: 412K (80979000 - 809e0000)
-console: do_page_fault(): sending SIGSEGV to mount for invalid write access=
- to 0018a000
-console: epc =3D 775cca54 in libc-2.27.so[775b3000+177000]
-console: ra  =3D 77754618 in ld-2.27.so[77743000+24000]
-console: do_page_fault(): sending SIGSEGV to klogd for invalid write access=
- to 0018a000
-console: epc =3D 770f0a54 in libc-2.27.so[770d7000+177000]
-console: ra  =3D 77278618 in ld-2.27.so[77267000+24000]
-console: do_page_fault(): sending SIGSEGV to S20urandom for invalid write a=
-ccess to 0018a000
-console: epc =3D 77d0ca54 in libc-2.27.so[77cf3000+177000]
-console: ra  =3D 77e94618 in ld-2.27.so[77e83000+24000]
-console: do_page_fault(): sending SIGSEGV to mkdir for invalid write access=
- to 0018a000
-console: epc =3D 776b8a54 in libc-2.27.so[7769f000+177000]
-console: ra  =3D 77840618 in ld-2.27.so[7782f000+24000]
-console: do_page_fault(): sending SIGSEGV to sh for invalid write access to=
- 0018a000
-console: epc =3D 77364a54 in libc-2.27.so[7734b000+177000]
-console: ra  =3D 774ec618 in ld-2.27.so[774db000+24000]
-console: do_page_fault(): sending SIGSEGV to sh for invalid write access to=
- 0018a000
-console: epc =3D 77bd4a54 in libc-2.27.so[77bbb000+177000]
-console: ra  =3D 77d5c618 in ld-2.27.so[77d4b000+24000]
-console: do_page_fault(): sending SIGSEGV to awk for invalid write access t=
-o 0018a000
-console: epc =3D 76f44a54 in libc-2.27.so[76f2b000+177000]
-console: ra  =3D 770cc618 in ld-2.27.so[770bb000+24000]
-console: do_page_fault(): sending SIGSEGV to cat for invalid write access t=
-o 0018a000
-console: epc =3D 770cca54 in libc-2.27.so[770b3000+177000]
-console: ra  =3D 77254618 in ld-2.27.so[77243000+24000]
-$ echo $?
-8
+This happens regardless of which program I have translated for Spike. =
+This is also the case with the official riscv-compliance tests, for =
+example.
 
-55adb3c45620c31f29978f209e2a44a08d34e2da is the first bad commit
-commit 55adb3c45620c31f29978f209e2a44a08d34e2da
-Author: John Snow <jsnow@redhat.com>
-Date:   Fri Jul 24 01:23:00 2020 -0400
+The query "if (st_size !=3D 8)" in the HTIF device always fails, because =
+st_size seems to be always 0.
 
-    ide: cancel pending callbacks on SRST
+To be able to reproduce it:
+- QEMU GIT Hash: d0ed6a69d399ae193959225cdeaa9382746c91cc (tag "v5.1.0")
+- System: Mac OS 10.14.6 (Darwin Kernel Version 18.7.0)
+- Compiler: Latest SiFive Build for GCC under OSX
+- Command: qemu-system-riscv32 -M spike -nographic -bios none -kernel =
+<ANY_SPIKE_ELF_FILE>
 
-    The SRST implementation did not keep up with the rest of IDE; it is
-    possible to perform a weak reset on an IDE device to remove the BSY/DRQ
-    bits, and then issue writes to the control/device registers which can
-    cause chaos with the state machine.
-
-    Fix that by actually performing a real reset.
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-
-** Tags: ide
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1900155
-
-Title:
-  MIPS Malta fails booting due to IDE error
-
-Status in QEMU:
-  New
-
-Bug description:
-  As of commit 3e407488349:
-
-  $ avocado --show=3Dconsole run -t machine:malta tests/acceptance/boot_lin=
-ux_console.py    =
-
-  console: [    0.000000] Linux version 4.5.0-2-4kc-malta (debian-kernel@li=
-sts.debian.org) (gcc version 5.3.1 20160519 (Debian 5.3.1-20) ) #1 Debian 4=
-.5.5-1 (2016-05-29)
-  console: [    0.000000] earlycon: Early serial console at I/O port 0x3f8 =
-(options '38400n8')
-  console: [    0.000000] bootconsole [uart0] enabled
-  console: [    0.000000] CPU0 revision is: 00019300 (MIPS 24Kc)
-  console: [    0.000000] FPU revision is: 00739300
-  console: [    0.000000] MIPS: machine is mti,malta
-  [...]
-  console: ata2.00: ATAPI: QEMU DVD-ROM, 2.5+, max UDMA/100
-  console: ata2.00: Drive reports diagnostics failure. This may indicate a =
-drive
-  console: ata2.00: fault or invalid emulation. Contact drive vendor for in=
-formation.
-  console: ata2.00: configured for UDMA/33
-  console: scsi 1:0:0:0: CD-ROM            QEMU     QEMU DVD-ROM     2.5+ P=
-Q: 0 ANSI: 5
-  console: Freeing unused kernel memory: 412K (80979000 - 809e0000)
-  console: do_page_fault(): sending SIGSEGV to mount for invalid write acce=
-ss to 0018a000
-  console: epc =3D 775cca54 in libc-2.27.so[775b3000+177000]
-  console: ra  =3D 77754618 in ld-2.27.so[77743000+24000]
-  console: do_page_fault(): sending SIGSEGV to klogd for invalid write acce=
-ss to 0018a000
-  console: epc =3D 770f0a54 in libc-2.27.so[770d7000+177000]
-  console: ra  =3D 77278618 in ld-2.27.so[77267000+24000]
-  console: do_page_fault(): sending SIGSEGV to S20urandom for invalid write=
- access to 0018a000
-  console: epc =3D 77d0ca54 in libc-2.27.so[77cf3000+177000]
-  console: ra  =3D 77e94618 in ld-2.27.so[77e83000+24000]
-  console: do_page_fault(): sending SIGSEGV to mkdir for invalid write acce=
-ss to 0018a000
-  console: epc =3D 776b8a54 in libc-2.27.so[7769f000+177000]
-  console: ra  =3D 77840618 in ld-2.27.so[7782f000+24000]
-  console: do_page_fault(): sending SIGSEGV to sh for invalid write access =
-to 0018a000
-  console: epc =3D 77364a54 in libc-2.27.so[7734b000+177000]
-  console: ra  =3D 774ec618 in ld-2.27.so[774db000+24000]
-  console: do_page_fault(): sending SIGSEGV to sh for invalid write access =
-to 0018a000
-  console: epc =3D 77bd4a54 in libc-2.27.so[77bbb000+177000]
-  console: ra  =3D 77d5c618 in ld-2.27.so[77d4b000+24000]
-  console: do_page_fault(): sending SIGSEGV to awk for invalid write access=
- to 0018a000
-  console: epc =3D 76f44a54 in libc-2.27.so[76f2b000+177000]
-  console: ra  =3D 770cc618 in ld-2.27.so[770bb000+24000]
-  console: do_page_fault(): sending SIGSEGV to cat for invalid write access=
- to 0018a000
-  console: epc =3D 770cca54 in libc-2.27.so[770b3000+177000]
-  console: ra  =3D 77254618 in ld-2.27.so[77243000+24000]
-  $ echo $?
-  8
-
-  55adb3c45620c31f29978f209e2a44a08d34e2da is the first bad commit
-  commit 55adb3c45620c31f29978f209e2a44a08d34e2da
-  Author: John Snow <jsnow@redhat.com>
-  Date:   Fri Jul 24 01:23:00 2020 -0400
-
-      ide: cancel pending callbacks on SRST
-
-      The SRST implementation did not keep up with the rest of IDE; it is
-      possible to perform a weak reset on an IDE device to remove the BSY/D=
-RQ
-      bits, and then issue writes to the control/device registers which can
-      cause chaos with the state machine.
-
-      Fix that by actually performing a real reset.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1900155/+subscriptions
+Best regards,
+Peer Adelt=
 
