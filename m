@@ -2,63 +2,59 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F552C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:38:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 337B0C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:43:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF34320795
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F017E20795
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:43:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="HeMcDe0G"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF34320795
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="NtoeFyJA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F017E20795
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTDlK-0003FU-3A
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:38:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33626)
+	id 1kTDq9-0004qg-Qt
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:43:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTDfw-0006w1-Lo; Thu, 15 Oct 2020 20:32:53 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:34355 helo=ozlabs.org)
+ id 1kTDp0-00046g-UX; Thu, 15 Oct 2020 20:42:14 -0400
+Received: from ozlabs.org ([203.11.71.1]:48149)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTDfo-0000Zj-Ci; Thu, 15 Oct 2020 20:32:46 -0400
+ id 1kTDoy-0001oP-Ur; Thu, 15 Oct 2020 20:42:14 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CC6Yf4P8qz9sTr; Fri, 16 Oct 2020 11:32:38 +1100 (AEDT)
+ id 4CC6mb4v9Xz9sTK; Fri, 16 Oct 2020 11:42:07 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1602808358;
- bh=IXQSSafvAJXfFXaugRaFsp9KrX8tZ3gG+kcKpBgEaAQ=;
+ d=gibson.dropbear.id.au; s=201602; t=1602808927;
+ bh=QSCVYgt5dfSZdPnu/6X4zOVNFZwfUa6m8OormgP9o1Y=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=HeMcDe0GeCaNNrisT8fx0kWB4bUCVZqfIyRXxZN7pwqDeCkfF++51i8eLA3E/UfkO
- KBc0l6nUeIG3LP/Lh2LgHPmbYzTcfM9hi4fTAdVYjCxgQP4uL+QBb2QhRP3PH8z762
- TrIgRsmO9+BtvSOEUbPIJCHDrp5cwGOOj0kB7qUU=
-Date: Fri, 16 Oct 2020 11:32:18 +1100
+ b=NtoeFyJAQRP4ug64OFtcsbyRpSIURGtWcnFbVTYLP56jNHzW0M8rwEBAAmmjmaj3I
+ Ga8pceyPeIJZf80/bpkMD62JMhjw3eOV9bOVXLPCe2+NXFagHKZPfAEiIPB4vn+3qE
+ dtKWm7/7tF9uTqb8C4ynl1PNQGjFkDiLg7WjI5kU=
+Date: Fri, 16 Oct 2020 11:42:00 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Elena Afanasova <eafanasova@gmail.com>
-Subject: Re: [PATCH] hw/net: move allocation to the heap due to very large
- stack frame
-Message-ID: <20201016003218.GF7078@yekko.fritz.box>
-References: <8f07132478469b35fb50a4706691e2b56b10a67b.camel@gmail.com>
- <20201010060745.GK1025389@yekko.fritz.box>
- <f505c80b88ee665a62883a69bed9d614f6ba2a66.camel@gmail.com>
- <20201012053001.GD4787@yekko.fritz.box>
- <38d5993e-8a10-0fb1-5263-6531a356fefd@redhat.com>
- <ca54ec71-11b4-70c5-6d48-4e58fb90a545@redhat.com>
- <20201013053250.GV71119@yekko.fritz.box>
- <96fa5d23ca57363e063b9b5006ad8f71e6b1b307.camel@gmail.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] spapr: Move spapr_create_nvdimm_dr_connectors() to core
+ machine code
+Message-ID: <20201016004200.GG7078@yekko.fritz.box>
+References: <160249772183.757627.7396780936543977766.stgit@bahia.lan>
+ <20201013004014.GF71119@yekko.fritz.box>
+ <20201013093344.644b5677@bahia.lan>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VuQYccsttdhdIfIP"
+ protocol="application/pgp-signature"; boundary="V32M1hWVjliPHW+c"
 Content-Disposition: inline
-In-Reply-To: <96fa5d23ca57363e063b9b5006ad8f71e6b1b307.camel@gmail.com>
+In-Reply-To: <20201013093344.644b5677@bahia.lan>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:30:17
@@ -81,51 +77,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
- jasowang@redhat.com, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
+ Shivaprasad G Bhat <sbhat@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---VuQYccsttdhdIfIP
+--V32M1hWVjliPHW+c
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 14, 2020 at 07:15:47AM -0700, Elena Afanasova wrote:
-> On Tue, 2020-10-13 at 16:32 +1100, David Gibson wrote:
-> > On Mon, Oct 12, 2020 at 03:45:02PM +0200, Paolo Bonzini wrote:
-> > > On 12/10/20 12:44, Thomas Huth wrote:
-> > > > I think this is one of the tasks from:
-> > > >=20
-> > > > =20
-> > > > https://wiki.qemu.org/Contribute/BiteSizedTasks#Compiler-driven_cle=
-anups
-> > > >=20
-> > > > It has been added by Paolo in 2016:
-> > > >=20
-> > > > =20
-> > > > https://wiki.qemu.org/index.php?title=3DContribute/BiteSizedTasks&d=
-iff=3D5368&oldid=3D5367
-> > > >=20
-> > > > ... so maybe Paolo can comment on the size that has been chosen
-> > > > here...?
+On Tue, Oct 13, 2020 at 09:33:44AM +0200, Greg Kurz wrote:
+> On Tue, 13 Oct 2020 11:40:14 +1100
+> David Gibson <david@gibson.dropbear.id.au> wrote:
+>=20
+> > On Mon, Oct 12, 2020 at 12:15:21PM +0200, Greg Kurz wrote:
+> > > The spapr_create_nvdimm_dr_connectors() function doesn't need to acce=
+ss
+> > > any internal details of the sPAPR NVDIMM implementation. Also, pretty
+> > > much like for the LMBs, only spapr_machine_init() is responsible for =
+the
+> > > creation of DR connectors for NVDIMMs.
 > > >=20
-> > > I used 16K, mostly because it is a nice round number.  8k is too
-> > > small
-> > > due to PATH_MAX-sized variables.  16k seemed to be plenty and
-> > > triggered
-> > > in few-enough places that the cleanup is viable.
+> > > Make this clear by making this function static in hw/ppc/spapr.c.
+> > >=20
+> > > Signed-off-by: Greg Kurz <groug@kaod.org>
 > >=20
-> > Ok.  Why are large stack frames bad in qemu?
+> > Hrm, I'm not really seeing the advantage to moving this.  It doesn't
+> > have to be in spapr_nvdimm for data hiding, but it is related, and
+> > spapr.c is kind of huge.
 > >=20
 >=20
-> I think that the main issue here is alloca() because it can lead to UB.
+> The only advantage is to give an appropriate scope to this function,
+> as many other functions that create internal devices, eg. other DRC
+> types or the default PHB for which a similar change was accepted
+> 2 years ago.
+>=20
+> commit 999c9caf2eee66103195e1ec7580b379929db9d2
+> Author: Greg Kurz <groug@kaod.org>
+> Date:   Fri Dec 21 01:35:09 2018 +0100
+>=20
+>     spapr: move spapr_create_phb() to core machine code
+>    =20
+>     This function is only used when creating the default PHB. Let's rename
+>     it and move it to the core machine code for clarity.
+>    =20
+>     Signed-off-by: Greg Kurz <groug@kaod.org>
+>     Reviewed-by: Alexey Kardashevskiy <aik@ozlabs.ru>
+>     Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+>     Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+>=20
+> I agree that spapr.c is huge indeed (4943 lines) but this increases its
+> size by _just_ 0.2 %. And there are certainly good candidates that
+> landed in spapr.c by _default_ over the years but should rather be
+> moved to their own compilation unit (eg. a bunch of FDT building
+> functions for various resources or some hotplug related functions
+> that don't need to access machine internals).
 
-That's a fair point.  I've applied the patch to ppc-for-5.2, with a
-tweak to the commit message.
+Good points.  Applied to ppc-for-5.2.
+
+>=20
+> > > ---
+> > >  hw/ppc/spapr.c                |   10 ++++++++++
+> > >  hw/ppc/spapr_nvdimm.c         |   11 -----------
+> > >  include/hw/ppc/spapr_nvdimm.h |    1 -
+> > >  3 files changed, 10 insertions(+), 12 deletions(-)
+> > >=20
+> > > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > > index 63315f2d0fa9..ee716a12af73 100644
+> > > --- a/hw/ppc/spapr.c
+> > > +++ b/hw/ppc/spapr.c
+> > > @@ -2641,6 +2641,16 @@ static hwaddr spapr_rma_size(SpaprMachineState=
+ *spapr, Error **errp)
+> > >      return rma_size;
+> > >  }
+> > > =20
+> > > +static void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spa=
+pr)
+> > > +{
+> > > +    MachineState *machine =3D MACHINE(spapr);
+> > > +    int i;
+> > > +
+> > > +    for (i =3D 0; i < machine->ram_slots; i++) {
+> > > +        spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_PMEM, i=
+);
+> > > +    }
+> > > +}
+> > > +
+> > >  /* pSeries LPAR / sPAPR hardware init */
+> > >  static void spapr_machine_init(MachineState *machine)
+> > >  {
+> > > diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
+> > > index b3a489e9fe18..9e3d94071fe1 100644
+> > > --- a/hw/ppc/spapr_nvdimm.c
+> > > +++ b/hw/ppc/spapr_nvdimm.c
+> > > @@ -106,17 +106,6 @@ void spapr_add_nvdimm(DeviceState *dev, uint64_t=
+ slot, Error **errp)
+> > >      }
+> > >  }
+> > > =20
+> > > -void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr)
+> > > -{
+> > > -    MachineState *machine =3D MACHINE(spapr);
+> > > -    int i;
+> > > -
+> > > -    for (i =3D 0; i < machine->ram_slots; i++) {
+> > > -        spapr_dr_connector_new(OBJECT(spapr), TYPE_SPAPR_DRC_PMEM, i=
+);
+> > > -    }
+> > > -}
+> > > -
+> > > -
+> > >  static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
+> > >                             int parent_offset, NVDIMMDevice *nvdimm)
+> > >  {
+> > > diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvd=
+imm.h
+> > > index b834d82f5545..490b19a009f4 100644
+> > > --- a/include/hw/ppc/spapr_nvdimm.h
+> > > +++ b/include/hw/ppc/spapr_nvdimm.h
+> > > @@ -31,6 +31,5 @@ void spapr_dt_persistent_memory(SpaprMachineState *=
+spapr, void *fdt);
+> > >  bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice=
+ *nvdimm,
+> > >                             uint64_t size, Error **errp);
+> > >  void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
+> > > -void spapr_create_nvdimm_dr_connectors(SpaprMachineState *spapr);
+> > > =20
+> > >  #endif
+> > >=20
+> > >=20
+> >=20
+>=20
+
+
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -133,25 +220,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VuQYccsttdhdIfIP
+--V32M1hWVjliPHW+c
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+I6hIACgkQbDjKyiDZ
-s5L3Aw//bQBpt7YEIZTtlMVxI0R5OJgnZuTHnV8zqz+ena1SQlzK3PJ+bsF9Fl/x
-3Mx5+lKvo9aziKJHun1BsDfoq3YcQQZTeSc0MOzGUcIRMbssMisZZ3aWHIWbUbWy
-R9AbTkttnsJn5CRDaqNxjHVMdiGrBkaOg5chqLA2LtqtMdOCTnyOdCGNBV/fS+Um
-LL5p60T9S34HyMwx4QsvpSOw/ql7qbMkW4tzv/UWJ3qW4JcunaNFFZbBzIs89i9X
-pFyatNFt/Z7zs/Xx7jVU8hiFVz7U/6ACnDWyj90Fl2ayq4w3e3PwVAfx/Kxl2vGi
-FU+4HS5qRLa3T13jnkrhFJCJu2QGBKPS4nymFCiCSaLsJr76gpiisz300WrFXjSS
-1eH5m5RrmjioZQPcXyu9ikCmrwI4FwDL3AN770ytEsJivLCsr0bTWOGhhTMBSWYZ
-iJJJqsDj1qu+93kv89sd7bA5PCFAA16b4YUvMDAr+Z6w1VI5G3hjfkqEU1Z3rjvG
-FCW8jkGNBcd1JAYcx9Sg9/8ukeKbeMSJl4Q4cd6xw7NtXFenC8VXVZXjfsK0exV+
-+u7RJQjC/DtM9Te5ysVaofcMagCFdGGcJ975+wVnie12EFx5blI1m3U2+4YZ2BQC
-LtdFXaxFYvuZMUwJbWbtKkth1K3WLqeIwG83sMTg0UoHxOkzWJQ=
-=xxkU
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+I7FgACgkQbDjKyiDZ
+s5K42A/+MBDZbqwQvEb7Rg9GtjRqYNXKuFOrKvpTpqmGWHKzfIOHOrjOpVYHNMZt
+ajWTaiwLHJb2iMqC95KAeSmOnjfVaNIqse4vk5DM0BcMuqpbeSFc+OpswvWVRJeJ
+1Y3TqZ3wMRUgYLuf5FjbLOykg4jNJCaDEdPfJNY3A3wBNvOz/fYSJecTM1LNcyn8
+EZfO3uCsjLOQtHlRKW2tfZQ2wvqGJ/9jUXobBMfwSHbApJXHN/NeDk5yI3gERST0
+gdy4tPJWGuvUv5lazBPlOc6l+9Oa+d1LvtUtcNvSokcEu/4lhUNzKicbVnQYwPIf
+clLCT9MA30XHWicXcN/kdZq27YghbnqSz01a/2dI/beUVhe5UB5zYbO121sEP2/U
+rPdyjBy7lwp+QEA9Eo1ksRJdZ3MBt0V8cyPOksjFohvKMSNFQpZOgBEkQINzWO40
+1Itkq61P9CeorITGx8akdBbaFSxLVA6UJ2cOEGmeoha5ViBNl48cP4Gtu4WbXVps
+EH0QHWza+bkFDki8GcJ2mXt1h6HAyKA3ifBVNxLk5rmdWDboejO4NkBdciyJjx6K
+AZZBiuPIBomLHGWVzXHoCC9yDx4cw0q3E+RveuNF9BoG72bZhOO7IxUK+TT8rpcj
+15y4c6+CoiWKHKhpTmwcbjPA4CKigw4exabX8Ss4uEo2uoLuqwU=
+=ZSep
 -----END PGP SIGNATURE-----
 
---VuQYccsttdhdIfIP--
+--V32M1hWVjliPHW+c--
 
