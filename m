@@ -2,96 +2,86 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0FCEC433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 16:56:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC474C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:04:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EDB8220E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 16:56:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E208920848
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:04:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kNqzmBNU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EDB8220E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DCgWpy+e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E208920848
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54932 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTT1s-0004zU-Oj
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 12:56:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58812)
+	id 1kTT95-00072F-Np
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:03:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kTT12-0004OM-Ix
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 12:55:40 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:36857)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kTT8E-0006aT-U4
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 13:03:06 -0400
+Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:40002)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kTT10-0005DB-AT
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 12:55:40 -0400
-Received: by mail-pl1-x641.google.com with SMTP id w21so1603625plq.3
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 09:55:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=fY0Kp6p80zDYDtbJNpys020qphxRq0E75+RNkPAIz8E=;
- b=kNqzmBNUM0+rWldksStOdquY4D4Fl54ZYkq/ZzW70Rs9wcYUWtHQTkTmYbmsHOqZic
- ztJgcfnWMI3BcFErJBBXHkJomqKkgzTWamogeoD979766+UJr78IqCVZ/dsQg/3k7321
- Y6rWjmh9Xrn6+7OoH0EIQTRu7sQd9ADue42mPh1niKESAQK1jhtGYMmaCij1hvT59xOH
- UToIAYBgtM9/z7w9lD5Nzkhf4cifjBJqxr/XOFmcEIbbJUoj3JS3mg6Kfi3qfFwai098
- hvou157DX8Ic2e8CkzNjlJV/d0Nxlx2+yMbBx4bW08wHIN/mfKH1wycd3rqCfZfRmijX
- GKng==
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kTT8C-0006HE-PE
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 13:03:06 -0400
+Received: by mail-lf1-x143.google.com with SMTP id a9so3817282lfc.7
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 10:03:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=zv8iWa+xTqVtDgllI7gt6Ed7/TcekXXbJ1P2Kb3yK1g=;
+ b=DCgWpy+eENccUPCa6eQgRmQx9F7+4oB0IQ+N0/6Gvhb8lFeGqBg91jEnDlISyaA4Xx
+ IN3s+LFSouxDHdQBViSY4/IOhsg6NpUufQfyiKZYtMt/s712yMKlj1ht34wThTzi99WL
+ NOTyxO2jQcSJxcnmYNVrjTRb8ZmhFb3M6ypnG7cczfm4HtWqPg0FbnHzpkHod20SKSCv
+ oDzGZjcI4LNve/aq5UzLtTGwH1Izza5cx6tgU3221OgG5kb9LG5uZzATT/sjnqJVTtN5
+ VFhMpDBwP/UDLg+nccjTpoAKytj7LrYXA7+qbPe/xZDZbBzXBardumWBj3kMPfnOA7xT
+ A3GA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=fY0Kp6p80zDYDtbJNpys020qphxRq0E75+RNkPAIz8E=;
- b=I1CHfxcS+k84ukJkuk3g/noJOryoxTe0MdzQtmhoBgLoQuJw78zKtdP7wqoQBC1U4E
- Us7xQ1WrItTJ/EkVs9x2evCcXJvXQ6Nz7Tvlk1QqenFAdkljOGBzB4bhtUjO8nqKN+e6
- wKqaX58gMy9WQvWf/Ggwap1tH8SH9F5tCGzWuccjBUQu24O9Ik3ybHhlAJY0LNUlDdPH
- JgZcHvmbCUVkE3Vh/NSjQwfTO1FlGlQc7OiKCd4zkirijKw3D5hhK6qUhsWGhgfnCEUn
- 1a7bZiypzRV47USIxQ7ptTjizbk75QyUGCH0dCbaORj9e2k6k10T0Hva/O0RX38uQwE7
- NUZg==
-X-Gm-Message-State: AOAM53195qrgEeGhYRuU4i3f6D4AtBqx2z7peuUKpmFP8JmMXcc3SzwZ
- FeJVr3Vk+kZGgUBb2ky6HeYTcw==
-X-Google-Smtp-Source: ABdhPJyCkDVI9lS6oSCbTjA5UypEo2XT6rIEx8gxD1JmeDZ1JhwIOhOCZYE8TROajTTRWcWdN1i5Bg==
-X-Received: by 2002:a17:90a:bb0e:: with SMTP id
- u14mr4910678pjr.112.1602867335671; 
- Fri, 16 Oct 2020 09:55:35 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id z25sm3402238pgl.6.2020.10.16.09.55.34
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Oct 2020 09:55:34 -0700 (PDT)
-Subject: Re: [PATCH v2 06/10] softfloat: Implement float128_muladd
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20200925152047.709901-1-richard.henderson@linaro.org>
- <20200925152047.709901-7-richard.henderson@linaro.org>
- <87tuuuuo7d.fsf@linaro.org>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <b0625633-f8aa-a3b3-706e-74757bb215e8@linaro.org>
-Date: Fri, 16 Oct 2020 09:55:32 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=zv8iWa+xTqVtDgllI7gt6Ed7/TcekXXbJ1P2Kb3yK1g=;
+ b=RE2iDMr4XPvwvT/7DR6f7pM1WchPhQjPSjXkXZzszO52EaONw7qEvZ9WKcJpwar4/v
+ 863GTv23Py4P7fHqOLhDpwXrbfF0M6NP+QdhyZmWnObJDShu0KqffhGNz4jkWS/X5IUq
+ O8kYgQVKxAOJ7J2vkLMU3lNeEXttTD1J3mJmJR1dovbEyZPqe9bVBHQln0llgGoHh6JY
+ F+XuefBl/nA1x7XTk83F2vs+jmEwkpUUAu5wILYgvrzJRJfixoMerRDqEJMnkqjziehz
+ 5EqIg7FhBM4q9a/xjBVbp8r7jKlHHWmqODOZtp7PW4orbTwcm0k56/gxSZxez+8GPxbc
+ REwg==
+X-Gm-Message-State: AOAM530oOq37QubupuxrRzDvV2mYyFOzNwgIkIDAGqANFH5PG/0/CX76
+ /GeYutjwTaPqFqPpI9jbhVFngI2wFr4nzDs7D38=
+X-Google-Smtp-Source: ABdhPJyGL/Yooebd0519+/4KTDkpfCwS6mxLkqyhD7ELt7L7HAP7ohf1M4H2M4NZPZEOuj0GEptsIJL8YN5hFbti6Ew=
+X-Received: by 2002:ac2:4ed0:: with SMTP id p16mr1681945lfr.554.1602867782406; 
+ Fri, 16 Oct 2020 10:03:02 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <87tuuuuo7d.fsf@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
+References: <20201013190506.3325-1-jandryuk@gmail.com>
+ <20201016153708.GB3105841@perard.uk.xensource.com>
+ <CAKf6xpssB-FGwiEhLqV8OFjBGuP4LKYh+9Pj_Bj7p5U2CJSw=g@mail.gmail.com>
+ <20201016164428.GC3105841@perard.uk.xensource.com>
+In-Reply-To: <20201016164428.GC3105841@perard.uk.xensource.com>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Fri, 16 Oct 2020 13:02:50 -0400
+Message-ID: <CAKf6xpst6xpMytFf_Pqi9-Y5TqhcfGp5odq=DEA-hBBjdSHMWw@mail.gmail.com>
+Subject: Re: [PATCH] hw/xen: Set suppress-vmdesc for Xen machines
+To: Anthony PERARD <anthony.perard@citrix.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::143;
+ envelope-from=jandryuk@gmail.com; helo=mail-lf1-x143.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -23
-X-Spam_score: -2.4
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.253,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -106,56 +96,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: bharata@linux.ibm.com, qemu-devel@nongnu.org, david@redhat.com
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paul Durrant <paul@xen.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?UTF-8?Q?Marek_Marczykowski=2DG=C3=B3recki?=
+ <marmarek@invisiblethingslab.com>, QEMU <qemu-devel@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ xen-devel <xen-devel@lists.xenproject.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/16/20 9:31 AM, Alex Bennée wrote:
->> +static void float128_unpack(FloatParts128 *p, float128 a, float_status *status)
->> +{
->> +    p->sign = extractFloat128Sign(a);
->> +    p->exp = extractFloat128Exp(a);
->> +    p->frac0 = extractFloat128Frac0(a);
->> +    p->frac1 = extractFloat128Frac1(a);
-> 
-> Here we are deviating from the exiting style, it would be nice if we
-> could separate the raw unpack and have something like:
-> 
-> static const FloatFmt float128_params = {
->     FLOAT_PARAMS(15, 112)
-> }
-> 
-> static inline FloatParts128 unpack128_raw(FloatFmt fmt, uint128_t raw)
-> {
->     const int sign_pos = fmt.frac_size + fmt.exp_size;
-> 
->     return (FloatParts128) {
->         .cls = float_class_unclassified,
->         .sign = extract128(raw, sign_pos, 1),
->         .exp = extract128(raw, fmt.frac_size, fmt.exp_size),
->         .frac1 = extract128_lo(raw, 0, fmt.frac_size),
->         .frac2 = extract128_hi(raw, 0, fmt.frac_size),
->     };
-> }
-> 
-> So even if we end up duplicating a chunk of the code the form will be
-> similar so when we side-by-side the logic we can see it works the same
-> way.
+On Fri, Oct 16, 2020 at 12:44 PM Anthony PERARD
+<anthony.perard@citrix.com> wrote:
+>
+> On Fri, Oct 16, 2020 at 12:01:47PM -0400, Jason Andryuk wrote:
+> > On Fri, Oct 16, 2020 at 11:38 AM Anthony PERARD
+> > <anthony.perard@citrix.com> wrote:
+> > >
+> > > On Tue, Oct 13, 2020 at 03:05:06PM -0400, Jason Andryuk wrote:
+> > > > xen-save-devices-state doesn't currently generate a vmdesc, so restore
+> > > > always triggers "Expected vmdescription section, but got 0".  This is
+> > > > not a problem when restore comes from a file.  However, when QEMU runs
+> > > > in a linux stubdom and comes over a console, EOF is not received.  This
+> > > > causes a delay restoring - though it does restore.
+> > > >
+> > > > Setting suppress-vmdesc skips looking for the vmdesc during restore and
+> > > > avoids the wait.
+> > >
+> > > suppress-vmdesc is only used during restore, right? So starting a guest
+> > > without it, saving the guest and restoring the guest with
+> > > suppress-vmdesc=on added will work as intended? (I'm checking that migration
+> > > across update of QEMU will work.)
+> >
+> > vmdesc is a json description of the migration stream that comes after
+> > the QEMU migration stream.  For our purposes, <migration
+> > stream><vmdesc json blob>.  Normal QEMU savevm will generate it,
+> > unless suppress-vmdesc is set.  QEMU restore will read it because:
+> > "Try to read in the VMDESC section as well, so that dumping tools that
+> > intercept our migration stream have the chance to see it."
+> >
+> > Xen save does not go through savevm, but instead
+> > xen-save-devices-state, which is a subset of the QEMU savevm.  It
+> > skips RAM since that is read out through Xen interfaces.  Xen uses
+> > xen-load-devices-state to restore device state.  That goes through the
+> > common qemu_loadvm_state which tries to read the vmdesc stream.
+> >
+> > For Xen, yes, suppress-vmdesc only matters for the restore case, and
+> > it suppresses the attempt to read the vmdesc.  I think every Xen
+> > restore currently has "Expected vmdescription section, but got -1" in
+> > the -dm.log since the vmdesc is missing.  I have not tested restoring
+> > across this change, but since it just controls reading and discarding
+> > the vmdesc stream, I don't think it will break migration across
+> > update.
+>
+> Thanks for the explanation.
+>
+> Acked-by: Anthony PERARD <anthony.perard@citrix.com>
+>
+> Do you think you could send a patch for libxl as well? Since libxl in
+> some cases may use the "pc machine instead of "xenfv". I can send the
+> patch otherwise.
 
-I suppose, but unlike the smaller fp formats, we won't be able to reuse this.
-Even if we pull in the x86 80-bit format and the m68k 96-bit format, there are
-a number of fundamental differences.  E.g. the implicit bit
+I should be able to, yes.
 
->> +        /* Add the implicit bit. */
->> +        p->frac0 |= UINT64_C(0x0001000000000000);
-
-is not present in the x86 and m68k formats.
-
-Finally, I'm continuing to use the existing Berkeley packing logic.  Which a
-bit persnickety with where that implicit bit goes.  Our smaller formats put the
-implicit bit at bit 62.
-
-
-r~
+Regards,
+Jason
 
