@@ -7,76 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BFB2C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:28:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B348C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:29:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AA525207F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD02A207F7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:29:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="TU8C2WOE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA525207F7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=bytedance-com.20150623.gappssmtp.com header.i=@bytedance-com.20150623.gappssmtp.com header.b="IZOjYKec"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD02A207F7
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=bytedance.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59510 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTNuS-0001Dp-B9
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:28:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57792)
+	id 1kTNvl-00028j-Mm
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:29:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57806)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1kTNsx-00083z-Qi
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:26:59 -0400
-Received: from mail-pf1-x429.google.com ([2607:f8b0:4864:20::429]:35161)
+ id 1kTNt1-00089z-J0
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:27:03 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:43090)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <wanghonghao@bytedance.com>)
- id 1kTNst-0008P1-KC
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:26:57 -0400
-Received: by mail-pf1-x429.google.com with SMTP id k8so1336707pfk.2
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 04:26:54 -0700 (PDT)
+ id 1kTNsz-0008PX-Qu
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:27:03 -0400
+Received: by mail-pf1-x444.google.com with SMTP id a200so1314022pfa.10
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 04:27:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bytedance-com.20150623.gappssmtp.com; s=20150623;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=9yP8toNqZXEMn5okbHcbki+5+xtmd1t1JiosrOc17qA=;
- b=TU8C2WOE2EJfVwRCOhvQHzdWTWaET+ysvkI5x65IO+tXhfoAlc4bfwtrwstJAkyTHS
- E1d+UHReRhw1THPijbb+iSqhU6+tFsM2vvMNFNUAu+frE03npiBJU7yeCRebmbxiTjiL
- qpRaC9NC1I4UviKajNTsPhIXUSvEPDZhIDYrxN4ZAWwKrP1oSBnm3pFt6SqfZXX0dDlI
- q+PVqOJHxoVT/b/RW/HGFDpgy+vAXTW7AjI6OFfNhDTXHH2/rZhN5vvSxKkmZOD538Lz
- A8guRnhHGZI305EQQJh8C6y9ndq5I985ydgPw2QAjNCs26ruvU8AFuE5PXOK+CP7ncWi
- Af4Q==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=zqb0Ty+vsxgT8kBwbAmBLpa09Tm7TCIZpLSwrwEPPlM=;
+ b=IZOjYKecOPRW/P67C8FR48t3PUf2gjbuoBhEc0PUVlWia6/GGoB+xKFh1mxTuXRAiA
+ AOT4P5IjPDEgenAD9rlJPoBhqvO2svReeHdtRL8ET4QTyoIbbPCMN27Yb2r5ffct6m3A
+ W8XgzHtrTS/PN4XEFAC24Ht4ws6pUvJgWOtQeTuLFzyuYxw4ifUlkjH8rMNBemZOlJ1p
+ mjdfE1FgstOqY4CRfFdXoOzNuxkzGIstH47Iu71+bmMWP9BIF/F4bsU5PkXN2836tdL3
+ NZoKCpY/3VGiX03dStNmnWXEt0Fv+F/sc67Qag5tAlJtYPgzt8ief+IxVB8c8V+ek38j
+ EKWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=9yP8toNqZXEMn5okbHcbki+5+xtmd1t1JiosrOc17qA=;
- b=Bq6c8bmrX0V/1jzyVvjdaWkXp46dXN7KvzdC8V/zAiWF5FRxFGAcXhbkNJ7QBzR+FZ
- SScjlt2ox0R4svCbSnbG/aeGMtQi0l+3QE5hCaxS1i6/4RPlqkqNKK/WQYdEuJB0ennU
- I08SANahV+XbT5XPLlw2BZlTpYZ5WenlHdG76EaTaGVaOON4ziBuhgqNFwExvN7A7R2J
- B0yLXroo3+uzBnzHmNYYky6ShB1aK9tU72+S543hewIfLNTjf48uq9RDie5UzgoKeVIw
- 7V+j+9ZLt0gmB7chbjFsOdPNLwMENr8cVuL4itfYrNdChBtUHBG0ydPqAWXW4eb9Rxem
- rqgQ==
-X-Gm-Message-State: AOAM530nacZL2rYII7/MiU1Hu66VrL7c3HMck6N/jDkzk9NfSd+ogt+x
- 5A4cacfiDQaLXD2EKdtMYiTFsNlcKFhdmVYJ
-X-Google-Smtp-Source: ABdhPJwe6TSHQ1UrfAn0q3l0y6poeeM2SLkGzt8ii3VzLddbjqqjCS5vV7/dpLWULl0V6gylRNvprg==
-X-Received: by 2002:a65:4485:: with SMTP id l5mr2728419pgq.121.1602847613226; 
- Fri, 16 Oct 2020 04:26:53 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=zqb0Ty+vsxgT8kBwbAmBLpa09Tm7TCIZpLSwrwEPPlM=;
+ b=Xnxt5bzSp+I73rWFAAMVhp6gGSHpW/pc3goV7WV1710xc9d2sG5qQJykPaEctd5Inh
+ qNJWeUL/XbgueoAreqXtovVfO3w3nHMy/uwLEsDrFHEIvpygftBy630812hVaRhbg9tJ
+ h5dwjAV5sl+rkRM0Bw+sNQC3m1tIoNbQ1yZEZ1V0BLDt9hIm3FJfpmacHJBJcEtRAcaB
+ Oi+alWTVWdlxy608bw8dgzoNNuROcyHFIZ8pNYC7RdERkMgjlmnU7QWvevd+QLU0o+pI
+ uuPUVlmJRkMn9xeMcXpQU32krVX/LfddRpJJ7DulRI8dwDx24pgcslZuYLmAvHheqrv4
+ 9i1A==
+X-Gm-Message-State: AOAM530td8Q95tVnKXyUivPfp7EWhYys4toAx3gUCGiqQGl8/+Wc+yBB
+ Euk/Hbp1qswMK6fNZNsA9AKjy5gQrJ//N4Te
+X-Google-Smtp-Source: ABdhPJxU+q8/AOb8Pwb9OVIEjzsN+fTi+POavDpOKcfzcLsd0MbJdGeUtJ6vU/Cw+FhbCtxKj66Z0w==
+X-Received: by 2002:a63:77c4:: with SMTP id s187mr2673136pgc.303.1602847620236; 
+ Fri, 16 Oct 2020 04:27:00 -0700 (PDT)
 Received: from MacBook-Pro.local.net ([61.120.150.78])
- by smtp.gmail.com with ESMTPSA id t15sm3238192pjy.33.2020.10.16.04.26.50
+ by smtp.gmail.com with ESMTPSA id t15sm3238192pjy.33.2020.10.16.04.26.57
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Fri, 16 Oct 2020 04:26:52 -0700 (PDT)
+ Fri, 16 Oct 2020 04:26:59 -0700 (PDT)
 From: wanghonghao <wanghonghao@bytedance.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/2] QSLIST: add atomic replace operation
-Date: Fri, 16 Oct 2020 19:26:39 +0800
-Message-Id: <20201016112640.91141-1-wanghonghao@bytedance.com>
+Subject: [PATCH v3 2/2] coroutine: take exactly one batch from global pool at
+ a time
+Date: Fri, 16 Oct 2020 19:26:40 +0800
+Message-Id: <20201016112640.91141-2-wanghonghao@bytedance.com>
 X-Mailer: git-send-email 2.24.3 (Apple Git-128)
+In-Reply-To: <20201016112640.91141-1-wanghonghao@bytedance.com>
+References: <20201016112640.91141-1-wanghonghao@bytedance.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::429;
- envelope-from=wanghonghao@bytedance.com; helo=mail-pf1-x429.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=wanghonghao@bytedance.com; helo=mail-pf1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -18
@@ -103,29 +106,126 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace a queue with another atomicly. It's useful when we need to transfer
-queues between threads.
+This patch replace the global coroutine queue with a lock-free stack of which
+the elements are coroutine queues. Threads can put coroutine queues into the
+stack or take queues from it and each coroutine queue has exactly
+POOL_BATCH_SIZE coroutines. Note that the stack is not strictly LIFO, but it's
+enough for buffer pool.
+
+Coroutines will be put into thread-local pools first while release. Now the
+fast pathes of both allocation and release are atomic-free, and there won't
+be too many coroutines remain in a single thread since POOL_BATCH_SIZE has been
+reduced to 16.
+
+In practice, I've run a VM with two block devices binding to two different
+iothreads, and run fio with iodepth 128 on each device. It maintains around
+400 coroutines and has about 1% chance of calling to `qemu_coroutine_new`
+without this patch. And with this patch, it maintains no more than 273
+coroutines and doesn't call `qemu_coroutine_new` after initial allocations.
 
 Signed-off-by: wanghonghao <wanghonghao@bytedance.com>
 ---
- include/qemu/queue.h | 4 ++++
- 1 file changed, 4 insertions(+)
+ util/qemu-coroutine.c | 63 ++++++++++++++++++++++++++++---------------
+ 1 file changed, 42 insertions(+), 21 deletions(-)
 
-diff --git a/include/qemu/queue.h b/include/qemu/queue.h
-index e029e7bf66..1f0cbdf87e 100644
---- a/include/qemu/queue.h
-+++ b/include/qemu/queue.h
-@@ -226,6 +226,10 @@ struct {                                                                \
-         (dest)->slh_first = qatomic_xchg(&(src)->slh_first, NULL);       \
- } while (/*CONSTCOND*/0)
+diff --git a/util/qemu-coroutine.c b/util/qemu-coroutine.c
+index 38fb6d3084..46e5073796 100644
+--- a/util/qemu-coroutine.c
++++ b/util/qemu-coroutine.c
+@@ -21,13 +21,14 @@
+ #include "block/aio.h"
  
-+#define QSLIST_REPLACE_ATOMIC(dest, src, old) do {                            \
-+        (old)->slh_first = qatomic_xchg(&(dest)->slh_first, (src)->slh_first); \
-+} while (/*CONSTCOND*/0)
+ enum {
+-    POOL_BATCH_SIZE = 64,
++    POOL_BATCH_SIZE = 16,
++    POOL_MAX_BATCHES = 32,
+ };
+ 
+-/** Free list to speed up creation */
+-static QSLIST_HEAD(, Coroutine) release_pool = QSLIST_HEAD_INITIALIZER(pool);
+-static unsigned int release_pool_size;
+-static __thread QSLIST_HEAD(, Coroutine) alloc_pool = QSLIST_HEAD_INITIALIZER(pool);
++/** Free stack to speed up creation */
++static QSLIST_HEAD(, Coroutine) pool[POOL_MAX_BATCHES];
++static int pool_top;
++static __thread QSLIST_HEAD(, Coroutine) alloc_pool;
+ static __thread unsigned int alloc_pool_size;
+ static __thread Notifier coroutine_pool_cleanup_notifier;
+ 
+@@ -49,20 +50,26 @@ Coroutine *qemu_coroutine_create(CoroutineEntry *entry, void *opaque)
+     if (CONFIG_COROUTINE_POOL) {
+         co = QSLIST_FIRST(&alloc_pool);
+         if (!co) {
+-            if (release_pool_size > POOL_BATCH_SIZE) {
+-                /* Slow path; a good place to register the destructor, too.  */
+-                if (!coroutine_pool_cleanup_notifier.notify) {
+-                    coroutine_pool_cleanup_notifier.notify = coroutine_pool_cleanup;
+-                    qemu_thread_atexit_add(&coroutine_pool_cleanup_notifier);
++            int top;
 +
- #define QSLIST_REMOVE_HEAD(head, field) do {                             \
-         typeof((head)->slh_first) elm = (head)->slh_first;               \
-         (head)->slh_first = elm->field.sle_next;                         \
++            /* Slow path; a good place to register the destructor, too.  */
++            if (!coroutine_pool_cleanup_notifier.notify) {
++                coroutine_pool_cleanup_notifier.notify = coroutine_pool_cleanup;
++                qemu_thread_atexit_add(&coroutine_pool_cleanup_notifier);
++            }
++
++            while ((top = qatomic_read(&pool_top)) > 0) {
++                if (qatomic_cmpxchg(&pool_top, top, top - 1) != top) {
++                    continue;
+                 }
+ 
+-                /* This is not exact; there could be a little skew between
+-                 * release_pool_size and the actual size of release_pool.  But
+-                 * it is just a heuristic, it does not need to be perfect.
+-                 */
+-                alloc_pool_size = qatomic_xchg(&release_pool_size, 0);
+-                QSLIST_MOVE_ATOMIC(&alloc_pool, &release_pool);
++                QSLIST_MOVE_ATOMIC(&alloc_pool, &pool[top - 1]);
+                 co = QSLIST_FIRST(&alloc_pool);
++
++                if (co) {
++                    alloc_pool_size = POOL_BATCH_SIZE;
++                    break;
++                }
+             }
+         }
+         if (co) {
+@@ -86,16 +93,30 @@ static void coroutine_delete(Coroutine *co)
+     co->caller = NULL;
+ 
+     if (CONFIG_COROUTINE_POOL) {
+-        if (release_pool_size < POOL_BATCH_SIZE * 2) {
+-            QSLIST_INSERT_HEAD_ATOMIC(&release_pool, co, pool_next);
+-            qatomic_inc(&release_pool_size);
+-            return;
+-        }
++        int top, value, old;
++
+         if (alloc_pool_size < POOL_BATCH_SIZE) {
+             QSLIST_INSERT_HEAD(&alloc_pool, co, pool_next);
+             alloc_pool_size++;
+             return;
+         }
++
++        for (top = qatomic_read(&pool_top); top < POOL_MAX_BATCHES; top++) {
++            QSLIST_REPLACE_ATOMIC(&pool[top], &alloc_pool, &alloc_pool);
++            if (!QSLIST_EMPTY(&alloc_pool)) {
++                continue;
++            }
++
++            value = top + 1;
++
++            do {
++                old = qatomic_cmpxchg(&pool_top, top, value);
++            } while (old != top && (top = old) < value);
++
++            QSLIST_INSERT_HEAD(&alloc_pool, co, pool_next);
++            alloc_pool_size = 1;
++            return;
++        }
+     }
+ 
+     qemu_coroutine_delete(co);
 -- 
 2.24.3 (Apple Git-128)
 
