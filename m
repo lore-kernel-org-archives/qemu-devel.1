@@ -2,108 +2,91 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96134C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:09:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19F25C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E993E2080A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:09:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3E3052080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:14:16 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPeakHKU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E993E2080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mH7sQvHK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E3052080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55642 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTKnV-0005rD-Q0
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:09:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48166)
+	id 1kTKsR-0007OA-2z
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:14:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTKmu-0005LN-Fu
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:08:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26709)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTKms-0002e5-7c
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:08:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602835708;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BCSZ17Jh/3+UFfPfRXfK27SAb08/f0XjwW1lT+9+PTc=;
- b=XPeakHKUSPa4UbCN2SS/zNDukbqBd+L1ggmHs0SzrxOTaK17NYK14c9NcvJJT6U7YxLBZj
- 0fQjWqtfFeR1ShzCm0bjaD/XOP/xWSBg7dplh81NnRIs0zWBIx1DG08yMWgjJmIife74UM
- 3VAkdc3vktwttX9ysTUCb56YVb2aqdo=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-546-BloNhE_eO4eZYX9qlRi63g-1; Fri, 16 Oct 2020 04:08:27 -0400
-X-MC-Unique: BloNhE_eO4eZYX9qlRi63g-1
-Received: by mail-wm1-f70.google.com with SMTP id u5so290212wme.3
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 01:08:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kTKrK-0006so-T1
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:13:06 -0400
+Received: from mail-lj1-x229.google.com ([2a00:1450:4864:20::229]:45943)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
+ id 1kTKrF-0004VB-Ip
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:13:06 -0400
+Received: by mail-lj1-x229.google.com with SMTP id a4so1468234lji.12
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 01:13:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:reply-to:from:date:message-id
+ :subject:to:cc;
+ bh=0koFFuFJs+Iwp5dzXdOBaIjz4V6abgQPGgxgrvWz4tM=;
+ b=mH7sQvHKqgEzvRFHz6sttDSj2O76PnBX6KIYVAP7qkp+ERlckiHhGl5iowkJu2jJoC
+ N26M4/TVcuOfOtT87kB+KXHXQAJ8ZEl7CSiOOU5TZTdZvgI4NjScOjSQwfjfCtiGDCjP
+ +dAYtMWzQ/9k6gfHdTmAvB+yyWLFpYabxXfotejcdDx9yV3zKsqFRTc6Fln8Z8yhXD/L
+ SqENZH3do5B1djWYAnGQU9Ui2963bErTQK0FuHruX5whoz+ABzwr2fCrLL7zBMibF17V
+ iG68p/Gxuwxz8wSLFTUH77G+183DVadOScwNViDJD7evRJ59PUPXJtLzvw7qo3vsDe0o
+ W1sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=BCSZ17Jh/3+UFfPfRXfK27SAb08/f0XjwW1lT+9+PTc=;
- b=a3QhuOKbGSM+R4pBIGwEcDzhwWqehRH7VA2O+AKaC6tH2RIL3NkyOEfH3UxeK5QdO8
- ho+kIYGmClHYXz8ur9oavChovZNx3otOEL+HRlxgm3OtQWgBwjU77APzRK9a5VtDy4Z5
- ZVIuEZHZdVcwmDVXluwuKjFMu7K58h18kXWtA9LY+sTZqN3YW6ge/x34zogHddizeASn
- pSfctj6aP/6FxgoTNUE+vCqbjFRhOSTKs+rtel2vIkgj0YnS7FOTse49ruQQpW+Gflkq
- O/og+lF+TC23AxMq5ywU97e4MC+qNTEz2Mq07tphsD2ZAmxj9w5dzEJKmCMOViniIVks
- NfEw==
-X-Gm-Message-State: AOAM531OmqrVAY199NDO6cGoE7Z1oUqyP1CM3oFE2gKIkpZ42KufobgA
- 9imjzBjWtLBloF8SZHFaFQ/UEGkDMq1PsKyf5fuGBUFJiL+aMlTEfOXTSgcBfksKiYUB1OGBZpX
- kzBBM5z1a4lMoRZw=
-X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr2478115wmm.2.1602835702978; 
- Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzLe3hG1tfPoTHkxvSe9Si3UFueQyvgyM0blKAqPyxf9uOU6dYETrbSYXm6n3OIF6Nh4ClyBw==
-X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr2478094wmm.2.1602835702733; 
- Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:4e8a:ee8e:6ed5:4bc3?
- ([2001:b07:6468:f312:4e8a:ee8e:6ed5:4bc3])
- by smtp.gmail.com with ESMTPSA id e25sm2577125wra.71.2020.10.16.01.08.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
-Subject: Re: [PATCH] hax: unbreak accelerator cpu code after cpus.c split
-To: Claudio Fontana <cfontana@suse.de>, =?UTF-8?Q?Volker_R=c3=bcmelin?=
- <vr_qemu@t-online.de>
-References: <20201016080032.13914-1-cfontana@suse.de>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <68898e9b-d89d-1a5c-870d-a053eb8ea570@redhat.com>
-Date: Fri, 16 Oct 2020 10:08:21 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
+ h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
+ :from:date:message-id:subject:to:cc;
+ bh=0koFFuFJs+Iwp5dzXdOBaIjz4V6abgQPGgxgrvWz4tM=;
+ b=XZcDearMAmJagJrIfKplTN+f7BIsKMBEL/xSI/4yUhyO1WYJ4ldYOaIN+8AT7+I5vL
+ lzFMg9VUeIZ4fwEY78xdYF287T1Hbo4xWm/TTnxRRxx2esYpzlreHHDjBLFr8haIApjx
+ uarEmFgSGVynSZTLqbKVuTJOqBS1Er/fehg95zDLHoPmWhUfLnxDjWVJ1kibE9o1/i2K
+ xDLnf9lZcFi3m2RBuRWMr+eNjGRSyS+RwKxXgNcs2AEKurl6/tS5mFhxAqbTiPewfpSE
+ I7jUjaoZenq++g0vcc+bxEqQuvbo+YwR6+obR1AA35w2CP12TFb1r4uEbpp2uQqMH1nJ
+ cfMA==
+X-Gm-Message-State: AOAM5321ISxbF8KpXh1nf6kU2UEo+rgtyUG9rOGH8pTyx8NS/8/8T02c
+ P1MeYaeIY6mxbzkNzcGAzNpEf20g6Q6E8FIcwGA=
+X-Google-Smtp-Source: ABdhPJwiyMgTj8RSBduyWY2NiBeZQNz8iRAHJIbIMnzUAi/ullO4XuO7F6Q02iHJP55sARpQ+vSiYULLxEULCbecL3I=
+X-Received: by 2002:a05:651c:1b6:: with SMTP id
+ c22mr1089469ljn.447.1602835979084; 
+ Fri, 16 Oct 2020 01:12:59 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201016080032.13914-1-cfontana@suse.de>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 03:57:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-1.019, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201015220626.418-1-luoyonggang@gmail.com>
+ <20201015220626.418-4-luoyonggang@gmail.com>
+ <9bd01bce-7409-26f9-5401-8f5ddd4f924c@redhat.com>
+ <CAE2XoE9EvboWrqMp_SD0BJ+=D3JjXUeL22qaZD=G5R+M0c4Npg@mail.gmail.com>
+ <4d0c598d-84c4-b760-790b-f2041bf3066e@redhat.com>
+ <ff7823a5-0445-c57d-7dfb-b26a26dcde0e@redhat.com>
+In-Reply-To: <ff7823a5-0445-c57d-7dfb-b26a26dcde0e@redhat.com>
+From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
+Date: Fri, 16 Oct 2020 16:12:47 +0800
+Message-ID: <CAE2XoE9SOx1PVuZ=5NfO1qcT1f-uF02tsR0knmB9Tn427OEsdA@mail.gmail.com>
+Subject: Re: [PATCH v4 3/4] meson: Move the detection logic for sphinx to meson
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000002aa7d805b1c555e8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::229;
+ envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x229.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,42 +100,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>, haxm-team@intel.com,
- qemu-devel@nongnu.org
+Reply-To: luoyonggang@gmail.com
+Cc: qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 16/10/20 10:00, Claudio Fontana wrote:
-> during my split of cpus.c, code line
-> "current_cpu = cpu"
-> was removed by mistake, causing hax to break.
-> 
-> This commit fixes the situation restoring it.
-> 
-> Reported-by: Volker Rümelin <vr_qemu@t-online.de>
-> Fixes: e92558e4bf8059ce4f0b310afe218802b72766bc
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
-> ---
->  target/i386/hax-cpus.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
-> index 99770e590c..f72c85bd49 100644
-> --- a/target/i386/hax-cpus.c
-> +++ b/target/i386/hax-cpus.c
-> @@ -38,6 +38,7 @@ static void *hax_cpu_thread_fn(void *arg)
->      qemu_thread_get_self(cpu->thread);
->  
->      cpu->thread_id = qemu_get_thread_id();
-> +    current_cpu = cpu;
->      hax_init_vcpu(cpu);
->      cpu_thread_signal_created(cpu);
->      qemu_guest_random_seed_thread_part2(cpu->random_seed);
-> 
+--0000000000002aa7d805b1c555e8
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Queued, thanks.
+On Fri, Oct 16, 2020 at 4:05 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On 16/10/20 09:57, Paolo Bonzini wrote:
+> > On 16/10/20 09:52, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:
+> >>
+> >>> build_docs =3D false
+> >>> if sphinx_build.found()
+> >>>   # This is a bit awkward but works: create a trivial document and
+> >>>   # try to run it with our configuration file (which enforces a
+> >>>   # version requirement). This will fail if sphinx-build is too old.
+> >>>   run_command('mkdir', ['-p', tmpdir / 'sphinx'])
+> >>>   run_command('touch', [tmpdir / 'sphinx/index.rst'])
+> >>>   sphinx_build_test_out =3D run_command(SPHINX_ARGS + [
+> >>>     '-c', meson.current_source_dir() / 'docs',
+> >>>     '-b', 'html', tmpdir / 'sphinx',
+> >>>     tmpdir / 'sphinx/out'])
+> >>>   build_docs =3D (sphinx_build_test_out.returncode() =3D=3D 0)
+> >>> endif
+> >> There is subtle error here, when  sphinx_build not found, there is
+> >> SPHINX_ARGS  should be [],
+> >> otherwise, latter place using  SPHINX_ARGS  have not found sphinx_buil=
+d
+> >> will cause error by meson
+> >> ..
+> >> I'll add
+> >>
+> >> else
+> >>   SPHINX_ARGS  =3D []
+> >> endif
+> >
+> > All uses of SPHINX_ARGS are protected by build_docs, and in turn
+> > build_docs is false if "not sphinx_build.found()".  Am I missing
+something?
+>
+> Ah there are uses in tests/ too, those should all be under "if
+> build_docs" too.
+Yeap, I did it before, but that changes a lot and not easy to review, you
+can do it in separate patch.
+Anyway setting  SPHINX_ARGS  to [] are more robust.
+>
+> Paolo
+>
 
-Paolo
 
+--
+         =E6=AD=A4=E8=87=B4
+=E7=A4=BC
+=E7=BD=97=E5=8B=87=E5=88=9A
+Yours
+    sincerely,
+Yonggang Luo
+
+--0000000000002aa7d805b1c555e8
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><br><br>On Fri, Oct 16, 2020 at 4:05 PM Paolo Bonzini &lt;=
+<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<b=
+r>&gt;<br>&gt; On 16/10/20 09:57, Paolo Bonzini wrote:<br>&gt; &gt; On 16/1=
+0/20 09:52, =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) wrote:<br>&gt; &gt;&g=
+t;<br>&gt; &gt;&gt;&gt; build_docs =3D false<br>&gt; &gt;&gt;&gt; if sphinx=
+_build.found()<br>&gt; &gt;&gt;&gt; =C2=A0 # This is a bit awkward but work=
+s: create a trivial document and<br>&gt; &gt;&gt;&gt; =C2=A0 # try to run i=
+t with our configuration file (which enforces a<br>&gt; &gt;&gt;&gt; =C2=A0=
+ # version requirement). This will fail if sphinx-build is too old.<br>&gt;=
+ &gt;&gt;&gt; =C2=A0 run_command(&#39;mkdir&#39;, [&#39;-p&#39;, tmpdir / &=
+#39;sphinx&#39;])<br>&gt; &gt;&gt;&gt; =C2=A0 run_command(&#39;touch&#39;, =
+[tmpdir / &#39;sphinx/index.rst&#39;])<br>&gt; &gt;&gt;&gt; =C2=A0 sphinx_b=
+uild_test_out =3D run_command(SPHINX_ARGS + [<br>&gt; &gt;&gt;&gt; =C2=A0 =
+=C2=A0 &#39;-c&#39;, meson.current_source_dir() / &#39;docs&#39;,<br>&gt; &=
+gt;&gt;&gt; =C2=A0 =C2=A0 &#39;-b&#39;, &#39;html&#39;, tmpdir / &#39;sphin=
+x&#39;,<br>&gt; &gt;&gt;&gt; =C2=A0 =C2=A0 tmpdir / &#39;sphinx/out&#39;])<=
+br>&gt; &gt;&gt;&gt; =C2=A0 build_docs =3D (sphinx_build_test_out.returncod=
+e() =3D=3D 0)<br>&gt; &gt;&gt;&gt; endif<br>&gt; &gt;&gt; There is subtle e=
+rror here, when =C2=A0sphinx_build not found, there is<br>&gt; &gt;&gt; SPH=
+INX_ARGS =C2=A0should be [],<br>&gt; &gt;&gt; otherwise, latter place using=
+ =C2=A0SPHINX_ARGS =C2=A0have not found sphinx_build<br>&gt; &gt;&gt; will =
+cause error by meson<br>&gt; &gt;&gt; ..<br>&gt; &gt;&gt; I&#39;ll add<br>&=
+gt; &gt;&gt;<br>&gt; &gt;&gt; else<br>&gt; &gt;&gt; =C2=A0 SPHINX_ARGS =C2=
+=A0=3D [] =C2=A0<br>&gt; &gt;&gt; endif<br>&gt; &gt;<br>&gt; &gt; All uses =
+of SPHINX_ARGS are protected by build_docs, and in turn<br>&gt; &gt; build_=
+docs is false if &quot;not sphinx_build.found()&quot;.=C2=A0 Am I missing s=
+omething?<br>&gt;<br>&gt; Ah there are uses in tests/ too, those should all=
+ be under &quot;if<br>&gt; build_docs&quot; too.<div>Yeap, I did it before,=
+ but that changes a lot and not easy to review, you can do it in separate p=
+atch.</div><div>Anyway setting=C2=A0
+
+SPHINX_ARGS=C2=A0 to [] are more robust.<br>&gt;<br>&gt; Paolo<br>&gt;<br><=
+br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=
+=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>=
+Yonggang Luo</div></div>
+
+--0000000000002aa7d805b1c555e8--
 
