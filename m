@@ -2,69 +2,65 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_TONAME_EQ_TOLOCAL_SHORT,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E829FC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFABC433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:37:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC0120848
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:33:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC0120848
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id B87552084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:37:52 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B87552084C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTNzG-00048R-LN
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:33:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58814)
+	id 1kTO3T-00066w-PJ
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59670)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTNyd-0003eY-UC
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:32:51 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:56992
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTNyb-0000fS-5d
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:32:50 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>) id 1kTNyd-0000kp-Io
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 12:32:51 +0100
-To: qemu-devel <qemu-devel@nongnu.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <2baf958b-80bd-778e-e0e8-b03364a942a6@ilande.co.uk>
-Date: Fri, 16 Oct 2020 12:32:46 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
+ id 1kTO1x-00055t-9v
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:36:17 -0400
+Received: from zxshcas1.zhaoxin.com ([203.148.12.81]:11749)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
+ id 1kTO1s-0001At-J5
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:36:16 -0400
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
+ (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 16 Oct
+ 2020 19:29:43 +0800
+Received: from localhost.localdomain (124.64.17.66) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Fri, 16 Oct
+ 2020 19:29:41 +0800
+From: FelixCuioc <FelixCui-oc@zhaoxin.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>, 
+ Eduardo Habkost <ehabkost@redhat.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+Subject: [PATCH 0/1] Skip flatview_simplify() for cpu vendor zhaoxin
+Date: Fri, 16 Oct 2020 07:29:32 -0400
+Message-ID: <20201016112933.14856-1-FelixCui-oc@zhaoxin.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: aio_poll() assertion fail on Windows
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: 1
-X-Spam_score: 0.1
-X-Spam_bar: /
-X-Spam_report: (0.1 / 5.0 requ) BAYES_00=-1.9,
- PDS_TONAME_EQ_TOLOCAL_SHORT=1.999, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [124.64.17.66]
+X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
+ zxbjmbx1.zhaoxin.com (10.29.252.163)
+Received-SPF: pass client-ip=203.148.12.81;
+ envelope-from=FelixCui-oc@zhaoxin.com; helo=ZXSHCAS1.zhaoxin.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 07:29:44
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,25 +73,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: TonyWWang-oc@zhaoxin.com, RockCui-oc@zhaoxin.com, qemu-devel@nongnu.org,
+ CobeChen-oc@zhaoxin.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Whilst testing a Windows build of git master of qemu-system-ppc in MSYS2/MingW64 I 
-noticed the following assertion message in the console after booting into OpenBIOS 
-and then closing the GTK GUI window without booting a client OS:
+The actual situation we encountered is:
+When assign EHCI device to the virtual machine,
+after initializing EHCI in seabios,it will continuously
+send dma cycles.
+After flatview_simplify(),the IOVA mappings of the
+EHCI device will be innocently unmapped between the
+delate and add phases of the VFIO MemoryListener.
+But the EHCI device is always sending DMA cycle.
+At this time,the IOMMU will block the DMA cycle.
+The purpose of this patch is to skip flatview_simplify()
+for zx vendor.
 
-$ ./qemu-system-ppc
-**
-ERROR:../util/aio-win32.c:337:aio_poll: assertion failed: 
-(in_aio_context_home_thread(ctx))
-Bail out! ERROR:../util/aio-win32.c:337:aio_poll: assertion failed: 
-(in_aio_context_home_thread(ctx))
+FelixCuioc (1):
+  Skip flatview_simplify() for cpu vendor zhaoxin
 
-Has anyone else seen this at all?
+ softmmu/memory.c  | 20 +++++++++++++++++++-
+ target/i386/cpu.c |  7 +++++++
+ target/i386/cpu.h |  3 +++
+ 3 files changed, 29 insertions(+), 1 deletion(-)
 
+-- 
+2.17.1
 
-ATB,
-
-Mark.
 
