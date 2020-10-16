@@ -2,100 +2,92 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 207D8C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 14:13:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE59C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 14:18:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 51A9020866
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 14:13:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 564FB20866
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 14:18:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjbDaT5O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A9020866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gxrBOW1g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 564FB20866
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58208 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTQTg-0003CD-7g
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 10:13:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40980)
+	id 1kTQYb-0004zA-WC
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 10:18:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41976)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTQT6-0002kR-Cm
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:12:28 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39594)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTQT4-0006jU-MM
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:12:28 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y12so3106790wrp.6
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 07:12:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=cKbMwCtgrm2XBy69b+k+8gfixiclGXZj2ZI3VZNnh30=;
- b=YjbDaT5O77aENW9+4oXATvc89iC9bLG6Dw5gX6UZC3zyGmtptCVblpQGgcDAkCMJ+B
- 9mKOe+97sE7ztxGR2uauSrb6rdfHKoTQo+ofZPI9iIoY1z/scr7LjEfzWHfYrQKUIRKg
- SW6gznX8FceGmaAtd731rzTfcY0UzbvvUZ/OcfvPl8iRWN5x65ImNtPiOvdfKtIO0UDe
- scqwJPPIY3hDz/zKSskLPocEqY1w2At0egTC22ov2x+JTUhQ8lb8qkAj1sJh/JV+84nB
- 8/tr8Vtbv+va+6XW9nB1d5L6XryjpDvBRke+xOm2G/B7EQmdzA51++hJ+rO/A+BEjy86
- L3Jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=cKbMwCtgrm2XBy69b+k+8gfixiclGXZj2ZI3VZNnh30=;
- b=Rf62ZEYzVOgu1xykcUbWnt4SRQf0h4OpgahxobFqO9NJwHfKNoBcZ/gCBwMc7kZC8V
- 0YYyOGW/CjBfXBvFXZWFC1KeDaUlDfDF3qQEpCxv0DgWDeRyFtpZGoKalrC6VhkNpih1
- S7YhItMVuyXsYCDURXhYPPJvu2Ag9Q84FlJdqxthoqShkLo2wZ0ZIbRONG5i8U3slxLf
- VUELiT5vSa4FmMd6eEOkBH8y0/cbzxEPsSbc8nAnuKqEmV9YxyC6n8Z774Sax8gbsUMo
- R6gwSpnbRPo0Jn6txpcoM2OtJXsCPQOjyYIHLs//FDd7oa7B87L9SrPz4pR7v8uXOq3/
- MmSQ==
-X-Gm-Message-State: AOAM5339zsm7HSQwVGSIitidt1azlLBz9MHLok5EmIGJ0/HK4kEs1j+4
- 1xeDUxc7pjmT7Wfs522YYJ8=
-X-Google-Smtp-Source: ABdhPJw+Zk3/1omXngjqB47wZvyBcbSoOLYqGeDeHTjDyLHShKteaFNNes04Hm+5AzUHpWPg+wZlcw==
-X-Received: by 2002:a5d:5106:: with SMTP id s6mr4096027wrt.51.1602857545011;
- Fri, 16 Oct 2020 07:12:25 -0700 (PDT)
-Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
- [83.59.162.106])
- by smtp.gmail.com with ESMTPSA id t12sm3769088wrm.25.2020.10.16.07.12.23
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 16 Oct 2020 07:12:24 -0700 (PDT)
-Subject: Re: [PATCH V14 4/8] target/mips: Add loongson-ext lsdc2 group of
- instructions
-To: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1602831120-3377-1-git-send-email-chenhc@lemote.com>
- <1602831120-3377-5-git-send-email-chenhc@lemote.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9342a700-74ad-6c34-e2eb-46875899a73d@amsat.org>
-Date: Fri, 16 Oct 2020 16:12:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kTQXj-0004Vf-Pq
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:17:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30420)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kTQXg-0007Mt-La
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 10:17:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602857831;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=UOt0Z+vxe2aEtQ0+x3zw0Ae7UgO/EU6s85qlW696vPI=;
+ b=gxrBOW1g8xYnt7DNYR/pj1x1IKav+evMVJyzaE4oTKk4d6fZBoWZeADGO+x3iOg52TgHqz
+ IMQC8NKeznak25dBKh7LDn2DtteegePoDy/ZdBa0VgTUwmIxiPlbdfRegqge1dq/QukuC6
+ xKQ4qi0pafHdUnd865j0E3TXr3qVMyo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-415-2aJ-wcAzOw2FnDoTTCuSlw-1; Fri, 16 Oct 2020 10:17:07 -0400
+X-MC-Unique: 2aJ-wcAzOw2FnDoTTCuSlw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B265B1005E5C;
+ Fri, 16 Oct 2020 14:17:06 +0000 (UTC)
+Received: from kaapi (ovpn-112-57.phx2.redhat.com [10.3.112.57])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 33FF75C1BD;
+ Fri, 16 Oct 2020 14:17:03 +0000 (UTC)
+Date: Fri, 16 Oct 2020 19:47:01 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: About 'qemu-security' mailing list
+In-Reply-To: <nycvar.YSQ.7.78.906.2010012320290.830962@xnncv>
+Message-ID: <nycvar.YSQ.7.78.906.2010161910530.1246156@xnncv>
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+ <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+ <20200914101517.GD579094@stefanha-x1.localdomain>
+ <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
+ <20200916111025.GA756728@stefanha-x1.localdomain>
+ <nycvar.YSQ.7.78.906.2009181031500.10832@xnncv> <m2362z8dvx.fsf@oracle.com>
+ <nycvar.YSQ.7.78.906.2010011502290.830962@xnncv> <m2mu166uyg.fsf@oracle.com>
+ <nycvar.YSQ.7.78.906.2010012320290.830962@xnncv>
 MIME-Version: 1.0
-In-Reply-To: <1602831120-3377-5-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.253,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:29:24
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,42 +100,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Stefan Hajnoczi <stefanha@gmail.com>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>,
+ =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, peter.maydell@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/16/20 8:51 AM, Huacai Chen wrote:
-> From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> 
-> LDC2/SDC2 opcodes have been rewritten as "load & store with offset"
-> group of instructions by loongson-ext ASE.
-> 
-> This patch add implementation of these instructions:
-> gslbx: load 1 bytes to GPR
-> gslhx: load 2 bytes to GPR
-> gslwx: load 4 bytes to GPR
-> gsldx: load 8 bytes to GPR
-> gslwxc1: load 4 bytes to FPR
-> gsldxc1: load 8 bytes to FPR
-> gssbx: store 1 bytes from GPR
-> gsshx: store 2 bytes from GPR
-> gsswx: store 4 bytes from GPR
-> gssdx: store 8 bytes from GPR
-> gsswxc1: store 4 bytes from FPR
-> gssdxc1: store 8 bytes from FPR
-> 
-> Details of Loongson-EXT is here:
-> https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
-> 
-> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> ---
->   target/mips/translate.c | 179 ++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 179 insertions(+)
+  Hello Darren, all
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
++-- On Thu, 1 Oct 2020, Darren Kenny wrote --+
+| On Thursday, 2020-10-01 at 16:05:58 +0530, P J P wrote:
+| > - A list member triaging such issue, would have to select their individual 
+| >   keys for each reply.
+| 
+| Maybe, honestly not had to deal with it personally.
+
+  "Ideally, encrypt all of your messages to their (possibly multiple) 
+   recipients. This means that you need not only the list's public key, but 
+   also keys for the reporter and for anyone else CC'ed. You may exercise your 
+   best effort to obtain such keys (from keyservers, by asking in the thread in 
+   plaintext without quoting any sensitive content, etc.), or failing that you 
+   may fallback to plaintext, in which case you should refrain from quoting 
+   (and adding) non-essential sensitive content. For example, if you merely 
+   want the reporter to agree to or specify a public disclosure date, then you 
+   may send a plaintext message back to them with this request and nothing else 
+   (most importantly, do not quote their original report)."
+
+  -> https://oss-security.openwall.org/wiki/mailing-lists/distros
+
+* Found above text for encrypted email workflow to communicate with non-member
+  reporters.
+
+
++-- On Thu, 1 Oct 2020, P J P wrote --+
+| Encrypted list, open to receive non-encrypted reports seems okay. Will have 
+| to check how to set it up and its workflow.
+
+* I reached out to '@solardiz' to check if the back end scripts/tools which 
+  power automatic encryption on '-distros' list are available as open source 
+  tools.
+
+  Unfortunately not.
+
+* As his suggestions/inputs for a list, he said:
+
+  >On Friday, 9 October, 2020, 12:15:37 am IST, Solar Designer wrote:
+  >
+  > my biggest concern is that issues discussed there or reproducers for them 
+  > might stay unpublished for very long, and would be a lucrative target.
+  > I think a more important than encryption property of the distros list is 
+  > that we impose a maximum embargo time, and have requirements on 
+  > publication of exploits too if those were provided.
+  >
+
+* So ie. we need to:
+
+  1. Create/setup a regular non-encrypted 'qemu-security' list.
+
+  2. Invite representatives from user/downstream communities to subscribe to 
+     it.
+
+  3. Collect & store their PGP public keys. Also create a key for the list.
+
+  4. Write 'encrypt & email' automation tool(s) to provide encryption support.
+
+  5. Document and publish above details and list workflow on a page.
+
+
+...wdyt?
+
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
