@@ -7,78 +7,93 @@ X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3424C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:08:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96134C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:09:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 184E52080A
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:08:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E993E2080A
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 08:09:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KyVo8rnM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 184E52080A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XPeakHKU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E993E2080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52886 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55642 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTKmc-0004fL-1U
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:08:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47556)
+	id 1kTKnV-0005rD-Q0
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 04:09:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTKkI-0003lf-MA
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:05:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30198)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTKmu-0005LN-Fu
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:08:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26709)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTKkG-0001dU-KU
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:05:50 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTKms-0002e5-7c
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 04:08:32 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602835546;
+ s=mimecast20190719; t=1602835708;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=4IIF++QRrWGPDssGgeuYwm4Se6kbcGJAqBUvQJliqRo=;
- b=KyVo8rnMOYPdsu0aPhdePgj/PWnrw6llpS0Md+Vo6ApNC8e9imE03ItLMr1HfMuhc/igAy
- 0XEzSHRh7yWdnRiky/mWQvv1A/88tO8MYZ42H3yji/t7SyItYBDmYVKuY0NnChgZG4HU3q
- k2NpiS1WIxP/g/pCzg2NKZ/j4QwNWKw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-254-dhcOJZ3qOTWgDBlRl8sWlg-1; Fri, 16 Oct 2020 04:05:44 -0400
-X-MC-Unique: dhcOJZ3qOTWgDBlRl8sWlg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5EAC803634;
- Fri, 16 Oct 2020 08:05:43 +0000 (UTC)
-Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 848201002391;
- Fri, 16 Oct 2020 08:05:33 +0000 (UTC)
-Subject: Re: [PATCH v10 04/10] virtio-iommu: Call memory notifiers in
- attach/detach
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- alex.williamson@redhat.com
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-5-jean-philippe@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <baeff067-ea2c-256b-e9f7-88d51791508d@redhat.com>
-Date: Fri, 16 Oct 2020 10:05:32 +0200
+ bh=BCSZ17Jh/3+UFfPfRXfK27SAb08/f0XjwW1lT+9+PTc=;
+ b=XPeakHKUSPa4UbCN2SS/zNDukbqBd+L1ggmHs0SzrxOTaK17NYK14c9NcvJJT6U7YxLBZj
+ 0fQjWqtfFeR1ShzCm0bjaD/XOP/xWSBg7dplh81NnRIs0zWBIx1DG08yMWgjJmIife74UM
+ 3VAkdc3vktwttX9ysTUCb56YVb2aqdo=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-546-BloNhE_eO4eZYX9qlRi63g-1; Fri, 16 Oct 2020 04:08:27 -0400
+X-MC-Unique: BloNhE_eO4eZYX9qlRi63g-1
+Received: by mail-wm1-f70.google.com with SMTP id u5so290212wme.3
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 01:08:27 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=BCSZ17Jh/3+UFfPfRXfK27SAb08/f0XjwW1lT+9+PTc=;
+ b=a3QhuOKbGSM+R4pBIGwEcDzhwWqehRH7VA2O+AKaC6tH2RIL3NkyOEfH3UxeK5QdO8
+ ho+kIYGmClHYXz8ur9oavChovZNx3otOEL+HRlxgm3OtQWgBwjU77APzRK9a5VtDy4Z5
+ ZVIuEZHZdVcwmDVXluwuKjFMu7K58h18kXWtA9LY+sTZqN3YW6ge/x34zogHddizeASn
+ pSfctj6aP/6FxgoTNUE+vCqbjFRhOSTKs+rtel2vIkgj0YnS7FOTse49ruQQpW+Gflkq
+ O/og+lF+TC23AxMq5ywU97e4MC+qNTEz2Mq07tphsD2ZAmxj9w5dzEJKmCMOViniIVks
+ NfEw==
+X-Gm-Message-State: AOAM531OmqrVAY199NDO6cGoE7Z1oUqyP1CM3oFE2gKIkpZ42KufobgA
+ 9imjzBjWtLBloF8SZHFaFQ/UEGkDMq1PsKyf5fuGBUFJiL+aMlTEfOXTSgcBfksKiYUB1OGBZpX
+ kzBBM5z1a4lMoRZw=
+X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr2478115wmm.2.1602835702978; 
+ Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzLe3hG1tfPoTHkxvSe9Si3UFueQyvgyM0blKAqPyxf9uOU6dYETrbSYXm6n3OIF6Nh4ClyBw==
+X-Received: by 2002:a05:600c:d8:: with SMTP id u24mr2478094wmm.2.1602835702733; 
+ Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:4e8a:ee8e:6ed5:4bc3?
+ ([2001:b07:6468:f312:4e8a:ee8e:6ed5:4bc3])
+ by smtp.gmail.com with ESMTPSA id e25sm2577125wra.71.2020.10.16.01.08.21
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 01:08:22 -0700 (PDT)
+Subject: Re: [PATCH] hax: unbreak accelerator cpu code after cpus.c split
+To: Claudio Fontana <cfontana@suse.de>, =?UTF-8?Q?Volker_R=c3=bcmelin?=
+ <vr_qemu@t-online.de>
+References: <20201016080032.13914-1-cfontana@suse.de>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <68898e9b-d89d-1a5c-870d-a053eb8ea570@redhat.com>
+Date: Fri, 16 Oct 2020 10:08:21 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-In-Reply-To: <20201008171558.410886-5-jean-philippe@linaro.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20201016080032.13914-1-cfontana@suse.de>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 03:57:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -102,88 +117,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, bbhushan2@marvell.com, qemu-devel@nongnu.org,
- peterx@redhat.com, mst@redhat.com
+Cc: Richard Henderson <richard.henderson@linaro.org>, haxm-team@intel.com,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi jean,
-
-On 10/8/20 7:15 PM, Jean-Philippe Brucker wrote:
-> From: Bharat Bhushan <bbhushan2@marvell.com>
+On 16/10/20 10:00, Claudio Fontana wrote:
+> during my split of cpus.c, code line
+> "current_cpu = cpu"
+> was removed by mistake, causing hax to break.
 > 
-> Call the memory notifiers when attaching an endpoint to a domain, to
-> replay existing mappings, and when detaching the endpoint, to remove all
-> mappings.
+> This commit fixes the situation restoring it.
 > 
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Reported-by: Volker Rümelin <vr_qemu@t-online.de>
+> Fixes: e92558e4bf8059ce4f0b310afe218802b72766bc
+> Signed-off-by: Claudio Fontana <cfontana@suse.de>
 > ---
-> v10: Remove notifiers_list, rename callbacks
-> ---
->  hw/virtio/virtio-iommu.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
+>  target/i386/hax-cpus.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index fcdf3a819f8..7e6e3cf5200 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -168,11 +168,39 @@ static void virtio_iommu_notify_unmap(IOMMUMemoryRegion *mr, hwaddr virt_start,
->      memory_region_notify_iommu(mr, 0, entry);
->  }
+> diff --git a/target/i386/hax-cpus.c b/target/i386/hax-cpus.c
+> index 99770e590c..f72c85bd49 100644
+> --- a/target/i386/hax-cpus.c
+> +++ b/target/i386/hax-cpus.c
+> @@ -38,6 +38,7 @@ static void *hax_cpu_thread_fn(void *arg)
+>      qemu_thread_get_self(cpu->thread);
 >  
-> +static gboolean virtio_iommu_notify_unmap_cb(gpointer key, gpointer value,
-> +                                             gpointer data)
-> +{
-> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-> +
-> +    virtio_iommu_notify_unmap(mr, interval->low, interval->high);
-> +
-> +    return false;
-> +}
-> +
-> +static gboolean virtio_iommu_notify_map_cb(gpointer key, gpointer value,
-> +                                           gpointer data)
-> +{
-> +    VirtIOIOMMUMapping *mapping = (VirtIOIOMMUMapping *) value;
-> +    VirtIOIOMMUInterval *interval = (VirtIOIOMMUInterval *) key;
-> +    IOMMUMemoryRegion *mr = (IOMMUMemoryRegion *) data;
-> +
-> +    virtio_iommu_notify_map(mr, interval->low, interval->high,
-> +                            mapping->phys_addr);
-Here also I think we should apply the mapping->flags.
-> +
-> +    return false;
-> +}
-> +
->  static void virtio_iommu_detach_endpoint_from_domain(VirtIOIOMMUEndpoint *ep)
->  {
-> +    VirtIOIOMMUDomain *domain = ep->domain;
-> +
->      if (!ep->domain) {
->          return;
->      }
-> +    g_tree_foreach(domain->mappings, virtio_iommu_notify_unmap_cb,
-> +                   ep->iommu_mr);
->      QLIST_REMOVE(ep, next);
->      ep->domain = NULL;
->  }
-> @@ -315,6 +343,10 @@ static int virtio_iommu_attach(VirtIOIOMMU *s,
->  
->      ep->domain = domain;
->  
-> +    /* Replay domain mappings on the associated memory region */
-> +    g_tree_foreach(domain->mappings, virtio_iommu_notify_map_cb,
-> +                   ep->iommu_mr);
-> +
->      return VIRTIO_IOMMU_S_OK;
->  }
->  
+>      cpu->thread_id = qemu_get_thread_id();
+> +    current_cpu = cpu;
+>      hax_init_vcpu(cpu);
+>      cpu_thread_signal_created(cpu);
+>      qemu_guest_random_seed_thread_part2(cpu->random_seed);
 > 
-Thanks
 
-Eric
+Queued, thanks.
+
+Paolo
 
 
