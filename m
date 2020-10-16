@@ -2,73 +2,74 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10831C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 02:18:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51280C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 02:24:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2CDFC20878
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 02:18:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B74D20878
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 02:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y8cttgFB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2CDFC20878
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JEPbr/NY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B74D20878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37830 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTFKM-0006jt-Ps
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 22:18:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55876)
+	id 1kTFPu-0008MU-8D
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 22:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kTFJU-0006B7-EG
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 22:17:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59458)
+ id 1kTFPL-0007xb-Bi
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 22:23:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35933)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kTFJR-0005Gc-Hv
- for qemu-devel@nongnu.org; Thu, 15 Oct 2020 22:17:47 -0400
+ id 1kTFPJ-00060i-9P
+ for qemu-devel@nongnu.org; Thu, 15 Oct 2020 22:23:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602814663;
+ s=mimecast20190719; t=1602815028;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6IZyciROz6W8g4Eb4FK1Micniim3/HI3EXyuBxcaNDQ=;
- b=Y8cttgFBMI2ZH3iHjU5itPPY5n+mZkDx7qW3h0eavVvi6FbNRHg/njro5xhNp1iLm18ytw
- 7mxcJjs3UV4f945adQvwLImppdw5UzcDDzuc0EErFVxEMANJtWx+fcFK2KWsJ7Iemg4hVp
- yoHBawEcJMlfJA2AD/5tG7IBfE13f6g=
+ bh=H0WXHoQ14EupyOu7Kg1wisCq6ivhkR8h3f93RGUNzfg=;
+ b=JEPbr/NYEHq+tkUmam4RmLMqv+tyqAqdt9fL+rUJ0mEmrS+vtFVUP0fvlH+ycyOIHQMs4s
+ KQATaeIuBNj4OQvw3ksJnYbxH+yNPXhKsQFGpbPMX4kWDQqfDRVUZnzTE3qri7quJ1bPvH
+ 5ju1oqRL4LVpOX3395d4+WD8h8BmMss=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-TZoXeoe2MGC3wVl0DdWRdg-1; Thu, 15 Oct 2020 22:17:42 -0400
-X-MC-Unique: TZoXeoe2MGC3wVl0DdWRdg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-397-ySpB_ZVvOpK0gk2bjaYiIw-1; Thu, 15 Oct 2020 22:23:46 -0400
+X-MC-Unique: ySpB_ZVvOpK0gk2bjaYiIw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 161401868426;
- Fri, 16 Oct 2020 02:17:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1D7C680365D;
+ Fri, 16 Oct 2020 02:23:45 +0000 (UTC)
 Received: from [10.72.12.212] (ovpn-12-212.pek2.redhat.com [10.72.12.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A714276673;
- Fri, 16 Oct 2020 02:17:36 +0000 (UTC)
-Subject: Re: [PATCH v2] virtio-net: Set mac address to hardware if the peer is
- vdpa
-To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org
-References: <20200925151333.6157-1-lulu@redhat.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CFE406EF61;
+ Fri, 16 Oct 2020 02:23:42 +0000 (UTC)
+Subject: Re: [PATCH 00/10] COLO project queued patches 20-Oct
+To: "Zhang, Chen" <chen.zhang@intel.com>, qemu-dev <qemu-devel@nongnu.org>
+References: <20201014072555.12515-1-chen.zhang@intel.com>
+ <7638dbe1-9095-28e2-0b5f-2eeaa5e3f98e@redhat.com>
+ <f71889f9bb054cdd8c294028878c739c@intel.com>
 From: Jason Wang <jasowang@redhat.com>
-Message-ID: <c7392598-5c4f-8b4a-e5e7-8488af6d3757@redhat.com>
-Date: Fri, 16 Oct 2020 10:17:34 +0800
+Message-ID: <38af8287-393b-1fdb-9fea-d334ff487d33@redhat.com>
+Date: Fri, 16 Oct 2020 10:23:41 +0800
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <20200925151333.6157-1-lulu@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <f71889f9bb054cdd8c294028878c739c@intel.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,43 +101,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org
+Cc: Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
-On 2020/9/25 下午11:13, Cindy Lu wrote:
-> If the peer's type is vdpa, we need to set the mac address to hardware
-> in virtio_net_device_realize,
+On 2020/10/15 下午3:58, Zhang, Chen wrote:
 >
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->   hw/net/virtio-net.c | 6 ++++++
->   1 file changed, 6 insertions(+)
+>> -----Original Message-----
+>> From: Jason Wang <jasowang@redhat.com>
+>> Sent: Thursday, October 15, 2020 3:56 PM
+>> To: Zhang, Chen <chen.zhang@intel.com>; qemu-dev <qemu-
+>> devel@nongnu.org>
+>> Cc: Zhang Chen <zhangckid@gmail.com>
+>> Subject: Re: [PATCH 00/10] COLO project queued patches 20-Oct
+>>
+>>
+>> On 2020/10/14 下午3:25, Zhang Chen wrote:
+>>> From: Zhang Chen <chen.zhang@intel.com>
+>>>
+>>> Hi Jason, this series include latest COLO related patches.
+>>> please check and merge it.
+>>>
+>>> Thanks
+>>> Zhang Chen
+>>
+>> Hi:
+>>
+>> I want to merge but I don't get patch 10/10.
+>>
+>> Is that lost during posting?
+> Oh, Sorry I missed it.
+> Already resend it:
+> [PATCH 10/10] net/colo-compare.c: Increase default queued packet scan frequency
 >
-> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-> index cb0d27084c..1f2c1643bf 100644
-> --- a/hw/net/virtio-net.c
-> +++ b/hw/net/virtio-net.c
-> @@ -3399,6 +3399,12 @@ static void virtio_net_device_realize(DeviceState *dev, Error **errp)
->       nc = qemu_get_queue(n->nic);
->       nc->rxfilter_notify_enabled = 1;
->   
-> +   if (nc->peer && nc->peer->info->type == NET_CLIENT_DRIVER_VHOST_VDPA) {
-> +        struct virtio_net_config netcfg = {};
-> +        memcpy(&netcfg.mac, &n->nic_conf.macaddr, ETH_ALEN);
-> +        vhost_net_set_config(get_vhost_net(nc->peer),
-> +            (uint8_t *)&netcfg, 0, ETH_ALEN, VHOST_SET_CONFIG_TYPE_MASTER);
-> +    }
->       QTAILQ_INIT(&n->rsc_chains);
->       n->qdev = dev;
->   
+> Thanks
+> Chen
 
 
-Applied.
+It looks to me Philippe has some minor comments on some patches, please 
+address them and send a new version.
 
 Thanks
 
+
+>
+>> Thanks
+>>
+>>
+>>> Li Zhijian (2):
+>>>     colo-compare: fix missing compare_seq initialization
+>>>     colo-compare: check mark in mutual exclusion
+>>>
+>>> Pan Nengyuan (1):
+>>>     net/filter-rewriter: destroy g_hash_table in colo_rewriter_cleanup
+>>>
+>>> Rao, Lei (3):
+>>>     Optimize seq_sorter function for colo-compare
+>>>     Reduce the time of checkpoint for COLO
+>>>     Fix the qemu crash when guest shutdown in COLO mode
+>>>
+>>> Zhang Chen (4):
+>>>     net/colo-compare.c: Fix compare_timeout format issue
+>>>     net/colo-compare.c: Change the timer clock type
+>>>     net/colo-compare.c: Add secondary old packet detection
+>>>     net/colo-compare.c: Increase default queued packet scan frequency
+>>>
+>>>    migration/ram.c       | 14 ++++++++++-
+>>>    net/colo-compare.c    | 57 ++++++++++++++++++++++---------------------
+>>>    net/colo.c            |  5 +---
+>>>    net/filter-rewriter.c |  2 ++
+>>>    softmmu/vl.c          |  1 +
+>>>    5 files changed, 46 insertions(+), 33 deletions(-)
+>>>
 
 
