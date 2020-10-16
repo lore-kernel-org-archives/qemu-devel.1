@@ -2,72 +2,71 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AE7FC433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7913C433E7
 	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 944D32084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 278A120866
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 11:48:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HfyR+Sqn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 944D32084C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LbCOZO8F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 278A120866
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTODq-0000HV-7A
+	id 1kTODq-0000I6-QK
 	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 07:48:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33292)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO9A-0002Lw-3w
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:43:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25245)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO9B-0002P2-52
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:43:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36224)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO98-0002Ez-9L
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:43:43 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kTO99-0002F8-5B
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:43:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602848621;
+ s=mimecast20190719; t=1602848622;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=7n9AqGVaGzPTAWJH2VRtnK1oRJEqNaPfQpn1YdvIyTs=;
- b=HfyR+SqnRWZbaA0R3SVDDcz57mEnnkTmygjaVoJS3NWOpMvhbYkYeQiPL9deUSZo3Mjmm2
- 4r//e7Mis01oB1PUm1T5gsaYwFa5+ZtYcDX3AV1UQT1Ln0INrC3BsNh2uHjDE2tq+kAkpZ
- lG6JjSE87ougkbdah8gJvqTl+OK5ihA=
+ bh=GemyLmzmoFkT3TaMBVYELboTpf28GueT5eyUcjiUWvU=;
+ b=LbCOZO8FsAGmHvsoGWpS6xgFxY4tzDnmqKTKVWdGMylb86dSDDUWDN7QdHFwDUMYs1qH46
+ YZm4YdqgHeIcXJTTIdWyoaaFXvRIRchoP/O1uTe3Mr5wBpxHLsWOkXWnpaPRWTceWGODSu
+ Kv2n3rtUHiFDXzQpneaLZf2l4WGyWaE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-96-hrRVvtaqP4ycfSJa6s9ZbQ-1; Fri, 16 Oct 2020 07:43:39 -0400
-X-MC-Unique: hrRVvtaqP4ycfSJa6s9ZbQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-232-5eLp4XmTNQqSTkqP2g4JqA-1; Fri, 16 Oct 2020 07:43:40 -0400
+X-MC-Unique: 5eLp4XmTNQqSTkqP2g4JqA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A97C86ABD9;
- Fri, 16 Oct 2020 11:43:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 862E1186DD39;
+ Fri, 16 Oct 2020 11:43:39 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 31D0010013DB;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2D67A5D9D5;
  Fri, 16 Oct 2020 11:43:29 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 50A521750A; Fri, 16 Oct 2020 13:43:28 +0200 (CEST)
+ id 5B4911753B; Fri, 16 Oct 2020 13:43:28 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] microvm: make number of virtio transports runtime
- configurable
-Date: Fri, 16 Oct 2020 13:43:25 +0200
-Message-Id: <20201016114328.18835-2-kraxel@redhat.com>
+Subject: [PATCH 2/4] microvm: make pcie irq base runtime configurable
+Date: Fri, 16 Oct 2020 13:43:26 +0200
+Message-Id: <20201016114328.18835-3-kraxel@redhat.com>
 In-Reply-To: <20201016114328.18835-1-kraxel@redhat.com>
 References: <20201016114328.18835-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -106,50 +105,60 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/i386/microvm.h | 2 +-
- hw/i386/microvm.c         | 9 +++++++--
- 2 files changed, 8 insertions(+), 3 deletions(-)
+ include/hw/i386/microvm.h |  2 +-
+ hw/i386/microvm.c         | 11 ++++++-----
+ 2 files changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/include/hw/i386/microvm.h b/include/hw/i386/microvm.h
-index 91b064575d55..0154ad5bd707 100644
+index 0154ad5bd707..ede9625756b8 100644
 --- a/include/hw/i386/microvm.h
 +++ b/include/hw/i386/microvm.h
-@@ -52,7 +52,6 @@
+@@ -63,7 +63,6 @@
+ #define PCIE_MMIO_SIZE        0x20000000
+ #define PCIE_ECAM_BASE        0xe0000000
+ #define PCIE_ECAM_SIZE        0x10000000
+-#define PCIE_IRQ_BASE         12
  
- /* Platform virtio definitions */
- #define VIRTIO_MMIO_BASE      0xfeb00000
--#define VIRTIO_NUM_TRANSPORTS 8
- #define VIRTIO_CMDLINE_MAXLEN 64
- 
- #define GED_MMIO_BASE         0xfea00000
-@@ -95,6 +94,7 @@ struct MicrovmMachineState {
+ /* Machine type options */
+ #define MICROVM_MACHINE_PIT                 "pit"
+@@ -93,6 +92,7 @@ struct MicrovmMachineState {
+     bool auto_kernel_cmdline;
  
      /* Machine state */
++    uint32_t pcie_irq_base;
      uint32_t virtio_irq_base;
-+    uint32_t virtio_num_transports;
+     uint32_t virtio_num_transports;
      bool kernel_cmdline_fixed;
-     Notifier machine_done;
-     Notifier powerdown_req;
 diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index 9dd74458aca4..eaf5da31f7e1 100644
+index eaf5da31f7e1..638e95c39e8c 100644
 --- a/hw/i386/microvm.c
 +++ b/hw/i386/microvm.c
-@@ -177,8 +177,13 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+@@ -180,6 +180,7 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+     mms->virtio_irq_base = 5;
+     mms->virtio_num_transports = 8;
+     if (x86_machine_is_acpi_enabled(x86ms)) {
++        mms->pcie_irq_base = 12;
+         mms->virtio_irq_base = 16;
+     }
  
-     kvmclock_create(true);
- 
--    mms->virtio_irq_base = x86_machine_is_acpi_enabled(x86ms) ? 16 : 5;
--    for (i = 0; i < VIRTIO_NUM_TRANSPORTS; i++) {
-+    mms->virtio_irq_base = 5;
-+    mms->virtio_num_transports = 8;
-+    if (x86_machine_is_acpi_enabled(x86ms)) {
-+        mms->virtio_irq_base = 16;
-+    }
-+
-+    for (i = 0; i < mms->virtio_num_transports; i++) {
-         sysbus_create_simple("virtio-mmio",
-                              VIRTIO_MMIO_BASE + i * 512,
-                              x86ms->gsi[mms->virtio_irq_base + i]);
+@@ -213,12 +214,12 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+         mms->gpex.mmio32.size = PCIE_MMIO_SIZE;
+         mms->gpex.ecam.base   = PCIE_ECAM_BASE;
+         mms->gpex.ecam.size   = PCIE_ECAM_SIZE;
+-        mms->gpex.irq         = PCIE_IRQ_BASE;
++        mms->gpex.irq         = mms->pcie_irq_base;
+         create_gpex(mms);
+-        x86ms->pci_irq_mask = ((1 << (PCIE_IRQ_BASE + 0)) |
+-                               (1 << (PCIE_IRQ_BASE + 1)) |
+-                               (1 << (PCIE_IRQ_BASE + 2)) |
+-                               (1 << (PCIE_IRQ_BASE + 3)));
++        x86ms->pci_irq_mask = ((1 << (mms->pcie_irq_base + 0)) |
++                               (1 << (mms->pcie_irq_base + 1)) |
++                               (1 << (mms->pcie_irq_base + 2)) |
++                               (1 << (mms->pcie_irq_base + 3)));
+     } else {
+         x86ms->pci_irq_mask = 0;
+     }
 -- 
 2.27.0
 
