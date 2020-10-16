@@ -2,89 +2,60 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82783C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:07:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA0BDC43457
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:21:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AFF8A2083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:07:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R92H6Xmk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFF8A2083B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id EB73521D40
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 12:21:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB73521D40
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36948 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46618 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTOVu-0007BX-IU
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 08:07:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34430)
+	id 1kTOjQ-0003Lb-QL
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 08:21:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODi-0000TQ-3b
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59283)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTODg-0002p2-8e
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 07:48:25 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602848903;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=A8StGSzSvq32/9gAol6iL6H2HpzjgTv5zAb0M+ocs8Y=;
- b=R92H6XmkoCpAlG2zezLpPdW9azBTE1w9twpGsHCTfrx1pRNRH13M0SKceD+6418Z/LsaP1
- beXGaODXePuo9JAg10r+syiBt2aMUvoBqY6aJq8d9kP02zMkaV+shlGsMEpcNVhrXEXZyg
- ZdfnFAm8Hmwzi/lYxBR1BhR3YOSuhRo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-262-bOMZV9m_M_KIEztx7Etdaw-1; Fri, 16 Oct 2020 07:48:20 -0400
-X-MC-Unique: bOMZV9m_M_KIEztx7Etdaw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9F1E8015B1;
- Fri, 16 Oct 2020 11:48:19 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5971B5C1D0;
- Fri, 16 Oct 2020 11:48:19 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 12/22] meson.build: don't condition iconv detection on library
- detection
-Date: Fri, 16 Oct 2020 07:48:04 -0400
-Message-Id: <20201016114814.1564523-13-pbonzini@redhat.com>
-In-Reply-To: <20201016114814.1564523-1-pbonzini@redhat.com>
-References: <20201016114814.1564523-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTOhj-0002WH-3l; Fri, 16 Oct 2020 08:19:27 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:16641)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTOhf-0006xa-RJ; Fri, 16 Oct 2020 08:19:26 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 1E7D3747624;
+ Fri, 16 Oct 2020 14:19:17 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id F420C747623; Fri, 16 Oct 2020 14:19:16 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id F225F747622;
+ Fri, 16 Oct 2020 14:19:16 +0200 (CEST)
+Date: Fri, 16 Oct 2020 14:19:16 +0200 (CEST)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v8 0/5] Mac Old World ROM experiment (ppc/mac_* clean
+ ups and loading binary ROM)
+In-Reply-To: <005ed95d-65ee-ab36-c068-e96a773ef8ed@ilande.co.uk>
+Message-ID: <f26e685a-4e93-c8a5-622f-5b12c71b8ac@eik.bme.hu>
+References: <cover.1602805637.git.balaton@eik.bme.hu>
+ <005ed95d-65ee-ab36-c068-e96a773ef8ed@ilande.co.uk>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 03:57:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII; format=flowed
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,57 +68,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Yonggang Luo <lbrogers@suse.com>, Bruce Rogers <brogers@suse.com>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-From: Bruce Rogers <brogers@suse.com>
+On Fri, 16 Oct 2020, Mark Cave-Ayland wrote:
+> On 16/10/2020 00:47, BALATON Zoltan via wrote:
+>> This is the cut down version of the earlier series omitting unfinished
+>> patches that I plan to rework later and rebased to Mark's qemu-macppc
+>> branch. Compared to v7 the only change is the cast to (target_ulong)
+>> from (uint32_t) as requested by Mark in patch 1.
+>
+> FWIW the reason for suggesting the cast to target_ulong is so that the same 
+> code works for both qemu-system-ppc and qemu-system-ppc64. For 
+> qemu-system-ppc that should correctly drop the sign extension from 32-bit, 
+> whilst still allowing someone to load a 64-bit ELF into qemu-system-ppc64 if 
+> requested.
+>
+> Can you confirm that the sign extension behaviour is still correct for both 
+> qemu-system-ppc and qemu-system-ppc64? If so I'm happy to give it a R-B tag.
 
-It isn't necessarily the case that use of iconv requires an additional
-library. For that reason we shouldn't conditionalize iconv detection on
-libiconv.found.
+I've tried it now again with both ppc and ppc64: both OpenBIOS and a G3 
+beige ROM can be loaded with qemu-system-ppc but qemu-system-ppc64 fails 
+with OpenBIOS when casting to target_ulong (i think because target_ulong 
+is 64 bit there but g3beige is still 32 bit but I haven't throughly 
+debugged it). But everything works with my original uint32_t cast, so 
+ditch it and use my original version. Should I resubmit or you can fix up? 
+(I think I wait until it's clear if this will be taken by David or you and 
+send a fixed version cc-ing David if this is decided to go through the PPC 
+queue.)
 
-Fixes: 5285e593c33 (configure: Fixes ncursesw detection under msys2/mingw by convert them to meson)
-
-Signed-off-by: Bruce Rogers <brogers@suse.com>
-Reviewed-by: Yonggang Luo<l <brogers@suse.com>uoyonggang@gmail.com>
-Reviewed-by:Yonggang Luo <luoyonggang@gmail.com>
-Message-Id: <20201014221939.196958-1-brogers@suse.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- meson.build | 16 +++++++---------
- 1 file changed, 7 insertions(+), 9 deletions(-)
-
-diff --git a/meson.build b/meson.build
-index 0c0f4f9fd8..c1c45e9845 100644
---- a/meson.build
-+++ b/meson.build
-@@ -459,15 +459,13 @@ if not get_option('iconv').disabled()
-   libiconv = cc.find_library('iconv',
-                              required: false,
-                              static: enable_static)
--  if libiconv.found()
--    if cc.links('''
--      #include <iconv.h>
--      int main(void) {
--        iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
--        return conv != (iconv_t) -1;
--      }''', dependencies: [libiconv])
--      iconv = declare_dependency(dependencies: [libiconv])
--    endif
-+  if cc.links('''
-+    #include <iconv.h>
-+    int main(void) {
-+      iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
-+      return conv != (iconv_t) -1;
-+    }''', dependencies: [libiconv])
-+    iconv = declare_dependency(dependencies: [libiconv])
-   endif
- endif
- if get_option('iconv').enabled() and not iconv.found()
--- 
-2.26.2
-
-
+Regards,
+BALATON Zoltan
 
