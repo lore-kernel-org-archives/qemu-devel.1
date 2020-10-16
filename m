@@ -7,58 +7,56 @@ X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,FROM_WSP_TRAIL,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D34C43457
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:00:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C6FC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:03:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83B97207DE
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 05:59:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B97207DE
+	by mail.kernel.org (Postfix) with ESMTPS id 70B89207C4
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 06:03:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70B89207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTImU-0005EA-CZ
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 01:59:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44066)
+	id 1kTIpc-00085o-CP
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 02:03:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kTIhW-0006Nv-JP
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:51 -0400
+ id 1kTIhf-0006Vy-9j
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:59 -0400
 Received: from mga01.intel.com ([192.55.52.88]:36617)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chen.zhang@intel.com>)
- id 1kTIhT-0005C7-E5
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:50 -0400
-IronPort-SDR: iFv7HZAx6PX3hHWitxscGwBYna7H/iqgm20S8Oou3QkdU5o8EIxxgQSJdk0kpilL44JivGC7Em
- XyGNjyjg/XyA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9775"; a="184094657"
-X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="184094657"
+ id 1kTIhc-0005C7-QZ
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 01:54:58 -0400
+IronPort-SDR: V/9QeNkcf4ecBV/F1v3snN1GDLfMvPHw/D8v8h4kG8Qf0D34xN+PFzgFYQJzcWSDFlApelfN9e
+ qIeBav0sNKKg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9775"; a="184094679"
+X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="184094679"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
 Received: from orsmga004.jf.intel.com ([10.7.209.38])
  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2020 22:54:46 -0700
-IronPort-SDR: 5RZ7Tg/NvEoyR6F/DguIFbbNY9bFf3aNHWlCjXW9sIhtX4kd3j80cLqoO8wqLywT0W5usQnFJn
- g1GnHZIotLGQ==
-X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="464572835"
+ 15 Oct 2020 22:54:55 -0700
+IronPort-SDR: hpHyIrnXq9YyAgMkOSv9ez7tHdDO0t0at+K/Cxb1BL5ajsb8vUTv+rLspkYwv9nNlNtx+7Igud
+ nlOxt1/cAWVQ==
+X-IronPort-AV: E=Sophos;i="5.77,381,1596524400"; d="scan'208";a="464572875"
 Received: from unknown (HELO localhost.localdomain) ([10.239.13.19])
  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 15 Oct 2020 22:54:44 -0700
+ 15 Oct 2020 22:54:53 -0700
 From: Zhang Chen <chen.zhang@intel.com >
 To: Jason Wang <jasowang@redhat.com>,
 	qemu-dev <qemu-devel@nongnu.org>
-Subject: [PATCH V2 05/10] colo-compare: fix missing compare_seq initialization
-Date: Fri, 16 Oct 2020 13:52:03 +0800
-Message-Id: <20201016055208.7969-6-chen.zhang@intel.com>
+Subject: [PATCH V2 10/10] net/colo-compare.c: Increase default queued packet
+ scan frequency
+Date: Fri, 16 Oct 2020 13:52:08 +0800
+Message-Id: <20201016055208.7969-11-chen.zhang@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201016055208.7969-1-chen.zhang@intel.com>
 References: <20201016055208.7969-1-chen.zhang@intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=192.55.52.88; envelope-from=chen.zhang@intel.com;
  helo=mga01.intel.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 01:54:36
@@ -84,44 +82,33 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Derek Su <dereksu@qnap.com>, Zhang Chen <chen.zhang@intel.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Li Zhijian <lizhijian@cn.fujitsu.com>, Zhang Chen <zhangckid@gmail.com>
+ Zhang Chen <zhangckid@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Li Zhijian <lizhijian@cn.fujitsu.com>
+From: Zhang Chen <chen.zhang@intel.com>
 
-Fixes: f449c9e549c ("colo: compare the packet based on the tcp sequence
-number")
+In my test, use this default parameter looks better.
 
-Signed-off-by: Li Zhijian <lizhijian@cn.fujitsu.com>
 Signed-off-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Zhang Chen <chen.zhang@intel.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- net/colo.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+ net/colo-compare.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/colo.c b/net/colo.c
-index a6c66d829a..ef00609848 100644
---- a/net/colo.c
-+++ b/net/colo.c
-@@ -133,14 +133,11 @@ void reverse_connection_key(ConnectionKey *key)
+diff --git a/net/colo-compare.c b/net/colo-compare.c
+index 0c87fd9e33..337025b44f 100644
+--- a/net/colo-compare.c
++++ b/net/colo-compare.c
+@@ -52,7 +52,7 @@ static NotifierList colo_compare_notifiers =
+ #define COLO_COMPARE_FREE_PRIMARY     0x01
+ #define COLO_COMPARE_FREE_SECONDARY   0x02
  
- Connection *connection_new(ConnectionKey *key)
- {
--    Connection *conn = g_slice_new(Connection);
-+    Connection *conn = g_slice_new0(Connection);
+-#define REGULAR_PACKET_CHECK_MS 3000
++#define REGULAR_PACKET_CHECK_MS 1000
+ #define DEFAULT_TIME_OUT_MS 3000
  
-     conn->ip_proto = key->ip_proto;
-     conn->processing = false;
--    conn->offset = 0;
-     conn->tcp_state = TCPS_CLOSED;
--    conn->pack = 0;
--    conn->sack = 0;
-     g_queue_init(&conn->primary_list);
-     g_queue_init(&conn->secondary_list);
- 
+ /* #define DEBUG_COLO_PACKETS */
 -- 
 2.17.1
 
