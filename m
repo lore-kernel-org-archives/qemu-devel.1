@@ -2,49 +2,54 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50228C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:23:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71D01C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:27:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF169207F7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:23:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF169207F7
+	by mail.kernel.org (Postfix) with ESMTPS id DF37E206E5
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 00:27:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF37E206E5
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42190 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTDWP-0002oJ-LE
-	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:23:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58808)
+	id 1kTDab-000476-Na
+	for qemu-devel@archiver.kernel.org; Thu, 15 Oct 2020 20:27:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRV-0005il-1r; Thu, 15 Oct 2020 20:17:57 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:30047)
+ id 1kTDZk-0003aT-Cg; Thu, 15 Oct 2020 20:26:28 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:24849)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTDRM-0006vi-NX; Thu, 15 Oct 2020 20:17:56 -0400
+ id 1kTDZi-00084B-OT; Thu, 15 Oct 2020 20:26:28 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id 6FA73747623;
- Fri, 16 Oct 2020 02:17:36 +0200 (CEST)
+ by localhost (Postfix) with SMTP id F3EE5747613;
+ Fri, 16 Oct 2020 02:26:24 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id E954574761D; Fri, 16 Oct 2020 02:17:35 +0200 (CEST)
-Message-Id: <1789fdb8ceb8894720ea3082976a0a5a0f58f1ad.1602805637.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1602805637.git.balaton@eik.bme.hu>
-References: <cover.1602805637.git.balaton@eik.bme.hu>
-Subject: [PATCH v8 1/5] mac_oldworld: Allow loading binary ROM image
-Date: Fri, 16 Oct 2020 01:47:17 +0200
+ id D3A277475FA; Fri, 16 Oct 2020 02:26:24 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id D2465746383;
+ Fri, 16 Oct 2020 02:26:24 +0200 (CEST)
+Date: Fri, 16 Oct 2020 02:26:24 +0200 (CEST)
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
+In-Reply-To: <4b25afd1-0ce5-0832-a3f0-1b58b3aa7b32@ilande.co.uk>
+Message-ID: <a5bf7f6-ace0-72e9-52df-e5b421b4e1c5@eik.bme.hu>
+References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
+ <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
+ <c882279b-a561-2c3a-a6b5-b27446fddb02@amsat.org>
+ <79df54b3-d9e5-145e-e277-24468b121ba0@ilande.co.uk>
+ <91a24667-5f72-d3d9-8e47-6453268d2b78@eik.bme.hu>
+ <4b25afd1-0ce5-0832-a3f0-1b58b3aa7b32@ilande.co.uk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-To: qemu-devel@nongnu.org,
-    qemu-ppc@nongnu.org
+Content-Type: text/plain; charset=US-ASCII; format=flowed
 Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
  helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:17:36
@@ -66,87 +71,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
 From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
-the rom region and fall back to loading a binary image with -bios if
-loading ELF image failed. This allows testing emulation with a ROM
-image from real hardware as well as using an ELF OpenBIOS image.
+On Thu, 15 Oct 2020, Mark Cave-Ayland wrote:
+> I've queued the grackle/uninorth patches to my qemu-macppc branch, however 
+> when I try to apply patches from the above series git fails with the 
+> following message:
+>
+> Applying: mac_oldworld: Drop a variable, use get_system_memory() directly
+> error: sha1 information is lacking or useless (hw/ppc/mac_oldworld.c).
+> error: could not build fake ancestor
 
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
----
- hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
- 1 file changed, 20 insertions(+), 9 deletions(-)
+Maybe because these were based on your screamer branch but I could 
+cherry-pick them from there to your qemu-macppc branch without issue.
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index 05e46ee6fe..0a40769b3e 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -59,6 +59,8 @@
- #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
- 
- #define GRACKLE_BASE 0xfec00000
-+#define PROM_BASE 0xffc00000
-+#define PROM_SIZE (4 * MiB)
- 
- static void fw_cfg_boot_set(void *opaque, const char *boot_device,
-                             Error **errp)
-@@ -100,6 +102,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     SysBusDevice *s;
-     DeviceState *dev, *pic_dev;
-     BusState *adb_bus;
-+    uint64_t bios_addr;
-     int bios_size;
-     unsigned int smp_cpus = machine->smp.cpus;
-     uint16_t ppc_boot_device;
-@@ -128,24 +131,32 @@ static void ppc_heathrow_init(MachineState *machine)
- 
-     memory_region_add_subregion(sysmem, 0, machine->ram);
- 
--    /* allocate and load BIOS */
--    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
-+    /* allocate and load firmware ROM */
-+    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
-                            &error_fatal);
-+    memory_region_add_subregion(sysmem, PROM_BASE, bios);
- 
--    if (bios_name == NULL)
-+    if (!bios_name) {
-         bios_name = PROM_FILENAME;
-+    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
--    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
--
--    /* Load OpenBIOS (ELF) */
-     if (filename) {
--        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, NULL,
--                             1, PPC_ELF_MACHINE, 0, 0);
-+        /* Load OpenBIOS (ELF) */
-+        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, &bios_addr,
-+                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
-+        /* Unfortunately, load_elf sign-extends reading elf32 */
-+        bios_addr = (target_ulong)bios_addr;
-+
-+        if (bios_size <= 0) {
-+            /* or load binary ROM image */
-+            bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
-+            bios_addr = PROM_BASE;
-+        }
-         g_free(filename);
-     } else {
-         bios_size = -1;
-     }
--    if (bios_size < 0 || bios_size > BIOS_SIZE) {
-+    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > PROM_SIZE) {
-         error_report("could not load PowerPC bios '%s'", bios_name);
-         exit(1);
-     }
--- 
-2.21.3
+> Any chance you can rebase and repost? I'm happy to take patches 3 and 4, and
 
+I've just posted the rebased series.
+
+> if my suggestion of casting the return address via target_ulong works then I 
+> think 1 and 2 are also fine.
+
+Your original comment was:
+
+"Given that this needs to work with both qemu-system-ppc and 
+qemu-system-ppc64 would casting bios_addr to target_ulong work?"
+
+This cast only appears in mac_oldworld.c which is qemu-system-ppc only (or 
+not different in qemu-system-ppc64 unlike mac_newworld.c) so target_ulong 
+there is basically uint32_t. I've changed the cast accordingly but I think 
+it does not really matter.
+
+> The I2C stuff I can't really review, and weren't 
+> there still issues with the SPD data in patch 8 reporting the wrong RAM size?
+
+As said in previous message the i2c and SPD patches are not quite ready 
+yet so I've omitted those from this series, I may rework them later once 
+this part is merged and can rebase the rest on top of that. We would also 
+need your screamer patches to get the Mac ROM working, what is still 
+missing for those?
+
+Regards,
+BALATON Zoltan
 
