@@ -2,92 +2,71 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DA65C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 19:02:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3032C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 19:09:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CA26E20EDD
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 19:02:43 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yS2Jo41y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CA26E20EDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 0128220EDD
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 19:09:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0128220EDD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTUzy-0000iy-JJ
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 15:02:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55476)
+	id 1kTV6S-0004n4-Ls
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 15:09:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kTUgi-0000gS-Hj
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 14:42:48 -0400
-Received: from mail-pl1-x62a.google.com ([2607:f8b0:4864:20::62a]:43377)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kTUgR-0002Bn-OS
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 14:42:48 -0400
-Received: by mail-pl1-x62a.google.com with SMTP id o9so1739478plx.10
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 11:42:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=sxotxj6XB7hzF7JenULfKlm4NqUCIgIUU5zaZ0WIWOQ=;
- b=yS2Jo41yV7EhlVhdqVxZ7EAubOw+rSsvov7dgPhqj481h70lP3dpb/mZwDCYW0hkP+
- ZL3qx/vEyAcBsrtUOBNsbchYradWQl0z5ejy5foaLM9HNmPay7A7lmQ5gRAJH4/dbrrR
- 9CETd+4kfnNmFvMkM9bKqHcv9w19m5mdDAae/INUg2eqRjVHv2DCQ+Gskw1i+n0zZ470
- zaQCZ3W3Uu3eNySOLxDtS0PVRaSIQK45Ipcfmhs0Y5Z4A46s2DHEo7oIoApyqlQR3ALr
- Miw2jmcnQNFqjxo2A10TC+7dEZyyFsD78fuCBrzx62kMYNszMK1clGhI4LCs0Gc87/os
- Iv1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=sxotxj6XB7hzF7JenULfKlm4NqUCIgIUU5zaZ0WIWOQ=;
- b=Ae3cSJf39lp48L7pJAUP4rh09JMnbHPc7w17JeqiQD8unvaW6/DEuykb9dZjEy2oZU
- DEmMJ7AbGZgHWfxr58N1wQ0XJyQF8uqOy2txV3x/36GFiaR/bzd8Y6P8JcMQOkX9NKY4
- jA3heOtn5Ph7wCcO25lgoldIkmYUTzQ2IlLLMd88YQPd1+chiaPOC3E0Vrx9yy1+VCPo
- WzPr4kiALonWcwSJLpTIrnS/BviSXj6MBn1Ki90+zZRsvgwfWLkgCthPf/hoNeV498B9
- 0onKbkVrI3TOg2LJLun1stsFZutIsvkCI3GhjsM0OQOPARTulKKUx/2oFgYJSD/KC6KE
- g1tg==
-X-Gm-Message-State: AOAM532LEdZI0e2Q+Zu/WT0Mlm/CE9h8nwRaJmkmeohM2zS4/HMhuwPY
- 7DmL2dCspqFpFJ67j712l+wXvbKNKLCaWA==
-X-Google-Smtp-Source: ABdhPJzOnl5cpuWrA60i+NFXVU8zxCowjszm0rvCnuT52zUSguaWhUnTZN9+wwM+rH/Hmbd5zj2RZQ==
-X-Received: by 2002:a17:90a:be11:: with SMTP id
- a17mr5136520pjs.181.1602873748439; 
- Fri, 16 Oct 2020 11:42:28 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id c15sm3426011pgg.77.2020.10.16.11.42.27
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 16 Oct 2020 11:42:27 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v11 12/12] tests/tcg/aarch64: Add bti smoke tests
-Date: Fri, 16 Oct 2020 11:42:07 -0700
-Message-Id: <20201016184207.786698-13-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kTV4G-0003bd-Sg; Fri, 16 Oct 2020 15:07:08 -0400
+Resent-Date: Fri, 16 Oct 2020 15:07:08 -0400
+Resent-Message-Id: <E1kTV4G-0003bd-Sg@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21711)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kTV49-0005Fd-0x; Fri, 16 Oct 2020 15:07:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1602875212; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=BxGxbR5CDSwqQhv3+BF05aMM0rnZFtApJP+TwXYiqfoDaqYiNefn7/twMXJnBxMz6T/zuT/d1NoSZWCYGAEQKf+BmIG/1LsK6SRGLbnTI/rmujfosOBKR4k0I6/uTylaHhW5jT3eASObmm4ioZOcrV0eICvftSnFgJNubPyPdYM=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1602875212;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=GHHn5V6ndqJabY8GedSN6R4YOjU5m4ryD4lVrmTcBiM=; 
+ b=jyhfKtZp2Wmu9ak2eqN0uFVhSsnNf7vMBR9jvrVKKUrJSs/z4Zmq+YHuNR2nWs4/BYHqez0joidUszdWo+VLGj5cZ9YINBwkMvpgTyxEveyg+eqMxy/pLowqJIQTeuUgEgBKiSXGduGJxlLRtu4CBkrctS6p3Ktp75cdc67wC6g=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 160287521010412.796348504163348;
+ Fri, 16 Oct 2020 12:06:50 -0700 (PDT)
+Subject: Re: [PATCH v11 00/12] linux-user: User support for AArch64 BTI
+Message-ID: <160287520829.1194.14173174275238509522@66eaa9a8a123>
 In-Reply-To: <20201016184207.786698-1-richard.henderson@linaro.org>
-References: <20201016184207.786698-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::62a;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x62a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: richard.henderson@linaro.org
+Date: Fri, 16 Oct 2020 12:06:50 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 15:06:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,308 +80,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: qemu-devel@nongnu.org
 Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org, alex.bennee@linaro.org,
- laurent@vivier.eu
+ qemu-devel@nongnu.org, laurent@vivier.eu
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The note test requires gcc 10 for -mbranch-protection=standard.
-The mmap test uses PROT_BTI and does not require special compiler support.
-
-Acked-by: Alex Bennée <alex.bennee@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
-v9: Expect and require gcc 10.
-v11: Squash mmap smoke test.
----
- tests/tcg/aarch64/bti-1.c         |  62 +++++++++++++++++
- tests/tcg/aarch64/bti-2.c         | 108 ++++++++++++++++++++++++++++++
- tests/tcg/aarch64/bti-crt.inc.c   |  51 ++++++++++++++
- tests/tcg/aarch64/Makefile.target |  10 +++
- tests/tcg/configure.sh            |   4 ++
- 5 files changed, 235 insertions(+)
- create mode 100644 tests/tcg/aarch64/bti-1.c
- create mode 100644 tests/tcg/aarch64/bti-2.c
- create mode 100644 tests/tcg/aarch64/bti-crt.inc.c
-
-diff --git a/tests/tcg/aarch64/bti-1.c b/tests/tcg/aarch64/bti-1.c
-new file mode 100644
-index 0000000000..61924f0d7a
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-1.c
-@@ -0,0 +1,62 @@
-+/*
-+ * Branch target identification, basic notskip cases.
-+ */
-+
-+#include "bti-crt.inc.c"
-+
-+static void skip2_sigill(int sig, siginfo_t *info, ucontext_t *uc)
-+{
-+    uc->uc_mcontext.pc += 8;
-+    uc->uc_mcontext.pstate = 1;
-+}
-+
-+#define NOP       "nop"
-+#define BTI_N     "hint #32"
-+#define BTI_C     "hint #34"
-+#define BTI_J     "hint #36"
-+#define BTI_JC    "hint #38"
-+
-+#define BTYPE_1(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; br x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16")
-+
-+#define BTYPE_2(DEST) \
-+    asm("mov %0,#1; adr x16, 1f; blr x16; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x16", "x30")
-+
-+#define BTYPE_3(DEST) \
-+    asm("mov %0,#1; adr x15, 1f; br x15; 1: " DEST "; mov %0,#0" \
-+        : "=r"(skipped) : : "x15")
-+
-+#define TEST(WHICH, DEST, EXPECT) \
-+    do { WHICH(DEST); fail += skipped ^ EXPECT; } while (0)
-+
-+
-+int main()
-+{
-+    int fail = 0;
-+    int skipped;
-+
-+    /* Signal-like with SA_SIGINFO.  */
-+    signal_info(SIGILL, skip2_sigill);
-+
-+    TEST(BTYPE_1, NOP, 1);
-+    TEST(BTYPE_1, BTI_N, 1);
-+    TEST(BTYPE_1, BTI_C, 0);
-+    TEST(BTYPE_1, BTI_J, 0);
-+    TEST(BTYPE_1, BTI_JC, 0);
-+
-+    TEST(BTYPE_2, NOP, 1);
-+    TEST(BTYPE_2, BTI_N, 1);
-+    TEST(BTYPE_2, BTI_C, 0);
-+    TEST(BTYPE_2, BTI_J, 1);
-+    TEST(BTYPE_2, BTI_JC, 0);
-+
-+    TEST(BTYPE_3, NOP, 1);
-+    TEST(BTYPE_3, BTI_N, 1);
-+    TEST(BTYPE_3, BTI_C, 1);
-+    TEST(BTYPE_3, BTI_J, 0);
-+    TEST(BTYPE_3, BTI_JC, 0);
-+
-+    return fail;
-+}
-diff --git a/tests/tcg/aarch64/bti-2.c b/tests/tcg/aarch64/bti-2.c
-new file mode 100644
-index 0000000000..6dc8908b5a
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-2.c
-@@ -0,0 +1,108 @@
-+/*
-+ * Branch target identification, basic notskip cases.
-+ */
-+
-+#include <stdio.h>
-+#include <signal.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+
-+#ifndef PROT_BTI
-+#define PROT_BTI  0x10
-+#endif
-+
-+static void skip2_sigill(int sig, siginfo_t *info, void *vuc)
-+{
-+    ucontext_t *uc = vuc;
-+    uc->uc_mcontext.pc += 8;
-+    uc->uc_mcontext.pstate = 1;
-+}
-+
-+#define NOP       "nop"
-+#define BTI_N     "hint #32"
-+#define BTI_C     "hint #34"
-+#define BTI_J     "hint #36"
-+#define BTI_JC    "hint #38"
-+
-+#define BTYPE_1(DEST)    \
-+    "mov x1, #1\n\t"     \
-+    "adr x16, 1f\n\t"    \
-+    "br x16\n"           \
-+"1: " DEST "\n\t"        \
-+    "mov x1, #0"
-+
-+#define BTYPE_2(DEST)    \
-+    "mov x1, #1\n\t"     \
-+    "adr x16, 1f\n\t"    \
-+    "blr x16\n"          \
-+"1: " DEST "\n\t"        \
-+    "mov x1, #0"
-+
-+#define BTYPE_3(DEST)    \
-+    "mov x1, #1\n\t"     \
-+    "adr x15, 1f\n\t"    \
-+    "br x15\n"           \
-+"1: " DEST "\n\t"        \
-+    "mov x1, #0"
-+
-+#define TEST(WHICH, DEST, EXPECT) \
-+    WHICH(DEST) "\n"              \
-+    ".if " #EXPECT "\n\t"         \
-+    "eor x1, x1," #EXPECT "\n"    \
-+    ".endif\n\t"                  \
-+    "add x0, x0, x1\n\t"
-+
-+extern char test_begin[], test_end[];
-+
-+asm("\n"
-+"test_begin:\n\t"
-+    BTI_C "\n\t"
-+    "mov x2, x30\n\t"
-+    "mov x0, #0\n\t"
-+
-+    TEST(BTYPE_1, NOP, 1)
-+    TEST(BTYPE_1, BTI_N, 1)
-+    TEST(BTYPE_1, BTI_C, 0)
-+    TEST(BTYPE_1, BTI_J, 0)
-+    TEST(BTYPE_1, BTI_JC, 0)
-+
-+    TEST(BTYPE_2, NOP, 1)
-+    TEST(BTYPE_2, BTI_N, 1)
-+    TEST(BTYPE_2, BTI_C, 0)
-+    TEST(BTYPE_2, BTI_J, 1)
-+    TEST(BTYPE_2, BTI_JC, 0)
-+
-+    TEST(BTYPE_3, NOP, 1)
-+    TEST(BTYPE_3, BTI_N, 1)
-+    TEST(BTYPE_3, BTI_C, 1)
-+    TEST(BTYPE_3, BTI_J, 0)
-+    TEST(BTYPE_3, BTI_JC, 0)
-+
-+    "ret x2\n"
-+"test_end:"
-+);
-+
-+int main()
-+{
-+    struct sigaction sa;
-+
-+    void *p = mmap(0, getpagesize(),
-+                   PROT_EXEC | PROT_READ | PROT_WRITE | PROT_BTI,
-+                   MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-+    if (p == MAP_FAILED) {
-+        perror("mmap");
-+        return 1;
-+    }
-+
-+    memset(&sa, 0, sizeof(sa));
-+    sa.sa_sigaction = skip2_sigill;
-+    sa.sa_flags = SA_SIGINFO;
-+    if (sigaction(SIGILL, &sa, NULL) < 0) {
-+        perror("sigaction");
-+        return 1;
-+    }
-+
-+    memcpy(p, test_begin, test_end - test_begin);
-+    return ((int (*)(void))p)();
-+}
-diff --git a/tests/tcg/aarch64/bti-crt.inc.c b/tests/tcg/aarch64/bti-crt.inc.c
-new file mode 100644
-index 0000000000..47805f4e35
---- /dev/null
-+++ b/tests/tcg/aarch64/bti-crt.inc.c
-@@ -0,0 +1,51 @@
-+/*
-+ * Minimal user-environment for testing BTI.
-+ *
-+ * Normal libc is not (yet) built with BTI support enabled,
-+ * and so could generate a BTI TRAP before ever reaching main.
-+ */
-+
-+#include <stdlib.h>
-+#include <signal.h>
-+#include <ucontext.h>
-+#include <asm/unistd.h>
-+
-+int main(void);
-+
-+void _start(void)
-+{
-+    exit(main());
-+}
-+
-+void exit(int ret)
-+{
-+    register int x0 __asm__("x0") = ret;
-+    register int x8 __asm__("x8") = __NR_exit;
-+
-+    asm volatile("svc #0" : : "r"(x0), "r"(x8));
-+    __builtin_unreachable();
-+}
-+
-+/*
-+ * Irritatingly, the user API struct sigaction does not match the
-+ * kernel API struct sigaction.  So for simplicity, isolate the
-+ * kernel ABI here, and make this act like signal.
-+ */
-+void signal_info(int sig, void (*fn)(int, siginfo_t *, ucontext_t *))
-+{
-+    struct kernel_sigaction {
-+        void (*handler)(int, siginfo_t *, ucontext_t *);
-+        unsigned long flags;
-+        unsigned long restorer;
-+        unsigned long mask;
-+    } sa = { fn, SA_SIGINFO, 0, 0 };
-+
-+    register int x0 __asm__("x0") = sig;
-+    register void *x1 __asm__("x1") = &sa;
-+    register void *x2 __asm__("x2") = 0;
-+    register int x3 __asm__("x3") = sizeof(unsigned long);
-+    register int x8 __asm__("x8") = __NR_rt_sigaction;
-+
-+    asm volatile("svc #0"
-+                 : : "r"(x0), "r"(x1), "r"(x2), "r"(x3), "r"(x8) : "memory");
-+}
-diff --git a/tests/tcg/aarch64/Makefile.target b/tests/tcg/aarch64/Makefile.target
-index e7249915e7..d7d33e293c 100644
---- a/tests/tcg/aarch64/Makefile.target
-+++ b/tests/tcg/aarch64/Makefile.target
-@@ -25,6 +25,16 @@ run-pauth-%: QEMU_OPTS += -cpu max
- run-plugin-pauth-%: QEMU_OPTS += -cpu max
- endif
- 
-+# BTI Tests
-+# bti-1 tests the elf notes, so we require special compiler support.
-+ifneq ($(DOCKER_IMAGE)$(CROSS_CC_HAS_ARMV8_BTI),)
-+AARCH64_TESTS += bti-1
-+bti-1: CFLAGS += -mbranch-protection=standard
-+bti-1: LDFLAGS += -nostdlib
-+endif
-+# bti-2 tests PROT_BTI, so no special compiler support required.
-+AARCH64_TESTS += bti-2
-+
- # Semihosting smoke test for linux-user
- AARCH64_TESTS += semihosting
- run-semihosting: semihosting
-diff --git a/tests/tcg/configure.sh b/tests/tcg/configure.sh
-index be51bdb5a4..e1b70e25f2 100755
---- a/tests/tcg/configure.sh
-+++ b/tests/tcg/configure.sh
-@@ -240,6 +240,10 @@ for target in $target_list; do
-                -march=armv8.3-a -o $TMPE $TMPC; then
-                 echo "CROSS_CC_HAS_ARMV8_3=y" >> $config_target_mak
-             fi
-+            if do_compiler "$target_compiler" $target_compiler_cflags \
-+               -mbranch-protection=standard -o $TMPE $TMPC; then
-+                echo "CROSS_CC_HAS_ARMV8_BTI=y" >> $config_target_mak
-+            fi
-         ;;
-     esac
- 
--- 
-2.25.1
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAxNjE4NDIwNy43ODY2
+OTgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNl
+ZW1zIHRvIGhhdmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cg
+Zm9yCm1vcmUgaW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMTYx
+ODQyMDcuNzg2Njk4LTEtcmljaGFyZC5oZW5kZXJzb25AbGluYXJvLm9yZwpTdWJqZWN0OiBbUEFU
+Q0ggdjExIDAwLzEyXSBsaW51eC11c2VyOiBVc2VyIHN1cHBvcnQgZm9yIEFBcmNoNjQgQlRJCgo9
+PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+
+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQg
+MApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2Fs
+IGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3JhbQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxi
+YWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJUFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFm
+Zjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRj
+aGV3LXByb2plY3QvcWVtdQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMDE2MTg0
+MjA3Ljc4NjY5OC0xLXJpY2hhcmQuaGVuZGVyc29uQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIw
+MTAxNjE4NDIwNy43ODY2OTgtMS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnClN3aXRjaGVk
+IHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYWRkZGViZCB0ZXN0cy90Y2cvYWFyY2g2NDogQWRkIGJ0
+aSBzbW9rZSB0ZXN0cwo2ZGU5ZTEyIGxpbnV4LXVzZXIvZWxmbG9hZDogUGFyc2UgR05VX1BST1BF
+UlRZX0FBUkNINjRfRkVBVFVSRV8xX0FORAo5YjA1MDc3IGxpbnV4LXVzZXIvZWxmbG9hZDogUGFy
+c2UgTlRfR05VX1BST1BFUlRZX1RZUEVfMCBub3RlcwplMDYzZmRlIGxpbnV4LXVzZXIvZWxmbG9h
+ZDogVXNlIEVycm9yIGZvciBsb2FkX2VsZl9pbnRlcnAKNWZhNjMwNSBsaW51eC11c2VyL2VsZmxv
+YWQ6IFVzZSBFcnJvciBmb3IgbG9hZF9lbGZfaW1hZ2UKMGJkZjNiOSBsaW51eC11c2VyL2VsZmxv
+YWQ6IE1vdmUgUFRfSU5URVJQIGRldGVjdGlvbiB0byBmaXJzdCBsb29wCjMxOTI5NDMgbGludXgt
+dXNlci9lbGZsb2FkOiBBZGp1c3QgaXRlcmF0aW9uIG92ZXIgcGhkcgpkMzVhYzBlIGxpbnV4LXVz
+ZXIvZWxmbG9hZDogRml4IGNvZGluZyBzdHlsZSBpbiBsb2FkX2VsZl9pbWFnZQpmMTAxOWMwIGxp
+bnV4LXVzZXIvZWxmbG9hZDogQXZvaWQgbGVha2luZyBpbnRlcnBfbmFtZSB1c2luZyBHTGliIG1l
+bW9yeSBBUEkKNDZiOGUwNCBpbmNsdWRlL2VsZjogQWRkIGRlZmluZXMgcmVsYXRlZCB0byBHTlUg
+cHJvcGVydHkgbm90ZXMgZm9yIEFBcmNoNjQKMTUxNjJiNCBsaW51eC11c2VyOiBTZXQgUEFHRV9U
+QVJHRVRfMSBmb3IgVEFSR0VUX1BST1RfQlRJCjQ5ZWQ3NGIgbGludXgtdXNlci9hYXJjaDY0OiBS
+ZXNldCBidHlwZSBmb3Igc2lnbmFscwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8xMiBDaGVja2lu
+ZyBjb21taXQgNDllZDc0YmMxYWVlIChsaW51eC11c2VyL2FhcmNoNjQ6IFJlc2V0IGJ0eXBlIGZv
+ciBzaWduYWxzKQoyLzEyIENoZWNraW5nIGNvbW1pdCAxNTE2MmI0ZGNiZWMgKGxpbnV4LXVzZXI6
+IFNldCBQQUdFX1RBUkdFVF8xIGZvciBUQVJHRVRfUFJPVF9CVEkpCjMvMTIgQ2hlY2tpbmcgY29t
+bWl0IDQ2YjhlMDQ3ODFhMSAoaW5jbHVkZS9lbGY6IEFkZCBkZWZpbmVzIHJlbGF0ZWQgdG8gR05V
+IHByb3BlcnR5IG5vdGVzIGZvciBBQXJjaDY0KQo0LzEyIENoZWNraW5nIGNvbW1pdCBmMTAxOWMw
+NDE2YzMgKGxpbnV4LXVzZXIvZWxmbG9hZDogQXZvaWQgbGVha2luZyBpbnRlcnBfbmFtZSB1c2lu
+ZyBHTGliIG1lbW9yeSBBUEkpCjUvMTIgQ2hlY2tpbmcgY29tbWl0IGQzNWFjMGUxOTMwYiAobGlu
+dXgtdXNlci9lbGZsb2FkOiBGaXggY29kaW5nIHN0eWxlIGluIGxvYWRfZWxmX2ltYWdlKQo2LzEy
+IENoZWNraW5nIGNvbW1pdCAzMTkyOTQzYjhkNzUgKGxpbnV4LXVzZXIvZWxmbG9hZDogQWRqdXN0
+IGl0ZXJhdGlvbiBvdmVyIHBoZHIpCjcvMTIgQ2hlY2tpbmcgY29tbWl0IDBiZGYzYjljMDdmNiAo
+bGludXgtdXNlci9lbGZsb2FkOiBNb3ZlIFBUX0lOVEVSUCBkZXRlY3Rpb24gdG8gZmlyc3QgbG9v
+cCkKOC8xMiBDaGVja2luZyBjb21taXQgNWZhNjMwNTZlMDg0IChsaW51eC11c2VyL2VsZmxvYWQ6
+IFVzZSBFcnJvciBmb3IgbG9hZF9lbGZfaW1hZ2UpCjkvMTIgQ2hlY2tpbmcgY29tbWl0IGUwNjNm
+ZGU3ZDRiMSAobGludXgtdXNlci9lbGZsb2FkOiBVc2UgRXJyb3IgZm9yIGxvYWRfZWxmX2ludGVy
+cCkKMTAvMTIgQ2hlY2tpbmcgY29tbWl0IDliMDUwNzdmYTJlZCAobGludXgtdXNlci9lbGZsb2Fk
+OiBQYXJzZSBOVF9HTlVfUFJPUEVSVFlfVFlQRV8wIG5vdGVzKQoxMS8xMiBDaGVja2luZyBjb21t
+aXQgNmRlOWUxMmIyYWRmIChsaW51eC11c2VyL2VsZmxvYWQ6IFBhcnNlIEdOVV9QUk9QRVJUWV9B
+QVJDSDY0X0ZFQVRVUkVfMV9BTkQpCjEyLzEyIENoZWNraW5nIGNvbW1pdCBhZGRkZWJkOGE3MDIg
+KHRlc3RzL3RjZy9hYXJjaDY0OiBBZGQgYnRpIHNtb2tlIHRlc3RzKQpXQVJOSU5HOiBhZGRlZCwg
+bW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/
+CiMzNzogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0CgpFUlJPUjogZXh0ZXJucyBzaG91bGQgYmUgYXZv
+aWRlZCBpbiAuYyBmaWxlcwojMTY1OiBGSUxFOiB0ZXN0cy90Y2cvYWFyY2g2NC9idGktMi5jOjU2
+OgorZXh0ZXJuIGNoYXIgdGVzdF9iZWdpbltdLCB0ZXN0X2VuZFtdOwoKRVJST1I6IHVzZSBxZW11
+X3JlYWxfaG9zdF9wYWdlX3NpemUgaW5zdGVhZCBvZiBnZXRwYWdlc2l6ZSgpCiMxOTk6IEZJTEU6
+IHRlc3RzL3RjZy9hYXJjaDY0L2J0aS0yLmM6OTA6CisgICAgdm9pZCAqcCA9IG1tYXAoMCwgZ2V0
+cGFnZXNpemUoKSwKCkVSUk9SOiBleHRlcm5zIHNob3VsZCBiZSBhdm9pZGVkIGluIC5jIGZpbGVz
+CiMyMzY6IEZJTEU6IHRlc3RzL3RjZy9hYXJjaDY0L2J0aS1jcnQuaW5jLmM6MTM6CitpbnQgbWFp
+bih2b2lkKTsKCnRvdGFsOiAzIGVycm9ycywgMSB3YXJuaW5ncywgMjQ3IGxpbmVzIGNoZWNrZWQK
+ClBhdGNoIDEyLzEyIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo9PT0gT1VUUFVUIEVORCA9
+PT0KClRlc3QgY29tbWFuZCBleGl0ZWQgd2l0aCBjb2RlOiAxCgoKVGhlIGZ1bGwgbG9nIGlzIGF2
+YWlsYWJsZSBhdApodHRwOi8vcGF0Y2hldy5vcmcvbG9ncy8yMDIwMTAxNjE4NDIwNy43ODY2OTgt
+MS1yaWNoYXJkLmhlbmRlcnNvbkBsaW5hcm8ub3JnL3Rlc3RpbmcuY2hlY2twYXRjaC8/dHlwZT1t
+ZXNzYWdlLgotLS0KRW1haWwgZ2VuZXJhdGVkIGF1dG9tYXRpY2FsbHkgYnkgUGF0Y2hldyBbaHR0
+cHM6Ly9wYXRjaGV3Lm9yZy9dLgpQbGVhc2Ugc2VuZCB5b3VyIGZlZWRiYWNrIHRvIHBhdGNoZXct
+ZGV2ZWxAcmVkaGF0LmNvbQ==
 
