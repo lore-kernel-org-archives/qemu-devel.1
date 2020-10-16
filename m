@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2107C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 18:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FF96C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 18:36:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 162A92084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 18:36:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 162A92084C
+	by mail.kernel.org (Postfix) with ESMTPS id 882312084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 18:36:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 882312084C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50696 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTUaX-0005Gz-R4
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 14:36:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52200)
+	id 1kTUaj-0005Y2-IT
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 14:36:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52220)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTUSd-0008G9-Ji; Fri, 16 Oct 2020 14:28:15 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57642
+ id 1kTUSi-0008RF-Ea; Fri, 16 Oct 2020 14:28:20 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:57652
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTUSb-0000Gy-UY; Fri, 16 Oct 2020 14:28:15 -0400
+ id 1kTUSg-0000HV-Pt; Fri, 16 Oct 2020 14:28:20 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTUSX-0003wP-7H; Fri, 16 Oct 2020 19:28:15 +0100
+ id 1kTUSd-0003wP-TC; Fri, 16 Oct 2020 19:28:20 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org, qemu-trivial@nongnu.org, f4bug@amsat.org,
  hpoussin@reactos.org, qemu-ppc@nongnu.org, atar4qemu@gmail.com,
  david@gibson.dropbear.id.au
-Date: Fri, 16 Oct 2020 19:27:38 +0100
-Message-Id: <20201016182739.22875-5-mark.cave-ayland@ilande.co.uk>
+Date: Fri, 16 Oct 2020 19:27:39 +0100
+Message-Id: <20201016182739.22875-6-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201016182739.22875-1-mark.cave-ayland@ilande.co.uk>
 References: <20201016182739.22875-1-mark.cave-ayland@ilande.co.uk>
@@ -50,8 +50,7 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 4/5] ppc405_boards: use qdev properties instead of legacy
- m48t59_init() function
+Subject: [PATCH 5/5] m48t59: remove legacy m48t59_init() function
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -80,46 +79,74 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Now that all of the callers of this function have been switched to use qdev
+properties, this legacy init function can now be removed.
+
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/ppc405_boards.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ hw/rtc/m48t59.c         | 35 -----------------------------------
+ include/hw/rtc/m48t59.h |  4 ----
+ 2 files changed, 39 deletions(-)
 
-diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
-index 6198ec1035..4687715b15 100644
---- a/hw/ppc/ppc405_boards.c
-+++ b/hw/ppc/ppc405_boards.c
-@@ -28,6 +28,8 @@
- #include "qemu-common.h"
- #include "cpu.h"
- #include "hw/ppc/ppc.h"
-+#include "hw/qdev-properties.h"
-+#include "hw/sysbus.h"
- #include "ppc405.h"
- #include "hw/rtc/m48t59.h"
- #include "hw/block/flash.h"
-@@ -145,6 +147,8 @@ static void ref405ep_init(MachineState *machine)
-     char *filename;
-     ppc4xx_bd_info_t bd;
-     CPUPPCState *env;
-+    DeviceState *dev;
-+    SysBusDevice *s;
-     qemu_irq *pic;
-     MemoryRegion *bios;
-     MemoryRegion *sram = g_new(MemoryRegion, 1);
-@@ -227,7 +231,11 @@ static void ref405ep_init(MachineState *machine)
-     /* Register FPGA */
-     ref405ep_fpga_init(sysmem, 0xF0300000);
-     /* Register NVRAM */
--    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
-+    dev = qdev_new("sysbus-m48t08");
-+    qdev_prop_set_int32(dev, "base-year", 1968);
-+    s = SYS_BUS_DEVICE(dev);
-+    sysbus_realize_and_unref(s, &error_fatal);
-+    sysbus_mmio_map(s, 0, 0xF0000000);
-     /* Load kernel */
-     linux_boot = (kernel_filename != NULL);
-     if (linux_boot) {
+diff --git a/hw/rtc/m48t59.c b/hw/rtc/m48t59.c
+index 6525206976..d54929e861 100644
+--- a/hw/rtc/m48t59.c
++++ b/hw/rtc/m48t59.c
+@@ -564,41 +564,6 @@ const MemoryRegionOps m48t59_io_ops = {
+     .endianness = DEVICE_LITTLE_ENDIAN,
+ };
+ 
+-/* Initialisation routine */
+-Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
+-                   uint32_t io_base, uint16_t size, int base_year,
+-                   int model)
+-{
+-    DeviceState *dev;
+-    SysBusDevice *s;
+-    int i;
+-
+-    for (i = 0; i < ARRAY_SIZE(m48txx_sysbus_info); i++) {
+-        if (m48txx_sysbus_info[i].size != size ||
+-            m48txx_sysbus_info[i].model != model) {
+-            continue;
+-        }
+-
+-        dev = qdev_new(m48txx_sysbus_info[i].bus_name);
+-        qdev_prop_set_int32(dev, "base-year", base_year);
+-        s = SYS_BUS_DEVICE(dev);
+-        sysbus_realize_and_unref(s, &error_fatal);
+-        sysbus_connect_irq(s, 0, IRQ);
+-        if (io_base != 0) {
+-            memory_region_add_subregion(get_system_io(), io_base,
+-                                        sysbus_mmio_get_region(s, 1));
+-        }
+-        if (mem_base != 0) {
+-            sysbus_mmio_map(s, 0, mem_base);
+-        }
+-
+-        return NVRAM(s);
+-    }
+-
+-    assert(false);
+-    return NULL;
+-}
+-
+ void m48t59_realize_common(M48t59State *s, Error **errp)
+ {
+     s->buffer = g_malloc0(s->size);
+diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
+index 9defe578d1..d9b45eb161 100644
+--- a/include/hw/rtc/m48t59.h
++++ b/include/hw/rtc/m48t59.h
+@@ -47,8 +47,4 @@ struct NvramClass {
+     void (*toggle_lock)(Nvram *obj, int lock);
+ };
+ 
+-Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
+-                   uint32_t io_base, uint16_t size, int base_year,
+-                   int type);
+-
+ #endif /* HW_M48T59_H */
 -- 
 2.20.1
 
