@@ -2,117 +2,121 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D63F3C433E7
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4342CC433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D24292084C
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7F1532084C
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=emdalo.onmicrosoft.com header.i=@emdalo.onmicrosoft.com header.b="AxiRf0TM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D24292084C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=emdalo.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="C/WYWYjr"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F1532084C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41386 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42958 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTTHo-00044q-AA
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:13:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34928)
+	id 1kTTII-0004jn-GU
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:13:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ivan.griffin@emdalo.com>)
- id 1kTTFH-000244-M1; Fri, 16 Oct 2020 13:10:23 -0400
-Received: from mail-eopbgr10041.outbound.protection.outlook.com
- ([40.107.1.41]:44923 helo=EUR02-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kTTGB-0002tz-8a; Fri, 16 Oct 2020 13:11:19 -0400
+Received: from mail-eopbgr00100.outbound.protection.outlook.com
+ ([40.107.0.100]:3705 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ivan.griffin@emdalo.com>)
- id 1kTTFC-00075n-4Q; Fri, 16 Oct 2020 13:10:21 -0400
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kTTG7-0007Mv-FH; Fri, 16 Oct 2020 13:11:18 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nJGTBS3I4ARvwOVzy5wRxI9PtcwFXJPa4ZYDz8LVyfHmY1OF3slpr3Zq0ncR1ERVFOHG31QXl4FKWpuY/0dTEipkGa/3vtX9eTBn5S9Q1OU2aPgZjFICYjbPTz+4zGOF2zSfTJy/b6nW2gFHGkXSiVwTUd/BPwnMJ1wE9S0JOzAz3HXH930RltWvKJbZnfQN4jJ0F1ydHWZnZIGrdFSqiFCL6b9xts+ldOjUYRKUTu49PQ8B+zAkSauWZGx3SkdepitfLENjjPtYtIDiJe8yjFA9c8kwdrAp6PZJNp78ZbNBGJSOS5Pq7B7jI02UxVZ0os3x3L086ncNfQM0CB73iA==
+ b=emi435Hg6AQLyT9AykWXrkn3mYep/sBY3tsMfAXh1F2bfJmsM6Cg7NbHGw5rLFxbtZPEmo1wtsbTGkCsso0QvbR3OOTNlz90rAvYtwAP1ZyD/1vPd1JsbZzVWw76crJHQJXiqhLK/aCMOrqBTwfLmN/zZEEzwH7RsMnQBJoC9Wupr2aZqY9Sy84L6L5J1wYkaMJ0/69kNQAzpyVhA67fvNJ2j+lwS2cndZHY8VtUbiLhDnCyb0HbbORp/d1q65503lrka9kP4Da7oDiC7IyCro7LSxVnuWpykztHtGDxQvgmFOXFSKURGdZTTCwIuBB0+D4Lyg3K25CL5ubF52Qvew==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pGertfte/FSkq0JSXR2swaiNwp7//1TX1TrcmKo2c30=;
- b=ArI32pJiIM2iHWR6Rzj83kSzOqusIliEQjRiLgE8Qrw2xdo8qqDVSQdLeWvhJ2HWmT9pVTOsyK8sBv78rRUSDiCWo+9BoMzOPRc/oMA0aJSHrywVHsCxt49/3s5RxykRYOVaZ0zAWc5vj+VtPyakQKzfWk2F1nJVsGieLGKr13wVy+NptoZAT8K9VthLXd6sfVLfhZqMS9JamGoASnneJSTl8rXu5gWsCiCllXIE9KT4wdeNJvzqSWZ9QcZ33V8LHVptHOfYkdROITCaEPWYPEt/YCp9VtmK2OvOCkLVRxFsxFJlsgtntboj31rhBObGNRkJvJZR539U5yssXDdiyQ==
+ bh=VRsNM4cuq3vUj96l+SDYDQaQmCXErz2vGHfcw9xJHGA=;
+ b=LMaUD0pjPIx+aapdf0QPEkLiyBQMPVdQ0nfEHv68L9Mol6Sw+HoxW4btZjbeht9vuefWS2A2Y7gT4GzX2qeyMItDgRNkLPq6T7od612OfB3q4mrKfh0bqZEy2zFG9wOGGXt5znBhcxXCGVsvpn7L++dgnjFwX2AedDvNZboKPH03HpC5olgjUo0gcY60h3++lOPTPgXh3wT7XmzwyfEuzsHwDf2g1QW8MDusAycimyPIXwIawR/3AVIWpLZSnKQRpTyLC1LB8+JwZPqj6Wq3q1pK+iDNtUALoAIDxTiBCVQtx9to+nwXF8E4GvUTJo0Lj0kkcdentbvgiUaPJb1A7A==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=emdalo.com; dmarc=pass action=none header.from=emdalo.com;
- dkim=pass header.d=emdalo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=emdalo.onmicrosoft.com; s=selector2-emdalo-onmicrosoft-com;
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pGertfte/FSkq0JSXR2swaiNwp7//1TX1TrcmKo2c30=;
- b=AxiRf0TMpFrIaXFqCfQAKduS1ZmuII8iuA7Qm3CuIWG17A388Cnt9vAT5vGtgQ25On49UJRoCQita3pu5be7lZ5CyActaG6alGZN4vVRUPPUJVunrQUPhS3yTRW8aetT6GmucFx8U1I5yAskWIepQMl9T9DPwMcVZ53t8sYOmp0=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=emdalo.com;
-Received: from DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:5:e::24) by
- DB6PR1001MB1384.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:4:b4::19) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.22; Fri, 16 Oct 2020 17:10:12 +0000
-Received: from DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::2cbe:c29d:d77f:e65f]) by DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::2cbe:c29d:d77f:e65f%7]) with mapi id 15.20.3477.021; Fri, 16 Oct 2020
- 17:10:12 +0000
-From: Ivan Griffin <ivan.griffin@emdalo.com>
-To: Alistair Francis <alistair23@gmail.com>
-Subject: [PATCH v2] hw/riscv: microchip_pfsoc: IOSCBCTRL memmap entry
-Date: Fri, 16 Oct 2020 18:10:00 +0100
-Message-Id: <20201016171000.21240-1-ivan.griffin@emdalo.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <CAKmqyKODEgnkw4zBbsNK1zQ7qaiKWEAZBpwhnHzEetjgWpxtzQ@mail.gmail.com>
-References: <CAKmqyKODEgnkw4zBbsNK1zQ7qaiKWEAZBpwhnHzEetjgWpxtzQ@mail.gmail.com>
+ bh=VRsNM4cuq3vUj96l+SDYDQaQmCXErz2vGHfcw9xJHGA=;
+ b=C/WYWYjrT4KnSpg1Cak1fUTXEkXgIfPwrN4C/xPiVNvzgYf6zJhEzdUq9zqGSBo6SEd6N5aq0Q7ecCM1Ys6RIEJN+tCNzw5KhtddhatrPqzQvV9hVYSClELXrKpcrxXPV+laRdhs7n6rW8DnFASi1T6N9BpJisnGeYn0b8wNsgw=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM5PR0801MB1972.eurprd08.prod.outlook.com (2603:10a6:203:4b::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Fri, 16 Oct
+ 2020 17:11:11 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Fri, 16 Oct 2020
+ 17:11:11 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
+ vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
+ stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
+ ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
+Subject: [PATCH v3 00/13] block: deal with errp: part I
+Date: Fri, 16 Oct 2020 20:10:44 +0300
+Message-Id: <20201016171057.6182-1-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.3
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [86.45.25.24]
-X-ClientProxiedBy: LO2P265CA0070.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:60::34) To DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:5:e::24)
+X-Originating-IP: [185.215.60.69]
+X-ClientProxiedBy: FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from igriffin-HP-EliteBook-840-G3.emdalo.com (86.45.25.24) by
- LO2P265CA0070.GBRP265.PROD.OUTLOOK.COM (2603:10a6:600:60::34) with Microsoft
+Received: from kvm.sw.ru (185.215.60.69) by
+ FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.21 via Frontend Transport; Fri, 16 Oct 2020 17:10:11 +0000
+ 15.20.3499.9 via Frontend Transport; Fri, 16 Oct 2020 17:11:10 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e853ed02-f2e0-449e-f467-08d871f65789
-X-MS-TrafficTypeDiagnostic: DB6PR1001MB1384:
+X-MS-Office365-Filtering-Correlation-Id: c34b55f4-12fd-4a41-59c6-08d871f67ae9
+X-MS-TrafficTypeDiagnostic: AM5PR0801MB1972:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <DB6PR1001MB13842A9BEEDDCBF01168C773FE030@DB6PR1001MB1384.EURPRD10.PROD.OUTLOOK.COM>
-X-MS-Oob-TLC-OOBClassifiers: OLM:3513;
+X-Microsoft-Antispam-PRVS: <AM5PR0801MB19727715A60E94DA83DA5E62C1030@AM5PR0801MB1972.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:15;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qTgIsv2YM74BbqiYHFAC0weLfmtOmyuDenzEuzKx+/6Qt4mWfcl8UdW1h3k60eOOhX9D7i7+vMYdyhe75I2+ZM2ScY8KTHare8Q9SMzlFkbi/c9nSfX0vu6t5tRjnVcsLb1ooBx2KavcSc7UKPIpL5PEcH8MbaPAdalcIco5gZZGK1oeX/tfErQ/G53h2aWgccPT4IPH/zRYxF7je6lW9iSGDk4PVCrwLm63LkA04EouYFYDv1nBBvbt6nClqLmThwNvWODtmuP/yQKelYKu5XpZrFMCSdtndJlcNLyghro4lgmAWw5TOrvO0iETAemwCnLnU3ZudGkvMrSJIXuYdA==
+X-Microsoft-Antispam-Message-Info: R704EhQjkZnAt4mFH4WQFAxD465nhQtyCY+MJgIPmhLK9DdfAkgH+x8nM+qXnPJ4jFD/nCqyC0FVPwj6aG0yjCY376A11MUJ6Xd5sXQ8GFxs2Ns2ZIqVdsb0UJHTOP07m3Tw4kYYJGdfzts/WqDwMRxyLeOyCQQvC5iNFieFF/9FaFAHX6gStCBFL4Io1T1N9uNB/mqj2nnbKuW6jXmXYpldWL8BcDcec43kRw0poKTWi5FKTR7GXZxvbqCRNkVh6HF5mvoEH+u5aH7gxI+fDo0DWPSWI5Uji1INeb+Dt30XiKUkVK0ncvGuYE7Txr7n7ZdtCCdTKYCXLmrn6vhh06T8vfTQftIHmZqD0dp3RJxf4IPxOMBXPuQh4gaIt3Z3
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM; PTR:; CAT:NONE;
- SFS:(346002)(136003)(39830400003)(396003)(376002)(366004)(36756003)(83380400001)(8936002)(26005)(5660300002)(16526019)(44832011)(478600001)(86362001)(186003)(6486002)(316002)(2616005)(6666004)(956004)(2906002)(107886003)(1076003)(66476007)(52116002)(66946007)(6916009)(8676002)(7696005)(66556008)(4326008);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: XLrF2lhFHH55m/U6hZBmMcwdNZHVaAP02GEaicCcXna56KTK9hxvC/SfIyIgOft5F9QN37PjocNDSXZK0I/3pJUkYheBAVEVgo+LyDf+o66FWTR7UqRZAdj13Ar9H4Cj7mMlvT5hhhwAY/lqsuY9IfHlRZb3HOhkOnsIirHLVQyrsM17BUlKXPRsPJcv9K7QOVuNYyzxSjkQs1fkgWMMM7w8nNRpE5GU4+pBz13M/o1PpVIlO49H/MpIKCNwL6d2zaWGCYhHjQsZbSPN2uJAiXB4uxY3Y15VEvMHwf+z+1AYB34YkUgEms7FjnTlM+kDop5No1Wk51DueIFF9mV9rWTTlDJG9Y2uuwiQgq4cjKoY5S8SUCn9UKyLpUikgG01t0PdRWzPnTIjdWP5864E5FEhVYySslugGBbPRcIPHmgASMFWpLJgpH+a/Uj0B0slf8kxRm7CJDuahoR1ADM+OP/k6rOHMLEnS67M/pQmv4o8rdapnPxXfx8/88jaiAGSUQ6+51L8bikwG0Ew7jPZs2c5CP7nvIwt5Dgcb3r52yCzFwGo35RAlpSJ5+k7UJcEtJb1GmmnBu4YvrJpOZ+XTXqkPEDUPgLPCfm2jCbw308P0Mb8mXa778OQaqjgjGTmhDxF5gNDC10uWs58NF72WA==
-X-OriginatorOrg: emdalo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e853ed02-f2e0-449e-f467-08d871f65789
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(39830400003)(366004)(346002)(376002)(136003)(83380400001)(8676002)(8936002)(6666004)(316002)(6486002)(36756003)(956004)(1076003)(5660300002)(6512007)(86362001)(107886003)(2616005)(52116002)(34490700002)(66946007)(2906002)(66556008)(66476007)(4326008)(186003)(478600001)(7416002)(26005)(6506007)(16526019)(6916009);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: bPMSxeVWceU2kEc63rFaam4WffIOLULNY2PKT5uwJ3cgWpEJ0GcMLYgE+4hSDD9eviQAKrPtOnfbO2l95ylxiJRyXFCHZMyNaWwci40iy7kQkYpEQVVLxxllQbYP1vTqghMUUruqmyyESLarQX9jEciFmGuApMlDj14A0xi1bGz4z5F1ByPRyrN0pwM/MryCANGXnTii0nvX89FPaGVnLeeJqnmJcPoyu9bBC6sAN4rg12v0qojUXtHFfDhkFaAeHZgt1jQ7+nCOSyAsbhGlgLYp+Jdo216iz2R3btst0ATRadstzZ2cTFdZbwp+W3/L0NIFiQrUJkmT4pY8Sx2Pg4jVMernaeVKAfUq60lhZtZkiyaUpYt83BD/8pjAwQSBU1g3WtdUP87adNigjr2IEdXCYmPr/FUMV8ML1jZ/k+r736vQ5aF7OzztWTK8eSlEdMj+S+Y93aKSAOjMGk8tlDVziFZHx008BjZAh7ZQLF3x/jgP/KnEwsF7MAnf9G6RSJ6Kf1V+a6dEVFluzeaVpiqBBGYORPzVfjsqIEVNKwtA2OnPFfAugcBs0F2X9jA7ah5VphPfbMDPrSDGzi5lUUHE5dwwbgXChMuLtC+rKJG+T8fsGBgMwv+9949n2Oj45+XbOAbNisMaowYRUdeQwA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c34b55f4-12fd-4a41-59c6-08d871f67ae9
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:10:11.9646 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:11:11.2295 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 12485e48-c3f6-4e74-8f2d-9058be9b6951
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: duvAZCYtaMZ6MiDcvA5nvziaJpYvmuzLnRwg2JjjR6R1uc47+aVHmqsIenelQGbVs4xup3Ohi7UCu5y1IDuffA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB6PR1001MB1384
-Received-SPF: pass client-ip=40.107.1.41; envelope-from=ivan.griffin@emdalo.com;
- helo=EUR02-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:10:13
+X-MS-Exchange-CrossTenant-UserPrincipalName: UdHYJY741/YMy6W1+MJtjYEJYIc3KjyH4Kvgd7PyKfMMaejmm1MoK8OlVxStRY5cpGOncG1b2CwonM0kFEscdz079wbn2ew/X01g+NwpysQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1972
+Received-SPF: pass client-ip=40.107.0.100;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR02-AM5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:11:12
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,65 +129,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-riscv@nongnu.org, qemu-devel@nongnu.org,
- ivan.griffin@emdalo.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Adding the PolarFire SoC IOSCBCTRL memory region to prevent QEMU
-reporting a STORE/AMO Access Fault.
+v3:
+08: update comment, add Alberto's r-b
+09: update comment, add Alberto's and Greg's r-bs
+10: add Alberto's r-b
+12: Update commit msg, add Alberto's and Greg's r-bs
+13: add Greg's r-b
 
-This region is used by the PolarFire SoC port of U-Boot to
-interact with the FPGA system controller.
+Vladimir Sementsov-Ogievskiy (13):
+  block: return status from bdrv_append and friends
+  block: use return status of bdrv_append()
+  block: check return value of bdrv_open_child and drop error
+    propagation
+  blockdev: fix drive_backup_prepare() missed error
+  block: drop extra error propagation for bdrv_set_backing_hd
+  block/mirror: drop extra error propagation in commit_active_start()
+  blockjob: return status from block_job_set_speed()
+  block/qcow2: qcow2_get_specific_info(): drop error propagation
+  block/qcow2-bitmap: improve qcow2_load_dirty_bitmaps() interface
+  block/qcow2-bitmap: return status from
+    qcow2_store_persistent_dirty_bitmaps
+  block/qcow2: read_cache_sizes: return status value
+  block/qcow2: simplify qcow2_co_invalidate_cache()
+  block/qed: bdrv_qed_do_open: deal with errp
 
-Signed-off-by: Ivan Griffin <ivan.griffin@emdalo.com>
----
- hw/riscv/microchip_pfsoc.c         | 10 ++++++++++
- include/hw/riscv/microchip_pfsoc.h |  1 +
- 2 files changed, 11 insertions(+)
+ block/qcow2.h               |  9 ++---
+ include/block/block.h       | 12 +++----
+ include/block/blockjob.h    |  2 +-
+ block.c                     | 50 ++++++++++++++-------------
+ block/backup-top.c          | 20 +++++------
+ block/blkdebug.c            |  6 ++--
+ block/blklogwrites.c        | 10 +++---
+ block/blkreplay.c           |  6 ++--
+ block/blkverify.c           | 11 +++---
+ block/commit.c              |  5 +--
+ block/mirror.c              | 18 ++++------
+ block/qcow2-bitmap.c        | 67 +++++++++++++++++++------------------
+ block/qcow2.c               | 53 +++++++++++------------------
+ block/qed.c                 | 24 ++++++++-----
+ block/quorum.c              |  6 ++--
+ blockdev.c                  |  7 ++--
+ blockjob.c                  | 18 +++++-----
+ tests/test-bdrv-graph-mod.c |  6 ++--
+ 18 files changed, 152 insertions(+), 178 deletions(-)
 
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 4627179cd3..9aaa276ee2 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -97,6 +97,7 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_GPIO2] =           { 0x20122000,     0x1000 },
-     [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
-     [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
-+    [MICROCHIP_PFSOC_IOSCB_CTRL] =      { 0x37020000,     0x1000 },
-     [MICROCHIP_PFSOC_IOSCB_CFG] =       { 0x37080000,     0x1000 },
-     [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
- };
-@@ -341,6 +342,15 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-     create_unimplemented_device("microchip.pfsoc.ioscb.cfg",
-         memmap[MICROCHIP_PFSOC_IOSCB_CFG].base,
-         memmap[MICROCHIP_PFSOC_IOSCB_CFG].size);
-+
-+    /* IOSCBCTRL
-+     *
-+     * These registers are not documented in the official documentation
-+     * but used by the polarfire-soc-bare-meta-library code
-+     */
-+    create_unimplemented_device("microchip.pfsoc.ioscb.ctrl",
-+        memmap[MICROCHIP_PFSOC_IOSCB_CTRL].base,
-+        memmap[MICROCHIP_PFSOC_IOSCB_CTRL].size);
- }
- 
- static void microchip_pfsoc_soc_class_init(ObjectClass *oc, void *data)
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index 8bfc7e1a85..3f1874b162 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -95,6 +95,7 @@ enum {
-     MICROCHIP_PFSOC_ENVM_CFG,
-     MICROCHIP_PFSOC_ENVM_DATA,
-     MICROCHIP_PFSOC_IOSCB_CFG,
-+    MICROCHIP_PFSOC_IOSCB_CTRL,
-     MICROCHIP_PFSOC_DRAM,
- };
- 
 -- 
-2.17.1
+2.21.3
 
 
