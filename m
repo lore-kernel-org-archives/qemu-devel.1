@@ -2,125 +2,99 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3E80C43467
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F40E7C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:17:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E571320874
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:13:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6E5CC20704
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:17:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="mHkILYbf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E571320874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uhV4R58j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6E5CC20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTTII-0004kd-N1
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:13:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35594)
+	id 1kTTMU-0007q1-S0
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:17:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35182)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGF-0002xt-Vl; Fri, 16 Oct 2020 13:11:24 -0400
-Received: from mail-am6eur05on2128.outbound.protection.outlook.com
- ([40.107.22.128]:42592 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGA-0007NG-Vz; Fri, 16 Oct 2020 13:11:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WOdvY5XhNIeVEWzbnpGtlIMcxHC/h7Yg3x7Dw/U9zXiqoB3+HgUChU2PswtQBshaLa0HWcgHWBZBsQMKcih8vZeOm3N3a+LcMHZ5YAIORjwiJnCUVZTmVop6D/4JF/p+wl4nRRCsXN/1bHAEZqz1S+YtA/ZPZzH72s7T+huqc8g6p4UVeP8GxeKZuFhsqikPHpFzSAxRIMYvlrRF9UfoHciylLW57pYJ5gkUFQEkGGgopsZh+8zEfWyL0e/WFWqwkdymgofNGrV8aOwaqQ/1cy5s+tHCk6yrCZlGnNebiZSjGyt+c9iJhynHTOy+pAkKYiU/ZMjGEnYso9lb/DZRiw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BASOl5cr5a/xNG0KYxJeYCAgA4LpgWDox81XUShwKVE=;
- b=HKZtIoSOUkrPnSxWmoMKHrDsJPIBXNXuaFewsoTGWcz4RmA3pxn1eYBNDnmpHGy2PAvHQ+wykmTQCIB5NEschSSo/R8BEoZPhVhQtNHJOfhedRdQ0j7VBDWXJbNxftNrlSpCxNtt8F9ZIRmAL/dcjVV8t/doOEkUDn6Vb+SU3f+2el4/5tRpFfRBA+bgTh5zv9BmdnDfF8xDp300Z3pBjTpvYFCukvad4IQe+qaMv3AI/gHyYeUcmd9D5crgG3hZ48eONbLk4miWih+8FIWimu5B2zY4w2G5mZCHhf2bH9RUGlvS73qkqpC8jNRRrcv9LWKPMfnY1sbscUm10RxUQA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=BASOl5cr5a/xNG0KYxJeYCAgA4LpgWDox81XUShwKVE=;
- b=mHkILYbfM0onNuS+BWQ/XqwD3t1+gBBLp0gWxz8xTB4H1JPjjd9ZLgC4KvAZTEfeG1pMYA3S+MpFpA/AeFwZWI6G8tFeEfRsfmlyBfCxBf5+cqD1JKGwiSwcLlH4jySssbdHVY2acUqu57ckeKm6PmjjCmuNkes2UjD9vJqVpHM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.24; Fri, 16 Oct
- 2020 17:11:15 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Fri, 16 Oct 2020
- 17:11:15 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
- vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
- ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org,
- Greg Kurz <groug@kaod.org>
-Subject: [PATCH v3 04/13] blockdev: fix drive_backup_prepare() missed error
-Date: Fri, 16 Oct 2020 20:10:48 +0300
-Message-Id: <20201016171057.6182-5-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201016171057.6182-1-vsementsov@virtuozzo.com>
-References: <20201016171057.6182-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [185.215.60.69]
-X-ClientProxiedBy: FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTTFb-0002RO-9f; Fri, 16 Oct 2020 13:10:43 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:34934)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTTFZ-0007E7-0I; Fri, 16 Oct 2020 13:10:42 -0400
+Received: by mail-wr1-x441.google.com with SMTP id n15so3789288wrq.2;
+ Fri, 16 Oct 2020 10:10:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=wVUU4UoRhrebVepMUeSCHeCzM5In/AAZ3lVuLCyImAk=;
+ b=uhV4R58jxh+uqRBmvv9eTWWG+KcptlLZh3YDQHTfXcgU0TskmXnzpKi+XaHa3E//K8
+ p4ljjJSieqHolmVvFMuAJlsTLQZoFB7LZMAz2c8WdjoiUS7Jzpn1Vd/FAAyoA6yEuSCg
+ 4I06MiNGnE6bTvWBz7wXuIrSDQt0vRMp907wAvPW6Xmh1qtTHmUVklpbHIBTrvEc3uBe
+ bczApGUWPWTpxVFYFzgLYAQn5OO/Op+IjCUE50jMr6MaJ2AzxsmXbILUt8kS3SUERAFr
+ d1FoM6x6tcbugT/dxYePXNWaSdaOaC+wLKP2g0rTyGrFGPuVMIgQz9ttD3oZHG26ZYvy
+ wIgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=wVUU4UoRhrebVepMUeSCHeCzM5In/AAZ3lVuLCyImAk=;
+ b=YjNecTIwIJnP9cPg16v3qLo2D66wE5YXutyuWMgLlCzld7zJglvXmM1QYbrzT6KobM
+ rL3DCZVOzufVBdkmwXy8Le3cA6B5g82ho3KAmT6MlXqDmye/8KwChymOjPMN1CB/XWU6
+ VKStaHj/dPjJ3qLKB1aBMQtkyf7OVpG1AcNuH+XkE79KJCAG76OZP0xUQxFg5Q0gBExC
+ 2olNF2/dvXBQ5XUvpJbe8/zhtZ8FFoSxTqY+scscRUWg3i3+v1gVa8pPyBXC7wtxBzFx
+ cD3CpyZYgyvWmPIF4yXRSiz43uuSNQE6FKqsL4ZryMG8+eMFsFHzwPU0UX55ae9295E0
+ bWOg==
+X-Gm-Message-State: AOAM531U95BkKee9MyEUF7sQ2B4O/U0gKInFP7KcbBnRtjuXXGtOjVxf
+ qbQ5WWtvLmeJVObiGqWt3II=
+X-Google-Smtp-Source: ABdhPJwT90h0ZnZiXm2OuSMJCKk9/MaqawCjx5A5gxFP20UcoRSaPvB5iOuRTCvx0mgvAkGPBJRSRA==
+X-Received: by 2002:adf:fc0d:: with SMTP id i13mr5225528wrr.156.1602868238901; 
+ Fri, 16 Oct 2020 10:10:38 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id 40sm4195024wrc.46.2020.10.16.10.10.37
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 10:10:38 -0700 (PDT)
+Subject: Re: [PATCH v3 13/15] hw/misc/bcm2835_cprman: add sane reset values to
+ the registers
+To: Luc Michel <luc@lmichel.fr>
+References: <20201010135759.437903-1-luc@lmichel.fr>
+ <20201010135759.437903-14-luc@lmichel.fr>
+ <48280560-3642-5367-a46e-53548e77c748@amsat.org>
+ <20201011182608.gfmfvdioiyyaxrfq@sekoia-pc.home.lmichel.fr>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <473818a2-b267-881f-b827-425a384a27bd@amsat.org>
+Date: Fri, 16 Oct 2020 19:10:37 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.69) by
- FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.9 via Frontend Transport; Fri, 16 Oct 2020 17:11:14 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e61748e5-9fac-4364-a353-08d871f67dab
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB54955F3E32A6A284F1151B26C1030@AM7PR08MB5495.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eO7xg808tiJ6dIurPcMIPvaXhBmMY/EIZsBYZVOK+N83Tay4BDPs+sfrifVlRTEU1xXYxXfPH0/q3QwvmxaY8XZ9CtZ6kTYHPeIsQbOl9/4GQSiB4f0OXPLviAoJYj9z5iAbzQ1wgju6ZYoc3l729YkZ73zNWnhooXDfGOV4K65OWueS2Il7Nb6F4JemHUzr0YUuoxkzP7uB4dRiX9/FIXJBqPya1JoPCNy1W5hOkrD+VgEvf0PfB3n9hoQDOwy7Q7vdW2wd+eeIXSTtQzSvyygJmIIxKcu/FYRxA6Pmxp2T873fXcpBq7nS1l695ZQEehq9f9RCRJPpLNNUFoQvxrZdD6rEPY5Vg0ny2PbRzu9DChAVmED0re77DvnWSGWk
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(39840400004)(376002)(346002)(136003)(66556008)(316002)(8936002)(36756003)(26005)(5660300002)(2616005)(6506007)(66946007)(86362001)(4744005)(16526019)(7416002)(6916009)(66476007)(478600001)(34490700002)(6666004)(186003)(6486002)(2906002)(52116002)(956004)(83380400001)(1076003)(4326008)(8676002)(6512007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cM+7KtuUup8gYM7JVgTeaSmeew9Z9KHZHwm9ljtNCcXk1aBM5T2DSmPC32avnUzfJYT7kZWlHnaxJo7FvI4+OuHkXSKMJcZMnEDZRbDfvNAsvsV8M67YkaQioWvYo4i5pEmJikSbZb3jwhOflemp9TVmEAIHD/0miOvCDR+VAkegnV8N9SZSoeHWDoMDuIBJESuYOC7oig+9EbIO7U9fO13HWJvaaWEjCFOD+biF3zb8gVBtsVymh24kUhfJrVPQ/Mp/5oTPgM/6ytWA/Y+13fnKVKZnsRh4eHH8bl233NDuKTLROr2lTtlKUc4qpHmJkSEmX7fkyByf6VfcDYWJWFi4x4NIRCu7zKbLkNScnAyZS/9TWfKhKiQLn95+KJ6MkS5xuhHR00RHXtB8LRllW+7gfEvfGMQ/FdaxK0eUOFVZ4lc6bmIDNcTrMR71qdV8TtFsJv6qTvbTLaxNvfk34mtlso/ZUVrNoF8nvL9EhnWdwm5hUp8h0Fh2xpdZ3dhdqwdTUVkhe+o3d9LhbD+adq92Un0Ex2t7ArtePFLJGbHB624g+KyE3LeOHYLaczcf1x5lCPrxV6ZfgYwrozXCgjH2Abytv1LVl4FzU6VZaFH54g7+N5gAVsAe0NbZROHsds/7q+lUuNSflzeudE+kkQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e61748e5-9fac-4364-a353-08d871f67dab
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:11:15.8533 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: DN+fmfS9cZqBDzpjV/3wruRHedENWhtH/gGbKiz6xt9tn3M+mQ6/wO4nxIQYGT28RLoFpTJv+KoYnU3xAZOgvHDBGkgtxaODu2FRSm7E4GE=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
-Received-SPF: pass client-ip=40.107.22.128;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:11:16
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201011182608.gfmfvdioiyyaxrfq@sekoia-pc.home.lmichel.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.253,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,35 +107,203 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org,
+ Havard Skinnemoen <hskinnemoen@google.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We leak local_err and don't report failure to the caller. It's
-definitely wrong, let's fix.
+On 10/11/20 8:26 PM, Luc Michel wrote:
+> On 18:18 Sat 10 Oct     , Philippe Mathieu-Daudé wrote:
+>> On 10/10/20 3:57 PM, Luc Michel wrote:
+>>> Those reset values have been extracted from a Raspberry Pi 3 model B
+>>> v1.2, using the 2020-08-20 version of raspios. The dump was done using
+>>> the debugfs interface of the CPRMAN driver in Linux (under
+>>> '/sys/kernel/debug/clk'). Each exposed clock tree stage (PLLs, channels
+>>> and muxes) can be observed by reading the 'regdump' file (e.g.
+>>> 'plla/regdump').
+>>>
+>>> Those values are set by the Raspberry Pi firmware at boot time (Linux
+>>> expects them to be set when it boots up).
+>>>
+>>> Some stages are not exposed by the Linux driver (e.g. the PLL B). For
+>>> those, the reset values are unknown and left to 0 which implies a
+>>> disabled output.
+>>>
+>>> Once booted in QEMU, the final clock tree is very similar to the one
+>>> visible on real hardware. The differences come from some unimplemented
+>>> devices for which the driver simply disable the corresponding clock.
+>>>
+>>> Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Signed-off-by: Luc Michel <luc@lmichel.fr>
+>>> ---
+>>>    include/hw/misc/bcm2835_cprman_internals.h | 269 +++++++++++++++++++++
+>>>    hw/misc/bcm2835_cprman.c                   |  31 +++
+>>>    2 files changed, 300 insertions(+)
+>>>
+>>> diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
+>>> index a6e799075f..339759b307 100644
+>>> --- a/include/hw/misc/bcm2835_cprman_internals.h
+>>> +++ b/include/hw/misc/bcm2835_cprman_internals.h
+>>> @@ -745,6 +745,275 @@ static inline void set_clock_mux_init_info(BCM2835CprmanState *s,
+>>>        mux->reg_div = &s->regs[CLOCK_MUX_INIT_INFO[id].cm_offset + 1];
+>>>        mux->int_bits = CLOCK_MUX_INIT_INFO[id].int_bits;
+>>>        mux->frac_bits = CLOCK_MUX_INIT_INFO[id].frac_bits;
+>>>    }
+>>> +
+>>> +/*
+>>> + * Object reset info
+>>> + * Those values have been dumped from a Raspberry Pi 3 Model B v1.2 using the
+>>> + * clk debugfs interface in Linux.
+>>> + */
+>>> +typedef struct PLLResetInfo {
+>>> +    uint32_t cm;
+>>> +    uint32_t a2w_ctrl;
+>>> +    uint32_t a2w_ana[4];
+>>> +    uint32_t a2w_frac;
+>>> +} PLLResetInfo;
+>>> +
+>>> +static const PLLResetInfo PLL_RESET_INFO[] = {
+>>> +    [CPRMAN_PLLA] = {
+>>> +        .cm = 0x0000008a,
+>>> +        .a2w_ctrl = 0x0002103a,
+>>> +        .a2w_frac = 0x00098000,
+>>> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
+>>> +    },
+>>> +
+>>> +    [CPRMAN_PLLC] = {
+>>> +        .cm = 0x00000228,
+>>> +        .a2w_ctrl = 0x0002103e,
+>>> +        .a2w_frac = 0x00080000,
+>>> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
+>>> +    },
+>>> +
+>>> +    [CPRMAN_PLLD] = {
+>>> +        .cm = 0x0000020a,
+>>> +        .a2w_ctrl = 0x00021034,
+>>> +        .a2w_frac = 0x00015556,
+>>> +        .a2w_ana = { 0x00000000, 0x00144000, 0x00000000, 0x00000100 }
+>>> +    },
+>>> +
+>>> +    [CPRMAN_PLLH] = {
+>>> +        .cm = 0x00000000,
+>>> +        .a2w_ctrl = 0x0002102d,
+>>> +        .a2w_frac = 0x00000000,
+>>> +        .a2w_ana = { 0x00900000, 0x0000000c, 0x00000000, 0x00000000 }
+>>> +    },
+>>> +
+>>> +    [CPRMAN_PLLB] = {
+>>> +        /* unknown */
+>>> +        .cm = 0x00000000,
+>>> +        .a2w_ctrl = 0x00000000,
+>>> +        .a2w_frac = 0x00000000,
+>>> +        .a2w_ana = { 0x00000000, 0x00000000, 0x00000000, 0x00000000 }
+>>> +    }
+>>> +};
+>>> +
+>>> +typedef struct PLLChannelResetInfo {
+>>> +    /*
+>>> +     * Even though a PLL channel has a CM register, it shares it with its
+>>> +     * parent PLL. The parent already takes care of the reset value.
+>>> +     */
+>>> +    uint32_t a2w_ctrl;
+>>> +} PLLChannelResetInfo;
+>>> +
+>>> +static const PLLChannelResetInfo PLL_CHANNEL_RESET_INFO[] = {
+>>> +    [CPRMAN_PLLA_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
+>>> +    [CPRMAN_PLLA_CHANNEL_CORE] = { .a2w_ctrl = 0x00000003 },
+>>> +    [CPRMAN_PLLA_CHANNEL_PER] = { .a2w_ctrl = 0x00000000 }, /* unknown */
+>>> +    [CPRMAN_PLLA_CHANNEL_CCP2] = { .a2w_ctrl = 0x00000100 },
+>>> +
+>>> +    [CPRMAN_PLLC_CHANNEL_CORE2] = { .a2w_ctrl = 0x00000100 },
+>>> +    [CPRMAN_PLLC_CHANNEL_CORE1] = { .a2w_ctrl = 0x00000100 },
+>>> +    [CPRMAN_PLLC_CHANNEL_PER] = { .a2w_ctrl = 0x00000002 },
+>>> +    [CPRMAN_PLLC_CHANNEL_CORE0] = { .a2w_ctrl = 0x00000002 },
+>>> +
+>>> +    [CPRMAN_PLLD_CHANNEL_DSI0] = { .a2w_ctrl = 0x00000100 },
+>>> +    [CPRMAN_PLLD_CHANNEL_CORE] = { .a2w_ctrl = 0x00000004 },
+>>> +    [CPRMAN_PLLD_CHANNEL_PER] = { .a2w_ctrl = 0x00000004 },
+>>> +    [CPRMAN_PLLD_CHANNEL_DSI1] = { .a2w_ctrl = 0x00000100 },
+>>> +
+>>> +    [CPRMAN_PLLH_CHANNEL_AUX] = { .a2w_ctrl = 0x00000004 },
+>>> +    [CPRMAN_PLLH_CHANNEL_RCAL] = { .a2w_ctrl = 0x00000000 },
+>>> +    [CPRMAN_PLLH_CHANNEL_PIX] = { .a2w_ctrl = 0x00000000 },
+>>> +
+>>> +    [CPRMAN_PLLB_CHANNEL_ARM] = { .a2w_ctrl = 0x00000000 }, /* unknown */
+>>> +};
+>>> +
+>>> +typedef struct ClockMuxResetInfo {
+>>> +    uint32_t cm_ctl;
+>>> +    uint32_t cm_div;
+>>> +} ClockMuxResetInfo;
+>>> +
+>>> +static const ClockMuxResetInfo CLOCK_MUX_RESET_INFO[] = {
+>>> +    [CPRMAN_CLOCK_GNRIC] = {
+>>> +        .cm_ctl = 0, /* unknown */
+>>> +        .cm_div = 0
+>>> +    },
+>>> +
+>> [...]
+>>> +};
+>>> +
+>>>    #endif
+>>> diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+>>> index 7a7401963d..7e415a017c 100644
+>>> --- a/hw/misc/bcm2835_cprman.c
+>>> +++ b/hw/misc/bcm2835_cprman.c
+>>> @@ -51,10 +51,21 @@
+>>>    #include "hw/misc/bcm2835_cprman_internals.h"
+>>>    #include "trace.h"
+>>>    /* PLL */
+>>> +static void pll_reset(DeviceState *dev)
+>>> +{
+>>> +    CprmanPllState *s = CPRMAN_PLL(dev);
+>>> +    const PLLResetInfo *info = &PLL_RESET_INFO[s->id];
+>>
+>> Hmm so we overwrite various values from PLL_INIT_INFO.
+>>> +
+>>> +    *s->reg_cm = info->cm;
+>>> +    *s->reg_a2w_ctrl = info->a2w_ctrl;
+>>> +    memcpy(s->reg_a2w_ana, info->a2w_ana, sizeof(info->a2w_ana));
+>>> +    *s->reg_a2w_frac = info->a2w_frac;
+>>
+>> set_pll_init_info() can be simplified as:
+>>
+>>      pll->id = id;
+>>      pll->prediv_mask = PLL_INIT_INFO[id].prediv_mask;
+>>
+>> Or directly in cprman_init():
+>>
+>>      &s->plls[i]->id = i;
+>>      &s->plls[i]->prediv_mask = PLL_INIT_INFO[i].prediv_mask;
+>>
+>> And the rest directly implemented in pll_reset().
+>>
+>> Maybe not, but having pll_reset() added in patch #8/15
+>> "bcm2835_cprman: add a PLL channel skeleton implementation"
+>> would make this patch review easier ;)
+> 
+> Hi Phil,
+> 
+> I think there is a misunderstanding here:
+>    - set_xxx_init_info functions set (among others) register pointers
+>      to alias the common register array "regs" in BCM2835CprmanState.
+>      This is really an initialization step (in the sense of the QOM
+>      object). Those pointers won't move during the object's lifetime.
+>    - xxx_reset however (like e.g. xxx_update) _dereferences_ those
+>      pointers to access the registers data (in this case to set their
+>      reset values).
+> 
+> Doing so greatly decreases code complexity because:
+>    - read/write functions can directly access the common "regs" array
+>      without further decoding.
+>    - Each PLL shares a register with all its channels (A2W_CTRL). With
+>      this scheme, they simply all have a pointer aliasing the same data.
+>    - A lot a registers are unknown/unimplemented.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- blockdev.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/blockdev.c b/blockdev.c
-index 3a896181fd..db59be7c68 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -1823,8 +1823,7 @@ static void drive_backup_prepare(BlkActionState *common, Error **errp)
-     aio_context_acquire(aio_context);
- 
-     if (set_backing_hd) {
--        bdrv_set_backing_hd(target_bs, source, &local_err);
--        if (local_err) {
-+        if (bdrv_set_backing_hd(target_bs, source, errp) < 0) {
-             goto unref;
-         }
-     }
--- 
-2.21.3
-
+OK, thanks for clarifying.
+(I wanted to split the boilerplate code from the dumped constants).
 
