@@ -2,74 +2,73 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B02B8C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:09:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10998C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:14:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B7552083B
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:09:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3278220848
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:14:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R5QtCMyK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B7552083B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gx3faZwG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3278220848
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44066 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTPTq-0002YM-T5
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:09:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51636)
+	id 1kTPZL-0005Ni-0Y
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:14:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52860)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTPT5-00026i-Lh
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:08:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33320)
+ id 1kTPY3-0004Sb-Es
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:13:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28833)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTPT3-0005Fa-68
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:08:23 -0400
+ id 1kTPXz-0005tU-Gz
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:13:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602853698;
+ s=mimecast20190719; t=1602854004;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fEcgZvNyGi00z6l/NYVkHO5KlLYfjwhUZbKBa/t1Hyk=;
- b=R5QtCMyKWpcX2qiiyqyz8l5bZV4maTN2uE5RZbV94aZAIqrId+/uxviI7ybjtGnpOHT2OE
- o9nAz+XWbGn5PTCtxNTjSgnwGpSb4ATrHGXQA9U4gizgyvbhY0CJpadobEF40ZqnlRxO6V
- HJM866h2Wv0lyUuG0J1c69LnMJyop4Y=
+ bh=KzaS+0Dq5U2B4OHO/ltbVkJ/zZvXt3LBkeGBg3Tmo4w=;
+ b=Gx3faZwGzgd0VgPciu63S76rBBQktSgVK3I5VDNe08CjNNeFt6ME+fDqGkRiW7Gqzrkd7s
+ cbX7uHMto/PuhQspgqhqScIi/mafj7XTBA5B/jatcU+4J0oYK6cDiBKurMEvbm4/ZGCeSQ
+ 8JOU7T50vDu0CgdCYsMoZoobjI4TcV0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-458-OrcRLewpMkeEQ1i9lbpWTg-1; Fri, 16 Oct 2020 09:08:14 -0400
-X-MC-Unique: OrcRLewpMkeEQ1i9lbpWTg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-530-cFLTttwZOXC6ztBQ9L6eTQ-1; Fri, 16 Oct 2020 09:13:23 -0400
+X-MC-Unique: cFLTttwZOXC6ztBQ9L6eTQ-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 387DF640A4;
- Fri, 16 Oct 2020 13:08:13 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAE981018F87;
+ Fri, 16 Oct 2020 13:13:21 +0000 (UTC)
 Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id D925E27BC3;
- Fri, 16 Oct 2020 13:08:04 +0000 (UTC)
-Subject: Re: [PATCH v10 09/10] virtio-iommu: Set supported page size mask
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 331927D4E3;
+ Fri, 16 Oct 2020 13:13:09 +0000 (UTC)
+Subject: Re: [PATCH v10 00/10] virtio-iommu: VFIO integration
 To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
  alex.williamson@redhat.com
 References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-10-jean-philippe@linaro.org>
 From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <53892fd2-a69f-bd83-4167-b1d2569fb4c3@redhat.com>
-Date: Fri, 16 Oct 2020 15:08:03 +0200
+Message-ID: <8d8ddef8-45bc-92ad-c469-95e65fe8aec4@redhat.com>
+Date: Fri, 16 Oct 2020 15:13:08 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20201008171558.410886-10-jean-philippe@linaro.org>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <20201008171558.410886-1-jean-philippe@linaro.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -110,101 +109,66 @@ Sender: "Qemu-devel"
 Hi Jean,
 
 On 10/8/20 7:15 PM, Jean-Philippe Brucker wrote:
-> From: Bharat Bhushan <bbhushan2@marvell.com>
+> This series adds support for VFIO endpoints to virtio-iommu.
 > 
-> The virtio-iommu device can deal with arbitrary page sizes for virtual
-> endpoints, but for endpoints assigned with VFIO it must follow the page
-> granule used by the host IOMMU driver.
+> Versions 1 to 9 were posted by Bharat Bhushan, but I am taking over for
+> now since he doesn't have much time to spend on it. Thanks again Bharat
+> for the work!
 > 
-> Implement the interface to set the vIOMMU page size mask, called by VFIO
-> for each endpoint. We assume that all host IOMMU drivers use the same
-> page granule (the host page granule). Override the page_size_mask field
-> in the virtio config space.
+> Two major changes since [v9]:
 > 
-> Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> * Don't use per-endoint page_size_mask properties. Instead keep a global
+>   page size for the virtio-iommu device, updated when adding a VFIO
+>   endpoint. Reject hotplug if the page size is incompatible.
+> 
+> * Try to make the MAP/UNMAP paths more efficient, by keeping track of
+>   memory region within the endpoint structure.
+> 
+> More testing would be appreciated, since I can only test using a software
+> model as host at the moment. But it does seem to hold well with PCIe
+> hotplug/unplug, and pass-through to guest userspace, which are no mean
+> feat.
 
-> ---
-> v10: Use global page mask, allowing VFIO to override it until boot.
-> ---
->  hw/virtio/virtio-iommu.c | 51 ++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 51 insertions(+)
-> 
-> diff --git a/hw/virtio/virtio-iommu.c b/hw/virtio/virtio-iommu.c
-> index 8823bfc804a..dd0b3093d1b 100644
-> --- a/hw/virtio/virtio-iommu.c
-> +++ b/hw/virtio/virtio-iommu.c
-> @@ -914,6 +914,56 @@ static int virtio_iommu_notify_flag_changed(IOMMUMemoryRegion *iommu_mr,
->      return 0;
->  }
->  
-> +static int virtio_iommu_set_page_size_mask(IOMMUMemoryRegion *mr,
-> +                                           uint64_t page_size_mask,
-> +                                           Error **errp)
-> +{
-> +    int new_granule, old_granule;
-> +    IOMMUDevice *sdev = container_of(mr, IOMMUDevice, iommu_mr);
-> +    VirtIOIOMMU *s = sdev->viommu;
-> +
-> +    if (!page_size_mask) {
-set errp
-> +        return -1;
-> +    }
-> +
-> +    new_granule = ctz64(page_size_mask);
-> +    old_granule = ctz64(s->config.page_size_mask);
+I tested vhost migration and the following configurations:
+host 4K- guest 4K: vhost, vfio, vfio hotplug
+host 64K - guest 64K: vhost, vfio, vfio hotplug
+host 4K - guest 64K: vhost, vfio, vfio hoplug
 
-I think this would be interesting to add a trace point
-> +
-> +    /*
-> +     * Modifying the page size after machine initialization isn't supported.
-> +     * Having a different mask is possible but the guest will use sub-optimal
-> +     * block sizes, so warn about it.
-> +     */
-> +    if (qdev_hotplug) {
-> +        if (new_granule != old_granule) {
-> +            error_setg(errp,
-> +                       "virtio-iommu page mask 0x%"PRIx64
-> +                       " is incompatible with mask 0x%"PRIx64,
-> +                       s->config.page_size_mask, page_size_mask);
-> +            return -1;
-> +        } else if (page_size_mask != s->config.page_size_mask) {
-> +            warn_report("virtio-iommu page mask 0x%"PRIx64
-> +                        " does not match 0x%"PRIx64,
-> +                        s->config.page_size_mask, page_size_mask);
-> +        }
-> +        return 0;
-> +    }
-> +
-> +    /*
-> +     * Disallow shrinking the page size. For example if an endpoint only
-> +     * supports 64kB pages, we can't globally enable 4kB pages. But that
-> +     * shouldn't happen, the host is unlikely to setup differing page granules.
-> +     * The other bits are only hints describing optimal block sizes.
-> +     */
-> +    if (new_granule < old_granule) {
-> +        error_setg(errp, "memory region shrinks the virtio-iommu page granule");
-> +        return -1;
-> +    }
-> +
-> +    s->config.page_size_mask = page_size_mask;
-> +    return 0;
-> +}
-> +
->  static void virtio_iommu_device_realize(DeviceState *dev, Error **errp)
->  {
->      VirtIODevice *vdev = VIRTIO_DEVICE(dev);
-> @@ -1146,6 +1196,7 @@ static void virtio_iommu_memory_region_class_init(ObjectClass *klass,
->      imrc->translate = virtio_iommu_translate;
->      imrc->replay = virtio_iommu_replay;
->      imrc->notify_flag_changed = virtio_iommu_notify_flag_changed;
-> +    imrc->iommu_set_page_size_mask = virtio_iommu_set_page_size_mask;
->  }
->  
->  static const TypeInfo virtio_iommu_info = {
-> 
+All those configs worked for me. I haven't noticed any isse with those.
+
 Thanks
 
 Eric
+> 
+> Note that one page size combination is not supported: host 64kB guest
+> 4kB cannot work, because the host IOMMU driver will automatically pick
+> 64kB pages which prevents mapping at a smaller granule. Supporting this
+> case would require introducing a page size negotiation mechanism from
+> the guest all the way to the host IOMMU driver. Possible, but not
+> planned at the moment.
+> 
+> [v9] https://lore.kernel.org/qemu-devel/20200323084617.1782-1-bbhushan2@marvell.com/
+> 
+> Bharat Bhushan (7):
+>   virtio-iommu: Add memory notifiers for map/unmap
+>   virtio-iommu: Call memory notifiers in attach/detach
+>   virtio-iommu: Add replay() memory region callback
+>   virtio-iommu: Add notify_flag_changed() memory region callback
+>   memory: Add interface to set iommu page size mask
+>   vfio: Set IOMMU page size as per host supported page size
+>   virtio-iommu: Set supported page size mask
+> 
+> Jean-Philippe Brucker (3):
+>   virtio-iommu: Fix virtio_iommu_mr()
+>   virtio-iommu: Store memory region in endpoint struct
+>   vfio: Don't issue full 2^64 unmap
+> 
+>  include/exec/memory.h    |  26 +++++
+>  hw/vfio/common.c         |  19 ++++
+>  hw/virtio/virtio-iommu.c | 204 ++++++++++++++++++++++++++++++++++++++-
+>  softmmu/memory.c         |  13 +++
+>  hw/virtio/trace-events   |   5 +
+>  5 files changed, 265 insertions(+), 2 deletions(-)
+> 
 
 
