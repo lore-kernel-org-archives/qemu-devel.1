@@ -7,85 +7,101 @@ X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10998C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:14:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3595C433E7
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:18:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3278220848
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D3F22083B
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 13:18:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gx3faZwG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3278220848
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QbqYt8Tq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D3F22083B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54376 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTPZL-0005Ni-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:14:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52860)
+	id 1kTPcg-0007YT-K8
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 09:18:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTPY3-0004Sb-Es
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:13:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28833)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kTPav-0006aD-5Q
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:16:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56665)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kTPXz-0005tU-Gz
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:13:30 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kTPat-0006Sl-IX
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 09:16:28 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602854004;
+ s=mimecast20190719; t=1602854186;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=KzaS+0Dq5U2B4OHO/ltbVkJ/zZvXt3LBkeGBg3Tmo4w=;
- b=Gx3faZwGzgd0VgPciu63S76rBBQktSgVK3I5VDNe08CjNNeFt6ME+fDqGkRiW7Gqzrkd7s
- cbX7uHMto/PuhQspgqhqScIi/mafj7XTBA5B/jatcU+4J0oYK6cDiBKurMEvbm4/ZGCeSQ
- 8JOU7T50vDu0CgdCYsMoZoobjI4TcV0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-530-cFLTttwZOXC6ztBQ9L6eTQ-1; Fri, 16 Oct 2020 09:13:23 -0400
-X-MC-Unique: cFLTttwZOXC6ztBQ9L6eTQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DAE981018F87;
- Fri, 16 Oct 2020 13:13:21 +0000 (UTC)
-Received: from [10.36.113.210] (ovpn-113-210.ams2.redhat.com [10.36.113.210])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 331927D4E3;
- Fri, 16 Oct 2020 13:13:09 +0000 (UTC)
-Subject: Re: [PATCH v10 00/10] virtio-iommu: VFIO integration
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
- alex.williamson@redhat.com
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <8d8ddef8-45bc-92ad-c469-95e65fe8aec4@redhat.com>
-Date: Fri, 16 Oct 2020 15:13:08 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ bh=aBB4cVh25BA/qfLC2sloIi+6afQ0zRe8vkIieM2qN4I=;
+ b=QbqYt8Tq7Euqf7htFTYmrJZWQsAkKh326J6FsKbFvuOsuo5WCz+Oy6JZf8NY2guE8pf3VO
+ n80Qo0q0jH+6VaELdCIh0QY5XqLLM+JqndgbWZLqvnWsZtAFpz84pnxdt3hMLif5gBZgza
+ AHnHkEONw3D98hdQaxV0NbMvCrypgN0=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-239-RXV2IQZKNzyGlH46v_wXrA-1; Fri, 16 Oct 2020 09:16:24 -0400
+X-MC-Unique: RXV2IQZKNzyGlH46v_wXrA-1
+Received: by mail-wm1-f71.google.com with SMTP id i9so718845wml.2
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 06:16:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=aBB4cVh25BA/qfLC2sloIi+6afQ0zRe8vkIieM2qN4I=;
+ b=GNXQNqDPuQHBz7lmBfP4G5lWwEJSiPEy/JSEmS1YDXjVtYDgGYFFxnpJh5BDIMTJBh
+ yt5dmS2mFLlqFOFlQI43qG4iPdmDu+RX/I5Kh2hpUzxhqZrn75sayZkqO/j6F6p/CJyW
+ gZVudfs8/iS72x/Y8VTA2V3MK3qIPZ1K15ETuYE5qnVeK6vagdJxUMuHIGJR1ahex450
+ J+yAs8emQp9E8NQycdcNwB/a/aSRWkwikjxsqTbK6OKUAv9WShfKFtISSaNyp7E75LtT
+ Z04CfC40xjS4iiVHCmgnSG9GqG5EyWdUfTAFkKhkLPqEKa4LSXvgL3gTLw61N9Hb2RQ0
+ l50Q==
+X-Gm-Message-State: AOAM531QSh7r9GI3VXs/SPV+IH+A58ssQog5QngkU+/6DDRueH1qQ040
+ 3n4NhM09rUtrToPADgzTD3rAb/QHB0oyBlQjVRQWsKNXhEXgOloQnf2fQixg8/fTuc4ocQMf1mB
+ n68zy31BO0S3xOWI=
+X-Received: by 2002:a05:600c:4147:: with SMTP id
+ h7mr3679997wmm.45.1602854183833; 
+ Fri, 16 Oct 2020 06:16:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzGoT2wM6A21zPdThVwWUaFZcWHfpB41RPXA9aTR8J/lFo5F46E8O45rYwg3s6q67cpzkDx9Q==
+X-Received: by 2002:a05:600c:4147:: with SMTP id
+ h7mr3679867wmm.45.1602854182094; 
+ Fri, 16 Oct 2020 06:16:22 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id 24sm2729984wmg.8.2020.10.16.06.16.20
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 06:16:21 -0700 (PDT)
+Subject: Re: [PATCH 0/4] RfC: microvm: add second ioapic
+To: Gerd Hoffmann <kraxel@redhat.com>, qemu-devel@nongnu.org
+References: <20201016114328.18835-1-kraxel@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ffd81f03-b2a0-2c58-9f13-c956dfd1ca17@redhat.com>
+Date: Fri, 16 Oct 2020 15:16:20 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201008171558.410886-1-jean-philippe@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201016114328.18835-1-kraxel@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eric.auger@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 03:57:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/15 20:29:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -23
 X-Spam_score: -2.4
 X-Spam_bar: --
 X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -100,75 +116,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, bbhushan2@marvell.com, qemu-devel@nongnu.org,
- peterx@redhat.com, mst@redhat.com
+Cc: Laurent Vivier <lvivier@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Sergio Lopez <slp@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jean,
+On 10/16/20 1:43 PM, Gerd Hoffmann wrote:
+> Add a second ioapic to microvm.  Gives us more IRQ lines we can
+> use for virtio-mmio devices.  Bump number of possible virtio-mmio
+> devices from 8 to 24.
+> 
+> Gerd Hoffmann (4):
+>    microvm: make number of virtio transports runtime configurable
+>    microvm: make pcie irq base runtime configurable
+>    microvm: add second ioapic
+>    microvm: reconfigure irqs if second ioapic is available
 
-On 10/8/20 7:15 PM, Jean-Philippe Brucker wrote:
-> This series adds support for VFIO endpoints to virtio-iommu.
-> 
-> Versions 1 to 9 were posted by Bharat Bhushan, but I am taking over for
-> now since he doesn't have much time to spend on it. Thanks again Bharat
-> for the work!
-> 
-> Two major changes since [v9]:
-> 
-> * Don't use per-endoint page_size_mask properties. Instead keep a global
->   page size for the virtio-iommu device, updated when adding a VFIO
->   endpoint. Reject hotplug if the page size is incompatible.
-> 
-> * Try to make the MAP/UNMAP paths more efficient, by keeping track of
->   memory region within the endpoint structure.
-> 
-> More testing would be appreciated, since I can only test using a software
-> model as host at the moment. But it does seem to hold well with PCIe
-> hotplug/unplug, and pass-through to guest userspace, which are no mean
-> feat.
-
-I tested vhost migration and the following configurations:
-host 4K- guest 4K: vhost, vfio, vfio hotplug
-host 64K - guest 64K: vhost, vfio, vfio hotplug
-host 4K - guest 64K: vhost, vfio, vfio hoplug
-
-All those configs worked for me. I haven't noticed any isse with those.
-
-Thanks
-
-Eric
-> 
-> Note that one page size combination is not supported: host 64kB guest
-> 4kB cannot work, because the host IOMMU driver will automatically pick
-> 64kB pages which prevents mapping at a smaller granule. Supporting this
-> case would require introducing a page size negotiation mechanism from
-> the guest all the way to the host IOMMU driver. Possible, but not
-> planned at the moment.
-> 
-> [v9] https://lore.kernel.org/qemu-devel/20200323084617.1782-1-bbhushan2@marvell.com/
-> 
-> Bharat Bhushan (7):
->   virtio-iommu: Add memory notifiers for map/unmap
->   virtio-iommu: Call memory notifiers in attach/detach
->   virtio-iommu: Add replay() memory region callback
->   virtio-iommu: Add notify_flag_changed() memory region callback
->   memory: Add interface to set iommu page size mask
->   vfio: Set IOMMU page size as per host supported page size
->   virtio-iommu: Set supported page size mask
-> 
-> Jean-Philippe Brucker (3):
->   virtio-iommu: Fix virtio_iommu_mr()
->   virtio-iommu: Store memory region in endpoint struct
->   vfio: Don't issue full 2^64 unmap
-> 
->  include/exec/memory.h    |  26 +++++
->  hw/vfio/common.c         |  19 ++++
->  hw/virtio/virtio-iommu.c | 204 ++++++++++++++++++++++++++++++++++++++-
->  softmmu/memory.c         |  13 +++
->  hw/virtio/trace-events   |   5 +
->  5 files changed, 265 insertions(+), 2 deletions(-)
-> 
+After looking at Laurent's m68k virt machine,
+I wonder if it is possible to use the Goldfish-PIC
+with the MicroVM instead (or another Goldfish machine
+type).
 
 
