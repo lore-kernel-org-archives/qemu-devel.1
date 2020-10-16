@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7651BC43457
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:18:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8FEC43457
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:21:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8DE620874
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:18:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 49705208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:21:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EFmUUrXw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8DE620874
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uIg+ft8a"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 49705208E4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60792 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTTND-0000NJ-Js
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:18:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35718)
+	id 1kTTQ5-0003r6-8X
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:21:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGN-00037Y-5Y; Fri, 16 Oct 2020 13:11:31 -0400
-Received: from mail-eopbgr00100.outbound.protection.outlook.com
- ([40.107.0.100]:3705 helo=EUR02-AM5-obe.outbound.protection.outlook.com)
+ id 1kTTGQ-0003Fo-FJ; Fri, 16 Oct 2020 13:11:34 -0400
+Received: from mail-am6eur05on2128.outbound.protection.outlook.com
+ ([40.107.22.128]:42592 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGJ-0007Mv-0A; Fri, 16 Oct 2020 13:11:30 -0400
+ id 1kTTGO-0007NG-6d; Fri, 16 Oct 2020 13:11:34 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LaQcZrcSWohzNVWOue4YFpruciwuJG45QH34fJQ2iTVGI4Z70BzKgpHI6bDYD0dKuue7jvo20LQU9M/VXMbTHef/m18hPibMf+h6+qHnxd7hL6BeZ24+NikJ1ZmtcLtyPF6gs1OfBsfu/UFUjUs5b3QskQ4xEwUUmpIIp4HghVTj3pribgIUexypi0KOtFHLtjFfx8J8jaTf4YYHJ4lD2HIHXhHrhDLgcT/i1cd973URSElKuzEz4scCwje11MzRGdTLoL4lzCPjnvirJGdByheZmHp/HToPYoMZ2gSZU4Pjc/4cF/wEMCbaR/I6qt73DWcUF9SmAiTvWdLz0T7Ncw==
+ b=l8MyftO8gFhZyrZ8EK4eHBjLdcXMndbnUcB4Z2P4vY+Q7NObGJdonQqfBIeODh7famXhOKZpN3C1+E7FAUjMHByaYpSOaBni6tgNK8fWSFW0B7s5bofHVUQcDPdZ/+o8mVfK5M7/z5AedxwCia4hiKLgP6ig/lQ13QBYuW4W22Zjat29whvQHkz4s9etECxlbFRoqWJdH80EN4P6Lt/9JPnsO4DtLnte3S6Rs1+VOXKapRe4IIIF3w0u5jJhH3SwiBxptMn9rT7qj2JaK/1TEYFwY63WcLY7/9UpPFi6n8gIzqLmnFLlwJtE93+TUIyQCMRIdF7v9NneiPLGewq03g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cm+6+FzPqWXrAb/weFgm9UyRar/9V9d6JgPD3kd9T3c=;
- b=QTSvYzr38ldqWvvkeube3LeJIUSIhkd6PlAgr/SSZmRiAdmfxD30FraZSX9EAq75XLYSHoFZ02wuSFwUkroH8PR4uGi+2bh2908eYAGZbvO/41ykyJgBr+hszrn7KJs+39425FAkN+l9zp4aPya2LL3dkRgxicDkkNebRtzvA6RukNr6bBH6vEn6jssVlvzjfg9hNaVYqtq386PXN7TOSOkHGd+O4xexz2J8QPVeIeLse2TQP9c4a6KsNyUECuy8E+UG7zjAmRDAoQm7rQO/S7QP0cl3L6CzCVKhYczUydTPLNp+yalu9QdZnyLpO7KiWVMePWdn8p/+1sP4NJR0hQ==
+ bh=LzwI6yjtID0+Lvy8WbOn3esTTKJbyyDELKSbFPHnepw=;
+ b=nLGFngZVfdAZS1BGPK5s58mY9gYqCvTnTSXYgP2IDU6FFiIgP96hIQDFuLZedl6lK00md2TTxXFHrbBuk2PhEcr1PiM9GsfXfv8PHRwim11ZmhNGcm5yGsIJvfkR6GBVlAj1IBsBKo9Ed29VGKhB4S+m5sJbaSIjobLTRbX8mvtZztpJebLU8ZMZ7O13FzhZ7vFjSMsYp3FjVMGAol2t19SQ5RXZo/eOuvcCqKY4BbMnZgU9rRwte5XozVyXel1HJi9DnUX4b1IX1KxXLnfk3xIRkg+0ilaHRSvCkLvsT+xMbOIiyBW1iuLkFoDaXffRAwCcdbWDAVU+1r/Cy3wmyg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Cm+6+FzPqWXrAb/weFgm9UyRar/9V9d6JgPD3kd9T3c=;
- b=EFmUUrXwyvLCHN7T4tuE5e7VtzBOTyf9dNbVoDfo3cYJdxj+DE1Mr6n63Tcx+pj7eSN0OVMTOtN/WFPuCsRnW68csdCktCTl9ZIcgd3RbLzAS9TM8PcHTu6Q4K9z7OiJnS/0kr5GajDMt9pMWtG98N/VOR4Xdar/c/8giQQRSAU=
+ bh=LzwI6yjtID0+Lvy8WbOn3esTTKJbyyDELKSbFPHnepw=;
+ b=uIg+ft8aw5jjfWCEGwAymkCUwqcsx8CIQJnJJR8uaWqwK7xcrmJAHAD26Qk0AD+NQS4i63XVCuu37i0FbJyHx+r68ldUq+8Sy/1Owj7CWoz2ixz5v2rz043Ni/NIsbsP3GnPfUNYLvmjxLUgCERpGaTH+3DPvar2chMZFi2OuqU=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0801MB1972.eurprd08.prod.outlook.com (2603:10a6:203:4b::11)
+ by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Fri, 16 Oct
- 2020 17:11:14 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.24; Fri, 16 Oct
+ 2020 17:11:20 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Fri, 16 Oct 2020
- 17:11:14 +0000
+ 17:11:20 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
@@ -66,10 +66,10 @@ Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
  stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
  ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org,
  Greg Kurz <groug@kaod.org>
-Subject: [PATCH v3 03/13] block: check return value of bdrv_open_child and
- drop error propagation
-Date: Fri, 16 Oct 2020 20:10:47 +0300
-Message-Id: <20201016171057.6182-4-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 08/13] block/qcow2: qcow2_get_specific_info(): drop error
+ propagation
+Date: Fri, 16 Oct 2020 20:10:52 +0300
+Message-Id: <20201016171057.6182-9-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201016171057.6182-1-vsementsov@virtuozzo.com>
 References: <20201016171057.6182-1-vsementsov@virtuozzo.com>
@@ -84,43 +84,44 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.69) by
  FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::13) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.9 via Frontend Transport; Fri, 16 Oct 2020 17:11:13 +0000
+ 15.20.3499.9 via Frontend Transport; Fri, 16 Oct 2020 17:11:19 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: c59e24db-fe0e-4651-72c5-08d871f67d0a
-X-MS-TrafficTypeDiagnostic: AM5PR0801MB1972:
+X-MS-Office365-Filtering-Correlation-Id: bd8393a8-f290-4483-72de-08d871f68038
+X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0801MB197206DA6DDEB38695576D94C1030@AM5PR0801MB1972.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:126;
+X-Microsoft-Antispam-PRVS: <AM7PR08MB5495DA7962FC3A67B1D848BBC1030@AM7PR08MB5495.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:298;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wegNg9RjcQwFpjVCiuNXiWmlTo7k6NgcBz1g+1wqm0r/txypn+X/XMwEkBSDV16nQbKPBBQ7KL5QMHKb6fmdc8mz1aRJFWNzwMydpO6xhLerYiQQnoOOYHQ5pGvGBOguGe43z3aS/KDQ6qCs0hmsVGZhImvy9NMFiNOs/2ixFNsg/NHayqaFqMz7f5hrssgbRUSzrUscK1+cKC06qF8WdJ8ycCo2pxr7y899742IjDdBuiJ7vc7uKKJ0VHQckWxg3mkBRMj1hioTa7A9j7RFwun5+BmGpQCyjipACAWYAu4X8yqLhtiK3jaAqYuGh6nQ0fSAgRGfiRDHzG7voS5VBbinOwzHGstaFskHLXY01hArQiJ/YRd2CKJR63U7li6s
+X-Microsoft-Antispam-Message-Info: ELXbvjnpXVv2hWeJWchXH657xqcqoeeQypZnPF40ugWc6TRjqH9+16qs1B/8wkmeQn9eZ6fvN7+t7XCqc8cB1Y78LbePncjA1ATA7Nh2AE32zwlHMJtRrBLpo/0k+0Nk6T2PvwXcRDWwDWWSqMIcaM3kNpu+GpZIKzCbCF4z7LCphv0kcrJMuUc8SxNSrr3IaIEmV7AfkdYYebKsyk0+lXcOrIwaT2zWRnL7GOlBLr3iwHAusyvfkCah0e+0UxV8YTwXqCtCo30F2s59SFSOANepeOTxEdapd2mW/ta18AJgAn2tbPb6pxOr5exQBxOaJrkBviru3glJ0NnFvnoTmu+Htj4oTLW+k6a99i7bM3+I9l/curskzOfivCFCfff2
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(39830400003)(366004)(346002)(376002)(136003)(83380400001)(8676002)(8936002)(6666004)(316002)(6486002)(36756003)(956004)(1076003)(5660300002)(6512007)(86362001)(2616005)(52116002)(34490700002)(66946007)(2906002)(66556008)(66476007)(4326008)(186003)(478600001)(7416002)(26005)(6506007)(16526019)(6916009);
+ SFS:(4636009)(366004)(396003)(39840400004)(376002)(346002)(136003)(66556008)(316002)(8936002)(36756003)(26005)(5660300002)(2616005)(6506007)(19627235002)(66946007)(86362001)(16526019)(7416002)(6916009)(66476007)(478600001)(34490700002)(6666004)(186003)(6486002)(2906002)(52116002)(956004)(83380400001)(1076003)(4326008)(8676002)(6512007);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1U85mcZPTs+i3lOdw4qRcaZX5Bv6BlqfH6hu0X7KGRM/rmEhP7wQDFr/LpsljtcbpvDWy8cW1CikwdOUoP2K72+p+ukjmvoafN9tCynGsE9w3ggL4gscMl/yq3suxALP/mbN42sxZr0qO8lwFM/VgqPDBpBq7GMjL/+GuwgT+znLrT9Ko1WRl7J+nG5tLohSf2lmD+8p5rj2I6V+B7gNQNaz/HN3cKGWXbNbwczLivwEN5oPDTxIKAjB5wZItYRUjOtA7Vde7vqLKFN7N0DeTyNFo8lz9MIGmR5ptigoInLcdmcwvIUAUhI14nZLUUvLW6nHy0iMyd+H/Nd6AJimgFKLpKTD2lPCYDEf9uBxS6ZOy5MNPUs8UoBvYeO0MHQmAj/4ZArsSmN2derdPySFiffMZ2h8Lta30tcPVw9uGd+ISd/u3dwhflBO4LXXhzQ3FL7lx+T7MFvE2IIDYWqFG0SszbpaXUjJ0tn+eBaoj5BtWlWubaU7K5ktL1QRFL6eZvvCGskhIyI8ElqdsSv1p4O4IwgJPBQwaQO/OKgP7p1IbuzGPBafFp2q2AyOdftxK+Iq9xja7Ltc05/By5Tu02kuZRcxM1jXH2QZwa/E31z69U/6VcSM1RPPn7pghGGVCKlFYMONO29RsvlI5QFX8Q==
+X-MS-Exchange-AntiSpam-MessageData: v1aMeKx40UKc2Fs8K5rsL6DjygfxBy1+XxjxqHIPV+JJ+SRbiiyZrkCOUDjkNNo/jZ2t1zR68M/nT5Kt/FkCxuVM3sgC1LNsaJT1t4zmU+L7eUus8iM6VcqvPcl9+iQEUAyRs8dz4ZNNYLGMF91PVCuulyxOXa2bbuWcfnmL0a4BLKfmAFCvKhmsSvIMQx3K1R2QjMLzeGRHcsS6zyF9hSBoXXJuwbqaX6S70wk9HEDuw+IWWeZY5RNb6RdF24DjowxodYvtVmWvkSMmlZlM9LnXnLRpIOXUReT0PiHbesde0dsQDbnxPLiXs+jatx3Yd2vNLaItRH0qG6bPiBOi87cW5xQAjbRj+HGjYoNIRYQeiy9I3n/ux8nlTjruXxIJg1BzoTa5iSsaibXsidUOrUny5bnZnAa0FYUk021h5RZTpsyca8uEOJTfQOdKvp6F2JTR8UYedHAaJixGqv87D/1uv+q4nbP+3hcLXxKQde3mbjjnBEUGjXY2r0yiXv1jhxdzwFR+15A2kqqVx6qmvBGhYkRyPnIrcxXXuphOG09/aQPfVbFIJDSdYLv9kanwqmZCPrNYNro/05EQ6Bv6Zm1OBFg3m3coDaksJ3aleQSLs6pe7Q0/LhKNgWFTx/3Ox4wfaOQzOyLS+947QVwljg==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c59e24db-fe0e-4651-72c5-08d871f67d0a
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd8393a8-f290-4483-72de-08d871f68038
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:11:14.7979 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:11:20.1465 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yOk7WugrU8VKBpmH6XhKsXLTQ4twG/cDW8rIgXufVkcgc4+V4/nxA6gmEHxDi9QTnPS0B7tAkCqrfqJr12g6Q/hqn80jkbE/D7scUcQZSic=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0801MB1972
-Received-SPF: pass client-ip=40.107.0.100;
+X-MS-Exchange-CrossTenant-UserPrincipalName: VLiEOWTE9S3E2THv5psgf3o9i3V7Jeq0MaGbVikSTntEO9jkBjcLT+/WJRQ8kpJ2xEDVFBw01+yFGRsTxL+7tvBTaM1UBSOg7bNjroMztgU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
+Received-SPF: pass client-ip=40.107.22.128;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR02-AM5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:11:12
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:11:16
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,195 +138,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch is generated by cocci script:
-
-@@
-symbol bdrv_open_child, errp, local_err;
-expression file;
-@@
-
-  file = bdrv_open_child(...,
--                        &local_err
-+                        errp
-                        );
-- if (local_err)
-+ if (!file)
-  {
-      ...
--     error_propagate(errp, local_err);
-      ...
-  }
-
-with command
-
-spatch --sp-file x.cocci --macro-file scripts/cocci-macro-file.h \
---in-place --no-show-diff --max-width 80 --use-gitgrep block
+Don't use error propagation in qcow2_get_specific_info(). For this
+refactor qcow2_get_bitmap_info_list, its current interface is rather
+weird.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
 Reviewed-by: Alberto Garcia <berto@igalia.com>
 ---
- block/blkdebug.c     |  6 ++----
- block/blklogwrites.c | 10 ++++------
- block/blkreplay.c    |  6 ++----
- block/blkverify.c    | 11 ++++-------
- block/qcow2.c        |  5 ++---
- block/quorum.c       |  6 ++----
- 6 files changed, 16 insertions(+), 28 deletions(-)
+ block/qcow2.h        |  4 ++--
+ block/qcow2-bitmap.c | 28 ++++++++++++++--------------
+ block/qcow2.c        | 10 +++-------
+ 3 files changed, 19 insertions(+), 23 deletions(-)
 
-diff --git a/block/blkdebug.c b/block/blkdebug.c
-index 54da719dd1..d795077fee 100644
---- a/block/blkdebug.c
-+++ b/block/blkdebug.c
-@@ -465,7 +465,6 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
+diff --git a/block/qcow2.h b/block/qcow2.h
+index 125ea9679b..024901a6ca 100644
+--- a/block/qcow2.h
++++ b/block/qcow2.h
+@@ -976,8 +976,8 @@ int qcow2_check_bitmaps_refcounts(BlockDriverState *bs, BdrvCheckResult *res,
+                                   void **refcount_table,
+                                   int64_t *refcount_table_size);
+ bool qcow2_load_dirty_bitmaps(BlockDriverState *bs, Error **errp);
+-Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+-                                                Error **errp);
++bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                Qcow2BitmapInfoList **info_list, Error **errp);
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
+ int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
+ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
+diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
+index d7a31a8ddc..55cd52ab96 100644
+--- a/block/qcow2-bitmap.c
++++ b/block/qcow2-bitmap.c
+@@ -1093,30 +1093,30 @@ static Qcow2BitmapInfoFlagsList *get_bitmap_info_flags(uint32_t flags)
+ /*
+  * qcow2_get_bitmap_info_list()
+  * Returns a list of QCOW2 bitmap details.
+- * In case of no bitmaps, the function returns NULL and
+- * the @errp parameter is not set.
+- * When bitmap information can not be obtained, the function returns
+- * NULL and the @errp parameter is set.
++ * On success return true with info_list set (note, that if there are no
++ * bitmaps, info_list is set to NULL).
++ * On failure return false with errp set.
+  */
+-Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+-                                                Error **errp)
++bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
++                                Qcow2BitmapInfoList **info_list, Error **errp)
  {
-     BDRVBlkdebugState *s = bs->opaque;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     int ret;
-     uint64_t align;
+     BDRVQcow2State *s = bs->opaque;
+     Qcow2BitmapList *bm_list;
+     Qcow2Bitmap *bm;
+-    Qcow2BitmapInfoList *list = NULL;
+-    Qcow2BitmapInfoList **plist = &list;
  
-@@ -495,10 +494,9 @@ static int blkdebug_open(BlockDriverState *bs, QDict *options, int flags,
-     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options, "image",
-                                bs, &child_of_bds,
-                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
--                               false, &local_err);
--    if (local_err) {
-+                               false, errp);
-+    if (!bs->file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto out;
+     if (s->nb_bitmaps == 0) {
+-        return NULL;
++        *info_list = NULL;
++        return true;
      }
  
-diff --git a/block/blklogwrites.c b/block/blklogwrites.c
-index 13ae63983b..b7579370a3 100644
---- a/block/blklogwrites.c
-+++ b/block/blklogwrites.c
-@@ -157,19 +157,17 @@ static int blk_log_writes_open(BlockDriverState *bs, QDict *options, int flags,
-     /* Open the file */
-     bs->file = bdrv_open_child(NULL, options, "file", bs, &child_of_bds,
-                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY, false,
--                               &local_err);
--    if (local_err) {
-+                               errp);
-+    if (!bs->file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto fail;
+     bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
+                                s->bitmap_directory_size, errp);
+-    if (bm_list == NULL) {
+-        return NULL;
++    if (!bm_list) {
++        return false;
      }
  
-     /* Open the log file */
-     s->log_file = bdrv_open_child(NULL, options, "log", bs, &child_of_bds,
--                                  BDRV_CHILD_METADATA, false, &local_err);
--    if (local_err) {
-+                                  BDRV_CHILD_METADATA, false, errp);
-+    if (!s->log_file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto fail;
++    *info_list = NULL;
++
+     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
+         Qcow2BitmapInfo *info = g_new0(Qcow2BitmapInfo, 1);
+         Qcow2BitmapInfoList *obj = g_new0(Qcow2BitmapInfoList, 1);
+@@ -1124,13 +1124,13 @@ Qcow2BitmapInfoList *qcow2_get_bitmap_info_list(BlockDriverState *bs,
+         info->name = g_strdup(bm->name);
+         info->flags = get_bitmap_info_flags(bm->flags & ~BME_RESERVED_FLAGS);
+         obj->value = info;
+-        *plist = obj;
+-        plist = &obj->next;
++        *info_list = obj;
++        info_list = &obj->next;
      }
  
-diff --git a/block/blkreplay.c b/block/blkreplay.c
-index 30a0f5d57a..4a247752fd 100644
---- a/block/blkreplay.c
-+++ b/block/blkreplay.c
-@@ -23,16 +23,14 @@ typedef struct Request {
- static int blkreplay_open(BlockDriverState *bs, QDict *options, int flags,
-                           Error **errp)
- {
--    Error *local_err = NULL;
-     int ret;
+     bitmap_list_free(bm_list);
  
-     /* Open the image file */
-     bs->file = bdrv_open_child(NULL, options, "image", bs, &child_of_bds,
-                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
--                               false, &local_err);
--    if (local_err) {
-+                               false, errp);
-+    if (!bs->file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto fail;
-     }
+-    return list;
++    return true;
+ }
  
-diff --git a/block/blkverify.c b/block/blkverify.c
-index 4aed53ab59..95ae73e2aa 100644
---- a/block/blkverify.c
-+++ b/block/blkverify.c
-@@ -112,7 +112,6 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
- {
-     BDRVBlkverifyState *s = bs->opaque;
-     QemuOpts *opts;
--    Error *local_err = NULL;
-     int ret;
- 
-     opts = qemu_opts_create(&runtime_opts, NULL, 0, &error_abort);
-@@ -125,20 +124,18 @@ static int blkverify_open(BlockDriverState *bs, QDict *options, int flags,
-     bs->file = bdrv_open_child(qemu_opt_get(opts, "x-raw"), options, "raw",
-                                bs, &child_of_bds,
-                                BDRV_CHILD_FILTERED | BDRV_CHILD_PRIMARY,
--                               false, &local_err);
--    if (local_err) {
-+                               false, errp);
-+    if (!bs->file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto fail;
-     }
- 
-     /* Open the test file */
-     s->test_file = bdrv_open_child(qemu_opt_get(opts, "x-image"), options,
-                                    "test", bs, &child_of_bds, BDRV_CHILD_DATA,
--                                   false, &local_err);
--    if (local_err) {
-+                                   false, errp);
-+    if (!s->test_file) {
-         ret = -EINVAL;
--        error_propagate(errp, local_err);
-         goto fail;
-     }
- 
+ int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp)
 diff --git a/block/qcow2.c b/block/qcow2.c
-index b05512718c..41a29072e6 100644
+index 41a29072e6..8c89c98978 100644
 --- a/block/qcow2.c
 +++ b/block/qcow2.c
-@@ -1612,9 +1612,8 @@ static int coroutine_fn qcow2_do_open(BlockDriverState *bs, QDict *options,
-     /* Open external data file */
-     s->data_file = bdrv_open_child(NULL, options, "data-file", bs,
-                                    &child_of_bds, BDRV_CHILD_DATA,
--                                   true, &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
-+                                   true, errp);
-+    if (!s->data_file) {
-         ret = -EINVAL;
-         goto fail;
-     }
-diff --git a/block/quorum.c b/block/quorum.c
-index e846a7e892..2ebe0ba16d 100644
---- a/block/quorum.c
-+++ b/block/quorum.c
-@@ -900,7 +900,6 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
-                        Error **errp)
- {
-     BDRVQuorumState *s = bs->opaque;
+@@ -5038,12 +5038,10 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+     BDRVQcow2State *s = bs->opaque;
+     ImageInfoSpecific *spec_info;
+     QCryptoBlockInfo *encrypt_info = NULL;
 -    Error *local_err = NULL;
-     QemuOpts *opts = NULL;
-     const char *pattern_str;
-     bool *opened;
-@@ -978,9 +977,8 @@ static int quorum_open(BlockDriverState *bs, QDict *options, int flags,
  
-         s->children[i] = bdrv_open_child(NULL, options, indexstr, bs,
-                                          &child_of_bds, BDRV_CHILD_DATA, false,
--                                         &local_err);
+     if (s->crypto != NULL) {
+-        encrypt_info = qcrypto_block_get_info(s->crypto, &local_err);
 -        if (local_err) {
 -            error_propagate(errp, local_err);
-+                                         errp);
-+        if (!s->children[i]) {
-             ret = -EINVAL;
-             goto close_exit;
++        encrypt_info = qcrypto_block_get_info(s->crypto, errp);
++        if (!encrypt_info) {
+             return NULL;
          }
+     }
+@@ -5060,9 +5058,7 @@ static ImageInfoSpecific *qcow2_get_specific_info(BlockDriverState *bs,
+         };
+     } else if (s->qcow_version == 3) {
+         Qcow2BitmapInfoList *bitmaps;
+-        bitmaps = qcow2_get_bitmap_info_list(bs, &local_err);
+-        if (local_err) {
+-            error_propagate(errp, local_err);
++        if (!qcow2_get_bitmap_info_list(bs, &bitmaps, errp)) {
+             qapi_free_ImageInfoSpecific(spec_info);
+             qapi_free_QCryptoBlockInfo(encrypt_info);
+             return NULL;
 -- 
 2.21.3
 
