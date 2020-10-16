@@ -2,70 +2,99 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D679AC433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4491C433DF
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:17:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1166820897
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:15:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3451208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 15:17:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="D8PZ2aOe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1166820897
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linuxfoundation.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tYzNcsSZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3451208E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTRRp-00028i-2n
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:15:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57896)
+	id 1kTRTt-0003YA-1R
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 11:17:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58238)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gregkh@linuxfoundation.org>)
- id 1kTRQi-0001Lj-No
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:14:06 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49600)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <gregkh@linuxfoundation.org>)
- id 1kTRQf-0006xg-98
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:14:04 -0400
-Received: from localhost (83-86-74-64.cable.dynamic.v4.ziggo.nl [83.86.74.64])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256
- bits)) (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 9300E206A1;
- Fri, 16 Oct 2020 15:13:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1602861239;
- bh=SU2uvwZI0LUxCNBQQdmpoJqsnGrJCAao6J5ggGoHKGM=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=D8PZ2aOehRX66/L20VGYutaDVmvjtf1wcPtaFf+aXdEWrAMBOsY9TLf8VeOgqTCIy
- OQ4bPsD+XbEZfa0QfZE2/1vkjf+yqfzwKbX/wrUEYdAFwde7j+lotBv37E80hgtrLP
- QuZAwwxOdNK0SrrfGsqs1ImPevCBnL0uJ1fGRsEg=
-Date: Fri, 16 Oct 2020 17:14:29 +0200
-From: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>
-To: "Catangiu, Adrian Costin" <acatan@amazon.com>
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-Message-ID: <20201016151429.GD1807983@kroah.com>
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTRS5-0002VS-Kf
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:15:29 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:38444)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTRS2-0007N0-If
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 11:15:28 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n18so3340086wrs.5
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 08:15:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Okc8pSExIJI8HrYDXiTNpsQmZTMNHEmKe6qWoNA6tgA=;
+ b=tYzNcsSZhtEGmiNWtMR1KWNlB76PJAFU1h8kHUI+PpxVZRZnFNbRfueQKivpLyQtIQ
+ G9kx2AhgG+Hd3Ye7ODUYvfFQ0kYxCy1kvg8+tMPyd1IZK8aZBKfo4guUdUtVJMBKuV2A
+ bx1XmJNd6YbKGA2jqf+aBIeIa0Uf1JJPziVlMe92QWOoI2CHBJFDEIYURaMqegVsjoa3
+ LycNA+a28dlWZba8TN2G9xWxw4f3ACtrv3rT3MqhWmN1u1urflLJ7MRYMmoU8cOm/bep
+ Mvpamnv9zWuv8clO49W+v2oOl+o0hPVCkkbM6hnguJiCnLVsBX5UI35eA/5bvV0GFIBX
+ TIQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Okc8pSExIJI8HrYDXiTNpsQmZTMNHEmKe6qWoNA6tgA=;
+ b=hNOk8RJ5p9WJgxDo/NkEk0W9VSe3qR3mHNoLXR9T6UwZRM1+gq0J7HTleO8vAZkIHe
+ K3KNaitkIcuyHPz4vo7weYcfhFiILVm4PBn6d7pw9X0NNWlOGtxd8WKYRmgEu7C5SrQi
+ UlGsnKk0dIr6B9QnYaq18dhkONDnOPVKflULnXewEPFP55XmsDmuhCLDD2/T13XGSu6m
+ wBpsvU6wGouhgEEiV2sZKi3LesHRLNUedFJ/nm2xJJxRfal3Y7bh+4tkEQl5phTBWqjW
+ bkgCOXieyuGd0FofO3mr+tgnz7gQVuxCZiy4r4Ty8iA98g6YRSb6LFBX3tBfsjK2mY6B
+ 9tJA==
+X-Gm-Message-State: AOAM53120JuHF77e/AyuTdCQod0z3ZKmgNSC2qr/1v81gpeFa78HtoR9
+ MrR+Cpam/5vkYUQvZbaNaFs=
+X-Google-Smtp-Source: ABdhPJxq2iia8jL7ntFJJx9/6MzJcJktDqwGfph33Wsa1OiNT/9yuIYRBBbxWDQqxwXBrw5XWRO7Zw==
+X-Received: by 2002:adf:dd8f:: with SMTP id x15mr4806030wrl.124.1602861325073; 
+ Fri, 16 Oct 2020 08:15:25 -0700 (PDT)
+Received: from [192.168.1.36] (106.red-83-59-162.dynamicip.rima-tde.net.
+ [83.59.162.106])
+ by smtp.gmail.com with ESMTPSA id s1sm3050567wmh.22.2020.10.16.08.15.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 08:15:24 -0700 (PDT)
+Subject: Re: [PATCH V14 1/8] target/mips: Fix PageMask with variable page size
+To: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+References: <1602831120-3377-1-git-send-email-chenhc@lemote.com>
+ <1602831120-3377-2-git-send-email-chenhc@lemote.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <bfb682a3-0e1f-926c-66a9-976a1659d534@amsat.org>
+Date: Fri, 16 Oct 2020 17:15:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
-Received-SPF: pass client-ip=198.145.29.99;
- envelope-from=gregkh@linuxfoundation.org; helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 11:13:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -68
-X-Spam_score: -6.9
-X-Spam_bar: ------
-X-Spam_report: (-6.9 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <1602831120-3377-2-git-send-email-chenhc@lemote.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.253,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,433 +107,147 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "bonzini@gnu.org" <bonzini@gnu.org>, "Graf \(AWS\),
- Alexander" <graf@amazon.de>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
- "ghammer@redhat.com" <ghammer@redhat.com>,
- "oridgar@gmail.com" <oridgar@gmail.com>, "corbet@lwn.net" <corbet@lwn.net>,
- "Weiss, Radu" <raduweis@amazon.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>, "mst@redhat.com" <mst@redhat.com>,
- "MacCarthaigh, Colm" <colmmacc@amazon.com>, "Singh,
- Balbir" <sblbir@amazon.com>, "Woodhouse, David" <dwmw@amazon.co.uk>
+Cc: Huacai Chen <chenhuacai@gmail.com>, Huacai Chen <chenhc@lemote.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, qemu-devel@nongnu.org,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 16, 2020 at 02:33:15PM +0000, Catangiu, Adrian Costin wrote:
-> +config VMGENID
-> +	tristate "Virtual Machine Generation ID driver"
-> +	depends on ACPI
-> +	default M
+On 10/16/20 8:51 AM, Huacai Chen wrote:
+> From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> 
+> Our current code assumed the target page size is always 4k
+> when handling PageMask and VPN2, however, variable page size
+> was just added to mips target and that's no longer true.
+> 
+> Fixes: ee3863b9d414 ("target/mips: Support variable page size")
+> Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+> Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> ---
+>   target/mips/cp0_helper.c | 36 +++++++++++++++++++++++++++++-------
+>   target/mips/cpu.h        |  1 +
+>   2 files changed, 30 insertions(+), 7 deletions(-)
+> 
+> diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
+> index de64add038..f3478d826b 100644
+> --- a/target/mips/cp0_helper.c
+> +++ b/target/mips/cp0_helper.c
+> @@ -867,13 +867,35 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
+>   
+>   void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
+>   {
+> -    uint64_t mask = arg1 >> (TARGET_PAGE_BITS + 1);
+> -    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 == ~0) ||
+> -        (mask == 0x0000 || mask == 0x0003 || mask == 0x000F ||
+> -         mask == 0x003F || mask == 0x00FF || mask == 0x03FF ||
+> -         mask == 0x0FFF || mask == 0x3FFF || mask == 0xFFFF)) {
+> -        env->CP0_PageMask = arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK << 1));
+> +    unsigned long mask;
+> +    int maskbits;
+> +
+> +    if (env->insn_flags & ISA_MIPS32R6) {
+> +        return;
+> +    }
+> +    /* Don't care MASKX as we don't support 1KB page */
+> +    mask = extract32((uint32_t)arg1, CP0PM_MASK, 16);
+> +    maskbits = find_first_zero_bit(&mask, 32);
+> +
+> +    /* Ensure no more set bit after first zero */
+> +    if (mask >> maskbits) {
+> +        goto invalid;
+> +    }
+> +    /* We don't support VTLB entry smaller than target page */
+> +    if ((maskbits + 12) < TARGET_PAGE_BITS) {
+> +        goto invalid;
+>       }
+> +    env->CP0_PageMask = mask << CP0PM_MASK;
+> +
+> +    return;
+> +
+> +invalid:
+> +    /*
+> +     * When invalid, ensure the value is bigger than or equal to
+> +     * the minimal but smaller than or equal to the maxium.
+> +     */
+> +    maskbits = MIN(16, MAX(maskbits, TARGET_PAGE_BITS - 12));
+> +    env->CP0_PageMask = ((1 << (16 + 1)) - 1) << CP0PM_MASK;
+>   }
+>   
+>   void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
+> @@ -1104,7 +1126,7 @@ void helper_mthc0_saar(CPUMIPSState *env, target_ulong arg1)
+>   void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
+>   {
+>       target_ulong old, val, mask;
+> -    mask = (TARGET_PAGE_MASK << 1) | env->CP0_EntryHi_ASID_mask;
+> +    mask = ~((1 << 14) - 1) | env->CP0_EntryHi_ASID_mask;
+>       if (((env->CP0_Config4 >> CP0C4_IE) & 0x3) >= 2) {
+>           mask |= 1 << CP0EnHi_EHINV;
+>       }
+> diff --git a/target/mips/cpu.h b/target/mips/cpu.h
+> index 7cf7f5239f..9c8bb23807 100644
+> --- a/target/mips/cpu.h
+> +++ b/target/mips/cpu.h
+> @@ -618,6 +618,7 @@ struct CPUMIPSState {
+>    * CP0 Register 5
+>    */
+>       int32_t CP0_PageMask;
+> +#define CP0PM_MASK 13
+>       int32_t CP0_PageGrain_rw_bitmask;
+>       int32_t CP0_PageGrain;
+>   #define CP0PG_RIE 31
+> 
 
-Unless this is required to boot a machine, this should be removed.
+Malta test failing:
 
-> +	help
-> +	  This is a Virtual Machine Generation ID driver which provides
-> +	  a virtual machine unique identifier. The provided UUID can be
-> +	  watched through the FS interface exposed by this driver, and
-> +	  thus can provide notifications for VM snapshot or cloning events.
+[    0.000000] Linux version 4.5.0-2-4kc-malta 
+(debian-kernel@lists.debian.org) (gcc version 5.3.1 20160519 (Debian 
+5.3.1-20) ) #1 Debian 4.5.5-1 (2016-05-29)
+[    0.000000] earlycon: Early serial console at I/O port 0x3f8 (options 
+'38400n8')
+[    0.000000] bootconsole [uart0] enabled
+[    0.000000] CPU0 revision is: 00019300 (MIPS 24Kc)
+[    0.000000] FPU revision is: 00739300
+[    0.000000] MIPS: machine is mti,malta
+[...]
+Freeing unused kernel memory: 412K (80979000 - 809e0000)
+do_page_fault(): sending SIGSEGV to mount for invalid write access to 
+0018a000
+epc = 77848a54 in libc-2.27.so[7782f000+177000]
+ra  = 779d0618 in ld-2.27.so[779bf000+24000]
+do_page_fault(): sending SIGSEGV to ln for invalid write access to 0018a000
+epc = 778d4a54 in libc-2.27.so[778bb000+177000]
+ra  = 77a5c618 in ld-2.27.so[77a4b000+24000]
+do_page_fault(): sending SIGSEGV to S01logging for invalid write access 
+to 0018a000
+epc = 77d08a54 in libc-2.27.so[77cef000+177000]
+ra  = 77e90618 in ld-2.27.so[77e7f000+24000]
+do_page_fault(): sending SIGSEGV to S20urandom for invalid write access 
+to 0018a000
+epc = 76ee4a54 in libc-2.27.so[76ecb000+177000]
+ra  = 7706c618 in ld-2.27.so[7705b000+24000]
+do_page_fault(): sending SIGSEGV to ifup for invalid write access to 
+0018a000
+epc = 77974a54 in libc-2.27.so[7795b000+177000]
+ra  = 77afc618 in ld-2.27.so[77aeb000+24000]
+do_page_fault(): sending SIGSEGV to awk for invalid read access from 
+00000000
+epc = 00000000 in busybox[400000+d8000]
+ra  = 77248110 in libc-2.27.so[770fb000+177000]
+do_page_fault(): sending SIGSEGV to cat for invalid write access to 0018a000
+epc = 77484a54 in libc-2.27.so[7746b000+177000]
+ra  = 7760c618 in ld-2.27.so[775fb000+24000]
+do_page_fault(): sending SIGSEGV to run.sh for invalid write access to 
+0018a000
+epc = 76e88a54 in libc-2.27.so[76e6f000+177000]
+ra  = 77010618 in ld-2.27.so[76fff000+24000]
+qemu-system-mips: terminating on signal 2
 
-Where is the uuid exposed in the filesystem?
+Please run the QEMU tests.
 
-> +	  This enables applications and libraries that store or cache
-> +	  sensitive information, to know that they need to regenerate it
-> +	  after process memory has been exposed to potential copying.
+The easiest way is to push your series on GitLab.
 
-Module name?
+Regards,
 
-> +
->  config FSL_HV_MANAGER
->  	tristate "Freescale hypervisor management driver"
->  	depends on FSL_SOC
-> diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
-> index fd33124..a1f8dcc 100644
-> --- a/drivers/virt/Makefile
-> +++ b/drivers/virt/Makefile
-> @@ -4,4 +4,5 @@
->  #
->  
->  obj-$(CONFIG_FSL_HV_MANAGER)	+= fsl_hypervisor.o
-> +obj-$(CONFIG_VMGENID)		+= vmgenid.o
->  obj-y				+= vboxguest/
-> diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-> new file mode 100644
-> index 0000000..d314c72
-> --- /dev/null
-> +++ b/drivers/virt/vmgenid.c
-> @@ -0,0 +1,419 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * Virtual Machine Generation ID driver
-> + *
-> + * Copyright (C) 2018 Red Hat Inc, Copyright (C) 2020 Amazon.com Inc
-
-That's not how you write copyright lines, please fix up.
-
-> + * All rights reserved.
-> + *	Authors:
-> + *	  Adrian Catangiu <acatan@amazon.com>
-> + *	  Or Idgar <oridgar@gmail.com>
-> + *	  Gal Hammer <ghammer@redhat.com>
-> + *
-> + */
-> +#include <linux/acpi.h>
-> +#include <linux/cdev.h>
-> +#include <linux/kernel.h>
-> +#include <linux/mm.h>
-> +#include <linux/module.h>
-> +#include <linux/poll.h>
-> +#include <linux/uuid.h>
-> +#include <linux/vmgenid.h>
-> +
-> +#define DEV_NAME "vmgenid"
-> +ACPI_MODULE_NAME(DEV_NAME);
-> +
-> +struct dev_data {
-> +	struct cdev       cdev;
-> +	dev_t             dev_id;
-> +	unsigned long     map_buf;
-> +
-> +	void              *uuid_iomap;
-> +	uuid_t            uuid;
-> +	wait_queue_head_t read_wait;
-> +
-> +	atomic_t          watchers;
-> +	atomic_t          outdated_watchers;
-> +	wait_queue_head_t outdated_wait;
-> +};
-> +
-> +struct file_data {
-> +	struct dev_data  *dev_data;
-> +	uuid_t           acked_uuid;
-> +};
-> +
-> +static bool vmgenid_uuid_matches(struct dev_data *priv, uuid_t *uuid)
-> +{
-> +	return !memcmp(uuid, &priv->uuid, sizeof(uuid_t));
-> +}
-> +
-> +static void vmgenid_put_outdated_watchers(struct dev_data *priv)
-> +{
-> +	if (atomic_dec_and_test(&priv->outdated_watchers))
-> +		wake_up_interruptible(&priv->outdated_wait);
-> +}
-> +
-> +static int vmgenid_open(struct inode *inode, struct file *file)
-> +{
-> +	struct dev_data *priv =
-> +		container_of(inode->i_cdev, struct dev_data, cdev);
-> +	struct file_data *file_data =
-> +		kzalloc(sizeof(struct file_data), GFP_KERNEL);
-> +
-> +	if (!file_data)
-> +		return -ENOMEM;
-> +
-> +	file_data->acked_uuid = priv->uuid;
-> +	file_data->dev_data = priv;
-> +
-> +	file->private_data = file_data;
-> +	atomic_inc(&priv->watchers);
-> +
-> +	return 0;
-> +}
-> +
-> +static int vmgenid_close(struct inode *inode, struct file *file)
-> +{
-> +	struct file_data *file_data = (struct file_data *) file->private_data;
-> +	struct dev_data *priv = file_data->dev_data;
-> +
-> +	if (!vmgenid_uuid_matches(priv, &file_data->acked_uuid))
-> +		vmgenid_put_outdated_watchers(priv);
-> +	atomic_dec(&priv->watchers);
-> +	kfree(file->private_data);
-> +
-> +	return 0;
-> +}
-> +
-> +static ssize_t
-> +vmgenid_read(struct file *file, char __user *ubuf, size_t nbytes, loff_t *ppos)
-> +{
-> +	struct file_data *file_data =
-> +		(struct file_data *) file->private_data;
-> +	struct dev_data *priv = file_data->dev_data;
-> +	ssize_t ret;
-> +
-> +	if (nbytes == 0)
-> +		return 0;
-> +	/* disallow partial UUID reads */
-> +	if (nbytes < sizeof(uuid_t))
-> +		return -EINVAL;
-> +	nbytes = sizeof(uuid_t);
-> +
-> +	if (vmgenid_uuid_matches(priv, &file_data->acked_uuid)) {
-> +		if (file->f_flags & O_NONBLOCK)
-> +			return -EAGAIN;
-> +		ret = wait_event_interruptible(
-> +			priv->read_wait,
-> +			!vmgenid_uuid_matches(priv, &file_data->acked_uuid)
-> +		);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	ret = copy_to_user(ubuf, &priv->uuid, nbytes);
-> +	if (ret)
-> +		return -EFAULT;
-> +
-> +	return nbytes;
-> +}
-> +
-> +static ssize_t vmgenid_write(struct file *file, const char __user *ubuf,
-> +				size_t count, loff_t *ppos)
-> +{
-> +	struct file_data *file_data = (struct file_data *) file->private_data;
-> +	struct dev_data *priv = file_data->dev_data;
-> +	uuid_t ack_uuid;
-> +
-> +	/* disallow partial UUID writes */
-> +	if (count != sizeof(uuid_t))
-> +		return -EINVAL;
-> +	if (copy_from_user(&ack_uuid, ubuf, count))
-> +		return -EFAULT;
-> +	/* wrong UUID acknowledged */
-> +	if (!vmgenid_uuid_matches(priv, &ack_uuid))
-> +		return -EINVAL;
-> +
-> +	if (!vmgenid_uuid_matches(priv, &file_data->acked_uuid)) {
-> +		/* update local view of UUID */
-> +		file_data->acked_uuid = ack_uuid;
-> +		vmgenid_put_outdated_watchers(priv);
-> +	}
-> +
-> +	return (ssize_t)count;
-> +}
-> +
-> +static __poll_t
-> +vmgenid_poll(struct file *file, poll_table *wait)
-> +{
-> +	__poll_t mask = 0;
-> +	struct file_data *file_data =
-> +		(struct file_data *) file->private_data;
-> +	struct dev_data *priv = file_data->dev_data;
-> +
-> +	if (!vmgenid_uuid_matches(priv, &file_data->acked_uuid))
-> +		return EPOLLIN | EPOLLRDNORM;
-> +
-> +	poll_wait(file, &priv->read_wait, wait);
-> +
-> +	if (!vmgenid_uuid_matches(priv, &file_data->acked_uuid))
-> +		mask = EPOLLIN | EPOLLRDNORM;
-> +
-> +	return mask;
-> +}
-> +
-> +static long vmgenid_ioctl(struct file *file,
-> +		unsigned int cmd, unsigned long arg)
-> +{
-> +	struct file_data *file_data =
-> +		(struct file_data *) file->private_data;
-> +	struct dev_data *priv = file_data->dev_data;
-> +	struct timespec __user *timeout = (void *) arg;
-> +	struct timespec kts;
-> +	ktime_t until;
-> +	int ret;
-> +
-> +	switch (cmd) {
-> +	case VMGENID_GET_OUTDATED_WATCHERS:
-> +		ret = atomic_read(&priv->outdated_watchers);
-> +		break;
-> +	case VMGENID_WAIT_WATCHERS:
-> +		if (timeout) {
-> +			ret = copy_from_user(&kts, timeout, sizeof(kts));
-> +			if (ret)
-> +				return -EFAULT;
-> +			until = timespec_to_ktime(kts);
-
-No validation of structure fields?
-
-And you are exposing a kernel structure to userspace?
-
-I don't see this function in Linus's tree right now, are you sure this
-builds?
-
-
-> +		} else {
-> +			until = KTIME_MAX;
-> +		}
-> +
-> +		ret = wait_event_interruptible_hrtimeout(
-> +			priv->outdated_wait,
-> +			!atomic_read(&priv->outdated_watchers),
-> +			until
-> +		);
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +		break;
-> +	}
-> +	return ret;
-> +}
-> +
-> +static vm_fault_t vmgenid_vm_fault(struct vm_fault *vmf)
-> +{
-> +	struct page *page;
-> +	struct file_data *file_data =
-> +			(struct file_data *) vmf->vma->vm_private_data;
-
-You do know you don't need to cast stuff like this, right?
-
-Also run checkpatch.pl so maintainers are not grumpy and tell you to run
-checkpatch.pl.
-
-> +	struct dev_data *priv = file_data->dev_data;
-> +
-> +	if (priv->map_buf) {
-> +		page = virt_to_page(priv->map_buf);
-> +		get_page(page);
-> +		vmf->page = page;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct vm_operations_struct vmgenid_vm_ops = {
-> +	.fault = vmgenid_vm_fault,
-> +};
-> +
-> +static int vmgenid_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +	if (vma->vm_pgoff != 0 || vma_pages(vma) > 1)
-> +		return -EINVAL;
-> +
-> +	if ((vma->vm_flags & VM_WRITE) != 0)
-> +		return -EPERM;
-> +
-> +	vma->vm_ops = &vmgenid_vm_ops;
-> +	vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-> +	vma->vm_private_data = file->private_data;
-> +
-> +	return 0;
-> +}
-> +
-> +static const struct file_operations fops = {
-> +	.owner          = THIS_MODULE,
-> +	.mmap           = vmgenid_mmap,
-> +	.open           = vmgenid_open,
-> +	.release        = vmgenid_close,
-> +	.read           = vmgenid_read,
-> +	.write          = vmgenid_write,
-> +	.poll           = vmgenid_poll,
-> +	.compat_ioctl   = vmgenid_ioctl,
-> +	.unlocked_ioctl = vmgenid_ioctl,
-> +};
-> +
-> +static int vmgenid_acpi_map(struct dev_data *priv, acpi_handle handle)
-> +{
-> +	int i;
-> +	phys_addr_t phys_addr;
-> +	struct acpi_buffer buffer = { ACPI_ALLOCATE_BUFFER, NULL };
-> +	acpi_status status;
-> +	union acpi_object *pss;
-> +	union acpi_object *element;
-> +
-> +	status = acpi_evaluate_object(handle, "ADDR", NULL, &buffer);
-> +	if (ACPI_FAILURE(status)) {
-> +		ACPI_EXCEPTION((AE_INFO, status, "Evaluating ADDR"));
-> +		return -ENODEV;
-> +	}
-> +	pss = buffer.pointer;
-> +	if (!pss || pss->type != ACPI_TYPE_PACKAGE || pss->package.count != 2)
-> +		return -EINVAL;
-> +
-> +	phys_addr = 0;
-> +	for (i = 0; i < pss->package.count; i++) {
-> +		element = &(pss->package.elements[i]);
-> +		if (element->type != ACPI_TYPE_INTEGER)
-> +			return -EINVAL;
-> +		phys_addr |= element->integer.value << i * 32;
-> +	}
-> +
-> +	priv->uuid_iomap = acpi_os_map_memory(phys_addr, sizeof(uuid_t));
-> +	if (!priv->uuid_iomap) {
-> +		pr_err("Could not map memory at 0x%llx, size %u",
-> +			   phys_addr,
-> +			   (u32)sizeof(uuid_t));
-> +		return -ENOMEM;
-> +	}
-> +
-> +	memcpy_fromio(&priv->uuid, priv->uuid_iomap, sizeof(uuid_t));
-> +	memcpy((void *) priv->map_buf, &priv->uuid, sizeof(uuid_t));
-> +
-> +	return 0;
-> +}
-> +
-> +static int vmgenid_acpi_add(struct acpi_device *device)
-> +{
-> +	int ret;
-> +	struct dev_data *priv;
-> +
-> +	if (!device)
-> +		return -EINVAL;
-> +
-> +	priv = kzalloc(sizeof(struct dev_data), GFP_KERNEL);
-> +	if (!priv)
-> +		return -ENOMEM;
-> +
-> +	priv->map_buf = get_zeroed_page(GFP_KERNEL);
-> +	if (!priv->map_buf) {
-> +		ret = -ENOMEM;
-> +		goto free;
-> +	}
-> +
-> +	device->driver_data = priv;
-> +
-> +	init_waitqueue_head(&priv->read_wait);
-> +	atomic_set(&priv->watchers, 0);
-> +	atomic_set(&priv->outdated_watchers, 0);
-> +	init_waitqueue_head(&priv->outdated_wait);
-> +
-> +	ret = vmgenid_acpi_map(priv, device->handle);
-> +	if (ret < 0)
-> +		goto err;
-> +
-> +	ret = alloc_chrdev_region(&priv->dev_id, 0, 1, DEV_NAME);
-
-Why is this not a misc device driver instead of messing around with all
-of this "by hand"?
-
-By doing things this way, you are not creating a device node in /dev/
-automatically, right?  How did you test this?
-
-> @@ -0,0 +1,22 @@
-> +/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
-> +/*
-> + * Copyright (c) 2020, Amazon.com Inc.
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License
-> + * as published by the Free Software Foundation; either version
-> + * 2 of the License, or (at your option) any later version.
-
-License boilerplate is not needed.
-
-> + */
-> +
-> +#ifndef _UAPI_LINUX_VMGENID_H
-> +#define _UAPI_LINUX_VMGENID_H
-> +
-> +#include <linux/ioctl.h>
-> +#include <linux/time.h>
-> +
-> +#define VMGENID_IOCTL 0x2d
-> +#define VMGENID_GET_OUTDATED_WATCHERS _IO(VMGENID_IOCTL, 1)
-> +#define VMGENID_WAIT_WATCHERS         _IOW(VMGENID_IOCTL, 2, struct timespec)
-
-Why do you need ioctls for this?  Why not just use read/write?
-
-thanks,
-
-greg k-h
+Phil.
 
