@@ -2,125 +2,104 @@ Return-Path: <SRS0=JoQ+=DX=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C78F1C433DF
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1778C43457
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:25:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B6D820789
-	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B53720789
+	for <qemu-devel@archiver.kernel.org>; Fri, 16 Oct 2020 17:25:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="vnf+mcya"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B6D820789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Z3QDvapS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B53720789
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42424 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTTTQ-0007K6-4d
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:25:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35838)
+	id 1kTTU7-0007sv-06
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 13:25:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGV-0003Qy-AB; Fri, 16 Oct 2020 13:11:39 -0400
-Received: from mail-am6eur05on2128.outbound.protection.outlook.com
- ([40.107.22.128]:42592 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kTTGR-0007NG-1T; Fri, 16 Oct 2020 13:11:38 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=IrNKcAV7W1mw5oZdaBSpINlcyVRCh2X9mb1GuTGvNRZ3Kr/3cziuyZ+OmUu7B4I2HiXoqmT3iGcY6bzDmDjL6HzBqCCMNRaSUcG10qH0btv9RVxUjhCzBCNTLrZY9JdGb/hX/hvTNfZ/EUE0mAh+nJ4hGS0ilKrjHfqPE01p+bqz+UJAd7CHGNKEAALXyBiUXhBP0OPO9Ug07pu5Y5x1eZ2pOox96P9XT5PL2hUpPr/Il4eetEoDfYHLKXSNKawjvmxRhYEb9kzrwZahI1eWXg8H8glt/1f/TU2RIWoSXgSZDRF86D9D35jnutJXINoL/ZMnHy/zs0RNim8tJOQLiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WMy/mfhnyu0Cl+u89MxhZGZL0x6erq5dKOO20vhls1Q=;
- b=EKQG+H9I92XRNY0QMWZuyg7bY05CRD0YX7v+Ao6uZdE0nEUlA/CvkTXTnqGccl4StjRiNuyYwNQvqf0Tv0+s0Cb3oq2+IncmPhG7u+/44U5tTkeQ/li3y+SZNZbPeuO66mLzLdEiwaPIUOTRV7+dQblCK3yGz4aI2odx4J/4LeQtqQ1tGpn8N05U4BqqTpxHVDrEq8CJrhJzojT7UAPVtpT8hmtlPJHhsD3riFMU2x5BLmD4CTBoPF/6t53dcG2K2y1LG5tacuyqhajD3alvqUUowRHOLzcw4DgqV9FpYaATiZZR8v553G1Ji2oB+rrIFXT4535KmEXurRxsUgfMYQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WMy/mfhnyu0Cl+u89MxhZGZL0x6erq5dKOO20vhls1Q=;
- b=vnf+mcyaL2A+ixIMgQ0fYFt7JoChHM2CWjDDAoa8xGaTLNio3qiTfF97iHFDLzZ/9taEF7Qakq0Hvu6bZZpxMAvipJlWiVNqWgCqcmwj+jgIWkeF9KEMFDxu6YkeL67daOtPuBR9Qz4aFXZSRpT9vITFxvYDTZPMS19PNRTjTGc=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM7PR08MB5495.eurprd08.prod.outlook.com (2603:10a6:20b:104::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3455.24; Fri, 16 Oct
- 2020 17:11:22 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3455.031; Fri, 16 Oct 2020
- 17:11:22 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
- vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
- ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org,
- Greg Kurz <groug@kaod.org>
-Subject: [PATCH v3 10/13] block/qcow2-bitmap: return status from
- qcow2_store_persistent_dirty_bitmaps
-Date: Fri, 16 Oct 2020 20:10:54 +0300
-Message-Id: <20201016171057.6182-11-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201016171057.6182-1-vsementsov@virtuozzo.com>
-References: <20201016171057.6182-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [185.215.60.69]
-X-ClientProxiedBy: FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::13) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTTNo-0001e8-Tx
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 13:19:13 -0400
+Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:42096)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTTNh-0008ET-Qw
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 13:19:12 -0400
+Received: by mail-pf1-x444.google.com with SMTP id x13so1856843pfa.9
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 10:19:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=xElUmhXNnSp7AFdkOLEgmMqLfxiXtNHwYnSUYtENJ9o=;
+ b=Z3QDvapSVrpJqCQ/VO85iZgCaIqVOvPnl7LZy+Ro9EpeH3ckZWcGP9vfyLZRw5LPIT
+ tLDoW7al8aSimy4No89wd2C+c/f0aqu6T+0A0+KCkYqo9sHYQvIQMBkfCTO3S+ynDbS+
+ a6BQXJmMRddrVcHSycGQW33ADHeKCwCnnyV40vFbs6aq37fnqNBbSzO/tff3WJ38fWnW
+ SWOMy/CISR3m5UD+9cX0GaaO+uwj9o0ole3kHn21S6QqpCIvaenaOEv+LH559FV0Y+rU
+ Rwm3Aiq/yM2bq+hfV+zn/tieqk/T/Iao2ICA9u4i9MViD/JOr2k1x7cG0D+LbKYCJsAK
+ kahw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=xElUmhXNnSp7AFdkOLEgmMqLfxiXtNHwYnSUYtENJ9o=;
+ b=FpDEK7+vtE0baULzl73rm8Leb/hImPj17HkBOXI4KiJFYUDKHpamkEGbW5rutqRI9b
+ Q5KG46Ca3kLx1BATOatF9m+VRhCDJrWxTwiIDWlslxAGc5KS0rFQkUIEkstJ2ZI1i3oo
+ /R+087d/E35mlu9KiuvHlF9cKtgF/lIF5FA3LBRe5QRA9qC4s/ntMszaNTdSbjZc6tgd
+ wKx907aCbvpSkwYggVGazxP58B//u/o7xPYppdAISw0kwRM0EtVT3//ZylZI/4+sB7Nf
+ jK0MIuEdsh3HifLcJ5nDAJwODlLh1IixLtAnWpyRHFZpU6YS1lwx7UAMrnkieNaeLdWp
+ 8Afg==
+X-Gm-Message-State: AOAM530rYYT/JACs9j5diYKn7p8OONfbUKY//bl665dLnb2ajHkXe3Hf
+ whHUvkVST4vUaAxktaVISpSI6Q==
+X-Google-Smtp-Source: ABdhPJzyblGiy9591jB3R9O1dJmtCy/hyIKmIf7e6i1k5AJA+j6Bqm8GfAvnr7aDWjjGmw6WD5gGdA==
+X-Received: by 2002:a62:4e05:0:b029:156:6a80:2686 with SMTP id
+ c5-20020a624e050000b02901566a802686mr4478680pfb.61.1602868743717; 
+ Fri, 16 Oct 2020 10:19:03 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id ch21sm3559531pjb.24.2020.10.16.10.19.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 16 Oct 2020 10:19:02 -0700 (PDT)
+Subject: Re: [RFC PATCH 0/3] target/mips: Make the number of TLB entries a CPU
+ property
+To: "Victor Kamensky (kamensky)" <kamensky@cisco.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Richard Henderson <rth@twiddle.net>
+References: <20201013132535.3599453-1-f4bug@amsat.org>
+ <BYAPR11MB30479E5264D94EF903E9FD92CD040@BYAPR11MB3047.namprd11.prod.outlook.com>
+ <515ec755fd8d7219040283f0c27346d762ee3c29.camel@linuxfoundation.org>
+ <ea0ed6c7-1e3a-f7ee-a962-b471555e362d@amsat.org>
+ <BYAPR11MB30471BC8B9D3B5F3E678F547CD050@BYAPR11MB3047.namprd11.prod.outlook.com>
+ <CAMKF1sokbfu1ox+nnZe0nJLid5_GnzZUeQEfWDmqmS4LY-RqNg@mail.gmail.com>
+ <BYAPR11MB30471A05FF44CF5F7C4C9A29CD020@BYAPR11MB3047.namprd11.prod.outlook.com>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <570801b3-ce5a-682a-334d-73404e418f3d@linaro.org>
+Date: Fri, 16 Oct 2020 10:19:00 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.69) by
- FR2P281CA0003.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.9 via Frontend Transport; Fri, 16 Oct 2020 17:11:21 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 33686f66-75c1-4c08-f4f5-08d871f68188
-X-MS-TrafficTypeDiagnostic: AM7PR08MB5495:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM7PR08MB5495B2AC8D5067F279E24372C1030@AM7PR08MB5495.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:246;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oGofrrqBr4g6f+Si1Noe4mC+kGb5xyut5WgXf05aHsk4MwnuEx97TlHrOYyXBpAYSFSa6Meq0OrVPLDQR5NOH5i13UrZ+0EfLE+iZ/r00W+Cb9qnBfSTYC2Fz2qdfgVGkYzkRdJUECo+wXry8ZFLK/OjKmge2oITC0dadT+jkqBIDlU1pboDsvCj/ydVd8NB/aRkrMC11hs23+RnOog/CrkZ1GnUj4mgh/Bfj0BUrYmO7oMgFLpDfCA3nCmfZBJHagr9cplc0HI1oO6JtNGBc1tOybbTJ2yI4FuQ3M9JuZ/Iq4/stPmXC0+LsmK5iJr3mrkVPrdzpqlvc6xkk2baBAIXsKGSuWb3pV1xBITod+goLJM03xwObogWpwajRw3S1FBv8AkJAUoU1o/fp/u6cw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(396003)(39840400004)(376002)(346002)(136003)(66556008)(316002)(8936002)(36756003)(26005)(5660300002)(2616005)(6506007)(19627235002)(66946007)(86362001)(16526019)(7416002)(6916009)(66476007)(478600001)(34490700002)(6666004)(186003)(6486002)(2906002)(52116002)(956004)(83380400001)(1076003)(4326008)(8676002)(6512007)(14143004);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: P5FaPXi5iv37zZN9hyoe5dZyklEarI3an0gUn9VnTQR4adn9F2Xt+7Gf9dCfyhC2po9fQASvBu0EdL72ThDQcUw/PaLFrj5g8zIlbdxEU++Q3IXr4JMl46wtjPQhxgT0Dya1phP0SGvpImIP+2XN3COcVTa1maS4LXSaGqXdQGEDBjaQNOZ4Wt68M8nZFP9aq+RkrRR253/gI0oo20ki0nHtD/xeCYbAs0/LCGE72eipbVvuW8LnNk0/tdfJ18Tom+hY0bGeUgpV0+YLZoiA0JviA7ky01tNtGJ6XGsXBv9Se4LcTYhn2rdVeU1G+VRqRa2vbUF11mwAurV20bWzhtp4Xvi8y8PTIIqhZNrdBy1465uVN0jyTyf2+Pfw4Wh3BjVAOmsWYWeebM1WrXZ+gFd8kVSV37uuswFtEnZOdX0jUa2kdvq5tpg+HPu4V0rD73fxgiRcYpNYYru3KM9sZB9ovCHWh6em3XKHWDUp99jNoOlB5S7v1blNPWPgyclYg9j5Pg+ukEWHzkknBnYCNkJc2/puN7CfPYRzGZ7IHAb8dCGjsQbyLA2LPB/f/HFTt4ihyUmeAOWeVSQk/uv5KItM+eD66Gk/x3CoMKXQZ2ZPe1qcdg9jLMBhyeC+ZfW8vinuzARVGtHWCfc/muH4rA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 33686f66-75c1-4c08-f4f5-08d871f68188
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Oct 2020 17:11:22.3508 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mxmP2Nhd8RkBFk9C5ow+WBvW8azfSH9Sh++ya3xZzkM7/oc+TwZ2WkY0cjI86PFrmsYqLZJoEzO/DEZu5AxbuzlFrYFPdAbzLfER4Iib2lQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR08MB5495
-Received-SPF: pass client-ip=40.107.22.128;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/16 13:11:16
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <BYAPR11MB30471A05FF44CF5F7C4C9A29CD020@BYAPR11MB3047.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -23
+X-Spam_score: -2.4
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.253,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -134,92 +113,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Khem Raj <raj.khem@gmail.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+ Richard Purdie <richard.purdie@linuxfoundation.org>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-It's better to return status together with setting errp. It makes
-possible to avoid error propagation.
+On 10/15/20 11:56 AM, Victor Kamensky (kamensky) via wrote:
+> Is possible to come back to 34Kf route, doing
+> very small localized very well defined change
+> of bumping TLBs number for model that we know
+> works well for us?
 
-While being here, put ERRP_GUARD() to fix error_prepend(errp, ...)
-usage inside qcow2_store_persistent_dirty_bitmaps() (see the comment
-above ERRP_GUARD() definition in include/qapi/error.h)
+Yes, thanks for testing.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
----
- block/qcow2.h        |  2 +-
- block/qcow2-bitmap.c | 13 ++++++-------
- 2 files changed, 7 insertions(+), 8 deletions(-)
+I think we should also add a property to enable Config3.PM for any cpu, and see
+how that gets on.  But simply adjusting the number of tlb entries is a good
+start, and is the only thing that will work for older kernels.
 
-diff --git a/block/qcow2.h b/block/qcow2.h
-index 4c994739ed..467cfd4779 100644
---- a/block/qcow2.h
-+++ b/block/qcow2.h
-@@ -981,7 +981,7 @@ bool qcow2_get_bitmap_info_list(BlockDriverState *bs,
-                                 Qcow2BitmapInfoList **info_list, Error **errp);
- int qcow2_reopen_bitmaps_rw(BlockDriverState *bs, Error **errp);
- int qcow2_truncate_bitmaps_check(BlockDriverState *bs, Error **errp);
--void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-+bool qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-                                           bool release_stored, Error **errp);
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp);
- bool qcow2_co_can_store_new_dirty_bitmap(BlockDriverState *bs,
-diff --git a/block/qcow2-bitmap.c b/block/qcow2-bitmap.c
-index ca01f08bac..9eccaab7f8 100644
---- a/block/qcow2-bitmap.c
-+++ b/block/qcow2-bitmap.c
-@@ -1536,9 +1536,10 @@ out:
-  * readonly to begin with, and whether we opened directly or reopened to that
-  * state shouldn't matter for the state we get afterward.
-  */
--void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-+bool qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-                                           bool release_stored, Error **errp)
- {
-+    ERRP_GUARD();
-     BdrvDirtyBitmap *bitmap;
-     BDRVQcow2State *s = bs->opaque;
-     uint32_t new_nb_bitmaps = s->nb_bitmaps;
-@@ -1558,7 +1559,7 @@ void qcow2_store_persistent_dirty_bitmaps(BlockDriverState *bs,
-         bm_list = bitmap_list_load(bs, s->bitmap_directory_offset,
-                                    s->bitmap_directory_size, errp);
-         if (bm_list == NULL) {
--            return;
-+            return false;
-         }
-     }
- 
-@@ -1673,7 +1674,7 @@ success:
-     }
- 
-     bitmap_list_free(bm_list);
--    return;
-+    return true;
- 
- fail:
-     QSIMPLEQ_FOREACH(bm, bm_list, entry) {
-@@ -1691,16 +1692,14 @@ fail:
-     }
- 
-     bitmap_list_free(bm_list);
-+    return false;
- }
- 
- int qcow2_reopen_bitmaps_ro(BlockDriverState *bs, Error **errp)
- {
-     BdrvDirtyBitmap *bitmap;
--    Error *local_err = NULL;
- 
--    qcow2_store_persistent_dirty_bitmaps(bs, false, &local_err);
--    if (local_err != NULL) {
--        error_propagate(errp, local_err);
-+    if (!qcow2_store_persistent_dirty_bitmaps(bs, false, errp)) {
-         return -EINVAL;
-     }
- 
--- 
-2.21.3
 
+r~
 
