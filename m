@@ -2,60 +2,59 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33F54C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 778F2C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47DCB206E5
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EF9A320756
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="LgZC93se"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47DCB206E5
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="T17/vC2E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9A320756
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTg0K-0004cs-Ag
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 02:47:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
+	id 1kTg0S-0004nt-1n
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 02:47:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33774)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTfyb-0003Lw-9u; Sat, 17 Oct 2020 02:46:01 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:48623 helo=ozlabs.org)
+ id 1kTfyb-0003Lr-9c; Sat, 17 Oct 2020 02:46:01 -0400
+Received: from bilbo.ozlabs.org ([203.11.71.1]:38993 helo=ozlabs.org)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTfyY-00036u-Ct; Sat, 17 Oct 2020 02:46:01 -0400
+ id 1kTfyY-00036s-Cb; Sat, 17 Oct 2020 02:46:00 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CCtnj1tWzz9sT6; Sat, 17 Oct 2020 17:45:45 +1100 (AEDT)
+ id 4CCtnj1MsSz9sTm; Sat, 17 Oct 2020 17:45:45 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1602917145;
- bh=aKnb7theXUwAXAPfeLl4uDFakqMXb4FhRESAwFtVGe0=;
+ bh=tznvDlDw1Lt9msRsr9/Dg2vqCnCa3egQaOESL6bg8h0=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=LgZC93sek2lxDZ7aB5dtPf63IXsSpqc7RQ/oexOZaRmgwIWNdkEYUHEb3V4Jmn2UO
- 9SgUvnBriNBNZcDRe4QiaBVnjaRLDYfp40gqSavLX75CI9K/x1rDvym6nHg8xgFM+t
- AaVeT+hl2LL8ZQEFnBUSPU5Cr067i5L4JQbu5iJE=
-Date: Sat, 17 Oct 2020 17:21:24 +1100
+ b=T17/vC2EIlrl5gL/rSfvfzMRj19x7RBBYI3v2aaxPNJP+4kgPce9FQXq4ac/YABV/
+ ulLaIqgraMCRkXbMqYVAKlTNfuc20mREsQD4spjhW9UivXfBkkCbG+lhvuHVg+EoGW
+ bkx/+iIYV5xmrvnyeI83k/V5EBI8vyEgy2x82/94=
+Date: Sat, 17 Oct 2020 17:20:00 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v2 1/3] macio: don't reference serial_hd() directly
- within the device
-Message-ID: <20201017062124.GB285896@yekko.fritz.box>
+Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
+Message-ID: <20201017062000.GA285896@yekko.fritz.box>
 References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
- <20201013114922.2946-2-mark.cave-ayland@ilande.co.uk>
- <20201016001614.GB7078@yekko.fritz.box>
- <b73997ec-b1fc-0d1a-408f-f69e59dbbfc4@ilande.co.uk>
+ <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
+ <20201016001803.GC7078@yekko.fritz.box>
+ <CABLmASE+GzEhSgqqJmum+Xu7DkyQX6PtboKLhA4LyaOY7PYoSA@mail.gmail.com>
+ <67efe378-7979-9a51-7c66-8d8c3f55e335@ilande.co.uk>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="7iMSBzlTiPOCCT2k"
+ protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
 Content-Disposition: inline
-In-Reply-To: <b73997ec-b1fc-0d1a-408f-f69e59dbbfc4@ilande.co.uk>
+In-Reply-To: <67efe378-7979-9a51-7c66-8d8c3f55e335@ilande.co.uk>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 02:45:46
@@ -78,42 +77,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org, f4bug@amsat.org
+Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
+ qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
+ Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---7iMSBzlTiPOCCT2k
-Content-Type: text/plain; charset=us-ascii
+--FCuugMFkClbJLl1L
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 16, 2020 at 08:00:06AM +0100, Mark Cave-Ayland wrote:
-> On 16/10/2020 01:16, David Gibson wrote:
+On Fri, Oct 16, 2020 at 07:53:10AM +0100, Mark Cave-Ayland wrote:
+> On 16/10/2020 07:45, Howard Spoelstra wrote:
 >=20
-> > On Tue, Oct 13, 2020 at 12:49:20PM +0100, Mark Cave-Ayland wrote:
-> > > Instead use qdev_prop_set_chr() to configure the ESCC serial chardevs=
- at the
-> > > Mac Old World and New World machine level.
-> > >=20
-> > > Also remove the now obsolete comment referring to the use of serial_h=
-d() and
-> > > the setting of user_creatable to false accordingly.
-> > >=20
-> > > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > Hi,
 > >=20
-> > Applied to ppc-for-5.2, thanks.
+> > I see compilation of the current ppc-for-5.2 branch fail with:
+> >=20
+> > ../hw/pci-host/grackle.c: In function =E2=80=98grackle_realize=E2=80=99:
+> > ../hw/pci-host/grackle.c:68:11: error: =E2=80=98GrackleState=E2=80=99 h=
+as no member named =E2=80=98pic=E2=80=99
+> >  =C2=A0 =C2=A068 | =C2=A0 =C2=A0 if (!s->pic) {
+> >  =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~
+> > make: *** [Makefile.ninja:1741: libcommon.fa.p/hw_pci-host_grackle.c.o]=
+ Error 1
+> >=20
+> > Best,
+> > Howard
 >=20
-> Ah okay, I was planning to send a separate qemu-macppc pull request myself
-> with these patches plus some cherry-picks from Zoltan's patchset after so=
-me
-> more testing. Does this mean you would prefer to take the patches directly
-> yourself?
+> I see - as per the cover letter, my series is a replacement for Phil's
+> original patch at
+> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg02988.html (the =
+PIC
+> link is now completely removed), so the solution here is to drop patch
+> 7daac97 "hw/pci-host/grackle: Verify PIC link is properly set".
 
-Not really.  I sent a PR recently, so I probably won't do another for
-a little while.  So go ahead and send yours, and mine should rebase
-easily enough.
+Ok, I've removed that from my ppc-for-5.2 tree.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -121,25 +123,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---7iMSBzlTiPOCCT2k
+--FCuugMFkClbJLl1L
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+KjWQACgkQbDjKyiDZ
-s5IMnw//cjcXpOrBqNhIc1JnHvrW9aUJo1/SDtQbwp6TMUqNH0eAEXWs4wNrMIPp
-jkFruyviOBtC5RgXMFCei12ECE3BK/ZMEcJieA39fTI1gkxdBbPJ4qMChmt0SfAz
-bmI68JsvfVhNVmAE0N00Yx853oTHzJdajthm/EA0UBA6HoBXWnLF860jYwXiWYkD
-/1hux6D+68iXxbku7J7dd1pkTjRsAYcvIy/1fJXilAm6ZVX2w/+PfWwhl3WDgeEC
-TJiOyNBbwlyCJmUzgn/uWffNjztQOZ+JXcxJKYG/50k6TRfF/ei7c81VBqo/KCDr
-eIA9TlK8g4c7tPeV+g/qMuRPa1FAaHj3wWQXcnJHXksqStJLpSBDN9bdr+6ae6dh
-NPk3S09uFIYhD4QnEy87/BVp0xPHtNMOleTTtcU78U9/ihVjYKAZWTxmHXcWEsQY
-M9WP93Ej4+Ud1YRLlOhh43/1QwS5S/xaM/HjRJBy7qtmNPrw+Acxl9YtebwSfsXG
-Kvt1OgWJHIbdXs0RWuEYFN/ACk5vOxSjko0on61HyFVRAerJjwwH7hxBs0F3pjFf
-wfdkL/WhW9AywxBzDvrgclPCG8kbVm/8XOXQlMRn20aaEzPhF6jgoEB3oTijRsUL
-IpSkTYyNJal/v7Edo+yumqtcDsjFsTOMtghzAeM5VtF/VkPh3Ig=
-=w092
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+KjQ4ACgkQbDjKyiDZ
+s5IESxAApOxHIF7ev/27uBRMeYGF15rL+o8+Bsto4tjSLQ0QbaDNwzjXPPR/vMh+
+tU0u/Fcd/KW4B0yWamUmWOy8gxm6S4nWTVdFiqHLY4Gjz1BUi2a5wfBzIp2O1Ne7
+H0D7kfH1a0qGLu7BuzFU5FczPTKR/L1M8ka3IDHu+B8mAVFYD5BuOnxvXoOtj/7O
+aBU9PRot9KwB/Jsrme/iG2gLoRQwfrE589Nl3HwaegAJGV1vVYGHReucQn0RKY49
+HoNM6DjdC7mQn+RY/SK5AdacjTSd/NPRcePdwGFab1FdeQMpax+l/LSVkLc+8GJR
+GpU9fTlWRV35rua92YUbUc8Jh57So+uh5DjIchxO8g5A5Z3/S7PyKclvJw1zmg6q
+3RaLXzVYFIAnJ0aylhre2iMo8NOL1Us0oCMJ7+obXcmaC9diLC1yApafsm2MuML9
+wpDTzsmaC5K7B8beIwNXuOv2NB87ERl5/IeDdEW+4DRhVLsEb1DaqtKqDfhB+toO
+iJyfLfYLNVj76jfuxA32LZR7urPGK8Dpeq6PdfUprKknW3Jzbqbyk6ne5+wgMOZ5
+IRW/rTyCa5X6OiLp+dqC77Cb0lGCadjslQZbE1GaBqyB7cyu4yWQf+mNAFdHakSN
+UKEc3NQsYFcL6Mh5VDfSLcNJgJtsAPKFORKYgcye+jGfaDj2Dio=
+=spcA
 -----END PGP SIGNATURE-----
 
---7iMSBzlTiPOCCT2k--
+--FCuugMFkClbJLl1L--
 
