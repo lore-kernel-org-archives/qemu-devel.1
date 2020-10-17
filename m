@@ -2,91 +2,73 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A4D6C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 07:16:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11AA1C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 07:19:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B136120758
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 07:16:00 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="sz/cSqdR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B136120758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8290620758
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 07:19:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8290620758
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=t-online.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTgRb-0007Vz-L7
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 03:15:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36822)
+	id 1kTgUh-0001gA-HT
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 03:19:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kTgNr-0002Jh-3f; Sat, 17 Oct 2020 03:12:07 -0400
-Received: from mail-lf1-x141.google.com ([2a00:1450:4864:20::141]:43310)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kTgNm-0003jk-R6; Sat, 17 Oct 2020 03:12:06 -0400
-Received: by mail-lf1-x141.google.com with SMTP id l28so6249025lfp.10;
- Sat, 17 Oct 2020 00:12:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=aJ0KQb6Ozzm+TKAEStsx77t+LpGGqIZVP5UuxdMy3MY=;
- b=sz/cSqdRUIo3p9a3ARPyy1gyI3vyqOtzDF28cgOHtAMJPOj5ARvk63VBLmQEqYQLeK
- pwXyIDCfSX9y7Be0lq6EkSqvNYieh1xkNKfDav5ej7MNFaf69PfXeoG7DJL1tL2hMwH0
- E7rEc6LQIHJmWymMzsKEbIFrLvEN/lhJkGazQYJLjPBqLlSKaqqW1WTASODdD07BuqV0
- hk9Jc4/nIdWJmXYu0FcPwG+7+RA0AlFpy8LXwxha1f4dz/6KvFK1gw9PxXBvhaZ2Awx+
- OFiSEDzA4Dcqj/Vh4U7YdSEY7Zx5W2G4nHwXeukWKUJVsGZdrmdiPf2zYG73gFbwZhwE
- X0YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=aJ0KQb6Ozzm+TKAEStsx77t+LpGGqIZVP5UuxdMy3MY=;
- b=PggjKgQIL/JgnWz0lyMsNJSXdgHEZ+9FKIvYqIdzeyIA3sjrF7BdlIsHk3z7TF0FFp
- mJa3uFJs4DsxhlgXyK2UIUmVcpbgVuzMFvH1Ib89Zjh022VlYbTuiqTusE65oqCSMgUI
- kT8OYIOEAzZcwcU26SJFZDLo4wzcu0L4w+/8QyG0hTka7JWmICXNvV4tZq/7cDd1QUbH
- fwdcxXpM6NMtkW7fkAN0EZOM156pDG5JKQucJmE/pnnvYUHEpuxCjMWzrtELCiqv7IQ/
- yi9XM5YE4/XGxfxQKT4deSq395H7+rXr2ZdQ8dLjpYYgVI80wBjouiBhJ7sf/P+oK8Dj
- ciDQ==
-X-Gm-Message-State: AOAM532C9l02seOjytIMHYeZwhpkVwZdpLI/D86kEqE+PbPGfpOxzJsP
- Gaqbp95zK86r57aQZIRbT5k=
-X-Google-Smtp-Source: ABdhPJyqRAdibYwDaLFbWrD5fgNcWEJuhtqfGMQHIDgJHRDawu9OOBVOuDFnLjPjYI6nvur73xYBEA==
-X-Received: by 2002:a19:e014:: with SMTP id x20mr2566022lfg.444.1602918720007; 
- Sat, 17 Oct 2020 00:12:00 -0700 (PDT)
-Received: from neptune.lab ([46.39.229.194])
- by smtp.googlemail.com with ESMTPSA id 184sm1626905lfh.232.2020.10.17.00.11.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 00:11:59 -0700 (PDT)
-From: Alexey Baturo <baturo.alexey@gmail.com>
-X-Google-Original-From: Alexey Baturo <space.monkey.delivers@gmail.com>
-To: 
-Subject: [PATCH v4 1/5] [RISCV_PM] Add J-extension into RISC-V
-Date: Sat, 17 Oct 2020 10:11:50 +0300
-Message-Id: <20201017071154.20642-2-space.monkey.delivers@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201017071154.20642-1-space.monkey.delivers@gmail.com>
-References: <20201017071154.20642-1-space.monkey.delivers@gmail.com>
+ (Exim 4.90_1) (envelope-from <vr_qemu@t-online.de>)
+ id 1kTgTd-0000kX-NK
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 03:18:05 -0400
+Received: from mailout07.t-online.de ([194.25.134.83]:34718)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vr_qemu@t-online.de>)
+ id 1kTgTb-0005kq-KU
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 03:18:05 -0400
+Received: from fwd32.aul.t-online.de (fwd32.aul.t-online.de [172.20.26.144])
+ by mailout07.t-online.de (Postfix) with SMTP id 0C7F342DFDEE;
+ Sat, 17 Oct 2020 09:17:59 +0200 (CEST)
+Received: from [192.168.211.200]
+ (ZwiFCsZBZhW1EQTazdTL7+DHZnLZqdVBUtWhSO1JDs5Gb4hXGiUwt0ieO9uwQvmQyJ@[46.86.52.112])
+ by fwd32.t-online.de
+ with (TLSv1.2:ECDHE-RSA-AES256-GCM-SHA384 encrypted)
+ esmtp id 1kTgTT-0HmP4K0; Sat, 17 Oct 2020 09:17:55 +0200
+Subject: Re: [PULL 07/37] cpus: extract out hax-specific code to target/i386/
+To: Claudio Fontana <cfontana@suse.de>
+References: <20201006072947.487729-1-pbonzini@redhat.com>
+ <20201006072947.487729-8-pbonzini@redhat.com>
+ <a412667e-c486-b002-1e9c-5128345cad75@t-online.de>
+ <39069adb-ee6d-ddf9-cc70-f069bcab5843@suse.de>
+From: =?UTF-8?Q?Volker_R=c3=bcmelin?= <vr_qemu@t-online.de>
+Message-ID: <7e8b24b1-98a1-0908-03b3-aad22419c941@t-online.de>
+Date: Sat, 17 Oct 2020 09:17:54 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::141;
- envelope-from=baturo.alexey@gmail.com; helo=mail-lf1-x141.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <39069adb-ee6d-ddf9-cc70-f069bcab5843@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-ID: ZwiFCsZBZhW1EQTazdTL7+DHZnLZqdVBUtWhSO1JDs5Gb4hXGiUwt0ieO9uwQvmQyJ
+X-TOI-EXPURGATEID: 150726::1602919075-0000C7C3-7814E52F/0/0 CLEAN NORMAL
+X-TOI-MSGID: df1d7c51-3ad5-46d2-a6f7-b4a92042b462
+Received-SPF: none client-ip=194.25.134.83; envelope-from=vr_qemu@t-online.de;
+ helo=mailout07.t-online.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 03:17:59
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FROM=0.001,
+ NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,63 +81,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: baturo.alexey@gmail.com, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, space.monkey.delivers@gmail.com,
- Alistair.Francis@wdc.com, kupokupokupopo@gmail.com, palmer@dabbelt.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alexey Baturo <space.monkey.delivers@gmail.com>
----
- target/riscv/cpu.c | 4 ++++
- target/riscv/cpu.h | 2 ++
- 2 files changed, 6 insertions(+)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 0bbfd7f457..fe6bab4a52 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -438,6 +438,9 @@ static void riscv_cpu_realize(DeviceState *dev, Error **errp)
-         if (cpu->cfg.ext_h) {
-             target_misa |= RVH;
-         }
-+        if (cpu->cfg.ext_j) {
-+            target_misa |= RVJ;
-+        }
-         if (cpu->cfg.ext_v) {
-             target_misa |= RVV;
-             if (!is_power_of_2(cpu->cfg.vlen)) {
-@@ -516,6 +519,7 @@ static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("u", RISCVCPU, cfg.ext_u, true),
-     /* This is experimental so mark with 'x-' */
-     DEFINE_PROP_BOOL("x-h", RISCVCPU, cfg.ext_h, false),
-+    DEFINE_PROP_BOOL("x-j", RISCVCPU, cfg.ext_j, false),
-     DEFINE_PROP_BOOL("x-v", RISCVCPU, cfg.ext_v, false),
-     DEFINE_PROP_BOOL("Counters", RISCVCPU, cfg.ext_counters, true),
-     DEFINE_PROP_BOOL("Zifencei", RISCVCPU, cfg.ext_ifencei, true),
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de275782e6..eca611a367 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -66,6 +66,7 @@
- #define RVS RV('S')
- #define RVU RV('U')
- #define RVH RV('H')
-+#define RVJ RV('J')
- 
- /* S extension denotes that Supervisor mode exists, however it is possible
-    to have a core that support S mode but does not have an MMU and there
-@@ -277,6 +278,7 @@ struct RISCVCPU {
-         bool ext_s;
-         bool ext_u;
-         bool ext_h;
-+        bool ext_j;
-         bool ext_v;
-         bool ext_counters;
-         bool ext_ifencei;
--- 
-2.20.1
+>> Hi Claudio,
+>>
+>> is there a reason why you removed current_cpu = cpu; from hax_cpu_thread_fn() when you moved that function to target/i386/hax-cpus.c? This change broke HAX on Windows. Adding back that line makes it work again.
+>
+> Hello Volker, I see the change in the history and it was clearly an ugly mistake on my part.
+> There was no reason or intention to remove the current_cpu = cpu assignment
+>
+> The fix seems indeed to just + current_cpu = cpu;
+> and I will send a patch momentarily that does just that,
+>
+> but I don't know of any CI coverage for Windows + hax currently,
+> so it would be good if you could spin the change to verify that it fixes the problem.
+>
 
+That was very quick. Only 5 hours from bug report to pull request. I've tested current master together with the patch from Paolo's PR. HAX on Windows works.
+
+With best regards,
+Volker
 
