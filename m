@@ -2,90 +2,94 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A569C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00CDBC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:40:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E10A20708
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E4B920708
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:40:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvVweg/p"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E10A20708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BlVy2jYZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E4B920708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54752 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTnMM-0006Ci-7f
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:39:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
+	id 1kTnNg-0007Wj-MZ
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:40:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37566)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qkrwngud825@gmail.com>)
- id 1kTnD7-0003eb-Tn
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:29:30 -0400
-Received: from mail-ua1-x92a.google.com ([2607:f8b0:4864:20::92a]:46422)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTmqc-0005Xw-Fq
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:14 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:38949)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <qkrwngud825@gmail.com>)
- id 1kTnD6-0006mZ-AN
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:29:29 -0400
-Received: by mail-ua1-x92a.google.com with SMTP id y1so1520352uac.13
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:29:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTmqa-000491-KH
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:14 -0400
+Received: by mail-wr1-x429.google.com with SMTP id y12so6588385wrp.6
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:06:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=P+gIv2Lcj4WNQ6W5r97xFTj/z+w+Zw6Am1AGbMCfPgE=;
- b=AvVweg/pSu+cvJE0S0zZqtqcLAoadXExFz3xAe9zG7vo50YMTLwHQ1i8ftED2DTCXA
- uDyLEeGC6cYYaKOaXhAhMiSavtK6o+K0Bf0j3CS6CK6OzuSRfmaff3DhIkmIeSRj1QmC
- iOisXBQpzXX94cVxrWjw059s2E/Sj+SZ8+0L6jcZKRmU2wzQSoBODay/ZjP4eDDE4KHD
- rIXoGB1a4ZvI8eIsepfck2FIUOVafAAvByyjbLIaaBkDw2ok0thiS0I16UshtZz++jVD
- JAra2+ekaIrQbnMF4Bc81YjliIwbhBI8tg+Dy3t7U9FlTbPsxakUCdFDzj6/YRsRUX3Z
- TwAw==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7NPFG3sCe3Q0DWcvvpgh0QRrJIh4WkqraUDSbppp/5Q=;
+ b=BlVy2jYZOLpKi+x8pl78DPw4PuPFNK5Hr9hii+HYldLiagJTlC0DDGRy7zPWkJs6V3
+ ibVI2ftO1N+gt7++lwBGO/Q4pfFz67tJf8/1lom2sc9nmN+VSWw5pKqlYobRAqPoCO2K
+ +WMHc9bC2Ysxhl9FINkqzJcMZoZUqkPgzWrAAMgdenB0cxRJhNTKR/yGUFD1hvhdmxDG
+ tcPdZMtRE5YtTgG4SNrIlXrjLOmBCsX1oAduAOrBFBIgBG/66SrZXxEiwGuOkJtn1rlc
+ FntM/3Xcf2wYrC3zyqe54H7rernF6exXQpT96pyHzSEeWWDdx3obTfl+lAIv1F71RkMd
+ dXpQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=P+gIv2Lcj4WNQ6W5r97xFTj/z+w+Zw6Am1AGbMCfPgE=;
- b=c2oUKxXsdGRKhwfBg1+OSZqkFypQBGcIgKpG0KmAYlWTdJYdnFSOf0it7vM7QuuYBR
- n2jdQ4/QuCWb1UacfbOoGYrWsho4GwKuy5S0l3adfFEhtmoV9j6rAQ3Mz2J6WSynN1K/
- tJLNbeJ87ukrkbmFymoiOlEb7kvuqU+Pl0/wTjWYGLYWMzoZXQk3lnw71sfT3mvACy8D
- BiXqdsYxZQ6Vz6T0DgGZ4BkE7WZ8fGZSiIef2dHArasiNJ2t8Wemf/Sn8C+4JXFhffJZ
- ZaTmKbhOyJxCsAi1p1ZUTyVBJlWKPv4jrh4DbAHtPAbxXQBP4hq2JqM4PL4VBN8uBp0D
- xUSA==
-X-Gm-Message-State: AOAM531kJPXougBkYGL6l26KD0IM/rpm7k4n6yZ4F2XNT3+CocCAJP/J
- nzRq4S7d9chdEyQVMW7LZ/MDjhbW9RQUSFez2/U=
-X-Google-Smtp-Source: ABdhPJzden7sO+y2LzeOJWCADNP5kK3JioLv+GRKwCvaAYdK5okKzL5TOLlsjB6Kg7jXp74ndZ1SqzW+p2DQEwMjyA0=
-X-Received: by 2002:ab0:6f81:: with SMTP id f1mr4272724uav.31.1602944967083;
- Sat, 17 Oct 2020 07:29:27 -0700 (PDT)
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=7NPFG3sCe3Q0DWcvvpgh0QRrJIh4WkqraUDSbppp/5Q=;
+ b=FNYJM+nuBwtxij7IyEBgQ6vwuSwwBZOWhRQNuJ+QyRjiv+E2WrLX73AA05pUwZ59oD
+ Uwxg9Q0FjFdHAhN8ityhjkSCL2U5g8NpU4BOJojDyH9d10Dj2b80hjaw1YH46aFaHAiR
+ nvsmazOi0n9Wql/kVK9awl/JOxzDIT2MwINC9odehOwjYddGUbYhIP66cNbVf/sp1YEd
+ ikdAGyhtFMf1Ofo+Z24jqxAEl4QACzGFazmASky+jC/KtFfwQkuuiYL5x5rNDqb+TNvF
+ lrb52xKQUnT+SM8lvV8csVB3j4Mj8qrIKiP/39EkcQ7EGjJDlnlg7Oy00wA8n2Zujf45
+ zpOQ==
+X-Gm-Message-State: AOAM531hvFtUSqBMF3vbTJ7C5HdUJ54ZTdehGqvGdP0MajeqjlRhq8Kh
+ 9SHHkdhUvLYCXQLu77SfybVKW8rIx1s=
+X-Google-Smtp-Source: ABdhPJwvjfQ7VDOjq7eWWyfNjaZNjJPALCxXvEfbifxYhb2RhMAky8HIvmkfSnFx3t13BMNPBposZg==
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr10218317wrp.24.1602943571161; 
+ Sat, 17 Oct 2020 07:06:11 -0700 (PDT)
+Received: from localhost.localdomain
+ (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
+ by smtp.gmail.com with ESMTPSA id y5sm8845509wrw.52.2020.10.17.07.06.10
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 17 Oct 2020 07:06:10 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 44/44] target/mips: Increase number of TLB entries on the 34Kf
+ core (16 -> 64)
+Date: Sat, 17 Oct 2020 16:02:43 +0200
+Message-Id: <20201017140243.1078718-45-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
+References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
-References: <CAD14+f3G2f4QEK+AQaEjAG4syUOK-9bDagXa8D=RxdFWdoi5fQ@mail.gmail.com>
- <20201001085900.ms5ix2zyoid7v3ra@steredhat>
- <CAD14+f1m8Xk-VC1nyMh-X4BfWJgObb74_nExhO0VO3ezh_G2jA@mail.gmail.com>
- <20201002073457.jzkmefo5c65zlka7@steredhat>
- <CAD14+f0h4Vp=bsgpByTmaOU-Vbz6nnShDHg=0MSg4WO5ZyO=vA@mail.gmail.com>
- <05afcc49-5076-1368-3cc7-99abcf44847a@kernel.dk>
-In-Reply-To: <05afcc49-5076-1368-3cc7-99abcf44847a@kernel.dk>
-From: Ju Hyung Park <qkrwngud825@gmail.com>
-Date: Sat, 17 Oct 2020 23:29:16 +0900
-Message-ID: <CAD14+f0h-r7o=m0NvHxjCgKaQe24_MDupcDdSOu05PhXp8B1-w@mail.gmail.com>
-Subject: Re: io_uring possibly the culprit for qemu hang (linux-5.4.y)
-To: Jens Axboe <axboe@kernel.dk>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::92a;
- envelope-from=qkrwngud825@gmail.com; helo=mail-ua1-x92a.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -7
-X-Spam_score: -0.8
-X-Spam_bar: /
-X-Spam_report: (-0.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,26 +103,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, io-uring@vger.kernel.org,
- Stefano Garzarella <sgarzare@redhat.com>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Victor Kamensky <kamensky@cisco.com>, Paul Burton <paulburton@kernel.org>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Jens.
+Per "MIPS32 34K Processor Core Family Software User's Manual,
+Revision 01.13" page 8 in "Joint TLB (JTLB)" section:
 
-On Sat, Oct 17, 2020 at 3:07 AM Jens Axboe <axboe@kernel.dk> wrote:
->
-> Would be great if you could try 5.4.71 and see if that helps for your
-> issue.
->
+  "The JTLB is a fully associative TLB cache containing 16, 32,
+   or 64-dual-entries mapping up to 128 virtual pages to their
+   corresponding physical addresses."
 
-Oh wow, yeah it did fix the issue.
+There is no particular reason to restrict the 34Kf core model to
+16 TLB entries, so raise its config to 64.
 
-I'm able to reliably turn off and start the VM multiple times in a row.
-Double checked by confirming QEMU is dynamically linked to liburing.so.1.
+This is helpful for other projects, in particular the Yocto Project:
 
-Looks like those 4 io_uring fixes helped.
+  Yocto Project uses qemu-system-mips 34Kf cpu model, to run 32bit
+  MIPS CI loop. It was observed that in this case CI test execution
+  time was almost twice longer than 64bit MIPS variant that runs
+  under MIPS64R2-generic model. It was investigated and concluded
+  that the difference in number of TLBs 16 in 34Kf case vs 64 in
+  MIPS64R2-generic is responsible for most of CI real time execution
+  difference. Because with 16 TLBs linux user-land trashes TLB more
+  and it needs to execute more instructions in TLB refill handler
+  calls, as result it runs much longer.
 
-Thanks!
+(https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg03428.html)
+
+Buglink: https://bugzilla.yoctoproject.org/show_bug.cgi?id=13992
+Reported-by: Victor Kamensky <kamensky@cisco.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20201016133317.553068-1-f4bug@amsat.org>
+---
+ target/mips/translate_init.c.inc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
+index c735b2bf667..fb5a9b38e5d 100644
+--- a/target/mips/translate_init.c.inc
++++ b/target/mips/translate_init.c.inc
+@@ -254,7 +254,7 @@ const mips_def_t mips_defs[] =
+         .CP0_PRid = 0x00019500,
+         .CP0_Config0 = MIPS_CONFIG0 | (0x1 << CP0C0_AR) |
+                        (MMU_TYPE_R4000 << CP0C0_MT),
+-        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (15 << CP0C1_MMU) |
++        .CP0_Config1 = MIPS_CONFIG1 | (1 << CP0C1_FP) | (63 << CP0C1_MMU) |
+                        (0 << CP0C1_IS) | (3 << CP0C1_IL) | (1 << CP0C1_IA) |
+                        (0 << CP0C1_DS) | (3 << CP0C1_DL) | (1 << CP0C1_DA) |
+                        (1 << CP0C1_CA),
+-- 
+2.26.2
+
 
