@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06F1AC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:12:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0287C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:13:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6EBD42075E
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:12:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EBD42075E
+	by mail.kernel.org (Postfix) with ESMTPS id 4D1D52076C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:13:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D1D52076C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38814 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTdZm-0007nA-Cz
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:12:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39940)
+	id 1kTdbO-0002Xz-Ba
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:13:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39904)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXg-0005tn-Lx
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5242 helo=huawei.com)
+ id 1kTdXf-0005rb-5P
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:03 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5237 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXe-0007Gf-M6
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
+ id 1kTdXd-0007CT-Dt
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:02 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 8606FA20CCE762B3E224;
+ by Forcepoint Email with ESMTP id 6FBC4D0D39749B1F3E5F;
  Sat, 17 Oct 2020 12:09:51 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 17 Oct 2020
- 12:09:43 +0800
+ 12:09:45 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v3 06/18] migration/rdma: export
- MultiFDSendParams/MultiFDRecvParams
-Date: Sat, 17 Oct 2020 12:25:36 +0800
-Message-ID: <1602908748-43335-7-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 08/18] migration/rdma: export getQIOChannel to get
+ QIOchannel in rdma
+Date: Sat, 17 Oct 2020 12:25:38 +0800
+Message-ID: <1602908748-43335-9-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
 References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
@@ -80,72 +80,41 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-MultiFDSendParams and MultiFDRecvParams is need for rdma, export it
-
 Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 ---
- migration/multifd.c | 26 ++++++++++++++++++++++++++
- migration/multifd.h |  2 ++
- 2 files changed, 28 insertions(+)
+ migration/qemu-file.c | 5 +++++
+ migration/qemu-file.h | 1 +
+ 2 files changed, 6 insertions(+)
 
-diff --git a/migration/multifd.c b/migration/multifd.c
-index 8ccfd46..03f3a1e 100644
---- a/migration/multifd.c
-+++ b/migration/multifd.c
-@@ -387,6 +387,19 @@ struct {
-     MultiFDSetup *setup_ops;
- } *multifd_send_state;
+diff --git a/migration/qemu-file.c b/migration/qemu-file.c
+index be21518..37f6201 100644
+--- a/migration/qemu-file.c
++++ b/migration/qemu-file.c
+@@ -260,6 +260,11 @@ void ram_control_before_iterate(QEMUFile *f, uint64_t flags)
+     }
+ }
  
-+int get_multifd_send_param(int id, MultiFDSendParams **param)
++void *getQIOChannel(QEMUFile *f)
 +{
-+    int ret = 0;
-+
-+    if (id < 0 || id >= migrate_multifd_channels()) {
-+        ret = -1;
-+    } else {
-+        *param = &(multifd_send_state->params[id]);
-+    }
-+
-+    return ret;
++    return f->opaque;
 +}
 +
- /*
-  * How we use multifd_send_state->pages and channel->pages?
-  *
-@@ -919,6 +932,19 @@ struct {
-     MultiFDSetup *setup_ops;
- } *multifd_recv_state;
- 
-+int get_multifd_recv_param(int id, MultiFDRecvParams **param)
-+{
-+    int ret = 0;
-+
-+    if (id < 0 || id >= migrate_multifd_channels()) {
-+        ret = -1;
-+    } else {
-+        *param = &(multifd_recv_state->params[id]);
-+    }
-+
-+    return ret;
-+}
-+
- static void multifd_recv_terminate_threads(Error *err)
+ void ram_control_after_iterate(QEMUFile *f, uint64_t flags)
  {
-     int i;
-diff --git a/migration/multifd.h b/migration/multifd.h
-index 62a0b2a..2f4e585 100644
---- a/migration/multifd.h
-+++ b/migration/multifd.h
-@@ -176,6 +176,8 @@ typedef struct {
- #ifdef CONFIG_RDMA
- MultiFDSetup *multifd_rdma_setup(void);
- #endif
-+int get_multifd_send_param(int id, MultiFDSendParams **param);
-+int get_multifd_recv_param(int id, MultiFDRecvParams **param);
- MultiFDSetup *multifd_setup_ops_init(void);
- void multifd_register_ops(int method, MultiFDMethods *ops);
+     int ret = 0;
+diff --git a/migration/qemu-file.h b/migration/qemu-file.h
+index a9b6d6c..4cef043 100644
+--- a/migration/qemu-file.h
++++ b/migration/qemu-file.h
+@@ -165,6 +165,7 @@ void qemu_file_set_blocking(QEMUFile *f, bool block);
+ void ram_control_before_iterate(QEMUFile *f, uint64_t flags);
+ void ram_control_after_iterate(QEMUFile *f, uint64_t flags);
+ void ram_control_load_hook(QEMUFile *f, uint64_t flags, void *data);
++void *getQIOChannel(QEMUFile *f);
  
+ /* Whenever this is found in the data stream, the flags
+  * will be passed to ram_control_load_hook in the incoming-migration
 -- 
 1.8.3.1
 
