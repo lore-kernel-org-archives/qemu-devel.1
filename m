@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF68CC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:17:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9DAAC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:17:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76D4F20704
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 45E7020704
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:17:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5advx1z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76D4F20704
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="uWEl5lH+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 45E7020704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44418 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTn16-0003jm-Fu
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:17:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37528)
+	id 1kTn19-0003q3-7E
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:17:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmqU-0005G2-Tu
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:06 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:40680)
+ id 1kTmoU-0002EC-2n
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:02 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:54096)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmqT-00048L-6P
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:06 -0400
-Received: by mail-wr1-x429.google.com with SMTP id h5so6580791wrv.7
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:06:02 -0700 (PDT)
+ id 1kTmoR-0003lh-PJ
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:01 -0400
+Received: by mail-wm1-x341.google.com with SMTP id f21so6138188wml.3
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=K4I6rKlRV5CwkXwi1bhz1e4ZJqjshXMHPloXxAGf1Gs=;
- b=f5advx1zgDfzeVwXM7qs/p/Ay06yMXHouCwif8kW3SK93qbRcRCb4drq5pO6ECTlYV
- 0a3PqW+zA0AWf/qWBU8kJPbPj3961C/F7gUPx/rov56AIOvkwXcYxjVij1fjMnPhuKDg
- c2pxCzg8TSV2dtcH80rIm9RI/jHJPr7LHX8lzStlwM4dArT5JQIQoGkMJR1HVJ1IU3de
- RMYaC4c5bJ4ILHKSeUxMuxBOtmnsey1PGaLCHoVog1bH1U5LMLc+/Kntzg1K5ooq809Q
- 1D/VdGA6uQ/BeXVB4xnh1RwMq7iiWcaEiuNIVBHM1nWdAlow/pwRbvsmGS0OqZNSOuUw
- rv/g==
+ bh=aXyjLY13V+nekeG3vOBz5nLcikYdxrMvA83lBS/TJQg=;
+ b=uWEl5lH+/ghH1iLYgNFh7PkEInKgeOE/u4LGKtFZmNaJrd8m8/jIgfuNaQNQlXrciV
+ qHejafDKTKRq426DLhcNAEcCwaZ2DEiNpKojFndGqu8kckHBsckqu3v+UZFaIp68UGMq
+ 1wtNuAmVgps/ejYzU2UfEQzyuckzxDdrxtAy1Sit65yLVdF6haRsWMkPcdzgnvmtgqkg
+ waMLAlgvwqinGT+YJefGdtfuVWLzJ6iSI6fMnvr5wpBLZYiDVMZRQrnM3/r+Csp6X1rf
+ N+/fj02m9zCqC+sb4W7fcCiFxE7XwVnEdeU6r/Q7Ri0N4z7+RXdiA0FaKi9i0E3oR8qC
+ f1Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=K4I6rKlRV5CwkXwi1bhz1e4ZJqjshXMHPloXxAGf1Gs=;
- b=M+XHPWcu+B/1yWI4qifsgRRUeo3QqHFtWg3yPjre6k/6th0KFVYMDiLIHH41BT0TF7
- CtMd71ZqQAyihsKx2eC6CZD6umbyD9yh1GUD3Ooa8uful0WnBorDXCN7KF7ex8YDBPGN
- OGdwOza2/qHJOfraFlQEg3+6YpOkwN4wDo39W5iG2MPkwS9OqWwaZRPGXDa5+08hxF60
- vVFaN+4PeIvgnBXW4DEhntaehIDqdGfKLHMCay4faBqHXNODtUJwAgcQl2/fx2stVhaP
- PDPVEQHQiwrw6UP130mohHErUERJQZ0rO+fQTfquWNG0+baTRCgTz+D4Fj5Tz9ssPiO1
- 4Bqg==
-X-Gm-Message-State: AOAM533aattwzIE+gRv6zuJxLHlsS/s71qcuXTjXaGmtIBmYsUkyvyCI
- Jw4uQKZa3tYd6G2gj7n3W8ZgGW6p/Vo=
-X-Google-Smtp-Source: ABdhPJzCxUSgdlziZfXv4uD1ng0gnQ2iPCuCmjbBBcyBT/XlH5ugoZcR1gpvUyx8zmP7Yez1X1Wypg==
-X-Received: by 2002:a5d:6cad:: with SMTP id a13mr11099223wra.347.1602943561904; 
- Sat, 17 Oct 2020 07:06:01 -0700 (PDT)
+ bh=aXyjLY13V+nekeG3vOBz5nLcikYdxrMvA83lBS/TJQg=;
+ b=cJv8NV96apQPpriBH9j/Mjcn9gJwqS/UujMPOOpsqv9W2EEG9L+hBoq5pFMKJybXqM
+ hbd2aYp+SPKH7vB0YkXnxN/SZ7ZHcr1NJW9yyW0H+uaIld6974zruWwWyV7DmYmW33DO
+ Sigm+jr3tPtSY5AtaI0FmXUBqi9RSGzulUKm8KRxyiR7ZXn60KF1xEFKdoHCoVSuhHiP
+ 7b/ltJMR1BYdeSa9FXeIy26LXwAoCKzNy3xYC+ARb/mhsSZ+m8yB1ohIsQp37TUSj8ca
+ B0iXRR+YtHmzmwoi7boCN6YTwCJabfaiI3Cm96MNd2Vh6LyWFLa/309UyxNisQNgy8n9
+ CraA==
+X-Gm-Message-State: AOAM533ncmjaWCWlKKEE1E+Lo+mbwx6N2ByKS7XFcdcFpPadKrUqaUvL
+ hB1SW4BttBx1vGUhdPuAe452KsCrU/0=
+X-Google-Smtp-Source: ABdhPJzwhW4mVi+f5x9wTnteifaIaWY7KcxpRoe6uMfIps/QYOVtdq/BcMmkU6mlXFvML8NSqsAC1A==
+X-Received: by 2002:a1c:7707:: with SMTP id t7mr9214439wmi.54.1602943435807;
+ Sat, 17 Oct 2020 07:03:55 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id b189sm7292068wmb.37.2020.10.17.07.06.00
+ by smtp.gmail.com with ESMTPSA id p9sm7542621wma.12.2020.10.17.07.03.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:06:01 -0700 (PDT)
+ Sat, 17 Oct 2020 07:03:55 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 42/44] MAINTAINERS: Downgrade MIPS Boston to 'Odd Fixes',
- fix Paul Burton mail
-Date: Sat, 17 Oct 2020 16:02:41 +0200
-Message-Id: <20201017140243.1078718-43-f4bug@amsat.org>
+Subject: [PULL 15/44] target/mips/cp0_timer: Explicit unit in variable name
+Date: Sat, 17 Oct 2020 16:02:14 +0200
+Message-Id: <20201017140243.1078718-16-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
 References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x429.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -106,48 +105,67 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
  Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Thomas Huth <thuth@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paul's Wavecomp email has been bouncing for months. He told us
-he "no longer has access to modern MIPS CPUs or Boston hardware,
-and wouldn't currently have time to spend on them if he did." [1]
-but "perhaps that might change in the future." [2].
-Be fair and downgrade the status of the Boston board to "Odd Fixes"
-(has a maintainer but they don't have time to do much other).
-Similarly to commit 2b107c2c1c (".mailmap: Update Paul Burton email
-address"), update his email address here too.
-
-[1] https://www.mail-archive.com/qemu-devel@nongnu.org/msg718739.html
-[2] https://www.mail-archive.com/qemu-devel@nongnu.org/msg728605.html
+Name variables holding nanoseconds with the '_ns' suffix.
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20201013101659.3557154-4-f4bug@amsat.org>
+Reviewed-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Message-Id: <20201012095804.3335117-7-f4bug@amsat.org>
 ---
- MAINTAINERS | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ target/mips/cp0_timer.c | 19 ++++++++++---------
+ 1 file changed, 10 insertions(+), 9 deletions(-)
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 50fb9fda34d..8770cd6d05a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1162,9 +1162,9 @@ S: Maintained
- F: hw/intc/loongson_liointc.c
+diff --git a/target/mips/cp0_timer.c b/target/mips/cp0_timer.c
+index 9c38e9da1c8..5194c967ae3 100644
+--- a/target/mips/cp0_timer.c
++++ b/target/mips/cp0_timer.c
+@@ -32,13 +32,14 @@
+ /* MIPS R4K timer */
+ static void cpu_mips_timer_update(CPUMIPSState *env)
+ {
+-    uint64_t now, next;
++    uint64_t now_ns, next_ns;
+     uint32_t wait;
  
- Boston
--M: Paul Burton <pburton@wavecomp.com>
-+M: Paul Burton <paulburton@kernel.org>
- R: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>
--S: Maintained
-+S: Odd Fixes
- F: hw/core/loader-fit.c
- F: hw/mips/boston.c
- F: hw/pci-host/xilinx-pcie.c
+-    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+-    wait = env->CP0_Compare - env->CP0_Count - (uint32_t)(now / TIMER_PERIOD);
+-    next = now + (uint64_t)wait * TIMER_PERIOD;
+-    timer_mod(env->timer, next);
++    now_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++    wait = env->CP0_Compare - env->CP0_Count -
++           (uint32_t)(now_ns / TIMER_PERIOD);
++    next_ns = now_ns + (uint64_t)wait * TIMER_PERIOD;
++    timer_mod(env->timer, next_ns);
+ }
+ 
+ /* Expire the timer.  */
+@@ -56,16 +57,16 @@ uint32_t cpu_mips_get_count(CPUMIPSState *env)
+     if (env->CP0_Cause & (1 << CP0Ca_DC)) {
+         return env->CP0_Count;
+     } else {
+-        uint64_t now;
++        uint64_t now_ns;
+ 
+-        now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
++        now_ns = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+         if (timer_pending(env->timer)
+-            && timer_expired(env->timer, now)) {
++            && timer_expired(env->timer, now_ns)) {
+             /* The timer has already expired.  */
+             cpu_mips_timer_expire(env);
+         }
+ 
+-        return env->CP0_Count + (uint32_t)(now / TIMER_PERIOD);
++        return env->CP0_Count + (uint32_t)(now_ns / TIMER_PERIOD);
+     }
+ }
+ 
 -- 
 2.26.2
 
