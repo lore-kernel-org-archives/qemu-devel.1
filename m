@@ -2,83 +2,85 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C33D2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:05:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1614BC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:05:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 442612072C
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 937A42072C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:05:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ndce9HV8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 442612072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MwhIzd9v"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 937A42072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59142 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTmpR-0002xQ-9S
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36304)
+	id 1kTmpe-0003FZ-HE
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:05:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36382)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmnJ-0001Pt-V6
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:02:49 -0400
-Received: from mail-wr1-x42a.google.com ([2a00:1450:4864:20::42a]:32869)
+ id 1kTmnV-0001UH-Bi
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:01 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:55019)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmnH-0003ea-Oa
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:02:49 -0400
-Received: by mail-wr1-x42a.google.com with SMTP id b8so6629827wrn.0
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:02:47 -0700 (PDT)
+ id 1kTmnT-0003gN-6D
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:00 -0400
+Received: by mail-wm1-x341.google.com with SMTP id p15so6120999wmi.4
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:02:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=PtIQnmYqmP/KaEsVLSNpFu0nRzeAC0WPtzPT3DpTUi0=;
- b=Ndce9HV8xQX92ey3QeHlk5wWsnS/aCkKt79IqnxY0XDqbK7FdhRgkeTD+8BV75qn8l
- km37h3PmmVjcpI4ZObT8bNeg98NK60xVOIyvwhyjV3P/prNnKsLT3EvtioDWJLaKNlFg
- Z3mqg0mhF0wZRn1aasvz5kNiF74epWBEGvcbLKtq2/Se/0EWv1s0AZuxvhJiEwu7+K0q
- LZD7g/4WXIxezHTvhS8M8xorLbv+cSWNuGJekIgIhkSf24evqcFujIvB2vMuRNx7P42N
- q/b9d3ncOmST38Gipc6bkY835UlQ2X5eSc2PuACG45t9gxCrQqTeJxvbeq6TbHg81+A0
- /kZQ==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ckhgHIzetD2FmHEm0FTTUKRnqskZdYevul/a5BWHNys=;
+ b=MwhIzd9vmKrNrMQcJ4xyTdGkBMDODFCRnuLvsNjbU1/TLj/fr3P0cRjdLTbxkg2QZ0
+ zETo7T9j/B1RF2DjsFcKSrwoBiYKBpndj9Hn6/J7H9EAwAIPQTO7Ktbb2vaV+G+V00mw
+ ZmmYucRGaXnM6gNFVskqJe/1esoAxkBSjB2nYA0xMsNB2G6CgYVrK5UnZhN1ujab7m+p
+ bB4acVFxaKLLW+27yBHQnnd7cnJq4vl5WJi/3dQ2pMB9aGT6mOlpctjlecWYH7+PFJuv
+ SXsnDXTYSG4QA5CYK7S+7DjWs7Qo5YI9j56liOq1B8uWB1qMK9g9Hoa/foiOFK7C0Bdc
+ WnQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=PtIQnmYqmP/KaEsVLSNpFu0nRzeAC0WPtzPT3DpTUi0=;
- b=NcL6m892bg7V4kyoxKJHwvd4FL5ogSpb7ljwSVM/r0I5UqGHfnBpiJp67YVKg3tIaz
- pBa5RVeE6/Hf6yFhAz/qDVkrI0s1Hy+LOEPl9Bf1iWvISRldwCb4sP1J43iE13U3UhJ4
- emR1bxWU58zFEY5aEsT+5buw+0klF+/4SFJorUAUHJuuHx+9Kvdhceq9mtXOHeKe3Jay
- HaXWQz01yLNEmsiXJSfBrZ4yneTLwMNLPLpKXRNUD0YUza2hc5DQ6pbJiEB4/9cQ6MRd
- 6VOL/OkymgHHgdkbdiOtWohEKEmtLw56GLnJCmRNvijyYrZjjLR40lEU5vx1wmRwE5LS
- 5L1g==
-X-Gm-Message-State: AOAM530sfYhaVrAyP9PNHgX65wwk6stPpuFEA2EbyYEdlNwEBJonkbkS
- WrF5700acrqq5LKRtnI9W2qKPESFU9c=
-X-Google-Smtp-Source: ABdhPJxRwkufBHKQppy6b4pcm/B9fpz8ITrpGlMHg3ld86TEYCiWQeoFmjUq037NSKH5QnRAuYpgWA==
-X-Received: by 2002:a05:6000:1084:: with SMTP id
- y4mr9750267wrw.138.1602943365689; 
- Sat, 17 Oct 2020 07:02:45 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=ckhgHIzetD2FmHEm0FTTUKRnqskZdYevul/a5BWHNys=;
+ b=TJlfgGisyYZe9r48Ez5aMZ5KlweKwI2oaxGMI+rXVx0Bm3dnJWOe3MJAm5uJID4y+T
+ XtZGp2GcUwE+R2l8JIDfZCAUqgIKfhJ9dkkFtHoC645KMd2Xu8q1y8RNplaZ2TSViTFU
+ PLfSfDINd+3Tq+WjHjAWA9RNwF2nSqM0v1vCat3UWChmCY0hpaMqRjDbgYwPEx6kDCfC
+ M0gCBVDkwdV9LpDeQXvLoe2VV3ln0JsX2uw1c6eEfRnkTOv5CFtx84q13P/yXMrfkKin
+ g8cwZM5c0/7iGwz4lNrauvl8F6JBx5cXWG/qijk6iAqwVzCt3cDtmhs6eA/MWMEDrwgK
+ QN4Q==
+X-Gm-Message-State: AOAM531YQ3FQ2c9l/uSHEh5oHrmKuBb5K9L6taXgYk6X957gXk45ncJ7
+ OjGUz0bQqOFjLFK6Wi9bZ92hw104kr4=
+X-Google-Smtp-Source: ABdhPJw8G3qQpcBEOQOl2n1jsv9b14X+nabi32lR8Ou+QXQn4MMlOoWQ6dDih6K8nK2W55im4NDSkw==
+X-Received: by 2002:a7b:c4cb:: with SMTP id g11mr8707586wmk.88.1602943375100; 
+ Sat, 17 Oct 2020 07:02:55 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id u6sm7443951wmj.40.2020.10.17.07.02.44
+ by smtp.gmail.com with ESMTPSA id b189sm7279971wmb.37.2020.10.17.07.02.54
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:02:45 -0700 (PDT)
+ Sat, 17 Oct 2020 07:02:54 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 00/44] mips-next patches for 2020-10-17
-Date: Sat, 17 Oct 2020 16:01:59 +0200
-Message-Id: <20201017140243.1078718-1-f4bug@amsat.org>
+Subject: [PULL 02/44] hw/qdev-clock: Display error hint when clock is missing
+ from device
+Date: Sat, 17 Oct 2020 16:02:01 +0200
+Message-Id: <20201017140243.1078718-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
+References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::42a;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42a.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -101,7 +103,9 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ "Edgar E . Iglesias" <edgar.iglesias@xilinx.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>, Luc Michel <luc@lmichel.fr>,
  Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
@@ -110,139 +114,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 7daf8f8d011cdd5d3e86930ed2bde969425c790c=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/kevin/tags/for-upstream' into stagi=
-ng=3D=0D
- (2020-10-16 17:39:01 +0100)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/philmd/qemu.git tags/mips-next-20201017=0D
-=0D
-for you to fetch changes up to 68fa519a6cb455005317bd61f95214b58b2f1e69:=0D
-=0D
-  target/mips: Increase number of TLB entries on the 34Kf core (16 -> 64) (=
-20=3D=0D
-20-10-17 13:59:40 +0200)=0D
-=0D
-----------------------------------------------------------------=0D
-MIPS patches queue=0D
-=0D
-. Fix some comment spelling errors=0D
-. Demacro some TCG helpers=0D
-. Add loongson-ext lswc2/lsdc2 group of instructions=0D
-. Log unimplemented cache opcode=0D
-. Increase number of TLB entries on the 34Kf core=0D
-. Allow the CPU to use dynamic frequencies=0D
-. Calculate the CP0 timer period using the CPU frequency=0D
-. Set CPU frequency for each machine=0D
-. Fix Malta FPGA I/O region size=0D
-. Allow running qtests when ROM is missing=0D
-. Add record/replay acceptance tests=0D
-. Update MIPS CPU documentation=0D
-. MAINTAINERS updates=0D
-=0D
-CI jobs results:=0D
-  https://gitlab.com/philmd/qemu/-/pipelines/203931842=0D
-  https://travis-ci.org/github/philmd/qemu/builds/736491461=0D
-  https://cirrus-ci.com/build/6272264062631936=0D
-  https://app.shippable.com/github/philmd/qemu/runs/886/summary/console=0D
-----------------------------------------------------------------=0D
-=0D
-Aleksandar Markovic (4):=0D
-  target/mips: Demacro helpers for <ABS|CHS>.<D|S|PS>=0D
-  target/mips: Demacro helpers for M<ADD|SUB>F.<D|S>=0D
-  target/mips: Demacro helpers for <MAX|MAXA|MIN|MINA>.<D|S>=0D
-  MAINTAINERS: Remove myself=0D
-=0D
-Eduardo Habkost (1):=0D
-  hw/mips: Rename TYPE_MIPS_BOSTON to TYPE_BOSTON=0D
-=0D
-Huacai Chen (1):=0D
-  docs/system: Update MIPS CPU documentation=0D
-=0D
-Jiaxun Yang (3):=0D
-  target/mips: Add loongson-ext lswc2 group of instructions (Part 1)=0D
-  target/mips: Add loongson-ext lswc2 group of instructions (Part 2)=0D
-  target/mips: Add loongson-ext lsdc2 group of instructions=0D
-=0D
-Luc Michel (1):=0D
-  hw/core/clock: Add the clock_new helper function=0D
-=0D
-Pavel Dovgalyuk (2):=0D
-  hw/mips: Remove exit(1) in case of missing ROM=0D
-  tests/acceptance: Add MIPS record/replay tests=0D
-=0D
-Philippe Mathieu-Daud=3DC3=3DA9 (31):=0D
-  util/cutils: Introduce freq_to_str() to display Hertz units=0D
-  hw/qdev-clock: Display error hint when clock is missing from device=0D
-  target/mips/op_helper: Convert multiple if() to switch case=0D
-  target/mips/op_helper: Document Invalidate/Writeback opcodes as no-op=0D
-  target/mips/op_helper: Log unimplemented cache opcode=0D
-  target/mips: Move cpu_mips_get_random() with CP0 helpers=0D
-  target/mips/cp0_timer: Explicit unit in variable name=0D
-  target/mips/cp0_timer: Document TIMER_PERIOD origin=0D
-  target/mips: Move cp0_count_ns to CPUMIPSState=0D
-  target/mips/cpu: Calculate the CP0 timer period using the CPU=0D
-    frequency=0D
-  target/mips/cpu: Make cp0_count_rate a property=0D
-  target/mips/cpu: Allow the CPU to use dynamic frequencies=0D
-  target/mips/cpu: Introduce mips_cpu_create_with_clock() helper=0D
-  hw/mips/r4k: Explicit CPU frequency is 200 MHz=0D
-  hw/mips/fuloong2e: Set CPU frequency to 533 MHz=0D
-  hw/mips/mipssim: Correct CPU frequency=0D
-  hw/mips/jazz: Correct CPU frequencies=0D
-  hw/mips/cps: Expose input clock and connect it to CPU cores=0D
-  hw/mips/boston: Set CPU frequency to 1 GHz=0D
-  hw/mips/malta: Set CPU frequency to 320 MHz=0D
-  hw/mips/cps: Do not allow use without input clock=0D
-  target/mips/cpu: Display warning when CPU is used without input clock=0D
-  hw/mips/malta: Fix FPGA I/O region size=0D
-  hw/mips/malta: Move gt64120 related code together=0D
-  hw/mips/malta: Use clearer qdev style=0D
-  hw/mips: Simplify loading 64-bit ELF kernels=0D
-  hw/mips: Simplify code using ROUND_UP(INITRD_PAGE_SIZE)=0D
-  MAINTAINERS: Put myself forward for MIPS target=0D
-  MAINTAINERS: Downgrade MIPS Boston to 'Odd Fixes', fix Paul Burton=0D
-    mail=0D
-  MAINTAINERS: Remove duplicated Malta test entries=0D
-  target/mips: Increase number of TLB entries on the 34Kf core (16 ->=0D
-    64)=0D
-=0D
-zhaolichang (1):=0D
-  target/mips: Fix some comment spelling errors=0D
-=0D
- docs/system/cpu-models-mips.rst.inc |  10 +-=0D
- include/hw/clock.h                  |  13 +=0D
- include/hw/mips/cps.h               |   2 +=0D
- include/hw/mips/mips.h              |   4 +-=0D
- include/qemu/cutils.h               |  12 +=0D
- target/mips/cpu.h                   |  26 ++=0D
- target/mips/internal.h              |   4 +-=0D
- hw/core/clock.c                     |  15 +=0D
- hw/core/qdev-clock.c                |  11 +=0D
- hw/mips/boston.c                    |  21 +-=0D
- hw/mips/cps.c                       |   9 +=0D
- hw/mips/fuloong2e.c                 |  18 +-=0D
- hw/mips/jazz.c                      |  23 +-=0D
- hw/mips/malta.c                     |  59 ++--=0D
- hw/mips/mipssim.c                   |  30 +-=0D
- hw/mips/r4k.c                       |  16 +-=0D
- target/mips/cp0_helper.c            |  25 ++=0D
- target/mips/cp0_timer.c             |  51 +---=0D
- target/mips/cpu.c                   |  55 +++-=0D
- target/mips/fpu_helper.c            | 220 ++++++++++----=0D
- target/mips/op_helper.c             |  27 +-=0D
- target/mips/translate.c             | 453 +++++++++++++++++++++++++++-=0D
- util/cutils.c                       |  14 +=0D
- MAINTAINERS                         |  25 +-=0D
- target/mips/translate_init.c.inc    |   4 +-=0D
- tests/acceptance/replay_kernel.py   | 167 +++++++++-=0D
- 26 files changed, 1119 insertions(+), 195 deletions(-)=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+Instead of directly aborting, display a hint to help the developer
+figure out the problem (likely trying to connect a clock to a device
+pre-dating the Clock API, thus not expecting clocks).
+
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Luc Michel <luc@lmichel.fr>
+Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-Id: <20201012095804.3335117-4-f4bug@amsat.org>
+---
+ hw/core/qdev-clock.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+
+diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
+index 47ecb5b4fae..6a9a340d0fb 100644
+--- a/hw/core/qdev-clock.c
++++ b/hw/core/qdev-clock.c
+@@ -12,6 +12,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "hw/qdev-clock.h"
+ #include "hw/qdev-core.h"
+ #include "qapi/error.h"
+@@ -153,6 +154,11 @@ Clock *qdev_get_clock_in(DeviceState *dev, const char *name)
+     assert(name);
+ 
+     ncl = qdev_get_clocklist(dev, name);
++    if (!ncl) {
++        error_report("Can not find clock-in '%s' for device type '%s'",
++                     name, object_get_typename(OBJECT(dev)));
++        abort();
++    }
+     assert(!ncl->output);
+ 
+     return ncl->clock;
+@@ -165,6 +171,11 @@ Clock *qdev_get_clock_out(DeviceState *dev, const char *name)
+     assert(name);
+ 
+     ncl = qdev_get_clocklist(dev, name);
++    if (!ncl) {
++        error_report("Can not find clock-out '%s' for device type '%s'",
++                     name, object_get_typename(OBJECT(dev)));
++        abort();
++    }
+     assert(ncl->output);
+ 
+     return ncl->clock;
+-- 
+2.26.2
+
 
