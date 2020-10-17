@@ -2,87 +2,89 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22EC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:42:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 653B7C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:45:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78BAA2074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:42:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5AB12074A
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:45:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u83Ne1vv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78BAA2074A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AH/3UCKk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5AB12074A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTqDZ-0008OQ-9w
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 13:42:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38400)
+	id 1kTqH3-0001AU-Tc
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 13:45:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTqA3-0006VO-5U; Sat, 17 Oct 2020 13:38:34 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42936)
+ id 1kTqFu-0000YN-L1; Sat, 17 Oct 2020 13:44:34 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46705)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTqA0-0001kJ-VN; Sat, 17 Oct 2020 13:38:30 -0400
-Received: by mail-wr1-x442.google.com with SMTP id j7so2843167wrt.9;
- Sat, 17 Oct 2020 10:38:27 -0700 (PDT)
+ id 1kTqFs-0002Jj-PU; Sat, 17 Oct 2020 13:44:34 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n6so6894223wrm.13;
+ Sat, 17 Oct 2020 10:44:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=KuEYCGFH8gjp+8Ls6mQNWt3KwF5OST9pKx9d2hlW3yE=;
- b=u83Ne1vvo6WKQCkaa1O/gwjlBVtyx5Q5l+epoCdhKo1cB+X2jy1tFPdW/UqUb7PRC6
- 0MLEd2A1ZLWtoWs0yzVNPlrdcx+xSZXFuaYewwjX/beqQxvkl2KhtVnXC6y6aLlrc8zI
- 35oO2YHjRWGfEqZSwvwhLd/V5arnA2ZjHjya9WGF47r18vbuohbGV/Yon3IGV2RMT9mO
- GTL+vAy+hBnaVijL+JDXokdZCXDIwXcO+N/AfaeuA8nPNqcFEPEFtS0bsUrkPpcXzk6F
- QQfBm1Ho7L+jzhs+ih0bgVtddm0Pj8dB4usF+TZ89OZfwlBTMB9Nhn16jWnoFABCkkdT
- Z0mw==
+ bh=NuBMMA9P9+Uu7GYL8b5m00yUHlAcPRtsrSZIdVJw364=;
+ b=AH/3UCKk4MNCjqJ3xsrX1M1lJD0bMh/bU4zZP2lyJ4Y6AC2XFRGDWW48Jgbce8F2aL
+ xRJLwT/Qb3cBxyf7FQxe3RSkVDcQwo4++SyoG1PQ2d7K0vPun/5Ou2LsTs6cehdmTtlP
+ 9dfnAQ8pG7Bor8xjoRq4b4WKvThbIq7Tsp+YUJ/aOiMNb0oU9l3VsolvdJXItiALSsEW
+ pD5WmCXdV4F4e5px+vXN0x749H+USdU4D05FF+4epKUuALDxbXLmGK1xHU65KRnbuD0S
+ tW6wp/Y6Es9mJlOS9x216MJWRRl9RPLzrKGtrfGc4AiRQInUNtNe1Mh3Ah0uz/gXMxvG
+ Ygmw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=KuEYCGFH8gjp+8Ls6mQNWt3KwF5OST9pKx9d2hlW3yE=;
- b=rMch89oxrtKni6eu972qYhUTR9InLt3JqiHWB8CdfOeU624qyWJfHHRZ8oG4FbWRr1
- PY8LwPZlRdD42JD6cRe6GbU5ihBHzcHKbVnZLlBwBwO/hxK3exTu2pP+P9ojSsyf+NED
- OvXKKJHmPqLiVFDX8wUG7KPc1Qu4Ry8S47fQw+Rw5f7BAKjRWhMNxxjW363fNS/fcscC
- w6SsG+2/WJTSRQokdNKyH5Z2cUmgnG2jAbP6q3c99LeJADPMdBhUlRpYpXv+6XvH7oCu
- N8Bh4rEw6g2WOwpHLBp0Do/4wHb0X9xO1/W/ka4MgzALIxdnp/t8FFIdIB2kGH3mkOMm
- x7xQ==
-X-Gm-Message-State: AOAM531jV/L1m0BK8KMXmgTBjOSd+R/3bU3IY6pWehqLl706OcoMDJc2
- HD0IE6i24P6IUmNLytfYjNeYmNYQvrI=
-X-Google-Smtp-Source: ABdhPJwmFszSFr/tnFtM3YH8R76XzCopuPko75lBYDn6PncjLyrf8FFjYJpoQPyspGoSUp0o2b7fNA==
-X-Received: by 2002:a5d:4e8d:: with SMTP id e13mr11070104wru.368.1602956306108; 
- Sat, 17 Oct 2020 10:38:26 -0700 (PDT)
+ bh=NuBMMA9P9+Uu7GYL8b5m00yUHlAcPRtsrSZIdVJw364=;
+ b=OodQwQfWz0PeJr4vRbZEZNOSR9ZEJKwV1t89Z8/R21iPXRJefGLWnSPg6qd67UolDS
+ comG+RF413vBJsitOW5CNlRQpFwxaF9bC78tYrAadDBw6JvP1Uwu6xmBiExMChIEzfbu
+ mWEwTcHzuAValYSHJzaGo/YGxqdaLdBOrDnUTk4lYZ1pvxLxNU6VAA6R2vp/nS1k0j4w
+ 4dTC0ejsQG1LqEc7FC4onveKsJPn7sg4840QfooFawnR8qIfsUq+Orn1cf0ChgIJ8z8Y
+ Zb7tHEgyosFBTtI5AhuFpPAJkQaf8qOOlUNP0UaFcL2k4pbu0v+2wR4XfKj7YKzTjvXh
+ RKaw==
+X-Gm-Message-State: AOAM5332vKdJGlN2knDZe5HGmDBFm4tFecx/TWxvikHWWQQ57Bd+3ct8
+ YJwHuD0VtYf8HwGoSK1h5oeXCF1x6yw=
+X-Google-Smtp-Source: ABdhPJzvGwmg55rEmKl247fyo5L46Aj8+U806GHKIdYZaivkcO9SuJVUyJm4sJgGmHprc8lMiJrjpw==
+X-Received: by 2002:adf:e70f:: with SMTP id c15mr11320079wrm.239.1602956670671; 
+ Sat, 17 Oct 2020 10:44:30 -0700 (PDT)
 Received: from [192.168.1.36] (117.red-83-52-172.dynamicip.rima-tde.net.
  [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id c15sm4274382wmb.27.2020.10.17.10.38.25
+ by smtp.gmail.com with ESMTPSA id s1sm8086802wmh.22.2020.10.17.10.44.29
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 17 Oct 2020 10:38:25 -0700 (PDT)
-Subject: Re: [PATCH v9] mac_oldworld: Allow loading binary ROM image
+ Sat, 17 Oct 2020 10:44:30 -0700 (PDT)
+Subject: Re: [PATCH v8 0/5] Mac Old World ROM experiment (ppc/mac_* clean ups
+ and loading binary ROM)
 To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <20201017155139.5A36A746331@zero.eik.bme.hu>
- <11c1edab-bcbe-bb02-7c53-b4b0707779c2@amsat.org>
- <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
+References: <cover.1602805637.git.balaton@eik.bme.hu>
+ <005ed95d-65ee-ab36-c068-e96a773ef8ed@ilande.co.uk>
+ <7c34f053-268e-6dbf-205f-48792328ebe8@amsat.org>
+ <edb86311-6093-9776-a81-17ee8205a6c@eik.bme.hu>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <348bb0e5-dee2-1d4d-0fb5-bf6d56ef5706@amsat.org>
-Date: Sat, 17 Oct 2020 19:38:24 +0200
+Message-ID: <6598b187-7936-563c-c06b-cb4315fa4cc1@amsat.org>
+Date: Sat, 17 Oct 2020 19:44:29 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <edb86311-6093-9776-a81-17ee8205a6c@eik.bme.hu>
+Content-Type: text/plain; charset=iso-8859-15; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -105,132 +107,63 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alistair Francis <alistair@alistair23.me>, qemu-ppc@nongnu.org,
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/20 6:31 PM, BALATON Zoltan via wrote:
-> On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
->> +Alistair for loader
->>
->> On 10/17/20 5:47 PM, BALATON Zoltan via wrote:
->>> The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
->>> the rom region and fall back to loading a binary image with -bios if
->>> loading ELF image failed. This allows testing emulation with a ROM
->>> image from real hardware as well as using an ELF OpenBIOS image.
+On 10/17/20 6:39 PM, BALATON Zoltan via wrote:
+> On Fri, 16 Oct 2020, Philippe Mathieu-DaudÃ© wrote:
+>> On 10/16/20 11:58 AM, Mark Cave-Ayland wrote:
+>>> On 16/10/2020 00:47, BALATON Zoltan via wrote:
 >>>
->>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
->>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>> ---
->>> v9: Revert change from v8, back to the same as v7 rebased on latest
+>>>> This is the cut down version of the earlier series omitting unfinished
+>>>> patches that I plan to rework later and rebased to Mark's qemu-macppc
+>>>> branch. Compared to v7 the only change is the cast to (target_ulong)
+>>>> from (uint32_t) as requested by Mark in patch 1.
 >>>
->>>   hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
->>>   1 file changed, 20 insertions(+), 9 deletions(-)
->>>
->>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
->>> index 05e46ee6fe..0117ae17f5 100644
->>> --- a/hw/ppc/mac_oldworld.c
->>> +++ b/hw/ppc/mac_oldworld.c
->>> @@ -59,6 +59,8 @@
->>>   #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
->>>     #define GRACKLE_BASE 0xfec00000
->>> +#define PROM_BASE 0xffc00000
->>> +#define PROM_SIZE (4 * MiB)
->>>     static void fw_cfg_boot_set(void *opaque, const char *boot_device,
->>>                               Error **errp)
->>> @@ -100,6 +102,7 @@ static void ppc_heathrow_init(MachineState *machine)
->>>       SysBusDevice *s;
->>>       DeviceState *dev, *pic_dev;
->>>       BusState *adb_bus;
->>> +    uint64_t bios_addr;
->>>       int bios_size;
->>>       unsigned int smp_cpus = machine->smp.cpus;
->>>       uint16_t ppc_boot_device;
->>> @@ -128,24 +131,32 @@ static void ppc_heathrow_init(MachineState 
->>> *machine)
->>>         memory_region_add_subregion(sysmem, 0, machine->ram);
->>>   -    /* allocate and load BIOS */
->>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
->>> +    /* allocate and load firmware ROM */
->>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
->>>                              &error_fatal);
->>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
->>>   -    if (bios_name == NULL)
->>> +    if (!bios_name) {
->>>           bios_name = PROM_FILENAME;
->>> +    }
->>>       filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
->>> -
->>> -    /* Load OpenBIOS (ELF) */
->>>       if (filename) {
->>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, 
->>> NULL, NULL,
->>> -                             1, PPC_ELF_MACHINE, 0, 0);
->>> +        /* Load OpenBIOS (ELF) */
->>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, 
->>> &bios_addr,
->>> +                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
->>> +        /* Unfortunately, load_elf sign-extends reading elf32 */
+>>> FWIW the reason for suggesting the cast to target_ulong is so that 
+>>> the same code works for both qemu-system-ppc and qemu-system-ppc64. 
+>>> For qemu-system-ppc that should correctly drop the sign extension 
+>>> from 32-bit, whilst still allowing someone to load a 64-bit ELF into 
+>>> qemu-system-ppc64 if requested.
 >>
->> Maybe this is what translate_fn() is for?
->>
->> uint64_t oldworld_phys(void *opaque, uint64_t addr)
->> {
->>    return addr & UINT32_MAX;
->> }
->>
->> Using as (untested):
->>
->>        bios_size = load_elf(filename, NULL, oldworld_phys, NULL,
->>                             NULL, &bios_addr, NULL,
->>                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>> IMO this is part of a bigger design problem. Not all
+>> machines main bus is 64-bit. I did some experiments
+>> but changing that involves a lot of work.
 > 
-> Please don't come up with any more great ideas for this patch unless you 
-> also propose a replacement and test it. This one works and we could just 
-> get this in as it is until the real problem with load_elf is fixed at 
-> which point all this can be removed so no need to be more sophisticated 
-> as the simple cast I have.
+> Did not want to reply to this to not bring it to your attention before 
+> patch gets in finally but it's too late...
+> 
+> Not sure what you refer to
 
-Zoltan, I'm not trying to block your patch to get merged,
-I'm asking because I'm trying to understand how this API
-is expected to be used.
+I refer to having machines with a N-bit main bus using a N-bit main bus
+(currently all main busses are 64-bit wide).
 
-> As you can see in the original discussion:
+Some 32-bit machines have access to 64-bit busses, some don't.
+
+I have been wondering about it because of the AVR CPU which
+uses a pair of busses, each less than 32-bit.
+
+If one day I can finish my work there, the Old World mac might
+benefit from it.
+
+> but in this particular case the problem only 
+> seems to be load_elf loading 32 bit ELF files returning sign extended 64 
+> bit address which looks bogus but since this function is widely used I 
+> did not feel confident enough to propose a patch to load_elf.
 > 
-> http://patchwork.ozlabs.org/project/qemu-devel/patch/c69a791c7cad1246f3f34b3993dee4f549b75aa2.1593456926.git.balaton@eik.bme.hu/ 
+> By the way, also the parameters of load_elf could take a clean up to 
+> remove all the mostly NULL values as I've pointed out before:
 > 
+> https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg03427.html
 > 
-> problem is really in include/hw/elf_ops.h this is just a work around for 
-> that as I did not want to break anything I can't test so I'd rather fix 
-> it up here and let you fix load_elf then drop this cast. But unless you 
-> can do that before the freeze please don't hold up this patch any more.
+> but all this could wait until later, these don't seem to be urgent 
+> problems to prevent moving mac machines forward now and could all be 
+> addressen in separate elf loading series. So just note the problem and 
+> move on for now please.
 > 
-> Regards,
+> Reagards.
 > BALATON Zoltan
-> 
->>> +        bios_addr = (uint32_t)bios_addr;
->>> +
->>> +        if (bios_size <= 0) {
->>> +            /* or load binary ROM image */
->>> +            bios_size = load_image_targphys(filename, PROM_BASE, 
->>> PROM_SIZE);
->>> +            bios_addr = PROM_BASE;
->>> +        }
->>>           g_free(filename);
->>>       } else {
->>>           bios_size = -1;
->>>       }
->>> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
->>> +    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > 
->>> PROM_SIZE) {
->>>           error_report("could not load PowerPC bios '%s'", bios_name);
->>>           exit(1);
->>>       }
->>>
->>
->>
->>
 
