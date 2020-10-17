@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26456C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:10:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD912C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:10:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9092B2072C
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:10:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5A5F02072C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:10:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UokLcAdf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9092B2072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmyZGF8r"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A5F02072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48174 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTmuF-0001df-Lv
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:09:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36400)
+	id 1kTmuR-0001ss-H2
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:10:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36472)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmnY-0001VK-Fk
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:08 -0400
-Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:44920)
+ id 1kTmnh-0001Xo-5I
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:18 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43346)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmnW-0003gd-Qz
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:04 -0400
-Received: by mail-wr1-x42c.google.com with SMTP id t9so6549393wrq.11
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:01 -0700 (PDT)
+ id 1kTmnf-0003hR-0L
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:12 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g12so6552604wrp.10
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=N+6P5UyNzQt64543jNV3+JqEP1ruUMZwDb9XjKLtnVQ=;
- b=UokLcAdfIvbxLFzHsZ+I+CiGEmjwM5PeSp77ZmCFFk3RV6ATrDiOffn65e2v7lhduq
- 7jMmhJEcYCjBJJG2CoPiX6dcTlXZ2kuo2teiO/ZxttnL60Wa04bFnw3HiqcLGaqK7vzQ
- LdYyr3hVim3AQvLtvbU19ewYtKwT9ynX1D1W2chfWAgvUqjvfXJ/MmFJr7xeqWBm2EwK
- BDDl9wYhbeouIv4p5X/3maRTAPAqp5ZqpXKIRMiE5ueaiRAYVAS/oltTiFFb+2k5w/GG
- m/3LUit1+mgriud4JH5Blu+KAVP4YuQCeCiwq+b3HoTSLrx0ygcpXQH6QgFAe29oAOly
- lrpQ==
+ bh=NKriZfWZy7VDzuwNa8INVpQFiDmOp1zR9QaKdg51zCU=;
+ b=bmyZGF8rClLcePprRp0bTQA+NNBuA50BsV490rx1eKcKn3iTqvgHkI6OA2rFygCJRF
+ rr3rb998/1/mz7mtLX0RHX+jWfBBPkm8FKVTZWjXRlu2cnbLVVqKknT8kl7Cc4f3tefJ
+ iZq5czFGsuGDkICDKYEqG6EIiNUkx9rOAZcSlA2ft5KlsVvcyk6dfIBJzG6H2aH3PIzs
+ xF8Q1iSm9cPO9oC5XH1Esuxz35vFluJb0+SDRKe0xvr3IeFXHusAjNq774JhnE0/RnqJ
+ VyEuaQkVvY7AdBliS10D5nYqM56kqQEKHbYAK3o/OgLDVnJlUYJzsb3YPfbHKfxzesEc
+ k0Ig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=N+6P5UyNzQt64543jNV3+JqEP1ruUMZwDb9XjKLtnVQ=;
- b=AF5XU5qALfbSKp5eveyHZRFISjRmcKV1tunLLnmmb+TsRFiAwp5e339Trygg8JjjEE
- bEY3qxbSXYMKvqpTvc63OFM/63xOLUzJw4/aj87j/ndCL7RoWYxqp5dFUNr703vQkhf5
- CJc0ltgdaAgHiIR9T1+N1NkCbPZNkKkdujVOfZKhGDvpyTEaEe1QJbvhYve0yGcS7ci4
- LjeUvKJCc3Jl+/+aye+c8+yeMUJt4Vy7Tpq5mvClWPE/Diewg0IfwefPOY96dp9WACnB
- rNVUofTnGeoQVWdcD/A1NBHrwkz0eV2k7EdZZiMdWkpQE4q1uKp3BQTS2VAAZX6KVNyO
- SusA==
-X-Gm-Message-State: AOAM533ME25qAioebKaHIYkTNYWj3VYPuFfCTOfo42rsp4nu5t1zckte
- cytmovse5biRPXMNhU8P1fSJKFucNB0=
-X-Google-Smtp-Source: ABdhPJyqrT+skP3Rc8vENV40BvEMM08JKTFVY/XKZPXcFmyh4Ppc3MLpElduEL+7q18vql3cCLBBDw==
-X-Received: by 2002:adf:e50b:: with SMTP id j11mr10486045wrm.263.1602943379830; 
- Sat, 17 Oct 2020 07:02:59 -0700 (PDT)
+ bh=NKriZfWZy7VDzuwNa8INVpQFiDmOp1zR9QaKdg51zCU=;
+ b=nTQ0QCS9F5QrZb+oLunI7yniLBu0/hSBtjK0+Cy5Xpi2aPoLLcxRoUfYWzCeN4xlKJ
+ d2Fuluevugnb4AOcAWIgJuDCV8snqP8xlc47eGEGdIGccyJeNXT6XCX07JB5syQSEr1+
+ udWkNL0+6YGGJq2qzz30+osQk9zZBkzoCchMjLgmNjntuatVnT1LixiA4w7LaLDXEO9R
+ viTeXiYEm0fozKUkQpUkFTmFtEpM08kN82mAjRydVCG8CkkrVEXlnjz62nDQAABMwD41
+ ADjEkeqNp+dh0m8ssr/fyzQeAAr1ooX26Fmn/VSzWUBehp2nL2Ql9ghtUPjzK/16c6Gc
+ WGYg==
+X-Gm-Message-State: AOAM530q8LUTMln6En6GkNnj+kslsZC3n5JMY0b3Q/JFTPng8S7dQFoU
+ Y7uXRO3L7lYD7M8Wv04MZ2qOBjqEHk4=
+X-Google-Smtp-Source: ABdhPJytxIKlOBIIqZpZuAYMSpmIP34nE2JS6VexfJLbd1A3Qbn0WgttJR+JbJE5UM528ibPSyOWWg==
+X-Received: by 2002:adf:f7c1:: with SMTP id a1mr10459276wrq.399.1602943389522; 
+ Sat, 17 Oct 2020 07:03:09 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id x18sm9349551wrg.4.2020.10.17.07.02.58
+ by smtp.gmail.com with ESMTPSA id 205sm7816168wme.38.2020.10.17.07.03.08
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:02:59 -0700 (PDT)
+ Sat, 17 Oct 2020 07:03:08 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/44] hw/core/clock: Add the clock_new helper function
-Date: Sat, 17 Oct 2020 16:02:02 +0200
-Message-Id: <20201017140243.1078718-4-f4bug@amsat.org>
+Subject: [PULL 05/44] target/mips: Demacro helpers for <ABS|CHS>.<D|S|PS>
+Date: Sat, 17 Oct 2020 16:02:04 +0200
+Message-Id: <20201017140243.1078718-6-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
 References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42c.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -103,84 +103,98 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Luc Michel <luc@lmichel.fr>, Paul Burton <paulburton@kernel.org>,
+ Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Luc Michel <luc@lmichel.fr>
+From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 
-This function creates a clock and parents it to another object with a
-given name. It calls clock_setup_canonical_path before returning the
-new clock.
+Remove function definitions via macros to achieve better code clarity.
 
-This function is useful to create clocks in devices when one doesn't
-want to expose it at the qdev level (as an input or an output).
-
-Suggested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Luc Michel <luc@lmichel.fr>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
 Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20201010135759.437903-4-luc@lmichel.fr>
+Message-Id: <1602103041-32017-2-git-send-email-aleksandar.qemu.devel@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/clock.h | 13 +++++++++++++
- hw/core/clock.c    | 15 +++++++++++++++
- 2 files changed, 28 insertions(+)
+ target/mips/fpu_helper.c | 59 ++++++++++++++++++++++++++--------------
+ 1 file changed, 39 insertions(+), 20 deletions(-)
 
-diff --git a/include/hw/clock.h b/include/hw/clock.h
-index d357594df99..cbc5e6ced1e 100644
---- a/include/hw/clock.h
-+++ b/include/hw/clock.h
-@@ -90,6 +90,19 @@ extern const VMStateDescription vmstate_clock;
-  */
- void clock_setup_canonical_path(Clock *clk);
- 
-+/**
-+ * clock_new:
-+ * @parent: the clock parent
-+ * @name: the clock object name
-+ *
-+ * Helper function to create a new clock and parent it to @parent. There is no
-+ * need to call clock_setup_canonical_path on the returned clock as it is done
-+ * by this function.
-+ *
-+ * @return the newly created clock
-+ */
-+Clock *clock_new(Object *parent, const char *name);
-+
- /**
-  * clock_set_callback:
-  * @clk: the clock to register the callback into
-diff --git a/hw/core/clock.c b/hw/core/clock.c
-index 7066282f7b9..f866717a835 100644
---- a/hw/core/clock.c
-+++ b/hw/core/clock.c
-@@ -23,6 +23,21 @@ void clock_setup_canonical_path(Clock *clk)
-     clk->canonical_path = object_get_canonical_path(OBJECT(clk));
+diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
+index 56beda49d82..f851723f22d 100644
+--- a/target/mips/fpu_helper.c
++++ b/target/mips/fpu_helper.c
+@@ -983,27 +983,46 @@ uint32_t helper_float_floor_2008_w_s(CPUMIPSState *env, uint32_t fst0)
  }
  
-+Clock *clock_new(Object *parent, const char *name)
+ /* unary operations, not modifying fp status  */
+-#define FLOAT_UNOP(name)                                       \
+-uint64_t helper_float_ ## name ## _d(uint64_t fdt0)                \
+-{                                                              \
+-    return float64_ ## name(fdt0);                             \
+-}                                                              \
+-uint32_t helper_float_ ## name ## _s(uint32_t fst0)                \
+-{                                                              \
+-    return float32_ ## name(fst0);                             \
+-}                                                              \
+-uint64_t helper_float_ ## name ## _ps(uint64_t fdt0)               \
+-{                                                              \
+-    uint32_t wt0;                                              \
+-    uint32_t wth0;                                             \
+-                                                               \
+-    wt0 = float32_ ## name(fdt0 & 0XFFFFFFFF);                 \
+-    wth0 = float32_ ## name(fdt0 >> 32);                       \
+-    return ((uint64_t)wth0 << 32) | wt0;                       \
++
++uint64_t helper_float_abs_d(uint64_t fdt0)
 +{
-+    Object *obj;
-+    Clock *clk;
-+
-+    obj = object_new(TYPE_CLOCK);
-+    object_property_add_child(parent, name, obj);
-+    object_unref(obj);
-+
-+    clk = CLOCK(obj);
-+    clock_setup_canonical_path(clk);
-+
-+    return clk;
++   return float64_abs(fdt0);
 +}
 +
- void clock_set_callback(Clock *clk, ClockCallback *cb, void *opaque)
- {
-     clk->callback = cb;
++uint32_t helper_float_abs_s(uint32_t fst0)
++{
++    return float32_abs(fst0);
++}
++
++uint64_t helper_float_abs_ps(uint64_t fdt0)
++{
++    uint32_t wt0;
++    uint32_t wth0;
++
++    wt0 = float32_abs(fdt0 & 0XFFFFFFFF);
++    wth0 = float32_abs(fdt0 >> 32);
++    return ((uint64_t)wth0 << 32) | wt0;
++}
++
++uint64_t helper_float_chs_d(uint64_t fdt0)
++{
++   return float64_chs(fdt0);
++}
++
++uint32_t helper_float_chs_s(uint32_t fst0)
++{
++    return float32_chs(fst0);
++}
++
++uint64_t helper_float_chs_ps(uint64_t fdt0)
++{
++    uint32_t wt0;
++    uint32_t wth0;
++
++    wt0 = float32_chs(fdt0 & 0XFFFFFFFF);
++    wth0 = float32_chs(fdt0 >> 32);
++    return ((uint64_t)wth0 << 32) | wt0;
+ }
+-FLOAT_UNOP(abs)
+-FLOAT_UNOP(chs)
+-#undef FLOAT_UNOP
+ 
+ /* MIPS specific unary operations */
+ uint64_t helper_float_recip_d(CPUMIPSState *env, uint64_t fdt0)
 -- 
 2.26.2
 
