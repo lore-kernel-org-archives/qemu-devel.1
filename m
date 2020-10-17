@@ -2,74 +2,70 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7859BC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:54:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70872C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:56:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D36C820709
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:54:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D36C820709
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 97FA220709
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:56:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="P0lKd/4e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97FA220709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49184 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTkn1-0001oG-Ub
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 07:54:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45074)
+	id 1kTkpE-0002mw-KO
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 07:56:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkmC-0001BO-Pm; Sat, 17 Oct 2020 07:53:32 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:58626
- helo=mail.default.ilande.uk0.bigv.io)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kTkoQ-0002OB-QW
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 07:55:52 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:50787)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkmA-00060f-J5; Sat, 17 Oct 2020 07:53:32 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkm0-0004Gf-3C; Sat, 17 Oct 2020 12:53:26 +0100
-To: BALATON Zoltan <balaton@eik.bme.hu>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-References: <20201016182739.22875-1-mark.cave-ayland@ilande.co.uk>
- <20201016182739.22875-5-mark.cave-ayland@ilande.co.uk>
- <653bf315-d1e4-4dc9-dac8-1e859a2ad4d1@eik.bme.hu>
- <8efee931-3314-7f3a-395b-3b840acdab90@amsat.org>
- <75bb5535-62b9-12e1-b6bb-ce15265ca7eb@eik.bme.hu>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <9c3a17fd-0b57-4008-2088-4578a2097454@ilande.co.uk>
-Date: Sat, 17 Oct 2020 12:53:13 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kTkoO-0006JQ-5k
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 07:55:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=afH06NDMUBW1rv91txIHyFgxlFgzdqOFMCFgFiSL5kI=; b=P0lKd/4elE21OdDpE8Gf1Yvlsu
+ AqXVm22vKf1pg5CMCSLEveijoIG1qU08Wcrc5bKv5fPpExn7ntZIPII3xdAhd/wMP7OhVtbqpb/QZ
+ /x2ZFgAwa9AuQ0QNqhrxdgHLReOyiYBpNYaTOHq0J8wfsDgqNbesJHFyhKzMiDLDXF5bhsSl5sjc8
+ ETLlXIx+lOjyS9bXHAQSuzLbXSi2nlfaXedZ/7AQUmt8vK7KHsnSvmiV1KEy0Jq17yktQb46v9uG6
+ qf6+xWgn9FSgrvQADv88CaO1u/OkE4P7Q56fnt/4Hb9zDqNrjzePIBRZnXHr9jTwsTUDtCvpqbT+k
+ z6wpqZ5A==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Greg Kurz <groug@kaod.org>
+Subject: Re: [PULL 0/5] 9p queue 2020-10-15
+Date: Sat, 17 Oct 2020 13:55:42 +0200
+Message-ID: <5809478.Xo1ZfStJPt@silver>
+In-Reply-To: <CAFEAcA_ygiXU=Lh1iOPUDOsXu-cuVze-wDhc90wZ+r7C-BBesA@mail.gmail.com>
+References: <cover.1602771296.git.qemu_oss@crudebyte.com>
+ <CAFEAcA_ygiXU=Lh1iOPUDOsXu-cuVze-wDhc90wZ+r7C-BBesA@mail.gmail.com>
 MIME-Version: 1.0
-In-Reply-To: <75bb5535-62b9-12e1-b6bb-ce15265ca7eb@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 4/5] ppc405_boards: use qdev properties instead of legacy
- m48t59_init() function
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 07:55:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.247,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,79 +78,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- hpoussin@reactos.org, atar4qemu@gmail.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/10/2020 11:44, BALATON Zoltan via wrote:
-
-> On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
->> On 10/16/20 10:38 PM, BALATON Zoltan via wrote:
->>> On Fri, 16 Oct 2020, Mark Cave-Ayland wrote:
->>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->>>> ---
->>>> hw/ppc/ppc405_boards.c | 10 +++++++++-
->>>> 1 file changed, 9 insertions(+), 1 deletion(-)
->>>>
->>>> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
->>>> index 6198ec1035..4687715b15 100644
->>>> --- a/hw/ppc/ppc405_boards.c
->>>> +++ b/hw/ppc/ppc405_boards.c
->>>> @@ -28,6 +28,8 @@
->>>> #include "qemu-common.h"
->>>> #include "cpu.h"
->>>> #include "hw/ppc/ppc.h"
->>>> +#include "hw/qdev-properties.h"
->>>> +#include "hw/sysbus.h"
->>>> #include "ppc405.h"
->>>> #include "hw/rtc/m48t59.h"
->>>> #include "hw/block/flash.h"
->>>> @@ -145,6 +147,8 @@ static void ref405ep_init(MachineState *machine)
->>>>     char *filename;
->>>>     ppc4xx_bd_info_t bd;
->>>>     CPUPPCState *env;
->>>> +    DeviceState *dev;
->>>> +    SysBusDevice *s;
->>>>     qemu_irq *pic;
->>>>     MemoryRegion *bios;
->>>>     MemoryRegion *sram = g_new(MemoryRegion, 1);
->>>> @@ -227,7 +231,11 @@ static void ref405ep_init(MachineState *machine)
->>>>     /* Register FPGA */
->>>>     ref405ep_fpga_init(sysmem, 0xF0300000);
->>>>     /* Register NVRAM */
->>>> -    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
->>>> +    dev = qdev_new("sysbus-m48t08");
->>>> +    qdev_prop_set_int32(dev, "base-year", 1968);
->>>
->>> Is there anything that uses other than 1968 as base year? If not this could be the 
->>> default in the device so you don't need these set prop calls here and in sun 
->>> machines.
->>>
->>> The only other place this device is used seems to be ppc/prep machine that uses 
->>> the isa version but does not set a base year. Is that a bug? The original prep 
->>> machine removed in b2ce76a0730 used 2000 but that's unlikely as well as these 
->>> machines predate that.
->>
->> =)
->>
->>> Anyway, the sysbus and isa versions are different
->>
->> They shouldn't, it is the same chipset, wired differently.
+On Samstag, 17. Oktober 2020 12:50:13 CEST Peter Maydell wrote:
+> On Thu, 15 Oct 2020 at 22:04, Christian Schoenebeck
 > 
-> I mean in QEMU the sysbus and isa devices are different object types so their default 
-> is settable independently. So setting the sysbus device base-year does not change the 
-> isa device which can be sorted out in another patch independently from this series 
-> later when the behaviour on 40p is confirmed.
+> <qemu_oss@crudebyte.com> wrote:
+> > The following changes since commit 
+57c98ea9acdcef5021f5671efa6475a5794a51c4:
+> >   Merge remote-tracking branch
+> >   'remotes/kraxel/tags/ui-20201014-pull-request' into staging (2020-10-14
+> >   13:56:06 +0100)> 
+> > are available in the Git repository at:
+> >   https://github.com/cschoenebeck/qemu.git tags/pull-9p-20201015
+> > 
+> > for you to fetch changes up to 97a64ec211d051439b654950ed3f7cffc47d489b:
+> >   tests/9pfs: add local Tmkdir test (2020-10-15 16:11:17 +0200)
+> > 
+> > ----------------------------------------------------------------
+> > 9pfs: add tests using local fs driver
+> > 
+> > The currently existing 9pfs test cases are all solely using the 9pfs
+> > 'synth' fileystem driver, which is a very simple and purely simulated (in
+> > RAM only) filesystem. There are issues though where the 'synth' fs driver
+> > is not sufficient. For example the following two bugs need test cases
+> > running the 9pfs 'local' fs driver:
+> > 
+> > https://bugs.launchpad.net/qemu/+bug/1336794
+> > https://bugs.launchpad.net/qemu/+bug/1877384
+> > 
+> > This patch set for that reason introduces 9pfs test cases using the 9pfs
+> > 'local' filesystem driver along to the already existing tests on 'synth'.
+> 
+> Build failure, OSX:
+> 
+> Compiling C object tests/qtest/libqos/libqos.fa.p/virtio-9p.c.o
+> ../../tests/qtest/libqos/virtio-9p.c:37:17: error: implicit
+> declaration of function 'get_current_dir_name' is invalid in C99
+> [-Werror,-Wimplicit-function-declaration]
+>     char *pwd = get_current_dir_name();
+>                 ^
+> ../../tests/qtest/libqos/virtio-9p.c:37:17: error: this function
+> declaration is not a prototype [-Werror,-Wstrict-prototypes]
+> ../../tests/qtest/libqos/virtio-9p.c:37:11: error: incompatible
+> integer to pointer conversion initializing 'char *' with an expression
+> of type 'int' [-Werror,-Wint-conversion]
+>     char *pwd = get_current_dir_name();
+> 
+> 
+> thanks
+> -- PMM
 
-Right, there are certainly some questions around exactly how this behaviour works but 
-in general people seem happy with this series. I'm going to apply this to my 
-qemu-macppc branch with the NVRAM cast suggested by Philippe so the basic conversion 
-is done, and then other improvements/tidy-ups can follow up later as time allows.
+Oops, get_current_dir_name() is a GNU extension. I just enabled Cirrus-CI to 
+prevent this from happening again. Sorry Peter.
+
+Am I supposed to rebase for v2 PRs?
+
+Fix for this is currently test running:
+
+> index 1524982634..d43647b3b7 100644
+> --- a/tests/qtest/libqos/virtio-9p.c
+> +++ b/tests/qtest/libqos/virtio-9p.c
+> @@ -34,9 +34,9 @@ static char *concat_path(const char* a, const char* b)
+> 
+>  static void init_local_test_path(void)
+>  {
+> 
+> -    char *pwd = get_current_dir_name();
+> +    char *pwd = g_get_current_dir();
+> 
+>      local_test_path = concat_path(pwd, "qtest-9p-local");
+> 
+> -    free(pwd);
+> +    g_free(pwd);
+> 
+>  }
+>  
+>  /* Creates the directory for the 9pfs 'local' filesystem driver to access.
+>  */
+
+Best regards,
+Christian Schoenebeck
 
 
-ATB,
-
-Mark.
 
