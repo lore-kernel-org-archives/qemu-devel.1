@@ -2,100 +2,97 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621B6C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F22EC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C3D792074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78BAA2074A
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:42:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cIYS/i+L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D792074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u83Ne1vv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78BAA2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33818 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTpUt-0005Sh-Mo
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 12:55:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33224)
+	id 1kTqDZ-0008OQ-9w
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 13:42:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38400)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTpTf-0004kz-OS
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:54:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20325)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kTpTa-0005XU-9k
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:54:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602953676;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=o9UNbp77ldf/iZxbcxa8yLgoBepvdQkfFMiGWEFJq9w=;
- b=cIYS/i+LSZTaNavquGyp37CDPZH87Lgq8ibP9wyx+XuutbJkkunv6AX/5IPHMP19Mo3eNp
- MP2kdj9mqgpjTkg7ZZgqk6EToEqmlIgzgP65+S1+ez6H3Du8JFk58QofAu0dka+W8b80t7
- gTtiDV5ZMFZs1OnfPzB4d7S3CiIsdB8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-usSyrO7ANMKc-EF2Jak6Xw-1; Sat, 17 Oct 2020 12:54:32 -0400
-X-MC-Unique: usSyrO7ANMKc-EF2Jak6Xw-1
-Received: by mail-ej1-f69.google.com with SMTP id p19so3085326ejy.11
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 09:54:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTqA3-0006VO-5U; Sat, 17 Oct 2020 13:38:34 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:42936)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTqA0-0001kJ-VN; Sat, 17 Oct 2020 13:38:30 -0400
+Received: by mail-wr1-x442.google.com with SMTP id j7so2843167wrt.9;
+ Sat, 17 Oct 2020 10:38:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=KuEYCGFH8gjp+8Ls6mQNWt3KwF5OST9pKx9d2hlW3yE=;
+ b=u83Ne1vvo6WKQCkaa1O/gwjlBVtyx5Q5l+epoCdhKo1cB+X2jy1tFPdW/UqUb7PRC6
+ 0MLEd2A1ZLWtoWs0yzVNPlrdcx+xSZXFuaYewwjX/beqQxvkl2KhtVnXC6y6aLlrc8zI
+ 35oO2YHjRWGfEqZSwvwhLd/V5arnA2ZjHjya9WGF47r18vbuohbGV/Yon3IGV2RMT9mO
+ GTL+vAy+hBnaVijL+JDXokdZCXDIwXcO+N/AfaeuA8nPNqcFEPEFtS0bsUrkPpcXzk6F
+ QQfBm1Ho7L+jzhs+ih0bgVtddm0Pj8dB4usF+TZ89OZfwlBTMB9Nhn16jWnoFABCkkdT
+ Z0mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=o9UNbp77ldf/iZxbcxa8yLgoBepvdQkfFMiGWEFJq9w=;
- b=LTnG9Ns4zrOgudLVb8XJVZ2zwRn+bxHr8spyezsJb/EVQWVwQaY1P7p8WBVs+SB+fx
- QWQsW77KaHHcZ+Wv4Ehbugm+XQ9QGvMguDG1K+Xd2a4yJLcGlN8gSPMYFwNiXyw8k4xg
- K+q0Eb8ETi5L8L0DUeMatGqjybKLBotEsqbgnK6sBxscGdNNG8TOsHBpgmmSCOCXohsJ
- 2D3sRaGTpc1pMlRG0n6Y4X50Owzr/uuR77vk9fr2K+9ynmBJj5v0NObG0JPEe3UwT7x5
- rSh63xI54xDHYaYl9vjeDzpG1kQ7FepACkawNzCYRLVCiWvans7aZExuzC5AyfuD56mA
- X5xQ==
-X-Gm-Message-State: AOAM533NDEzQNgO4a3/q1rJZ7jPPp1vi6vxeK+7fyPYx/GZEjr4/GudP
- jCGdk5UyT+f9aMw8t9G4a4nd082omBcswRtDS8uRzZHMkr75AY+lyGHS7nEvbRxOXZ0gO/uUP32
- QHkUtexIzC4AWCv3GZNKwumE14O00DDg=
-X-Received: by 2002:a05:6402:b72:: with SMTP id
- cb18mr9685117edb.129.1602953671199; 
- Sat, 17 Oct 2020 09:54:31 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxFAkt7sGh/cwnHEseE50y5pSGKtLljrTO1gNPDpmptoIZiUgvQzceIyPCkdSdgo7zjFKnt3ZQ+avibMirhR/w=
-X-Received: by 2002:a05:6402:b72:: with SMTP id
- cb18mr9685106edb.129.1602953670938; 
- Sat, 17 Oct 2020 09:54:30 -0700 (PDT)
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=KuEYCGFH8gjp+8Ls6mQNWt3KwF5OST9pKx9d2hlW3yE=;
+ b=rMch89oxrtKni6eu972qYhUTR9InLt3JqiHWB8CdfOeU624qyWJfHHRZ8oG4FbWRr1
+ PY8LwPZlRdD42JD6cRe6GbU5ihBHzcHKbVnZLlBwBwO/hxK3exTu2pP+P9ojSsyf+NED
+ OvXKKJHmPqLiVFDX8wUG7KPc1Qu4Ry8S47fQw+Rw5f7BAKjRWhMNxxjW363fNS/fcscC
+ w6SsG+2/WJTSRQokdNKyH5Z2cUmgnG2jAbP6q3c99LeJADPMdBhUlRpYpXv+6XvH7oCu
+ N8Bh4rEw6g2WOwpHLBp0Do/4wHb0X9xO1/W/ka4MgzALIxdnp/t8FFIdIB2kGH3mkOMm
+ x7xQ==
+X-Gm-Message-State: AOAM531jV/L1m0BK8KMXmgTBjOSd+R/3bU3IY6pWehqLl706OcoMDJc2
+ HD0IE6i24P6IUmNLytfYjNeYmNYQvrI=
+X-Google-Smtp-Source: ABdhPJwmFszSFr/tnFtM3YH8R76XzCopuPko75lBYDn6PncjLyrf8FFjYJpoQPyspGoSUp0o2b7fNA==
+X-Received: by 2002:a5d:4e8d:: with SMTP id e13mr11070104wru.368.1602956306108; 
+ Sat, 17 Oct 2020 10:38:26 -0700 (PDT)
+Received: from [192.168.1.36] (117.red-83-52-172.dynamicip.rima-tde.net.
+ [83.52.172.117])
+ by smtp.gmail.com with ESMTPSA id c15sm4274382wmb.27.2020.10.17.10.38.25
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 17 Oct 2020 10:38:25 -0700 (PDT)
+Subject: Re: [PATCH v9] mac_oldworld: Allow loading binary ROM image
+To: BALATON Zoltan <balaton@eik.bme.hu>
+References: <20201017155139.5A36A746331@zero.eik.bme.hu>
+ <11c1edab-bcbe-bb02-7c53-b4b0707779c2@amsat.org>
+ <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <348bb0e5-dee2-1d4d-0fb5-bf6d56ef5706@amsat.org>
+Date: Sat, 17 Oct 2020 19:38:24 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201017164329.1634-1-luoyonggang@gmail.com>
-In-Reply-To: <20201017164329.1634-1-luoyonggang@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Sat, 17 Oct 2020 18:53:56 +0200
-Message-ID: <CABgObfZej0fByb+THQhxUdMsQu=ATn9LXfmSb2=vVVcX5QXr6g@mail.gmail.com>
-Subject: Re: [PATCH v11] scripts: Convert qemu-version.sh to qemu-version.py
-To: Yonggang Luo <luoyonggang@gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000025e84a05b1e0bcf4"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 05:57:47
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.247,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,301 +105,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel <qemu-devel@nongnu.org>
+Cc: Alistair Francis <alistair@alistair23.me>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000025e84a05b1e0bcf4
-Content-Type: text/plain; charset="UTF-8"
+On 10/17/20 6:31 PM, BALATON Zoltan via wrote:
+> On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
+>> +Alistair for loader
+>>
+>> On 10/17/20 5:47 PM, BALATON Zoltan via wrote:
+>>> The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
+>>> the rom region and fall back to loading a binary image with -bios if
+>>> loading ELF image failed. This allows testing emulation with a ROM
+>>> image from real hardware as well as using an ELF OpenBIOS image.
+>>>
+>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>> v9: Revert change from v8, back to the same as v7 rebased on latest
+>>>
+>>>   hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
+>>>   1 file changed, 20 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>>> index 05e46ee6fe..0117ae17f5 100644
+>>> --- a/hw/ppc/mac_oldworld.c
+>>> +++ b/hw/ppc/mac_oldworld.c
+>>> @@ -59,6 +59,8 @@
+>>>   #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+>>>     #define GRACKLE_BASE 0xfec00000
+>>> +#define PROM_BASE 0xffc00000
+>>> +#define PROM_SIZE (4 * MiB)
+>>>     static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>>>                               Error **errp)
+>>> @@ -100,6 +102,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>>>       SysBusDevice *s;
+>>>       DeviceState *dev, *pic_dev;
+>>>       BusState *adb_bus;
+>>> +    uint64_t bios_addr;
+>>>       int bios_size;
+>>>       unsigned int smp_cpus = machine->smp.cpus;
+>>>       uint16_t ppc_boot_device;
+>>> @@ -128,24 +131,32 @@ static void ppc_heathrow_init(MachineState 
+>>> *machine)
+>>>         memory_region_add_subregion(sysmem, 0, machine->ram);
+>>>   -    /* allocate and load BIOS */
+>>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+>>> +    /* allocate and load firmware ROM */
+>>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+>>>                              &error_fatal);
+>>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
+>>>   -    if (bios_name == NULL)
+>>> +    if (!bios_name) {
+>>>           bios_name = PROM_FILENAME;
+>>> +    }
+>>>       filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
+>>> -
+>>> -    /* Load OpenBIOS (ELF) */
+>>>       if (filename) {
+>>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, 
+>>> NULL, NULL,
+>>> -                             1, PPC_ELF_MACHINE, 0, 0);
+>>> +        /* Load OpenBIOS (ELF) */
+>>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, 
+>>> &bios_addr,
+>>> +                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>>> +        /* Unfortunately, load_elf sign-extends reading elf32 */
+>>
+>> Maybe this is what translate_fn() is for?
+>>
+>> uint64_t oldworld_phys(void *opaque, uint64_t addr)
+>> {
+>>    return addr & UINT32_MAX;
+>> }
+>>
+>> Using as (untested):
+>>
+>>        bios_size = load_elf(filename, NULL, oldworld_phys, NULL,
+>>                             NULL, &bios_addr, NULL,
+>>                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
+> 
+> Please don't come up with any more great ideas for this patch unless you 
+> also propose a replacement and test it. This one works and we could just 
+> get this in as it is until the real problem with load_elf is fixed at 
+> which point all this can be removed so no need to be more sophisticated 
+> as the simple cast I have.
 
-Il sab 17 ott 2020, 18:43 Yonggang Luo <luoyonggang@gmail.com> ha scritto:
+Zoltan, I'm not trying to block your patch to get merged,
+I'm asking because I'm trying to understand how this API
+is expected to be used.
 
-> The sh script are harder to maintain for compatible different
-> xsh environment so convert it to python script
-> Also incorporate the fixes in
->
-> https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
->
-> According to https://github.com/msys2/MSYS2-packages/issues/2176
-> We need use CYGWIN=noglob and MSYS=noglob in the environment variable
-> for disable wildcard expanding in msys or cygwin git, and setting the
-> shell=False
->
-
-Honestly, I don't see the point in doing this change. Python is the wrong
-tool for this job, and it's not like the configure script is disappearing
-any time soon---so getting rid of shell scripts at this point is of limited
-utility, especially for something like qemu-version.sh.
-
-IMO the msys build is already much more robust in 5.2 than in 5.1 once the
-pending pull request for ninja is in). Any other change has to provide a
-clear improvement.
-
-Paolo
-
-
-> Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-> Message-Id: <20201006112139.700-1-luoyonggang@gmail.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  meson.build             |  2 +-
->  scripts/qemu-version.py | 37 +++++++++++++++++++++++++++++++++++++
->  scripts/qemu-version.sh | 25 -------------------------
->  3 files changed, 38 insertions(+), 26 deletions(-)
->  create mode 100644 scripts/qemu-version.py
->  delete mode 100755 scripts/qemu-version.sh
->
-> diff --git a/meson.build b/meson.build
-> index 05fb59a00b..b100b6d7be 100644
-> --- a/meson.build
-> +++ b/meson.build
-> @@ -1240,7 +1240,7 @@ tracetool = [
->     '--backend=' + config_host['TRACE_BACKENDS']
->  ]
->
-> -qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
-> +qemu_version_cmd = [find_program('scripts/qemu-version.py'),
->                      meson.current_source_dir(),
->                      config_host['PKGVERSION'], meson.project_version()]
->  qemu_version = custom_target('qemu-version.h',
-> diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
-> new file mode 100644
-> index 0000000000..cf97b2bbb5
-> --- /dev/null
-> +++ b/scripts/qemu-version.py
-> @@ -0,0 +1,37 @@
-> +#!/usr/bin/env python3
-> +
-> +#
-> +# Script for retrieve qemu git version information
-> +#
-> +# Authors:
-> +#  Yonggang Luo <luoyonggang@gmail.com>
-> +#
-> +# This work is licensed under the terms of the GNU GPL, version 2
-> +# or, at your option, any later version.  See the COPYING file in
-> +# the top-level directory.
-> +
-> +import sys
-> +import subprocess
-> +import os
-> +import os.path
-> +
-> +def main(_program, dir, pkgversion, version, *unused):
-> +    os.chdir(dir)
-> +    if not pkgversion and os.path.exists('.git'):
-> +        pc = subprocess.run(
-> +            ['git', 'describe', '--match', 'v*', '--dirty', '--always'],
-> +            env=dict(os.environ, CYGWIN="noglob", MSYS='noglob'),
-> +            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
-> +            encoding='utf8', shell=False)
-> +        if pc.returncode == 0:
-> +            pkgversion = pc.stdout.strip()
-> +
-> +    fullversion = version
-> +    if pkgversion:
-> +        fullversion = "{} ({})".format(version, pkgversion)
-> +
-> +    print('#define QEMU_PKGVERSION "%s"' % pkgversion)
-> +    print('#define QEMU_FULL_VERSION "%s"' % fullversion)
-> +
-> +if __name__ == "__main__":
-> +    main(*sys.argv)
-> diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
-> deleted file mode 100755
-> index 3f6e7e6d41..0000000000
-> --- a/scripts/qemu-version.sh
-> +++ /dev/null
-> @@ -1,25 +0,0 @@
-> -#!/bin/sh
-> -
-> -set -eu
-> -
-> -dir="$1"
-> -pkgversion="$2"
-> -version="$3"
-> -
-> -if [ -z "$pkgversion" ]; then
-> -    cd "$dir"
-> -    if [ -e .git ]; then
-> -        pkgversion=$(git describe --match 'v*' --dirty) || :
-> -    fi
-> -fi
-> -
-> -if [ -n "$pkgversion" ]; then
-> -    fullversion="$version ($pkgversion)"
-> -else
-> -    fullversion="$version"
-> -fi
-> -
-> -cat <<EOF
-> -#define QEMU_PKGVERSION "$pkgversion"
-> -#define QEMU_FULL_VERSION "$fullversion"
-> -EOF
-> --
-> 2.28.0.windows.1
->
->
-
---00000000000025e84a05b1e0bcf4
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
-class=3D"gmail_attr">Il sab 17 ott 2020, 18:43 Yonggang Luo &lt;<a href=3D"=
-mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; ha scritto:<br>=
-</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
-eft:1px #ccc solid;padding-left:1ex">The sh script are harder to maintain f=
-or compatible different<br>
-xsh environment so convert it to python script<br>
-Also incorporate the fixes in<br>
-<a href=3D"https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lurea=
-u@redhat.com/" rel=3D"noreferrer noreferrer" target=3D"_blank">https://patc=
-hew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/</a><br>
-<br>
-According to <a href=3D"https://github.com/msys2/MSYS2-packages/issues/2176=
-" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.com/msys2/=
-MSYS2-packages/issues/2176</a><br>
-We need use CYGWIN=3Dnoglob and MSYS=3Dnoglob in the environment variable<b=
-r>
-for disable wildcard expanding in msys or cygwin git, and setting the shell=
-=3DFalse<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
-=3D"auto">Honestly, I don&#39;t see the point in doing this change. Python =
-is the wrong tool for this job, and it&#39;s not like the configure script =
-is disappearing any time soon---so getting rid of shell scripts at this poi=
-nt is of limited utility, especially for something like qemu-version.sh.</d=
-iv><div dir=3D"auto"><br></div><div dir=3D"auto">IMO the msys build is alre=
-ady much more robust in 5.2 than in 5.1 once the pending pull request for n=
-inja is in). Any other change has to provide a clear improvement.</div><div=
- dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"auto"><br>=
-</div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gma=
-il_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-lef=
-t:1ex">
-<br>
-Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" ta=
-rget=3D"_blank" rel=3D"noreferrer">luoyonggang@gmail.com</a>&gt;<br>
-Message-Id: &lt;<a href=3D"mailto:20201006112139.700-1-luoyonggang@gmail.co=
-m" target=3D"_blank" rel=3D"noreferrer">20201006112139.700-1-luoyonggang@gm=
-ail.com</a>&gt;<br>
-Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" tar=
-get=3D"_blank" rel=3D"noreferrer">pbonzini@redhat.com</a>&gt;<br>
----<br>
-=C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 2 =
-+-<br>
-=C2=A0scripts/qemu-version.py | 37 +++++++++++++++++++++++++++++++++++++<br=
->
-=C2=A0scripts/qemu-version.sh | 25 -------------------------<br>
-=C2=A03 files changed, 38 insertions(+), 26 deletions(-)<br>
-=C2=A0create mode 100644 scripts/qemu-version.py<br>
-=C2=A0delete mode 100755 scripts/qemu-version.sh<br>
-<br>
-diff --git a/meson.build b/meson.build<br>
-index 05fb59a00b..b100b6d7be 100644<br>
---- a/meson.build<br>
-+++ b/meson.build<br>
-@@ -1240,7 +1240,7 @@ tracetool =3D [<br>
-=C2=A0 =C2=A0 &#39;--backend=3D&#39; + config_host[&#39;TRACE_BACKENDS&#39;=
-]<br>
-=C2=A0]<br>
-<br>
--qemu_version_cmd =3D [find_program(&#39;scripts/qemu-version.sh&#39;),<br>
-+qemu_version_cmd =3D [find_program(&#39;scripts/qemu-version.py&#39;),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0meson.current_source_dir(),<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0config_host[&#39;PKGVERSION&#39;], meson.project_version()]<br>
-=C2=A0qemu_version =3D custom_target(&#39;qemu-version.h&#39;,<br>
-diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py<br>
-new file mode 100644<br>
-index 0000000000..cf97b2bbb5<br>
---- /dev/null<br>
-+++ b/scripts/qemu-version.py<br>
-@@ -0,0 +1,37 @@<br>
-+#!/usr/bin/env python3<br>
-+<br>
-+#<br>
-+# Script for retrieve qemu git version information<br>
-+#<br>
-+# Authors:<br>
-+#=C2=A0 Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" target=
-=3D"_blank" rel=3D"noreferrer">luoyonggang@gmail.com</a>&gt;<br>
-+#<br>
-+# This work is licensed under the terms of the GNU GPL, version 2<br>
-+# or, at your option, any later version.=C2=A0 See the COPYING file in<br>
-+# the top-level directory.<br>
-+<br>
-+import sys<br>
-+import subprocess<br>
-+import os<br>
-+import os.path<br>
-+<br>
-+def main(_program, dir, pkgversion, version, *unused):<br>
-+=C2=A0 =C2=A0 os.chdir(dir)<br>
-+=C2=A0 =C2=A0 if not pkgversion and os.path.exists(&#39;.git&#39;):<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 pc =3D subprocess.run(<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [&#39;git&#39;, &#39;describe&#3=
-9;, &#39;--match&#39;, &#39;v*&#39;, &#39;--dirty&#39;, &#39;--always&#39;]=
-,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env=3Ddict(os.environ, CYGWIN=3D=
-&quot;noglob&quot;, MSYS=3D&#39;noglob&#39;),<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout=3Dsubprocess.PIPE, stderr=
-=3Dsubprocess.DEVNULL,<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 encoding=3D&#39;utf8&#39;, shell=
-=3DFalse)<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 if pc.returncode =3D=3D 0:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pkgversion =3D pc.stdout.strip()=
-<br>
-+<br>
-+=C2=A0 =C2=A0 fullversion =3D version<br>
-+=C2=A0 =C2=A0 if pkgversion:<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 fullversion =3D &quot;{} ({})&quot;.format(ver=
-sion, pkgversion)<br>
-+<br>
-+=C2=A0 =C2=A0 print(&#39;#define QEMU_PKGVERSION &quot;%s&quot;&#39; % pkg=
-version)<br>
-+=C2=A0 =C2=A0 print(&#39;#define QEMU_FULL_VERSION &quot;%s&quot;&#39; % f=
-ullversion)<br>
-+<br>
-+if __name__ =3D=3D &quot;__main__&quot;:<br>
-+=C2=A0 =C2=A0 main(*sys.argv)<br>
-diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh<br>
-deleted file mode 100755<br>
-index 3f6e7e6d41..0000000000<br>
---- a/scripts/qemu-version.sh<br>
-+++ /dev/null<br>
-@@ -1,25 +0,0 @@<br>
--#!/bin/sh<br>
--<br>
--set -eu<br>
--<br>
--dir=3D&quot;$1&quot;<br>
--pkgversion=3D&quot;$2&quot;<br>
--version=3D&quot;$3&quot;<br>
--<br>
--if [ -z &quot;$pkgversion&quot; ]; then<br>
--=C2=A0 =C2=A0 cd &quot;$dir&quot;<br>
--=C2=A0 =C2=A0 if [ -e .git ]; then<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 pkgversion=3D$(git describe --match &#39;v*&#3=
-9; --dirty) || :<br>
--=C2=A0 =C2=A0 fi<br>
--fi<br>
--<br>
--if [ -n &quot;$pkgversion&quot; ]; then<br>
--=C2=A0 =C2=A0 fullversion=3D&quot;$version ($pkgversion)&quot;<br>
--else<br>
--=C2=A0 =C2=A0 fullversion=3D&quot;$version&quot;<br>
--fi<br>
--<br>
--cat &lt;&lt;EOF<br>
--#define QEMU_PKGVERSION &quot;$pkgversion&quot;<br>
--#define QEMU_FULL_VERSION &quot;$fullversion&quot;<br>
--EOF<br>
--- <br>
-2.28.0.windows.1<br>
-<br>
-</blockquote></div></div></div>
-
---00000000000025e84a05b1e0bcf4--
-
+> As you can see in the original discussion:
+> 
+> http://patchwork.ozlabs.org/project/qemu-devel/patch/c69a791c7cad1246f3f34b3993dee4f549b75aa2.1593456926.git.balaton@eik.bme.hu/ 
+> 
+> 
+> problem is really in include/hw/elf_ops.h this is just a work around for 
+> that as I did not want to break anything I can't test so I'd rather fix 
+> it up here and let you fix load_elf then drop this cast. But unless you 
+> can do that before the freeze please don't hold up this patch any more.
+> 
+> Regards,
+> BALATON Zoltan
+> 
+>>> +        bios_addr = (uint32_t)bios_addr;
+>>> +
+>>> +        if (bios_size <= 0) {
+>>> +            /* or load binary ROM image */
+>>> +            bios_size = load_image_targphys(filename, PROM_BASE, 
+>>> PROM_SIZE);
+>>> +            bios_addr = PROM_BASE;
+>>> +        }
+>>>           g_free(filename);
+>>>       } else {
+>>>           bios_size = -1;
+>>>       }
+>>> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
+>>> +    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > 
+>>> PROM_SIZE) {
+>>>           error_report("could not load PowerPC bios '%s'", bios_name);
+>>>           exit(1);
+>>>       }
+>>>
+>>
+>>
+>>
 
