@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CDFEC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:20:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C5B4DC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:20:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D64820791
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:20:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D64820791
+	by mail.kernel.org (Postfix) with ESMTPS id 4BC9720791
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:20:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BC9720791
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59436 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTdht-0002fj-Kp
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:20:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40104)
+	id 1kTdi0-0002jz-88
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:20:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXy-0006JF-D5
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:23 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5249 helo=huawei.com)
+ id 1kTdXg-0005uH-TT
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5240 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXt-0007Jg-Ny
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:22 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 900DEFD1854B5AB8137D;
- Sat, 17 Oct 2020 12:09:56 +0800 (CST)
+ id 1kTdXe-0007GZ-Cu
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 77AEC1621E9FF7088B2F;
+ Sat, 17 Oct 2020 12:09:51 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 17 Oct 2020
- 12:09:47 +0800
+ 12:09:43 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v3 11/18] migration/rdma: record host_port for multifd RDMA
-Date: Sat, 17 Oct 2020 12:25:41 +0800
-Message-ID: <1602908748-43335-12-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 05/18] migration/rdma: do not need sync main for rdma
+Date: Sat, 17 Oct 2020 12:25:35 +0800
+Message-ID: <1602908748-43335-6-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
 References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
@@ -79,60 +79,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 ---
- migration/migration.c | 1 +
- migration/migration.h | 3 +++
- migration/rdma.c      | 3 +++
- 3 files changed, 7 insertions(+)
+ migration/multifd.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index be6166a..7061410 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -1891,6 +1891,7 @@ void migrate_init(MigrationState *s)
-     s->postcopy_after_devices = false;
-     s->migration_thread_running = false;
-     s->enabled_rdma_migration = false;
-+    s->host_port = NULL;
-     error_free(s->error);
-     s->error = NULL;
-     s->hostname = NULL;
-diff --git a/migration/migration.h b/migration/migration.h
-index e92eb29..fea63de 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -269,6 +269,9 @@ struct MigrationState
-      * Enable RDMA migration
-      */
-     bool enabled_rdma_migration;
-+
-+    /* Need by Multi-RDMA */
-+    char *host_port;
- };
- 
- void migrate_set_state(int *state, int old_state, int new_state);
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 63559f1..dd9f705 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -4206,6 +4206,8 @@ void rdma_start_outgoing_migration(void *opaque,
-         goto err;
+diff --git a/migration/multifd.c b/migration/multifd.c
+index 0d494df..8ccfd46 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -580,6 +580,10 @@ void multifd_send_sync_main(QEMUFile *f)
+     if (!migrate_use_multifd()) {
+         return;
      }
++     /* Do not need sync for rdma */
++    if (migrate_use_rdma()) {
++        return;
++    }
+     if (multifd_send_state->pages->used) {
+         if (multifd_send_pages(f) < 0) {
+             error_report("%s: multifd_send_pages fail", __func__);
+@@ -1002,6 +1006,10 @@ void multifd_recv_sync_main(void)
+     if (!migrate_use_multifd()) {
+         return;
+     }
++    /* Do not need sync for rdma */
++    if (migrate_use_rdma()) {
++        return;
++    }
+     for (i = 0; i < migrate_multifd_channels(); i++) {
+         MultiFDRecvParams *p = &multifd_recv_state->params[i];
  
-+    s->host_port = g_strdup(host_port);
-+
-     ret = qemu_rdma_source_init(rdma,
-         s->enabled_capabilities[MIGRATION_CAPABILITY_RDMA_PIN_ALL], errp);
- 
-@@ -4250,6 +4252,7 @@ void rdma_start_outgoing_migration(void *opaque,
- 
-     s->to_dst_file = qemu_fopen_rdma(rdma, "wb");
-     migrate_fd_connect(s, NULL);
-+    g_free(s->host_port);
-     return;
- return_path_err:
-     qemu_rdma_cleanup(rdma);
 -- 
 1.8.3.1
 
