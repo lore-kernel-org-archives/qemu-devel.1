@@ -2,89 +2,91 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 653B7C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:45:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 145DDC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:52:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5AB12074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:45:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C8AD2064B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 17:52:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AH/3UCKk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5AB12074A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pceAxWy8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C8AD2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42902 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTqH3-0001AU-Tc
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 13:45:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39002)
+	id 1kTqNe-0004AD-CT
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 13:52:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40392)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTqFu-0000YN-L1; Sat, 17 Oct 2020 13:44:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:46705)
+ id 1kTqMq-0003je-5g
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 13:51:44 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42015)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTqFs-0002Jj-PU; Sat, 17 Oct 2020 13:44:34 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n6so6894223wrm.13;
- Sat, 17 Oct 2020 10:44:32 -0700 (PDT)
+ id 1kTqMn-0003Kc-Hi
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 13:51:43 -0400
+Received: by mail-wr1-x443.google.com with SMTP id j7so2863098wrt.9
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 10:51:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ h=sender:subject:to:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=NuBMMA9P9+Uu7GYL8b5m00yUHlAcPRtsrSZIdVJw364=;
- b=AH/3UCKk4MNCjqJ3xsrX1M1lJD0bMh/bU4zZP2lyJ4Y6AC2XFRGDWW48Jgbce8F2aL
- xRJLwT/Qb3cBxyf7FQxe3RSkVDcQwo4++SyoG1PQ2d7K0vPun/5Ou2LsTs6cehdmTtlP
- 9dfnAQ8pG7Bor8xjoRq4b4WKvThbIq7Tsp+YUJ/aOiMNb0oU9l3VsolvdJXItiALSsEW
- pD5WmCXdV4F4e5px+vXN0x749H+USdU4D05FF+4epKUuALDxbXLmGK1xHU65KRnbuD0S
- tW6wp/Y6Es9mJlOS9x216MJWRRl9RPLzrKGtrfGc4AiRQInUNtNe1Mh3Ah0uz/gXMxvG
- Ygmw==
+ bh=G4XuQcb/CQfDws+C5XF2wYMQNXWW3jnVCRDKvuS7Y20=;
+ b=pceAxWy8DwfY1ulbZxslp5FSUNqAFTCcc0f0EmxgI6n/PcwTOFpgNT/rCuQVmz29/1
+ i/V3tBwEDi6ZSPYiVQMzDWhCln92UKC5fXcNz0RDVuTOqHRj954TZqAy67/9bO0UWfej
+ Nhxf5hMiORtUah9++pQRuBKE6yRSH9Hi2tDYGgeC9/2LVaN7CC3C+LHHBUNbFE6ETTrT
+ on4Q55Okrt6NN8a7AHXF+kHmR9uVmR69RuAz3jxevH47kSENNBP9e/xxtzSYWI+rVCYO
+ hZ2ewOoSy5BNkf2kkWm0/K3QZ3rirbl1/0ZdiuBtiVCpw6lxheiyAgNqenrxfELHbUO0
+ UZag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ h=x-gm-message-state:sender:subject:to:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=NuBMMA9P9+Uu7GYL8b5m00yUHlAcPRtsrSZIdVJw364=;
- b=OodQwQfWz0PeJr4vRbZEZNOSR9ZEJKwV1t89Z8/R21iPXRJefGLWnSPg6qd67UolDS
- comG+RF413vBJsitOW5CNlRQpFwxaF9bC78tYrAadDBw6JvP1Uwu6xmBiExMChIEzfbu
- mWEwTcHzuAValYSHJzaGo/YGxqdaLdBOrDnUTk4lYZ1pvxLxNU6VAA6R2vp/nS1k0j4w
- 4dTC0ejsQG1LqEc7FC4onveKsJPn7sg4840QfooFawnR8qIfsUq+Orn1cf0ChgIJ8z8Y
- Zb7tHEgyosFBTtI5AhuFpPAJkQaf8qOOlUNP0UaFcL2k4pbu0v+2wR4XfKj7YKzTjvXh
- RKaw==
-X-Gm-Message-State: AOAM5332vKdJGlN2knDZe5HGmDBFm4tFecx/TWxvikHWWQQ57Bd+3ct8
- YJwHuD0VtYf8HwGoSK1h5oeXCF1x6yw=
-X-Google-Smtp-Source: ABdhPJzvGwmg55rEmKl247fyo5L46Aj8+U806GHKIdYZaivkcO9SuJVUyJm4sJgGmHprc8lMiJrjpw==
-X-Received: by 2002:adf:e70f:: with SMTP id c15mr11320079wrm.239.1602956670671; 
- Sat, 17 Oct 2020 10:44:30 -0700 (PDT)
+ bh=G4XuQcb/CQfDws+C5XF2wYMQNXWW3jnVCRDKvuS7Y20=;
+ b=j5YYYfJ7fuoSWpBxKWf8LcN3MZBhR/CnAssJ3sZfaAL25+8C43SixVNH+udbeZdevg
+ 3y7ceYrH21tXhQVkHLPgA8orEEoCB2c3yDU6dKMEteB679SrYb24UzNeoYhCOPlVs1lR
+ UENfFMYQyUJnR+Hpswq/s+Z6yF3DmnBJJKBY/rbgpTEup/miwQQQWsQHrLBuy6MEKEeV
+ s8SUbFfP5y10rxKFGUpuy70xXJZv9VWPPrAv3+I2kzWWLQ++VERVyx5lc5CjzKIBWQK+
+ 6pClKuO8TRWMIo1ZoFXhax1h7gsxY2XtGNGMb1FsWpYVn6FkJciukoULBvjcEJLrIDY2
+ CAzg==
+X-Gm-Message-State: AOAM531m4wcTUobWuxVCBCG1CPGF/UO+JQBn3z9pFXv/lDEyIidWi1pN
+ WvC5AuyAYYhrrnm08zrEaGg=
+X-Google-Smtp-Source: ABdhPJxZJOH5kXVUCLoYa7mdg3p0bxLBCEegnY7b/g4CrqqBZBTZResVRfwELX7tAUFMb0Fr64VN3w==
+X-Received: by 2002:adf:a501:: with SMTP id i1mr10751948wrb.162.1602957099704; 
+ Sat, 17 Oct 2020 10:51:39 -0700 (PDT)
 Received: from [192.168.1.36] (117.red-83-52-172.dynamicip.rima-tde.net.
  [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id s1sm8086802wmh.22.2020.10.17.10.44.29
+ by smtp.gmail.com with ESMTPSA id 10sm8191188wmn.9.2020.10.17.10.51.38
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 17 Oct 2020 10:44:30 -0700 (PDT)
-Subject: Re: [PATCH v8 0/5] Mac Old World ROM experiment (ppc/mac_* clean ups
- and loading binary ROM)
-To: BALATON Zoltan <balaton@eik.bme.hu>
-References: <cover.1602805637.git.balaton@eik.bme.hu>
- <005ed95d-65ee-ab36-c068-e96a773ef8ed@ilande.co.uk>
- <7c34f053-268e-6dbf-205f-48792328ebe8@amsat.org>
- <edb86311-6093-9776-a81-17ee8205a6c@eik.bme.hu>
+ Sat, 17 Oct 2020 10:51:38 -0700 (PDT)
+Subject: Re: [PULL 25/33] tests/acceptance: Add a test for the N800 and N810
+ arm machines
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Thomas Huth <thuth@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20200228163840.23585-1-peter.maydell@linaro.org>
+ <20200228163840.23585-26-peter.maydell@linaro.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6598b187-7936-563c-c06b-cb4315fa4cc1@amsat.org>
-Date: Sat, 17 Oct 2020 19:44:29 +0200
+Message-ID: <a049110f-b7cb-52bd-de77-6e1193b5b6de@amsat.org>
+Date: Sat, 17 Oct 2020 19:51:37 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <edb86311-6093-9776-a81-17ee8205a6c@eik.bme.hu>
-Content-Type: text/plain; charset=iso-8859-15; format=flowed
+In-Reply-To: <20200228163840.23585-26-peter.maydell@linaro.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -16
@@ -107,63 +109,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/17/20 6:39 PM, BALATON Zoltan via wrote:
-> On Fri, 16 Oct 2020, Philippe Mathieu-DaudÃ© wrote:
->> On 10/16/20 11:58 AM, Mark Cave-Ayland wrote:
->>> On 16/10/2020 00:47, BALATON Zoltan via wrote:
->>>
->>>> This is the cut down version of the earlier series omitting unfinished
->>>> patches that I plan to rework later and rebased to Mark's qemu-macppc
->>>> branch. Compared to v7 the only change is the cast to (target_ulong)
->>>> from (uint32_t) as requested by Mark in patch 1.
->>>
->>> FWIW the reason for suggesting the cast to target_ulong is so that 
->>> the same code works for both qemu-system-ppc and qemu-system-ppc64. 
->>> For qemu-system-ppc that should correctly drop the sign extension 
->>> from 32-bit, whilst still allowing someone to load a 64-bit ELF into 
->>> qemu-system-ppc64 if requested.
->>
->> IMO this is part of a bigger design problem. Not all
->> machines main bus is 64-bit. I did some experiments
->> but changing that involves a lot of work.
-> 
-> Did not want to reply to this to not bring it to your attention before 
-> patch gets in finally but it's too late...
-> 
-> Not sure what you refer to
+Hi Peter, Igor, Thomas,
 
-I refer to having machines with a N-bit main bus using a N-bit main bus
-(currently all main busses are 64-bit wide).
-
-Some 32-bit machines have access to 64-bit busses, some don't.
-
-I have been wondering about it because of the AVR CPU which
-uses a pair of busses, each less than 32-bit.
-
-If one day I can finish my work there, the Old World mac might
-benefit from it.
-
-> but in this particular case the problem only 
-> seems to be load_elf loading 32 bit ELF files returning sign extended 64 
-> bit address which looks bogus but since this function is widely used I 
-> did not feel confident enough to propose a patch to load_elf.
+On 2/28/20 5:38 PM, Peter Maydell wrote:
+> From: Thomas Huth <thuth@redhat.com>
 > 
-> By the way, also the parameters of load_elf could take a clean up to 
-> remove all the mostly NULL values as I've pointed out before:
+> Old kernels from the Meego project can be used to check that Linux
+> is at least starting on these machines.
 > 
-> https://lists.nongnu.org/archive/html/qemu-devel/2019-01/msg03427.html
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
+> Reviewed-by: Wainer dos Santos Moschetta <wainersm@redhat.com>
+> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Tested-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Message-id: 20200225172501.29609-2-philmd@redhat.com
+> Message-Id: <20200129131920.22302-1-thuth@redhat.com>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   MAINTAINERS                          |  1 +
+>   tests/acceptance/machine_arm_n8x0.py | 49 ++++++++++++++++++++++++++++
+>   2 files changed, 50 insertions(+)
+>   create mode 100644 tests/acceptance/machine_arm_n8x0.py
 > 
-> but all this could wait until later, these don't seem to be urgent 
-> problems to prevent moving mac machines forward now and could all be 
-> addressen in separate elf loading series. So just note the problem and 
-> move on for now please.
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index b66c46dcb9f..264374adbe8 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -686,6 +686,7 @@ F: hw/rtc/twl92230.c
+>   F: include/hw/display/blizzard.h
+>   F: include/hw/input/tsc2xxx.h
+>   F: include/hw/misc/cbus.h
+> +F: tests/acceptance/machine_arm_n8x0.py
+>   
+>   Palm
+>   M: Andrzej Zaborowski <balrogg@gmail.com>
+> diff --git a/tests/acceptance/machine_arm_n8x0.py b/tests/acceptance/machine_arm_n8x0.py
+> new file mode 100644
+> index 00000000000..e5741f2d8d1
+> --- /dev/null
+> +++ b/tests/acceptance/machine_arm_n8x0.py
+> @@ -0,0 +1,49 @@
+> +# Functional test that boots a Linux kernel and checks the console
+> +#
+> +# Copyright (c) 2020 Red Hat, Inc.
+> +#
+> +# Author:
+> +#  Thomas Huth <thuth@redhat.com>
+> +#
+> +# This work is licensed under the terms of the GNU GPL, version 2 or
+> +# later.  See the COPYING file in the top-level directory.
+> +
+> +import os
+> +
+> +from avocado import skipUnless
+> +from avocado_qemu import Test
+> +from avocado_qemu import wait_for_console_pattern
+> +
+> +class N8x0Machine(Test):
+> +    """Boots the Linux kernel and checks that the console is operational"""
+> +
+> +    timeout = 90
+> +
+> +    def __do_test_n8x0(self):
+> +        kernel_url = ('http://stskeeps.subnetmask.net/meego-n8x0/'
+> +                      'meego-arm-n8x0-1.0.80.20100712.1431-'
+> +                      'vmlinuz-2.6.35~rc4-129.1-n8x0')
+> +        kernel_hash = 'e9d5ab8d7548923a0061b6fbf601465e479ed269'
+> +        kernel_path = self.fetch_asset(kernel_url, asset_hash=kernel_hash)
+> +
+> +        self.vm.set_console(console_index=1)
+> +        self.vm.add_args('-kernel', kernel_path,
+> +                         '-append', 'printk.time=0 console=ttyS1')
+> +        self.vm.launch()
+> +        wait_for_console_pattern(self, 'TSC2005 driver initializing')
+> +
+> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
+> +    def test_n800(self):
+> +        """
+> +        :avocado: tags=arch:arm
+> +        :avocado: tags=machine:n800
+> +        """
+> +        self.__do_test_n8x0()
+> +
+> +    @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
+> +    def test_n810(self):
+> +        """
+> +        :avocado: tags=arch:arm
+> +        :avocado: tags=machine:n810
+> +        """
+> +        self.__do_test_n8x0()
 > 
-> Reagards.
-> BALATON Zoltan
+
+FYI this test is failing:
+
+qemu-system-arm: kernel 'meego-arm-n8x0-1.0.80.20100712.1431-vml
+inuz-2.6.35~rc4-129.1-n8x0' is too large to fit in RAM (kernel size 
+1964608, RAM size 0)
+
+Alex, Thomas, can we enable AVOCADO_ALLOW_UNTRUSTED_CODE on GitLab
+to avoid such regressions?
+
+Regards,
+
+Phil.
 
