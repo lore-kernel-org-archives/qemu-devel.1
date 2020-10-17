@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08840C433DF
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4DCC433E7
 	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:16:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 73A1520791
+	by mail.kernel.org (Postfix) with ESMTPS id E8398207C4
 	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 73A1520791
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8398207C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46838 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTde1-0005tu-DF
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:16:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39932)
+	id 1kTde2-0005vX-1H
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:16:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40074)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXg-0005t0-4T
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5238 helo=huawei.com)
+ id 1kTdXu-0006Gg-8P
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:19 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5248 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXe-0007CU-9D
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:03 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 7393A80C7702E1FEBCA2;
- Sat, 17 Oct 2020 12:09:51 +0800 (CST)
+ id 1kTdXs-0007Iy-4e
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:17 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 87BF5CC55B61983A2968;
+ Sat, 17 Oct 2020 12:09:56 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 17 Oct 2020
- 12:09:45 +0800
+ 12:09:46 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v3 09/18] migration/rdma: add multifd_rdma_load_setup() to
- setup multifd rdma
-Date: Sat, 17 Oct 2020 12:25:39 +0800
-Message-ID: <1602908748-43335-10-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 10/18] migration/rdma: Create the multifd recv channels for
+ RDMA
+Date: Sat, 17 Oct 2020 12:25:40 +0800
+Message-ID: <1602908748-43335-11-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
 References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
@@ -80,81 +80,117 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We still don't transmit anything through them, and we only build
+the RDMA connections.
+
+Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 ---
- migration/rdma.c | 52 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 52 insertions(+)
+ migration/rdma.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 68 insertions(+), 2 deletions(-)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index ad4e4ba..2baa933 100644
+index 2baa933..63559f1 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -4010,6 +4010,48 @@ static void rdma_accept_incoming_migration(void *opaque)
+@@ -3266,6 +3266,40 @@ static void rdma_cm_poll_handler(void *opaque)
      }
  }
  
-+static bool multifd_rdma_load_setup(const char *host_port,
-+                                    RDMAContext *rdma, Error **errp)
++static bool qemu_rdma_accept_setup(RDMAContext *rdma)
 +{
++    RDMAContext *multifd_rdma = NULL;
 +    int thread_count;
 +    int i;
-+    int idx;
 +    MultiFDRecvParams *multifd_recv_param;
-+    RDMAContext *multifd_rdma;
-+
-+    if (!migrate_use_multifd()) {
-+        return true;
-+    }
-+
-+    if (multifd_load_setup(errp) != 0) {
-+        /*
-+         * We haven't been able to create multifd threads
-+         * nothing better to do
-+         */
-+        return false;
-+    }
-+
 +    thread_count = migrate_multifd_channels();
++    /* create the multifd channels for RDMA */
 +    for (i = 0; i < thread_count; i++) {
 +        if (get_multifd_recv_param(i, &multifd_recv_param) < 0) {
-+            ERROR(errp, "rdma: error getting multifd_recv_param(%d)", i);
++            error_report("rdma: error getting multifd_recv_param(%d)", i);
 +            return false;
 +        }
 +
-+        multifd_rdma = qemu_rdma_data_init(host_port, errp);
-+        for (idx = 0; idx < RDMA_WRID_MAX; idx++) {
-+            multifd_rdma->wr_data[idx].control_len = 0;
-+            multifd_rdma->wr_data[idx].control_curr = NULL;
++        multifd_rdma = (RDMAContext *) multifd_recv_param->rdma;
++        if (multifd_rdma->cm_id == NULL) {
++            break;
++        } else {
++            multifd_rdma = NULL;
 +        }
-+        /* the CM channel and CM id is shared */
-+        multifd_rdma->channel = rdma->channel;
-+        multifd_rdma->listen_id = rdma->listen_id;
-+        multifd_recv_param->rdma = (void *)multifd_rdma;
++    }
++
++    if (multifd_rdma) {
++        qemu_set_fd_handler(rdma->channel->fd,
++                            rdma_accept_incoming_migration,
++                            NULL, (void *)(intptr_t)multifd_rdma);
++    } else {
++        qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
++                            NULL, rdma);
 +    }
 +
 +    return true;
 +}
 +
- void rdma_start_incoming_migration(const char *host_port, Error **errp)
+ static int qemu_rdma_accept(RDMAContext *rdma)
  {
-     int ret;
-@@ -4057,6 +4099,16 @@ void rdma_start_incoming_migration(const char *host_port, Error **errp)
-         qemu_rdma_return_path_dest_init(rdma_return_path, rdma);
-     }
+     RDMACapabilities cap;
+@@ -3365,6 +3399,10 @@ static int qemu_rdma_accept(RDMAContext *rdma)
+         qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
+                             NULL,
+                             (void *)(intptr_t)rdma->return_path);
++    } else if (migrate_use_multifd()) {
++        if (!qemu_rdma_accept_setup(rdma)) {
++            goto err_rdma_dest_wait;
++        }
+     } else {
+         qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
+                             NULL, rdma);
+@@ -3975,6 +4013,35 @@ static QEMUFile *qemu_fopen_rdma(RDMAContext *rdma, const char *mode)
+     return rioc->file;
+ }
  
-+    /* multifd rdma setup */
-+    if (!multifd_rdma_load_setup(host_port, rdma, &local_err)) {
-+        /*
-+         * We haven't been able to create multifd threads
-+         * nothing better to do
-+         */
-+        error_report_err(local_err);
-+        goto err;
++static void migration_rdma_process_incoming(QEMUFile *f,
++                                            RDMAContext *rdma, Error **errp)
++{
++    MigrationIncomingState *mis = migration_incoming_get_current();
++    QIOChannel *ioc = NULL;
++    bool start_migration = false;
++
++    /* FIXME: Need refactor */
++    if (!migrate_use_multifd()) {
++        rdma->migration_started_on_destination = 1;
++        migration_fd_process_incoming(f, errp);
++        return;
 +    }
 +
-     qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
-                         NULL, (void *)(intptr_t)rdma);
-     return;
++    if (!mis->from_src_file) {
++        mis->from_src_file = f;
++        qemu_file_set_blocking(f, false);
++    } else {
++        ioc = QIO_CHANNEL(getQIOChannel(f));
++        /* Multiple connections */
++        assert(migrate_use_multifd());
++        start_migration = multifd_recv_new_channel(ioc, errp);
++    }
++
++    if (start_migration) {
++        migration_incoming_process();
++    }
++}
++
+ static void rdma_accept_incoming_migration(void *opaque)
+ {
+     RDMAContext *rdma = opaque;
+@@ -4003,8 +4070,7 @@ static void rdma_accept_incoming_migration(void *opaque)
+         return;
+     }
+ 
+-    rdma->migration_started_on_destination = 1;
+-    migration_fd_process_incoming(f, &local_err);
++    migration_rdma_process_incoming(f, rdma, &local_err);
+     if (local_err) {
+         error_reportf_err(local_err, "RDMA ERROR:");
+     }
 -- 
 1.8.3.1
 
