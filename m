@@ -2,69 +2,95 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4AF58C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3FC7C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:26:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1FEF20657
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:26:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CCAB20657
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:26:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="HU86bJBO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1FEF20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PQ/2WKzi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CCAB20657
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43796 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTn9p-00075A-Kn
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:26:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40632)
+	id 1kTn9w-0007HO-Et
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:26:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <49220110c8fb16b9d52ad7485ccf2c2b51157035@lizzy.crudebyte.com>)
- id 1kTn8U-0005hu-9b
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:24:42 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:46975)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <49220110c8fb16b9d52ad7485ccf2c2b51157035@lizzy.crudebyte.com>)
- id 1kTn8S-00061e-Kw
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:24:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=uYCOhtjPf6+B9BmnvExTz7BoHTRQm0BF5tGsJnw9wkM=; b=HU86b
- JBO2L706iJhIxiBymfEgXum2DlFih35DpZ3l2bBTSIuMOX0Xzw1OqSWSoHhxEuQtz25TyKJgAdiPn
- AX6TIdSCsPVTQN6/7AMUb7DVivVqhRhZbROpqv3cTFxYKhPChFH3RskTo3gCqAGuKT5/oWkRXWO7K
- pMyxq300vIhb9e/msVn7B4NyhD/JSsuIA+tAqaknXMBvVehJ8l6b1WqAvrjtv6CZpl+BuC1o/cyuq
- YxUV0CvC4ObkBqAqdFqJyiJRRg80rV5+Ihe6OXBn4yiUYHjVEfBEpLlKCOjxnqDb2Baoc3zfdu763
- qiE4hsPOk9yliPxfUyHvK+FExCjTg==;
-Message-Id: <49220110c8fb16b9d52ad7485ccf2c2b51157035.1602943547.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1602943547.git.qemu_oss@crudebyte.com>
-References: <cover.1602943547.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Thu, 8 Oct 2020 20:34:56 +0200
-Subject: [PULL v2 1/5] tests/9pfs: change qtest name prefix to synth
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=49220110c8fb16b9d52ad7485ccf2c2b51157035@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 10:23:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTmpG-00037K-VP
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:50 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:46726)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTmpE-0003qO-MF
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:50 -0400
+Received: by mail-wr1-x431.google.com with SMTP id n6so6532057wrm.13
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:04:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=r9DIlhS/zwAECFf9vZAtbGMbBBzzJfBM2jPK1vmGZTU=;
+ b=PQ/2WKzi2E0RbWQLOhNCp3J7+V7Gb4+mNhk/HK3t5XL9mpHIEBbQCR7UH7CgGfd2Bp
+ EZUhCsIVUNY2ofVooNeduCrPTKxwQs0/QJtH9Urf5Rm46IfJulnhWwle4eWu1Faofk+i
+ OfxsnirTQV8bOJPdsgjVAWckPEgzcAE8MOPbcjrdosniAIKeMrwz2K3m7tY5D1vex7pL
+ aQ4d8qFaxxlJZQAyEKpS6klWmqayrHPrs3fduSSDRZ/7pWFwN2284B0A3bCrGoQlMzWC
+ bYdYN/MkzcSjfZniiH558W1rs4eEHiHlT7QdKXMopK0WHC8NbDyKusBmkOjpwdBqNzz5
+ MIDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=r9DIlhS/zwAECFf9vZAtbGMbBBzzJfBM2jPK1vmGZTU=;
+ b=GvAjq2HrYhrmOXsU+bKp1huBi1HVuc1fNja5dB0US7BBgjXhmZQP6/qZJ9tNvEsiNh
+ nf3/HWsBY1G8aTZQdqhEWn53GYxGUfCJsQ08I+u0D8x0F8aYiCRSAGAub26I9m7Rn07l
+ XDnsk4d2xb7bFzx/GuLXTmywTlAklzr6Mj+654qTRlBvgqtU/Pmz7UJAaG8N3Mz9dE+Z
+ i6laqQ7aM6W3LB10WZpYDhkANhqGzSH0BCUKY+fc+oKTcr3OfN9s+3yhyZw57c6DOMbL
+ CDqKf27S7D2HHHQIhF3mL5x8p5iQLcD2S4/6Uris8/d+rWGBRJA5baPKmFLUwEgiGxyn
+ 0DZw==
+X-Gm-Message-State: AOAM533qE69FxtiKefBq8PKabMfu5Hd3l/Njx+ueBl7K2moSB+lFd8Nq
+ Hf3YVqXqjjZLzr0+rrzfymWk47jPfbs=
+X-Google-Smtp-Source: ABdhPJyA6DQC9L5VQ0mmac/gAzSetbtYjAFC97JTI3WDSlzcYQ06mrWC3sMTCgYK1XNbj6mw18h+YA==
+X-Received: by 2002:adf:dd8f:: with SMTP id x15mr10897534wrl.124.1602943487274; 
+ Sat, 17 Oct 2020 07:04:47 -0700 (PDT)
+Received: from localhost.localdomain
+ (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
+ by smtp.gmail.com with ESMTPSA id x3sm7544780wmi.45.2020.10.17.07.04.46
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sat, 17 Oct 2020 07:04:46 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 26/44] hw/mips/cps: Expose input clock and connect it to CPU
+ cores
+Date: Sat, 17 Oct 2020 16:02:25 +0200
+Message-Id: <20201017140243.1078718-27-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
+References: <20201017140243.1078718-1-f4bug@amsat.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x431.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,72 +103,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Paul Burton <paulburton@kernel.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
+ Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-All existing 9pfs test cases are using the 'synth' fs driver so far, which
-means they are not accessing real files, but a purely simulated (in RAM
-only) file system.
+Expose a qdev input clock named 'clk-in', and connect it to each
+core to forward-propagate the clock.
 
-Let's make this clear by changing the prefix of the individual qtest case
-names from 'fs/' to 'synth/'. That way they'll be easily distinguishable
-from upcoming new 9pfs test cases supposed to be using a different fs
-driver.
-
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <e04e75acb849b085c6d6320b2433a15fa935bcff.1602182956.git.qemu_oss@crudebyte.com>
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201012095804.3335117-18-f4bug@amsat.org>
 ---
- tests/qtest/virtio-9p-test.c | 28 ++++++++++++++--------------
- 1 file changed, 14 insertions(+), 14 deletions(-)
+ include/hw/mips/cps.h | 2 ++
+ hw/mips/cps.c         | 4 ++++
+ 2 files changed, 6 insertions(+)
 
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index de30b717b6..3281153b9c 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -897,26 +897,26 @@ static void fs_readdir_split_512(void *obj, void *data,
+diff --git a/include/hw/mips/cps.h b/include/hw/mips/cps.h
+index 9e35a881366..859a8d4a674 100644
+--- a/include/hw/mips/cps.h
++++ b/include/hw/mips/cps.h
+@@ -21,6 +21,7 @@
+ #define MIPS_CPS_H
  
- static void register_virtio_9p_test(void)
- {
--    qos_add_test("config", "virtio-9p", pci_config, NULL);
--    qos_add_test("fs/version/basic", "virtio-9p", fs_version, NULL);
--    qos_add_test("fs/attach/basic", "virtio-9p", fs_attach, NULL);
--    qos_add_test("fs/walk/basic", "virtio-9p", fs_walk, NULL);
--    qos_add_test("fs/walk/no_slash", "virtio-9p", fs_walk_no_slash,
-+    qos_add_test("synth/config", "virtio-9p", pci_config, NULL);
-+    qos_add_test("synth/version/basic", "virtio-9p", fs_version, NULL);
-+    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach, NULL);
-+    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk, NULL);
-+    qos_add_test("synth/walk/no_slash", "virtio-9p", fs_walk_no_slash,
-                  NULL);
--    qos_add_test("fs/walk/dotdot_from_root", "virtio-9p",
-+    qos_add_test("synth/walk/dotdot_from_root", "virtio-9p",
-                  fs_walk_dotdot, NULL);
--    qos_add_test("fs/lopen/basic", "virtio-9p", fs_lopen, NULL);
--    qos_add_test("fs/write/basic", "virtio-9p", fs_write, NULL);
--    qos_add_test("fs/flush/success", "virtio-9p", fs_flush_success,
-+    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen, NULL);
-+    qos_add_test("synth/write/basic", "virtio-9p", fs_write, NULL);
-+    qos_add_test("synth/flush/success", "virtio-9p", fs_flush_success,
-                  NULL);
--    qos_add_test("fs/flush/ignored", "virtio-9p", fs_flush_ignored,
-+    qos_add_test("synth/flush/ignored", "virtio-9p", fs_flush_ignored,
-                  NULL);
--    qos_add_test("fs/readdir/basic", "virtio-9p", fs_readdir, NULL);
--    qos_add_test("fs/readdir/split_512", "virtio-9p",
-+    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir, NULL);
-+    qos_add_test("synth/readdir/split_512", "virtio-9p",
-                  fs_readdir_split_512, NULL);
--    qos_add_test("fs/readdir/split_256", "virtio-9p",
-+    qos_add_test("synth/readdir/split_256", "virtio-9p",
-                  fs_readdir_split_256, NULL);
--    qos_add_test("fs/readdir/split_128", "virtio-9p",
-+    qos_add_test("synth/readdir/split_128", "virtio-9p",
-                  fs_readdir_split_128, NULL);
- }
+ #include "hw/sysbus.h"
++#include "hw/clock.h"
+ #include "hw/misc/mips_cmgcr.h"
+ #include "hw/intc/mips_gic.h"
+ #include "hw/misc/mips_cpc.h"
+@@ -43,6 +44,7 @@ struct MIPSCPSState {
+     MIPSGICState gic;
+     MIPSCPCState cpc;
+     MIPSITUState itu;
++    Clock *clock;
+ };
  
+ qemu_irq get_cps_irq(MIPSCPSState *cps, int pin_number);
+diff --git a/hw/mips/cps.c b/hw/mips/cps.c
+index 23c0f87e41a..af7b58c4bdd 100644
+--- a/hw/mips/cps.c
++++ b/hw/mips/cps.c
+@@ -22,6 +22,7 @@
+ #include "qemu/module.h"
+ #include "hw/mips/cps.h"
+ #include "hw/mips/mips.h"
++#include "hw/qdev-clock.h"
+ #include "hw/qdev-properties.h"
+ #include "hw/mips/cpudevs.h"
+ #include "sysemu/kvm.h"
+@@ -38,6 +39,7 @@ static void mips_cps_init(Object *obj)
+     SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
+     MIPSCPSState *s = MIPS_CPS(obj);
+ 
++    s->clock = qdev_init_clock_in(DEVICE(obj), "clk-in", NULL, NULL);
+     /*
+      * Cover entire address space as there do not seem to be any
+      * constraints for the base address of CPC and GIC.
+@@ -80,6 +82,8 @@ static void mips_cps_realize(DeviceState *dev, Error **errp)
+                                       errp)) {
+             return;
+         }
++        /* All cores use the same clock tree */
++        qdev_connect_clock_in(DEVICE(cpu), "clk-in", s->clock);
+ 
+         if (!qdev_realize_and_unref(DEVICE(cpu), NULL, errp)) {
+             return;
 -- 
-2.20.1
+2.26.2
 
 
