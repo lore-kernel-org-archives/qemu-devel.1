@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B4DCC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:16:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5BFFC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:18:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E8398207C4
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:16:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E8398207C4
+	by mail.kernel.org (Postfix) with ESMTPS id 1FA8E20791
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:18:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FA8E20791
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTde2-0005vX-1H
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40074)
+	id 1kTdgF-0008QR-5i
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:18:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXu-0006Gg-8P
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:19 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5248 helo=huawei.com)
+ id 1kTdXr-0006Db-LD
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:15 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5243 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXs-0007Iy-4e
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:17 -0400
+ id 1kTdXp-0007Hx-JL
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:15 -0400
 Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 87BF5CC55B61983A2968;
+ by Forcepoint Email with ESMTP id 7B2445C3648B4EC72B5E;
  Sat, 17 Oct 2020 12:09:56 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 17 Oct 2020
- 12:09:46 +0800
+ 12:09:48 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v3 10/18] migration/rdma: Create the multifd recv channels for
- RDMA
-Date: Sat, 17 Oct 2020 12:25:40 +0800
-Message-ID: <1602908748-43335-11-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 13/18] migration/rdma: Add the function for dynamic page
+ registration
+Date: Sat, 17 Oct 2020 12:25:43 +0800
+Message-ID: <1602908748-43335-14-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
 References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
@@ -80,117 +80,77 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We still don't transmit anything through them, and we only build
-the RDMA connections.
+Add the 'qemu_rdma_registration' function, multifd send threads
+call it to register memory.
 
 Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 ---
- migration/rdma.c | 70 ++++++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 68 insertions(+), 2 deletions(-)
+ migration/rdma.c | 51 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 51 insertions(+)
 
 diff --git a/migration/rdma.c b/migration/rdma.c
-index 2baa933..63559f1 100644
+index 1af81f5..a366849 100644
 --- a/migration/rdma.c
 +++ b/migration/rdma.c
-@@ -3266,6 +3266,40 @@ static void rdma_cm_poll_handler(void *opaque)
-     }
+@@ -3738,6 +3738,57 @@ out:
+     return ret;
  }
  
-+static bool qemu_rdma_accept_setup(RDMAContext *rdma)
++/*
++ * Dynamic page registrations for multifd RDMA threads.
++ */
++static int qemu_rdma_registration(void *opaque)
 +{
-+    RDMAContext *multifd_rdma = NULL;
-+    int thread_count;
-+    int i;
-+    MultiFDRecvParams *multifd_recv_param;
-+    thread_count = migrate_multifd_channels();
-+    /* create the multifd channels for RDMA */
-+    for (i = 0; i < thread_count; i++) {
-+        if (get_multifd_recv_param(i, &multifd_recv_param) < 0) {
-+            error_report("rdma: error getting multifd_recv_param(%d)", i);
-+            return false;
-+        }
++    RDMAContext *rdma = opaque;
++    RDMAControlHeader resp = {.type = RDMA_CONTROL_RAM_BLOCKS_RESULT };
++    RDMALocalBlocks *local = &rdma->local_ram_blocks;
++    int reg_result_idx, i, nb_dest_blocks;
++    RDMAControlHeader head = { .len = 0, .repeat = 1 };
++    int ret = 0;
 +
-+        multifd_rdma = (RDMAContext *) multifd_recv_param->rdma;
-+        if (multifd_rdma->cm_id == NULL) {
-+            break;
-+        } else {
-+            multifd_rdma = NULL;
-+        }
++    head.type = RDMA_CONTROL_RAM_BLOCKS_REQUEST;
++
++    ret = qemu_rdma_exchange_send(rdma, &head, NULL, &resp,
++            &reg_result_idx, rdma->pin_all ?
++            qemu_rdma_reg_whole_ram_blocks : NULL);
++    if (ret < 0) {
++        goto out;
 +    }
 +
-+    if (multifd_rdma) {
-+        qemu_set_fd_handler(rdma->channel->fd,
-+                            rdma_accept_incoming_migration,
-+                            NULL, (void *)(intptr_t)multifd_rdma);
-+    } else {
-+        qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
-+                            NULL, rdma);
++    nb_dest_blocks = resp.len / sizeof(RDMADestBlock);
++
++    if (local->nb_blocks != nb_dest_blocks) {
++        rdma->error_state = -EINVAL;
++        ret = -1;
++        goto out;
 +    }
 +
-+    return true;
++    qemu_rdma_move_header(rdma, reg_result_idx, &resp);
++    memcpy(rdma->dest_blocks,
++           rdma->wr_data[reg_result_idx].control_curr, resp.len);
++
++    for (i = 0; i < nb_dest_blocks; i++) {
++        network_to_dest_block(&rdma->dest_blocks[i]);
++
++        /* We require that the blocks are in the same order */
++        if (rdma->dest_blocks[i].length != local->block[i].length) {
++            rdma->error_state = -EINVAL;
++            ret = -1;
++            goto out;
++        }
++        local->block[i].remote_host_addr =
++            rdma->dest_blocks[i].remote_host_addr;
++        local->block[i].remote_rkey = rdma->dest_blocks[i].remote_rkey;
++    }
++
++out:
++    return ret;
 +}
 +
- static int qemu_rdma_accept(RDMAContext *rdma)
- {
-     RDMACapabilities cap;
-@@ -3365,6 +3399,10 @@ static int qemu_rdma_accept(RDMAContext *rdma)
-         qemu_set_fd_handler(rdma->channel->fd, rdma_accept_incoming_migration,
-                             NULL,
-                             (void *)(intptr_t)rdma->return_path);
-+    } else if (migrate_use_multifd()) {
-+        if (!qemu_rdma_accept_setup(rdma)) {
-+            goto err_rdma_dest_wait;
-+        }
-     } else {
-         qemu_set_fd_handler(rdma->channel->fd, rdma_cm_poll_handler,
-                             NULL, rdma);
-@@ -3975,6 +4013,35 @@ static QEMUFile *qemu_fopen_rdma(RDMAContext *rdma, const char *mode)
-     return rioc->file;
- }
- 
-+static void migration_rdma_process_incoming(QEMUFile *f,
-+                                            RDMAContext *rdma, Error **errp)
-+{
-+    MigrationIncomingState *mis = migration_incoming_get_current();
-+    QIOChannel *ioc = NULL;
-+    bool start_migration = false;
-+
-+    /* FIXME: Need refactor */
-+    if (!migrate_use_multifd()) {
-+        rdma->migration_started_on_destination = 1;
-+        migration_fd_process_incoming(f, errp);
-+        return;
-+    }
-+
-+    if (!mis->from_src_file) {
-+        mis->from_src_file = f;
-+        qemu_file_set_blocking(f, false);
-+    } else {
-+        ioc = QIO_CHANNEL(getQIOChannel(f));
-+        /* Multiple connections */
-+        assert(migrate_use_multifd());
-+        start_migration = multifd_recv_new_channel(ioc, errp);
-+    }
-+
-+    if (start_migration) {
-+        migration_incoming_process();
-+    }
-+}
-+
- static void rdma_accept_incoming_migration(void *opaque)
- {
-     RDMAContext *rdma = opaque;
-@@ -4003,8 +4070,7 @@ static void rdma_accept_incoming_migration(void *opaque)
-         return;
-     }
- 
--    rdma->migration_started_on_destination = 1;
--    migration_fd_process_incoming(f, &local_err);
-+    migration_rdma_process_incoming(f, rdma, &local_err);
-     if (local_err) {
-         error_reportf_err(local_err, "RDMA ERROR:");
-     }
+ /* Destination:
+  * Called via a ram_control_load_hook during the initial RAM load section which
+  * lists the RAMBlocks by name.  This lets us know the order of the RAMBlocks
 -- 
 1.8.3.1
 
