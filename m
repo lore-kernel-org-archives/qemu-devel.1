@@ -2,84 +2,85 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D900C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:07:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 828DEC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:07:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DAFD2072C
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:07:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 12A1D2072C
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:07:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lhX/T6Br"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DAFD2072C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="oOszRg2x"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A1D2072C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTmrl-0006oR-FR
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:07:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36432)
+	id 1kTmsA-00071Q-Uj
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:07:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmne-0001WJ-SA
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:10 -0400
-Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:38942)
+ id 1kTmo2-0001fT-84
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:36 -0400
+Received: from mail-wr1-x435.google.com ([2a00:1450:4864:20::435]:34896)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmna-0003hD-Qs
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:10 -0400
-Received: by mail-wr1-x431.google.com with SMTP id y12so6582122wrp.6
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:06 -0700 (PDT)
+ id 1kTmo0-0003iw-8q
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:33 -0400
+Received: by mail-wr1-x435.google.com with SMTP id n15so6610291wrq.2
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=w+RNDLWj4IFLfK+eBwoAQeU4+ogED2fJwsKp3kpT+Og=;
- b=lhX/T6Bru4d0moFLuUF2q4LSoamJYEL5oNBJuvK0IxgRDUtHSVPxN6AJ0Bv4l22Qks
- xzJEqr2pha9/XVqVVrVWi8Hs+67hZcHWQUw5mjmWWvTYyvJYI8Ntl9CQNsggRghkr3P1
- ubWi1C8ear09/xBwpw1L/uG2Snkt7LKZbT7g+T3X/3C0lrQTynM7yeGGrzj+BUggViO+
- 4sEV7HyrGH74z67Au32UsqRXRlXXY7x6Lv8E/66MLcocGLWozxczlZ6x7xAoZOj3vUz6
- 62h3ybpTChNmvIIEVnhDyEV5ELR9G4f7xirn0wQNgRSYRlWsxA3KwWODqENhfKUx79Ih
- ilJA==
+ bh=OSp3zRmHarSiGKoLWGfVF0cWMHS0w9Z8Zx5+7o1qy80=;
+ b=oOszRg2xS8PAnc3qzG10flRDpOTzWvT3YzsGr48xb2GWVqM+CG16sv6zsRvq9FY5RH
+ ziRpZ0eZAKZfrKGGyxBsamDXRrrdwmmPEKgDFpwTG6GgdEx4l975qB3hJmywbFzL9wWB
+ 13aC6j4NOoO2r6GeEvvbWRgtKN+0MSr0COK+wviEcw1YWY2TGn7lq14YomD4LPNnC6ME
+ jCLEh7cHpfYvtOWdw6s8KlAx1qon4F3TG73dVeoK/AwYRZgiPJfrHtN/wv1L87wtBxyw
+ RocuRrlT0Nu2UWrrklcwZlh6CRyTikpTLPFgoSZ/zknXaheY45xxC9P5ALsp9nXkezlt
+ 7aOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=w+RNDLWj4IFLfK+eBwoAQeU4+ogED2fJwsKp3kpT+Og=;
- b=BWlk4ViLd+rBuaoFe96QMZtll73g6YNBHCF/wxrG8zw74/hq05B+Fz5Hv3yjd67gZj
- nCZdXhlLSWk24tpihoz4hvwAN5+NZWFO31zh1ipl/5GzojER76NkfUDRAaJum4KXJ/A5
- fUmru4PIsEdFVtHU3I/+thf68sNof8l+g6y4fVi2SVRUu7bhmiohYs1CEQxHw0zUCifa
- 6gbfnhOjCyMHiB0ym58q1lBnXl6OaY5MW53obhu9KsKX1qXRMjhlcLDRK0ZWXG+zPyXc
- XwPblI++Xhug+dABKN4vexiCSVjXp+m+H18iMt/TZ1LsWOAwDofahO4b/wtzQqpBYH79
- O/yA==
-X-Gm-Message-State: AOAM530P/icpvpZ3Ohg4/weZo/0rJ2Y0nEseSWRulfpxFOAXVdf6H/AI
- 8E15XA3NqXAQxW/lqnlHk6S856j/VFM=
-X-Google-Smtp-Source: ABdhPJxG5+l9hlcXnZrOemPyWR8o2wyYmK06a0XaqlKt/EeufscTUvpOWH0ZY346xWY67cemSmFizg==
-X-Received: by 2002:adf:e444:: with SMTP id t4mr10876914wrm.58.1602943384583; 
- Sat, 17 Oct 2020 07:03:04 -0700 (PDT)
+ bh=OSp3zRmHarSiGKoLWGfVF0cWMHS0w9Z8Zx5+7o1qy80=;
+ b=OERSWa0/muRcOC4excU3DxA7QUhoOGf3YCdHRu5t7rGmLabVJK4SUZrzAX/sqAdUH8
+ 9mml4RK+hR+REYiVt4BmhsF9xxn17G731cURhnnqKyr1vs+gjQ0EHztHsQk4Duv1c75P
+ 4sRvYDyOEdNj1fzW6XfCnsYLX26HjD+avoA0455LFMqdE5Pu2+XULTb3MWiJhVB6V8mw
+ ODlbjUXCwAHvkXUMAFkOT5ahOhw4N7pbjoSiRhslTU4lhxaQfD5zbJeB2X7/po2Bg/TT
+ sAdgLtYZFFBKmYbqxvs+nxfBaoKTZIx7Td/fbwjrK5PpdE1tSVkF4HsXXIMZe51VRX9X
+ qcaQ==
+X-Gm-Message-State: AOAM531q7UsCPFdsQprIhHr1RgOYttcqiIV+XsCkOKrwwQoaWjxS2n+S
+ WJh2doHdNE+mpxCZ4WAz6POHduowPvU=
+X-Google-Smtp-Source: ABdhPJy35ojWNF+MRnOwgt8mjVHg/+6HIWmo9n5c3IWHWROenbbla51I+0FN+HFP6oGd/gd+xsOIYg==
+X-Received: by 2002:adf:dfc7:: with SMTP id q7mr9941400wrn.382.1602943408022; 
+ Sat, 17 Oct 2020 07:03:28 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id f6sm8403768wru.50.2020.10.17.07.03.03
+ by smtp.gmail.com with ESMTPSA id 24sm7284039wmg.8.2020.10.17.07.03.26
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:03:04 -0700 (PDT)
+ Sat, 17 Oct 2020 07:03:27 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 04/44] target/mips: Fix some comment spelling errors
-Date: Sat, 17 Oct 2020 16:02:03 +0200
-Message-Id: <20201017140243.1078718-5-f4bug@amsat.org>
+Subject: [PULL 09/44] target/mips: Add loongson-ext lswc2 group of
+ instructions (Part 2)
+Date: Sat, 17 Oct 2020 16:02:08 +0200
+Message-Id: <20201017140243.1078718-10-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
 References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::431;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x431.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::435;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x435.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -103,106 +104,254 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Paul Burton <paulburton@kernel.org>, zhaolichang <zhaolichang@huawei.com>,
+ Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- David Edmondson <david.edmondson@oracle.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: zhaolichang <zhaolichang@huawei.com>
+From: Jiaxun Yang <jiaxun.yang@flygoat.com>
 
-There are many spelling errors in the comments in target/mips/.
-Use spellcheck to check the spelling errors.
+LWC2 & SWC2 have been rewritten by Loongson EXT vendor ASE
+as "load/store quad word" and "shifted load/store" groups of
+instructions.
 
-Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <20201009064449.2336-7-zhaolichang@huawei.com>
+This patch add implementation of these instructions:
+
+  gslwlc1: similar to lwl but RT is FPR instead of GPR
+  gslwrc1: similar to lwr but RT is FPR instead of GPR
+  gsldlc1: similar to ldl but RT is FPR instead of GPR
+  gsldrc1: similar to ldr but RT is FPR instead of GPR
+  gsswlc1: similar to swl but RT is FPR instead of GPR
+  gsswrc1: similar to swr but RT is FPR instead of GPR
+  gssdlc1: similar to sdl but RT is FPR instead of GPR
+  gssdrc1: similar to sdr but RT is FPR instead of GPR
+
+Details of Loongson-EXT is here:
+https://github.com/FlyGoat/loongson-insn/blob/master/loongson-ext.md
+
+Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Message-Id: <1602831120-3377-4-git-send-email-chenhc@lemote.com>
+[PMD: Reuse t1 on MIPS32, reintroduce t2/fp0]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- target/mips/internal.h           |  2 +-
- target/mips/translate.c          | 10 +++++-----
- target/mips/translate_init.c.inc |  2 +-
- 3 files changed, 7 insertions(+), 7 deletions(-)
+ target/mips/translate.c | 182 +++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 180 insertions(+), 2 deletions(-)
 
-diff --git a/target/mips/internal.h b/target/mips/internal.h
-index 7f159a9230c..b811f547f38 100644
---- a/target/mips/internal.h
-+++ b/target/mips/internal.h
-@@ -188,7 +188,7 @@ static inline bool cpu_mips_hw_interrupts_pending(CPUMIPSState *env)
-         /*
-          * A MIPS configured with a vectorizing external interrupt controller
-          * will feed a vector into the Cause pending lines. The core treats
--         * the status lines as a vector level, not as indiviual masks.
-+         * the status lines as a vector level, not as individual masks.
-          */
-         r = pending > status;
-     } else {
 diff --git a/target/mips/translate.c b/target/mips/translate.c
-index 398edf72898..b4d009078e0 100644
+index e83954d782f..b335645e03b 100644
 --- a/target/mips/translate.c
 +++ b/target/mips/translate.c
-@@ -3718,7 +3718,7 @@ static void gen_st_cond(DisasContext *ctx, int rt, int base, int offset,
+@@ -471,6 +471,19 @@ enum {
+     OPC_GSSHFS      = OPC_SWC2,
+ };
+ 
++/* Loongson EXT shifted load/store opcodes */
++#define MASK_LOONGSON_GSSHFLS(op)         (MASK_OP_MAJOR(op) | (op & 0xc03f))
++enum {
++    OPC_GSLWLC1     = 0x4 | OPC_GSSHFL,
++    OPC_GSLWRC1     = 0x5 | OPC_GSSHFL,
++    OPC_GSLDLC1     = 0x6 | OPC_GSSHFL,
++    OPC_GSLDRC1     = 0x7 | OPC_GSSHFL,
++    OPC_GSSWLC1     = 0x4 | OPC_GSSHFS,
++    OPC_GSSWRC1     = 0x5 | OPC_GSSHFS,
++    OPC_GSSDLC1     = 0x6 | OPC_GSSHFS,
++    OPC_GSSDRC1     = 0x7 | OPC_GSSHFS,
++};
++
+ /* BSHFL opcodes */
+ #define MASK_BSHFL(op)              (MASK_SPECIAL3(op) | (op & (0x1F << 6)))
+ 
+@@ -5924,12 +5937,13 @@ no_rd:
+ static void gen_loongson_lswc2(DisasContext *ctx, int rt,
+                                int rs, int rd)
+ {
+-    TCGv t0;
++    TCGv t0, t1, t2;
++    TCGv_i32 fp0;
+ #if defined(TARGET_MIPS64)
+-    TCGv t1;
+     int lsq_rt1 = ctx->opcode & 0x1f;
+     int lsq_offset = sextract32(ctx->opcode, 6, 9) << 4;
+ #endif
++    int shf_offset = sextract32(ctx->opcode, 6, 8);
  
      t0 = tcg_temp_new();
-     addr = tcg_temp_new();
--    /* compare the address against that of the preceeding LL */
-+    /* compare the address against that of the preceding LL */
-     gen_base_offset_addr(ctx, addr, base, offset);
-     tcg_gen_brcond_tl(TCG_COND_EQ, addr, cpu_lladdr, l1);
-     tcg_temp_free(addr);
-@@ -25597,7 +25597,7 @@ static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
-         }
-         /* return resulting half-words to its original position */
-         tcg_gen_shri_i32(t0, t0, 16);
--        /* finaly update the destination */
-+        /* finally update the destination */
-         tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
  
+@@ -5986,6 +6000,170 @@ static void gen_loongson_lswc2(DisasContext *ctx, int rt,
          tcg_temp_free(t1);
-@@ -25633,7 +25633,7 @@ static void gen_mxu_D16MAX_D16MIN(DisasContext *ctx)
-         }
-         /* return resulting half-words to its original position */
-         tcg_gen_shri_i32(t0, t0, 16);
--        /* finaly update the destination */
-+        /* finally update the destination */
-         tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
- 
-         tcg_temp_free(t1);
-@@ -25702,7 +25702,7 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
-             }
-             /* return resulting byte to its original position */
-             tcg_gen_shri_i32(t0, t0, 8 * (3 - i));
--            /* finaly update the destination */
-+            /* finally update the destination */
-             tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
-         }
- 
-@@ -25742,7 +25742,7 @@ static void gen_mxu_Q8MAX_Q8MIN(DisasContext *ctx)
-             }
-             /* return resulting byte to its original position */
-             tcg_gen_shri_i32(t0, t0, 8 * (3 - i));
--            /* finaly update the destination */
-+            /* finally update the destination */
-             tcg_gen_or_i32(mxu_gpr[XRa - 1], mxu_gpr[XRa - 1], t0);
-         }
- 
-diff --git a/target/mips/translate_init.c.inc b/target/mips/translate_init.c.inc
-index 637caccd890..c735b2bf667 100644
---- a/target/mips/translate_init.c.inc
-+++ b/target/mips/translate_init.c.inc
-@@ -995,7 +995,7 @@ static void mvp_init (CPUMIPSState *env, const mips_def_t *def)
- 
-     /* MVPConf1 implemented, TLB sharable, no gating storage support,
-        programmable cache partitioning implemented, number of allocatable
--       and sharable TLB entries, MVP has allocatable TCs, 2 VPEs
-+       and shareable TLB entries, MVP has allocatable TCs, 2 VPEs
-        implemented, 5 TCs implemented. */
-     env->mvp->CP0_MVPConf0 = (1U << CP0MVPC0_M) | (1 << CP0MVPC0_TLBS) |
-                              (0 << CP0MVPC0_GS) | (1 << CP0MVPC0_PCP) |
+         break;
+ #endif
++    case OPC_GSSHFL:
++        switch (MASK_LOONGSON_GSSHFLS(ctx->opcode)) {
++        case OPC_GSLWLC1:
++            check_cp1_enabled(ctx);
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            t1 = tcg_temp_new();
++            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++            tcg_gen_andi_tl(t1, t0, 3);
++#ifndef TARGET_WORDS_BIGENDIAN
++            tcg_gen_xori_tl(t1, t1, 3);
++#endif
++            tcg_gen_shli_tl(t1, t1, 3);
++            tcg_gen_andi_tl(t0, t0, ~3);
++            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
++            tcg_gen_shl_tl(t0, t0, t1);
++            t2 = tcg_const_tl(-1);
++            tcg_gen_shl_tl(t2, t2, t1);
++            fp0 = tcg_temp_new_i32();
++            gen_load_fpr32(ctx, fp0, rt);
++            tcg_gen_ext_i32_tl(t1, fp0);
++            tcg_gen_andc_tl(t1, t1, t2);
++            tcg_temp_free(t2);
++            tcg_gen_or_tl(t0, t0, t1);
++            tcg_temp_free(t1);
++#if defined(TARGET_MIPS64)
++            tcg_gen_extrl_i64_i32(fp0, t0);
++#else
++            tcg_gen_ext32s_tl(fp0, t0);
++#endif
++            gen_store_fpr32(ctx, fp0, rt);
++            tcg_temp_free_i32(fp0);
++            break;
++        case OPC_GSLWRC1:
++            check_cp1_enabled(ctx);
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            t1 = tcg_temp_new();
++            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++            tcg_gen_andi_tl(t1, t0, 3);
++#ifdef TARGET_WORDS_BIGENDIAN
++            tcg_gen_xori_tl(t1, t1, 3);
++#endif
++            tcg_gen_shli_tl(t1, t1, 3);
++            tcg_gen_andi_tl(t0, t0, ~3);
++            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEUL);
++            tcg_gen_shr_tl(t0, t0, t1);
++            tcg_gen_xori_tl(t1, t1, 31);
++            t2 = tcg_const_tl(0xfffffffeull);
++            tcg_gen_shl_tl(t2, t2, t1);
++            fp0 = tcg_temp_new_i32();
++            gen_load_fpr32(ctx, fp0, rt);
++            tcg_gen_ext_i32_tl(t1, fp0);
++            tcg_gen_and_tl(t1, t1, t2);
++            tcg_temp_free(t2);
++            tcg_gen_or_tl(t0, t0, t1);
++            tcg_temp_free(t1);
++#if defined(TARGET_MIPS64)
++            tcg_gen_extrl_i64_i32(fp0, t0);
++#else
++            tcg_gen_ext32s_tl(fp0, t0);
++#endif
++            gen_store_fpr32(ctx, fp0, rt);
++            tcg_temp_free_i32(fp0);
++            break;
++#if defined(TARGET_MIPS64)
++        case OPC_GSLDLC1:
++            check_cp1_enabled(ctx);
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            t1 = tcg_temp_new();
++            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++            tcg_gen_andi_tl(t1, t0, 7);
++#ifndef TARGET_WORDS_BIGENDIAN
++            tcg_gen_xori_tl(t1, t1, 7);
++#endif
++            tcg_gen_shli_tl(t1, t1, 3);
++            tcg_gen_andi_tl(t0, t0, ~7);
++            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
++            tcg_gen_shl_tl(t0, t0, t1);
++            t2 = tcg_const_tl(-1);
++            tcg_gen_shl_tl(t2, t2, t1);
++            gen_load_fpr64(ctx, t1, rt);
++            tcg_gen_andc_tl(t1, t1, t2);
++            tcg_temp_free(t2);
++            tcg_gen_or_tl(t0, t0, t1);
++            tcg_temp_free(t1);
++            gen_store_fpr64(ctx, t0, rt);
++            break;
++        case OPC_GSLDRC1:
++            check_cp1_enabled(ctx);
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            t1 = tcg_temp_new();
++            tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, MO_UB);
++            tcg_gen_andi_tl(t1, t0, 7);
++#ifdef TARGET_WORDS_BIGENDIAN
++            tcg_gen_xori_tl(t1, t1, 7);
++#endif
++            tcg_gen_shli_tl(t1, t1, 3);
++            tcg_gen_andi_tl(t0, t0, ~7);
++            tcg_gen_qemu_ld_tl(t0, t0, ctx->mem_idx, MO_TEQ);
++            tcg_gen_shr_tl(t0, t0, t1);
++            tcg_gen_xori_tl(t1, t1, 63);
++            t2 = tcg_const_tl(0xfffffffffffffffeull);
++            tcg_gen_shl_tl(t2, t2, t1);
++            gen_load_fpr64(ctx, t1, rt);
++            tcg_gen_and_tl(t1, t1, t2);
++            tcg_temp_free(t2);
++            tcg_gen_or_tl(t0, t0, t1);
++            tcg_temp_free(t1);
++            gen_store_fpr64(ctx, t0, rt);
++            break;
++#endif
++        default:
++            MIPS_INVAL("loongson_gsshfl");
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
++    case OPC_GSSHFS:
++        switch (MASK_LOONGSON_GSSHFLS(ctx->opcode)) {
++        case OPC_GSSWLC1:
++            check_cp1_enabled(ctx);
++            t1 = tcg_temp_new();
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            fp0 = tcg_temp_new_i32();
++            gen_load_fpr32(ctx, fp0, rt);
++            tcg_gen_ext_i32_tl(t1, fp0);
++            gen_helper_0e2i(swl, t1, t0, ctx->mem_idx);
++            tcg_temp_free_i32(fp0);
++            tcg_temp_free(t1);
++            break;
++        case OPC_GSSWRC1:
++            check_cp1_enabled(ctx);
++            t1 = tcg_temp_new();
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            fp0 = tcg_temp_new_i32();
++            gen_load_fpr32(ctx, fp0, rt);
++            tcg_gen_ext_i32_tl(t1, fp0);
++            gen_helper_0e2i(swr, t1, t0, ctx->mem_idx);
++            tcg_temp_free_i32(fp0);
++            tcg_temp_free(t1);
++            break;
++#if defined(TARGET_MIPS64)
++        case OPC_GSSDLC1:
++            check_cp1_enabled(ctx);
++            t1 = tcg_temp_new();
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            gen_load_fpr64(ctx, t1, rt);
++            gen_helper_0e2i(sdl, t1, t0, ctx->mem_idx);
++            tcg_temp_free(t1);
++            break;
++        case OPC_GSSDRC1:
++            check_cp1_enabled(ctx);
++            t1 = tcg_temp_new();
++            gen_base_offset_addr(ctx, t0, rs, shf_offset);
++            gen_load_fpr64(ctx, t1, rt);
++            gen_helper_0e2i(sdr, t1, t0, ctx->mem_idx);
++            tcg_temp_free(t1);
++            break;
++#endif
++        default:
++            MIPS_INVAL("loongson_gsshfs");
++            generate_exception_end(ctx, EXCP_RI);
++            break;
++        }
++        break;
+     default:
+         MIPS_INVAL("loongson_gslsq");
+         generate_exception_end(ctx, EXCP_RI);
 -- 
 2.26.2
 
