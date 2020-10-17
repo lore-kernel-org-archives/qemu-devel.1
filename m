@@ -7,71 +7,72 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00E02C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 10:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 004C3C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 10:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 57E3520708
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 10:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 532CE2064B
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 10:52:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ztFQWVar"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57E3520708
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ySGG2iI/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 532CE2064B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42374 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44496 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTjoG-0000Jp-FJ
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 06:51:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37868)
+	id 1kTjpN-0001EF-GC
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 06:52:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kTjnE-0008Im-4h
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 06:50:33 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:35334)
+ id 1kTjoF-0000S7-3o
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 06:51:35 -0400
+Received: from mail-ej1-x630.google.com ([2a00:1450:4864:20::630]:36428)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kTjnC-0007fe-1R
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 06:50:31 -0400
-Received: by mail-ed1-x542.google.com with SMTP id cq12so5340954edb.2
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 03:50:25 -0700 (PDT)
+ id 1kTjoD-0007tB-EX
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 06:51:34 -0400
+Received: by mail-ej1-x630.google.com with SMTP id qp15so7151151ejb.3
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 03:51:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=IuxQG69JBE57RLDbG16ZdlmpAednQVXKs8Yr9zaGbJU=;
- b=ztFQWVarMQo3iUjIh+qD289CBInipgsFhK2G+noWiQn0PeKnWQs/q7GefhwGAJjWG3
- M+1LOhRNsvjpK95c/em9Sy7A0D1AXWOFkZ62JY85sKU4cimQcJTYDbqIJd9HdsyjWSCU
- cbkTjrzXCx7wif8bMKfU8IccAOFtK3a6+/uuSwD+Cqp0J7qRkm5VZl3zGGtxKeVvF6OA
- TzaHEEywy3r5nxhLaEOV96h7oJpwFP+dO7ai/TPaf8w79OqAgY/YMbup3X5Vc0oQCksZ
- 2iU2Nf0s0CtWKausPUE9DZJOY2CHZhVteVJaZkhYFWzetEsyZzxNHCkRqMIWlcIy0esy
- evKA==
+ :cc; bh=+GkEjtcrckr7ZXL36ntqQcfJtHBXedswOvHyVxLizKM=;
+ b=ySGG2iI/JJUzN/VkdMDH9K3/0aWK+L1l1SS0LMPFg8gyRk3P4IhL71BT0Citf10Wj9
+ LsswlaHE9cIUpk9SjJoYDY7C9m0WMdLuQQiiUgujUeEJDaeMxaOLagjbtxwt+IhmkrHP
+ 4QtL9Hq/vabvP4uBCP/NvVVxko48Hj0x8Gp/JzfYZCndEO4E4aE0cycbvts3c08m4Aky
+ JxoTN/W7bW02LoajxyaAt+6XO1R/HAPG9HLvX+T5/yM3jBYQSqN8z/uHadaqeUghBwPu
+ uS9zMX9LqSx4SWnqkPkf2202yZdzRfZVTp96/YSY2Jco5Qs+oI2M2+c/8TF8O/HPSUoi
+ 6P/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=IuxQG69JBE57RLDbG16ZdlmpAednQVXKs8Yr9zaGbJU=;
- b=NXDDA86qrEyrlHCidjTsobUz696rqo9q0qAaItM0nSAzoNJYnux6weDEkN1SMg3XnP
- CW6Y5TRrTYCfeO9baEP30HOEOfHgGkldC4w7TEAAT2iugoXU7vANJVdo94ox56bBMODZ
- 0gUCZ04Scc1eIMYIZiTttuTCZR+r2rRNBYwxv71ZVI3uUyg5RneO/VlYniRwMZoS/Iuq
- w1R1jx1lS9nn4VJhDzTyzMCX9cjuFhxY0tIb2BER90JkbmouXkFv9YOl62S2q8WcN+CO
- sZ9HDJS3a3ol00uH7eKnjJkYwQkzjZDG066KT4W4jhtYu5VJvLEiOOZGDZhbckZVLyyX
- 821A==
-X-Gm-Message-State: AOAM530hjIfWvTSfBqJvcGN2P5kpltXEaPQc1KLYYPEAawnyva7hcq9S
- tc+/oXkEMW6rifzFkowJ+e6Sjehq5sOUVvyy7JOetocdEamm/w==
-X-Google-Smtp-Source: ABdhPJzdlRVBPRBdKywzQaNNiZzr2XNQzbSXJZbW4kPbWOC18spxfHOHZL1HQZpt1TF0l/V6i9htR+J1WFV5QCpALWg=
-X-Received: by 2002:a50:c34a:: with SMTP id q10mr8989879edb.36.1602931824831; 
- Sat, 17 Oct 2020 03:50:24 -0700 (PDT)
+ bh=+GkEjtcrckr7ZXL36ntqQcfJtHBXedswOvHyVxLizKM=;
+ b=LIFg0EKp9cNYkbVrv+rf9JA2u/wgdlchqMLG/RjTJSaiGMIS6ByckFPojXILPePfdY
+ /xT/Hp/OezCbAlgDZemwlIkoen/S2QzhqHWCiUevXxGEbQocJCwQfBdYYAS8huo1rq7O
+ 61DuonO0WenSuxJ8B9EQ3NBtTDjXC+XcpbJnGbGcoMYC2m2QmfWAPOAnf7sLl7kqNxxF
+ lbUXuMxijnyYimJKxU2sCE+PcqhsCEbtlvMSy8RZOLcObdRBD+9BGgPTnj3zk4OSea3R
+ JsNvxA8lGCM6F2YEpWl+13fKFwp5i/Hu+CfWQXXsrkZL8PIE5UdW90W/iwyRpNGT9L/Z
+ obmA==
+X-Gm-Message-State: AOAM53129oqmL+GSqWr/XqHC95NImVSpKlRz9FQ3s/NZQtJUhL0TD9LR
+ mZPuMAep8PXUs/Lc21rQ4aAJipva1Hk7uEjXgb9J4w==
+X-Google-Smtp-Source: ABdhPJybLTegHSrlBIPHRzilewhbbRnADl6OGJv6fzvaFFnwspYedeKKwzmh+1XbpLeg4cvv37zALABuqru+0QdCf5c=
+X-Received: by 2002:a17:906:ce21:: with SMTP id
+ sd1mr8272029ejb.4.1602931891848; 
+ Sat, 17 Oct 2020 03:51:31 -0700 (PDT)
 MIME-Version: 1.0
-References: <cover.1602771296.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1602771296.git.qemu_oss@crudebyte.com>
+References: <20201016052435.26180-1-kraxel@redhat.com>
+In-Reply-To: <20201016052435.26180-1-kraxel@redhat.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Sat, 17 Oct 2020 11:50:13 +0100
-Message-ID: <CAFEAcA_ygiXU=Lh1iOPUDOsXu-cuVze-wDhc90wZ+r7C-BBesA@mail.gmail.com>
-Subject: Re: [PULL 0/5] 9p queue 2020-10-15
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Sat, 17 Oct 2020 11:51:20 +0100
+Message-ID: <CAFEAcA-jNYAZjT9WaNABLn-9LG-_aA5jBQC9oQzRCwaKR0PDLw@mail.gmail.com>
+Subject: Re: [PULL 0/3] Usb 20201016 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::630;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x630.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,13 +94,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>, Greg Kurz <groug@kaod.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 15 Oct 2020 at 22:04, Christian Schoenebeck
-<qemu_oss@crudebyte.com> wrote:
+On Fri, 16 Oct 2020 at 06:28, Gerd Hoffmann <kraxel@redhat.com> wrote:
 >
 > The following changes since commit 57c98ea9acdcef5021f5671efa6475a5794a51c4:
 >
@@ -107,42 +107,31 @@ On Thu, 15 Oct 2020 at 22:04, Christian Schoenebeck
 >
 > are available in the Git repository at:
 >
->   https://github.com/cschoenebeck/qemu.git tags/pull-9p-20201015
+>   git://git.kraxel.org/qemu tags/usb-20201016-pull-request
 >
-> for you to fetch changes up to 97a64ec211d051439b654950ed3f7cffc47d489b:
+> for you to fetch changes up to 9832f6783c4198658d101c6b8e8a14e1f2c57aa3:
 >
->   tests/9pfs: add local Tmkdir test (2020-10-15 16:11:17 +0200)
+>   hw/usb/hcd-dwc2: fix divide-by-zero in dwc2_handle_packet() (2020-10-15 12:16:42 +0200)
 >
 > ----------------------------------------------------------------
-> 9pfs: add tests using local fs driver
+> usb: fixes for dwc2 + ehci.
 >
-> The currently existing 9pfs test cases are all solely using the 9pfs 'synth'
-> fileystem driver, which is a very simple and purely simulated (in RAM only)
-> filesystem. There are issues though where the 'synth' fs driver is not
-> sufficient. For example the following two bugs need test cases running the
-> 9pfs 'local' fs driver:
+> ----------------------------------------------------------------
 >
-> https://bugs.launchpad.net/qemu/+bug/1336794
-> https://bugs.launchpad.net/qemu/+bug/1877384
+> Anthony PERARD via (1):
+>   usb/hcd-ehci: Fix error handling on missing device for iTD
 >
-> This patch set for that reason introduces 9pfs test cases using the 9pfs
-> 'local' filesystem driver along to the already existing tests on 'synth'.
+> Mauro Matteo Cascella (1):
+>   hw/usb/hcd-dwc2: fix divide-by-zero in dwc2_handle_packet()
+>
+> Paul Zimmerman (1):
+>   usb: hcd-dwc2: change assert()s to qemu_log_mask(LOG_GUEST_ERROR...)
 
-Build failure, OSX:
+Anthony PERARD via (1):
+      usb/hcd-ehci: Fix error handling on missing device for iTD
+ERROR: pull request includes commits attributed to list
 
-Compiling C object tests/qtest/libqos/libqos.fa.p/virtio-9p.c.o
-../../tests/qtest/libqos/virtio-9p.c:37:17: error: implicit
-declaration of function 'get_current_dir_name' is invalid in C99
-[-Werror,-Wimplicit-function-declaration]
-    char *pwd = get_current_dir_name();
-                ^
-../../tests/qtest/libqos/virtio-9p.c:37:17: error: this function
-declaration is not a prototype [-Werror,-Wstrict-prototypes]
-../../tests/qtest/libqos/virtio-9p.c:37:11: error: incompatible
-integer to pointer conversion initializing 'char *' with an expression
-of type 'int' [-Werror,-Wint-conversion]
-    char *pwd = get_current_dir_name();
-
+Can you fix up the author for that commit, please?
 
 thanks
 -- PMM
