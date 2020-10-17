@@ -2,69 +2,108 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 778F2C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE13EC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:57:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF9A320756
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:47:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1DF5E2074A
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 06:57:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="T17/vC2E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF9A320756
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qT5tSTup"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1DF5E2074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57426 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTg0S-0004nt-1n
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 02:47:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33774)
+	id 1kTg9E-0007Q9-RR
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 02:57:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34850)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTfyb-0003Lr-9c; Sat, 17 Oct 2020 02:46:01 -0400
-Received: from bilbo.ozlabs.org ([203.11.71.1]:38993 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kTfyY-00036s-Cb; Sat, 17 Oct 2020 02:46:00 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CCtnj1MsSz9sTm; Sat, 17 Oct 2020 17:45:45 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1602917145;
- bh=tznvDlDw1Lt9msRsr9/Dg2vqCnCa3egQaOESL6bg8h0=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=T17/vC2EIlrl5gL/rSfvfzMRj19x7RBBYI3v2aaxPNJP+4kgPce9FQXq4ac/YABV/
- ulLaIqgraMCRkXbMqYVAKlTNfuc20mREsQD4spjhW9UivXfBkkCbG+lhvuHVg+EoGW
- bkx/+iIYV5xmrvnyeI83k/V5EBI8vyEgy2x82/94=
-Date: Sat, 17 Oct 2020 17:20:00 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Subject: Re: [PATCH v2 2/3] grackle: use qdev gpios for PCI IRQs
-Message-ID: <20201017062000.GA285896@yekko.fritz.box>
-References: <20201013114922.2946-1-mark.cave-ayland@ilande.co.uk>
- <20201013114922.2946-3-mark.cave-ayland@ilande.co.uk>
- <20201016001803.GC7078@yekko.fritz.box>
- <CABLmASE+GzEhSgqqJmum+Xu7DkyQX6PtboKLhA4LyaOY7PYoSA@mail.gmail.com>
- <67efe378-7979-9a51-7c66-8d8c3f55e335@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTg8N-00071D-Pd
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 02:56:07 -0400
+Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:42814)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTg8J-0006mM-Fv
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 02:56:07 -0400
+Received: by mail-lj1-x243.google.com with SMTP id h20so5128107lji.9
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 23:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=wzkWOoKjInRI+O5FvJvA/t/AUj8a5RTpGl8TvIyMwpk=;
+ b=qT5tSTupKtI9+LV08l4NhIywJjENbE/1819qMpMZ4wleQCC2UZcegHiJKzfH1HMZ3e
+ VQ39ggQjsnoUsTrwcVQ97D1zQSE6mutGso5Q8ogf39SUNsMEKhaYEUFy/VRoirOjmt9b
+ 37fnHoejXu8BkEr6+HM11CFBIeNasDURFIHxGHoIweZ8GffWeTWMHjs1yf08SJ9aElhz
+ uVubdWIw6/aHW+WMsmF6jE1F+EA14IbVZRX4CbiaSO5HESQkyn+DtfxAcYY1TXnDXa3y
+ L0xoXUEVvRAwv4QmP1JweP+0D8VJwUznxwhWGyWIOZuxwKsIs2yP+PPDqRQknJmj0Lnw
+ LbIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=wzkWOoKjInRI+O5FvJvA/t/AUj8a5RTpGl8TvIyMwpk=;
+ b=PgZy1JsqicGWDTZsGIIm+3QQQU4ISgG+aFeyfL/bNqUZZWv8bqzAK2fiCQi80Hzdw8
+ OIqgSRZde2R/WNYBDT0xCsg+nychmPDsImcbzM+1S31RhNFriC1Ot/DViTRhjsLSeFDo
+ MEZYCWyD+EvhMp9TbdE+FXi59BeJCr1SVL0OC6b427Juuddw/5o2VeDBBf8z18CqeGHr
+ aV5YrT+/sQA6hBpaFruBfHwBPscpmQpbBu1jkQ+uiFN2Kt9/29dc1OYo2cBWZ/Q8qERD
+ BxQ8mhs9we0l+55xYIlo9wDr/ja+L9TCfwFeK/DzdOMrbz0Gwb39Ml639L2vP+m+IsWC
+ sKOw==
+X-Gm-Message-State: AOAM530dGPJSOmBBlMZhDzZwYj7UIDrJMhwcy1Hp7M4GM1Vpvr8tFtmb
+ k35PZ32RJ0R4/O2pwaCwn3sZY4I8vE1CVNpcDyVM5w==
+X-Google-Smtp-Source: ABdhPJy+7ndzZeyQ/tSwJHmtK1PTCVWdHHr1LWw9yj8KnDosvV+fAVJTuHJyVyhRpmky/WIBh3xN8Pb/8hbCqMiC0A0=
+X-Received: by 2002:a2e:8816:: with SMTP id x22mr2697080ljh.377.1602917761335; 
+ Fri, 16 Oct 2020 23:56:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="FCuugMFkClbJLl1L"
-Content-Disposition: inline
-In-Reply-To: <67efe378-7979-9a51-7c66-8d8c3f55e335@ilande.co.uk>
-Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 02:45:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <20201017033606.GA14014@1wt.eu>
+ <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+ <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
+ <20201017053712.GA14105@1wt.eu>
+ <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
+ <20201017064442.GA14117@1wt.eu>
+In-Reply-To: <20201017064442.GA14117@1wt.eu>
+From: Jann Horn <jannh@google.com>
+Date: Sat, 17 Oct 2020 08:55:34 +0200
+Message-ID: <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+To: Willy Tarreau <w@1wt.eu>
+Cc: Colm MacCarthaigh <colmmacc@amazon.com>, "Catangiu,
+ Adrian Costin" <acatan@amazon.com>, 
+ Andy Lutomirski <luto@kernel.org>, Jason Donenfeld <Jason@zx2c4.com>,
+ "Theodore Y. Ts'o" <tytso@mit.edu>, Eric Biggers <ebiggers@kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ kernel list <linux-kernel@vger.kernel.org>, 
+ "open list:VIRTIO GPU DRIVER" <virtualization@lists.linux-foundation.org>, 
+ "Graf (AWS), Alexander" <graf@amazon.de>, "Woodhouse,
+ David" <dwmw@amazon.co.uk>, bonzini@gnu.org, 
+ "Singh, Balbir" <sblbir@amazon.com>, "Weiss, Radu" <raduweis@amazon.com>,
+ oridgar@gmail.com, ghammer@redhat.com, Jonathan Corbet <corbet@lwn.net>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, 
+ Qemu Developers <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>, 
+ Michal Hocko <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::243;
+ envelope-from=jannh@google.com; helo=mail-lj1-x243.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,71 +116,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>,
- qemu-ppc <qemu-ppc@nongnu.org>, qemu-devel qemu-devel <qemu-devel@nongnu.org>,
- Howard Spoelstra <hsp.cat7@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Sat, Oct 17, 2020 at 8:44 AM Willy Tarreau <w@1wt.eu> wrote:
+> On Sat, Oct 17, 2020 at 07:52:48AM +0200, Jann Horn wrote:
+> > On Sat, Oct 17, 2020 at 7:37 AM Willy Tarreau <w@1wt.eu> wrote:
+> > > On Sat, Oct 17, 2020 at 07:01:31AM +0200, Jann Horn wrote:
+> > > > Microsoft's documentation
+> > > > (http://go.microsoft.com/fwlink/?LinkId=260709) says that the VM
+> > > > Generation ID that we get after a fork "is a 128-bit,
+> > > > cryptographically random integer value". If multiple people use the
+> > > > same image, it guarantees that each use of the image gets its own,
+> > > > fresh ID:
+> > >
+> > > No. It cannot be more unique than the source that feeds that cryptographic
+> > > transformation. All it guarantees is that the entropy source is protected
+> > > from being guessed based on the output. Applying cryptography on a simple
+> > > counter provides apparently random numbers that will be unique for a long
+> > > period for the same source, but as soon as you duplicate that code between
+> > > users and they start from the same counter they'll get the same IDs.
+> > >
+> > > This is why I think that using a counter is better if you really need something
+> > > unique. Randoms only reduce predictability which helps avoiding collisions.
+> >
+> > Microsoft's spec tells us that they're giving us cryptographically
+> > random numbers. Where they're getting those from is not our problem.
+> > (And if even the hypervisor is not able to collect enough entropy to
+> > securely generate random numbers, worrying about RNG reseeding in the
+> > guest would be kinda pointless, we'd be fairly screwed anyway.)
+>
+> Sorry if I sound annoying, but it's a matter of terminology and needs.
+>
+> Cryptograhically random means safe for use with cryptography in that it
+> is unguessable enough so that you can use it for encryption keys that
+> nobody will be able to guess. It in no ways guarantees uniqueness, just
+> like you don't really care if the symmetric crypto key of you VPN has
+> already been used once somewhere else as long as there's no way to know.
+> However with the good enough distribution that a CSPRNG provides,
+> collisions within a *same* generator are bound to a very low, predictable
+> rate which is by generally considered as acceptable for all use cases.
 
---FCuugMFkClbJLl1L
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes.
 
-On Fri, Oct 16, 2020 at 07:53:10AM +0100, Mark Cave-Ayland wrote:
-> On 16/10/2020 07:45, Howard Spoelstra wrote:
->=20
-> > Hi,
-> >=20
-> > I see compilation of the current ppc-for-5.2 branch fail with:
-> >=20
-> > ../hw/pci-host/grackle.c: In function =E2=80=98grackle_realize=E2=80=99:
-> > ../hw/pci-host/grackle.c:68:11: error: =E2=80=98GrackleState=E2=80=99 h=
-as no member named =E2=80=98pic=E2=80=99
-> >  =C2=A0 =C2=A068 | =C2=A0 =C2=A0 if (!s->pic) {
-> >  =C2=A0 =C2=A0 =C2=A0 | =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 ^~
-> > make: *** [Makefile.ninja:1741: libcommon.fa.p/hw_pci-host_grackle.c.o]=
- Error 1
-> >=20
-> > Best,
-> > Howard
->=20
-> I see - as per the cover letter, my series is a replacement for Phil's
-> original patch at
-> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg02988.html (the =
-PIC
-> link is now completely removed), so the solution here is to drop patch
-> 7daac97 "hw/pci-host/grackle: Verify PIC link is properly set".
+> Something random (cryptographically or not) *cannot* be unique by
+> definition, otherwise it's not random anymore, since each draw has an
+> influence on the remaining list of possible draws, which is contrary to
+> randomness. And conversely something unique cannot be completely random
+> because if you know it's unique, you can already rule out all other known
+> values from the candidates, thus it's more predictable than random.
 
-Ok, I've removed that from my ppc-for-5.2 tree.
+Yes.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+> With this in mind, picking randoms from a same RNG is often highly
+> sufficient to consider they're highly likely unique within a long
+> period. But it's not a guarantee. And it's even less one between two
+> RNGs (e.g. if uniqueness is required between multiple hypervisors in
+> case VMs are migrated or centrally managed, which I don't know).
+>
+> If what is sought here is a strong guarantee of uniqueness, using a
+> counter as you first suggested is better.
 
---FCuugMFkClbJLl1L
-Content-Type: application/pgp-signature; name="signature.asc"
+My suggestion is to use a counter *in the UAPI*, not in the hypervisor
+protocol. (And as long as that counter can only miss increments in a
+cryptographically negligible fraction of cases, everything's fine.)
 
------BEGIN PGP SIGNATURE-----
+> If what is sought is pure
+> randomness (in the sense that it's unpredictable, which I don't think
+> is needed here), then randoms are better.
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+KjQ4ACgkQbDjKyiDZ
-s5IESxAApOxHIF7ev/27uBRMeYGF15rL+o8+Bsto4tjSLQ0QbaDNwzjXPPR/vMh+
-tU0u/Fcd/KW4B0yWamUmWOy8gxm6S4nWTVdFiqHLY4Gjz1BUi2a5wfBzIp2O1Ne7
-H0D7kfH1a0qGLu7BuzFU5FczPTKR/L1M8ka3IDHu+B8mAVFYD5BuOnxvXoOtj/7O
-aBU9PRot9KwB/Jsrme/iG2gLoRQwfrE589Nl3HwaegAJGV1vVYGHReucQn0RKY49
-HoNM6DjdC7mQn+RY/SK5AdacjTSd/NPRcePdwGFab1FdeQMpax+l/LSVkLc+8GJR
-GpU9fTlWRV35rua92YUbUc8Jh57So+uh5DjIchxO8g5A5Z3/S7PyKclvJw1zmg6q
-3RaLXzVYFIAnJ0aylhre2iMo8NOL1Us0oCMJ7+obXcmaC9diLC1yApafsm2MuML9
-wpDTzsmaC5K7B8beIwNXuOv2NB87ERl5/IeDdEW+4DRhVLsEb1DaqtKqDfhB+toO
-iJyfLfYLNVj76jfuxA32LZR7urPGK8Dpeq6PdfUprKknW3Jzbqbyk6ne5+wgMOZ5
-IRW/rTyCa5X6OiLp+dqC77Cb0lGCadjslQZbE1GaBqyB7cyu4yWQf+mNAFdHakSN
-UKEc3NQsYFcL6Mh5VDfSLcNJgJtsAPKFORKYgcye+jGfaDj2Dio=
-=spcA
------END PGP SIGNATURE-----
+And this is what *the hypervisor protocol* gives us (which could be
+very useful for reseeding the kernel RNG).
 
---FCuugMFkClbJLl1L--
+> If both are required, just
+> concatenate a counter and a random. And if you need them to be spatially
+> unique, just include a node identifier.
+>
+> Now the initial needs in the forwarded message are not entirely clear
+> to me but I wanted to rule out the apparent mismatch between the expressed
+> needs for uniqueness and the proposed solutions solely based on randomness.
+
+Sure, from a theoretical standpoint, it would be a little bit nicer if
+the hypervisor protocol included a generation number along with the
+128-bit random value. But AFAIU it doesn't, so if we want this to just
+work under Microsoft's existing hypervisor, we'll have to make do with
+checking whether the random value changed. :P
 
