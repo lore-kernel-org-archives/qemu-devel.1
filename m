@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A068C43457
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C45DEC433E7
 	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:18:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2B4820791
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:18:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2B4820791
+	by mail.kernel.org (Postfix) with ESMTPS id 6D12820791
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 04:18:58 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D12820791
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53096 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTdgG-0008Tk-UT
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:18:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39936)
+	id 1kTdgH-00005P-D9
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 00:18:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXg-0005td-Ho
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5239 helo=huawei.com)
+ id 1kTdXv-0006HD-J5
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:19 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5245 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kTdXe-0007Gb-DE
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:04 -0400
-Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 7B63CD1119B5D6BEA59B;
- Sat, 17 Oct 2020 12:09:51 +0800 (CST)
+ id 1kTdXr-0007Ij-5e
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 00:10:19 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 7F60251D1C4A51D745D8;
+ Sat, 17 Oct 2020 12:09:56 +0800 (CST)
 Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
  (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Sat, 17 Oct 2020
- 12:09:41 +0800
+ 12:09:47 +0800
 From: Chuan Zheng <zhengchuan@huawei.com>
 To: <quintela@redhat.com>, <dgilbert@redhat.com>
-Subject: [PATCH v3 02/18] migration/rdma: judge whether or not the RDMA is
- used for migration
-Date: Sat, 17 Oct 2020 12:25:32 +0800
-Message-ID: <1602908748-43335-3-git-send-email-zhengchuan@huawei.com>
+Subject: [PATCH v3 12/18] migration/rdma: Create the multifd send channels for
+ RDMA
+Date: Sat, 17 Oct 2020 12:25:42 +0800
+Message-ID: <1602908748-43335-13-git-send-email-zhengchuan@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
 References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
@@ -80,93 +80,132 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add enabled_rdma_migration into MigrationState to judge
-whether or not the RDMA is used for migration.
-
-Signed-off-by: Zhimin Feng <fengzhimin1@huawei.com>
 Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
 ---
- migration/migration.c | 13 +++++++++++++
- migration/migration.h |  6 ++++++
- 2 files changed, 19 insertions(+)
+ migration/multifd.c |  4 ++--
+ migration/multifd.h |  2 ++
+ migration/rdma.c    | 56 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 60 insertions(+), 2 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index 64ae417..be6166a 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -389,7 +389,9 @@ void migrate_add_address(SocketAddress *address)
- void qemu_start_incoming_migration(const char *uri, Error **errp)
- {
-     const char *p = NULL;
-+    MigrationState *s = migrate_get_current();
- 
-+    s->enabled_rdma_migration = false;
-     qapi_event_send_migration(MIGRATION_STATUS_SETUP);
-     if (!strcmp(uri, "defer")) {
-         deferred_incoming_migration(errp);
-@@ -399,6 +401,7 @@ void qemu_start_incoming_migration(const char *uri, Error **errp)
-         socket_start_incoming_migration(p ? p : uri, errp);
- #ifdef CONFIG_RDMA
-     } else if (strstart(uri, "rdma:", &p)) {
-+        s->enabled_rdma_migration = true;
-         rdma_start_incoming_migration(p, errp);
- #endif
-     } else if (strstart(uri, "exec:", &p)) {
-@@ -1887,6 +1890,7 @@ void migrate_init(MigrationState *s)
-     s->start_postcopy = false;
-     s->postcopy_after_devices = false;
-     s->migration_thread_running = false;
-+    s->enabled_rdma_migration = false;
-     error_free(s->error);
-     s->error = NULL;
-     s->hostname = NULL;
-@@ -2115,6 +2119,7 @@ void qmp_migrate(const char *uri, bool has_blk, bool blk,
-         socket_start_outgoing_migration(s, p ? p : uri, &local_err);
- #ifdef CONFIG_RDMA
-     } else if (strstart(uri, "rdma:", &p)) {
-+        s->enabled_rdma_migration = true;
-         rdma_start_outgoing_migration(s, p, &local_err);
- #endif
-     } else if (strstart(uri, "exec:", &p)) {
-@@ -2329,6 +2334,14 @@ bool migrate_use_events(void)
-     return s->enabled_capabilities[MIGRATION_CAPABILITY_EVENTS];
+diff --git a/migration/multifd.c b/migration/multifd.c
+index 03f3a1e..9439b3c 100644
+--- a/migration/multifd.c
++++ b/migration/multifd.c
+@@ -173,7 +173,7 @@ void multifd_register_ops(int method, MultiFDMethods *ops)
+     multifd_ops[method] = ops;
  }
  
-+bool migrate_use_rdma(void)
+-static int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
++int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp)
+ {
+     MultiFDInit_t msg = {};
+     int ret;
+@@ -500,7 +500,7 @@ int multifd_queue_page(QEMUFile *f, RAMBlock *block, ram_addr_t offset)
+     return 1;
+ }
+ 
+-static void multifd_send_terminate_threads(Error *err)
++void multifd_send_terminate_threads(Error *err)
+ {
+     int i;
+ 
+diff --git a/migration/multifd.h b/migration/multifd.h
+index ff80bd5..ec9e897 100644
+--- a/migration/multifd.h
++++ b/migration/multifd.h
+@@ -184,6 +184,8 @@ typedef struct {
+ #ifdef CONFIG_RDMA
+ MultiFDSetup *multifd_rdma_setup(void);
+ #endif
++void multifd_send_terminate_threads(Error *err);
++int multifd_send_initial_packet(MultiFDSendParams *p, Error **errp);
+ int get_multifd_send_param(int id, MultiFDSendParams **param);
+ int get_multifd_recv_param(int id, MultiFDRecvParams **param);
+ MultiFDSetup *multifd_setup_ops_init(void);
+diff --git a/migration/rdma.c b/migration/rdma.c
+index dd9f705..1af81f5 100644
+--- a/migration/rdma.c
++++ b/migration/rdma.c
+@@ -4261,9 +4261,54 @@ err:
+     g_free(rdma_return_path);
+ }
+ 
++static int multifd_channel_rdma_connect(void *opaque)
 +{
-+    MigrationState *s;
-+    s = migrate_get_current();
++    MultiFDSendParams *p = opaque;
++    Error *local_err = NULL;
++    int ret = 0;
++    MigrationState *s = migrate_get_current();
 +
-+    return s->enabled_rdma_migration;
++    p->rdma = qemu_rdma_data_init(s->host_port, &local_err);
++    if (p->rdma == NULL) {
++        goto out;
++    }
++
++    ret = qemu_rdma_source_init(p->rdma,
++                                migrate_use_rdma_pin_all(),
++                                &local_err);
++    if (ret) {
++        goto out;
++    }
++
++    ret = qemu_rdma_connect(p->rdma, &local_err);
++    if (ret) {
++        goto out;
++    }
++
++    p->file = qemu_fopen_rdma(p->rdma, "wb");
++    if (p->file == NULL) {
++        goto out;
++    }
++
++    p->c = QIO_CHANNEL(getQIOChannel(p->file));
++
++out:
++    if (local_err) {
++        trace_multifd_send_error(p->id);
++    }
++
++    return ret;
 +}
 +
- bool migrate_use_rdma_pin_all(void)
+ static void *multifd_rdma_send_thread(void *opaque)
  {
-     MigrationState *s;
-diff --git a/migration/migration.h b/migration/migration.h
-index 74fd790..e92eb29 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -264,6 +264,11 @@ struct MigrationState
-      * This save hostname when out-going migration starts
-      */
-     char *hostname;
+     MultiFDSendParams *p = opaque;
++    Error *local_err = NULL;
 +
-+    /*
-+     * Enable RDMA migration
-+     */
-+    bool enabled_rdma_migration;
- };
++    trace_multifd_send_thread_start(p->id);
++    if (multifd_send_initial_packet(p, &local_err) < 0) {
++        goto out;
++    }
  
- void migrate_set_state(int *state, int old_state, int new_state);
-@@ -300,6 +305,7 @@ bool migrate_ignore_shared(void);
- bool migrate_validate_uuid(void);
+     while (true) {
+         qemu_mutex_lock(&p->mutex);
+@@ -4275,6 +4320,11 @@ static void *multifd_rdma_send_thread(void *opaque)
+         qemu_sem_wait(&p->sem);
+     }
  
- bool migrate_auto_converge(void);
-+bool migrate_use_rdma(void);
- bool migrate_use_rdma_pin_all(void);
- bool migrate_use_multifd(void);
- bool migrate_pause_before_switchover(void);
++out:
++    if (local_err) {
++        trace_multifd_send_error(p->id);
++        multifd_send_terminate_threads(local_err);
++    }
+     qemu_mutex_lock(&p->mutex);
+     p->running = false;
+     qemu_mutex_unlock(&p->mutex);
+@@ -4286,6 +4336,12 @@ static void multifd_rdma_send_channel_setup(MultiFDSendParams *p)
+ {
+     Error *local_err = NULL;
+ 
++    if (multifd_channel_rdma_connect(p)) {
++        error_setg(&local_err, "multifd: rdma channel %d not established",
++                   p->id);
++        return ;
++    }
++
+     if (p->quit) {
+         error_setg(&local_err, "multifd: send id %d already quit", p->id);
+         return ;
 -- 
 1.8.3.1
 
