@@ -2,86 +2,99 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCCE1C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 621B6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:56:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19A7C2074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:48:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3D792074A
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:56:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jpZPsioX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19A7C2074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cIYS/i+L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3D792074A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTpNQ-0003WG-6z
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 12:48:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60352)
+	id 1kTpUt-0005Sh-Mo
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 12:55:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTpMR-00034s-Ns
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:47:15 -0400
-Received: from mail-lf1-x131.google.com ([2a00:1450:4864:20::131]:41851)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTpMP-0004jl-DM
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:47:15 -0400
-Received: by mail-lf1-x131.google.com with SMTP id d24so7309618lfa.8
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 09:47:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=PA82ky01KBl/hHsyobJkiyHAKGuS/CEsJ5FmCxQG9hY=;
- b=jpZPsioXu8eDcmueXfy+0weputO+s8YL6DLw49R507FcEX6Gc0FZf/DA+kITJr+FCX
- 0a//x62LRfMLuR+GSLv2zFypiB1FfSFdpNPgE61tgkEgvEaK5XIEfOuoaRWUXhL2rbV8
- Qet4cr0J5kAfTIN2BKDuLFjtMR9DSnkv1Lt01tZkS4oJqtfG3Z5gEEr4u+bB3WAWxQzj
- NHVHwTb/Qmd3lKU3ruZEu3xWOXunA44R/d+QP66zh+dcQXK7IJBRYamZVsPxZc6oh1Ou
- PCYnIiZZPbdHMEHiRYQAtW9f4SXjkTmvh1C5k7WMCGbooAudNr7ckpmPguAJFkgIiPZa
- MC6g==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTpTf-0004kz-OS
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:54:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20325)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kTpTa-0005XU-9k
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:54:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602953676;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=o9UNbp77ldf/iZxbcxa8yLgoBepvdQkfFMiGWEFJq9w=;
+ b=cIYS/i+LSZTaNavquGyp37CDPZH87Lgq8ibP9wyx+XuutbJkkunv6AX/5IPHMP19Mo3eNp
+ MP2kdj9mqgpjTkg7ZZgqk6EToEqmlIgzgP65+S1+ez6H3Du8JFk58QofAu0dka+W8b80t7
+ gTtiDV5ZMFZs1OnfPzB4d7S3CiIsdB8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-439-usSyrO7ANMKc-EF2Jak6Xw-1; Sat, 17 Oct 2020 12:54:32 -0400
+X-MC-Unique: usSyrO7ANMKc-EF2Jak6Xw-1
+Received: by mail-ej1-f69.google.com with SMTP id p19so3085326ejy.11
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 09:54:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=PA82ky01KBl/hHsyobJkiyHAKGuS/CEsJ5FmCxQG9hY=;
- b=D622ZeqBKaHwuVQjO1edQ87VhdFQSxLYhuIKLcLMrj13tqAVy0FLJM60GZTk1y6XiI
- 04XJ6TJvIdMG8+xYdkZQhN4g56voc32NCHPpQg2y2xtvy2klmB3bDncJxvuwWNXba9vJ
- aMU82hHD37t1pbpUgneL7qmp3Zffwg6vCKw16wrbCpCUu7vZPFV54QqxZIPhmnpPus6o
- cJ51xN6WZTiux7rGAvDEwlp8iJbe8aZT9ahwvee+wfr71f9fdKSizoCgKFHrrePdve3q
- 7BAvQiHoiGBu5fY5ezk1HlU9iAP78DvPh5TPDQ8Ag0w+X1zgsdG06p481RFDG8GJ9TlZ
- 4uqg==
-X-Gm-Message-State: AOAM533AtIpD+P7Mqz+EAeP839SYhGbG27fn83L0MNwgtAjbDGuYT8CU
- FRaE3gOLyxX3wah5SlLsO0mhmI4tXxchIIhv1K1Gu5ryEbAgvg==
-X-Google-Smtp-Source: ABdhPJxm5dd1TMDx0c+kFBy7XWloF7XB+ykNnMNMI3sXYJcQBQl7eiXf3YWtNRQA02XVrjj2i28KQNnOjMo9n+4oDVA=
-X-Received: by 2002:ac2:4ed0:: with SMTP id p16mr3120704lfr.554.1602953230385; 
- Sat, 17 Oct 2020 09:47:10 -0700 (PDT)
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=o9UNbp77ldf/iZxbcxa8yLgoBepvdQkfFMiGWEFJq9w=;
+ b=LTnG9Ns4zrOgudLVb8XJVZ2zwRn+bxHr8spyezsJb/EVQWVwQaY1P7p8WBVs+SB+fx
+ QWQsW77KaHHcZ+Wv4Ehbugm+XQ9QGvMguDG1K+Xd2a4yJLcGlN8gSPMYFwNiXyw8k4xg
+ K+q0Eb8ETi5L8L0DUeMatGqjybKLBotEsqbgnK6sBxscGdNNG8TOsHBpgmmSCOCXohsJ
+ 2D3sRaGTpc1pMlRG0n6Y4X50Owzr/uuR77vk9fr2K+9ynmBJj5v0NObG0JPEe3UwT7x5
+ rSh63xI54xDHYaYl9vjeDzpG1kQ7FepACkawNzCYRLVCiWvans7aZExuzC5AyfuD56mA
+ X5xQ==
+X-Gm-Message-State: AOAM533NDEzQNgO4a3/q1rJZ7jPPp1vi6vxeK+7fyPYx/GZEjr4/GudP
+ jCGdk5UyT+f9aMw8t9G4a4nd082omBcswRtDS8uRzZHMkr75AY+lyGHS7nEvbRxOXZ0gO/uUP32
+ QHkUtexIzC4AWCv3GZNKwumE14O00DDg=
+X-Received: by 2002:a05:6402:b72:: with SMTP id
+ cb18mr9685117edb.129.1602953671199; 
+ Sat, 17 Oct 2020 09:54:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxFAkt7sGh/cwnHEseE50y5pSGKtLljrTO1gNPDpmptoIZiUgvQzceIyPCkdSdgo7zjFKnt3ZQ+avibMirhR/w=
+X-Received: by 2002:a05:6402:b72:: with SMTP id
+ cb18mr9685106edb.129.1602953670938; 
+ Sat, 17 Oct 2020 09:54:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201017164329.1634-1-luoyonggang@gmail.com>
 In-Reply-To: <20201017164329.1634-1-luoyonggang@gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sun, 18 Oct 2020 00:46:59 +0800
-Message-ID: <CAE2XoE-XCJR_M-K8Xft1CJOD0r=0U=zV-67wOy4+OqQNmncj5w@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Sat, 17 Oct 2020 18:53:56 +0200
+Message-ID: <CABgObfZej0fByb+THQhxUdMsQu=ATn9LXfmSb2=vVVcX5QXr6g@mail.gmail.com>
 Subject: Re: [PATCH v11] scripts: Convert qemu-version.sh to qemu-version.py
-To: qemu-level <qemu-devel@nongnu.org>
-Content-Type: multipart/alternative; boundary="000000000000e388b005b1e0a1db"
-Received-SPF: pass client-ip=2a00:1450:4864:20::131;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x131.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+To: Yonggang Luo <luoyonggang@gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="00000000000025e84a05b1e0bcf4"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 05:57:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,31 +108,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000e388b005b1e0a1db
+--00000000000025e84a05b1e0bcf4
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Sun, Oct 18, 2020 at 12:43 AM Yonggang Luo <luoyonggang@gmail.com> wrote=
-:
->
+Il sab 17 ott 2020, 18:43 Yonggang Luo <luoyonggang@gmail.com> ha scritto:
+
 > The sh script are harder to maintain for compatible different
 > xsh environment so convert it to python script
 > Also incorporate the fixes in
 >
-https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.co=
-m/
+> https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/
 >
 > According to https://github.com/msys2/MSYS2-packages/issues/2176
-> We need use CYGWIN=3Dnoglob and MSYS=3Dnoglob in the environment variable
+> We need use CYGWIN=noglob and MSYS=noglob in the environment variable
 > for disable wildcard expanding in msys or cygwin git, and setting the
-shell=3DFalse
+> shell=False
 >
+
+Honestly, I don't see the point in doing this change. Python is the wrong
+tool for this job, and it's not like the configure script is disappearing
+any time soon---so getting rid of shell scripts at this point is of limited
+utility, especially for something like qemu-version.sh.
+
+IMO the msys build is already much more robust in 5.2 than in 5.1 once the
+pending pull request for ninja is in). Any other change has to provide a
+clear improvement.
+
+Paolo
+
+
 > Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
 > Message-Id: <20201006112139.700-1-luoyonggang@gmail.com>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
@@ -135,15 +157,15 @@ shell=3DFalse
 > index 05fb59a00b..b100b6d7be 100644
 > --- a/meson.build
 > +++ b/meson.build
-> @@ -1240,7 +1240,7 @@ tracetool =3D [
->     '--backend=3D' + config_host['TRACE_BACKENDS']
+> @@ -1240,7 +1240,7 @@ tracetool = [
+>     '--backend=' + config_host['TRACE_BACKENDS']
 >  ]
 >
-> -qemu_version_cmd =3D [find_program('scripts/qemu-version.sh'),
-> +qemu_version_cmd =3D [find_program('scripts/qemu-version.py'),
+> -qemu_version_cmd = [find_program('scripts/qemu-version.sh'),
+> +qemu_version_cmd = [find_program('scripts/qemu-version.py'),
 >                      meson.current_source_dir(),
 >                      config_host['PKGVERSION'], meson.project_version()]
->  qemu_version =3D custom_target('qemu-version.h',
+>  qemu_version = custom_target('qemu-version.h',
 > diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py
 > new file mode 100644
 > index 0000000000..cf97b2bbb5
@@ -170,27 +192,22 @@ shell=3DFalse
 > +def main(_program, dir, pkgversion, version, *unused):
 > +    os.chdir(dir)
 > +    if not pkgversion and os.path.exists('.git'):
-> +        pc =3D subprocess.run(
+> +        pc = subprocess.run(
 > +            ['git', 'describe', '--match', 'v*', '--dirty', '--always'],
-> +            env=3Ddict(os.environ, CYGWIN=3D"noglob", MSYS=3D'noglob'),
-Sorry for disturb, under msys2,  use   env=3Ddict(os.environ,
-CYGWIN=3D"noglob", MSYS=3D'noglob') we make sure
-'v*=E2=80=98 are passed into git without wildcard. So I send this patch aga=
-in for
-fixes this issue
-> +            stdout=3Dsubprocess.PIPE, stderr=3Dsubprocess.DEVNULL,
-> +            encoding=3D'utf8', shell=3DFalse)
-> +        if pc.returncode =3D=3D 0:
-> +            pkgversion =3D pc.stdout.strip()
+> +            env=dict(os.environ, CYGWIN="noglob", MSYS='noglob'),
+> +            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL,
+> +            encoding='utf8', shell=False)
+> +        if pc.returncode == 0:
+> +            pkgversion = pc.stdout.strip()
 > +
-> +    fullversion =3D version
+> +    fullversion = version
 > +    if pkgversion:
-> +        fullversion =3D "{} ({})".format(version, pkgversion)
+> +        fullversion = "{} ({})".format(version, pkgversion)
 > +
 > +    print('#define QEMU_PKGVERSION "%s"' % pkgversion)
 > +    print('#define QEMU_FULL_VERSION "%s"' % fullversion)
 > +
-> +if __name__ =3D=3D "__main__":
+> +if __name__ == "__main__":
 > +    main(*sys.argv)
 > diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh
 > deleted file mode 100755
@@ -202,21 +219,21 @@ fixes this issue
 > -
 > -set -eu
 > -
-> -dir=3D"$1"
-> -pkgversion=3D"$2"
-> -version=3D"$3"
+> -dir="$1"
+> -pkgversion="$2"
+> -version="$3"
 > -
 > -if [ -z "$pkgversion" ]; then
 > -    cd "$dir"
 > -    if [ -e .git ]; then
-> -        pkgversion=3D$(git describe --match 'v*' --dirty) || :
+> -        pkgversion=$(git describe --match 'v*' --dirty) || :
 > -    fi
 > -fi
 > -
 > -if [ -n "$pkgversion" ]; then
-> -    fullversion=3D"$version ($pkgversion)"
+> -    fullversion="$version ($pkgversion)"
 > -else
-> -    fullversion=3D"$version"
+> -    fullversion="$version"
 > -fi
 > -
 > -cat <<EOF
@@ -226,103 +243,166 @@ fixes this issue
 > --
 > 2.28.0.windows.1
 >
+>
 
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---000000000000e388b005b1e0a1db
+--00000000000025e84a05b1e0bcf4
 Content-Type: text/html; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-<div dir=3D"ltr"><br><br>On Sun, Oct 18, 2020 at 12:43 AM Yonggang Luo &lt;=
-<a href=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; wrot=
-e:<br>&gt;<br>&gt; The sh script are harder to maintain for compatible diff=
-erent<br>&gt; xsh environment so convert it to python script<br>&gt; Also i=
-ncorporate the fixes in<br>&gt; <a href=3D"https://patchew.org/QEMU/2020092=
-9143654.518157-1-marcandre.lureau@redhat.com/">https://patchew.org/QEMU/202=
-00929143654.518157-1-marcandre.lureau@redhat.com/</a><br>&gt;<br>&gt; Accor=
-ding to <a href=3D"https://github.com/msys2/MSYS2-packages/issues/2176">htt=
-ps://github.com/msys2/MSYS2-packages/issues/2176</a><br>&gt; We need use CY=
-GWIN=3Dnoglob and MSYS=3Dnoglob in the environment variable<br>&gt; for dis=
-able wildcard expanding in msys or cygwin git, and setting the shell=3DFals=
-e<br>&gt;<br>&gt; Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyong=
-gang@gmail.com">luoyonggang@gmail.com</a>&gt;<br>&gt; Message-Id: &lt;<a hr=
-ef=3D"mailto:20201006112139.700-1-luoyonggang@gmail.com">20201006112139.700=
--1-luoyonggang@gmail.com</a>&gt;<br>&gt; Signed-off-by: Paolo Bonzini &lt;<=
-a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt;<br>&gt; -=
---<br>&gt; =C2=A0meson.build =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | =
-=C2=A02 +-<br>&gt; =C2=A0scripts/qemu-version.py | 37 +++++++++++++++++++++=
-++++++++++++++++<br>&gt; =C2=A0scripts/qemu-version.sh | 25 ---------------=
-----------<br>&gt; =C2=A03 files changed, 38 insertions(+), 26 deletions(-)=
-<br>&gt; =C2=A0create mode 100644 scripts/qemu-version.py<br>&gt; =C2=A0del=
-ete mode 100755 scripts/qemu-version.sh<br>&gt;<br>&gt; diff --git a/meson.=
-build b/meson.build<br>&gt; index 05fb59a00b..b100b6d7be 100644<br>&gt; ---=
- a/meson.build<br>&gt; +++ b/meson.build<br>&gt; @@ -1240,7 +1240,7 @@ trac=
-etool =3D [<br>&gt; =C2=A0 =C2=A0 &#39;--backend=3D&#39; + config_host[&#39=
-;TRACE_BACKENDS&#39;]<br>&gt; =C2=A0]<br>&gt;<br>&gt; -qemu_version_cmd =3D=
- [find_program(&#39;scripts/qemu-version.sh&#39;),<br>&gt; +qemu_version_cm=
-d =3D [find_program(&#39;scripts/qemu-version.py&#39;),<br>&gt; =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0meson.cur=
-rent_source_dir(),<br>&gt; =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0config_host[&#39;PKGVERSION&#39;], meson.projec=
-t_version()]<br>&gt; =C2=A0qemu_version =3D custom_target(&#39;qemu-version=
-.h&#39;,<br>&gt; diff --git a/scripts/qemu-version.py b/scripts/qemu-versio=
-n.py<br>&gt; new file mode 100644<br>&gt; index 0000000000..cf97b2bbb5<br>&=
-gt; --- /dev/null<br>&gt; +++ b/scripts/qemu-version.py<br>&gt; @@ -0,0 +1,=
-37 @@<br>&gt; +#!/usr/bin/env python3<br>&gt; +<br>&gt; +#<br>&gt; +# Scrip=
-t for retrieve qemu git version information<br>&gt; +#<br>&gt; +# Authors:<=
-br>&gt; +# =C2=A0Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com">=
-luoyonggang@gmail.com</a>&gt;<br>&gt; +#<br>&gt; +# This work is licensed u=
-nder the terms of the GNU GPL, version 2<br>&gt; +# or, at your option, any=
- later version.=C2=A0 See the COPYING file in<br>&gt; +# the top-level dire=
-ctory.<br>&gt; +<br>&gt; +import sys<br>&gt; +import subprocess<br>&gt; +im=
-port os<br>&gt; +import os.path<br>&gt; +<br>&gt; +def main(_program, dir, =
-pkgversion, version, *unused):<br>&gt; + =C2=A0 =C2=A0os.chdir(dir)<br>&gt;=
- + =C2=A0 =C2=A0if not pkgversion and os.path.exists(&#39;.git&#39;):<br>&g=
-t; + =C2=A0 =C2=A0 =C2=A0 =C2=A0pc =3D subprocess.run(<br>&gt; + =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0[&#39;git&#39;, &#39;describe&#39;, &#39;--m=
-atch&#39;, &#39;v*&#39;, &#39;--dirty&#39;, &#39;--always&#39;],<br>&gt; + =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0env=3Ddict(os.environ, CYGWIN=3D&q=
-uot;noglob&quot;, MSYS=3D&#39;noglob&#39;),<div>Sorry for disturb, under ms=
-ys2,=C2=A0 use=C2=A0
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il sab 17 ott 2020, 18:43 Yonggang Luo &lt;<a href=3D"=
+mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; ha scritto:<br>=
+</div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-l=
+eft:1px #ccc solid;padding-left:1ex">The sh script are harder to maintain f=
+or compatible different<br>
+xsh environment so convert it to python script<br>
+Also incorporate the fixes in<br>
+<a href=3D"https://patchew.org/QEMU/20200929143654.518157-1-marcandre.lurea=
+u@redhat.com/" rel=3D"noreferrer noreferrer" target=3D"_blank">https://patc=
+hew.org/QEMU/20200929143654.518157-1-marcandre.lureau@redhat.com/</a><br>
+<br>
+According to <a href=3D"https://github.com/msys2/MSYS2-packages/issues/2176=
+" rel=3D"noreferrer noreferrer" target=3D"_blank">https://github.com/msys2/=
+MSYS2-packages/issues/2176</a><br>
+We need use CYGWIN=3Dnoglob and MSYS=3Dnoglob in the environment variable<b=
+r>
+for disable wildcard expanding in msys or cygwin git, and setting the shell=
+=3DFalse<br></blockquote></div></div><div dir=3D"auto"><br></div><div dir=
+=3D"auto">Honestly, I don&#39;t see the point in doing this change. Python =
+is the wrong tool for this job, and it&#39;s not like the configure script =
+is disappearing any time soon---so getting rid of shell scripts at this poi=
+nt is of limited utility, especially for something like qemu-version.sh.</d=
+iv><div dir=3D"auto"><br></div><div dir=3D"auto">IMO the msys build is alre=
+ady much more robust in 5.2 than in 5.1 once the pending pull request for n=
+inja is in). Any other change has to provide a clear improvement.</div><div=
+ dir=3D"auto"><br></div><div dir=3D"auto">Paolo</div><div dir=3D"auto"><br>=
+</div><div dir=3D"auto"><div class=3D"gmail_quote"><blockquote class=3D"gma=
+il_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #ccc solid;padding-lef=
+t:1ex">
+<br>
+Signed-off-by: Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" ta=
+rget=3D"_blank" rel=3D"noreferrer">luoyonggang@gmail.com</a>&gt;<br>
+Message-Id: &lt;<a href=3D"mailto:20201006112139.700-1-luoyonggang@gmail.co=
+m" target=3D"_blank" rel=3D"noreferrer">20201006112139.700-1-luoyonggang@gm=
+ail.com</a>&gt;<br>
+Signed-off-by: Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat.com" tar=
+get=3D"_blank" rel=3D"noreferrer">pbonzini@redhat.com</a>&gt;<br>
+---<br>
+=C2=A0meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=C2=A0 2 =
++-<br>
+=C2=A0scripts/qemu-version.py | 37 +++++++++++++++++++++++++++++++++++++<br=
+>
+=C2=A0scripts/qemu-version.sh | 25 -------------------------<br>
+=C2=A03 files changed, 38 insertions(+), 26 deletions(-)<br>
+=C2=A0create mode 100644 scripts/qemu-version.py<br>
+=C2=A0delete mode 100755 scripts/qemu-version.sh<br>
+<br>
+diff --git a/meson.build b/meson.build<br>
+index 05fb59a00b..b100b6d7be 100644<br>
+--- a/meson.build<br>
++++ b/meson.build<br>
+@@ -1240,7 +1240,7 @@ tracetool =3D [<br>
+=C2=A0 =C2=A0 &#39;--backend=3D&#39; + config_host[&#39;TRACE_BACKENDS&#39;=
+]<br>
+=C2=A0]<br>
+<br>
+-qemu_version_cmd =3D [find_program(&#39;scripts/qemu-version.sh&#39;),<br>
++qemu_version_cmd =3D [find_program(&#39;scripts/qemu-version.py&#39;),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0meson.current_source_dir(),<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0config_host[&#39;PKGVERSION&#39;], meson.project_version()]<br>
+=C2=A0qemu_version =3D custom_target(&#39;qemu-version.h&#39;,<br>
+diff --git a/scripts/qemu-version.py b/scripts/qemu-version.py<br>
+new file mode 100644<br>
+index 0000000000..cf97b2bbb5<br>
+--- /dev/null<br>
++++ b/scripts/qemu-version.py<br>
+@@ -0,0 +1,37 @@<br>
++#!/usr/bin/env python3<br>
++<br>
++#<br>
++# Script for retrieve qemu git version information<br>
++#<br>
++# Authors:<br>
++#=C2=A0 Yonggang Luo &lt;<a href=3D"mailto:luoyonggang@gmail.com" target=
+=3D"_blank" rel=3D"noreferrer">luoyonggang@gmail.com</a>&gt;<br>
++#<br>
++# This work is licensed under the terms of the GNU GPL, version 2<br>
++# or, at your option, any later version.=C2=A0 See the COPYING file in<br>
++# the top-level directory.<br>
++<br>
++import sys<br>
++import subprocess<br>
++import os<br>
++import os.path<br>
++<br>
++def main(_program, dir, pkgversion, version, *unused):<br>
++=C2=A0 =C2=A0 os.chdir(dir)<br>
++=C2=A0 =C2=A0 if not pkgversion and os.path.exists(&#39;.git&#39;):<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 pc =3D subprocess.run(<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 [&#39;git&#39;, &#39;describe&#3=
+9;, &#39;--match&#39;, &#39;v*&#39;, &#39;--dirty&#39;, &#39;--always&#39;]=
+,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 env=3Ddict(os.environ, CYGWIN=3D=
+&quot;noglob&quot;, MSYS=3D&#39;noglob&#39;),<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 stdout=3Dsubprocess.PIPE, stderr=
+=3Dsubprocess.DEVNULL,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 encoding=3D&#39;utf8&#39;, shell=
+=3DFalse)<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 if pc.returncode =3D=3D 0:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 pkgversion =3D pc.stdout.strip()=
+<br>
++<br>
++=C2=A0 =C2=A0 fullversion =3D version<br>
++=C2=A0 =C2=A0 if pkgversion:<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 fullversion =3D &quot;{} ({})&quot;.format(ver=
+sion, pkgversion)<br>
++<br>
++=C2=A0 =C2=A0 print(&#39;#define QEMU_PKGVERSION &quot;%s&quot;&#39; % pkg=
+version)<br>
++=C2=A0 =C2=A0 print(&#39;#define QEMU_FULL_VERSION &quot;%s&quot;&#39; % f=
+ullversion)<br>
++<br>
++if __name__ =3D=3D &quot;__main__&quot;:<br>
++=C2=A0 =C2=A0 main(*sys.argv)<br>
+diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh<br>
+deleted file mode 100755<br>
+index 3f6e7e6d41..0000000000<br>
+--- a/scripts/qemu-version.sh<br>
++++ /dev/null<br>
+@@ -1,25 +0,0 @@<br>
+-#!/bin/sh<br>
+-<br>
+-set -eu<br>
+-<br>
+-dir=3D&quot;$1&quot;<br>
+-pkgversion=3D&quot;$2&quot;<br>
+-version=3D&quot;$3&quot;<br>
+-<br>
+-if [ -z &quot;$pkgversion&quot; ]; then<br>
+-=C2=A0 =C2=A0 cd &quot;$dir&quot;<br>
+-=C2=A0 =C2=A0 if [ -e .git ]; then<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 pkgversion=3D$(git describe --match &#39;v*&#3=
+9; --dirty) || :<br>
+-=C2=A0 =C2=A0 fi<br>
+-fi<br>
+-<br>
+-if [ -n &quot;$pkgversion&quot; ]; then<br>
+-=C2=A0 =C2=A0 fullversion=3D&quot;$version ($pkgversion)&quot;<br>
+-else<br>
+-=C2=A0 =C2=A0 fullversion=3D&quot;$version&quot;<br>
+-fi<br>
+-<br>
+-cat &lt;&lt;EOF<br>
+-#define QEMU_PKGVERSION &quot;$pkgversion&quot;<br>
+-#define QEMU_FULL_VERSION &quot;$fullversion&quot;<br>
+-EOF<br>
+-- <br>
+2.28.0.windows.1<br>
+<br>
+</blockquote></div></div></div>
 
-=C2=A0env=3Ddict(os.environ, CYGWIN=3D&quot;noglob&quot;, MSYS=3D&#39;noglo=
-b&#39;) we make sure</div><div>&#39;v*=E2=80=98 are passed into git without=
- wildcard. So I send this patch again for fixes this issue<br>&gt; + =C2=A0=
- =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stdout=3Dsubprocess.PIPE, stderr=3Dsubpr=
-ocess.DEVNULL,<br>&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0encoding=
-=3D&#39;utf8&#39;, shell=3DFalse)<br>&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0if p=
-c.returncode =3D=3D 0:<br>&gt; + =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0p=
-kgversion =3D pc.stdout.strip()<br>&gt; +<br>&gt; + =C2=A0 =C2=A0fullversio=
-n =3D version<br>&gt; + =C2=A0 =C2=A0if pkgversion:<br>&gt; + =C2=A0 =C2=A0=
- =C2=A0 =C2=A0fullversion =3D &quot;{} ({})&quot;.format(version, pkgversio=
-n)<br>&gt; +<br>&gt; + =C2=A0 =C2=A0print(&#39;#define QEMU_PKGVERSION &quo=
-t;%s&quot;&#39; % pkgversion)<br>&gt; + =C2=A0 =C2=A0print(&#39;#define QEM=
-U_FULL_VERSION &quot;%s&quot;&#39; % fullversion)<br>&gt; +<br>&gt; +if __n=
-ame__ =3D=3D &quot;__main__&quot;:<br>&gt; + =C2=A0 =C2=A0main(*sys.argv)<b=
-r>&gt; diff --git a/scripts/qemu-version.sh b/scripts/qemu-version.sh<br>&g=
-t; deleted file mode 100755<br>&gt; index 3f6e7e6d41..0000000000<br>&gt; --=
-- a/scripts/qemu-version.sh<br>&gt; +++ /dev/null<br>&gt; @@ -1,25 +0,0 @@<=
-br>&gt; -#!/bin/sh<br>&gt; -<br>&gt; -set -eu<br>&gt; -<br>&gt; -dir=3D&quo=
-t;$1&quot;<br>&gt; -pkgversion=3D&quot;$2&quot;<br>&gt; -version=3D&quot;$3=
-&quot;<br>&gt; -<br>&gt; -if [ -z &quot;$pkgversion&quot; ]; then<br>&gt; -=
- =C2=A0 =C2=A0cd &quot;$dir&quot;<br>&gt; - =C2=A0 =C2=A0if [ -e .git ]; th=
-en<br>&gt; - =C2=A0 =C2=A0 =C2=A0 =C2=A0pkgversion=3D$(git describe --match=
- &#39;v*&#39; --dirty) || :<br>&gt; - =C2=A0 =C2=A0fi<br>&gt; -fi<br>&gt; -=
-<br>&gt; -if [ -n &quot;$pkgversion&quot; ]; then<br>&gt; - =C2=A0 =C2=A0fu=
-llversion=3D&quot;$version ($pkgversion)&quot;<br>&gt; -else<br>&gt; - =C2=
-=A0 =C2=A0fullversion=3D&quot;$version&quot;<br>&gt; -fi<br>&gt; -<br>&gt; =
--cat &lt;&lt;EOF<br>&gt; -#define QEMU_PKGVERSION &quot;$pkgversion&quot;<b=
-r>&gt; -#define QEMU_FULL_VERSION &quot;$fullversion&quot;<br>&gt; -EOF<br>=
-&gt; --<br>&gt; 2.28.0.windows.1<br>&gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=
-=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=
-=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div></div>
+--00000000000025e84a05b1e0bcf4--
 
---000000000000e388b005b1e0a1db--
 
