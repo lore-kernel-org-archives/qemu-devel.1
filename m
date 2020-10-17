@@ -2,98 +2,107 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C57EC433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 09:55:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C972C433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 09:58:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADAFC20704
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 09:55:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C059620704
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 09:58:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f5sLLsxb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAFC20704
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I5DduZtG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C059620704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49712 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTiw5-0002dX-Rz
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 05:55:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58792)
+	id 1kTizI-0003rE-VD
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 05:58:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59230)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTiuY-0001w7-Rv; Sat, 17 Oct 2020 05:54:02 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:40918)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTiuX-0001Es-5W; Sat, 17 Oct 2020 05:54:02 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h5so6149099wrv.7;
- Sat, 17 Oct 2020 02:53:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=q49UfyD14QXRlfnbUMiA5vIoF4Xb1w8fN0itedSb+2M=;
- b=f5sLLsxblQrfSujPopRSZJu+ffXtEZdorPpo9KhpjmeXeaqTIEAaQyLwJ0p1EHZVfD
- MiXrLykGkCkUZvxeD1EHFbypsrmGV/zDF0BdgESlgzidr2sLrLqiS1uq2t2lgTp3jq5j
- qAb9xSDA+OcZqUK9FeVKlKfDFL8PZV+G+CMpC6hGq40kGVjpNmhxUxQMymtF5G5YUw1G
- xm8QVpO/yVp4NULjbS2Acny4gCpUoxrsRJp+WaW67opBT4Maw35eMlBcCLze/NYbl1Yd
- eXFuNSa82bNSypBhOreRnpL1L7n3xPFZ52FgDqEcDGjjBNtGIWp5nSSMblVOOitSE5Sl
- NZeg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kTiyG-0003OD-D5
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 05:57:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47230)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kTiyD-0001hk-Hn
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 05:57:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1602928667;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=An9bXN71cr32Fo0zF9nZw8jJ11tNpN+N0lxmzeK9iec=;
+ b=I5DduZtG50jy/VnxVcNritcP5LQSgP4flt5ytpRqJY9fMpKdhC7oy9sk+oqxWnpS82iyWI
+ Ccv+H5sFOG8L2UuWLIxj2R0++GUNTLmtceJtt/qu2bGaXrZkhm29+cASOWDq+Mrc57a0CK
+ YEMlqDTkPJT/rwDvSm0NjwWocoUwv2U=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-113-PaBt8Sn_Pt6gXSVNYDcMmA-1; Sat, 17 Oct 2020 05:57:45 -0400
+X-MC-Unique: PaBt8Sn_Pt6gXSVNYDcMmA-1
+Received: by mail-wr1-f72.google.com with SMTP id b6so4865229wrn.17
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 02:57:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=q49UfyD14QXRlfnbUMiA5vIoF4Xb1w8fN0itedSb+2M=;
- b=p7eE3IWeAThl10Us6CzQEBtezfH0y1HtaSYqMqVR/jHiHssJGCDVReW3GhgA0mJ79T
- 1kjs369bBFmiddBqLlv9c8spD0M4OSane4yVPacr6O68uT24sKfvp0ECSm7pCiVFpqsB
- Vse4icacDkbq4V1PqjFzGkiEA69ygFKKSgcGKYHV9bD77TA1IO23RopH+SvdmOzZB9Ko
- oRbfIRKFmUtfRGhl3xuqNE0UBHz6uF5/3Lt4StM/2d0x3kMOU+s1coAH0zbCKXgnM+HQ
- uwTslXa1ryF9T+le2C8y9wf0LnrMAiJivdv4rLakSYZGEdzBHyYIoZl3PXwnxSAJH33/
- LtvQ==
-X-Gm-Message-State: AOAM532eRVrupMC6gQ+Ockswr/ia0b3X1ACcWEhS+LCj6kIOzxfgvMGB
- UOZ0q7STc31qfurC2R7FI14=
-X-Google-Smtp-Source: ABdhPJzAhSzbhJyrmRYg+EN/1RzYaqKROMIjk0y3saZJ4DAONmPExQTKDvmuRu1mD5fCo6vlH9lYdQ==
-X-Received: by 2002:a5d:504a:: with SMTP id h10mr8902218wrt.85.1602928438803; 
- Sat, 17 Oct 2020 02:53:58 -0700 (PDT)
+ bh=An9bXN71cr32Fo0zF9nZw8jJ11tNpN+N0lxmzeK9iec=;
+ b=F75wDU7730t1cB7CeK66fAyqF5L+j4psL7oM8N7l7OCz6hCvT0R3kqKuuZTruTQaMt
+ kapmIo4H6mJvzFHkZ6EeyhhyC7pGl0MOpWj0pOON5KREyUKIVx1+u88AJ4Tzel4fOXBc
+ iMVf2a5RMN5RscWJeRsvhWc9couJtGCyq8pjMGVQTHvjjehQCea0NhdS5YJZfKfqO0lm
+ NWyBOqLtJBsrM+hkDFFzlNpxyo/V97cnR+aX0VGmrj6Cf8kmsmqR8lvMMEZKcjjuQFBr
+ 6fhtcFGCPFaj4KvoCMztC9SYDD86xAnzC60WoxghmhujXo1UzRCcUF7nDNyMNrs32whe
+ NlUg==
+X-Gm-Message-State: AOAM532TJPNvb8TnpFIjj/EXQ5N06IOGdZslikIprlpx0gGNaKGcM2C0
+ JN42+EV35B49D5D7W52haniSCpke5W7iM+XUmTDk3kntNTug4qR1sIy71lOFnY6owGnE1FAmno/
+ t1UJxzQ5nH0Alfc0=
+X-Received: by 2002:a1c:dcc3:: with SMTP id t186mr7892041wmg.70.1602928664228; 
+ Sat, 17 Oct 2020 02:57:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9SVJfN+X3Rk8MikCgI6zzTYi5I8nhzkmH0bABGmuHdU8IZXw3ku7kTbcBBuLEJq5EXb52Qg==
+X-Received: by 2002:a1c:dcc3:: with SMTP id t186mr7892024wmg.70.1602928664049; 
+ Sat, 17 Oct 2020 02:57:44 -0700 (PDT)
 Received: from [192.168.1.36] (117.red-83-52-172.dynamicip.rima-tde.net.
  [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id q7sm3182764wrr.39.2020.10.17.02.53.57
+ by smtp.gmail.com with ESMTPSA id c18sm6812588wmk.36.2020.10.17.02.57.42
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 17 Oct 2020 02:53:57 -0700 (PDT)
-Subject: Re: [PATCH 5/5] m48t59: remove legacy m48t59_init() function
-To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org, hpoussin@reactos.org, qemu-ppc@nongnu.org,
- atar4qemu@gmail.com, david@gibson.dropbear.id.au
-References: <20201016182739.22875-1-mark.cave-ayland@ilande.co.uk>
- <20201016182739.22875-6-mark.cave-ayland@ilande.co.uk>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ad533302-e715-cc8a-12ec-d7e4ad75c120@amsat.org>
-Date: Sat, 17 Oct 2020 11:53:57 +0200
+ Sat, 17 Oct 2020 02:57:43 -0700 (PDT)
+Subject: Re: [PATCH v1] migration: using trace_ to replace DPRINTF
+To: Bihong Yu <yubihong@huawei.com>, quintela@redhat.com, eblake@redhat.com,
+ dgilbert@redhat.com, berrange@redhat.com
+References: <1602927347-15669-1-git-send-email-yubihong@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1bd1c3f7-4c88-c93f-127c-9576fed176c7@redhat.com>
+Date: Sat, 17 Oct 2020 11:57:42 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201016182739.22875-6-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <1602927347-15669-1-git-send-email-yubihong@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.253,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 05:57:47
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -23
+X-Spam_score: -2.4
+X-Spam_bar: --
+X-Spam_report: (-2.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.253, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,119 +115,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: david.edmondson@oracle.com, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ wanghao232@huawei.com, zhengchuan@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/16/20 8:27 PM, Mark Cave-Ayland wrote:
-> Now that all of the callers of this function have been switched to use qdev
-> properties, this legacy init function can now be removed.
-> 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+On 10/17/20 11:35 AM, Bihong Yu wrote:
+> Signed-off-by: Bihong Yu <yubihong@huawei.com>
 > ---
->   hw/rtc/m48t59.c         | 35 -----------------------------------
->   include/hw/rtc/m48t59.h |  4 ----
->   2 files changed, 39 deletions(-)
+>   migration/block.c      | 36 ++++++++++++++++++------------------
+>   migration/page_cache.c | 13 +++----------
+>   migration/trace-events | 13 +++++++++++++
+>   3 files changed, 34 insertions(+), 28 deletions(-)
+...
+> diff --git a/migration/trace-events b/migration/trace-events
+> index 338f38b..772bb81 100644
+> --- a/migration/trace-events
+> +++ b/migration/trace-events
+> @@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
+>   calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+>   skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+>   find_page_matched(const char *idstr) "ramblock %s addr or size changed"
+> +
+> +# block.c
+> +init_blk_migration_shared(const char *blk_device_name) "Start migration for %s with shared base image"
+> +init_blk_migration_full(const char *blk_device_name) "Start full migration for %s"
+> +mig_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
+> +flush_blks(const char *action, int submitted, int read_done, int transferred) "%s submitted %d read_done %d transferred %d"
+> +block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
+> +block_save_complete(void) "Block migration completed"
+> +block_save_pending(uint64_t pending) "Enter save live pending  %" PRIu64
+> +
+> +# page_cache.c
+> +cache_init(int64_t max_num_items) "Setting cache buckets to %" PRId64
+> +cache_insert(void) "Error allocating page"
 
-In the PoC I started after your suggestion, I see:
+The patch is good, but I strongly recommend to have trace events
+starting with the subsystem prefix (here migration). So we can
+keep using the 'block*' rule to match all events from the block
+subsystem, without including the migration events.
 
-#define TYPE_M48T02_SRAM "sysbus-m48t02"
-#define TYPE_M48T08_SRAM "sysbus-m48t08"
-#define TYPE_M48T59_SRAM "sysbus-m48t59"
+Thanks,
 
-static void m48t02_class_init(ObjectClass *oc, void *data)
-{
-     M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
+Phil.
 
-     amc->model = 2;
-     amc->size = 2 * KiB;
-};
-
-static void m48t08_class_init(ObjectClass *oc, void *data)
-{
-     M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
-
-     amc->model = 8;
-     amc->size = 8 * KiB;
-};
-
-static void m48t59_class_init(ObjectClass *oc, void *data)
-{
-     M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
-
-     amc->model = 59;
-     amc->size = 8 * KiB;
-};
-
-static const TypeInfo m48t59_register_types[] = {
-     {
-         .name           = TYPE_M48T02_SRAM,
-         .parent         = TYPE_M48TXX_SYSBUS,
-         .class_init     = m48t02_class_init,
-     }, {
-         .name           = TYPE_M48T08_SRAM,
-         .parent         = TYPE_M48TXX_SYSBUS,
-         .class_init     = m48t08_class_init,
-     }, {
-         .name           = TYPE_M48T59_SRAM,
-         .parent         = TYPE_M48TXX_SYSBUS,
-         .class_init     = m48t59_class_init,
-     }, {
-         .name           = TYPE_M48TXX_SYSBUS,
-         .parent         = TYPE_SYS_BUS_DEVICE,
-         .instance_size  = sizeof(M48txxSysBusState),
-         .instance_init = m48t59_init1,
-         .class_size     = sizeof(M48txxSysBusDeviceClass),
-         .class_init     = m48txx_sysbus_class_init,
-         .abstract       = true,
-         .interfaces = (InterfaceInfo[]) {
-             { TYPE_NVRAM },
-             { }
-         }
-     }
-};
-
-and:
-
-#define TYPE_M48T59_SRAM "isa-m48t59"
-
-static void m48t59_class_init(ObjectClass *oc, void *data)
-{
-     M48txxISADeviceClass *midc = M48TXX_ISA_CLASS(oc);
-
-     midc->model = 59;
-     midc->size = 8 * KiB;
-};
-
-static const TypeInfo m48t59_isa_register_types[] = {
-     {
-         .name           = TYPE_M48T59_SRAM,
-         .parent         = TYPE_M48TXX_ISA,
-         .class_init     = m48t59_class_init,
-     }, {
-         .name           = TYPE_M48TXX_ISA,
-         .parent         = TYPE_ISA_DEVICE,
-         .instance_size  = sizeof(M48txxISAState),
-         .class_size     = sizeof(M48txxISADeviceClass),
-         .class_init     = m48txx_isa_class_init,
-         .abstract       = true,
-         .interfaces = (InterfaceInfo[]) {
-             { TYPE_NVRAM },
-             { }
-         }
-     }
-};
-
-I guess I didn't pursue because I wondered what was the
-best way to have the same model usable by sysbus/isa.
-
-IIRC I wanted to proceed as having TYPE_M48T59_SRAM being
-an abstract qdev parent, and then TYPE_M48TXX_SYSBUS /
-TYPE_M48TXX_ISA implementing the SYSBUS/ISA interfaces.
-
-As it need some thinking I postponed that for after 5.2.
-
-Anyhow back to this patch:
-
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
