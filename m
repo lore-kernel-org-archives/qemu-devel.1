@@ -2,103 +2,89 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE42CC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 01:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52EABC433DF
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 02:30:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E269120866
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 01:41:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B1F60206CB
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 02:30:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dQiCd8Xy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E269120866
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QlKZWubA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1F60206CB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTbDz-00010h-O2
-	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 21:41:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51402)
+	id 1kTbyz-0008C8-DD
+	for qemu-devel@archiver.kernel.org; Fri, 16 Oct 2020 22:30:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTbDB-0000ZZ-5j
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 21:40:45 -0400
-Received: from mail-lf1-x144.google.com ([2a00:1450:4864:20::144]:36243)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTby0-0006lm-0V
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 22:29:08 -0400
+Received: from mail-pg1-x542.google.com ([2607:f8b0:4864:20::542]:34739)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTbD4-0002m7-0h
- for qemu-devel@nongnu.org; Fri, 16 Oct 2020 21:40:44 -0400
-Received: by mail-lf1-x144.google.com with SMTP id h6so5650846lfj.3
- for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 18:40:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=BopKGQtPaTfGwvlC86xQaWETvH2e42ZAR9Kr5ZDpv5s=;
- b=dQiCd8XyqN/Fitc8jJSyUjY0qDqNyPd4ShZrsSIFOTL3hIXs/X4bpKQd9pwCeUBOFb
- rOLxxBpLKrOA8rhA0PKoUKMLfJVMXtBRFwpgtaWBjmnQFfjRPHciUbyHFxHAs2M7Ew5r
- Go6yyxTpGz2QKjj6Qe+uxMDSvLKOxUJLCapzz+Bz4LuJMdcWwb/eeIp4hUxbTF6+EAzG
- xukDvdgot880aXqWOTeg+XakhsxqiTDpmPUY2afjLe/JRu3gDGQclNJUgrrh8wEYaq5e
- oKCRvn2Io8fmIn5mXPhnlbp+xC5dBXEyamkajNc8GtUTODOpFnryQCw4W12GE+nS0sDV
- 5jGw==
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kTbxy-0007uN-2B
+ for qemu-devel@nongnu.org; Fri, 16 Oct 2020 22:29:07 -0400
+Received: by mail-pg1-x542.google.com with SMTP id f5so2514986pgb.1
+ for <qemu-devel@nongnu.org>; Fri, 16 Oct 2020 19:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YZMLFV5Ei0DzvvOkOg98W90m+qGQEz9/RS//5BEDF+c=;
+ b=QlKZWubA7jYf0MlQx9Hs6YN20ZpBN3KUCt0T3EFMYAinN56Sd4qhXG4z1oViAQ8JFd
+ fvxnHO09ww0Flb/m6p1Y8SYnIw4ttknVHIsEaMHxmqItMHMxyHeLrc4+I+xM1zz1x2DW
+ LRq8IPXR87D6qM4VOT89GEBknIZRvbk7c1nN31QJ0J6pzecPsHTtLnSnN8iANiCiNIf0
+ 0x3cMMySaOYJqBuGNeTuamv3OnLyMWOCxnD0rHGT0brQSkkcjc85PHwJtqimS4ngJ3ud
+ 9zWfgK1KmV1oZWUEFSeOtSEdwBHWfeRk0nqyQSkifuPH53T0/MLhss39XWipgKQwHK3K
+ I14w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=BopKGQtPaTfGwvlC86xQaWETvH2e42ZAR9Kr5ZDpv5s=;
- b=AFH0jHkPPS8/Oyi1E+lwYlc27gVljeSvbt/2zsfaN/JbMI5ZXjMAI7iEA7oAS6CHeo
- stGYNKhDiIYFCWIqNksqd5xGxLI3iN87dBwjkCqiq4kTMhJDOEoy58xtDrWJ55tcrgCJ
- jp0creBT7lao/+3ohtoThA0Azj3gigPa21m0PR5KRgISVpIsUExZRQDEB2XeT7sjTNrA
- jPvwG4R6xLr5K50JBPki8Cc1ThguMvGZikJJSNn/HlQ0gHOvXzUkreCXQeFiVcxqEdlM
- kem567RXPU2+veFhzYc0ZeSS5VS5Yutk/wwGcN3WPup5SGcFacHARxCYh3YP+SClAspB
- z9+w==
-X-Gm-Message-State: AOAM533sEki1/gbBmXJk5ota+xoOYI3nZH4NYplvOrTfbAArqXOp2wes
- E0CZ9UOJTvaAB7RsgjFrnEm5+gAn5OLEHsktfnDjYA==
-X-Google-Smtp-Source: ABdhPJzGuYJEkcAsnQmiRIzfXcMIc/qN2/3dOgPxRLYyuzsdMoyuYhfEYm6oFrU0i0UreLfHV5fP3MEtahH4QnFku+A=
-X-Received: by 2002:a19:e308:: with SMTP id a8mr2221438lfh.573.1602898834832; 
- Fri, 16 Oct 2020 18:40:34 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YZMLFV5Ei0DzvvOkOg98W90m+qGQEz9/RS//5BEDF+c=;
+ b=Y0dAsJaXEJd4qk+AZrsHkYlS2T7/JDgoOG9dbxs14891CanPhrMwmBe1gsvLcE5Mak
+ Iy9ArMVQagvxtbN+Ogf0QyZ54L27d2muqb7/l2I8ab+lgM81NA4nM7XBmTpr/++amJ9g
+ T1pmCqlEMOCP6DfjcDbehActsL5g9Ga6QPULb2AIYvJvxSwCI/6CDWaTK2cWikZe0kWp
+ iHpY9udbJ5c1i1YCOB1J2AfsJ520zXLT88O78XERi5X5CbM6Q4nbfGiTL+WQlHg1SsRP
+ cUrWmlqDzDBzkf8cEwdbunxc6RlzF6GwnaTOPx/8vvmtSTYlE1e+3jKUCfK7IcOJytOH
+ ESXQ==
+X-Gm-Message-State: AOAM533FBomba2kYWexSJJaTcUsY5J8f7BsKLa66H8p2EBOXBTbv01Kv
+ bsAdTceN9hefQsSF5hNBISkPgnxlfCtxfA==
+X-Google-Smtp-Source: ABdhPJxUPKoHCYtCrnpiPwbnLjju5pyIOv3EN3gcBZk+bMyPyvYG0P7HklTmyfx6Vrf7n2difaYZJg==
+X-Received: by 2002:a63:474b:: with SMTP id w11mr5529151pgk.376.1602901743666; 
+ Fri, 16 Oct 2020 19:29:03 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id k9sm4150818pgt.72.2020.10.16.19.29.02
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 16 Oct 2020 19:29:02 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/4] target/s390x: Improve carry computation
+Date: Fri, 16 Oct 2020 19:28:57 -0700
+Message-Id: <20201017022901.78425-1-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <AQHWo8lIfZnFKGe8nkGmhTCXwq5R3w==>
- <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
-In-Reply-To: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
-From: Jann Horn <jannh@google.com>
-Date: Sat, 17 Oct 2020 03:40:08 +0200
-Message-ID: <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To: "Catangiu, Adrian Costin" <acatan@amazon.com>,
- Andy Lutomirski <luto@kernel.org>, 
- Jason Donenfeld <Jason@zx2c4.com>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Willy Tarreau <w@1wt.eu>, Eric Biggers <ebiggers@kernel.org>
-Cc: "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
- "virtualization@lists.linux-foundation.org"
- <virtualization@lists.linux-foundation.org>, 
- "Graf (AWS), Alexander" <graf@amazon.de>, "MacCarthaigh,
- Colm" <colmmacc@amazon.com>, 
- "Woodhouse, David" <dwmw@amazon.co.uk>, "bonzini@gnu.org" <bonzini@gnu.org>,
- "Singh, Balbir" <sblbir@amazon.com>, 
- "Weiss, Radu" <raduweis@amazon.com>, "oridgar@gmail.com" <oridgar@gmail.com>, 
- "ghammer@redhat.com" <ghammer@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
- "mst@redhat.com" <mst@redhat.com>, 
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>,
- Michal Hocko <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Pavel Machek <pavel@ucw.cz>, Linux API <linux-api@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::144;
- envelope-from=jannh@google.com; helo=mail-lf1-x144.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::542;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -175
-X-Spam_score: -17.6
-X-Spam_bar: -----------------
-X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,361 +97,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: david@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-[adding some more people who are interested in RNG stuff: Andy, Jason,
-Theodore, Willy Tarreau, Eric Biggers. also linux-api@, because this
-concerns some pretty fundamental API stuff related to RNG usage]
+While testing the float128_muladd changes for s390x host,
+emulating under x86_64 of course, I noticed that the code
+we generate for strings of ALCGR and SLBGR is pretty awful.
 
-On Fri, Oct 16, 2020 at 4:33 PM Catangiu, Adrian Costin
-<acatan@amazon.com> wrote:
-> - Background
->
-> The VM Generation ID is a feature defined by Microsoft (paper:
-> http://go.microsoft.com/fwlink/?LinkId=260709) and supported by
-> multiple hypervisor vendors.
->
-> The feature is required in virtualized environments by apps that work
-> with local copies/caches of world-unique data such as random values,
-> uuids, monotonically increasing counters, etc.
-> Such apps can be negatively affected by VM snapshotting when the VM
-> is either cloned or returned to an earlier point in time.
->
-> The VM Generation ID is a simple concept meant to alleviate the issue
-> by providing a unique ID that changes each time the VM is restored
-> from a snapshot. The hw provided UUID value can be used to
-> differentiate between VMs or different generations of the same VM.
->
-> - Problem
->
-> The VM Generation ID is exposed through an ACPI device by multiple
-> hypervisor vendors but neither the vendors or upstream Linux have no
-> default driver for it leaving users to fend for themselves.
->
-> Furthermore, simply finding out about a VM generation change is only
-> the starting point of a process to renew internal states of possibly
-> multiple applications across the system. This process could benefit
-> from a driver that provides an interface through which orchestration
-> can be easily done.
->
-> - Solution
->
-> This patch is a driver which exposes the Virtual Machine Generation ID
-> via a char-dev FS interface that provides ID update sync and async
-> notification, retrieval and confirmation mechanisms:
->
-> When the device is 'open()'ed a copy of the current vm UUID is
-> associated with the file handle. 'read()' operations block until the
-> associated UUID is no longer up to date - until HW vm gen id changes -
-> at which point the new UUID is provided/returned. Nonblocking 'read()'
-> uses EWOULDBLOCK to signal that there is no _new_ UUID available.
->
-> 'poll()' is implemented to allow polling for UUID updates. Such
-> updates result in 'EPOLLIN' events.
->
-> Subsequent read()s following a UUID update no longer block, but return
-> the updated UUID. The application needs to acknowledge the UUID update
-> by confirming it through a 'write()'.
-> Only on writing back to the driver the right/latest UUID, will the
-> driver mark this "watcher" as up to date and remove EPOLLIN status.
->
-> 'mmap()' support allows mapping a single read-only shared page which
-> will always contain the latest UUID value at offset 0.
+I realized that we were missing a trick: the output cc is
+based only on the output (result and carry) and so we don't
+need to save the inputs.  And once we do that, we can use
+the output carry as a direct input to the next insn.
 
-It would be nicer if that page just contained an incrementing counter,
-instead of a UUID. It's not like the application cares *what* the UUID
-changed to, just that it *did* change and all RNGs state now needs to
-be reseeded from the kernel, right? And an application can't reliably
-read the entire UUID from the memory mapping anyway, because the VM
-might be forked in the middle.
+For subtract, computing carry as per the PoO (a + ~b + c),
+in tcg is less efficient than computing borrow.  We can
+convert between the two simply by adding or subtracting 1.
 
-So I think your kernel driver should detect UUID changes and then turn
-those into a monotonically incrementing counter. (Probably 64 bits
-wide?) (That's probably also a little bit faster than comparing an
-entire UUID.)
+As an example from float128_muladd,
 
-An option might be to put that counter into the vDSO, instead of a
-separate VMA; but I don't know how the other folks feel about that.
-Andy, do you have opinions on this? That way, normal userspace code
-that uses this infrastructure wouldn't have to mess around with a
-special device at all. And it'd be usable in seccomp sandboxes and so
-on without needing special plumbing. And libraries wouldn't have to
-call open() and mess with file descriptor numbers.
+0x400003f014:  b90b 0019       slgr     %r1, %r9
+0x400003f018:  b989 002a       slbgr    %r2, %r10
+0x400003f01c:  b989 0030       slbgr    %r3, %r0
 
-> The driver also adds support for tracking count of open file handles
-> that haven't acknowledged an UUID update. This is exposed through
-> two IOCTLs:
->  * VMGENID_GET_OUTDATED_WATCHERS: immediately returns the number of
->    _outdated_ watchers - number of file handles that were open during
->    a VM generation change, and which have not yet confirmed the new
->    Vm-Gen-Id.
->  * VMGENID_WAIT_WATCHERS: blocks until there are no more _outdated_
->    watchers, or if a 'timeout' argument is provided, until the timeout
->    expires.
+Before:
 
-Does this mean that code that uses the memory mapping to detect
-changes is still supposed to confirm generation IDs? What about
-multithreaded processes, especially ones that use libraries - if a
-library opens a single file descriptor that is used from multiple
-threads, is the library required to synchronize all its threads before
-confirming the change? That seems like it could get messy. And it
-again means that this interface can't easily be used from inside
-seccomp sandboxes.
+  -- guest addr 0x000000400003f014
+0x7fcbf811a4bc:  4d 8b f5                 movq     %r13, %r14
+0x7fcbf811a4bf:  4c 8b 7d 48              movq     0x48(%rbp), %r15
+0x7fcbf811a4c3:  4d 2b ef                 subq     %r15, %r13
+0x7fcbf811a4c6:  4c 89 6d 08              movq     %r13, 8(%rbp)
+  -- guest addr 0x000000400003f018
+0x7fcbf811a4ca:  4c 8b d3                 movq     %rbx, %r10
+0x7fcbf811a4cd:  4c 8b 5d 50              movq     0x50(%rbp), %r11
+0x7fcbf811a4d1:  49 2b db                 subq     %r11, %rbx
+0x7fcbf811a4d4:  4d 3b f7                 cmpq     %r15, %r14
+0x7fcbf811a4d7:  41 0f 92 c6              setb     %r14b
+0x7fcbf811a4db:  45 0f b6 f6              movzbl   %r14b, %r14d
+0x7fcbf811a4df:  49 2b de                 subq     %r14, %rbx
+0x7fcbf811a4e2:  48 89 5d 10              movq     %rbx, 0x10(%rbp)
+0x7fcbf811a4e6:  4c 8b c3                 movq     %rbx, %r8
+  -- guest addr 0x000000400003f01c
+0x7fcbf811a4e9:  4c 8b 75 18              movq     0x18(%rbp), %r14
+0x7fcbf811a4ed:  4d 8b fe                 movq     %r14, %r15
+0x7fcbf811a4f0:  4c 8b 4d 00              movq     (%rbp), %r9
+0x7fcbf811a4f4:  4d 2b f1                 subq     %r9, %r14
+0x7fcbf811a4f7:  48 8b fd                 movq     %rbp, %rdi
+0x7fcbf811a4fa:  be 12 00 00 00           movl     $0x12, %esi
+0x7fcbf811a4ff:  49 8b d2                 movq     %r10, %rdx
+0x7fcbf811a502:  49 8b cb                 movq     %r11, %rcx
+0x7fcbf811a505:  ff 15 4d 01 00 00        callq    *0x14d(%rip)
+0x7fcbf811a50b:  83 f8 02                 cmpl     $2, %eax
+0x7fcbf811a50e:  41 0f 92 c2              setb     %r10b
+0x7fcbf811a512:  45 0f b6 d2              movzbl   %r10b, %r10d
+0x7fcbf811a516:  45 8b d2                 movl     %r10d, %r10d
+0x7fcbf811a519:  4d 2b f2                 subq     %r10, %r14
+0x7fcbf811a51c:  4c 89 75 18              movq     %r14, 0x18(%rbp)
+0x7fcbf811a520:  48 8b 4d 00              movq     (%rbp), %rcx
+0x7fcbf811a524:  4d 8b c6                 movq     %r14, %r8
 
-[...]
-> diff --git a/Documentation/virt/vmgenid.rst b/Documentation/virt/vmgenid.rst
-[...]
-> +``close()``:
-> +  Removes the file handle as a Vm-Gen-Id watcher.
+After:
 
-(Linux doesn't have "file handles". Technically close() just closes a
-file descriptor, and if that file descriptor points to the same file
-description object (aka struct file) as another file descriptor,
-nothing happens.)
+  -- guest addr 0x000000400003f014
+0x7fd1d011a23c:  45 33 f6                 xorl     %r14d, %r14d
+0x7fd1d011a23f:  4c 8b 7d 48              movq     0x48(%rbp), %r15
+0x7fd1d011a243:  4d 2b ef                 subq     %r15, %r13
+0x7fd1d011a246:  4d 1b f6                 sbbq     %r14, %r14
+0x7fd1d011a249:  4c 89 6d 08              movq     %r13, 8(%rbp)
+  -- guest addr 0x000000400003f018
+0x7fd1d011a24d:  49 03 de                 addq     %r14, %rbx
+0x7fd1d011a250:  49 83 d6 00              adcq     $0, %r14
+0x7fd1d011a254:  4c 8b 7d 50              movq     0x50(%rbp), %r15
+0x7fd1d011a258:  49 2b df                 subq     %r15, %rbx
+0x7fd1d011a25b:  49 83 de 00              sbbq     $0, %r14
+0x7fd1d011a25f:  48 89 5d 10              movq     %rbx, 0x10(%rbp)
+  -- guest addr 0x000000400003f01c
+0x7fd1d011a263:  4c 8b 7d 18              movq     0x18(%rbp), %r15
+0x7fd1d011a267:  4d 03 fe                 addq     %r14, %r15
+0x7fd1d011a26a:  49 83 d6 00              adcq     $0, %r14
+0x7fd1d011a26e:  4c 8b 55 00              movq     (%rbp), %r10
+0x7fd1d011a272:  4d 2b fa                 subq     %r10, %r15
+0x7fd1d011a275:  49 83 de 00              sbbq     $0, %r14
+0x7fd1d011a279:  4c 89 7d 18              movq     %r15, 0x18(%rbp)
 
-> +Example application workflows
-> +-----------------------------
-> +
-> +1) Watchdog thread simplified example::
-> +
-> +       void watchdog_thread_handler(int *thread_active)
-> +       {
-> +               uuid_t uuid;
-> +               int fd = open("/dev/vmgenid", O_RDWR, S_IRUSR | S_IWUSR);
 
-In case we actually keep this API, you should use O_CLOEXEC here.
+r~
 
-> +
-> +               do {
-> +                       // read new UUID - blocks until VM generation changes
-> +                       read(fd, &uuid, sizeof(uuid));
-> +
-> +                       // because of VM generation change, we need to rebuild world
-> +                       reseed_app_env();
-> +
-> +                       // confirm we're done handling UUID update
-> +                       write(fd, &uuid, sizeof(uuid));
-> +               } while (atomic_read(thread_active));
-> +
-> +               close(fd);
-> +       }
-[...]
-> +3) Mapped memory polling simplified example::
-> +
-> +       /*
-> +        * app/library function that provides cached secrets
-> +        */
-> +       char * safe_cached_secret(app_data_t *app)
-> +       {
-> +               char *secret;
-> +               volatile uuid_t *const uuid_ptr = get_vmgenid_mapping(app);
-> +       again:
-> +               secret = __cached_secret(app);
-> +
-> +               if (unlikely(*uuid_ptr != app->cached_uuid)) {
-> +                       app->cached_uuid = *uuid_ptr;
-> +
-> +                       // rebuild world then confirm the uuid update (thru write)
-> +                       rebuild_caches(app);
-> +                       ack_vmgenid_update(app);
-> +
-> +                       goto again;
-> +               }
-> +
-> +               return secret;
-> +       }
-> +
-> +4) Orchestrator simplified example::
-> +
-> +       /*
-> +        * orchestrator - manages multiple apps and libraries used by a service
-> +        * and tries to make sure all sensitive components gracefully handle
-> +        * VM generation changes.
-> +        * Following function is called on detection of a VM generation change.
-> +        */
-> +       int handle_vmgen_update(int vmgenfd, uuid_t new_uuid)
-> +       {
-> +               // pause until all components have handled event
-> +               pause_service();
-> +
-> +               // confirm *this* watcher as up-to-date
-> +               write(fd, &new_uuid, sizeof(uuid_t));
-> +
-> +               // wait for all *others*
-> +               ioctl(fd, VMGENID_WAIT_WATCHERS, NULL);
-> +
-> +               // all apps on the system have rebuilt worlds
-> +               resume_service();
-> +       }
 
-Can you describe what value such an "Orchestrator" would add? Because
-it seems to me like this will just unnecessarily complicate things.
+Richard Henderson (4):
+  target/s390x: Improve cc computation for ADD LOGICAL
+  target/s390x: Improve ADD LOGICAL WITH CARRY
+  target/s390x: Improve cc computation for SUBTRACT LOGICAL
+  target/s390x: Improve SUB LOGICAL WITH BORROW
 
-[...]
-> diff --git a/drivers/virt/Makefile b/drivers/virt/Makefile
-> index fd33124..a1f8dcc 100644
-> --- a/drivers/virt/Makefile
-> +++ b/drivers/virt/Makefile
-> @@ -4,4 +4,5 @@
->  #
->
->  obj-$(CONFIG_FSL_HV_MANAGER)   += fsl_hypervisor.o
-> +obj-$(CONFIG_VMGENID)          += vmgenid.o
->  obj-y                          += vboxguest/
-> diff --git a/drivers/virt/vmgenid.c b/drivers/virt/vmgenid.c
-[...]
-> +static int vmgenid_close(struct inode *inode, struct file *file)
-> +{
-> +       struct file_data *file_data = (struct file_data *) file->private_data;
-> +       struct dev_data *priv = file_data->dev_data;
-> +
-> +       if (!vmgenid_uuid_matches(priv, &file_data->acked_uuid))
-> +               vmgenid_put_outdated_watchers(priv);
-> +       atomic_dec(&priv->watchers);
+ target/s390x/internal.h    |  11 +-
+ target/s390x/cc_helper.c   | 123 +++-------------
+ target/s390x/helper.c      |  10 +-
+ target/s390x/translate.c   | 286 ++++++++++++++++++++-----------------
+ target/s390x/insn-data.def |  76 +++++-----
+ 5 files changed, 213 insertions(+), 293 deletions(-)
 
-What happens if the UUID changes between the previous two calls? Then
-the outdated watcher count will go out of sync, right?
+-- 
+2.25.1
 
-(But as I've said, I think that maybe the outdated watcher counting is
-a bad idea in general, and we should just get rid of it.)
-
-> +       kfree(file->private_data);
-> +
-> +       return 0;
-> +}
-> +
-> +static ssize_t
-> +vmgenid_read(struct file *file, char __user *ubuf, size_t nbytes, loff_t *ppos)
-> +{
-> +       struct file_data *file_data =
-> +               (struct file_data *) file->private_data;
-> +       struct dev_data *priv = file_data->dev_data;
-> +       ssize_t ret;
-> +
-> +       if (nbytes == 0)
-> +               return 0;
-> +       /* disallow partial UUID reads */
-> +       if (nbytes < sizeof(uuid_t))
-> +               return -EINVAL;
-> +       nbytes = sizeof(uuid_t);
-> +
-> +       if (vmgenid_uuid_matches(priv, &file_data->acked_uuid)) {
-> +               if (file->f_flags & O_NONBLOCK)
-> +                       return -EAGAIN;
-> +               ret = wait_event_interruptible(
-> +                       priv->read_wait,
-> +                       !vmgenid_uuid_matches(priv, &file_data->acked_uuid)
-> +               );
-> +               if (ret)
-> +                       return ret;
-> +       }
-> +
-> +       ret = copy_to_user(ubuf, &priv->uuid, nbytes);
-
-If the VM is again forked in the middle of this, will userspace see a
-torn UUID (consisting of half old and half new value)?
-
-> +       if (ret)
-> +               return -EFAULT;
-> +
-> +       return nbytes;
-> +}
-[...]
-> +static vm_fault_t vmgenid_vm_fault(struct vm_fault *vmf)
-> +{
-> +       struct page *page;
-> +       struct file_data *file_data =
-> +                       (struct file_data *) vmf->vma->vm_private_data;
-> +       struct dev_data *priv = file_data->dev_data;
-> +
-> +       if (priv->map_buf) {
-> +               page = virt_to_page(priv->map_buf);
-> +               get_page(page);
-> +               vmf->page = page;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static const struct vm_operations_struct vmgenid_vm_ops = {
-> +       .fault = vmgenid_vm_fault,
-> +};
-> +
-> +static int vmgenid_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +       if (vma->vm_pgoff != 0 || vma_pages(vma) > 1)
-> +               return -EINVAL;
-> +
-> +       if ((vma->vm_flags & VM_WRITE) != 0)
-> +               return -EPERM;
-
-This doesn't work, you also need to clear VM_MAYWRITE. See e.g. binder_mmap().
-
-Also, I think mmap handlers for special mappings like this usually
-directly install the page inside the mmap handler, using something
-like vm_insert_page(). And then they don't need a ->fault handler.
-
-(But if we decide to put this into the vDSO, the whole memory mapping
-thing would become unnecessary anyway.)
-
-> +       vma->vm_ops = &vmgenid_vm_ops;
-> +       vma->vm_flags |= VM_DONTEXPAND | VM_DONTDUMP;
-> +       vma->vm_private_data = file->private_data;
-> +
-> +       return 0;
-> +}
-> +
-> +static const struct file_operations fops = {
-> +       .owner          = THIS_MODULE,
-> +       .mmap           = vmgenid_mmap,
-> +       .open           = vmgenid_open,
-> +       .release        = vmgenid_close,
-> +       .read           = vmgenid_read,
-> +       .write          = vmgenid_write,
-> +       .poll           = vmgenid_poll,
-> +       .compat_ioctl   = vmgenid_ioctl,
-
-You don't need to define a compat_ioctl if the normal ioctl handler is the same.
-
-> +       .unlocked_ioctl = vmgenid_ioctl,
-> +};
-[...]
-> +static void vmgenid_acpi_notify(struct acpi_device *device, u32 event)
-> +{
-> +       uuid_t old_uuid;
-> +       struct dev_data *priv;
-> +
-> +       pr_debug("VMGENID notified, event %u", event);
-> +
-> +       if (!device || !acpi_driver_data(device)) {
-> +               pr_err("VMGENID notify with NULL private data");
-> +               return;
-> +       }
-> +       priv = acpi_driver_data(device);
-> +
-> +       /* update VM Generation UUID */
-> +       old_uuid = priv->uuid;
-> +       memcpy_fromio(&priv->uuid, priv->uuid_iomap, sizeof(uuid_t));
-> +
-> +       if (!vmgenid_uuid_matches(priv, &old_uuid)) {
-> +               /* HW uuid updated */
-> +               memcpy((void *) priv->map_buf, &priv->uuid, sizeof(uuid_t));
-> +               atomic_set(&priv->outdated_watchers,
-> +                        atomic_read(&priv->watchers));
-> +               wake_up_interruptible(&priv->read_wait);
-> +       }
-> +}
-
-If we know that the VM just got forked, we should probably also make
-sure that we reseed the kernel's internal RNG before we tell userspace
-to fetch new RNG seeds from the kernel? Otherwise this is kinda
-pointless. Or are we already taking care of that elsewhere? If not, we
-should probably mix the UUID into the entropy pool (at least
-`write_pool(&input_pool, uuid, sizeof(uuid_t))`, although technically
-it would be better to do it in a way that ensures that userspace can't
-write the same value into the RNG - maybe we should introduce type
-prefixes into write_pool()?) and then trigger a reseed of everything
-else (`crng_reseed(&primary_crng, &input_pool)`).
 
