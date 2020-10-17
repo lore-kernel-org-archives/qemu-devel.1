@@ -2,72 +2,99 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0712AC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6FBCC433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:48:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9F7B620704
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:20:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F7B620704
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 020BF20704
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 11:48:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="POpiGvSB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 020BF20704
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56784 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41132 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTkGe-0008Oq-Nf
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 07:20:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41046)
+	id 1kTkhO-0006nw-Tu
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 07:48:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44454)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkFk-0007eX-Ef; Sat, 17 Oct 2020 07:20:00 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:58572
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkFi-0002MM-PM; Sat, 17 Oct 2020 07:20:00 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=[192.168.1.65])
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kTkFc-00040J-Du; Sat, 17 Oct 2020 12:19:58 +0100
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org, hpoussin@reactos.org,
- qemu-ppc@nongnu.org, atar4qemu@gmail.com, david@gibson.dropbear.id.au
-References: <20201016182739.22875-1-mark.cave-ayland@ilande.co.uk>
- <20201016182739.22875-6-mark.cave-ayland@ilande.co.uk>
- <ad533302-e715-cc8a-12ec-d7e4ad75c120@amsat.org>
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3a5a388d-8be7-dc1b-401f-ed9e8fa3b554@ilande.co.uk>
-Date: Sat, 17 Oct 2020 12:19:46 +0100
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTkgX-0006Fz-6O
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 07:47:41 -0400
+Received: from mail-wm1-x332.google.com ([2a00:1450:4864:20::332]:38227)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kTkgV-0005XD-Dw
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 07:47:40 -0400
+Received: by mail-wm1-x332.google.com with SMTP id b127so8151768wmb.3
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 04:47:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:cc:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=NJzCXnhIa+dW7oJxSivbPZX34UE3Q2odgbVJFBGquzw=;
+ b=POpiGvSBbReFdr1wu7Fffs3pIox5p59Dnhl9YSli59J1WMqaa4JhYDKwGLuOXSV1KC
+ 467UJ3KqCoBLb7ti+FYb+GIEaaoxh9rLycMFwmo7j94tixVcdfV3JeejEKtg4RpEXVLS
+ sSM/SkVLblNCANw9HL9mD2hcN/pRJEG1yrd8qCIs3Az47D3lYrn0rfAJsZIKeEgH6iVV
+ 7V6W7Lx7hfadh14igPsjYhBOazYjQ2bWnMiF5JDQo5c2XHBdIzWl8DCnoIR0lJAGVHzM
+ 9fvQedwlMN/R6gYSedvmLYovq4IXmsJJs6u+VATDEsRqKqg45SSXrWcPv4w5AcSaRLC4
+ GsPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=NJzCXnhIa+dW7oJxSivbPZX34UE3Q2odgbVJFBGquzw=;
+ b=l4+moof9gGyKP1f0Ib/vUKYGezC3glohS1885MrcJE9upTZW913+OEQYHese4XAt0J
+ QqIpS21HJrMlZGQbYHr0SpTxKeUbx3eGXc2iutvF5Pgvm/Ods7ZJ9g2SiSXa9hRq6fJF
+ dLZoUpGZOnc27xt2rOjaCm8AbCvKvmLJMmtsF2O2yG+Sjc0ZU38vO2/DmMZig+yrZtyx
+ OowAxoL4cmsY3iPXbli5NhQmxHL1GMEoxOFgi9D3E08jiLn31Gxv6Rb4XOUHDLxdeEJ7
+ jaf4+uO/wch2E9C7eZuFs2xiSFp8CHyO90CXYtJ/xlxAhRfgmmgS3fJVia5BY0QC1ST9
+ jIhA==
+X-Gm-Message-State: AOAM532CrLXLcW/klWUqsyIYt46gbiCM0DD82XrUWYgGJxUqVt/IVHGs
+ WbK/QfH0yTmcv8XdnFfTPQw=
+X-Google-Smtp-Source: ABdhPJwdSxp42v7ySOltjVGUCbYfg8ThJqNmkFCKSMff1i8+ZZZMnpDNGxx2E+Ltt1kAgxfRQxc+Sg==
+X-Received: by 2002:a1c:1d15:: with SMTP id d21mr8175465wmd.79.1602935257280; 
+ Sat, 17 Oct 2020 04:47:37 -0700 (PDT)
+Received: from [192.168.1.36] (117.red-83-52-172.dynamicip.rima-tde.net.
+ [83.52.172.117])
+ by smtp.gmail.com with ESMTPSA id e11sm2423150wrj.75.2020.10.17.04.47.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Sat, 17 Oct 2020 04:47:36 -0700 (PDT)
+Subject: Re: [PULL 09/31] hw/core/clock: introduce clock object
+To: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org,
+ Damien Hedde <damien.hedde@greensocs.com>
+References: <20200430115142.13430-1-peter.maydell@linaro.org>
+ <20200430115142.13430-10-peter.maydell@linaro.org>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f295c99f-0405-1c26-6f58-12abdec8bd3d@amsat.org>
+Date: Sat, 17 Oct 2020 13:47:35 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <ad533302-e715-cc8a-12ec-d7e4ad75c120@amsat.org>
+In-Reply-To: <20200430115142.13430-10-peter.maydell@linaro.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 5/5] m48t59: remove legacy m48t59_init() function
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::332;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x332.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.253,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -16
+X-Spam_score: -1.7
+X-Spam_bar: -
+X-Spam_report: (-1.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.247,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,134 +107,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/10/2020 10:53, Philippe Mathieu-Daudé wrote:
+Hi Damien, Peter,
 
-> On 10/16/20 8:27 PM, Mark Cave-Ayland wrote:
->> Now that all of the callers of this function have been switched to use qdev
->> properties, this legacy init function can now be removed.
->>
->> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
->> ---
->>   hw/rtc/m48t59.c         | 35 -----------------------------------
->>   include/hw/rtc/m48t59.h |  4 ----
->>   2 files changed, 39 deletions(-)
+On 4/30/20 1:51 PM, Peter Maydell wrote:
+> This object may be used to represent a clock inside a clock tree.
 > 
-> In the PoC I started after your suggestion, I see:
+> A clock may be connected to another clock so that it receives update,
+> through a callback, whenever the source/parent clock is updated.
 > 
-> #define TYPE_M48T02_SRAM "sysbus-m48t02"
-> #define TYPE_M48T08_SRAM "sysbus-m48t08"
-> #define TYPE_M48T59_SRAM "sysbus-m48t59"
+> Although only the root clock of a clock tree controls the values
+> (represented as periods) of all clocks in tree, each clock holds
+> a local state containing the current value so that it can be fetched
+> independently. It will allows us to fullfill migration requirements
+> by migrating each clock independently of others.
 > 
-> static void m48t02_class_init(ObjectClass *oc, void *data)
-> {
->      M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
+> This is based on the original work of Frederic Konrad.
 > 
->      amc->model = 2;
->      amc->size = 2 * KiB;
-> };
+> Signed-off-by: Damien Hedde <damien.hedde@greensocs.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+> Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+> Message-id: 20200406135251.157596-2-damien.hedde@greensocs.com
+> [PMM: Use uint64_t rather than unsigned long long in trace events;
+>   the dtrace backend can't handle the latter]
+> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+> ---
+>   hw/core/Makefile.objs |   1 +
+>   include/hw/clock.h    | 216 ++++++++++++++++++++++++++++++++++++++++++
+>   hw/core/clock.c       | 130 +++++++++++++++++++++++++
+>   hw/core/trace-events  |   7 ++
+>   4 files changed, 354 insertions(+)
+>   create mode 100644 include/hw/clock.h
+>   create mode 100644 hw/core/clock.c
 > 
-> static void m48t08_class_init(ObjectClass *oc, void *data)
-> {
->      M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
-> 
->      amc->model = 8;
->      amc->size = 8 * KiB;
-> };
-> 
-> static void m48t59_class_init(ObjectClass *oc, void *data)
-> {
->      M48txxSysBusDeviceClass *amc = M48TXX_SYS_BUS_CLASS(oc);
-> 
->      amc->model = 59;
->      amc->size = 8 * KiB;
-> };
-> 
-> static const TypeInfo m48t59_register_types[] = {
->      {
->          .name           = TYPE_M48T02_SRAM,
->          .parent         = TYPE_M48TXX_SYSBUS,
->          .class_init     = m48t02_class_init,
->      }, {
->          .name           = TYPE_M48T08_SRAM,
->          .parent         = TYPE_M48TXX_SYSBUS,
->          .class_init     = m48t08_class_init,
->      }, {
->          .name           = TYPE_M48T59_SRAM,
->          .parent         = TYPE_M48TXX_SYSBUS,
->          .class_init     = m48t59_class_init,
->      }, {
->          .name           = TYPE_M48TXX_SYSBUS,
->          .parent         = TYPE_SYS_BUS_DEVICE,
->          .instance_size  = sizeof(M48txxSysBusState),
->          .instance_init = m48t59_init1,
->          .class_size     = sizeof(M48txxSysBusDeviceClass),
->          .class_init     = m48txx_sysbus_class_init,
->          .abstract       = true,
->          .interfaces = (InterfaceInfo[]) {
->              { TYPE_NVRAM },
->              { }
->          }
->      }
-> };
-> 
-> and:
-> 
-> #define TYPE_M48T59_SRAM "isa-m48t59"
-> 
-> static void m48t59_class_init(ObjectClass *oc, void *data)
-> {
->      M48txxISADeviceClass *midc = M48TXX_ISA_CLASS(oc);
-> 
->      midc->model = 59;
->      midc->size = 8 * KiB;
-> };
-> 
-> static const TypeInfo m48t59_isa_register_types[] = {
->      {
->          .name           = TYPE_M48T59_SRAM,
->          .parent         = TYPE_M48TXX_ISA,
->          .class_init     = m48t59_class_init,
->      }, {
->          .name           = TYPE_M48TXX_ISA,
->          .parent         = TYPE_ISA_DEVICE,
->          .instance_size  = sizeof(M48txxISAState),
->          .class_size     = sizeof(M48txxISADeviceClass),
->          .class_init     = m48txx_isa_class_init,
->          .abstract       = true,
->          .interfaces = (InterfaceInfo[]) {
->              { TYPE_NVRAM },
->              { }
->          }
->      }
-> };
-> 
-> I guess I didn't pursue because I wondered what was the
-> best way to have the same model usable by sysbus/isa.
-> 
-> IIRC I wanted to proceed as having TYPE_M48T59_SRAM being
-> an abstract qdev parent, and then TYPE_M48TXX_SYSBUS /
-> TYPE_M48TXX_ISA implementing the SYSBUS/ISA interfaces.
-> 
-> As it need some thinking I postponed that for after 5.2.
-> 
-> Anyhow back to this patch:
-> 
-> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> diff --git a/hw/core/Makefile.objs b/hw/core/Makefile.objs
+> index 6215e7c2085..1d9b0aa2057 100644
+> --- a/hw/core/Makefile.objs
+> +++ b/hw/core/Makefile.objs
+> @@ -7,6 +7,7 @@ common-obj-y += hotplug.o
+>   common-obj-y += vmstate-if.o
+>   # irq.o needed for qdev GPIO handling:
+>   common-obj-y += irq.o
+> +common-obj-y += clock.o
+>   
+>   common-obj-$(CONFIG_SOFTMMU) += reset.o
+>   common-obj-$(CONFIG_SOFTMMU) += qdev-fw.o
+> diff --git a/include/hw/clock.h b/include/hw/clock.h
+> new file mode 100644
+> index 00000000000..82a7f3c6982
+> --- /dev/null
+> +++ b/include/hw/clock.h
+> @@ -0,0 +1,216 @@
+> +/*
+> + * Hardware Clocks
+> + *
+> + * Copyright GreenSocs 2016-2020
+> + *
+> + * Authors:
+> + *  Frederic Konrad
+> + *  Damien Hedde
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2 or later.
+> + * See the COPYING file in the top-level directory.
+> + */
+> +
+> +#ifndef QEMU_HW_CLOCK_H
+> +#define QEMU_HW_CLOCK_H
+> +
+> +#include "qom/object.h"
+> +#include "qemu/queue.h"
+> +
+> +#define TYPE_CLOCK "clock"
+> +#define CLOCK(obj) OBJECT_CHECK(Clock, (obj), TYPE_CLOCK)
+> +
+> +typedef void ClockCallback(void *opaque);
+> +
+> +/*
+> + * clock store a value representing the clock's period in 2^-32ns unit.
+> + * It can represent:
+> + *  + periods from 2^-32ns up to 4seconds
+> + *  + frequency from ~0.25Hz 2e10Ghz
+> + * Resolution of frequency representation decreases with frequency:
+> + * + at 100MHz, resolution is ~2mHz
+> + * + at 1Ghz,   resolution is ~0.2Hz
+> + * + at 10Ghz,  resolution is ~20Hz
+> + */
+> +#define CLOCK_SECOND (1000000000llu << 32)
+> +
+> +/*
+> + * macro helpers to convert to hertz / nanosecond
+> + */
+> +#define CLOCK_PERIOD_FROM_NS(ns) ((ns) * (CLOCK_SECOND / 1000000000llu))
+> +#define CLOCK_PERIOD_TO_NS(per) ((per) / (CLOCK_SECOND / 1000000000llu))
+> +#define CLOCK_PERIOD_FROM_HZ(hz) (((hz) != 0) ? CLOCK_SECOND / (hz) : 0u)
 
-Ha indeed, I think you also came to the same conclusion that I did in my previous 
-email :)
+I'm having Floating Point Exception using a frequency of 1GHz.
 
-I'm also not convinced by the dynamic generation of various M48TXX types using 
-class_data - this seems overly complex, and there's nothing there I can see that 
-can't be just as easily handled using qdev properties using an abstract parent as you 
-suggest above.
+Using frequency >=1GHz we have CLOCK_PERIOD_FROM_HZ(hz) > 0x100000000.
 
+Then CLOCK_PERIOD_TO_NS(0x100000000) = 0.
 
-ATB,
+So for frequency >=1GHz clock_get_ns() returns 0.
 
-Mark.
+> +#define CLOCK_PERIOD_TO_HZ(per) (((per) != 0) ? CLOCK_SECOND / (per) : 0u)
+> +
+[...]
 
