@@ -2,92 +2,62 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1BBBC43457
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 21:04:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16424C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 21:59:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F133F207BB
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 21:04:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yx0iaM/S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F133F207BB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 61A77207BC
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 21:59:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61A77207BC
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44682 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTtN6-0000i7-TE
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 17:04:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37964)
+	id 1kTuEE-0004wR-6u
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 17:59:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eafanasova@gmail.com>)
- id 1kTtM3-0007rh-Ic
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 17:03:07 -0400
-Received: from mail-lf1-x143.google.com ([2a00:1450:4864:20::143]:42480)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <eafanasova@gmail.com>)
- id 1kTtM1-0007us-AZ
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 17:03:07 -0400
-Received: by mail-lf1-x143.google.com with SMTP id a7so7991992lfk.9
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 14:03:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=N6hEF7OQXNqkChSy9Ne4Ue5yKVOERWYUsm/i+t2FDZU=;
- b=Yx0iaM/SCAnxUuT9qEr7RlSK2cjGYZ1fhRWD/XrlDAAiJ+3I/wditfQhBCjSLgfiX6
- 3FaEKA/ruxf9DZ1UB8zL1yogD5HYFxW/mHVA3rovss8dbP/nZcIIaStIMmHnuFapQ/nX
- mHpsgcjTgdf+fLq9mKpJEQSiAvAZYUkTAMJ91CggUFbouOUZMWm0dagm5nxtbVcZcqYK
- uWP9+vvgRGSiLEhEmExp1h47tlfTvcdqZOGIpxBaVe4uIqkQzncYJrNwTPm8jzjs9iww
- xdfshIfDmyHOErM0zlyMXoDDOPwWhPKkpftVq1Bq2hy3I0wz5Dwfd0TrlG9MHJ5MccsL
- WwHw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=N6hEF7OQXNqkChSy9Ne4Ue5yKVOERWYUsm/i+t2FDZU=;
- b=oZs/TDLzlvhhLs9QxSN7FH6YWArIX5/DU9F3wG7VquKuYHB5fgib7kzTVezzmroGob
- PlNkp0bQfS46NTrjLkvNZELTFCXoSP1c0UaL1wojOCevFNxRSfHSCS0EiAt8r0VeVU2n
- m/r/tVEpTZMtck7mwqYSQUb+Wc+6WY03eavOt2Tig5l+bO8kX3k//0HvHzuKtsdR7wKO
- DmXUIoVsGyvr91ax4r0KPy7LF0z/HnGrH3amXVU4j5outfXTWsfVp3FKf3Viy+MmJe4h
- ICWGK8kdOVu9AYdpwn0Yyx+YzHRa23xljFGGJXDEmoAapQJrvtEMJy98CMPMyBQnwUMM
- PD0Q==
-X-Gm-Message-State: AOAM533iqFAmQkCH8kMNo0KCAUghGJBueq7vA/avg+g+ltmySlDBEtGZ
- lAFXOUrN+I095NxiJwvxQIJKIxThjuVjJozn
-X-Google-Smtp-Source: ABdhPJzfCN8U1Yh6HdIovy6tPfymlA0Y9J874VMWzvJ7dpir0+470VdWnakks9CFBgtyOwToU+IGtw==
-X-Received: by 2002:a19:c8c2:: with SMTP id y185mr3654357lff.231.1602968580331; 
- Sat, 17 Oct 2020 14:03:00 -0700 (PDT)
-Received: from localhost.localdomain (37-145-186-126.broadband.corbina.ru.
- [37.145.186.126])
- by smtp.gmail.com with ESMTPSA id a17sm2414840ljp.129.2020.10.17.14.02.59
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 14:02:59 -0700 (PDT)
-From: Elena Afanasova <eafanasova@gmail.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] softmmu/memory: fix memory_region_ioeventfd_equal()
-Date: Sat, 17 Oct 2020 14:01:02 -0700
-Message-Id: <20201017210102.26036-2-eafanasova@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201017210102.26036-1-eafanasova@gmail.com>
-References: <20201017210102.26036-1-eafanasova@gmail.com>
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTuDC-0004JW-Du; Sat, 17 Oct 2020 17:58:02 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:37076)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTuD8-00056N-M8; Sat, 17 Oct 2020 17:58:01 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id DD936747623;
+ Sat, 17 Oct 2020 23:57:52 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 9E386747620; Sat, 17 Oct 2020 23:57:52 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 9CA6274594E;
+ Sat, 17 Oct 2020 23:57:52 +0200 (CEST)
+Date: Sat, 17 Oct 2020 23:57:52 +0200 (CEST)
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v9] mac_oldworld: Allow loading binary ROM image
+In-Reply-To: <348bb0e5-dee2-1d4d-0fb5-bf6d56ef5706@amsat.org>
+Message-ID: <40ed5022-b3d7-6b80-9d39-8c8a5d3561cc@eik.bme.hu>
+References: <20201017155139.5A36A746331@zero.eik.bme.hu>
+ <11c1edab-bcbe-bb02-7c53-b4b0707779c2@amsat.org>
+ <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
+ <348bb0e5-dee2-1d4d-0fb5-bf6d56ef5706@amsat.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::143;
- envelope-from=eafanasova@gmail.com; helo=mail-lf1-x143.google.com
+Content-Type: multipart/mixed;
+ boundary="3866299591-445051963-1602971872=:60614"
+Received-SPF: pass client-ip=2001:738:2001:2001::2001;
+ envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,47 +71,157 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Afanasova <eafanasova@gmail.com>, pbonzini@redhat.com,
- stefanha@redhat.com
+Cc: Alistair Francis <alistair@alistair23.me>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-Eventfd can be registered with a zero length when fast_mmio is true.
-Handle this case properly when dispatching through QEMU.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Signed-off-by: Elena Afanasova <eafanasova@gmail.com>
----
- softmmu/memory.c | 15 +++++++++++----
- 1 file changed, 11 insertions(+), 4 deletions(-)
+--3866299591-445051963-1602971872=:60614
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
 
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 403ff3abc9..3ca2154a64 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -203,10 +203,17 @@ static bool memory_region_ioeventfd_before(MemoryRegionIoeventfd *a,
- }
- 
- static bool memory_region_ioeventfd_equal(MemoryRegionIoeventfd *a,
--                                          MemoryRegionIoeventfd *b)
--{
--    return !memory_region_ioeventfd_before(a, b)
--        && !memory_region_ioeventfd_before(b, a);
-+                                          MemoryRegionIoeventfd *mrb)
-+{
-+    if (int128_eq(a->addr.start, mrb->addr.start) &&
-+            (!int128_nz(mrb->addr.size) ||
-+             int128_eq(a->addr.size, mrb->addr.size)) &&
-+            (a->match_data == mrb->match_data) &&
-+            ((mrb->match_data && (a->data == mrb->data)) || !mrb->match_data) &&
-+            (a->e == mrb->e))
-+        return true;
-+
-+    return false;
- }
- 
- /* Range of memory in the global map.  Addresses are absolute. */
--- 
-2.25.1
+On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
+> On 10/17/20 6:31 PM, BALATON Zoltan via wrote:
+>> On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
+>>> +Alistair for loader
+>>> 
+>>> On 10/17/20 5:47 PM, BALATON Zoltan via wrote:
+>>>> The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
+>>>> the rom region and fall back to loading a binary image with -bios if
+>>>> loading ELF image failed. This allows testing emulation with a ROM
+>>>> image from real hardware as well as using an ELF OpenBIOS image.
+>>>> 
+>>>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>>>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>>> ---
+>>>> v9: Revert change from v8, back to the same as v7 rebased on latest
+>>>> 
+>>>>   hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
+>>>>   1 file changed, 20 insertions(+), 9 deletions(-)
+>>>> 
+>>>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>>>> index 05e46ee6fe..0117ae17f5 100644
+>>>> --- a/hw/ppc/mac_oldworld.c
+>>>> +++ b/hw/ppc/mac_oldworld.c
+>>>> @@ -59,6 +59,8 @@
+>>>>   #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+>>>>     #define GRACKLE_BASE 0xfec00000
+>>>> +#define PROM_BASE 0xffc00000
+>>>> +#define PROM_SIZE (4 * MiB)
+>>>>     static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>>>>                               Error **errp)
+>>>> @@ -100,6 +102,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>>>>       SysBusDevice *s;
+>>>>       DeviceState *dev, *pic_dev;
+>>>>       BusState *adb_bus;
+>>>> +    uint64_t bios_addr;
+>>>>       int bios_size;
+>>>>       unsigned int smp_cpus = machine->smp.cpus;
+>>>>       uint16_t ppc_boot_device;
+>>>> @@ -128,24 +131,32 @@ static void ppc_heathrow_init(MachineState 
+>>>> *machine)
+>>>>         memory_region_add_subregion(sysmem, 0, machine->ram);
+>>>>   -    /* allocate and load BIOS */
+>>>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+>>>> +    /* allocate and load firmware ROM */
+>>>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+>>>>                              &error_fatal);
+>>>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
+>>>>   -    if (bios_name == NULL)
+>>>> +    if (!bios_name) {
+>>>>           bios_name = PROM_FILENAME;
+>>>> +    }
+>>>>       filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>>>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
+>>>> -
+>>>> -    /* Load OpenBIOS (ELF) */
+>>>>       if (filename) {
+>>>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, 
+>>>> NULL,
+>>>> -                             1, PPC_ELF_MACHINE, 0, 0);
+>>>> +        /* Load OpenBIOS (ELF) */
+>>>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, 
+>>>> &bios_addr,
+>>>> +                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>>>> +        /* Unfortunately, load_elf sign-extends reading elf32 */
+>>> 
+>>> Maybe this is what translate_fn() is for?
+>>> 
+>>> uint64_t oldworld_phys(void *opaque, uint64_t addr)
+>>> {
+>>>    return addr & UINT32_MAX;
+>>> }
+>>> 
+>>> Using as (untested):
+>>> 
+>>>        bios_size = load_elf(filename, NULL, oldworld_phys, NULL,
+>>>                             NULL, &bios_addr, NULL,
+>>>                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>> 
+>> Please don't come up with any more great ideas for this patch unless you 
+>> also propose a replacement and test it. This one works and we could just 
+>> get this in as it is until the real problem with load_elf is fixed at which 
+>> point all this can be removed so no need to be more sophisticated as the 
+>> simple cast I have.
+>
+> Zoltan, I'm not trying to block your patch to get merged,
 
+I didn't say you're trying to do that but based on my past experience any 
+slightest doubt could result in that so I did not want it to miss another 
+freeze now that it's almost got in.
+
+> I'm asking because I'm trying to understand how this API
+> is expected to be used.
+
+Likely nobody knows, this seems to have been evolved into this mess which 
+could be cleaned up but unrelated to this series. Probably nobody dared to 
+touch it so far as it's used by almost every board so breling something is 
+easy and testing it is difficult.
+
+Regards,
+BALATON Zoltan
+
+>> As you can see in the original discussion:
+>> 
+>> http://patchwork.ozlabs.org/project/qemu-devel/patch/c69a791c7cad1246f3f34b3993dee4f549b75aa2.1593456926.git.balaton@eik.bme.hu/ 
+>> 
+>> problem is really in include/hw/elf_ops.h this is just a work around for 
+>> that as I did not want to break anything I can't test so I'd rather fix it 
+>> up here and let you fix load_elf then drop this cast. But unless you can do 
+>> that before the freeze please don't hold up this patch any more.
+>> 
+>> Regards,
+>> BALATON Zoltan
+>> 
+>>>> +        bios_addr = (uint32_t)bios_addr;
+>>>> +
+>>>> +        if (bios_size <= 0) {
+>>>> +            /* or load binary ROM image */
+>>>> +            bios_size = load_image_targphys(filename, PROM_BASE, 
+>>>> PROM_SIZE);
+>>>> +            bios_addr = PROM_BASE;
+>>>> +        }
+>>>>           g_free(filename);
+>>>>       } else {
+>>>>           bios_size = -1;
+>>>>       }
+>>>> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
+>>>> +    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > PROM_SIZE) 
+>>>> {
+>>>>           error_report("could not load PowerPC bios '%s'", bios_name);
+>>>>           exit(1);
+>>>>       }
+>>>> 
+>>> 
+>>> 
+>>> 
+>
+>
+--3866299591-445051963-1602971872=:60614--
 
