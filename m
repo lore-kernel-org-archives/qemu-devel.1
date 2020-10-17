@@ -2,90 +2,61 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA7B8C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19EC3C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 370982074A
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:17:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PbCS449D"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 370982074A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 88EEF206B6
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 16:32:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88EEF206B6
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42434 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTotk-0000Uc-9g
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 12:17:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56098)
+	id 1kTp8I-00058j-9T
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 12:32:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58022)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kToso-0008UT-GJ
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:16:38 -0400
-Received: from mail-lf1-x142.google.com ([2a00:1450:4864:20::142]:33575)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kTosm-0001c8-Gv
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 12:16:38 -0400
-Received: by mail-lf1-x142.google.com with SMTP id l2so7315059lfk.0
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 09:16:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=9Y0HtsfBeeQcdJ1Dgb0HIIz4VB9d9dSewLp/ZzTCgCU=;
- b=PbCS449Dksd+FwFaxCiHI4RvEQuLdgv8E++3CVrgWndr1fUAYu977A2DMiwsihwfIQ
- acY1jeVY/1+Js7x5EhzyLwQuEgsfEGi/HnW0va5BxptoySdVHWEqVDerb7o5O6SpTsqs
- ihcUOEwd8QLjoH1V7m1IDV+O95Or/I4rmflhr7awqQBnXAknSeFJZvlREH/9THqucxjX
- ODwqbjGPzo58GUK6IzzlWBPUbuciEmIMTJ9h5jxvlVjtENFz9KF6Ul6MaYBA5m8m6DjJ
- aNsclA5HdN8khmmfOXKOA72lr6XbK3pMF8ky7LSk4bzuIaZxfbaw9D+IeGqqnQOcAHKM
- WA/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=9Y0HtsfBeeQcdJ1Dgb0HIIz4VB9d9dSewLp/ZzTCgCU=;
- b=L3qj+ZZLWrLHMK7elxImp0fsdY1bhBgB8jV8IcimPPgnoo6ueHdA4N+JqQpfAeUpOB
- 9wAJ4V2ugSB6Se2jYVUOr70gWS7WprqxJ19RPronkAhmmEOdiUKr7Q98BCoxhuDeHwKe
- 2ZCTDsmFYBDBZ1yEw11P7BobZY3ptNjjGlLC2IXkSZjTB4inbugE5TxmK5Tw2VBzGFXO
- Ygy+wDKMyq37JuLNDZEMzECxAiVqkxvbeh2Pkl8Xwp2x8KuhrcG+kFyd/jQQ7JSw0AG+
- PX0Q9LF3XOO1NRgyxTW1UyNXLyOSNOBmL4al8ivHzD4SHob+j/fi3kLgVSD57h2H2G1u
- CW4A==
-X-Gm-Message-State: AOAM531mA3PFeKA5x9FakZvotUiJm5xzUjD1dlu6pjDtP0x7XC+Y2alT
- 1CElh3tMPCGmJIMfrOWK3TCiHy6+4jYfu9SFefw=
-X-Google-Smtp-Source: ABdhPJxPMH1U6SAVXJ2KqQYM2rOsH/uvAYfKp89jGhp2/OW+JOGQq5OMNMhcKO/MIa/qa9wF9yXy1axmZtx9vefsF9o=
-X-Received: by 2002:ac2:54ab:: with SMTP id w11mr2976424lfk.50.1602951393768; 
- Sat, 17 Oct 2020 09:16:33 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTp73-00047F-HJ; Sat, 17 Oct 2020 12:31:21 -0400
+Received: from zero.eik.bme.hu ([152.66.115.2]:26078)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
+ id 1kTp6x-0003CA-8v; Sat, 17 Oct 2020 12:31:20 -0400
+Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
+ by localhost (Postfix) with SMTP id 5D40D746333;
+ Sat, 17 Oct 2020 18:31:11 +0200 (CEST)
+Received: by zero.eik.bme.hu (Postfix, from userid 432)
+ id 32F28746331; Sat, 17 Oct 2020 18:31:11 +0200 (CEST)
+Received: from localhost (localhost [127.0.0.1])
+ by zero.eik.bme.hu (Postfix) with ESMTP id 30F6174594E;
+ Sat, 17 Oct 2020 18:31:11 +0200 (CEST)
+Date: Sat, 17 Oct 2020 18:31:11 +0200 (CEST)
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH v9] mac_oldworld: Allow loading binary ROM image
+In-Reply-To: <11c1edab-bcbe-bb02-7c53-b4b0707779c2@amsat.org>
+Message-ID: <146aa146-80e9-6cea-fbda-ccca6e47d33@eik.bme.hu>
+References: <20201017155139.5A36A746331@zero.eik.bme.hu>
+ <11c1edab-bcbe-bb02-7c53-b4b0707779c2@amsat.org>
 MIME-Version: 1.0
-References: <20201016155331.1613089-1-pbonzini@redhat.com>
- <CAFEAcA_ZW2mq3ygzCjuphW2kkdOy4fcTzDObcyQTw0BJJgspZw@mail.gmail.com>
- <ecd2b5bf-0c3c-fa58-ce4d-3d4d55274424@redhat.com>
- <CAFEAcA_HDoheozjRjcAKy3eEJ94cBgU29FDftMe2yn=SdMKHMA@mail.gmail.com>
- <03d83be5-db1a-3856-5243-66b0f7bdc724@redhat.com>
-In-Reply-To: <03d83be5-db1a-3856-5243-66b0f7bdc724@redhat.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Sun, 18 Oct 2020 00:16:23 +0800
-Message-ID: <CAE2XoE_jDSbTC5KiKZErBRn+Jxxfv_zCZ6CEOS7O0ST8hUbvCA@mail.gmail.com>
-Subject: Re: [PULL v2 00/22] Build system + misc changes for 2020-10-16
-To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: multipart/alternative; boundary="0000000000006afaf605b1e03470"
-Received-SPF: pass client-ip=2a00:1450:4864:20::142;
- envelope-from=luoyonggang@gmail.com; helo=mail-lf1-x142.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/mixed;
+ boundary="3866299591-1483104841-1602952271=:25114"
+Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
+ helo=zero.eik.bme.hu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 11:56:58
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,83 +69,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alistair Francis <alistair@alistair23.me>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
+From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
---0000000000006afaf605b1e03470
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-On Sat, Oct 17, 2020 at 11:37 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+--3866299591-1483104841-1602952271=:25114
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8BIT
+
+On Sat, 17 Oct 2020, Philippe Mathieu-Daudé wrote:
+> +Alistair for loader
 >
-> On 17/10/20 16:39, Peter Maydell wrote:
-> > On Sat, 17 Oct 2020 at 14:38, Paolo Bonzini <pbonzini@redhat.com> wrote=
-:
-> >> OpenBSD and NetBSD call the ninja package "ninja-build" unlike FreeBSD=
-.
-> >>  I'm sure I had used the right name but well I didn't.  I'll send a v3=
-.
-> >
-> > OpenBSD built OK but meson produces this new warning:
-> >
-> > Library iconv found: NO
-> > ../src/meson.build:531: WARNING: iconv required for curses UI but not
-> > available, disabling
+> On 10/17/20 5:47 PM, BALATON Zoltan via wrote:
+>> The beige G3 Power Macintosh has a 4MB firmware ROM. Fix the size of
+>> the rom region and fall back to loading a binary image with -bios if
+>> loading ELF image failed. This allows testing emulation with a ROM
+>> image from real hardware as well as using an ELF OpenBIOS image.
+>> 
+>> Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+>> Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>> ---
+>> v9: Revert change from v8, back to the same as v7 rebased on latest
+>>
+>>   hw/ppc/mac_oldworld.c | 29 ++++++++++++++++++++---------
+>>   1 file changed, 20 insertions(+), 9 deletions(-)
+>> 
+>> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+>> index 05e46ee6fe..0117ae17f5 100644
+>> --- a/hw/ppc/mac_oldworld.c
+>> +++ b/hw/ppc/mac_oldworld.c
+>> @@ -59,6 +59,8 @@
+>>   #define NDRV_VGA_FILENAME "qemu_vga.ndrv"
+>>     #define GRACKLE_BASE 0xfec00000
+>> +#define PROM_BASE 0xffc00000
+>> +#define PROM_SIZE (4 * MiB)
+>>     static void fw_cfg_boot_set(void *opaque, const char *boot_device,
+>>                               Error **errp)
+>> @@ -100,6 +102,7 @@ static void ppc_heathrow_init(MachineState *machine)
+>>       SysBusDevice *s;
+>>       DeviceState *dev, *pic_dev;
+>>       BusState *adb_bus;
+>> +    uint64_t bios_addr;
+>>       int bios_size;
+>>       unsigned int smp_cpus = machine->smp.cpus;
+>>       uint16_t ppc_boot_device;
+>> @@ -128,24 +131,32 @@ static void ppc_heathrow_init(MachineState *machine)
+>>         memory_region_add_subregion(sysmem, 0, machine->ram);
+>>   -    /* allocate and load BIOS */
+>> -    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", BIOS_SIZE,
+>> +    /* allocate and load firmware ROM */
+>> +    memory_region_init_rom(bios, NULL, "ppc_heathrow.bios", PROM_SIZE,
+>>                              &error_fatal);
+>> +    memory_region_add_subregion(sysmem, PROM_BASE, bios);
+>>   -    if (bios_name == NULL)
+>> +    if (!bios_name) {
+>>           bios_name = PROM_FILENAME;
+>> +    }
+>>       filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>> -    memory_region_add_subregion(sysmem, PROM_ADDR, bios);
+>> -
+>> -    /* Load OpenBIOS (ELF) */
+>>       if (filename) {
+>> -        bios_size = load_elf(filename, NULL, 0, NULL, NULL, NULL, NULL, 
+>> NULL,
+>> -                             1, PPC_ELF_MACHINE, 0, 0);
+>> +        /* Load OpenBIOS (ELF) */
+>> +        bios_size = load_elf(filename, NULL, NULL, NULL, NULL, &bios_addr,
+>> +                             NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+>> +        /* Unfortunately, load_elf sign-extends reading elf32 */
 >
-> Hrm, the curses test was not plainly converted from shell to meson (guys
-> please do *one* thing per patch, things are already complex enough!);
-Oh, sorry for that,
-> and it is messed up in more ways than I had first noticed (of which the
-> most blatant is using /usr/include/ncursesw as a library path).  I'll
-> fix everything up and resend this pull request when I'm done.
+> Maybe this is what translate_fn() is for?
 >
-> I'm not sure if that will remove the warning or not, but I'll check (and
-> if it does remain, it'll be of the "useful" kind which documents some
-> unexpected dependency between options).
+> uint64_t oldworld_phys(void *opaque, uint64_t addr)
+> {
+>    return addr & UINT32_MAX;
+> }
 >
-> Paolo
+> Using as (untested):
 >
+>        bios_size = load_elf(filename, NULL, oldworld_phys, NULL,
+>                             NULL, &bios_addr, NULL,
+>                             NULL, 1, PPC_ELF_MACHINE, 0, 0);
 
+Please don't come up with any more great ideas for this patch unless you 
+also propose a replacement and test it. This one works and we could just 
+get this in as it is until the real problem with load_elf is fixed at 
+which point all this can be removed so no need to be more sophisticated as 
+the simple cast I have. As you can see in the original discussion:
 
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+http://patchwork.ozlabs.org/project/qemu-devel/patch/c69a791c7cad1246f3f34b3993dee4f549b75aa2.1593456926.git.balaton@eik.bme.hu/
 
---0000000000006afaf605b1e03470
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+problem is really in include/hw/elf_ops.h this is just a work around for 
+that as I did not want to break anything I can't test so I'd rather fix it 
+up here and let you fix load_elf then drop this cast. But unless you can 
+do that before the freeze please don't hold up this patch any more.
 
-<div dir=3D"ltr"><br><br>On Sat, Oct 17, 2020 at 11:37 PM Paolo Bonzini &lt=
-;<a href=3D"mailto:pbonzini@redhat.com">pbonzini@redhat.com</a>&gt; wrote:<=
-br>&gt;<br>&gt; On 17/10/20 16:39, Peter Maydell wrote:<br>&gt; &gt; On Sat=
-, 17 Oct 2020 at 14:38, Paolo Bonzini &lt;<a href=3D"mailto:pbonzini@redhat=
-.com">pbonzini@redhat.com</a>&gt; wrote:<br>&gt; &gt;&gt; OpenBSD and NetBS=
-D call the ninja package &quot;ninja-build&quot; unlike FreeBSD.<br>&gt; &g=
-t;&gt; =C2=A0I&#39;m sure I had used the right name but well I didn&#39;t.=
-=C2=A0 I&#39;ll send a v3.<br>&gt; &gt;<br>&gt; &gt; OpenBSD built OK but m=
-eson produces this new warning:<br>&gt; &gt;<br>&gt; &gt; Library iconv fou=
-nd: NO<br>&gt; &gt; ../src/meson.build:531: WARNING: iconv required for cur=
-ses UI but not<br>&gt; &gt; available, disabling<br>&gt;<br>&gt; Hrm, the c=
-urses test was not plainly converted from shell to meson (guys<br>&gt; plea=
-se do *one* thing per patch, things are already complex enough!);<div>Oh, s=
-orry for that,=C2=A0<br>&gt; and it is messed up in more ways than I had fi=
-rst noticed (of which the<br>&gt; most blatant is using /usr/include/ncurse=
-sw as a library path).=C2=A0 I&#39;ll<br>&gt; fix everything up and resend =
-this pull request when I&#39;m done.<br>&gt;<br>&gt; I&#39;m not sure if th=
-at will remove the warning or not, but I&#39;ll check (and<br>&gt; if it do=
-es remain, it&#39;ll be of the &quot;useful&quot; kind which documents some=
-<br>&gt; unexpected dependency between options).<br>&gt;<br>&gt; Paolo<br>&=
-gt;<br><br><br>--<br>=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<b=
-r>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincer=
-ely,<br>Yonggang Luo</div></div>
+Regards,
+BALATON Zoltan
 
---0000000000006afaf605b1e03470--
+>> +        bios_addr = (uint32_t)bios_addr;
+>> +
+>> +        if (bios_size <= 0) {
+>> +            /* or load binary ROM image */
+>> +            bios_size = load_image_targphys(filename, PROM_BASE, 
+>> PROM_SIZE);
+>> +            bios_addr = PROM_BASE;
+>> +        }
+>>           g_free(filename);
+>>       } else {
+>>           bios_size = -1;
+>>       }
+>> -    if (bios_size < 0 || bios_size > BIOS_SIZE) {
+>> +    if (bios_size < 0 || bios_addr - PROM_BASE + bios_size > PROM_SIZE) {
+>>           error_report("could not load PowerPC bios '%s'", bios_name);
+>>           exit(1);
+>>       }
+>> 
+>
+>
+>
+--3866299591-1483104841-1602952271=:25114--
 
