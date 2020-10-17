@@ -2,84 +2,85 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AFB6C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCB5C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:13:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BAFAC20704
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:12:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 788EC20704
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:13:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M19aeNKO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BAFAC20704
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mqHNvVO2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 788EC20704
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60686 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTmx2-0005Q9-Qn
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:12:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36504)
+	id 1kTmxj-0007AW-JI
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:13:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmno-0001Zu-5K
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:20 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35632)
+ id 1kTmpC-000339-Cl
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:46 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:35836)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmnm-0003hv-Eg
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:03:19 -0400
-Received: by mail-wr1-x443.google.com with SMTP id n15so6609849wrq.2
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:03:15 -0700 (PDT)
+ id 1kTmpA-0003ou-Ot
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:04:46 -0400
+Received: by mail-wm1-x334.google.com with SMTP id q5so8400700wmq.0
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:04:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=ixr+1nbJukvy2COfOoRzV+WTmXwjG84YPtvZ7E/7AI0=;
- b=M19aeNKO/uroBwIY39BuP9GQV3DwHoBEGX5ArebTHGgr/T8YMKFeo0ucZNeWD6t90x
- XfEkqsX2JQSXJXM3ZyVwT/PfHnPzoxS8p83DmnXm/Bpw+6L0ce+nmQEVgfgaUvtE7pLF
- 0nOyLDp2JALNrbkBsgCybprMRrurcCyskwGA2yEy3Hw+VXoZUCHZ0C5dIfByeg7Vek6N
- o0Neb4k9MA9d4vM+FsrMjLlW3Mj6LnQVGGW3n5Ao9fQYd2DwN4cfPmMgcVZGvUvDgbdn
- k850hMGSZuA+2CCxzMRMi1rZJy9qNfhsliZK6lvGjSupQ64K6u5DjdxK2dtPSWNNAxSK
- GrLQ==
+ bh=XmLmCuW1uC91Ho4Ow45XNevc9vvm/zFFsaaxmUUiG5M=;
+ b=mqHNvVO2fTMeS3nBKdm4vhleFvgihW6QRu3mUkC5imATa2QZ2zKtKNyFHkR6Ccot2+
+ +md8ipYIZm57WNnUPBgSfgg9qi0E0jD6oE295Y8MBqzt7v9H9IOzbWJvyhk7Oud/oc1X
+ eMoib9l90CxJtzMpG/VAALC0aK5FkBi8eRG956I5ayjrpZk2UuIQrWfPeVJ40bR+70yV
+ BGpXsPc3eTxE5jLjTAeUqUamkjgNgR7Y35CdAoCm8Zzyg5JPXo1+rmfe4tcOY7AZPbmO
+ CcjGQmcGwLqSMRQHzqsJ6lCivTjtnw2LmJBf+qzUaNHoHCR79B+k7YbLyoVL1DUSck4s
+ HVBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=ixr+1nbJukvy2COfOoRzV+WTmXwjG84YPtvZ7E/7AI0=;
- b=CxsUHpyFVNFcfDwxT+Z6to0BDPyPohuIobp5f5YEGzPxGnsYpN0nM/ClmzGixHlMa2
- pdsuPPFZDpQhS014P8rIN3eOXXreZECZ9/5hRzvMObdhVONPy1OiHo5jduQyZMSA4VEs
- Gy/DVS8fLcnab6jMvHWfkNilQ5sPsjJAVimjgdwrw2TWpiHCR8hlPKlcHZ6Iy6BmjoOY
- xGUuO59d26AXDKIJku7pYnp89nQrWfwR6r84ToBfIsk1EBbJy0R6XWOPtfaancG1pP3C
- 2gheiE741mSExdLKX16NY5ufVxkYIpSjQ8IqZyVyK4GAofRPtgJwoczOHPlP8zr3ZfoV
- jUjQ==
-X-Gm-Message-State: AOAM533nHe5howhMjEa6fbGvMvOPMQAIC9QurpeGakO/6LZ3RJqwmiVH
- O+clPZUGUrRUc+Allfp8TJrcsCoLTVg=
-X-Google-Smtp-Source: ABdhPJwehpEamaBiHfGnLBIyOv5QOZYErEvZXca3Ijw6DyX132g7ZsetO2VcUjfx2+LfLh4UF02mpA==
-X-Received: by 2002:adf:bbc6:: with SMTP id z6mr10331941wrg.298.1602943394108; 
- Sat, 17 Oct 2020 07:03:14 -0700 (PDT)
+ bh=XmLmCuW1uC91Ho4Ow45XNevc9vvm/zFFsaaxmUUiG5M=;
+ b=jELkQfnFs411boZ7eRT4FL5KwzXSHggHSFpnqR0b4xTDtKHq8oPwaOMl2Bu53XITvS
+ 4CD5F+pC6LxOSlxkCFTiqulOTQCvLSGPUuVC3FQHBzfD7Ed8aqZjRPqLUV/PCeOGaITf
+ VjuSexR/ZDbhWSf0sZwYscunufLtB/rufON+DmH+rIi0T7gVNPbCsT1N28RCyGZFEiB7
+ CjuKqs1MxL+x0IRU9/d9XjNaCfHoLcKMbrXwTuj1LTlE2qDMYQkJ1DMUJ1YgWQE5rA4C
+ ckyctiBNmBYw2O05rYI1lkZdqyqDHdxaveSHur/wO4k7z8iBH8sj4xIXJvxCIMh2z7Tb
+ r3wg==
+X-Gm-Message-State: AOAM532awnEJyL8z2bghBY/9Z5k/b5iFU9vKQ7O+NKMrYbzmyK72GXxB
+ wfWBBt8Brv2QuU/g1QInwkRjqnepqAk=
+X-Google-Smtp-Source: ABdhPJwj01yC179U9DYlynyObToIbQeXqwPVrPV5r+USZE7Ridb8rpPYLCwGaZB60dbFY1V2tyOFSw==
+X-Received: by 2002:a05:600c:2144:: with SMTP id
+ v4mr8603091wml.172.1602943482716; 
+ Sat, 17 Oct 2020 07:04:42 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id h16sm9232144wre.87.2020.10.17.07.03.13
+ by smtp.gmail.com with ESMTPSA id j7sm9226923wrn.81.2020.10.17.07.04.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:03:13 -0700 (PDT)
+ Sat, 17 Oct 2020 07:04:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 06/44] target/mips: Demacro helpers for M<ADD|SUB>F.<D|S>
-Date: Sat, 17 Oct 2020 16:02:05 +0200
-Message-Id: <20201017140243.1078718-7-f4bug@amsat.org>
+Subject: [PULL 25/44] hw/mips/jazz: Correct CPU frequencies
+Date: Sat, 17 Oct 2020 16:02:24 +0200
+Message-Id: <20201017140243.1078718-26-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
 References: <20201017140243.1078718-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::334;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x334.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -105,101 +106,68 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
  Paul Burton <paulburton@kernel.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
  Huacai Chen <chenhc@lemote.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+The Magnum 4000PC CPU runs at 100 MHz, and the Acer PICA-61
+CPU at ~134 MHz.
 
-Remove function definitions via macros to achieve better code clarity.
-
-Signed-off-by: Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-Id: <1602103041-32017-3-git-send-email-aleksandar.qemu.devel@gmail.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201012095804.3335117-17-f4bug@amsat.org>
 ---
- target/mips/fpu_helper.c | 63 +++++++++++++++++++++++++++++-----------
- 1 file changed, 46 insertions(+), 17 deletions(-)
+ hw/mips/jazz.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/target/mips/fpu_helper.c b/target/mips/fpu_helper.c
-index f851723f22d..b3c715494a9 100644
---- a/target/mips/fpu_helper.c
-+++ b/target/mips/fpu_helper.c
-@@ -1666,25 +1666,54 @@ uint64_t helper_float_nmsub_ps(CPUMIPSState *env, uint64_t fdt0,
- }
+diff --git a/hw/mips/jazz.c b/hw/mips/jazz.c
+index 47723093b63..8f1ad55ba34 100644
+--- a/hw/mips/jazz.c
++++ b/hw/mips/jazz.c
+@@ -24,6 +24,7 @@
  
+ #include "qemu/osdep.h"
+ #include "qemu-common.h"
++#include "hw/clock.h"
+ #include "hw/mips/mips.h"
+ #include "hw/mips/cpudevs.h"
+ #include "hw/intc/i8259.h"
+@@ -142,6 +143,7 @@ static void mips_jazz_init(MachineState *machine,
+     MemoryRegion *address_space = get_system_memory();
+     char *filename;
+     int bios_size, n;
++    Clock *cpuclk;
+     MIPSCPU *cpu;
+     CPUClass *cc;
+     CPUMIPSState *env;
+@@ -163,14 +165,25 @@ static void mips_jazz_init(MachineState *machine,
+     MemoryRegion *bios2 = g_new(MemoryRegion, 1);
+     SysBusESPState *sysbus_esp;
+     ESPState *esp;
++    static const struct {
++        unsigned freq_hz;
++        unsigned pll_mult;
++    } ext_clk[] = {
++        [JAZZ_MAGNUM] = {50000000, 2},
++        [JAZZ_PICA61] = {33333333, 4},
++    };
  
--#define FLOAT_FMADDSUB(name, bits, muladd_arg)                          \
--uint ## bits ## _t helper_float_ ## name(CPUMIPSState *env,             \
--                                         uint ## bits ## _t fs,         \
--                                         uint ## bits ## _t ft,         \
--                                         uint ## bits ## _t fd)         \
--{                                                                       \
--    uint ## bits ## _t fdret;                                           \
--                                                                        \
--    fdret = float ## bits ## _muladd(fs, ft, fd, muladd_arg,            \
--                                     &env->active_fpu.fp_status);       \
--    update_fcr31(env, GETPC());                                         \
--    return fdret;                                                       \
-+uint32_t helper_float_maddf_s(CPUMIPSState *env, uint32_t fs,
-+                              uint32_t ft, uint32_t fd)
-+{
-+    uint32_t fdret;
-+
-+    fdret = float32_muladd(fs, ft, fd, 0,
-+                           &env->active_fpu.fp_status);
-+
-+    update_fcr31(env, GETPC());
-+    return fdret;
-+}
-+
-+uint64_t helper_float_maddf_d(CPUMIPSState *env, uint64_t fs,
-+                              uint64_t ft, uint64_t fd)
-+{
-+    uint64_t fdret;
-+
-+    fdret = float64_muladd(fs, ft, fd, 0,
-+                           &env->active_fpu.fp_status);
-+
-+    update_fcr31(env, GETPC());
-+    return fdret;
-+}
-+
-+uint32_t helper_float_msubf_s(CPUMIPSState *env, uint32_t fs,
-+                              uint32_t ft, uint32_t fd)
-+{
-+    uint32_t fdret;
-+
-+    fdret = float32_muladd(fs, ft, fd, float_muladd_negate_product,
-+                           &env->active_fpu.fp_status);
-+
-+    update_fcr31(env, GETPC());
-+    return fdret;
-+}
-+
-+uint64_t helper_float_msubf_d(CPUMIPSState *env, uint64_t fs,
-+                              uint64_t ft, uint64_t fd)
-+{
-+    uint64_t fdret;
-+
-+    fdret = float64_muladd(fs, ft, fd, float_muladd_negate_product,
-+                           &env->active_fpu.fp_status);
-+
-+    update_fcr31(env, GETPC());
-+    return fdret;
- }
+     if (machine->ram_size > 256 * MiB) {
+         error_report("RAM size more than 256Mb is not supported");
+         exit(EXIT_FAILURE);
+     }
  
--FLOAT_FMADDSUB(maddf_s, 32, 0)
--FLOAT_FMADDSUB(maddf_d, 64, 0)
--FLOAT_FMADDSUB(msubf_s, 32, float_muladd_negate_product)
--FLOAT_FMADDSUB(msubf_d, 64, float_muladd_negate_product)
--#undef FLOAT_FMADDSUB
++    cpuclk = clock_new(OBJECT(machine), "cpu-refclk");
++    clock_set_hz(cpuclk, ext_clk[jazz_model].freq_hz
++                         * ext_clk[jazz_model].pll_mult);
++
+     /* init CPUs */
+-    cpu = MIPS_CPU(cpu_create(machine->cpu_type));
++    cpu = mips_cpu_create_with_clock(machine->cpu_type, cpuclk);
+     env = &cpu->env;
+     qemu_register_reset(main_cpu_reset, cpu);
  
- /* compare operations */
- #define FOP_COND_D(op, cond)                                   \
 -- 
 2.26.2
 
