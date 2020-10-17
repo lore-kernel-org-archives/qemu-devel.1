@@ -2,93 +2,90 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACDBC433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A569C433E7
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:39:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 98FB420708
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:38:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0E10A20708
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 14:39:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d5diqqeF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98FB420708
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvVweg/p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E10A20708
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTnLr-0005mN-K8
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:38:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37546)
+	id 1kTnMM-0006Ci-7f
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 10:39:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41416)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmqX-0005MG-Kh
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:09 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:52835)
+ (Exim 4.90_1) (envelope-from <qkrwngud825@gmail.com>)
+ id 1kTnD7-0003eb-Tn
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:29:30 -0400
+Received: from mail-ua1-x92a.google.com ([2607:f8b0:4864:20::92a]:46422)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kTmqW-00048p-0B
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:06:09 -0400
-Received: by mail-wm1-x334.google.com with SMTP id e23so6142301wme.2
- for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:06:07 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <qkrwngud825@gmail.com>)
+ id 1kTnD6-0006mZ-AN
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 10:29:29 -0400
+Received: by mail-ua1-x92a.google.com with SMTP id y1so1520352uac.13
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 07:29:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=gN5fG1W2a6ABvVlFISLEsEnU3++HZ+v2I6FNfu0op4U=;
- b=d5diqqeFh0UWzD1oEGPFGSH0Vp0hsp93siVOISRezbTjupm2MDl/aOiNULYOztM0x8
- NLUx1EJkE1CIobTOmhdv1Zd6reVXZ0gqbgaKGnI2okhSyyHqsJFGHXClD5dOVfs6iaoP
- e/VJWs/dRaRGP7XYDqbmwLbg3Mqk/pn3CbwD5XWvMzECTkl+Ri9DGcBPgNkvgt9UOQko
- AFn0+kmKtqVl9DGaEOhi+Pb3kWlRZZfA/XmNEDIFFN/FZDwf2tGEHHU+RXAdpl03DylS
- bTwFR6Eh3gyWuxhIC47VvvARTwRd2WvEl7T877v7yUzP9l23wV7/Hh6TcwxWaF+mh7UD
- +8RA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=P+gIv2Lcj4WNQ6W5r97xFTj/z+w+Zw6Am1AGbMCfPgE=;
+ b=AvVweg/pSu+cvJE0S0zZqtqcLAoadXExFz3xAe9zG7vo50YMTLwHQ1i8ftED2DTCXA
+ uDyLEeGC6cYYaKOaXhAhMiSavtK6o+K0Bf0j3CS6CK6OzuSRfmaff3DhIkmIeSRj1QmC
+ iOisXBQpzXX94cVxrWjw059s2E/Sj+SZ8+0L6jcZKRmU2wzQSoBODay/ZjP4eDDE4KHD
+ rIXoGB1a4ZvI8eIsepfck2FIUOVafAAvByyjbLIaaBkDw2ok0thiS0I16UshtZz++jVD
+ JAra2+ekaIrQbnMF4Bc81YjliIwbhBI8tg+Dy3t7U9FlTbPsxakUCdFDzj6/YRsRUX3Z
+ TwAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=gN5fG1W2a6ABvVlFISLEsEnU3++HZ+v2I6FNfu0op4U=;
- b=Un7grveiFsQicSWQXTBtDoq9kw7HxdzsdjbWJSD2du9retRd0pMu9+grH5v2vhFUnb
- S1GKKGBPnRfaPb/QybSKbMbG+ryN281an563x8PFBwHVF6GfTd/RE1cNeLVr3tcz1M8w
- 80JD5GQnonOcJ3IhtZSUhsMM1qDbbGobg+Cv6woKo7votYz5G31/VoJIoVg5VLvZy3sm
- jlla85f7fVMgbpJkK1/J9infBfUjhob8mlHcN6VWLbh04w4t1NBWhEyMHNbsoqAEZJjl
- sL9qsAkUXUydSvjICwzb2A5hw6tDjUhpisYSdlX1bv3dlBYspUMadgOrokDPrOa7N9mv
- GCtA==
-X-Gm-Message-State: AOAM530qA68IdYLvVmIVN2yd/af+04NJo3S3uPFGhScFlGgc4s7P1C3K
- NZyS96nUWgPaB+Cdc0P2m+r53bBBlbI=
-X-Google-Smtp-Source: ABdhPJwGri4MKQExmjGpd06cO0csoTaEcETa7dJ3YVIlJrW+leo6QafUYzIIaCgC5+79Ae4JAFESiw==
-X-Received: by 2002:a1c:6788:: with SMTP id b130mr9265405wmc.91.1602943566495; 
- Sat, 17 Oct 2020 07:06:06 -0700 (PDT)
-Received: from localhost.localdomain
- (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id c15sm3534613wmb.27.2020.10.17.07.06.05
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sat, 17 Oct 2020 07:06:05 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 43/44] MAINTAINERS: Remove duplicated Malta test entries
-Date: Sat, 17 Oct 2020 16:02:42 +0200
-Message-Id: <20201017140243.1078718-44-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201017140243.1078718-1-f4bug@amsat.org>
-References: <20201017140243.1078718-1-f4bug@amsat.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=P+gIv2Lcj4WNQ6W5r97xFTj/z+w+Zw6Am1AGbMCfPgE=;
+ b=c2oUKxXsdGRKhwfBg1+OSZqkFypQBGcIgKpG0KmAYlWTdJYdnFSOf0it7vM7QuuYBR
+ n2jdQ4/QuCWb1UacfbOoGYrWsho4GwKuy5S0l3adfFEhtmoV9j6rAQ3Mz2J6WSynN1K/
+ tJLNbeJ87ukrkbmFymoiOlEb7kvuqU+Pl0/wTjWYGLYWMzoZXQk3lnw71sfT3mvACy8D
+ BiXqdsYxZQ6Vz6T0DgGZ4BkE7WZ8fGZSiIef2dHArasiNJ2t8Wemf/Sn8C+4JXFhffJZ
+ ZaTmKbhOyJxCsAi1p1ZUTyVBJlWKPv4jrh4DbAHtPAbxXQBP4hq2JqM4PL4VBN8uBp0D
+ xUSA==
+X-Gm-Message-State: AOAM531kJPXougBkYGL6l26KD0IM/rpm7k4n6yZ4F2XNT3+CocCAJP/J
+ nzRq4S7d9chdEyQVMW7LZ/MDjhbW9RQUSFez2/U=
+X-Google-Smtp-Source: ABdhPJzden7sO+y2LzeOJWCADNP5kK3JioLv+GRKwCvaAYdK5okKzL5TOLlsjB6Kg7jXp74ndZ1SqzW+p2DQEwMjyA0=
+X-Received: by 2002:ab0:6f81:: with SMTP id f1mr4272724uav.31.1602944967083;
+ Sat, 17 Oct 2020 07:29:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x334.google.com
+References: <CAD14+f3G2f4QEK+AQaEjAG4syUOK-9bDagXa8D=RxdFWdoi5fQ@mail.gmail.com>
+ <20201001085900.ms5ix2zyoid7v3ra@steredhat>
+ <CAD14+f1m8Xk-VC1nyMh-X4BfWJgObb74_nExhO0VO3ezh_G2jA@mail.gmail.com>
+ <20201002073457.jzkmefo5c65zlka7@steredhat>
+ <CAD14+f0h4Vp=bsgpByTmaOU-Vbz6nnShDHg=0MSg4WO5ZyO=vA@mail.gmail.com>
+ <05afcc49-5076-1368-3cc7-99abcf44847a@kernel.dk>
+In-Reply-To: <05afcc49-5076-1368-3cc7-99abcf44847a@kernel.dk>
+From: Ju Hyung Park <qkrwngud825@gmail.com>
+Date: Sat, 17 Oct 2020 23:29:16 +0900
+Message-ID: <CAD14+f0h-r7o=m0NvHxjCgKaQe24_MDupcDdSOu05PhXp8B1-w@mail.gmail.com>
+Subject: Re: io_uring possibly the culprit for qemu hang (linux-5.4.y)
+To: Jens Axboe <axboe@kernel.dk>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::92a;
+ envelope-from=qkrwngud825@gmail.com; helo=mail-ua1-x92a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -7
+X-Spam_score: -0.8
+X-Spam_bar: /
+X-Spam_report: (-0.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.999, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,39 +99,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Paul Burton <paulburton@kernel.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- =?UTF-8?q?Herv=C3=A9=20Poussineau?= <hpoussin@reactos.org>,
- Thomas Huth <thuth@redhat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: qemu-devel@nongnu.org, io-uring@vger.kernel.org,
+ Stefano Garzarella <sgarzare@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The Malta tests are already covered in the Malta section.
+Hi Jens.
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Message-Id: <20201013101659.3557154-3-f4bug@amsat.org>
----
- MAINTAINERS | 2 --
- 1 file changed, 2 deletions(-)
+On Sat, Oct 17, 2020 at 3:07 AM Jens Axboe <axboe@kernel.dk> wrote:
+>
+> Would be great if you could try 5.4.71 and see if that helps for your
+> issue.
+>
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 8770cd6d05a..a7f0acf8663 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -237,8 +237,6 @@ F: include/hw/intc/mips_gic.h
- F: include/hw/mips/
- F: include/hw/misc/mips_*
- F: include/hw/timer/mips_gictimer.h
--F: tests/acceptance/linux_ssh_mips_malta.py
--F: tests/acceptance/machine_mips_malta.py
- F: tests/tcg/mips/
- K: ^Subject:.*(?i)mips
- 
--- 
-2.26.2
+Oh wow, yeah it did fix the issue.
 
+I'm able to reliably turn off and start the VM multiple times in a row.
+Double checked by confirming QEMU is dynamically linked to liburing.so.1.
+
+Looks like those 4 io_uring fixes helped.
+
+Thanks!
 
