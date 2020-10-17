@@ -2,43 +2,40 @@ Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F3F2C433DF
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 20:39:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DBE0C43457
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 20:40:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2E5BA207BB
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 20:39:44 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2E5BA207BB
+	by mail.kernel.org (Postfix) with ESMTPS id 4813D207BB
+	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 20:40:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4813D207BB
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59530 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTszP-0006F4-9n
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 16:39:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34238)
+	id 1kTszx-0007Ha-EY
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 16:40:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTsvj-0000iO-2Y; Sat, 17 Oct 2020 16:35:55 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:13763)
+ id 1kTsvj-0000ib-8B; Sat, 17 Oct 2020 16:35:55 -0400
+Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:13753)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kTsvf-0004ZO-M8; Sat, 17 Oct 2020 16:35:54 -0400
+ id 1kTsvf-0004ZL-Kq; Sat, 17 Oct 2020 16:35:54 -0400
 Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id E310B747E09;
+ by localhost (Postfix) with SMTP id 7E468747634;
  Sat, 17 Oct 2020 22:35:46 +0200 (CEST)
 Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 5BACD74762C; Sat, 17 Oct 2020 22:35:46 +0200 (CEST)
-Message-Id: <540c1f05cdd1c01ce45f46355d2829aa494e2adb.1602965621.git.balaton@eik.bme.hu>
-In-Reply-To: <cover.1602965621.git.balaton@eik.bme.hu>
-References: <cover.1602965621.git.balaton@eik.bme.hu>
-Subject: [PATCH 1/6] m48t59-isa: remove legacy m48t59_init_isa() function
+ id 560D8745953; Sat, 17 Oct 2020 22:35:46 +0200 (CEST)
+Message-Id: <cover.1602965621.git.balaton@eik.bme.hu>
+Subject: [PATCH 0/6] m48t59: remove legacy init functions
 Date: Sat, 17 Oct 2020 22:13:41 +0200
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -77,68 +74,34 @@ Sender: "Qemu-devel"
 Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
 From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+This is inspired by Mark's series:
 
-This function is no longer used within the codebase.
+https://lists.nongnu.org/archive/html/qemu-ppc/2020-10/msg00251.html
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
+and implements what I've suggested in review of that series to
+simplify it and avoid code churn if implementing my suggestion later.
+
+Regards,
+BALATON Zoltan
+
+BALATON Zoltan (4):
+  mt48t59: Set default value of base-year property to 1968
+  sun4m: use qdev instead of legacy m48t59_init() function
+  sun4u: use qdev instead of legacy m48t59_init() function
+  ppc405_boards: use qdev instead of legacy m48t59_init() function
+
+Mark Cave-Ayland (2):
+  m48t59-isa: remove legacy m48t59_init_isa() function
+  m48t59: remove legacy m48t59_init() function
+
+ hw/ppc/ppc405_boards.c  |  3 ++-
  hw/rtc/m48t59-isa.c     | 25 -------------------------
- include/hw/rtc/m48t59.h |  2 --
- 2 files changed, 27 deletions(-)
+ hw/rtc/m48t59.c         | 37 +------------------------------------
+ hw/sparc/sun4m.c        |  5 +++--
+ hw/sparc64/sun4u.c      |  6 ++++--
+ include/hw/rtc/m48t59.h |  6 ------
+ 6 files changed, 10 insertions(+), 72 deletions(-)
 
-diff --git a/hw/rtc/m48t59-isa.c b/hw/rtc/m48t59-isa.c
-index cae315e488..dc21fb10a5 100644
---- a/hw/rtc/m48t59-isa.c
-+++ b/hw/rtc/m48t59-isa.c
-@@ -58,31 +58,6 @@ static M48txxInfo m48txx_isa_info[] = {
-     }
- };
- 
--Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
--                       int base_year, int model)
--{
--    ISADevice *isa_dev;
--    DeviceState *dev;
--    int i;
--
--    for (i = 0; i < ARRAY_SIZE(m48txx_isa_info); i++) {
--        if (m48txx_isa_info[i].size != size ||
--            m48txx_isa_info[i].model != model) {
--            continue;
--        }
--
--        isa_dev = isa_new(m48txx_isa_info[i].bus_name);
--        dev = DEVICE(isa_dev);
--        qdev_prop_set_uint32(dev, "iobase", io_base);
--        qdev_prop_set_int32(dev, "base-year", base_year);
--        isa_realize_and_unref(isa_dev, bus, &error_fatal);
--        return NVRAM(dev);
--    }
--
--    assert(false);
--    return NULL;
--}
--
- static uint32_t m48txx_isa_read(Nvram *obj, uint32_t addr)
- {
-     M48txxISAState *d = M48TXX_ISA(obj);
-diff --git a/include/hw/rtc/m48t59.h b/include/hw/rtc/m48t59.h
-index 04abedf3b2..9defe578d1 100644
---- a/include/hw/rtc/m48t59.h
-+++ b/include/hw/rtc/m48t59.h
-@@ -47,8 +47,6 @@ struct NvramClass {
-     void (*toggle_lock)(Nvram *obj, int lock);
- };
- 
--Nvram *m48t59_init_isa(ISABus *bus, uint32_t io_base, uint16_t size,
--                       int base_year, int type);
- Nvram *m48t59_init(qemu_irq IRQ, hwaddr mem_base,
-                    uint32_t io_base, uint16_t size, int base_year,
-                    int type);
 -- 
 2.21.3
 
