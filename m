@@ -2,83 +2,83 @@ Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD17C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EADBC433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:36:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E88072227E
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EE82B22277
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:36:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NTw7BVNe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E88072227E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S88fHOt4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE82B22277
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUFPP-0003Mf-2c
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 16:36:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37738)
+	id 1kUFQA-0004pl-0q
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 16:36:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUFNa-0001dc-MS; Sun, 18 Oct 2020 16:34:10 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:35171)
+ id 1kUFNn-0001lq-FU; Sun, 18 Oct 2020 16:34:23 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35174)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUFNY-0000xd-KX; Sun, 18 Oct 2020 16:34:10 -0400
-Received: by mail-wr1-x442.google.com with SMTP id n15so9154030wrq.2;
- Sun, 18 Oct 2020 13:34:07 -0700 (PDT)
+ id 1kUFNl-0000yz-Ss; Sun, 18 Oct 2020 16:34:23 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so9154316wrq.2;
+ Sun, 18 Oct 2020 13:34:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JltEwXbGzmO7Iz477A1CNJvyjNGP/jwshVCvgGssOxI=;
- b=NTw7BVNemAHcvBRqoWTLshLu4jivqW5YakETFN99wdCcTKLZ6jH/BTv33U+nyWBrIv
- ka09/4NG1rqLvsg0NrKDmgykvh7hTIufA8Caq1FrrqLzvoePoP2KGasoPTP0v8v6BJJl
- VDVECrB9WCHdDee95IKbb6xVEnlVKzCLNHif69qGtvPv8sqSIiXles+4v+DO+MW/RDld
- K/bSOtU7AVWp2hgdJyDsxUPSrcW5FTpJs3FSymbK8wrSdzfxj1MpOFQkzpe8jw4SJpFe
- xdCygaRZ0tYPjfz1edSnVxOd8tTlnkTQRz6zOu+MfM05nhfyY93l0V5J+6mk2KL8e1Kf
- SNKQ==
+ bh=QcjhrFqjAYV+Q6plgNPayGWcmQofCNspcYhj6aIa8BM=;
+ b=S88fHOt4fYPvKKEH0xh2S14khv8CZREiBDQPhGjwnuTTVinBOHQ51NeCHg5RPOOvfG
+ 0pevdhh7TcViZiHr/cvt13uSjrr4NPuYtYrFHEiHmcwcsN7BksRlm0gpJpQ04EgRYvTL
+ Pf3FC30Ll1STlF5D1COoMzQcuWg7rZ4FrD+7cMU0LmoNcLWyuoNrvCYzTzt4222McDwU
+ Pj03gq84PPRq6+1wS8Zqk31ZePLYNdbs2bXQypzc/uyL14WsbwiSnlnCvs3k/9FX1Cd7
+ XNNOiWUQZ74lMk0lPjpys3T5t0dnGhKP6Cfz1PA+e2qjzQDn7anHdIwtyDPlK5nOJJdg
+ iPTA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=JltEwXbGzmO7Iz477A1CNJvyjNGP/jwshVCvgGssOxI=;
- b=GGLt6e3A7why+12B8fOx5RSN4GSYE6BwO8bwL30hxNBS822nlAhYcb50oQXz1NMJy2
- qXLK3CrF+o6yWFg/MWBNoPYcW2uijYjnQCsJFbXw3KH6fvTfzibbLIxHSGB3c/6tBz8U
- xN4Mi85bhfoAJwynaEfrPVQo2SwC0GxPMEjA9/0HF/VoISeSPeV4nY/8Oh1Dj+I7IqGn
- 3jSQKWFtv8LwVH+eY02PwyKc64IdnrQoWkxaFJzgGRWsOAFyZ4s8DOWTt+Q+L3+/O6dp
- Ems+XjP97wlCvCFyTQxPxlcqQ/aYZs82YUkQb5nt86SaYZLV37zGpBzv28yR2tIm2oC5
- l4Tw==
-X-Gm-Message-State: AOAM530BuTvfLVstkajBNhQP3SVjwYBBxoEYuEDiD81FIl7ss4gbXLUL
- KkfpoSPJWZhilJBf1yr+3iLuJI/kIn4=
-X-Google-Smtp-Source: ABdhPJzl/cpUUSyqCT4RVaRiQObPh5b8VF72su4Twl/WOxKA9meLc4tXPxcd1lhx0Bc0rs10gKPsgw==
-X-Received: by 2002:a5d:44cb:: with SMTP id z11mr15831401wrr.290.1603053246274; 
- Sun, 18 Oct 2020 13:34:06 -0700 (PDT)
+ bh=QcjhrFqjAYV+Q6plgNPayGWcmQofCNspcYhj6aIa8BM=;
+ b=dWvkiuT8DI5rAiBl1ZtfCsBEx3KK5zSj4gfhWEdK71QhitSGH5BC3W+IZTi9fhdbto
+ sBPABxy3hjdAUddF+hubSY+IdCM9G0xSb8Iz/xf0rJBSQbwTh8kzQitK5zWvKHJoLdT9
+ uUtolyICxdZmseNoe41qzC9iMD/eRAKeDYNaXJqasmlSmEbhGH2PIrEIvixmPJbvieC/
+ HifKdxTVH/ogb/SWE6LSljC2kZzqzDDO51hTGTdW2DiNs7XVjVLhekw5N1IomV2c3D2s
+ Fq6rixWrZxPaa7/plYYBBP2HmVFdDU0Lro8CLvvSDhCS2kI+l7tUQSyyEjmEpSF7iWSL
+ 0qQQ==
+X-Gm-Message-State: AOAM533GFFSexN3oGtWbHBjTcPsxCRmUYDNhp/PtHFWabV1B7gIblB5G
+ AGhMeKK1NwrMjX0/PxKSt+Av/W5OMuQ=
+X-Google-Smtp-Source: ABdhPJyMxOLmcmB6MgHjtw4hORwQBemfFcIetNda0xBwwM8Lmg5GkLkFvVwmmWJc1EuRJyIixrqq9g==
+X-Received: by 2002:adf:eb41:: with SMTP id u1mr15593621wrn.94.1603053260138; 
+ Sun, 18 Oct 2020 13:34:20 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id k16sm13828755wmi.5.2020.10.18.13.34.05
+ by smtp.gmail.com with ESMTPSA id v189sm14080474wmg.14.2020.10.18.13.34.19
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 18 Oct 2020 13:34:05 -0700 (PDT)
+ Sun, 18 Oct 2020 13:34:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 1/9] hw/arm/bcm2836: Restrict BCM283XInfo declaration to C
- source
-Date: Sun, 18 Oct 2020 22:33:50 +0200
-Message-Id: <20201018203358.1530378-2-f4bug@amsat.org>
+Subject: [PATCH v3 4/9] hw/arm/bcm2836: Only provide "enabled-cpus" property
+ to multicore SoCs
+Date: Sun, 18 Oct 2020 22:33:53 +0200
+Message-Id: <20201018203358.1530378-5-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201018203358.1530378-1-f4bug@amsat.org>
 References: <20201018203358.1530378-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -109,65 +109,68 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-No code out of bcm2836.c uses (or requires) the BCM283XInfo
-declarations. Move it locally to the C source file.
+It makes no sense to set enabled-cpus=0 on single core SoCs.
 
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- include/hw/arm/bcm2836.h |  8 --------
- hw/arm/bcm2836.c         | 14 ++++++++++++++
- 2 files changed, 14 insertions(+), 8 deletions(-)
+ hw/arm/bcm2836.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 428c15d316e..43e9f8cd0ef 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -43,12 +43,4 @@ struct BCM283XState {
-     BCM2835PeripheralState peripherals;
- };
- 
--typedef struct BCM283XInfo BCM283XInfo;
--
--struct BCM283XClass {
--    DeviceClass parent_class;
--    const BCM283XInfo *info;
--};
--
--
- #endif /* BCM2836_H */
 diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index f15cc3b4053..e7cc2c930d9 100644
+index c5d46a8e805..fcb2c9c3e73 100644
 --- a/hw/arm/bcm2836.c
 +++ b/hw/arm/bcm2836.c
-@@ -17,6 +17,15 @@
- #include "hw/arm/raspi_platform.h"
- #include "hw/sysbus.h"
+@@ -34,6 +34,9 @@ typedef struct BCM283XClass {
+ #define BCM283X_GET_CLASS(obj) \
+     OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
  
-+typedef struct BCM283XInfo BCM283XInfo;
++static Property bcm2836_enabled_cores_property =
++    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus, 0);
 +
-+typedef struct BCM283XClass {
-+    /*< private >*/
-+    DeviceClass parent_class;
-+    /*< public >*/
-+    const BCM283XInfo *info;
-+} BCM283XClass;
-+
- struct BCM283XInfo {
-     const char *name;
-     const char *cpu_type;
-@@ -25,6 +34,11 @@ struct BCM283XInfo {
-     int clusterid;
+ static void bcm2836_init(Object *obj)
+ {
+     BCM283XState *s = BCM283X(obj);
+@@ -44,6 +47,10 @@ static void bcm2836_init(Object *obj)
+         object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
+                                 bc->cpu_type);
+     }
++    if (bc->core_count > 1) {
++        qdev_property_add_static(DEVICE(obj), &bcm2836_enabled_cores_property);
++        qdev_prop_set_uint32(DEVICE(obj), "enabled-cpus", bc->core_count);
++    }
+ 
+     object_initialize_child(obj, "control", &s->control, TYPE_BCM2836_CONTROL);
+ 
+@@ -130,12 +137,6 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+     }
+ }
+ 
+-static Property bcm2836_props[] = {
+-    DEFINE_PROP_UINT32("enabled-cpus", BCM283XState, enabled_cpus,
+-                       BCM283X_NCPUS),
+-    DEFINE_PROP_END_OF_LIST()
+-};
+-
+ static void bcm283x_class_init(ObjectClass *oc, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(oc);
+@@ -155,7 +156,6 @@ static void bcm2836_class_init(ObjectClass *oc, void *data)
+     bc->ctrl_base = 0x40000000;
+     bc->clusterid = 0xf;
+     dc->realize = bcm2836_realize;
+-    device_class_set_props(dc, bcm2836_props);
  };
  
-+#define BCM283X_CLASS(klass) \
-+    OBJECT_CLASS_CHECK(BCM283XClass, (klass), TYPE_BCM283X)
-+#define BCM283X_GET_CLASS(obj) \
-+    OBJECT_GET_CLASS(BCM283XClass, (obj), TYPE_BCM283X)
-+
- static const BCM283XInfo bcm283x_socs[] = {
-     {
-         .name = TYPE_BCM2836,
+ #ifdef TARGET_AARCH64
+@@ -170,7 +170,6 @@ static void bcm2837_class_init(ObjectClass *oc, void *data)
+     bc->ctrl_base = 0x40000000;
+     bc->clusterid = 0x0;
+     dc->realize = bcm2836_realize;
+-    device_class_set_props(dc, bcm2836_props);
+ };
+ #endif
+ 
 -- 
 2.26.2
 
