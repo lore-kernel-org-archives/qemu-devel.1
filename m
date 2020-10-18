@@ -2,56 +2,55 @@ Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 624E8C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:14:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 26005C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:16:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C94ED20773
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:14:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C94ED20773
+	by mail.kernel.org (Postfix) with ESMTPS id B479220773
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:16:44 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B479220773
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44216 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50102 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUBK9-0002z0-QE
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:14:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55576)
+	id 1kUBMR-0005ZP-RN
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:16:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUBJL-0001hF-UO; Sun, 18 Oct 2020 12:13:31 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60536
+ id 1kUB6p-0002yT-Jt; Sun, 18 Oct 2020 12:00:35 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60434
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUBJJ-00065R-Pl; Sun, 18 Oct 2020 12:13:31 -0400
+ id 1kUB6m-0004Y0-2N; Sun, 18 Oct 2020 12:00:35 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=[192.168.1.65])
+ ([86.148.246.80] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUBJE-0001Mh-PU; Sun, 18 Oct 2020 17:13:29 +0100
-To: BALATON Zoltan <balaton@eik.bme.hu>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org
-References: <cover.1602965621.git.balaton@eik.bme.hu>
+ id 1kUB6j-0001FH-FR; Sun, 18 Oct 2020 17:00:35 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <3f3c6cc9-3b65-d5b7-8aad-9e26afebb816@ilande.co.uk>
-Date: Sun, 18 Oct 2020 17:13:18 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
+ david@gibson.dropbear.id.au, atar4qemu@gmail.com
+Date: Sun, 18 Oct 2020 16:59:18 +0100
+Message-Id: <20201018155919.21200-13-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
+References: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <cover.1602965621.git.balaton@eik.bme.hu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 0/6] m48t59: remove legacy init functions
+Subject: [PULL 12/13] mac_oldworld: Drop some variables
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -62,8 +61,8 @@ X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,56 +75,128 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Herve Poussineau <hpoussin@reactos.org>,
- Philippe Mathieu-Daude <f4bug@amsat.org>,
- Artyom Tarasenko <atar4qemu@gmail.com>,
- David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17/10/2020 21:13, BALATON Zoltan via wrote:
+From: BALATON Zoltan <balaton@eik.bme.hu>
 
-> This is inspired by Mark's series:
-> 
-> https://lists.nongnu.org/archive/html/qemu-ppc/2020-10/msg00251.html
-> 
-> and implements what I've suggested in review of that series to
-> simplify it and avoid code churn if implementing my suggestion later.
-> 
-> Regards,
-> BALATON Zoltan
-> 
-> BALATON Zoltan (4):
->    mt48t59: Set default value of base-year property to 1968
->    sun4m: use qdev instead of legacy m48t59_init() function
->    sun4u: use qdev instead of legacy m48t59_init() function
->    ppc405_boards: use qdev instead of legacy m48t59_init() function
-> 
-> Mark Cave-Ayland (2):
->    m48t59-isa: remove legacy m48t59_init_isa() function
->    m48t59: remove legacy m48t59_init() function
-> 
->   hw/ppc/ppc405_boards.c  |  3 ++-
->   hw/rtc/m48t59-isa.c     | 25 -------------------------
->   hw/rtc/m48t59.c         | 37 +------------------------------------
->   hw/sparc/sun4m.c        |  5 +++--
->   hw/sparc64/sun4u.c      |  6 ++++--
->   include/hw/rtc/m48t59.h |  6 ------
->   6 files changed, 10 insertions(+), 72 deletions(-)
+Values not used frequently enough may not worth putting in a local
+variable, especially with names almost as long as the original value
+because that does not improve readability, to the contrary it makes it
+harder to see what value is used. Drop a few such variables.
 
-Unfortunately this arrived too late - I'd already finished the tagging and local 
-testing, but didn't get a chance to do the final PR before having to head out yesterday.
+Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
+Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <d67bc8d914a366ca6822b5190c1308d31af5c9b3.1602805637.git.balaton@eik.bme.hu>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+---
+ hw/ppc/mac_oldworld.c | 35 +++++++++++++++++------------------
+ 1 file changed, 17 insertions(+), 18 deletions(-)
 
-I think most people here agree that this code could be improved, but I'm not clear 
-that this is the right solution given that Artyom has already pointed out that 40p 
-uses 1900 as the base year. There would also be an overlap with the ideas that 
-Philippe has expressed in this thread which would cause more code churn later, so if 
-this is something that interests you I would suggest starting a separate thread to 
-gain consensus as to the desired solution first before working on an updated series.
+diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+index 1abf26b5b4..e34680f980 100644
+--- a/hw/ppc/mac_oldworld.c
++++ b/hw/ppc/mac_oldworld.c
+@@ -83,14 +83,11 @@ static void ppc_heathrow_reset(void *opaque)
+ static void ppc_heathrow_init(MachineState *machine)
+ {
+     ram_addr_t ram_size = machine->ram_size;
+-    const char *kernel_filename = machine->kernel_filename;
+-    const char *kernel_cmdline = machine->kernel_cmdline;
+-    const char *initrd_filename = machine->initrd_filename;
+     const char *boot_device = machine->boot_order;
+     PowerPCCPU *cpu = NULL;
+     CPUPPCState *env = NULL;
+     char *filename;
+-    int linux_boot, i;
++    int i;
+     MemoryRegion *bios = g_new(MemoryRegion, 1);
+     uint32_t kernel_base, initrd_base, cmdline_base = 0;
+     int32_t kernel_size, initrd_size;
+@@ -109,8 +106,6 @@ static void ppc_heathrow_init(MachineState *machine)
+     void *fw_cfg;
+     uint64_t tbfreq;
+ 
+-    linux_boot = (kernel_filename != NULL);
+-
+     /* init CPUs */
+     for (i = 0; i < smp_cpus; i++) {
+         cpu = POWERPC_CPU(cpu_create(machine->cpu_type));
+@@ -147,7 +142,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         bios_addr = (uint32_t)bios_addr;
+ 
+         if (bios_size <= 0) {
+-            /* or load binary ROM image */
++            /* or if could not load ELF try loading a binary ROM image */
+             bios_size = load_image_targphys(filename, PROM_BASE, PROM_SIZE);
+             bios_addr = PROM_BASE;
+         }
+@@ -160,7 +155,7 @@ static void ppc_heathrow_init(MachineState *machine)
+         exit(1);
+     }
+ 
+-    if (linux_boot) {
++    if (machine->kernel_filename) {
+         int bswap_needed;
+ 
+ #ifdef BSWAP_NEEDED
+@@ -169,29 +164,32 @@ static void ppc_heathrow_init(MachineState *machine)
+         bswap_needed = 0;
+ #endif
+         kernel_base = KERNEL_LOAD_ADDR;
+-        kernel_size = load_elf(kernel_filename, NULL,
++        kernel_size = load_elf(machine->kernel_filename, NULL,
+                                translate_kernel_address, NULL, NULL, NULL,
+                                NULL, NULL, 1, PPC_ELF_MACHINE, 0, 0);
+         if (kernel_size < 0)
+-            kernel_size = load_aout(kernel_filename, kernel_base,
++            kernel_size = load_aout(machine->kernel_filename, kernel_base,
+                                     ram_size - kernel_base, bswap_needed,
+                                     TARGET_PAGE_SIZE);
+         if (kernel_size < 0)
+-            kernel_size = load_image_targphys(kernel_filename,
++            kernel_size = load_image_targphys(machine->kernel_filename,
+                                               kernel_base,
+                                               ram_size - kernel_base);
+         if (kernel_size < 0) {
+-            error_report("could not load kernel '%s'", kernel_filename);
++            error_report("could not load kernel '%s'",
++                         machine->kernel_filename);
+             exit(1);
+         }
+         /* load initrd */
+-        if (initrd_filename) {
+-            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size + KERNEL_GAP);
+-            initrd_size = load_image_targphys(initrd_filename, initrd_base,
++        if (machine->initrd_filename) {
++            initrd_base = TARGET_PAGE_ALIGN(kernel_base + kernel_size +
++                                            KERNEL_GAP);
++            initrd_size = load_image_targphys(machine->initrd_filename,
++                                              initrd_base,
+                                               ram_size - initrd_base);
+             if (initrd_size < 0) {
+                 error_report("could not load initial ram disk '%s'",
+-                             initrd_filename);
++                             machine->initrd_filename);
+                 exit(1);
+             }
+             cmdline_base = TARGET_PAGE_ALIGN(initrd_base + initrd_size);
+@@ -343,9 +341,10 @@ static void ppc_heathrow_init(MachineState *machine)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MACHINE_ID, ARCH_HEATHROW);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_ADDR, kernel_base);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_SIZE, kernel_size);
+-    if (kernel_cmdline) {
++    if (machine->kernel_cmdline) {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, cmdline_base);
+-        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE, kernel_cmdline);
++        pstrcpy_targphys("cmdline", cmdline_base, TARGET_PAGE_SIZE,
++                         machine->kernel_cmdline);
+     } else {
+         fw_cfg_add_i32(fw_cfg, FW_CFG_KERNEL_CMDLINE, 0);
+     }
+-- 
+2.20.1
 
-
-ATB,
-
-Mark.
 
