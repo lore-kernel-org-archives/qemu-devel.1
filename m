@@ -7,50 +7,51 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 804CDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:11:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BFA0C433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:12:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 012D520773
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:11:11 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 012D520773
+	by mail.kernel.org (Postfix) with ESMTPS id B39B420657
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:12:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B39B420657
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUBH5-0006fC-0F
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:11:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53042)
+	id 1kUBIC-00005L-Ql
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:12:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB6s-00030v-2v; Sun, 18 Oct 2020 12:00:38 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60444
+ id 1kUB6P-0002gq-2g; Sun, 18 Oct 2020 12:00:09 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60388
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB6p-0004YS-N0; Sun, 18 Oct 2020 12:00:37 -0400
+ id 1kUB6N-0004Qg-4x; Sun, 18 Oct 2020 12:00:08 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB6p-0001FH-Af; Sun, 18 Oct 2020 17:00:40 +0100
+ id 1kUB6M-0001FH-PR; Sun, 18 Oct 2020 17:00:11 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
  david@gibson.dropbear.id.au, atar4qemu@gmail.com
-Date: Sun, 18 Oct 2020 16:59:19 +0100
-Message-Id: <20201018155919.21200-14-mark.cave-ayland@ilande.co.uk>
+Date: Sun, 18 Oct 2020 16:59:13 +0100
+Message-Id: <20201018155919.21200-8-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
 References: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 13/13] mac_oldworld: Change PCI address of macio to match real
- hardware
+Subject: [PULL 07/13] ppc405_boards: use qdev properties instead of legacy
+ m48t59_init() function
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,33 +80,50 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: BALATON Zoltan <balaton@eik.bme.hu>
-
-The board firmware expect these to be at fixed addresses and programs
-them without probing, this patch puts the macio device at the expected
-PCI address.
-
-Signed-off-by: BALATON Zoltan <balaton@eik.bme.hu>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <f14bcaf3cf129500710ba5289980a134086bd949.1602805637.git.balaton@eik.bme.hu>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-Id: <20201016182739.22875-5-mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Hervé Poussineau <hpoussin@reactos.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/ppc/mac_oldworld.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ hw/ppc/ppc405_boards.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index e34680f980..6c59aa5601 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -288,7 +288,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     ide_drive_get(hd, ARRAY_SIZE(hd));
- 
-     /* MacIO */
--    macio = pci_new(-1, TYPE_OLDWORLD_MACIO);
-+    macio = pci_new(PCI_DEVFN(16, 0), TYPE_OLDWORLD_MACIO);
-     dev = DEVICE(macio);
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
+diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+index 6198ec1035..4687715b15 100644
+--- a/hw/ppc/ppc405_boards.c
++++ b/hw/ppc/ppc405_boards.c
+@@ -28,6 +28,8 @@
+ #include "qemu-common.h"
+ #include "cpu.h"
+ #include "hw/ppc/ppc.h"
++#include "hw/qdev-properties.h"
++#include "hw/sysbus.h"
+ #include "ppc405.h"
+ #include "hw/rtc/m48t59.h"
+ #include "hw/block/flash.h"
+@@ -145,6 +147,8 @@ static void ref405ep_init(MachineState *machine)
+     char *filename;
+     ppc4xx_bd_info_t bd;
+     CPUPPCState *env;
++    DeviceState *dev;
++    SysBusDevice *s;
+     qemu_irq *pic;
+     MemoryRegion *bios;
+     MemoryRegion *sram = g_new(MemoryRegion, 1);
+@@ -227,7 +231,11 @@ static void ref405ep_init(MachineState *machine)
+     /* Register FPGA */
+     ref405ep_fpga_init(sysmem, 0xF0300000);
+     /* Register NVRAM */
+-    m48t59_init(NULL, 0xF0000000, 0, 8192, 1968, 8);
++    dev = qdev_new("sysbus-m48t08");
++    qdev_prop_set_int32(dev, "base-year", 1968);
++    s = SYS_BUS_DEVICE(dev);
++    sysbus_realize_and_unref(s, &error_fatal);
++    sysbus_mmio_map(s, 0, 0xF0000000);
+     /* Load kernel */
+     linux_boot = (kernel_filename != NULL);
+     if (linux_boot) {
 -- 
 2.20.1
 
