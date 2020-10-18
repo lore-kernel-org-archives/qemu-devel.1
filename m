@@ -1,94 +1,116 @@
-Return-Path: <SRS0=yvcL=DY=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1564C433E7
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 23:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03AA6C433DF
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 02:09:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 15BAB20758
-	for <qemu-devel@archiver.kernel.org>; Sat, 17 Oct 2020 23:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4D5C0207FF
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 02:09:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e7snVR6c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15BAB20758
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JYBvkmsN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D5C0207FF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kTvtg-0002w9-Qr
-	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 19:46:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56034)
+	id 1kTy8L-0005mx-7n
+	for qemu-devel@archiver.kernel.org; Sat, 17 Oct 2020 22:09:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kTvse-00029O-1n
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 19:44:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32656)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kTvsa-0007yd-St
- for qemu-devel@nongnu.org; Sat, 17 Oct 2020 19:44:55 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1602978290;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=2TK8Zb3rx7oZpsMUG1Y5A9x7+KZC5fy92sD9+9h/wAM=;
- b=e7snVR6cYehKvxLnCKn8SAj40l56so//nQiaA7D2ELTxNCkE2+03G5CX9fK/XodFnUO4YN
- rI7DPf1cgauZBp7nVFwdLPJSjjEc2SHLlJ9rDYVwACDlMz9UsfM6GigvupAS58cnyfAneP
- lAGefLHB/WCEy3rptQqrEpIN++X4/cc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-53-qmqGqPH7OLWxeuZgSPZJeA-1; Sat, 17 Oct 2020 19:44:46 -0400
-X-MC-Unique: qmqGqPH7OLWxeuZgSPZJeA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4D602802B7A;
- Sat, 17 Oct 2020 23:44:43 +0000 (UTC)
-Received: from x1.home (ovpn-113-35.phx2.redhat.com [10.3.113.35])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7E79E6EF58;
- Sat, 17 Oct 2020 23:44:37 +0000 (UTC)
-Date: Sat, 17 Oct 2020 17:44:37 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 05/17] vfio: Add VM state change handler to know
- state of VM
-Message-ID: <20201017174437.2fb6b699@x1.home>
-In-Reply-To: <0fd89808-74b2-49de-da79-ea034d83a5de@nvidia.com>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-6-git-send-email-kwankhede@nvidia.com>
- <20200925142023.54e2c7c0@x1.home>
- <0fd89808-74b2-49de-da79-ea034d83a5de@nvidia.com>
-Organization: Red Hat
+ (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTy7h-0005Mf-Tn
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 22:08:37 -0400
+Received: from mail-lj1-x244.google.com ([2a00:1450:4864:20::244]:46686)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <jannh@google.com>) id 1kTy7f-0005dR-GI
+ for qemu-devel@nongnu.org; Sat, 17 Oct 2020 22:08:37 -0400
+Received: by mail-lj1-x244.google.com with SMTP id c21so7213843ljn.13
+ for <qemu-devel@nongnu.org>; Sat, 17 Oct 2020 19:08:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=EoL7d0lHzdswPEFGsAEJJdNfE07sA8igVy5PEUcTbDQ=;
+ b=JYBvkmsN9RysEeFQRgQMS2IGgQheKP8WCpVEITeoShBcDrScb2YzXJWCS9fBQBrxMO
+ n86hAFDTEQHXskSLJ578m/TKYBOiwMg0z/aLu4hSKM9fzy3Bml2AtFnKiNFHXmC81ou5
+ oLgoTyjjd7m8dU7zn1iDkaLBmUIFwukS3W1degboeUcB5xxmHAwJ7X7ZJjY5qLq4Uevz
+ 9565oX51vhmKmr/jiZRuPNAZjyZvYkS6kUYo9TyvCsqYY8xkBsy/gcixSZeElDfa4GKl
+ lQjC5lLseYNii8XoYpb7znRj1djIzK3pwUzl9c71Hf2cfPLya0ovLXiar856omGyFgtc
+ cBdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=EoL7d0lHzdswPEFGsAEJJdNfE07sA8igVy5PEUcTbDQ=;
+ b=jXLkRx/cxWAcEIpL+4bsLmMEJpda2BrjZR6rkmgIpkiqz6hIklm8ia7i0KLlAaM0tM
+ xUsy1Zpgd45ZIKT2V2lEmyyf3OOavf6osbWiIAFW5MDPvuwOqWT2zuVz/o388hAcwh0C
+ WMlxw3whxZb7kJ01EmQZRsGqEz41EbWlGrk3c74wHDzobkyCC3zqUWq9PeZNPYGsxhPS
+ Vz5J39FL7as0XFTYrqUiomTK6Fpf/PoTkODtljEe12uerGgCfknSowH7sA/AFo5zSDF4
+ m8jlQobHtzZ1RJ+Ws55gA2YPnpZW7oP2VKrteCJ2tTP7bykOddPKcjC4w8/a+WKDFxha
+ gIlw==
+X-Gm-Message-State: AOAM531mFYz72/dwY59mrXChCXY2zuf2IDXGyHJggm/jHFbheJeFw5pG
+ F26XvaLPsUmsYhtkbM8oCTWwpGsfVUB5fRH8mtgSEA==
+X-Google-Smtp-Source: ABdhPJxVC4A8hz5Ph8xI5Lcuiwu6i49AGWglYFrVbrHYISFimwHqgN7R9bAY4u2r3Hi8cj+JpNCqLDs0HlkcXSFAtqI=
+X-Received: by 2002:a05:651c:1313:: with SMTP id
+ u19mr1073920lja.47.1602986911177; 
+ Sat, 17 Oct 2020 19:08:31 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/17 19:44:50
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <20201017033606.GA14014@1wt.eu>
+ <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+ <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
+ <20201017053712.GA14105@1wt.eu>
+ <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
+ <20201017064442.GA14117@1wt.eu>
+ <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
+ <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
+ <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
+In-Reply-To: <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
+From: Jann Horn <jannh@google.com>
+Date: Sun, 18 Oct 2020 04:08:04 +0200
+Message-ID: <CAG48ez0JYK2_tk0DuEgKY2y0d38N+O5HJrH2je7RRk6o7XBixA@mail.gmail.com>
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+To: Alexander Graf <graf@amazon.de>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Willy Tarreau <w@1wt.eu>,
+ Colm MacCarthaigh <colmmacc@amazon.com>, 
+ "Catangiu, Adrian Costin" <acatan@amazon.com>,
+ Andy Lutomirski <luto@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, 
+ Eric Biggers <ebiggers@kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ kernel list <linux-kernel@vger.kernel.org>, 
+ "open list:VIRTIO GPU DRIVER" <virtualization@lists.linux-foundation.org>, 
+ "Woodhouse, David" <dwmw@amazon.co.uk>, bonzini@gnu.org, "Singh,
+ Balbir" <sblbir@amazon.com>, 
+ "Weiss, Radu" <raduweis@amazon.com>, oridgar@gmail.com, ghammer@redhat.com, 
+ Jonathan Corbet <corbet@lwn.net>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ KVM list <kvm@vger.kernel.org>, 
+ Michal Hocko <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, Linux API <linux-api@vger.kernel.org>,
+ Christian Borntraeger <borntraeger@de.ibm.com>, 
+ Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::244;
+ envelope-from=jannh@google.com; helo=mail-lj1-x244.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,302 +123,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 18 Oct 2020 02:00:44 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+On Sat, Oct 17, 2020 at 8:09 PM Alexander Graf <graf@amazon.de> wrote:
+> There are applications way beyond that though. What do you do with
+> applications that already consumed randomness? For example a cached pool
+> of SSL keys. Or a higher level language primitive that consumes
+> randomness and caches its seed somewhere in an internal data structure.
 
-> On 9/26/2020 1:50 AM, Alex Williamson wrote:
-> > On Wed, 23 Sep 2020 04:54:07 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> VM state change handler gets called on change in VM's state. This is used to set
-> >> VFIO device state to _RUNNING.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> ---
-> >>   hw/vfio/migration.c           | 136 ++++++++++++++++++++++++++++++++++++++++++
-> >>   hw/vfio/trace-events          |   3 +-
-> >>   include/hw/vfio/vfio-common.h |   4 ++
-> >>   3 files changed, 142 insertions(+), 1 deletion(-)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index 2f760f1f9c47..a30d628ba963 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -10,6 +10,7 @@
-> >>   #include "qemu/osdep.h"
-> >>   #include <linux/vfio.h>
-> >>   
-> >> +#include "sysemu/runstate.h"
-> >>   #include "hw/vfio/vfio-common.h"
-> >>   #include "cpu.h"
-> >>   #include "migration/migration.h"
-> >> @@ -22,6 +23,58 @@
-> >>   #include "exec/ram_addr.h"
-> >>   #include "pci.h"
-> >>   #include "trace.h"
-> >> +#include "hw/hw.h"
-> >> +
-> >> +static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
-> >> +                                  off_t off, bool iswrite)
-> >> +{
-> >> +    int ret;
-> >> +
-> >> +    ret = iswrite ? pwrite(vbasedev->fd, val, count, off) :
-> >> +                    pread(vbasedev->fd, val, count, off);
-> >> +    if (ret < count) {
-> >> +        error_report("vfio_mig_%s%d %s: failed at offset 0x%lx, err: %s",
-> >> +                     iswrite ? "write" : "read", count * 8,
-> >> +                     vbasedev->name, off, strerror(errno));  
-> > 
-> > This would suggest from the log that there's, for example, a
-> > vfio_mig_read8 function, which doesn't exist.
-> >   
-> 
-> Changing to:
-> error_report("vfio_mig_%s %d byte %s: failed at offset 0x%lx, err: %s",
->               iswrite ? "write" : "read", count,
->               vbasedev->name, off, strerror(errno));
-> Hope this address your concern.
-> 
-> >> +        return (ret < 0) ? ret : -EINVAL;
-> >> +    }
-> >> +    return 0;
-> >> +}
-> >> +
-> >> +static int vfio_mig_rw(VFIODevice *vbasedev, __u8 *buf, size_t count,
-> >> +                       off_t off, bool iswrite)
-> >> +{
-> >> +    int ret, done = 0;
-> >> +    __u8 *tbuf = buf;
-> >> +
-> >> +    while (count) {
-> >> +        int bytes = 0;
-> >> +
-> >> +        if (count >= 8 && !(off % 8)) {
-> >> +            bytes = 8;
-> >> +        } else if (count >= 4 && !(off % 4)) {
-> >> +            bytes = 4;
-> >> +        } else if (count >= 2 && !(off % 2)) {
-> >> +            bytes = 2;
-> >> +        } else {
-> >> +            bytes = 1;
-> >> +        }
-> >> +
-> >> +        ret = vfio_mig_access(vbasedev, tbuf, bytes, off, iswrite);
-> >> +        if (ret) {
-> >> +            return ret;
-> >> +        }
-> >> +
-> >> +        count -= bytes;
-> >> +        done += bytes;
-> >> +        off += bytes;
-> >> +        tbuf += bytes;
-> >> +    }
-> >> +    return done;
-> >> +}
-> >> +
-> >> +#define vfio_mig_read(f, v, c, o)       vfio_mig_rw(f, (__u8 *)v, c, o, false)
-> >> +#define vfio_mig_write(f, v, c, o)      vfio_mig_rw(f, (__u8 *)v, c, o, true)
-> >>   
-> >>   static void vfio_migration_region_exit(VFIODevice *vbasedev)
-> >>   {
-> >> @@ -70,6 +123,82 @@ err:
-> >>       return ret;
-> >>   }
-> >>   
-> >> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
-> >> +                                    uint32_t value)
-> >> +{
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    VFIORegion *region = &migration->region;
-> >> +    off_t dev_state_off = region->fd_offset +
-> >> +                      offsetof(struct vfio_device_migration_info, device_state);
-> >> +    uint32_t device_state;
-> >> +    int ret;
-> >> +
-> >> +    ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
-> >> +                        dev_state_off);
-> >> +    if (ret < 0) {
-> >> +        return ret;
-> >> +    }
-> >> +
-> >> +    device_state = (device_state & mask) | value;  
-> > 
-> > Agree with Connie that mask and value args are not immediately obvious
-> > how they're used.  I don't have a naming convention that would be more
-> > clear and the names do make some sense once they're understood, but a
-> > comment to indicate mask bits are preserved, value bits are set,
-> > remaining bits are cleared would probably help the reader.
-> >   
-> 
-> Added comment.
-> 
-> >> +
-> >> +    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
-> >> +        return -EINVAL;
-> >> +    }
-> >> +
-> >> +    ret = vfio_mig_write(vbasedev, &device_state, sizeof(device_state),
-> >> +                         dev_state_off);
-> >> +    if (ret < 0) {
-> >> +        ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
-> >> +                          dev_state_off);
-> >> +        if (ret < 0) {
-> >> +            return ret;  
-> > 
-> > Seems like we're in pretty bad shape here, should this be combined with
-> > below to trigger a hw_error?
-> >   
-> 
-> Ok.
-> 
-> >> +        }
-> >> +
-> >> +        if (VFIO_DEVICE_STATE_IS_ERROR(device_state)) {
-> >> +            hw_error("%s: Device is in error state 0x%x",
-> >> +                     vbasedev->name, device_state);
-> >> +            return -EFAULT;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    vbasedev->device_state = device_state;
-> >> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
-> >> +    return 0;  
-> > 
-> > So we return success even if we failed to write the desired state as
-> > long as we were able to read back any non-error state?
-> > vbasedev->device_state remains correct, but it seems confusing form a
-> > caller perspective that a set-state can succeed but it's then necessary
-> > to check the state.
-> >   
-> 
-> Correcting here. If vfio_mig_write() had retured error, return error 
-> from vfio_migration_set_state()
-> 
-> >> +}
-> >> +
-> >> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +
-> >> +    if ((vbasedev->vm_running != running)) {
-> >> +        int ret;
-> >> +        uint32_t value = 0, mask = 0;
-> >> +
-> >> +        if (running) {
-> >> +            value = VFIO_DEVICE_STATE_RUNNING;
-> >> +            if (vbasedev->device_state & VFIO_DEVICE_STATE_RESUMING) {
-> >> +                mask = ~VFIO_DEVICE_STATE_RESUMING;
-> >> +            }
-> >> +        } else {
-> >> +            mask = ~VFIO_DEVICE_STATE_RUNNING;
-> >> +        }
-> >> +
-> >> +        ret = vfio_migration_set_state(vbasedev, mask, value);
-> >> +        if (ret) {
-> >> +            /*
-> >> +             * vm_state_notify() doesn't support reporting failure. If such
-> >> +             * error reporting support added in furure, migration should be
-> >> +             * aborted.
-> >> +             */
-> >> +            error_report("%s: Failed to set device state 0x%x",
-> >> +                         vbasedev->name, value & mask);
-> >> +        }  
-> > 
-> > Here for instance we assume that success means the device is now in the
-> > desired state, but we'd actually need to evaluate
-> > vbasedev->device_state to determine that.
-> >   
-> 
-> Updating.
-> 
-> >> +        vbasedev->vm_running = running;
-> >> +        trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
-> >> +                                  value & mask);
-> >> +    }
-> >> +}
-> >> +
-> >>   static int vfio_migration_init(VFIODevice *vbasedev,
-> >>                                  struct vfio_region_info *info)
-> >>   {
-> >> @@ -87,8 +216,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-> >>                        vbasedev->name);
-> >>           g_free(vbasedev->migration);
-> >>           vbasedev->migration = NULL;
-> >> +        return ret;
-> >>       }
-> >>   
-> >> +    vbasedev->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-> >> +                                                          vbasedev);
-> >>       return ret;
-> >>   }
-> >>   
-> >> @@ -131,6 +263,10 @@ add_blocker:
-> >>   
-> >>   void vfio_migration_finalize(VFIODevice *vbasedev)
-> >>   {
-> >> +    if (vbasedev->vm_state) {
-> >> +        qemu_del_vm_change_state_handler(vbasedev->vm_state);
-> >> +    }
-> >> +
-> >>       if (vbasedev->migration_blocker) {
-> >>           migrate_del_blocker(vbasedev->migration_blocker);
-> >>           error_free(vbasedev->migration_blocker);
-> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> >> index 8fe913175d85..6524734bf7b4 100644
-> >> --- a/hw/vfio/trace-events
-> >> +++ b/hw/vfio/trace-events
-> >> @@ -149,4 +149,5 @@ vfio_display_edid_write_error(void) ""
-> >>   
-> >>   # migration.c
-> >>   vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
-> >> -
-> >> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
-> >> +vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> >> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> >> index 8275c4c68f45..25e3b1a3b90a 100644
-> >> --- a/include/hw/vfio/vfio-common.h
-> >> +++ b/include/hw/vfio/vfio-common.h
-> >> @@ -29,6 +29,7 @@
-> >>   #ifdef CONFIG_LINUX
-> >>   #include <linux/vfio.h>
-> >>   #endif
-> >> +#include "sysemu/sysemu.h"
-> >>   
-> >>   #define VFIO_MSG_PREFIX "vfio %s: "
-> >>   
-> >> @@ -119,6 +120,9 @@ typedef struct VFIODevice {
-> >>       unsigned int flags;
-> >>       VFIOMigration *migration;
-> >>       Error *migration_blocker;
-> >> +    VMChangeStateEntry *vm_state;
-> >> +    uint32_t device_state;
-> >> +    int vm_running;  
-> > 
-> > Could these be placed in VFIOMigration?  Thanks,
-> >  
-> 
-> I think device_state should be part of VFIODevice since its about device 
-> rather than only related to migration, others can be moved to VFIOMigration.
+For deterministic protection, those would also have to poll some
+memory location that tells them whether the VmGenID changed:
 
-But these are only valid when migration is supported and thus when
-VFIOMigration exists.  Thanks,
+1. between reading entropy from their RNG pool and using it
+2. between collecting data from external sources (user input, clock,
+...) and encrypting it
 
-Alex
+and synchronously shoot down the connection if a change happened. If
+e.g. an application inside the VM has an AES-GCM-encrypted TLS
+connection and, directly after the VM is restored, triggers an
+application-level timeout that sends some fixed message across the
+connection, then the TLS library must guarantee that either the VM was
+already committed to sending exactly that message before the VM was
+forked or the message will be blocked. If we don't do that, an
+attacker who captures both a single packet from the forked VM and
+traffic from the old VM can decrypt the next message from the old VM
+after the fork (because AES-GCM is like AES-CTR plus an authenticator,
+and CTR means that when keystream reuse occurs and one of the
+plaintexts is known, the attacker can simply recover the other
+plaintext using XOR).
 
+(Or maybe, in disaster failover environments, TLS 1.3 servers could
+get away with rekeying the connection instead of shooting it down? Ask
+your resident friendly cryptographer whether that would be secure, I
+am not one.)
+
+I don't think a mechanism based around asynchronously telling the
+application and waiting for it to confirm the rotation at a later
+point is going to cut it; we should have some hard semantics on when
+an application needs to poll this value.
+
+> Or even worse: your system's host ssh key.
+
+Mmmh... I think I normally would not want a VM to reset its host ssh
+key after merely restoring a snapshot though? And more importantly,
+Microsoft's docs say that they also change the VmGenID on disaster
+failover. I think you very much wouldn't want your server to lose its
+host key every time disaster failover happens. On the other hand,
+after importing a public VM image, it might be a good idea.
+
+I guess you could push that responsibility on the user, by adding an
+option to the sshd_config that tells OpenSSH whether the host key
+should be rotated on an ID change or not... but that still would not
+be particularly pretty.
+
+Ideally we would have the host tell us what type of events happened to
+the VM, or something like that... or maybe even get the host VM
+management software to ask the user whether they're importing a public
+image... I really feel like with Microsoft's current protocol, we
+don't get enough information to figure out what we should do about
+private long-term authentication keys.
 
