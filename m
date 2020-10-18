@@ -2,82 +2,82 @@ Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBBDC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:40:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D858CC43457
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:40:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 491E222277
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:40:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D4AF2227E
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 20:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GoktLn+7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 491E222277
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMCc+q6S"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D4AF2227E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59358 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33866 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUFTN-00010G-8M
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 16:40:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37774)
+	id 1kUFTv-00027j-Bk
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 16:40:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUFNj-0001jc-RD; Sun, 18 Oct 2020 16:34:19 -0400
-Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:54675)
+ id 1kUFO6-0002I9-9m; Sun, 18 Oct 2020 16:34:42 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:44318)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUFNh-0000yo-CS; Sun, 18 Oct 2020 16:34:18 -0400
-Received: by mail-wm1-x342.google.com with SMTP id p15so8334212wmi.4;
- Sun, 18 Oct 2020 13:34:16 -0700 (PDT)
+ id 1kUFO4-00010g-Hg; Sun, 18 Oct 2020 16:34:41 -0400
+Received: by mail-wr1-x441.google.com with SMTP id t9so9098735wrq.11;
+ Sun, 18 Oct 2020 13:34:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=wZ942IpuEYn6heYqqSxOTzqAXYjCwIpQoTDS92tNWTM=;
- b=GoktLn+7Kg6e5bzY1x2YW/octAubvrjSEOSOVcinXgzvkMW2KKb6meio6GyucaI43K
- B7QOFoZKew9EpnWusMPoxU/WN4FeLEVyHQu6tWY1QJTnrxmvnG9Cw3d9IGYQf8wwdrAu
- 3Yyjnz6lPrscGaiQYlFPIcbGDtMLmE7sCmhoYiV8nQYjLg8CvSMTclS7yErun2PAaiiu
- RQ4BLgKuPpewRuYw1l+/FVzjQn/q4PGpx7LmHRimAVYD3QlcsH3WTAAHF5COzSNT33Gj
- w3NNBbAZ/Lt+ugNgnvY7TPo/N9g5Mh7i122cmkKvOcpJnBNlc6GqgHctUMO31FD8sDVk
- XzFQ==
+ bh=T+AjHLV6TbQto2ptPmPM4vzjwRMfK43yR9xTQuzop2M=;
+ b=gMCc+q6SdNQ3Y5/Lz5suHD7Sacqw2KW33mm+3gmrGycb3IJ5VTTWGu0E5skFyEW2g2
+ 9K595vduWOx6Hv4dGn4hCMCKKJhmRj21Oib5JKCsOjgLcfWerhlqxzW8wMOKexfgo6ii
+ pXo9HXyLmgcU7PZlCAJP0kr/P4RoWX653itwEob05mGTtOta64SAIspDplmIKcD7VIxC
+ kRAq+sLVklt44uoJpkajtkP3UB/6/SdL4aUYYnC2YvZLerZXvfa6rfnZTXvtI3H7j8bL
+ ZeaNiMFpBNgS1T2y6MYZVy/cjC/roGiB+W4yNxTJjB6kQ8tt6MIc0jTkcNAngG3WHjDL
+ QsMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=wZ942IpuEYn6heYqqSxOTzqAXYjCwIpQoTDS92tNWTM=;
- b=ddsIEd7qFUfDrq0G89oPvKPdTFskNE2TL6PpZiCCaaE/FfAmVH+2tNZPkJcnNeQXOx
- pXszNkKeIS2+T1t2cynaZtsUeetL/LU3x/33Q6vhrrk2qinlQ33XhKsCVVGjuxKupvVH
- 7ugCeI0NUHOq94rHczA2xDJn9ADONdMlsSNofLqxkEQasiX5uP98Aev8//9V9rL7N9iv
- WXL4hYjlcqXQOa9sFlFU1RCm4juqe2sQBHVhaDS6dXuho650NxDIfUXipM/wwIKsQ4qp
- f5IAMkVqVJ6NLglb8FyyHctKPQQLdZGPHes4Chr8S4oPtK655UzaAGSL+Y2JTfmbjiCi
- CnHQ==
-X-Gm-Message-State: AOAM532mlSXVCK+MnmHWTcjez4PjkBEsUJzcZUmTjPekURzWs5MvWiYy
- 6jwFatO75QVSNcfv0QGh6STAT09MEiU=
-X-Google-Smtp-Source: ABdhPJxTKAB4eRLpWLWpd5of0t7AjsT/yu0zk11mLI/oldhgFRRdU4qk1ZV+lGNw8FDJ6C4XlUZm1w==
-X-Received: by 2002:a7b:cbd1:: with SMTP id n17mr14077026wmi.29.1603053255469; 
- Sun, 18 Oct 2020 13:34:15 -0700 (PDT)
+ bh=T+AjHLV6TbQto2ptPmPM4vzjwRMfK43yR9xTQuzop2M=;
+ b=Jj8cBXKJxq8dXmOpFwhRqViZ1agHtrO4EWhxkdq8zCEgigBx01QM4G4enHHmSZKJM7
+ euS0c414L6GgpxLTlSEoLAnGvQJA9U/2nPdnnlWnMErXR6341gk8DO7UGbw9qgYN/Zm7
+ QwOMkD6ugG0fgYFjtIOuRg4NAF9oCTkt9grKV1pH3SA7Gz1rl0KVdQBV/qLtr0P0DeEm
+ LWi42156yh21zJ0Xsnn3RSl/sQs1NHp9hWxCnKwb1o80wjk8lYJwI2Cr1j7xeZILeDNt
+ YXU3mZL/efBhIzvPwYaZmL8RGZ0x3skl6ULK4zug93mVrXXkCwEUe28gHQ32MCK8Z9kT
+ yqQw==
+X-Gm-Message-State: AOAM531ua0gRV4qYIFFLmtL4twKOL8r7uzCDCJUpONFg6cDfT3iDXh5S
+ HR4MY3aaLRxc4Tlr4IB4meYxIeq75xQ=
+X-Google-Smtp-Source: ABdhPJx2TkLFDVsQzdqrE1shupbQBccbEwjXO1yjvXlOPG5IeX2dA9iMLsz4e74JxO7RDJbK0V4mLg==
+X-Received: by 2002:a5d:6a49:: with SMTP id t9mr15964543wrw.194.1603053278522; 
+ Sun, 18 Oct 2020 13:34:38 -0700 (PDT)
 Received: from localhost.localdomain
  (117.red-83-52-172.dynamicip.rima-tde.net. [83.52.172.117])
- by smtp.gmail.com with ESMTPSA id y7sm13123376wmg.40.2020.10.18.13.34.14
+ by smtp.gmail.com with ESMTPSA id g5sm13452489wmi.4.2020.10.18.13.34.37
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Sun, 18 Oct 2020 13:34:14 -0700 (PDT)
+ Sun, 18 Oct 2020 13:34:37 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/9] hw/arm/bcm2836: Introduce BCM283XClass::core_count
-Date: Sun, 18 Oct 2020 22:33:52 +0200
-Message-Id: <20201018203358.1530378-4-f4bug@amsat.org>
+Subject: [PATCH v3 8/9] hw/arm/raspi: Add the Raspberry Pi Zero machine
+Date: Sun, 18 Oct 2020 22:33:57 +0200
+Message-Id: <20201018203358.1530378-9-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201018203358.1530378-1-f4bug@amsat.org>
 References: <20201018203358.1530378-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::342;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -108,52 +108,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The BCM2835 has only one core. Introduce the core_count field to
-be able to use values different than BCM283X_NCPUS (4).
+Similarly to the Pi A, the Pi Zero uses a BCM2835 SoC (ARMv6Z core).
+
+Example booting the machine using content from [*]:
+
+  $ qemu-system-arm -M raspi0 -serial stdio \
+      -kernel raspberrypi/firmware/boot/kernel.img \
+      -dtb raspberrypi/firmware/boot/bcm2708-rpi-zero.dtb \
+      -append 'printk.time=0 earlycon=pl011,0x20201000 console=ttyAMA0'
+  [    0.000000] Booting Linux on physical CPU 0x0
+  [    0.000000] Linux version 4.19.118+ (dom@buildbot) (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1311 Mon Apr 27 14:16:15 BST 2020
+  [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision 7 (ARMv7), cr=00c5387d
+  [    0.000000] CPU: VIPT aliasing data cache, unknown instruction cache
+  [    0.000000] OF: fdt: Machine model: Raspberry Pi Zero
+  ...
+
+[*] http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-kernel_1.20200512-2_armhf.deb
 
 Reviewed-by: Luc Michel <luc.michel@greensocs.com>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/arm/bcm2836.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ hw/arm/raspi.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 8f921d8e904..c5d46a8e805 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -23,6 +23,7 @@ typedef struct BCM283XClass {
-     /*< public >*/
-     const char *name;
-     const char *cpu_type;
-+    unsigned core_count;
-     hwaddr peri_base; /* Peripheral base address seen by the CPU */
-     hwaddr ctrl_base; /* Interrupt controller and mailboxes etc. */
-     int clusterid;
-@@ -39,7 +40,7 @@ static void bcm2836_init(Object *obj)
-     BCM283XClass *bc = BCM283X_GET_CLASS(obj);
-     int n;
+diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+index 91a59d1d489..1510ca01afe 100644
+--- a/hw/arm/raspi.c
++++ b/hw/arm/raspi.c
+@@ -319,6 +319,15 @@ static void raspi_machine_class_common_init(MachineClass *mc,
+     mc->default_ram_id = "ram";
+ };
  
--    for (n = 0; n < BCM283X_NCPUS; n++) {
-+    for (n = 0; n < bc->core_count; n++) {
-         object_initialize_child(obj, "cpu[*]", &s->cpu[n].core,
-                                 bc->cpu_type);
-     }
-@@ -149,6 +150,7 @@ static void bcm2836_class_init(ObjectClass *oc, void *data)
-     BCM283XClass *bc = BCM283X_CLASS(oc);
++static void raspi0_machine_class_init(ObjectClass *oc, void *data)
++{
++    MachineClass *mc = MACHINE_CLASS(oc);
++    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
++
++    rmc->board_rev = 0x900092;
++    raspi_machine_class_common_init(mc, rmc->board_rev);
++};
++
+ static void raspi1ap_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -352,6 +361,10 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
  
-     bc->cpu_type = ARM_CPU_TYPE_NAME("cortex-a7");
-+    bc->core_count = BCM283X_NCPUS;
-     bc->peri_base = 0x3f000000;
-     bc->ctrl_base = 0x40000000;
-     bc->clusterid = 0xf;
-@@ -163,6 +165,7 @@ static void bcm2837_class_init(ObjectClass *oc, void *data)
-     BCM283XClass *bc = BCM283X_CLASS(oc);
- 
-     bc->cpu_type = ARM_CPU_TYPE_NAME("cortex-a53");
-+    bc->core_count = BCM283X_NCPUS;
-     bc->peri_base = 0x3f000000;
-     bc->ctrl_base = 0x40000000;
-     bc->clusterid = 0x0;
+ static const TypeInfo raspi_machine_types[] = {
+     {
++        .name           = MACHINE_TYPE_NAME("raspi0"),
++        .parent         = TYPE_RASPI_MACHINE,
++        .class_init     = raspi0_machine_class_init,
++    }, {
+         .name           = MACHINE_TYPE_NAME("raspi1ap"),
+         .parent         = TYPE_RASPI_MACHINE,
+         .class_init     = raspi1ap_machine_class_init,
 -- 
 2.26.2
 
