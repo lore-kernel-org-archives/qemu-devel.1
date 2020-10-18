@@ -2,67 +2,107 @@ Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A425C433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:01:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DECC433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:02:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6C4C20773
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:01:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6C4C20773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 0D36920773
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 16:02:05 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pyf4yAXz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D36920773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34586 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUB7z-0003K5-Qz
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:01:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52624)
+	id 1kUB8G-0003sa-5i
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 12:02:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB5v-0001gy-TN; Sun, 18 Oct 2020 11:59:39 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:60324
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB5u-0004K6-8T; Sun, 18 Oct 2020 11:59:39 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUB5t-0001FH-RQ; Sun, 18 Oct 2020 16:59:41 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: peter.maydell@linaro.org, qemu-devel@nongnu.org, qemu-ppc@nongnu.org,
- david@gibson.dropbear.id.au, atar4qemu@gmail.com
-Date: Sun, 18 Oct 2020 16:59:07 +0100
-Message-Id: <20201018155919.21200-2-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
-References: <20201018155919.21200-1-mark.cave-ayland@ilande.co.uk>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kUB67-00027b-G5
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 11:59:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31401)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kUB65-0004LM-2K
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 11:59:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603036787;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=G1NfFqRvQCLurPJ/4oycBIXRpf/JK9ZrKM1/uUoh0IA=;
+ b=Pyf4yAXzQVn2Aj82XmoXSyLYN97mk9UayHMBtuxkEhO2tsJrAtLI8o/4ftXbS1JseST0dR
+ MUozCkLLJkcBN2mmXQUtGjfeBWpeek3vqoyUp3WZnuUg1d5frZLAVidmNiV+JJKe9Yvu9f
+ dSZolVLhGG7ZO7zxXGEhltq8Rr3yQbw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-397-YnRG61A4Nxuq2M3YeBdlcA-1; Sun, 18 Oct 2020 11:59:45 -0400
+X-MC-Unique: YnRG61A4Nxuq2M3YeBdlcA-1
+Received: by mail-wr1-f71.google.com with SMTP id b11so6311686wrm.3
+ for <qemu-devel@nongnu.org>; Sun, 18 Oct 2020 08:59:45 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=G1NfFqRvQCLurPJ/4oycBIXRpf/JK9ZrKM1/uUoh0IA=;
+ b=J5Xl6vibr0Oj6sEGQi/25Gq3V49X+43jMgmV+R6YSkVe9U0bF9qvbhvcqUBjFq3IEZ
+ ALLBHzhLPj46KM5mlvA87wG4uzybYym1LvXohQFLHSB7c4se0GFpOjH9uO8XPaIFbLpW
+ I6lFlaocDLyfOd4hFNNyFZR2ahifaRkMQE56bNQkCxiDAyV4d3xjjtGoVQvXPYU66RTT
+ gOcTANfWHBdPIqDzL2iraIZVEMY7im2q9minww+hDNsGqb4GdBGsq7Dmh1N9UG8hyzRI
+ Mvsdu33+sGq2yjrwRAmAZjJDrZ/LsHecgpFrJnkfaah9LE3ceYh80wOGFWbCQ/5DQfRN
+ bNkw==
+X-Gm-Message-State: AOAM530TQEsWKIGzSUQlq8UA3PCO+XIhSB/4X/Z/Niu4IiBv1VAWilTH
+ /6++hqzzY6zvK0bZyp73ePdQaf2HUfFKsQpdLBCh/nbHJdRbq64KiLawgujjx935wskEgzbpwfA
+ 0U//LQQpMeAW145Y=
+X-Received: by 2002:a1c:f719:: with SMTP id v25mr13416590wmh.186.1603036784693; 
+ Sun, 18 Oct 2020 08:59:44 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyKG4LDYGrfcTeGKXBvhe3OP7bjzV07mWsDR9CnUloQlRE4wGL7GgoXxjxr0ZXIKJ7mRGf5bw==
+X-Received: by 2002:a1c:f719:: with SMTP id v25mr13416551wmh.186.1603036784415; 
+ Sun, 18 Oct 2020 08:59:44 -0700 (PDT)
+Received: from redhat.com (bzq-79-176-118-93.red.bezeqint.net. [79.176.118.93])
+ by smtp.gmail.com with ESMTPSA id a82sm12794262wmc.44.2020.10.18.08.59.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Sun, 18 Oct 2020 08:59:43 -0700 (PDT)
+Date: Sun, 18 Oct 2020 11:59:39 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Andy Lutomirski <luto@kernel.org>
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+Message-ID: <20201018115524-mutt-send-email-mst@kernel.org>
+References: <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+ <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
+ <20201017053712.GA14105@1wt.eu>
+ <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
+ <20201017064442.GA14117@1wt.eu>
+ <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
+ <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
+ <20201018114625-mutt-send-email-mst@kernel.org>
+ <CALCETrXBJZnKXo2QLKVWSgAhSMdwEVHeut6pRw4P92CR_5A-fQ@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 01/13] macio: don't reference serial_hd() directly within the
- device
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CALCETrXBJZnKXo2QLKVWSgAhSMdwEVHeut6pRw4P92CR_5A-fQ@mail.gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 11:52:15
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,96 +115,83 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, KVM list <kvm@vger.kernel.org>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, ghammer@redhat.com,
+ "Weiss, Radu" <raduweis@amazon.com>, Qemu Developers <qemu-devel@nongnu.org>,
+ "open list:VIRTIO GPU DRIVER" <virtualization@lists.linux-foundation.org>,
+ Pavel Machek <pavel@ucw.cz>, Colm MacCarthaigh <colmmacc@amazon.com>,
+ Jonathan Corbet <corbet@lwn.net>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Eric Biggers <ebiggers@kernel.org>, "Singh, Balbir" <sblbir@amazon.com>,
+ bonzini@gnu.org, "Graf \(AWS\), Alexander" <graf@amazon.de>,
+ Jann Horn <jannh@google.com>, oridgar@gmail.com, "Catangiu,
+ Adrian Costin" <acatan@amazon.com>, Michal Hocko <mhocko@kernel.org>,
+ "Theodore Y. Ts'o" <tytso@mit.edu>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ kernel list <linux-kernel@vger.kernel.org>,
+ Linux API <linux-api@vger.kernel.org>, Willy Tarreau <w@1wt.eu>, "Woodhouse,
+ David" <dwmw@amazon.co.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead use qdev_prop_set_chr() to configure the ESCC serial chardevs at the
-Mac Old World and New World machine level.
+On Sun, Oct 18, 2020 at 08:54:36AM -0700, Andy Lutomirski wrote:
+> On Sun, Oct 18, 2020 at 8:52 AM Michael S. Tsirkin <mst@redhat.com> wrote:
+> >
+> > On Sat, Oct 17, 2020 at 03:24:08PM +0200, Jason A. Donenfeld wrote:
+> > > 4c. The guest kernel maintains an array of physical addresses that are
+> > > MADV_WIPEONFORK. The hypervisor knows about this array and its
+> > > location through whatever protocol, and before resuming a
+> > > moved/snapshotted/duplicated VM, it takes the responsibility for
+> > > memzeroing this memory. The huge pro here would be that this
+> > > eliminates all races, and reduces complexity quite a bit, because the
+> > > hypervisor can perfectly synchronize its bringup (and SMP bringup)
+> > > with this, and it can even optimize things like on-disk memory
+> > > snapshots to simply not write out those pages to disk.
+> > >
+> > > A 4c-like approach seems like it'd be a lot of bang for the buck -- we
+> > > reuse the existing mechanism (MADV_WIPEONFORK), so there's no new
+> > > userspace API to deal with, and it'd be race free, and eliminate a lot
+> > > of kernel complexity.
+> >
+> > Clearly this has a chance to break applications, right?
+> > If there's an app that uses this as a non-system-calls way
+> > to find out whether there was a fork, it will break
+> > when wipe triggers without a fork ...
+> > For example, imagine:
+> >
+> > MADV_WIPEONFORK
+> > copy secret data to MADV_DONTFORK
+> > fork
+> >
+> >
+> > used to work, with this change it gets 0s instead of the secret data.
+> >
+> >
+> > I am also not sure it's wise to expose each guest process
+> > to the hypervisor like this. E.g. each process needs a
+> > guest physical address of its own then. This is a finite resource.
+> >
+> >
+> > The mmap interface proposed here is somewhat baroque, but it is
+> > certainly simple to implement ...
+> 
+> Wipe of fork/vmgenid/whatever could end up being much more problematic
+> than it naively appears -- it could be wiped in the middle of a read.
+> Either the API needs to handle this cleanly, or we need something more
+> aggressive like signal-on-fork.
+> 
+> --Andy
 
-Also remove the now obsolete comment referring to the use of serial_hd() and
-the setting of user_creatable to false accordingly.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201013114922.2946-2-mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/misc/macio/macio.c | 4 ----
- hw/ppc/mac_newworld.c | 6 ++++++
- hw/ppc/mac_oldworld.c | 6 ++++++
- 3 files changed, 12 insertions(+), 4 deletions(-)
+Right, it's not on fork, it's actually when process is snapshotted.
 
-diff --git a/hw/misc/macio/macio.c b/hw/misc/macio/macio.c
-index 679722628e..51368884d0 100644
---- a/hw/misc/macio/macio.c
-+++ b/hw/misc/macio/macio.c
-@@ -109,8 +109,6 @@ static void macio_common_realize(PCIDevice *d, Error **errp)
-     qdev_prop_set_uint32(DEVICE(&s->escc), "disabled", 0);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "frequency", ESCC_CLOCK);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "it_shift", 4);
--    qdev_prop_set_chr(DEVICE(&s->escc), "chrA", serial_hd(0));
--    qdev_prop_set_chr(DEVICE(&s->escc), "chrB", serial_hd(1));
-     qdev_prop_set_uint32(DEVICE(&s->escc), "chnBtype", escc_serial);
-     qdev_prop_set_uint32(DEVICE(&s->escc), "chnAtype", escc_serial);
-     if (!qdev_realize(DEVICE(&s->escc), BUS(&s->macio_bus), errp)) {
-@@ -458,8 +456,6 @@ static void macio_class_init(ObjectClass *klass, void *data)
-     k->class_id = PCI_CLASS_OTHERS << 8;
-     device_class_set_props(dc, macio_properties);
-     set_bit(DEVICE_CATEGORY_BRIDGE, dc->categories);
--    /* Reason: Uses serial_hds in macio_instance_init */
--    dc->user_creatable = false;
- }
- 
- static const TypeInfo macio_bus_info = {
-diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
-index 4dfbeec0ca..6f5ef2e782 100644
---- a/hw/ppc/mac_newworld.c
-+++ b/hw/ppc/mac_newworld.c
-@@ -123,6 +123,7 @@ static void ppc_core99_init(MachineState *machine)
-     UNINHostState *uninorth_pci;
-     PCIBus *pci_bus;
-     PCIDevice *macio;
-+    ESCCState *escc;
-     bool has_pmu, has_adb;
-     MACIOIDEState *macio_ide;
-     BusState *adb_bus;
-@@ -380,6 +381,11 @@ static void ppc_core99_init(MachineState *machine)
-     qdev_prop_set_bit(dev, "has-adb", has_adb);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
-                              &error_abort);
-+
-+    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
-+    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
-+    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
-+
-     pci_realize_and_unref(macio, pci_bus, &error_fatal);
- 
-     /* We only emulate 2 out of 3 IDE controllers for now */
-diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
-index f8173934a2..d6a76d06dc 100644
---- a/hw/ppc/mac_oldworld.c
-+++ b/hw/ppc/mac_oldworld.c
-@@ -96,6 +96,7 @@ static void ppc_heathrow_init(MachineState *machine)
-     PCIBus *pci_bus;
-     PCIDevice *macio;
-     MACIOIDEState *macio_ide;
-+    ESCCState *escc;
-     SysBusDevice *s;
-     DeviceState *dev, *pic_dev;
-     BusState *adb_bus;
-@@ -281,6 +282,11 @@ static void ppc_heathrow_init(MachineState *machine)
-     qdev_prop_set_uint64(dev, "frequency", tbfreq);
-     object_property_set_link(OBJECT(macio), "pic", OBJECT(pic_dev),
-                              &error_abort);
-+
-+    escc = ESCC(object_resolve_path_component(OBJECT(macio), "escc"));
-+    qdev_prop_set_chr(DEVICE(escc), "chrA", serial_hd(0));
-+    qdev_prop_set_chr(DEVICE(escc), "chrB", serial_hd(1));
-+
-     pci_realize_and_unref(macio, pci_bus, &error_fatal);
- 
-     macio_ide = MACIO_IDE(object_resolve_path_component(OBJECT(macio),
+If we assume it's CRIU we care about, then I
+wonder what's wrong with something like
+MADV_CHANGEONPTRACE_SEIZE
+and basically say it's X bytes which change the value...
+
+
 -- 
-2.20.1
+MST
 
 
