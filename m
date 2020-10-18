@@ -2,71 +2,60 @@ Return-Path: <SRS0=E7tW=DZ=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 233DAC433DF
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 05:43:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97CBEC433E7
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 06:36:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AF02A20829
-	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 05:43:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AF02A20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id F13C320EDD
+	for <qemu-devel@archiver.kernel.org>; Sun, 18 Oct 2020 06:36:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F13C320EDD
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49148 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kU1U3-0005PC-Ks
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 01:43:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35224)
+	id 1kU2JI-0008FX-Nd
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 02:36:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kU1TF-0004uh-IN; Sun, 18 Oct 2020 01:43:06 -0400
-Resent-Date: Sun, 18 Oct 2020 01:43:05 -0400
-Resent-Message-Id: <E1kU1TF-0004uh-IN@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21788)
+ (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
+ id 1kU2Gw-0006Xi-Dr; Sun, 18 Oct 2020 02:34:26 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38996 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kU1TD-0006Qc-32; Sun, 18 Oct 2020 01:43:05 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1602999766; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=cbSQDbPd1SyKVtLd9rFgBi543Da/YWQYSIEW6+3k1sdwBqGMmxU/Ya7TzrXbyq8Ghpwk3U5OfpnMZuDTg7qGvSLjX2W4O2Bsyp3sEu69gWe6Nl5u/v51nApB5+BJzHG0u2JoTup0jwEmYAUN/wILBwPs0xu2PtXaztDZp21TDTg=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1602999766;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=zkMqd2PoGsRETKfrObokfyzGKfE/Ipqr5yjk2Bz5JkE=; 
- b=QE+UEtDbUjTvmfkMhScitI2fE8KK/0sT6CMvmOC2xAnxMpPnNho8iHeLZJEXDhj6ENTO3ySifxjmIA2jp+wRzharKF0mwXl8Hb4mV/nHLBswzetc3SE8+CYmardsqMp9RdirToaiD3j5lwxGqdSW65MTB0csMo+4vTivDULtsgI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1602999764107697.9273458087587;
- Sat, 17 Oct 2020 22:42:44 -0700 (PDT)
-Subject: Re: [PATCH] qemu-img: add support for rate limit in qemu-img convert
-Message-ID: <160299976266.17996.16077375266149312335@66eaa9a8a123>
-In-Reply-To: <1602999390-21324-1-git-send-email-lizhengui@huawei.com>
+ (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
+ id 1kU2Gt-0006C7-Rr; Sun, 18 Oct 2020 02:34:26 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 02C5AE006DC6BB0AAC8B;
+ Sun, 18 Oct 2020 14:34:11 +0800 (CST)
+Received: from DESKTOP-80C7KIU.china.huawei.com (10.174.187.210) by
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Sun, 18 Oct 2020 14:34:03 +0800
+From: Zhengui li <lizhengui@huawei.com>
+To: <pbonzini@redhat.com>, <stefanha@redhat.com>, <mreitz@redhat.com>,
+ <kwolf@redhat.com>
+Subject: [PATCH] qemu-img: add support for rate limit in qemu-img commit
+Date: Sun, 18 Oct 2020 06:33:59 +0000
+Message-ID: <1603002839-1532-1-git-send-email-lizhengui@huawei.com>
+X-Mailer: git-send-email 2.6.4.windows.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: lizhengui@huawei.com
-Date: Sat, 17 Oct 2020 22:42:44 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 01:36:54
+Content-Type: text/plain
+X-Originating-IP: [10.174.187.210]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=lizhengui@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 02:34:11
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -80,43 +69,88 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, xieyingtai@huawei.com, lizhengui@huawei.com,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, mreitz@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com
+Cc: xieyingtai@huawei.com, lizhengui@huawei.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAyOTk5MzkwLTIxMzI0LTEt
-Z2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdlaS5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMg
-c2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxv
-dyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNjAyOTk5
-MzkwLTIxMzI0LTEtZ2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdlaS5jb20KU3ViamVjdDog
-W1BBVENIXSBxZW11LWltZzogYWRkIHN1cHBvcnQgZm9yIHJhdGUgbGltaXQgaW4gcWVtdS1pbWcg
-Y29udmVydAoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBh
-cnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8x
-NjAyOTk5MzkwLTIxMzI0LTEtZ2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdlaS5jb20gLT4g
-cGF0Y2hldy8xNjAyOTk5MzkwLTIxMzI0LTEtZ2l0LXNlbmQtZW1haWwtbGl6aGVuZ3VpQGh1YXdl
-aS5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpjMzk2NzJjIHFlbXUtaW1nOiBh
-ZGQgc3VwcG9ydCBmb3IgcmF0ZSBsaW1pdCBpbiBxZW11LWltZyBjb252ZXJ0Cgo9PT0gT1VUUFVU
-IEJFR0lOID09PQpFUlJPUjogY29uc2lkZXIgdXNpbmcgcWVtdV9zdHJ0b3VsbCBpbiBwcmVmZXJl
-bmNlIHRvIHN0cnRvdWxsCiM5NDogRklMRTogcWVtdS1pbWcuYzoyMzM2OgorICAgICAgICAgICAg
-dW5zaWduZWQgbG9uZyBsb25nIHN2YWwgPSBzdHJ0b3VsbChvcHRhcmcsICZlbmQsIDEwKTsKCnRv
-dGFsOiAxIGVycm9ycywgMCB3YXJuaW5ncywgOTQgbGluZXMgY2hlY2tlZAoKQ29tbWl0IGMzOTY3
-MmMyM2U1ZCAocWVtdS1pbWc6IGFkZCBzdXBwb3J0IGZvciByYXRlIGxpbWl0IGluIHFlbXUtaW1n
-IGNvbnZlcnQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09PQoK
-VGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxh
-YmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE2MDI5OTkzOTAtMjEzMjQtMS1naXQtc2Vu
-ZC1lbWFpbC1saXpoZW5ndWlAaHVhd2VpLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVz
-c2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBz
-Oi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRl
-dmVsQHJlZGhhdC5jb20=
+From: Zhengui <lizhengui@huawei.com>
+
+Currently, there is no rate limit for qemu-img commit. This may
+cause the task of qemu-img commit to consume all the bandwidth
+of the storage. This will affect the IO performance of other processes
+and virtual machines under shared storage. So we add support for
+offline rate limit in qemu-img commit to get better quality of sevice.
+
+Signed-off-by: Zhengui <lizhengui@huawei.com>
+---
+ qemu-img-cmds.hx |  4 ++--
+ qemu-img.c       | 13 +++++++++++--
+ 2 files changed, 13 insertions(+), 4 deletions(-)
+
+diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
+index b89c019..ed55b76 100644
+--- a/qemu-img-cmds.hx
++++ b/qemu-img-cmds.hx
+@@ -34,9 +34,9 @@ SRST
+ ERST
+ 
+ DEF("commit", img_commit,
+-    "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
++    "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-s speed] [-d] [-p] filename")
+ SRST
+-.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-d] [-p] FILENAME
++.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-s SPEED] [-d] [-p] FILENAME
+ ERST
+ 
+ DEF("compare", img_compare,
+diff --git a/qemu-img.c b/qemu-img.c
+index 2103507..74e4d64 100644
+--- a/qemu-img.c
++++ b/qemu-img.c
+@@ -980,6 +980,7 @@ static int img_commit(int argc, char **argv)
+     CommonBlockJobCBInfo cbi;
+     bool image_opts = false;
+     AioContext *aio_context;
++    int64_t rate_limit = 0;
+ 
+     fmt = NULL;
+     cache = BDRV_DEFAULT_CACHE;
+@@ -991,7 +992,7 @@ static int img_commit(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
+             {0, 0, 0, 0}
+         };
+-        c = getopt_long(argc, argv, ":f:ht:b:dpq",
++        c = getopt_long(argc, argv, ":f:ht:b:dpqs:",
+                         long_options, NULL);
+         if (c == -1) {
+             break;
+@@ -1026,6 +1027,14 @@ static int img_commit(int argc, char **argv)
+         case 'q':
+             quiet = true;
+             break;
++        case 's': {
++            unsigned long long sval;
++            if (qemu_strtou64(optarg, NULL, 10, &sval)) {
++                error_report("rate limit parse failed");
++                return 1;
++            }
++            rate_limit = (int64_t)sval * 1024 * 1024;
++        }   break;
+         case OPTION_OBJECT: {
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -1099,7 +1108,7 @@ static int img_commit(int argc, char **argv)
+ 
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+-    commit_active_start("commit", bs, base_bs, JOB_DEFAULT, 0,
++    commit_active_start("commit", bs, base_bs, JOB_DEFAULT, rate_limit,
+                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
+                         &cbi, false, &local_err);
+     aio_context_release(aio_context);
+-- 
+1.8.3.1
+
 
