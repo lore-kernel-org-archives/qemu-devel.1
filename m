@@ -2,90 +2,111 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CF1C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:19:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ED69C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F343421741
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:19:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3ABDE2224D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XzfBQVFl"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F343421741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CrqDb4zQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3ABDE2224D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYou-0003ed-R5
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:19:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44184)
+	id 1kUYtQ-0005VO-4T
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46306)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kUYm1-00012v-Tp
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:41 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:34237)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kUYlx-0003J8-Mp
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:41 -0400
-Received: by mail-ed1-x542.google.com with SMTP id x1so127500eds.1
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:16:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=VccOzqRTahoJBssQpE8H5vS+Wi/1LUL9l2I4wA3LzOg=;
- b=XzfBQVFl7UgGVSnL4bYO3O8cs5Z8/S4r4EExVGnDEMIsYtxUTQKUZlPJ9JUvv7HHhJ
- 4ypeIMXcuT00rW8sZVN32/rShweimSHUA31nwCEOzTRSgIgHt/7YxI3gUpPjnUNiC1Ou
- 0IsKY0HoNhoHXRrB8qvVXb3hJwuHcVhwE+qLVF/LFxYjUVnoIuwdg3R/S9CTZKfuLgri
- fPfAsO3GQn5QzSJ8iJRo4G6Hq/hhkQRVTvMi2yc+M8PP9tpTtFS1bKEnBLBNIENTBxNN
- SxnBB0KuLzNR9pmz9VjZdPWSVfa6PpflQ0QNDn9Vu1/dchvDMLebJJM+Uh6c4zpxLYA+
- 7koA==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUYsJ-0004jU-Ne
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:23:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20824)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUYsH-0004DM-Ja
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:23:11 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603128188;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iyfaajfaeY0sL3SM1O7r3+L+hK8i+b4BJi1UnSz8L/Q=;
+ b=CrqDb4zQ6VYnhW8K3xqPzIO/dmzXVgQ9KFScgKt+9Cr3flLqXkDQvV1GkC21II5MPlhd82
+ I9otTl/3/WJ/Wcv5tV7SSS9UcmdjQnbvYBexyZOg9X4lKgSRDXl7/qx6zZJjh/DkdW+GHO
+ LjIHlKAsbmsdkEqZdDRMnZ0JBcd3A5k=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-178-HdWKQuP4NM-VLegGJYupOQ-1; Mon, 19 Oct 2020 13:23:05 -0400
+X-MC-Unique: HdWKQuP4NM-VLegGJYupOQ-1
+Received: by mail-wm1-f72.google.com with SMTP id c204so70804wmd.5
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:23:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=VccOzqRTahoJBssQpE8H5vS+Wi/1LUL9l2I4wA3LzOg=;
- b=Y0DtEOI5uFkPF/75XcADLE6QilW/+mgusfkCyCou/dvZO9tF3QjGVtJUMX3z68SaLN
- oFpJEqc7LUZwZ55UjUgMebXTjRdIKUBxSA7NMuXiGqW+8n2Dfyspl/9RUM3BGYAKikTh
- dFqFTRfuzKJi7nnkpVB+NpK6cX9a3VhLsX2RKXhYSNpIKE9cGzwdWFhB+YQlFDjIpGM9
- FRIIsgd49zBZgWJBmpUjCGa9XCI038b17wFgWSXbhJDjMDa9CJUdA0R6slIZJp4yn+R4
- MG51prfxEaJHwJ0MJBKZmOg3eF/LMfIbpAZIi9BDT5IfAMsETo9AiD5sqFAWjaSAfFi0
- lFXQ==
-X-Gm-Message-State: AOAM531wjB+Lf4K7sjMxZBsTl2Jm5LmZgxXsIT8WtwtUtrCOYTMc4Wo9
- 1WLCuvoQVQSttAZiQIlSDuFkMUr8JM/VfTQZIigxuK6li04=
-X-Google-Smtp-Source: ABdhPJxYStgkTjIoOcaQJ1mzJb+lL/modMLUlgmNMB+bwiRn8tp3xQwchX11uSi6WWsWSklnEUtodBtSA4uf7eGMNfQ=
-X-Received: by 2002:a50:9548:: with SMTP id v8mr810826eda.115.1603127794312;
- Mon, 19 Oct 2020 10:16:34 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iyfaajfaeY0sL3SM1O7r3+L+hK8i+b4BJi1UnSz8L/Q=;
+ b=q7M4wkT7bJ0fMPzeVOAmK/YdioE4cPsJezZkwCYUrrP1dfppiDSw4WkZ7KayXbdXvK
+ vpZm/Idl+6T9t34JyG7XwFqA4m4VU8OEPrNaY3PFk4RCPL5V/CuYRryIJoygz8E5VYz/
+ hyRDH9+LAbgN6UzTvEghCI5fpxRPzaa5IYtrUEHv7PMs4vubCNtVlED1AfV7Z59k/0qu
+ t/a+B7bqXhW/MYF87WPaEnpJevsxtlep4/XkSZaoPva75eIGjtUF3TwwLh36jxpSecTW
+ 7tG2JJsuUKOy/1cyeLQqdAplt/DjOuPYQVdzmorO8g8AsIquhhavIFmCkRdu3P2tZW2t
+ ZkRw==
+X-Gm-Message-State: AOAM530J13wrz+d3FaJrz+L5avcv9fzESvIsKupR5T8VougdVSaSviK/
+ cJUNhtwHoZSjeBSA3mc9eK8fdgZxu/P+uMKuJsDbdrI5mjQGSI6ms9TE68x6HL4lzTWndOA0x6m
+ G47rskJI2kwi2srQ=
+X-Received: by 2002:a5d:6cae:: with SMTP id a14mr288577wra.187.1603128183968; 
+ Mon, 19 Oct 2020 10:23:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxp5a3Ur3bzuI2abaNiB2URm2K7WGwncR4g7KiOErx8Yz0Fr298GZ1uww9AHk+v60JRBVo8fw==
+X-Received: by 2002:a5d:6cae:: with SMTP id a14mr288564wra.187.1603128183784; 
+ Mon, 19 Oct 2020 10:23:03 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id m1sm247792wmm.34.2020.10.19.10.23.02
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 19 Oct 2020 10:23:03 -0700 (PDT)
+Subject: Re: ld: file not found: _PreallocMode_lookup on macOS Catalina
+To: Emmanuel Blot <eblot.ml@gmail.com>, QEMU <qemu-devel@nongnu.org>
+References: <24B952F3-465C-4AB2-AF28-6CA4722D94B7@gmail.com>
+ <3869557c-10a0-8f07-a59a-69120a522568@redhat.com>
+ <AA504B32-5134-4CDD-8CDA-6F200C7376CF@gmail.com>
+ <3C35D6D8-D9FE-4977-B27F-59CCACFEAA32@gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <34bcbf58-141b-35a1-6433-006a369827db@redhat.com>
+Date: Mon, 19 Oct 2020 19:23:02 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <CAKs3XfJPrMGxdAouGCje3ppnWKA6fXpNaywQ5rj9u45VkPuUXg@mail.gmail.com>
- <CAKs3XfJnyuZi85=7iX2eG2viP+X893qBGG=a7dAtd8=ovN-p9g@mail.gmail.com>
-In-Reply-To: <CAKs3XfJnyuZi85=7iX2eG2viP+X893qBGG=a7dAtd8=ovN-p9g@mail.gmail.com>
-From: Owen Anderson <oanderso@google.com>
-Date: Mon, 19 Oct 2020 10:16:23 -0700
-Message-ID: <CAKs3XfJB03kquRL1X3ENTapy2RCw_CwD_rEPcteO6tOQ5q32Hw@mail.gmail.com>
-Subject: Re: [RFC] Don't lookup full CPU state in the indirect branch fast
- path on AArch64 when running in user mode.
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <richard.henderson@linaro.org>, rth@twiddle.net
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=oanderso@google.com; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -175
-X-Spam_score: -17.6
-X-Spam_bar: -----------------
-X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+In-Reply-To: <3C35D6D8-D9FE-4977-B27F-59CCACFEAA32@gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,105 +119,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping
+On 19/10/20 19:16, Emmanuel Blot wrote:
+> --- undef_sh.log    2020-10-19 19:15:08.000000000 +0200
+> +++ undef_py.log    2020-10-19 19:15:20.000000000 +0200
+> @@ -1,3 +1,4 @@
+> +-Wl,-u,
+>  -Wl,-u,_PreallocMode_lookup
+>  -Wl,-u,__TRACE_CURL_CLOSE_DSTATE
+>  -Wl,-u,__TRACE_CURL_OPEN_DSTATE
+> 
+> 
+> I think it can be addressed with the following patch:
+> 
+> From d157bd508d32485dd5cdb3efcff7969a89628cc1 Mon Sep 17 00:00:00 2001
+> From: Emmanuel Blot <emmanuel.blot@sifive.com>
+> Date: Mon, 19 Oct 2020 19:07:03 +0200
+> Subject: [PATCH] Fix regression with undefined symbol filter introduced in
+>  604f3e4e.
+> 
+> ---
+>  scripts/undefsym.py | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/scripts/undefsym.py b/scripts/undefsym.py
+> index 69a895cd26..254c456f25 100644
+> --- a/scripts/undefsym.py
+> +++ b/scripts/undefsym.py
+> @@ -21,6 +21,8 @@ def filter_lines_set(stdout, from_staticlib):
+>                      continue
+>                  if not from_staticlib and tokens[1] != b'U':
+>                      continue
+> +            if not tokens[0]:
+> +                continue
+>              new_line = b'-Wl,-u,' + tokens[0]
+>              if not new_line in linesSet:
+>                  linesSet.add(new_line)
 
-On Mon, Oct 12, 2020 at 1:52 PM Owen Anderson <oanderso@google.com> wrote:
->
-> Ping.
->
-> I'd like to get feedback on how/whether this could be developed into a
-> landable version.
->
-> Thanks,
->
-> --Owen
->
-> On Tue, Sep 29, 2020 at 2:32 PM Owen Anderson <oanderso@google.com> wrote:
-> >
-> > Hello,
-> >
-> > I would like to request feedback on the following patch, which I do
-> > not believe should be applied to master as-is.  The idea here is to
-> > avoid gathering the full CPU state in the fast path of an indirect
-> > branch lookup when running in user mode on a platform where the flags
-> > can only be changed in privileged mode.  I believe this is true on the
-> > AArch64 scenario that I care about, but clearly not true in general.
-> > I'm particularly seeking feedback on how to clean this up into a
-> > version that checks the correct necessary and sufficient conditions to
-> > allow all users that can benefit from it to do so.
-> >
-> > On the workload that I am targeting (aarch64 on x86), this patch
-> > reduces execution wall time by approximately 20%, and eliminates
-> > indirect branch lookups from the hot stack traces entirely.
-> >
-> > Thank you,
-> >
-> > --Owen
-> >
-> > From 3d96db17d3baacb92ef1bc5e70ef06b97d06a0ae Mon Sep 17 00:00:00 2001
-> > From: Owen Anderson <oanderso@google.com>
-> > Date: Tue, 29 Sep 2020 13:47:00 -0700
-> > Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
-> >  AArch64 when running in user mode.
-> >
-> > Most of the CPU state can't be changed in user mode, so this is useless work.
-> >
-> > Signed-off-by: Owen Anderson <oanderso@google.com>
-> > ---
-> >  include/exec/tb-lookup.h | 15 +++++++++++++++
-> >  1 file changed, 15 insertions(+)
-> >
-> > diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
-> > index 9cf475bb03..f4ea0eb4c0 100644
-> > --- a/include/exec/tb-lookup.h
-> > +++ b/include/exec/tb-lookup.h
-> > @@ -25,7 +25,15 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
-> > *pc, target_ulong *cs_base,
-> >      TranslationBlock *tb;
-> >      uint32_t hash;
-> >
-> > +#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
-> >      cpu_get_tb_cpu_state(env, pc, cs_base, flags);
-> > +#else
-> > +    if (is_a64(env)) {
-> > +      *pc = env->pc;
-> > +    } else {
-> > +      *pc = env->regs[15];
-> > +    }
-> > +#endif
-> >      hash = tb_jmp_cache_hash_func(*pc);
-> >      tb = qatomic_rcu_read(&cpu->tb_jmp_cache[hash]);
-> >
-> > @@ -34,12 +42,19 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
-> > *pc, target_ulong *cs_base,
-> >
-> >      if (likely(tb &&
-> >                 tb->pc == *pc &&
-> > +#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
-> >                 tb->cs_base == *cs_base &&
-> >                 tb->flags == *flags &&
-> > +#endif
-> >                 tb->trace_vcpu_dstate == *cpu->trace_dstate &&
-> >                 (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cf_mask)) {
-> >          return tb;
-> >      }
-> > +
-> > +#ifdef CONFIG_USER_ONLY
-> > +    cpu_get_tb_cpu_state(env, pc, cs_base, flags);
-> > +#endif
-> > +
-> >      tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags, cf_mask);
-> >      if (tb == NULL) {
-> >          return NULL;
-> > --
-> > 2.28.0.709.gb0816b6eb0-goog
+Great, thanks.  Can you check if my patch would also work, as it would
+adhere more to the pre-conversion logic?
 
+Paolo
 
-
--- 
---Owen
 
