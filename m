@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 512FFC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 05:28:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2787C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 05:32:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C389C22243
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 05:28:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C389C22243
+	by mail.kernel.org (Postfix) with ESMTPS id 07E1622243
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 05:32:13 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 07E1622243
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47332 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUNj4-00027b-NM
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 01:28:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54206)
+	id 1kUNmG-0003xP-Si
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 01:32:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kUNaU-0003xz-K0
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 01:20:02 -0400
-Received: from mail-pg1-f195.google.com ([209.85.215.195]:46510)
+ id 1kUNaY-0003zv-PJ
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 01:20:07 -0400
+Received: from mail-pf1-f181.google.com ([209.85.210.181]:38287)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kUNaS-0005Cj-PK
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 01:20:02 -0400
-Received: by mail-pg1-f195.google.com with SMTP id q21so5313775pgi.13
- for <qemu-devel@nongnu.org>; Sun, 18 Oct 2020 22:19:59 -0700 (PDT)
+ id 1kUNaW-0005F1-60
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 01:20:05 -0400
+Received: by mail-pf1-f181.google.com with SMTP id 10so5310813pfp.5
+ for <qemu-devel@nongnu.org>; Sun, 18 Oct 2020 22:20:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=VcX5b0rIH1CAwWo8IR5Ccs4kmN3tFttlmfq40I1XE5k=;
- b=VYL428QAzUmr3JVV8t4hLoN7sSA6u6eM564UDVqSlIfd+66NceMcBTgVoFvaNu69Sw
- 7QSFZg+sVlZN6O9C8f/VRCOaZW0GHFIw3z2BOaLP7HBfbvWqLeJEBkoe6frasM2M+lWi
- LgnkRRRqpWTAHoe6IeR8crKv/Hkbyx+XwflwHlmKfZITaxNVRjal1oZnQ3XpqduHZqug
- kv8Do/+61gs62x1aHpPwj2HBdoORQiE8T/ssJYXGRYQ4/0zSjMOie1bn4EsBttekClzn
- mnLqZceryMt6DUjRotsXbCKkImXgZ1A0P7e4URAgKvz1yXpfu5EYfT15i1uTgJR9JsfA
- JIIQ==
-X-Gm-Message-State: AOAM533ieprpmgW7GLIel0Dc+Rn/yggUVpeXiocs1CM7AkB07gGFXJqi
- qJV31tTTRAW6dyR6gNCx3y3LXrFlite4RQ==
-X-Google-Smtp-Source: ABdhPJzqiPkSE6fRqUGHmC+Ve9AXn5jD0eQRv0MeX5Ow5A5Eu/Mw+Pul6Aj8fSz5/aI5IXtE2heFlg==
-X-Received: by 2002:a62:1b02:0:b029:154:fdbe:4d2a with SMTP id
- b2-20020a621b020000b0290154fdbe4d2amr15239881pfb.27.1603084797723; 
- Sun, 18 Oct 2020 22:19:57 -0700 (PDT)
+ bh=yMXkuvLteAigHqW9O1WnZdSVRLVrRCLRnjpnByL1edY=;
+ b=DHCKxkEyG8dbaGWbiyN1d3ZFR9/7uf955hLBvHzC/NSANGFpTGCEZAYIGYCG8CsrNT
+ 2NU0F0/TbJk0mtaX68PVzu+GhMTFzqnn50y0YGaxF1DUBFSOI2H49BoCvg0VP1iY3qxj
+ JQSs86Qo/e9Ax8p7G6/RSZlinmOMSNsByxl4WmB5WAq+G5ryHxNwtzUJ5VsyCYoKkwLJ
+ x00snvOFjOR5NFp8Q1iiHUZgTiG5+KU7Jv6E22rlt1fsevNzMIpjp3uIXgPeRku1CE+z
+ /4KFHuX4CUUoVtc9vzxCYxN1A0kDC0CFN/+SaLELq0OwgX7R1nCCKVfT03laP5oikMQ4
+ z7wA==
+X-Gm-Message-State: AOAM5322fBRUPEWBJJzsAyEvx3iUFumwyDZ5l7ces0uVbQYIv4yxn6l5
+ ZQCAmdNHWb/4c4OMapQ9v82dNWEdn+I=
+X-Google-Smtp-Source: ABdhPJyODetit+QhkgmMlp21XvSDsalwlaZBurpl7NV+xkBrhORuhOjnficdZ/1CNEmZB/Y7PF+6EA==
+X-Received: by 2002:a63:ed15:: with SMTP id d21mr10853795pgi.348.1603084802283; 
+ Sun, 18 Oct 2020 22:20:02 -0700 (PDT)
 Received: from localhost.localdomain ([73.93.152.253])
- by smtp.gmail.com with ESMTPSA id p6sm10673904pjd.1.2020.10.18.22.19.57
+ by smtp.gmail.com with ESMTPSA id p6sm10673904pjd.1.2020.10.18.22.20.01
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 18 Oct 2020 22:19:57 -0700 (PDT)
+ Sun, 18 Oct 2020 22:20:01 -0700 (PDT)
 From: Joelle van Dyne <j@getutm.app>
 To: qemu-devel@nongnu.org
-Subject: [PATCH RESEND v2 2/9] configure: cross-compiling without cross_prefix
-Date: Sun, 18 Oct 2020 22:19:46 -0700
-Message-Id: <20201019051953.90107-3-j@getutm.app>
+Subject: [PATCH RESEND v2 4/9] coroutine: add libucontext as external library
+Date: Sun, 18 Oct 2020 22:19:48 -0700
+Message-Id: <20201019051953.90107-5-j@getutm.app>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201019051953.90107-1-j@getutm.app>
 References: <20201019051953.90107-1-j@getutm.app>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.215.195;
- envelope-from=osy86github@gmail.com; helo=mail-pg1-f195.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:19:58
+Received-SPF: pass client-ip=209.85.210.181;
+ envelope-from=osy86github@gmail.com; helo=mail-pf1-f181.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:20:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -13
 X-Spam_score: -1.4
@@ -89,74 +88,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Joelle van Dyne <j@getutm.app>
+Cc: Kevin Wolf <kwolf@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: osy <osy86@users.noreply.github.com>
 
-The iOS toolchain does not use the host prefix naming convention. We add a
-new option `--enable-cross-compile` that forces cross-compile even without
-a cross_prefix.
+iOS does not support ucontext natively for aarch64 and the sigaltstack is
+also unsupported (even worse, it fails silently, see:
+https://openradar.appspot.com/13002712 )
+
+As a workaround we include a library implementation of ucontext and add it
+as a build option.
 
 Signed-off-by: Joelle van Dyne <j@getutm.app>
 ---
- configure | 13 ++++++++++++-
- 1 file changed, 12 insertions(+), 1 deletion(-)
+ configure                 | 23 ++++++++++++++++++++---
+ meson.build               | 29 ++++++++++++++++++++++++++++-
+ util/coroutine-ucontext.c |  9 +++++++++
+ .gitmodules               |  3 +++
+ libucontext               |  1 +
+ meson_options.txt         |  2 ++
+ 6 files changed, 63 insertions(+), 4 deletions(-)
+ create mode 160000 libucontext
 
 diff --git a/configure b/configure
-index ea1753c117..ced6d2e961 100755
+index 12d65397b1..e7e6ba2c45 100755
 --- a/configure
 +++ b/configure
-@@ -234,6 +234,7 @@ cpu=""
- iasl="iasl"
- interp_prefix="/usr/gnemul/qemu-%M"
- static="no"
-+cross_compile="no"
- cross_prefix=""
- audio_drv_list=""
- block_drv_rw_whitelist=""
-@@ -457,6 +458,11 @@ for opt do
-   optarg=$(expr "x$opt" : 'x[^=]*=\(.*\)')
-   case "$opt" in
-   --cross-prefix=*) cross_prefix="$optarg"
-+                    cross_compile="yes"
+@@ -1757,7 +1757,7 @@ Advanced options (experts only):
+   --oss-lib                path to OSS library
+   --cpu=CPU                Build for host CPU [$cpu]
+   --with-coroutine=BACKEND coroutine backend. Supported options:
+-                           ucontext, sigaltstack, windows
++                           ucontext, libucontext, sigaltstack, windows
+   --enable-gcov            enable test coverage analysis with gcov
+   --disable-blobs          disable installing provided firmware blobs
+   --with-vss-sdk=SDK-path  enable Windows VSS support in QEMU Guest Agent
+@@ -4929,6 +4929,8 @@ if test "$coroutine" = ""; then
+     coroutine=win32
+   elif test "$ucontext_works" = "yes"; then
+     coroutine=ucontext
++  elif test "$ios" = "yes"; then
++    coroutine=libucontext
+   else
+     coroutine=sigaltstack
+   fi
+@@ -4952,12 +4954,27 @@ else
+       error_exit "only the 'windows' coroutine backend is valid for Windows"
+     fi
+     ;;
++  libucontext)
 +  ;;
-+  --enable-cross-compile) cross_compile="yes"
-+  ;;
-+  --disable-cross-compile) cross_compile="no"
-   ;;
-   --cc=*) CC="$optarg"
-   ;;
-@@ -879,6 +885,10 @@ for opt do
-   ;;
-   --cross-prefix=*)
-   ;;
-+  --enable-cross-compile)
-+  ;;
-+  --disable-cross-compile)
-+  ;;
-   --cc=*)
-   ;;
-   --host-cc=*) host_cc="$optarg"
-@@ -1688,6 +1698,7 @@ Advanced options (experts only):
-   --efi-aarch64=PATH       PATH of efi file to use for aarch64 VMs.
-   --with-suffix=SUFFIX     suffix for QEMU data inside datadir/libdir/sysconfdir/docdir [$qemu_suffix]
-   --with-pkgversion=VERS   use specified string as sub-version of the package
-+  --enable-cross-compile   enable cross compiling (set automatically if $cross_prefix is set)
-   --enable-debug           enable common debug build options
-   --enable-sanitizers      enable default sanitizers
-   --enable-tsan            enable thread sanitizer
-@@ -7023,7 +7034,7 @@ if has $sdl2_config; then
+   *)
+     error_exit "unknown coroutine backend $coroutine"
+     ;;
+   esac
  fi
- echo "strip = [$(meson_quote $strip)]" >> $cross
- echo "windres = [$(meson_quote $windres)]" >> $cross
--if test -n "$cross_prefix"; then
-+if test "$cross_compile" = "yes"; then
-     cross_arg="--cross-file config-meson.cross"
-     echo "[host_machine]" >> $cross
-     if test "$mingw32" = "yes" ; then
+ 
++case $coroutine in
++libucontext)
++  git_submodules="${git_submodules} libucontext"
++  mkdir -p libucontext
++  coroutine_impl=ucontext
++  libucontext="enabled"
++  ;;
++*)
++  coroutine_impl=$coroutine
++  libucontext="disabled"
++  ;;
++esac
++
+ if test "$coroutine_pool" = ""; then
+   coroutine_pool=yes
+ fi
+@@ -6534,7 +6551,7 @@ if test "$rbd" = "yes" ; then
+   echo "RBD_LIBS=$rbd_libs" >> $config_host_mak
+ fi
+ 
+-echo "CONFIG_COROUTINE_BACKEND=$coroutine" >> $config_host_mak
++echo "CONFIG_COROUTINE_BACKEND=$coroutine_impl" >> $config_host_mak
+ if test "$coroutine_pool" = "yes" ; then
+   echo "CONFIG_COROUTINE_POOL=1" >> $config_host_mak
+ else
+@@ -7133,7 +7150,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+         -Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+         -Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
+         -Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
+-        -Diconv=$iconv -Dcurses=$curses \
++        -Diconv=$iconv -Dcurses=$curses -Ducontext=$libucontext \
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
+diff --git a/meson.build b/meson.build
+index ea7c10ba08..888a3b156d 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1170,9 +1170,35 @@ if not fdt.found() and fdt_required.length() > 0
+   error('fdt not available but required by targets ' + ', '.join(fdt_required))
+ endif
+ 
++ucontext = not_found
++slirp_opt = 'disabled'
++if get_option('ucontext').enabled()
++  if not fs.is_dir(meson.current_source_dir() / 'libucontext/arch' / cpu)
++    error('libucontext is wanted but not implemented for host ' + cpu)
++  endif
++  arch = host_machine.cpu()
++  ucontext_cargs = ['-DG_LOG_DOMAIN="ucontext"', '-DCUSTOM_IMPL']
++  ucontext_files = [
++    'libucontext/arch' / arch / 'getcontext.S',
++    'libucontext/arch' / arch / 'setcontext.S',
++    'libucontext/arch' / arch / 'makecontext.c',
++    'libucontext/arch' / arch / 'startcontext.S',
++    'libucontext/arch' / arch / 'swapcontext.S',
++  ]
++
++  ucontext_inc = include_directories('libucontext/include')
++  libucontext = static_library('ucontext',
++                               sources: ucontext_files,
++                               c_args: ucontext_cargs,
++                               include_directories: ucontext_inc)
++  ucontext = declare_dependency(link_with: libucontext,
++                                include_directories: ucontext_inc)
++endif
++
+ config_host_data.set('CONFIG_CAPSTONE', capstone.found())
+ config_host_data.set('CONFIG_FDT', fdt.found())
+ config_host_data.set('CONFIG_SLIRP', slirp.found())
++config_host_data.set('CONFIG_LIBUCONTEXT', ucontext.found())
+ 
+ #####################
+ # Generated sources #
+@@ -1399,7 +1425,7 @@ util_ss.add_all(trace_ss)
+ util_ss = util_ss.apply(config_all, strict: false)
+ libqemuutil = static_library('qemuutil',
+                              sources: util_ss.sources() + stub_ss.sources() + genh,
+-                             dependencies: [util_ss.dependencies(), m, glib, socket, malloc])
++                             dependencies: [util_ss.dependencies(), m, glib, socket, malloc, ucontext])
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
+ 
+@@ -2049,6 +2075,7 @@ if targetos == 'windows'
+   summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI')}
+ endif
+ summary_info += {'seccomp support':   config_host.has_key('CONFIG_SECCOMP')}
++summary_info += {'libucontext support': ucontext.found()}
+ summary_info += {'coroutine backend': config_host['CONFIG_COROUTINE_BACKEND']}
+ summary_info += {'coroutine pool':    config_host['CONFIG_COROUTINE_POOL'] == '1'}
+ summary_info += {'debug stack usage': config_host.has_key('CONFIG_DEBUG_STACK_USAGE')}
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index 904b375192..1e1dd43512 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -23,7 +23,16 @@
+ #undef _FORTIFY_SOURCE
+ #endif
+ #include "qemu/osdep.h"
++#if defined(CONFIG_LIBUCONTEXT)
++#include <libucontext.h>
++#define ucontext_t libucontext_ucontext_t
++#define getcontext libucontext_getcontext
++#define setcontext libucontext_setcontext
++#define swapcontext libucontext_swapcontext
++#define makecontext libucontext_makecontext
++#else
+ #include <ucontext.h>
++#endif
+ #include "qemu/coroutine_int.h"
+ 
+ #ifdef CONFIG_VALGRIND_H
+diff --git a/.gitmodules b/.gitmodules
+index 2bdeeacef8..065b52867f 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -64,3 +64,6 @@
+ [submodule "roms/vbootrom"]
+ 	path = roms/vbootrom
+ 	url = https://git.qemu.org/git/vbootrom.git
++[submodule "libucontext"]
++	path = libucontext
++	url = https://github.com/utmapp/libucontext.git
+diff --git a/libucontext b/libucontext
+new file mode 160000
+index 0000000000..7094e4c427
+--- /dev/null
++++ b/libucontext
+@@ -0,0 +1 @@
++Subproject commit 7094e4c42723b6178a4e2b60d4631d8a88f40719
+diff --git a/meson_options.txt b/meson_options.txt
+index e6cb1e589b..4e3f2e6b99 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -52,6 +52,8 @@ option('vnc_sasl', type : 'feature', value : 'auto',
+        description: 'SASL authentication for VNC server')
+ option('xkbcommon', type : 'feature', value : 'auto',
+        description: 'xkbcommon support')
++option('ucontext', type : 'feature', value : 'disabled',
++       description: 'libucontext support')
+ 
+ option('capstone', type: 'combo', value: 'auto',
+        choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
 -- 
 2.24.3 (Apple Git-128)
 
