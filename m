@@ -2,87 +2,98 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F2BC43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93221C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:19:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B0E18222C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:06:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C417F222C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:19:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kjx64Qu2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0E18222C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="T23FQopO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C417F222C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56536 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36592 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUKZ2-0005bP-QH
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 22:06:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53958)
+	id 1kUKm4-0001Nb-KU
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 22:19:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56128)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kUKYC-0004vJ-QR; Sun, 18 Oct 2020 22:05:28 -0400
-Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:35897)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kUKYA-0002rR-Vv; Sun, 18 Oct 2020 22:05:28 -0400
-Received: by mail-yb1-xb43.google.com with SMTP id f140so7542307ybg.3;
- Sun, 18 Oct 2020 19:05:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=23Cikbh05ukXkcHCv9z0Pt7LyTI4adA1SHYWMMMzxZI=;
- b=Kjx64Qu2H6zPmdz2XOuf6SKzTotcTH6thnJe/q5+iX7JBXMx7O7h1Ecj1Jz9cRfB+H
- 5AX43YVGxdQwWSlLhYQjTqtaTh/qoCFrFNiwgPvouGifhwPAfGZOTE2nKY6kwL6XKXuD
- 92098R9q+ks51yTuZcNv5gUZNqRknHJd9qzga3tD0KlIEe1+Mwx7Ll0hwm17qWf+eDTm
- bqRSbBa2YTEbGC5syWwOdKsS46GRid8SLIAAyWXKcIMyFMry4KSOrzXLntiJng5hjNbq
- cgyC5PVaoqAaKjDWewSgKOl0xkpVJrW85vA4s4HHn233Qf7IRFwsuNEflBIghlNSfRY7
- iN9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=23Cikbh05ukXkcHCv9z0Pt7LyTI4adA1SHYWMMMzxZI=;
- b=qb8sir3xzb7/LNoQw4P/WMkwj/Be3mkkATuS8TPphg7MQ0KCVvc/LYZZMZf4pgOtg7
- Mrg/whU7ADtbsZhsGyb5Oze2Tz+qLIkMfYgkZFUomo1OTR0u0Xv9o0MLnwp9oYdX0GHH
- xmtZGj7m+0nzWuvVpGYozDohRM94r697wwjsvsLZc00HZ0R/OBDNIj2mnx1oP4gJotFq
- 0Qrt9jeh08oXvpWEdm2VsHevungtnbtzaFqbgIBqDOukkQHBNwXOr1wSzVdMvQ318rfZ
- tLctMLZbPTFqySTMzTeYDB/yD7r2uDFsdFZzm41R3MxIcm3bOMO0+2OUxOVUeg/eNAD/
- DkXw==
-X-Gm-Message-State: AOAM530poyoqfRi0IwSK0vmGxRoMh5v+PLo6RtipnrVgQKzNGkDlmPgZ
- MhVkXQzaZieYCnk9HVh9czAE70T0YkddqFW3Evs=
-X-Google-Smtp-Source: ABdhPJzuP0crXM5Dtk7hdVDjD/YG4wC5QjvnoHN7tr8aRMrV2IsFbtvspfe/84I5TICv3PGocGqEJjjqUqkPv6gjtcw=
-X-Received: by 2002:a25:705:: with SMTP id 5mr18975685ybh.239.1603073123878;
- Sun, 18 Oct 2020 19:05:23 -0700 (PDT)
+ (Exim 4.90_1)
+ (envelope-from <prvs=5541069a6=dmitry.fomichev@wdc.com>)
+ id 1kUKk3-0007yk-2H; Sun, 18 Oct 2020 22:17:43 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44111)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=5541069a6=dmitry.fomichev@wdc.com>)
+ id 1kUKk0-0004HN-Qs; Sun, 18 Oct 2020 22:17:42 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1603073860; x=1634609860;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=SMG2Ngfk2iZA+zlHITm2D7Ljs/qojB/EptGd2Tv57Vk=;
+ b=T23FQopODkMV2FrdB0cKCl/dUpWzkBnJA6l7z7kQVqVcrjh39ZPKFhyb
+ C0Bv35uZCv5y44UD6YpH6HM9HN18ssVOSCW3L+0OahYF9TqCSGKznL2rY
+ g6aWK23s28jc/T875j8MBVaKM0nUu7JtRI4LyXh6ogzsq9YBzw83rd3p0
+ FJwcQ9lIBqy3PiC0Xo0swHGNaMRRiRHlsPgKhB5ZYxasusGFrgOtoQHil
+ H9rW2PDg1uyW/eEKe7GI0t/BHaaaU1OWfGHQUH8WfZN1q5oonkFZFrJyS
+ 5voV+GJv0jDe45uzyxMh0vQljAJlUAt6UG+V/MgeZHKbTafAS3XNc6Bo1 A==;
+IronPort-SDR: Q4jg9hl2b32M4XjpU6F3D23oorXeAfw421It+Md3aYXRje1LYqE+zZgGGevD7MPCMvxFrN8L8Q
+ kEFucQ1F+7lc797flUdLSqGBdBkvubUNvk309sPdRsDqHFNnf8qayLtDnDVg39kguRcyxA4R3h
+ bWGzx7syk+eAcCyiRgpar7zN2X8Jmv6zapGF7AwOyvoXUkfjtDUQkckSbs8U9z43X/h3BWvdwP
+ EUdq6ECZF3cP1JH3lwb9rJ2NiG1vi8WYLJn7/O0i7472lNn4XMNQzek0oYhQQdpOoNuynZNbfO
+ TLI=
+X-IronPort-AV: E=Sophos;i="5.77,393,1596470400"; d="scan'208";a="150207953"
+Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
+ ([199.255.45.15])
+ by ob1.hgst.iphmx.com with ESMTP; 19 Oct 2020 10:17:36 +0800
+IronPort-SDR: vJvuw3oZ+dksJGtfGVP72pkxbm+xCWlReSwjfQimDuGz2kPDGF09cAP2kTJb8U9W9A6OVdgbd4
+ ITrbXZbENE9qx4f+4zQPKZ+1WYzW7NeY0YM24FpK4lykHMmfqnCcu8X6IMXXhGCIpNTM4/TcZs
+ DHcgKs2I767uVFl8QhDScILkpzkcOSLyCp85xrLtUXo7ZKG2WX9kJ+sWSPO4Hw2/zDuatFAqSP
+ gyMDJLnmo5wmpFWoVCFasoOyxbajdJHq6xULyeFuxRC4VX1CcbdpA7TKSf3jPbmpkEM9fLtdeK
+ jpnezXoJldI5eO1W2WQuAw6V
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 18 Oct 2020 19:03:13 -0700
+IronPort-SDR: 2nyalcMwhW2hQEqyL+YPE1vJgULz0IcsCV5RvqYQTSYxX2QofLg6WJ3V+dFndtXWDqmWa1NqnK
+ +pO+SxwB8QjEdYegEI7UhmVrVrw2de8KrpareQqZ3ZdPN43PkKhW6FuhbubaKvzKXfxUVAEAZT
+ Z6j5wrnc51VwmHzm3V3KhNOge2+s4ao6+snXDaiPxTf/SL09DhdZj0Ac85iewJSU9EZ5s7+HGZ
+ +616iSO/OByHd1x1iquu/aSh3fCZFK42f54oUbEVj8qbYQGB0ID6Yk5Cjv8K8KvpCyzfjM4+sW
+ hE4=
+WDCIronportException: Internal
+Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
+ by uls-op-cesaip02.wdc.com with ESMTP; 18 Oct 2020 19:17:35 -0700
+From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
+ Kevin Wolf <kwolf@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
+Subject: [PATCH v7 02/11] hw/block/nvme: Generate namespace UUIDs
+Date: Mon, 19 Oct 2020 11:17:17 +0900
+Message-Id: <20201019021726.12048-3-dmitry.fomichev@wdc.com>
+X-Mailer: git-send-email 2.21.0
+In-Reply-To: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
+References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-References: <20201016123737.8118-1-ivan.griffin@emdalo.com>
- <CAKmqyKNykruYK2AQ05KZyGCGD0rUsqQOVBbnccY+ELATBF=Ozg@mail.gmail.com>
- <DB7PR10MB191544AA04D0B3ECF82C57CDFE030@DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM>
-In-Reply-To: <DB7PR10MB191544AA04D0B3ECF82C57CDFE030@DB7PR10MB1915.EURPRD10.PROD.OUTLOOK.COM>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 19 Oct 2020 10:05:12 +0800
-Message-ID: <CAEUhbmVPzOuP3kuMhZB2JgN47nnzL7p9+meyhyBK7kRAhu5BCw@mail.gmail.com>
-Subject: Re: [PATCH] hw/riscv: microchip_pfsoc: IOSCBCTRL memmap entry
-To: Ivan Griffin <ivan.griffin@emdalo.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.42;
+ envelope-from=prvs=5541069a6=dmitry.fomichev@wdc.com; helo=esa4.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 22:17:33
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,74 +107,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- Alistair Francis <alistair23@gmail.com>, Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Niklas Cassel <niklas.cassel@wdc.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
+ Alistair Francis <alistair.francis@wdc.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Ivan,
+In NVMe 1.4, a namespace must report an ID descriptor of UUID type
+if it doesn't support EUI64 or NGUID. Add a new namespace property,
+"uuid", that provides the user the option to either specify the UUID
+explicitly or have a UUID generated automatically every time a
+namespace is initialized.
 
-On Sat, Oct 17, 2020 at 12:31 AM Ivan Griffin <ivan.griffin@emdalo.com> wro=
-te:
->
-> I don't know why it isn't documented in that PDF (or in the register map)=
-, but if you check https://github.com/polarfire-soc/polarfire-soc-bare-meta=
-l-library/blob/master/src/platform/drivers/mss_sys_services/mss_sys_service=
-s.h you'll see the following
->
-> ```
-> typedef struct
-> {
->     volatile uint32_t SOFT_RESET;
->     volatile uint32_t VDETECTOR;
->     volatile uint32_t TVS_CONTROL;
->     volatile uint32_t TVS_TEMP_A;
->     volatile uint32_t TVS_TEMP_B;
->     volatile uint32_t TVS_TEMP_C;
->     volatile uint32_t TVS_VOLT_A;
->     volatile uint32_t TVS_VOLT_B;
->     volatile uint32_t TVS_VOLT_C;
->     volatile uint32_t TVS_OUTPUT0;
->     volatile uint32_t TVS_OUTPUT1;
->     volatile uint32_t TVS_TRIGGER;
->     volatile uint32_t TRIM_VDET1P05;
->     volatile uint32_t TRIM_VDET1P8;
->     volatile uint32_t TRIM_VDET2P5;
->     volatile uint32_t TRIM_TVS;
->     volatile uint32_t TRIM_GDET1P05;
->     volatile uint32_t RESERVED0;
->     volatile uint32_t RESERVED1;
->     volatile uint32_t RESERVED2;
->     volatile uint32_t SERVICES_CR;
->     volatile uint32_t SERVICES_SR;
->     volatile uint32_t USER_DETECTOR_SR;
->     volatile uint32_t USER_DETECTOR_CR;
->     volatile uint32_t MSS_SPI_CR;
->
-> } SCBCTRL_TypeDef;
->
-> #define MSS_SCBCTRL                    ((SCBCTRL_TypeDef*) (0x37020000UL)=
-)
->
-> /*2kB bytes long mailbox.*/
-> #define MSS_SCBMAILBOX                 ((uint32_t*) (0x37020800UL))
-> ```
->
-> And in https://github.com/polarfire-soc/polarfire-soc-bare-metal-library/=
-blob/master/src/platform/drivers/mss_sys_services/mss_sys_services.c you'll=
- see MSS_SCB and MSS_SCBMAILBOX used in many places to interact with the FP=
-GA system controller to perform various services.
+Suggested-by: Klaus Jansen <its@irrelevant.dk>
+Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Reviewed-by: Klaus Jansen <its@irrelevant.dk>
+---
+ hw/block/nvme-ns.c | 1 +
+ hw/block/nvme-ns.h | 1 +
+ hw/block/nvme.c    | 9 +++++----
+ 3 files changed, 7 insertions(+), 4 deletions(-)
 
-It's actually documented, but not in the PDF file. I also spent some
-time locating the doc when I do the DDR controller modeling work.
+diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+index b69cdaf27e..de735eb9f3 100644
+--- a/hw/block/nvme-ns.c
++++ b/hw/block/nvme-ns.c
+@@ -129,6 +129,7 @@ static void nvme_ns_realize(DeviceState *dev, Error **errp)
+ static Property nvme_ns_props[] = {
+     DEFINE_BLOCK_PROPERTIES(NvmeNamespace, blkconf),
+     DEFINE_PROP_UINT32("nsid", NvmeNamespace, params.nsid, 0),
++    DEFINE_PROP_UUID("uuid", NvmeNamespace, params.uuid),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/block/nvme-ns.h b/hw/block/nvme-ns.h
+index ea8c2f785d..a38071884a 100644
+--- a/hw/block/nvme-ns.h
++++ b/hw/block/nvme-ns.h
+@@ -21,6 +21,7 @@
+ 
+ typedef struct NvmeNamespaceParams {
+     uint32_t nsid;
++    QemuUUID uuid;
+ } NvmeNamespaceParams;
+ 
+ typedef struct NvmeNamespace {
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 5a9493d89f..29139d8a17 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1574,6 +1574,7 @@ static uint16_t nvme_identify_nslist(NvmeCtrl *n, NvmeRequest *req)
+ 
+ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+ {
++    NvmeNamespace *ns;
+     NvmeIdentify *c = (NvmeIdentify *)&req->cmd;
+     uint32_t nsid = le32_to_cpu(c->nsid);
+     uint8_t list[NVME_IDENTIFY_DATA_SIZE];
+@@ -1593,7 +1594,8 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+         return NVME_INVALID_NSID | NVME_DNR;
+     }
+ 
+-    if (unlikely(!nvme_ns(n, nsid))) {
++    ns = nvme_ns(n, nsid);
++    if (unlikely(!ns)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ 
+@@ -1602,12 +1604,11 @@ static uint16_t nvme_identify_ns_descr_list(NvmeCtrl *n, NvmeRequest *req)
+     /*
+      * Because the NGUID and EUI64 fields are 0 in the Identify Namespace data
+      * structure, a Namespace UUID (nidt = 0x3) must be reported in the
+-     * Namespace Identification Descriptor. Add a very basic Namespace UUID
+-     * here.
++     * Namespace Identification Descriptor. Add the namespace UUID here.
+      */
+     ns_descrs->uuid.hdr.nidt = NVME_NIDT_UUID;
+     ns_descrs->uuid.hdr.nidl = NVME_NIDT_UUID_LEN;
+-    stl_be_p(&ns_descrs->uuid.v, nsid);
++    memcpy(&ns_descrs->uuid.v, ns->params.uuid.data, NVME_NIDT_UUID_LEN);
+ 
+     return nvme_dma(n, list, NVME_IDENTIFY_DATA_SIZE,
+                     DMA_DIRECTION_FROM_DEVICE, req);
+-- 
+2.21.0
 
-See Register Map/PF_SoC_RegMap_V1_1/MPFS250T/pfsoc_control_scb.htm in
-https://www.microsemi.com/document-portal/doc_download/1244581-polarfire-so=
-c-register-map
-
-Regards,
-Bin
 
