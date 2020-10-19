@@ -2,78 +2,82 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB198C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54D38C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4B59A22243
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ADAB122243
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAXfaHgz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B59A22243
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y5/DEvjC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADAB122243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42512 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUQ4u-0004gt-8f
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:59:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54276)
+	id 1kUQ5F-0005E1-O3
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:59:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54840)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyI-0005CV-2x
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28240)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUQ0t-0000HR-V9
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:55:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39802)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyG-00086u-6O
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:45 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUQ0s-0000dv-0e
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:55:27 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603093963;
+ s=mimecast20190719; t=1603094125;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jpBjHoJ7TJJFHT0NNFAxXbhXswV7KiWZ0nZ17TzYQcQ=;
- b=SAXfaHgzZbqpV4YFK8x1a4aw8LoHaaSxi2m1aT4SO4uCcEIJtWoQrvsNvsl5l4pohZwLsV
- S53JDMXMcQHJi4v+f5ZRKsj1BAM3DPWq7Eox0V8BoSniERHtkV6zJcM8wku9+Svfj3asoY
- eSBODij0MgFI+CQxi3sbuOQ4RIFI4g8=
+ bh=9nkt/Ojpp8+FXMDervNsVDCE8IqKlxbRoOzcaqnkKeo=;
+ b=Y5/DEvjC5Q98+9LNGjkxUBaB7YqdP2Ni+Obk9c+GwevgyDpHLwmCRbUDnj4kNea18Hpdiq
+ x6VmvRpsPV82+1WYtYCVTZygjwHd58s6bPfPNjqJdgOJdCNw9t/Nc9dQSqMbj9zs6q3PkR
+ K/gdhEcI00QU49yBNvln2IYOzR4116E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-256-MgXP2-mANK2W-lEAULE5AQ-1; Mon, 19 Oct 2020 03:52:41 -0400
-X-MC-Unique: MgXP2-mANK2W-lEAULE5AQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-370-vigFfHzgNtOZF01_4Zggkw-1; Mon, 19 Oct 2020 03:55:23 -0400
+X-MC-Unique: vigFfHzgNtOZF01_4Zggkw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DA12846360
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6057B7A0;
- Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id B023F9A94; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 12/14] spice: flip modules switch
-Date: Mon, 19 Oct 2020 09:52:22 +0200
-Message-Id: <20201019075224.14803-13-kraxel@redhat.com>
-In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
-References: <20201019075224.14803-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52302185A0F0
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:55:22 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 20C621A4D6;
+ Mon, 19 Oct 2020 07:55:22 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 9AD341132A08; Mon, 19 Oct 2020 09:55:20 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 0/5] qapi: Restrict machine (and migration) specific
+ commands
+References: <20201012121536.3381997-1-philmd@redhat.com>
+ <20201015182824.GG5733@habkost.net>
+Date: Mon, 19 Oct 2020 09:55:20 +0200
+In-Reply-To: <20201015182824.GG5733@habkost.net> (Eduardo Habkost's message of
+ "Thu, 15 Oct 2020 14:28:24 -0400")
+Message-ID: <87ft6a1wgn.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,53 +100,27 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Build spice core code as module.  This removes libspice-server and a
-handful of indirect dependencies from core qemu.  The number of shared
-libraries for qemu-system-x86_64 goes down from 73 to 66 on my system.
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- ui/meson.build | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+> On Mon, Oct 12, 2020 at 02:15:31PM +0200, Philippe Mathieu-Daud=C3=A9 wro=
+te:
+>> Reduce the machine code pulled into qemu-storage-daemon.
+>>=20
+>> The series is fully Acked, but Markus wants it reviewed
+>> by the Machine core maintainers.
+>
+> I've confirmed that all patches move QAPI schema code without
+> introducing any additional changes.
+>
+> Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
 
-diff --git a/ui/meson.build b/ui/meson.build
-index fc1b31daec47..996e1d13ab34 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -15,7 +15,6 @@ softmmu_ss.add(files(
- softmmu_ss.add([spice_headers, files('spice-module.c')])
- 
- softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('input-linux.c'))
--softmmu_ss.add(when: [spice, 'CONFIG_SPICE'], if_true: files('spice-core.c', 'spice-input.c', 'spice-display.c'))
- softmmu_ss.add(when: cocoa, if_true: files('cocoa.m'))
- 
- vnc_ss = ss.source_set()
-@@ -71,6 +70,16 @@ if sdl.found()
-   ui_modules += {'sdl' : sdl_ss}
- endif
- 
-+if config_host.has_key('CONFIG_SPICE')
-+  spice_core_ss = ss.source_set()
-+  spice_core_ss.add(spice, pixman, files(
-+    'spice-core.c',
-+    'spice-input.c',
-+    'spice-display.c'
-+  ))
-+  ui_modules += {'spice-core' : spice_core_ss}
-+endif
-+
- if config_host.has_key('CONFIG_SPICE') and config_host.has_key('CONFIG_GIO')
-   spice_ss = ss.source_set()
-   spice_ss.add(spice, gio, pixman, files('spice-app.c'))
--- 
-2.27.0
+I take this as "I agree the things moved to machine.json belong there".
+Holler if I'm mistaken.
 
 
