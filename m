@@ -7,56 +7,56 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59C14C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18E33C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:58:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7FEC122400
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:53:05 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FEC122400
+	by mail.kernel.org (Postfix) with ESMTPS id 58EC122400
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:58:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58EC122400
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUd5U-0002WA-Ca
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 17:53:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49398)
+	id 1kUdAf-0005Tm-8Q
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 17:58:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUd4u-00026t-Nj
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:52:28 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34866
+ id 1kUd9i-0004dv-7W
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:57:27 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34876
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUd4r-0005YP-8P
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:52:28 -0400
+ id 1kUd9Z-0006FE-Ed
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:57:20 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUd4q-0002IO-Ox; Mon, 19 Oct 2020 22:52:28 +0100
+ id 1kUd9X-0002Jb-RA; Mon, 19 Oct 2020 22:57:20 +0100
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20201012170950.3491912-1-f4bug@amsat.org>
- <20201012170950.3491912-5-f4bug@amsat.org>
+ <20201012170950.3491912-6-f4bug@amsat.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <6e7036fd-da9c-c7b9-b606-91414bb92e1e@ilande.co.uk>
-Date: Mon, 19 Oct 2020 22:52:17 +0100
+Message-ID: <1bac5940-6e9d-fce8-6f42-bad484a94c34@ilande.co.uk>
+Date: Mon, 19 Oct 2020 22:57:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201012170950.3491912-5-f4bug@amsat.org>
+In-Reply-To: <20201012170950.3491912-6-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 4/6] hw/pci-host/sabre: Report unimplemented accesses via
- UNIMP log_mask
+Subject: Re: [PATCH 5/6] hw/pci-host/sabre: Report IOMMU address range as
+ unimplemented
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -87,49 +87,41 @@ Sender: "Qemu-devel"
 
 On 12/10/2020 18:09, Philippe Mathieu-Daudé wrote:
 
-> Report unimplemented register accesses using qemu_log_mask(UNIMP).
-> 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->   hw/pci-host/sabre.c | 12 ++++++++----
->   1 file changed, 8 insertions(+), 4 deletions(-)
+>   hw/pci-host/sabre.c | 2 ++
+>   1 file changed, 2 insertions(+)
 > 
 > diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-> index 3645bc962cb..4412e23131c 100644
+> index 4412e23131c..67699ac9058 100644
 > --- a/hw/pci-host/sabre.c
 > +++ b/hw/pci-host/sabre.c
-> @@ -121,8 +121,10 @@ static void sabre_config_write(void *opaque, hwaddr addr,
->       trace_sabre_config_write(addr, val);
+> @@ -122,6 +122,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
 >   
 >       switch (addr) {
-> -    case 0x30 ... 0x4f: /* DMA error registers */
-> -        /* XXX: not implemented yet */
-> +    case  0x30 ...  0x4f: /* DMA error registers */
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: Register 0x%02" HWADDR_PRIX " not implemented\n",
-> +                      __func__, addr);
->           break;
->       case 0xc00 ... 0xc3f: /* PCI interrupt control */
->           if (addr & 4) {
-> @@ -198,8 +200,10 @@ static uint64_t sabre_config_read(void *opaque,
->       uint32_t val = 0;
+>       case  0x30 ...  0x4f: /* DMA error registers */
+> +    case 0x200 ... 0x21f: /* IOMMU registers */
+>           qemu_log_mask(LOG_UNIMP,
+>                         "%s: Register 0x%02" HWADDR_PRIX " not implemented\n",
+>                         __func__, addr);
+> @@ -201,6 +202,7 @@ static uint64_t sabre_config_read(void *opaque,
 >   
 >       switch (addr) {
-> -    case 0x30 ... 0x4f: /* DMA error registers */
-> -        /* XXX: not implemented yet */
-> +    case  0x30 ...  0x4f: /* DMA error registers */
-> +        qemu_log_mask(LOG_UNIMP,
-> +                      "%s: Register 0x%02" HWADDR_PRIX " not implemented\n",
-> +                      __func__, addr);
->           break;
->       case 0xc00 ... 0xc3f: /* PCI interrupt control */
->           if (addr & 4) {
+>       case  0x30 ...  0x4f: /* DMA error registers */
+> +    case 0x200 ... 0x21f: /* IOMMU registers */
+>           qemu_log_mask(LOG_UNIMP,
+>                         "%s: Register 0x%02" HWADDR_PRIX " not implemented\n",
+>                         __func__, addr);
 
-It seems as if there are quite a few other registers that haven't been implemented 
-here which aren't mentioned in the comments. My preference would be to rework this 
-patch so that the comments for the unimplemented registers are all at the end of the 
-switch() with the fallthrough to default, and then update patch 6 to use LOG_UNIMP so 
-everything is logged in one place.
+In theory this should never happen since a reference to the IOMMU should always be 
+set using an object property link (i.e. it is a developer error rather than an 
+unimplemented error) and its memory region overlaps this space within the PCI host 
+bridge.
+
+Rather than add these logging statemants and/or failing if the property is not set, I 
+think now it may be possible to simply embed the IOMMU device within sabre itself 
+using the updated QOM APIs. I can take a look to see if this approach will work later 
+in the week.
 
 
 ATB,
