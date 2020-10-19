@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4371BC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:58:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB198C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AF0D22243
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:58:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4B59A22243
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:59:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LivSQTXV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AF0D22243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SAXfaHgz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4B59A22243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39492 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUQ4G-0003xd-FR
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:58:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54300)
+	id 1kUQ4u-0004gt-8f
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:59:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54276)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyK-0005IJ-Et
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58498)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyI-0005CV-2x
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28240)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyH-00087G-Eu
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:48 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyG-00086u-6O
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:45 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603093964;
+ s=mimecast20190719; t=1603093963;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=i4SQi3qlFXaEs4MAuJUwCkKtwhjjNVrBj9tqjfNCtgI=;
- b=LivSQTXVYo0MtVvBynLv/LeQFTzZ/4BGdlCATyl/fZsi0tHZm7ACKEHD7y/iPJ0kujR9Ed
- o4vTq0F/xrQm3nTlKSt48Ppbel0JwOx31aaUkHVoQxEulFrYKmG44jva0LdgqT+fBPDUDU
- ge/jYkIT7McMuRsO3EKjG/Nyrf98M+Y=
+ bh=jpBjHoJ7TJJFHT0NNFAxXbhXswV7KiWZ0nZ17TzYQcQ=;
+ b=SAXfaHgzZbqpV4YFK8x1a4aw8LoHaaSxi2m1aT4SO4uCcEIJtWoQrvsNvsl5l4pohZwLsV
+ S53JDMXMcQHJi4v+f5ZRKsj1BAM3DPWq7Eox0V8BoSniERHtkV6zJcM8wku9+Svfj3asoY
+ eSBODij0MgFI+CQxi3sbuOQ4RIFI4g8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-t6gXDulkO1C3LctWjI0eTg-1; Mon, 19 Oct 2020 03:52:42 -0400
-X-MC-Unique: t6gXDulkO1C3LctWjI0eTg-1
+ us-mta-256-MgXP2-mANK2W-lEAULE5AQ-1; Mon, 19 Oct 2020 03:52:41 -0400
+X-MC-Unique: MgXP2-mANK2W-lEAULE5AQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9E60018A824E
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9DA12846360
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 08DFC5B4C3;
- Mon, 19 Oct 2020 07:52:25 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5F6057B7A0;
+ Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 32EE11753B; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
+ id B023F9A94; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 02/14] spice: add QemuSpiceOps, move migrate_info
-Date: Mon, 19 Oct 2020 09:52:12 +0200
-Message-Id: <20201019075224.14803-3-kraxel@redhat.com>
+Subject: [PATCH 12/14] spice: flip modules switch
+Date: Mon, 19 Oct 2020 09:52:22 +0200
+Message-Id: <20201019075224.14803-13-kraxel@redhat.com>
 In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
 References: <20201019075224.14803-1-kraxel@redhat.com>
 MIME-Version: 1.0
@@ -104,108 +104,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add QemuSpiceOps struct.  This struct holds function pointers to the
-spice functions.  It will be initialized with pointers to the stub
-functions.  When spice gets initialized the function pointers will
-be re-written to the real functions.
-
-The spice stubs will move from qemu-spice.h to spice-module.c for that,
-because they will be needed for both "CONFIG_SPICE=n" and "CONFIG_SPICE=y
-but spice module not loaded" cases.
-
-This patch adds the infrastructure and starts with moving
-qemu_spice_migrate_info() to QemuSpiceOps.
+Build spice core code as module.  This removes libspice-server and a
+handful of indirect dependencies from core qemu.  The number of shared
+libraries for qemu-system-x86_64 goes down from 73 to 66 on my system.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/ui/qemu-spice-module.h |  5 +++++
- include/ui/qemu-spice.h        |  5 -----
- monitor/misc.c                 |  2 +-
- ui/spice-core.c                |  5 +++++
- ui/spice-module.c              | 10 ++++++++++
- 5 files changed, 21 insertions(+), 6 deletions(-)
+ ui/meson.build | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/include/ui/qemu-spice-module.h b/include/ui/qemu-spice-module.h
-index 1af0e659a109..7a9963dd5810 100644
---- a/include/ui/qemu-spice-module.h
-+++ b/include/ui/qemu-spice-module.h
-@@ -18,6 +18,11 @@
- #ifndef QEMU_SPICE_MODULE_H
- #define QEMU_SPICE_MODULE_H
+diff --git a/ui/meson.build b/ui/meson.build
+index fc1b31daec47..996e1d13ab34 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -15,7 +15,6 @@ softmmu_ss.add(files(
+ softmmu_ss.add([spice_headers, files('spice-module.c')])
  
-+struct QemuSpiceOps {
-+    int (*migrate_info)(const char *h, int p, int t, const char *s);
-+};
+ softmmu_ss.add(when: 'CONFIG_LINUX', if_true: files('input-linux.c'))
+-softmmu_ss.add(when: [spice, 'CONFIG_SPICE'], if_true: files('spice-core.c', 'spice-input.c', 'spice-display.c'))
+ softmmu_ss.add(when: cocoa, if_true: files('cocoa.m'))
+ 
+ vnc_ss = ss.source_set()
+@@ -71,6 +70,16 @@ if sdl.found()
+   ui_modules += {'sdl' : sdl_ss}
+ endif
+ 
++if config_host.has_key('CONFIG_SPICE')
++  spice_core_ss = ss.source_set()
++  spice_core_ss.add(spice, pixman, files(
++    'spice-core.c',
++    'spice-input.c',
++    'spice-display.c'
++  ))
++  ui_modules += {'spice-core' : spice_core_ss}
++endif
 +
- extern int using_spice;
-+extern struct QemuSpiceOps qemu_spice;
- 
- #endif
-diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
-index ab523788b9a9..3157016c2bb4 100644
---- a/include/ui/qemu-spice.h
-+++ b/include/ui/qemu-spice.h
-@@ -60,11 +60,6 @@ static inline int qemu_spice_set_pw_expire(time_t expires)
- {
-     return -1;
- }
--static inline int qemu_spice_migrate_info(const char *h, int p, int t,
--                                          const char *s)
--{
--    return -1;
--}
- 
- static inline int qemu_spice_display_add_client(int csock, int skipauth,
-                                                 int tls)
-diff --git a/monitor/misc.c b/monitor/misc.c
-index 4a859fb24a21..32e6a8c13d07 100644
---- a/monitor/misc.c
-+++ b/monitor/misc.c
-@@ -437,7 +437,7 @@ void qmp_client_migrate_info(const char *protocol, const char *hostname,
-             return;
-         }
- 
--        if (qemu_spice_migrate_info(hostname,
-+        if (qemu_spice.migrate_info(hostname,
-                                     has_port ? port : -1,
-                                     has_tls_port ? tls_port : -1,
-                                     cert_subject)) {
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index a7fa5743585f..b03d743cf9b9 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -993,8 +993,13 @@ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd)
-     return spice_display_is_running;
- }
- 
-+static struct QemuSpiceOps real_spice_ops = {
-+    .migrate_info = qemu_spice_migrate_info,
-+};
-+
- static void spice_register_config(void)
- {
-+    qemu_spice = real_spice_ops;
-     qemu_add_opts(&qemu_spice_opts);
- }
- opts_init(spice_register_config);
-diff --git a/ui/spice-module.c b/ui/spice-module.c
-index f86b0ac517dc..f1939545a684 100644
---- a/ui/spice-module.c
-+++ b/ui/spice-module.c
-@@ -21,3 +21,13 @@
- #include "ui/qemu-spice-module.h"
- 
- int using_spice;
-+
-+static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
-+                                        const char *s)
-+{
-+    return -1;
-+}
-+
-+struct QemuSpiceOps qemu_spice = {
-+    .migrate_info = qemu_spice_migrate_info_stub,
-+};
+ if config_host.has_key('CONFIG_SPICE') and config_host.has_key('CONFIG_GIO')
+   spice_ss = ss.source_set()
+   spice_ss.add(spice, gio, pixman, files('spice-app.c'))
 -- 
 2.27.0
 
