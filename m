@@ -7,64 +7,66 @@ X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,
 	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C59C9C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 01:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FF94C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 01:42:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3717E21D7F
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 01:42:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3717E21D7F
+	by mail.kernel.org (Postfix) with ESMTPS id CEB3A21D7F
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 01:42:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CEB3A21D7F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38144 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUKC0-0002NM-5D
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 21:42:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50234)
+	id 1kUKC1-0002Mr-Pn
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 21:42:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50236)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kUK9D-0000Sx-71; Sun, 18 Oct 2020 21:39:39 -0400
-Received: from mail-pg1-f196.google.com ([209.85.215.196]:38668)
+ id 1kUK9D-0000TA-Dw
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 21:39:39 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:39809)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kUK9B-0008M0-4p; Sun, 18 Oct 2020 21:39:38 -0400
-Received: by mail-pg1-f196.google.com with SMTP id j7so5073690pgk.5;
- Sun, 18 Oct 2020 18:39:36 -0700 (PDT)
+ id 1kUK9B-0008M5-Gt
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 21:39:39 -0400
+Received: by mail-pg1-f169.google.com with SMTP id o7so5073003pgv.6
+ for <qemu-devel@nongnu.org>; Sun, 18 Oct 2020 18:39:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=rbEsSrVkm+uDWZW6EZAjkhb1mszKtcwtcfi7OhcF+XQ=;
- b=LVeKYHrujmVExZKg0owNJpNNRufFTs6wJBJwmoWFvodVgfkadEwMqw3jAeAiXJHJSq
- kuyjY3SM1OOdAPsu43Zj3cTWUvaOqmhetEC0Y0TxQQ+064U0qk1FFkH3RkfVzy9j+O9X
- GUCcMLWn2ubEvxt75KT8g1wJLdnuUXRt6PSkiYMySOhV1N6+SJXuT7r6YPK8wgUR7UUF
- YvBLInC8Ckfu+whLAjk0YnhvZetmvxHrNpsO8zNsc8hLZOBUlX5k9Q89rqxoOvAA4Ou+
- K4lAMYQpZHB/WaZArI3NmUX50U6ESyMkCMSFnsYAK5SLAEZFT1Gm9cB2CIYDP8fJvAz5
- 1G9g==
-X-Gm-Message-State: AOAM532yGAFfvo/OzGYfJ82CsLMOqnD9j4F4x3vDXxnVBi3birpKjYMz
- nyo4VbWM4xjc9U920Bjj/d0sxH6vqlCwcg==
-X-Google-Smtp-Source: ABdhPJyfLBkEZXfsxQfAq4qq0FyXCEqsr1Ql7SW85vnCfyoRmvFDs+rmGCXihSNJ5RW76V+o233EDA==
-X-Received: by 2002:a63:1119:: with SMTP id g25mr12298644pgl.385.1603071574668; 
- Sun, 18 Oct 2020 18:39:34 -0700 (PDT)
+ bh=lsY91JiQVYnAYr01zAMsqCpC4z0zNTmucTOKUw5e+rE=;
+ b=PcXVgGNm4S0ok7f3QpPFdPfPbHEJRWrXw50aAh8QNNrzB5mZ1mT/1NZNzXUTI5w9DY
+ ppjomUfbDP50uI+rOP5Ql0eebv1JnYCjTQHgK6lg6+PORYMh1CtcDI10y8/jsRvfr2vi
+ SCJR2edJ5IW2wb/4lciv7S6ObBS4+IyqKHYM07lWQwjSiGJ7AYHcjjpfg0+B1+/zXHcH
+ sQbugaVMNpBR2RoGto8dL/PSswrdHVyY3xdRQW9bsOO1Osv1q6ncMuouTxdrycw55Lbt
+ wy9X/u19ps8fNBrogJYsTTxTJWuSiBP9NyV5IQFrTa0e2wMLKIiX/4bbcbWKcHlFYDBe
+ FoHQ==
+X-Gm-Message-State: AOAM530lEDhTSNKzDu3qt14OiqCmOMVltaHVuyOdGnZCra7nOrKu4QmS
+ oVky3Cu90Y/pN+A8V2JTywnNQ0Ftm++yIQ==
+X-Google-Smtp-Source: ABdhPJxm6HOwJNEmfxtfMUFwffE8LvAPTyydCViGn7sRIB/J2ZMinYnh/1NPYw/KeWcpApG3czpmxQ==
+X-Received: by 2002:a63:4459:: with SMTP id t25mr12605597pgk.104.1603071575969; 
+ Sun, 18 Oct 2020 18:39:35 -0700 (PDT)
 Received: from localhost.localdomain ([73.93.155.115])
- by smtp.gmail.com with ESMTPSA id p8sm2446607pgs.34.2020.10.18.18.39.33
+ by smtp.gmail.com with ESMTPSA id p8sm2446607pgs.34.2020.10.18.18.39.35
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Sun, 18 Oct 2020 18:39:34 -0700 (PDT)
+ Sun, 18 Oct 2020 18:39:35 -0700 (PDT)
 From: Joelle van Dyne <j@getutm.app>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 3/9] qemu: add support for iOS host
-Date: Sun, 18 Oct 2020 18:39:22 -0700
-Message-Id: <20201019013928.72770-4-j@getutm.app>
+Subject: [PATCH v2 4/9] coroutine: add libucontext as external library
+Date: Sun, 18 Oct 2020 18:39:23 -0700
+Message-Id: <20201019013928.72770-5-j@getutm.app>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201019013928.72770-1-j@getutm.app>
 References: <20201019013928.72770-1-j@getutm.app>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.215.196;
- envelope-from=osy86github@gmail.com; helo=mail-pg1-f196.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 21:39:35
+Received-SPF: pass client-ip=209.85.215.169;
+ envelope-from=osy86github@gmail.com; helo=mail-pg1-f169.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 21:39:36
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -13
 X-Spam_score: -1.4
@@ -86,436 +88,209 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Marek Vasut <marex@denx.de>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Jason Wang <jasowang@redhat.com>, Chris Wulff <crwulff@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, Joelle van Dyne <j@getutm.app>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Stefan Hajnoczi <stefanha@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: osy <osy86@users.noreply.github.com>
 
-This introduces support for building for iOS hosts. When the correct Xcode
-toolchain is used, iOS host will be detected automatically.
+iOS does not support ucontext natively for aarch64 and the sigaltstack is
+also unsupported (even worse, it fails silently, see:
+https://openradar.appspot.com/13002712 )
 
-block: disable features not supported by iOS sandbox
-slirp: disable SMB features for iOS
-target: disable system() calls for iOS
-tcg: use sys_icache_invalidate() instead of GCC builtin for iOS
-tests: disable tests on iOS which uses system()
+As a workaround we include a library implementation of ucontext and add it
+as a build option.
+
 Signed-off-by: Joelle van Dyne <j@getutm.app>
 ---
- configure                 | 43 ++++++++++++++++++++++++++++++++++++++-
- meson.build               |  2 +-
- tcg/aarch64/tcg-target.h  | 10 +++++++++
- block.c                   |  2 +-
- block/file-posix.c        | 30 ++++++++++++++++-----------
- net/slirp.c               | 16 +++++++--------
- qga/commands-posix.c      |  6 ++++++
- target/arm/arm-semi.c     |  2 ++
- target/m68k/m68k-semi.c   |  2 ++
- target/nios2/nios2-semi.c |  2 ++
- tests/qtest/meson.build   |  7 +++----
- 11 files changed, 95 insertions(+), 27 deletions(-)
+ configure                 | 23 ++++++++++++++++++++---
+ meson.build               | 29 ++++++++++++++++++++++++++++-
+ util/coroutine-ucontext.c |  9 +++++++++
+ .gitmodules               |  3 +++
+ libucontext               |  1 +
+ meson_options.txt         |  2 ++
+ 6 files changed, 63 insertions(+), 4 deletions(-)
+ create mode 160000 libucontext
 
 diff --git a/configure b/configure
-index 46d5db63e8..c474d7c221 100755
+index c474d7c221..0b7e25e7a5 100755
 --- a/configure
 +++ b/configure
-@@ -561,6 +561,19 @@ EOF
-   compile_object
- }
- 
-+check_ios() {
-+  cat > $TMPC <<EOF
-+#ifdef __APPLE__
-+#import "TargetConditionals.h"
-+#if !TARGET_OS_IPHONE
-+#error TARGET_OS_IPHONE not true
-+#endif
-+#endif
-+int main(void) { return 0; }
-+EOF
-+  compile_object
-+}
-+
- check_include() {
- cat > $TMPC <<EOF
- #include <$1>
-@@ -603,7 +616,11 @@ elif check_define __DragonFly__ ; then
- elif check_define __NetBSD__; then
-   targetos='NetBSD'
- elif check_define __APPLE__; then
--  targetos='Darwin'
-+  if check_ios ; then
-+    targetos='iOS'
-+  else
-+    targetos='Darwin'
-+  fi
- else
-   # This is a fatal error, but don't report it yet, because we
-   # might be going to just print the --help text, or it might
-@@ -780,6 +797,22 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
- ;;
-+iOS)
-+  bsd="yes"
-+  darwin="yes"
-+  ios="yes"
-+  if [ "$cpu" = "x86_64" ] ; then
-+    QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-+    QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
-+  fi
-+  host_block_device_support="no"
-+  audio_drv_list=""
-+  audio_possible_drivers=""
-+  QEMU_LDFLAGS="-framework CoreFoundation $QEMU_LDFLAGS"
-+  # Disable attempts to use ObjectiveC features in os/object.h since they
-+  # won't work when we're compiling with gcc as a C compiler.
-+  QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-+;;
- SunOS)
-   solaris="yes"
-   make="${MAKE-gmake}"
-@@ -6162,6 +6195,10 @@ if test "$darwin" = "yes" ; then
-   echo "CONFIG_DARWIN=y" >> $config_host_mak
- fi
- 
-+if test "$ios" = "yes" ; then
-+  echo "CONFIG_IOS=y" >> $config_host_mak
-+fi
-+
- if test "$solaris" = "yes" ; then
-   echo "CONFIG_SOLARIS=y" >> $config_host_mak
- fi
-@@ -7166,6 +7203,7 @@ echo "cpp_link_args = [${LDFLAGS:+$(meson_quote $LDFLAGS)}]" >> $cross
- echo "[binaries]" >> $cross
- echo "c = [$(meson_quote $cc)]" >> $cross
- test -n "$cxx" && echo "cpp = [$(meson_quote $cxx)]" >> $cross
-+test -n "$objcc" && echo "objc = [$(meson_quote $objcc)]" >> $cross
- echo "ar = [$(meson_quote $ar)]" >> $cross
- echo "nm = [$(meson_quote $nm)]" >> $cross
- echo "pkgconfig = [$(meson_quote $pkg_config_exe)]" >> $cross
-@@ -7184,6 +7222,9 @@ if test "$cross_compile" = "yes"; then
-     if test "$linux" = "yes" ; then
-         echo "system = 'linux'" >> $cross
+@@ -1756,7 +1756,7 @@ Advanced options (experts only):
+   --oss-lib                path to OSS library
+   --cpu=CPU                Build for host CPU [$cpu]
+   --with-coroutine=BACKEND coroutine backend. Supported options:
+-                           ucontext, sigaltstack, windows
++                           ucontext, libucontext, sigaltstack, windows
+   --enable-gcov            enable test coverage analysis with gcov
+   --disable-blobs          disable installing provided firmware blobs
+   --with-vss-sdk=SDK-path  enable Windows VSS support in QEMU Guest Agent
+@@ -5058,6 +5058,8 @@ if test "$coroutine" = ""; then
+     coroutine=win32
+   elif test "$ucontext_works" = "yes"; then
+     coroutine=ucontext
++  elif test "$ios" = "yes"; then
++    coroutine=libucontext
+   else
+     coroutine=sigaltstack
+   fi
+@@ -5081,12 +5083,27 @@ else
+       error_exit "only the 'windows' coroutine backend is valid for Windows"
      fi
-+    if test "$darwin" = "yes" ; then
-+        echo "system = 'darwin'" >> $cross
-+    fi
-     case "$ARCH" in
-         i386|x86_64)
-             echo "cpu_family = 'x86'" >> $cross
+     ;;
++  libucontext)
++  ;;
+   *)
+     error_exit "unknown coroutine backend $coroutine"
+     ;;
+   esac
+ fi
+ 
++case $coroutine in
++libucontext)
++  git_submodules="${git_submodules} libucontext"
++  mkdir -p libucontext
++  coroutine_impl=ucontext
++  libucontext="enabled"
++  ;;
++*)
++  coroutine_impl=$coroutine
++  libucontext="disabled"
++  ;;
++esac
++
+ if test "$coroutine_pool" = ""; then
+   coroutine_pool=yes
+ fi
+@@ -6676,7 +6693,7 @@ if test "$rbd" = "yes" ; then
+   echo "RBD_LIBS=$rbd_libs" >> $config_host_mak
+ fi
+ 
+-echo "CONFIG_COROUTINE_BACKEND=$coroutine" >> $config_host_mak
++echo "CONFIG_COROUTINE_BACKEND=$coroutine_impl" >> $config_host_mak
+ if test "$coroutine_pool" = "yes" ; then
+   echo "CONFIG_COROUTINE_POOL=1" >> $config_host_mak
+ else
+@@ -7273,7 +7290,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+ 	-Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
+ 	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+ 	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
+-	-Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
++	-Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt -Ducontext=$libucontext \
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
 diff --git a/meson.build b/meson.build
-index 5d3a47784b..69a3c00cce 100644
+index 69a3c00cce..e3ff35f46b 100644
 --- a/meson.build
 +++ b/meson.build
-@@ -140,7 +140,7 @@ if targetos == 'windows'
-                                       include_directories: include_directories('.'))
- elif targetos == 'darwin'
-   coref = dependency('appleframeworks', modules: 'CoreFoundation')
--  iokit = dependency('appleframeworks', modules: 'IOKit')
-+  iokit = dependency('appleframeworks', modules: 'IOKit', required: 'CONFIG_IOS' not in config_host)
-   cocoa = dependency('appleframeworks', modules: 'Cocoa', required: get_option('cocoa'))
- elif targetos == 'sunos'
-   socket = [cc.find_library('socket'),
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index 663dd0b95e..a2b22b4305 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -148,9 +148,19 @@ typedef enum {
- #define TCG_TARGET_DEFAULT_MO (0)
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
+@@ -1099,9 +1099,35 @@ if not fdt.found() and fdt_required.length() > 0
+   error('fdt not available but required by targets ' + ', '.join(fdt_required))
+ endif
  
-+#if defined(__APPLE__)
-+void sys_icache_invalidate(void *start, size_t len);
-+#endif
++ucontext = not_found
++slirp_opt = 'disabled'
++if get_option('ucontext').enabled()
++  if not fs.is_dir(meson.current_source_dir() / 'libucontext/arch' / cpu)
++    error('libucontext is wanted but not implemented for host ' + cpu)
++  endif
++  arch = host_machine.cpu()
++  ucontext_cargs = ['-DG_LOG_DOMAIN="ucontext"', '-DCUSTOM_IMPL']
++  ucontext_files = [
++    'libucontext/arch' / arch / 'getcontext.S',
++    'libucontext/arch' / arch / 'setcontext.S',
++    'libucontext/arch' / arch / 'makecontext.c',
++    'libucontext/arch' / arch / 'startcontext.S',
++    'libucontext/arch' / arch / 'swapcontext.S',
++  ]
 +
- static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
-+#if defined(__APPLE__)
-+    sys_icache_invalidate((char *)start, stop - start);
-+#elif defined(__GNUC__)
-     __builtin___clear_cache((char *)start, (char *)stop);
++  ucontext_inc = include_directories('libucontext/include')
++  libucontext = static_library('ucontext',
++                               sources: ucontext_files,
++                               c_args: ucontext_cargs,
++                               include_directories: ucontext_inc)
++  ucontext = declare_dependency(link_with: libucontext,
++                                include_directories: ucontext_inc)
++endif
++
+ config_host_data.set('CONFIG_CAPSTONE', capstone.found())
+ config_host_data.set('CONFIG_FDT', fdt.found())
+ config_host_data.set('CONFIG_SLIRP', slirp.found())
++config_host_data.set('CONFIG_LIBUCONTEXT', ucontext.found())
+ 
+ genh += configure_file(output: 'config-host.h', configuration: config_host_data)
+ 
+@@ -1321,7 +1347,7 @@ util_ss.add_all(trace_ss)
+ util_ss = util_ss.apply(config_all, strict: false)
+ libqemuutil = static_library('qemuutil',
+                              sources: util_ss.sources() + stub_ss.sources() + genh,
+-                             dependencies: [util_ss.dependencies(), m, glib, socket, malloc])
++                             dependencies: [util_ss.dependencies(), m, glib, socket, malloc, ucontext])
+ qemuutil = declare_dependency(link_with: libqemuutil,
+                               sources: genh + version_res)
+ 
+@@ -1916,6 +1942,7 @@ if targetos == 'windows'
+   summary_info += {'QGA MSI support':   config_host.has_key('CONFIG_QGA_MSI')}
+ endif
+ summary_info += {'seccomp support':   config_host.has_key('CONFIG_SECCOMP')}
++summary_info += {'libucontext support': ucontext.found()}
+ summary_info += {'coroutine backend': config_host['CONFIG_COROUTINE_BACKEND']}
+ summary_info += {'coroutine pool':    config_host['CONFIG_COROUTINE_POOL'] == '1'}
+ summary_info += {'debug stack usage': config_host.has_key('CONFIG_DEBUG_STACK_USAGE')}
+diff --git a/util/coroutine-ucontext.c b/util/coroutine-ucontext.c
+index 904b375192..1e1dd43512 100644
+--- a/util/coroutine-ucontext.c
++++ b/util/coroutine-ucontext.c
+@@ -23,7 +23,16 @@
+ #undef _FORTIFY_SOURCE
+ #endif
+ #include "qemu/osdep.h"
++#if defined(CONFIG_LIBUCONTEXT)
++#include <libucontext.h>
++#define ucontext_t libucontext_ucontext_t
++#define getcontext libucontext_getcontext
++#define setcontext libucontext_setcontext
++#define swapcontext libucontext_swapcontext
++#define makecontext libucontext_makecontext
 +#else
-+#error "Missing builtin to flush instruction cache"
+ #include <ucontext.h>
 +#endif
- }
+ #include "qemu/coroutine_int.h"
  
- void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t);
-diff --git a/block.c b/block.c
-index 430edf79bb..5d49869d02 100644
---- a/block.c
-+++ b/block.c
-@@ -53,7 +53,7 @@
- #ifdef CONFIG_BSD
- #include <sys/ioctl.h>
- #include <sys/queue.h>
--#ifndef __DragonFly__
-+#if !defined(__DragonFly__) && !defined(CONFIG_IOS)
- #include <sys/disk.h>
- #endif
- #endif
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 52f7c20525..cdc73b5f1d 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -181,7 +181,16 @@ typedef struct BDRVRawReopenState {
-     bool check_cache_dropped;
- } BDRVRawReopenState;
+ #ifdef CONFIG_VALGRIND_H
+diff --git a/.gitmodules b/.gitmodules
+index 2bdeeacef8..065b52867f 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -64,3 +64,6 @@
+ [submodule "roms/vbootrom"]
+ 	path = roms/vbootrom
+ 	url = https://git.qemu.org/git/vbootrom.git
++[submodule "libucontext"]
++	path = libucontext
++	url = https://github.com/utmapp/libucontext.git
+diff --git a/libucontext b/libucontext
+new file mode 160000
+index 0000000000..7094e4c427
+--- /dev/null
++++ b/libucontext
+@@ -0,0 +1 @@
++Subproject commit 7094e4c42723b6178a4e2b60d4631d8a88f40719
+diff --git a/meson_options.txt b/meson_options.txt
+index 1d3c94840a..a04a00649c 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -48,6 +48,8 @@ option('vnc_sasl', type : 'feature', value : 'auto',
+        description: 'SASL authentication for VNC server')
+ option('xkbcommon', type : 'feature', value : 'auto',
+        description: 'xkbcommon support')
++option('ucontext', type : 'feature', value : 'disabled',
++       description: 'libucontext support')
  
--static int fd_open(BlockDriverState *bs);
-+static int fd_open(BlockDriverState *bs)
-+{
-+    BDRVRawState *s = bs->opaque;
-+
-+    /* this is just to ensure s->fd is sane (its called by io ops) */
-+    if (s->fd >= 0)
-+        return 0;
-+    return -EIO;
-+}
-+
- static int64_t raw_getlength(BlockDriverState *bs);
- 
- typedef struct RawPosixAIOData {
-@@ -252,6 +261,12 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
- }
- #endif
- 
-+#if defined(CONFIG_IOS)
-+static int probe_logical_blocksize(int fd, unsigned int *sector_size_p)
-+{
-+    return -ENOTSUP; /* not supported on iOS */
-+}
-+#else /* CONFIG_IOS */
- /*
-  * Get logical block size via ioctl. On success store it in @sector_size_p.
-  */
-@@ -284,6 +299,7 @@ static int probe_logical_blocksize(int fd, unsigned int *sector_size_p)
- 
-     return success ? 0 : -errno;
- }
-+#endif /* !CONFIG_IOS */
- 
- /**
-  * Get physical block size of @fd.
-@@ -2306,7 +2322,7 @@ again:
-         }
-         if (size == 0)
- #endif
--#if defined(__APPLE__) && defined(__MACH__)
-+#if !defined(CONFIG_IOS) && defined(__APPLE__) && defined(__MACH__)
-         {
-             uint64_t sectors = 0;
-             uint32_t sector_size = 0;
-@@ -3541,16 +3557,6 @@ hdev_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
- }
- #endif /* linux */
- 
--static int fd_open(BlockDriverState *bs)
--{
--    BDRVRawState *s = bs->opaque;
--
--    /* this is just to ensure s->fd is sane (its called by io ops) */
--    if (s->fd >= 0)
--        return 0;
--    return -EIO;
--}
--
- static coroutine_fn int
- hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- {
-diff --git a/net/slirp.c b/net/slirp.c
-index 77042e6df7..8413042c09 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -27,7 +27,7 @@
- #include "net/slirp.h"
- 
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- #include <pwd.h>
- #include <sys/wait.h>
- #endif
-@@ -90,7 +90,7 @@ typedef struct SlirpState {
-     Slirp *slirp;
-     Notifier poll_notifier;
-     Notifier exit_notifier;
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     gchar *smb_dir;
- #endif
-     GSList *fwd;
-@@ -103,7 +103,7 @@ static QTAILQ_HEAD(, SlirpState) slirp_stacks =
- static int slirp_hostfwd(SlirpState *s, const char *redir_str, Error **errp);
- static int slirp_guestfwd(SlirpState *s, const char *config_str, Error **errp);
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- static int slirp_smb(SlirpState *s, const char *exported_dir,
-                      struct in_addr vserver_addr, Error **errp);
- static void slirp_smb_cleanup(SlirpState *s);
-@@ -368,7 +368,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     struct in6_addr ip6_prefix;
-     struct in6_addr ip6_host;
-     struct in6_addr ip6_dns;
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     struct in_addr smbsrv = { .s_addr = 0 };
- #endif
-     NetClientState *nc;
-@@ -478,7 +478,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-         return -1;
-     }
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     if (vsmbserver && !inet_aton(vsmbserver, &smbsrv)) {
-         error_setg(errp, "Failed to parse SMB address");
-         return -1;
-@@ -593,7 +593,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-             }
-         }
-     }
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     if (smb_export) {
-         if (slirp_smb(s, smb_export, smbsrv, errp) < 0) {
-             goto error;
-@@ -785,7 +785,7 @@ void hmp_hostfwd_add(Monitor *mon, const QDict *qdict)
- 
- }
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- 
- /* automatic user mode samba server configuration */
- static void slirp_smb_cleanup(SlirpState *s)
-@@ -900,7 +900,7 @@ static int slirp_smb(SlirpState* s, const char *exported_dir,
-     return 0;
- }
- 
--#endif /* !defined(_WIN32) */
-+#endif /* !defined(_WIN32) && !defined(CONFIG_IOS) */
- 
- static int guestfwd_can_read(void *opaque)
- {
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 3bffee99d4..ebb63b2188 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -34,6 +34,12 @@
- 
- #ifndef CONFIG_HAS_ENVIRON
- #ifdef __APPLE__
-+#include "TargetConditionals.h"
-+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
-+#define APPLE_USE_CRT_EXTERNS
-+#endif
-+#endif
-+#ifdef APPLE_USE_CRT_EXTERNS
- #include <crt_externs.h>
- #define environ (*_NSGetEnviron())
- #else
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 8718fd0194..3704f19df6 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -891,6 +891,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         return clock() / (CLOCKS_PER_SEC / 100);
-     case TARGET_SYS_TIME:
-         return set_swi_errno(env, time(NULL));
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case TARGET_SYS_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -907,6 +908,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             unlock_user(s, arg0, 0);
-             return ret;
-         }
-+#endif /* CONFIG_IOS */
-     case TARGET_SYS_ERRNO:
-         return get_swi_errno(env);
-     case TARGET_SYS_GET_CMDLINE:
-diff --git a/target/m68k/m68k-semi.c b/target/m68k/m68k-semi.c
-index 8e5fbfc8fa..6b8941839e 100644
---- a/target/m68k/m68k-semi.c
-+++ b/target/m68k/m68k-semi.c
-@@ -402,6 +402,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
-             result = isatty(arg0);
-         }
-         break;
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case HOSTED_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -420,6 +421,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
-             }
-         }
-         break;
-+#endif /* CONFIG_IOS */
-     case HOSTED_INIT_SIM:
- #if defined(CONFIG_USER_ONLY)
-         {
-diff --git a/target/nios2/nios2-semi.c b/target/nios2/nios2-semi.c
-index d7a80dd303..bb029070d3 100644
---- a/target/nios2/nios2-semi.c
-+++ b/target/nios2/nios2-semi.c
-@@ -426,6 +426,7 @@ void do_nios2_semihosting(CPUNios2State *env)
-             result = isatty(arg0);
-         }
-         break;
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case HOSTED_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -444,6 +445,7 @@ void do_nios2_semihosting(CPUNios2State *env)
-             }
-         }
-         break;
-+#endif
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "nios2-semihosting: unsupported "
-                       "semihosting syscall %d\n", nr);
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 0f32ca0895..7184edcafa 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -46,12 +46,11 @@ qtests_i386 = \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-test'] : []) +              \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-swtpm-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['rtl8139-test'] : []) +              \
-+  (not config_host.has_key('CONFIG_IOS') ? ['bios-tables-test', 'hd-geo-test'] : []) +      \
-   qtests_pci +                                                                              \
-   ['fdc-test',
-    'ide-test',
--   'hd-geo-test',
-    'boot-order-test',
--   'bios-tables-test',
-    'rtc-test',
-    'i440fx-test',
-    'fw_cfg-test',
-@@ -141,9 +140,9 @@ qtests_arm = \
-    'boot-serial-test',
-    'hexloader-test']
- 
--# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional
-+# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional (except on iOS)
- qtests_aarch64 = \
--  (cpu != 'arm' ? ['bios-tables-test'] : []) +                                                  \
-+  (cpu != 'arm' and not config_host.has_key('CONFIG_IOS') ? ['bios-tables-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
-   ['arm-cpu-features',
+ option('capstone', type: 'combo', value: 'auto',
+        choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
 -- 
 2.24.3 (Apple Git-128)
 
