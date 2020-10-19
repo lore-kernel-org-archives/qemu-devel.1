@@ -2,89 +2,103 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2432FC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:45:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B64CC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:59:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 92060223FD
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:45:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AED9C22200
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:59:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="scCvdFb9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 92060223FD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WrUp7Uqj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AED9C22200
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUduR-0005Rx-Dw
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 18:45:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35186)
+	id 1kUe7L-00006g-Qj
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 18:59:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kUdtE-0004zA-3o
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:44:28 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:44078)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <oanderso@google.com>)
- id 1kUdtC-00044i-AO
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:44:27 -0400
-Received: by mail-ed1-x544.google.com with SMTP id t20so932962edr.11
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 15:44:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=icWKdykUJr0TVGHHPAx/DBzmweZhJlz3Q58PtMqaONs=;
- b=scCvdFb9tWVBhAjVXSBUUQyW6ShC0wb/Qz6BoPmd1oRjj/wq7XZ63vWQKOG3l5bY4t
- +KlHdF4nceInsr2xA3+DGWiv4BQp8TnwsQEo1kxEf+0XZvwplTmshtiaJSE6n5JcOVtu
- E3HJfqXt3zNqrWTnvxSEe2Ddjf7PBJrVFcOWOEIrkLCA8GU6SJOO1u7c1PV4AY4mZixU
- pTwuNnI3wa0ebYETkUlPV25i3Jw+6JNFtD803wVm/SBcmXunnhY6uEbI2Cqsz+pDop98
- AQyc9g+18/6vXJ/LeYDMOMMMhbQRAjeteA9fr+eQFder8W+3dxk2HYLeFpNYaLAlk51W
- b1yg==
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUe5q-00070P-VJ
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:57:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54770)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUe5o-0005cJ-IK
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:57:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603148247;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=n4IR530G0jn3KaGrAMU+kHWU9guPG9Q80wHEffp3OJw=;
+ b=WrUp7UqjNSJnhPiGza7P0Iv87t/y2LN4l/f22wdWkkvs6jwaKxvTfYa7O2HYDDYYGmH5Eu
+ fKT+CEuaAH2mumYeYIIJhb0WoIhBC0XQSLiHDGv+mTeDXd7f1KeUky6J+Yn0WG+1sdsz8U
+ S0U1nNl3Y7ZwXsYDBF468Wupo9iR4+s=
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com
+ [209.85.166.197]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-487-_tvVK4qIMt2CMa5Yv7a6hQ-1; Mon, 19 Oct 2020 18:57:25 -0400
+X-MC-Unique: _tvVK4qIMt2CMa5Yv7a6hQ-1
+Received: by mail-il1-f197.google.com with SMTP id p17so1456595ilj.0
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 15:57:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=icWKdykUJr0TVGHHPAx/DBzmweZhJlz3Q58PtMqaONs=;
- b=GD9h8poH30P/T+atigh/AbBtG6xy2LpxJN1xOAjdj0eaaBhI5pbSyQFmqP10l1xFHr
- 9yP8tMKbRp2rJSaq4xHR2Kt8CWHnlc2DyDhapxMm2HOHYczl0RtrTphr6aUNaA866wBv
- PDyTLMq+rRZkCd0zK8jJxZKHLCL6xdG69tZ99oL2kN8pfY9ua2WjI1oDDCisjri8YyS/
- qXAOZ3gl2jmYAFHxlH+nwtJyidf0hWXpY/lrZ25/FNHYPkkWqraRa0T/R4KXTgTL+X8v
- FGHLSQ+xTtvnE4beRCvxNAuhu0NCfSPsC+Dx1ilK9l2QwBC75ri9CzevT3N6PAxtmk5G
- PhHg==
-X-Gm-Message-State: AOAM531dGTuK+FOgbJAJFg03nSSkfFOqtx1IF1BC76f96M9CncAIrJXY
- CPfyKhf2E+hDiLkwN4ZPKutDAza1h0DGo2Q5Zyv/0Q==
-X-Google-Smtp-Source: ABdhPJzj0vSe4IYl6woNQsSEfnhsMHDwlvkT+tR9MnuU6q8uygxc/LWr3h8sLaU5t/BCzOYKWxsUWr+RI/M1jrenPDQ=
-X-Received: by 2002:a50:be87:: with SMTP id b7mr2191010edk.185.1603147463377; 
- Mon, 19 Oct 2020 15:44:23 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=n4IR530G0jn3KaGrAMU+kHWU9guPG9Q80wHEffp3OJw=;
+ b=iW2EUcUN5F4UofdWyPy1rCt4jcfCvsdrj8BMwbfLaZcTA6iiupgwWek37qEwcYPm0J
+ GXz3uFfr2CAn8D2Kvu39iuSI44wF3s9OvQJBTXk9vI/Nr5Y9c4/DkqxFW4IC321J2AtQ
+ RmTw5v2jFjSJJLTuzt5ksdkoiTdJVeqTOjY71psxt57JMXX3UP3Qk6XioymrzfrVUDyo
+ p1LS5XuFN0/oerVDtv/bPVKQN674FAmtXKC8RvkH7ktx3JbsfLVXHDFjToOjCEEbTJZ1
+ PCkoaN/ivFD2eXbFSpy9WyQHmYmjhCMucNj2G4CR0KYEA/xYJqKqb0CqsGrqwt2Cho7F
+ FaXw==
+X-Gm-Message-State: AOAM533fXHfjQqgGyLiVInWF7qh3AI/bpsjO/S0dL4w6/ZWPuRt5FWcU
+ rey/LP2zW6ZozRjmpAvrFUctQN0m2LIW82CDiKwjpXAFzzqWV4k0DIQYctPxVMzYfSB8aJF8HsJ
+ zmInw3dQ3DQ5rayE=
+X-Received: by 2002:a5e:d719:: with SMTP id v25mr54997iom.32.1603148244718;
+ Mon, 19 Oct 2020 15:57:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxN63MEt+Wcot7AwVcM3Pym62fevDxqfrAUC6UTLm3lhCFpqeNaRvMAGxgrorpA04e/7B+9iQ==
+X-Received: by 2002:a5e:d719:: with SMTP id v25mr54983iom.32.1603148244536;
+ Mon, 19 Oct 2020 15:57:24 -0700 (PDT)
+Received: from xz-x1.redhat.com
+ (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca. [174.95.215.133])
+ by smtp.gmail.com with ESMTPSA id z89sm6017ilk.4.2020.10.19.15.57.23
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Oct 2020 15:57:23 -0700 (PDT)
+From: Peter Xu <peterx@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v5 1/6] migration: Pass incoming state into
+ qemu_ufd_copy_ioctl()
+Date: Mon, 19 Oct 2020 18:57:15 -0400
+Message-Id: <20201019225720.172743-2-peterx@redhat.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201019225720.172743-1-peterx@redhat.com>
+References: <20201019225720.172743-1-peterx@redhat.com>
 MIME-Version: 1.0
-References: <CAKs3XfJPrMGxdAouGCje3ppnWKA6fXpNaywQ5rj9u45VkPuUXg@mail.gmail.com>
- <7c416109-6431-076e-2284-0f8406931ab9@linaro.org>
-In-Reply-To: <7c416109-6431-076e-2284-0f8406931ab9@linaro.org>
-From: Owen Anderson <oanderso@google.com>
-Date: Mon, 19 Oct 2020 15:44:12 -0700
-Message-ID: <CAKs3XfKMpTaAO6vj-V--zp_zY_Jm9HKkgkpCbCCKCQHSDT8y3g@mail.gmail.com>
-Subject: Re: [RFC] Don't lookup full CPU state in the indirect branch fast
- path on AArch64 when running in user mode.
-To: Richard Henderson <richard.henderson@linaro.org>
-Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=oanderso@google.com; helo=mail-ed1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -175
-X-Spam_score: -17.6
-X-Spam_bar: -----------------
-X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 15:28:27
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
- USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,27 +111,59 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 11:22 AM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> (1) What qemu version are you looking at and,
-> (2) Do you have --enable-tcg-debug enabled?
+It'll be used in follow up patches to access more fields out of it.  Meanwhile
+fetch the userfaultfd inside the function.
 
-My use case is a large automated testing environment for large C++
-binaries with heavy use of virtual dispatch.  The binaries are
-generally not built at high optimization levels (-O0 or -O1), so it's
-not very surprising to me that indirect branches are more dominant in
-this as a workload
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Peter Xu <peterx@redhat.com>
+---
+ migration/postcopy-ram.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-My use case is currently using QEMU 4.0, but we will be moving to QEMU
-4.2 soon.  I do not have --enable-tcg-debug enabled.
-e979972a6a1 does look promising, and like it might deliver increased
-performance for our use case. It looks like the code in 4.0 is doing a
-lot more work gathering the flags values from a variety of places.
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 0a2f88a87d..722034dc01 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -1128,10 +1128,12 @@ int postcopy_ram_incoming_setup(MigrationIncomingState *mis)
+     return 0;
+ }
+ 
+-static int qemu_ufd_copy_ioctl(int userfault_fd, void *host_addr,
++static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
+                                void *from_addr, uint64_t pagesize, RAMBlock *rb)
+ {
++    int userfault_fd = mis->userfault_fd;
+     int ret;
++
+     if (from_addr) {
+         struct uffdio_copy copy_struct;
+         copy_struct.dst = (uint64_t)(uintptr_t)host_addr;
+@@ -1185,7 +1187,7 @@ int postcopy_place_page(MigrationIncomingState *mis, void *host, void *from,
+      * which would be slightly cheaper, but we'd have to be careful
+      * of the order of updating our page state.
+      */
+-    if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, from, pagesize, rb)) {
++    if (qemu_ufd_copy_ioctl(mis, host, from, pagesize, rb)) {
+         int e = errno;
+         error_report("%s: %s copy host: %p from: %p (size: %zd)",
+                      __func__, strerror(e), host, from, pagesize);
+@@ -1212,7 +1214,7 @@ int postcopy_place_page_zero(MigrationIncomingState *mis, void *host,
+      * but it's not available for everything (e.g. hugetlbpages)
+      */
+     if (qemu_ram_is_uf_zeroable(rb)) {
+-        if (qemu_ufd_copy_ioctl(mis->userfault_fd, host, NULL, pagesize, rb)) {
++        if (qemu_ufd_copy_ioctl(mis, host, NULL, pagesize, rb)) {
+             int e = errno;
+             error_report("%s: %s zero host: %p",
+                          __func__, strerror(e), host);
+-- 
+2.26.2
 
---Owen
 
