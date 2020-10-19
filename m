@@ -2,61 +2,59 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A0DC433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:01:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A8D6C43457
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:05:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 280EC20936
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:01:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 280EC20936
+	by mail.kernel.org (Postfix) with ESMTPS id AB1A9222C4
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 22:05:18 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB1A9222C4
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUdDP-0008Eg-L4
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 18:01:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51490)
+	id 1kUdHJ-0002UP-Aa
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 18:05:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52396)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUdBK-0006Pl-H2
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:59:06 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34882
+ id 1kUdDg-0000Eh-4S
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:01:33 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:34892
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUdBI-0006UQ-UI
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:59:06 -0400
+ id 1kUdDd-0006xf-Vl
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 18:01:31 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kUdBI-0002K4-1e; Mon, 19 Oct 2020 22:59:10 +0100
+ id 1kUdDf-0002L2-0y; Mon, 19 Oct 2020 23:01:34 +0100
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20201012170950.3491912-1-f4bug@amsat.org>
- <20201012170950.3491912-7-f4bug@amsat.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <e2216f5f-f7b2-e2d8-876d-d94c5668cc45@ilande.co.uk>
-Date: Mon, 19 Oct 2020 22:58:57 +0100
+Message-ID: <a928dbd1-ac7d-0ef7-2cb2-adedb0fe2bdf@ilande.co.uk>
+Date: Mon, 19 Oct 2020 23:01:24 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201012170950.3491912-7-f4bug@amsat.org>
+In-Reply-To: <20201012170950.3491912-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH 6/6] hw/pci-host/sabre: Log reserved address accesses as
- GUEST_ERROR
+Subject: Re: [PATCH 0/6] hw/pci-host/sabre: Report UNIMP/GUEST_ERROR accesses
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -87,46 +85,24 @@ Sender: "Qemu-devel"
 
 On 12/10/2020 18:09, Philippe Mathieu-Daudé wrote:
 
-> Report accesses to reserved registers using qemu_log_mask(GUEST_ERROR).
+> Notes while trying to understand Mark's patch from yesterday:
+> "sabre: increase number of PCI bus IRQs from 32 to 64"
+> https://www.mail-archive.com/qemu-devel@nongnu.org/msg749458.html
 > 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   hw/pci-host/sabre.c | 8 ++++++++
->   1 file changed, 8 insertions(+)
+> Philippe Mathieu-Daudé (6):
+>    hw/pci-host/sabre: Update documentation link
+>    hw/pci-host/sabre: Remove superfluous address range check
+>    hw/pci-host/sabre: Simplify code initializing variable once
+>    hw/pci-host/sabre: Report unimplemented accesses via UNIMP log_mask
+>    hw/pci-host/sabre: Report IOMMU address range as unimplemented
+>    hw/pci-host/sabre: Log reserved address accesses as GUEST_ERROR
 > 
-> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-> index 67699ac9058..cc97c266a57 100644
-> --- a/hw/pci-host/sabre.c
-> +++ b/hw/pci-host/sabre.c
-> @@ -189,7 +189,11 @@ static void sabre_config_write(void *opaque, hwaddr addr,
->       case 0xa800 ... 0xa80f: /* Interrupt diagnostics */
->       case 0xf000 ... 0xf01f: /* FFB config, memory control */
->           /* we don't care */
-> +        break;
->       default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Register 0x%04" HWADDR_PRIX " is reserved\n",
-> +                      __func__, addr);
->           break;
->       }
->   }
-> @@ -235,7 +239,11 @@ static uint64_t sabre_config_read(void *opaque,
->       case 0xa800 ... 0xa80f: /* Interrupt diagnostics */
->       case 0xf000 ... 0xf01f: /* FFB config, memory control */
->           /* we don't care */
-> +        break;
->       default:
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "%s: Register 0x%04" HWADDR_PRIX " is reserved\n",
-> +                      __func__, addr);
->           break;
->       }
->       trace_sabre_config_read(addr, val);
+>   hw/pci-host/sabre.c | 40 ++++++++++++++++++++++------------------
+>   1 file changed, 22 insertions(+), 18 deletions(-)
 
-As per my comment on patch 4, I think these should be logged at LOG_UNIMP and the 
-message changed to "is unimplemented". Other than that:
-
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Thanks for this - I've applied patches 1-3 to my qemu-sparc branch with some comments 
+on patches 4-6. I should be able to look at these later in the week if you're 
+currently busy.
 
 
 ATB,
