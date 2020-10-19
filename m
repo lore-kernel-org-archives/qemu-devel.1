@@ -6,41 +6,41 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E704C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:33:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ADE5EC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:33:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3C5020747
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:33:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3C5020747
+	by mail.kernel.org (Postfix) with ESMTPS id A881520747
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:33:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A881520747
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44598 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45640 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUVI1-0002sy-Qf
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:33:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44026)
+	id 1kUVII-0003JP-Ma
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:33:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUVG8-0001h0-0S; Mon, 19 Oct 2020 09:31:32 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5185 helo=huawei.com)
+ id 1kUVFN-0000wb-9r; Mon, 19 Oct 2020 09:30:45 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5184 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUVG6-0005g1-1t; Mon, 19 Oct 2020 09:31:31 -0400
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 70A51A8E98B2226C50BA;
- Mon, 19 Oct 2020 21:31:23 +0800 (CST)
+ id 1kUVFL-0005VX-D2; Mon, 19 Oct 2020 09:30:45 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 70B572FEF5191047ED8C;
+ Mon, 19 Oct 2020 21:30:36 +0800 (CST)
 Received: from DESKTOP-80C7KIU.china.huawei.com (10.174.187.210) by
- DGGEMS413-HUB.china.huawei.com (10.3.19.213) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 19 Oct 2020 21:31:15 +0800
+ DGGEMS411-HUB.china.huawei.com (10.3.19.211) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 19 Oct 2020 21:30:27 +0800
 From: Zhengui li <lizhengui@huawei.com>
 To: <pbonzini@redhat.com>, <stefanha@redhat.com>, <mreitz@redhat.com>,
  <kwolf@redhat.com>
-Subject: [PATCH] vhost-user: fix incorrect print type
-Date: Mon, 19 Oct 2020 13:31:12 +0000
-Message-ID: <1603114272-25004-1-git-send-email-lizhengui@huawei.com>
+Subject: [PATCH] vhost-user-scsi: fix incorrect print type
+Date: Mon, 19 Oct 2020 13:30:25 +0000
+Message-ID: <1603114225-22628-1-git-send-email-lizhengui@huawei.com>
 X-Mailer: git-send-email 2.6.4.windows.1
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -76,58 +76,22 @@ Sender: "Qemu-devel"
 
 fix incorrect print type.
 ---
- hw/virtio/vhost-user.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ contrib/vhost-user-scsi/vhost-user-scsi.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/virtio/vhost-user.c b/hw/virtio/vhost-user.c
-index 9c5b4f7..db563bd 100644
---- a/hw/virtio/vhost-user.c
-+++ b/hw/virtio/vhost-user.c
-@@ -308,7 +308,7 @@ static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
-     /* validate message size is sane */
-     if (msg->hdr.size > VHOST_USER_PAYLOAD_SIZE) {
-         error_report("Failed to read msg header."
--                " Size %d exceeds the maximum %zu.", msg->hdr.size,
-+                " Size %u exceeds the maximum %zu.", msg->hdr.size,
-                 VHOST_USER_PAYLOAD_SIZE);
-         return -1;
+diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
+index 3c91238..1527ffd 100644
+--- a/contrib/vhost-user-scsi/vhost-user-scsi.c
++++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
+@@ -182,7 +182,7 @@ static int handle_cmd_sync(struct iscsi_context *ctx,
+         task->iovector_in.niov = in_len;
      }
-@@ -319,7 +319,7 @@ static int vhost_user_read(struct vhost_dev *dev, VhostUserMsg *msg)
-         r = qemu_chr_fe_read_all(chr, p, size);
-         if (r != size) {
-             error_report("Failed to read msg payload."
--                         " Read %d instead of %d.", r, msg->hdr.size);
-+                         " Read %d instead of %u.", r, msg->hdr.size);
-             return -1;
-         }
-     }
-@@ -740,7 +740,7 @@ static int send_add_regions(struct vhost_dev *dev,
-                  */
-                 if (msg_reply.hdr.size != msg->hdr.size) {
-                     error_report("%s: Unexpected size for postcopy reply "
--                                 "%d vs %d", __func__, msg_reply.hdr.size,
-+                                 "%u vs %u", __func__, msg_reply.hdr.size,
-                                  msg->hdr.size);
-                     return -1;
-                 }
-@@ -905,7 +905,7 @@ static int vhost_user_set_mem_table_postcopy(struct vhost_dev *dev,
-          */
-         if (msg_reply.hdr.size != msg.hdr.size) {
-             error_report("%s: Unexpected size for postcopy reply "
--                         "%d vs %d", __func__, msg_reply.hdr.size,
-+                         "%u vs %u", __func__, msg_reply.hdr.size,
-                          msg.hdr.size);
-             return -1;
-         }
-@@ -1445,7 +1445,7 @@ static void slave_read(void *opaque)
  
-     if (hdr.size > VHOST_USER_PAYLOAD_SIZE) {
-         error_report("Failed to read msg header."
--                " Size %d exceeds the maximum %zu.", hdr.size,
-+                " Size %u exceeds the maximum %zu.", hdr.size,
-                 VHOST_USER_PAYLOAD_SIZE);
-         goto err;
-     }
+-    g_debug("Sending iscsi cmd (cdb_len=%d, dir=%d, task=%p)",
++    g_debug("Sending iscsi cmd (cdb_len=%d, dir=%u, task=%p)",
+          cdb_len, dir, task);
+     if (!iscsi_scsi_command_sync(ctx, 0, task, NULL)) {
+         g_warning("Error serving SCSI command");
 -- 
 1.8.3.1
 
