@@ -2,93 +2,94 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90648C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03282C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:24:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F0C6E2231B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CD552231B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:24:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q8oKyXk8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0C6E2231B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cHU5VTk9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CD552231B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUX0p-0002mc-Ux
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:23:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42018)
+	id 1kUX1q-0004Jk-AR
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:24:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUWqZ-0006sV-Fx
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:15 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33366)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUWqV-0002kJ-Up
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:14 -0400
-Received: by mail-wr1-x441.google.com with SMTP id b8so180015wrn.0
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 08:13:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=kLCgJNRELMxG1PAWJwJlgP80Ymoy4kuq1bsu+yq9fEQ=;
- b=q8oKyXk8lShUd8g1quoB7Qr1ZdncnUXrAW3TcBPPd06bpvGw1ESIGJNfEKmubWDsyq
- rsd0orW58GjAf4L7c2ewRj0aSlxh7xQEX2qOHiG/sQbCQlqde35mAiRvpiVKh2fLNveq
- 7NyCVLEbKfc/oVjaqAOySWfb5qgrTJvCEKmHBuUMyNY7/R3X9SUbThLUHFFGQuHAI2uV
- gOZnAfxlZX7WgMkQrq4iRWqFdGy6lXObIYz3ruBafJE5bkhVANow0FoRAP4ZZ8eZJ8Nz
- CMO51IVl5Ky4xs9nbUH0Pdh5igYXVRJCmP5FA8LAq67hUoQ+JpXVdZdp1Qx+13ETt/n7
- BHvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=kLCgJNRELMxG1PAWJwJlgP80Ymoy4kuq1bsu+yq9fEQ=;
- b=DXk8LR6L6qVAqkMvP9TA+FNByO4B5YwvyxJjGtijja/SdU2YX5pHkN8TCNRXHcXXGM
- EA6IiEj3xn/dSSDt/1jDrWJ0rP/aoN3HKaABbuQ11icWCloTuPmtwkGhW5IwAgRH/SaV
- gIwyz8qBIHxIR+fxISM9sVM/aho7CWZjug4siK9yUnn9zugHVEIoiLizf3ZAt0iFUAUS
- 2H6jRspzBoVlfubWKCgYG9ver2B3XZHVCLQwntQveLxV13a0ZShIHdigpPpmglj6IlkT
- 01Mccd+jSlkQMqQ0iPp5Koo/ubZfZzmAFJEETtoujW0/CkLNF/kqB7pIYn11GV4fJdnY
- ZN+g==
-X-Gm-Message-State: AOAM5319Ylehh7iOzIYu3emcQ9dpt9jmJfG6V0h75D7hWjmT+QKpOWfX
- O9VH1aw1ZkCHz/M0+NEaH2pCdQ==
-X-Google-Smtp-Source: ABdhPJzhe4PUVIdfJqtJdpDK+9K7Sp5MC4wZZnRr5e9G/Zy/omywWpMwFoEHKpbskPQPRNVCGHyB6A==
-X-Received: by 2002:a5d:480b:: with SMTP id l11mr20640042wrq.225.1603120388580; 
- Mon, 19 Oct 2020 08:13:08 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y14sm309918wma.48.2020.10.19.08.13.07
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Oct 2020 08:13:07 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-arm@nongnu.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2 04/10] target/arm: Make the t32 insn[25:23]=111 group
- non-overlapping
-Date: Mon, 19 Oct 2020 16:12:55 +0100
-Message-Id: <20201019151301.2046-5-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201019151301.2046-1-peter.maydell@linaro.org>
-References: <20201019151301.2046-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kUX0V-0002WK-Uz
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:23:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34101)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <drjones@redhat.com>)
+ id 1kUX0P-0003yJ-FN
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:23:30 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603121002;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=8qqe4i/Zi2sPJmvXzSJ7X87OrF4YFyucaDslDr3ii2k=;
+ b=cHU5VTk9/jFqXNF7ktDFWhQwS7pl8PR+tphuUlxHuTWIu2tm4QCBorr+L9qohTrXlecTJp
+ vPNzQoUM2XsMLmq3YrnuMFCkYcFQHRGyq9e+2k40FpWvhxwkOyB9OZI/cQGtdR3PH8S9Yd
+ yi6miACOTWFdDFEbJ6iSSBlwhcLf0To=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-284-cXtUVPOHN9uPi8dHsLPXhg-1; Mon, 19 Oct 2020 11:23:17 -0400
+X-MC-Unique: cXtUVPOHN9uPi8dHsLPXhg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C574A8049C1;
+ Mon, 19 Oct 2020 15:23:15 +0000 (UTC)
+Received: from kamzik.brq.redhat.com (unknown [10.40.193.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F5F410013D0;
+ Mon, 19 Oct 2020 15:23:13 +0000 (UTC)
+Date: Mon, 19 Oct 2020 17:23:11 +0200
+From: Andrew Jones <drjones@redhat.com>
+To: Dave Martin <Dave.Martin@arm.com>
+Subject: Re: Kernel patch cases qemu live migration failed.
+Message-ID: <20201019152311.csxcz52sawia4imi@kamzik.brq.redhat.com>
+References: <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
+ <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
+ <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
+ <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
+ <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
+ <20201019113157.GN32292@arm.com>
+ <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
+ <20201019134043.vqusmzhqp7owjt6x@kamzik.brq.redhat.com>
+ <CAFEAcA8RB6MTnv0qavxWs28=pbT16i9dT1pd+0Dy9HxPVk+bZA@mail.gmail.com>
+ <20201019145839.GO32292@arm.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201019145839.GO32292@arm.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=drjones@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=drjones@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,87 +102,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: qemu-devel <qemu-devel@nongnu.org>,
+ Peter Maydell <peter.maydell@linaro.org>, xu910121@sina.com,
+ kvmarm <kvmarm@lists.cs.columbia.edu>, Marc Zyngier <maz@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The t32 decode has a group which represents a set of insns
-which overlap with B_cond_thumb because they have [25:23]=111
-(which is an invalid condition code field for the branch insn).
-This group is currently defined using the {} overlap-OK syntax,
-but it is almost entirely non-overlapping patterns. Switch
-it over to use a non-overlapping group.
+On Mon, Oct 19, 2020 at 03:58:40PM +0100, Dave Martin wrote:
+> On Mon, Oct 19, 2020 at 03:18:11PM +0100, Peter Maydell wrote:
+> > On Mon, 19 Oct 2020 at 14:40, Andrew Jones <drjones@redhat.com> wrote:
+> > >
+> > > On Mon, Oct 19, 2020 at 12:43:33PM +0100, Peter Maydell wrote:
+> > > > Well, ID regs are special in the architecture -- they always exist
+> > > > and must RAZ/WI, even if they're not actually given any fields yet.
+> > > > This is different from other "unused" parts of the system register
+> > > > encoding space, which UNDEF.
+> > >
+> > > Table D12-2 confirms the register should be RAZ, as it says the register
+> > > is "RO, but RAZ if SVE is not implemented". Does "RO" imply "WI", though?
+> > > For the guest we inject an exception on writes, and for userspace we
+> > > require the value to be preserved on write.
+> > 
+> > Sorry, I mis-spoke. They're RAZ, but not WI, just RO (which is to say
+> > they'll UNDEF if you try to write to them).
+> > 
+> > > I think we should follow the spec, even for userspace access, and be RAZ
+> > > for when the feature isn't implemented. As for writes, assuming the
+> > > exception injection is what we want for the guest (not WI), then that's
+> > > correct. For userspace, I think we should continue forcing preservation
+> > > (which will force preservation of zero when it's RAZ).
+> > 
+> > Yes, that sounds right.
+> 
+> [...]
+> 
+> > > > The problem is that you've actually removed registers from
+> > > > the list that were previously in it (because pre-SVE
+> > > > kernels put this ID register in the list as a RAZ/WI register,
+> > > > and now it's not in the list if SVE isn't supported).
+> 
+> Define "previously", though.  IIUC, the full enumeration was added in
+> v4.15 (with ID_AA64ZFR0_EL1 still not supported at all):
+> 
+> v4.15-rc1~110^2~27
+> 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
+> 
+> 
+> And then ID_AA64FZR0_EL1 was removed from the enumeration, also in
+> v4.15:
+> 
+> v4.15-rc1~110^2~5
+> 07d79fe7c223 ("arm64/sve: KVM: Hide SVE from CPU features exposed to guests")
+> 
+> 
+> So, are there really two upstram kernel tags that are mismatched on
+> this, or is this just a bisectability issue in v4.14..v4.15?
+> 
+> It's a while since I looked at this, and I may have misunderstood the
+> timeline.
+> 
+> 
+> > > > > So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
+> > > > > parhaps we should move all ID_UNALLOCATED() regs (and possibly
+> > > > > ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
+> > > >
+> > > > What does this do as far as the user-facing list-of-registers
+> > > > is concerned? All these registers need to remain in the
+> > > > KVM_GET_REG_LIST list, or you break migration from an old
+> > > > kernel to a new one.
+> 
+> OK, I think I see where you are coming from, now.
+> 
+> It may make sense to get rid of the REG_HIDDEN_GUEST / REG_HIDDEN_USER
+> distinction, and provide the same visibility for userspace as for MSR/
+> MRS all the time.  This would restore ID_AA64ZFR0_EL1 into the userspace
+> view, and may also allow a bit of simplification in the code.
+> 
+> Won't this will still break migration from the resulting kernel to a
+> current kernel that hides ID_AA64ZFR0_EL1?  Or have I misunderstood
+> something.
+>
 
-For this to be valid syntactically, CPS must move into the same
-overlapping-group as the hint insns (CPS vs hints was the
-only actual use of the overlap facility for the group).
+Yes, but, while neither direction old -> new nor new -> old is actually
+something that people should do when using host cpu passthrough (they
+should only ever migrate between identical hosts, both hardware and
+host kernel version), migrating from old -> new makes more sense, as
+that's the upgrade path, and it's more supportable - we can workaround
+things on the new side. So, long story short, new -> old will fail due
+to making this change, but it's still probably the right thing to do,
+as we'll be defining a better pattern for ID registers going forward,
+and we never claimed new -> old migrations would work anyway with host
+passthrough.
 
-The non-overlapping subgroup for CLREX/DSB/DMB/ISB/SB is no longer
-necessary and so we can remove it (promoting those insns to
-be members of the parent group).
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- target/arm/t32.decode | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
-
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index d8454bd814e..7d5e000e82c 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -296,8 +296,8 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
- {
-   # Group insn[25:23] = 111, which is cond=111x for the branch below,
-   # or unconditional, which would be illegal for the branch.
--  {
--    # Hints
-+  [
-+    # Hints, and CPS
-     {
-       YIELD      1111 0011 1010 1111 1000 0000 0000 0001
-       WFE        1111 0011 1010 1111 1000 0000 0000 0010
-@@ -310,20 +310,18 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-       # The canonical nop ends in 0000 0000, but the whole rest
-       # of the space is "reserved hint, behaves as nop".
-       NOP        1111 0011 1010 1111 1000 0000 ---- ----
-+
-+      # If imod == '00' && M == '0' then SEE "Hint instructions", above.
-+      CPS        1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
-+                 &cps
-     }
- 
--    # If imod == '00' && M == '0' then SEE "Hint instructions", above.
--    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
--                 &cps
--
-     # Miscellaneous control
--    [
--      CLREX      1111 0011 1011 1111 1000 1111 0010 1111
--      DSB        1111 0011 1011 1111 1000 1111 0100 ----
--      DMB        1111 0011 1011 1111 1000 1111 0101 ----
--      ISB        1111 0011 1011 1111 1000 1111 0110 ----
--      SB         1111 0011 1011 1111 1000 1111 0111 0000
--    ]
-+    CLREX        1111 0011 1011 1111 1000 1111 0010 1111
-+    DSB          1111 0011 1011 1111 1000 1111 0100 ----
-+    DMB          1111 0011 1011 1111 1000 1111 0101 ----
-+    ISB          1111 0011 1011 1111 1000 1111 0110 ----
-+    SB           1111 0011 1011 1111 1000 1111 0111 0000
- 
-     # Note that the v7m insn overlaps both the normal and banked insn.
-     {
-@@ -351,7 +349,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-     HVC          1111 0111 1110 ....  1000 .... .... ....     \
-                  &i imm=%imm16_16_0
-     UDF          1111 0111 1111 ----  1010 ---- ---- ----
--  }
-+  ]
-   B_cond_thumb   1111 0. cond:4 ...... 10.0 ............      &ci imm=%imm21
- }
- 
--- 
-2.20.1
+Thanks,
+drew
 
 
