@@ -2,92 +2,99 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 225A8C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:34:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 72D852224D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:26:02 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ersHZS3a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 72D852224D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id B05E3222EA
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:34:53 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B05E3222EA
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYv3-00071c-9R
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:26:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46860)
+	id 1kUZ3c-0001n5-43
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:34:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kUYtx-0005qs-Cq
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:24:53 -0400
-Received: from mail-lj1-x236.google.com ([2a00:1450:4864:20::236]:40830)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kUYtv-0004QY-LE
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:24:52 -0400
-Received: by mail-lj1-x236.google.com with SMTP id 23so921966ljv.7
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:24:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version; bh=6cXcyq49YeK0CIacutBMvNQbn/a7ge9uZijJ3uFfqH0=;
- b=ersHZS3aQSEPjBUkvwNZht1Cs7SbW0XuBqRNMCP2MD5SQNwhlLkkUVt0ZtQ+iduPJo
- D/2vvn+5TvGJkvM1ICAWtW/3SEXqfoVqkrJjxCC3KczY0busY6UNVLTSgwKerSJshjrS
- AFAqzoUed5U40SCnPquYdihj3K9aDGxG6y+G8uW9Vuq9y9O1qdkkNU1zyUeYjLLzn731
- N+ZT3s0jctoVgGWfDYtVwbaLoSY43IcTPgSaJRLYaswtqk3gUL6n02tHhXN7ScDHxhWq
- sVsO1tLiiu15Gi1w1BKmjlWk+CXm9kMuD6ubfHCSs/HqB2gwmBAgL1+r46DJez5diFbF
- qPUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version;
- bh=6cXcyq49YeK0CIacutBMvNQbn/a7ge9uZijJ3uFfqH0=;
- b=qkSTe9xFE3UhyHn3MOoGcgpwjWZUWVvK6RaP9fqPPGVESS0DfoalqESI5Xue6EO+zG
- 1o68lnqxlKZjTLLvb3pmwTxdHQt2McbuxTl6/oytX8o8yZdHXEOkJZiXk70uuwDK+4XU
- lAqkw4Q884u1WAIn3aieAlXQ+qHXsdtmF9W5VgZlP2Jr2WuKOzodOm4hWi7DLfp3OwYj
- RUANg1axrQsmJOdnW9T2e0DCfpv5ebmX6rTeW1MTulgbi/ia82nBXZmDDX6RsI4S+gjs
- B2TxEegLg/QNayXORv1Mqnp4bWC8DC8sLx5Cj7h+PRc3j20fatXkYAcyXrMd2IfCeRDd
- YeYg==
-X-Gm-Message-State: AOAM532O5oewYJfnTctf48vHCBK+6KnKpQR68bvYLdWMlEoQ+1sHGP0a
- ABTtQ8I4uQS1WO/DKr4Cl6s=
-X-Google-Smtp-Source: ABdhPJwVUyVWQJaWxaSVU02Ji2Mm0yFrYt1CU5SvPcJz+d5yAlO5lyGhK8CibvRwXvtPDls6AFGRwQ==
-X-Received: by 2002:a2e:80d2:: with SMTP id r18mr478382ljg.286.1603128289613; 
- Mon, 19 Oct 2020 10:24:49 -0700 (PDT)
-Received: from [192.168.2.1] (net.iroazh.eu. [109.190.73.171])
- by smtp.gmail.com with ESMTPSA id 130sm86438ljj.69.2020.10.19.10.24.48
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 19 Oct 2020 10:24:49 -0700 (PDT)
-From: "Emmanuel Blot" <eblot.ml@gmail.com>
-To: "Paolo Bonzini" <pbonzini@redhat.com>
-Subject: Re: ld: file not found: _PreallocMode_lookup on macOS Catalina
-Date: Mon, 19 Oct 2020 19:24:47 +0200
-X-Mailer: MailMate (1.13.2r5673)
-Message-ID: <D99AD299-56A5-4252-9A39-FA0262B24B24@gmail.com>
-In-Reply-To: <1cdb3e50-0dfb-3ddd-fed7-142e893fa364@redhat.com>
-References: <24B952F3-465C-4AB2-AF28-6CA4722D94B7@gmail.com>
- <3869557c-10a0-8f07-a59a-69120a522568@redhat.com>
- <AA504B32-5134-4CDD-8CDA-6F200C7376CF@gmail.com>
- <1cdb3e50-0dfb-3ddd-fed7-142e893fa364@redhat.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUZ05-0000Ye-P7; Mon, 19 Oct 2020 13:31:15 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:54673)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUZ03-0005fD-18; Mon, 19 Oct 2020 13:31:13 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id 38EAC793;
+ Mon, 19 Oct 2020 13:31:08 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Mon, 19 Oct 2020 13:31:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=/mt0GAFdrGAiNoFPYWlHnOZSQWa
+ 3S99EftvEcSEdRGg=; b=NU+CyevPej3wm5LAakIAYJBU2MoCtZLgXk9fBijXlMS
+ p/KyeM4Z55TbYJWr2hW6tYzv+oxl3bUwYkJptHTiTJWnad0H/wlOU41/M+Iwn0zE
+ XPQVvI5EUyuHmb1OUl0t/hWXufvMoIDCiRBoBQ+qjKpm1efeY4ILMmWf6MV1pXYL
+ gKGPrlykBEd9W6Nl1aD2zVqerRAt/Pe4jtfSWs2dRVUTBY484uUGW8NyN9ccF4jY
+ ISQPSdkg0tHYti59g5v47RPrAuT3l1fhQ7DbKh5FBONM8orDjTMIph0sUvlccImP
+ ISaqlWVg/yi0Hitr8WsOBRB0nwyKrHuwNw4OKX6jTQg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=/mt0GA
+ FdrGAiNoFPYWlHnOZSQWa3S99EftvEcSEdRGg=; b=hEErORGqtBYgRQDXWYbq+r
+ HqDCtZrrTDQ2MM10yWVH8hrauEYp8uZKjB+HCI6hHdRz3rjCd4D0Rk7g2vvNPnty
+ XBtMpdz5VHyEaohifwlIYg3+6UGsDWeZE6EEJVyM+oySTkFECHNZSe1AQPf9cKXg
+ wKfQjq/CNzt5/KLNa4RxLkV0SWxsXKMOkynYXsgmmza7SNey7CXseH9yaI1fqZ8e
+ 3HWf+MUXfmNA8c+wCYXzKXayZwuMFKJQCvDb+zphZMVuYB9wQX1wTSdxCzplQyjI
+ f4NkqWsBWRDXSV01bjFLEBYN163xFy2lykm3GHKYMnstyDJDeVv6sFkHGcAjF9Bw
+ ==
+X-ME-Sender: <xms:Ws2NXyEi2okUYkBa2eYekuXVrDubc7IFc2RUiF70aGeqdjpcj3fDQg>
+ <xme:Ws2NXzVK7AjPe5IuMfgoigiekXjTrsy--mRchj65L0OKaUEd_8r05JnL54H0bXDCq
+ 4wyIrmHyFPEiLFXWAA>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjedugdduudegucetufdoteggodetrfdotf
+ fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+ uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+ cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
+ keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:Ws2NX8KOg21ecTx329aFriQpqwB0s3lZHblaWfN5vjvcUlVdMJXE-A>
+ <xmx:Ws2NX8GAAe_yOK49-n6j08f5K_tP_S312Z4wBGn6KW3zVgjBvcFpaA>
+ <xmx:Ws2NX4X8gGlhCZG8G-qXVn1XH0r7fIzBWORq6e13nr_vVtnlHJxsdw>
+ <xmx:W82NXyfmtVMTbRVWiLdt4lXormE07i5Sp9Lsc2jtgdW7JRHitu3MrJ8FtLk>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 55A31328005D;
+ Mon, 19 Oct 2020 13:31:05 -0400 (EDT)
+Date: Mon, 19 Oct 2020 19:31:03 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH] hw/block/nvme: fix prp mapping status codes
+Message-ID: <20201019173103.GE10549@apples.localdomain>
+References: <20201019113039.76146-1-its@irrelevant.dk>
+ <20201019163455.GA1435260@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-Received-SPF: pass client-ip=2a00:1450:4864:20::236;
- envelope-from=eblot.ml@gmail.com; helo=mail-lj1-x236.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="so9zsI5B81VjUb/o"
+Content-Disposition: inline
+In-Reply-To: <20201019163455.GA1435260@dhcp-10-100-145-180.wdc.com>
+Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
+ helo=wnew1-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 13:31:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,28 +108,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- Markus Armbruster <armbru@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>,
+ Gollu Appalanaidu <anaidu.gollu@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19 Oct 2020, at 19:14, Paolo Bonzini wrote:
 
-Sorry, I received your email just after I posted mine.
+--so9zsI5B81VjUb/o
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> I think this could be the fix.  The problem would be that
->
-> 	awk '$2=="U"{print "-Wl,-u," $1}'
+On Oct 19 09:34, Keith Busch wrote:
+> On Mon, Oct 19, 2020 at 01:30:39PM +0200, Klaus Jensen wrote:
+> > @@ -328,7 +328,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t =
+prp1, uint64_t prp2,
+> >      trace_pci_nvme_map_prp(trans_len, len, prp1, prp2, num_prps);
+> > =20
+> >      if (unlikely(!prp1)) {
+> > -        trace_pci_nvme_err_invalid_prp();
+> > +        trace_pci_nvme_err_invalid_prp1_missing();
+>=20
+> Why is address 0 considered a missing entry? Some embedded systems
+> consider that a valid address.
+>=20
+> Otherwise, the offset checks look correct. And I realize the check for 0
+> predates this patch anyway, but it's not the correct thing to do: as
+> long as the host requests a properly aligned address, and 0 is aligned,
+> the controller should attempt to use it.
+>=20
 
-/
+Uhm. That's a good point.
 
-> Great, thanks.  Can you check if my patch would also work, as it would
-> adhere more to the pre-conversion logic?
+--so9zsI5B81VjUb/o
+Content-Type: application/pgp-signature; name="signature.asc"
 
-You fix does work, you can forget mine.
+-----BEGIN PGP SIGNATURE-----
 
-Thanks for the quick fix,
-Emmanuel.
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+NzVUACgkQTeGvMW1P
+DenTBQf/XzuDaZQ1iaCJFIJJRXMT9hSIyHJvxBUV1jwsykjRXNkeZJpltM3YgJY0
+jtNCM/DU7be7YRAyE2fy+kqSPMUbjag/VFtCMUMlFTfuj10NP7wgO/on+Ipll1QL
+5E885ITvjTH5LTHQnEpdFKEAhuUDq1+NT+1vukyURS6XTa6V06nLzSD1B+3Fuabl
+z8vEtf28+7LB4gjlr/QxVUeH0S2+ICiAK9ItUt3gjPM2NoWrq0SYwRRrbSfAnlLW
+/KKtphsIa+B3BnKp/lt7LtKp/VwYqoglpxJNHlzus1lS+YjHUxBHkte8WZu/oaxw
+6aBjyWCxyXJoNJLKzogbLJZT9/WR9w==
+=FCpM
+-----END PGP SIGNATURE-----
+
+--so9zsI5B81VjUb/o--
 
