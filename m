@@ -2,86 +2,64 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC797C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11672C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:11:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9DE221741
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:11:01 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ze+dZL+a"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9DE221741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 77E062222C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:11:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77E062222C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48936 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUpXg-0006Xw-Sq
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:11:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49620)
+	id 1kUpXh-0006aY-EU
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:11:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUpS0-0007ga-IT
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:05:08 -0400
-Received: from mail-ed1-x535.google.com ([2a00:1450:4864:20::535]:39843)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUpRy-0006xL-HD
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:05:08 -0400
-Received: by mail-ed1-x535.google.com with SMTP id t21so1370246eds.6
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 04:05:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=19qn0BCYWTM0zx/HwCCABK7hV/xe9G+1LyV7NGMXlQU=;
- b=Ze+dZL+aSJSyQyvOV24FW+TcTcJ4hKvSue+XKEjS9cR6zBBkjaBZBMt6awYUppzhh5
- fBRuBN+wv0IAOGiWtN0DY5Wd8Rkz+MTmgzFKKJkCK9SIQ/qxrHGU0N7rk+Byd455zA7Y
- vSZsQF+h604Fd4CdXBq0MkiAGHaoh3oRxlWn+5F4Ll0r8Dt56mU9Er4VVYIk3bGRXvbo
- w9JVrJK5qpgy+Bxtskb/Xcz/m/pzygG2tuvy2SoUvLVHpK03hobVVT0eC6HhNQh0az+P
- nYxhwtk0cVd8+xGoZ9Pl/UvyfWWbMEQ490J94y9lvnaTbcueAssKX6mCjAiJnmn7yGyM
- NYcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=19qn0BCYWTM0zx/HwCCABK7hV/xe9G+1LyV7NGMXlQU=;
- b=uLNrzZnW3dYd7Sz8joeV6ThPi+WVnNb8YprG8y7qoIpOWADFrmPR1QV8B9nTKTZNHj
- lIz5YcjWoWJGbj8K77idlC+e6ccFNStbpnyOXOXTB8Gqt1Gpb1ztofrnYNYikUHR5XMs
- EEr3wqu6WEc1S//j3vF3RFUFp22J/cysFVPv+nbYVgNhcztQ3kRh3c5PujvY/d+Purjx
- Jr3CNRXaHKyNUIbkp2JpVLogJ04JueitzMsXZXyvj1WXd0RDX0/D5m8divXcCriGcsmP
- Pvz8MZ8gv69esvB8D1rJwz0x4VO5egvDWOGt90hl+cLNoaMwz7hMcw2MRf3pTJexLEkw
- 2qEQ==
-X-Gm-Message-State: AOAM531VHY1HnsC7qZMWDXztBhc1LiXgBUVUvg03OIly+nGfn1FoUGR7
- xNzLs4bL5/GDNnMo5SYIP09GF9xeCQx20sk4vG+FlQ==
-X-Google-Smtp-Source: ABdhPJyxgQ1NUIDElmJPF32wlaL+q6lIGOZ6SS+mmUFF3b6UdtFwUNurBr+pczB3pHND2ZDQUpmCeZsgP0D2mo4LuYg=
-X-Received: by 2002:a05:6402:3133:: with SMTP id
- dd19mr2232319edb.100.1603191904687; 
- Tue, 20 Oct 2020 04:05:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <ganqixin@huawei.com>)
+ id 1kUpQx-00067S-LH; Tue, 20 Oct 2020 07:04:03 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:38960 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ganqixin@huawei.com>)
+ id 1kUpQv-0006oj-FT; Tue, 20 Oct 2020 07:04:03 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id ACACA193F93C4181BED7;
+ Tue, 20 Oct 2020 19:03:49 +0800 (CST)
+Received: from huawei.com (10.175.104.175) by DGGEMS403-HUB.china.huawei.com
+ (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 19:03:39 +0800
+From: Gan Qixin <ganqixin@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH 02/10] hw/core/:split some lines containing more than 80
+ characters
+Date: Tue, 20 Oct 2020 04:30:15 +0800
+Message-ID: <20201019203023.658555-3-ganqixin@huawei.com>
+X-Mailer: git-send-email 2.23.0
+In-Reply-To: <20201019203023.658555-1-ganqixin@huawei.com>
+References: <20201019203023.658555-1-ganqixin@huawei.com>
 MIME-Version: 1.0
-References: <20201020100239.272748-1-anthony.perard@citrix.com>
-In-Reply-To: <20201020100239.272748-1-anthony.perard@citrix.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Oct 2020 12:04:53 +0100
-Message-ID: <CAFEAcA-_w_tve3MfUnPLMJyerox_f8JQAu2SsvCV29O=ZKY9Gg@mail.gmail.com>
-Subject: Re: [PULL 0/4] xen queue 2020-10-20
-To: Anthony PERARD <anthony.perard@citrix.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::535;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x535.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.175]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=ganqixin@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:03:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -31
+X-Spam_score: -3.2
+X-Spam_bar: ---
+X-Spam_report: (-3.2 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_12_24=1.049,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,39 +72,132 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: lvivier@redhat.com, peter.maydell@linaro.org,
+ zhang.zhanghailiang@huawei.com, mst@redhat.com, f4bug@amsat.org,
+ alistair.francis@wdc.com, Gan Qixin <ganqixin@huawei.com>,
+ kuhn.chenqun@huawei.com, david@gibson.dropbear.id.au
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Oct 2020 at 11:02, Anthony PERARD <anthony.perard@citrix.com> wrote:
->
-> The following changes since commit d76f4f97eb2772bf85fe286097183d0c7db19ae8:
->
->   Merge remote-tracking branch 'remotes/cschoenebeck/tags/pull-9p-20201019' into staging (2020-10-19 14:39:27 +0100)
->
-> are available in the Git repository at:
->
->   https://xenbits.xen.org/git-http/people/aperard/qemu-dm.git tags/pull-xen-20201020
->
-> for you to fetch changes up to 8959e0a63a3a681a31ff8397d9345a88e6d905bf:
->
->   hw/xen: Set suppress-vmdesc for Xen machines (2020-10-19 16:33:28 +0100)
->
-> ----------------------------------------------------------------
-> Xen queue
->
-> * cleanup patches.
-> * improve xen backend setup performance when other xen guests are
->   running/booting.
-> * improve xen guest migration when running in a stubdomain.
->
+By using scripts/checkpatch.pl, it is found that many files in hw/core/
+contain lines with more than 80 characters.
 
+Signed-off-by: Gan Qixin <ganqixin@huawei.com>
+---
+ hw/core/bus.c                    |  3 ++-
+ hw/core/loader.c                 | 17 +++++++++++------
+ hw/core/machine-hmp-cmds.c       |  6 ++++--
+ hw/core/machine.c                |  3 ++-
+ hw/core/qdev-properties-system.c |  4 ++--
+ 5 files changed, 21 insertions(+), 12 deletions(-)
 
-Applied, thanks.
+diff --git a/hw/core/bus.c b/hw/core/bus.c
+index a0483859ae..9b2dc7e25c 100644
+--- a/hw/core/bus.c
++++ b/hw/core/bus.c
+@@ -158,7 +158,8 @@ void qbus_create_inplace(void *bus, size_t size, const char *typename,
+     qbus_init(bus, parent, name);
+ }
+ 
+-BusState *qbus_create(const char *typename, DeviceState *parent, const char *name)
++BusState *qbus_create(const char *typename, DeviceState *parent,
++                      const char *name)
+ {
+     BusState *bus;
+ 
+diff --git a/hw/core/loader.c b/hw/core/loader.c
+index 8bbb1797a4..50839d93e3 100644
+--- a/hw/core/loader.c
++++ b/hw/core/loader.c
+@@ -211,14 +211,18 @@ static void bswap_ahdr(struct exec *e)
+ #define N_TXTOFF(x)							\
+     (N_MAGIC(x) == ZMAGIC ? _N_HDROFF((x)) + sizeof (struct exec) :	\
+      (N_MAGIC(x) == QMAGIC ? 0 : sizeof (struct exec)))
+-#define N_TXTADDR(x, target_page_size) (N_MAGIC(x) == QMAGIC ? target_page_size : 0)
+-#define _N_SEGMENT_ROUND(x, target_page_size) (((x) + target_page_size - 1) & ~(target_page_size - 1))
++#define N_TXTADDR(x, target_page_size) \
++    (N_MAGIC(x) == QMAGIC ? target_page_size : 0)
++#define _N_SEGMENT_ROUND(x, target_page_size) \
++    (((x) + target_page_size - 1) & ~(target_page_size - 1))
+ 
+-#define _N_TXTENDADDR(x, target_page_size) (N_TXTADDR(x, target_page_size)+(x).a_text)
++#define _N_TXTENDADDR(x, target_page_size) \
++    (N_TXTADDR(x, target_page_size) + (x).a_text)
+ 
+ #define N_DATADDR(x, target_page_size) \
+-    (N_MAGIC(x)==OMAGIC? (_N_TXTENDADDR(x, target_page_size)) \
+-     : (_N_SEGMENT_ROUND (_N_TXTENDADDR(x, target_page_size), target_page_size)))
++    (N_MAGIC(x) == OMAGIC ? (_N_TXTENDADDR(x, target_page_size)) \
++     : (_N_SEGMENT_ROUND(_N_TXTENDADDR(x, target_page_size), \
++    target_page_size)))
+ 
+ 
+ int load_aout(const char *filename, hwaddr addr, int max_sz,
+@@ -1190,7 +1194,8 @@ int rom_check_and_register_reset(void)
+         }
+         section = memory_region_find(rom->mr ? rom->mr : get_system_memory(),
+                                      rom->addr, 1);
+-        rom->isrom = int128_nz(section.size) && memory_region_is_rom(section.mr);
++        rom->isrom = int128_nz(section.size)
++                     && memory_region_is_rom(section.mr);
+         memory_region_unref(section.mr);
+     }
+     qemu_register_reset(rom_reset, NULL);
+diff --git a/hw/core/machine-hmp-cmds.c b/hw/core/machine-hmp-cmds.c
+index 6357be9c6b..65280d53bc 100644
+--- a/hw/core/machine-hmp-cmds.c
++++ b/hw/core/machine-hmp-cmds.c
+@@ -73,7 +73,8 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+             monitor_printf(mon, "    node-id: \"%" PRIu64 "\"\n", c->node_id);
+         }
+         if (c->has_socket_id) {
+-            monitor_printf(mon, "    socket-id: \"%" PRIu64 "\"\n", c->socket_id);
++            monitor_printf(mon, "    socket-id: \"%" PRIu64 "\"\n",
++                           c->socket_id);
+         }
+         if (c->has_die_id) {
+             monitor_printf(mon, "    die-id: \"%" PRIu64 "\"\n", c->die_id);
+@@ -82,7 +83,8 @@ void hmp_hotpluggable_cpus(Monitor *mon, const QDict *qdict)
+             monitor_printf(mon, "    core-id: \"%" PRIu64 "\"\n", c->core_id);
+         }
+         if (c->has_thread_id) {
+-            monitor_printf(mon, "    thread-id: \"%" PRIu64 "\"\n", c->thread_id);
++            monitor_printf(mon, "    thread-id: \"%" PRIu64 "\"\n",
++                           c->thread_id);
+         }
+ 
+         l = l->next;
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index 7e2f4ec08e..055473c23a 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -317,7 +317,8 @@ static char *machine_get_dt_compatible(Object *obj, Error **errp)
+     return g_strdup(ms->dt_compatible);
+ }
+ 
+-static void machine_set_dt_compatible(Object *obj, const char *value, Error **errp)
++static void machine_set_dt_compatible(Object *obj,
++                                      const char *value, Error **errp)
+ {
+     MachineState *ms = MACHINE(obj);
+ 
+diff --git a/hw/core/qdev-properties-system.c b/hw/core/qdev-properties-system.c
+index 49bdd12581..c4f7170a06 100644
+--- a/hw/core/qdev-properties-system.c
++++ b/hw/core/qdev-properties-system.c
+@@ -418,8 +418,8 @@ static void set_netdev(Object *obj, Visitor *v, const char *name,
+     }
+ 
+     if (queues > MAX_QUEUE_NUM) {
+-        error_setg(errp, "queues of backend '%s'(%d) exceeds QEMU limitation(%d)",
+-                   str, queues, MAX_QUEUE_NUM);
++        error_setg(errp, "queues of backend '%s'(%d) exceeds"
++                   "QEMU limitation(%d)", str, queues, MAX_QUEUE_NUM);
+         goto out;
+     }
+ 
+-- 
+2.23.0
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
