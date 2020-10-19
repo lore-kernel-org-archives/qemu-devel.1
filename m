@@ -2,85 +2,93 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23AA4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30A61C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 54C2D222EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8DE9422314
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:50:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1h8XnTy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54C2D222EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BOwuCvq1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8DE9422314
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYLK-0006h3-2X
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:49:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36654)
+	id 1kUYMW-0007lT-A9
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:50:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36926)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kUYJt-00057d-Ox
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:47:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20637)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUYL4-0006Y8-L3
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:48:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36138)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kUYJr-0007da-Pt
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:47:37 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUYL3-0007ku-0a
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:48:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603126054;
+ s=mimecast20190719; t=1603126128;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=6+/psbPsJ2sdV3kNFa//0/F0KfQGmEIHWD2GfmJUbYg=;
- b=i1h8XnTyLkO0S/9tDOd0Ts9EOpQ5h4yjvbHT32Uf2oHSNABCLgf3TugoL4Up+p3aXRaJS+
- /3O/INnrwDzkXCEsdumOIzch/fc6jBOm53UUZ2k50ZUqh351ZEu8++hJ84vtL+gg/LbESp
- w45ruv7S3Tq9Hglmw1xjWglQzlDy+D4=
+ bh=FDSNaZFUKEIFML0TRQK8ggpjLMI28/rzzJ43JqJWn08=;
+ b=BOwuCvq1bgDHScOLIJbQTvUxUW+9jTCau9+8I0iOsjgeK9khktUDivyf+httFIraJkOlAW
+ W2YN//fZD68kjSacnPAp/bqzhcccp/Ko6LrAQh3ukp4KyipyV5GQDGFvER8b/8enWc31/Z
+ qQJicdmoGCj7ExuPFYqK8UXHRR+HK4M=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-9vbzWFbqOZWLygpcDNN1Kg-1; Mon, 19 Oct 2020 12:47:33 -0400
-X-MC-Unique: 9vbzWFbqOZWLygpcDNN1Kg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-116-EKdytOr_ORmp9xirr697DQ-1; Mon, 19 Oct 2020 12:48:46 -0400
+X-MC-Unique: EKdytOr_ORmp9xirr697DQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B8D82835B91;
- Mon, 19 Oct 2020 16:47:31 +0000 (UTC)
-Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6A3155D9D2;
- Mon, 19 Oct 2020 16:47:31 +0000 (UTC)
-Date: Mon, 19 Oct 2020 12:47:30 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: tobin@linux.ibm.com
-Subject: Re: [PATCH v5] sev: add sev-inject-launch-secret
-Message-ID: <20201019164730.GN5733@habkost.net>
-References: <20201015143713.14682-1-tobin@linux.ibm.com>
- <20201019164604.GM5733@habkost.net>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 613861084D61
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 16:48:45 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31B896716C;
+ Mon, 19 Oct 2020 16:48:45 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id AC4931132A08; Mon, 19 Oct 2020 18:48:40 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v2 0/5] qapi: Restrict machine (and migration) specific
+ commands
+References: <20201012121536.3381997-1-philmd@redhat.com>
+ <20201015182824.GG5733@habkost.net>
+ <87ft6a1wgn.fsf@dusky.pond.sub.org>
+ <20201019123014.GI5733@habkost.net>
+Date: Mon, 19 Oct 2020 18:48:40 +0200
+In-Reply-To: <20201019123014.GI5733@habkost.net> (Eduardo Habkost's message of
+ "Mon, 19 Oct 2020 08:30:14 -0400")
+Message-ID: <87mu0i2mc7.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-In-Reply-To: <20201019164604.GM5733@habkost.net>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,65 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, dgilbert@redhat.com, berrange@redhat.com,
- pbonzini@redhat.com
+Cc: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 12:46:08PM -0400, Eduardo Habkost wrote:
-> On Thu, Oct 15, 2020 at 10:37:13AM -0400, tobin@linux.ibm.com wrote:
-> [...]
-> > diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> > index 88e3f39a1e..2d2ee54cc6 100644
-> > --- a/target/i386/sev-stub.c
-> > +++ b/target/i386/sev-stub.c
-> > @@ -49,3 +49,8 @@ SevCapability *sev_get_capabilities(Error **errp)
-> >      error_setg(errp, "SEV is not available in this QEMU");
-> >      return NULL;
-> >  }
-> > +int sev_inject_launch_secret(const char *hdr, const char *secret,
-> > +                             uint64_t gpa)
-> > +{
-> > +    return 1;
-> > +}
-> 
-> This doesn't match the actual function prototype.  I had to apply the following
-> fixup:
-> 
-> ---
-> diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-> index 2d2ee54cc6..62a2587e7b 100644
-> --- a/target/i386/sev-stub.c
-> +++ b/target/i386/sev-stub.c
-> @@ -49,8 +49,10 @@ SevCapability *sev_get_capabilities(Error **errp)
->      error_setg(errp, "SEV is not available in this QEMU");
->      return NULL;
->  }
-> +
->  int sev_inject_launch_secret(const char *hdr, const char *secret,
-> -                             uint64_t gpa)
-> +                             uint64_t gpa, Error *errp)
+Eduardo Habkost <ehabkost@redhat.com> writes:
 
-Oops. Fixing up the fixup:
+> On Mon, Oct 19, 2020 at 09:55:20AM +0200, Markus Armbruster wrote:
+>> Eduardo Habkost <ehabkost@redhat.com> writes:
+>>=20
+>> > On Mon, Oct 12, 2020 at 02:15:31PM +0200, Philippe Mathieu-Daud=C3=A9 =
+wrote:
+>> >> Reduce the machine code pulled into qemu-storage-daemon.
+>> >>=20
+>> >> The series is fully Acked, but Markus wants it reviewed
+>> >> by the Machine core maintainers.
+>> >
+>> > I've confirmed that all patches move QAPI schema code without
+>> > introducing any additional changes.
+>> >
+>> > Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+>>=20
+>> I take this as "I agree the things moved to machine.json belong there".
+>> Holler if I'm mistaken.
+>
+> I agree machine.json is better than misc.json for them, yes.
+>
+> I miss short descriptions of the purpose of each file, though.
+> It would help us decide what's appropriate in the future.
 
----
-diff --git a/target/i386/sev-stub.c b/target/i386/sev-stub.c
-index 62a2587e7b..e4e60d9a7d 100644
---- a/target/i386/sev-stub.c
-+++ b/target/i386/sev-stub.c
-@@ -51,7 +51,7 @@ SevCapability *sev_get_capabilities(Error **errp)
- }
- 
- int sev_inject_launch_secret(const char *hdr, const char *secret,
--                             uint64_t gpa, Error *errp)
-+                             uint64_t gpa, Error **errp)
- {
-     error_setg(errp, "SEV is not available in this QEMU");
-     return 1;
+The QAPI modules are commonly aligned with sub-systems defined in
+MAINTAINERS.
 
--- 
-Eduardo
+Regardless, file comments would be nice.
 
 
