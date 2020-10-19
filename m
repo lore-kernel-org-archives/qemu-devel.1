@@ -2,85 +2,90 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1BFFC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83226C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:53:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 38C9622240
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A971B2224D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:53:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZLWOeFA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 38C9622240
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lKtrtm9n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A971B2224D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44240 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51232 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kURn7-0008M3-30
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 05:49:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50608)
+	id 1kURr6-0002zl-II
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 05:53:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52084)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kURjp-0005EP-Vx
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:45:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32437)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kURjg-0001zQ-0M
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:45:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603100744;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=L8ffqZ+SBgziaMJy6OpuuuSfBvXxA4HyotT5zQsKk7E=;
- b=iZLWOeFAihrkrUMefm4WRMyyJ1dwzcYM/yzDttQKeab/DMeQFTl82y7TGHKyeIi7T+vhsi
- fxzarPw91sxH9hTHR3DuWtNFEhYN9rfRyqnEUGZK0jlFNLLveGMcGg41YYc38SItuu9OiC
- vqDre8jkJ+r5xJezhMg+3jQ+g8tEwk8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-PrpdpLr9NKCJpOS_Bw_33g-1; Mon, 19 Oct 2020 05:45:39 -0400
-X-MC-Unique: PrpdpLr9NKCJpOS_Bw_33g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 71413803F42;
- Mon, 19 Oct 2020 09:45:38 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B80C960FC2;
- Mon, 19 Oct 2020 09:45:34 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kURpc-0002BV-FS; Mon, 19 Oct 2020 05:51:56 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:35024)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kURpb-0002lg-0N; Mon, 19 Oct 2020 05:51:56 -0400
+Received: by mail-wr1-x443.google.com with SMTP id n15so10670826wrq.2;
+ Mon, 19 Oct 2020 02:51:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=wgZScEWYKTpXPaYbK3zydk54RFmHl/X/t15IeTCJRI8=;
+ b=lKtrtm9n3lWzzlfifUOD61dnSul5OX0l+d8EiLEpBlUSICBCLBXbtbkDKQvkfsR7YI
+ /ML4uNued4yo8sOLM4gqZAJQH67342v+d3NZqsLPE7W9tnvLTzhukxzWF3L4LM75uHF4
+ L0Esx8CQF85NBi6lGALa0FSC+OJhsJjia2YJK8M7mK0uut7cQJIlDj/Xn++jf3A6HMsa
+ 56ld6A2mr48zasF6RnIJ/qjJTT1b6HDNHfCcR5DNaiJkRGbJZ+u2jFhW7tEBZY8XnbOW
+ DlBvaQm3YJrDxSc8a+J8n53BohsojY2y96jKOuL3lBdxb3uqjVLETcXFaQLv5FLyh8xt
+ //mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
+ :mime-version:content-transfer-encoding;
+ bh=wgZScEWYKTpXPaYbK3zydk54RFmHl/X/t15IeTCJRI8=;
+ b=erFDkrtcsSDYKCuc5s6TR4BHwwXd3IIXKLMhis4Ea3RxXrN2qfF2VVob8B70jOlkmx
+ CtJnbhRsdh4WF3H29UdBn9WFpjeJNsb/ZxvTs5L2Ogc8osefcQUiekFq1XhXJTq5axIJ
+ Al/gWvYN1T4Rxz28JM5KhaZW5Z5vkRrpwZw+FjKci5mhlXBK2VSpXOlVMA2xRGDCNIbA
+ 6mWegUFAoZ4wZls9MYUOA4t7wV2Q7qNkRVEcF0uymCg66d94JJqcGOkJ0DSIIUXzd1rR
+ vE3RlXO0AIjmL9nFaouyb1aIkVUiiKytK/Xb+g39f9vUkGVU3BjyVqYlUOTtNkGnrYWj
+ fzxA==
+X-Gm-Message-State: AOAM530mRD1kPQqVW9dJEBrgnj0LA6CxQISzB251wu8a7VtXnKZrdsJp
+ yoy+kaLuQi52CHjxz6Hp4fsJqn7Gqog=
+X-Google-Smtp-Source: ABdhPJxYcXq6cA525LLgHoX8hLgk8XlgOomhChZ92Pbomu8KzyjZL8ggl71xu1kyjTIeOBF4f4h/wg==
+X-Received: by 2002:adf:e54b:: with SMTP id z11mr19803289wrm.128.1603101110100; 
+ Mon, 19 Oct 2020 02:51:50 -0700 (PDT)
+Received: from x1w.redhat.com (36.red-83-57-175.dynamicip.rima-tde.net.
+ [83.57.175.36])
+ by smtp.gmail.com with ESMTPSA id t19sm16560535wmi.26.2020.10.19.02.51.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Oct 2020 02:51:49 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] meson: rewrite curses/iconv test
-Date: Mon, 19 Oct 2020 05:45:34 -0400
-Message-Id: <20201019094534.1713842-1-pbonzini@redhat.com>
+Subject: [PATCH] hw/arm/nseries: Fix loading kernel image on n8x0 machines
+Date: Mon, 19 Oct 2020 11:51:48 +0200
+Message-Id: <20201019095148.1602119-1-f4bug@amsat.org>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,150 +98,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: luoyonggang@gmail.com, kraxel@redhat.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, Andrew Jones <drjones@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-arm@nongnu.org, Igor Mammedov <imammedo@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Redo the curses test to do the same tests that the configure
-check used to do.  OpenBSD triggers the warning because
-it does not support NCURSES_WIDECHAR and thus the cc.links
-test fails.
+Commit 7998beb9c2e removed the ram_size initialization in the
+arm_boot_info structure, however it is used by arm_load_kernel().
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+Initialize the field to fix:
+
+  $ qemu-system-arm -M n800 -append 'console=ttyS1' \
+    -kernel meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0
+  qemu-system-arm: kernel 'meego-arm-n8x0-1.0.80.20100712.1431-vmlinuz-2.6.35~rc4-129.1-n8x0' is too large to fit in RAM (kernel size 1964608, RAM size 0)
+
+Noticed while running the test introduced in commit 050a82f0c5b
+("tests/acceptance: Add a test for the N800 and N810 arm machines").
+
+Fixes: 7998beb9c2e ("arm/nseries: use memdev for RAM")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- meson.build | 109 +++++++++++++++++++++++++++++-----------------------
- 1 file changed, 60 insertions(+), 49 deletions(-)
+ hw/arm/nseries.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/meson.build b/meson.build
-index 05fb59a00b..d1155aea65 100644
---- a/meson.build
-+++ b/meson.build
-@@ -463,6 +463,59 @@ endif
- iconv = not_found
- curses = not_found
- if have_system and not get_option('curses').disabled()
-+  curses_test = '''
-+    #include <locale.h>
-+    #include <curses.h>
-+    #include <wchar.h>
-+    int main(void) {
-+      wchar_t wch = L'w';
-+      setlocale(LC_ALL, "");
-+      resize_term(0, 0);
-+      addwstr(L"wide chars\n");
-+      addnwstr(&wch, 1);
-+      add_wch(WACS_DEGREE);
-+      return 0;
-+    }'''
-+
-+  curses = dependency((targetos == 'windows' ? 'ncurses' : 'ncursesw'),
-+                      required: false,
-+                      method: 'pkg-config',
-+                      static: enable_static)
-+  msg = get_option('curses').enabled() ? 'curses library not found' : ''
-+  if curses.found()
-+    if cc.links(curses_test, dependencies: [curses])
-+      curses = declare_dependency(compile_args: '-DNCURSES_WIDECHAR', dependencies: [curses])
-+    else
-+      msg = 'curses package not usable'
-+      curses = not_found
-+    endif
-+  endif
-+  if not curses.found()
-+    curses_compile_args = ['-DNCURSES_WIDECHAR']
-+    has_curses_h = cc.has_header('curses.h', args: curses_compile_args)
-+    if targetos != 'windows' and not has_curses_h
-+      message('Trying with /usr/include/ncursesw')
-+      curses_compile_args += ['-I/usr/include/ncursesw']
-+      has_curses_h = cc.has_header('curses.h', args: curses_compile_args)
-+    endif
-+    if has_curses_h
-+      curses_libname_list = (targetos == 'windows' ? ['pdcurses'] : ['ncursesw', 'cursesw'])
-+      foreach curses_libname : curses_libname_list
-+        libcurses = cc.find_library(curses_libname,
-+                                    required: false,
-+                                    static: enable_static)
-+        if libcurses.found()
-+          if cc.links(curses_test, args: curses_compile_args, dependencies: libcurses)
-+            curses = declare_dependency(compile_args: curses_compile_args,
-+                                        dependencies: [libcurses])
-+            break
-+          else
-+            msg = 'curses library not usable'
-+          endif
-+        endif
-+      endforeach
-+    endif
-+  endif
-   if not get_option('iconv').disabled()
-     libiconv = cc.find_library('iconv',
-                                required: false,
-@@ -476,57 +529,15 @@ if have_system and not get_option('curses').disabled()
-       iconv = declare_dependency(dependencies: [libiconv])
-     endif
-   endif
--  if get_option('iconv').enabled() and not iconv.found()
--    error('Cannot detect iconv API')
-+  if curses.found() and not iconv.found()
-+    msg = 'iconv required for curses UI but not available'
-+    curses = not_found
-   endif
--  if iconv.found()
--    curses_libname_list = ['ncursesw', 'ncurses', 'cursesw', 'pdcurses']
--    curses_test = '''
--      #include <locale.h>
--      #include <curses.h>
--      #include <wchar.h>
--      int main(void) {
--        wchar_t wch = L'w';
--        setlocale(LC_ALL, "");
--        resize_term(0, 0);
--        addwstr(L"wide chars\n");
--        addnwstr(&wch, 1);
--        add_wch(WACS_DEGREE);
--        return 0;
--      }'''
--    foreach curses_libname : curses_libname_list
--      libcurses = dependency(curses_libname,
--                             required: false,
--                             method: 'pkg-config',
--                             static: enable_static)
--
--      if not libcurses.found()
--        dirs = ['/usr/include/ncursesw']
--        if targetos == 'windows'
--          dirs = []
--        endif
--        libcurses = cc.find_library(curses_libname,
--                                    required: false,
--                                    dirs: dirs,
--                                    static: enable_static)
--      endif
--      if libcurses.found()
--        if cc.links(curses_test, dependencies: [libcurses])
--          curses = declare_dependency(compile_args: '-DNCURSES_WIDECHAR', dependencies: [libcurses])
--          break
--        endif
--      endif
--    endforeach
--  endif
--  if not curses.found()
--    if iconv.found()
--      if get_option('curses').enabled()
--        error('Cannot find curses')
--      endif
--    elif get_option('curses').enabled()
--      error('iconv required for curses UI but not available')
-+  if not curses.found() and msg != ''
-+    if get_option('curses').enabled()
-+      error(msg)
-     else
--      warning('iconv required for curses UI but not available, disabling')
-+      warning(msg + ', disabling')
-     endif
-   endif
- endif
+diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
+index e48092ca047..76fd7fe9854 100644
+--- a/hw/arm/nseries.c
++++ b/hw/arm/nseries.c
+@@ -1318,6 +1318,7 @@ static void n8x0_init(MachineState *machine,
+         g_free(sz);
+         exit(EXIT_FAILURE);
+     }
++    binfo->ram_size = machine->ram_size;
+ 
+     memory_region_add_subregion(get_system_memory(), OMAP2_Q2_BASE,
+                                 machine->ram);
 -- 
 2.26.2
 
