@@ -2,110 +2,90 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55BE1C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:18:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9CF1C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:19:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C856321741
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:18:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F343421741
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:19:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kp5MxjrX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C856321741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XzfBQVFl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F343421741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=google.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYnS-0002XY-Ks
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:18:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44104)
+	id 1kUYou-0003ed-R5
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:19:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kUYlh-0000tX-Ja
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42988)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kUYlb-0003Gx-1W
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:20 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603127772;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=w8kfedeknWc3Gl9wEFSgf7H+jeWSR9nYp3f9Nu1nsOc=;
- b=Kp5MxjrXH9mcJAtZY9MJHNbkEljNR+UiPJN/nl2ODkP1tS6+BJ24f6frUQkUbmYwd/5KGw
- +AlGuhjXhOlWrp8kjJwaBG1gwrWOGNQNiRdtLHCHt+9JdkIB5V0fMaXbKM4qQQxn7bI7jK
- 4/KMAHyJP52GQ+RD4wobPSh3SHM+how=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-283-WFCYhSpkNw63EUh0u1CXMg-1; Mon, 19 Oct 2020 13:14:04 -0400
-X-MC-Unique: WFCYhSpkNw63EUh0u1CXMg-1
-Received: by mail-wr1-f69.google.com with SMTP id x16so132336wrg.7
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:14:04 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <oanderso@google.com>)
+ id 1kUYm1-00012v-Tp
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:41 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:34237)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <oanderso@google.com>)
+ id 1kUYlx-0003J8-Mp
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 13:16:41 -0400
+Received: by mail-ed1-x542.google.com with SMTP id x1so127500eds.1
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:16:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=VccOzqRTahoJBssQpE8H5vS+Wi/1LUL9l2I4wA3LzOg=;
+ b=XzfBQVFl7UgGVSnL4bYO3O8cs5Z8/S4r4EExVGnDEMIsYtxUTQKUZlPJ9JUvv7HHhJ
+ 4ypeIMXcuT00rW8sZVN32/rShweimSHUA31nwCEOzTRSgIgHt/7YxI3gUpPjnUNiC1Ou
+ 0IsKY0HoNhoHXRrB8qvVXb3hJwuHcVhwE+qLVF/LFxYjUVnoIuwdg3R/S9CTZKfuLgri
+ fPfAsO3GQn5QzSJ8iJRo4G6Hq/hhkQRVTvMi2yc+M8PP9tpTtFS1bKEnBLBNIENTBxNN
+ SxnBB0KuLzNR9pmz9VjZdPWSVfa6PpflQ0QNDn9Vu1/dchvDMLebJJM+Uh6c4zpxLYA+
+ 7koA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w8kfedeknWc3Gl9wEFSgf7H+jeWSR9nYp3f9Nu1nsOc=;
- b=ab7FEl29lIjv2qNZqgzfplRcxfEU9f/cbWLd/qtcRBMvn3Q1Lu1xi9Vlfnry6O5Hp/
- yp8tnIz6AMxh2zaFdaFcnuIWEY1KMw7cG+itWkMoyji5YgnFoC9N4qJXWVvqJpSncysi
- IyZDozCMvzFYIkkpADPK9R+hRAlQmHI6H5G6wANSODDIibqZq9573rMI0zbVg/ucJh8w
- bO0uoKfK3ZA7qFEWLIENgHzi3leRkDUrnAY4snU/Vesail3xxGVdUWXNAgx51iykZyNX
- YhLbZx2elLvr37dR911ZxCCMmnbiHfwPQgwoPtaFrPj6mI99HzzcX0paOHVONRVtGe4Y
- hJ7w==
-X-Gm-Message-State: AOAM531eXuC+SvOp5qE51hY7A19kYdDXEVbQLg+5jWZjHgqd2DoNCJkJ
- 8GiXNCea3s9FxyJTCdaNtl+tx11LHctNDp8pQndIBADCO8yQi5zlxiDO94ZLFPCvnLDDMLWzU8c
- /NsIyV2c98nGF+Zg=
-X-Received: by 2002:adf:d0cf:: with SMTP id z15mr240702wrh.213.1603127643456; 
- Mon, 19 Oct 2020 10:14:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJaETvGmSSvK5d65w2S+BINQMegPr+7AW/V5IJurcyphxuvZ26od/9FlsjPeCFjTe2emV9tw==
-X-Received: by 2002:adf:d0cf:: with SMTP id z15mr240681wrh.213.1603127643212; 
- Mon, 19 Oct 2020 10:14:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id u202sm253366wmu.23.2020.10.19.10.14.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 19 Oct 2020 10:14:02 -0700 (PDT)
-To: Emmanuel Blot <eblot.ml@gmail.com>, QEMU <qemu-devel@nongnu.org>
-References: <24B952F3-465C-4AB2-AF28-6CA4722D94B7@gmail.com>
- <3869557c-10a0-8f07-a59a-69120a522568@redhat.com>
- <AA504B32-5134-4CDD-8CDA-6F200C7376CF@gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: ld: file not found: _PreallocMode_lookup on macOS Catalina
-Message-ID: <1cdb3e50-0dfb-3ddd-fed7-142e893fa364@redhat.com>
-Date: Mon, 19 Oct 2020 19:14:01 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=VccOzqRTahoJBssQpE8H5vS+Wi/1LUL9l2I4wA3LzOg=;
+ b=Y0DtEOI5uFkPF/75XcADLE6QilW/+mgusfkCyCou/dvZO9tF3QjGVtJUMX3z68SaLN
+ oFpJEqc7LUZwZ55UjUgMebXTjRdIKUBxSA7NMuXiGqW+8n2Dfyspl/9RUM3BGYAKikTh
+ dFqFTRfuzKJi7nnkpVB+NpK6cX9a3VhLsX2RKXhYSNpIKE9cGzwdWFhB+YQlFDjIpGM9
+ FRIIsgd49zBZgWJBmpUjCGa9XCI038b17wFgWSXbhJDjMDa9CJUdA0R6slIZJp4yn+R4
+ MG51prfxEaJHwJ0MJBKZmOg3eF/LMfIbpAZIi9BDT5IfAMsETo9AiD5sqFAWjaSAfFi0
+ lFXQ==
+X-Gm-Message-State: AOAM531wjB+Lf4K7sjMxZBsTl2Jm5LmZgxXsIT8WtwtUtrCOYTMc4Wo9
+ 1WLCuvoQVQSttAZiQIlSDuFkMUr8JM/VfTQZIigxuK6li04=
+X-Google-Smtp-Source: ABdhPJxYStgkTjIoOcaQJ1mzJb+lL/modMLUlgmNMB+bwiRn8tp3xQwchX11uSi6WWsWSklnEUtodBtSA4uf7eGMNfQ=
+X-Received: by 2002:a50:9548:: with SMTP id v8mr810826eda.115.1603127794312;
+ Mon, 19 Oct 2020 10:16:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <AA504B32-5134-4CDD-8CDA-6F200C7376CF@gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+References: <CAKs3XfJPrMGxdAouGCje3ppnWKA6fXpNaywQ5rj9u45VkPuUXg@mail.gmail.com>
+ <CAKs3XfJnyuZi85=7iX2eG2viP+X893qBGG=a7dAtd8=ovN-p9g@mail.gmail.com>
+In-Reply-To: <CAKs3XfJnyuZi85=7iX2eG2viP+X893qBGG=a7dAtd8=ovN-p9g@mail.gmail.com>
+From: Owen Anderson <oanderso@google.com>
+Date: Mon, 19 Oct 2020 10:16:23 -0700
+Message-ID: <CAKs3XfJB03kquRL1X3ENTapy2RCw_CwD_rEPcteO6tOQ5q32Hw@mail.gmail.com>
+Subject: Re: [RFC] Don't lookup full CPU state in the indirect branch fast
+ path on AArch64 when running in user mode.
+To: qemu-devel@nongnu.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, rth@twiddle.net
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=oanderso@google.com; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -175
+X-Spam_score: -17.6
+X-Spam_bar: -----------------
+X-Spam_report: (-17.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ ENV_AND_HDR_SPF_MATCH=-0.5, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001, USER_IN_DEF_DKIM_WL=-7.5,
+ USER_IN_DEF_SPF_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -118,83 +98,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- John Snow <jsnow@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19/10/20 18:40, Emmanuel Blot wrote:
-> On 19 Oct 2020, at 17:50, Philippe Mathieu-Daudé wrote:
-> 
->> Cc'ing Markus/John/Paolo
-> 
-> I never used `git bisect` up to now, so I might be wronb but it seems
-> the issue would have been introduced with the following commit:
+Ping
 
-Hi,
+On Mon, Oct 12, 2020 at 1:52 PM Owen Anderson <oanderso@google.com> wrote:
+>
+> Ping.
+>
+> I'd like to get feedback on how/whether this could be developed into a
+> landable version.
+>
+> Thanks,
+>
+> --Owen
+>
+> On Tue, Sep 29, 2020 at 2:32 PM Owen Anderson <oanderso@google.com> wrote:
+> >
+> > Hello,
+> >
+> > I would like to request feedback on the following patch, which I do
+> > not believe should be applied to master as-is.  The idea here is to
+> > avoid gathering the full CPU state in the fast path of an indirect
+> > branch lookup when running in user mode on a platform where the flags
+> > can only be changed in privileged mode.  I believe this is true on the
+> > AArch64 scenario that I care about, but clearly not true in general.
+> > I'm particularly seeking feedback on how to clean this up into a
+> > version that checks the correct necessary and sufficient conditions to
+> > allow all users that can benefit from it to do so.
+> >
+> > On the workload that I am targeting (aarch64 on x86), this patch
+> > reduces execution wall time by approximately 20%, and eliminates
+> > indirect branch lookups from the hot stack traces entirely.
+> >
+> > Thank you,
+> >
+> > --Owen
+> >
+> > From 3d96db17d3baacb92ef1bc5e70ef06b97d06a0ae Mon Sep 17 00:00:00 2001
+> > From: Owen Anderson <oanderso@google.com>
+> > Date: Tue, 29 Sep 2020 13:47:00 -0700
+> > Subject: [RFC] Don't lookup full CPU state in the indirect branch fast path on
+> >  AArch64 when running in user mode.
+> >
+> > Most of the CPU state can't be changed in user mode, so this is useless work.
+> >
+> > Signed-off-by: Owen Anderson <oanderso@google.com>
+> > ---
+> >  include/exec/tb-lookup.h | 15 +++++++++++++++
+> >  1 file changed, 15 insertions(+)
+> >
+> > diff --git a/include/exec/tb-lookup.h b/include/exec/tb-lookup.h
+> > index 9cf475bb03..f4ea0eb4c0 100644
+> > --- a/include/exec/tb-lookup.h
+> > +++ b/include/exec/tb-lookup.h
+> > @@ -25,7 +25,15 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
+> > *pc, target_ulong *cs_base,
+> >      TranslationBlock *tb;
+> >      uint32_t hash;
+> >
+> > +#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
+> >      cpu_get_tb_cpu_state(env, pc, cs_base, flags);
+> > +#else
+> > +    if (is_a64(env)) {
+> > +      *pc = env->pc;
+> > +    } else {
+> > +      *pc = env->regs[15];
+> > +    }
+> > +#endif
+> >      hash = tb_jmp_cache_hash_func(*pc);
+> >      tb = qatomic_rcu_read(&cpu->tb_jmp_cache[hash]);
+> >
+> > @@ -34,12 +42,19 @@ tb_lookup__cpu_state(CPUState *cpu, target_ulong
+> > *pc, target_ulong *cs_base,
+> >
+> >      if (likely(tb &&
+> >                 tb->pc == *pc &&
+> > +#if !defined(TARGET_ARM) || !defined(CONFIG_USER_ONLY)
+> >                 tb->cs_base == *cs_base &&
+> >                 tb->flags == *flags &&
+> > +#endif
+> >                 tb->trace_vcpu_dstate == *cpu->trace_dstate &&
+> >                 (tb_cflags(tb) & (CF_HASH_MASK | CF_INVALID)) == cf_mask)) {
+> >          return tb;
+> >      }
+> > +
+> > +#ifdef CONFIG_USER_ONLY
+> > +    cpu_get_tb_cpu_state(env, pc, cs_base, flags);
+> > +#endif
+> > +
+> >      tb = tb_htable_lookup(cpu, *pc, *cs_base, *flags, cf_mask);
+> >      if (tb == NULL) {
+> >          return NULL;
+> > --
+> > 2.28.0.709.gb0816b6eb0-goog
 
-I think this could be the fix.  The problem would be that
-
-	awk '$2=="U"{print "-Wl,-u," $1}'
-
-used to filter away lines with only one token, while the
-Python script does not.
-
-diff --git a/scripts/undefsym.py b/scripts/undefsym.py
-index 69a895cd26..4b6a72d95f 100644
---- a/scripts/undefsym.py
-+++ b/scripts/undefsym.py
-@@ -15,12 +15,11 @@ def filter_lines_set(stdout, from_staticlib):
-     linesSet = set()
-     for line in stdout.splitlines():
-         tokens = line.split(b' ')
--        if len(tokens) >= 1:
--            if len(tokens) > 1:
--                if from_staticlib and tokens[1] == b'U':
--                    continue
--                if not from_staticlib and tokens[1] != b'U':
--                    continue
-+        if len(tokens) >= 2:
-+            if from_staticlib and tokens[1] == b'U':
-+                continue
-+            if not from_staticlib and tokens[1] != b'U':
-+                continue
-             new_line = b'-Wl,-u,' + tokens[0]
-             if not new_line in linesSet:
-                 linesSet.add(new_line)
 
 
-If not, can you attach (or diff) the contents of block.syms and
-qemu.syms before and after this commit?
-
-Also please attach the output (on any commit) of "nm -P -g *.so".
-
-Thanks,
-
-Paolo
-
-> 604f3e4e90c011a6b94fdc1d13700f3ec2375f2a is the first bad commit
-> commit 604f3e4e90c011a6b94fdc1d13700f3ec2375f2a
-> Author: Yonggang Luo <luoyonggang@gmail.com>
-> Date:   Thu Sep 3 01:00:50 2020 +0800
-> 
->     meson: Convert undefsym.sh to undefsym.py
-> 
->     Shell scripts are not easily invoked from the build process
->     on MSYS, so convert undefsym.sh to a python script.
-> 
->     Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
->     Message-Id: <20200902170054.810-3-luoyonggang@gmail.com>
->     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
->  meson.build         |  2 +-
->  scripts/undefsym.py | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
->  scripts/undefsym.sh | 20 --------------------
->  3 files changed, 50 insertions(+), 21 deletions(-)
->  create mode 100644 scripts/undefsym.py
->  delete mode 100755 scripts/undefsym.sh
-
-
-
+-- 
+--Owen
 
