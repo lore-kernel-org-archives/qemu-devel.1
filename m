@@ -6,55 +6,54 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD7AC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 19:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB533C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 19:25:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8A38B22260
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 19:23:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D0D3622260
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 19:25:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="XiD0zqe5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A38B22260
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="qM7BXzoH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D3622260
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58818 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33116 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUal2-0004ps-7g
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 15:23:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45892)
+	id 1kUamz-00062H-Gv
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 15:25:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46122)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kUak9-0004Iy-77; Mon, 19 Oct 2020 15:22:53 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33256)
+ id 1kUalU-0005Mw-JB; Mon, 19 Oct 2020 15:24:16 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33496)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kUak7-0003YZ-Co; Mon, 19 Oct 2020 15:22:52 -0400
+ id 1kUalT-0003gC-43; Mon, 19 Oct 2020 15:24:16 -0400
 Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
  (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 81D9222260;
- Mon, 19 Oct 2020 19:22:48 +0000 (UTC)
+ by mail.kernel.org (Postfix) with ESMTPSA id 11AC722260;
+ Mon, 19 Oct 2020 19:24:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603135369;
- bh=yBqG+QvxZQN4FmfGLWz3L9y2wBVkasbCMREf1s+Cry4=;
+ s=default; t=1603135453;
+ bh=pUC3Ky1rQud7NlWjZnI236A8uzbsjnVZxeMlc6OZw14=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=XiD0zqe5S4+CKREtTc6klA4JxDhH7v/AsHAd3f7GAbhyloN993fseQ/QPQWaYfmkD
- DKaHhAsmw4qMsGsVhCQbdXmanmS55zHqYa7Fap0lr4+/FMHy0x2PDvc4bQq4lu4ytX
- awgu+l2On072QDfcbZgCRBi3R7ATZTiJcKzmXYdI=
-Date: Mon, 19 Oct 2020 12:22:46 -0700
+ b=qM7BXzoHGuuvi81UI41F2FY/bDbNHlFMyNCJHMckAlCaXDb1qLOkDdzVtbgbY61O2
+ xlm3h3V5HbOtz8tr/yJ2O+hqZ/v3QwDf0QxnE6Fn9FyWnUFwUP5WMVNf7PE2j+pI4W
+ oGYXN9wR9FqIiq0wy7+cRB+p6wuusq4k/0BoTLTs=
+Date: Mon, 19 Oct 2020 12:24:09 -0700
 From: Keith Busch <kbusch@kernel.org>
 To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v7 01/11] hw/block/nvme: Add Commands Supported and
- Effects log
-Message-ID: <20201019192246.GD1435260@dhcp-10-100-145-180.wdc.com>
+Subject: Re: [PATCH v7 02/11] hw/block/nvme: Generate namespace UUIDs
+Message-ID: <20201019192409.GE1435260@dhcp-10-100-145-180.wdc.com>
 References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
- <20201019021726.12048-2-dmitry.fomichev@wdc.com>
+ <20201019021726.12048-3-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20201019021726.12048-2-dmitry.fomichev@wdc.com>
+In-Reply-To: <20201019021726.12048-3-dmitry.fomichev@wdc.com>
 Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
  helo=mail.kernel.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 12:35:01
@@ -89,20 +88,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 11:17:16AM +0900, Dmitry Fomichev wrote:
-> This log page becomes necessary to implement to allow checking for
-> Zone Append command support in Zoned Namespace Command Set.
+On Mon, Oct 19, 2020 at 11:17:17AM +0900, Dmitry Fomichev wrote:
+> In NVMe 1.4, a namespace must report an ID descriptor of UUID type
+> if it doesn't support EUI64 or NGUID. Add a new namespace property,
+> "uuid", that provides the user the option to either specify the UUID
+> explicitly or have a UUID generated automatically every time a
+> namespace is initialized.
 > 
-> This commit adds the code to report this log page for NVM Command
-> Set only. The parts that are specific to zoned operation will be
-> added later in the series.
-> 
-> All incoming admin and i/o commands are now only processed if their
-> corresponding support bits are set in this log. This provides an
-> easy way to control what commands to support and what not to
-> depending on set CC.CSS.
-> 
+> Suggested-by: Klaus Jansen <its@irrelevant.dk>
 > Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> Reviewed-by: Klaus Jansen <its@irrelevant.dk>
 
 Looks good to me.
 
