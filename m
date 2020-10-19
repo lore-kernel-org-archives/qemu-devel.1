@@ -2,69 +2,97 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFB3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B09C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:14:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC91D2231B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:10:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC91D2231B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 98CFB2231B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:14:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KsryDIGe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 98CFB2231B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUWnc-0003DV-Cs
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:10:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37678)
+	id 1kUWrU-0008Lx-Eg
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:14:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38076)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Dave.Martin@arm.com>)
- id 1kUWcb-00048C-DH
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 10:58:50 -0400
-Received: from foss.arm.com ([217.140.110.172]:52298)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Dave.Martin@arm.com>) id 1kUWcX-0000kG-R4
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 10:58:48 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 1C9BD1FB;
- Mon, 19 Oct 2020 07:58:44 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 36CE93F66B;
- Mon, 19 Oct 2020 07:58:43 -0700 (PDT)
-Date: Mon, 19 Oct 2020 15:58:40 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: Kernel patch cases qemu live migration failed.
-Message-ID: <20201019145839.GO32292@arm.com>
-References: <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
- <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
- <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
- <20201019113157.GN32292@arm.com>
- <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
- <20201019134043.vqusmzhqp7owjt6x@kamzik.brq.redhat.com>
- <CAFEAcA8RB6MTnv0qavxWs28=pbT16i9dT1pd+0Dy9HxPVk+bZA@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kUWe3-0004xj-Kg
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:00:20 -0400
+Received: from mail-pf1-x430.google.com ([2607:f8b0:4864:20::430]:46714)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kUWdz-0000vt-UR
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:00:17 -0400
+Received: by mail-pf1-x430.google.com with SMTP id y14so77713pfp.13
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 08:00:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=Spkcq4TayC4Sg03SiEiSobwtKiAxZIs3buh6QupjT0M=;
+ b=KsryDIGeCPbfw6lgDWoJ8CrIT5Dkhauql1cdv6qOyVweC3GlVcBEK1TWu3WU6I2KaM
+ XKhGi5Yroicw/IfIG4xBYM0zsP8bYceYHZcbgwc+3thTYN4wF9nQg0J0K5Han8GaD4Jp
+ onlYz1HXVQ0ABiP9bK0oJNozo1mVMS39wUBO71fG77pgq7DUDKjhO+V6BfhmYUD85pA5
+ oFyCYYaYwpjCkRYajhUK27zIW5F8Ra8qVv6F/HALC652WvkcHPpLTuWDLyodUMCr8SnL
+ jXU6SCsyVqFGH9PqI7ZBWF/isCtQQ2HmHqkcK8OejPcySNf50h/qatbd7XNCghVlRoc4
+ Lhhg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Spkcq4TayC4Sg03SiEiSobwtKiAxZIs3buh6QupjT0M=;
+ b=XnXMvMl9jXfcPyHj5MMt1QBoQW1H5E15SoRKZObT9VaHwB6BAwFeOYyWwxgfhnCgD8
+ 4KW+3jmAHeZbxnuoqHGbIoWORKZjXlle1olIErhG63J0sLfg6q7NdR7A0mxS98f6XGS2
+ Nu3Z9QSV4Q/7GH6fpJ9aogdAZv9C8268rusk2ulJP7u21LmG2gfrdNnJFVqMxaqWAB4c
+ DDsSJKJkRN0WUohsQ2dp2D635OrM7n7OhPTjAnMlnTCDctUdVueo9mItb1pAL9OWoz2w
+ w4roZ+kFKFodbRHhCuOz4VNKbwKzU/WRbh9qGsBT4VtoOGMKiSeyTbd4TPLRwCon54jf
+ UlqA==
+X-Gm-Message-State: AOAM530H5Pqm77hJ1hH4/0aooiIyv5wpwFHn1Zp6VwxWCS3U1OXzpYV9
+ P1nnAKvbn5orHsSu5EWDB2pbQgfV/UwUKg==
+X-Google-Smtp-Source: ABdhPJxx3MawlbAYLj5ekcDGNJ7tVMMORzOO5eLVt7YAp2d6Jh/VCnd1ThuLZpfjpnn33aQ6hGkeNw==
+X-Received: by 2002:a63:ed50:: with SMTP id m16mr35599pgk.195.1603119613707;
+ Mon, 19 Oct 2020 08:00:13 -0700 (PDT)
+Received: from [192.168.1.11] ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id y65sm167087pfy.57.2020.10.19.08.00.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 19 Oct 2020 08:00:12 -0700 (PDT)
+Subject: Re: [PATCH v3 0/3] tcg-cpus: split into 3 tcg variants
+To: Claudio Fontana <cfontana@suse.de>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+References: <20201015143217.29337-1-cfontana@suse.de>
+From: Richard Henderson <richard.henderson@linaro.org>
+Message-ID: <87ba7ac2-9859-74a6-54d7-b17d0560de98@linaro.org>
+Date: Mon, 19 Oct 2020 08:00:11 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAFEAcA8RB6MTnv0qavxWs28=pbT16i9dT1pd+0Dy9HxPVk+bZA@mail.gmail.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Received-SPF: pass client-ip=217.140.110.172; envelope-from=Dave.Martin@arm.com;
- helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 10:28:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201015143217.29337-1-cfontana@suse.de>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::430;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x430.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,86 +105,19 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
- xu910121@sina.com, kvmarm <kvmarm@lists.cs.columbia.edu>,
- qemu-devel <qemu-devel@nongnu.org>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 03:18:11PM +0100, Peter Maydell wrote:
-> On Mon, 19 Oct 2020 at 14:40, Andrew Jones <drjones@redhat.com> wrote:
-> >
-> > On Mon, Oct 19, 2020 at 12:43:33PM +0100, Peter Maydell wrote:
-> > > Well, ID regs are special in the architecture -- they always exist
-> > > and must RAZ/WI, even if they're not actually given any fields yet.
-> > > This is different from other "unused" parts of the system register
-> > > encoding space, which UNDEF.
-> >
-> > Table D12-2 confirms the register should be RAZ, as it says the register
-> > is "RO, but RAZ if SVE is not implemented". Does "RO" imply "WI", though?
-> > For the guest we inject an exception on writes, and for userspace we
-> > require the value to be preserved on write.
-> 
-> Sorry, I mis-spoke. They're RAZ, but not WI, just RO (which is to say
-> they'll UNDEF if you try to write to them).
-> 
-> > I think we should follow the spec, even for userspace access, and be RAZ
-> > for when the feature isn't implemented. As for writes, assuming the
-> > exception injection is what we want for the guest (not WI), then that's
-> > correct. For userspace, I think we should continue forcing preservation
-> > (which will force preservation of zero when it's RAZ).
-> 
-> Yes, that sounds right.
+On 10/15/20 7:32 AM, Claudio Fontana wrote:
+> Claudio Fontana (3):
+>   accel/tcg: split CpusAccel into three TCG variants
+>   accel/tcg: split tcg_start_vcpu_thread
+>   accel/tcg: rename tcg-cpus functions to match module name
 
-[...]
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 
-> > > The problem is that you've actually removed registers from
-> > > the list that were previously in it (because pre-SVE
-> > > kernels put this ID register in the list as a RAZ/WI register,
-> > > and now it's not in the list if SVE isn't supported).
+r~
 
-Define "previously", though.  IIUC, the full enumeration was added in
-v4.15 (with ID_AA64ZFR0_EL1 still not supported at all):
-
-v4.15-rc1~110^2~27
-93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-
-
-And then ID_AA64FZR0_EL1 was removed from the enumeration, also in
-v4.15:
-
-v4.15-rc1~110^2~5
-07d79fe7c223 ("arm64/sve: KVM: Hide SVE from CPU features exposed to guests")
-
-
-So, are there really two upstram kernel tags that are mismatched on
-this, or is this just a bisectability issue in v4.14..v4.15?
-
-It's a while since I looked at this, and I may have misunderstood the
-timeline.
-
-
-> > > > So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-> > > > parhaps we should move all ID_UNALLOCATED() regs (and possibly
-> > > > ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
-> > >
-> > > What does this do as far as the user-facing list-of-registers
-> > > is concerned? All these registers need to remain in the
-> > > KVM_GET_REG_LIST list, or you break migration from an old
-> > > kernel to a new one.
-
-OK, I think I see where you are coming from, now.
-
-It may make sense to get rid of the REG_HIDDEN_GUEST / REG_HIDDEN_USER
-distinction, and provide the same visibility for userspace as for MSR/
-MRS all the time.  This would restore ID_AA64ZFR0_EL1 into the userspace
-view, and may also allow a bit of simplification in the code.
-
-Won't this will still break migration from the resulting kernel to a
-current kernel that hides ID_AA64ZFR0_EL1?  Or have I misunderstood
-something.
-
-Cheers
----Dave
 
