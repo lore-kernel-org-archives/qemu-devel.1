@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 684EDC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:22:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90648C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:23:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B33E42080D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F0C6E2231B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 15:23:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pxIxatKy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B33E42080D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q8oKyXk8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0C6E2231B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48168 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53004 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUWze-0000if-HG
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:22:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42142)
+	id 1kUX0p-0002mc-Ux
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 11:23:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUWqe-0006wq-76
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:20 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:36658)
+ id 1kUWqZ-0006sV-Fx
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:15 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:33366)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUWqZ-0002lm-Om
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:19 -0400
-Received: by mail-wm1-x341.google.com with SMTP id e2so214879wme.1
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 08:13:15 -0700 (PDT)
+ id 1kUWqV-0002kJ-Up
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 11:13:14 -0400
+Received: by mail-wr1-x441.google.com with SMTP id b8so180015wrn.0
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 08:13:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=Qb+QmhGDxs7W6jI1SEIOgXt8J7LxSA55gH0Mjqcc4gY=;
- b=pxIxatKyEhcRUXh1qsI5nkSqT/GHSQf52wjK3lq1h9a+jqPU9IF8pcWKSPxAGBEfsj
- oO+zna2VevQ3YMwqhUsYchiwFNhDIhR7zAwTKdlwAIPMe7Uz+i3Lhh69zBlyUhTk483b
- TbognvcpBKyHV3ssMokRFbIF4CYwvtDgmnBjmq7H2oR55dxuWWaKnaehk0sYs7MBFPyN
- 0NxoWa8618uSI2S4mycJydWnjuoFbMXdgQc0V9mN7EAu2TsDcdq8nzhAvVc7A/KoRQzB
- gs7NuT8duuJFz6knVh+HRdJ5o613hmBrnUHls16SBqlplt3q8Yt8tUYIZyajPFqXdKU/
- D7KA==
+ bh=kLCgJNRELMxG1PAWJwJlgP80Ymoy4kuq1bsu+yq9fEQ=;
+ b=q8oKyXk8lShUd8g1quoB7Qr1ZdncnUXrAW3TcBPPd06bpvGw1ESIGJNfEKmubWDsyq
+ rsd0orW58GjAf4L7c2ewRj0aSlxh7xQEX2qOHiG/sQbCQlqde35mAiRvpiVKh2fLNveq
+ 7NyCVLEbKfc/oVjaqAOySWfb5qgrTJvCEKmHBuUMyNY7/R3X9SUbThLUHFFGQuHAI2uV
+ gOZnAfxlZX7WgMkQrq4iRWqFdGy6lXObIYz3ruBafJE5bkhVANow0FoRAP4ZZ8eZJ8Nz
+ CMO51IVl5Ky4xs9nbUH0Pdh5igYXVRJCmP5FA8LAq67hUoQ+JpXVdZdp1Qx+13ETt/n7
+ BHvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=Qb+QmhGDxs7W6jI1SEIOgXt8J7LxSA55gH0Mjqcc4gY=;
- b=Iy9o2hCHBbrc8qyyrJu93kj3ikhniY+q3/XunSOK+GJl/knd7J6LcGgg/qgDZf/0vD
- SJ61sORaEhHv96nZ88T6Bdg0MgQuum89tIPio0KhtQsNnvtEVF4/nl+9376wi2my8jbH
- CU8xJrBEMALXuBcjtqPeJr5Z59+ifAiCoh6lr+1Bgdxm850u682l5zs0pJBFzg/mBWdD
- 6eZSzxjvJiSGqiqp4UBUPxrELYEqN0/P8Jrbp+LVKue63/NDElxok3S3rHAo/T4LrBKl
- /WgbIJNdWuLG7AcUX8Hd/uIOkv+AqiZ/VygAvkDX2WC1JzBkX8PXEoYJQiU/wQMc4Mr4
- kitA==
-X-Gm-Message-State: AOAM533tafMJx/KG738wbHHCP1duGFF17rEI1YHaRFg+bOP6pupfdm4p
- DkH1Tj6xubMelTaBMRzsPy7XbA==
-X-Google-Smtp-Source: ABdhPJxnJcj42JOgwM22Ic6uBqs/klmBOjaKDuc9lWRA/1AUIAEKu51ERpuE1BdJ1zxc8cfaI8Zlvw==
-X-Received: by 2002:a1c:2108:: with SMTP id h8mr18009559wmh.63.1603120394344; 
- Mon, 19 Oct 2020 08:13:14 -0700 (PDT)
+ bh=kLCgJNRELMxG1PAWJwJlgP80Ymoy4kuq1bsu+yq9fEQ=;
+ b=DXk8LR6L6qVAqkMvP9TA+FNByO4B5YwvyxJjGtijja/SdU2YX5pHkN8TCNRXHcXXGM
+ EA6IiEj3xn/dSSDt/1jDrWJ0rP/aoN3HKaABbuQ11icWCloTuPmtwkGhW5IwAgRH/SaV
+ gIwyz8qBIHxIR+fxISM9sVM/aho7CWZjug4siK9yUnn9zugHVEIoiLizf3ZAt0iFUAUS
+ 2H6jRspzBoVlfubWKCgYG9ver2B3XZHVCLQwntQveLxV13a0ZShIHdigpPpmglj6IlkT
+ 01Mccd+jSlkQMqQ0iPp5Koo/ubZfZzmAFJEETtoujW0/CkLNF/kqB7pIYn11GV4fJdnY
+ ZN+g==
+X-Gm-Message-State: AOAM5319Ylehh7iOzIYu3emcQ9dpt9jmJfG6V0h75D7hWjmT+QKpOWfX
+ O9VH1aw1ZkCHz/M0+NEaH2pCdQ==
+X-Google-Smtp-Source: ABdhPJzhe4PUVIdfJqtJdpDK+9K7Sp5MC4wZZnRr5e9G/Zy/omywWpMwFoEHKpbskPQPRNVCGHyB6A==
+X-Received: by 2002:a5d:480b:: with SMTP id l11mr20640042wrq.225.1603120388580; 
+ Mon, 19 Oct 2020 08:13:08 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id y14sm309918wma.48.2020.10.19.08.13.13
+ by smtp.gmail.com with ESMTPSA id y14sm309918wma.48.2020.10.19.08.13.07
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Oct 2020 08:13:13 -0700 (PDT)
+ Mon, 19 Oct 2020 08:13:07 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-arm@nongnu.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH v2 09/10] target/arm: Allow M-profile CPUs with FP16 to set
- FPSCR.FP16
-Date: Mon, 19 Oct 2020 16:13:00 +0100
-Message-Id: <20201019151301.2046-10-peter.maydell@linaro.org>
+Subject: [PATCH v2 04/10] target/arm: Make the t32 insn[25:23]=111 group
+ non-overlapping
+Date: Mon, 19 Oct 2020 16:12:55 +0100
+Message-Id: <20201019151301.2046-5-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201019151301.2046-1-peter.maydell@linaro.org>
 References: <20201019151301.2046-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,100 +106,81 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-M-profile CPUs with half-precision floating point support should
-be able to write to FPSCR.FZ16, but an M-profile specific masking
-of the value at the top of vfp_set_fpscr() currently prevents that.
-This is not yet an active bug because we have no M-profile
-FP16 CPUs, but needs to be fixed before we can add any.
+The t32 decode has a group which represents a set of insns
+which overlap with B_cond_thumb because they have [25:23]=111
+(which is an invalid condition code field for the branch insn).
+This group is currently defined using the {} overlap-OK syntax,
+but it is almost entirely non-overlapping patterns. Switch
+it over to use a non-overlapping group.
 
-The bits that the masking is effectively preventing from being
-set are the A-profile only short-vector Len and Stride fields,
-plus the Neon QC bit. Rearrange the order of the function so
-that those fields are handled earlier and only under a suitable
-guard; this allows us to drop the M-profile specific masking,
-making FZ16 writeable.
+For this to be valid syntactically, CPS must move into the same
+overlapping-group as the hint insns (CPS vs hints was the
+only actual use of the overlap facility for the group).
 
-This change also makes the QC bit correctly RAZ/WI for older
-no-Neon A-profile cores.
+The non-overlapping subgroup for CLREX/DSB/DMB/ISB/SB is no longer
+necessary and so we can remove it (promoting those insns to
+be members of the parent group).
 
-This refactoring also paves the way for the low-overhead-branch
-LTPSIZE field, which uses some of the bits that are used for
-A-profile Stride and Len.
-
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/vfp_helper.c | 47 ++++++++++++++++++++++++-----------------
- 1 file changed, 28 insertions(+), 19 deletions(-)
+ target/arm/t32.decode | 26 ++++++++++++--------------
+ 1 file changed, 12 insertions(+), 14 deletions(-)
 
-diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
-index 5666393ef79..c3d01d781b6 100644
---- a/target/arm/vfp_helper.c
-+++ b/target/arm/vfp_helper.c
-@@ -194,36 +194,45 @@ void HELPER(vfp_set_fpscr)(CPUARMState *env, uint32_t val)
-         val &= ~FPCR_FZ16;
-     }
- 
--    if (arm_feature(env, ARM_FEATURE_M)) {
-+    vfp_set_fpscr_to_host(env, val);
+diff --git a/target/arm/t32.decode b/target/arm/t32.decode
+index d8454bd814e..7d5e000e82c 100644
+--- a/target/arm/t32.decode
++++ b/target/arm/t32.decode
+@@ -296,8 +296,8 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+ {
+   # Group insn[25:23] = 111, which is cond=111x for the branch below,
+   # or unconditional, which would be illegal for the branch.
+-  {
+-    # Hints
++  [
++    # Hints, and CPS
+     {
+       YIELD      1111 0011 1010 1111 1000 0000 0000 0001
+       WFE        1111 0011 1010 1111 1000 0000 0000 0010
+@@ -310,20 +310,18 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+       # The canonical nop ends in 0000 0000, but the whole rest
+       # of the space is "reserved hint, behaves as nop".
+       NOP        1111 0011 1010 1111 1000 0000 ---- ----
 +
-+    if (!arm_feature(env, ARM_FEATURE_M)) {
-         /*
--         * M profile FPSCR is RES0 for the QC, STRIDE, FZ16, LEN bits
--         * and also for the trapped-exception-handling bits IxE.
-+         * Short-vector length and stride; on M-profile these bits
-+         * are used for different purposes.
-+         * We can't make this conditional be "if MVFR0.FPShVec != 0",
-+         * because in v7A no-short-vector-support cores still had to
-+         * allow Stride/Len to be written with the only effect that
-+         * some insns are required to UNDEF if the guest sets them.
-+         *
-+         * TODO: if M-profile MVE implemented, set LTPSIZE.
-          */
--        val &= 0xf7c0009f;
-+        env->vfp.vec_len = extract32(val, 16, 3);
-+        env->vfp.vec_stride = extract32(val, 20, 2);
++      # If imod == '00' && M == '0' then SEE "Hint instructions", above.
++      CPS        1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
++                 &cps
      }
  
--    vfp_set_fpscr_to_host(env, val);
-+    if (arm_feature(env, ARM_FEATURE_NEON)) {
-+        /*
-+         * The bit we set within fpscr_q is arbitrary; the register as a
-+         * whole being zero/non-zero is what counts.
-+         * TODO: M-profile MVE also has a QC bit.
-+         */
-+        env->vfp.qc[0] = val & FPCR_QC;
-+        env->vfp.qc[1] = 0;
-+        env->vfp.qc[2] = 0;
-+        env->vfp.qc[3] = 0;
-+    }
- 
-     /*
-      * We don't implement trapped exception handling, so the
-      * trap enable bits, IDE|IXE|UFE|OFE|DZE|IOE are all RAZ/WI (not RES0!)
-      *
--     * If we exclude the exception flags, IOC|DZC|OFC|UFC|IXC|IDC
--     * (which are stored in fp_status), and the other RES0 bits
--     * in between, then we clear all of the low 16 bits.
-+     * The exception flags IOC|DZC|OFC|UFC|IXC|IDC are stored in
-+     * fp_status; QC, Len and Stride are stored separately earlier.
-+     * Clear out all of those and the RES0 bits: only NZCV, AHP, DN,
-+     * FZ, RMode and FZ16 are kept in vfp.xregs[FPSCR].
-      */
-     env->vfp.xregs[ARM_VFP_FPSCR] = val & 0xf7c80000;
--    env->vfp.vec_len = (val >> 16) & 7;
--    env->vfp.vec_stride = (val >> 20) & 3;
+-    # If imod == '00' && M == '0' then SEE "Hint instructions", above.
+-    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
+-                 &cps
 -
--    /*
--     * The bit we set within fpscr_q is arbitrary; the register as a
--     * whole being zero/non-zero is what counts.
--     */
--    env->vfp.qc[0] = val & FPCR_QC;
--    env->vfp.qc[1] = 0;
--    env->vfp.qc[2] = 0;
--    env->vfp.qc[3] = 0;
+     # Miscellaneous control
+-    [
+-      CLREX      1111 0011 1011 1111 1000 1111 0010 1111
+-      DSB        1111 0011 1011 1111 1000 1111 0100 ----
+-      DMB        1111 0011 1011 1111 1000 1111 0101 ----
+-      ISB        1111 0011 1011 1111 1000 1111 0110 ----
+-      SB         1111 0011 1011 1111 1000 1111 0111 0000
+-    ]
++    CLREX        1111 0011 1011 1111 1000 1111 0010 1111
++    DSB          1111 0011 1011 1111 1000 1111 0100 ----
++    DMB          1111 0011 1011 1111 1000 1111 0101 ----
++    ISB          1111 0011 1011 1111 1000 1111 0110 ----
++    SB           1111 0011 1011 1111 1000 1111 0111 0000
+ 
+     # Note that the v7m insn overlaps both the normal and banked insn.
+     {
+@@ -351,7 +349,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
+     HVC          1111 0111 1110 ....  1000 .... .... ....     \
+                  &i imm=%imm16_16_0
+     UDF          1111 0111 1111 ----  1010 ---- ---- ----
+-  }
++  ]
+   B_cond_thumb   1111 0. cond:4 ...... 10.0 ............      &ci imm=%imm21
  }
  
- void vfp_set_fpscr(CPUARMState *env, uint32_t val)
 -- 
 2.20.1
 
