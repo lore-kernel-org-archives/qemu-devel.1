@@ -2,90 +2,101 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C32C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C8ECC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:49:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95E5F22268
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:45:06 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="R55ieoV4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95E5F22268
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 650E922268
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:49:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 650E922268
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58160 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUTb7-0002YE-J9
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 07:45:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48016)
+	id 1kUTex-000452-V7
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 07:49:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUTZs-00010K-LF
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:43:48 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:39954)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUTZq-0008SK-Es
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:43:48 -0400
-Received: by mail-ed1-x544.google.com with SMTP id p13so9878776edi.7
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 04:43:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=lhRyiaF4Mj4SAFapWDuVKTR91M4N1ZAMCfQG7PSQtZE=;
- b=R55ieoV4chafnTnejfeCIzez71tOjmqPt6Eaa9gpHowReSiqasMTu6h/2iyTbC51Sd
- 6qF4op744gdzUEn6hhBRNK860EHqYz2fvdMvGVIWexAZ3R34PR9aDJcgponBXclqPfsY
- Y8wiWlbdaLzy12g+MuBTSN6Gsu1D2DW19vIyb48KXeoB2Q030VvzalZMPdzV9vFYbFIb
- NBm0lKET3zw78IUd4Dsw/mnl1zb7Tv/IZo3rID/MPO2tujGJyLnblNuzy2P+B1WzAsEn
- X1LG7G6PAzvWUbXPogSiaxbOpPedR+fzm+7USziBdsrLxyiUmb7bFpmyIxqKvKHlSkTK
- 3QHQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=lhRyiaF4Mj4SAFapWDuVKTR91M4N1ZAMCfQG7PSQtZE=;
- b=O3Hgi5IV8w1sLjuHv+y4Ch7QNzPa1wWz3lMBeKReCH4lD4uqSigOjXNpZHji2LRQy/
- AUSBtMZxk3WPQHsUH1BPZ36dukDW0gMcLAIW5mM+ZyAJwqoExstAn1PE18r3JbTY0YkE
- iZL+0mQKTcdzFOkHGLfarYeH/3JT5gU0LI6zAe7XhGUxvtYNuywIocUeZxmjSv7WPO33
- 6qlk1+IUY2eBDiXm+YO4owqrSySgC2U0g8yA+mFMvOGRc4RZ/MrOjeRCLhu/HUr9Uk/P
- F+m12TdmatwKv8OIC4tWpQRKgLgdHbLhmmWfYa4JN4/QT1Kj6Hcfbdtrrbopa9EG5pJ9
- EW/Q==
-X-Gm-Message-State: AOAM532Ne9MkdlaLB3FUs/zCVOZY+qENYFhdYCCqaBC3UEPlcfN7EkL5
- rCMiVKsncldrdxDXGdfNrEOSsqbRuLlNb+8iEdqACQ==
-X-Google-Smtp-Source: ABdhPJyWN6vu70FNoDT+mUde/Oxrsko4OlVYRLt7U8r4v0TFnpNAU3f+Bg5gCpqSY5aGvzYrrda8cyfIAg2ZyBrRK8Y=
-X-Received: by 2002:aa7:c683:: with SMTP id n3mr17448774edq.146.1603107824651; 
- Mon, 19 Oct 2020 04:43:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUTYn-0000Ds-6l; Mon, 19 Oct 2020 07:42:41 -0400
+Received: from wnew4-smtp.messagingengine.com ([64.147.123.18]:39607)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUTYk-0008NM-PG; Mon, 19 Oct 2020 07:42:40 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id D2D6E340;
+ Mon, 19 Oct 2020 07:42:35 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Mon, 19 Oct 2020 07:42:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=bNunAICK0DwTzC4dKY9RkLQT4q8
+ uE7a0C83wfeZ58uU=; b=HMaH4K16tw6DFfzuhQ9WF1XWI11WjNT1lyDO+EILcde
+ VuTV07rJsbwmwGGLHyXkPfUkJVGnoyXSwHrVXLoITqB88tH1XYZQq77yg+AsEnKK
+ sHUw517DaZ5G0u2RwuZNylOOP3VfKyUwhkNzb41wCAef/7S4dY//hb9A4zCYujjS
+ EDHfK9mVzB8yVN1OBZTAPaeOp4tKAql/CEIYFgelx+HhLwfzlliSnNrmLXEoAMCk
+ VXXsYTgN/9dH1elyvxwyAQ56b3+OzPh8nJ2WmMJracyPrmf3g9Br+oT46FOJakul
+ YKuViM0gTlixwAmzgnc+qkjLqv+rTabRgXnBjslGCeg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=bNunAI
+ CK0DwTzC4dKY9RkLQT4q8uE7a0C83wfeZ58uU=; b=ick9uLYJZK6od0FJMbYGOV
+ 6ltGKQvo3rD4RLzBrKwpUiipMDJykXj/947WWrjJJCdvsbyXQnqsWqpcElTNc+zr
+ bFuuO/zZm3K7kNbnRY5uajvVmI1sqogJD8jnKXkIALdHrMwDPXrOxTWKLwue5Y4K
+ qT7blfbL/8Icf+W4tyBuzXAwbuUg/cZaPkAarux5WLTz0c+sOAUIpG6Cdccx+F1i
+ T7KXYoPRgZyvRFJiijiby8YeQsjnmZna84l2Y75rG4aCxdtlVgwcl3J/gLsV/abX
+ wgvYXQ7PpGrrwVx1o+zdh4qQvi+o3IBIJ0l1fLWwoIMK/4PA5u1mR7TAbysaYQ6A
+ ==
+X-ME-Sender: <xms:qnuNX3wVm3JtZdc00ojLgFYrTktPtEYTDW99eOh84aFnCQ_zhwFgPg>
+ <xme:qnuNX_Spm78fRKPEDny7QhEQT1n_FRg2PpBrqL7GFnWpDLkU_5TNbTs-G3FDl5rEZ
+ PpKV0DyA8xfkbdcvJk>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjedugdeggecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:qnuNXxXtSKw3e65_py8hfDBvPeFxU2nbmsY5szLr_jEmtRs3lMVDTw>
+ <xmx:qnuNXxg8TeqwORJpmHJ8L9F5JaTlvl4W4LcF8f6Qg2IMUiw65KbKqg>
+ <xmx:qnuNX5DqQ5k7wjF5N7S-qBRUa-7z6j4U9kvVXAHpmDBGW9xzUV0uvQ>
+ <xmx:q3uNX-IauxkPnw5xsRSw0hJh5HgXJcGgDhvPfUthgKRX10f63BY50H1Mr9aOiIC4>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 4B14A306467E;
+ Mon, 19 Oct 2020 07:42:32 -0400 (EDT)
+Date: Mon, 19 Oct 2020 13:42:30 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v7 08/11] hw/block/nvme: Add injection of
+ Offline/Read-Only zones
+Message-ID: <20201019114230.GB10549@apples.localdomain>
+References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
+ <20201019021726.12048-9-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-References: <20201015040639.70C6D414009F@webmail.sinamail.sina.com.cn>
- <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
- <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
- <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
- <20201019113157.GN32292@arm.com>
-In-Reply-To: <20201019113157.GN32292@arm.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 19 Oct 2020 12:43:33 +0100
-Message-ID: <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-To: Dave Martin <Dave.Martin@arm.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="l76fUT7nc3MelDdI"
+Content-Disposition: inline
+In-Reply-To: <20201019021726.12048-9-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=64.147.123.18; envelope-from=its@irrelevant.dk;
+ helo=wnew4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 07:30:44
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,62 +110,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <maz@kernel.org>, Andrew Jones <drjones@redhat.com>,
- xu910121@sina.com, qemu-devel <qemu-devel@nongnu.org>,
- kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Oct 2020 at 12:32, Dave Martin <Dave.Martin@arm.com> wrote:
-> I'm not quite sure about Peter's assessment here.
->
-> I agree with the inconsistency identified here: we always enumerate all
-> unallocated ID regs, but we enumerate ID_AA64ZFR0_EL1 conditionally.
-> This doesn't feel right: on a non-SVE guest, ID_AA64ZFR0_EL1 should
-> behave exactly as an unallocated ID register.
->
-> I'm not sure about the proposed fix.
->
-> For one thing, I'm not sure that old hosts will accept writing of 0 to
-> arbitrary ID regs.  This may require some digging, but commit
-> 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-> may be the place to start.
 
-Well, ID regs are special in the architecture -- they always exist
-and must RAZ/WI, even if they're not actually given any fields yet.
-This is different from other "unused" parts of the system register
-encoding space, which UNDEF.
+--l76fUT7nc3MelDdI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Older hosts didn't permit writing 0 to all parts of the ID
-register space (and didn't list all ID registers in the KVM_GET_REG_LIST
-list), but that was a kernel bug which we've since fixed.
-(QEMU has workaround code for pre-4.15 kernels for this.)
-Across that older bugfix, migration works from an old kernel to
-a newer one, but wouldn't have worked from a post-bugfix kernel
-to a pre-4.15 one.
+On Oct 19 11:17, Dmitry Fomichev wrote:
+> ZNS specification defines two zone conditions for the zones that no
+> longer can function properly, possibly because of flash wear or other
+> internal fault. It is useful to be able to "inject" a small number of
+> such zones for testing purposes.
+>=20
+> This commit defines two optional device properties, "offline_zones"
+> and "rdonly_zones". Users can assign non-zero values to these variables
+> to specify the number of zones to be initialized as Offline or
+> Read-Only. The actual number of injected zones may be smaller than the
+> requested amount - Read-Only and Offline counts are expected to be much
+> smaller than the total number of zones on a drive.
+>=20
+> Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+> ---
+>  hw/block/nvme-ns.c | 64 ++++++++++++++++++++++++++++++++++++++++++++++
+>  hw/block/nvme-ns.h |  2 ++
+>  2 files changed, 66 insertions(+)
+>=20
+> diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+> index 255ded2b43..d050f97909 100644
+> --- a/hw/block/nvme-ns.c
+> +++ b/hw/block/nvme-ns.c
+> @@ -21,6 +21,7 @@
+>  #include "sysemu/sysemu.h"
+>  #include "sysemu/block-backend.h"
+>  #include "qapi/error.h"
+> +#include "crypto/random.h"
+> =20
+>  #include "hw/qdev-properties.h"
+>  #include "hw/qdev-core.h"
+> @@ -132,6 +133,32 @@ static int nvme_calc_zone_geometry(NvmeNamespace *ns=
+, Error **errp)
+>          return -1;
+>      }
+> =20
+> +    if (ns->params.zd_extension_size) {
+> +        if (ns->params.zd_extension_size & 0x3f) {
+> +            error_setg(errp,
+> +                "zone descriptor extension size must be a multiple of 64=
+B");
+> +            return -1;
+> +        }
+> +        if ((ns->params.zd_extension_size >> 6) > 0xff) {
+> +            error_setg(errp, "zone descriptor extension size is too larg=
+e");
+> +            return -1;
+> +        }
+> +    }
 
-> My original idea was that at the source end we should be conservative:
-> enumerate and dump the minimum set of registers relevant to the
-> target -- for compatibility with old hosts that don't handle the
-> unallocated ID regs at all.  At the destination end, modern hosts
-> should be permissive, i.e., allow any ID reg to be set to 0, but don't
-> require the setting of any reg that older source hosts might not send.
+Looks like this should have been added in the previous patch.
 
-The problem is that you've actually removed registers from
-the list that were previously in it (because pre-SVE
-kernels put this ID register in the list as a RAZ/WI register,
-and now it's not in the list if SVE isn't supported).
+--l76fUT7nc3MelDdI
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-> parhaps we should move all ID_UNALLOCATED() regs (and possibly
-> ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
+-----BEGIN PGP SIGNATURE-----
 
-What does this do as far as the user-facing list-of-registers
-is concerned? All these registers need to remain in the
-KVM_GET_REG_LIST list, or you break migration from an old
-kernel to a new one.
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+Ne6MACgkQTeGvMW1P
+DenAsggAkvuxQLC5ADkQyCUVpI/ZtYu44yadhDSQa1NkR2dAcarpIyxSNWsqWPwb
+6vshuF99+LzgTouhNQh5y1X68FvZDSzqJEhe1Ugsv0YrNiIjY6gYNiMlTGgfzMwF
+2rkExRN6FYZDY0AimvQYELfaQu2f1YrL72h5hFp4A9oe9Fi16ejZWjzFJz/1KB8k
+nGXTDddioUIx6ie1X3NELoRDT+lBG33mC+KiWT70CimnqMmFYd605MaOWqusu5vN
+XdiQ04s9smQ3EvkUJJbul6o8w4OtnN71S7raYFw14Xo6qMo3o/kh7kjuKlI4k28t
+gCyqoWILzN+lRg6P+f/httLiphzwog==
+=7s1E
+-----END PGP SIGNATURE-----
 
-thanks
--- PMM
+--l76fUT7nc3MelDdI--
 
