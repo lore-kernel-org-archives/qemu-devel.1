@@ -2,73 +2,79 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8FB5C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3C50C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:03:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E132221D7B
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:02:49 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="HvaM660g"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E132221D7B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id E12EC21D7B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 13:03:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E12EC21D7B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUUoK-0006Mv-Pm
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:02:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35870)
+	id 1kUUos-0006t6-Ny
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 09:03:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36796)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com>)
- id 1kUUiU-00019o-0n
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:46 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:39149)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com>)
- id 1kUUiS-0001Dl-8T
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 08:56:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
- Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=UXdORMhNTzUaXATYfFlOjsg4HMQM6pqpJfi/o477dzE=; b=HvaM6
- 60gWN9+nPx/DN8XSCVHwLQfIzNx8uCyQmBKNtRSwT+gCY31K49bjbWVURco4lhKaaxm33u448/03u
- xArs5LETfaZoo89aPft2M1TYFxBZCMeNab66bwaoXIAuHeg9yah4ELZoSFVwbeMZSvpl6izsW6fzG
- uP8+qE2Pp/uZrACBy3TtuXKABhkva4RhLYiO2ZT9q1uJaOW6JRlr0zgT3SGI58H5+ixKDTReyEA63
- v7Sh5yv3Wd6vRED6pWpYB2KFMYXE6uYFubdqJLkqGgPbya65oD3TCSFBlN9tYBbSMmqWtSpGusiEl
- 2cm/Vks7yLDim/4ampXbLQf4ok8ZA==;
-Message-Id: <3a565c641a5c50bd6d0cb4df881b607a279505f6.1603111175.git.qemu_oss@crudebyte.com>
-In-Reply-To: <cover.1603111175.git.qemu_oss@crudebyte.com>
-References: <cover.1603111175.git.qemu_oss@crudebyte.com>
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Thu, 8 Oct 2020 20:34:56 +0200
-Subject: [PULL v3 3/6] tests/9pfs: introduce local tests
-To: qemu-devel@nongnu.org,
-    Peter Maydell <peter.maydell@linaro.org>
-Cc: Greg Kurz <groug@kaod.org>
-Received-SPF: none client-ip=91.194.90.13;
- envelope-from=3a565c641a5c50bd6d0cb4df881b607a279505f6@lizzy.crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 06:27:23
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 13
-X-Spam_score: 1.3
-X-Spam_bar: +
-X-Spam_report: (1.3 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_96_XX=3.405,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kUUmV-0005AL-Rf
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 09:00:55 -0400
+Received: from indium.canonical.com ([91.189.90.7]:39928)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kUUmT-0001pj-JT
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 09:00:55 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kUUmQ-00048B-FO
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 13:00:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 63D8C2E8071
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 13:00:50 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 19 Oct 2020 12:53:52 -0000
+From: Gerd Hoffmann <1900352@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: azrdev kraxel-redhat
+X-Launchpad-Bug-Reporter: azrdev (azrdev)
+X-Launchpad-Bug-Modifier: Gerd Hoffmann (kraxel-redhat)
+References: <160305441976.24841.13039199321181716252.malonedeb@soybean.canonical.com>
+Message-Id: <160311203256.25689.12508101730156170697.malone@soybean.canonical.com>
+Subject: [Bug 1900352] Re: no sound in spice when VNC enabled
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="58bb2f3096f16f0e0acc917602669aecb4ffaf54"; Instance="production"
+X-Launchpad-Hash: cb1baaac1be0cbd933ea1af84e942f828be7ea14
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 07:01:04
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -77,213 +83,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Reply-To: Bug 1900352 <1900352@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch introduces 9pfs test cases using the 9pfs 'local'
-filesystem driver which reads/writes/creates/deletes real files
-and directories.
+What is in the libvirt logs (/var/log/libvirt/qemu/${guest}.log) ?
 
-In this initial version, there is only one local test which actually
-only checks if the 9pfs 'local' device was created successfully.
+-- =
 
-Before the 9pfs 'local' tests are run, a test directory 'qtest-9p-local'
-is created (with world rwx permissions) under the current working
-directory. At this point that test directory is not auto deleted yet.
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1900352
 
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Message-Id: <81fc4b3b6b6c9bf7999e79f5e7cbc364a5f09ddb.1602182956.git.qemu_oss@crudebyte.com>
-Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
----
- tests/qtest/libqos/virtio-9p.c | 81 ++++++++++++++++++++++++++++++++++
- tests/qtest/libqos/virtio-9p.h |  5 +++
- tests/qtest/virtio-9p-test.c   | 44 ++++++++++++------
- 3 files changed, 116 insertions(+), 14 deletions(-)
+Title:
+  no sound in spice when VNC enabled
 
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index 2e300063e3..ee331166de 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -24,6 +24,34 @@
- #include "qgraph.h"
- 
- static QGuestAllocator *alloc;
-+static char *local_test_path;
-+
-+/* Concatenates the passed 2 pathes. Returned result must be freed. */
-+static char *concat_path(const char* a, const char* b)
-+{
-+    return g_build_filename(a, b, NULL);
-+}
-+
-+static void init_local_test_path(void)
-+{
-+    char *pwd = g_get_current_dir();
-+    local_test_path = concat_path(pwd, "qtest-9p-local");
-+    g_free(pwd);
-+}
-+
-+/* Creates the directory for the 9pfs 'local' filesystem driver to access. */
-+static void create_local_test_dir(void)
-+{
-+    struct stat st;
-+
-+    g_assert(local_test_path != NULL);
-+    mkdir(local_test_path, 0777);
-+
-+    /* ensure test directory exists now ... */
-+    g_assert(stat(local_test_path, &st) == 0);
-+    /* ... and is actually a directory */
-+    g_assert((st.st_mode & S_IFMT) == S_IFDIR);
-+}
- 
- static void virtio_9p_cleanup(QVirtio9P *interface)
- {
-@@ -146,11 +174,64 @@ static void *virtio_9p_pci_create(void *pci_bus, QGuestAllocator *t_alloc,
-     return obj;
- }
- 
-+/**
-+ * Performs regular expression based search and replace on @a haystack.
-+ *
-+ * @param haystack - input string to be parsed, result of replacement is
-+ *                   stored back to @a haystack
-+ * @param pattern - the regular expression pattern for scanning @a haystack
-+ * @param replace_fmt - matches of supplied @a pattern are replaced by this,
-+ *                      if necessary glib printf format can be used to add
-+ *                      variable arguments of this function to this
-+ *                      replacement string
-+ */
-+static void regex_replace(GString *haystack, const char *pattern,
-+                          const char *replace_fmt, ...)
-+{
-+    GRegex *regex;
-+    char *replace, *s;
-+    va_list argp;
-+
-+    va_start(argp, replace_fmt);
-+    replace = g_strdup_vprintf(replace_fmt, argp);
-+    va_end(argp);
-+
-+    regex = g_regex_new(pattern, 0, 0, NULL);
-+    s = g_regex_replace(regex, haystack->str, -1, 0, replace, 0, NULL);
-+    g_string_assign(haystack, s);
-+    g_free(s);
-+    g_regex_unref(regex);
-+    g_free(replace);
-+}
-+
-+void virtio_9p_assign_local_driver(GString *cmd_line, const char *args)
-+{
-+    g_assert_nonnull(local_test_path);
-+
-+    /* replace 'synth' driver by 'local' driver */
-+    regex_replace(cmd_line, "-fsdev synth,", "-fsdev local,");
-+
-+    /* append 'path=...' to '-fsdev ...' group */
-+    regex_replace(cmd_line, "(-fsdev \\w[^ ]*)", "\\1,path='%s'",
-+                  local_test_path);
-+
-+    if (!args) {
-+        return;
-+    }
-+
-+    /* append passed args to '-fsdev ...' group */
-+    regex_replace(cmd_line, "(-fsdev \\w[^ ]*)", "\\1,%s", args);
-+}
-+
- static void virtio_9p_register_nodes(void)
- {
-     const char *str_simple = "fsdev=fsdev0,mount_tag=" MOUNT_TAG;
-     const char *str_addr = "fsdev=fsdev0,addr=04.0,mount_tag=" MOUNT_TAG;
- 
-+    /* make sure test dir for the 'local' tests exists and is clean */
-+    init_local_test_path();
-+    create_local_test_dir();
-+
-     QPCIAddress addr = {
-         .devfn = QPCI_DEVFN(4, 0),
-     };
-diff --git a/tests/qtest/libqos/virtio-9p.h b/tests/qtest/libqos/virtio-9p.h
-index b1e6badc4a..326a603f72 100644
---- a/tests/qtest/libqos/virtio-9p.h
-+++ b/tests/qtest/libqos/virtio-9p.h
-@@ -44,4 +44,9 @@ struct QVirtio9PDevice {
-     QVirtio9P v9p;
- };
- 
-+/**
-+ * Prepares QEMU command line for 9pfs tests using the 'local' fs driver.
-+ */
-+void virtio_9p_assign_local_driver(GString *cmd_line, const char *args);
-+
- #endif
-diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 3281153b9c..af7e169d3a 100644
---- a/tests/qtest/virtio-9p-test.c
-+++ b/tests/qtest/virtio-9p-test.c
-@@ -895,29 +895,45 @@ static void fs_readdir_split_512(void *obj, void *data,
-     fs_readdir_split(obj, data, t_alloc, 512);
- }
- 
-+static void *assign_9p_local_driver(GString *cmd_line, void *arg)
-+{
-+    virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-+    return arg;
-+}
-+
- static void register_virtio_9p_test(void)
- {
--    qos_add_test("synth/config", "virtio-9p", pci_config, NULL);
--    qos_add_test("synth/version/basic", "virtio-9p", fs_version, NULL);
--    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach, NULL);
--    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk, NULL);
-+
-+    QOSGraphTestOptions opts = {
-+    };
-+
-+    /* 9pfs test cases using the 'synth' filesystem driver */
-+    qos_add_test("synth/config", "virtio-9p", pci_config, &opts);
-+    qos_add_test("synth/version/basic", "virtio-9p", fs_version,  &opts);
-+    qos_add_test("synth/attach/basic", "virtio-9p", fs_attach,  &opts);
-+    qos_add_test("synth/walk/basic", "virtio-9p", fs_walk,  &opts);
-     qos_add_test("synth/walk/no_slash", "virtio-9p", fs_walk_no_slash,
--                 NULL);
-+                  &opts);
-     qos_add_test("synth/walk/dotdot_from_root", "virtio-9p",
--                 fs_walk_dotdot, NULL);
--    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen, NULL);
--    qos_add_test("synth/write/basic", "virtio-9p", fs_write, NULL);
-+                 fs_walk_dotdot,  &opts);
-+    qos_add_test("synth/lopen/basic", "virtio-9p", fs_lopen,  &opts);
-+    qos_add_test("synth/write/basic", "virtio-9p", fs_write,  &opts);
-     qos_add_test("synth/flush/success", "virtio-9p", fs_flush_success,
--                 NULL);
-+                  &opts);
-     qos_add_test("synth/flush/ignored", "virtio-9p", fs_flush_ignored,
--                 NULL);
--    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir, NULL);
-+                  &opts);
-+    qos_add_test("synth/readdir/basic", "virtio-9p", fs_readdir,  &opts);
-     qos_add_test("synth/readdir/split_512", "virtio-9p",
--                 fs_readdir_split_512, NULL);
-+                 fs_readdir_split_512,  &opts);
-     qos_add_test("synth/readdir/split_256", "virtio-9p",
--                 fs_readdir_split_256, NULL);
-+                 fs_readdir_split_256,  &opts);
-     qos_add_test("synth/readdir/split_128", "virtio-9p",
--                 fs_readdir_split_128, NULL);
-+                 fs_readdir_split_128,  &opts);
-+
-+
-+    /* 9pfs test cases using the 'local' filesystem driver */
-+    opts.before = assign_9p_local_driver;
-+    qos_add_test("local/config", "virtio-9p", pci_config,  &opts);
- }
- 
- libqos_init(register_virtio_9p_test);
--- 
-2.20.1
+Status in QEMU:
+  New
 
+Bug description:
+  Running Fedora32 with virt-manager =E2=86=92 libvirt =E2=86=92 qemu  I no=
+ticed that I
+  got no sound in my spice client. The VM is configured with a SPICE-
+  server and a QXL display, and in addition a VNC display.
+
+  Apparently when I remove the VNC display, then the sound is routed
+  just fine to the spice client: I can hear it, and
+  `G_MESSAGES_DEBUG=3Dall remote-viewer --spice-debug
+  spice://localhost:5900` mentions SpicePlaybackChannel and
+  SpiceRecordChannel. With the VNC server configured, such messages are
+  missing, and I cannot hear the sound (which is sent by the guest OS to
+  the virtual hardware).
+
+  qemu-4.2.1-1.fc32
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1900352/+subscriptions
 
