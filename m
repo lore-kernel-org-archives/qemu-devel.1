@@ -2,85 +2,78 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 381E9C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:52:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9FC4EC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:54:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5A1E022243
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:52:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0833F22243
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 07:54:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hEVUciae"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5A1E022243
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="APuDgPjN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0833F22243
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53852 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUPxy-0004du-ND
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:52:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53950)
+	id 1kUPzo-0006Zc-Pc
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 03:54:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54212)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUPwo-0004Ad-0k
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:51:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20632)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyF-00057a-1F
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23327)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUPwk-0007d5-47
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:51:13 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyD-00085a-7B
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603093865;
+ s=mimecast20190719; t=1603093960;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=JrFWQXwRnWY5nL907CH1sIZSsT8nMrWEB8qUKDwwHXU=;
- b=hEVUciae06Df76MCnvv49V5U6pmsdbx977lBKmsF+XqDwRLaMuC+5hXW7GYOnx9niFM4LF
- jj3V6VrJErnTs4TJukIheIUiKg0fW+l6meqHGft81g700n0VaTDi8CGnIPfFcffOycUigJ
- PfFdFjTAN2Qr30dMo8EV2mT7T/JBnK0=
+ bh=OxA3Qq4UKBx78H131SKHi4ZpLY9OCsgstMMSifTmJY4=;
+ b=APuDgPjNdBc8VA0NsIRoYTbLdb2HArNRgvq03BzVIm9XR9KtR61ZW9Q4dflyPByn3tzLHM
+ 6n9tqh4eE7XH2oORxbkyvkhA+LhEtJ0HcND4xSPwKLjy04qUDybe8B5ebc/PGwIUqZeetp
+ FGwGmso1GczLdVW6ssTzdYXJfIXFtOg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-188-wQ4HUso7MyujODyZeqcZ5g-1; Mon, 19 Oct 2020 03:51:01 -0400
-X-MC-Unique: wQ4HUso7MyujODyZeqcZ5g-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-572-qLqPAl1SN62Ewam4u5Qeug-1; Mon, 19 Oct 2020 03:52:38 -0400
+X-MC-Unique: qLqPAl1SN62Ewam4u5Qeug-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF5B9879513;
- Mon, 19 Oct 2020 07:50:59 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ECFED1A4D6;
- Mon, 19 Oct 2020 07:50:58 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 672FF1132A08; Mon, 19 Oct 2020 09:50:57 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-Subject: Re: [PATCH] hw/pci-host/grackle: Verify PIC link is properly set
-References: <20201011190332.3189611-1-f4bug@amsat.org>
- <20201011223446.GA4787@yekko.fritz.box>
- <369509c1-2e90-13cf-8845-892e754516d1@amsat.org>
- <20201012065436.GB71119@yekko.fritz.box>
- <9f7e4847-801d-dcd3-b876-bf2d276251@eik.bme.hu>
- <6e587154-4bc5-c44c-0c85-b46e0dddd3aa@amsat.org>
-Date: Mon, 19 Oct 2020 09:50:57 +0200
-In-Reply-To: <6e587154-4bc5-c44c-0c85-b46e0dddd3aa@amsat.org> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 12 Oct 2020 14:00:56
- +0200")
-Message-ID: <87k0vm1wny.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E01C803F42
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:37 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3E82A5C641;
+ Mon, 19 Oct 2020 07:52:25 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 51C459D5A; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 04/14] spice: move display_init() to QemuSpiceOps.
+Date: Mon, 19 Oct 2020 09:52:14 +0200
+Message-Id: <20201019075224.14803-5-kraxel@redhat.com>
+In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
+References: <20201019075224.14803-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -103,59 +96,112 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>,
- qemu-ppc@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ include/ui/qemu-spice-module.h | 1 +
+ include/ui/qemu-spice.h        | 7 -------
+ softmmu/vl.c                   | 2 +-
+ ui/spice-core.c                | 1 +
+ ui/spice-module.c              | 9 +++++++++
+ 5 files changed, 12 insertions(+), 8 deletions(-)
 
-> On 10/12/20 1:50 PM, BALATON Zoltan via wrote:
->> On Mon, 12 Oct 2020, David Gibson wrote:
->>> On Mon, Oct 12, 2020 at 08:21:41AM +0200, Philippe
->>> Mathieu-Daud=C3=83=C6=92=C3=86=E2=80=99=C3=83=E2=80=9A=C3=82=C2=A9 wrot=
-e:
->>>> On 10/12/20 12:34 AM, David Gibson wrote:
->>>>> On Sun, Oct 11, 2020 at 09:03:32PM +0200, Philippe
->>>>> Mathieu-Daud=C3=83=C6=92=C3=86=E2=80=99=C3=83=E2=80=9A=C3=82=C2=A9 wr=
-ote:
->>>>>> The Grackle PCI host model expects the interrupt controller
->>>>>> being set, but does not verify it is present. Add a check to
->>>>>> help developers using this model.
->>>>>
->>>>> I don't think thaqt's very likely, but, sure, applied to ppc-for-5.2
->>>>
->>>> Do you want I correct the description as:
->>>> "The Grackle PCI host model expects the interrupt controller
->>>> being set, but does not verify it is present.
->>>> A developer basing its implementation on the Grackle model
->>>> might hit this problem. Add a check to help future developers
->>>> using this model as reference."?
->>>
->>> No, it's fine.=C3=82=C2=A0 All I was saying is that the chances of anyo=
-ne using
->>> Grackle in future seem very low to me.
->> So maybe an assert instead of a user visible error would be enough?
->
-> My understanding is realize() shouldn't abort()
-> (the caller might choose to by using &error_abort).
-
-assert() is for checking invariants.  A violated invariant is a
-programming error: developers screwed up, safe recovery is impossible.
-
-Abusing assert() to catch errors that are not programming errors is
-wrong.
-
-You may check invariants with assert() anywhere in the code.
-
-You should not misuse assert() anywhere in the code.
-
-Sometimes, an error condition that is *not* a programming error in the
-function where it is detected *is* a programming error for certain
-calls.  Having these calls pass &error_abort is a common solution for
-this problem.
-
-Hope this helps.
+diff --git a/include/ui/qemu-spice-module.h b/include/ui/qemu-spice-module.h
+index b182bc4c21a6..dbe09035dade 100644
+--- a/include/ui/qemu-spice-module.h
++++ b/include/ui/qemu-spice-module.h
+@@ -20,6 +20,7 @@
+ 
+ struct QemuSpiceOps {
+     void (*init)(void);
++    void (*display_init)(void);
+     int (*migrate_info)(const char *h, int p, int t, const char *s);
+ };
+ 
+diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+index e6df0a8715b0..a3fd1ea5ade8 100644
+--- a/include/ui/qemu-spice.h
++++ b/include/ui/qemu-spice.h
+@@ -66,13 +66,6 @@ static inline int qemu_spice_display_add_client(int csock, int skipauth,
+     return -1;
+ }
+ 
+-static inline void qemu_spice_display_init(void)
+-{
+-    /* This must never be called if CONFIG_SPICE is disabled */
+-    error_report("spice support is disabled");
+-    abort();
+-}
+-
+ #endif /* CONFIG_SPICE */
+ 
+ static inline bool qemu_using_spice(Error **errp)
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 65c34a6b8a2e..8a06fe8bf77a 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -4447,7 +4447,7 @@ void qemu_init(int argc, char **argv, char **envp)
+ #endif
+ 
+     if (using_spice) {
+-        qemu_spice_display_init();
++        qemu_spice.display_init();
+     }
+ 
+     if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
+diff --git a/ui/spice-core.c b/ui/spice-core.c
+index 6ef66eb387de..82d5dbda3e26 100644
+--- a/ui/spice-core.c
++++ b/ui/spice-core.c
+@@ -995,6 +995,7 @@ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd)
+ 
+ static struct QemuSpiceOps real_spice_ops = {
+     .init         = qemu_spice_init,
++    .display_init = qemu_spice_display_init,
+     .migrate_info = qemu_spice_migrate_info,
+ };
+ 
+diff --git a/ui/spice-module.c b/ui/spice-module.c
+index a30fa452ea93..56868aaffe9a 100644
+--- a/ui/spice-module.c
++++ b/ui/spice-module.c
+@@ -18,6 +18,7 @@
+  */
+ 
+ #include "qemu/osdep.h"
++#include "qemu/error-report.h"
+ #include "ui/qemu-spice-module.h"
+ 
+ int using_spice;
+@@ -26,6 +27,13 @@ static void qemu_spice_init_stub(void)
+ {
+ }
+ 
++static void qemu_spice_display_init_stub(void)
++{
++    /* This must never be called if CONFIG_SPICE is disabled */
++    error_report("spice support is disabled");
++    abort();
++}
++
+ static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
+                                         const char *s)
+ {
+@@ -34,5 +42,6 @@ static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
+ 
+ struct QemuSpiceOps qemu_spice = {
+     .init         = qemu_spice_init_stub,
++    .display_init = qemu_spice_display_init_stub,
+     .migrate_info = qemu_spice_migrate_info_stub,
+ };
+-- 
+2.27.0
 
 
