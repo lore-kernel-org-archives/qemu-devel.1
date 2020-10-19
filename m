@@ -2,89 +2,107 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89701C433E7
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF66EC433DF
 	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:10:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ADD6522268
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:10:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FCCE2225F
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:10:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUgyOX/x"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ADD6522268
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HJf91SQA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FCCE2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60298 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60334 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kURBf-0004uP-EF
+	id 1kURBf-0004vy-Sj
 	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 05:10:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43464)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUR9l-0003dK-J2
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:08:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45884)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUR9k-0003cH-6B
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:08:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32824)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUR9j-000633-FC
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:08:41 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUR9h-00062S-10
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:08:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603098518;
+ s=mimecast20190719; t=1603098514;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/EroG+YMzt/peYN+rgs2bNi9+VHUIsE1/4RZLuQZ7zg=;
- b=MUgyOX/xGvo48q4FHTH1/acy6EcCFiQuwQwHNe9wQ+sb6sGy2dp5oaJDNw/T9iqYXl/kSx
- EAhlK26sTUy/BAHfzL+Ox6RA9bInecej0AwfmfZV2axiveLygqGeR7VofnKa+lOCYVxG4x
- bfWG5JWzNtbtKELGSDvAXbNSxjKUVL8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-pIE123nNOxarGruKJ3QSyg-1; Mon, 19 Oct 2020 05:08:36 -0400
-X-MC-Unique: pIE123nNOxarGruKJ3QSyg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 168268030A3;
- Mon, 19 Oct 2020 09:08:35 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DAEA65577A;
- Mon, 19 Oct 2020 09:08:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 7137D1132A08; Mon, 19 Oct 2020 11:08:33 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH v4 0/7] qemu-storage-daemon: Remove QemuOpts from --object
-References: <20201011073505.1185335-1-armbru@redhat.com>
- <20201012143908.GF7777@merkur.fritz.box>
-Date: Mon, 19 Oct 2020 11:08:33 +0200
-In-Reply-To: <20201012143908.GF7777@merkur.fritz.box> (Kevin Wolf's message of
- "Mon, 12 Oct 2020 16:39:08 +0200")
-Message-ID: <87sgaazipa.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ bh=IcrWkVtq6M8tcSBX9LdqNv5TcNxSLD/rGERk43hwxLE=;
+ b=HJf91SQA4o0S06171pCTT6tpH2V5/CaWoW8igxRCgETcC9/bkqBLa8h/k2ckKddnmjWSRh
+ /+/vgEnpOnMbcimbgZNAyCJe8Sq1hLN5AKjcZx0RIX4J8ZP0llV/Pfd1BvMS7ZplLZ/cv2
+ lRSoAcWIMmkHi6cl4l4l1FGE3u2G5ko=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-41-cQPbaa2QNtSG-H-RrUw4Dw-1; Mon, 19 Oct 2020 05:08:30 -0400
+X-MC-Unique: cQPbaa2QNtSG-H-RrUw4Dw-1
+Received: by mail-wr1-f71.google.com with SMTP id t3so7178383wrq.2
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 02:08:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=IcrWkVtq6M8tcSBX9LdqNv5TcNxSLD/rGERk43hwxLE=;
+ b=Salyqs1ERsJZ91W7cONZi4mfxRNw6BAudRrLe0zTIJTz4NoEi4qn3LFtItprl+I7C8
+ fu5/AAyx4YWhqwL7/GUd0BJmPCwachTugFmpXjfS+trW6mf24/OeCO8IzpYoRCwf2gKz
+ k5Z46/LsIGV5quiMmLAiBrIUeBJprBycflKBFOKcZA/MSd1PkZHZl0arr3EFKaP0Zc/F
+ urI1Gn8GFfqyHXkhitGcR6X8gdNE56aZPft0u0dHjqsaXWnhaw6GKRMYxfTHb8zT0hJr
+ CUl1wgaHXN8RNqhXcdFAkQ2Ew6GYqRxUfCpBFxcADpfLJaAcKhvAXvSrryhsphoEQT7c
+ Hxsw==
+X-Gm-Message-State: AOAM5321tneIiCAeHtK7HcvyIWAdF3mcHmK9aDgJjsFqMaVCgDixoxES
+ BoZ2hh58j1xY4HfDOY/O9rNoHvBmLxKS9xDe7GY5fr6/rCG0LkztNFvWpBRwGPQK5CuNGZv66ho
+ s5Uf0VORuApFkig4=
+X-Received: by 2002:adf:e447:: with SMTP id t7mr18651564wrm.384.1603098509587; 
+ Mon, 19 Oct 2020 02:08:29 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxMnjZCikVQGo5Vt5Rj6pHq3tPr90DvLj6WX0w1qVI6UvPS8w480y8IU1f9KCuZO5GsNHk7yw==
+X-Received: by 2002:adf:e447:: with SMTP id t7mr18651545wrm.384.1603098509377; 
+ Mon, 19 Oct 2020 02:08:29 -0700 (PDT)
+Received: from [192.168.1.36] (36.red-83-57-175.dynamicip.rima-tde.net.
+ [83.57.175.36])
+ by smtp.gmail.com with ESMTPSA id h16sm17332443wre.87.2020.10.19.02.08.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 19 Oct 2020 02:08:28 -0700 (PDT)
+Subject: Re: [PATCH 3/5] spapr: Use appropriate getter for PC_DIMM_SLOT_PROP
+To: Greg Kurz <groug@kaod.org>, David Gibson <david@gibson.dropbear.id.au>
+References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
+ <160309730758.2739814.15821922745424652642.stgit@bahia.lan>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <d30860c5-5f96-f60e-2f8f-45e86feb55c7@redhat.com>
+Date: Mon, 19 Oct 2020 11:08:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <160309730758.2739814.15821922745424652642.stgit@bahia.lan>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,35 +115,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, qemu-block@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On 10/19/20 10:48 AM, Greg Kurz wrote:
+> The PC_DIMM_SLOT_PROP property is defined as:
+> 
+>      DEFINE_PROP_INT32(PC_DIMM_SLOT_PROP, PCDIMMDevice, slot,
+>                        PC_DIMM_UNASSIGNED_SLOT),
 
-> Am 11.10.2020 um 09:34 hat Markus Armbruster geschrieben:
->> This replaces the QemuOpts-based help code for --object in the storage
->> daemon with code based on the keyval parser.
->> 
->> Review of v3 led me to preexisting issues.  Instead of posting my
->> fixes separately, then working with Kevin to rebase his work on top of
->> mine, I did the rebase myself and am posting it together with my fixes
->> as v4.  Hope that's okay.
->> 
->> Note: to test qemu-storage-daemon --object help, you need Philippe's
->> "[PATCH v3] hw/nvram: Always register FW_CFG_DATA_GENERATOR_INTERFACE"
->> and its prerequisites (first 10 patches of Paolo's "[PULL 00/39] SCSI,
->> qdev, qtest, meson patches for 2020-10-10"), so it doesn't crash with
->> "missing interface 'fw_cfg-data-generator' for object 'tls-creds'".
->
-> Thanks, fixed up the typos in patch 4 and applied patches 1-4. I'm
-> taking patches 5-7 from my original series because you didn't add your
-> S-o-b (they are unchanged anyway, so no practical difference).
+Worth adding:
 
-Makes sense.  I didn't feel like slapping my S-o-b on patches I reposted
-unchanged.
+       #define PC_DIMM_UNASSIGNED_SLOT -1
 
-Thanks!
+for better understanding why it is signed.
+
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+
+> 
+> Use object_property_get_int() instead of object_property_get_uint().
+> Since spapr_memory_plug() only gets called if pc_dimm_pre_plug()
+> succeeded, we expect to have a valid >= 0 slot number, either because
+> the user passed a valid slot number or because pc_dimm_get_free_slot()
+> picked one up for us.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
+> ---
+>   hw/ppc/spapr.c |    9 ++++++---
+>   1 file changed, 6 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 115fc52e3b06..1b173861152f 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3433,7 +3433,8 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>       Error *local_err = NULL;
+>       SpaprMachineState *ms = SPAPR_MACHINE(hotplug_dev);
+>       PCDIMMDevice *dimm = PC_DIMM(dev);
+> -    uint64_t size, addr, slot;
+> +    uint64_t size, addr;
+> +    int64_t slot;
+>       bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+>   
+>       size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
+> @@ -3450,11 +3451,13 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>                          spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+>                          &local_err);
+>       } else {
+> -        slot = object_property_get_uint(OBJECT(dimm),
+> -                                        PC_DIMM_SLOT_PROP, &local_err);
+> +        slot = object_property_get_int(OBJECT(dimm),
+> +                                       PC_DIMM_SLOT_PROP, &local_err);
+>           if (local_err) {
+>               goto out_unplug;
+>           }
+> +        /* We should have valid slot number at this point */
+> +        g_assert(slot >= 0);
+>           spapr_add_nvdimm(dev, slot, &local_err);
+>       }
+>   
+> 
+> 
+> 
 
 
