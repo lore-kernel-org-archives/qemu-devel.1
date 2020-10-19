@@ -2,92 +2,67 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F5AAC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:47:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 735E1C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:47:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AEB0F222EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:47:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B6CBE22260
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:47:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fNaatsSp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEB0F222EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="zK+TSUmY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6CBE22260
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34128 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36018 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYJb-00048p-GR
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:47:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35314)
+	id 1kUYK1-0004vp-KQ
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:47:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35784)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kUYDY-0006DR-Mm
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:41:04 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:36653)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <eblot.ml@gmail.com>)
- id 1kUYDW-0006uR-9Q
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:41:04 -0400
-Received: by mail-wm1-x331.google.com with SMTP id e2so185711wme.1
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 09:41:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=+BolaTrCd1wVwrGXLni5DjU/jWn0bUFOsPgEjRRayms=;
- b=fNaatsSpxcgF32gSKQ8Vz7Xa1oUTVq6wNFQJ7+naUj1prs4Z9DTAxNkiDxJZ0+UD81
- FIT8MMlFAms7e2UCn4JAqUJsndLUvUTFzlgWDPCoq8Nko5NgjeN3qciX5CdaBoHcHAve
- VZ6nsIaIZ+6Yi37LyhvocJXOcrWtlS+T+B10ETS6ILYKrA1ZrB+WWURmx6FY/RSyvLb3
- EsizQGGAmmbGpQ1op5yb1HIzK2Z8u8unlScOvIgAjQJxtNlHvZv47blKD+z1R9VhkyDX
- skSiAn+rrOCNVrvyWLgi0yrJVCdXs+Tx059ppmnKUDjK0wtI8CeT5Ogr7f24+CGDkfFY
- Uaaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=+BolaTrCd1wVwrGXLni5DjU/jWn0bUFOsPgEjRRayms=;
- b=p5eD6BfkK80cq1ibgQUULjvDZMEq1s9eAvcjQhPHMoYMfxFeEYuDnlBGf/kwRhACZA
- t0CxTlp3yEInhiWu4zWp8mWAoAX9hhg2TOsrhzp5SwfeYrYqwozTqyhp6YT/P6kO4Z6Z
- M3Fl5VE0u2Pe3LYGxmwXBpx921Ci6dsTi7U0POE7W57IyeDr/jqlJQI2gz/rRpUxeQyz
- hFkNT6q+qwpl9kS1YYwB0pdn5zfb0vo1J/VNx1d35o9i34ZOKKx6D4bAlAgU3q6xAdFS
- tYNyNhkfk6e/mL9ZJ1URqOgvOz/Ew8DiSvsfHycn3Yov7wlrFT7x6nouNVeRjM1xWScY
- qFTA==
-X-Gm-Message-State: AOAM530KS7iwd8riegmJJcpwiSt++iddHtN6BZHHNAS9tdLaRNYBsiIT
- F5jI3tjg5A9Ax5dqMPyN3J1SuJEUdNavp+Vt
-X-Google-Smtp-Source: ABdhPJynaB4U80vpmjExXBBLRvGTo8UfdIBgyNdmAT+0jxEjqm8djmdYKEYIiyNZM7zc31rBubpU0A==
-X-Received: by 2002:a1c:f216:: with SMTP id s22mr102307wmc.150.1603125660437; 
- Mon, 19 Oct 2020 09:41:00 -0700 (PDT)
-Received: from [192.168.2.1] (net.iroazh.eu. [109.190.73.171])
- by smtp.gmail.com with ESMTPSA id u15sm307256wrm.77.2020.10.19.09.40.59
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 19 Oct 2020 09:40:59 -0700 (PDT)
-From: "Emmanuel Blot" <eblot.ml@gmail.com>
-To: QEMU <qemu-devel@nongnu.org>
-Subject: Re: ld: file not found: _PreallocMode_lookup on macOS Catalina
-Date: Mon, 19 Oct 2020 18:40:58 +0200
-X-Mailer: MailMate (1.13.2r5673)
-Message-ID: <AA504B32-5134-4CDD-8CDA-6F200C7376CF@gmail.com>
-In-Reply-To: <3869557c-10a0-8f07-a59a-69120a522568@redhat.com>
-References: <24B952F3-465C-4AB2-AF28-6CA4722D94B7@gmail.com>
- <3869557c-10a0-8f07-a59a-69120a522568@redhat.com>
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kUYGH-0001LT-Gr; Mon, 19 Oct 2020 12:43:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40376)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kUYGE-00076H-2v; Mon, 19 Oct 2020 12:43:52 -0400
+Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id C4522222EA;
+ Mon, 19 Oct 2020 16:43:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1603125827;
+ bh=Zz71mlDUXQ/ADoWnOSUfGr6Dba0b+/BragPLql0yfy0=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=zK+TSUmYa2EjLjkcaGUCZXBsQgSGYBCnGmnlZOiae6THaFqjKqtxbG4rPsPIVUAmo
+ rJyw26W6FO+nP/84ci3mN3kcdTfELubbJWGF/zjZnd5UCJckVgLwtTWNSf/MPpf4mA
+ mJLicZnu0L60uo6zoeV2qObswHpQFNKCAJP9UUdk=
+Date: Mon, 19 Oct 2020 09:43:32 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Klaus Jensen <its@irrelevant.dk>
+Subject: Re: [PATCH] hw/block/nvme: fix aer logic
+Message-ID: <20201019164332.GB1435260@dhcp-10-100-145-180.wdc.com>
+References: <20201019065416.34638-1-its@irrelevant.dk>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=eblot.ml@gmail.com; helo=mail-wm1-x331.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201019065416.34638-1-its@irrelevant.dk>
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 12:35:01
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,39 +76,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Philippe =?utf-8?q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Dmitry Fomichev <dmitry.fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 19 Oct 2020, at 17:50, Philippe Mathieu-Daudé wrote:
+On Mon, Oct 19, 2020 at 08:54:16AM +0200, Klaus Jensen wrote:
+> @@ -844,6 +838,12 @@ static void nvme_enqueue_event(NvmeCtrl *n, uint8_t event_type,
+>          return;
+>      }
+>  
+> +    /* ignore if masked (cqe posted, but event not cleared) */
+> +    if (n->aer_mask & (1 << event_type)) {
+> +        trace_pci_nvme_aer_masked(event_type, n->aer_mask);
+> +        return;
+> +    }
 
-> Cc'ing Markus/John/Paolo
+The 'mask' means the host hasn't yet acknowledged the AER with the
+appropriate log. The controller should continue to internally enqueue
+subsequent events of this type, but suppress sending the notification
+for them until the host unlatches the event type.
 
-I never used `git bisect` up to now, so I might be wronb but it seems 
-the issue would have been introduced with the following commit:
+>      event = g_new(NvmeAsyncEvent, 1);
+>      event->result = (NvmeAerResult) {
+>          .event_type = event_type,
+> @@ -859,9 +859,15 @@ static void nvme_enqueue_event(NvmeCtrl *n, uint8_t event_type,
+>  
+>  static void nvme_clear_events(NvmeCtrl *n, uint8_t event_type)
+>  {
+> +    NvmeAsyncEvent *event, *next;
+> +
+>      n->aer_mask &= ~(1 << event_type);
+> -    if (!QTAILQ_EMPTY(&n->aer_queue)) {
+> -        nvme_process_aers(n);
+> +
+> +    QTAILQ_FOREACH_SAFE(event, &n->aer_queue, entry, next) {
+> +        if (event->result.event_type == event_type) {
+> +            QTAILQ_REMOVE(&n->aer_queue, event, entry);
 
-604f3e4e90c011a6b94fdc1d13700f3ec2375f2a is the first bad commit
-commit 604f3e4e90c011a6b94fdc1d13700f3ec2375f2a
-Author: Yonggang Luo <luoyonggang@gmail.com>
-Date:   Thu Sep 3 01:00:50 2020 +0800
+Memory leaking the 'event'?
 
-     meson: Convert undefsym.sh to undefsym.py
-
-     Shell scripts are not easily invoked from the build process
-     on MSYS, so convert undefsym.sh to a python script.
-
-     Signed-off-by: Yonggang Luo <luoyonggang@gmail.com>
-     Message-Id: <20200902170054.810-3-luoyonggang@gmail.com>
-     Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-
-  meson.build         |  2 +-
-  scripts/undefsym.py | 49 
-+++++++++++++++++++++++++++++++++++++++++++++++++
-  scripts/undefsym.sh | 20 --------------------
-  3 files changed, 50 insertions(+), 21 deletions(-)
-  create mode 100644 scripts/undefsym.py
-  delete mode 100755 scripts/undefsym.sh
+> +            n->aer_queued--;
+> +        }
+>      }
+>  }
 
