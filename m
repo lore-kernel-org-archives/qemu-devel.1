@@ -2,69 +2,87 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFAC2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B4D0C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:39:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B51E21D81
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:38:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B51E21D81
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7038C21D81
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 16:39:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3WhTSXJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7038C21D81
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUYBF-0002kd-6E
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:38:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34362)
+	id 1kUYBn-0003Gz-Dz
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 12:39:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Dave.Martin@arm.com>)
- id 1kUY9Z-0001Z8-MB
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:36:57 -0400
-Received: from foss.arm.com ([217.140.110.172]:54246)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Dave.Martin@arm.com>) id 1kUY9W-0006Bv-Gw
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:36:56 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B6151FB;
- Mon, 19 Oct 2020 09:36:53 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 408C73F66B;
- Mon, 19 Oct 2020 09:36:52 -0700 (PDT)
-Date: Mon, 19 Oct 2020 17:36:49 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-Message-ID: <20201019163648.GR32292@arm.com>
-References: <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
- <20201019113157.GN32292@arm.com>
- <CAFEAcA8oncKmGxKGEZBg9Pnm4hjSO8u9KSv4YxFWxX0+LJ5E2g@mail.gmail.com>
- <20201019134043.vqusmzhqp7owjt6x@kamzik.brq.redhat.com>
- <CAFEAcA8RB6MTnv0qavxWs28=pbT16i9dT1pd+0Dy9HxPVk+bZA@mail.gmail.com>
- <20201019145839.GO32292@arm.com>
- <20201019152311.csxcz52sawia4imi@kamzik.brq.redhat.com>
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kUY9w-0001im-CO
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:37:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mlevitsk@redhat.com>)
+ id 1kUY9u-0006EV-5Q
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 12:37:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603125437;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=CAVIJyu9OkU7Q70Y2qGkvrCnYMEjGToAce8PrSfWBvQ=;
+ b=G3WhTSXJp8tku0Q2MOip4NIzEi5BN50GtL4cQ16GMKznjysi3pUaHMbn0bICPTgPvMtyfW
+ 4YtiCGi24jOuMwk6ePWbyi7b++9i26lqQSzfEuE/HSrnPDPOosDKtN3bQMIRBsbsuVicC3
+ Jnw8oJZFmn9X3cT8keTXIYgI6Qjc64Q=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-471-ElNDdu6mPNarTwmrfz-cig-1; Mon, 19 Oct 2020 12:37:15 -0400
+X-MC-Unique: ElNDdu6mPNarTwmrfz-cig-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1A2521007463;
+ Mon, 19 Oct 2020 16:37:14 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.35.206.118])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5508A5B4AD;
+ Mon, 19 Oct 2020 16:37:11 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 1/4] qdev: Fix two typos
+Date: Mon, 19 Oct 2020 19:36:59 +0300
+Message-Id: <20201019163702.471239-2-mlevitsk@redhat.com>
+In-Reply-To: <20201019163702.471239-1-mlevitsk@redhat.com>
+References: <20201019163702.471239-1-mlevitsk@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201019152311.csxcz52sawia4imi@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Received-SPF: pass client-ip=217.140.110.172; envelope-from=Dave.Martin@arm.com;
- helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 10:28:18
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mlevitsk@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mlevitsk@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -77,110 +95,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Marc Zyngier <maz@kernel.org>, xu910121@sina.com,
- qemu-devel <qemu-devel@nongnu.org>, kvmarm <kvmarm@lists.cs.columbia.edu>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 05:23:11PM +0200, Andrew Jones wrote:
-> On Mon, Oct 19, 2020 at 03:58:40PM +0100, Dave Martin wrote:
-> > On Mon, Oct 19, 2020 at 03:18:11PM +0100, Peter Maydell wrote:
-> > > On Mon, 19 Oct 2020 at 14:40, Andrew Jones <drjones@redhat.com> wrote:
-> > > >
-> > > > On Mon, Oct 19, 2020 at 12:43:33PM +0100, Peter Maydell wrote:
-> > > > > Well, ID regs are special in the architecture -- they always exist
-> > > > > and must RAZ/WI, even if they're not actually given any fields yet.
-> > > > > This is different from other "unused" parts of the system register
-> > > > > encoding space, which UNDEF.
-> > > >
-> > > > Table D12-2 confirms the register should be RAZ, as it says the register
-> > > > is "RO, but RAZ if SVE is not implemented". Does "RO" imply "WI", though?
-> > > > For the guest we inject an exception on writes, and for userspace we
-> > > > require the value to be preserved on write.
-> > > 
-> > > Sorry, I mis-spoke. They're RAZ, but not WI, just RO (which is to say
-> > > they'll UNDEF if you try to write to them).
-> > > 
-> > > > I think we should follow the spec, even for userspace access, and be RAZ
-> > > > for when the feature isn't implemented. As for writes, assuming the
-> > > > exception injection is what we want for the guest (not WI), then that's
-> > > > correct. For userspace, I think we should continue forcing preservation
-> > > > (which will force preservation of zero when it's RAZ).
-> > > 
-> > > Yes, that sounds right.
-> > 
-> > [...]
-> > 
-> > > > > The problem is that you've actually removed registers from
-> > > > > the list that were previously in it (because pre-SVE
-> > > > > kernels put this ID register in the list as a RAZ/WI register,
-> > > > > and now it's not in the list if SVE isn't supported).
-> > 
-> > Define "previously", though.  IIUC, the full enumeration was added in
-> > v4.15 (with ID_AA64ZFR0_EL1 still not supported at all):
-> > 
-> > v4.15-rc1~110^2~27
-> > 93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-> > 
-> > 
-> > And then ID_AA64FZR0_EL1 was removed from the enumeration, also in
-> > v4.15:
-> > 
-> > v4.15-rc1~110^2~5
-> > 07d79fe7c223 ("arm64/sve: KVM: Hide SVE from CPU features exposed to guests")
-> > 
-> > 
-> > So, are there really two upstram kernel tags that are mismatched on
-> > this, or is this just a bisectability issue in v4.14..v4.15?
-> > 
-> > It's a while since I looked at this, and I may have misunderstood the
-> > timeline.
-> > 
-> > 
-> > > > > > So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-> > > > > > parhaps we should move all ID_UNALLOCATED() regs (and possibly
-> > > > > > ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
-> > > > >
-> > > > > What does this do as far as the user-facing list-of-registers
-> > > > > is concerned? All these registers need to remain in the
-> > > > > KVM_GET_REG_LIST list, or you break migration from an old
-> > > > > kernel to a new one.
-> > 
-> > OK, I think I see where you are coming from, now.
-> > 
-> > It may make sense to get rid of the REG_HIDDEN_GUEST / REG_HIDDEN_USER
-> > distinction, and provide the same visibility for userspace as for MSR/
-> > MRS all the time.  This would restore ID_AA64ZFR0_EL1 into the userspace
-> > view, and may also allow a bit of simplification in the code.
-> > 
-> > Won't this will still break migration from the resulting kernel to a
-> > current kernel that hides ID_AA64ZFR0_EL1?  Or have I misunderstood
-> > something.
-> >
-> 
-> Yes, but, while neither direction old -> new nor new -> old is actually
-> something that people should do when using host cpu passthrough (they
-> should only ever migrate between identical hosts, both hardware and
-> host kernel version), migrating from old -> new makes more sense, as
-> that's the upgrade path, and it's more supportable - we can workaround
-> things on the new side. So, long story short, new -> old will fail due
-> to making this change, but it's still probably the right thing to do,
-> as we'll be defining a better pattern for ID registers going forward,
-> and we never claimed new -> old migrations would work anyway with host
-> passthrough.
-> 
-> Thanks,
-> drew
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ include/hw/qdev-core.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Ack, just wanted to make sure I understood the implications correctly.
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 868973319e..3761186804 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -163,8 +163,8 @@ struct NamedClockList {
+ /**
+  * DeviceState:
+  * @realized: Indicates whether the device has been fully constructed.
+- *            When accessed outsize big qemu lock, must be accessed with
+- *            atomic_load_acquire()
++ *            When accessed outside big qemu lock, must be accessed with
++ *            qatomic_load_acquire()
+  * @reset: ResettableState for the device; handled by Resettable interface.
+  *
+  * This structure should not be accessed directly.  We declare it here
+-- 
+2.26.2
 
-I'm still not sure I fully understand why we hit this problem (i.e.,
-ZFR0 enumeration mismatch between host and guest) in the first place,
-unless I've misunderstood which patches make these changes, or unless
-RHEL has cherry-picked odd patches that weren't intended to be applied
-separately...
-
-Cheers
----Dave
 
