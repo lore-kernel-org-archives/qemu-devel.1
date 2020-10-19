@@ -2,99 +2,70 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51A2C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:27:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0730C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 03:31:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EB78422268
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 02:27:33 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="quN6jdAT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EB78422268
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4524D22260
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 03:31:41 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4524D22260
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57760 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUKtY-00035O-R2
-	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 22:27:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56316)
+	id 1kULtc-0000vW-8z
+	for qemu-devel@archiver.kernel.org; Sun, 18 Oct 2020 23:31:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38958)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5541069a6=dmitry.fomichev@wdc.com>)
- id 1kUKkL-000087-LV; Sun, 18 Oct 2020 22:18:01 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:44142)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kULso-0000S5-8B
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 23:30:50 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:52844 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=5541069a6=dmitry.fomichev@wdc.com>)
- id 1kUKkF-0004J9-Tg; Sun, 18 Oct 2020 22:18:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603073875; x=1634609875;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=1iCaLcRtJJI6ux6xIcpSpsgXa0rjaAlQdhmLZREtcPs=;
- b=quN6jdATFX5XJ9dTETrD3hXJg4fbIPH4eq1mYiO1AFTo4nf7lZg6ix9Z
- XjNp3GzkPc6MtqWhxOq3ybiT8/l0MZrqf6xwseKhu58tyLGBrOtVxkoX7
- 2wGqcWvVcaqU0LDsIWsGcZs9Xe+hkhL1dU01+5RNQhr48kGWMnnslzIVx
- gQhOjTNJfCgyw68lfUHafy5Sof5NtjA+c8jiZLNMlzSJ0pJL7jVM+LpB5
- ZeYzs0BG0nMVigF3C6x/gYTIKeetjD0nfgtOwW18N+7a6d6SX3RjoZs2n
- rGnj2pp7T1P86wid400o8aDFltcA0lBW+tCma1W6utHUxYcbiXUyyeU0X w==;
-IronPort-SDR: ov/+7RVXszbCz0ni4vRNjtFLp6ATgThWbbMHuTa7tkfF17hCVdvOpQvQdIDXaeMppPCYIVCOrD
- HEodd3QzJmdB6uvoem0z5Dn/jkJLxI6p6tlQ8als4NziJRgD0om93b8Mf3+bN/UswhGJqjQ24N
- lyfslSkY0+AWN0YMdMtDdcx7RlAGbu3f2rb2bOgCpbPUUX4bDTxf0SO5rA+0OYd4oBNbZBGAGw
- uOT+WNocCVZtxvvQEF06HET716KL/6lrrWyiJ3nzMahF3VryPMz3KMBKQ284hl+n0QbjGXavx6
- 6Es=
-X-IronPort-AV: E=Sophos;i="5.77,393,1596470400"; d="scan'208";a="150207982"
-Received: from uls-op-cesaip02.wdc.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 19 Oct 2020 10:17:54 +0800
-IronPort-SDR: nhFKUpOnvI/jImUYuc/nAhZtrtHuuW5sUktlf6wT9DCagxth1UzmlzuEq2o58eNywVnkEzXYIr
- DiGNwsoOsiy71OzlR/PNcEIPB5EAAJ18PIv7V5n4Ep7eipu5Tt5LbiNAwkRECR9KKP5MDQxeJ2
- 6US8oRyXuZF1jH+T8menYCK1qzAnYC+Q3s0nQvnf6/wlpm2rkHmzOUi6y1VcQdEtZw6VvcW8gT
- k0uadzExPniKTHMip5kofoKPUXlg3j0PxhrM16oviI9GrpVSd9hrgKaUBmwj+U7FMSG41tr6jC
- 0HBBQZIsyt66CleKaxugiUiS
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 18 Oct 2020 19:03:31 -0700
-IronPort-SDR: oGppLOyS0TD5KXnNeT1gRs8w5G9X8rhHeIwI7STcV1Y1aPoq8qc6DKLgSNMJI5mL91+48PgPXe
- 7SIes05Rabb4cHuuGRxFHRXtWc/WXM0gEQH84rAZqN6LsmdRdHQXIX3tH1lyzEAUegM+Y3ejgD
- xClZ3HT5QpW/z2QrJbWd64Qk3aD0umoffzzZwFBAkcS/QslgwxycAlvobuZVXsL11Nw4ZAKipt
- kEVGKBfVOyjOxhEWOdmUxuIi1+COKd1PpDodnQnvSLqLS/wlYl96MNrbuJ1uL8LMu2aCIIYVYR
- 0g8=
-WDCIronportException: Internal
-Received: from unknown (HELO redsun50.ssa.fujisawa.hgst.com) ([10.149.66.24])
- by uls-op-cesaip02.wdc.com with ESMTP; 18 Oct 2020 19:17:52 -0700
-From: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-To: Keith Busch <kbusch@kernel.org>, Klaus Jensen <k.jensen@samsung.com>,
- Kevin Wolf <kwolf@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Fam Zheng <fam@euphon.net>
-Subject: [PATCH v7 10/11] hw/block/nvme: Separate read and write handlers
-Date: Mon, 19 Oct 2020 11:17:25 +0900
-Message-Id: <20201019021726.12048-11-dmitry.fomichev@wdc.com>
-X-Mailer: git-send-email 2.21.0
-In-Reply-To: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
-References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kULsk-0000W5-NQ
+ for qemu-devel@nongnu.org; Sun, 18 Oct 2020 23:30:49 -0400
+Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 9EC25EE67AD099E54427;
+ Mon, 19 Oct 2020 11:30:27 +0800 (CST)
+Received: from [10.174.186.14] (10.174.186.14) by
+ DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
+ 14.3.487.0; Mon, 19 Oct 2020 11:30:21 +0800
+Subject: Re: [PATCH v1] migration: using trace_ to replace DPRINTF
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ <quintela@redhat.com>, <eblake@redhat.com>, <dgilbert@redhat.com>,
+ <berrange@redhat.com>
+References: <1602927347-15669-1-git-send-email-yubihong@huawei.com>
+ <1bd1c3f7-4c88-c93f-127c-9576fed176c7@redhat.com>
+From: Bihong Yu <yubihong@huawei.com>
+Message-ID: <6e93294c-a7d9-2853-d902-8d479bccdd1d@huawei.com>
+Date: Mon, 19 Oct 2020 11:30:20 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
+In-Reply-To: <1bd1c3f7-4c88-c93f-127c-9576fed176c7@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=5541069a6=dmitry.fomichev@wdc.com; helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 22:17:33
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+X-Originating-IP: [10.174.186.14]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=yubihong@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 23:30:28
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,302 +78,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Niklas Cassel <niklas.cassel@wdc.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Dmitry Fomichev <dmitry.fomichev@wdc.com>, qemu-devel@nongnu.org,
- Alistair Francis <alistair.francis@wdc.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: david.edmondson@oracle.com, zhang.zhanghailiang@huawei.com,
+ qemu-devel@nongnu.org, xiexiangyou@huawei.com, alex.chen@huawei.com,
+ wanghao232@huawei.com, zhengchuan@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With ZNS support in place, the majority of code in nvme_rw() has
-become read- or write-specific. Move these parts to two separate
-handlers, nvme_read() and nvme_write() to make the code more
-readable and to remove multiple is_write checks that so far existed
-in the i/o path.
+Thank you for your review.OK ,I will adapt them.
 
-This is a refactoring patch, no change in functionality.
-
-Signed-off-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
----
- hw/block/nvme.c       | 191 +++++++++++++++++++++++++-----------------
- hw/block/trace-events |   3 +-
- 2 files changed, 114 insertions(+), 80 deletions(-)
-
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 3b9ea326d7..5ec4ce5e28 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1162,10 +1162,10 @@ typedef struct NvmeReadFillCtx {
-     uint32_t  post_rd_fill_nlb;
- } NvmeReadFillCtx;
- 
--static uint16_t nvme_check_zone_read(NvmeNamespace *ns, NvmeZone *zone,
--                                     uint64_t slba, uint32_t nlb,
--                                     NvmeReadFillCtx *rfc)
-+static uint16_t nvme_check_zone_read(NvmeNamespace *ns, uint64_t slba,
-+                                     uint32_t nlb, NvmeReadFillCtx *rfc)
- {
-+    NvmeZone *zone = nvme_get_zone_by_slba(ns, slba);
-     NvmeZone *next_zone;
-     uint64_t bndry = nvme_zone_rd_boundary(ns, zone);
-     uint64_t end = slba + nlb, wp1, wp2;
-@@ -1449,6 +1449,86 @@ static uint16_t nvme_flush(NvmeCtrl *n, NvmeRequest *req)
-     return NVME_NO_COMPLETE;
- }
- 
-+static uint16_t nvme_read(NvmeCtrl *n, NvmeRequest *req)
-+{
-+    NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-+    NvmeNamespace *ns = req->ns;
-+    uint64_t slba = le64_to_cpu(rw->slba);
-+    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
-+    uint32_t fill_len;
-+    uint64_t data_size = nvme_l2b(ns, nlb);
-+    uint64_t data_offset, fill_ofs;
-+    NvmeReadFillCtx rfc;
-+    BlockBackend *blk = ns->blkconf.blk;
-+    uint16_t status;
-+
-+    trace_pci_nvme_read(nvme_cid(req), nvme_nsid(ns), nlb, data_size, slba);
-+
-+    status = nvme_check_mdts(n, data_size);
-+    if (status) {
-+        trace_pci_nvme_err_mdts(nvme_cid(req), data_size);
-+        goto invalid;
-+    }
-+
-+    status = nvme_check_bounds(n, ns, slba, nlb);
-+    if (status) {
-+        trace_pci_nvme_err_invalid_lba_range(slba, nlb, ns->id_ns.nsze);
-+        goto invalid;
-+    }
-+
-+    if (ns->params.zoned) {
-+        status = nvme_check_zone_read(ns, slba, nlb, &rfc);
-+        if (status != NVME_SUCCESS) {
-+            trace_pci_nvme_err_zone_read_not_ok(slba, nlb, status);
-+            goto invalid;
-+        }
-+    }
-+
-+    status = nvme_map_dptr(n, data_size, req);
-+    if (status) {
-+        goto invalid;
-+    }
-+
-+    if (ns->params.zoned) {
-+        if (rfc.pre_rd_fill_nlb) {
-+            fill_ofs = nvme_l2b(ns, rfc.pre_rd_fill_slba - slba);
-+            fill_len = nvme_l2b(ns, rfc.pre_rd_fill_nlb);
-+            nvme_fill_read_data(req, fill_ofs, fill_len,
-+                                n->params.fill_pattern);
-+        }
-+        if (!rfc.read_nlb) {
-+            /* No backend I/O necessary, only needed to fill the buffer */
-+            req->status = NVME_SUCCESS;
-+            return NVME_SUCCESS;
-+        }
-+        if (rfc.post_rd_fill_nlb) {
-+            req->fill_ofs = nvme_l2b(ns, rfc.post_rd_fill_slba - slba);
-+            req->fill_len = nvme_l2b(ns, rfc.post_rd_fill_nlb);
-+        } else {
-+            req->fill_len = 0;
-+        }
-+        slba = rfc.read_slba;
-+        data_size = nvme_l2b(ns, rfc.read_nlb);
-+    }
-+
-+    data_offset = nvme_l2b(ns, slba);
-+
-+    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
-+                     BLOCK_ACCT_READ);
-+    if (req->qsg.sg) {
-+        req->aiocb = dma_blk_read(blk, &req->qsg, data_offset,
-+                                  BDRV_SECTOR_SIZE, nvme_rw_cb, req);
-+    } else {
-+        req->aiocb = blk_aio_preadv(blk, data_offset, &req->iov, 0,
-+                                    nvme_rw_cb, req);
-+    }
-+    return NVME_NO_COMPLETE;
-+
-+invalid:
-+    block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_READ);
-+    return status | NVME_DNR;
-+}
-+
- static uint16_t nvme_write_zeroes(NvmeCtrl *n, NvmeRequest *req)
- {
-     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-@@ -1495,25 +1575,20 @@ invalid:
-     return status | NVME_DNR;
- }
- 
--static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req, bool append)
-+static uint16_t nvme_write(NvmeCtrl *n, NvmeRequest *req, bool append)
- {
-     NvmeRwCmd *rw = (NvmeRwCmd *)&req->cmd;
-     NvmeNamespace *ns = req->ns;
--    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
-     uint64_t slba = le64_to_cpu(rw->slba);
-+    uint32_t nlb = (uint32_t)le16_to_cpu(rw->nlb) + 1;
-     uint64_t data_size = nvme_l2b(ns, nlb);
--    uint64_t data_offset, fill_ofs;
--
-+    uint64_t data_offset;
-     NvmeZone *zone;
--    uint32_t fill_len;
--    NvmeReadFillCtx rfc;
--    bool is_write = rw->opcode == NVME_CMD_WRITE || append;
--    enum BlockAcctType acct = is_write ? BLOCK_ACCT_WRITE : BLOCK_ACCT_READ;
-     BlockBackend *blk = ns->blkconf.blk;
-     uint16_t status;
- 
--    trace_pci_nvme_rw(nvme_cid(req), nvme_io_opc_str(rw->opcode),
--                      nvme_nsid(ns), nlb, data_size, slba);
-+    trace_pci_nvme_write(nvme_cid(req), nvme_io_opc_str(rw->opcode),
-+                         nvme_nsid(ns), nlb, data_size, slba);
- 
-     status = nvme_check_mdts(n, data_size);
-     if (status) {
-@@ -1530,29 +1605,21 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req, bool append)
-     if (ns->params.zoned) {
-         zone = nvme_get_zone_by_slba(ns, slba);
- 
--        if (is_write) {
--            status = nvme_check_zone_write(n, ns, zone, slba, nlb, append);
--            if (status != NVME_SUCCESS) {
--                goto invalid;
--            }
--
--            if (append) {
--                slba = zone->w_ptr;
--            }
--
--            status = nvme_auto_open_zone(ns, zone);
--            if (status != NVME_SUCCESS) {
--                goto invalid;
--            }
--
--            req->cqe.result64 = nvme_advance_zone_wp(ns, zone, nlb);
--        } else {
--            status = nvme_check_zone_read(ns, zone, slba, nlb, &rfc);
--            if (status != NVME_SUCCESS) {
--                trace_pci_nvme_err_zone_read_not_ok(slba, nlb, status);
--                goto invalid;
--            }
-+        status = nvme_check_zone_write(n, ns, zone, slba, nlb, append);
-+        if (status != NVME_SUCCESS) {
-+            goto invalid;
-         }
-+
-+        status = nvme_auto_open_zone(ns, zone);
-+        if (status != NVME_SUCCESS) {
-+            goto invalid;
-+        }
-+
-+        if (append) {
-+            slba = zone->w_ptr;
-+        }
-+
-+        req->cqe.result64 = nvme_advance_zone_wp(ns, zone, nlb);
-     } else if (append) {
-         trace_pci_nvme_err_invalid_opc(rw->opcode);
-         status = NVME_INVALID_OPCODE;
-@@ -1566,56 +1633,21 @@ static uint16_t nvme_rw(NvmeCtrl *n, NvmeRequest *req, bool append)
-         goto invalid;
-     }
- 
--    if (ns->params.zoned) {
--        if (is_write) {
--            req->cqe.result64 = nvme_advance_zone_wp(ns, zone, nlb);
--        } else {
--            if (rfc.pre_rd_fill_nlb) {
--                fill_ofs = nvme_l2b(ns, rfc.pre_rd_fill_slba - slba);
--                fill_len = nvme_l2b(ns, rfc.pre_rd_fill_nlb);
--                nvme_fill_read_data(req, fill_ofs, fill_len,
--                                    n->params.fill_pattern);
--            }
--            if (!rfc.read_nlb) {
--                /* No backend I/O necessary, only needed to fill the buffer */
--                req->status = NVME_SUCCESS;
--                return NVME_SUCCESS;
--            }
--            if (rfc.post_rd_fill_nlb) {
--                req->fill_ofs = nvme_l2b(ns, rfc.post_rd_fill_slba - slba);
--                req->fill_len = nvme_l2b(ns, rfc.post_rd_fill_nlb);
--            } else {
--                req->fill_len = 0;
--            }
--            slba = rfc.read_slba;
--            data_size = nvme_l2b(ns, rfc.read_nlb);
--        }
--    }
--
-     data_offset = nvme_l2b(ns, slba);
- 
--    block_acct_start(blk_get_stats(blk), &req->acct, data_size, acct);
-+    block_acct_start(blk_get_stats(blk), &req->acct, data_size,
-+                     BLOCK_ACCT_WRITE);
-     if (req->qsg.sg) {
--        if (is_write) {
--            req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
--                                       BDRV_SECTOR_SIZE, nvme_rw_cb, req);
--        } else {
--            req->aiocb = dma_blk_read(blk, &req->qsg, data_offset,
--                                      BDRV_SECTOR_SIZE, nvme_rw_cb, req);
--        }
-+        req->aiocb = dma_blk_write(blk, &req->qsg, data_offset,
-+                                   BDRV_SECTOR_SIZE, nvme_rw_cb, req);
-     } else {
--        if (is_write) {
--            req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
--                                         nvme_rw_cb, req);
--        } else {
--            req->aiocb = blk_aio_preadv(blk, data_offset, &req->iov, 0,
--                                        nvme_rw_cb, req);
--        }
-+        req->aiocb = blk_aio_pwritev(blk, data_offset, &req->iov, 0,
-+                                     nvme_rw_cb, req);
-     }
-     return NVME_NO_COMPLETE;
- 
- invalid:
--    block_acct_invalid(blk_get_stats(blk), acct);
-+    block_acct_invalid(blk_get_stats(blk), BLOCK_ACCT_WRITE);
-     return status | NVME_DNR;
- }
- 
-@@ -2096,10 +2128,11 @@ static uint16_t nvme_io_cmd(NvmeCtrl *n, NvmeRequest *req)
-     case NVME_CMD_WRITE_ZEROES:
-         return nvme_write_zeroes(n, req);
-     case NVME_CMD_ZONE_APPEND:
--        return nvme_rw(n, req, true);
-+        return nvme_write(n, req, true);
-     case NVME_CMD_WRITE:
-+        return nvme_write(n, req, false);
-     case NVME_CMD_READ:
--        return nvme_rw(n, req, false);
-+        return nvme_read(n, req);
-     case NVME_CMD_ZONE_MGMT_SEND:
-         return nvme_zone_mgmt_send(n, req);
-     case NVME_CMD_ZONE_MGMT_RECV:
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 962084e40c..7ee90a50c3 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -40,7 +40,8 @@ pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2,
- pci_nvme_map_sgl(uint16_t cid, uint8_t typ, uint64_t len) "cid %"PRIu16" type 0x%"PRIx8" len %"PRIu64""
- pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
- pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode, const char *opname) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8" opname '%s'"
--pci_nvme_rw(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
-+pci_nvme_read(uint16_t cid, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
-+pci_nvme_write(uint16_t cid, const char *verb, uint32_t nsid, uint32_t nlb, uint64_t count, uint64_t lba) "cid %"PRIu16" opname '%s' nsid %"PRIu32" nlb %"PRIu32" count %"PRIu64" lba 0x%"PRIx64""
- pci_nvme_rw_cb(uint16_t cid, const char *blkname) "cid %"PRIu16" blk '%s'"
- pci_nvme_write_zeroes(uint16_t cid, uint32_t nsid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" nsid %"PRIu32" slba %"PRIu64" nlb %"PRIu32""
- pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
--- 
-2.21.0
-
+On 2020/10/17 17:57, Philippe Mathieu-Daudé wrote:
+> On 10/17/20 11:35 AM, Bihong Yu wrote:
+>> Signed-off-by: Bihong Yu <yubihong@huawei.com>
+>> ---
+>>   migration/block.c      | 36 ++++++++++++++++++------------------
+>>   migration/page_cache.c | 13 +++----------
+>>   migration/trace-events | 13 +++++++++++++
+>>   3 files changed, 34 insertions(+), 28 deletions(-)
+> ...
+>> diff --git a/migration/trace-events b/migration/trace-events
+>> index 338f38b..772bb81 100644
+>> --- a/migration/trace-events
+>> +++ b/migration/trace-events
+>> @@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
+>>   calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+>>   skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+>>   find_page_matched(const char *idstr) "ramblock %s addr or size changed"
+>> +
+>> +# block.c
+>> +init_blk_migration_shared(const char *blk_device_name) "Start migration for %s with shared base image"
+>> +init_blk_migration_full(const char *blk_device_name) "Start full migration for %s"
+>> +mig_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
+>> +flush_blks(const char *action, int submitted, int read_done, int transferred) "%s submitted %d read_done %d transferred %d"
+>> +block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
+>> +block_save_complete(void) "Block migration completed"
+>> +block_save_pending(uint64_t pending) "Enter save live pending  %" PRIu64
+>> +
+>> +# page_cache.c
+>> +cache_init(int64_t max_num_items) "Setting cache buckets to %" PRId64
+>> +cache_insert(void) "Error allocating page"
+> 
+> The patch is good, but I strongly recommend to have trace events
+> starting with the subsystem prefix (here migration). So we can
+> keep using the 'block*' rule to match all events from the block
+> subsystem, without including the migration events.
+> 
+> Thanks,
+> 
+> Phil.
+> 
+> .
 
