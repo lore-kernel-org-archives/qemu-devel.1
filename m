@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,DATE_IN_PAST_12_24,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA875C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:08:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19BCEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:08:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2FB9321741
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:08:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2FB9321741
+	by mail.kernel.org (Postfix) with ESMTPS id 3DA7121741
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:08:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DA7121741
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40420 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUpVV-0002u5-2e
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:08:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49308)
+	id 1kUpVa-00036d-5q
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:08:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ganqixin@huawei.com>)
- id 1kUpQt-00060h-37; Tue, 20 Oct 2020 07:03:59 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:38654 helo=huawei.com)
+ id 1kUpRH-0006xf-Qd; Tue, 20 Oct 2020 07:04:23 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:45562 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ganqixin@huawei.com>)
- id 1kUpQp-0006mv-Se; Tue, 20 Oct 2020 07:03:58 -0400
+ id 1kUpRE-0006sl-Cb; Tue, 20 Oct 2020 07:04:23 -0400
 Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id A6CCB55C9628D24EB3C0;
- Tue, 20 Oct 2020 19:03:49 +0800 (CST)
+ by Forcepoint Email with ESMTP id 990A0A079AE851536F90;
+ Tue, 20 Oct 2020 19:04:15 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS403-HUB.china.huawei.com
  (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 19:03:41 +0800
+ 19:03:49 +0800
 From: Gan Qixin <ganqixin@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH 04/10] hw/intc/:split some lines containing more than 80
+Subject: [PATCH 09/10] hw/input/:split some lines containing more than 80
  characters
-Date: Tue, 20 Oct 2020 04:30:17 +0800
-Message-ID: <20201019203023.658555-5-ganqixin@huawei.com>
+Date: Tue, 20 Oct 2020 04:30:22 +0800
+Message-ID: <20201019203023.658555-10-ganqixin@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20201019203023.658555-1-ganqixin@huawei.com>
 References: <20201019203023.658555-1-ganqixin@huawei.com>
@@ -50,9 +50,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.175.104.175]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=ganqixin@huawei.com;
+Received-SPF: pass client-ip=45.249.212.32; envelope-from=ganqixin@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:03:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:04:17
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -31
 X-Spam_score: -3.2
@@ -80,105 +80,96 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-By using scripts/checkpatch.pl, it is found that many files in hw/intc/
+By using scripts/checkpatch.pl, it is found that many files in hw/input/
 contain lines with more than 80 characters.
 
 Signed-off-by: Gan Qixin <ganqixin@huawei.com>
 ---
- hw/intc/apic.c           | 3 ++-
- hw/intc/arm_gic.c        | 5 +++--
- hw/intc/arm_gic_common.c | 3 ++-
- hw/intc/ioapic.c         | 3 ++-
- hw/intc/xics.c           | 3 ++-
- hw/intc/xics_kvm.c       | 3 ++-
- 6 files changed, 13 insertions(+), 7 deletions(-)
+ hw/input/hid.c               |  3 ++-
+ hw/input/milkymist-softusb.c | 16 ++++++++++------
+ hw/input/pxa2xx_keypad.c     |  3 ++-
+ hw/input/virtio-input.c      |  3 ++-
+ 4 files changed, 16 insertions(+), 9 deletions(-)
 
-diff --git a/hw/intc/apic.c b/hw/intc/apic.c
-index b6a05e5439..89c2558f78 100644
---- a/hw/intc/apic.c
-+++ b/hw/intc/apic.c
-@@ -426,7 +426,8 @@ static void apic_eoi(APICCommonState *s)
-     if (isrv < 0)
-         return;
-     apic_reset_bit(s->isr, isrv);
--    if (!(s->spurious_vec & APIC_SV_DIRECTED_IO) && apic_get_bit(s->tmr, isrv)) {
-+    if (!(s->spurious_vec & APIC_SV_DIRECTED_IO) &&
-+        apic_get_bit(s->tmr, isrv)) {
-         ioapic_eoi_broadcast(isrv);
-     }
-     apic_sync_vapic(s, SYNC_FROM_VAPIC | SYNC_TO_VAPIC);
-diff --git a/hw/intc/arm_gic.c b/hw/intc/arm_gic.c
-index c60dc6b5e6..7580ef25c1 100644
---- a/hw/intc/arm_gic.c
-+++ b/hw/intc/arm_gic.c
-@@ -1976,8 +1976,9 @@ static MemTxResult gic_hyp_write(void *opaque, int cpu, hwaddr addr,
-     return MEMTX_OK;
- }
+diff --git a/hw/input/hid.c b/hw/input/hid.c
+index 89239b5634..f3074e3b07 100644
+--- a/hw/input/hid.c
++++ b/hw/input/hid.c
+@@ -100,7 +100,8 @@ void hid_set_next_idle(HIDState *hs)
+         uint64_t expire_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) +
+                                NANOSECONDS_PER_SECOND * hs->idle * 4 / 1000;
+         if (!hs->idle_timer) {
+-            hs->idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, hid_idle_timer, hs);
++            hs->idle_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, hid_idle_timer,
++                                          hs);
+         }
+         timer_mod_ns(hs->idle_timer, expire_time);
+     } else {
+diff --git a/hw/input/milkymist-softusb.c b/hw/input/milkymist-softusb.c
+index 5acd7a6f7d..7f7a87be28 100644
+--- a/hw/input/milkymist-softusb.c
++++ b/hw/input/milkymist-softusb.c
+@@ -259,13 +259,15 @@ static void milkymist_softusb_realize(DeviceState *dev, Error **errp)
+     sysbus_init_mmio(sbd, &s->regs_region);
  
--static MemTxResult gic_thiscpu_hyp_read(void *opaque, hwaddr addr, uint64_t *data,
--                                    unsigned size, MemTxAttrs attrs)
-+static MemTxResult gic_thiscpu_hyp_read(void *opaque, hwaddr addr,
-+                                        uint64_t *data, unsigned size,
-+                                        MemTxAttrs attrs)
+     /* register pmem and dmem */
+-    memory_region_init_ram_nomigrate(&s->pmem, OBJECT(s), "milkymist-softusb.pmem",
+-                           s->pmem_size, &error_fatal);
++    memory_region_init_ram_nomigrate(&s->pmem, OBJECT(s),
++                                     "milkymist-softusb.pmem", s->pmem_size,
++                                     &error_fatal);
+     vmstate_register_ram_global(&s->pmem);
+     s->pmem_ptr = memory_region_get_ram_ptr(&s->pmem);
+     sysbus_init_mmio(sbd, &s->pmem);
+-    memory_region_init_ram_nomigrate(&s->dmem, OBJECT(s), "milkymist-softusb.dmem",
+-                           s->dmem_size, &error_fatal);
++    memory_region_init_ram_nomigrate(&s->dmem, OBJECT(s),
++                                     "milkymist-softusb.dmem", s->dmem_size,
++                                     &error_fatal);
+     vmstate_register_ram_global(&s->dmem);
+     s->dmem_ptr = memory_region_get_ram_ptr(&s->dmem);
+     sysbus_init_mmio(sbd, &s->dmem);
+@@ -289,8 +291,10 @@ static const VMStateDescription vmstate_milkymist_softusb = {
+ };
+ 
+ static Property milkymist_softusb_properties[] = {
+-    DEFINE_PROP_UINT32("pmem_size", MilkymistSoftUsbState, pmem_size, 0x00001000),
+-    DEFINE_PROP_UINT32("dmem_size", MilkymistSoftUsbState, dmem_size, 0x00002000),
++    DEFINE_PROP_UINT32("pmem_size", MilkymistSoftUsbState,
++                       pmem_size, 0x00001000),
++    DEFINE_PROP_UINT32("dmem_size", MilkymistSoftUsbState,
++                       dmem_size, 0x00002000),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/input/pxa2xx_keypad.c b/hw/input/pxa2xx_keypad.c
+index 7f2f739fb3..7999fc2430 100644
+--- a/hw/input/pxa2xx_keypad.c
++++ b/hw/input/pxa2xx_keypad.c
+@@ -101,7 +101,8 @@ struct PXA2xxKeyPadState {
+     uint32_t    kpkdi;
+ };
+ 
+-static void pxa27x_keypad_find_pressed_key(PXA2xxKeyPadState *kp, int *row, int *col)
++static void pxa27x_keypad_find_pressed_key(PXA2xxKeyPadState *kp, int *row,
++                                           int *col)
  {
-     GICState *s = (GICState *)opaque;
- 
-diff --git a/hw/intc/arm_gic_common.c b/hw/intc/arm_gic_common.c
-index 7b44d5625b..337ef239be 100644
---- a/hw/intc/arm_gic_common.c
-+++ b/hw/intc/arm_gic_common.c
-@@ -87,7 +87,8 @@ static const VMStateDescription vmstate_gic_virt_state = {
-         /* Virtual CPU interfaces */
-         VMSTATE_UINT32_SUB_ARRAY(cpu_ctlr, GICState, GIC_NCPU, GIC_NCPU),
-         VMSTATE_UINT16_SUB_ARRAY(priority_mask, GICState, GIC_NCPU, GIC_NCPU),
--        VMSTATE_UINT16_SUB_ARRAY(running_priority, GICState, GIC_NCPU, GIC_NCPU),
-+        VMSTATE_UINT16_SUB_ARRAY(running_priority, GICState, GIC_NCPU,
-+                                 GIC_NCPU),
-         VMSTATE_UINT16_SUB_ARRAY(current_pending, GICState, GIC_NCPU, GIC_NCPU),
-         VMSTATE_UINT8_SUB_ARRAY(bpr, GICState, GIC_NCPU, GIC_NCPU),
-         VMSTATE_UINT8_SUB_ARRAY(abpr, GICState, GIC_NCPU, GIC_NCPU),
-diff --git a/hw/intc/ioapic.c b/hw/intc/ioapic.c
-index bca71b5934..68d5548fd9 100644
---- a/hw/intc/ioapic.c
-+++ b/hw/intc/ioapic.c
-@@ -237,7 +237,8 @@ void ioapic_eoi_broadcast(int vector)
-             entry = s->ioredtbl[n];
- 
-             if ((entry & IOAPIC_VECTOR_MASK) != vector ||
--                ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) != IOAPIC_TRIGGER_LEVEL) {
-+                ((entry >> IOAPIC_LVT_TRIGGER_MODE_SHIFT) & 1) !=
-+                IOAPIC_TRIGGER_LEVEL) {
-                 continue;
-             }
- 
-diff --git a/hw/intc/xics.c b/hw/intc/xics.c
-index 68f9d44feb..c1bee454b5 100644
---- a/hw/intc/xics.c
-+++ b/hw/intc/xics.c
-@@ -322,7 +322,8 @@ static void icp_realize(DeviceState *dev, Error **errp)
-         break;
- 
-     default:
--        error_setg(errp, "XICS interrupt controller does not support this CPU bus model");
-+        error_setg(errp, "XICS interrupt controller does not support this "
-+                   "CPU bus model");
-         return;
+     int i;
+     for (i = 0; i < 4; i++)
+diff --git a/hw/input/virtio-input.c b/hw/input/virtio-input.c
+index 54bcb46c74..c7fa659e92 100644
+--- a/hw/input/virtio-input.c
++++ b/hw/input/virtio-input.c
+@@ -61,7 +61,8 @@ void virtio_input_send(VirtIOInput *vinput, virtio_input_event *event)
+     for (i = 0; i < vinput->qindex; i++) {
+         elem = vinput->queue[i].elem;
+         len = iov_from_buf(elem->in_sg, elem->in_num,
+-                           0, &vinput->queue[i].event, sizeof(virtio_input_event));
++                           0, &vinput->queue[i].event,
++                           sizeof(virtio_input_event));
+         virtqueue_push(vinput->evt, elem, len);
+         g_free(elem);
      }
- 
-diff --git a/hw/intc/xics_kvm.c b/hw/intc/xics_kvm.c
-index 68bb1914b9..a8a2327062 100644
---- a/hw/intc/xics_kvm.c
-+++ b/hw/intc/xics_kvm.c
-@@ -400,7 +400,8 @@ int xics_kvm_connect(SpaprInterruptController *intc, uint32_t nr_servers,
-     /* Create the KVM XICS device */
-     rc = kvm_create_device(kvm_state, KVM_DEV_TYPE_XICS, false);
-     if (rc < 0) {
--        error_setg_errno(&local_err, -rc, "Error on KVM_CREATE_DEVICE for XICS");
-+        error_setg_errno(&local_err, -rc,
-+                         "Error on KVM_CREATE_DEVICE for XICS");
-         goto fail;
-     }
- 
 -- 
 2.23.0
 
