@@ -2,63 +2,87 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0433C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 10:17:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD2CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 10:18:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8F80922268
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 10:17:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8F80922268
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=suse.de
+	by mail.kernel.org (Postfix) with ESMTPS id 24D0022268
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 10:18:42 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hrJqfMxh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24D0022268
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48534 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50824 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUSEB-000648-9X
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 06:17:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56928)
+	id 1kUSFV-00072l-3v
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 06:18:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kUSCO-0005Me-5P
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 06:15:28 -0400
-Received: from mx2.suse.de ([195.135.220.15]:35482)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cfontana@suse.de>) id 1kUSCK-0005lJ-BZ
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 06:15:27 -0400
-X-Virus-Scanned: by amavisd-new at test-mx.suse.de
-Received: from relay2.suse.de (unknown [195.135.221.27])
- by mx2.suse.de (Postfix) with ESMTP id 8B523AEC1;
- Mon, 19 Oct 2020 10:15:22 +0000 (UTC)
-Subject: Re: [PATCH v3 2/3] accel/tcg: split tcg_start_vcpu_thread
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Richard Henderson <richard.henderson@linaro.org>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20201015143217.29337-1-cfontana@suse.de>
- <20201015143217.29337-3-cfontana@suse.de>
-From: Claudio Fontana <cfontana@suse.de>
-Message-ID: <42370695-710d-6c9a-c9c6-c9dddc272cd5@suse.de>
-Date: Mon, 19 Oct 2020 12:15:22 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kUSEH-0006Is-RH
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 06:17:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22136)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kUSEE-0005zf-OX
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 06:17:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603102640;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=d8ddGxTzgy0HtCDRrfpC7GHFE6vB0l6gTHWt152MyzM=;
+ b=hrJqfMxhNtNt+tjFhuPFyQ+Y9+VUc34v4u2oQO/nQPKeHSx67eWV1uiF4+/19iCPv+vc/h
+ 21UH2VjAD9qBAHZbTp9GfRpmd6bESZX/bjw81RC5cz12nMfI976k0ZqSH6LLiLPIduB+K7
+ soh2buHVZAICoNX+HMfFRMTJ0eW6BJM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-263-m8eJzDPqNIqMX7ztx2YXjA-1; Mon, 19 Oct 2020 06:17:19 -0400
+X-MC-Unique: m8eJzDPqNIqMX7ztx2YXjA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F32ED1006702
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 10:17:17 +0000 (UTC)
+Received: from work-vm (ovpn-114-228.ams2.redhat.com [10.36.114.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6BC5550B44;
+ Mon, 19 Oct 2020 10:17:10 +0000 (UTC)
+Date: Mon, 19 Oct 2020 11:17:07 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH 02/14] spice: add QemuSpiceOps, move migrate_info
+Message-ID: <20201019101707.GD3565@work-vm>
+References: <20201019075224.14803-1-kraxel@redhat.com>
+ <20201019075224.14803-3-kraxel@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201015143217.29337-3-cfontana@suse.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=195.135.220.15; envelope-from=cfontana@suse.de;
- helo=mx2.suse.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/18 16:52:59
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+In-Reply-To: <20201019075224.14803-3-kraxel@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -72,306 +96,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi all,
-
-is this one ok now in your view?
-
-Thanks,
-
-Claudio
-
-On 10/15/20 4:32 PM, Claudio Fontana wrote:
-> after the initial split into 3 tcg variants, we proceed to also
-> split tcg_start_vcpu_thread.
+* Gerd Hoffmann (kraxel@redhat.com) wrote:
+> Add QemuSpiceOps struct.  This struct holds function pointers to the
+> spice functions.  It will be initialized with pointers to the stub
+> functions.  When spice gets initialized the function pointers will
+> be re-written to the real functions.
 > 
-> We actually split it in 2 this time, since the icount variant
-> just uses the round robin function.
+> The spice stubs will move from qemu-spice.h to spice-module.c for that,
+> because they will be needed for both "CONFIG_SPICE=n" and "CONFIG_SPICE=y
+> but spice module not loaded" cases.
 > 
-> Suggested-by: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Claudio Fontana <cfontana@suse.de>
+> This patch adds the infrastructure and starts with moving
+> qemu_spice_migrate_info() to QemuSpiceOps.
+> 
+> Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 > ---
->  accel/tcg/tcg-all.c         |  5 ++++
->  accel/tcg/tcg-cpus-icount.c |  2 +-
->  accel/tcg/tcg-cpus-mttcg.c  | 29 +++++++++++++++++--
->  accel/tcg/tcg-cpus-mttcg.h  | 21 --------------
->  accel/tcg/tcg-cpus-rr.c     | 39 +++++++++++++++++++++++--
->  accel/tcg/tcg-cpus-rr.h     |  3 +-
->  accel/tcg/tcg-cpus.c        | 58 -------------------------------------
->  accel/tcg/tcg-cpus.h        |  1 -
->  8 files changed, 71 insertions(+), 87 deletions(-)
->  delete mode 100644 accel/tcg/tcg-cpus-mttcg.h
+>  include/ui/qemu-spice-module.h |  5 +++++
+>  include/ui/qemu-spice.h        |  5 -----
+>  monitor/misc.c                 |  2 +-
+>  ui/spice-core.c                |  5 +++++
+>  ui/spice-module.c              | 10 ++++++++++
+>  5 files changed, 21 insertions(+), 6 deletions(-)
 > 
-> diff --git a/accel/tcg/tcg-all.c b/accel/tcg/tcg-all.c
-> index e42a028043..1ac0b76515 100644
-> --- a/accel/tcg/tcg-all.c
-> +++ b/accel/tcg/tcg-all.c
-> @@ -105,6 +105,11 @@ static int tcg_init(MachineState *ms)
->      tcg_exec_init(s->tb_size * 1024 * 1024);
->      mttcg_enabled = s->mttcg_enabled;
+> diff --git a/include/ui/qemu-spice-module.h b/include/ui/qemu-spice-module.h
+> index 1af0e659a109..7a9963dd5810 100644
+> --- a/include/ui/qemu-spice-module.h
+> +++ b/include/ui/qemu-spice-module.h
+> @@ -18,6 +18,11 @@
+>  #ifndef QEMU_SPICE_MODULE_H
+>  #define QEMU_SPICE_MODULE_H
 >  
-> +    /*
-> +     * Initialize TCG regions
-> +     */
-> +    tcg_region_init();
+> +struct QemuSpiceOps {
+> +    int (*migrate_info)(const char *h, int p, int t, const char *s);
+> +};
 > +
->      if (mttcg_enabled) {
->          cpus_register_accel(&tcg_cpus_mttcg);
->      } else if (icount_enabled()) {
-> diff --git a/accel/tcg/tcg-cpus-icount.c b/accel/tcg/tcg-cpus-icount.c
-> index d3af3afb6d..82dbe2cacf 100644
-> --- a/accel/tcg/tcg-cpus-icount.c
-> +++ b/accel/tcg/tcg-cpus-icount.c
-> @@ -138,7 +138,7 @@ static void icount_handle_interrupt(CPUState *cpu, int mask)
->  }
+
+I realise that's mostly a move, but if you need to repost, can you
+expand those 4 single character parameter names?
+
+Dave
+
+>  extern int using_spice;
+> +extern struct QemuSpiceOps qemu_spice;
 >  
->  const CpusAccel tcg_cpus_icount = {
-> -    .create_vcpu_thread = tcg_start_vcpu_thread,
-> +    .create_vcpu_thread = rr_start_vcpu_thread,
->      .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
->  
->      .handle_interrupt = icount_handle_interrupt,
-> diff --git a/accel/tcg/tcg-cpus-mttcg.c b/accel/tcg/tcg-cpus-mttcg.c
-> index dac724fc85..f2b892a380 100644
-> --- a/accel/tcg/tcg-cpus-mttcg.c
-> +++ b/accel/tcg/tcg-cpus-mttcg.c
-> @@ -33,7 +33,6 @@
->  #include "hw/boards.h"
->  
->  #include "tcg-cpus.h"
-> -#include "tcg-cpus-mttcg.h"
->  
->  /*
->   * In the multi-threaded case each vCPU has its own thread. The TLS
-> @@ -41,7 +40,7 @@
->   * current CPUState for a given thread.
->   */
->  
-> -void *tcg_cpu_thread_fn(void *arg)
-> +static void *tcg_cpu_thread_fn(void *arg)
+>  #endif
+> diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
+> index ab523788b9a9..3157016c2bb4 100644
+> --- a/include/ui/qemu-spice.h
+> +++ b/include/ui/qemu-spice.h
+> @@ -60,11 +60,6 @@ static inline int qemu_spice_set_pw_expire(time_t expires)
 >  {
->      CPUState *cpu = arg;
->  
-> @@ -109,8 +108,32 @@ static void mttcg_kick_vcpu_thread(CPUState *cpu)
->      cpu_exit(cpu);
+>      return -1;
 >  }
->  
-> +static void mttcg_start_vcpu_thread(CPUState *cpu)
-> +{
-> +    char thread_name[VCPU_THREAD_NAME_SIZE];
-> +
-> +    g_assert(tcg_enabled());
-> +
-> +    parallel_cpus = (current_machine->smp.max_cpus > 1);
-> +
-> +    cpu->thread = g_malloc0(sizeof(QemuThread));
-> +    cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-> +    qemu_cond_init(cpu->halt_cond);
-> +
-> +    /* create a thread per vCPU with TCG (MTTCG) */
-> +    snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-> +             cpu->cpu_index);
-> +
-> +    qemu_thread_create(cpu->thread, thread_name, tcg_cpu_thread_fn,
-> +                       cpu, QEMU_THREAD_JOINABLE);
-> +
-> +#ifdef _WIN32
-> +    cpu->hThread = qemu_thread_get_handle(cpu->thread);
-> +#endif
-> +}
-> +
->  const CpusAccel tcg_cpus_mttcg = {
-> -    .create_vcpu_thread = tcg_start_vcpu_thread,
-> +    .create_vcpu_thread = mttcg_start_vcpu_thread,
->      .kick_vcpu_thread = mttcg_kick_vcpu_thread,
->  
->      .handle_interrupt = tcg_handle_interrupt,
-> diff --git a/accel/tcg/tcg-cpus-mttcg.h b/accel/tcg/tcg-cpus-mttcg.h
-> deleted file mode 100644
-> index d1bd771f49..0000000000
-> --- a/accel/tcg/tcg-cpus-mttcg.h
-> +++ /dev/null
-> @@ -1,21 +0,0 @@
-> -/*
-> - * QEMU TCG Multi Threaded vCPUs implementation
-> - *
-> - * Copyright 2020 SUSE LLC
-> - *
-> - * This work is licensed under the terms of the GNU GPL, version 2 or later.
-> - * See the COPYING file in the top-level directory.
-> - */
-> -
-> -#ifndef TCG_CPUS_MTTCG_H
-> -#define TCG_CPUS_MTTCG_H
-> -
-> -/*
-> - * In the multi-threaded case each vCPU has its own thread. The TLS
-> - * variable current_cpu can be used deep in the code to find the
-> - * current CPUState for a given thread.
-> - */
-> -
-> -void *tcg_cpu_thread_fn(void *arg);
-> -
-> -#endif /* TCG_CPUS_MTTCG_H */
-> diff --git a/accel/tcg/tcg-cpus-rr.c b/accel/tcg/tcg-cpus-rr.c
-> index ad50a3765f..f3b262bec7 100644
-> --- a/accel/tcg/tcg-cpus-rr.c
-> +++ b/accel/tcg/tcg-cpus-rr.c
-> @@ -144,7 +144,7 @@ static void deal_with_unplugged_cpus(void)
->   * elsewhere.
->   */
->  
-> -void *tcg_rr_cpu_thread_fn(void *arg)
-> +static void *tcg_rr_cpu_thread_fn(void *arg)
->  {
->      CPUState *cpu = arg;
->  
-> @@ -262,8 +262,43 @@ void *tcg_rr_cpu_thread_fn(void *arg)
->      return NULL;
->  }
->  
-> +void rr_start_vcpu_thread(CPUState *cpu)
-> +{
-> +    char thread_name[VCPU_THREAD_NAME_SIZE];
-> +    static QemuCond *single_tcg_halt_cond;
-> +    static QemuThread *single_tcg_cpu_thread;
-> +
-> +    g_assert(tcg_enabled());
-> +    parallel_cpus = false;
-> +
-> +    if (!single_tcg_cpu_thread) {
-> +        cpu->thread = g_malloc0(sizeof(QemuThread));
-> +        cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-> +        qemu_cond_init(cpu->halt_cond);
-> +
-> +        /* share a single thread for all cpus with TCG */
-> +        snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
-> +        qemu_thread_create(cpu->thread, thread_name,
-> +                           tcg_rr_cpu_thread_fn,
-> +                           cpu, QEMU_THREAD_JOINABLE);
-> +
-> +        single_tcg_halt_cond = cpu->halt_cond;
-> +        single_tcg_cpu_thread = cpu->thread;
-> +#ifdef _WIN32
-> +        cpu->hThread = qemu_thread_get_handle(cpu->thread);
-> +#endif
-> +    } else {
-> +        /* we share the thread */
-> +        cpu->thread = single_tcg_cpu_thread;
-> +        cpu->halt_cond = single_tcg_halt_cond;
-> +        cpu->thread_id = first_cpu->thread_id;
-> +        cpu->can_do_io = 1;
-> +        cpu->created = true;
-> +    }
-> +}
-> +
->  const CpusAccel tcg_cpus_rr = {
-> -    .create_vcpu_thread = tcg_start_vcpu_thread,
-> +    .create_vcpu_thread = rr_start_vcpu_thread,
->      .kick_vcpu_thread = qemu_cpu_kick_rr_cpus,
->  
->      .handle_interrupt = tcg_handle_interrupt,
-> diff --git a/accel/tcg/tcg-cpus-rr.h b/accel/tcg/tcg-cpus-rr.h
-> index 1936fd16ab..2e5943eda9 100644
-> --- a/accel/tcg/tcg-cpus-rr.h
-> +++ b/accel/tcg/tcg-cpus-rr.h
-> @@ -15,6 +15,7 @@
->  /* Kick all RR vCPUs. */
->  void qemu_cpu_kick_rr_cpus(CPUState *unused);
->  
-> -void *tcg_rr_cpu_thread_fn(void *arg);
-> +/* start the round robin vcpu thread */
-> +void rr_start_vcpu_thread(CPUState *cpu);
->  
->  #endif /* TCG_CPUS_RR_H */
-> diff --git a/accel/tcg/tcg-cpus.c b/accel/tcg/tcg-cpus.c
-> index f2b9bbf99e..86fd09545a 100644
-> --- a/accel/tcg/tcg-cpus.c
-> +++ b/accel/tcg/tcg-cpus.c
-> @@ -35,67 +35,9 @@
->  #include "hw/boards.h"
->  
->  #include "tcg-cpus.h"
-> -#include "tcg-cpus-mttcg.h"
-> -#include "tcg-cpus-rr.h"
->  
->  /* common functionality among all TCG variants */
->  
-> -void tcg_start_vcpu_thread(CPUState *cpu)
+> -static inline int qemu_spice_migrate_info(const char *h, int p, int t,
+> -                                          const char *s)
 > -{
-> -    char thread_name[VCPU_THREAD_NAME_SIZE];
-> -    static QemuCond *single_tcg_halt_cond;
-> -    static QemuThread *single_tcg_cpu_thread;
-> -    static int tcg_region_inited;
-> -
-> -    assert(tcg_enabled());
-> -    /*
-> -     * Initialize TCG regions--once. Now is a good time, because:
-> -     * (1) TCG's init context, prologue and target globals have been set up.
-> -     * (2) qemu_tcg_mttcg_enabled() works now (TCG init code runs before the
-> -     *     -accel flag is processed, so the check doesn't work then).
-> -     */
-> -    if (!tcg_region_inited) {
-> -        tcg_region_inited = 1;
-> -        tcg_region_init();
-> -        parallel_cpus = qemu_tcg_mttcg_enabled() && current_machine->smp.max_cpus > 1;
-> -    }
-> -
-> -    if (qemu_tcg_mttcg_enabled() || !single_tcg_cpu_thread) {
-> -        cpu->thread = g_malloc0(sizeof(QemuThread));
-> -        cpu->halt_cond = g_malloc0(sizeof(QemuCond));
-> -        qemu_cond_init(cpu->halt_cond);
-> -
-> -        if (qemu_tcg_mttcg_enabled()) {
-> -            /* create a thread per vCPU with TCG (MTTCG) */
-> -            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "CPU %d/TCG",
-> -                 cpu->cpu_index);
-> -
-> -            qemu_thread_create(cpu->thread, thread_name, tcg_cpu_thread_fn,
-> -                               cpu, QEMU_THREAD_JOINABLE);
-> -
-> -        } else {
-> -            /* share a single thread for all cpus with TCG */
-> -            snprintf(thread_name, VCPU_THREAD_NAME_SIZE, "ALL CPUs/TCG");
-> -            qemu_thread_create(cpu->thread, thread_name,
-> -                               tcg_rr_cpu_thread_fn,
-> -                               cpu, QEMU_THREAD_JOINABLE);
-> -
-> -            single_tcg_halt_cond = cpu->halt_cond;
-> -            single_tcg_cpu_thread = cpu->thread;
-> -        }
-> -#ifdef _WIN32
-> -        cpu->hThread = qemu_thread_get_handle(cpu->thread);
-> -#endif
-> -    } else {
-> -        /* For non-MTTCG cases we share the thread */
-> -        cpu->thread = single_tcg_cpu_thread;
-> -        cpu->halt_cond = single_tcg_halt_cond;
-> -        cpu->thread_id = first_cpu->thread_id;
-> -        cpu->can_do_io = 1;
-> -        cpu->created = true;
-> -    }
+> -    return -1;
 > -}
-> -
->  void qemu_tcg_destroy_vcpu(CPUState *cpu)
->  {
->      cpu_thread_signal_destroyed(cpu);
-> diff --git a/accel/tcg/tcg-cpus.h b/accel/tcg/tcg-cpus.h
-> index 279ba72e1f..b7ca954e13 100644
-> --- a/accel/tcg/tcg-cpus.h
-> +++ b/accel/tcg/tcg-cpus.h
-> @@ -18,7 +18,6 @@ extern const CpusAccel tcg_cpus_mttcg;
->  extern const CpusAccel tcg_cpus_icount;
->  extern const CpusAccel tcg_cpus_rr;
 >  
-> -void tcg_start_vcpu_thread(CPUState *cpu);
->  void qemu_tcg_destroy_vcpu(CPUState *cpu);
->  int tcg_cpu_exec(CPUState *cpu);
->  void tcg_handle_interrupt(CPUState *cpu, int mask);
+>  static inline int qemu_spice_display_add_client(int csock, int skipauth,
+>                                                  int tls)
+> diff --git a/monitor/misc.c b/monitor/misc.c
+> index 4a859fb24a21..32e6a8c13d07 100644
+> --- a/monitor/misc.c
+> +++ b/monitor/misc.c
+> @@ -437,7 +437,7 @@ void qmp_client_migrate_info(const char *protocol, const char *hostname,
+>              return;
+>          }
+>  
+> -        if (qemu_spice_migrate_info(hostname,
+> +        if (qemu_spice.migrate_info(hostname,
+>                                      has_port ? port : -1,
+>                                      has_tls_port ? tls_port : -1,
+>                                      cert_subject)) {
+> diff --git a/ui/spice-core.c b/ui/spice-core.c
+> index a7fa5743585f..b03d743cf9b9 100644
+> --- a/ui/spice-core.c
+> +++ b/ui/spice-core.c
+> @@ -993,8 +993,13 @@ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd)
+>      return spice_display_is_running;
+>  }
+>  
+> +static struct QemuSpiceOps real_spice_ops = {
+> +    .migrate_info = qemu_spice_migrate_info,
+> +};
+> +
+>  static void spice_register_config(void)
+>  {
+> +    qemu_spice = real_spice_ops;
+>      qemu_add_opts(&qemu_spice_opts);
+>  }
+>  opts_init(spice_register_config);
+> diff --git a/ui/spice-module.c b/ui/spice-module.c
+> index f86b0ac517dc..f1939545a684 100644
+> --- a/ui/spice-module.c
+> +++ b/ui/spice-module.c
+> @@ -21,3 +21,13 @@
+>  #include "ui/qemu-spice-module.h"
+>  
+>  int using_spice;
+> +
+> +static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
+> +                                        const char *s)
+> +{
+> +    return -1;
+> +}
+> +
+> +struct QemuSpiceOps qemu_spice = {
+> +    .migrate_info = qemu_spice_migrate_info_stub,
+> +};
+> -- 
+> 2.27.0
 > 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
