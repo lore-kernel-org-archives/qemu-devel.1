@@ -2,91 +2,68 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23A86C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:39:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56E7FC433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:40:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DF782222F
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:39:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DF782222F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
+	by mail.kernel.org (Postfix) with ESMTPS id 9F6AE2222F
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:40:35 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="L1VB/3/3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9F6AE2222F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35750 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUekC-0006ai-2O
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 19:39:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47212)
+	id 1kUelW-00083h-Dp
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 19:40:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47642)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <osy86dev@gmail.com>)
- id 1kUehy-00066x-4z
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:36:54 -0400
-Received: from mail-il1-f196.google.com ([209.85.166.196]:40996)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <osy86dev@gmail.com>)
- id 1kUehw-0002Lp-FA
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:36:53 -0400
-Received: by mail-il1-f196.google.com with SMTP id w17so2297244ilg.8
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 16:36:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=eL1N9gVCU+0+w2+/G+LMSsNq7qs3JUFKLzg1VhkzvoY=;
- b=qOINsY9gXwCLSMNyZGO3+liRVswZmjwbCk/jSs53B0LfR6XsCGClV2c+Ld4GERMjGC
- Hl3Hy/bHNvmwR0KTKO25MMCL1CO7Sgn10muHDHU1aXs9GB4QQYzEKNcwmcaFDcBZAqEN
- zIBQh9vid9M7NeyrziaxmhLDf+z9+lG2YkwM36zWrzxHh96N61N+VPhvwT/uOG7KkOX4
- a0ZloeQCKnKrztJiSI3fdZ7jDhw+xbPC1RNz+b62g0iyUFGECHByyh484t6o8PFv3Oms
- D/VC/xx6FD1wlUzh82eaCaTcpuPConSJQs6te+Kon9HaMhAcaqH85yuNZb9CK1rx+zgK
- RdpA==
-X-Gm-Message-State: AOAM532kIp/90iJMY95viZ1KunzAvBw1qyvUysRWq5Sm41bxpqzCDmkK
- HdrAbTGH/OIlzLtDthy4IGeXe7kvczg=
-X-Google-Smtp-Source: ABdhPJxXvWtiyxqpqJ2z9h4uOzYkPN7wF7HajCK8Oz5Xet0QtOxs7Ge5fEO1svFMWF/gd6+gRfS39A==
-X-Received: by 2002:a05:6e02:5c7:: with SMTP id
- l7mr2147995ils.43.1603150611287; 
- Mon, 19 Oct 2020 16:36:51 -0700 (PDT)
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com.
- [209.85.166.172])
- by smtp.gmail.com with ESMTPSA id 128sm8846iow.50.2020.10.19.16.36.51
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 19 Oct 2020 16:36:51 -0700 (PDT)
-Received: by mail-il1-f172.google.com with SMTP id w17so2297210ilg.8
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 16:36:51 -0700 (PDT)
-X-Received: by 2002:a05:6e02:931:: with SMTP id
- o17mr2093939ilt.273.1603150610876; 
- Mon, 19 Oct 2020 16:36:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201019013928.72770-1-j@getutm.app>
- <20201019013928.72770-6-j@getutm.app>
- <11912dd5-2740-1d7c-c691-1174fa7ef390@linaro.org>
-In-Reply-To: <11912dd5-2740-1d7c-c691-1174fa7ef390@linaro.org>
-From: Joelle van Dyne <j@getutm.app>
-Date: Mon, 19 Oct 2020 16:36:40 -0700
-X-Gmail-Original-Message-ID: <CA+E+eSBdg6ZMXOD2LQQfuv5DPBuah45SpwM8bL-Jn-c+FdKs9Q@mail.gmail.com>
-Message-ID: <CA+E+eSBdg6ZMXOD2LQQfuv5DPBuah45SpwM8bL-Jn-c+FdKs9Q@mail.gmail.com>
-Subject: Re: [PATCH v2 5/9] tcg: add const hints for code pointers
-To: Richard Henderson <richard.henderson@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.166.196; envelope-from=osy86dev@gmail.com;
- helo=mail-il1-f196.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 19:36:51
+ (Exim 4.90_1)
+ (envelope-from <03b427019be98d12761924f1e6132eefc82c80ec@lizzy.crudebyte.com>)
+ id 1kUejd-0006f0-LD
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:38:39 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:46091)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <03b427019be98d12761924f1e6132eefc82c80ec@lizzy.crudebyte.com>)
+ id 1kUejY-0002Oq-Co
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:38:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
+ Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
+ Content-Description; bh=cnu0mo5+5Umg2MICUQzzLjXUPHcM5xBEoZQ/ZXahtCs=; b=L1VB/
+ 3/34mTBmMzzVfnJuoCMUT7tJ1lBewxwkczffWoTxs55pFGJMe10kLP8TEvdMKBzgAGi6A+db/zzxx
+ ofkPi1MU9EKMkc7Jb6B3PmAweKdvUX7tZ3q+ajIQ+S+y0xtm4nq8MhoV9AkF4kQp/nXAb4A3XuWWN
+ qSbpqT6MiAyJu7O1b5pB6KIZtAQhmWyEADU3u0+O55vOHcZ6hV3iC7yVF9QzdgNjQYe+aNkZ1viZc
+ Fp6TmzZ34fKs3Nvdxw13bakSe8ED1xptfOS3IetfphILgvqRYrUVSqd+KKHYWOnS+/s9s2Caccb/E
+ dTXNGWENTqxi0RG7aLWVqAgu8Ibfw==;
+Message-Id: <03b427019be98d12761924f1e6132eefc82c80ec.1603149434.git.qemu_oss@crudebyte.com>
+In-Reply-To: <cover.1603149434.git.qemu_oss@crudebyte.com>
+References: <cover.1603149434.git.qemu_oss@crudebyte.com>
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Date: Tue, 20 Oct 2020 01:13:23 +0200
+Subject: [PATCH 1/8] tests/9pfs: simplify fs_mkdir()
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Received-SPF: none client-ip=91.194.90.13;
+ envelope-from=03b427019be98d12761924f1e6132eefc82c80ec@lizzy.crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 19:37:26
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.249, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,50 +76,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Seems like I missed a few. Sorry about that. Will fix.
+Split out walking a directory path to a separate new utility function
+fs_walk_fid() and use that function in fs_mkdir().
 
--j
+The code difference saved this way is not much, but we'll use that new
+fs_walk_fid() function in the upcoming patches, so it will avoid quite
+some code duplication after all.
 
-On Mon, Oct 19, 2020 at 4:27 PM Richard Henderson
-<richard.henderson@linaro.org> wrote:
->
-> On 10/18/20 6:39 PM, Joelle van Dyne wrote:
-> > From: osy <osy86@users.noreply.github.com>
-> >
-> > We will introduce mirror mapping for JIT segment with separate RX and R=
-W
-> > access. Adding 'const' hints will make it easier to identify read-only
-> > accesses and allow us to easier catch bugs at compile time in the futur=
-e.
-> >
-> > Signed-off-by: Joelle van Dyne <j@getutm.app>
-> > ---
-> >  include/tcg/tcg.h            |  8 ++++----
-> >  tcg/tcg.c                    |  4 ++--
-> >  tcg/aarch64/tcg-target.c.inc | 19 +++++++++++--------
-> >  tcg/arm/tcg-target.c.inc     | 12 +++++++-----
-> >  tcg/i386/tcg-target.c.inc    | 10 +++++-----
-> >  tcg/mips/tcg-target.c.inc    | 33 +++++++++++++++++++--------------
-> >  tcg/ppc/tcg-target.c.inc     | 21 +++++++++++++--------
-> >  tcg/riscv/tcg-target.c.inc   | 11 ++++++-----
-> >  tcg/s390/tcg-target.c.inc    |  9 +++++----
-> >  tcg/sparc/tcg-target.c.inc   | 10 +++++-----
-> >  tcg/tcg-ldst.c.inc           |  2 +-
-> >  tcg/tci/tcg-target.c.inc     |  2 +-
-> >  12 files changed, 79 insertions(+), 62 deletions(-)
->
-> tcg/ppc/tcg-target.c.inc:2349:26: error: assignment discards =E2=80=98con=
-st=E2=80=99 qualifier
-> from pointer target type [-Werror]
->      s->code_gen_epilogue =3D tb_ret_addr =3D s->code_ptr;
->
-> How many of the targets did you build?
->
->
-> r~
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+---
+ tests/qtest/virtio-9p-test.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
+diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+index c15908f27b..dc724bbb1e 100644
+--- a/tests/qtest/virtio-9p-test.c
++++ b/tests/qtest/virtio-9p-test.c
+@@ -967,13 +967,12 @@ static void fs_flush_ignored(void *obj, void *data, QGuestAllocator *t_alloc)
+     g_free(wnames[0]);
+ }
+ 
+-static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
+-                     const char *path, const char *cname)
++/* utility function: walk to requested dir and return fid for that dir */
++static uint32_t fs_walk_fid(void *obj, void *data, QGuestAllocator *t_alloc,
++                            const char *path)
+ {
+     QVirtio9P *v9p = obj;
+-    alloc = t_alloc;
+     char **wnames;
+-    char *const name = g_strdup(cname);
+     P9Req *req;
+     const uint32_t fid = genfid();
+ 
+@@ -983,12 +982,26 @@ static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
+     v9fs_req_wait_for_reply(req, NULL);
+     v9fs_rwalk(req, NULL, NULL);
+ 
++    split_free(&wnames);
++    return fid;
++}
++
++static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
++                     const char *path, const char *cname)
++{
++    QVirtio9P *v9p = obj;
++    alloc = t_alloc;
++    char *const name = g_strdup(cname);
++    uint32_t fid;
++    P9Req *req;
++
++    fid = fs_walk_fid(v9p, data, t_alloc, path);
++
+     req = v9fs_tmkdir(v9p, fid, name, 0750, 0, 0);
+     v9fs_req_wait_for_reply(req, NULL);
+     v9fs_rmkdir(req, NULL);
+ 
+     g_free(name);
+-    split_free(&wnames);
+ }
+ 
+ static void fs_readdir_split_128(void *obj, void *data,
+-- 
+2.20.1
+
 
