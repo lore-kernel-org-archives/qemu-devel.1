@@ -2,65 +2,84 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AB326C433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:39:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EEDC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:43:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8CBA22257
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:39:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8CBA22257
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3A8D522257
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 11:43:41 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhjWcUCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A8D522257
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUTW2-0006sO-Sf
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 07:39:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44948)
+	id 1kUTZk-0000JH-No
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 07:43:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <Dave.Martin@arm.com>)
- id 1kUTOe-0003Yk-ST
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:32:12 -0400
-Received: from foss.arm.com ([217.140.110.172]:48246)
- by eggs.gnu.org with esmtp (Exim 4.90_1)
- (envelope-from <Dave.Martin@arm.com>) id 1kUTOb-0006lc-C2
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:32:11 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
- by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 2F08930E;
- Mon, 19 Oct 2020 04:32:04 -0700 (PDT)
-Received: from arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
- by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 46E503F719;
- Mon, 19 Oct 2020 04:32:03 -0700 (PDT)
-Date: Mon, 19 Oct 2020 12:32:00 +0100
-From: Dave Martin <Dave.Martin@arm.com>
-To: Andrew Jones <drjones@redhat.com>
-Subject: Re: Kernel patch cases qemu live migration failed.
-Message-ID: <20201019113157.GN32292@arm.com>
-References: <20201015040639.70C6D414009F@webmail.sinamail.sina.com.cn>
- <7fecfc67da4caab1d677a8b4cd5386b3@kernel.org>
- <20201015133505.ubxvbrt6xyvl4362@kamzik.brq.redhat.com>
- <16400df4bdf79b8b22e824eb1a20e2b4@kernel.org>
- <20201015144104.ytwzpxjlsgyun3ob@kamzik.brq.redhat.com>
- <CAFEAcA-LBmbjp-Teb35f=O-1QtMLd8bAuq5XaCz9URdQZ1jxow@mail.gmail.com>
- <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUTXU-0007o5-4V
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:41:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32818)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUTXO-0008Fs-5b
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 07:41:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603107671;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=rL4LkJrvxpzmkHLXsU0YL91P/ux/ccPkrguJPrDhEYQ=;
+ b=LhjWcUCB/a9l26sIUf6LyWwcO1UZMlA16XiINmbTpFRwF9t4DlFaqziiFW9acpz+RKFkdq
+ bZRHKAQq05ekTOTRKIuyX0JRyWD71O95ZQH31z5k3Z/2WLOlGjqsnEciU+ad1I/tnyoAlJ
+ qLwWJgCYafRSqM3XXEdOy0pyayhOFnY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-433-goqw4IasNvCnH4WwkPyGnQ-1; Mon, 19 Oct 2020 07:41:09 -0400
+X-MC-Unique: goqw4IasNvCnH4WwkPyGnQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ECD5C846376
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 11:41:08 +0000 (UTC)
+Received: from virtlab701.virt.lab.eng.bos.redhat.com
+ (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B70355C1A3
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 11:41:08 +0000 (UTC)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] do not use colons in test names
+Date: Mon, 19 Oct 2020 07:41:07 -0400
+Message-Id: <20201019114108.1779369-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201019092525.ekvgbcwwtm63pueu@kamzik.brq.redhat.com>
-User-Agent: Mutt/1.5.23 (2014-03-12)
-Received-SPF: pass client-ip=217.140.110.172; envelope-from=Dave.Martin@arm.com;
- helo=foss.arm.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 07:32:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -74,67 +93,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, xu910121@sina.com,
- qemu-devel <qemu-devel@nongnu.org>, kvmarm <kvmarm@lists.cs.columbia.edu>,
- Marc Zyngier <maz@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 11:25:25AM +0200, Andrew Jones wrote:
-> On Thu, Oct 15, 2020 at 03:57:02PM +0100, Peter Maydell wrote:
-> > On Thu, 15 Oct 2020 at 15:41, Andrew Jones <drjones@redhat.com> wrote:
-> > > The reporter states neither the source nor destination hardware supports
-> > > SVE. My guess is that what's happening is the reserved ID register
-> > > ID_UNALLOCATED(4,4) was showing up in the KVM_GET_REG_LIST count on
-> > > the old kernel, but the new kernel filters it out. Maybe it is a
-> > > bug to filter it out of the count, as it's a reserved ID register and
-> > > I suppose the other reserved ID registers are still showing up?
-> > 
-> > Yeah, RES0 ID registers should show up in the list, because otherwise
-> > userspace has to annoyingly special case them when the architecture
-> > eventually defines behaviour for them.
-> > 
-> > Dave's comment in the kernel commit message
-> > # ID_AA64ZFR0_EL1 is RO-RAZ for MRS/MSR when SVE is disabled for the
-> > # guest, but for compatibility with non-SVE aware KVM implementations
-> > # the register should not be enumerated at all for KVM_GET_REG_LIST
-> > # in this case.
-> > seems wrong to me -- for compatibility the register should remain
-> > present and behave as RAZ/WI if SVE is disabled in the guest,
-> > the same way it was before the kernel/KVM knew about SVE at all.
-> 
-> Yup, I agree with you and I'll try writing a patch for this.
-> 
-> Thanks,
-> drew
+Starting with meson 0.56, colons are used to separate the subproject name
+from the test name.  Use dash or slash depending on what looks nicer.
 
-I'm not quite sure about Peter's assessment here.
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ tests/fp/meson.build    | 4 ++--
+ tests/qtest/meson.build | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-I agree with the inconsistency identified here: we always enumerate all
-unallocated ID regs, but we enumerate ID_AA64ZFR0_EL1 conditionally.
-This doesn't feel right: on a non-SVE guest, ID_AA64ZFR0_EL1 should
-behave exactly as an unallocated ID register.
+diff --git a/tests/fp/meson.build b/tests/fp/meson.build
+index 24739ad421..514e345bf5 100644
+--- a/tests/fp/meson.build
++++ b/tests/fp/meson.build
+@@ -603,7 +603,7 @@ fptest_rounding_args = ['-r', 'all']
+ # FIXME: i32_to_extF80 (broken), i64_to_extF80 (broken)
+ #        extF80_roundToInt (broken)
+ foreach k, v : softfloat_conv_tests
+-  test('fp-test:' + k, fptest,
++  test('fp-test-' + k, fptest,
+        args: fptest_args + fptest_rounding_args + v.split(),
+        suite: ['softfloat', 'softfloat-conv'])
+ endforeach
+@@ -612,7 +612,7 @@ endforeach
+ #        extF80_{mulAdd} (missing)
+ foreach k, v : softfloat_tests
+   extF80_broken = ['lt_quiet', 'rem'].contains(k)
+-  test('fp-test:' + k, fptest,
++  test('fp-test-' + k, fptest,
+        args: fptest_args + fptest_rounding_args +
+              ['f16_' + k, 'f32_' + k, 'f64_' + k, 'f128_' + k] +
+              (extF80_broken ? [] : ['extF80_' + k]),
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 3987f96086..c2822d9de7 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -250,7 +250,7 @@ foreach dir : target_dirs
+       }
+     endif
+     # FIXME: missing dependency on the emulator binary and qemu-img
+-    test('qtest-@0@: @1@'.format(target_base, test),
++    test('qtest-@0@/@1@'.format(target_base, test),
+          qtest_executables[test],
+          depends: [test_deps, qtest_emulator],
+          env: qtest_env,
+-- 
+2.26.2
 
-I'm not sure about the proposed fix.
-
-For one thing, I'm not sure that old hosts will accept writing of 0 to
-arbitrary ID regs.  This may require some digging, but commit
-93390c0a1b20 ("arm64: KVM: Hide unsupported AArch64 CPU features from guests")
-may be the place to start.
-
-My original idea was that at the source end we should be conservative:
-enumerate and dump the minimum set of registers relevant to the
-target -- for compatibility with old hosts that don't handle the
-unallocated ID regs at all.  At the destination end, modern hosts
-should be permissive, i.e., allow any ID reg to be set to 0, but don't
-require the setting of any reg that older source hosts might not send.
-
-So, I think that instead of changing the ID_AA64ZFR0_EL1 behaviour,
-parhaps we should move all ID_UNALLOCATED() regs (and possibly
-ID_HIDDEN(), not sure about that) to have REG_HIDDEN_USER visibility.
-
-Thoughts?
-
----Dave
 
