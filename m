@@ -2,89 +2,85 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0AC4C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:34:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 852D0C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:40:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B05E3222EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:34:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B05E3222EA
+	by mail.kernel.org (Postfix) with ESMTPS id 4CC902224D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 17:40:56 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4CC902224D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53500 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUZ3c-0001n5-43
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:34:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48980)
+	id 1kUZ9T-0003IY-3U
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 13:40:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49956)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUZ05-0000Ye-P7; Mon, 19 Oct 2020 13:31:15 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:54673)
+ id 1kUZ4V-0002Ly-GJ; Mon, 19 Oct 2020 13:35:47 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:33509)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUZ03-0005fD-18; Mon, 19 Oct 2020 13:31:13 -0400
+ id 1kUZ4S-0006DF-J9; Mon, 19 Oct 2020 13:35:47 -0400
 Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id 38EAC793;
- Mon, 19 Oct 2020 13:31:08 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Mon, 19 Oct 2020 13:31:08 -0400
+ by mailnew.west.internal (Postfix) with ESMTP id 5786AED7;
+ Mon, 19 Oct 2020 13:35:42 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Mon, 19 Oct 2020 13:35:42 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=/mt0GAFdrGAiNoFPYWlHnOZSQWa
- 3S99EftvEcSEdRGg=; b=NU+CyevPej3wm5LAakIAYJBU2MoCtZLgXk9fBijXlMS
- p/KyeM4Z55TbYJWr2hW6tYzv+oxl3bUwYkJptHTiTJWnad0H/wlOU41/M+Iwn0zE
- XPQVvI5EUyuHmb1OUl0t/hWXufvMoIDCiRBoBQ+qjKpm1efeY4ILMmWf6MV1pXYL
- gKGPrlykBEd9W6Nl1aD2zVqerRAt/Pe4jtfSWs2dRVUTBY484uUGW8NyN9ccF4jY
- ISQPSdkg0tHYti59g5v47RPrAuT3l1fhQ7DbKh5FBONM8orDjTMIph0sUvlccImP
- ISaqlWVg/yi0Hitr8WsOBRB0nwyKrHuwNw4OKX6jTQg==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding; s=fm1; bh=wC420adlcXnsNQmHo8r6vrvauI
+ XaCbar7ddwpsI8s4A=; b=hCCJ5GWZON6jNlZ3Z1Fm3EXUxunWnwKDigOFIgZtzh
+ Nqgs1t9E9ok5ZA792NLIbnKxr2CqES+VwHDsnzTztsVjA+b9X8dIE2yIm8tlLmLQ
+ RTymMXtB3doplYibIqDlre83qVDGT0GfKBRbG6k7fV2VTF0gWwHfp2xC5eX+VfIS
+ 6AJeapirLHhT+Y8ZG2tuzjSkeUalHaS2w8JlEdP3AwFrw/yBxDVNfgQoqlTzjkLd
+ YZawR0Gfqs829xhE7JVuR8oaKK9nOF19ta2cIFwOHrUTWvd9dyomP3Rul8axdKBL
+ eSCF+ccSDynsLMWQrMxw3oIKlgz2vtD/lx5obQ8zVZNw==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=/mt0GA
- FdrGAiNoFPYWlHnOZSQWa3S99EftvEcSEdRGg=; b=hEErORGqtBYgRQDXWYbq+r
- HqDCtZrrTDQ2MM10yWVH8hrauEYp8uZKjB+HCI6hHdRz3rjCd4D0Rk7g2vvNPnty
- XBtMpdz5VHyEaohifwlIYg3+6UGsDWeZE6EEJVyM+oySTkFECHNZSe1AQPf9cKXg
- wKfQjq/CNzt5/KLNa4RxLkV0SWxsXKMOkynYXsgmmza7SNey7CXseH9yaI1fqZ8e
- 3HWf+MUXfmNA8c+wCYXzKXayZwuMFKJQCvDb+zphZMVuYB9wQX1wTSdxCzplQyjI
- f4NkqWsBWRDXSV01bjFLEBYN163xFy2lykm3GHKYMnstyDJDeVv6sFkHGcAjF9Bw
- ==
-X-ME-Sender: <xms:Ws2NXyEi2okUYkBa2eYekuXVrDubc7IFc2RUiF70aGeqdjpcj3fDQg>
- <xme:Ws2NXzVK7AjPe5IuMfgoigiekXjTrsy--mRchj65L0OKaUEd_8r05JnL54H0bXDCq
- 4wyIrmHyFPEiLFXWAA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjedugdduudegucetufdoteggodetrfdotf
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=wC420adlcXnsNQmHo
+ 8r6vrvauIXaCbar7ddwpsI8s4A=; b=nLY9iYce5mR3jkjyPCsl/RWRrBMwzcaw7
+ FYXS4H2LwFWKTIy5HlvaQ7HXnJR8KNQ3X8mBi24vhRsGF3f6h7jYl182y3qFXTiN
+ Nn5dfp/q8qKcyqKktJHQY2Ys82qjQYC2w+QL6OMGeCWFq2zqT6gqSJOygav9G9z1
+ l/ovlWVi5daJqZCm0X6e98pC41E4SIzkCi8+LnrnRGiU5XeCT9eVLLpUzozFvHHQ
+ Hi6e4ClYTV2o74s3Q/9Q1TxZL2BWI6TR0x7MDFtWGbEimNg+8ZbSzF1rzYhbrL69
+ f18PULNX6Wct1TkHtw4FW7yIBxZuwtvHqOgRO63whCl4Sz9UH8RjQ==
+X-ME-Sender: <xms:bM6NXxc5GooeXqKAp6F1G_GhylgCDqTVQ8sxLxDUzFYT0ya3W6EsTA>
+ <xme:bM6NX_MUnzf_BwyjhAxRLRbmAcbEyewLkm0F8_Jy9vBWIPCjgLti3JIPxI3eanJ7D
+ IPmQh7FtjzZO0MMlSY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjedugdduudehucetufdoteggodetrfdotf
  fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
  uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
- cujfgurhepfffhvffukfhfgggtuggjsehgtderredttdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeejgeduffeuieetkeeileekvdeuleetveejudeileduffefjeegfffhuddvudff
- keenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:Ws2NX8KOg21ecTx329aFriQpqwB0s3lZHblaWfN5vjvcUlVdMJXE-A>
- <xmx:Ws2NX8GAAe_yOK49-n6j08f5K_tP_S312Z4wBGn6KW3zVgjBvcFpaA>
- <xmx:Ws2NX4X8gGlhCZG8G-qXVn1XH0r7fIzBWORq6e13nr_vVtnlHJxsdw>
- <xmx:W82NXyfmtVMTbRVWiLdt4lXormE07i5Sp9Lsc2jtgdW7JRHitu3MrJ8FtLk>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ cujfgurhephffvufffkffoggfgsedtkeertdertddtnecuhfhrohhmpefmlhgruhhsucfl
+ vghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtthgvrh
+ hnpeefveelvdeikeduueffteeggeefhedvffffjeeuueeludehvdegjeevjefhtdetheen
+ ucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurf
+ grrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:bM6NX6iV8pytT30SJc47bQmtz3-Nrfr9ibxWo56XlwqLnXafUBhzAw>
+ <xmx:bM6NX68UgrEkgN1-3ufT-wesjn6gmWmZFSTD3Rg9Blg1x0PxloXiEQ>
+ <xmx:bM6NX9vMj4I6BjJMKOuYVJH8zIfMX_V5qOxY7iqbfCEu3USMENcfhg>
+ <xmx:bc6NX7WWk3IEm7jl-fB3sQnZgv0cgx_ZRD8hrgSfKQwl2vD_9XgcI1bPvJw>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 55A31328005D;
- Mon, 19 Oct 2020 13:31:05 -0400 (EDT)
-Date: Mon, 19 Oct 2020 19:31:03 +0200
+ by mail.messagingengine.com (Postfix) with ESMTPA id 7F49F306467E;
+ Mon, 19 Oct 2020 13:35:39 -0400 (EDT)
 From: Klaus Jensen <its@irrelevant.dk>
-To: Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH] hw/block/nvme: fix prp mapping status codes
-Message-ID: <20201019173103.GE10549@apples.localdomain>
-References: <20201019113039.76146-1-its@irrelevant.dk>
- <20201019163455.GA1435260@dhcp-10-100-145-180.wdc.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2] hw/block/nvme: fix prp mapping status codes
+Date: Mon, 19 Oct 2020 19:35:38 +0200
+Message-Id: <20201019173538.129854-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="so9zsI5B81VjUb/o"
-Content-Disposition: inline
-In-Reply-To: <20201019163455.GA1435260@dhcp-10-100-145-180.wdc.com>
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
  helo=wnew1-smtp.messagingengine.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 13:31:09
@@ -110,53 +106,121 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
  Klaus Jensen <k.jensen@samsung.com>,
- Gollu Appalanaidu <anaidu.gollu@samsung.com>, qemu-devel@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+ Gollu Appalanaidu <anaidu.gollu@samsung.com>, Max Reitz <mreitz@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Gollu Appalanaidu <anaidu.gollu@samsung.com>
 
---so9zsI5B81VjUb/o
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Address 0 is not an invalid address. Remove those invalikd checks.
 
-On Oct 19 09:34, Keith Busch wrote:
-> On Mon, Oct 19, 2020 at 01:30:39PM +0200, Klaus Jensen wrote:
-> > @@ -328,7 +328,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t =
-prp1, uint64_t prp2,
-> >      trace_pci_nvme_map_prp(trans_len, len, prp1, prp2, num_prps);
-> > =20
-> >      if (unlikely(!prp1)) {
-> > -        trace_pci_nvme_err_invalid_prp();
-> > +        trace_pci_nvme_err_invalid_prp1_missing();
->=20
-> Why is address 0 considered a missing entry? Some embedded systems
-> consider that a valid address.
->=20
-> Otherwise, the offset checks look correct. And I realize the check for 0
-> predates this patch anyway, but it's not the correct thing to do: as
-> long as the host requests a properly aligned address, and 0 is aligned,
-> the controller should attempt to use it.
->=20
+Unaligned PRP2 and PRP list entries should result in Invalid PRP Offset
+status code and not Invalid Field. Fix that.
 
-Uhm. That's a good point.
+See NVMe Express v1.3d, Section 4.3 ("Physical Region Page Entry and
+List").
 
---so9zsI5B81VjUb/o
-Content-Type: application/pgp-signature; name="signature.asc"
+Suggested-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Gollu Appalanaidu <anaidu.gollu@samsung.com>
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ include/block/nvme.h  |  1 +
+ hw/block/nvme.c       | 20 +++++---------------
+ hw/block/trace-events |  4 +---
+ 3 files changed, 7 insertions(+), 18 deletions(-)
 
------BEGIN PGP SIGNATURE-----
+diff --git a/include/block/nvme.h b/include/block/nvme.h
+index 6de2d5aa75a9..8a46d9cf015f 100644
+--- a/include/block/nvme.h
++++ b/include/block/nvme.h
+@@ -655,6 +655,7 @@ enum NvmeStatusCodes {
+     NVME_MD_SGL_LEN_INVALID     = 0x0010,
+     NVME_SGL_DESCR_TYPE_INVALID = 0x0011,
+     NVME_INVALID_USE_OF_CMB     = 0x0012,
++    NVME_INVALID_PRP_OFFSET     = 0x0013,
+     NVME_LBA_RANGE              = 0x0080,
+     NVME_CAP_EXCEEDED           = 0x0081,
+     NVME_NS_NOT_READY           = 0x0082,
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index 9d30ca69dcf1..dcfab56c1c04 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -327,11 +327,6 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+ 
+     trace_pci_nvme_map_prp(trans_len, len, prp1, prp2, num_prps);
+ 
+-    if (unlikely(!prp1)) {
+-        trace_pci_nvme_err_invalid_prp();
+-        return NVME_INVALID_FIELD | NVME_DNR;
+-    }
+-
+     if (nvme_addr_is_cmb(n, prp1)) {
+         qemu_iovec_init(iov, num_prps);
+     } else {
+@@ -345,11 +340,6 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+ 
+     len -= trans_len;
+     if (len) {
+-        if (unlikely(!prp2)) {
+-            trace_pci_nvme_err_invalid_prp2_missing();
+-            return NVME_INVALID_FIELD | NVME_DNR;
+-        }
+-
+         if (len > n->page_size) {
+             uint64_t prp_list[n->max_prp_ents];
+             uint32_t nents, prp_trans;
+@@ -370,9 +360,9 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+                 uint64_t prp_ent = le64_to_cpu(prp_list[i]);
+ 
+                 if (i == n->max_prp_ents - 1 && len > n->page_size) {
+-                    if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
++                    if (unlikely(prp_ent & (n->page_size - 1))) {
+                         trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
+-                        return NVME_INVALID_FIELD | NVME_DNR;
++                        return NVME_INVALID_PRP_OFFSET | NVME_DNR;
+                     }
+ 
+                     if (prp_list_in_cmb != nvme_addr_is_cmb(n, prp_ent)) {
+@@ -391,9 +381,9 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+                     prp_ent = le64_to_cpu(prp_list[i]);
+                 }
+ 
+-                if (unlikely(!prp_ent || prp_ent & (n->page_size - 1))) {
++                if (unlikely(prp_ent & (n->page_size - 1))) {
+                     trace_pci_nvme_err_invalid_prplist_ent(prp_ent);
+-                    return NVME_INVALID_FIELD | NVME_DNR;
++                    return NVME_INVALID_PRP_OFFSET | NVME_DNR;
+                 }
+ 
+                 trans_len = MIN(len, n->page_size);
+@@ -408,7 +398,7 @@ static uint16_t nvme_map_prp(NvmeCtrl *n, uint64_t prp1, uint64_t prp2,
+         } else {
+             if (unlikely(prp2 & (n->page_size - 1))) {
+                 trace_pci_nvme_err_invalid_prp2_align(prp2);
+-                return NVME_INVALID_FIELD | NVME_DNR;
++                return NVME_INVALID_PRP_OFFSET | NVME_DNR;
+             }
+             status = nvme_map_addr(n, qsg, iov, prp2, len);
+             if (status) {
+diff --git a/hw/block/trace-events b/hw/block/trace-events
+index cab9913b1f2d..c1537e3ac0b0 100644
+--- a/hw/block/trace-events
++++ b/hw/block/trace-events
+@@ -97,10 +97,8 @@ pci_nvme_err_invalid_sgld(uint16_t cid, uint8_t typ) "cid %"PRIu16" type 0x%"PRI
+ pci_nvme_err_invalid_num_sgld(uint16_t cid, uint8_t typ) "cid %"PRIu16" type 0x%"PRIx8""
+ pci_nvme_err_invalid_sgl_excess_length(uint16_t cid) "cid %"PRIu16""
+ pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
+-pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
++pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is not page aligned: 0x%"PRIx64""
+ pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
+-pci_nvme_err_invalid_prp2_missing(void) "PRP2 is null and more data to be transferred"
+-pci_nvme_err_invalid_prp(void) "invalid PRP"
+ pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
+ pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
+ pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
+-- 
+2.28.0
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+NzVUACgkQTeGvMW1P
-DenTBQf/XzuDaZQ1iaCJFIJJRXMT9hSIyHJvxBUV1jwsykjRXNkeZJpltM3YgJY0
-jtNCM/DU7be7YRAyE2fy+kqSPMUbjag/VFtCMUMlFTfuj10NP7wgO/on+Ipll1QL
-5E885ITvjTH5LTHQnEpdFKEAhuUDq1+NT+1vukyURS6XTa6V06nLzSD1B+3Fuabl
-z8vEtf28+7LB4gjlr/QxVUeH0S2+ICiAK9ItUt3gjPM2NoWrq0SYwRRrbSfAnlLW
-/KKtphsIa+B3BnKp/lt7LtKp/VwYqoglpxJNHlzus1lS+YjHUxBHkte8WZu/oaxw
-6aBjyWCxyXJoNJLKzogbLJZT9/WR9w==
-=FCpM
------END PGP SIGNATURE-----
-
---so9zsI5B81VjUb/o--
 
