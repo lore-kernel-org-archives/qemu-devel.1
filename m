@@ -2,69 +2,92 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9222FC43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 20:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6573DC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 20:10:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DFAD7223BE
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 20:08:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B183F223BE
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 20:10:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tb9PWHeo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFAD7223BE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RSo7bJwF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B183F223BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUbSf-0000oR-Mj
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 16:08:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56010)
+	id 1kUbTx-0001jW-Ri
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 16:10:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56242)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kUbRq-0007vc-2Y; Mon, 19 Oct 2020 16:08:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48526)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
- id 1kUbRo-00015g-BF; Mon, 19 Oct 2020 16:08:01 -0400
-Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
- (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kUbSg-00011O-NM
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 16:08:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39126)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kUbSf-0001BP-4z
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 16:08:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603138131;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QNT/Blost0UywBHZJQ3FhZMKSoejoEaUW22NIYfMryE=;
+ b=RSo7bJwFK64O45CoQ8Nvf+Cl5/uCStAmdv4JLTuZL/jw8zLELIKj2/U9GYF33+nWhuaka3
+ At7QSjU/8hrEzzXDg/mmp7G4iUKScidobaHLRhzqERA2YoKrb2NhPsxe10SATw1ArWX9cP
+ mUFcfjwPwJ+ONYo2s4KTVAAaXIMPCQ0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-550-7S3MhBnOO9-yF8tsMuJB-w-1; Mon, 19 Oct 2020 16:08:47 -0400
+X-MC-Unique: 7S3MhBnOO9-yF8tsMuJB-w-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mail.kernel.org (Postfix) with ESMTPSA id 41A93223C7;
- Mon, 19 Oct 2020 20:07:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
- s=default; t=1603138078;
- bh=NbXTstzp7NXfERXQXuZ2w/YIfkyvmmAaV3SvYI4wA/A=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=Tb9PWHeoROz0D5Crm22qpGsEjs1ol4+tz65Zn6tUD7oRS3vcTf219ynnmVplfKhDy
- qih1ybXRpeaXnK5x0L7TFqfH2ejcEi2OrMrOZgB4m/5rwpEv/HcDu5A+PLStA+w7Xv
- zgSt59ZOW6FYOvTEjnRmBTv+J7hN+DIBI95/063I=
-Date: Mon, 19 Oct 2020 13:07:55 -0700
-From: Keith Busch <kbusch@kernel.org>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v7 04/11] hw/block/nvme: Support allocated CNS command
- variants
-Message-ID: <20201019200755.GG1435260@dhcp-10-100-145-180.wdc.com>
-References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
- <20201019021726.12048-5-dmitry.fomichev@wdc.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 84E8F879515;
+ Mon, 19 Oct 2020 20:08:46 +0000 (UTC)
+Received: from [10.3.112.28] (ovpn-112-28.phx2.redhat.com [10.3.112.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id C85C95577A;
+ Mon, 19 Oct 2020 20:08:42 +0000 (UTC)
+Subject: Re: [RFC PATCH v3 1/1] tests/vm: Add Haiku test based on their
+ vagrant images
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201019110749.1635343-1-f4bug@amsat.org>
+ <20201019110749.1635343-2-f4bug@amsat.org>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <b49bcd34-30e2-a51f-e0a8-946376d04afa@redhat.com>
+Date: Mon, 19 Oct 2020 15:08:42 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201019021726.12048-5-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
- helo=mail.kernel.org
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 12:35:01
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201019110749.1635343-2-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,35 +101,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
+ Alexander von Gluck IV <kallisti5@unixzen.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Gerd Hoffmann <kraxel@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 11:17:19AM +0900, Dmitry Fomichev wrote:
-> Add a new Boolean namespace property, "attached", to provide the most
-> basic namespace attachment support. The default value for this new
-> property is true. Also, implement the logic in the new CNS values to
-> include/exclude namespaces based on this new property. The only thing
-> missing is hooking up the actual Namespace Attachment command opcode,
-> which will allow a user to toggle the "attached" flag per namespace.
+On 10/19/20 6:07 AM, Philippe Mathieu-Daudé wrote:
+> From: Alexander von Gluck IV <kallisti5@unixzen.com>
 > 
-> The reason for not hooking up this command completely is because the
-> NVMe specification requires the namespace management command to be
-> supported if the namespace attachment command is supported.
+> Signed-off-by: Alexander von Gluck IV <kallisti5@unixzen.com>
+> [PMD: Avoid to recreate the image each time]
 
-Huh, the spec does require that, and that seems like an odd requirement
-since it prevents dynamic namespace attach states in a static namespace
-setup. I'm not sure why the spec assumes those two things go together,
-but it sure enough does!
+grammar: s/to recreate/recreating/
 
-The implementation looks fine.
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
 
-Reviewed-by: Keith Busch <kbusch@kernel.org>
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
+
 
