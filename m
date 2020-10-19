@@ -2,91 +2,82 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC986C43457
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E95B0C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:39:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20D7F2236F
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:38:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 455E32231B
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 21:39:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PHpHB1f8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20D7F2236F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDvkFZuW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 455E32231B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39948 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUcqu-0004H3-45
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 17:38:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46174)
+	id 1kUcsn-0005Uj-9Y
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 17:39:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46640)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUcpI-0003Or-3X
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:36:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47970)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kUcqr-0004V5-Q9
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:37:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46821)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUcpG-0003er-IK
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:36:19 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kUcqp-0003mV-CE
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 17:37:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603143377;
+ s=mimecast20190719; t=1603143474;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9ic7dwW4v2yK/+r4XxQGsIoM+/TKTAGvuqpRZuZMoWw=;
- b=PHpHB1f8QricyLWm79VvG88jbXxaRpSzTG7399A261c8O2ppb8aKttFqRjzf46KIAziFsP
- B6+e9huR2aL0cXZZRLlGNLoOxWT/HC4i8E5B9t8uADuLSNUrgadzGz4H7+YgWLnstzUlj/
- FZuLdY7UA7qirybfshaBB6CQBKdR0iQ=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-562-8OOVCAL6M_yV1dijCbDGGw-1; Mon, 19 Oct 2020 17:36:16 -0400
-X-MC-Unique: 8OOVCAL6M_yV1dijCbDGGw-1
-Received: by mail-io1-f70.google.com with SMTP id q126so1193504iof.3
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 14:36:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=9ic7dwW4v2yK/+r4XxQGsIoM+/TKTAGvuqpRZuZMoWw=;
- b=Tu6+T2S70BlJGS7dCFhMinp9VjFQfhsYEEi2Cu589W6rMsWkgZ+Fs3g/nFfDyw1Nkg
- DtTrYyLX1ufm5ZuRYIhnqpMojVQKIZX2QOUfTEKb1vgTkprocUvta9HldOm/5YoihUcD
- k9ML8nMZfjoKO4VhHLhb0DxluyGtv2jJn6qbhdAb3cuFLQmfqI48THaEekwECX7xd5YH
- TAGIp+YcBylxc3itflsNisl8Fd6XZmE/9gh4t3zOXlKD191X8PM2V1nCLR2lvISfP1iv
- 3HMqYlIprFtuIbLgmf7t5HSHAURz2hYc/diaDLVgQC1npYvypmgrbolZU/vo2MnykuN4
- agLA==
-X-Gm-Message-State: AOAM530Gm+EbtCEzzmRXfulohG1LdZmMMMLqG6zELSPSFq/jq7TFS7QP
- ET+8SguBFfRObX1R+jTDJ5GRNL1n/HXCxDEcynAKWo/NMbXyB1vNP/I8RFKqX36akFKk/ZkvC5D
- pEErzvBXlgqNUQ2Y=
-X-Received: by 2002:a6b:8b0b:: with SMTP id n11mr1317240iod.66.1603143375271; 
- Mon, 19 Oct 2020 14:36:15 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzz2HRuJInMtHPtiGPXALtUV4O0dkPc9PGpWhWW422XYBQA/g7ocnwixwa0UZ1XM81FnuMlkA==
-X-Received: by 2002:a6b:8b0b:: with SMTP id n11mr1317236iod.66.1603143375132; 
- Mon, 19 Oct 2020 14:36:15 -0700 (PDT)
-Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
- [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id z21sm755853ioq.35.2020.10.19.14.36.13
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 19 Oct 2020 14:36:14 -0700 (PDT)
-Date: Mon, 19 Oct 2020 17:36:13 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [PATCH v10 01/10] virtio-iommu: Fix virtio_iommu_mr()
-Message-ID: <20201019213613.GD3203@xz-x1>
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-2-jean-philippe@linaro.org>
+ bh=/x3KppJkYljO/uyANkNW9HC+rnPTLuX5/9GGzLSaADs=;
+ b=MDvkFZuWpWFO6UkuvEQe5YrkOqW30IfyMcN5M5WDzFIw7pCqqad82hBnDJRgCeK9ihKorw
+ 3AL64TKJswU4+Luk9Gno8PqcjYrdMT1MDWRjltAH8zKwyJqqGXmFoN0/PwqIbditNPFmBm
+ wqWL1dvn83YsSWN5xLmXICTKRG34zeg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-464-7E4SZBTOMeWFozKR9PUDEA-1; Mon, 19 Oct 2020 17:37:49 -0400
+X-MC-Unique: 7E4SZBTOMeWFozKR9PUDEA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E6D112C6C0;
+ Mon, 19 Oct 2020 21:37:48 +0000 (UTC)
+Received: from [10.3.112.28] (ovpn-112-28.phx2.redhat.com [10.3.112.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 594E010013C1;
+ Mon, 19 Oct 2020 21:37:47 +0000 (UTC)
+Subject: Re: [PATCH v6 06/10] migration: control whether snapshots are
+ ovewritten
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201008155001.3357288-1-berrange@redhat.com>
+ <20201008155001.3357288-7-berrange@redhat.com>
+From: Eric Blake <eblake@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <4954a4e9-ecd9-71d8-db65-a89ccf2b20a3@redhat.com>
+Date: Mon, 19 Oct 2020 16:37:46 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201008171558.410886-2-jean-philippe@linaro.org>
+In-Reply-To: <20201008155001.3357288-7-berrange@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=peterx@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -95,8 +86,9 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,23 +101,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, bbhushan2@marvell.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 08, 2020 at 07:15:49PM +0200, Jean-Philippe Brucker wrote:
-> Due to an invalid mask, virtio_iommu_mr() may return the wrong memory
-> region. It hasn't been too problematic so far because the function was
-> only used to test existence of an endpoint, but that is about to change.
+On 10/8/20 10:49 AM, Daniel P. Berrangé wrote:
+> The traditional HMP "savevm" command will overwrite an existing snapshot
+> if it already exists with the requested name. This new flag allows this
+> to be controlled allowing for safer behaviour with a future QMP command.
 > 
-> Fixes: cfb42188b24d ("virtio-iommu: Implement attach/detach command")
-> Signed-off-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
+> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> ---
 
-Reviewed-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
-Peter Xu
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
