@@ -2,78 +2,82 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2647FC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:11:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E0BC4C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:19:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 64E4D2224D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:11:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FD112225F
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:19:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IPmPSZGw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64E4D2224D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISrw7+tP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FD112225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUQGU-0000VS-6b
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:11:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54450)
+	id 1kUQNt-0006bT-Nn
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:19:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyd-0005dC-Bg
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:53:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23697)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUQEu-0006oL-Fa
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:09:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60168)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyW-0008E1-AR
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:53:07 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUQEs-0005NN-Ka
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:09:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603093979;
+ s=mimecast20190719; t=1603094994;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=efct5dMGUCNCT0EVZ2xRSyo4byWypz2XZQaZZeAadPw=;
- b=IPmPSZGwZOnYFzX/w9QItu3NNbfE7TDVGmzjDZzishTpzjuIE7fmdLKkuUuaEEiIkzeJJl
- vExaZxper+HvQpv6RgJxRFsXR03fgRfHpswwF22qqjGLcDoXDcQ87oQXUPCzeWIJJbWYWp
- Tgzhr1U5YkVZQ3/UeMTxfBJ51YX5XGo=
+ bh=zuhxENw14ZJiJAiW1pplH3Ea7h5f5AD6Sn154T891dQ=;
+ b=ISrw7+tPnHUWo6aTDnOSyU2QgXFVc++suhaBNkRpxCixRf5i7FaS2EuGKA+xP9I+MsGS8d
+ YLPwnFxjnSHD0oNXm5bI37kpiSZFyzT2wKxROZVndzDTSQn3f0SyAa6yCow9jD8q6/jQJv
+ S7fLCBbf/ij/w1wBxQzlpnothigHJkA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-563-Zs3Ow4yMNWqSysxhLaXtNQ-1; Mon, 19 Oct 2020 03:52:57 -0400
-X-MC-Unique: Zs3Ow4yMNWqSysxhLaXtNQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-533-n8H8qBA2M3-tiiHIUBjrzw-1; Mon, 19 Oct 2020 04:09:49 -0400
+X-MC-Unique: n8H8qBA2M3-tiiHIUBjrzw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6AF2410A0B9D
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:56 +0000 (UTC)
-Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
- [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 94C856EF44;
- Mon, 19 Oct 2020 07:52:38 +0000 (UTC)
-Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 817E59D0E; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
-From: Gerd Hoffmann <kraxel@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 07/14] spice: move display_add_client() to QemuSpiceOps.
-Date: Mon, 19 Oct 2020 09:52:17 +0200
-Message-Id: <20201019075224.14803-8-kraxel@redhat.com>
-In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
-References: <20201019075224.14803-1-kraxel@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DC5618BE166;
+ Mon, 19 Oct 2020 08:09:48 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3C9751A4D6;
+ Mon, 19 Oct 2020 08:09:48 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id A07391132A08; Mon, 19 Oct 2020 10:09:46 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+Subject: Re: [PULL 00/34] QAPI patches patches for 2020-10-10
+References: <20201010095504.796182-1-armbru@redhat.com>
+ <7f68ee42-dce8-b304-365a-402c5b37147b@amsat.org>
+Date: Mon, 19 Oct 2020 10:09:46 +0200
+In-Reply-To: <7f68ee42-dce8-b304-365a-402c5b37147b@amsat.org> ("Philippe
+ =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Sun, 18 Oct 2020 09:29:49
+ +0200")
+Message-ID: <87eelu1vsl.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,116 +100,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, peter.maydell@linaro.org,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- include/ui/qemu-spice-module.h | 1 +
- include/ui/qemu-spice.h        | 6 ------
- monitor/qmp-cmds.c             | 2 +-
- ui/spice-core.c                | 3 ++-
- ui/spice-module.c              | 7 +++++++
- 5 files changed, 11 insertions(+), 8 deletions(-)
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> writes:
 
-diff --git a/include/ui/qemu-spice-module.h b/include/ui/qemu-spice-module.h
-index 1ea3a999ce8a..7422f6404ba0 100644
---- a/include/ui/qemu-spice-module.h
-+++ b/include/ui/qemu-spice-module.h
-@@ -29,6 +29,7 @@ struct QemuSpiceOps {
-     int (*set_passwd)(const char *passwd,
-                       bool fail_if_connected, bool disconnect_if_connected);
-     int (*set_pw_expire)(time_t expires);
-+    int (*display_add_client)(int csock, int skipauth, int tls);
- #ifdef CONFIG_SPICE
-     int (*add_interface)(SpiceBaseInstance *sin);
- #endif
-diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
-index 921b7a38d023..2beb7929728c 100644
---- a/include/ui/qemu-spice.h
-+++ b/include/ui/qemu-spice.h
-@@ -28,7 +28,6 @@
- 
- void qemu_spice_input_init(void);
- void qemu_spice_display_init(void);
--int qemu_spice_display_add_client(int csock, int skipauth, int tls);
- bool qemu_spice_have_display_interface(QemuConsole *con);
- int qemu_spice_add_display_interface(QXLInstance *qxlin, QemuConsole *con);
- int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
-@@ -45,11 +44,6 @@ int qemu_spice_migrate_info(const char *hostname, int port, int tls_port,
- #include "qemu/error-report.h"
- 
- #define spice_displays 0
--static inline int qemu_spice_display_add_client(int csock, int skipauth,
--                                                int tls)
--{
--    return -1;
--}
- 
- #endif /* CONFIG_SPICE */
- 
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index 8ac59977e661..a08143b32335 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -340,7 +340,7 @@ void qmp_add_client(const char *protocol, const char *fdname,
-         }
-         skipauth = has_skipauth ? skipauth : false;
-         tls = has_tls ? tls : false;
--        if (qemu_spice_display_add_client(fd, skipauth, tls) < 0) {
-+        if (qemu_spice.display_add_client(fd, skipauth, tls) < 0) {
-             error_setg(errp, "spice failed to add client");
-             close(fd);
-         }
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index 4fe543aba058..99457c226e6f 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -959,7 +959,7 @@ static int qemu_spice_set_pw_expire(time_t expires)
-     return qemu_spice_set_ticket(false, false);
- }
- 
--int qemu_spice_display_add_client(int csock, int skipauth, int tls)
-+static int qemu_spice_display_add_client(int csock, int skipauth, int tls)
- {
-     if (tls) {
-         return spice_server_add_ssl_client(spice_server, csock, skipauth);
-@@ -999,6 +999,7 @@ static struct QemuSpiceOps real_spice_ops = {
-     .migrate_info = qemu_spice_migrate_info,
-     .set_passwd   = qemu_spice_set_passwd,
-     .set_pw_expire = qemu_spice_set_pw_expire,
-+    .display_add_client = qemu_spice_display_add_client,
-     .add_interface = qemu_spice_add_interface,
- };
- 
-diff --git a/ui/spice-module.c b/ui/spice-module.c
-index 299aeb479be5..8fbc99c03c55 100644
---- a/ui/spice-module.c
-+++ b/ui/spice-module.c
-@@ -52,10 +52,17 @@ static int qemu_spice_set_pw_expire_stub(time_t expires)
-     return -1;
- }
- 
-+static int qemu_spice_display_add_client_stub(int csock, int skipauth,
-+                                              int tls)
-+{
-+    return -1;
-+}
-+
- struct QemuSpiceOps qemu_spice = {
-     .init         = qemu_spice_init_stub,
-     .display_init = qemu_spice_display_init_stub,
-     .migrate_info = qemu_spice_migrate_info_stub,
-     .set_passwd   = qemu_spice_set_passwd_stub,
-     .set_pw_expire = qemu_spice_set_pw_expire_stub,
-+    .display_add_client = qemu_spice_display_add_client_stub,
- };
--- 
-2.27.0
+> On 10/10/20 11:54 AM, Markus Armbruster wrote:
+>> The following changes since commit 4a7c0bd9dcb08798c6f82e55b5a3423f7ee66=
+9f1:
+>>    Merge remote-tracking branch
+>> 'remotes/dgibson/tags/ppc-for-5.2-20201009' into staging (2020-10-09
+>> 15:48:04 +0100)
+>> are available in the Git repository at:
+>>    git://repo.or.cz/qemu/armbru.git tags/pull-qapi-2020-10-10
+>> for you to fetch changes up to
+>> b4c0aa59aff520e2a55edd5fef393058ca6520de:
+>>    qapi/visit.py: add type hint annotations (2020-10-10 11:37:49
+>> +0200)
+>> ----------------------------------------------------------------
+>> QAPI patches patches for 2020-10-10
+>
+> The "GCC check-tcg (user)" is 6 min slower since this pull request,
+> making Travis-CI fails:
+>
+> https://travis-ci.org/github/qemu/qemu/builds/734773760
+> https://travis-ci.org/github/qemu/qemu/builds/734983001
+>
+> Any remote idea what could be the reason?
+
+No.  This is unexpected.  The changes to generated QAPI files are
+limited to whitespace.
+
+John, can you work with Philippe to get to the bottom of this?
 
 
