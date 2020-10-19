@@ -2,73 +2,91 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EAEFC433E7
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:54:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A324C433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:56:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9E7A920790
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:54:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E7A920790
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9544320790
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:56:48 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SFv++abe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9544320790
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34362 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUQvZ-0001Q3-NR
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:54:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38232)
+	id 1kUQyF-0003Pj-Fn
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39780)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUQqm-0004Js-CZ
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:49:04 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:56423)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1kUQwM-0002S4-7Z
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:54:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21738)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUQqk-0002vX-Qr
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:49:04 -0400
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1kUQwJ-00046L-W2
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 04:54:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603097685;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Q26CNdJXI7dTrNvrc4aWTxsNvYzFepC4s1JUWSi6AcM=;
+ b=SFv++abeNtNAfua1n4TBLMTEVh8XLDvRprJd7qFZC/Z7M6uvoNKKdHPA4xhbqyLOsdR9RE
+ edVHnr1MceLdkE2ZUg1Cu50QCUDYQaPfjIbrcHkVmOkP09gW2ZncBQLAFsjjnfpeh7JUof
+ h2nCZip/6Gh98NyvypO8Xrbn+WQQKGU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-464-P7TqVq-NNC2DzU0OemN32g-1; Mon, 19 Oct 2020 04:48:57 -0400
-X-MC-Unique: P7TqVq-NNC2DzU0OemN32g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-242-jdGd289LO7-Rq2stRq6uVw-1; Mon, 19 Oct 2020 04:54:43 -0400
+X-MC-Unique: jdGd289LO7-Rq2stRq6uVw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 89C4518A0765;
- Mon, 19 Oct 2020 08:48:56 +0000 (UTC)
-Received: from bahia.lan (ovpn-112-78.ams2.redhat.com [10.36.112.78])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BAECB70105;
- Mon, 19 Oct 2020 08:48:42 +0000 (UTC)
-Subject: [PATCH 4/5] spapr: Pass &error_abort when getting some PC DIMM
- properties
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 19 Oct 2020 10:48:41 +0200
-Message-ID: <160309732180.2739814.7243774674998010907.stgit@bahia.lan>
-In-Reply-To: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
-References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7454C18BE187;
+ Mon, 19 Oct 2020 08:54:42 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1C1CB5D9D2;
+ Mon, 19 Oct 2020 08:54:34 +0000 (UTC)
+Date: Mon, 19 Oct 2020 10:54:31 +0200
+From: Peter Krempa <pkrempa@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <f4bug@amsat.org>
+Subject: Re: [PATCH] docs/system: Deprecate raspi2/raspi3 machine aliases
+Message-ID: <20201019085431.GF3081357@angien.pipo.sk>
+References: <20201019082121.1544550-1-f4bug@amsat.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201019082121.1544550-1-f4bug@amsat.org>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pkrempa@redhat.com
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 04:48:02
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pkrempa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,86 +99,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: libvir-list@redhat.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Both PC_DIMM_SLOT_PROP and PC_DIMM_ADDR_PROP are defined in the
-default property list of the PC DIMM device class:
+On Mon, Oct 19, 2020 at 10:21:21 +0200, Philippe Mathieu-Daudé wrote:
+> Since commit aa35ec2213b ("hw/arm/raspi: Use more
+> specific machine names") the raspi2/raspi3 machines
+> have been renamed as raspi2b/raspi3b.
+> 
+> As more Raspberry Pi 2/3 models are emulated, in order
+> to avoid confusion deprecate the raspi2/raspi3 machine
+> aliases.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+>  docs/system/deprecated.rst | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+> index 905628f3a0c..f0c7aaeb2ff 100644
+> --- a/docs/system/deprecated.rst
+> +++ b/docs/system/deprecated.rst
+> @@ -355,6 +355,11 @@ This machine has been renamed ``fuloong2e``.
+>  These machine types are very old and likely can not be used for live migration
+>  from old QEMU versions anymore. A newer machine type should be used instead.
+>  
+> +Raspberry Pi ``raspi2`` and ``raspi3`` machines (since 5.2)
+> +'''''''''''''''''''''''''''''''''''''
+> +
+> +These machines have been respectively renamed ``raspi2b`` and ``raspi3b``.
+> +
 
-    DEFINE_PROP_UINT64(PC_DIMM_ADDR_PROP, PCDIMMDevice, addr, 0),
+libvirt doesn't do any interpretation for these machine types, so we
+don't need to add any compatibility. Obviously users of these machine
+types might end up with broken configs if they were using them, but
+that's qemu's decision.
 
-    DEFINE_PROP_INT32(PC_DIMM_SLOT_PROP, PCDIMMDevice, slot,
-                      PC_DIMM_UNASSIGNED_SLOT),
+On behalf of libvirt:
 
-They should thus be always gettable for both PC DIMMs and NVDIMMs.
-An error in getting them can only be the result of a programming
-error. It doesn't make much sense to propagate the error in this
-case. Abort instead.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- hw/ppc/spapr.c |   17 +++--------------
- 1 file changed, 3 insertions(+), 14 deletions(-)
-
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 1b173861152f..62f217a6b914 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3443,19 +3443,13 @@ static void spapr_memory_plug(HotplugHandler *hotpl=
-ug_dev, DeviceState *dev,
-=20
-     if (!is_nvdimm) {
-         addr =3D object_property_get_uint(OBJECT(dimm),
--                                        PC_DIMM_ADDR_PROP, &local_err);
--        if (local_err) {
--            goto out_unplug;
--        }
-+                                        PC_DIMM_ADDR_PROP, &error_abort);
-         spapr_add_lmbs(dev, addr, size,
-                        spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
-                        &local_err);
-     } else {
-         slot =3D object_property_get_int(OBJECT(dimm),
--                                       PC_DIMM_SLOT_PROP, &local_err);
--        if (local_err) {
--            goto out_unplug;
--        }
-+                                       PC_DIMM_SLOT_PROP, &error_abort);
-         /* We should have valid slot number at this point */
-         g_assert(slot >=3D 0);
-         spapr_add_nvdimm(dev, slot, &local_err);
-@@ -3634,7 +3628,6 @@ static void spapr_memory_unplug_request(HotplugHandle=
-r *hotplug_dev,
-                                         DeviceState *dev, Error **errp)
- {
-     SpaprMachineState *spapr =3D SPAPR_MACHINE(hotplug_dev);
--    Error *local_err =3D NULL;
-     PCDIMMDevice *dimm =3D PC_DIMM(dev);
-     uint32_t nr_lmbs;
-     uint64_t size, addr_start, addr;
-@@ -3650,11 +3643,7 @@ static void spapr_memory_unplug_request(HotplugHandl=
-er *hotplug_dev,
-     nr_lmbs =3D size / SPAPR_MEMORY_BLOCK_SIZE;
-=20
-     addr_start =3D object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PRO=
-P,
--                                         &local_err);
--    if (local_err) {
--        error_propagate(errp, local_err);
--        return;
--    }
-+                                          &error_abort);
-=20
-     /*
-      * An existing pending dimm state for this DIMM means that there is an
-
+ACKed-by: Peter Krempa <pkrempa@redhat.com>
 
 
