@@ -2,87 +2,83 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9C89C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:03:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21262C433E7
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:06:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 44B2A2224D
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:03:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 547C02224D
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 08:06:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZBV2LIos"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44B2A2224D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8wvuAB9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 547C02224D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUQ8T-0008Hc-4N
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:03:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54296)
+	id 1kUQBe-0002h6-AU
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 04:06:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54468)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyJ-0005FX-Cr
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36491)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPye-0005eM-6J
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:53:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37526)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyH-00087J-FZ
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:52:47 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUPyW-0008EG-C2
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 03:53:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603093964;
+ s=mimecast20190719; t=1603093979;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=RKeLauqdIaclnPiWN2ZnmD0w1dLsI1Xl3FhKss0Moxs=;
- b=ZBV2LIosQLcQdpUIo78bx63Sz+AKKSnQcu87VY9IBzCJfFVzCa9hpP+xiaEIk4fr+yCrSt
- FYAQpU2KyeEb5+lUwapy/2kCgjY2paZzYf79wJ8ncDFIRhRACzT4KomQPu4c1Jk/o76Ftt
- QSNb1U3KXez5tXMXMVkI1Tqx4pGq7Mk=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=c4FOUYi9cXKiAWDYma5Y4/Q87X5rvRTOZxLMStEVqw4=;
+ b=S8wvuAB9GUvAPZ3aquhXgMtJico3eu9Cyok/4/Ye13Gou6PhGPwd+VU/b+RGUV7iG0+Z6p
+ yWaWVYE5BvzYsDb6LdCn9xXxkwOg8SwmD9ykYn41p5U7Pd7WCoQUq4DqhTwCTHBWlLOh7r
+ pepAcf6FwAPZkk1KBnqUqlGf9SORIUs=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-478-TYUfRfMeMESmtzaYP8r0Hw-1; Mon, 19 Oct 2020 03:52:41 -0400
-X-MC-Unique: TYUfRfMeMESmtzaYP8r0Hw-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-329-iU6lTWIUMe63aj_F3WgPvg-1; Mon, 19 Oct 2020 03:52:57 -0400
+X-MC-Unique: iU6lTWIUMe63aj_F3WgPvg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA8261018F79
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4B4F510A0B83
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 07:52:56 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AECC25C662;
- Mon, 19 Oct 2020 07:52:40 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 14E287838A;
+ Mon, 19 Oct 2020 07:52:25 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id C35781FCE5; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
+ id 1508316E18; Mon, 19 Oct 2020 09:52:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 14/14] opengl: build opengl helper code modular
-Date: Mon, 19 Oct 2020 09:52:24 +0200
-Message-Id: <20201019075224.14803-15-kraxel@redhat.com>
-In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
-References: <20201019075224.14803-1-kraxel@redhat.com>
+Subject: [PATCH 00/14] ui: build spice and opengl as module.
+Date: Mon, 19 Oct 2020 09:52:10 +0200
+Message-Id: <20201019075224.14803-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 01:44:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,60 +100,47 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Removes opengl dependency from core qemu.  The number of shared
-libraries for qemu-system-x86_64 goes down from 66 to 60 on my system.
-
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
----
- util/module.c  | 7 +++++++
- ui/meson.build | 8 +++++++-
- 2 files changed, 14 insertions(+), 1 deletion(-)
-
-diff --git a/util/module.c b/util/module.c
-index 21237dcc24df..fe3b82dd4d37 100644
---- a/util/module.c
-+++ b/util/module.c
-@@ -181,6 +181,13 @@ static const struct {
-     { "hw-display-qxl", "ui-spice-core" },
-     { "ui-spice-app",   "ui-spice-core" },
-     { "ui-spice-app",   "chardev-spice" },
-+
-+#ifdef CONFIG_OPENGL
-+    { "ui-egl-headless", "ui-opengl"    },
-+    { "ui-gtk",          "ui-opengl"    },
-+    { "ui-sdl",          "ui-opengl"    },
-+    { "ui-spice-core",   "ui-opengl"    },
-+#endif
- };
- #endif
- 
-diff --git a/ui/meson.build b/ui/meson.build
-index 3cf03d2c297b..73c8dbc7c742 100644
---- a/ui/meson.build
-+++ b/ui/meson.build
-@@ -33,7 +33,6 @@ vnc_ss.add(zlib, png, jpeg)
- vnc_ss.add(when: sasl, if_true: files('vnc-auth-sasl.c'))
- softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
- softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
--softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
- specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: opengl)
- 
- ui_modules = {}
-@@ -44,6 +43,13 @@ if curses.found()
-   ui_modules += {'curses' : curses_ss}
- endif
- 
-+if config_host.has_key('CONFIG_OPENGL')
-+  opengl_ss = ss.source_set()
-+  opengl_ss.add(when: [opengl, pixman, 'CONFIG_OPENGL'],
-+               if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
-+  ui_modules += {'opengl' : opengl_ss}
-+endif
-+
- if config_host.has_key('CONFIG_OPENGL_DMABUF')
-   egl_headless_ss = ss.source_set()
-   egl_headless_ss.add(when: [opengl, pixman, 'CONFIG_OPENGL_DMABUF'],
--- 
-2.27.0
+- Add QemuSpiceOps, reorganize spice stubs.=0D
+- Add support for module dependencies.=0D
+- Build spice-core modular, and make the existing spice=0D
+  modules (audio, chardev, qxl) depend on spice-core.=0D
+- Build egl-headless display and opengl helpers modular=0D
+  (pretty easy thanks to module dependencies).=0D
+=0D
+Gerd Hoffmann (14):=0D
+  spice: add module helpers=0D
+  spice: add QemuSpiceOps, move migrate_info=0D
+  spice: move qemu_spice_init() to QemuSpiceOps.=0D
+  spice: move display_init() to QemuSpiceOps.=0D
+  spice: move add_interface() to QemuSpiceOps.=0D
+  spice: move auth functions to QemuSpiceOps.=0D
+  spice: move display_add_client() to QemuSpiceOps.=0D
+  spice: wire up monitor in QemuSpiceOps.=0D
+  spice: load module when enabled on the cmdline=0D
+  modules: dependencies infrastructure=0D
+  modules: add spice dependencies=0D
+  spice: flip modules switch=0D
+  opengl: build egl-headless display modular=0D
+  opengl: build opengl helper code modular=0D
+=0D
+ include/ui/qemu-spice-module.h | 44 ++++++++++++++++++=0D
+ include/ui/qemu-spice.h        | 42 +----------------=0D
+ audio/spiceaudio.c             |  4 +-=0D
+ chardev/spice.c                |  2 +-=0D
+ monitor/misc.c                 |  2 +-=0D
+ monitor/qmp-cmds.c             |  6 +--=0D
+ softmmu/vl.c                   | 10 ++--=0D
+ ui/spice-core.c                | 31 +++++++++----=0D
+ ui/spice-input.c               |  6 +--=0D
+ ui/spice-module.c              | 85 ++++++++++++++++++++++++++++++++++=0D
+ util/module.c                  | 44 ++++++++++++++++--=0D
+ ui/meson.build                 | 28 +++++++++--=0D
+ 12 files changed, 232 insertions(+), 72 deletions(-)=0D
+ create mode 100644 include/ui/qemu-spice-module.h=0D
+ create mode 100644 ui/spice-module.c=0D
+=0D
+--=20=0D
+2.27.0=0D
+=0D
 
 
