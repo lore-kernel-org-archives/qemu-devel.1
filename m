@@ -2,91 +2,91 @@ Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 097E3C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:20:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0105CC433DF
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:24:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5C7E422200
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CF2722200
+	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 09:23:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jRuN0zUp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5C7E422200
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlv/9Sgc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CF2722200
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43004 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kURLA-0001tY-C4
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 05:20:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45814)
+	id 1kUROY-00037N-9o
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 05:23:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46322)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kURKN-0001QE-3b
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:19:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26676)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kURKK-0007NG-RD
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:19:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603099174;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Jny3kRZG5li2UDitjRNCw9xoh+Gx3C7ZMPwY/sY9qFM=;
- b=jRuN0zUpZZTx+r7Cm5KJGB10JdLR4zPQVpnFaFHEtu7TCDbfdAEckZhBDkZYI87GkvekrF
- hUcthD4VeISNIYf2veNxfhJDGzwaPIbDgLT3n6C1aTPpwZ169kdycHeFgkh+jS/TTGrJgp
- sOoCweifOT7gtdPBNIuPln7RJWDUSm0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-416-7DnLkPOsMJCD9ihWSKJrBA-1; Mon, 19 Oct 2020 05:19:32 -0400
-X-MC-Unique: 7DnLkPOsMJCD9ihWSKJrBA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E2F48030A6;
- Mon, 19 Oct 2020 09:19:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F3E855D9D2;
- Mon, 19 Oct 2020 09:19:30 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 703561132A08; Mon, 19 Oct 2020 11:19:29 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH] monitor: Fix order in monitor_cleanup()
-References: <20201013125027.41003-1-kwolf@redhat.com>
- <878sc8yba7.fsf@linaro.org> <20201015074613.GA4610@merkur.fritz.box>
-Date: Mon, 19 Oct 2020 11:19:29 +0200
-In-Reply-To: <20201015074613.GA4610@merkur.fritz.box> (Kevin Wolf's message of
- "Thu, 15 Oct 2020 09:46:13 +0200")
-Message-ID: <87lfg2zi72.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kURNn-0002g9-35
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:23:11 -0400
+Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:37674)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <pankaj.gupta.linux@gmail.com>)
+ id 1kURNl-0007lQ-Bj
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 05:23:10 -0400
+Received: by mail-il1-x142.google.com with SMTP id j13so9740815ilc.4
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 02:23:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=M7zMqBIzaYC8t0KoPaFRCpogFr9O8bSVaG7aPpieQD4=;
+ b=mlv/9SgcqSzEsTUZx9aRiX8kkAQ5dvoCcGrbk6YP/JHefD8mEwqyBM1VYGzHZ9CQbt
+ jtidmdeeBcV4VbN4G2xxlCnrDicwAvX8SJmS7PwSS3wuzRvKZiKLGuQicQGejlxlSnuB
+ u5KPuO5rQuZIcabFcytDQRlyE0mj667ifS/5RYIIMUkhGPMiq1hqB5ORtJHWV44gCvRH
+ 7X4dxW4mVf2gvtXb+A+JRZOdE/1Hb+vtzNgt2b0NFlWoWum3DMR7BUzB/DTF0Fsm3pcl
+ i2WspKoi2wZyTZnUgzIHYAgSBfqZid55HaFPxHD5dRFaaAymjo2//WtkCE3QacYbPQ8i
+ LCMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=M7zMqBIzaYC8t0KoPaFRCpogFr9O8bSVaG7aPpieQD4=;
+ b=t7rFFLpiIW5kIZXWca2aR/qqqc775uMRW0+uQdJpKPT8GegCdSQQd+F+qcy3edl/vi
+ 4fwG2H4p2lFTAajRSwjWQcF1hFD0OIUzkkMogEo/D93zNSOR+TOv8AXKwiqUhYtPmTJ0
+ v0BLgpCnHdOMrG++FTo4C8+Rrg1OZ5r9KkoOQQx0D4gqL3SOEiseahbN2nOFHEwr4Qbb
+ Eo+5qo8LgvBQFJrLAhdhzfmXzd7OM3npmH+vXp5u8FT80xvjnpmCCCOcteatwO68YhZ9
+ zU2Jldnc/DDQ+moh1uIBc9HOLwCAuiCErhol5H0ooSk3XJ2QutqcqGAcBg6NDRDTalGU
+ rM+g==
+X-Gm-Message-State: AOAM5331IG7Uu72HWHSJEdvs7w8XXyXs9wiEJOOIzQpeey8rZRwGvt23
+ zdZ5+LYSIfsT2RXM/7O5RXZREx+zY7K9xYwuixY=
+X-Google-Smtp-Source: ABdhPJxGIkaEEmNkCDdDA+n1nnJLFEJi1EMI8Ug7uTfGxLgBJQBjMXMdt2JxEkCXXD/BwUsOZKovV+VDQHJ3I90X2e8=
+X-Received: by 2002:a92:c04c:: with SMTP id o12mr2851792ilf.22.1603099387435; 
+ Mon, 19 Oct 2020 02:23:07 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 02:32:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <CAD14+f3G2f4QEK+AQaEjAG4syUOK-9bDagXa8D=RxdFWdoi5fQ@mail.gmail.com>
+ <20201001085900.ms5ix2zyoid7v3ra@steredhat>
+ <CAD14+f1m8Xk-VC1nyMh-X4BfWJgObb74_nExhO0VO3ezh_G2jA@mail.gmail.com>
+ <20201002073457.jzkmefo5c65zlka7@steredhat>
+ <CAD14+f0h4Vp=bsgpByTmaOU-Vbz6nnShDHg=0MSg4WO5ZyO=vA@mail.gmail.com>
+ <05afcc49-5076-1368-3cc7-99abcf44847a@kernel.dk>
+ <CAD14+f0h-r7o=m0NvHxjCgKaQe24_MDupcDdSOu05PhXp8B1-w@mail.gmail.com>
+In-Reply-To: <CAD14+f0h-r7o=m0NvHxjCgKaQe24_MDupcDdSOu05PhXp8B1-w@mail.gmail.com>
+From: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
+Date: Mon, 19 Oct 2020 11:22:56 +0200
+Message-ID: <CAM9Jb+gip_ahaA6Chwrt62pkfuJ2HfZki84pPSKEJhaQaSovMw@mail.gmail.com>
+Subject: Re: io_uring possibly the culprit for qemu hang (linux-5.4.y)
+To: Jack Wang <jack.wang.usish@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
+ envelope-from=pankaj.gupta.linux@gmail.com; helo=mail-il1-x142.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,58 +99,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, f4bug@amsat.org,
- qemu-devel@nongnu.org
+Cc: Jens Axboe <axboe@kernel.dk>, Ju Hyung Park <qkrwngud825@gmail.com>,
+ Stefano Garzarella <sgarzare@redhat.com>,
+ Qemu Developers <qemu-devel@nongnu.org>, io-uring@vger.kernel.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+@Jack Wang,
+Maybe four io_uring patches in 5.4.71 fixes the issue for you as well?
 
-> Am 14.10.2020 um 19:20 hat Alex Benn=C3=83=C6=92=C3=82=C2=A9e geschrieben=
-:
->>=20
->> Kevin Wolf <kwolf@redhat.com> writes:
->>=20
->> > We can only destroy Monitor objects after we're sure that they are not
->> > in use by the dispatcher coroutine any more. This fixes crashes like t=
-he
->> > following where we tried to destroy a monitor mutex while the dispatch=
-er
->> > coroutine still holds it:
->> >
->> >  (gdb) bt
->> >  #0  0x00007fe541cf4bc5 in raise () at /lib64/libc.so.6
->> >  #1  0x00007fe541cdd8a4 in abort () at /lib64/libc.so.6
->> >  #2  0x000055c24e965327 in error_exit (err=3D16, msg=3D0x55c24eead3a0 =
-<__func__.33> "qemu_mutex_destroy") at ../util/qemu-thread-posix.c:37
->> >  #3  0x000055c24e9654c3 in qemu_mutex_destroy (mutex=3D0x55c25133e0f0)=
- at ../util/qemu-thread-posix.c:70
->> >  #4  0x000055c24e7cfaf1 in monitor_data_destroy_qmp (mon=3D0x55c25133d=
-fd0) at ../monitor/qmp.c:439
->> >  #5  0x000055c24e7d23bc in monitor_data_destroy (mon=3D0x55c25133dfd0)=
- at ../monitor/monitor.c:615
->> >  #6  0x000055c24e7d253a in monitor_cleanup () at ../monitor/monitor.c:=
-644
->> >  #7  0x000055c24e6cb002 in qemu_cleanup () at ../softmmu/vl.c:4549
->> >  #8  0x000055c24e0d259b in main (argc=3D24, argv=3D0x7ffff66b0d58, env=
-p=3D0x7ffff66b0e20) at ../softmmu/main.c:51
->> >
->> > Reported-by: Alex Benn=C3=83=C6=92=C3=82=C2=A9e <alex.bennee@linaro.or=
-g>
->> > Signed-off-by: Kevin Wolf <kwolf@redhat.com>
->>=20
->> LGTM:
->>=20
->> Tested-by: Alex Benn=C3=83=C6=92=C3=82=C2=A9e <alex.bennee@linaro.org>
->> Reviewed-by: Alex Benn=C3=83=C6=92=C3=82=C2=A9e <alex.bennee@linaro.org>
->>=20
->> Who's tree is going to take it?
+Thanks,
+Pankaj
+
+> Hi Jens.
 >
-> In theory Markus, but he's on vacation this week. As this seems to
-> affect multiple people and we want to unblock testing quickly, I'll just
-> take it through mine.
-
-Thanks!
-
+> On Sat, Oct 17, 2020 at 3:07 AM Jens Axboe <axboe@kernel.dk> wrote:
+> >
+> > Would be great if you could try 5.4.71 and see if that helps for your
+> > issue.
+> >
+>
+> Oh wow, yeah it did fix the issue.
+>
+> I'm able to reliably turn off and start the VM multiple times in a row.
+> Double checked by confirming QEMU is dynamically linked to liburing.so.1.
+>
+> Looks like those 4 io_uring fixes helped.
+>
+> Thanks!
+>
 
