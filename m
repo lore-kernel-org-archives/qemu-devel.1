@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1D1BC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 18:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30282C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 18:22:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 130F52098B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 18:22:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 56E1E2098B
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 18:22:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="n24E9+xh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 130F52098B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RhJLTZej"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56E1E2098B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUwGz-0002u6-Rl
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 14:22:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49934)
+	id 1kUwH5-0002xr-9D
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 14:22:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49962)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUwFC-0001Dm-9d
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:20:22 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:36604)
+ id 1kUwFH-0001FM-S5
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:20:30 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:55767)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUwF7-00070D-57
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:20:20 -0400
-Received: by mail-wr1-x444.google.com with SMTP id x7so3364508wrl.3
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 11:20:16 -0700 (PDT)
+ id 1kUwFC-00070a-17
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:20:24 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a72so2824123wme.5
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 11:20:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=6rbwkEpyi/KBr1JflrTSauoQCOoSH88ZHs4jFJdadLY=;
- b=n24E9+xhkh9MrByR5MozzwrcTs0OvFhmmKqxdRGH9X2ffwdz+R9EfGxGSYqXiyU7jn
- vxbMoEJLQHBatb6jS5goc3XWgDibMd5rdlb/vUZuxKcNutZtdn1if9Y3P0HUYK4DsQTs
- 15MHj3PHlwaP2ZaduFeJIBeam3iXd5mw4ai5oXzs2wjQP4Q4SZovzWVs8fRFEtKomp7P
- fXq48Z4SRGW5SnUBVKaduriygCItDskxD9xHW6qNmcAxXw8FJ32eFbOYRHZ7lOF48xCn
- ZBiy3YwINRrPx3nWTDuMAqmkcT2ydCAt+WRPQ3YHGM9grb1e8rqFiMVGXfcf6il16Cw9
- dY8w==
+ bh=BzyypNaASWej9ZmqdqMi6vPl5wcM+vKdt8ggZ4Ao8SM=;
+ b=RhJLTZejm2gWA9eGOUcqIM2r/w8aepvah0h9G0w3fJNQYUvFupuSiHZJ4tu8sByrGI
+ CqegSXD5jZ3tjSzXLRnIuc+rIKpldSw1FhweAWbVggoYaUmWpJeSFhEjRfgrBqquZozI
+ Ev1QQe5awJJTEkWIZ3GV0jksGmolBwJnZul17cownl+HDM+K0hKTxWCbdzYwqPnn3d4a
+ 7t5oZeRQwEoOLyyVnGUbH7H9KWzKLeF9cKzSbdAPzhLewYSRuybsSnKOfcIv6P8xCYcC
+ rYta/IvP/nIs+9OB5iBPtmFCUd7dJ5j+mf7JhhO9unvVc3pGDDcNKY+aw4Z5qNAFTgk9
+ 8tmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=6rbwkEpyi/KBr1JflrTSauoQCOoSH88ZHs4jFJdadLY=;
- b=Mi5un/cY91ZyVcT+zmgZKsLq1EZQ3tfyK5sMwBfdaoQcyOPiD45Df+lSMDfcyVBJCn
- Qc32RWMvE8wPx/CN76CiBKcGuz3k3ApFa/O01p0rE9cL9TMHsrEmXovIVsRC2KjcDlKU
- HgvoBh0l2Y+WMuR9xMmWdtRhxnPfVF2XkyCc7UfaQSbzpMriRE41IRs6Cjjqpnkc7xvK
- NVJJbKsMAgEXm/W/ksEFvFCXBvnE+z4WRcFaqYqZgeTTpb4kl6GLeCoJoCckxYNPMsuK
- 453PtAky3xRGZVljFD7pleCtlplW1u3t3IXk5KhgE0L0i4iHFXW++/p9hLTIwKcl0CSl
- e8QA==
-X-Gm-Message-State: AOAM530nuWNikxxSXXYGQqjyIMFvrd457fo5pogXHH2tV9jHrLW66vtI
- Lp5ZLh2XUznm5vK+g/qGg9KWEvKZQLs=
-X-Google-Smtp-Source: ABdhPJzvwZsia23Py+FB4CSB7KBEzY4PeneAkRECN47o3hJO+3qvV26MpElNdqBbCuWPZ0QFPnWi9g==
-X-Received: by 2002:adf:ec0e:: with SMTP id x14mr5407603wrn.204.1603218015232; 
- Tue, 20 Oct 2020 11:20:15 -0700 (PDT)
+ bh=BzyypNaASWej9ZmqdqMi6vPl5wcM+vKdt8ggZ4Ao8SM=;
+ b=NFt9QAcJj2ubw3Wodykqq75Q/GFL4WKiWlGdyc5QzXxzTF23rToGRkKJtew+qZye4N
+ J+S5JYoLB7qOpaQDC3UNupJrY6eEzGgqBkgg86qlfSSnHMVe1L5CqEFLzz++BK6mt4d8
+ +eIQxryLfhMdeet4Aqr7qrp7sdcwczanpSjwvWI0HpircmDQL54+jYkwq9BALAgsqc21
+ WtwRQg7XF1DVU7Dbqi5FeX3DbPDAEPVy+q/Dgf1frf721xIL/jrBdGrQK3GtpBGqAuGF
+ J+aplA0LksjQ80vQikTI7NVwyp5W9EW1WYLSK+FViy5K8hPptBa/0BZdimSFW3tX/k4T
+ qBiQ==
+X-Gm-Message-State: AOAM532zJmJNAVE6xLjLVlmdd6vHCIV8UuN2i/W+01GzSD/HMdFt6qPN
+ 2be6JpTe1ZA/gZxVXuTCGDcDp/SapVo=
+X-Google-Smtp-Source: ABdhPJyXxKnhC3yc7AHjoNry4FEVDcg/tefmGklGRGk32fXmUDSPwAGNKv4APV2vDLL6mfUaQ4GhmA==
+X-Received: by 2002:a7b:c350:: with SMTP id l16mr4392111wmj.135.1603218020008; 
+ Tue, 20 Oct 2020 11:20:20 -0700 (PDT)
 Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id f14sm4254328wrr.80.2020.10.20.11.20.13
+ by smtp.gmail.com with ESMTPSA id r1sm4334870wro.18.2020.10.20.11.20.18
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 11:20:14 -0700 (PDT)
+ Tue, 20 Oct 2020 11:20:19 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/4] qdev-monitor: Display frequencies scaled to SI unit
-Date: Tue, 20 Oct 2020 20:20:05 +0200
-Message-Id: <20201020182008.2240590-2-f4bug@amsat.org>
+Subject: [PATCH 2/4] hw/core/clock: trace clock values in Hz instead of ns
+Date: Tue, 20 Oct 2020 20:20:06 +0200
+Message-Id: <20201020182008.2240590-3-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201020182008.2240590-1-f4bug@amsat.org>
 References: <20201020182008.2240590-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -108,60 +108,80 @@ Cc: Damien Hedde <damien.hedde@greensocs.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Alistair Francis <alistair.francis@wdc.com>, Luc Michel <luc@lmichel.fr>,
- Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
+ Luc Michel <luc@lmichel.fr>, Paolo Bonzini <pbonzini@redhat.com>,
+ Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Since commit 9f2ff99c7f2 ("qdev-monitor: print the device's clock
-with info qtree") we can display the clock frequencies in the
-monitor. Use the recently introduced freq_to_str() to display
-the frequencies using the closest SI unit (human friendlier).
+From: Luc Michel <luc@lmichel.fr>
 
-Before:
+The nanosecond unit greatly limits the dynamic range we can display in
+clock value traces, for values in the order of 1GHz and more. The
+internal representation can go way beyond this value and it is quite
+common for today's clocks to be within those ranges.
 
-  (qemu) info qtree
-  [...]
-  dev: xilinx,zynq_slcr, id ""
-    clock-in "ps_clk" freq_hz=3.333333e+07
-    mmio 00000000f8000000/0000000000001000
+For example, a frequency between 500MHz+ and 1GHz will be displayed as
+1ns. Beyond 1GHz, it will show up as 0ns.
 
-After:
+Replace nanosecond periods traces with frequencies in the Hz unit
+to have more dynamic range in the trace output.
 
-  dev: xilinx,zynq_slcr, id ""
-    clock-in "ps_clk" freq_hz=33.3 MHz
-    mmio 00000000f8000000/0000000000001000
-
-Reviewed-by: Luc Michel <luc@lmichel.fr>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20201010135759.437903-3-luc@lmichel.fr>
+[PMD: Replace CLOCK_PERIOD_TO_HZ() by clock_get_hz()]
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- softmmu/qdev-monitor.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ hw/core/clock.c      | 8 +++++---
+ hw/core/trace-events | 4 ++--
+ 2 files changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/softmmu/qdev-monitor.c b/softmmu/qdev-monitor.c
-index bcfb90a08f3..1c5b509aea2 100644
---- a/softmmu/qdev-monitor.c
-+++ b/softmmu/qdev-monitor.c
-@@ -747,11 +747,13 @@ static void qdev_print(Monitor *mon, DeviceState *dev, int indent)
-         }
-     }
-     QLIST_FOREACH(ncl, &dev->clocks, node) {
--        qdev_printf("clock-%s%s \"%s\" freq_hz=%e\n",
-+        g_autofree char *freq = NULL;
+diff --git a/hw/core/clock.c b/hw/core/clock.c
+index f866717a835..5cc9599ba3a 100644
+--- a/hw/core/clock.c
++++ b/hw/core/clock.c
+@@ -51,12 +51,14 @@ void clock_clear_callback(Clock *clk)
+ 
+ bool clock_set(Clock *clk, uint64_t period)
+ {
++    uint64_t old_hz;
 +
-+        freq = freq_to_str(clock_get_hz(ncl->clock));
-+        qdev_printf("clock-%s%s \"%s\" freq_hz=%s\n",
-                     ncl->output ? "out" : "in",
-                     ncl->alias ? " (alias)" : "",
--                    ncl->name,
--                    CLOCK_PERIOD_TO_HZ(1.0 * clock_get(ncl->clock)));
-+                    ncl->name, freq);
+     if (clk->period == period) {
+         return false;
      }
-     class = object_get_class(OBJECT(dev));
-     do {
+-    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_NS(clk->period),
+-                    CLOCK_PERIOD_TO_NS(period));
++    old_hz = clock_get_hz(clk);
+     clk->period = period;
++    trace_clock_set(CLOCK_PATH(clk), old_hz, clock_get_hz(clk));
+ 
+     return true;
+ }
+@@ -69,7 +71,7 @@ static void clock_propagate_period(Clock *clk, bool call_callbacks)
+         if (child->period != clk->period) {
+             child->period = clk->period;
+             trace_clock_update(CLOCK_PATH(child), CLOCK_PATH(clk),
+-                               CLOCK_PERIOD_TO_NS(clk->period),
++                               clock_get_hz(clk),
+                                call_callbacks);
+             if (call_callbacks && child->callback) {
+                 child->callback(child->callback_opaque);
+diff --git a/hw/core/trace-events b/hw/core/trace-events
+index 1ac60ede6b7..7b2869cbaab 100644
+--- a/hw/core/trace-events
++++ b/hw/core/trace-events
+@@ -31,6 +31,6 @@ resettable_transitional_function(void *obj, const char *objtype) "obj=%p(%s)"
+ # clock.c
+ clock_set_source(const char *clk, const char *src) "'%s', src='%s'"
+ clock_disconnect(const char *clk) "'%s'"
+-clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', ns=%"PRIu64"->%"PRIu64
++clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', %"PRIu64" Hz-> %"PRIu64" Hz"
+ clock_propagate(const char *clk) "'%s'"
+-clock_update(const char *clk, const char *src, uint64_t val, int cb) "'%s', src='%s', ns=%"PRIu64", cb=%d"
++clock_update(const char *clk, const char *src, uint64_t hz, int cb) "'%s', src='%s', val=%"PRIu64" Hz cb=%d"
 -- 
 2.26.2
 
