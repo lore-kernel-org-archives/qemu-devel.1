@@ -4,83 +4,99 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9F63C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A7AC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 11CFA222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:25:32 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BL+7PZ+m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11CFA222C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 9DB1D222C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:09 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB1D222C8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUmxX-0003bt-1b
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:25:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43190)
+	id 1kUmy8-0003SV-DQ
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:26:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42692)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kUmvo-0001TI-29
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 04:23:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54145)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kUmvk-00058m-2W
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 04:23:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603182219;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=QjCHYclfxOWWJch4YnbpBToy20b0bWpeJXcs26hEtqk=;
- b=BL+7PZ+mZ/sNaktxPWQ3TAFm01LUOV+dMBKkF6fotJ0c7oY/weyex9qlVT3wiB7n1e+Ars
- q3kdR/SrKFksObGIgeQOjvwF8J/Hah9Rc0GhX9jUifaIZnVIbqRiy8CU87Ya+H+7N/Ts1x
- 3xEZI07hX1ywJ0XPudpcr7LR8wqk9ZU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-kEjXXAKUOruHzKVyDkaqpQ-1; Tue, 20 Oct 2020 04:23:37 -0400
-X-MC-Unique: kEjXXAKUOruHzKVyDkaqpQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8A2CE8049D3;
- Tue, 20 Oct 2020 08:23:36 +0000 (UTC)
-Received: from merkur.fritz.box (ovpn-112-88.ams2.redhat.com [10.36.112.88])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 5995F5B4A3;
- Tue, 20 Oct 2020 08:23:35 +0000 (UTC)
-Date: Tue, 20 Oct 2020 10:23:33 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Alberto Garcia <berto@igalia.com>
-Subject: Re: Plans to bring QMP 'x-blockdev-reopen' out of experimental?
-Message-ID: <20201020082333.GB4452@merkur.fritz.box>
-References: <20201006091001.GA64583@paraplu>
- <w51mu0ifbuf.fsf@maestria.local.igalia.com>
- <w51k0vmf9k3.fsf@maestria.local.igalia.com>
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUmtg-0007JF-75; Tue, 20 Oct 2020 04:21:32 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:57053)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kUmtc-0004PB-Jz; Tue, 20 Oct 2020 04:21:31 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailnew.west.internal (Postfix) with ESMTP id 0C439B47;
+ Tue, 20 Oct 2020 04:21:22 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Tue, 20 Oct 2020 04:21:23 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=sNjh9PPK3pOaPfYbDpJQNCXgkQR
+ cUV4hdxAA544JLN8=; b=XYstEw0WilkQDHYXT7JpkrSe2Unt02YcvkDTS5CGzNv
+ o9wiOkS83oraR3SaYpm4iMzm0FcCZuTCM4E8StfXWZt6QpP+oQCSfFPGvi6Dq7zm
+ B98cfW79bQblzijAGgBwumiN43d2xj45lH+wwMlX/z9R5Gx6EeGyXib2vGtjP9Uc
+ t3IVg69Gb+ydHqUqgIHzq7YJQmOpls1l5ymR8TLM2MLwK9tiPfywCpQLZ3VAA8hw
+ Sut+vvACK/AKsAV8OtticVkbOUsfHklE7rtEnh3GbjIc9WMdCU8yCfO50wRKWDtp
+ RLQrcBIRvCbgtM+OxDWV67UDm+HKmqjNdGl9Y5bdEnA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=sNjh9P
+ PK3pOaPfYbDpJQNCXgkQRcUV4hdxAA544JLN8=; b=A1V6Y/q4G0KX3RELiFXjUH
+ kc0wI9PAdupcZDpx6g4uGcZGbifLFwe1npFyfegwzl/wBHjKfeKVyGn58Wd5574e
+ zhaKU1/LIC/78RD0y9+2AbUNng1MCyI2A7sNKGJd8fe1dJOyUxE8yTHTVaPCs+Tc
+ eSSkwIQ08O4EIeELS/8U2qjqxCwU9WCeuxV2fihMawI/RjcT34mBavmWl17L/uaS
+ 9oNkBKwKt2d/PoQsLFlNcwO0VHpi4bCwXMt2K7ox9rYW0AtIxigPQYOfQFI/NmT1
+ 35MeSNePE3Ac3K1h0C95BpnSFObx7bthr/ji0pk3oH8hNPZqg+pSsv3iLv90A+Rw
+ ==
+X-ME-Sender: <xms:AZ6OXwao8WcLiUdfa4NE4Q97_hL5UHayAoFV4iTGF8C8bzCTE3s1Sg>
+ <xme:AZ6OX7YKWMCmDxqEp1By5uqHJgJyCbkGctWeiTIBhu2K3Ud5ivVBLUYI_KbatnzfX
+ FIoecek0JlT0437aWI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgddtvdcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:AZ6OX69rRKoHhBQb4qsy4HC1q4ly450PSsgBVGOd_iURW3MgpriQyg>
+ <xmx:AZ6OX6p_GEQJAznvprU_CBoMSxj5QuaNHid8hn5tZ5w6viVCuPl3iQ>
+ <xmx:AZ6OX7rbHFoxUvI5rHOpip64-NpLsdqkkQUb_J2RJ1dFUVqLzUcV2Q>
+ <xmx:Ap6OX0QCVoHzvQ-exxWbGBZg4Dr1RjEnRu9b9yB-8wJUyjIpUDfFpSEW3W8>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id EAD7D328005A;
+ Tue, 20 Oct 2020 04:21:19 -0400 (EDT)
+Date: Tue, 20 Oct 2020 10:21:18 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Subject: Re: [PATCH v7 04/11] hw/block/nvme: Support allocated CNS command
+ variants
+Message-ID: <20201020082118.GA178548@apples.localdomain>
+References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
+ <20201019021726.12048-5-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
-In-Reply-To: <w51k0vmf9k3.fsf@maestria.local.igalia.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+In-Reply-To: <20201019021726.12048-5-dmitry.fomichev@wdc.com>
+Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
+ helo=wnew1-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:21:24
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,40 +109,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mreitz@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Kashyap Chamarthy <kchamart@redhat.com>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
+ Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 19.10.2020 um 18:46 hat Alberto Garcia geschrieben:
-> On Mon 19 Oct 2020 05:56:56 PM CEST, Alberto Garcia wrote:
-> > And this one in particular:
-> >
-> >    https://lists.gnu.org/archive/html/qemu-block/2020-02/msg00601.html
-> 
-> I forgot to add, we still don't support changing bs->file with this
-> command, so I guess that would be one blocker?
-> 
-> There's no other way of inserting filter nodes, or is there?
 
-Not that I'm aware of.
+--2fHTh5uZTiUOsy+g
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-So yes, changing bs->file is the one thing I had in mind for
-implementing before we mark it stable.
+On Oct 19 11:17, Dmitry Fomichev wrote:
 
-I'm not entirely sure if we should make some restrictions or allow
-arbitrary changes. If it's only about filters, we could check that the
-node returned by bdrv_skip_filters() stays the same. This would be
-almost certainly safe (if the chain is not frozen, of course).
+(snip)
 
-If people want to dynamically insert non-filters (maybe quorum?), it
-might be more restrictive than necessary, though.
+> CAP.CSS (together with the I/O Command Set data structure) defines
+> what command sets are supported by the controller.
+>=20
+> CC.CSS (together with Set Profile) can be set to enable a subset of
+> the available command sets.
+>=20
+> Even if a user configures CC.CSS to e.g. Admin only, NVM namespaces
+> will still be attached (and thus marked as active).
+> Similarly, if a user configures CC.CSS to e.g. NVM, ZNS namespaces
+> will still be attached (and thus marked as active).
+>=20
+> However, any operation from a disabled command set will result in a
+> Invalid Command Opcode.
+>=20
 
-Other cases like inserting a qcow2 file in the chain where the old child
-becomes the backing file of the newly inserted node should in theory
-already be covered by blockdev-snapshot.
+This part of the commit message seems irrelevant to the patch.
 
-Kevin
+> Add a new Boolean namespace property, "attached", to provide the most
+> basic namespace attachment support. The default value for this new
+> property is true. Also, implement the logic in the new CNS values to
+> include/exclude namespaces based on this new property. The only thing
+> missing is hooking up the actual Namespace Attachment command opcode,
+> which will allow a user to toggle the "attached" flag per namespace.
+>=20
 
+Without Namespace Attachment support, the sole purpose of this parameter
+is to allow unusable namespace IDs to be reported. I have no problems
+with adding support for the additional CNS values. They will return
+identical responses, but I think that is good enough for now.
+
+When it is not really needed, we should be wary of adding a parameter
+that is really hard to get rid of again.
+
+> The reason for not hooking up this command completely is because the
+> NVMe specification requires the namespace management command to be
+> supported if the namespace attachment command is supported.
+>=20
+
+There are many ways to support Namespace Management, and there are a lot
+of quirks with each of them. Do we use a big blockdev and carve out
+namespaces? Then, what are the semantics of an image resize operation?
+
+Do we dynamically create blockdev devices - thats sounds pretty nice,
+but might have other quirks and the attachment is not really persistent.
+
+I think at least the "attached" parameter should be x-prefixed, but
+better, leave it out for now until we know how we want Namespace
+Attachment and Management to be implemented.
+
+--2fHTh5uZTiUOsy+g
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+OnfkACgkQTeGvMW1P
+DelmmggAns78TcOR8S003gbK3JlLkiLL6pfqp0oWBpPzthhfsqIqVjGI2TmCeuDJ
+LksmvI5dWv8uiG6LrGTAFh2R5If2yUnPfqa19oGTvIacLHveubhMQmZj1GYdFFlI
+xq6/sgRINYb2NiCdFJFZFHgyCDp+XDhcIlZ1hNmLDN2aGmsJXyS0KThh4Rz1CXyJ
+yNugoqhQFNBhv+WqC5O/yxBZN2rTa4kK+UFeZ5lXjWlupLEV1cEiysGqQzw0hhF5
+WCJCsbiF7ZPJot7iBqL+5h9RMWTz0vAJC2HUgx0kGwYRAhK3+vxAScpSsAWW1eZ4
+7sumbSs5+X3IweKJyxQ5Oave4Ml7AA==
+=QIyQ
+-----END PGP SIGNATURE-----
+
+--2fHTh5uZTiUOsy+g--
 
