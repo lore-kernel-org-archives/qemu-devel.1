@@ -2,83 +2,87 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFD1C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A826C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:50:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 406742224F
+	by mail.kernel.org (Postfix) with ESMTPS id C2971223C6
 	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:50:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RYe+pavI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 406742224F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jIFIZYYL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2971223C6
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56972 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUmPt-0006Rc-0I
+	id 1kUmPt-0006Ro-Jd
 	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 03:50:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35782)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOJ-00058X-Th
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOJ-00057a-4n
  for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56718)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26770)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOE-0001qT-C9
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:07 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOE-0001oH-ER
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603180140;
+ s=mimecast20190719; t=1603180137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=73OhakPiEo4H0NBEo1NTdVVL6u+6Ni6vkp6gJPsouUs=;
- b=RYe+pavIbzrafwlZFL08KqlMicWhxvSKCFVAsxwXqvQ0WMRtiDUW8WtYamICmAcy8zxQ0F
- QZ/kLHlN/V7h6NnPwJbbGgCGAenxJnLCtvJ+r8DYughYKnhxIWGJVRlE6Nq8nYRxma+ou/
- 4RTY/WuNAt7jKnj9wz5P8PZMPOZBD7Q=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j9GC9/ihmfVPuNcAnW2v0hGLdwPP8vCySlqQdX6QH/8=;
+ b=jIFIZYYLL/SA/S8cFVcBKZDzxt6HZtPg6U0nu9yeorc1td+nefY+ETJujJNrm0WIzQLQZQ
+ K41PvW/SQPGne1il3HtN3bHy0Vad/h4oGEHVW2aEmaIjfWYYkO+gEv7axJA75VBwemnCv0
+ BM6septBa1R982LuQv3vEFk4ghNbBjw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-fNO_m0MuNJ2IJejBt9bpcQ-1; Tue, 20 Oct 2020 03:48:58 -0400
-X-MC-Unique: fNO_m0MuNJ2IJejBt9bpcQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-522-5wrkIApgM4KbuAxvFrF8Ng-1; Tue, 20 Oct 2020 03:48:55 -0400
+X-MC-Unique: 5wrkIApgM4KbuAxvFrF8Ng-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 90E531006C90;
- Tue, 20 Oct 2020 07:48:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B0B5B107465F;
+ Tue, 20 Oct 2020 07:48:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E547C60C13;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E78795D9D2;
  Tue, 20 Oct 2020 07:48:45 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id E7E3411AB5; Tue, 20 Oct 2020 09:48:44 +0200 (CEST)
+ id 30C3C1753B; Tue, 20 Oct 2020 09:48:45 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 00/10] microvm: add usb support
-Date: Tue, 20 Oct 2020 09:48:34 +0200
-Message-Id: <20201020074844.5304-1-kraxel@redhat.com>
+Subject: [PATCH v3 02/10] usb/xhci: add include/hw/usb/xhci.h header file
+Date: Tue, 20 Oct 2020 09:48:36 +0200
+Message-Id: <20201020074844.5304-3-kraxel@redhat.com>
+In-Reply-To: <20201020074844.5304-1-kraxel@redhat.com>
+References: <20201020074844.5304-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,50 +106,254 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This depends on the pending microvm pull request.=0D
-=0D
-v2:=0D
- - add some xhci cleanups.=0D
- - move aml builder to sysbus-xhci.=0D
- - add acpi testcase for usb=3Don (and while being at it rtc=3Don too).=0D
-v3:=0D
- - fix Kconfig deps for XHCI=0D
-=0D
-Gerd Hoffmann (10):=0D
-  acpi: add aml builder stubs=0D
-  usb/xhci: add include/hw/usb/xhci.h header file=0D
-  usb/xhci: add xhci_sysbus_build_aml() helper=0D
-  usb/xhci: fixup xhci kconfig deps=0D
-  microvm: add usb support=0D
-  tests/acpi: allow updates for expected data files=0D
-  tests/acpi: add empty tests/data/acpi/microvm/DSDT.{usb,rtc} files=0D
-  tests/acpi: add microvm usb test=0D
-  tests/acpi: add microvm rtc test=0D
-  tests/acpi: update expected data files=0D
-=0D
- hw/usb/hcd-xhci-sysbus.h         |   1 -=0D
- hw/usb/hcd-xhci.h                |  22 ++++++--------------=0D
- include/hw/i386/microvm.h        |   5 ++++-=0D
- include/hw/usb/xhci.h            |  21 +++++++++++++++++++=0D
- hw/acpi/aml-build-stub.c         |  14 +++++++++++++=0D
- hw/i386/acpi-microvm.c           |   9 ++++++++=0D
- hw/i386/microvm.c                |  13 ++++++++++++=0D
- hw/usb/hcd-xhci-nec.c            |   4 ++--=0D
- hw/usb/hcd-xhci-pci.c            |   4 ++--=0D
- hw/usb/hcd-xhci-sysbus.c         |  19 +++++++++++++++--=0D
- hw/usb/hcd-xhci.c                |  34 +++++++++++++++----------------=0D
- tests/qtest/bios-tables-test.c   |  24 ++++++++++++++++++++++=0D
- hw/i386/Kconfig                  |   1 +=0D
- hw/usb/Kconfig                   |   6 ++----=0D
- tests/data/acpi/microvm/DSDT.rtc | Bin 0 -> 404 bytes=0D
- tests/data/acpi/microvm/DSDT.usb | Bin 0 -> 414 bytes=0D
- 16 files changed, 131 insertions(+), 46 deletions(-)=0D
- create mode 100644 include/hw/usb/xhci.h=0D
- create mode 100644 tests/data/acpi/microvm/DSDT.rtc=0D
- create mode 100644 tests/data/acpi/microvm/DSDT.usb=0D
-=0D
---=20=0D
-2.27.0=0D
-=0D
+Move a bunch of defines which might be needed outside core xhci
+code to that place.  Add XHCI_ prefixes to avoid name clashes.
+No functional change.
+
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/usb/hcd-xhci-sysbus.h |  1 -
+ hw/usb/hcd-xhci.h        | 22 ++++++----------------
+ include/hw/usb/xhci.h    | 19 +++++++++++++++++++
+ hw/usb/hcd-xhci-nec.c    |  4 ++--
+ hw/usb/hcd-xhci-pci.c    |  4 ++--
+ hw/usb/hcd-xhci-sysbus.c |  4 ++--
+ hw/usb/hcd-xhci.c        | 34 ++++++++++++++++------------------
+ 7 files changed, 47 insertions(+), 41 deletions(-)
+ create mode 100644 include/hw/usb/xhci.h
+
+diff --git a/hw/usb/hcd-xhci-sysbus.h b/hw/usb/hcd-xhci-sysbus.h
+index a308753ceb9b..fdfcbbee3bf4 100644
+--- a/hw/usb/hcd-xhci-sysbus.h
++++ b/hw/usb/hcd-xhci-sysbus.h
+@@ -15,7 +15,6 @@
+ #include "hcd-xhci.h"
+ #include "hw/sysbus.h"
+ 
+-#define TYPE_XHCI_SYSBUS "sysbus-xhci"
+ #define XHCI_SYSBUS(obj) \
+     OBJECT_CHECK(XHCISysbusState, (obj), TYPE_XHCI_SYSBUS)
+ 
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index f859a17e73ee..ccf50ae28bed 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -24,23 +24,13 @@
+ #include "qom/object.h"
+ 
+ #include "hw/usb.h"
++#include "hw/usb/xhci.h"
+ #include "sysemu/dma.h"
+ 
+-#define TYPE_XHCI "base-xhci"
+-#define TYPE_NEC_XHCI "nec-usb-xhci"
+-#define TYPE_QEMU_XHCI "qemu-xhci"
+-
+ OBJECT_DECLARE_SIMPLE_TYPE(XHCIState, XHCI)
+ 
+-#define MAXPORTS_2 15
+-#define MAXPORTS_3 15
+-
+-#define MAXPORTS (MAXPORTS_2 + MAXPORTS_3)
+-#define MAXSLOTS 64
+-#define MAXINTRS 16
+-
+ /* Very pessimistic, let's hope it's enough for all cases */
+-#define EV_QUEUE (((3 * 24) + 16) * MAXSLOTS)
++#define EV_QUEUE (((3 * 24) + 16) * XHCI_MAXSLOTS)
+ 
+ typedef struct XHCIStreamContext XHCIStreamContext;
+ typedef struct XHCIEPContext XHCIEPContext;
+@@ -217,15 +207,15 @@ typedef struct XHCIState {
+     uint32_t dcbaap_high;
+     uint32_t config;
+ 
+-    USBPort  uports[MAX_CONST(MAXPORTS_2, MAXPORTS_3)];
+-    XHCIPort ports[MAXPORTS];
+-    XHCISlot slots[MAXSLOTS];
++    USBPort  uports[MAX_CONST(XHCI_MAXPORTS_2, XHCI_MAXPORTS_3)];
++    XHCIPort ports[XHCI_MAXPORTS];
++    XHCISlot slots[XHCI_MAXSLOTS];
+     uint32_t numports;
+ 
+     /* Runtime Registers */
+     int64_t mfindex_start;
+     QEMUTimer *mfwrap_timer;
+-    XHCIInterrupter intr[MAXINTRS];
++    XHCIInterrupter intr[XHCI_MAXINTRS];
+ 
+     XHCIRing cmd_ring;
+ 
+diff --git a/include/hw/usb/xhci.h b/include/hw/usb/xhci.h
+new file mode 100644
+index 000000000000..dc0c29930dcc
+--- /dev/null
++++ b/include/hw/usb/xhci.h
+@@ -0,0 +1,19 @@
++#ifndef HW_USB_XHCI_H
++#define HW_USB_XHCI_H
++
++#define TYPE_XHCI "base-xhci"
++#define TYPE_NEC_XHCI "nec-usb-xhci"
++#define TYPE_QEMU_XHCI "qemu-xhci"
++#define TYPE_XHCI_SYSBUS "sysbus-xhci"
++
++#define XHCI_MAXPORTS_2 15
++#define XHCI_MAXPORTS_3 15
++
++#define XHCI_MAXPORTS (XHCI_MAXPORTS_2 + XHCI_MAXPORTS_3)
++#define XHCI_MAXSLOTS 64
++#define XHCI_MAXINTRS 16
++
++/* must be power of 2 */
++#define XHCI_LEN_REGS 0x4000
++
++#endif
+diff --git a/hw/usb/hcd-xhci-nec.c b/hw/usb/hcd-xhci-nec.c
+index 2efa6fa0f8af..5707b2cabd16 100644
+--- a/hw/usb/hcd-xhci-nec.c
++++ b/hw/usb/hcd-xhci-nec.c
+@@ -34,8 +34,8 @@ static Property nec_xhci_properties[] = {
+                     xhci.flags, XHCI_FLAG_SS_FIRST, true),
+     DEFINE_PROP_BIT("force-pcie-endcap", XHCIPciState, xhci.flags,
+                     XHCI_FLAG_FORCE_PCIE_ENDCAP, false),
+-    DEFINE_PROP_UINT32("intrs", XHCIPciState, xhci.numintrs, MAXINTRS),
+-    DEFINE_PROP_UINT32("slots", XHCIPciState, xhci.numslots, MAXSLOTS),
++    DEFINE_PROP_UINT32("intrs", XHCIPciState, xhci.numintrs, XHCI_MAXINTRS),
++    DEFINE_PROP_UINT32("slots", XHCIPciState, xhci.numslots, XHCI_MAXSLOTS),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
+index a6d746e1da38..b78fcd2bb2d5 100644
+--- a/hw/usb/hcd-xhci-pci.c
++++ b/hw/usb/hcd-xhci-pci.c
+@@ -240,8 +240,8 @@ static void qemu_xhci_instance_init(Object *obj)
+ 
+     s->msi      = ON_OFF_AUTO_OFF;
+     s->msix     = ON_OFF_AUTO_AUTO;
+-    xhci->numintrs = MAXINTRS;
+-    xhci->numslots = MAXSLOTS;
++    xhci->numintrs = XHCI_MAXINTRS;
++    xhci->numslots = XHCI_MAXSLOTS;
+     xhci_set_flag(xhci, XHCI_FLAG_SS_FIRST);
+ }
+ 
+diff --git a/hw/usb/hcd-xhci-sysbus.c b/hw/usb/hcd-xhci-sysbus.c
+index 852ca5103b4d..570618467356 100644
+--- a/hw/usb/hcd-xhci-sysbus.c
++++ b/hw/usb/hcd-xhci-sysbus.c
+@@ -69,8 +69,8 @@ static void xhci_sysbus_instance_init(Object *obj)
+ }
+ 
+ static Property xhci_sysbus_props[] = {
+-    DEFINE_PROP_UINT32("intrs", XHCISysbusState, xhci.numintrs, MAXINTRS),
+-    DEFINE_PROP_UINT32("slots", XHCISysbusState, xhci.numslots, MAXSLOTS),
++    DEFINE_PROP_UINT32("intrs", XHCISysbusState, xhci.numintrs, XHCI_MAXINTRS),
++    DEFINE_PROP_UINT32("slots", XHCISysbusState, xhci.numslots, XHCI_MAXSLOTS),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 5e8bed9ef90c..79ce5c4be6c4 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -46,15 +46,13 @@
+ #define TRANSFER_LIMIT  256
+ 
+ #define LEN_CAP         0x40
+-#define LEN_OPER        (0x400 + 0x10 * MAXPORTS)
+-#define LEN_RUNTIME     ((MAXINTRS + 1) * 0x20)
+-#define LEN_DOORBELL    ((MAXSLOTS + 1) * 0x20)
++#define LEN_OPER        (0x400 + 0x10 * XHCI_MAXPORTS)
++#define LEN_RUNTIME     ((XHCI_MAXINTRS + 1) * 0x20)
++#define LEN_DOORBELL    ((XHCI_MAXSLOTS + 1) * 0x20)
+ 
+ #define OFF_OPER        LEN_CAP
+ #define OFF_RUNTIME     0x1000
+ #define OFF_DOORBELL    0x2000
+-/* must be power of 2 */
+-#define LEN_REGS        0x4000
+ 
+ #if (OFF_OPER + LEN_OPER) > OFF_RUNTIME
+ #error Increase OFF_RUNTIME
+@@ -62,8 +60,8 @@
+ #if (OFF_RUNTIME + LEN_RUNTIME) > OFF_DOORBELL
+ #error Increase OFF_DOORBELL
+ #endif
+-#if (OFF_DOORBELL + LEN_DOORBELL) > LEN_REGS
+-# error Increase LEN_REGS
++#if (OFF_DOORBELL + LEN_DOORBELL) > XHCI_LEN_REGS
++# error Increase XHCI_LEN_REGS
+ #endif
+ 
+ /* bit definitions */
+@@ -3276,11 +3274,11 @@ static void usb_xhci_init(XHCIState *xhci)
+ 
+     xhci->usbsts = USBSTS_HCH;
+ 
+-    if (xhci->numports_2 > MAXPORTS_2) {
+-        xhci->numports_2 = MAXPORTS_2;
++    if (xhci->numports_2 > XHCI_MAXPORTS_2) {
++        xhci->numports_2 = XHCI_MAXPORTS_2;
+     }
+-    if (xhci->numports_3 > MAXPORTS_3) {
+-        xhci->numports_3 = MAXPORTS_3;
++    if (xhci->numports_3 > XHCI_MAXPORTS_3) {
++        xhci->numports_3 = XHCI_MAXPORTS_3;
+     }
+     usbports = MAX(xhci->numports_2, xhci->numports_3);
+     xhci->numports = xhci->numports_2 + xhci->numports_3;
+@@ -3302,7 +3300,7 @@ static void usb_xhci_init(XHCIState *xhci)
+                 USB_SPEED_MASK_LOW  |
+                 USB_SPEED_MASK_FULL |
+                 USB_SPEED_MASK_HIGH;
+-            assert(i < MAXPORTS);
++            assert(i < XHCI_MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb2 port #%d", i+1);
+             speedmask |= port->speedmask;
+         }
+@@ -3316,7 +3314,7 @@ static void usb_xhci_init(XHCIState *xhci)
+             }
+             port->uport = &xhci->uports[i];
+             port->speedmask = USB_SPEED_MASK_SUPER;
+-            assert(i < MAXPORTS);
++            assert(i < XHCI_MAXPORTS);
+             snprintf(port->name, sizeof(port->name), "usb3 port #%d", i+1);
+             speedmask |= port->speedmask;
+         }
+@@ -3331,8 +3329,8 @@ static void usb_xhci_realize(DeviceState *dev, Error **errp)
+ 
+     XHCIState *xhci = XHCI(dev);
+ 
+-    if (xhci->numintrs > MAXINTRS) {
+-        xhci->numintrs = MAXINTRS;
++    if (xhci->numintrs > XHCI_MAXINTRS) {
++        xhci->numintrs = XHCI_MAXINTRS;
+     }
+     while (xhci->numintrs & (xhci->numintrs - 1)) {   /* ! power of 2 */
+         xhci->numintrs++;
+@@ -3340,8 +3338,8 @@ static void usb_xhci_realize(DeviceState *dev, Error **errp)
+     if (xhci->numintrs < 1) {
+         xhci->numintrs = 1;
+     }
+-    if (xhci->numslots > MAXSLOTS) {
+-        xhci->numslots = MAXSLOTS;
++    if (xhci->numslots > XHCI_MAXSLOTS) {
++        xhci->numslots = XHCI_MAXSLOTS;
+     }
+     if (xhci->numslots < 1) {
+         xhci->numslots = 1;
+@@ -3355,7 +3353,7 @@ static void usb_xhci_realize(DeviceState *dev, Error **errp)
+     usb_xhci_init(xhci);
+     xhci->mfwrap_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, xhci_mfwrap_timer, xhci);
+ 
+-    memory_region_init(&xhci->mem, OBJECT(dev), "xhci", LEN_REGS);
++    memory_region_init(&xhci->mem, OBJECT(dev), "xhci", XHCI_LEN_REGS);
+     memory_region_init_io(&xhci->mem_cap, OBJECT(dev), &xhci_cap_ops, xhci,
+                           "capabilities", LEN_CAP);
+     memory_region_init_io(&xhci->mem_oper, OBJECT(dev), &xhci_oper_ops, xhci,
+-- 
+2.27.0
 
 
