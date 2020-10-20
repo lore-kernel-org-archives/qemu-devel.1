@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B505C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E90F6C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC4302225F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 407592225F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i4XGvKQD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC4302225F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GrwZviTm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407592225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39384 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUxYI-0007fe-Qy
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:44:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43070)
+	id 1kUxYi-00084w-4q
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:44:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43094)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRQ-0006nr-0U
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46577)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRR-0006rZ-AU
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28314)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRN-00015j-Cj
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:03 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRO-00016a-To
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603222614;
+ s=mimecast20190719; t=1603222621;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=hP/4T0zG6g9Hvmx+Yu4vPHzZJOt+8Khgz5pfCdrLA0g=;
- b=i4XGvKQDvtx6RkTEhIU4msSyKiJ9e5R7H2+WgPz40acTLbncQ8vkdHw3PXIvoS+EX+FQLh
- dlPMzpsTvR0oP3AKJHZV0Y2l77R19vpjoWrHzyLhcUoAhZmjgtP1A/FZonDdL6+BDPeQJF
- k+QwQJyQ2lJvKpOL06A7o04G2Qv8m5A=
+ bh=79GMuVmF7GJj2WwzlD3/UxNAdI37gZGCq/ccc0tMkUU=;
+ b=GrwZviTmtxIgrMvZUm2poyJYeeLoED1Rqb09O+NqVEhYhYyM5EOVb15NtaTAe5i5TUUUbS
+ k6PHzN/2hOLFkr7CWTV6zz0oJoZPNhgWzHTBstb6oV/YVkAb7CiFUHSRhCxto+8djcCWt0
+ RfrenQiyUqQTinCmcNOHuyXwtT/eZ+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-46-aIfhnjnkPIy0IEjHe-bhEQ-1; Tue, 20 Oct 2020 15:36:53 -0400
-X-MC-Unique: aIfhnjnkPIy0IEjHe-bhEQ-1
+ us-mta-448-XZD-CJmAPoiP4B644XpuiA-1; Tue, 20 Oct 2020 15:36:58 -0400
+X-MC-Unique: XZD-CJmAPoiP4B644XpuiA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C964B801AC4;
- Tue, 20 Oct 2020 19:36:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3E7810866A4;
+ Tue, 20 Oct 2020 19:36:56 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EE2A85C1C2;
- Tue, 20 Oct 2020 19:36:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F3A6A5C1C2;
+ Tue, 20 Oct 2020 19:36:51 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 14/15] python/qemu: add isort to pipenv
-Date: Tue, 20 Oct 2020 15:35:54 -0400
-Message-Id: <20201020193555.1493936-15-jsnow@redhat.com>
+Subject: [PATCH v3 15/15] python/qemu: add qemu package itself to pipenv
+Date: Tue, 20 Oct 2020 15:35:55 -0400
+Message-Id: <20201020193555.1493936-16-jsnow@redhat.com>
 In-Reply-To: <20201020193555.1493936-1-jsnow@redhat.com>
 References: <20201020193555.1493936-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -68,8 +68,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
@@ -108,54 +108,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-isort 5.0.0 through 5.0.4 has a bug that causes it to misinterpret
-certain "from ..." clauses that are not related to imports.
+This adds the python qemu packages themselves to the pipenv manifest.
+'pipenv sync' will create a virtual environment sufficient to use the SDK.
+'pipenv sync --dev' will create a virtual environment sufficient to use
+and test the SDK (with pylint, mypy, isort, flake8, etc.)
 
-Require 5.0.5 or greater.
-
-isort can be run with 'isort -c qemu' from the python root.
+The qemu packages are installed in 'editable' mode; all changes made to
+the python package inside the git tree will be reflected in the
+installed package without reinstallation. This includes changes made
+via git pull and so on.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
  python/Pipfile      | 1 +
- python/Pipfile.lock | 4 ++--
- 2 files changed, 3 insertions(+), 2 deletions(-)
+ python/Pipfile.lock | 9 +++++++--
+ 2 files changed, 8 insertions(+), 2 deletions(-)
 
 diff --git a/python/Pipfile b/python/Pipfile
-index 51c537b0d1..75b96f29d8 100644
+index 75b96f29d8..214fb175e7 100644
 --- a/python/Pipfile
 +++ b/python/Pipfile
-@@ -5,6 +5,7 @@ verify_ssl = true
- 
- [dev-packages]
- flake8 = ">=3.6.0"
-+isort = ">=5.0.5"
- mypy = ">=0.770"
+@@ -10,6 +10,7 @@ mypy = ">=0.770"
  pylint = ">=2.6.0"
  
+ [packages]
++qemu = {editable = true,path = "."}
+ 
+ [requires]
+ python_version = "3.6"
 diff --git a/python/Pipfile.lock b/python/Pipfile.lock
-index 376f95a6a8..74563b444c 100644
+index 74563b444c..386ca54ea6 100644
 --- a/python/Pipfile.lock
 +++ b/python/Pipfile.lock
 @@ -1,7 +1,7 @@
  {
      "_meta": {
          "hash": {
--            "sha256": "65f010a8f2e55e9870d2b7e0d8af129516097d23abf2504f396552748b067ade"
-+            "sha256": "b89c7a1b8a414f2a4cd708964123fb427d55419ee0b39e088bf2e7d4fbc11979"
+-            "sha256": "b89c7a1b8a414f2a4cd708964123fb427d55419ee0b39e088bf2e7d4fbc11979"
++            "sha256": "e38d142c3fadc2f2ed849e86f7ebd14e25974dc12228751490aef5a9ee074f2f"
          },
          "pipfile-spec": 6,
          "requires": {
-@@ -46,7 +46,7 @@
-                 "sha256:dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7",
-                 "sha256:dcaeec1b5f0eca77faea2a35ab790b4f3680ff75590bfcb7145986905aab2f58"
-             ],
--            "markers": "python_version >= '3.6' and python_version < '4.0'",
-+            "index": "pypi",
-             "version": "==5.6.4"
-         },
-         "lazy-object-proxy": {
+@@ -15,7 +15,12 @@
+             }
+         ]
+     },
+-    "default": {},
++    "default": {
++        "qemu": {
++            "editable": true,
++            "path": "."
++        }
++    },
+     "develop": {
+         "astroid": {
+             "hashes": [
 -- 
 2.26.2
 
