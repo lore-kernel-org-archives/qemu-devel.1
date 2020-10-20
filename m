@@ -2,109 +2,91 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF7DAC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 712DBC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:58:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1922722249
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:57:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C3F8E22249
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:58:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hGTTkUG0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1922722249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tZHqj/4q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C3F8E22249
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUu0r-00045f-2b
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:57:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36956)
+	id 1kUu1j-0005zV-Nd
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:58:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kUtzq-0003FG-0V
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:56:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55276)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kUtzo-0003jo-Ba
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:56:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603209379;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=qtWvl8nlLkFHzSOYM9skQyMfI3OVf/eTkUnCggWZHxY=;
- b=hGTTkUG0sfO7GClsD/R1uGQBSAlnNCaWC32X58gDSeHHdpOdwnWXpee5X5KVlAaO118qdL
- jKMsn26+vcpdCGtCTeR39byfsRmokSkIHayikIZKMJTpsyQppeiC7MX+i1EKt7nK9fgDYp
- eNNY/spw7vRYbeHGrfB19IdTaK45uvw=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-245-P0hIQncKOIKDXzTVbz3yhA-1; Tue, 20 Oct 2020 11:56:15 -0400
-X-MC-Unique: P0hIQncKOIKDXzTVbz3yhA-1
-Received: by mail-wr1-f70.google.com with SMTP id v5so1000583wrr.0
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:56:15 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUu0Y-00049M-Ql
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:06 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:45190)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUu0V-0003pH-FN
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:06 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id e17so2770782wru.12
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=XOCeDt/XshK6ncC0g9UgbF4Gv2PxS5XPW6TaNeQwZoc=;
+ b=tZHqj/4qIYoda6/BxM5FiSZthev/nTdKYHosS4UsZ1UgSUQ8KplFQLXjUR/CWwk/VM
+ VAqhl6tNr7v4U1KlWryYSUsbDfGygNrXMLjAn0v+8PIeLdWyX+Cxk9Fq91n+QQtVPVK0
+ OpbztpwG3R6MyQ8lx3hmuQDw0Z3slfTe4pQxgn/604yUSO0CJ5t7M+SdSkRUTVXhtF/a
+ xOuZfAQpv+t7znFuKyIocjz5vwekiEcFXrb6skwSY7eL4RF60CRkWZZ3Fb9JtbiTOt2q
+ KQv6V/JlEDs7RELFt4pmHLfBTt4YoqnW0fTUU4EjQ70IXqtXtIr9j5Ri+z96RRv23C6V
+ u0rA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=qtWvl8nlLkFHzSOYM9skQyMfI3OVf/eTkUnCggWZHxY=;
- b=HNNNeAlycFxbtAKqpQIWUspOdiliwYb4idRAK+6CyzvZXUdbolYBy3oDwnOcf2fGKc
- keoGhQmXmD4RC9JTewjmDsLalQYBuPkT1HyjGJBvrQx9qNvTRm5AAj90cC4g0SwNR02W
- mEYzArLqDhgiZ1yENbTsKwe0VhWnc9t/nNV84t6Fwtd5PuX8cpCxV5bKfrhoNoAA/gkW
- gTxAJ1APLKFOLnkrZJZ4fpy84B9lSL/XcjqO+X9WyHhbDsZlnqE2XbZ0yL4Xl5VDrWdw
- +WsWcleLyD/VC+YaDaYF7JUVu5hEy8exLcM05a6BkI/cryAEkA3mrcBeDWQVLwmL1dUx
- 1awA==
-X-Gm-Message-State: AOAM533ZdVD2nqS7YWR3DPOjm5gZp9B9khA40m1EkhXLq8iu1QxqpfaU
- Qkbw2nJVVgegUYyVYguH+jfUYKM2wGadrazGEE7Kwg0lcBdaAfsX5g2KNUMSU1z+Vte0/AlSsok
- 16xUGBgt+63FFa9s=
-X-Received: by 2002:a1c:5f46:: with SMTP id t67mr3517474wmb.173.1603209374228; 
- Tue, 20 Oct 2020 08:56:14 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxJ1oHO0/ErRe6BrHvDOp0Djk8qGyUpEoeRpvuWcD0LE7DXYf+CtaFbDigXNNungqohOYlmIw==
-X-Received: by 2002:a1c:5f46:: with SMTP id t67mr3517452wmb.173.1603209374026; 
- Tue, 20 Oct 2020 08:56:14 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id n9sm3548869wrq.72.2020.10.20.08.56.11
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Oct 2020 08:56:11 -0700 (PDT)
-Subject: Re: [PATCH v5] sev: add sev-inject-launch-secret
-To: Eduardo Habkost <ehabkost@redhat.com>
-References: <20201015143713.14682-1-tobin@linux.ibm.com>
- <2f1be055-58c8-dcf8-debc-8956636d8ef8@redhat.com>
- <20201020135444.GR5733@habkost.net>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e4bc6348-cda5-e7f5-3753-61f4d3ba0116@redhat.com>
-Date: Tue, 20 Oct 2020 17:56:10 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=XOCeDt/XshK6ncC0g9UgbF4Gv2PxS5XPW6TaNeQwZoc=;
+ b=W3ilkHsp7MAlJMhRYhxse5SEWZk1trZlcT9xB5p7eQCoOBvPnJj15UQ2dpTG3kci+B
+ bmAz1fMOwnIjN1PjmKMGlzbER73hNhH/8E4PIr0PhUkQQt1s63g9CrKrfPJsaBeEpFj5
+ Cbe8kNcc6H+468ZMSTcBoi0T3kUOOSqFUHgPrYwmJLuQLJes5d5YSmXmGUqTh4JonheC
+ Ihb/aDlx87UU/vhftMJkMmJAt9SvIqsS4LcJrUgcXCoI+96YGlZPvrJsk1iUx7+o4MoP
+ wYOMQ5WskxHXyEVs9IQm3/hh9bZo9r5Z3OdN7IxhlDxW8NX9vjSho/c2ZheWEKw67HqN
+ 2rCw==
+X-Gm-Message-State: AOAM530hIlNBYmlF6sU5cKPclCXrKRGcPVNrKEQDni5SQ3/qiWpidrrm
+ KMfCEQOU45TRBU/AU1u54trptdSX1zO0aQ==
+X-Google-Smtp-Source: ABdhPJwboZ4UfVuz4A7gY+F7hoiDjeZNUsyWT/3PG7mvM5grmFqJRnN8qe7eLsAl+32nEaJDtzMrLg==
+X-Received: by 2002:adf:b353:: with SMTP id k19mr4198342wrd.216.1603209420838; 
+ Tue, 20 Oct 2020 08:57:00 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.56.59
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Oct 2020 08:56:59 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 01/41] target/arm: Fix SMLAD incorrect setting of Q bit
+Date: Tue, 20 Oct 2020 16:56:16 +0100
+Message-Id: <20201020155656.8045-2-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
+References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20201020135444.GR5733@habkost.net>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,42 +100,120 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
- tobin@ibm.com, qemu-devel@nongnu.org, dgilbert@redhat.com, tobin@linux.ibm.com,
- berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20/10/20 15:54, Eduardo Habkost wrote:
-> On Tue, Oct 20, 2020 at 11:03:51AM +0200, Paolo Bonzini wrote:
->> On 15/10/20 16:37, tobin@linux.ibm.com wrote:
->>> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error **errp)
->>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, Error **errp)
->>>  {
->>>      MemoryRegionSection mrs = memory_region_find(get_system_memory(),
->>> -                                                 addr, 1);
->>> +                                                 addr, size);
->>
->> You need to check size against mrs.size and fail if mrs.size is smaller.
->>  Otherwise, the ioctl can access memory out of range.
-> 
-> Good catch!  I'm dequeuing it.
-> 
-> Is there a reason memory_region_find() doesn't ensure that by
-> default?
+The SMLAD instruction is supposed to:
+ * signed multiply Rn[15:0] * Rm[15:0]
+ * signed multiply Rn[31:16] * Rm[31:16]
+ * perform a signed addition of the products and Ra
+ * set Rd to the low 32 bits of the theoretical
+   infinite-precision result
+ * set the Q flag if the sign-extension of Rd
+   would differ from the infinite-precision result
+   (ie on overflow)
 
-IIRC memory_region_find() was used to do DMA in the very first versions
-of "virtio-blk dataplane" so you would call it multiple times in a loop.
- So it's like that because it maps the way address_space_map() works.
+Our current implementation doesn't quite do this, though: it performs
+an addition of the products setting Q on overflow, and then it adds
+Ra, again possibly setting Q.  This sometimes incorrectly sets Q when
+the architecturally mandated only-check-for-overflow-once algorithm
+does not. For instance:
+ r1 = 0x80008000; r2 = 0x80008000; r3 = 0xffffffff
+ smlad r0, r1, r2, r3
+This is (-32768 * -32768) + (-32768 * -32768) - 1
 
-> The call at virtio_balloon_handle_output() looks suspicious,
-> though, because it looks for a BALLOON_PAGE_SIZE range, but
-> there's no check for the returned section size.
+The products are both 0x4000_0000, so when added together as 32-bit
+signed numbers they overflow (and QEMU sets Q), but because the
+addition of Ra == -1 brings the total back down to 0x7fff_ffff
+there is no overflow for the complete operation and setting Q is
+incorrect.
 
-I think it's not a bug because ultimately it's checked in
-ram_block_discard_range, but it's not pretty.
+Fix this edge case by resorting to 64-bit arithmetic for the
+case where we need to add three values together.
 
-Paolo
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201009144712.11187-1-peter.maydell@linaro.org
+---
+ target/arm/translate.c | 58 ++++++++++++++++++++++++++++++++++--------
+ 1 file changed, 48 insertions(+), 10 deletions(-)
+
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index d34c1d351a6..d8729e42c48 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -7401,21 +7401,59 @@ static bool op_smlad(DisasContext *s, arg_rrrr *a, bool m_swap, bool sub)
+     gen_smul_dual(t1, t2);
+ 
+     if (sub) {
+-        /* This subtraction cannot overflow. */
++        /*
++         * This subtraction cannot overflow, so we can do a simple
++         * 32-bit subtraction and then a possible 32-bit saturating
++         * addition of Ra.
++         */
+         tcg_gen_sub_i32(t1, t1, t2);
++        tcg_temp_free_i32(t2);
++
++        if (a->ra != 15) {
++            t2 = load_reg(s, a->ra);
++            gen_helper_add_setq(t1, cpu_env, t1, t2);
++            tcg_temp_free_i32(t2);
++        }
++    } else if (a->ra == 15) {
++        /* Single saturation-checking addition */
++        gen_helper_add_setq(t1, cpu_env, t1, t2);
++        tcg_temp_free_i32(t2);
+     } else {
+         /*
+-         * This addition cannot overflow 32 bits; however it may
+-         * overflow considered as a signed operation, in which case
+-         * we must set the Q flag.
++         * We need to add the products and Ra together and then
++         * determine whether the final result overflowed. Doing
++         * this as two separate add-and-check-overflow steps incorrectly
++         * sets Q for cases like (-32768 * -32768) + (-32768 * -32768) + -1.
++         * Do all the arithmetic at 64-bits and then check for overflow.
+          */
+-        gen_helper_add_setq(t1, cpu_env, t1, t2);
+-    }
+-    tcg_temp_free_i32(t2);
++        TCGv_i64 p64, q64;
++        TCGv_i32 t3, qf, one;
+ 
+-    if (a->ra != 15) {
+-        t2 = load_reg(s, a->ra);
+-        gen_helper_add_setq(t1, cpu_env, t1, t2);
++        p64 = tcg_temp_new_i64();
++        q64 = tcg_temp_new_i64();
++        tcg_gen_ext_i32_i64(p64, t1);
++        tcg_gen_ext_i32_i64(q64, t2);
++        tcg_gen_add_i64(p64, p64, q64);
++        load_reg_var(s, t2, a->ra);
++        tcg_gen_ext_i32_i64(q64, t2);
++        tcg_gen_add_i64(p64, p64, q64);
++        tcg_temp_free_i64(q64);
++
++        tcg_gen_extr_i64_i32(t1, t2, p64);
++        tcg_temp_free_i64(p64);
++        /*
++         * t1 is the low half of the result which goes into Rd.
++         * We have overflow and must set Q if the high half (t2)
++         * is different from the sign-extension of t1.
++         */
++        t3 = tcg_temp_new_i32();
++        tcg_gen_sari_i32(t3, t1, 31);
++        qf = load_cpu_field(QF);
++        one = tcg_const_i32(1);
++        tcg_gen_movcond_i32(TCG_COND_NE, qf, t2, t3, one, qf);
++        store_cpu_field(qf, QF);
++        tcg_temp_free_i32(one);
++        tcg_temp_free_i32(t3);
+         tcg_temp_free_i32(t2);
+     }
+     store_reg(s, a->rd, t1);
+-- 
+2.20.1
 
 
