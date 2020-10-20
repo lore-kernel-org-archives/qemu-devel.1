@@ -2,89 +2,93 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C289C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 01:39:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5D5C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:06:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2525022244
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 01:39:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B054E2222F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:06:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A7mqDmUV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2525022244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/fiaVos"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B054E2222F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58062 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUgcU-00025d-2c
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 21:39:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50074)
+	id 1kUh2w-0005UZ-J7
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 22:06:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kUgbm-0001fH-Nk
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 21:38:38 -0400
-Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:34611)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
- id 1kUgbk-00024w-NI
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 21:38:38 -0400
-Received: by mail-io1-xd43.google.com with SMTP id z5so579213iob.1
- for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 18:38:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=WQ+zWkOTSia8+hOtCzfR94LCldPx7U8qnc/EYzzhllA=;
- b=A7mqDmUVL5V49q68VsY2kNWLfmIZx+IRPXcNMn4TgbbYkiNPclSVFYphSa+gEmVyCe
- qHbLDfmMTFYxEfy/e+jKvfIE8JfcuLoUU2LSuAGDAjT57725naPa9iGKNHij7bSmED1U
- wPyDkhu6fE5Uo7mBzVk+qZ9wgsADyk9ptEKFTlOj5bMUeqkb4I3wdWnJ3TCkQorunDqd
- /ZoXBKuW0KKvZ7nNxM/KY6iGZHcw+EFTCkvi63dQpA+YoSeEVBpQAba+GDI/js3cjMhX
- tjJ1AFROv4FjavpZJrtIMgkps4g7WKhLhkIVds/M3XXg1EyES4lBypdLT/Cw/hBiGXdO
- xV8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=WQ+zWkOTSia8+hOtCzfR94LCldPx7U8qnc/EYzzhllA=;
- b=WSPd54Is/6iaqyspRk5C9Q5ShVCP4Fl5pCn2rnk83IMPq2O6bmvMy9aeuCO2glV3wv
- /Eg9ZetHwN/5TJ4az5CzPcCAaUajK+FXu18+A5g0ZqPmgI2ScVs6ZL8YJeheuMTkbASs
- eq6ZViu2SoQWG+rKVYU6mFtY/ktNbtmacB5ZGU0SGFEd2NtOpyv6UrIjARisNqUcxQBa
- Lhe7aYIbZF0CH9omDyFhqsWDEF8+ZoBMQEx14oJBO1ryilVpiMyoQ0YsEnbHHW/4ev6e
- dyhhDB5YBNQcVzwOM6MOqVCxXz7Q6tv3U5hHe9+YUWmMxCYkJlVSRlTG3TdEVTM9kHGU
- dp2g==
-X-Gm-Message-State: AOAM532NQSpqvpUoVJaGXIDQXW3M4pgG+NrWeTKGKAkWqaoStY0bg57s
- u4Obc1dBw8AVJP7GrFHvX7x3ZdMNkLVmGOPZMT0=
-X-Google-Smtp-Source: ABdhPJxNWXN6utvnZ8eztI5RbYaglKAr/Ix/nRJjyLLeMJ5bVynHn1yzGIgV0WmVhHVgkd/0/QXCeNgfyxBjWPZlPlw=
-X-Received: by 2002:a6b:8bd7:: with SMTP id n206mr457388iod.13.1603157914985; 
- Mon, 19 Oct 2020 18:38:34 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kUh10-0004dS-Be
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:04:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43088)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kUh0v-0005aN-KV
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:04:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603159473;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=sJ9mnbPhLqETFjr0TlQcoVWNbgqv7mKfYOPkF5VzMQc=;
+ b=X/fiaVosNGTX/R/E0RWhCb183zWcE85OuQf4lQJiHEChqdXjY0MxffHPUxDJ0T0RWC9v5L
+ 7lWKYbPo1/Z91QhluxkTFuszlRrmcF3g83Mcjt44S/QSFl1X1bFAu16NqH4WAwjQr4rwd5
+ W1GUvwGHaSx4VeHqw21n1qIrg+Wd4qQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-306-dfpwWhpSOK-FMu4GvP1BXg-1; Mon, 19 Oct 2020 22:04:31 -0400
+X-MC-Unique: dfpwWhpSOK-FMu4GvP1BXg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72A9757240;
+ Tue, 20 Oct 2020 02:04:29 +0000 (UTC)
+Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 604955B4AE;
+ Tue, 20 Oct 2020 02:04:11 +0000 (UTC)
+Subject: Re: [PATCH v2 0/5] memory: Skip assertion in
+ memory_region_unregister_iommu_notifier
+To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
+ qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
+References: <20201019104244.21830-1-eperezma@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <ed3e1d6e-263c-f3da-15d2-deaae3b7a734@redhat.com>
+Date: Tue, 20 Oct 2020 10:04:09 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-References: <1602831120-3377-1-git-send-email-chenhc@lemote.com>
- <1602831120-3377-2-git-send-email-chenhc@lemote.com>
- <bfb682a3-0e1f-926c-66a9-976a1659d534@amsat.org>
-In-Reply-To: <bfb682a3-0e1f-926c-66a9-976a1659d534@amsat.org>
-From: Huacai Chen <chenhuacai@gmail.com>
-Date: Tue, 20 Oct 2020 09:38:23 +0800
-Message-ID: <CAAhV-H5Gaaxi5vY_u=MsoEqJ4i1zhLQYgk4iL8_rHxsG-rv6ww@mail.gmail.com>
-Subject: Re: [PATCH V14 1/8] target/mips: Fix PageMask with variable page size
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
- envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd43.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201019104244.21830-1-eperezma@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:04:33
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,164 +102,218 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Huacai Chen <zltjiangshi@gmail.com>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
+Cc: Peter Maydell <peter.maydell@linaro.org>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
+ Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
+ Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
+ =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
+ Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, Philippe,
 
-On Fri, Oct 16, 2020 at 11:15 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
-rg> wrote:
+On 2020/10/19 下午6:42, Eugenio Pérez wrote:
+> I am able to hit this assertion when a Red Hat 7 guest virtio_net device
+> raises an "Invalidation" of all the TLB entries. This happens in the
+> guest's startup if 'intel_iommu=on' argument is passed to the guest
+> kernel and right IOMMU/ATS devices are declared in qemu's command line.
 >
-> On 10/16/20 8:51 AM, Huacai Chen wrote:
-> > From: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> >
-> > Our current code assumed the target page size is always 4k
-> > when handling PageMask and VPN2, however, variable page size
-> > was just added to mips target and that's no longer true.
-> >
-> > Fixes: ee3863b9d414 ("target/mips: Support variable page size")
-> > Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
-> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
-> > ---
-> >   target/mips/cp0_helper.c | 36 +++++++++++++++++++++++++++++-------
-> >   target/mips/cpu.h        |  1 +
-> >   2 files changed, 30 insertions(+), 7 deletions(-)
-> >
-> > diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-> > index de64add038..f3478d826b 100644
-> > --- a/target/mips/cp0_helper.c
-> > +++ b/target/mips/cp0_helper.c
-> > @@ -867,13 +867,35 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, t=
-arget_ulong arg1)
-> >
-> >   void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *p=
-agemask)
-> >   {
-> > -    uint64_t mask =3D arg1 >> (TARGET_PAGE_BITS + 1);
-> > -    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 =3D=3D ~0) ||
-> > -        (mask =3D=3D 0x0000 || mask =3D=3D 0x0003 || mask =3D=3D 0x000=
-F ||
-> > -         mask =3D=3D 0x003F || mask =3D=3D 0x00FF || mask =3D=3D 0x03F=
-F ||
-> > -         mask =3D=3D 0x0FFF || mask =3D=3D 0x3FFF || mask =3D=3D 0xFFF=
-F)) {
-> > -        env->CP0_PageMask =3D arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK <=
-< 1));
-> > +    unsigned long mask;
-> > +    int maskbits;
-> > +
-> > +    if (env->insn_flags & ISA_MIPS32R6) {
-> > +        return;
-> > +    }
-> > +    /* Don't care MASKX as we don't support 1KB page */
-> > +    mask =3D extract32((uint32_t)arg1, CP0PM_MASK, 16);
-> > +    maskbits =3D find_first_zero_bit(&mask, 32);
-> > +
-> > +    /* Ensure no more set bit after first zero */
-> > +    if (mask >> maskbits) {
-> > +        goto invalid;
-> > +    }
-> > +    /* We don't support VTLB entry smaller than target page */
-> > +    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-> > +        goto invalid;
-> >       }
-> > +    env->CP0_PageMask =3D mask << CP0PM_MASK;
-> > +
-> > +    return;
-> > +
-> > +invalid:
-> > +    /*
-> > +     * When invalid, ensure the value is bigger than or equal to
-> > +     * the minimal but smaller than or equal to the maxium.
-> > +     */
-> > +    maskbits =3D MIN(16, MAX(maskbits, TARGET_PAGE_BITS - 12));
-> > +    env->CP0_PageMask =3D ((1 << (16 + 1)) - 1) << CP0PM_MASK;
-> >   }
-> >
-> >   void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
-> > @@ -1104,7 +1126,7 @@ void helper_mthc0_saar(CPUMIPSState *env, target_=
-ulong arg1)
-> >   void helper_mtc0_entryhi(CPUMIPSState *env, target_ulong arg1)
-> >   {
-> >       target_ulong old, val, mask;
-> > -    mask =3D (TARGET_PAGE_MASK << 1) | env->CP0_EntryHi_ASID_mask;
-> > +    mask =3D ~((1 << 14) - 1) | env->CP0_EntryHi_ASID_mask;
-> >       if (((env->CP0_Config4 >> CP0C4_IE) & 0x3) >=3D 2) {
-> >           mask |=3D 1 << CP0EnHi_EHINV;
-> >       }
-> > diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-> > index 7cf7f5239f..9c8bb23807 100644
-> > --- a/target/mips/cpu.h
-> > +++ b/target/mips/cpu.h
-> > @@ -618,6 +618,7 @@ struct CPUMIPSState {
-> >    * CP0 Register 5
-> >    */
-> >       int32_t CP0_PageMask;
-> > +#define CP0PM_MASK 13
-> >       int32_t CP0_PageGrain_rw_bitmask;
-> >       int32_t CP0_PageGrain;
-> >   #define CP0PG_RIE 31
-> >
+> Command line:
+> /home/qemu/x86_64-softmmu/qemu-system-x86_64 -name \
+> guest=rhel7-test,debug-threads=on -machine \
+> pc-q35-5.1,accel=kvm,usb=off,dump-guest-core=off,kernel_irqchip=split \
+> -cpu \
+> Broadwell,vme=on,ss=on,vmx=on,f16c=on,rdrand=on,hypervisor=on,arat=on,tsc-adjust=on,umip=on,arch-capabilities=on,xsaveopt=on,pdpe1gb=on,abm=on,skip-l1dfl-vmentry=on,rtm=on,hle=on \
+> -m 8096 -realtime mlock=off -smp 2,sockets=2,cores=1,threads=1 -uuid \
+> d022ecbf-679e-4755-87ce-eb87fc5bbc5d -display none -no-user-config \
+> -nodefaults -rtc base=utc,driftfix=slew -global \
+> kvm-pit.lost_tick_policy=delay -no-hpet -no-shutdown -global \
+> ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 -boot strict=on \
+> -device intel-iommu,intremap=on,device-iotlb=on -device \
+> pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1 \
+> -device \
+> pcie-root-port,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x1.0x1 \
+> -device \
+> pcie-root-port,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x1.0x2 \
+> -device \
+> pcie-root-port,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x1.0x3 \
+> -device \
+> pcie-root-port,port=0xc,chassis=5,id=pci.5,bus=pcie.0,addr=0x1.0x4 \
+> -device \
+> pcie-root-port,port=0xd,chassis=6,id=pci.6,bus=pcie.0,addr=0x1.0x5 \
+> -device \
+> pcie-root-port,port=0xe,chassis=7,id=pci.7,bus=pcie.0,addr=0x1.0x6 \
+> -device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 -device \
+> virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -drive \
+> file=/home/virtio-test2.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 \
+> -device \
+> virtio-blk-pci,scsi=off,bus=pci.4,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
+> -netdev tap,id=hostnet0,vhost=on,vhostforce=on -device \
+> virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:0d:1d:f2,bus=pci.1,addr=0x0,iommu_platform=on,ats=on \
+> -device virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 -object \
+> rng-random,id=objrng0,filename=/dev/urandom -device \
+> virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.6,addr=0x0 -s -msg \
+> timestamp=on
 >
-> Malta test failing:
+> Full backtrace:
+>   #0  0x00007ffff521370f in raise () at /lib64/libc.so.6
+>   #1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
+>   #2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
+>   #3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
+>   #4  0x0000555555888171 in memory_region_notify_one (notifier=0x7ffde0487fa8,
+>                                                      entry=0x7ffde5dfe200)
+>                            at /home/qemu/memory.c:1918
+>   #5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=0x555556f6c0b0,
+>                                                        iommu_idx=0, entry=...)
+>                            at /home/qemu/memory.c:1941
+>   #6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=0x555557609000,
+>                                                         inv_desc=0x7ffde5dfe2d0)
+>                            at /home/qemu/hw/i386/intel_iommu.c:2468
+>   #7  0x0000555555951e6a in vtd_process_inv_desc (s=0x555557609000)
+>                            at /home/qemu/hw/i386/intel_iommu.c:2531
+>   #8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=0x555557609000)
+>                            at /home/qemu/hw/i386/intel_iommu.c:2563
+>   #9  0x00005555559520e5 in vtd_handle_iqt_write (s=0x555557609000)
+>                            at /home/qemu/hw/i386/intel_iommu.c:2590
+>   #10 0x0000555555952b45 in vtd_mem_write (opaque=0x555557609000, addr=136,
+>                                           val=2688, size=4)
+>                            at /home/qemu/hw/i386/intel_iommu.c:2837
+>   #11 0x0000555555883e17 in memory_region_write_accessor (mr=0x555557609330,
+>                                                          addr=136,
+>                                                          value=0x7ffde5dfe478,
+>                                                          size=4,
+>                                                          shift=0,
+>                                                          mask=4294967295,
+>                                                          attrs=...)
+>                           at /home/qemu/memory.c:483
+>   #12 0x000055555588401d in access_with_adjusted_size (addr=136,
+>                         value=0x7ffde5dfe478,
+>                         size=4,
+>                         access_size_min=4,
+>                         access_size_max=8,
+>                         access_fn=0x555555883d38 <memory_region_write_accessor>,
+>                         mr=0x555557609330,
+>                         attrs=...)
+>                         at /home/qemu/memory.c:544
+>   #13 0x0000555555886f37 in memory_region_dispatch_write (mr=0x555557609330,
+>                                                         addr=136,
+>                                                         data=2688,
+>                                                         op=MO_32,
+>                                                         attrs=...)
+>                           at /home/qemu/memory.c:1476
+>   #14 0x0000555555827a03 in flatview_write_continue (fv=0x7ffdd8503150,
+>                                                     addr=4275634312,
+>                                                     attrs=...,
+>                                                     ptr=0x7ffff7ff0028,
+>                                                     len=4,
+>                                                     addr1=136,
+>                                                     l=4,
+>                                                     mr=0x555557609330)
+>                            at /home/qemu/exec.c:3146
+>   #15 0x0000555555827b48 in flatview_write (fv=0x7ffdd8503150,
+>                                            addr=4275634312,
+>                                            attrs=...,
+>                                            buf=0x7ffff7ff0028,
+>                                            len=4)
+>                            at /home/qemu/exec.c:3186
+>   #16 0x0000555555827e9d in address_space_write (
+>                                        as=0x5555567ca640 <address_space_memory>,
+>                                        addr=4275634312,
+>                                        attrs=...,
+>                                        buf=0x7ffff7ff0028,
+>                                        len=4)
+>                            at /home/qemu/exec.c:3277
+>   #17 0x0000555555827f0a in address_space_rw (
+>                                        as=0x5555567ca640 <address_space_memory>,
+>                                        addr=4275634312,
+>                                        attrs=...,
+>                                        buf=0x7ffff7ff0028,
+>                                        len=4,
+>                                        is_write=true)
+>                            at /home/qemu/exec.c:3287
+>   #18 0x000055555589b633 in kvm_cpu_exec (cpu=0x555556b65640)
+>                                 at /home/qemu/accel/kvm/kvm-all.c:2511
+>   #19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=0x555556b65640)
+>                                 at /home/qemu/cpus.c:1284
+>   #20 0x0000555555dafff1 in qemu_thread_start (args=0x555556b8c3b0)
+>                                 at util/qemu-thread-posix.c:521
+>   #21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
+>   #22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
 >
-> [    0.000000] Linux version 4.5.0-2-4kc-malta
-> (debian-kernel@lists.debian.org) (gcc version 5.3.1 20160519 (Debian
-> 5.3.1-20) ) #1 Debian 4.5.5-1 (2016-05-29)
-> [    0.000000] earlycon: Early serial console at I/O port 0x3f8 (options
-> '38400n8')
-> [    0.000000] bootconsole [uart0] enabled
-> [    0.000000] CPU0 revision is: 00019300 (MIPS 24Kc)
-> [    0.000000] FPU revision is: 00739300
-> [    0.000000] MIPS: machine is mti,malta
-> [...]
-> Freeing unused kernel memory: 412K (80979000 - 809e0000)
-> do_page_fault(): sending SIGSEGV to mount for invalid write access to
-> 0018a000
-> epc =3D 77848a54 in libc-2.27.so[7782f000+177000]
-> ra  =3D 779d0618 in ld-2.27.so[779bf000+24000]
-> do_page_fault(): sending SIGSEGV to ln for invalid write access to 0018a0=
-00
-> epc =3D 778d4a54 in libc-2.27.so[778bb000+177000]
-> ra  =3D 77a5c618 in ld-2.27.so[77a4b000+24000]
-> do_page_fault(): sending SIGSEGV to S01logging for invalid write access
-> to 0018a000
-> epc =3D 77d08a54 in libc-2.27.so[77cef000+177000]
-> ra  =3D 77e90618 in ld-2.27.so[77e7f000+24000]
-> do_page_fault(): sending SIGSEGV to S20urandom for invalid write access
-> to 0018a000
-> epc =3D 76ee4a54 in libc-2.27.so[76ecb000+177000]
-> ra  =3D 7706c618 in ld-2.27.so[7705b000+24000]
-> do_page_fault(): sending SIGSEGV to ifup for invalid write access to
-> 0018a000
-> epc =3D 77974a54 in libc-2.27.so[7795b000+177000]
-> ra  =3D 77afc618 in ld-2.27.so[77aeb000+24000]
-> do_page_fault(): sending SIGSEGV to awk for invalid read access from
-> 00000000
-> epc =3D 00000000 in busybox[400000+d8000]
-> ra  =3D 77248110 in libc-2.27.so[770fb000+177000]
-> do_page_fault(): sending SIGSEGV to cat for invalid write access to 0018a=
-000
-> epc =3D 77484a54 in libc-2.27.so[7746b000+177000]
-> ra  =3D 7760c618 in ld-2.27.so[775fb000+24000]
-> do_page_fault(): sending SIGSEGV to run.sh for invalid write access to
-> 0018a000
-> epc =3D 76e88a54 in libc-2.27.so[76e6f000+177000]
-> ra  =3D 77010618 in ld-2.27.so[76fff000+24000]
-> qemu-system-mips: terminating on signal 2
+> (gdb) frame 4
+>   #4  0x0000555555888171 in memory_region_notify_one
+>                        (notifier=0x7ffde0487fa8, entry=0x7ffde5dfe200)
+>                        at /home/qemu/memory.c:1918
+> 1918        assert(entry->iova >= notifier->start && entry_end <=
+> notifier->end);
+> (gdb) p *entry
+> $1 = {target_as = 0x555556f6c050, iova = 0, translated_addr = 0,
+> addr_mask = 18446744073709551615, perm = IOMMU_NONE}
+> --
 >
-> Please run the QEMU tests.
-OK, we are investigating.
+> Tested with vhost-net and qemu driver, host<->guest communication.
+>
+> v2: * Delete underflow assertion
+>      * Tested again rebased over ("3e407488349 Merge remote-tracking
+>        branch 'remotes/rth/tags/pull-mb-20201014' into staging")
+>
+> v1: * IOMMU_NOTIFIER_ALL now includes IOMMU_NOTIFIER_DEVIOTLB_EVENTS
+>        also. VFIO IOMMU notifier will register for all events (as before
+>        of the patching)
+>      * Cosmetic changes, like:
+>        - Expand commit messages
+>        - Better naming and checks
+>        - Fix alignment issues
+>        - Avoid an already present casting from `void *`
+>   at https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg01505.html
+>
+> RFC v8: Fix use of "tmp" notification in memory.c:memory_region_notify_iommu_one
+>
+> v7: Add IOMMUTLBNotification, and move introduced "type" from
+>      IOMMUTLBEntry to the former.
+>
+> v6: Introduce "type" field for IOMMUTLBEntry. Fill in all uses.
+>      Update tests reports with more fine-tuning (CPU, RPS/XPS tunning).
+>
+> v5: Skip regular IOTLB notifications in dev_iotlb notifiers
+>
+> v4: Rename IOMMU_NOTIFIER_IOTLB -> IOMMU_NOTIFIER_DEVIOTLB.
+>      Make vhost-net notifier just IOMMU_NOTIFIER_DEVIOTLB, not
+>      IOMMU_NOTIFIER_UNMAP
+>
+> v3: Skip the assertion in case notifier is a IOTLB one, since they can manage
+>      arbitrary ranges. Using a flag in the notifier for now, as Peter suggested.
+>
+> v2: Actually delete assertion instead of just commenting out using C99
+>
+> Eugenio Pérez (5):
+>    memory: Rename memory_region_notify_one to
+>      memory_region_notify_iommu_one
+>    memory: Add IOMMUTLBEvent
+>    memory: Add IOMMU_NOTIFIER_DEVIOTLB_UNMAP IOMMUTLBNotificationType
+>    intel_iommu: Skip page walking on device iotlb invalidations
+>    memory: Skip bad range assertion if notifier is DEVIOTLB_UNMAP type
+>
+>   include/exec/memory.h | 40 ++++++++++---------
+>   hw/arm/smmu-common.c  | 13 +++---
+>   hw/arm/smmuv3.c       | 13 +++---
+>   hw/i386/intel_iommu.c | 92 +++++++++++++++++++++++++------------------
+>   hw/misc/tz-mpc.c      | 32 ++++++++-------
+>   hw/ppc/spapr_iommu.c  | 15 +++----
+>   hw/virtio/vhost.c     |  2 +-
+>   softmmu/memory.c      | 30 ++++++++------
+>   8 files changed, 134 insertions(+), 103 deletions(-)
+
+
+Acked-by: Jason Wang <jasowang@redhat.com>
+
+Thanks
+
 
 >
-> The easiest way is to push your series on GitLab.
->
-> Regards,
->
-> Phil.
+
 
