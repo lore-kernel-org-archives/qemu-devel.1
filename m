@@ -6,72 +6,73 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BB0DC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:37:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2028C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:38:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9635622251
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:37:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2408021534
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:38:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PGVS/QPT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9635622251
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xLPxO+eI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2408021534
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUslH-00012n-7O
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:37:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45102)
+	id 1kUsm4-000295-46
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:38:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44002)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUsjw-0007tf-Hq
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:35:52 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37075)
+ id 1kUshZ-0005BH-Fk
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:33:25 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:43133)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUsju-0001L7-O6
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:35:52 -0400
-Received: by mail-ej1-x642.google.com with SMTP id e22so3086401ejr.4
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 07:35:50 -0700 (PDT)
+ id 1kUshU-0000nN-3h
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:33:25 -0400
+Received: by mail-ed1-x541.google.com with SMTP id dn5so2070680edb.10
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 07:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=Gw5Lxt+HBtIRoi98EcrOfsnFo4nLxZc23yBIU18mjHs=;
- b=PGVS/QPTwDGcrB3XW/JR4HzN9YTE2zBE35pNsZhp3FW0aKSNgtsZysU0VU6s8pWrqJ
- JyqhVsIXIh2M67zcv0vHdgQxPFkPkEE+T2tm21p2b0aaqoESMWSVIvYGow3p73eBPlYO
- QEhA4ppExaJcLEFftYBimcRjL2ckOfeA3yp0kQHlHXrhaHwva7kXky2+qLi4HznY67u9
- eAdoQ7lR0h0qaY/uNusSz9A8F4JcSt3a+SWL08W1u6WQJ0gLdQYPoX+YJB6wJuiCXE3P
- nF9/Pq1fXzoFrHspQWDj6mNYWNu+PHBfjHYn8Y5y0eLiKOq60u0uEv66LQ0MbJ93tw8j
- wPsw==
+ :cc:content-transfer-encoding;
+ bh=fZ2F8raE+nkd5CcBTlfLFBayCR2ABggzo7wSTuWas5E=;
+ b=xLPxO+eIHc8AN9bd0ouILNPJ+nbTKkm6ae0752F4RM1rr9+qLUedVL33rFYEPf9UqR
+ /wkHmLSaP+6xr0PNUYS0PjtsOp2H6g9ITkIubk5BD8+gAbOevsAYbGMz062jBYqWFl+Z
+ 4J+9TkkNWi0dQMCm42Xaeb/lMmio1hwBpFjPSKOlH2Fn7KfglyURkVPaaV49FfjftJAe
+ Zs/cqmsolD9NtPZf8WAw4HOzblWNRuVvKvBNPMFVtf+DLSHHwHihM/VRF+SNLkQ38u7c
+ gW50D5CkJr9zc+k63M10ODtRolQxi0FBtjmPp4De7e5CqWOy6bIEstnIJUo/oe1EiUSg
+ 4keQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=Gw5Lxt+HBtIRoi98EcrOfsnFo4nLxZc23yBIU18mjHs=;
- b=hDchBRhYSfKpJYau8+AfWbOzc0My/axhvpmqvRpz99U+t/77Mg6C+vfyW2te1OZoKx
- PH8Ec1/RRtE01QMqCFYY9Sm3m4fkPkSLqXl081q/6uULZewHzt44rAjLYX/oJJkK84Dz
- 9KP0PYyav6wc6xNT35c+F+2cpbZpLUQhjN1yXJRe89zpyZIeHs8pPpVnvc/IsWNwtCD6
- lC5Yl0oxnrLtTPXfyuCOUcRQQ6A6kuw4aKxlLMohj9LJTwLRFudeLvabATZw0MVB10Qo
- 6oB2VKOp60awi+oCUPFSVLGMDhCdWcW/FP4G2QvzBKs3fErmBu3DjhYUdzxUf7WTaLJ8
- M6EQ==
-X-Gm-Message-State: AOAM532Nq9CkkrZam2cFp1bNip+PHDb7RsnjtHE/e18gTdPlpPOhRi27
- YCAaZAVUg9Onx90Hs+xiD1+u6NjFvwZQg/bvK/x0cw==
-X-Google-Smtp-Source: ABdhPJx3UtbsPF+OSLjq3ICIgF6Hfzf+7tG3VbBGXDlVVaHM1ocASxRY5nFbj3PfnoMsLdQXgXCBf4QUSx23XEaYtYY=
-X-Received: by 2002:a17:906:ce21:: with SMTP id
- sd1mr3541536ejb.4.1603204549262; 
- Tue, 20 Oct 2020 07:35:49 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=fZ2F8raE+nkd5CcBTlfLFBayCR2ABggzo7wSTuWas5E=;
+ b=alz+6WGrPFGRTG+VjK/2revarOmSWBmu6eckWvyl9vYA/7x4nGtphWO1x2fXDPuuvy
+ NOrTgc6xN4KbTYZVH2kMBuk8YR9PgMiXnkEn9jQk7E9krE36MGRRh1TGwf0kibkV5MZD
+ NK9gCKqsUKJKlozMyYyf1dN6AFzPtlounnHfYgcelV4ULPHLDVMwqSW2jIlkVqI4btu8
+ Ohk7Zd9Tz2sG6yCYRcamPHqF4wgZZv3DqdJiFaavMtg3vnQF3NGR2mGxdS9BbxwY7iuT
+ GUmfImoJboZQG/w6SyknNyC6SdcPFLMwLjvlKzhKNVAMDQwVudYmGkg5oS0HA9SuhG8O
+ gQwg==
+X-Gm-Message-State: AOAM532uam2CWgSwenip7hoWqzuSQhb6tLdchqtScCo0NhSOAyvhPKVi
+ zHx8cXbWA81kNXPC/KM/ZbaUVSR5ABn6//nIrtFfqQ==
+X-Google-Smtp-Source: ABdhPJyeJd2T/yP1gGXqsYtfxMqpp1XZaqTpowUbdGOzGpViSIMF1n5z7JNvEMaQI/rHY2sWFyCWyCppl95BwP2kVq4=
+X-Received: by 2002:aa7:c302:: with SMTP id l2mr3125193edq.204.1603204398469; 
+ Tue, 20 Oct 2020 07:33:18 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201008162155.161886-1-richard.henderson@linaro.org>
-In-Reply-To: <20201008162155.161886-1-richard.henderson@linaro.org>
+References: <20201017180731.1165871-1-f4bug@amsat.org>
+In-Reply-To: <20201017180731.1165871-1-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Oct 2020 15:35:38 +0100
-Message-ID: <CAFEAcA8uBFG1tZ38Aumm+prMU+hv_tr7uG-hvttCudo6GHGHJA@mail.gmail.com>
-Subject: Re: [PATCH 0/3] target/arm: MTE fixes
-To: Richard Henderson <richard.henderson@linaro.org>
+Date: Tue, 20 Oct 2020 15:33:06 +0100
+Message-ID: <CAFEAcA_qoM2=L+CaaZq1kMJ=NCaZZK7J0ieTEq151DFTks7ttQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] hw/intc/bcm283x: Trivial tracing cleanup
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -93,28 +94,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-arm <qemu-arm@nongnu.org>, vincenzo.frascino@arm.com,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: qemu-arm <qemu-arm@nongnu.org>, Luc Michel <luc@lmichel.fr>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 8 Oct 2020 at 17:21, Richard Henderson
-<richard.henderson@linaro.org> wrote:
+On Sat, 17 Oct 2020 at 19:07, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
+ wrote:
 >
-> One code cleanup and two bug fixes for MTE.
+> Add trace event for IRQ from CPU/GPU,
+> use definitions for IRQ numbers.
 >
-> Vincenzo, thanks for the clear report.  Can you please run
-> this through your test case?
->
->
-> r~
->
->
-> Richard Henderson (3):
->   target/arm: Remove redundant mmu_idx lookup
->   target/arm: Fix reported EL for mte_check_fail
->   target/arm: Ignore HCR_EL2.ATA when {E2H,TGE} != 11
+> Philippe Mathieu-Daud=C3=A9 (2):
+>   hw/intc/bcm2835_ic: Trace GPU/CPU IRQ handlers
+>   hw/intc/bcm2836_control: Use IRQ definitions instead of magic numbers
 
 
 
