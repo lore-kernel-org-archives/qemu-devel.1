@@ -2,63 +2,87 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D16D9C4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4FAEC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:27:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2818B20BED
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:26:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2818B20BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1231420BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:27:21 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDEGhdng"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1231420BED
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52704 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58834 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUreR-0006Q0-0c
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:26:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50578)
+	id 1kUrfc-0000Z5-Tb
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:27:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU8-0000N2-TT; Tue, 20 Oct 2020 09:15:29 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48304 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrTy-00076c-Q6; Tue, 20 Oct 2020 09:15:28 -0400
-Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 37B86F4A968219B23357;
- Tue, 20 Oct 2020 21:15:08 +0800 (CST)
-Received: from localhost (10.174.186.67) by DGGEMS409-HUB.china.huawei.com
- (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 21:15:01 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH v2 05/13] hw: add compat machines for 5.3
-Date: Tue, 20 Oct 2020 21:14:32 +0800
-Message-ID: <20201020131440.1090-6-fangying1@huawei.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
-References: <20201020131440.1090-1-fangying1@huawei.com>
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kUrS4-0006FN-92
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:13:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53991)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kUrS2-0006vP-49
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:13:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603199594;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=vVZzARi07qgLmdx6A/Q8nbl2HnAOho4uuxEBCLeO4rU=;
+ b=iDEGhdngrGb+G6zmkEcCFJRHXko4hhzvlfuvRKfqK/ROKcVF9QrrXHwt+PuxDrV+GNl+b4
+ V5BZaAPdyPWPu+x/E2FxDOmOJOGim+Un6hd3hXYjvr29fKQAPgOtQLMM7l/FIHmB4v5gDK
+ MwEP5NPSy6BqK14xUlLceiWGv9DLMJI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-493-_jPjrPdBMcC8suFVXvpwJQ-1; Tue, 20 Oct 2020 09:13:12 -0400
+X-MC-Unique: _jPjrPdBMcC8suFVXvpwJQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0892F8799EF;
+ Tue, 20 Oct 2020 13:13:11 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-115-203.rdu2.redhat.com [10.10.115.203])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D859F60CCC;
+ Tue, 20 Oct 2020 13:13:03 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 6DE81220307; Tue, 20 Oct 2020 09:13:03 -0400 (EDT)
+Date: Tue, 20 Oct 2020 09:13:03 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: Chirantan Ekbote <chirantan@chromium.org>
+Subject: Re: [Virtio-fs] [PATCH v3] virtiofsd: add container-friendly -o
+ sandbox=chroot option
+Message-ID: <20201020131303.GA380917@redhat.com>
+References: <20201008085534.16070-1-stefanha@redhat.com>
+ <CAJFHJrohwGOvZax=anXZdFeuTT+uZAJ89Hu9CohgnE-tJEKTiw@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.186.67]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:04:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAJFHJrohwGOvZax=anXZdFeuTT+uZAJ89Hu9CohgnE-tJEKTiw@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=vgoyal@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,239 +95,34 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, alistair.francis@wdc.com,
- Ying Fang <fangying1@huawei.com>, imammedo@redhat.com
+Cc: vromanso@redhat.com, qemu-devel@nongnu.org, mpatel@redhat.com,
+ virtio-fs-list <virtio-fs@redhat.com>, Al Viro <viro@zeniv.linux.org.uk>,
+ Stefan Hajnoczi <stefanha@redhat.com>, rmohr@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add 5.2 machine types for arm/i440fx/q35/s390x/spapr.
+On Mon, Oct 19, 2020 at 06:43:41PM +0900, Chirantan Ekbote wrote:
+> On Thu, Oct 8, 2020 at 5:55 PM Stefan Hajnoczi <stefanha@redhat.com> wrote:
+> >
+> > virtiofsd cannot run in a container because CAP_SYS_ADMIN is required to
+> > create namespaces.
+> >
+> 
+> In crosvm we deal with this by also creating a user namespace, which
+> then allows us to create the mount, net, and pid namespaces as well.
+> Could that also work for virtiofsd?
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- hw/arm/virt.c              |  9 ++++++++-
- hw/core/machine.c          |  3 +++
- hw/i386/pc.c               |  3 +++
- hw/i386/pc_piix.c          | 15 ++++++++++++++-
- hw/i386/pc_q35.c           | 14 +++++++++++++-
- hw/ppc/spapr.c             | 15 +++++++++++++--
- hw/s390x/s390-virtio-ccw.c | 14 +++++++++++++-
- include/hw/boards.h        |  3 +++
- include/hw/i386/pc.h       |  3 +++
- 9 files changed, 73 insertions(+), 6 deletions(-)
+I think one key question here is that who does the sandboxing. Is it
+the contatiner runtime environment or virtiofsd itself. I think what
+stefan is trying to do is that container runtime has done the sandboxing
+so virtiofsd has not do it.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index ba902b53ba..ff8a14439e 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -2665,10 +2665,17 @@ static void machvirt_machine_init(void)
- }
- type_init(machvirt_machine_init);
- 
-+static void virt_machine_5_3_options(MachineClass *mc)
-+{
-+}
-+DEFINE_VIRT_MACHINE_AS_LATEST(5, 3)
-+
- static void virt_machine_5_2_options(MachineClass *mc)
- {
-+    virt_machine_5_3_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
- }
--DEFINE_VIRT_MACHINE_AS_LATEST(5, 2)
-+DEFINE_VIRT_MACHINE(5, 2)
- 
- static void virt_machine_5_1_options(MachineClass *mc)
- {
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 7e2f4ec08e..6dc77699a9 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -28,6 +28,9 @@
- #include "hw/mem/nvdimm.h"
- #include "migration/vmstate.h"
- 
-+GlobalProperty hw_compat_5_2[] = { };
-+const size_t hw_compat_5_2_len = G_N_ELEMENTS(hw_compat_5_2);
-+
- GlobalProperty hw_compat_5_1[] = {
-     { "vhost-scsi", "num_queues", "1"},
-     { "vhost-user-blk", "num-queues", "1"},
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index e87be5d29a..eaa046ff5d 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -97,6 +97,9 @@
- #include "trace.h"
- #include CONFIG_DEVICES
- 
-+GlobalProperty pc_compat_5_2[] = { };
-+const size_t pc_compat_5_2_len = G_N_ELEMENTS(pc_compat_5_2);
-+
- GlobalProperty pc_compat_5_1[] = {
-     { "ICH9-LPC", "x-smi-cpu-hotplug", "off" },
- };
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 3c2ae0612b..01254090ce 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -426,7 +426,7 @@ static void pc_i440fx_machine_options(MachineClass *m)
-     machine_class_allow_dynamic_sysbus_dev(m, TYPE_VMBUS_BRIDGE);
- }
- 
--static void pc_i440fx_5_2_machine_options(MachineClass *m)
-+static void pc_i440fx_5_3_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_i440fx_machine_options(m);
-@@ -435,6 +435,19 @@ static void pc_i440fx_5_2_machine_options(MachineClass *m)
-     pcmc->default_cpu_version = 1;
- }
- 
-+DEFINE_I440FX_MACHINE(v5_3, "pc-i440fx-5.3", NULL,
-+                      pc_i440fx_5_3_machine_options);
-+
-+static void pc_i440fx_5_2_machine_options(MachineClass *m)
-+{
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    pc_i440fx_machine_options(m);
-+    m->alias = NULL;
-+    m->is_default = false;
-+    compat_props_add(m->compat_props, hw_compat_5_2, hw_compat_5_2_len);
-+    compat_props_add(m->compat_props, pc_compat_5_2, pc_compat_5_2_len);
-+}
-+
- DEFINE_I440FX_MACHINE(v5_2, "pc-i440fx-5.2", NULL,
-                       pc_i440fx_5_2_machine_options);
- 
-diff --git a/hw/i386/pc_q35.c b/hw/i386/pc_q35.c
-index a3f4959c43..dd14803edb 100644
---- a/hw/i386/pc_q35.c
-+++ b/hw/i386/pc_q35.c
-@@ -344,7 +344,7 @@ static void pc_q35_machine_options(MachineClass *m)
-     m->max_cpus = 288;
- }
- 
--static void pc_q35_5_2_machine_options(MachineClass *m)
-+static void pc_q35_5_3_machine_options(MachineClass *m)
- {
-     PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-     pc_q35_machine_options(m);
-@@ -352,6 +352,18 @@ static void pc_q35_5_2_machine_options(MachineClass *m)
-     pcmc->default_cpu_version = 1;
- }
- 
-+DEFINE_Q35_MACHINE(v5_3, "pc-q35-5.3", NULL,
-+                   pc_q35_5_3_machine_options);
-+
-+static void pc_q35_5_2_machine_options(MachineClass *m)
-+{
-+    PCMachineClass *pcmc = PC_MACHINE_CLASS(m);
-+    pc_q35_machine_options(m);
-+    m->alias = NULL;
-+    compat_props_add(m->compat_props, hw_compat_5_2, hw_compat_5_2_len);
-+    compat_props_add(m->compat_props, pc_compat_5_2, pc_compat_5_2_len);
-+}
-+
- DEFINE_Q35_MACHINE(v5_2, "pc-q35-5.2", NULL,
-                    pc_q35_5_2_machine_options);
- 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index 2db810f73a..c292a3edd9 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -4511,15 +4511,26 @@ static void spapr_machine_latest_class_options(MachineClass *mc)
-     }                                                                \
-     type_init(spapr_machine_register_##suffix)
- 
-+/*
-+ * pseries-5.3
-+ */
-+static void spapr_machine_5_3_class_options(MachineClass *mc)
-+{
-+    /* Defaults for the latest behaviour inherited from the base class */
-+}
-+
-+DEFINE_SPAPR_MACHINE(5_3, "5.3", true);
-+
- /*
-  * pseries-5.2
-  */
- static void spapr_machine_5_2_class_options(MachineClass *mc)
- {
--    /* Defaults for the latest behaviour inherited from the base class */
-+    spapr_machine_5_3_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
- }
- 
--DEFINE_SPAPR_MACHINE(5_2, "5.2", true);
-+DEFINE_SPAPR_MACHINE(5_2, "5.2", false);
- 
- /*
-  * pseries-5.1
-diff --git a/hw/s390x/s390-virtio-ccw.c b/hw/s390x/s390-virtio-ccw.c
-index 28266a3a35..bde084e13d 100644
---- a/hw/s390x/s390-virtio-ccw.c
-+++ b/hw/s390x/s390-virtio-ccw.c
-@@ -789,14 +789,26 @@ bool css_migration_enabled(void)
-     }                                                                         \
-     type_init(ccw_machine_register_##suffix)
- 
-+static void ccw_machine_5_3_instance_options(MachineState *machine)
-+{
-+}
-+
-+static void ccw_machine_5_3_class_options(MachineClass *mc)
-+{
-+}
-+DEFINE_CCW_MACHINE(5_3, "5.3", true);
-+
- static void ccw_machine_5_2_instance_options(MachineState *machine)
- {
-+    ccw_machine_5_3_instance_options(machine);
- }
- 
- static void ccw_machine_5_2_class_options(MachineClass *mc)
- {
-+    ccw_machine_5_3_class_options(mc);
-+    compat_props_add(mc->compat_props, hw_compat_5_2, hw_compat_5_2_len);
- }
--DEFINE_CCW_MACHINE(5_2, "5.2", true);
-+DEFINE_CCW_MACHINE(5_2, "5.2", false);
- 
- static void ccw_machine_5_1_instance_options(MachineState *machine)
- {
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index bf53e8a16e..f631c1799d 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -311,6 +311,9 @@ struct MachineState {
-     } \
-     type_init(machine_initfn##_register_types)
- 
-+extern GlobalProperty hw_compat_5_2[];
-+extern const size_t hw_compat_5_2_len;
-+
- extern GlobalProperty hw_compat_5_1[];
- extern const size_t hw_compat_5_1_len;
- 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 84639d0ebc..6f1531ed14 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -190,6 +190,9 @@ void pc_system_firmware_init(PCMachineState *pcms, MemoryRegion *rom_memory);
- void pc_madt_cpu_entry(AcpiDeviceIf *adev, int uid,
-                        const CPUArchIdList *apic_ids, GArray *entry);
- 
-+extern GlobalProperty pc_compat_5_2[];
-+extern const size_t pc_compat_5_2_len;
-+
- extern GlobalProperty pc_compat_5_1[];
- extern const size_t pc_compat_5_1_len;
- 
--- 
-2.23.0
+Having said that, if container runtime has setup things in such a
+way that virtiofsd has CAP_SYS_ADMIN, is it desirable that virtiofsd
+does pivot_root() instead of chroot()?
+
+Thanks
+Vivek
 
 
