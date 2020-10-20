@@ -2,62 +2,86 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D8D1C43467
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:30:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F125C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:44:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9E7E223FD
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:30:24 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9E7E223FD
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C5817223BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:44:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="RQSsIZfp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5817223BF
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUhPr-0005ol-87
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 22:30:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60462)
+	id 1kUhdc-0000cC-T5
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 22:44:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36376)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUhKX-00005m-0r; Mon, 19 Oct 2020 22:24:53 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:57946 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUhKQ-000802-KJ; Mon, 19 Oct 2020 22:24:52 -0400
-Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 6F93C45FC900B1963286;
- Tue, 20 Oct 2020 10:24:41 +0800 (CST)
-Received: from DESKTOP-80C7KIU.china.huawei.com (10.174.187.210) by
- DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 20 Oct 2020 10:24:34 +0800
-From: Zhengui li <lizhengui@huawei.com>
-To: <pbonzini@redhat.com>, <stefanha@redhat.com>, <mreitz@redhat.com>,
- <kwolf@redhat.com>
-Subject: [PATCH v2 4/6] virtio-gpu: fix incorrect print type
-Date: Tue, 20 Oct 2020 02:24:02 +0000
-Message-ID: <1603160644-7308-4-git-send-email-lizhengui@huawei.com>
-X-Mailer: git-send-email 2.6.4.windows.1
-In-Reply-To: <1603160644-7308-1-git-send-email-lizhengui@huawei.com>
-References: <1603160644-7308-1-git-send-email-lizhengui@huawei.com>
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kUhcL-000054-05
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:43:17 -0400
+Received: from mail-qk1-x743.google.com ([2607:f8b0:4864:20::743]:44836)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kUhcI-0003hf-M9
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:43:16 -0400
+Received: by mail-qk1-x743.google.com with SMTP id s14so358919qkg.11
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 19:43:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=QGhNw3ofxCAvVNnc4W09NQkI/S08+z6oo3UBPlGeL8w=;
+ b=RQSsIZfpLFLhx+3bWXoJGO6x8b/stbfQwOvFHEoUdcsKc4xSwJ3zPvdMrw0GfvooAT
+ ehdDPvW+TtwPBooqMa7H/wq3D+I6KcU01rs8Bn+YMSjk+BwG0u5+tJ1Av8pcnBE2BkZA
+ k0YHQy5WkCkH0FnRkcqZvcNEJpdKwqh5OtpKihMGKHc+zQT7TgtBv7f6rzgQmJh02lQQ
+ DuZK1Di+AIkBQMOaYtn9W2CE4KdkEUqtQt5EWwqwj1fdEUW/eIWSvhG53Ia8kgNXxi24
+ xJIrcVxlN5ji26163YY2R2zJq7HVoLBenIgULUUCxhmVdEkP7arZrpJ4QCf1lq58Ubv6
+ N5cw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=QGhNw3ofxCAvVNnc4W09NQkI/S08+z6oo3UBPlGeL8w=;
+ b=IaWDYCVUudTxYsEwYdWznUy3Nk2pNPdjvBMzTeNOm6ssvaPwlJwb2wkhHzg561NYfR
+ rKr1MsmUEOsp70wbgMzm/QP8hmX5nHdrQuBBGh1EdllI5kvnKacPSNIKRl+Dw+/5K2CD
+ j38TqSpVYl1rWrwHDfbMaXanmxhMnH2Ccm7mv7o3Av6q5SHos2BjW0P7cGlymNcvHZ+i
+ AUpy5VqN8zcgmC+jDT/phZNJHU/RVYi1FyM4GP9REN8urh1ZmFvNjIy5ddsuf1ZX/RiN
+ 76yvYkakegKVNOca7JHmyVlcrcQI4HguHSrSqpiY2saLc3KJEaRtB8syYNe6upczYdMK
+ KhwA==
+X-Gm-Message-State: AOAM5336J2hf/gjgaa3b31bYgCL6OFGjrKNlNX/i0C8Rr5JXHjM1hO+R
+ K+5LQat765Fr4DG/fG+XDJbTwqk9UhtHArWxTfAIvg==
+X-Google-Smtp-Source: ABdhPJwb55vccGQbXpBlMpIFu7YK4q1tmNhscH8VLDtkHpdr+2v6u5vo8lE76yq+2j3zTof4Gir7wymL3KhJvurjAoU=
+X-Received: by 2002:a37:e20d:: with SMTP id g13mr731011qki.325.1603161792944; 
+ Mon, 19 Oct 2020 19:43:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.187.210]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=lizhengui@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:24:36
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+References: <20201015041424.23090-1-green.wan@sifive.com>
+ <20201015041424.23090-3-green.wan@sifive.com>
+ <CAEUhbmXZ5wXWyPqMwfwMoRUzmuKzj7-7QAXGd10MYhKanQhwbg@mail.gmail.com>
+In-Reply-To: <CAEUhbmXZ5wXWyPqMwfwMoRUzmuKzj7-7QAXGd10MYhKanQhwbg@mail.gmail.com>
+From: Green Wan <green.wan@sifive.com>
+Date: Tue, 20 Oct 2020 10:43:01 +0800
+Message-ID: <CAJivOr4OCiVr6Ez2z+i74pup2r_fOyvuyhC40jnPk2T0rA=0yQ@mail.gmail.com>
+Subject: Re: [RFC PATCH v7 2/2] hw/misc/sifive_u_otp: Add backend drive support
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::743;
+ envelope-from=green.wan@sifive.com; helo=mail-qk1-x743.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,162 +95,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: xieyingtai@huawei.com, lizhengui@huawei.com, qemu-devel@nongnu.org,
- qemu-block@nongnu.org
+Cc: Alistair Francis <alistair23@gmail.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The type of input variable is unsigned int
-while the printer type is int. So fix incorrect print type.
+Sorry for replying late. I missed this email. I will revise the patch
+today. Thanks,
 
-Signed-off-by: Zhengui li <lizhengui@huawei.com>
----
- hw/display/virtio-gpu.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+- Green
 
-diff --git a/hw/display/virtio-gpu.c b/hw/display/virtio-gpu.c
-index 90be4e3..d785d88 100644
---- a/hw/display/virtio-gpu.c
-+++ b/hw/display/virtio-gpu.c
-@@ -275,7 +275,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, c2d.resource_id);
-     if (res) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: resource already exists %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: resource already exists %u\n",
-                       __func__, c2d.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -291,7 +291,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
-     pformat = virtio_gpu_get_pixman_format(c2d.format);
-     if (!pformat) {
-         qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s: host couldn't handle guest format %d\n",
-+                      "%s: host couldn't handle guest format %u\n",
-                       __func__, c2d.format);
-         g_free(res);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
-@@ -308,7 +308,7 @@ static void virtio_gpu_resource_create_2d(VirtIOGPU *g,
- 
-     if (!res->image) {
-         qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s: resource creation failed %d %d %d\n",
-+                      "%s: resource creation failed %u %u %u\n",
-                       __func__, c2d.resource_id, c2d.width, c2d.height);
-         g_free(res);
-         cmd->error = VIRTIO_GPU_RESP_ERR_OUT_OF_MEMORY;
-@@ -379,7 +379,7 @@ static void virtio_gpu_resource_unref(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, unref.resource_id);
-     if (!res) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, unref.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -403,7 +403,7 @@ static void virtio_gpu_transfer_to_host_2d(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, t2d.resource_id);
-     if (!res || !res->iov) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, t2d.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -416,7 +416,7 @@ static void virtio_gpu_transfer_to_host_2d(VirtIOGPU *g,
-         t2d.r.x + t2d.r.width > res->width ||
-         t2d.r.y + t2d.r.height > res->height) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: transfer bounds outside resource"
--                      " bounds for resource %d: %d %d %d %d vs %d %d\n",
-+                      " bounds for resource %u: %u %u %u %u vs %u %u\n",
-                       __func__, t2d.resource_id, t2d.r.x, t2d.r.y,
-                       t2d.r.width, t2d.r.height, res->width, res->height);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
-@@ -461,7 +461,7 @@ static void virtio_gpu_resource_flush(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, rf.resource_id);
-     if (!res) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, rf.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -474,7 +474,7 @@ static void virtio_gpu_resource_flush(VirtIOGPU *g,
-         rf.r.x + rf.r.width > res->width ||
-         rf.r.y + rf.r.height > res->height) {
-         qemu_log_mask(LOG_GUEST_ERROR, "%s: flush bounds outside resource"
--                      " bounds for resource %d: %d %d %d %d vs %d %d\n",
-+                      " bounds for resource %u: %u %u %u %u vs %u %u\n",
-                       __func__, rf.resource_id, rf.r.x, rf.r.y,
-                       rf.r.width, rf.r.height, res->width, res->height);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
-@@ -533,7 +533,7 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
-                                      ss.r.width, ss.r.height, ss.r.x, ss.r.y);
- 
-     if (ss.scanout_id >= g->parent_obj.conf.max_outputs) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal scanout id specified %d",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal scanout id specified %u",
-                       __func__, ss.scanout_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_SCANOUT_ID;
-         return;
-@@ -548,7 +548,7 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
-     /* create a surface for this scanout */
-     res = virtio_gpu_find_resource(g, ss.resource_id);
-     if (!res) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, ss.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -562,8 +562,8 @@ static void virtio_gpu_set_scanout(VirtIOGPU *g,
-         ss.r.height > res->height ||
-         ss.r.x + ss.r.width > res->width ||
-         ss.r.y + ss.r.height > res->height) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal scanout %d bounds for"
--                      " resource %d, (%d,%d)+%d,%d vs %d %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal scanout %u bounds for"
-+                      " resource %u, (%u,%u)+%u,%u vs %u %u\n",
-                       __func__, ss.scanout_id, ss.resource_id, ss.r.x, ss.r.y,
-                       ss.r.width, ss.r.height, res->width, res->height);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_PARAMETER;
-@@ -621,7 +621,7 @@ int virtio_gpu_create_mapping_iov(VirtIOGPU *g,
- 
-     if (ab->nr_entries > 16384) {
-         qemu_log_mask(LOG_GUEST_ERROR,
--                      "%s: nr_entries is too big (%d > 16384)\n",
-+                      "%s: nr_entries is too big (%u > 16384)\n",
-                       __func__, ab->nr_entries);
-         return -1;
-     }
-@@ -654,7 +654,7 @@ int virtio_gpu_create_mapping_iov(VirtIOGPU *g,
-         }
-         if (!(*iov)[i].iov_base || len != l) {
-             qemu_log_mask(LOG_GUEST_ERROR, "%s: failed to map MMIO memory for"
--                          " resource %d element %d\n",
-+                          " resource %u element %d\n",
-                           __func__, ab->resource_id, i);
-             if ((*iov)[i].iov_base) {
-                 i++; /* cleanup the 'i'th map */
-@@ -711,7 +711,7 @@ virtio_gpu_resource_attach_backing(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, ab.resource_id);
-     if (!res) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, ab.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
-@@ -744,7 +744,7 @@ virtio_gpu_resource_detach_backing(VirtIOGPU *g,
- 
-     res = virtio_gpu_find_resource(g, detach.resource_id);
-     if (!res || !res->iov) {
--        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %d\n",
-+        qemu_log_mask(LOG_GUEST_ERROR, "%s: illegal resource specified %u\n",
-                       __func__, detach.resource_id);
-         cmd->error = VIRTIO_GPU_RESP_ERR_INVALID_RESOURCE_ID;
-         return;
--- 
-2.6.4.windows.1
-
+On Thu, Oct 15, 2020 at 4:01 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> On Thu, Oct 15, 2020 at 12:15 PM Green Wan <green.wan@sifive.com> wrote:
+> >
+> > Add '-drive' support to OTP device. Allow users to assign a raw file
+> > as OTP image.
+> >
+> > test commands for 16k otp.img filled with zero:
+> >
+> > $ dd if=/dev/zero of=./otp.img bs=1k count=16
+> > $ ./qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none \
+> > -kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf \
+> > -d guest_errors -drive if=none,format=raw,file=otp.img
+> >
+> > Signed-off-by: Green Wan <green.wan@sifive.com>
+> > ---
+> >  hw/misc/sifive_u_otp.c         | 67 +++++++++++++++++++++++++++++++++-
+> >  include/hw/misc/sifive_u_otp.h |  2 +
+> >  2 files changed, 68 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
+> > index 565eec082f..60066375ab 100644
+> > --- a/hw/misc/sifive_u_otp.c
+> > +++ b/hw/misc/sifive_u_otp.c
+> > @@ -19,11 +19,14 @@
+> >   */
+> >
+> >  #include "qemu/osdep.h"
+> > +#include "qapi/error.h"
+> >  #include "hw/qdev-properties.h"
+> >  #include "hw/sysbus.h"
+> >  #include "qemu/log.h"
+> >  #include "qemu/module.h"
+> >  #include "hw/misc/sifive_u_otp.h"
+> > +#include "sysemu/blockdev.h"
+> > +#include "sysemu/block-backend.h"
+> >
+> >  #define WRITTEN_BIT_ON 0x1
+> >
+> > @@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+> >          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
+> >              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
+> >              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
+> > +
+> > +            /* read from backend */
+> > +            if (s->blk) {
+> > +                int32_t buf;
+> > +
+> > +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
+> > +                          SIFIVE_U_OTP_FUSE_WORD);
+> > +                return buf;
+> > +            }
+> > +
+> >              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
+> >          } else {
+> >              return 0xff;
+> > @@ -137,7 +150,7 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+> >          if (s->pwe && !s->pas) {
+> >              if (GET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio)) {
+> >                  qemu_log_mask(LOG_GUEST_ERROR,
+> > -                              "Error: write idx<%u>, bit<%u>\n",
+> > +                              "write once error: idx<%u>, bit<%u>\n",
+>
+> This should be in the patch 1.
+>
+> >                                s->pa, s->paio);
+> >                  break;
+> >              }
+> > @@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+> >              /* write bit data */
+> >              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
+> >
+> > +            /* write to backend */
+> > +            if (s->blk) {
+> > +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
+> > +                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
+> > +            }
+> > +
+> >              /* update written bit */
+> >              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
+> >          }
+> > @@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
+> >
+> >  static Property sifive_u_otp_properties[] = {
+> >      DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
+> > +    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
+> >      DEFINE_PROP_END_OF_LIST(),
+> >  };
+> >
+>
+> Otherwise,
+> Reviewed-by: Bin Meng <bin.meng@windriver.com>
+> Tested-by: Bin Meng <bin.meng@windriver.com>
+>
+> You can drop the "RFC" tag in the next version.
 
