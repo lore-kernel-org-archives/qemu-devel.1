@@ -2,89 +2,96 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05F1AC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:39:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C376C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:40:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5089322242
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:39:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B9B3122242
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:40:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KoImGANc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5089322242
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="OKlA4pTp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9B3122242
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUufz-000160-84
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:39:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45176)
+	id 1kUug3-0001GF-I5
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:39:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kUuSb-0002e1-0U
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:26:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42107)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kUuSV-0007bs-MO
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:26:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603211153;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DrwutcZjdleYUH/m4Q/XzbDqHVGY42CIZ3t5X3tvPoE=;
- b=KoImGANckGgq0iz3c8jwe2V1IMXMasqIg1Lbj1iGol5RNsUtUn9Vjut4JRZIaSWPsw31a/
- TWzQo3bQDeHMFzM/MtNyESNJzj2bMc9YQGEcQxU5NHMh9bbJsT5h2PrXCvn4Z+/CNouAPS
- b9jamKdWQsm8vS3zxw6+T512XmaND4I=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-584-CKYHyv7tO1ylex36dlCJoQ-1; Tue, 20 Oct 2020 12:25:49 -0400
-X-MC-Unique: CKYHyv7tO1ylex36dlCJoQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 63E461084C87;
- Tue, 20 Oct 2020 16:25:47 +0000 (UTC)
-Received: from gondolin (ovpn-114-95.ams2.redhat.com [10.36.114.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C7E2527CC8;
- Tue, 20 Oct 2020 16:25:35 +0000 (UTC)
-Date: Tue, 20 Oct 2020 18:25:32 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v26 09/17] vfio: Add load state functions to SaveVMHandlers
-Message-ID: <20201020182532.76b544b6.cohuck@redhat.com>
-In-Reply-To: <5ca09cd6-efd6-ed8d-277f-5a1b42b5835c@nvidia.com>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-10-git-send-email-kwankhede@nvidia.com>
- <20201001120730.36eb76dd.cohuck@redhat.com>
- <5ca09cd6-efd6-ed8d-277f-5a1b42b5835c@nvidia.com>
-Organization: Red Hat GmbH
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kUue6-0007uu-Hv
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:37:58 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:38812)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kUue2-0000zr-Kv
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:37:57 -0400
+Received: by mail-wm1-x343.google.com with SMTP id b127so2688343wmb.3
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 09:37:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=ynL+ImLU8/MZiwy8JbT5zQ/0QgGC9xGdCjTroVHDtRY=;
+ b=OKlA4pTpDYGoYJp1GCr28VzKFsKuZTGzmoSHGMK1pUZn0wYy9IxiZ7ZgjgtL2E9nj0
+ +xPrXoXf4RFwL67aOG77Phv5n7nTwvOE1Be0Mj9qJF3LL+Wg8bIuQ7Myzz9Uy/PhmOKM
+ OeZaqEY4x2EeNX5L12hEzBBNpxyPO25Ne1BtLdtrOO4J4LH6/+Zgn6N0ak03/F+zE8IO
+ HCKaTPSixcRcEJBf08Nr087hJS3+ligp7wmViTiEHE5nL+URSKqBqIbjZHydmBs3kEO7
+ d4pdjI+uC7FUFqeLbIUPQWN1eTf7GtrLuRv4KE+bDYOJSmF4nS8p19Z737Yt68luOLrF
+ QBmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=ynL+ImLU8/MZiwy8JbT5zQ/0QgGC9xGdCjTroVHDtRY=;
+ b=j7b4494pV47EH06JLwWTQlCSzFAzjPJ4yM5uj3/cipG5lbE2zIQZvLmZUFSWMmza/j
+ YTKseCO1XuSX8yE/GAjnTCGGF0GvR5Q0bbAmFyqoJzDYH3gzjt8vnLD+XIVdLGEZ8GVr
+ JZy7g5VvdWR68hQ48jrS3WW1kVllj9AdsVpC5ds7CZ0Xg+E+FV/RxJa6YOVTsZzkP9FR
+ +wvRS6u3LUGiMkZdsu7AmmNhojNF3Jw68mwMxunUW/N6LJcM9hskGIsne1qPz/5urthO
+ byjWgoB002OVsYpylvy49hwrPvlVDSGIesT/TUU8+vlC5C3jo4mBkgx+cJqGxOolKzPN
+ WfZQ==
+X-Gm-Message-State: AOAM531+RwINazmX6K0F/N/RvegpCp84seNIWyA0T4IjUhRqaQLBRsT4
+ 5369JBbQFsfzar0YaCe675/mYA==
+X-Google-Smtp-Source: ABdhPJyCKkQyGxAve0SGv9njdbT2dNTMKc5Y8MlsICzltaLGesAnxoXKrnadPChsTwzJpPzt6y/QNg==
+X-Received: by 2002:a1c:a1c2:: with SMTP id k185mr3832355wme.39.1603211871942; 
+ Tue, 20 Oct 2020 09:37:51 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id i14sm3305204wml.24.2020.10.20.09.37.41
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Oct 2020 09:37:44 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id EEE021FF92;
+ Tue, 20 Oct 2020 17:37:39 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [RFC PATCH 6/8] int128.h: add bunch of uint128 utility functions
+ (INCOMPLETE)
+Date: Tue, 20 Oct 2020 17:37:36 +0100
+Message-Id: <20201020163738.27700-7-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201020163738.27700-1-alex.bennee@linaro.org>
+References: <20201020163738.27700-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,299 +104,225 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- eauger@redhat.com, yi.l.liu@intel.com, quintela@redhat.com,
- ziye.yang@intel.com, armbru@redhat.com, mlevitsk@redhat.com,
- pasic@linux.ibm.com, felipe@nutanix.com, zhi.a.wang@intel.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
+Cc: cota@braap.org, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Oct 2020 02:17:43 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+These will be useful for softfloat. I've included the extract/desposit
+functions with the main Int128 header and not with cutils as we need
+alternate versions for systems that don't have compiler support for
+Uint128. Even with compiler support some stuff we need to
+hand-hack (like clz128).
 
-> On 10/1/2020 3:37 PM, Cornelia Huck wrote:
-> > On Wed, 23 Sep 2020 04:54:11 +0530
-> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> >   
-> >> Sequence  during _RESUMING device state:
-> >> While data for this device is available, repeat below steps:
-> >> a. read data_offset from where user application should write data.
-> >> b. write data of data_size to migration region from data_offset.
-> >> c. write data_size which indicates vendor driver that data is written in
-> >>     staging buffer.
-> >>
-> >> For user, data is opaque. User should write data in the same order as
-> >> received.
-> >>
-> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> >> ---
-> >>   hw/vfio/migration.c  | 170 +++++++++++++++++++++++++++++++++++++++++++++++++++
-> >>   hw/vfio/trace-events |   3 +
-> >>   2 files changed, 173 insertions(+)
-> >>
-> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> >> index 4611bb972228..ffd70282dd0e 100644
-> >> --- a/hw/vfio/migration.c
-> >> +++ b/hw/vfio/migration.c
-> >> @@ -328,6 +328,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
-> >>       return qemu_file_get_error(f);
-> >>   }
-> >>   
-> >> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    uint64_t data;
-> >> +
-> >> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
-> >> +        int ret;
-> >> +
-> >> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
-> >> +        if (ret) {
-> >> +            error_report("%s: Failed to load device config space",
-> >> +                         vbasedev->name);
-> >> +            return ret;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    data = qemu_get_be64(f);
-> >> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +        error_report("%s: Failed loading device config space, "
-> >> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);  
-> > 
-> > I'm confused here: If we don't have a vfio_load_config callback, or if
-> > that callback did not read everything, we also might end up with a
-> > value that's not END_OF_STATE... in that case, the problem is not with
-> > the stream, but rather with the consumer?  
-> 
-> Right, hence "end flag incorrect" is reported.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+---
+ include/qemu/int128.h | 122 ++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 122 insertions(+)
 
-Yes, but that's what I find confusing... a missing or incorrect
-vfio_load_config callback does not have anything to do with incorrect
-end flags as present in the stream, but with the consumer not reading
-things correctly. If I got this error, I would go looking whether
-there's anything wrong with the stream and the code that produced it,
-and that's the wrong direction.
-
-(...)
-
-> >> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
-> >> +{
-> >> +    VFIODevice *vbasedev = opaque;
-> >> +    VFIOMigration *migration = vbasedev->migration;
-> >> +    int ret = 0;
-> >> +    uint64_t data, data_size;
-> >> +
-> >> +    data = qemu_get_be64(f);
-> >> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +
-> >> +        trace_vfio_load_state(vbasedev->name, data);
-> >> +
-> >> +        switch (data) {
-> >> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
-> >> +        {
-> >> +            ret = vfio_load_device_config_state(f, opaque);
-> >> +            if (ret) {
-> >> +                return ret;
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
-> >> +        {
-> >> +            data = qemu_get_be64(f);
-> >> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
-> >> +                return ret;
-> >> +            } else {
-> >> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
-> >> +                             vbasedev->name, data);
-> >> +                return -EINVAL;
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
-> >> +        {
-> >> +            VFIORegion *region = &migration->region;
-> >> +            uint64_t data_offset = 0, size;  
-> > 
-> > I think this function would benefit from splitting this off into a
-> > function handling DEV_DATA_STATE. It is quite hard to follow through
-> > all the checks and find out when we continue, and when we break off.
-> >   
-> 
-> Each switch case has a break, we break off on success cases, where as we 
-> return error if we encounter any case where (ret < 0)
-
-Of course, but I don't find it easy to follow when the errors are
-happening.
-
-> 
-> 
-> > Some documentation about the markers would also be really helpful.  
-> 
-> Sure adding it in patch 07, where these are defined.
-> 
-> > The logic seems to be:
-> > - DEV_CONFIG_STATE has config data and must be ended by END_OF_STATE  
-> Right
-> 
-> > - DEV_SETUP_STATE has only END_OF_STATE, no data  
-> Right now there is no data, but this is provision to add data if 
-> required in future.
-> 
-> > - DEV_DATA_STATE has... data; if there's any END_OF_STATE, it's buried
-> >    far down in the called functions
-> >  
-> 
-> This is not correct, END_OF_STATE is after data. Moved data buffer 
-> loading logic to function vfio_load_buffer(), so DEV_DATA_STATE looks 
-> simplified as below. Hope this helps.
-> 
->          case VFIO_MIG_FLAG_DEV_DATA_STATE:
->          {
->              uint64_t data_size;
-> 
->              data_size = qemu_get_be64(f);
->              if (data_size == 0) {
->                  break;
->              }
-> 
->              ret = vfio_load_buffer(f, vbasedev, data_size);
->              if (ret < 0) {
->                  return ret;
->              }
->              break;
->          }
-
-Hm.
-
-What I find not that easy to follow is the structure here:
-
-while (!end_marker) {
-    switch (data) {
-    case config_state:
-        if (load_config)
-            return error;
-        break;
-    case setup_state:
-        read_next_value();
-        if (end_marker)
-            return 0;
-        else
-            return error;
-        break;
-    case data_state:
-        size = read_next_value();
-        if (!size)
-            break;
-        if (vfio_load_buffer())
-            return error;
-        break;
-    default:
-        return error;
-    }
-    read_next_value();
-    if (qemu_file_get_error())
-        return error;
-}
-
-So, what I don't understand is:
-- Why do we call qemu_file_get_error() only after we went through the
-  whole switch? This means it is never called for the
-  setup_state/end_marker pair.
-- If we look for an end marker for config_state and data_state, it's
-  buried in the called functions. How can we be sure they actually do
-  look for it? That needs at least a comment.
-- If we find a valid setup_state section, we return success
-  immediately. If we find valid config_state or data_state sections, we
-  keep looking for more sections. Why? This also needs at least a
-  comment.
-
-> 
-> Also handling the case if data_size is greater than the data section of 
-> migration region at destination in vfio_load_buffer()in my next version.
-> 
-> Thanks,
-> Kirti
-> 
-> >   
-> >> +
-> >> +            data_size = size = qemu_get_be64(f);
-> >> +            if (data_size == 0) {
-> >> +                break;
-> >> +            }
-> >> +
-> >> +            ret = vfio_mig_read(vbasedev, &data_offset, sizeof(data_offset),
-> >> +                                region->fd_offset +
-> >> +                                offsetof(struct vfio_device_migration_info,
-> >> +                                         data_offset));
-> >> +            if (ret < 0) {
-> >> +                return ret;
-> >> +            }
-> >> +
-> >> +            trace_vfio_load_state_device_data(vbasedev->name, data_offset,
-> >> +                                              data_size);
-> >> +
-> >> +            while (size) {
-> >> +                void *buf = NULL;
-> >> +                uint64_t sec_size;
-> >> +                bool buf_alloc = false;
-> >> +
-> >> +                buf = get_data_section_size(region, data_offset, size,
-> >> +                                            &sec_size);
-> >> +
-> >> +                if (!buf) {
-> >> +                    buf = g_try_malloc(sec_size);
-> >> +                    if (!buf) {
-> >> +                        error_report("%s: Error allocating buffer ", __func__);
-> >> +                        return -ENOMEM;
-> >> +                    }
-> >> +                    buf_alloc = true;
-> >> +                }
-> >> +
-> >> +                qemu_get_buffer(f, buf, sec_size);
-> >> +
-> >> +                if (buf_alloc) {
-> >> +                    ret = vfio_mig_write(vbasedev, buf, sec_size,
-> >> +                                         region->fd_offset + data_offset);
-> >> +                    g_free(buf);
-> >> +
-> >> +                    if (ret < 0) {
-> >> +                        return ret;
-> >> +                    }
-> >> +                }
-> >> +                size -= sec_size;
-> >> +                data_offset += sec_size;
-> >> +            }
-> >> +
-> >> +            ret = vfio_mig_write(vbasedev, &data_size, sizeof(data_size),
-> >> +                                 region->fd_offset +
-> >> +                       offsetof(struct vfio_device_migration_info, data_size));
-> >> +            if (ret < 0) {
-> >> +                return ret;
-> >> +            }
-> >> +            break;
-> >> +        }
-> >> +
-> >> +        default:
-> >> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
-> >> +            return -EINVAL;
-> >> +        }
-> >> +
-> >> +        data = qemu_get_be64(f);
-> >> +        ret = qemu_file_get_error(f);
-> >> +        if (ret) {
-> >> +            return ret;
-> >> +        }
-> >> +    }
-> >> +
-> >> +    return ret;
-> >> +}
-> >> +
+diff --git a/include/qemu/int128.h b/include/qemu/int128.h
+index 76ea405922..38c8b1ab29 100644
+--- a/include/qemu/int128.h
++++ b/include/qemu/int128.h
+@@ -3,8 +3,10 @@
+ 
+ #ifdef CONFIG_INT128
+ #include "qemu/bswap.h"
++#include "qemu/host-utils.h"
+ 
+ typedef __int128_t Int128;
++typedef __uint128_t Uint128;
+ 
+ static inline Int128 int128_make64(uint64_t a)
+ {
+@@ -16,6 +18,11 @@ static inline Int128 int128_make128(uint64_t lo, uint64_t hi)
+     return (__uint128_t)hi << 64 | lo;
+ }
+ 
++static inline Uint128 uint128_make128(uint64_t lo, uint64_t hi)
++{
++    return (__uint128_t)hi << 64 | lo;
++}
++
+ static inline uint64_t int128_get64(Int128 a)
+ {
+     uint64_t r = a;
+@@ -28,16 +35,31 @@ static inline uint64_t int128_getlo(Int128 a)
+     return a;
+ }
+ 
++static inline uint64_t uint128_getlo(Uint128 a)
++{
++    return a;
++}
++
+ static inline int64_t int128_gethi(Int128 a)
+ {
+     return a >> 64;
+ }
+ 
++static inline uint64_t uint128_gethi(Uint128 a)
++{
++    return a >> 64;
++}
++
+ static inline Int128 int128_zero(void)
+ {
+     return 0;
+ }
+ 
++static inline Uint128 uint128_zero(void)
++{
++    return 0;
++}
++
+ static inline Int128 int128_one(void)
+ {
+     return 1;
+@@ -58,21 +80,51 @@ static inline Int128 int128_and(Int128 a, Int128 b)
+     return a & b;
+ }
+ 
++static inline Uint128 uint128_and(Uint128 a, Uint128 b)
++{
++    return a & b;
++}
++
++static inline Int128 int128_or(Int128 a, Int128 b)
++{
++    return a | b;
++}
++
++static inline Uint128 uint128_or(Uint128 a, Uint128 b)
++{
++    return a | b;
++}
++
+ static inline Int128 int128_rshift(Int128 a, int n)
+ {
+     return a >> n;
+ }
+ 
++static inline Uint128 uint128_rshift(Uint128 a, int n)
++{
++    return a >> n;
++}
++
+ static inline Int128 int128_lshift(Int128 a, int n)
+ {
+     return a << n;
+ }
+ 
++static inline Uint128 uint128_lshift(Uint128 a, int n)
++{
++    return a << n;
++}
++
+ static inline Int128 int128_add(Int128 a, Int128 b)
+ {
+     return a + b;
+ }
+ 
++static inline Uint128 uint128_add(Uint128 a, Uint128 b)
++{
++    return a + b;
++}
++
+ static inline Int128 int128_neg(Int128 a)
+ {
+     return -a;
+@@ -83,6 +135,11 @@ static inline Int128 int128_sub(Int128 a, Int128 b)
+     return a - b;
+ }
+ 
++static inline Uint128 uint128_sub(Uint128 a, Uint128 b)
++{
++    return a - b;
++}
++
+ static inline bool int128_nonneg(Int128 a)
+ {
+     return a >= 0;
+@@ -93,6 +150,11 @@ static inline bool int128_eq(Int128 a, Int128 b)
+     return a == b;
+ }
+ 
++static inline bool uint128_eq(Uint128 a, Uint128 b)
++{
++    return a == b;
++}
++
+ static inline bool int128_ne(Int128 a, Int128 b)
+ {
+     return a != b;
+@@ -148,6 +210,66 @@ static inline Int128 bswap128(Int128 a)
+     return int128_make128(bswap64(int128_gethi(a)), bswap64(int128_getlo(a)));
+ }
+ 
++/**
++ * extract128:
++ * @value: the value to extract the bit field from
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ *
++ * Extract from the 128 bit input @value the bit field specified by the
++ * @start and @length parameters, and return it. The bit field must
++ * lie entirely within the 128 bit word. It is valid to request that
++ * all 128 bits are returned (ie @length 128 and @start 0).
++ *
++ * Returns: the value of the bit field extracted from the input value.
++ */
++static inline Uint128 extract128(Uint128 value, int start, int length)
++{
++    assert(start >= 0 && length > 0 && length <= 128 - start);
++    Uint128 mask = ~(Uint128)0 >> (128 - length);
++    Uint128 shifted = value >> start;
++    return shifted & mask;
++}
++
++/**
++ * deposit128:
++ * @value: initial value to insert bit field into
++ * @start: the lowest bit in the bit field (numbered from 0)
++ * @length: the length of the bit field
++ * @fieldval: the value to insert into the bit field
++ *
++ * Deposit @fieldval into the 128 bit @value at the bit field specified
++ * by the @start and @length parameters, and return the modified
++ * @value. Bits of @value outside the bit field are not modified.
++ * Bits of @fieldval above the least significant @length bits are
++ * ignored. The bit field must lie entirely within the 128 bit word.
++ * It is valid to request that all 128 bits are modified (ie @length
++ * 128 and @start 0).
++ *
++ * Returns: the modified @value.
++ */
++static inline Uint128 deposit128(Uint128 value, int start, int length,
++                                 Uint128 fieldval)
++{
++    assert(start >= 0 && length > 0 && length <= 128 - start);
++    Uint128 mask = (~(Uint128)0 >> (128 - length)) << start;
++    return (value & ~mask) | ((fieldval << start) & mask);
++}
++
++static inline int clz128(Uint128 val)
++{
++    if (val) {
++        uint64_t hi = uint128_gethi(val);
++        if (hi) {
++            return clz64(hi);
++        } else {
++            return 64 + clz64(uint128_getlo(val));
++        }
++    } else {
++        return 128;
++    }
++}
++
+ #else /* !CONFIG_INT128 */
+ 
+ typedef struct Int128 Int128;
+-- 
+2.20.1
 
 
