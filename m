@@ -2,80 +2,83 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84DB5C5517F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0AB0C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:11:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AE45E208C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:09:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C8F032224F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:11:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Li0VxR7z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AE45E208C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ymd9PImY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8F032224F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46884 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48790 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUsKT-0008Ny-7n
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:09:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36808)
+	id 1kUsM5-00014F-BH
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:11:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36948)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kUsJV-0007vw-GY
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:08:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48587)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUsJy-0008KD-SW
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:09:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32072)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kUsJT-0005sT-Rq
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:08:33 -0400
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUsJv-0005u3-PT
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:09:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603202910;
+ s=mimecast20190719; t=1603202939;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=dqXz8mn0Jc+v1mxkLMNLxjdQ8aBFC98pEjfP4TG+aVI=;
- b=Li0VxR7zPM4+ccLRcTY22RlTl79D6l6xWe6lVfKPCCxFY/L3AFxRbdRT3og1Tz2181xvV+
- Kn64FKI3njyeJ3QjbDUe5sigTXVtXgG9wufNfVfHXxES996G4eh7FFUgJ4P2mhfbN4Oy6R
- KzqKHYmhWlrag8FgMAeOzv5/IA1S2qk=
+ bh=0N96Rd726+74B/Tl0yla2QtpD2xDW5Elm8YFTtptrpI=;
+ b=Ymd9PImYmAUDhfrbaCW4ON6nhwhu1rEkuVWM51XrORKJNHIiE2wMysl51MOIxqtiXrIMoT
+ gEesjJiX7qp9VH8jPh9aoUjvb130ScosaNONSj2l84dF7h0zXOncqZahhkWGkvNc8efuJD
+ VBSYeE/yUmIH/jM7jXo6R+qO8iReSQY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-143-eKN7HUWUOSe3RDh5ZOOAeQ-1; Tue, 20 Oct 2020 10:08:27 -0400
-X-MC-Unique: eKN7HUWUOSe3RDh5ZOOAeQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-339-x3shb2MVOqmzpFSo0lqVMw-1; Tue, 20 Oct 2020 10:08:57 -0400
+X-MC-Unique: x3shb2MVOqmzpFSo0lqVMw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 60FAF803F47;
- Tue, 20 Oct 2020 14:08:26 +0000 (UTC)
-Received: from [10.36.114.141] (ovpn-114-141.ams2.redhat.com [10.36.114.141])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C999B5B4A1;
- Tue, 20 Oct 2020 14:08:25 +0000 (UTC)
-Subject: Re: [PATCH 1/4] target/s390x: Improve cc computation for ADD LOGICAL
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20201017022901.78425-1-richard.henderson@linaro.org>
- <20201017022901.78425-2-richard.henderson@linaro.org>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <649e2a34-6ef1-1be2-321c-bfeb050b90b5@redhat.com>
-Date: Tue, 20 Oct 2020 16:08:24 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF4091006C8D;
+ Tue, 20 Oct 2020 14:08:55 +0000 (UTC)
+Received: from kaapi (ovpn-112-157.phx2.redhat.com [10.3.112.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F6C127C2A;
+ Tue, 20 Oct 2020 14:08:52 +0000 (UTC)
+Date: Tue, 20 Oct 2020 19:38:49 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: Stefan Hajnoczi <stefanha@gmail.com>, peter.maydell@linaro.org
+Subject: Re: About 'qemu-security' mailing list
+In-Reply-To: <nycvar.YSQ.7.78.906.2010161910530.1246156@xnncv>
+Message-ID: <nycvar.YSQ.7.78.906.2010201935590.1506567@xnncv>
+References: <nycvar.YSQ.7.78.906.2009111910280.36374@xnncv>
+ <CAFEAcA_9BVbqFCHJqS8jj6L3OqVNc60NCjAjRs516VyLH2EFfw@mail.gmail.com>
+ <20200914101517.GD579094@stefanha-x1.localdomain>
+ <nycvar.YSQ.7.78.906.2009151536090.10832@xnncv>
+ <20200916111025.GA756728@stefanha-x1.localdomain>
+ <nycvar.YSQ.7.78.906.2009181031500.10832@xnncv> <m2362z8dvx.fsf@oracle.com>
+ <nycvar.YSQ.7.78.906.2010011502290.830962@xnncv> <m2mu166uyg.fsf@oracle.com>
+ <nycvar.YSQ.7.78.906.2010012320290.830962@xnncv>
+ <nycvar.YSQ.7.78.906.2010161910530.1246156@xnncv>
 MIME-Version: 1.0
-In-Reply-To: <20201017022901.78425-2-richard.henderson@linaro.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -84,9 +87,8 @@ X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,28 +101,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Darren Kenny <darren.kenny@oracle.com>,
+ =?ISO-8859-15?Q?Daniel_P=2E_Berrang=E9?= <berrange@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 17.10.20 04:28, Richard Henderson wrote:
-> The resulting cc is only dependent on the result and the
-> carry-out.  So save those things rather than the inputs.
-> 
-> Carry-out for 64-bit inputs is had via tcg_gen_add2_i64 directly
-> into cc_src.  Carry-out for 32-bit inputs is had via extraction
-> from a normal 64-bit add (with zero-extended inputs).
-> 
-> Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
++-- On Fri, 16 Oct 2020, P J P wrote --+
+| * So ie. we need to:
+| 
+|   1. Create/setup a regular non-encrypted 'qemu-security' list.
+| 
+|   2. Invite representatives from user/downstream communities to subscribe to 
+|      it.
+| 
+|   3. Collect & store their PGP public keys. Also create a key for the list.
+| 
+|   4. Write 'encrypt & email' automation tool(s) to provide encryption support.
+| 
+|   5. Document and publish above details and list workflow on a page.
+| 
+| ...wdyt?
 
-LGTM
-
-Reviewed-by: David Hildenbrand <david@redhat.com>
-
-
--- 
-Thanks,
-
-David / dhildenb
+Ping..! (just checking; probably folks are buys with KVMForum I guess)
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
 
 
