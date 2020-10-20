@@ -2,64 +2,109 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E720C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C89DC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:35:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6DDAA2224A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:32:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DDAA2224A
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7E1C622242
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 11:35:09 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Noa1QOKv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E1C622242
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:32908 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39158 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUpsG-0007sx-7I
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:32:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54724)
+	id 1kUpv2-0002b8-Gk
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 07:35:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kUpqB-0006cY-Is
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:30:07 -0400
-Received: from zero.eik.bme.hu ([152.66.115.2]:59771)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kUpq6-0001nS-6S
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:30:05 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id A3D8074760B;
- Tue, 20 Oct 2020 13:29:59 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 28DCB747604; Tue, 20 Oct 2020 13:29:59 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 27900747602;
- Tue, 20 Oct 2020 13:29:59 +0200 (CEST)
-Date: Tue, 20 Oct 2020 13:29:59 +0200 (CEST)
-To: P J P <ppandit@redhat.com>
-Subject: Re: [PATCH] ati: mask x y display parameter values
-In-Reply-To: <nycvar.YSQ.7.78.906.2010201220140.1506567@xnncv>
-Message-ID: <d43d9494-72c3-eb52-4588-d324f2857c45@eik.bme.hu>
-References: <20201018120852.1415440-1-ppandit@redhat.com>
- <607d183b-8885-583f-de2a-ee693e641a50@eik.bme.hu>
- <nycvar.YSQ.7.78.906.2010191056550.1472930@xnncv>
- <1e94cbca-121f-52f2-b1e3-6d2fdb59ee42@eik.bme.hu>
- <nycvar.YSQ.7.78.906.2010201220140.1506567@xnncv>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUpu4-0001eQ-Sh
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:34:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60390)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUpu2-0002NB-D2
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 07:34:08 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603193644;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=QONgRfenDuI4RpW0FL5NIret7BNhEnCuWDDU9PU5+As=;
+ b=Noa1QOKvMsxLQfvP81anStTvN1Rk3kIeFgbYrFGlVSWKcZ0eKskvr4RWJK93+SpFq27Q7v
+ 3sEvXTTuCZjcx2aVyfW5vtGN15k8o8jcc1RZ/Lj+lk9Qd3q+pLaCNEXnFv7Wxyo/yk04Di
+ 1bfmwvBS2xWx2MLZihykz0iMrDVE8xk=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-258-aaceRuvTNNedOVvC0bW9GA-1; Tue, 20 Oct 2020 07:34:03 -0400
+X-MC-Unique: aaceRuvTNNedOVvC0bW9GA-1
+Received: by mail-wm1-f72.google.com with SMTP id r19so348053wmh.9
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 04:34:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QONgRfenDuI4RpW0FL5NIret7BNhEnCuWDDU9PU5+As=;
+ b=FA6NxHhDJztyYR/2osP08TcXlIWooWqa+HuLhZw+n2tsIhBhv6l7MP02PhjhcXGz+6
+ 1cJZUIVln5Uc0kgh5fQaArlksFUNWjlLnOVlR8mEJ4s/KaylbSYiiv/XOnvbcCbeP+Gy
+ VZDlrdW9zVtkTqnGauWDXEfFi1KCvULmK24tStRA+ZYCM6tspAj3x968SCdin7jBUF/n
+ 7Nmrz16Ato7RugsKCXKbcby0I4Fg5I/TxKwA7OvqlUhbKkg8xz0M1NVaHVOpF9QZN0H9
+ q+7ogX4eiYNTbrgxyeiFkXm/zLGLePJ7UWragXiNO3Vq+btmTmymyhFPjgymz9jlLaW0
+ dISw==
+X-Gm-Message-State: AOAM531i/FuXipsdJ6k+3EPU4kpXnMfQD6gXcnec5s0LgrXONW20Z0C8
+ HLKVFvTG8UfsNDZyShRmbiFa/vRlWx3RYd6Bvhuo/h4Va4wxY8+4kEecvpD39YYdxOApoDUQZog
+ UzgSuWcluCSGeyQw=
+X-Received: by 2002:adf:edc6:: with SMTP id v6mr2941057wro.273.1603193642053; 
+ Tue, 20 Oct 2020 04:34:02 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw6PL5IpnV1bxIUa5iO6FR+78bxzjTJeAN0rU8dfHQv803JJ7D86sd1/6Ddrg1A3SXEjx6Jog==
+X-Received: by 2002:adf:edc6:: with SMTP id v6mr2941020wro.273.1603193641803; 
+ Tue, 20 Oct 2020 04:34:01 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id i10sm2977962wrq.27.2020.10.20.04.34.00
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Oct 2020 04:34:00 -0700 (PDT)
+Subject: Re: [RFC 5/5] block/nvme: Align iov's va and size on host page size
+To: Eric Auger <eric.auger@redhat.com>, eric.auger.pro@gmail.com,
+ qemu-devel@nongnu.org, qemu-arm@nongnu.org, stefanha@redhat.com,
+ fam@euphon.net, alex.williamson@redhat.com
+References: <20201015115252.15582-1-eric.auger@redhat.com>
+ <20201015115252.15582-6-eric.auger@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <71f7e137-6664-60d9-eb20-887de6a05eac@redhat.com>
+Date: Tue, 20 Oct 2020 13:33:59 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=152.66.115.2; envelope-from=balaton@eik.bme.hu;
- helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:29:59
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201015115252.15582-6-eric.auger@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,103 +117,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gaoning Pan <pgn@zju.edu.cn>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: kwolf@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-Hello,
+On 10/15/20 1:52 PM, Eric Auger wrote:
+> Make sure iov's va and size are properly aligned on the host page
+> size.
+> 
+> Signed-off-by: Eric Auger <eric.auger@redhat.com>
 
-On Tue, 20 Oct 2020, P J P wrote:
-> +-- On Mon, 19 Oct 2020, BALATON Zoltan wrote --+
-> | On Mon, 19 Oct 2020, P J P wrote:
-> | >    dst_x = ... (s->regs.dst_x(=0) + 1 - s->regs.dst_width(=16383))
-> | >    dst_y = ... (s->regs.dst_y(=0) + 1 - s->regs.dst_height(=16383))
-> | >
-> | >  ati_2d_blt
-> | >    pixman_blt(0x7f03cbe00000, 0x7f03cbe00000, 131064, 131064, 32, 32,
-> | >       src_x=0, src_y=-16382, dst_x=0, dst_y=-16382, 16383, 16383)
-> | >
-> | > Shown as negative values due to signed '%d' conversion.
-> |
-> | Checking the docs again I see that the allowed range of at least
-> | s->regs.[src|dst]_[xy] can actually be negative (-8192:8191)
->
-> * But 'struct ATIVGARegs' declares these fields as 'uint32_t' type. Ie. no
->  negativeve values.
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-The card has 32 bit registers with values in them interpreted differently 
-for different regs. For dst_x|y lower 14 bits can be set and value should 
-be interpreted as -8192:8191 according to docs. I've got this wrong 
-because all guests I've tried did not actually use negative values. The 
-Solaris driver I was recently shown not to work may use that so I plan to 
-look at it and fix it when I'll have time.
+> ---
+>   block/nvme.c | 13 +++++++------
+>   1 file changed, 7 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index be8ec48bf2..45807ed110 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -978,11 +978,12 @@ static coroutine_fn int nvme_cmd_map_qiov(BlockDriverState *bs, NvmeCmd *cmd,
+>       for (i = 0; i < qiov->niov; ++i) {
+>           bool retry = true;
+>           uint64_t iova;
+> +        size_t len = QEMU_ALIGN_UP(qiov->iov[i].iov_len,
+> +                                   qemu_real_host_page_size);
+>   try_map:
+>           r = qemu_vfio_dma_map(s->vfio,
+>                                 qiov->iov[i].iov_base,
+> -                              qiov->iov[i].iov_len,
+> -                              true, &iova);
+> +                              len, true, &iova);
+>           if (r == -ENOMEM && retry) {
+>               retry = false;
+>               trace_nvme_dma_flush_queue_wait(s);
+> @@ -1126,8 +1127,8 @@ static inline bool nvme_qiov_aligned(BlockDriverState *bs,
+>       BDRVNVMeState *s = bs->opaque;
+>   
+>       for (i = 0; i < qiov->niov; ++i) {
+> -        if (!QEMU_PTR_IS_ALIGNED(qiov->iov[i].iov_base, s->page_size) ||
+> -            !QEMU_IS_ALIGNED(qiov->iov[i].iov_len, s->page_size)) {
+> +        if (!QEMU_PTR_IS_ALIGNED(qiov->iov[i].iov_base, qemu_real_host_page_size) ||
+> +            !QEMU_IS_ALIGNED(qiov->iov[i].iov_len, qemu_real_host_page_size)) {
+>               trace_nvme_qiov_unaligned(qiov, i, qiov->iov[i].iov_base,
+>                                         qiov->iov[i].iov_len, s->page_size);
+>               return false;
+> @@ -1143,7 +1144,7 @@ static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+>       int r;
+>       uint8_t *buf = NULL;
+>       QEMUIOVector local_qiov;
+> -
+> +    size_t len = QEMU_ALIGN_UP(bytes, qemu_real_host_page_size);
+>       assert(QEMU_IS_ALIGNED(offset, s->page_size));
+>       assert(QEMU_IS_ALIGNED(bytes, s->page_size));
+>       assert(bytes <= s->max_transfer);
+> @@ -1151,7 +1152,7 @@ static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+>           return nvme_co_prw_aligned(bs, offset, bytes, qiov, is_write, flags);
+>       }
+>       trace_nvme_prw_buffered(s, offset, bytes, qiov->niov, is_write);
+> -    buf = qemu_try_memalign(s->page_size, bytes);
+> +    buf = qemu_try_memalign(qemu_real_host_page_size, len);
+>   
+>       if (!buf) {
+>           return -ENOMEM;
+> 
 
-> * I guess that range applies to src->regs.dst_[width|height] too? Considering
->  it being subtracted from s->regs.dst_[xy] values above.
-
-Docs aren't very clear on that but I think these cannot be negative so 
-0:8191 is valid range because it mentions that also bits 0-13 (or maybe 
-0-15, the docs have a lot of copy&paste errors) are valid but only 0-12 
-are used for rectangles, 13-15 used only for trapezoids (which we don't 
-emulate). The docs are really bad so we have to guess and see what guest 
-drivers do most of the time.
-
-> | >    uint8_t *end = s->vga.vram_ptr + s->vga.vram_size;
-> | >    if (dst_bits >= end || dst_bits + dst_x + (dst_y + s->regs.dst_height) *
-> | >    dst_stride >= end) {
-> | >        qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
-> | >        return;
-> |
-> | ... Could it be it overflows?
->
-> * Yes, following expression
->
->  dst_y(=4294950914(=-16382)) + s->regs.dst_height(=16383)) overflows to => 1
->
-> Ie. (dst_bits + dst_x(=0) + (1) * dst_stride >= end) returns false.
-
-So maybe we should cast something (like dst_stride) to uint64_t here to 
-promote everything to 64 bit and prevent it overflowing which then should 
-catch this as well?
-
-> | maybe rather add additional term for src|dst_x|y to the already existing
-> | checks if their condition cannot be fixed to detect it properly.
-> ===
-> diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
-> index 524bc03a83..5fa7362305 100644
-> --- a/hw/display/ati_2d.c
-> +++ b/hw/display/ati_2d.c
-> @@ -54,9 +54,9 @@ void ati_2d_blt(ATIVGAState *s)
-> ...
-> -    if (dst_bits >= end || dst_bits + dst_x + (dst_y + s->regs.dst_height) *
-> -        dst_stride >= end) {
-> +    if (dst_x > 0x3fff || dst_y > 0x3fff || dst_bits >= end
-> +        || dst_bits + dst_x + (dst_y + s->regs.dst_height)
-> +         * dst_stride >= end) {
->         qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
->         return;
->     }
-> ...
-> -        if (src_bits >= end || src_bits + src_x +
-> -            (src_y + s->regs.dst_height) * src_stride >= end) {
-> +        if (src_x > 0x3fff || src_y > 0x3ff || src_bits >= end
-> +            || src_bits + src_x + (src_y + s->regs.dst_height)
-> +             * src_stride >= end) {
->             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
->             return;
->         }
-> ===
->
-> * Does it look okay?
-
-I can live with that until I have a chance to rewrite it but are you sure 
-this will catch all possible overflows with all vram sizes that can be set 
-with vgamem_mb property?
-
-Regards,
-BALATON Zoltan
 
