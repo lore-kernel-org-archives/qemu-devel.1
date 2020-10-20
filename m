@@ -2,93 +2,90 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD5D5C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:06:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0687DC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:23:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B054E2222F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:06:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 36D1D222E9
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 02:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X/fiaVos"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B054E2222F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hm42nY9M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36D1D222E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58062 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60782 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUh2w-0005UZ-J7
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 22:06:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56388)
+	id 1kUhJS-0007qJ-2v
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 22:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60082)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kUh10-0004dS-Be
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:04:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43088)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kUh0v-0005aN-KV
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:04:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603159473;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=sJ9mnbPhLqETFjr0TlQcoVWNbgqv7mKfYOPkF5VzMQc=;
- b=X/fiaVosNGTX/R/E0RWhCb183zWcE85OuQf4lQJiHEChqdXjY0MxffHPUxDJ0T0RWC9v5L
- 7lWKYbPo1/Z91QhluxkTFuszlRrmcF3g83Mcjt44S/QSFl1X1bFAu16NqH4WAwjQr4rwd5
- W1GUvwGHaSx4VeHqw21n1qIrg+Wd4qQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-306-dfpwWhpSOK-FMu4GvP1BXg-1; Mon, 19 Oct 2020 22:04:31 -0400
-X-MC-Unique: dfpwWhpSOK-FMu4GvP1BXg-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 72A9757240;
- Tue, 20 Oct 2020 02:04:29 +0000 (UTC)
-Received: from [10.72.13.171] (ovpn-13-171.pek2.redhat.com [10.72.13.171])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 604955B4AE;
- Tue, 20 Oct 2020 02:04:11 +0000 (UTC)
-Subject: Re: [PATCH v2 0/5] memory: Skip assertion in
- memory_region_unregister_iommu_notifier
-To: =?UTF-8?Q?Eugenio_P=c3=a9rez?= <eperezma@redhat.com>,
- qemu-devel@nongnu.org, Peter Xu <peterx@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
-References: <20201019104244.21830-1-eperezma@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <ed3e1d6e-263c-f3da-15d2-deaae3b7a734@redhat.com>
-Date: Tue, 20 Oct 2020 10:04:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kUhI7-0007Ns-Sw
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:22:23 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:37300)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chenhuacai@gmail.com>)
+ id 1kUhI3-0007qx-SS
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 22:22:23 -0400
+Received: by mail-io1-xd43.google.com with SMTP id q25so698877ioh.4
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 19:22:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=/OCzxbejkp6iYPb+XXKUw+6TmvhO9YHyefUfUoWFaGY=;
+ b=Hm42nY9MfyJZMB7xFwMFMWVAjBQHn4k7Y60KkaexQN5rj4m2ecR2Fa6u09wjk2RMye
+ GP6tcqFHM6iB8zr3SZCFWySnn714nQ2dbBR65RLy1g8UAfhQSAshZ1jm8eNz4ao2QD7G
+ Y4ik/SZFJFmFqCCIv5Jex0kL0kivXespbtetmPFef15tmz31ptDmr1JzSRtr7oxOKhLS
+ H6Dl6QVVSaqF+ilRC0VP7Egp06ieQBNljXKZ7reQWir++5M6NQczSMVeGMAL0h61wSjo
+ HWyPXax/fmffYykU2M88ER6yGkQfDSc1scyR2JrDpIFVo/VZym1+Kj8bfhkY12YKgCCv
+ 6+dA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=/OCzxbejkp6iYPb+XXKUw+6TmvhO9YHyefUfUoWFaGY=;
+ b=T8xoOaalVgxsQENdCBZprRSO/szdhVSWJNWJVmlC0JIOrTvl/2nISQiHeanpm06hH1
+ aTD+6xoh6DWq3Q/uIdvat+3z+uY+RzkcAEI35Z/p+mS2KE0rpXZrR0S3rz7YsomsIjxq
+ o9gs20OKywrlNvCh8oO96ZrpAO+7YqYIsDeJ8skAwWqDSqNuiw7LEE6kfPTOMdt8V8YL
+ 3T4HwK2VuPJSh2Khd+lEWBuwIBhXoWUflJzCbGEXXoduSMtF9WnUp2Db8TIcpnAGF3zm
+ HKODo4AttaUhB76Zvg4vXsOh/ZG09RlW0FFajmYI3uKTX2Ea2Nk2WZv6t1g5/6lXFjhM
+ APlQ==
+X-Gm-Message-State: AOAM530nWKl0YeWjI8o8SJJZzwHU1FgMKrWqT7ltxsPo7oZHbfA1+8IJ
+ S3Rg3ddOuyhysh7h7TYoaLf74CCjUg6Nl8lMPoc=
+X-Google-Smtp-Source: ABdhPJxnOIWf3LHXjxItjNnaeQU30yKcoWFUnu25EGCN4qLU/XyXwbQfNwWOthWf+kYW5+rmGJWnlzzarUsoVH4Lf6I=
+X-Received: by 2002:a05:6602:1352:: with SMTP id
+ i18mr571075iov.148.1603160538409; 
+ Mon, 19 Oct 2020 19:22:18 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201019104244.21830-1-eperezma@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:04:33
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <1602831120-3377-1-git-send-email-chenhc@lemote.com>
+ <1602831120-3377-7-git-send-email-chenhc@lemote.com>
+ <20c5dfdb-f856-8fbe-bdef-27f9df3f5885@amsat.org>
+In-Reply-To: <20c5dfdb-f856-8fbe-bdef-27f9df3f5885@amsat.org>
+From: Huacai Chen <chenhuacai@gmail.com>
+Date: Tue, 20 Oct 2020 10:22:05 +0800
+Message-ID: <CAAhV-H6=FREsk8rqLFzvQZEbw6oFEndJ=M6g-2yJ8yXu72bWeg@mail.gmail.com>
+Subject: Re: [PATCH V14 6/8] hw/mips: Add Loongson-3 boot parameter helpers
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=chenhuacai@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,218 +99,522 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>,
  Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Yan Zhao <yan.y.zhao@intel.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Juan Quintela <quintela@redhat.com>, qemu-ppc@nongnu.org,
- Eric Auger <eric.auger@redhat.com>, qemu-arm@nongnu.org,
- =?UTF-8?Q?Herv=c3=a9_Poussineau?= <hpoussin@reactos.org>,
- Avi Kivity <avi@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+ Aurelien Jarno <aurelien@aurel32.net>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, Philippe,
 
-On 2020/10/19 下午6:42, Eugenio Pérez wrote:
-> I am able to hit this assertion when a Red Hat 7 guest virtio_net device
-> raises an "Invalidation" of all the TLB entries. This happens in the
-> guest's startup if 'intel_iommu=on' argument is passed to the guest
-> kernel and right IOMMU/ATS devices are declared in qemu's command line.
+On Fri, Oct 16, 2020 at 10:24 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.o=
+rg> wrote:
 >
-> Command line:
-> /home/qemu/x86_64-softmmu/qemu-system-x86_64 -name \
-> guest=rhel7-test,debug-threads=on -machine \
-> pc-q35-5.1,accel=kvm,usb=off,dump-guest-core=off,kernel_irqchip=split \
-> -cpu \
-> Broadwell,vme=on,ss=on,vmx=on,f16c=on,rdrand=on,hypervisor=on,arat=on,tsc-adjust=on,umip=on,arch-capabilities=on,xsaveopt=on,pdpe1gb=on,abm=on,skip-l1dfl-vmentry=on,rtm=on,hle=on \
-> -m 8096 -realtime mlock=off -smp 2,sockets=2,cores=1,threads=1 -uuid \
-> d022ecbf-679e-4755-87ce-eb87fc5bbc5d -display none -no-user-config \
-> -nodefaults -rtc base=utc,driftfix=slew -global \
-> kvm-pit.lost_tick_policy=delay -no-hpet -no-shutdown -global \
-> ICH9-LPC.disable_s3=1 -global ICH9-LPC.disable_s4=1 -boot strict=on \
-> -device intel-iommu,intremap=on,device-iotlb=on -device \
-> pcie-root-port,port=0x8,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x1 \
-> -device \
-> pcie-root-port,port=0x9,chassis=2,id=pci.2,bus=pcie.0,addr=0x1.0x1 \
-> -device \
-> pcie-root-port,port=0xa,chassis=3,id=pci.3,bus=pcie.0,addr=0x1.0x2 \
-> -device \
-> pcie-root-port,port=0xb,chassis=4,id=pci.4,bus=pcie.0,addr=0x1.0x3 \
-> -device \
-> pcie-root-port,port=0xc,chassis=5,id=pci.5,bus=pcie.0,addr=0x1.0x4 \
-> -device \
-> pcie-root-port,port=0xd,chassis=6,id=pci.6,bus=pcie.0,addr=0x1.0x5 \
-> -device \
-> pcie-root-port,port=0xe,chassis=7,id=pci.7,bus=pcie.0,addr=0x1.0x6 \
-> -device qemu-xhci,p2=15,p3=15,id=usb,bus=pci.2,addr=0x0 -device \
-> virtio-serial-pci,id=virtio-serial0,bus=pci.3,addr=0x0 -drive \
-> file=/home/virtio-test2.qcow2,format=qcow2,if=none,id=drive-virtio-disk0 \
-> -device \
-> virtio-blk-pci,scsi=off,bus=pci.4,addr=0x0,drive=drive-virtio-disk0,id=virtio-disk0,bootindex=1 \
-> -netdev tap,id=hostnet0,vhost=on,vhostforce=on -device \
-> virtio-net-pci,netdev=hostnet0,id=net0,mac=52:54:00:0d:1d:f2,bus=pci.1,addr=0x0,iommu_platform=on,ats=on \
-> -device virtio-balloon-pci,id=balloon0,bus=pci.5,addr=0x0 -object \
-> rng-random,id=objrng0,filename=/dev/urandom -device \
-> virtio-rng-pci,rng=objrng0,id=rng0,bus=pci.6,addr=0x0 -s -msg \
-> timestamp=on
+> Hi Huacai,
 >
-> Full backtrace:
->   #0  0x00007ffff521370f in raise () at /lib64/libc.so.6
->   #1  0x00007ffff51fdb25 in abort () at /lib64/libc.so.6
->   #2  0x00007ffff51fd9f9 in _nl_load_domain.cold.0 () at /lib64/libc.so.6
->   #3  0x00007ffff520bcc6 in .annobin_assert.c_end () at /lib64/libc.so.6
->   #4  0x0000555555888171 in memory_region_notify_one (notifier=0x7ffde0487fa8,
->                                                      entry=0x7ffde5dfe200)
->                            at /home/qemu/memory.c:1918
->   #5  0x0000555555888247 in memory_region_notify_iommu (iommu_mr=0x555556f6c0b0,
->                                                        iommu_idx=0, entry=...)
->                            at /home/qemu/memory.c:1941
->   #6  0x0000555555951c8d in vtd_process_device_iotlb_desc (s=0x555557609000,
->                                                         inv_desc=0x7ffde5dfe2d0)
->                            at /home/qemu/hw/i386/intel_iommu.c:2468
->   #7  0x0000555555951e6a in vtd_process_inv_desc (s=0x555557609000)
->                            at /home/qemu/hw/i386/intel_iommu.c:2531
->   #8  0x0000555555951fa5 in vtd_fetch_inv_desc (s=0x555557609000)
->                            at /home/qemu/hw/i386/intel_iommu.c:2563
->   #9  0x00005555559520e5 in vtd_handle_iqt_write (s=0x555557609000)
->                            at /home/qemu/hw/i386/intel_iommu.c:2590
->   #10 0x0000555555952b45 in vtd_mem_write (opaque=0x555557609000, addr=136,
->                                           val=2688, size=4)
->                            at /home/qemu/hw/i386/intel_iommu.c:2837
->   #11 0x0000555555883e17 in memory_region_write_accessor (mr=0x555557609330,
->                                                          addr=136,
->                                                          value=0x7ffde5dfe478,
->                                                          size=4,
->                                                          shift=0,
->                                                          mask=4294967295,
->                                                          attrs=...)
->                           at /home/qemu/memory.c:483
->   #12 0x000055555588401d in access_with_adjusted_size (addr=136,
->                         value=0x7ffde5dfe478,
->                         size=4,
->                         access_size_min=4,
->                         access_size_max=8,
->                         access_fn=0x555555883d38 <memory_region_write_accessor>,
->                         mr=0x555557609330,
->                         attrs=...)
->                         at /home/qemu/memory.c:544
->   #13 0x0000555555886f37 in memory_region_dispatch_write (mr=0x555557609330,
->                                                         addr=136,
->                                                         data=2688,
->                                                         op=MO_32,
->                                                         attrs=...)
->                           at /home/qemu/memory.c:1476
->   #14 0x0000555555827a03 in flatview_write_continue (fv=0x7ffdd8503150,
->                                                     addr=4275634312,
->                                                     attrs=...,
->                                                     ptr=0x7ffff7ff0028,
->                                                     len=4,
->                                                     addr1=136,
->                                                     l=4,
->                                                     mr=0x555557609330)
->                            at /home/qemu/exec.c:3146
->   #15 0x0000555555827b48 in flatview_write (fv=0x7ffdd8503150,
->                                            addr=4275634312,
->                                            attrs=...,
->                                            buf=0x7ffff7ff0028,
->                                            len=4)
->                            at /home/qemu/exec.c:3186
->   #16 0x0000555555827e9d in address_space_write (
->                                        as=0x5555567ca640 <address_space_memory>,
->                                        addr=4275634312,
->                                        attrs=...,
->                                        buf=0x7ffff7ff0028,
->                                        len=4)
->                            at /home/qemu/exec.c:3277
->   #17 0x0000555555827f0a in address_space_rw (
->                                        as=0x5555567ca640 <address_space_memory>,
->                                        addr=4275634312,
->                                        attrs=...,
->                                        buf=0x7ffff7ff0028,
->                                        len=4,
->                                        is_write=true)
->                            at /home/qemu/exec.c:3287
->   #18 0x000055555589b633 in kvm_cpu_exec (cpu=0x555556b65640)
->                                 at /home/qemu/accel/kvm/kvm-all.c:2511
->   #19 0x0000555555876ba8 in qemu_kvm_cpu_thread_fn (arg=0x555556b65640)
->                                 at /home/qemu/cpus.c:1284
->   #20 0x0000555555dafff1 in qemu_thread_start (args=0x555556b8c3b0)
->                                 at util/qemu-thread-posix.c:521
->   #21 0x00007ffff55a62de in start_thread () at /lib64/libpthread.so.0
->   #22 0x00007ffff52d7e83 in clone () at /lib64/libc.so.6
+> On 10/16/20 8:51 AM, Huacai Chen wrote:
+> > Preparing to add Loongson-3 machine support, add Loongson-3's LEFI (a
+> > UEFI-like interface for BIOS-Kernel boot parameters) helpers first.
+> >
+> > Signed-off-by: Huacai Chen <chenhc@lemote.com>
+> > Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 >
-> (gdb) frame 4
->   #4  0x0000555555888171 in memory_region_notify_one
->                        (notifier=0x7ffde0487fa8, entry=0x7ffde5dfe200)
->                        at /home/qemu/memory.c:1918
-> 1918        assert(entry->iova >= notifier->start && entry_end <=
-> notifier->end);
-> (gdb) p *entry
-> $1 = {target_as = 0x555556f6c050, iova = 0, translated_addr = 0,
-> addr_mask = 18446744073709551615, perm = IOMMU_NONE}
-> --
+>  From the kernel documentation [*] on the "Co-developed-by" tag:
 >
-> Tested with vhost-net and qemu driver, host<->guest communication.
+>    A Co-Developed-by: states that the patch was also created
+>    by another developer along with the original author. This
+>    is useful at times when multiple people work on a single
+>    patch. Note, this person also needs to have a Signed-off-by:
+>    line in the patch as well.
 >
-> v2: * Delete underflow assertion
->      * Tested again rebased over ("3e407488349 Merge remote-tracking
->        branch 'remotes/rth/tags/pull-mb-20201014' into staging")
->
-> v1: * IOMMU_NOTIFIER_ALL now includes IOMMU_NOTIFIER_DEVIOTLB_EVENTS
->        also. VFIO IOMMU notifier will register for all events (as before
->        of the patching)
->      * Cosmetic changes, like:
->        - Expand commit messages
->        - Better naming and checks
->        - Fix alignment issues
->        - Avoid an already present casting from `void *`
->   at https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg01505.html
->
-> RFC v8: Fix use of "tmp" notification in memory.c:memory_region_notify_iommu_one
->
-> v7: Add IOMMUTLBNotification, and move introduced "type" from
->      IOMMUTLBEntry to the former.
->
-> v6: Introduce "type" field for IOMMUTLBEntry. Fill in all uses.
->      Update tests reports with more fine-tuning (CPU, RPS/XPS tunning).
->
-> v5: Skip regular IOTLB notifications in dev_iotlb notifiers
->
-> v4: Rename IOMMU_NOTIFIER_IOTLB -> IOMMU_NOTIFIER_DEVIOTLB.
->      Make vhost-net notifier just IOMMU_NOTIFIER_DEVIOTLB, not
->      IOMMU_NOTIFIER_UNMAP
->
-> v3: Skip the assertion in case notifier is a IOTLB one, since they can manage
->      arbitrary ranges. Using a flag in the notifier for now, as Peter suggested.
->
-> v2: Actually delete assertion instead of just commenting out using C99
->
-> Eugenio Pérez (5):
->    memory: Rename memory_region_notify_one to
->      memory_region_notify_iommu_one
->    memory: Add IOMMUTLBEvent
->    memory: Add IOMMU_NOTIFIER_DEVIOTLB_UNMAP IOMMUTLBNotificationType
->    intel_iommu: Skip page walking on device iotlb invalidations
->    memory: Skip bad range assertion if notifier is DEVIOTLB_UNMAP type
->
->   include/exec/memory.h | 40 ++++++++++---------
->   hw/arm/smmu-common.c  | 13 +++---
->   hw/arm/smmuv3.c       | 13 +++---
->   hw/i386/intel_iommu.c | 92 +++++++++++++++++++++++++------------------
->   hw/misc/tz-mpc.c      | 32 ++++++++-------
->   hw/ppc/spapr_iommu.c  | 15 +++----
->   hw/virtio/vhost.c     |  2 +-
->   softmmu/memory.c      | 30 ++++++++------
->   8 files changed, 134 insertions(+), 103 deletions(-)
-
-
-Acked-by: Jason Wang <jasowang@redhat.com>
-
-Thanks
-
+> Can Jiaxun Yang add his Signed-off-by tag?
+OK, I will add him.
 
 >
+> [*]
+> https://www.kernel.org/doc/html/v4.17/process/submitting-patches.html#whe=
+n-to-use-acked-by-cc-and-co-developed-by
+>
+> > ---
+> >   hw/mips/loongson3_bootp.c | 162 +++++++++++++++++++++++++++
+> >   hw/mips/loongson3_bootp.h | 225 +++++++++++++++++++++++++++++++++++++=
++
+> >   hw/mips/meson.build       |   1 +
+> >   3 files changed, 388 insertions(+)
+> >   create mode 100644 hw/mips/loongson3_bootp.c
+> >   create mode 100644 hw/mips/loongson3_bootp.h
+>
+> Consider using scripts/git.orderfile to avoid reviewer
+> scrolling down/up/down/up.
+OK, I will do.
 
+>
+> >
+> > diff --git a/hw/mips/loongson3_bootp.c b/hw/mips/loongson3_bootp.c
+> > new file mode 100644
+> > index 0000000000..eab6f51a01
+> > --- /dev/null
+> > +++ b/hw/mips/loongson3_bootp.c
+> > @@ -0,0 +1,162 @@
+> > +/*
+> > + * LEFI (a UEFI-like interface for BIOS-Kernel boot parameters) helper=
+s
+> > + *
+> > + * Copyright (c) 2017-2020 Huacai Chen (chenhc@lemote.com)
+> > + * Copyright (c) 2017-2020 Jiaxun Yang <jiaxun.yang@flygoat.com>
+> > + *
+> > + * This program is free software: you can redistribute it and/or modif=
+y
+> > + * it under the terms of the GNU General Public License as published b=
+y
+> > + * the Free Software Foundation, either version 2 of the License, or
+> > + * (at your option) any later version.
+> > + *
+> > + * This program is distributed in the hope that it will be useful,
+> > + * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> > + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+> > + * GNU General Public License for more details.
+> > + *
+> > + * You should have received a copy of the GNU General Public License
+> > + * along with this program. If not, see <https://www.gnu.org/licenses/=
+>.
+> > + */
+> > +
+> > +#include "qemu/osdep.h"
+> > +#include "qemu/units.h"
+> > +#include "qemu/cutils.h"
+> > +#include "cpu.h"
+> > +#include "hw/boards.h"
+> > +#include "hw/mips/loongson3_bootp.h"
+> > +
+> > +static struct efi_cpuinfo_loongson *init_cpu_info(void *g_cpuinfo, uin=
+t64_t cpu_freq)
+> > +{
+> > +    struct efi_cpuinfo_loongson *c =3D g_cpuinfo;
+> > +
+> > +    stl_le_p(&c->cputype, Loongson_3A);
+> > +    stl_le_p(&c->processor_id, MIPS_CPU(first_cpu)->env.CP0_PRid);
+> > +    if (cpu_freq > UINT_MAX) {
+> > +        stl_le_p(&c->cpu_clock_freq, UINT_MAX);
+> > +    } else {
+> > +        stl_le_p(&c->cpu_clock_freq, cpu_freq);
+> > +    }
+> > +
+> > +    stw_le_p(&c->cpu_startup_core_id, 0);
+> > +    stl_le_p(&c->nr_cpus, current_machine->smp.cpus);
+> > +    stl_le_p(&c->total_node, (current_machine->smp.cpus + 3) / 4);
+>
+> Please replace this magic values by a definition, such:
+>
+> #define LOONGSON3_CORE_PER_NODE 4
+>
+> Then you can use:
+>
+>     stl_le_p(&c->total_node, DIV_ROUND_UP(current_machine->smp.cpus,
+>                                           LOONGSON3_CORE_PER_NODE));
+>
+OK, Thank you.
+
+> > +
+> > +    return c;
+> > +}
+> > +
+> > +static struct efi_memory_map_loongson *init_memory_map(void *g_map, ui=
+nt64_t ram_size)
+> > +{
+> > +    struct efi_memory_map_loongson *emap =3D g_map;
+> > +
+> > +    stl_le_p(&emap->nr_map, 2);
+> > +    stl_le_p(&emap->mem_freq, 300000000);
+> > +
+> > +    stl_le_p(&emap->map[0].node_id, 0);
+> > +    stl_le_p(&emap->map[0].mem_type, 1);
+> > +    stq_le_p(&emap->map[0].mem_start, 0x0);
+> > +    stl_le_p(&emap->map[0].mem_size, 240);
+> > +
+> > +    stl_le_p(&emap->map[1].node_id, 0);
+> > +    stl_le_p(&emap->map[1].mem_type, 2);
+> > +    stq_le_p(&emap->map[1].mem_start, 0x90000000);
+> > +    stl_le_p(&emap->map[1].mem_size, (ram_size / MiB) - 256);
+> > +
+> > +    return emap;
+> > +}
+> > +
+> > +static struct system_loongson *init_system_loongson(void *g_system)
+> > +{
+> > +    struct system_loongson *s =3D g_system;
+> > +
+> > +    stl_le_p(&s->ccnuma_smp, 0);
+> > +    stl_le_p(&s->sing_double_channel, 1);
+> > +    stl_le_p(&s->nr_uarts, 1);
+> > +    stl_le_p(&s->uarts[0].iotype, 2);
+> > +    stl_le_p(&s->uarts[0].int_offset, 2);
+> > +    stl_le_p(&s->uarts[0].uartclk, 25000000); /* Random value */
+> > +    stq_le_p(&s->uarts[0].uart_base, virt_memmap[VIRT_UART].base);
+> > +
+> > +    return s;
+> > +}
+> > +
+> > +static struct irq_source_routing_table *init_irq_source(void *g_irq_so=
+urce)
+> > +{
+> > +    struct irq_source_routing_table *irq_info =3D g_irq_source;
+> > +
+> > +    stl_le_p(&irq_info->node_id, 0);
+> > +    stl_le_p(&irq_info->PIC_type, 0);
+> > +    stw_le_p(&irq_info->dma_mask_bits, 64);
+> > +    stq_le_p(&irq_info->pci_mem_start_addr, virt_memmap[VIRT_PCIE_MMIO=
+].base);
+> > +    stq_le_p(&irq_info->pci_mem_end_addr, virt_memmap[VIRT_PCIE_MMIO].=
+base +
+> > +                                          virt_memmap[VIRT_PCIE_MMIO].=
+size - 1);
+> > +    stq_le_p(&irq_info->pci_io_start_addr, virt_memmap[VIRT_PCIE_PIO].=
+base);
+> > +
+> > +    return irq_info;
+> > +}
+> > +
+> > +static struct interface_info *init_interface_info(void *g_interface)
+> > +{
+> > +    struct interface_info *interface =3D g_interface;
+> > +
+> > +    stw_le_p(&interface->vers, 0x01);
+> > +    strpadcpy(interface->description, 64, "UEFI_Version_v1.0", '\0');
+> > +
+> > +    return interface;
+> > +}
+> > +
+> > +static struct board_devices *board_devices_info(void *g_board)
+> > +{
+> > +    struct board_devices *bd =3D g_board;
+> > +
+> > +    strpadcpy(bd->name, 64, "Loongson-3A-VIRT-1w-V1.00-demo", '\0');
+> > +
+> > +    return bd;
+> > +}
+> > +
+> > +static struct loongson_special_attribute *init_special_info(void *g_sp=
+ecial)
+> > +{
+> > +    struct loongson_special_attribute *special =3D g_special;
+> > +
+> > +    strpadcpy(special->special_name, 64, "2017-10-12", '\0');
+> > +
+> > +    return special;
+> > +}
+> > +
+> > +void init_loongson_params(struct loongson_params *lp, void *p,
+> > +                          uint64_t cpu_freq, uint64_t ram_size)
+> > +{
+> > +    stq_le_p(&lp->cpu_offset,
+> > +              (uintptr_t)init_cpu_info(p, cpu_freq) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct efi_cpuinfo_loongson), 64);
+> > +
+> > +    stq_le_p(&lp->memory_offset,
+> > +              (uintptr_t)init_memory_map(p, ram_size) - (uintptr_t)lp)=
+;
+> > +    p +=3D ROUND_UP(sizeof(struct efi_memory_map_loongson), 64);
+> > +
+> > +    stq_le_p(&lp->system_offset,
+> > +              (uintptr_t)init_system_loongson(p) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct system_loongson), 64);
+> > +
+> > +    stq_le_p(&lp->irq_offset,
+> > +              (uintptr_t)init_irq_source(p) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct irq_source_routing_table), 64);
+> > +
+> > +    stq_le_p(&lp->interface_offset,
+> > +              (uintptr_t)init_interface_info(p) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct interface_info), 64);
+> > +
+> > +    stq_le_p(&lp->boarddev_table_offset,
+> > +              (uintptr_t)board_devices_info(p) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct board_devices), 64);
+> > +
+> > +    stq_le_p(&lp->special_offset,
+> > +              (uintptr_t)init_special_info(p) - (uintptr_t)lp);
+> > +    p +=3D ROUND_UP(sizeof(struct loongson_special_attribute), 64);
+> > +}
+> > +
+> > +void init_reset_system(struct efi_reset_system_t *reset)
+> > +{
+> > +    stq_le_p(&reset->Shutdown, 0xffffffffbfc000a8);
+> > +    stq_le_p(&reset->ResetCold, 0xffffffffbfc00080);
+> > +    stq_le_p(&reset->ResetWarm, 0xffffffffbfc00080);
+> > +}
+> > diff --git a/hw/mips/loongson3_bootp.h b/hw/mips/loongson3_bootp.h
+> > new file mode 100644
+> > index 0000000000..1edd736b6a
+> > --- /dev/null
+> > +++ b/hw/mips/loongson3_bootp.h
+> > @@ -0,0 +1,225 @@
+> > +/*
+> > + * LEFI (a UEFI-like interface for BIOS-Kernel boot parameters) data s=
+tructrues
+> > + * defined at arch/mips/include/asm/mach-loongson64/boot_param.h in Li=
+nux kernel
+>
+> Missing license boilerplate.
+I thought this is unneccesary for a .h file, and I will add that in
+the next version.
+>
+> > + */
+> > +
+> > +#ifndef HW_MIPS_LOONGSON3_BOOTP_H
+> > +#define HW_MIPS_LOONGSON3_BOOTP_H
+> > +
+> > +struct efi_memory_map_loongson {
+> > +    uint16_t vers;               /* version of efi_memory_map */
+> > +    uint32_t nr_map;             /* number of memory_maps */
+> > +    uint32_t mem_freq;           /* memory frequence */
+> > +    struct mem_map {
+> > +        uint32_t node_id;        /* node_id which memory attached to *=
+/
+> > +        uint32_t mem_type;       /* system memory, pci memory, pci io,=
+ etc. */
+> > +        uint64_t mem_start;      /* memory map start address */
+> > +        uint32_t mem_size;       /* each memory_map size, not the tota=
+l size */
+> > +    } map[128];
+> > +} QEMU_PACKED;
+> > +
+> > +enum loongson_cpu_type {
+> > +    Legacy_2E =3D 0x0,
+> > +    Legacy_2F =3D 0x1,
+> > +    Legacy_3A =3D 0x2,
+> > +    Legacy_3B =3D 0x3,
+> > +    Legacy_1A =3D 0x4,
+> > +    Legacy_1B =3D 0x5,
+> > +    Legacy_2G =3D 0x6,
+> > +    Legacy_2H =3D 0x7,
+> > +    Loongson_1A =3D 0x100,
+> > +    Loongson_1B =3D 0x101,
+> > +    Loongson_2E =3D 0x200,
+> > +    Loongson_2F =3D 0x201,
+> > +    Loongson_2G =3D 0x202,
+> > +    Loongson_2H =3D 0x203,
+> > +    Loongson_3A =3D 0x300,
+> > +    Loongson_3B =3D 0x301
+> > +};
+> > +
+> > +/*
+> > + * Capability and feature descriptor structure for MIPS CPU
+> > + */
+> > +struct efi_cpuinfo_loongson {
+> > +    uint16_t vers;               /* version of efi_cpuinfo_loongson */
+> > +    uint32_t processor_id;       /* PRID, e.g. 6305, 6306 */
+> > +    uint32_t cputype;            /* Loongson_3A/3B, etc. */
+> > +    uint32_t total_node;         /* num of total numa nodes */
+> > +    uint16_t cpu_startup_core_id;   /* Boot core id */
+> > +    uint16_t reserved_cores_mask;
+> > +    uint32_t cpu_clock_freq;     /* cpu_clock */
+> > +    uint32_t nr_cpus;
+> > +    char cpuname[64];
+> > +} QEMU_PACKED;
+> > +
+> > +#define MAX_UARTS 64
+> > +struct uart_device {
+> > +    uint32_t iotype;
+> > +    uint32_t uartclk;
+> > +    uint32_t int_offset;
+> > +    uint64_t uart_base;
+> > +} QEMU_PACKED;
+> > +
+> > +#define MAX_SENSORS 64
+> > +#define SENSOR_TEMPER  0x00000001
+> > +#define SENSOR_VOLTAGE 0x00000002
+> > +#define SENSOR_FAN     0x00000004
+> > +struct sensor_device {
+> > +    char name[32];  /* a formal name */
+> > +    char label[64]; /* a flexible description */
+> > +    uint32_t type;       /* SENSOR_* */
+> > +    uint32_t id;         /* instance id of a sensor-class */
+> > +    uint32_t fan_policy; /* step speed or constant speed */
+> > +    uint32_t fan_percent;/* only for constant speed policy */
+> > +    uint64_t base_addr;  /* base address of device registers */
+> > +} QEMU_PACKED;
+> > +
+> > +struct system_loongson {
+> > +    uint16_t vers;               /* version of system_loongson */
+> > +    uint32_t ccnuma_smp;         /* 0: no numa; 1: has numa */
+> > +    uint32_t sing_double_channel;/* 1: single; 2: double */
+> > +    uint32_t nr_uarts;
+> > +    struct uart_device uarts[MAX_UARTS];
+> > +    uint32_t nr_sensors;
+> > +    struct sensor_device sensors[MAX_SENSORS];
+> > +    char has_ec;
+> > +    char ec_name[32];
+> > +    uint64_t ec_base_addr;
+> > +    char has_tcm;
+> > +    char tcm_name[32];
+> > +    uint64_t tcm_base_addr;
+> > +    uint64_t workarounds;
+> > +    uint64_t of_dtb_addr; /* NULL if not support */
+> > +} QEMU_PACKED;
+> > +
+> > +struct irq_source_routing_table {
+> > +    uint16_t vers;
+> > +    uint16_t size;
+> > +    uint16_t rtr_bus;
+> > +    uint16_t rtr_devfn;
+> > +    uint32_t vendor;
+> > +    uint32_t device;
+> > +    uint32_t PIC_type;           /* conform use HT or PCI to route to =
+CPU-PIC */
+> > +    uint64_t ht_int_bit;         /* 3A: 1<<24; 3B: 1<<16 */
+> > +    uint64_t ht_enable;          /* irqs used in this PIC */
+> > +    uint32_t node_id;            /* node id: 0x0-0; 0x1-1; 0x10-2; 0x1=
+1-3 */
+> > +    uint64_t pci_mem_start_addr;
+> > +    uint64_t pci_mem_end_addr;
+> > +    uint64_t pci_io_start_addr;
+> > +    uint64_t pci_io_end_addr;
+> > +    uint64_t pci_config_addr;
+> > +    uint16_t dma_mask_bits;
+> > +    uint16_t dma_noncoherent;
+> > +} QEMU_PACKED;
+> > +
+> > +struct interface_info {
+> > +    uint16_t vers;               /* version of the specificition */
+> > +    uint16_t size;
+> > +    uint8_t  flag;
+> > +    char description[64];
+> > +} QEMU_PACKED;
+> > +
+> > +#define MAX_RESOURCE_NUMBER 128
+> > +struct resource_loongson {
+> > +    uint64_t start;              /* resource start address */
+> > +    uint64_t end;                /* resource end address */
+> > +    char name[64];
+> > +    uint32_t flags;
+> > +};
+> > +
+> > +struct archdev_data {};          /* arch specific additions */
+> > +
+> > +struct board_devices {
+> > +    char name[64];               /* hold the device name */
+> > +    uint32_t num_resources;      /* number of device_resource */
+> > +    /* for each device's resource */
+> > +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
+> > +    /* arch specific additions */
+> > +    struct archdev_data archdata;
+>
+> Maybe drop archdev_data and use:
+>
+>         char arch_specific_data[];
+I just keep consistency with Linux kernel here.
+
+>
+> > +};
+> > +
+> > +struct loongson_special_attribute {
+> > +    uint16_t vers;               /* version of this special */
+> > +    char special_name[64];       /* special_atribute_name */
+> > +    uint32_t loongson_special_type; /* type of special device */
+> > +    /* for each device's resource */
+> > +    struct resource_loongson resource[MAX_RESOURCE_NUMBER];
+> > +};
+> > +
+> > +struct loongson_params {
+> > +    uint64_t memory_offset;      /* efi_memory_map_loongson struct off=
+set */
+> > +    uint64_t cpu_offset;         /* efi_cpuinfo_loongson struct offset=
+ */
+> > +    uint64_t system_offset;      /* system_loongson struct offset */
+> > +    uint64_t irq_offset;         /* irq_source_routing_table struct of=
+fset */
+> > +    uint64_t interface_offset;   /* interface_info struct offset */
+> > +    uint64_t special_offset;     /* loongson_special_attribute struct =
+offset */
+> > +    uint64_t boarddev_table_offset;  /* board_devices offset */
+> > +};
+> > +
+> > +struct smbios_tables {
+> > +    uint16_t vers;               /* version of smbios */
+> > +    uint64_t vga_bios;           /* vga_bios address */
+> > +    struct loongson_params lp;
+> > +};
+> > +
+> > +struct efi_reset_system_t {
+> > +    uint64_t ResetCold;
+> > +    uint64_t ResetWarm;
+> > +    uint64_t ResetType;
+> > +    uint64_t Shutdown;
+> > +    uint64_t DoSuspend; /* NULL if not support */
+> > +};
+> > +
+> > +struct efi_loongson {
+> > +    uint64_t mps;                /* MPS table */
+> > +    uint64_t acpi;               /* ACPI table (IA64 ext 0.71) */
+> > +    uint64_t acpi20;             /* ACPI table (ACPI 2.0) */
+> > +    struct smbios_tables smbios; /* SM BIOS table */
+> > +    uint64_t sal_systab;         /* SAL system table */
+> > +    uint64_t boot_info;          /* boot info table */
+> > +};
+> > +
+> > +struct boot_params {
+> > +    struct efi_loongson efi;
+> > +    struct efi_reset_system_t reset_system;
+> > +};
+> > +
+> > +/* Overall MMIO & Memory layout */
+> > +enum {
+> > +    VIRT_LOWMEM,
+> > +    VIRT_PM,
+> > +    VIRT_FW_CFG,
+> > +    VIRT_RTC,
+> > +    VIRT_PCIE_PIO,
+> > +    VIRT_PCIE_ECAM,
+> > +    VIRT_BIOS_ROM,
+> > +    VIRT_UART,
+> > +    VIRT_LIOINTC,
+> > +    VIRT_PCIE_MMIO,
+> > +    VIRT_HIGHMEM
+> > +};
+> > +
+> > +/* Low MEM layout for QEMU kernel loader */
+> > +enum {
+> > +    LOADER_KERNEL,
+> > +    LOADER_INITRD,
+> > +    LOADER_CMDLINE
+> > +};
+> > +
+> > +/* BIOS ROM layout for QEMU kernel loader */
+> > +enum {
+> > +    LOADER_BOOTROM,
+> > +    LOADER_PARAM,
+> > +};
+> > +
+> > +struct MemmapEntry {
+> > +    hwaddr base;
+> > +    hwaddr size;
+> > +};
+> > +
+> > +extern const struct MemmapEntry virt_memmap[];
+> > +void init_loongson_params(struct loongson_params *lp, void *p,
+> > +                          uint64_t cpu_freq, uint64_t ram_size);
+> > +void init_reset_system(struct efi_reset_system_t *reset);
+> > +
+> > +#endif
+> > diff --git a/hw/mips/meson.build b/hw/mips/meson.build
+> > index c98391ce99..802e5e4a1d 100644
+> > --- a/hw/mips/meson.build
+> > +++ b/hw/mips/meson.build
+> > @@ -1,6 +1,7 @@
+> >   mips_ss =3D ss.source_set()
+> >   mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
+> >   mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
+> > +mips_ss.add(when: 'CONFIG_LOONGSON3V', if_true: files('loongson3_bootp=
+.c'))
+> >   mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
+> >   mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'ma=
+lta.c'))
+> >   mips_ss.add(when: 'CONFIG_MIPSSIM', if_true: files('mipssim.c'))
+> >
+>
+> With comment addressed: Reviewed-by: Philippe Mathieu-Daud=C3=A9
+> <f4bug@amsat.org>
 
