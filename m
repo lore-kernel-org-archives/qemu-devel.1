@@ -7,108 +7,116 @@ X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4CE6C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D98C43467
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:57:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19C8A2224E
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:55:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B7A621741
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:57:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5pGKnQV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19C8A2224E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="vTIK1LAd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7A621741
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36544 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUoMe-0000zY-G0
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:55:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35188)
+	id 1kUoOq-00038n-1f
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:57:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35462)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUoLt-0008U5-C2
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:54:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21387)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUoLr-0004Dh-JK
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:54:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603187682;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1KgGYGpnLC1uOVxKz0kFw94mmZd132z/7pJevCY16i4=;
- b=E5pGKnQV8ll956ws0eFuggQh2OKMDpsZPHjats/32o5D5dfq56QR8qiTrZIJ+YXSmBh0Oj
- omLt938cWql7QYhEqevsxIM+0VCAlBr3HmvidRoFP/QNdPsBLir4GqXguXr8IExRiWknEa
- scxw+938UPPY2DWOXGHMDaCLIjeQoos=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-487-LHNkTootMEyTbai90b9_rg-1; Tue, 20 Oct 2020 05:54:41 -0400
-X-MC-Unique: LHNkTootMEyTbai90b9_rg-1
-Received: by mail-wr1-f69.google.com with SMTP id f11so588731wro.15
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 02:54:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=1KgGYGpnLC1uOVxKz0kFw94mmZd132z/7pJevCY16i4=;
- b=NA9ePAQj1eQh42QKijMpiZG06WDjObt4W6fq2m2SKBKmv5eKNf1sZleMMo6acsqxdY
- uYzG9JBnCW7XNaSoNBaLzEHO8CECmjAgootgXQ9SniIANcGJyJRlcw7BeuY2oLF4gDKf
- X25dj3VpFcvbF46CPTT3PccMUY/tUGSvFODSrLkJlHQkX95nodT4iwZqd7Bzg86O3VmF
- iUu6uX2xFm4H/hGCEsqwKa8l5vwU6DS6vnSZ8WDfnM2DOtUQ8nvVpN0QS5rjf2jfHwIt
- xrdf+C4m+NzdGj7ebfsxmsRJgTZ7OEfnuhksRKSz6un7cQvSkHV78FdD+4LavO8/0OJO
- kDDw==
-X-Gm-Message-State: AOAM533rdYNfUnfZ/ptIpa8eMHsaVlOU5maMh2IAM5LdaNi5FE7s5lQC
- wwbKeVchWUt4hArSxmVEs6b1QtDv5vxMr+YOamZF8ewHykfIo3vNgFBgjTk8oOtT/hQOeMsFltF
- gA1iAXxMW5i40l78=
-X-Received: by 2002:a1c:59c3:: with SMTP id n186mr2085394wmb.32.1603187679825; 
- Tue, 20 Oct 2020 02:54:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJydol1q2+Nj4hGa9CAigMImUUJF0X9tz3HYOpw4T9xVtmqNecFrnWCeh+GdlqVY19IexcxCmw==
-X-Received: by 2002:a1c:59c3:: with SMTP id n186mr2085372wmb.32.1603187679560; 
- Tue, 20 Oct 2020 02:54:39 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id b63sm2079535wme.9.2020.10.20.02.54.38
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 20 Oct 2020 02:54:38 -0700 (PDT)
-Subject: Re: roms/efirom, tests/uefi-test-tools: update edk2's own submodules
- first
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20201020091605.GA2301@aepfle.de>
- <3fc07eb7-f99a-516b-9bb9-e48049547928@redhat.com>
- <20201020094419.GF287149@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <0e196d48-6735-5116-ade5-a9b138020aea@redhat.com>
-Date: Tue, 20 Oct 2020 11:54:37 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
+ id 1kUoMU-00010z-3I
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:55:22 -0400
+Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:14011)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
+ id 1kUoMR-0004Ve-TP
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:55:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+ t=1603187720; x=1634723720;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=/DxSLhphaBCVEkABHTKTdeogLf9sDq3PuegJ5sNW2kk=;
+ b=vTIK1LAduoSGrkOriTsXWMapExdbqcEj8vj/00ADhht5Xp+Ufv6LRZnK
+ 28kiixNggJZHwMLKZTfBWqDGtg44dUYW6MSPob1UQn/FPbwd38Q1i2Afe
+ MSgAiUGH35rnsuGvHmDagZCjk+gptHBISgRAZlxQ9U7RF5wfVFggrtdF4 A=;
+X-IronPort-AV: E=Sophos;i="5.77,396,1596499200"; d="scan'208";a="60319327"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO
+ email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.43.8.6])
+ by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP;
+ 20 Oct 2020 09:55:12 +0000
+Received: from EX13MTAUWC002.ant.amazon.com
+ (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+ by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS
+ id E637EA2330; Tue, 20 Oct 2020 09:55:04 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 20 Oct 2020 09:55:04 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.161.71) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 20 Oct 2020 09:54:58 +0000
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+To: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason A. Donenfeld"
+ <Jason@zx2c4.com>, Jann Horn <jannh@google.com>
+CC: Willy Tarreau <w@1wt.eu>, Colm MacCarthaigh <colmmacc@amazon.com>,
+ "Catangiu, Adrian Costin" <acatan@amazon.com>, Andy Lutomirski
+ <luto@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, Eric Biggers
+ <ebiggers@kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ kernel list <linux-kernel@vger.kernel.org>, "open list:VIRTIO GPU DRIVER"
+ <virtualization@lists.linux-foundation.org>, "Woodhouse, David"
+ <dwmw@amazon.co.uk>, <bonzini@gnu.org>, "Singh, Balbir" <sblbir@amazon.com>,
+ "Weiss, Radu" <raduweis@amazon.com>, <oridgar@gmail.com>,
+ <ghammer@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, "Michael S. Tsirkin" <mst@redhat.com>, "Qemu
+ Developers" <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>, "Michal
+ Hocko" <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Pavel
+ Machek" <pavel@ucw.cz>, Linux API <linux-api@vger.kernel.org>,
+ <mpe@ellerman.id.au>, linux-s390 <linux-s390@vger.kernel.org>
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <20201017033606.GA14014@1wt.eu>
+ <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
+ <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
+ <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
+ <20201017053712.GA14105@1wt.eu>
+ <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
+ <20201017064442.GA14117@1wt.eu>
+ <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
+ <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
+ <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
+ <2e505365-db4a-6054-8bc8-f9a81978c6d4@de.ibm.com>
+From: Alexander Graf <graf@amazon.de>
+Message-ID: <b2f8ecec-35e8-93c6-b4cb-bb89ee8baa2d@amazon.de>
+Date: Tue, 20 Oct 2020 11:54:56 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.3.3
 MIME-Version: 1.0
-In-Reply-To: <20201020094419.GF287149@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+In-Reply-To: <2e505365-db4a-6054-8bc8-f9a81978c6d4@de.ibm.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Originating-IP: [10.43.161.71]
+X-ClientProxiedBy: EX13D04UWA002.ant.amazon.com (10.43.160.31) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=72.21.198.25;
+ envelope-from=prvs=555e5d02a=graf@amazon.de; helo=smtp-fw-4101.amazon.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 05:55:17
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -117,66 +125,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Olaf Hering <olaf@aepfle.de>, Laszlo Ersek <lersek@redhat.com>,
- qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/20/20 11:44 AM, Daniel P. Berrangé wrote:
-> On Tue, Oct 20, 2020 at 11:29:01AM +0200, Philippe Mathieu-Daudé wrote:
->> Hi Olaf,
->>
->> On 10/20/20 11:16 AM, Olaf Hering wrote:
->>> This is about qemu.git#ec87b5daca761039bbcf781eedbe4987f790836f
->>>
->>> On Mon, Sep 07, Laszlo Ersek wrote:
->>>
->>>> In edk2 commit 06033f5abad3 ("BaseTools: Make brotli a submodule",
->>>> 2020-04-16), part of edk2-stable202005, the Brotli compressor /
->>>> decompressor source code that edk2 had flattened into BaseTools was
->>>> replaced with a git submodule.
->>>>
->>>> This means we have to initialize edk2's own submodules before building
->>>> BaseTools not just in "roms/Makefile.edk2", but in "roms/Makefile" (for
->>>> the sake of the "efirom" target) and "tests/uefi-test-tools/Makefile" as
->>>> well.
->>>
->>>> +++ b/roms/Makefile
->>>>    edk2-basetools:
->>>> +	cd edk2/BaseTools && git submodule update --init --force
->>>>    build-edk2-tools:
->>>> +	cd $(edk2_dir)/BaseTools && git submodule update --init --force
->>>
->>>
->>> This change can not possibly be correct.
->>>
->>> With current qemu.git#master one is forced to have network access to
->>> build the roms. This fails with exported (and complete) sources in an
->>> offline environment.
->>
->> The EDK2 roms are only used for testing, we certainly don't want them
->> to be used by distributions. I suppose the question is "why is this
->> rule called if tests are not built?".
-> 
-> I don't believe that is correct - the pc-bios/edk*  ROMs and the
-> corresponding  pc-bios/descriptor files are there for real world
-> end user consumption.   roms/edk2 should (must) match / reflect
-> the content used to build the pci-bios/edk* blobs.
-> 
-> Many distros have a policy requiring them to build everything
-> from source, so they will ignore the pre-built edk2 ROMs, but
-> regular end users taking QEMU directly from upstream can certainly
-> use our edk2 ROMs.
-
-Well I'm lost (and I don't think mainstream QEMU have the
-bandwidth to follow mainstream EDK2 security fixes) so I'm
-giving up, waiting for clarification from Laszlo.
-
-> 
-> 
-> Regards,
-> Daniel
-> 
+Ck9uIDIwLjEwLjIwIDExOjM1LCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIgd3JvdGU6Cj4gT24gMTcu
+MTAuMjAgMjA6MDksIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+PiBIaSBKYXNvbiwKPj4KPj4gT24g
+MTcuMTAuMjAgMTU6MjQsIEphc29uIEEuIERvbmVuZmVsZCB3cm90ZToKPj4+Cj4+PiBBZnRlciBk
+aXNjdXNzaW5nIHRoaXMgb2ZmbGluZSB3aXRoIEphbm4gYSBiaXQsIEkgaGF2ZSBhIGZldyBnZW5l
+cmFsCj4+PiBjb21tZW50cyBvbiB0aGUgZGVzaWduIG9mIHRoaXMuCj4+Pgo+Pj4gRmlyc3QsIHRo
+ZSBVVUlEIGNvbW11bmljYXRlZCBieSB0aGUgaHlwZXJ2aXNvciBzaG91bGQgYmUgY29uc3VtZWQg
+YnkKPj4+IHRoZSBrZXJuZWwgLS0gYWRkZWQgYXMgYW5vdGhlciBpbnB1dCB0byB0aGUgcm5nIC0t
+IGFuZCB0aGVuIHVzZXJzcGFjZQo+Pgo+PiBXZSBkZWZpbml0ZWx5IHdhbnQgYSBrZXJuZWwgaW50
+ZXJuYWwgbm90aWZpZXIgYXMgd2VsbCwgeWVzIDopLgo+Pgo+Pj4gc2hvdWxkIGJlIG5vdGlmaWVk
+IHRoYXQgaXQgc2hvdWxkIHJlc2VlZCBhbnkgdXNlcnNwYWNlIFJOR3MgdGhhdCBpdAo+Pj4gbWF5
+IGhhdmUsIHdpdGhvdXQgYWN0dWFsbHkgY29tbXVuaWNhdGluZyB0aGF0IFVVSUQgdG8gdXNlcnNw
+YWNlLiBJT1csCj4+Cj4+IEkgYWxzbyB0ZW5kIHRvIGFncmVlIHRoYXQgaXQgbWFrZXMgc2Vuc2Ug
+dG8gZGlzY29ubmVjdCB0aGUgYWN0dWFsIFVVSUQgd2UgcmVjZWl2ZSBmcm9tIHRoZSBub3RpZmlj
+YXRpb24gdG8gdXNlciBzcGFjZS4gVGhpcyB3b3VsZCBhbGxvdyB1cyB0byBjcmVhdGUgYSBnZW5l
+cmljIG1lY2hhbmlzbSBmb3IgVk0gc2F2ZS9yZXN0b3JlIGN5Y2xlcyBhY3Jvc3MgZGlmZmVyZW50
+IGh5cGVydmlzb3JzLiBMZXQgbWUgYWRkIFBQQyBhbmQgczM5MHggcGVvcGxlIHRvIHRoZSBDQyBs
+aXN0IHRvIHNlZSB3aGV0aGVyIHRoZXkgaGF2ZSBhbnl0aGluZyByZW1vdGVseSBzaW1pbGFyIHRv
+IHRoZSBWbUdlbklEIG1lY2hhbmlzbS4gRm9yIHg4NiBhbmQgYWFyY2g2NCwgdGhlIEFDUEkgYW5k
+IG1lbW9yeSBiYXNlZCBWbUdlbklEIGltcGxlbWVudGVkIGhlcmUgaXMgdGhlIG1vc3Qgb2J2aW91
+cyBvcHRpb24gdG8gaW1wbGVtZW50IElNSE8uIEl0J3MgYWxzbyBhbHJlYWR5IGltcGxlbWVudGVk
+IGluIGFsbCBtYWpvciBoeXBlcnZpc29ycy4KPiAKPiBIbW0sIHdoYXQgd2UgZG8gaGF2ZSBjb25m
+aWd1cmF0aW9ucyAoZS5nLiBzdGZsZSBiaXRzKSBhbmQgd2UgZG8gaGF2ZSBhIG5vdGlmaWNhdGlv
+biBtZWNoYW5pc20gdmlhIHNjbHAgdGhhdCBub3RpZmllcyBndWVzdHMgd2hlbiB0aGluZ3MgY2hh
+bmdlLgo+IEFzIG9mIHRvZGF5IG5laXRoZXIgS1ZNIG5vciBMaW51eCBpbXBsZW1lbnQgdGhlIHNj
+bHAgY2hhbmdlIG5vdGlmaWNhdGlvbiBtZWNoYW5pc20sIGJ1dCBJIGRvIHNlZSB2YWx1ZSBpbiBz
+dWNoIGEgdGhpbmcuCgpzdGZsZSBvbmx5IHN0b3JlcyBhcmNoaXRlY3RlZCBDUFUgY2FwYWJpbGl0
+aWVzLCBubz8gVGhlIFVVSUQgaXMgYWJvdXQgCnVuaXF1ZWx5IGlkZW50aWZ5aW5nIGNsb25lcyBv
+ZiB0aGUgc2FtZSBiYXNlIGltYWdlLCBzbyB0aGV5IGNhbiAKcmVlc3RhYmxpc2ggdGhlaXIgdW5p
+cXVlbmVzcy4KClRoYXQgc2FpZCwgeW91ciBpbnRlcmVzdCBtZWFucyB0aGF0IHRoZXJlIG1heSBi
+ZSBhIG1lY2hhbmlzbSBvbiBzMzkwIG9uZSAKZGF5LCBzbyB3ZSBzaG91bGQgdGhpbmsgYWJvdXQg
+bWFraW5nIGl0IG1vcmUgZ2VuZXJpYy4KCj4gCj4+Cj4+PiBJIGFncmVlIHdpdGggSmFubiB0aGVy
+ZS4gVGhlbiwgaXQncyB0aGUgZnVuY3Rpb25pbmcgb2YgdGhpcwo+Pj4gbm90aWZpY2F0aW9uIG1l
+Y2hhbmlzbSB0byB1c2Vyc3BhY2UgdGhhdCBpcyBpbnRlcmVzdGluZyB0byBtZS4KPj4KPj4gQWJz
+b2x1dGVseSEgUGxlYXNlIGhhdmUgYSBsb29rIGF0IHRoZSBwcmV2aW91cyBkaXNjdXNzaW9uIGhl
+cmU6Cj4+Cj4+Cj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LXBtL0I3NzkzQjdBLTM2
+NjAtNDc2OS05QjlBLUZGQ0YyNTA3MjhCQkBhbWF6b24uY29tLwo+Pgo+PiBUaGUgdXNlciBzcGFj
+ZSBpbnRlcmZhY2UgaXMgYWJzb2x1dGVseSB3aGF0IHRoaXMgaXMgYWJvdXQuCj4gCj4gWWVzLiBQ
+YXNzaW5nIGEgbm90aWZpY2F0aW9uIHRvIHVzZXJzcGFjZSBpcyBlc3NlbnRpYWwuIFdoZXJlIEkg
+ZG8gbm90IHNlZSBhIHNvbHV0aW9uIHlldCBpcyB0aGUgcmFjZSBiZXR3ZWVuIG5vdGlmaWNhdGlv
+biBhbmQKPiBhbHJlYWR5IHJ1bm5pbmcgd2l0aCB0aGUgb2xkIGtub3dsZWRnZS4KCldpdGggYSBw
+b3N0LW1vcnRlbSBpbnRlcmZhY2UsIHdlIHdpbGwgYWx3YXlzIGhhdmUgYSB0aW55IHJhY2Ugd2lu
+ZG93LiAKSSdtIG5vdCByZWFsbHkgY29udmluY2VkIHRoYXQgdGhpcyBpcyBhIHNlcmlvdXMgcHJv
+YmxlbSB5ZXQgdGhvdWdoLgoKSW4gb3JkZXIgdG8gZG8gZXh0cmFjdCBhbnl0aGluZyBvZmYgYSB2
+aXJ0dWFsIG1hY2hpbmUgdGhhdCB3YXMgY2xvbmVkLCAKeW91IG5lZWQgdG8gY29tbXVuaWNhdGUg
+d2l0aCBpdC4gSWYgeW91IGZvciBleGFtcGxlIHN0b3AgdGhlIG5ldHdvcmsgCmxpbmsgdW50aWwg
+YWxsIG9mIHRoaXMgZGV2aWNlJ3MgdXNlcnMgaGF2ZSBpbmRpY2F0ZWQgdGhleSBhcmUgZmluaXNo
+ZWQgCmFkanVzdGluZywgdGhlIHJhY2Ugc2hvdWxkIGJlIHNtYWxsIGVub3VnaCBmb3IgYW55IHBy
+YWN0aWNhbCBwdXJwb3NlcyBJIApjYW4gdGhpbmsgb2YuCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxv
+cG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2Vz
+Y2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5n
+ZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIK
+U2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
 
 
