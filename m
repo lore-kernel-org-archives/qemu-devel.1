@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61714C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:19:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 651CEC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:20:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD702224A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:19:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A24902224A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:20:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pNpp+dS3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD702224A
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aj1G23Ik"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A24902224A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45226 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuMd-00018K-Ib
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:19:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37600)
+	id 1kUuNF-00023E-GG
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:20:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0x-0004wX-AJ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:31 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34145)
+ id 1kUu1H-0005XK-PF
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:52 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:50692)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0v-0003ue-Fv
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:30 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i1so2798468wro.1
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:29 -0700 (PDT)
+ id 1kUu1D-0003xN-Gd
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:51 -0400
+Received: by mail-wm1-x343.google.com with SMTP id 13so2340819wmf.0
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=FowuUdgPQYyMq4aZYTGoaCziepWA2LAbbAYSLaMy7xQ=;
- b=pNpp+dS3ZiyI+fdLUaV6f3Hw6HhMIc/4VL/LNTCDCdWgemUBdBZaJnVznVNItm9zTX
- AjP584Lu2N89OEJD74v71dIiRLnp8AkdROjSatHiEMvs7wy5wKHHDm88F61oMCT7VZIc
- NI2puEatX5uJe5x9g3ClHKagqt6gDR8YsghYZxlOLUqnSjJJ99wiHrQbrfY9fUasn9oV
- 42bZtgmP2zc4jEcfmumTuDHw6ikJVhNssdk3oYDIbLShoyIldB5UrjcCLjOTbY+D+aN2
- Gj1f3ZFcUsUZe5nnLnh3E5UoMNy80O+0R/KH5F1KsHE227uAGKgfvUkPNXXMeIlTfiaD
- ui9w==
+ bh=24XJoNPc8DTNqAEsM0sOYnp5VshSzc0j1PLW+SwTh3Q=;
+ b=aj1G23Ik8CU6OUJ4eGwiJxMgEW5fcICviPcPd3Ojg9BlE57fkSdC08WBpp2xyLmbpr
+ jdgTjVlx/toYvbjl/m0fiKS4f1BVgWkb3Zgs/ZZXBbkbUc1aAd2skzuykQqaKYCU2hok
+ lH00e245uROQ0sn1TOLHh637AR+9ExkSQU8yx1/aG3uBPZShvUbBxvpgH3q+FZfWEgan
+ mQC1vZr41jds9hfNzWVHLMNCoZL7jHhWSy1491jY0qcfhIERNXj5OwvTF1jq0Qlw1J07
+ lVMEPRvW/3Tlv45rDFmWSEG1l6Xwhmkv7dU4ZPEuoQs7d45DEfFstLPyc/fVfP+kv/P2
+ z+JA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=FowuUdgPQYyMq4aZYTGoaCziepWA2LAbbAYSLaMy7xQ=;
- b=a6tr8Qq8i3Tfo0+6hX4J5VduZOxIyEpsWd0bAEcyptWztZOmJS48zPQr06s/RqCqHp
- sZOsH5pKZQX/Ef8eqajDYtX3K6kbnl9XA+GtdY2J+YoAlqPOfZBeLO5cVuFPKd6mtnYK
- TRgPbu1pzmy9VEnEkylLU/q/Nkj9gBlMwMk94AjSYvYTLZH0nYKFMHt3glY+pe97hMLV
- HyWvCtZTRE566zkTuaeCOk6Viw8d/CZSzXHhbwKjianeAuSkU4euPJbTpl28AzsoihZL
- gma3VVuw3+T4i/x9r1x+qhk7N0KXIuFk4qArcDuVqzi7Qr7nBG2M/01vVfoumQW0n5TL
- aDsw==
-X-Gm-Message-State: AOAM531RFELbnbl+CfAw+HrnqEOSZtgW280MuUlGwNEePn00ReK/j+/X
- kEKBD8/wcfd4v6lnXgpDTDDyqcf1l2aXyg==
-X-Google-Smtp-Source: ABdhPJwWTqz1HMYPevrosE9msjy2s0ezWFwmQ0ohm17UrD6oKnSTxhSxIkrEwZGOHwh+6oqufDoLkA==
-X-Received: by 2002:a05:6000:1084:: with SMTP id
- y4mr4074898wrw.138.1603209447264; 
- Tue, 20 Oct 2020 08:57:27 -0700 (PDT)
+ bh=24XJoNPc8DTNqAEsM0sOYnp5VshSzc0j1PLW+SwTh3Q=;
+ b=a8/PEPZ6ZpTgKEhWOkYdOMbytLeUnj7t7k8RX9whh4IM41Xfry6zKDVdsEQ6nYkb+/
+ G14aHRgAnvI4uSbJaIU0ZwDL33BDVBKyvkCavMnIDYo9kWYjX0DiB7ZA6gGZo/xRB3Qr
+ HGZF0/0RlpN4nf4nP/JimJ1KXmLiNWx1+y0n7H6+3HY7qKTjcnSo/FqtL0SsyGvI7Lxd
+ 8oAicOzJagxqXmKoLY0RTXOnUa/4nCf2YlMsoq0/XBTFwkHPguVRuaHVdkw/3vH6Qleu
+ 13ABO8gZKteqchqbCgqwEVu7dDCYYAUzNxULMBzCDXOZOHCsJOyIOuBulza2gbsFVwQu
+ vRfA==
+X-Gm-Message-State: AOAM531RDt3s+P5rjj4MyjvU4guMobSOOfiKbNbgpgKEjtb2lLH0IY2h
+ 2maViQGq89adH54Fvg/ywPItNNUcboOrEw==
+X-Google-Smtp-Source: ABdhPJzzuEgcVpAsqBFYq3S0EPXIWjyNle/LaPWk0vU4M37uxc9+XMBlXUZQ1Jut35rYgUgpnuUtkg==
+X-Received: by 2002:a1c:8093:: with SMTP id b141mr3613706wmd.139.1603209465513; 
+ Tue, 20 Oct 2020 08:57:45 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.26
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.44
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:26 -0700 (PDT)
+ Tue, 20 Oct 2020 08:57:44 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/41] target/arm: Ignore HCR_EL2.ATA when {E2H,TGE} != 11
-Date: Tue, 20 Oct 2020 16:56:32 +0100
-Message-Id: <20201020155656.8045-18-peter.maydell@linaro.org>
+Subject: [PULL 31/41] linux-user: Set PAGE_TARGET_1 for TARGET_PROT_BTI
+Date: Tue, 20 Oct 2020 16:56:46 +0100
+Message-Id: <20201020155656.8045-32-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
 References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,65 +106,110 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-Unlike many other bits in HCR_EL2, the description for this
-bit does not contain the phrase "if ... this field behaves
-as 0 for all purposes other than", so do not squash the bit
-in arm_hcr_el2_eff.
+Transform the prot bit to a qemu internal page bit, and save
+it in the page tables.
 
-Instead, replicate the E2H+TGE test in the two places that
-require it.
-
-Reported-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Reviewed-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Tested-by: Vincenzo Frascino <vincenzo.frascino@arm.com>
-Message-id: 20201008162155.161886-4-richard.henderson@linaro.org
+Message-id: 20201016184207.786698-3-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- target/arm/internals.h | 9 +++++----
- target/arm/helper.c    | 9 +++++----
- 2 files changed, 10 insertions(+), 8 deletions(-)
+ include/exec/cpu-all.h     |  2 ++
+ linux-user/syscall_defs.h  |  4 ++++
+ target/arm/cpu.h           |  5 +++++
+ linux-user/mmap.c          | 16 ++++++++++++++++
+ target/arm/translate-a64.c |  6 +++---
+ 5 files changed, 30 insertions(+), 3 deletions(-)
 
-diff --git a/target/arm/internals.h b/target/arm/internals.h
-index ae99725d2b5..5460678756d 100644
---- a/target/arm/internals.h
-+++ b/target/arm/internals.h
-@@ -1252,10 +1252,11 @@ static inline bool allocation_tag_access_enabled(CPUARMState *env, int el,
-         && !(env->cp15.scr_el3 & SCR_ATA)) {
-         return false;
-     }
--    if (el < 2
--        && arm_feature(env, ARM_FEATURE_EL2)
--        && !(arm_hcr_el2_eff(env) & HCR_ATA)) {
--        return false;
-+    if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-+        uint64_t hcr = arm_hcr_el2_eff(env);
-+        if (!(hcr & HCR_ATA) && (!(hcr & HCR_E2H) || !(hcr & HCR_TGE))) {
-+            return false;
-+        }
-     }
-     sctlr &= (el == 0 ? SCTLR_ATA0 : SCTLR_ATA);
-     return sctlr != 0;
-diff --git a/target/arm/helper.c b/target/arm/helper.c
-index f49b045d366..97bb6b8c01b 100644
---- a/target/arm/helper.c
-+++ b/target/arm/helper.c
-@@ -6906,10 +6906,11 @@ static CPAccessResult access_mte(CPUARMState *env, const ARMCPRegInfo *ri,
- {
-     int el = arm_current_el(env);
+diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
+index 61e13b50382..656a2a87888 100644
+--- a/include/exec/cpu-all.h
++++ b/include/exec/cpu-all.h
+@@ -274,6 +274,8 @@ extern intptr_t qemu_host_page_mask;
+ /* FIXME: Code that sets/uses this is broken and needs to go away.  */
+ #define PAGE_RESERVED  0x0020
+ #endif
++/* Target-specific bits that will be used via page_get_flags().  */
++#define PAGE_TARGET_1  0x0080
  
--    if (el < 2 &&
--        arm_feature(env, ARM_FEATURE_EL2) &&
--        !(arm_hcr_el2_eff(env) & HCR_ATA)) {
--        return CP_ACCESS_TRAP_EL2;
-+    if (el < 2 && arm_feature(env, ARM_FEATURE_EL2)) {
-+        uint64_t hcr = arm_hcr_el2_eff(env);
-+        if (!(hcr & HCR_ATA) && (!(hcr & HCR_E2H) || !(hcr & HCR_TGE))) {
-+            return CP_ACCESS_TRAP_EL2;
+ #if defined(CONFIG_USER_ONLY)
+ void page_dump(FILE *f);
+diff --git a/linux-user/syscall_defs.h b/linux-user/syscall_defs.h
+index 731c3d5341a..cabbfb762dd 100644
+--- a/linux-user/syscall_defs.h
++++ b/linux-user/syscall_defs.h
+@@ -1277,6 +1277,10 @@ struct target_winsize {
+ #define TARGET_PROT_SEM         0x08
+ #endif
+ 
++#ifdef TARGET_AARCH64
++#define TARGET_PROT_BTI         0x10
++#endif
++
+ /* Common */
+ #define TARGET_MAP_SHARED	0x01		/* Share changes */
+ #define TARGET_MAP_PRIVATE	0x02		/* Changes are private */
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index 49cd5cabcf2..c18a9167665 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -3445,6 +3445,11 @@ static inline MemTxAttrs *typecheck_memtxattrs(MemTxAttrs *x)
+ #define arm_tlb_bti_gp(x) (typecheck_memtxattrs(x)->target_tlb_bit0)
+ #define arm_tlb_mte_tagged(x) (typecheck_memtxattrs(x)->target_tlb_bit1)
+ 
++/*
++ * AArch64 usage of the PAGE_TARGET_* bits for linux-user.
++ */
++#define PAGE_BTI  PAGE_TARGET_1
++
+ /*
+  * Naming convention for isar_feature functions:
+  * Functions which test 32-bit ID registers should have _aa32_ in
+diff --git a/linux-user/mmap.c b/linux-user/mmap.c
+index f2615634201..00c05e6a0f1 100644
+--- a/linux-user/mmap.c
++++ b/linux-user/mmap.c
+@@ -83,6 +83,22 @@ static int validate_prot_to_pageflags(int *host_prot, int prot)
+     *host_prot = (prot & (PROT_READ | PROT_WRITE))
+                | (prot & PROT_EXEC ? PROT_READ : 0);
+ 
++#ifdef TARGET_AARCH64
++    /*
++     * The PROT_BTI bit is only accepted if the cpu supports the feature.
++     * Since this is the unusual case, don't bother checking unless
++     * the bit has been requested.  If set and valid, record the bit
++     * within QEMU's page_flags.
++     */
++    if (prot & TARGET_PROT_BTI) {
++        ARMCPU *cpu = ARM_CPU(thread_cpu);
++        if (cpu_isar_feature(aa64_bti, cpu)) {
++            valid |= TARGET_PROT_BTI;
++            page_flags |= PAGE_BTI;
 +        }
-     }
-     if (el < 3 &&
-         arm_feature(env, ARM_FEATURE_EL3) &&
++    }
++#endif
++
+     return prot & ~valid ? 0 : page_flags;
+ }
+ 
+diff --git a/target/arm/translate-a64.c b/target/arm/translate-a64.c
+index 71888083417..072754fa24d 100644
+--- a/target/arm/translate-a64.c
++++ b/target/arm/translate-a64.c
+@@ -14507,10 +14507,10 @@ static void disas_data_proc_simd_fp(DisasContext *s, uint32_t insn)
+  */
+ static bool is_guarded_page(CPUARMState *env, DisasContext *s)
+ {
+-#ifdef CONFIG_USER_ONLY
+-    return false;  /* FIXME */
+-#else
+     uint64_t addr = s->base.pc_first;
++#ifdef CONFIG_USER_ONLY
++    return page_get_flags(addr) & PAGE_BTI;
++#else
+     int mmu_idx = arm_to_core_mmu_idx(s->mmu_idx);
+     unsigned int index = tlb_index(env, mmu_idx, addr);
+     CPUTLBEntry *entry = tlb_entry(env, mmu_idx, addr);
 -- 
 2.20.1
 
