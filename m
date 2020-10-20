@@ -2,103 +2,102 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08B8FC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:19:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8030DC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:25:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2119A2224A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:19:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D509A22251
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:25:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NMjeO1cr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2119A2224A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="axEbR89O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D509A22251
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39222 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUxA7-0000XP-RC
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:19:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37410)
+	id 1kUxGK-00036n-He
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:25:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUx8I-0007wv-9w
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:17:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41028)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUxEw-0002Gt-7J
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:24:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55214)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUx8F-0006ry-WF
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:17:17 -0400
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUxEu-0007hh-9o
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:24:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603221433;
+ s=mimecast20190719; t=1603221846;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=7Q9DI35sHTYqBoQs1d4E6iesJ9aamM0qa4wGkPbasmU=;
- b=NMjeO1crL8EbzBJMqsb1TvR0vKGDNopI+xoI9M+exn3iTLaHoeKdgSTYvbpy71KZH9f+07
- lAE3fd5eT9jHQJjJRWqAtoNdykslnQ4Q2jsMVO2fhUdiX375vtXIVMWvjJ9CKt6dgubs6r
- +uWAxZqFvANx6sIwqOVbTqxeVhALuL0=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-349-OvCK5Qu7O7STl-UBsHmchg-1; Tue, 20 Oct 2020 15:17:10 -0400
-X-MC-Unique: OvCK5Qu7O7STl-UBsHmchg-1
-Received: by mail-qk1-f200.google.com with SMTP id n125so2755131qke.19
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 12:17:09 -0700 (PDT)
+ bh=Ha976sjSQpmbDoykCbkQtiuh0E8jZdzYcn+h61TyUHo=;
+ b=axEbR89O5aFYQ0H2ciTxo0AECKsDZXoRtqK9bOPUCjRzE2T3vai1dJMR6P4aP8ptPnbc0q
+ BZFmMq8jlgtWUdyyvVTqXcZYbKPxQeSAb01zMuQzuT1xzLTdp4LhyUYylcJE8vT2YhzZaT
+ VH7siOz462V/s2OoZ/O0l7rwYKRb6VI=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-554-qOLMiFjeOiutRSm0k-yfNQ-1; Tue, 20 Oct 2020 15:24:04 -0400
+X-MC-Unique: qOLMiFjeOiutRSm0k-yfNQ-1
+Received: by mail-qt1-f200.google.com with SMTP id d22so2558161qtn.0
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 12:24:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:date:from:to:cc:subject:message-id:references
  :mime-version:content-disposition:in-reply-to;
- bh=7Q9DI35sHTYqBoQs1d4E6iesJ9aamM0qa4wGkPbasmU=;
- b=VcIpkKxZvWW4SN0+ZDY5y6dR5jQIUkglbv7sAr3BWIu8GUkGy9D7pE7EUgtaImxp81
- xQfazHhbvoE6sbDVIqUjRYVMBcsS/2l4YUSM9uvewR309HhDuV/CLi73y1knhhoP97cT
- t0mhzmCb8McewKu6wn6wAtV4lRZHLOy7LC4bXG8lW8PP3Ms4vd7I9Lp6mnE4D0jKKrXG
- u/QX1LlonZ8aaWnukcUvdiIAyOQIMe0hv4TbIAzOi4xboOfp5azr+mGD1gUqSlRYxRmR
- nuQhUwuYU++rMdkcpFVWsLnfNwIsFqxhAHDHhZmzXIm4A12V0TzZk1P/PE9fyBWi3nqa
- /o9Q==
-X-Gm-Message-State: AOAM532cbTti5wQGSrJcFHU0MMbgx3vIq+D7TtDOpA2kNHPE5xsPSYM2
- tpRDt0cCnG4xjLhu6IIb9dxSnqBuqMr1p8l2CnyvDUB3Ju+xU4FvLAi1vhkd2qVxp0bwfz7eAHU
- lhq5mbImgQAjxYmk=
-X-Received: by 2002:a05:6214:546:: with SMTP id
- ci6mr5077950qvb.0.1603221429556; 
- Tue, 20 Oct 2020 12:17:09 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwoPyl4MqRn2qWmKxqU0KGkSu2qx8t54LciyZWe6LOJhV8Kw3ZwKnXs1FG6pPUtNrZj4IncCQ==
-X-Received: by 2002:a05:6214:546:: with SMTP id
- ci6mr5077921qvb.0.1603221429254; 
- Tue, 20 Oct 2020 12:17:09 -0700 (PDT)
+ bh=Ha976sjSQpmbDoykCbkQtiuh0E8jZdzYcn+h61TyUHo=;
+ b=EJ15qbsYCZ4iKXTsRiUhTYbVjhY7kpuXxjY0csBlXAnuuffmxCUicMotgMg4aHrhqb
+ nWJb48oLOUzc/eMaayDf2TZp15k5yGBm/VCL/zRMGwhZ3fnradgDwZ69zGXmDa45E6NB
+ bCpgKWmVt4+Et/55yKgj239ZxKgpuYcoaI6+7K61VCoFxpBTpgPmAc5zS702/aAUbQ9K
+ +qCMV0eXzWp1QfMwD9l0MDOh9A1TJF8Hw90LSKEuaG4M4JbZAF6Uj37MbTpcHstrkayN
+ NtAOAFdCdrpwcRHI9fUGpVi65uafsczZmLdD5tcWNkBZNpE+CGqDJc69oVV4MrXcg2yY
+ /mtA==
+X-Gm-Message-State: AOAM532sEq80JbdxT4gkrqa5VKkLP+g72FTMV2N9QX/58bEvGy2c/YTf
+ 8ZeLkn3zUn5xM+xUjSj9B0ey5X4sONaAyTwT/nZBcvJfx3edK2/xfhKBml1q8H6xjq3htrlZLV0
+ zyvX5EhlzDA2s50E=
+X-Received: by 2002:a05:620a:5b9:: with SMTP id
+ q25mr4309422qkq.501.1603221843839; 
+ Tue, 20 Oct 2020 12:24:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxoxj3apvSGiWZqiJOg4j743g7vGHan0JIZb6YgCSg5XG5h+d/KitudlGuUBlF/8tfa0i5cuA==
+X-Received: by 2002:a05:620a:5b9:: with SMTP id
+ q25mr4309397qkq.501.1603221843633; 
+ Tue, 20 Oct 2020 12:24:03 -0700 (PDT)
 Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
  [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id k16sm1209554qtu.45.2020.10.20.12.17.07
+ by smtp.gmail.com with ESMTPSA id t1sm1306184qkh.19.2020.10.20.12.24.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 12:17:08 -0700 (PDT)
-Date: Tue, 20 Oct 2020 15:17:06 -0400
+ Tue, 20 Oct 2020 12:24:02 -0700 (PDT)
+Date: Tue, 20 Oct 2020 15:24:01 -0400
 From: Peter Xu <peterx@redhat.com>
 To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH PROTOTYPE 4/6] memory: Extend
- ram_block_discard_(require|disable) by two discard types
-Message-ID: <20201020191706.GB200400@xz-x1>
+Subject: Re: [PATCH PROTOTYPE 1/6] memory: Introduce sparse RAM handler for
+ memory regions
+Message-ID: <20201020192401.GC200400@xz-x1>
 References: <20200924160423.106747-1-david@redhat.com>
- <20200924160423.106747-5-david@redhat.com>
+ <20200924160423.106747-2-david@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20200924160423.106747-5-david@redhat.com>
+In-Reply-To: <20200924160423.106747-2-david@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=peterx@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -123,49 +122,28 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Sep 24, 2020 at 06:04:21PM +0200, David Hildenbrand wrote:
-> We want to separate the two cases whereby
-> - balloning drivers do random discards on random guest memory (e.g.,
->   virtio-balloon) - uncoordinated discards
-> - paravirtualized memory devices do discards in well-known granularity,
->   and always know which block is currently accessible or inaccessible by
->   a guest. - coordinated discards
-> 
-> This will be required to get virtio_mem + vfio running - vfio still
-> wants to block random memory ballooning.
-> 
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: "Michael S. Tsirkin" <mst@redhat.com>
-> Cc: Alex Williamson <alex.williamson@redhat.com>
-> Cc: Wei Yang <richardw.yang@linux.intel.com>
-> Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-> Cc: Igor Mammedov <imammedo@redhat.com>
-> Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>
-> Cc: Peter Xu <peterx@redhat.com>
-> Signed-off-by: David Hildenbrand <david@redhat.com>
-> ---
->  exec.c                | 109 ++++++++++++++++++++++++++++++++++--------
->  include/exec/memory.h |  36 ++++++++++++--
->  2 files changed, 121 insertions(+), 24 deletions(-)
-> 
-> diff --git a/exec.c b/exec.c
-> index e34b602bdf..83098e9230 100644
-> --- a/exec.c
-> +++ b/exec.c
-> @@ -4098,52 +4098,121 @@ void mtree_print_dispatch(AddressSpaceDispatch *d, MemoryRegion *root)
->   * If positive, discarding RAM is disabled. If negative, discarding RAM is
->   * required to work and cannot be disabled.
->   */
-> -static int ram_block_discard_disabled;
-> +static int uncoordinated_discard_disabled;
-> +static int coordinated_discard_disabled;
+On Thu, Sep 24, 2020 at 06:04:18PM +0200, David Hildenbrand wrote:
+> +static inline void memory_region_set_sparse_ram_handler(MemoryRegion *mr,
+> +                                                        SparseRAMHandler *srh)
+> +{
+> +    g_assert(memory_region_is_ram(mr));
 
-Instead of duplicating the codes, how about start to make it an array?
+Nit: Maybe assert mr->srh==NULL here?  If sparse ram handler is exclusive,
+which afaiu, is a yes.
 
-Btw, iiuc these flags do not need atomic operations at all, because all callers
-should be with BQL and called majorly during machine start/reset.  Even not, I
-think we can also use a mutex, maybe it could make things simpler.  No strong
-opinion, though.
+> +    mr->srh = srh;
+> +}
+> +
+> +static inline void memory_region_register_sparse_ram_notifier(MemoryRegion *mr,
+> +                                                           SparseRAMNotifier *n)
+> +{
+> +    SparseRAMHandler *srh = memory_region_get_sparse_ram_handler(mr);
+> +    SparseRAMHandlerClass *srhc = SPARSE_RAM_HANDLER_GET_CLASS(srh);
+> +
+> +    srhc->register_listener(srh, mr, n);
+
+I feel like you need to check srhc!=NULL first or vfio may start crash without
+virtio-mem...  Same question to the other ones (at least unregister).
 
 -- 
 Peter Xu
