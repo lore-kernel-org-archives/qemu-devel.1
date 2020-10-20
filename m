@@ -2,100 +2,59 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C99C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:33:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAA0C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:34:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E382222F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:33:40 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E382222F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 78DBB2222F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:34:42 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DBB2222F
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60046 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUn5O-0001Cx-Ue
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:33:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44402)
+	id 1kUn6P-0003D5-7J
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:34:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45104)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUn18-00076U-8Q; Tue, 20 Oct 2020 04:29:14 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:56117)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kUn4v-0001l2-0D; Tue, 20 Oct 2020 04:33:09 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:49796 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUn16-0007Ht-Fl; Tue, 20 Oct 2020 04:29:13 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id 0D0A79E7;
- Tue, 20 Oct 2020 04:29:09 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Tue, 20 Oct 2020 04:29:11 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=4Md/RH6R/JODYqrDMQ+BP8xCRJW
- X9txwAmGCTkc9Yw4=; b=VDsV3RIDRCqX0NlmNwh0yvt/W1trFTIBzyK38He6JsJ
- /3E3w7XVzH89nKIuAAtW0mKB/MVSxZDtNlcyRTC++bf2BLQrGqvNYDU2qj87wDOT
- r/GTYFgVBk1Gr/4icDVmpTCEfVTbkocJKs24lt0amGpIJpOojW9rfyuXZEK2t/P5
- GcvFQgwnXiy84siR5DDYt1oVfzzwX2fNwp50+TCBeqlGaWVa/sgCY+0Ak3yMN3l/
- 6dUUHmIeUAamGtq+M/x7TcGSGOuwVWH6pKBeHkNBuIUp4EfJLbxyiQfe9qfrWZmQ
- 4cFt9znz+Hd7Bj3CEwnEmYq/BFVu0zrT0Y/dADQFyoA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=4Md/RH
- 6R/JODYqrDMQ+BP8xCRJWX9txwAmGCTkc9Yw4=; b=Qylv8xthy5Xe4ev7qhE34n
- EuET6k/03aO/y26BimgdeqNVplUDnI/F22GV2Yx3GfQFiR7JKOR1HaUGDp+vWUAm
- 93Eouyy/KOYM7iux3RXDIrzm/ExGLtqIhA6wa7lpvM4Z6Hqe0wDuJvwFg3xbGCDp
- apVDX2Nig9D1bnFXR+EPS8LldjFDGaby5Qq/bL2SoKZXXEzhkTqhW9WIFXtytLMg
- TQfF0B4w7pMffmByWVN+p90F1TdVI31yRENuAZBGQGHUChRRVbB/KQkLdKha4kvF
- P+Hlw7mAOLWq8DBuFv+DTJh3Ug6s7t+5G3/zKyboRYtLzSVFUubdQ6VSLzyj/WyA
- ==
-X-ME-Sender: <xms:1Z-OX53jHm4ztqBDgzbMG4PW4RChRT9mNeTVktMzCVSufuyk-6jmUg>
- <xme:1Z-OXwEUWOYkSHzK8aXXwwW-6jB3ymZmJC2Xa0xI1yN83qv9Wi1DEHGxDv0BGYOcc
- WHz7Iv-jTQIqDM5a4k>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgddtfecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgepudenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:1Z-OX57CxXuDM-VLhldQwxwv0SItdDci1iINrHPDoxpRHqb9SWlqCA>
- <xmx:1Z-OX209mRKUjlPs5CVTDvpIST9xBy3WkvO1p13As08kP8goZl_QUA>
- <xmx:1Z-OX8HZLvtaIhQYP7gKshEyKs5G-w-nKSQtNaT63-gS2nS5DVOa_g>
- <xmx:1Z-OX_8pLD_EH4o9pnb-KrJPRV57xJ-CloX0RuWUPg1IzdABFNIx8z24YBg>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id C6B323064684;
- Tue, 20 Oct 2020 04:29:07 -0400 (EDT)
-Date: Tue, 20 Oct 2020 10:29:06 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v7 11/11] hw/block/nvme: Merge nvme_write_zeroes() with
- nvme_write()
-Message-ID: <20201020082906.GC178548@apples.localdomain>
-References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
- <20201019021726.12048-12-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kUn4p-0000Cp-E8; Tue, 20 Oct 2020 04:33:08 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id E489C925E32503E4F55C;
+ Tue, 20 Oct 2020 16:32:55 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 16:32:49 +0800
+From: Bihong Yu <yubihong@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH v4] migration: using trace_ to replace DPRINTF
+Date: Tue, 20 Oct 2020 16:31:46 +0800
+Message-ID: <1603182706-2421-1-git-send-email-yubihong@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="E/DnYTRukya0zdZ1"
-Content-Disposition: inline
-In-Reply-To: <20201019021726.12048-12-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
- helo=wnew1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:21:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=yubihong@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:32:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,44 +68,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
+Cc: yubihong@huawei.com, zhengchuan@huawei.com, dgilbert@redhat.com,
+ alex.chen@huawei.com, wanghao232@huawei.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
+---
+ migration/block.c      | 36 ++++++++++++++++++------------------
+ migration/page_cache.c | 13 +++----------
+ migration/trace-events | 13 +++++++++++++
+ 3 files changed, 34 insertions(+), 28 deletions(-)
 
---E/DnYTRukya0zdZ1
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+diff --git a/migration/block.c b/migration/block.c
+index 273392b..a950977 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -26,6 +26,7 @@
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/block-backend.h"
++#include "trace.h"
+ 
+ #define BLK_MIG_BLOCK_SIZE           (1 << 20)
+ #define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_BITS)
+@@ -434,10 +435,9 @@ static int init_blk_migration(QEMUFile *f)
+         block_mig_state.total_sector_sum += sectors;
+ 
+         if (bmds->shared_base) {
+-            DPRINTF("Start migration for %s with shared base image\n",
+-                    bdrv_get_device_name(bs));
++            trace_migration_block_init_shared(bdrv_get_device_name(bs));
+         } else {
+-            DPRINTF("Start full migration for %s\n", bdrv_get_device_name(bs));
++            trace_migration_block_init_full(bdrv_get_device_name(bs));
+         }
+ 
+         QSIMPLEQ_INSERT_TAIL(&block_mig_state.bmds_list, bmds, entry);
+@@ -592,7 +592,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+     return (bmds->cur_dirty >= bmds->total_sectors);
+ 
+ error:
+-    DPRINTF("Error reading sector %" PRId64 "\n", sector);
++    trace_migration_block_save_device_dirty(sector);
+     g_free(blk->buf);
+     g_free(blk);
+     return ret;
+@@ -628,9 +628,9 @@ static int flush_blks(QEMUFile *f)
+     BlkMigBlock *blk;
+     int ret = 0;
+ 
+-    DPRINTF("%s Enter submitted %d read_done %d transferred %d\n",
+-            __func__, block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_migration_block_flush_blks("Enter", block_mig_state.submitted,
++                                     block_mig_state.read_done,
++                                     block_mig_state.transferred);
+ 
+     blk_mig_lock();
+     while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
+@@ -656,9 +656,9 @@ static int flush_blks(QEMUFile *f)
+     }
+     blk_mig_unlock();
+ 
+-    DPRINTF("%s Exit submitted %d read_done %d transferred %d\n", __func__,
+-            block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_migration_block_flush_blks("Exit", block_mig_state.submitted,
++                                     block_mig_state.read_done,
++                                     block_mig_state.transferred);
+     return ret;
+ }
+ 
+@@ -727,8 +727,8 @@ static int block_save_setup(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live setup submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("setup", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     qemu_mutex_lock_iothread();
+     ret = init_blk_migration(f);
+@@ -759,8 +759,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
+     int64_t last_ftell = qemu_ftell(f);
+     int64_t delta_ftell;
+ 
+-    DPRINTF("Enter save live iterate submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("iterate", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -825,8 +825,8 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live complete submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("complete", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -851,7 +851,7 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+     /* report completion */
+     qemu_put_be64(f, (100 << BDRV_SECTOR_BITS) | BLK_MIG_FLAG_PROGRESS);
+ 
+-    DPRINTF("Block migration completed\n");
++    trace_migration_block_save_complete();
+ 
+     qemu_put_be64(f, BLK_MIG_FLAG_EOS);
+ 
+@@ -884,7 +884,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         pending = max_size + BLK_MIG_BLOCK_SIZE;
+     }
+ 
+-    DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
++    trace_migration_block_save_pending(pending);
+     /* We don't do postcopy */
+     *res_precopy_only += pending;
+ }
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 775582f..098b436 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -18,14 +18,7 @@
+ #include "qapi/error.h"
+ #include "qemu/host-utils.h"
+ #include "page_cache.h"
+-
+-#ifdef DEBUG_CACHE
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stdout, "cache: " fmt, ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
++#include "trace.h"
+ 
+ /* the page in cache will not be replaced in two cycles */
+ #define CACHED_PAGE_LIFETIME 2
+@@ -75,7 +68,7 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+     cache->num_items = 0;
+     cache->max_num_items = num_pages;
+ 
+-    DPRINTF("Setting cache buckets to %" PRId64 "\n", cache->max_num_items);
++    trace_migration_pagecache_init(cache->max_num_items);
+ 
+     /* We prefer not to abort if there is no memory */
+     cache->page_cache = g_try_malloc((cache->max_num_items) *
+@@ -169,7 +162,7 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
+     if (!it->it_data) {
+         it->it_data = g_try_malloc(cache->page_size);
+         if (!it->it_data) {
+-            DPRINTF("Error allocating page\n");
++            trace_migration_pagecache_insert();
+             return -1;
+         }
+         cache->num_items++;
+diff --git a/migration/trace-events b/migration/trace-events
+index 338f38b..bd2fecb 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
+ calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+ skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+ find_page_matched(const char *idstr) "ramblock %s addr or size changed"
++
++# block.c
++migration_block_init_shared(const char *blk_device_name) "Start migration for %s with shared base image"
++migration_block_init_full(const char *blk_device_name) "Start full migration for %s"
++migration_block_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
++migration_block_flush_blks(const char *action, int submitted, int read_done, int transferred) "%s (submitted %d, read_done %d, transferred %d)"
++migration_block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
++migration_block_save_complete(void) "Block migration completed"
++migration_block_save_pending(uint64_t pending) "Save live (blocks pending: %" PRIu64 ")"
++
++# page_cache.c
++migration_pagecache_init(int64_t max_num_items) "Setting cache to %" PRId64 " buckets"
++migration_pagecache_insert(void) "Error allocating page"
+-- 
+1.8.3.1
 
-On Oct 19 11:17, Dmitry Fomichev wrote:
-> nvme_write() now handles WRITE, WRITE ZEROES and ZONE_APPEND.
->=20
-
-Same here, Acked, but maybe move it in front as a preparation patch as
-well?
-
---E/DnYTRukya0zdZ1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+On9AACgkQTeGvMW1P
-DenpIAf/SYhr8M114IqdPYVz9k4rCd10gBTvxqsikdMAifftPlwSEkDliQ3pf9a5
-MK5Lfa0wdVTI/6E2dKZhGE5MQybQ1uj+/sXbXxQHwWLocOv5U1S1GAI1pPrDQsuD
-8PkxbgR33etU6wLthK3IAMNgcT8SohK13P9fTnCVOSFwJ7nigGGdQXF+9QZDQOgI
-rpfXk0Gv0xu9R6hixMxjbx7o9AxoWsMhVFIDTXFauwgYmt9flD6gqjZTNsicHxa5
-iP5D5Ss+L4v9WP8dm5MDc4iE93USlbZqqdX+rVfqg4+dJ6/wMUrRrTY9z0kK6/A8
-LXzuFJqqchnvgUjhPmLT+XOaWMlPpQ==
-=0M6y
------END PGP SIGNATURE-----
-
---E/DnYTRukya0zdZ1--
 
