@@ -2,82 +2,108 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB01C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:06:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B05BC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:08:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0E6ED22253
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:06:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6751222253
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:08:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="JKmZ25Xm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0E6ED22253
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E9PQgXgR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6751222253
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUoX4-0003Zj-25
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:06:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37486)
+	id 1kUoZ3-0006Yl-61
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:08:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1kUoTw-00088f-3t
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:03:04 -0400
-Received: from esa4.hc3370-68.iphmx.com ([216.71.155.144]:49467)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
- id 1kUoTt-0007Dz-V4
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:03:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=citrix.com; s=securemail; t=1603188181;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=OpXFFycQpm63jLyG0eJbtosSLwARUWOqqFYJe8oF60I=;
- b=JKmZ25XmE5x56kv2Y/5SJUnpIbbozN9mk0JuZFKD/L+Rj8D2wnm5j/3Y
- 5AhvW7T4EMd6HsujuNrWNpvkJSEZ6BeICUfHtRClqAxENMEwNhk2eiVvI
- XBiD4RO6ncCysy8saaph95t7I7X6Obad3PtGvPB8aSOTBJdYkIwIMTqsc U=;
-Authentication-Results: esa4.hc3370-68.iphmx.com;
- dkim=none (message not signed) header.i=none
-IronPort-SDR: HUdtSCvk176Hqd5za+zmg5siqa+utctAw0qDn5VOihY2m3fWBEkzyDek0qB7FeC/8NVbXQq6Ns
- X1WhSO0X9B78I7Ez7jYVV9P3po9ayOsPasOoVxYcSPGQeUZY1XrA8KVMsvjSHt+13/wrTY1YDr
- +cf2FiamsVjK8u7hLS0mZQOaCYDG9FNP0nTGDAE0KqnmtM9MSLzA+3OixVQV1zBWzc/eptn8KD
- v8F2jfZwSzt3zUJ+bjDH6IHbItNqiQ5WXAYmGL4ZUq2exeXZxlfqp6jMty28R2xTdxy5LVImFF
- mjE=
-X-SBRS: None
-X-MesageID: 30419947
-X-Ironport-Server: esa4.hc3370-68.iphmx.com
-X-Remote-IP: 162.221.158.21
-X-Policy: $RELAYED
-X-IronPort-AV: E=Sophos;i="5.77,396,1596513600"; d="scan'208";a="30419947"
-To: <qemu-devel@nongnu.org>
-CC: Peter Maydell <peter.maydell@linaro.org>, Paul Durrant
- <pdurrant@amazon.com>, Anthony PERARD <anthony.perard@citrix.com>
-Subject: [PULL 3/4] xen-bus: reduce scope of backend watch
-Date: Tue, 20 Oct 2020 11:02:38 +0100
-Message-ID: <20201020100239.272748-4-anthony.perard@citrix.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201020100239.272748-1-anthony.perard@citrix.com>
-References: <20201020100239.272748-1-anthony.perard@citrix.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUoXN-0004Yx-Br
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:06:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30414)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUoXL-0007hz-6v
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:06:37 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603188393;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fZsNdwegAsSsK5SvAMc7L3pFHjvMUHfLCLtiBtqc7VA=;
+ b=E9PQgXgRDHai4fvRGlNQtJ/9gwTcFFJyxFXH/YasRoWc7LNun6SjDXHEnWXJ8tdoFLRs2m
+ LztvykZ+LX7dYyK6PnmNRfG38VGxNgroqW+w2Hld2TaVCbg5iAJZB/nRxPF/PobbVS1lSS
+ cMgD/JAiOjrmD+eQ8mOhMCtX3Oac8Qw=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-110-OQDCvR-xPc6A6w0DfeyF3Q-1; Tue, 20 Oct 2020 06:06:31 -0400
+X-MC-Unique: OQDCvR-xPc6A6w0DfeyF3Q-1
+Received: by mail-wm1-f71.google.com with SMTP id c204so276471wmd.5
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 03:06:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fZsNdwegAsSsK5SvAMc7L3pFHjvMUHfLCLtiBtqc7VA=;
+ b=Ch25OfttGKu6nzJj6CxbNYDEWUzwb/M9KtzLsvC3lr36ux5hjPL4NXnEf1RyxPFR/G
+ s9l7dvYcomFkgSZ37O0f3dLtptshmszDZ0gDHs+XhumNsXilQWYOfh0c+F1bcJS00p2W
+ w6Oi71WGreZ0OEAlK8HgfLr2sHyevsPWW1pBA8eidO/CyYzvs2EebeCAcus2ODgkC0vl
+ 0L6JEixZsqcglQZssGNP6IalsGrU5AqEROUTbcnYClLFEfAH3i9zft/oyg9M8G4q6pFs
+ ty5/4x89c7sgNzDMkgC76lm4sDBo4bZRmUjSkAAMLDvz+zQyD9Mt4x3Lx7rfm3f8JSGx
+ e4pA==
+X-Gm-Message-State: AOAM533nq3wQwnTNs/HNLhcgWPhBY0p7HuA2yN8QZABPecDj8J85rsnE
+ AMMIkgmCZkDeX5jYGkLvCEt6Zxwrb0Q0rgACk+chqy7kgoAd0UWfXQ8d9A384DMYinQYw5O49tM
+ OtzoMIDw/1zfKI4E=
+X-Received: by 2002:adf:8462:: with SMTP id 89mr2542855wrf.389.1603188390123; 
+ Tue, 20 Oct 2020 03:06:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxfEyA9S+CO9YXoYBSrhQ8LWbrwdiIhPetPuDYzKol2MQPtzdrXlUVFwq3QgS/4FZpQFkKweQ==
+X-Received: by 2002:adf:8462:: with SMTP id 89mr2542842wrf.389.1603188389919; 
+ Tue, 20 Oct 2020 03:06:29 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id v4sm1831640wmg.35.2020.10.20.03.06.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Oct 2020 03:06:29 -0700 (PDT)
+Subject: Re: [PATCH] scripts/tracetool: silence SystemTap dtrace(1) long long
+ warnings
+To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
+References: <20201020094043.159935-1-stefanha@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <43806e3a-05c3-2d93-bf9b-52c83ec525cd@redhat.com>
+Date: Tue, 20 Oct 2020 12:06:28 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <20201020094043.159935-1-stefanha@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.71.155.144;
- envelope-from=anthony.perard@citrix.com; helo=esa4.hc3370-68.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 06:02:54
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -90,167 +116,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Daniel Berrange <berrange@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Anthony PERARD <anthony.perard@citrix.com>
-From: Anthony PERARD via <qemu-devel@nongnu.org>
 
-From: Paul Durrant <pdurrant@amazon.com>
+On 10/20/20 11:40 AM, Stefan Hajnoczi wrote:
+> SystemTap's dtrace(1) prints the following warning when it encounters
+> long long arguments:
+> 
+>    Warning: /usr/bin/dtrace:trace/trace-dtrace-hw_virtio.dtrace:76: syntax error near:
+>    probe vhost_vdpa_dev_start
+> 
+>    Warning: Proceeding as if --no-pyparsing was given.
+> 
+> Use the uint64_t and int64_t types, respectively. This works with all
+> host CPU 32- and 64-bit data models (ILP32, LP64, and LLP64) that QEMU
+> supports.
+> 
+> Reported-by: Markus Armbruster <armbru@redhat.com>
+> Suggested-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+> ---
+>   scripts/tracetool/format/d.py | 6 ++++++
+>   1 file changed, 6 insertions(+)
+> 
+> diff --git a/scripts/tracetool/format/d.py b/scripts/tracetool/format/d.py
+> index 353722f89c..ebfb714200 100644
+> --- a/scripts/tracetool/format/d.py
+> +++ b/scripts/tracetool/format/d.py
+> @@ -57,6 +57,12 @@ def generate(events, backend, group):
+>                   # Avoid it by changing probe type to signed char * beforehand.
+>                   if type_ == 'int8_t *':
+>                       type_ = 'signed char *'
+> +
+> +            # SystemTap dtrace(1) emits a warning when long long is used
+> +            type_ = type_.replace('unsigned long long', 'uint64_t')
+> +            type_ = type_.replace('signed long long', 'int64_t')
+> +            type_ = type_.replace('long long', 'int64_t')
+> +
+>               if name in RESERVED_WORDS:
+>                   name += '_'
+>               args.append(type_ + ' ' + name)
+> 
 
-Currently a single watch on /local/domain/X/backend is registered by each
-QEMU process running in service domain X (where X is usually 0). The purpose
-of this watch is to ensure that QEMU is notified when the Xen toolstack
-creates a new device backend area.
-Such a backend area is specific to a single frontend area created for a
-specific guest domain and, since each QEMU process is also created to service
-a specfic guest domain, it is unnecessary and inefficient to notify all QEMU
-processes.
-Only the QEMU process associated with the same guest domain need
-receive the notification. This patch re-factors the watch registration code
-such that notifications are targetted appropriately.
-
-Reported-by: Jerome Leseinne <jerome.leseinne@gmail.com>
-Signed-off-by: Paul Durrant <pdurrant@amazon.com>
-Reviewed-by: Anthony PERARD <anthony.perard@citrix.com>
-Message-Id: <20201001081500.1026-1-paul@xen.org>
-Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
----
- hw/xen/xen-backend.c         | 11 ++++++++++
- hw/xen/xen-bus.c             | 40 ++++++++++++++++++++++++++++--------
- include/hw/xen/xen-backend.h |  1 +
- include/hw/xen/xen-bus.h     |  3 ++-
- 4 files changed, 46 insertions(+), 9 deletions(-)
-
-diff --git a/hw/xen/xen-backend.c b/hw/xen/xen-backend.c
-index 10199fb58d10..5b0fb76eaeb3 100644
---- a/hw/xen/xen-backend.c
-+++ b/hw/xen/xen-backend.c
-@@ -41,6 +41,12 @@ static void xen_backend_table_add(XenBackendImpl *impl)
-     g_hash_table_insert(xen_backend_table_get(), (void *)impl->type, impl);
- }
- 
-+static const char **xen_backend_table_keys(unsigned int *count)
-+{
-+    return (const char **)g_hash_table_get_keys_as_array(
-+        xen_backend_table_get(), count);
-+}
-+
- static const XenBackendImpl *xen_backend_table_lookup(const char *type)
- {
-     return g_hash_table_lookup(xen_backend_table_get(), type);
-@@ -70,6 +76,11 @@ void xen_backend_register(const XenBackendInfo *info)
-     xen_backend_table_add(impl);
- }
- 
-+const char **xen_backend_get_types(unsigned int *count)
-+{
-+    return xen_backend_table_keys(count);
-+}
-+
- static QLIST_HEAD(, XenBackendInstance) backend_list;
- 
- static void xen_backend_list_add(XenBackendInstance *backend)
-diff --git a/hw/xen/xen-bus.c b/hw/xen/xen-bus.c
-index 9ce1c9540b9e..8c588920d9fc 100644
---- a/hw/xen/xen-bus.c
-+++ b/hw/xen/xen-bus.c
-@@ -430,7 +430,15 @@ static void xen_bus_unrealize(BusState *bus)
-     trace_xen_bus_unrealize();
- 
-     if (xenbus->backend_watch) {
--        xen_bus_remove_watch(xenbus, xenbus->backend_watch, NULL);
-+        unsigned int i;
-+
-+        for (i = 0; i < xenbus->backend_types; i++) {
-+            if (xenbus->backend_watch[i]) {
-+                xen_bus_remove_watch(xenbus, xenbus->backend_watch[i], NULL);
-+            }
-+        }
-+
-+        g_free(xenbus->backend_watch);
-         xenbus->backend_watch = NULL;
-     }
- 
-@@ -446,8 +454,11 @@ static void xen_bus_unrealize(BusState *bus)
- 
- static void xen_bus_realize(BusState *bus, Error **errp)
- {
-+    char *key = g_strdup_printf("%u", xen_domid);
-     XenBus *xenbus = XEN_BUS(bus);
-     unsigned int domid;
-+    const char **type;
-+    unsigned int i;
-     Error *local_err = NULL;
- 
-     trace_xen_bus_realize();
-@@ -469,19 +480,32 @@ static void xen_bus_realize(BusState *bus, Error **errp)
- 
-     module_call_init(MODULE_INIT_XEN_BACKEND);
- 
--    xenbus->backend_watch =
--        xen_bus_add_watch(xenbus, "", /* domain root node */
--                          "backend", xen_bus_backend_changed, &local_err);
--    if (local_err) {
--        /* This need not be treated as a hard error so don't propagate */
--        error_reportf_err(local_err,
--                          "failed to set up enumeration watch: ");
-+    type = xen_backend_get_types(&xenbus->backend_types);
-+    xenbus->backend_watch = g_new(XenWatch *, xenbus->backend_types);
-+
-+    for (i = 0; i < xenbus->backend_types; i++) {
-+        char *node = g_strdup_printf("backend/%s", type[i]);
-+
-+        xenbus->backend_watch[i] =
-+            xen_bus_add_watch(xenbus, node, key, xen_bus_backend_changed,
-+                              &local_err);
-+        if (local_err) {
-+            /* This need not be treated as a hard error so don't propagate */
-+            error_reportf_err(local_err,
-+                              "failed to set up '%s' enumeration watch: ",
-+                              type[i]);
-+        }
-+
-+        g_free(node);
-     }
- 
-+    g_free(type);
-+    g_free(key);
-     return;
- 
- fail:
-     xen_bus_unrealize(bus);
-+    g_free(key);
- }
- 
- static void xen_bus_unplug_request(HotplugHandler *hotplug,
-diff --git a/include/hw/xen/xen-backend.h b/include/hw/xen/xen-backend.h
-index 010d71263876..aac2fd454d44 100644
---- a/include/hw/xen/xen-backend.h
-+++ b/include/hw/xen/xen-backend.h
-@@ -31,6 +31,7 @@ void xen_backend_set_device(XenBackendInstance *backend,
- XenDevice *xen_backend_get_device(XenBackendInstance *backend);
- 
- void xen_backend_register(const XenBackendInfo *info);
-+const char **xen_backend_get_types(unsigned int *nr);
- 
- void xen_backend_device_create(XenBus *xenbus, const char *type,
-                                const char *name, QDict *opts, Error **errp);
-diff --git a/include/hw/xen/xen-bus.h b/include/hw/xen/xen-bus.h
-index 3df696136f7b..6bdbf3ff8220 100644
---- a/include/hw/xen/xen-bus.h
-+++ b/include/hw/xen/xen-bus.h
-@@ -66,7 +66,8 @@ struct XenBus {
-     domid_t backend_id;
-     struct xs_handle *xsh;
-     XenWatchList *watch_list;
--    XenWatch *backend_watch;
-+    unsigned int backend_types;
-+    XenWatch **backend_watch;
-     QLIST_HEAD(, XenDevice) inactive_devices;
- };
- 
--- 
-Anthony PERARD
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
 
