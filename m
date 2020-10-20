@@ -2,93 +2,124 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46409C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 283B8C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:31:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C6302222D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 51A562222D
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:31:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrJM/CIB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C6302222D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="LEy7smrf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 51A562222D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48010 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53468 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUopm-00054l-C5
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:25:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41772)
+	id 1kUovD-0007lq-T9
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:31:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42912)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kUony-00042b-7s
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:23:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24075)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kUonv-0001Lf-9l
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:23:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603189420;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=wkp/tPd3+FUnb+xRDeagskgJEWxxuH/qn2NHBEzbJRw=;
- b=FrJM/CIB19BIoK3mowARpiu5demv1Yk6rSlaBdF1uMnsOoTZSOip0kYQ/YIRCSt16TEJin
- kX1Y/OGkx3iUbJ3/KbNlNUXeEdBiYqsUmZpiWy6wX0gHGNzhPnBCPOaJyzgFBFZkC+vpQS
- P+HgDBGczPSOstoD9iZQE/0NVsTVpPs=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-514-KqhPuz2EN0KIhM1Xqfq0xg-1; Tue, 20 Oct 2020 06:23:38 -0400
-X-MC-Unique: KqhPuz2EN0KIhM1Xqfq0xg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 42C56803F4E;
- Tue, 20 Oct 2020 10:23:36 +0000 (UTC)
-Received: from gondolin (ovpn-114-95.ams2.redhat.com [10.36.114.95])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F14AE60BF3;
- Tue, 20 Oct 2020 10:23:22 +0000 (UTC)
-Date: Tue, 20 Oct 2020 12:23:20 +0200
-From: Cornelia Huck <cohuck@redhat.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v26 05/17] vfio: Add VM state change handler to know
- state of VM
-Message-ID: <20201020122320.675dbcd4.cohuck@redhat.com>
-In-Reply-To: <20201019115136.70c96820@w520.home>
-References: <1600817059-26721-1-git-send-email-kwankhede@nvidia.com>
- <1600817059-26721-6-git-send-email-kwankhede@nvidia.com>
- <20200925142023.54e2c7c0@x1.home>
- <0fd89808-74b2-49de-da79-ea034d83a5de@nvidia.com>
- <20201017174437.2fb6b699@x1.home>
- <c33278af-ab58-5786-9b70-d4f82b75cf96@nvidia.com>
- <20201019115136.70c96820@w520.home>
-Organization: Red Hat GmbH
-MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
+ (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
+ id 1kUotx-0006u9-31; Tue, 20 Oct 2020 06:29:57 -0400
+Received: from mail-vi1eur05on2094.outbound.protection.outlook.com
+ ([40.107.21.94]:54624 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
+ id 1kUotn-0002DS-Lb; Tue, 20 Oct 2020 06:29:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TQdsrfOlz3SS0p86t5/xRSm6RezF5iYFDFRFbgdTlDhoXw8hbuLBGIeKoVInhCIuS+vAUV6SlGU6n8abKfsi7dAzb93l6FhBa1NplNgIQx1/X4nhcERjbggwUOGOyJca2M1I8UNDFkdjjKYK9N0uIh1EkjV0x4t90R9lyFm3uTK3XFCI0u+qQUe4Bnkn2kOxgPl6kZKv/bVhsu0Y4Q7yjcDpN+wN+hot1/6Qf/J2mEkq8NFOsM58l/D6V9dysjnW9vuSfKKpD49jTsDzldxACRpkv3Ziqcn33MSqGT86boCmwo6xPl3ixc9/TtekcmAJGjgDNlpUBUah+4J/m7iSWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w+HdiLoW/MGeezO/KSfACeG1U2a44cdxS//5YenFK5Y=;
+ b=dcg/kmjvmwgZewoUgKQAoroD4AUAIHsy1VZ3cjqbtgPo3tMZJdjglfojboznOwPF8QJFOLFbkAndMSSBcAYPnhkkOSYRoCbhEHWdshgna8BnnD18ZWRKQXD4YGw158w385MlQAVsEvGNgJ0xV6FSdKiEGusqO+399nn3dMAlrqaFblpGJ3kc+VgrEaQDDcxoGIEEZYomTuKPWLeK0PE5/6EY07LB94viP9TGKTZa3qbVbaDIl+r3m/Y7UDbza/HgEaOiT0RKwQxQOcDTeJC9ePTnuRgC1GLDTosfw9fSUUcutI2zJSPatxdDiusapZXzgN2fmARXjM2+ArIvxZ/AXQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=w+HdiLoW/MGeezO/KSfACeG1U2a44cdxS//5YenFK5Y=;
+ b=LEy7smrfR67WWJjNAWzbEe5HvkwWHd5MNvHKFjVGL1DTzgeH9r0wTVIg4rod85lqQUnKahoYHhiIo1/HndnxSR9p60zEFY5z0cSHODN+y4lwCM+ea1OXDcOfm9dGiLqFWmP60hrMrFRoTQ709IOQW+HFMb8JmNwz07TyeQE6n+k=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com (2603:10a6:3:c4::16)
+ by HE1PR08MB2937.eurprd08.prod.outlook.com (2603:10a6:7:2d::27) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Tue, 20 Oct
+ 2020 10:29:42 +0000
+Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com
+ ([fe80::d12a:7bcb:c813:55c1]) by HE1PR0802MB2298.eurprd08.prod.outlook.com
+ ([fe80::d12a:7bcb:c813:55c1%10]) with mapi id 15.20.3477.028; Tue, 20 Oct
+ 2020 10:29:42 +0000
+Subject: Re: RFC: tracking valid backing chain issue
+From: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <3b99657c-2016-78cb-4314-27aacb30ca3c@virtuozzo.com>
+ <20201020085029.GC4452@merkur.fritz.box>
+ <a996a3cc-387a-8847-17b8-72a714d47776@virtuozzo.com>
+Message-ID: <3fe1dd27-7720-2846-2658-e4aadab9a9ff@virtuozzo.com>
+Date: Tue, 20 Oct 2020 13:29:40 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+In-Reply-To: <a996a3cc-387a-8847-17b8-72a714d47776@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Originating-IP: [109.252.131.121]
+X-ClientProxiedBy: AM0PR06CA0134.eurprd06.prod.outlook.com
+ (2603:10a6:208:ab::39) To HE1PR0802MB2298.eurprd08.prod.outlook.com
+ (2603:10a6:3:c4::16)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.38] (109.252.131.121) by
+ AM0PR06CA0134.eurprd06.prod.outlook.com (2603:10a6:208:ab::39) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.21 via Frontend Transport; Tue, 20 Oct 2020 10:29:41 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1cd29b6d-40fb-40d5-faa1-08d874e30e5c
+X-MS-TrafficTypeDiagnostic: HE1PR08MB2937:
+X-Microsoft-Antispam-PRVS: <HE1PR08MB29374CC58617AC56ED165B9BA21F0@HE1PR08MB2937.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2D8NQay7ib61zCynHCGyUDolvm5Y5psLsgaHJmfWlIAseSVaWm998mD0hUgdc3X0ad/DHHUUHGiYXlieXsE1acSsxyFz+dWtqb16nfObXbHiOmqZ1eSn5j+s2C0LHcqsV4VtctCoPclVXm2T6DeowSPW5p92hEiTHdP/GCt9J8rZl4JeqWuWyuBGuZMYBuJsXTD52V97iEHEQpLH3wmx+P1p5+u2qY2WyeWQA14PXOZXgQ1rTVIhsnWTtVseP0OoX8V0UrWF5FvQIozkog0rCjnkLDHRnqRsMsV/o8/ePBBy7LnH6nQ9B88zm7H+GZFKCgKfyhg176EUmqHPnswY9q/Qsp1foOKbUWo1G/87Co2RySYVmEWyRTKPwEsminvB
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0802MB2298.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(39840400004)(376002)(346002)(396003)(136003)(5660300002)(16576012)(2906002)(31686004)(6486002)(956004)(2616005)(86362001)(66476007)(4326008)(8936002)(8676002)(66946007)(66556008)(36756003)(186003)(26005)(52116002)(6916009)(16526019)(478600001)(53546011)(316002)(31696002)(83380400001)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: pCdubQP/ECRdYHHXgyNFKr8pWlKjyrsWdKIS02RUGV1mQRi1kS3AlHx2hkU46m/IP2KlLtLYVe6tBQ+6Wj45oJMkoQUEwDux3jhO7IBwrfj3xztpivLVN3LwL3J2ETZb6h/wJDcFEfMssCuzehvX/dc0RZfRHZxAXMbhaIlJ7+MZiNXB2/m6tAjFqC1UB1/kaswpZkzxRw2B06vyocm33M3YTdxtQEvTZM96jVfOVBDLEMN6ulPKuR7BpRkOl4INbdiIByaTW4U7Nbi1ZBpGGvFh9Kz/BcRYDBIAKXAcuaqk5ZbHI9xw58QP9+6UimY8ftCyL5VKWYdp5//sPXhzzUKdfRZR+uRZmxniETe7x/3Zbl/859a8hpeBFMSKtaxjfzZuzfckZyLsWGtLqz4ehgDfDsUmHO4TCAjidt7/pU57S27P5O91KvVqxE2X4Poon0mMfkZ85MS2ra6/2FOYHpF8zv3SRBf3vsgZB8+rP0Zu5IpHhzAJUzC0lWU/JTIBSxaAnE00Wyx2IPtB6n5iR0s3xNvmPJ/85jicAhcunTnUz7SekkYMkjOM9G1DGHwc2gbVfdvkvZ5bUUeUcCQ6r996NIFv5vD0I4LNF/+HUTGNy5k5+pUjUZAFbVRS5xnUCVZY6wFYiw4ZYLSZzYNZhg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1cd29b6d-40fb-40d5-faa1-08d874e30e5c
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0802MB2298.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2020 10:29:42.2546 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: lT3efigEOV1VvmyXgiw0omcyLPUNpI3QBsGoApUOORRaumPSl5INRiLAkSK814KBpscYdWsgCx14jzsImg5O7ZzD1q+6i/RomX7bcQxmO10=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2937
+Received-SPF: pass client-ip=40.107.21.94;
+ envelope-from=nshirokovskiy@virtuozzo.com;
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 06:29:44
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,76 +132,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cjia@nvidia.com, aik@ozlabs.ru, Zhengxiao.zx@Alibaba-inc.com,
- shuangtai.tst@alibaba-inc.com, qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, kevin.tian@intel.com, yan.y.zhao@intel.com,
- dgilbert@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
- Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Oct 2020 11:51:36 -0600
-Alex Williamson <alex.williamson@redhat.com> wrote:
 
-> On Sun, 18 Oct 2020 23:13:39 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+On 20.10.2020 13:23, Nikolay Shirokovskiy wrote:
 > 
-> > <snip>
-> >   
-> > >>>> +vfio_migration_set_state(char *name, uint32_t state) " (%s) state %d"
-> > >>>> +vfio_vmstate_change(char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-> > >>>> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> > >>>> index 8275c4c68f45..25e3b1a3b90a 100644
-> > >>>> --- a/include/hw/vfio/vfio-common.h
-> > >>>> +++ b/include/hw/vfio/vfio-common.h
-> > >>>> @@ -29,6 +29,7 @@
-> > >>>>    #ifdef CONFIG_LINUX
-> > >>>>    #include <linux/vfio.h>
-> > >>>>    #endif
-> > >>>> +#include "sysemu/sysemu.h"
-> > >>>>    
-> > >>>>    #define VFIO_MSG_PREFIX "vfio %s: "
-> > >>>>    
-> > >>>> @@ -119,6 +120,9 @@ typedef struct VFIODevice {
-> > >>>>        unsigned int flags;
-> > >>>>        VFIOMigration *migration;
-> > >>>>        Error *migration_blocker;
-> > >>>> +    VMChangeStateEntry *vm_state;
-> > >>>> +    uint32_t device_state;
-> > >>>> +    int vm_running;    
-> > >>>
-> > >>> Could these be placed in VFIOMigration?  Thanks,
-> > >>>       
-> > >>
-> > >> I think device_state should be part of VFIODevice since its about device
-> > >> rather than only related to migration, others can be moved to VFIOMigration.    
-> > > 
-> > > But these are only valid when migration is supported and thus when
-> > > VFIOMigration exists.  Thanks,
-> > >     
-> > 
-> > Even though it is used when migration is supported, its device's attribute.  
 > 
-> device_state is a local copy of the migration region register, so it
-> serves no purpose when a migration region is not present.  In fact the
-> initial value would indicate the device is stopped, which is incorrect.
-> vm_running is never initialized and cannot be set other than through a
-> migration region update of device_state, so at least two of these
-> values show incorrect state when migration is not supported by the
-> device.  vm_state is unused when migration isn't present, so if nothing
-> else the pointer here is wasteful.  It's not clear to me what
-> justification is being presented here as a "device's attribute",
-> supporting migration as indicated by a non-NULL migration pointer is
-> also a device attribute and these are attributes further defining the
-> state of that support.
+> On 20.10.2020 11:50, Kevin Wolf wrote:
+>> Am 20.10.2020 um 10:21 hat Nikolay Shirokovskiy geschrieben:
+>>> Hi, all.
+>>>
+>>> I recently found a corner case when it is impossible AFAIK to find out valid
+>>> backing chain after block commit operation. Imagine committing top image. After
+>>> commit ready state pivot is sent and then mgmt crashed. So far so good. Upon
+>>> next start mgmt can either check block job status for non-autodissmised job or
+>>> inspect backing chain to infer was pivot was successful or not in case of older
+>>> qemu.
+>>>
+>>> But imagine after mgmt crash qemu process was destroyed too. In this case there
+>>> is no option to know now what is valid backing chain. Yeah libvirt starts qemu
+>>> process with -no-shutdown flags so process is not destroyed in case of shutdown
+>>> but still process can crash.
+>>
+>> I don't think this is a problem.
+>>
+>> Between completion of the job and finalising it, both the base node and
+>> the top node are equivalent. You can access either and you'll always get
+>> the same data.
+>>
+>> So if libvirt didn't save that the job was already completed, it will
+>> use the old image file, and it's fine. And if libvirt already sent the
+>> job-finalize command, it will first have saved that the job was
+>> completed and therefore use the new image, and it's fine, too.
+> 
+> So finalizing can't fail? Otherwise libvirt can save that job is completed and
+> graph is changed while is was really wasn't
+> 
 
-Agreed. Also, it is not obvious from the naming that 'device_state' is
-related to migration, and it is easy to assume that this field is
-useful even in the non-migration case. Moving it would solve that
-problem.
+Hmm, it is even not the matter of qemu. Libvirt can save that job is completed
+and then crash before sending command to finalize to qemu. So after qemu crash
+and libvirt start libvirt would think that valid backing chain is without
+top image which is not true.
 
+>>
+>> Kevin
+>>
+>>> So corner case is very rare. Mgmt crash in a specific short moment and then
+>>> qemu crash before mgmt is up again.
+>>>
+>>> I guess some 'invalidated' flag for image would help. And also qemu itself
+>>> could check that mgmt is not trying to run on invalid backing chain based
+>>> on this flag.
+>>>
+>>> Nikolay
+>>>
+>>
 
