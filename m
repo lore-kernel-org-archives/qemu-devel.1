@@ -7,42 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D418C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:52:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AC03C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:52:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3044D21534
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:52:18 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3044D21534
+	by mail.kernel.org (Postfix) with ESMTPS id D1C6421741
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:52:51 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1C6421741
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46510 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUszp-0002aH-4k
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:52:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48522)
+	id 1kUt0M-0003GC-T8
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:52:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48538)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUsvm-0006uu-JP; Tue, 20 Oct 2020 10:48:06 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5194 helo=huawei.com)
+ id 1kUsvo-00070E-Qr; Tue, 20 Oct 2020 10:48:08 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5195 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <lizhengui@huawei.com>)
- id 1kUsvk-00031F-7s; Tue, 20 Oct 2020 10:48:06 -0400
+ id 1kUsvm-00031H-Nb; Tue, 20 Oct 2020 10:48:08 -0400
 Received: from DGGEMS405-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 2AE623D2F05E011C6D58;
+ by Forcepoint Email with ESMTP id 314E3A4AB1BAD10B0ED8;
  Tue, 20 Oct 2020 22:47:59 +0800 (CST)
 Received: from DESKTOP-80C7KIU.china.huawei.com (10.174.187.210) by
  DGGEMS405-HUB.china.huawei.com (10.3.19.205) with Microsoft SMTP Server id
- 14.3.487.0; Tue, 20 Oct 2020 22:47:52 +0800
+ 14.3.487.0; Tue, 20 Oct 2020 22:47:49 +0800
 From: Zhengui li <lizhengui@huawei.com>
 To: <pbonzini@redhat.com>, <stefanha@redhat.com>, <mreitz@redhat.com>,
  <kwolf@redhat.com>
-Subject: [PATCH v3 2/2] qemu-img: add support for rate limit in qemu-img
- convert
-Date: Tue, 20 Oct 2020 14:47:44 +0000
-Message-ID: <1603205264-17424-3-git-send-email-lizhengui@huawei.com>
+Subject: [PATCH v3 1/2] qemu-img: add support for rate limit in qemu-img commit
+Date: Tue, 20 Oct 2020 14:47:43 +0000
+Message-ID: <1603205264-17424-2-git-send-email-lizhengui@huawei.com>
 X-Mailer: git-send-email 2.6.4.windows.1
 In-Reply-To: <1603205264-17424-1-git-send-email-lizhengui@huawei.com>
 References: <1603205264-17424-1-git-send-email-lizhengui@huawei.com>
@@ -80,135 +79,96 @@ Sender: "Qemu-devel"
 
 From: Zhengui <lizhengui@huawei.com>
 
-add support for rate limit in qemu-img convert.
+add support for rate limit in qemu-img commit.
 
 Signed-off-by: Zhengui <lizhengui@huawei.com>
 ---
- docs/tools/qemu-img.rst |  6 +++++-
+ docs/tools/qemu-img.rst |  4 +++-
  qemu-img-cmds.hx        |  4 ++--
- qemu-img.c              | 27 ++++++++++++++++++++++++++-
- 3 files changed, 33 insertions(+), 4 deletions(-)
+ qemu-img.c              | 11 +++++++++--
+ 3 files changed, 14 insertions(+), 5 deletions(-)
 
 diff --git a/docs/tools/qemu-img.rst b/docs/tools/qemu-img.rst
-index bcb11b0..b615aa8 100644
+index c35bd64..bcb11b0 100644
 --- a/docs/tools/qemu-img.rst
 +++ b/docs/tools/qemu-img.rst
-@@ -188,6 +188,10 @@ Parameters to convert subcommand:
-   allocated target image depending on the host support for getting allocation
-   information.
+@@ -349,7 +349,7 @@ Command description:
+   state after (the attempt at) repairing it. That is, a successful ``-r all``
+   will yield the exit code 0, independently of the image state before.
  
-+.. option:: -r
+-.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-d] [-p] FILENAME
++.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-r RATE_LIMIT] [-d] [-p] FILENAME
+ 
+   Commit the changes recorded in *FILENAME* in its base image or backing file.
+   If the backing file is smaller than the snapshot, then the backing file will be
+@@ -371,6 +371,8 @@ Command description:
+   garbage data when read. For this reason, ``-b`` implies ``-d`` (so that
+   the top image stays valid).
+ 
++  The rate limit for the commit process is specified by ``-r``.
 +
-+   Rate limit for the convert process
-+
- .. option:: --salvage
+ .. option:: compare [--object OBJECTDEF] [--image-opts] [-f FMT] [-F FMT] [-T SRC_CACHE] [-p] [-q] [-s] [-U] FILENAME1 FILENAME2
  
-   Try to ignore I/O errors when reading.  Unless in quiet mode (``-q``), errors
-@@ -410,7 +414,7 @@ Command description:
-   4
-     Error on reading data
- 
--.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
-+.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-r RATE_LIMIT] [-m NUM_COROUTINES] [-W] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
- 
-   Convert the disk image *FILENAME* or a snapshot *SNAPSHOT_PARAM*
-   to disk image *OUTPUT_FILENAME* using format *OUTPUT_FMT*. It can
+   Check if two images have the same content. You can compare images with
 diff --git a/qemu-img-cmds.hx b/qemu-img-cmds.hx
-index 2a31806..7eb489b 100644
+index b89c019..2a31806 100644
 --- a/qemu-img-cmds.hx
 +++ b/qemu-img-cmds.hx
-@@ -46,9 +46,9 @@ SRST
+@@ -34,9 +34,9 @@ SRST
  ERST
  
- DEF("convert", img_convert,
--    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
-+    "convert [--object objectdef] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f fmt] [-t cache] [-T src_cache] [-O output_fmt] [-B backing_file] [-o options] [-l snapshot_param] [-S sparse_size] [-r rate_limit] [-m num_coroutines] [-W] [--salvage] filename [filename2 [...]] output_filename")
+ DEF("commit", img_commit,
+-    "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-d] [-p] filename")
++    "commit [--object objectdef] [--image-opts] [-q] [-f fmt] [-t cache] [-b base] [-r rate_limit] [-d] [-p] filename")
  SRST
--.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
-+.. option:: convert [--object OBJECTDEF] [--image-opts] [--target-image-opts] [--target-is-zero] [--bitmaps] [-U] [-C] [-c] [-p] [-q] [-n] [-f FMT] [-t CACHE] [-T SRC_CACHE] [-O OUTPUT_FMT] [-B BACKING_FILE] [-o OPTIONS] [-l SNAPSHOT_PARAM] [-S SPARSE_SIZE] [-r RATE_LIMIT] [-m NUM_COROUTINES] [-W] [--salvage] FILENAME [FILENAME2 [...]] OUTPUT_FILENAME
+-.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-d] [-p] FILENAME
++.. option:: commit [--object OBJECTDEF] [--image-opts] [-q] [-f FMT] [-t CACHE] [-b BASE] [-r RATE_LIMIT] [-d] [-p] FILENAME
  ERST
  
- DEF("create", img_create,
+ DEF("compare", img_compare,
 diff --git a/qemu-img.c b/qemu-img.c
-index 3023abe..a968c74 100644
+index 2103507..3023abe 100644
 --- a/qemu-img.c
 +++ b/qemu-img.c
-@@ -50,6 +50,8 @@
- #include "block/qapi.h"
- #include "crypto/init.h"
- #include "trace/control.h"
-+#include "qemu/throttle.h"
-+#include "block/throttle-groups.h"
- 
- #define QEMU_IMG_VERSION "qemu-img version " QEMU_FULL_VERSION \
-                           "\n" QEMU_COPYRIGHT "\n"
-@@ -1669,6 +1671,7 @@ enum ImgConvertBlockStatus {
- };
- 
- #define MAX_COROUTINES 16
-+#define CONVERT_THROTTLE_GROUP "img_convert"
- 
- typedef struct ImgConvertState {
-     BlockBackend **src;
-@@ -2184,6 +2187,17 @@ static int convert_copy_bitmaps(BlockDriverState *src, BlockDriverState *dst)
- 
- #define MAX_BUF_SECTORS 32768
- 
-+static void set_rate_limit(BlockBackend *blk, int64_t rate_limit)
-+{
-+    ThrottleConfig cfg;
-+
-+    throttle_config_init(&cfg);
-+    cfg.buckets[THROTTLE_BPS_WRITE].avg = rate_limit;
-+
-+    blk_io_limits_enable(blk, CONVERT_THROTTLE_GROUP);
-+    blk_set_io_limits(blk, &cfg);
-+}
-+
- static int img_convert(int argc, char **argv)
- {
-     int c, bs_i, flags, src_flags = 0;
-@@ -2204,6 +2218,7 @@ static int img_convert(int argc, char **argv)
-     bool force_share = false;
-     bool explict_min_sparse = false;
-     bool bitmaps = false;
+@@ -980,6 +980,7 @@ static int img_commit(int argc, char **argv)
+     CommonBlockJobCBInfo cbi;
+     bool image_opts = false;
+     AioContext *aio_context;
 +    int64_t rate_limit = 0;
  
-     ImgConvertState s = (ImgConvertState) {
-         /* Need at least 4k of zeros for sparse detection */
-@@ -2226,7 +2241,7 @@ static int img_convert(int argc, char **argv)
-             {"bitmaps", no_argument, 0, OPTION_BITMAPS},
+     fmt = NULL;
+     cache = BDRV_DEFAULT_CACHE;
+@@ -991,7 +992,7 @@ static int img_commit(int argc, char **argv)
+             {"image-opts", no_argument, 0, OPTION_IMAGE_OPTS},
              {0, 0, 0, 0}
          };
--        c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WU",
-+        c = getopt_long(argc, argv, ":hf:O:B:Cco:l:S:pt:T:qnm:WUr:",
+-        c = getopt_long(argc, argv, ":f:ht:b:dpq",
++        c = getopt_long(argc, argv, ":f:ht:b:dpqr:",
                          long_options, NULL);
          if (c == -1) {
              break;
-@@ -2323,6 +2338,12 @@ static int img_convert(int argc, char **argv)
-         case 'U':
-             force_share = true;
+@@ -1026,6 +1027,12 @@ static int img_commit(int argc, char **argv)
+         case 'q':
+             quiet = true;
              break;
 +        case 'r':
 +            rate_limit = cvtnum("rate limit", optarg);
 +            if (rate_limit < 0) {
-+                goto fail_getopt;
++                return 1;
 +            }
 +            break;
          case OPTION_OBJECT: {
-             QemuOpts *object_opts;
-             object_opts = qemu_opts_parse_noisily(&qemu_object_opts,
-@@ -2712,6 +2733,10 @@ static int img_convert(int argc, char **argv)
-         s.cluster_sectors = bdi.cluster_size / BDRV_SECTOR_SIZE;
-     }
+             QemuOpts *opts;
+             opts = qemu_opts_parse_noisily(&qemu_object_opts,
+@@ -1099,7 +1106,7 @@ static int img_commit(int argc, char **argv)
  
-+    if (rate_limit) {
-+        set_rate_limit(s.target, rate_limit);
-+    }
-+
-     ret = convert_do_copy(&s);
- 
-     /* Now copy the bitmaps */
+     aio_context = bdrv_get_aio_context(bs);
+     aio_context_acquire(aio_context);
+-    commit_active_start("commit", bs, base_bs, JOB_DEFAULT, 0,
++    commit_active_start("commit", bs, base_bs, JOB_DEFAULT, rate_limit,
+                         BLOCKDEV_ON_ERROR_REPORT, NULL, common_block_job_cb,
+                         &cbi, false, &local_err);
+     aio_context_release(aio_context);
 -- 
 2.6.4.windows.1
 
