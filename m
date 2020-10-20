@@ -2,60 +2,100 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FAA0C43457
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:34:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8FDFC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:35:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 78DBB2222F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:34:42 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78DBB2222F
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id C9CD52222F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:35:37 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pRC66Jx+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9CD52222F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUn6P-0003D5-7J
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:34:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45104)
+	id 1kUn7I-0004Wk-Om
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:35:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUn4v-0001l2-0D; Tue, 20 Oct 2020 04:33:09 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:49796 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUn4p-0000Cp-E8; Tue, 20 Oct 2020 04:33:08 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id E489C925E32503E4F55C;
- Tue, 20 Oct 2020 16:32:55 +0800 (CST)
-Received: from huawei.com (10.175.124.27) by DGGEMS408-HUB.china.huawei.com
- (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 16:32:49 +0800
-From: Bihong Yu <yubihong@huawei.com>
-To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v4] migration: using trace_ to replace DPRINTF
-Date: Tue, 20 Oct 2020 16:31:46 +0800
-Message-ID: <1603182706-2421-1-git-send-email-yubihong@huawei.com>
-X-Mailer: git-send-email 1.8.3.1
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kUn4K-0001G3-Fx
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 04:32:32 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:43190)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kUn4I-0008W3-Rd
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 04:32:32 -0400
+Received: by mail-wr1-x443.google.com with SMTP id g12so1032557wrp.10
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 01:32:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=ibEjVVPi+FirD8gYLhJISOpQaB7YuMMV0RIjTpvwP8A=;
+ b=pRC66Jx+fK5dnYL7pcPros/4tKyTUpwbN6CquNwzxvUeIDwxRnsn+Id7nBgZln9PIn
+ kaSW0aLGFRE6zbFAQuHLFNfTnQ4DePJYk2kBnA6W1FsTDX4YilmqzLf3LR6vw18k95Uc
+ Orq0Pu3CifS/398JdBehI4nCaxJ0tUYuQ6ZffFHXmyjDFiP5WPGANJl6ZfJs3Hc6CE+l
+ QASmJftQQfoH3OD/s1C2oCu1oLY5S1vkSKObr/KbIvUldZ9PTXcXFKaQr2EkRArc1pgq
+ vsGKbrvGb4QlwMv8j3T4pme2I7lVsxdkoQA/R9/MypK9LSjAGQARN6J5IXX8RZZM6NjE
+ lBgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=ibEjVVPi+FirD8gYLhJISOpQaB7YuMMV0RIjTpvwP8A=;
+ b=E4tWap6dbnPKZs+d7nnN08/JjDS8UrJT2UKSIc5SmrOxU9qFkIuaC9rvwU9y1B4x4E
+ zQQGU5g/3ZmY4LsRPJ9lwL4C2W5N16MjMsS+S+DOSLyxI7wjZWTPF2777UNh99ZohKyJ
+ W0XBVoDr+AVKUQlD+RE8NI8szPHvyvLZuoC3vlDeKhFTzgQijw75Dwbo8KT0vkeGRje9
+ RIbN2rdDdsfMtIOp3n47l3IaUPjmvhkPDeJJeTcPgCH7sF8+UCDlQsbN3B+BedYAJc1C
+ fEVcVEDIXb1Q1w8aq47Pk9AS1LDEo71OY6hrvwqzWwxli7jfzIYEOJhjgXk+Rw3pyRF2
+ amBg==
+X-Gm-Message-State: AOAM533COl+YDh9SXfGXogDpse7UmLWkrIw2tNf1y8SywSO0DP2zDeNi
+ KXKSkcaUmsPtuK8lsw1Oidg=
+X-Google-Smtp-Source: ABdhPJwa6Khib653apYddM03Q8z+5r4CmBkky9ZVqdwzvnw7U1/YVxrYpWUxVo1oiXftXSnd088ydA==
+X-Received: by 2002:adf:b641:: with SMTP id i1mr2062882wre.376.1603182748433; 
+ Tue, 20 Oct 2020 01:32:28 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id g125sm1588293wme.33.2020.10.20.01.32.27
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Oct 2020 01:32:27 -0700 (PDT)
+Subject: Re: [PATCH] hw/core/qdev-clock: add a reference on aliased clocks
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
+References: <20201020074426.105878-1-luc@lmichel.fr>
+ <32eb21b8-e63d-87bb-6d94-95d888ec9a3b@amsat.org>
+Message-ID: <9841f5ed-2731-0ae9-7871-cb32efc12a68@amsat.org>
+Date: Tue, 20 Oct 2020 10:32:26 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.175.124.27]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.35; envelope-from=yubihong@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:32:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <32eb21b8-e63d-87bb-6d94-95d888ec9a3b@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -68,190 +108,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yubihong@huawei.com, zhengchuan@huawei.com, dgilbert@redhat.com,
- alex.chen@huawei.com, wanghao232@huawei.com, philmd@redhat.com
+Cc: Damien Hedde <damien.hedde@greensocs.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Bihong Yu <yubihong@huawei.com>
----
- migration/block.c      | 36 ++++++++++++++++++------------------
- migration/page_cache.c | 13 +++----------
- migration/trace-events | 13 +++++++++++++
- 3 files changed, 34 insertions(+), 28 deletions(-)
+On 10/20/20 9:58 AM, Philippe Mathieu-Daudé wrote:
+> Cc'ing Markus/Marc-André too.
+> 
+> On 10/20/20 9:44 AM, Luc Michel wrote:
+>> When aliasing a clock with the qdev_alias_clock() function, a new link
+>> property is created on the device aliasing the clock. The link points
+>> to the aliased clock and use the OBJ_PROP_LINK_STRONG flag. This
+>> property is read only since it does not provide a check callback for
+>> modifications.
+>>
+>> The object_property_add_link() documentation stats that with
+>> OBJ_PROP_LINK_STRONG properties, the linked object reference count get
+>> decremented when the property is deleted. But it is _not_ incremented on
+>> creation (object_property_add_link() does not actually know the link).
+>>
+>> This commit increments the reference count on the aliased clock to
+>> ensure the aliased clock stays alive during the property lifetime, and
+>> to avoid a double-free memory error when the property get deleted.
+>>
+>> Signed-off-by: Luc Michel <luc@lmichel.fr>
+>> ---
+>>   hw/core/qdev-clock.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
+>> index 6a9a340d0f..5f5e143702 100644
+>> --- a/hw/core/qdev-clock.c
+>> +++ b/hw/core/qdev-clock.c
+>> @@ -59,10 +59,11 @@ static NamedClockList 
+>> *qdev_init_clocklist(DeviceState *dev, const char *name,
+>>       } else {
+>>           object_property_add_link(OBJECT(dev), name,
+>>                                    object_get_typename(OBJECT(clk)),
+>>                                    (Object **) &ncl->clock,
+>>                                    NULL, OBJ_PROP_LINK_STRONG);
+>> +        object_ref(OBJECT(clk));
 
-diff --git a/migration/block.c b/migration/block.c
-index 273392b..a950977 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -26,6 +26,7 @@
- #include "qemu-file.h"
- #include "migration/vmstate.h"
- #include "sysemu/block-backend.h"
-+#include "trace.h"
- 
- #define BLK_MIG_BLOCK_SIZE           (1 << 20)
- #define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_BITS)
-@@ -434,10 +435,9 @@ static int init_blk_migration(QEMUFile *f)
-         block_mig_state.total_sector_sum += sectors;
- 
-         if (bmds->shared_base) {
--            DPRINTF("Start migration for %s with shared base image\n",
--                    bdrv_get_device_name(bs));
-+            trace_migration_block_init_shared(bdrv_get_device_name(bs));
-         } else {
--            DPRINTF("Start full migration for %s\n", bdrv_get_device_name(bs));
-+            trace_migration_block_init_full(bdrv_get_device_name(bs));
-         }
- 
-         QSIMPLEQ_INSERT_TAIL(&block_mig_state.bmds_list, bmds, entry);
-@@ -592,7 +592,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
-     return (bmds->cur_dirty >= bmds->total_sectors);
- 
- error:
--    DPRINTF("Error reading sector %" PRId64 "\n", sector);
-+    trace_migration_block_save_device_dirty(sector);
-     g_free(blk->buf);
-     g_free(blk);
-     return ret;
-@@ -628,9 +628,9 @@ static int flush_blks(QEMUFile *f)
-     BlkMigBlock *blk;
-     int ret = 0;
- 
--    DPRINTF("%s Enter submitted %d read_done %d transferred %d\n",
--            __func__, block_mig_state.submitted, block_mig_state.read_done,
--            block_mig_state.transferred);
-+    trace_migration_block_flush_blks("Enter", block_mig_state.submitted,
-+                                     block_mig_state.read_done,
-+                                     block_mig_state.transferred);
- 
-     blk_mig_lock();
-     while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
-@@ -656,9 +656,9 @@ static int flush_blks(QEMUFile *f)
-     }
-     blk_mig_unlock();
- 
--    DPRINTF("%s Exit submitted %d read_done %d transferred %d\n", __func__,
--            block_mig_state.submitted, block_mig_state.read_done,
--            block_mig_state.transferred);
-+    trace_migration_block_flush_blks("Exit", block_mig_state.submitted,
-+                                     block_mig_state.read_done,
-+                                     block_mig_state.transferred);
-     return ret;
- }
- 
-@@ -727,8 +727,8 @@ static int block_save_setup(QEMUFile *f, void *opaque)
- {
-     int ret;
- 
--    DPRINTF("Enter save live setup submitted %d transferred %d\n",
--            block_mig_state.submitted, block_mig_state.transferred);
-+    trace_migration_block_save("setup", block_mig_state.submitted,
-+                               block_mig_state.transferred);
- 
-     qemu_mutex_lock_iothread();
-     ret = init_blk_migration(f);
-@@ -759,8 +759,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
-     int64_t last_ftell = qemu_ftell(f);
-     int64_t delta_ftell;
- 
--    DPRINTF("Enter save live iterate submitted %d transferred %d\n",
--            block_mig_state.submitted, block_mig_state.transferred);
-+    trace_migration_block_save("iterate", block_mig_state.submitted,
-+                               block_mig_state.transferred);
- 
-     ret = flush_blks(f);
-     if (ret) {
-@@ -825,8 +825,8 @@ static int block_save_complete(QEMUFile *f, void *opaque)
- {
-     int ret;
- 
--    DPRINTF("Enter save live complete submitted %d transferred %d\n",
--            block_mig_state.submitted, block_mig_state.transferred);
-+    trace_migration_block_save("complete", block_mig_state.submitted,
-+                               block_mig_state.transferred);
- 
-     ret = flush_blks(f);
-     if (ret) {
-@@ -851,7 +851,7 @@ static int block_save_complete(QEMUFile *f, void *opaque)
-     /* report completion */
-     qemu_put_be64(f, (100 << BDRV_SECTOR_BITS) | BLK_MIG_FLAG_PROGRESS);
- 
--    DPRINTF("Block migration completed\n");
-+    trace_migration_block_save_complete();
- 
-     qemu_put_be64(f, BLK_MIG_FLAG_EOS);
- 
-@@ -884,7 +884,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
-         pending = max_size + BLK_MIG_BLOCK_SIZE;
-     }
- 
--    DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
-+    trace_migration_block_save_pending(pending);
-     /* We don't do postcopy */
-     *res_precopy_only += pending;
- }
-diff --git a/migration/page_cache.c b/migration/page_cache.c
-index 775582f..098b436 100644
---- a/migration/page_cache.c
-+++ b/migration/page_cache.c
-@@ -18,14 +18,7 @@
- #include "qapi/error.h"
- #include "qemu/host-utils.h"
- #include "page_cache.h"
--
--#ifdef DEBUG_CACHE
--#define DPRINTF(fmt, ...) \
--    do { fprintf(stdout, "cache: " fmt, ## __VA_ARGS__); } while (0)
--#else
--#define DPRINTF(fmt, ...) \
--    do { } while (0)
--#endif
-+#include "trace.h"
- 
- /* the page in cache will not be replaced in two cycles */
- #define CACHED_PAGE_LIFETIME 2
-@@ -75,7 +68,7 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
-     cache->num_items = 0;
-     cache->max_num_items = num_pages;
- 
--    DPRINTF("Setting cache buckets to %" PRId64 "\n", cache->max_num_items);
-+    trace_migration_pagecache_init(cache->max_num_items);
- 
-     /* We prefer not to abort if there is no memory */
-     cache->page_cache = g_try_malloc((cache->max_num_items) *
-@@ -169,7 +162,7 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
-     if (!it->it_data) {
-         it->it_data = g_try_malloc(cache->page_size);
-         if (!it->it_data) {
--            DPRINTF("Error allocating page\n");
-+            trace_migration_pagecache_insert();
-             return -1;
-         }
-         cache->num_items++;
-diff --git a/migration/trace-events b/migration/trace-events
-index 338f38b..bd2fecb 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
- calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
- skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
- find_page_matched(const char *idstr) "ramblock %s addr or size changed"
-+
-+# block.c
-+migration_block_init_shared(const char *blk_device_name) "Start migration for %s with shared base image"
-+migration_block_init_full(const char *blk_device_name) "Start full migration for %s"
-+migration_block_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
-+migration_block_flush_blks(const char *action, int submitted, int read_done, int transferred) "%s (submitted %d, read_done %d, transferred %d)"
-+migration_block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
-+migration_block_save_complete(void) "Block migration completed"
-+migration_block_save_pending(uint64_t pending) "Save live (blocks pending: %" PRIu64 ")"
-+
-+# page_cache.c
-+migration_pagecache_init(int64_t max_num_items) "Setting cache to %" PRId64 " buckets"
-+migration_pagecache_insert(void) "Error allocating page"
--- 
-1.8.3.1
+OK, this is particular to this model because device_finalize()
+garbage-collector and calls qdev_finalize_clocklist().
 
+With a comment explaining why we need this call:
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+
+>>       }
+>>       ncl->clock = clk;
+>>       QLIST_INSERT_HEAD(&dev->clocks, ncl, node);
+>>
+> 
 
