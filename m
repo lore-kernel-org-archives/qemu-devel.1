@@ -2,45 +2,45 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E158FC4363D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D874C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:35:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 496AD21D7B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:34:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 496AD21D7B
+	by mail.kernel.org (Postfix) with ESMTPS id BB3BA21741
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:35:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB3BA21741
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48202 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUrmD-0006rY-7j
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:34:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50570)
+	id 1kUrne-0008FX-Oq
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:35:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU8-0000M6-JN; Tue, 20 Oct 2020 09:15:29 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48302 helo=huawei.com)
+ id 1kUrUA-0000Qk-MD; Tue, 20 Oct 2020 09:15:30 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5269 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU0-00076d-Oe; Tue, 20 Oct 2020 09:15:28 -0400
-Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 4D201BCECE48456486A5;
- Tue, 20 Oct 2020 21:15:08 +0800 (CST)
+ id 1kUrU0-00077T-Pa; Tue, 20 Oct 2020 09:15:30 -0400
+Received: from DGGEMS407-HUB.china.huawei.com (unknown [172.30.72.59])
+ by Forcepoint Email with ESMTP id 5A4B42D3DE87B59C9C38;
+ Tue, 20 Oct 2020 21:15:13 +0800 (CST)
 Received: from localhost (10.174.186.67) by DGGEMS407-HUB.china.huawei.com
  (10.3.19.207) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 21:15:00 +0800
+ 21:15:06 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH v2 04/13] device_tree: Add qemu_fdt_add_path
-Date: Tue, 20 Oct 2020 21:14:31 +0800
-Message-ID: <20201020131440.1090-5-fangying1@huawei.com>
+Subject: [RFC PATCH v2 13/13] hw/arm/virt-acpi-build: Enable CPU cache topology
+Date: Tue, 20 Oct 2020 21:14:40 +0800
+Message-ID: <20201020131440.1090-14-fangying1@huawei.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
 References: <20201020131440.1090-1-fangying1@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.67]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=fangying1@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:04:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:15:07
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -73,100 +73,190 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, drjones@redhat.com,
  zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, alistair.francis@wdc.com, imammedo@redhat.com
+ qemu-arm@nongnu.org, alistair.francis@wdc.com,
+ Ying Fang <fangying1@huawei.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Andrew Jones <drjones@redhat.com>
+A helper struct AcpiCacheOffset is introduced to describe the offset
+of three level caches. The cache hierarchy is built according to
+ACPI spec v6.3 5.2.29.2. Let's enable CPU cache topology now.
 
-qemu_fdt_add_path() works like qemu_fdt_add_subnode(), except
-it also adds any missing parent nodes. We also tweak an error
-message of qemu_fdt_add_subnode().
-
-We'll make use of the new function in a coming patch.
-
-Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
 ---
- device_tree.c                | 45 ++++++++++++++++++++++++++++++++++--
- include/sysemu/device_tree.h |  1 +
- 2 files changed, 44 insertions(+), 2 deletions(-)
+ hw/acpi/aml-build.c         | 19 +++++++++-----
+ hw/arm/virt-acpi-build.c    | 52 ++++++++++++++++++++++++++++++++-----
+ include/hw/acpi/acpi-defs.h |  6 +++++
+ include/hw/acpi/aml-build.h |  7 ++---
+ 4 files changed, 68 insertions(+), 16 deletions(-)
 
-diff --git a/device_tree.c b/device_tree.c
-index b335dae707..c080909bb9 100644
---- a/device_tree.c
-+++ b/device_tree.c
-@@ -515,8 +515,8 @@ int qemu_fdt_add_subnode(void *fdt, const char *name)
- 
-     retval = fdt_add_subnode(fdt, parent, basename);
-     if (retval < 0) {
--        error_report("FDT: Failed to create subnode %s: %s", name,
--                     fdt_strerror(retval));
-+        error_report("%s: Failed to create subnode %s: %s",
-+                     __func__, name, fdt_strerror(retval));
-         exit(1);
-     }
- 
-@@ -524,6 +524,47 @@ int qemu_fdt_add_subnode(void *fdt, const char *name)
-     return retval;
+diff --git a/hw/acpi/aml-build.c b/hw/acpi/aml-build.c
+index 6f0e8df49b..f449fa27e7 100644
+--- a/hw/acpi/aml-build.c
++++ b/hw/acpi/aml-build.c
+@@ -1799,27 +1799,32 @@ void build_cache_hierarchy(GArray *tbl,
+ /*
+  * ACPI 6.3: 5.2.29.1 Processor hierarchy node structure (Type 0)
+  */
+-void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
++void build_socket_hierarchy(GArray *tbl, uint32_t parent,
++                            uint32_t offset, uint32_t id)
+ {
+     build_append_byte(tbl, 0);          /* Type 0 - processor */
+-    build_append_byte(tbl, 20);         /* Length, no private resources */
++    build_append_byte(tbl, 24);         /* Length, no private resources */
+     build_append_int_noprefix(tbl, 0, 2);  /* Reserved */
+     build_append_int_noprefix(tbl, 1, 4);  /* Flags: Physical package */
+     build_append_int_noprefix(tbl, parent, 4);  /* Parent */
+     build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
+-    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
++    build_append_int_noprefix(tbl, 1, 4);  /*  Number of private resources */
++    build_append_int_noprefix(tbl, offset, 4);  /* Private resources */
  }
  
-+/*
-+ * Like qemu_fdt_add_subnode(), but will add all missing
-+ * subnodes in the path.
-+ */
-+int qemu_fdt_add_path(void *fdt, const char *path)
-+{
-+    char *dupname, *basename, *p;
-+    int parent, retval = -1;
-+
-+    if (path[0] != '/') {
-+        return retval;
-+    }
-+
-+    parent = fdt_path_offset(fdt, "/");
-+    p = dupname = g_strdup(path);
-+
-+    while (p) {
-+        *p = '/';
-+        basename = p + 1;
-+        p = strchr(p + 1, '/');
-+        if (p) {
-+            *p = '\0';
-+        }
-+        retval = fdt_path_offset(fdt, dupname);
-+        if (retval < 0 && retval != -FDT_ERR_NOTFOUND) {
-+            error_report("%s: Invalid path %s: %s",
-+                         __func__, path, fdt_strerror(retval));
-+            exit(1);
-+        } else if (retval == -FDT_ERR_NOTFOUND) {
-+            retval = fdt_add_subnode(fdt, parent, basename);
-+            if (retval < 0) {
-+                break;
-+            }
-+        }
-+        parent = retval;
-+    }
-+
-+    g_free(dupname);
-+    return retval;
+-void build_processor_hierarchy(GArray *tbl, uint32_t flags,
+-                               uint32_t parent, uint32_t id)
++void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
++                               AcpiCacheOffset offset, uint32_t id)
+ {
+     build_append_byte(tbl, 0);          /* Type 0 - processor */
+-    build_append_byte(tbl, 20);         /* Length, no private resources */
++    build_append_byte(tbl, 32);         /* Length, no private resources */
+     build_append_int_noprefix(tbl, 0, 2);      /* Reserved */
+     build_append_int_noprefix(tbl, flags, 4);  /* Flags */
+     build_append_int_noprefix(tbl, parent, 4); /* Parent */
+     build_append_int_noprefix(tbl, id, 4);     /* ACPI processor ID */
+-    build_append_int_noprefix(tbl, 0, 4);  /* Number of private resources */
++    build_append_int_noprefix(tbl, 3, 4);  /* Number of private resources */
++    build_append_int_noprefix(tbl, offset.l1d_offset, 4);/* Private resources */
++    build_append_int_noprefix(tbl, offset.l1i_offset, 4);/* Private resources */
++    build_append_int_noprefix(tbl, offset.l2_offset, 4); /* Private resources */
+ }
+ 
+ void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id)
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index e1f3ea50ad..8a026ba24e 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -429,29 +429,69 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
+ 
+-static void build_pptt(GArray *table_data, BIOSLinker *linker, MachineState *ms)
++static inline void arm_acpi_cache_info(CPUCacheInfo *cpu_cache,
++                                       AcpiCacheInfo *acpi_cache)
+ {
++    acpi_cache->size = cpu_cache->size;
++    acpi_cache->sets = cpu_cache->sets;
++    acpi_cache->associativity = cpu_cache->associativity;
++    acpi_cache->attributes = cpu_cache->attributes;
++    acpi_cache->line_size = cpu_cache->line_size;
 +}
 +
- void qemu_fdt_dumpdtb(void *fdt, int size)
- {
-     const char *dumpdtb = qemu_opt_get(qemu_get_machine_opts(), "dumpdtb");
-diff --git a/include/sysemu/device_tree.h b/include/sysemu/device_tree.h
-index 982c89345f..15fb98af98 100644
---- a/include/sysemu/device_tree.h
-+++ b/include/sysemu/device_tree.h
-@@ -104,6 +104,7 @@ uint32_t qemu_fdt_get_phandle(void *fdt, const char *path);
- uint32_t qemu_fdt_alloc_phandle(void *fdt);
- int qemu_fdt_nop_node(void *fdt, const char *node_path);
- int qemu_fdt_add_subnode(void *fdt, const char *name);
-+int qemu_fdt_add_path(void *fdt, const char *path);
++static void build_pptt(GArray *table_data, BIOSLinker *linker,
++                       VirtMachineState *vms)
++{
++    MachineState *ms = MACHINE(vms);
+     int pptt_start = table_data->len;
+     int uid = 0, cpus = 0, socket;
+     unsigned int smp_cores = ms->smp.cores;
+     unsigned int smp_threads = ms->smp.threads;
++    AcpiCacheOffset offset;
++    ARMCPU *cpu = ARM_CPU(qemu_get_cpu(cpus));
++    AcpiCacheInfo cache_info;
  
- #define qemu_fdt_setprop_cells(fdt, node_path, property, ...)                 \
-     do {                                                                      \
+     acpi_data_push(table_data, sizeof(AcpiTableHeader));
+ 
+     for (socket = 0; cpus < ms->possible_cpus->len; socket++) {
+-        uint32_t socket_offset = table_data->len - pptt_start;
++        uint32_t l3_offset = table_data->len - pptt_start;
++        uint32_t socket_offset;
+         int core;
+ 
+-        build_socket_hierarchy(table_data, 0, socket);
++        /* L3 cache type structure */
++        arm_acpi_cache_info(cpu->caches.l3_cache, &cache_info);
++        build_cache_hierarchy(table_data, 0, &cache_info);
++
++        socket_offset = table_data->len - pptt_start;
++        build_socket_hierarchy(table_data, 0, l3_offset, socket);
+ 
+         for (core = 0; core < smp_cores; core++) {
+             uint32_t core_offset = table_data->len - pptt_start;
+             int thread;
+ 
++            /* L2 cache tpe structure */
++            offset.l2_offset = table_data->len - pptt_start;
++            arm_acpi_cache_info(cpu->caches.l2_cache, &cache_info);
++            build_cache_hierarchy(table_data, 0, &cache_info);
++
++            /* L1d cache type structure */
++            offset.l1d_offset = table_data->len - pptt_start;
++            arm_acpi_cache_info(cpu->caches.l1d_cache, &cache_info);
++            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
++
++            /* L1i cache type structure */
++            offset.l1i_offset = table_data->len - pptt_start;
++            arm_acpi_cache_info(cpu->caches.l1i_cache, &cache_info);
++            build_cache_hierarchy(table_data, offset.l2_offset, &cache_info);
++
++            core_offset = table_data->len - pptt_start;
+             if (smp_threads <= 1) {
+-                build_processor_hierarchy(table_data, 2, socket_offset, uid++);
++                build_processor_hierarchy(table_data, 2, socket_offset,
++                                          offset, uid++);
+              } else {
+-                build_processor_hierarchy(table_data, 0, socket_offset, core);
++
++                build_processor_hierarchy(table_data, 0, socket_offset,
++                                          offset, core);
+                 for (thread = 0; thread < smp_threads; thread++) {
+                     build_smt_hierarchy(table_data, core_offset, uid++);
+                 }
+@@ -727,7 +767,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+ 
+     if (cpu_topology_enabled) {
+         acpi_add_table(table_offsets, tables_blob);
+-        build_pptt(tables_blob, tables->linker, ms);
++        build_pptt(tables_blob, tables->linker, vms);
+     }
+ 
+     acpi_add_table(table_offsets, tables_blob);
+diff --git a/include/hw/acpi/acpi-defs.h b/include/hw/acpi/acpi-defs.h
+index 3df38ab449..e48b7fa506 100644
+--- a/include/hw/acpi/acpi-defs.h
++++ b/include/hw/acpi/acpi-defs.h
+@@ -626,4 +626,10 @@ typedef struct AcpiCacheInfo {
+     uint16_t line_size;
+ } AcpiCacheInfo;
+ 
++typedef struct AcpiCacheOffset {
++    uint32_t l1d_offset;
++    uint32_t l1i_offset;
++    uint32_t l2_offset;
++} AcpiCacheOffset;
++
+ #endif
+diff --git a/include/hw/acpi/aml-build.h b/include/hw/acpi/aml-build.h
+index 01078753a8..a15ccb2c91 100644
+--- a/include/hw/acpi/aml-build.h
++++ b/include/hw/acpi/aml-build.h
+@@ -440,10 +440,11 @@ void build_slit(GArray *table_data, BIOSLinker *linker, MachineState *ms);
+ void build_cache_hierarchy(GArray *tbl,
+               uint32_t next_level, AcpiCacheInfo *cache_info);
+ 
+-void build_socket_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
++void build_socket_hierarchy(GArray *tbl, uint32_t parent,
++                            uint32_t offset, uint32_t id);
+ 
+-void build_processor_hierarchy(GArray *tbl, uint32_t flags,
+-                               uint32_t parent, uint32_t id);
++void build_processor_hierarchy(GArray *tbl, uint32_t flags, uint32_t parent,
++                               AcpiCacheOffset offset, uint32_t id);
+ 
+ void build_smt_hierarchy(GArray *tbl, uint32_t parent, uint32_t id);
+ 
 -- 
 2.23.0
 
