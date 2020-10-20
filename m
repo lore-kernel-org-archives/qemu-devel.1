@@ -7,59 +7,61 @@ X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CE4C4363A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80F80C388F7
 	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:16:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 501072222D
+	by mail.kernel.org (Postfix) with ESMTPS id 05EB522247
 	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:16:39 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501072222D
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05EB522247
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51588 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUtNO-0001ht-5D
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:16:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54660)
+	id 1kUtNP-0001l9-0d
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:16:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtIH-0003ms-BH
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:11:21 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:38854)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtIa-000439-8p
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:11:40 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:42590)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtIF-0006Uu-Rq
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:11:21 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtIY-0006WT-Q3
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:11:39 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-500-xeswPDDFPrireYi_UfwXUg-1; Tue, 20 Oct 2020 11:11:15 -0400
-X-MC-Unique: xeswPDDFPrireYi_UfwXUg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-305-svRMrcQqP66xpFx8bgD4rw-1; Tue, 20 Oct 2020 11:11:36 -0400
+X-MC-Unique: svRMrcQqP66xpFx8bgD4rw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 40FEB1006C90;
- Tue, 20 Oct 2020 15:11:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E82D71074656;
+ Tue, 20 Oct 2020 15:11:34 +0000 (UTC)
 Received: from bahia.lan (ovpn-115-53.ams2.redhat.com [10.36.115.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9000D6EF6A;
- Tue, 20 Oct 2020 15:11:13 +0000 (UTC)
-Subject: [PATCH 2/5] tests/9pfs: Turn fs_readdir_split() into a helper
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 445C01002C18;
+ Tue, 20 Oct 2020 15:11:34 +0000 (UTC)
+Subject: [PATCH 5/5] tests/9pfs: Turn fs_mkdir() into a helper
 From: Greg Kurz <groug@kaod.org>
 To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 20 Oct 2020 17:11:12 +0200
-Message-ID: <160320667267.255209.16813057225265843854.stgit@bahia.lan>
+Date: Tue, 20 Oct 2020 17:11:33 +0200
+Message-ID: <160320669332.255209.15848887356639293774.stgit@bahia.lan>
 In-Reply-To: <160320655763.255209.3890094487013964615.stgit@bahia.lan>
 References: <160320655763.255209.3890094487013964615.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
  helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 11:11:04
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 11:11:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -11
 X-Spam_score: -1.2
@@ -83,61 +85,44 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-fs_readdir_split() isn't a top level test function and thus shouldn't
-take the "void *obj, void *data, QGuestAllocator *t_alloc" arguments.
+fs_mkdir() isn't a top level test function and thus shouldn't take
+the "void *obj, void *data, QGuestAllocator *t_alloc" arguments.
 Turn it into a helper to be used by test functions.
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- tests/qtest/virtio-9p-test.c |   14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ tests/qtest/virtio-9p-test.c |    7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 63f91aaf77e6..d0cdc14fee3e 100644
+index 1e1b1433014b..155d327fd9f5 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -727,11 +727,8 @@ static void fs_readdir(void *obj, void *data, QGuestAl=
-locator *t_alloc)
+@@ -972,11 +972,8 @@ static void fs_flush_ignored(void *obj, void *data, QG=
+uestAllocator *t_alloc)
+     g_free(wnames[0]);
  }
 =20
- /* readdir test where overall request is split over several messages */
--static void fs_readdir_split(void *obj, void *data, QGuestAllocator *t_all=
-oc,
--                             uint32_t count)
-+static void do_fs_readdir_split(QVirtio9P *v9p, uint32_t count)
+-static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
+-                     const char *path, const char *cname)
++static void do_fs_mkdir(QVirtio9P *v9p, const char *path, const char *cnam=
+e)
  {
 -    QVirtio9P *v9p =3D obj;
 -    alloc =3D t_alloc;
-     char *const wnames[] =3D { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-     uint16_t nqid;
-     v9fs_qid qid;
-@@ -998,19 +995,22 @@ static void fs_mkdir(void *obj, void *data, QGuestAll=
-ocator *t_alloc,
- static void fs_readdir_split_128(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
- {
--    fs_readdir_split(obj, data, t_alloc, 128);
-+    alloc =3D t_alloc;
-+    do_fs_readdir_split(obj, 128);
- }
+     char **wnames;
+     char *const name =3D g_strdup(cname);
+     P9Req *req;
+@@ -1031,7 +1028,7 @@ static void fs_create_dir(void *obj, void *data, QGue=
+stAllocator *t_alloc)
+     g_assert(root_path !=3D NULL);
 =20
- static void fs_readdir_split_256(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
- {
--    fs_readdir_split(obj, data, t_alloc, 256);
-+    alloc =3D t_alloc;
-+    do_fs_readdir_split(obj, 256);
- }
+     do_fs_attach(v9p);
+-    fs_mkdir(v9p, data, t_alloc, "/", "01");
++    do_fs_mkdir(v9p, "/", "01");
 =20
- static void fs_readdir_split_512(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
- {
--    fs_readdir_split(obj, data, t_alloc, 512);
-+    alloc =3D t_alloc;
-+    do_fs_readdir_split(obj, 512);
- }
-=20
-=20
+     /* check if created directory really exists now ... */
+     g_assert(stat(new_dir, &st) =3D=3D 0);
 
 
 
