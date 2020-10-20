@@ -2,77 +2,60 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1778C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:43:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45B06C43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:45:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AFF22237B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:43:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AFF22237B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id B469B2237B
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:45:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B469B2237B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57448 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUlNB-000331-V1
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 02:43:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50824)
+	id 1kUlOK-0004M4-0U
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 02:45:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51206)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUlLz-0002Jl-L5; Tue, 20 Oct 2020 02:42:39 -0400
-Received: from mail-ej1-f65.google.com ([209.85.218.65]:40766)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kUlLx-00036h-Ow; Tue, 20 Oct 2020 02:42:39 -0400
-Received: by mail-ej1-f65.google.com with SMTP id z5so1022911ejw.7;
- Mon, 19 Oct 2020 23:42:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=n5wA3F/wNadLtgZKL7hEJNVuHrBuhC/d+3AOnovrj7s=;
- b=F0wyKRSEyovPqLJEAFMHrNL06pLkdznSKBOGwgFIfaUhuHAmoQPDFQld89zRNOCsda
- 22H8IXc9mUO/2081tigrhsbcF2LBKTeLFU6olzgbS0/wFn6+56SG0N8QDO8tq3eI3wKU
- a9kX38ToWTuT0AXrO7Jx9ztwtHEGcjtVy5rhkgVzpmS06efiJf74gug07HD29yvS1Vwu
- 3U3l/UeVPbBmaMATGRPc9ot4ueLvF0eTAeV4NzqdLgBTQu9lILUC6sVe9PC30ltfnjT+
- 79TWt3ABkaImPGMZclqBdcbNjhhKrk2wILDTy1c5Giq5BcuP7QMYbLdh7Pe56dEFh6a7
- DU6g==
-X-Gm-Message-State: AOAM530yiz7NOZwPvuKiz3+mvdzU/Z/cm1KcOHxsMX9n5nGIDHhABPxE
- 2n2nDd/c7+3tQNRpAS/vVmV8IVUHvfjKc4DgwG8=
-X-Google-Smtp-Source: ABdhPJzOTKSm0mIIS2FPQf0RDVsv4FcrMyx267Rcq9bvKebT0LHe5ufxq7CB+qm+iBIC7DACIM25SfCFe2EcbAciBsk=
-X-Received: by 2002:a17:906:fb86:: with SMTP id
- lr6mr1609234ejb.510.1603176155998; 
- Mon, 19 Oct 2020 23:42:35 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kUlMl-0002xk-4o; Tue, 20 Oct 2020 02:43:27 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5190 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
+ id 1kUlMi-0003O2-80; Tue, 20 Oct 2020 02:43:26 -0400
+Received: from DGGEMS412-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 30FB7A6CE43AE5AC8C84;
+ Tue, 20 Oct 2020 14:43:14 +0800 (CST)
+Received: from huawei.com (10.175.124.27) by DGGEMS412-HUB.china.huawei.com
+ (10.3.19.212) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 14:43:05 +0800
+From: Bihong Yu <yubihong@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
+Subject: [PATCH v2] migration: using trace_ to replace DPRINTF
+Date: Tue, 20 Oct 2020 14:42:01 +0800
+Message-ID: <1603176121-750-1-git-send-email-yubihong@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
 MIME-Version: 1.0
-References: <20201009064449.2336-1-zhaolichang@huawei.com>
- <a5a68476-0ed8-08f9-f993-464317d798bf@huawei.com>
-In-Reply-To: <a5a68476-0ed8-08f9-f993-464317d798bf@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Date: Tue, 20 Oct 2020 08:42:24 +0200
-Message-ID: <CAAdtpL5HZzb+_gAyNGQfM1N7vBxmLck2TXiGohv9D9dgO16cRw@mail.gmail.com>
-Subject: Re: [PATCH V2 00/14] fix some comment spelling errors
-To: Lichang Zhao <zhaolichang@huawei.com>, 
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=209.85.218.65;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-f65.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 02:42:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9,
- FREEMAIL_FORGED_FROMDOMAIN=0.249, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain
+X-Originating-IP: [10.175.124.27]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=yubihong@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 02:43:14
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,76 +68,190 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Michael Tokarev <mjt@tls.msk.ru>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: yubihong@huawei.com, zhengchuan@huawei.com, dgilbert@redhat.com,
+ alex.chen@huawei.com, wanghao232@huawei.com, philmd@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-You forgot to Cc qemu-devel@.
-
-(See https://wiki.qemu.org/Contribute/SubmitAPatch#CC_the_relevant_maintain=
-er)
-
-On Tue, Oct 20, 2020 at 4:46 AM Lichang Zhao <zhaolichang@huawei.com> wrote=
-:
-
-Now your name is properly displayed, so I assume you finally ran:
-
-$ git config user.name "Lichang Zhao".
-
-To fix how your name is displayed in your previous contributions,
-consider sending this patch:
-
--- >8 --
-diff --git a/.mailmap b/.mailmap
-index 663819fb017..a56c5ba5ee1 100644
---- a/.mailmap
-+++ b/.mailmap
-@@ -113,6 +113,7 @@ Liu Yu <yu.liu@freescale.com>
-Liu Yu <Yu.Liu@freescale.com>
-Li Zhang <zhlcindy@gmail.com>
-Li Zhang <zhlcindy@linux.vnet.ibm.com>
-+Lichang Zhao <zhaolichang@huawei.com>
-Llu=C3=ADs Vilanova <vilanova@ac.upc.edu>
-Llu=C3=ADs Vilanova <xscript@gmx.net>
-Longpeng (Mike) <longpeng2@huawei.com>
-
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
 ---
+ migration/block.c      | 36 ++++++++++++++++++------------------
+ migration/page_cache.c | 13 +++----------
+ migration/trace-events | 13 +++++++++++++
+ 3 files changed, 34 insertions(+), 28 deletions(-)
 
-(or Ack-by it here and I'll send it).
+diff --git a/migration/block.c b/migration/block.c
+index 273392b..1e76a9f 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -26,6 +26,7 @@
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/block-backend.h"
++#include "trace.h"
+ 
+ #define BLK_MIG_BLOCK_SIZE           (1 << 20)
+ #define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_BITS)
+@@ -434,10 +435,9 @@ static int init_blk_migration(QEMUFile *f)
+         block_mig_state.total_sector_sum += sectors;
+ 
+         if (bmds->shared_base) {
+-            DPRINTF("Start migration for %s with shared base image\n",
+-                    bdrv_get_device_name(bs));
++            trace_init_blk_migration_shared(bdrv_get_device_name(bs));
+         } else {
+-            DPRINTF("Start full migration for %s\n", bdrv_get_device_name(bs));
++            trace_init_blk_migration_full(bdrv_get_device_name(bs));
+         }
+ 
+         QSIMPLEQ_INSERT_TAIL(&block_mig_state.bmds_list, bmds, entry);
+@@ -592,7 +592,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+     return (bmds->cur_dirty >= bmds->total_sectors);
+ 
+ error:
+-    DPRINTF("Error reading sector %" PRId64 "\n", sector);
++    trace_mig_save_device_dirty(sector);
+     g_free(blk->buf);
+     g_free(blk);
+     return ret;
+@@ -628,9 +628,9 @@ static int flush_blks(QEMUFile *f)
+     BlkMigBlock *blk;
+     int ret = 0;
+ 
+-    DPRINTF("%s Enter submitted %d read_done %d transferred %d\n",
+-            __func__, block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_flush_blks("Enter", block_mig_state.submitted,
++                     block_mig_state.read_done,
++                     block_mig_state.transferred);
+ 
+     blk_mig_lock();
+     while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
+@@ -656,9 +656,9 @@ static int flush_blks(QEMUFile *f)
+     }
+     blk_mig_unlock();
+ 
+-    DPRINTF("%s Exit submitted %d read_done %d transferred %d\n", __func__,
+-            block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_flush_blks("Exit", block_mig_state.submitted,
++                     block_mig_state.read_done,
++                     block_mig_state.transferred);
+     return ret;
+ }
+ 
+@@ -727,8 +727,8 @@ static int block_save_setup(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live setup submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("setup", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     qemu_mutex_lock_iothread();
+     ret = init_blk_migration(f);
+@@ -759,8 +759,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
+     int64_t last_ftell = qemu_ftell(f);
+     int64_t delta_ftell;
+ 
+-    DPRINTF("Enter save live iterate submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("iterate", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -825,8 +825,8 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live complete submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("complete", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -851,7 +851,7 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+     /* report completion */
+     qemu_put_be64(f, (100 << BDRV_SECTOR_BITS) | BLK_MIG_FLAG_PROGRESS);
+ 
+-    DPRINTF("Block migration completed\n");
++    trace_migration_block_save_complete();
+ 
+     qemu_put_be64(f, BLK_MIG_FLAG_EOS);
+ 
+@@ -884,7 +884,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         pending = max_size + BLK_MIG_BLOCK_SIZE;
+     }
+ 
+-    DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
++    trace_migration_block_save_pending(pending);
+     /* We don't do postcopy */
+     *res_precopy_only += pending;
+ }
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 775582f..d554efa 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -18,14 +18,7 @@
+ #include "qapi/error.h"
+ #include "qemu/host-utils.h"
+ #include "page_cache.h"
+-
+-#ifdef DEBUG_CACHE
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stdout, "cache: " fmt, ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
++#include "trace.h"
+ 
+ /* the page in cache will not be replaced in two cycles */
+ #define CACHED_PAGE_LIFETIME 2
+@@ -75,7 +68,7 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+     cache->num_items = 0;
+     cache->max_num_items = num_pages;
+ 
+-    DPRINTF("Setting cache buckets to %" PRId64 "\n", cache->max_num_items);
++    trace_cache_init(cache->max_num_items);
+ 
+     /* We prefer not to abort if there is no memory */
+     cache->page_cache = g_try_malloc((cache->max_num_items) *
+@@ -169,7 +162,7 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
+     if (!it->it_data) {
+         it->it_data = g_try_malloc(cache->page_size);
+         if (!it->it_data) {
+-            DPRINTF("Error allocating page\n");
++            trace_cache_insert();
+             return -1;
+         }
+         cache->num_items++;
+diff --git a/migration/trace-events b/migration/trace-events
+index 338f38b..094dbe4 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
+ calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+ skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+ find_page_matched(const char *idstr) "ramblock %s addr or size changed"
++
++# block.c
++init_blk_migration_shared(const char *blk_device_name) "Start migration for %s with shared base image"
++init_blk_migration_full(const char *blk_device_name) "Start full migration for %s"
++mig_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
++flush_blks(const char *action, int submitted, int read_done, int transferred) "%s submitted %d read_done %d transferred %d"
++migration_block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
++migration_block_save_complete(void) "Block migration completed"
++migration_block_save_pending(uint64_t pending) "Enter save live pending  %" PRIu64
++
++# page_cache.c
++cache_init(int64_t max_num_items) "Setting cache buckets to %" PRId64
++cache_insert(void) "Error allocating page"
+-- 
+1.8.3.1
 
->
-> On 2020/10/9 14:44, zhaolichang wrote:
-> > I found that there are many spelling errors in the comments of qemu/tar=
-get/.
-> >
-> > I used spellcheck to check the spelling errors and found some errors in=
- the folder.
-> >
-> >
-> >
-> > The checkpatch.pl file in the Linux kernel can check spelling errors in=
- patches.
-> >
-> > I'm trying to add this function to the checkpatch.pl in qemu,
-> >
-> > so that no similar spelling errors will occur in the feture.
-> >
-> > It's not done yet and I will commit the patch when it's done.
-> >
-> >
-> >
-> > v1 -> v2:
-> >
-> >   add reviewed-by for patch
-> >
-> >
-> >
-> > Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-> >
->
-> ping
-> This series of patches have been reviewed. Can you help me to pull them?
->
 
