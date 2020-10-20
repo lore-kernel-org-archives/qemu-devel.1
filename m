@@ -2,124 +2,63 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6688CC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:18:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC694C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:20:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBA4522247
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:18:41 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="X9ioz+kF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBA4522247
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 260F322247
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:20:05 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 260F322247
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53176 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUrXE-0003an-N3
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:18:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47472)
+	id 1kUrYa-0005Qe-4E
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:20:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50512)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kUrJ3-0001pn-An; Tue, 20 Oct 2020 09:04:01 -0400
-Received: from mail-eopbgr70134.outbound.protection.outlook.com
- ([40.107.7.134]:56643 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kUrU4-0000FH-0h; Tue, 20 Oct 2020 09:15:24 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42546 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kUrJ0-0005bG-3h; Tue, 20 Oct 2020 09:04:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=I4pmPLYs2sIiLsVXXU5E3S9ELPs1/AzudWcZDoxlkOI2VE9Y9MzfoeSLPZchC95UUzE1fI3DsHl9qT05iswntIasQQ/kFzIiiAekPQSKmUokq34NbdmQBr9Hihjt9neiPoBtCxPh/JDmHxJTDvj1G0n5smAAZUOtzT+Oifnfj68NMBgsq19DjYWlY0ov3jjRgyR3Ef8NwLG+9Jy8EAa/wPwtE2ChSjrFKIOCOxsEayzfK42pf0L7d+aP2gv8VYM1z8DGpGV0f6L0bj7oBCFp7AI7D6FOvwDHpqM/KCPmYhrXWv2Dvx+Dva2/l3OtVDTVPbfQpKIBSRVCoqIGKMBPNA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RdcAJywfqKOozzqSUAv5jUdiToU+YjSlDEysNsc8lHE=;
- b=lrR0dkgtW05kgOaev75qno6zspwC4aL4YfbeK+6lJWWpWzJYbulECs9+mqIsTy0fqGbUIrZJvtYJIECz5pE5Ny+4eA6vK+Hd0mR04CkUhX0G3NkDJcKuVWbTaFpOpJwNrzndpRN5+vA65+JAOh+xQ7xCE8Pf9x6V4cFLKKJEFAiGXa2w3AmNKj/H/MxwUsUI6VrLYP5Cp7veSyR/Vz8xVFPahy839bzuEyb3FTWSAqzdKj3pSZYxw1RdkLLggC3WnBmvwH6LdzPd/F/+Y01vS2qSTVouAnUGrpRUyVBRcB/V9Y46ledIbny1zo5n582h+sR6X4+ptIZlgH1aZFhPzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RdcAJywfqKOozzqSUAv5jUdiToU+YjSlDEysNsc8lHE=;
- b=X9ioz+kFUY6LxrVxZo5NYhNqrD7D8OCvhZKUUFBZ2oRWAY3Y3aSkptJWIEh0qB962pqtnHzojkCJazdQ0ne41ZnAdbJchshhLLYqDoWdS8WCFwfbLvb04/MusQYdH73vali6n0D/sq1Gmzql4dNa8nRkfOVBDjRTbxjaPxdx+Q0=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AS8PR08MB6168.eurprd08.prod.outlook.com (2603:10a6:20b:294::9)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 20 Oct
- 2020 13:03:40 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Tue, 20 Oct 2020
- 13:03:40 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, armbru@redhat.com, berto@igalia.com,
- vsementsov@virtuozzo.com, eblake@redhat.com, jsnow@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, pavel.dovgaluk@ispras.ru,
- ari@tuxera.com, mreitz@redhat.com, kwolf@redhat.com,
- Greg Kurz <groug@kaod.org>
-Subject: [PATCH v4 13/14] block/qed: bdrv_qed_do_open: deal with errp
-Date: Tue, 20 Oct 2020 16:03:10 +0300
-Message-Id: <20201020130311.14311-14-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201020130311.14311-1-vsementsov@virtuozzo.com>
-References: <20201020130311.14311-1-vsementsov@virtuozzo.com>
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kUrTy-000762-P1; Tue, 20 Oct 2020 09:15:23 -0400
+Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 45A84A5D2351B4E9E90C;
+ Tue, 20 Oct 2020 21:15:05 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS401-HUB.china.huawei.com
+ (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 21:14:58 +0800
+From: Ying Fang <fangying1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [RFC PATCH v2 01/13] hw/arm/virt: Spell out smp.cpus and smp.max_cpus
+Date: Tue, 20 Oct 2020 21:14:28 +0800
+Message-ID: <20201020131440.1090-2-fangying1@huawei.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
+References: <20201020131440.1090-1-fangying1@huawei.com>
+MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Originating-IP: [185.215.60.66]
-X-ClientProxiedBy: FR2P281CA0023.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::10) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.66) by
- FR2P281CA0023.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::10) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.9 via Frontend Transport; Tue, 20 Oct 2020 13:03:38 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: aadda7c7-6d4b-473f-3229-08d874f8904e
-X-MS-TrafficTypeDiagnostic: AS8PR08MB6168:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AS8PR08MB6168307BD0557C8C38C103CCC11F0@AS8PR08MB6168.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:826;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: PCmdE2aHNkmCa5yRwu7Ka0CMlHcBZC8fB6xHOelvqTioItGEbO5fjqXKJie/CDZ80LVWeSGy31wnoWCZOvuI1qoeRIlbUJGE3wdG/M9GcmjoPK6THDquNESDgQhaVy0qNh+BRq+fST4EFkYiKbnzCNhBKm1Ft9kAxzjpV6d5oB40GFmVoi1DpSZVtkeRwQ18ZbdFDzUQn7Xy4GeTNSB3mWuWVXn95euxpZcrgMsAHSOgwpB8eCJyoQYBJeEfn0KV2iq3gts8jjWDB/lRtSIQwrd38uBUHFdfhn4GxseLfpA58f/RAzFWWAeLnIz9ZDsBnWTqUpYjvtN6haBdxjEq/A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(366004)(136003)(376002)(346002)(396003)(8676002)(66946007)(16526019)(478600001)(8936002)(186003)(5660300002)(52116002)(6506007)(6486002)(2906002)(6916009)(316002)(83380400001)(36756003)(2616005)(26005)(7416002)(956004)(1076003)(86362001)(66556008)(4326008)(6512007)(6666004)(66476007);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: elHJI6ZTh7vQCgCXo4fFVsceIVuoXmSYXT0AFQSaNbnQdTAq5m7TI/3WWU92idzvXJc+VodcHwAUM9iNDtk58+xQNam9JfV6wmk18ytR28z5MExwpdU98K81vQZ3h1AxK0CeHrRh6AvkJ6RVg45bAGjcqDqT89H5/kSq6K7NxZdYBpCyeO7ubhZz204j0PGrPiYve1A/tQy+rP+Df9o7gzxs3vMk8PlJBt7gJWQUd0SQadOqKPkiT1vNZO7MhHvY4PrjqfPqpQ6dbyA1xJKsfNpE9KWSHEpkEzNYlc77CWVqWv8j88KPyT+IX+QdzvIU0ieNwU0AxQWNKq9WHCyvGSsRynYpvgUoTtdgIaNwCpLRjkLBWJZ9ptyDRpYwmqLveWBWRdjjnkw9tXL8qt/6EIbm4HKS0wztAxnF1CEa9B70LGzgCGtholS+WUg55jO8Ri40Qx/FKC2X1N7WObrqvtUfo+7BcoYRU1i6yEZPThKYV+4e5j4jgPNMiJAR9fsHT70poF3254+ff0994wE4Q9kzWS/8MEhKKgGA6T23QcOzp6zWmpd9+/LmLa/51P4xFnQBpibEHlKZ5f5snh0lweplTUo5B62PoZM1VyNBp7880Rh1detxQZ2ULOzlzf+Y2cJQp91Nhgank8zDJjXcpA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: aadda7c7-6d4b-473f-3229-08d874f8904e
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2020 13:03:39.6522 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 8g2zLIIFcp9QpOEm+jcJUz5IxQ6kB3Lkr4HOn5EdLkF7PbsEBW3AQzJ5x8iktcZHnhs/EK3HRVRFdUpPPx3ZTzDUIAOfNwKCUU7l040Z6DM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6168
-Received-SPF: pass client-ip=40.107.7.134;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:03:42
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
-X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Originating-IP: [10.174.186.67]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:15:06
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,141 +71,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: peter.maydell@linaro.org, drjones@redhat.com,
+ zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, alistair.francis@wdc.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Set errp always on failure. Generic bdrv_open_driver supports driver
-functions which can return negative value and forget to set errp.
-That's a strange thing.. Let's improve bdrv_qed_do_open to not behave
-this way. This allows to simplify code in
-bdrv_qed_co_invalidate_cache().
+From: Andrew Jones <drjones@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Reviewed-by: Alberto Garcia <berto@igalia.com>
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Prefer to spell out the smp.cpus and smp.max_cpus machine state
+variables in order to make grepping easier and to avoid any
+confusion as to what cpu count is being used where.
+
+Signed-off-by: Andrew Jones <drjones@redhat.com>
 ---
- block/qed.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
+ hw/arm/virt-acpi-build.c |  8 +++----
+ hw/arm/virt.c            | 51 +++++++++++++++++++---------------------
+ include/hw/arm/virt.h    |  2 +-
+ 3 files changed, 29 insertions(+), 32 deletions(-)
 
-diff --git a/block/qed.c b/block/qed.c
-index b27e7546ca..f45c640513 100644
---- a/block/qed.c
-+++ b/block/qed.c
-@@ -393,6 +393,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index 9747a6458f..a222981737 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -57,11 +57,11 @@
  
-     ret = bdrv_pread(bs->file, 0, &le_header, sizeof(le_header));
-     if (ret < 0) {
-+        error_setg(errp, "Failed to read QED header");
-         return ret;
-     }
-     qed_header_le_to_cpu(&le_header, &s->header);
-@@ -408,25 +409,30 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
-         return -ENOTSUP;
-     }
-     if (!qed_is_cluster_size_valid(s->header.cluster_size)) {
-+        error_setg(errp, "QED cluster size is invalid");
-         return -EINVAL;
-     }
+ #define ARM_SPI_BASE 32
  
-     /* Round down file size to the last cluster */
-     file_size = bdrv_getlength(bs->file->bs);
-     if (file_size < 0) {
-+        error_setg(errp, "Failed to get file length");
-         return file_size;
-     }
-     s->file_size = qed_start_of_cluster(s, file_size);
- 
-     if (!qed_is_table_size_valid(s->header.table_size)) {
-+        error_setg(errp, "QED table size is invalid");
-         return -EINVAL;
-     }
-     if (!qed_is_image_size_valid(s->header.image_size,
-                                  s->header.cluster_size,
-                                  s->header.table_size)) {
-+        error_setg(errp, "QED image size is invalid");
-         return -EINVAL;
-     }
-     if (!qed_check_table_offset(s, s->header.l1_table_offset)) {
-+        error_setg(errp, "QED table offset is invalid");
-         return -EINVAL;
-     }
- 
-@@ -438,6 +444,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
- 
-     /* Header size calculation must not overflow uint32_t */
-     if (s->header.header_size > UINT32_MAX / s->header.cluster_size) {
-+        error_setg(errp, "QED header size is too large");
-         return -EINVAL;
-     }
- 
-@@ -445,6 +452,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
-         if ((uint64_t)s->header.backing_filename_offset +
-             s->header.backing_filename_size >
-             s->header.cluster_size * s->header.header_size) {
-+            error_setg(errp, "QED backing filename offset is invalid");
-             return -EINVAL;
-         }
- 
-@@ -453,6 +461,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
-                               bs->auto_backing_file,
-                               sizeof(bs->auto_backing_file));
-         if (ret < 0) {
-+            error_setg(errp, "Failed to read backing filename");
-             return ret;
-         }
-         pstrcpy(bs->backing_file, sizeof(bs->backing_file),
-@@ -475,6 +484,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
- 
-         ret = qed_write_header_sync(s);
-         if (ret) {
-+            error_setg(errp, "Failed to update header");
-             return ret;
-         }
- 
-@@ -487,6 +497,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
- 
-     ret = qed_read_l1_table_sync(s);
-     if (ret) {
-+        error_setg(errp, "Failed to read L1 table");
-         goto out;
-     }
- 
-@@ -503,6 +514,7 @@ static int coroutine_fn bdrv_qed_do_open(BlockDriverState *bs, QDict *options,
- 
-             ret = qed_check(s, &result, true);
-             if (ret) {
-+                error_setg(errp, "Image corrupted");
-                 goto out;
-             }
-         }
-@@ -1537,22 +1549,16 @@ static void coroutine_fn bdrv_qed_co_invalidate_cache(BlockDriverState *bs,
-                                                       Error **errp)
+-static void acpi_dsdt_add_cpus(Aml *scope, int smp_cpus)
++static void acpi_dsdt_add_cpus(Aml *scope, int cpus)
  {
-     BDRVQEDState *s = bs->opaque;
--    Error *local_err = NULL;
-     int ret;
+     uint16_t i;
  
-     bdrv_qed_close(bs);
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < cpus; i++) {
+         Aml *dev = aml_device("C%.03X", i);
+         aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
+         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
+@@ -480,7 +480,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
+     gicd->version = vms->gic_version;
  
-     bdrv_qed_init_state(bs);
-     qemu_co_mutex_lock(&s->table_lock);
--    ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, &local_err);
-+    ret = bdrv_qed_do_open(bs, NULL, bs->open_flags, errp);
-     qemu_co_mutex_unlock(&s->table_lock);
--    if (local_err) {
--        error_propagate_prepend(errp, local_err,
--                                "Could not reopen qed layer: ");
--        return;
--    } else if (ret < 0) {
--        error_setg_errno(errp, -ret, "Could not reopen qed layer");
--        return;
-+    if (ret < 0) {
-+        error_prepend(errp, "Could not reopen qed layer: ");
+-    for (i = 0; i < vms->smp_cpus; i++) {
++    for (i = 0; i < MACHINE(vms)->smp.cpus; i++) {
+         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
+                                                            sizeof(*gicc));
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
+@@ -599,7 +599,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+      * the RTC ACPI device at all when using UEFI.
+      */
+     scope = aml_scope("\\_SB");
+-    acpi_dsdt_add_cpus(scope, vms->smp_cpus);
++    acpi_dsdt_add_cpus(scope, ms->smp.cpus);
+     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
+                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
+     if (vmc->acpi_expose_flash) {
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e465a988d6..0069fa1298 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -322,7 +322,7 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
+     if (vms->gic_version == VIRT_GIC_VERSION_2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+-                             (1 << vms->smp_cpus) - 1);
++                             (1 << MACHINE(vms)->smp.cpus) - 1);
      }
+ 
+     qemu_fdt_add_subnode(vms->fdt, "/timer");
+@@ -363,7 +363,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
+      *  The simplest way to go is to examine affinity IDs of all our CPUs. If
+      *  at least one of them has Aff3 populated, we set #address-cells to 2.
+      */
+-    for (cpu = 0; cpu < vms->smp_cpus; cpu++) {
++    for (cpu = 0; cpu < ms->smp.cpus; cpu++) {
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
+ 
+         if (armcpu->mp_affinity & ARM_AFF3_MASK) {
+@@ -376,7 +376,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
+     qemu_fdt_setprop_cell(vms->fdt, "/cpus", "#address-cells", addr_cells);
+     qemu_fdt_setprop_cell(vms->fdt, "/cpus", "#size-cells", 0x0);
+ 
+-    for (cpu = vms->smp_cpus - 1; cpu >= 0; cpu--) {
++    for (cpu = ms->smp.cpus - 1; cpu >= 0; cpu--) {
+         char *nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
+         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
+         CPUState *cs = CPU(armcpu);
+@@ -387,7 +387,7 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
+                                     armcpu->dtb_compatible);
+ 
+         if (vms->psci_conduit != QEMU_PSCI_CONDUIT_DISABLED
+-            && vms->smp_cpus > 1) {
++            && ms->smp.cpus > 1) {
+             qemu_fdt_setprop_string(vms->fdt, nodename,
+                                         "enable-method", "psci");
+         }
+@@ -533,7 +533,7 @@ static void fdt_add_pmu_nodes(const VirtMachineState *vms)
+     if (vms->gic_version == VIRT_GIC_VERSION_2) {
+         irqflags = deposit32(irqflags, GIC_FDT_IRQ_PPI_CPU_START,
+                              GIC_FDT_IRQ_PPI_CPU_WIDTH,
+-                             (1 << vms->smp_cpus) - 1);
++                             (1 << MACHINE(vms)->smp.cpus) - 1);
+     }
+ 
+     qemu_fdt_add_subnode(vms->fdt, "/pmu");
+@@ -622,14 +622,13 @@ static void create_gic(VirtMachineState *vms)
+     SysBusDevice *gicbusdev;
+     const char *gictype;
+     int type = vms->gic_version, i;
+-    unsigned int smp_cpus = ms->smp.cpus;
+     uint32_t nb_redist_regions = 0;
+ 
+     gictype = (type == 3) ? gicv3_class_name() : gic_class_name();
+ 
+     vms->gic = qdev_new(gictype);
+     qdev_prop_set_uint32(vms->gic, "revision", type);
+-    qdev_prop_set_uint32(vms->gic, "num-cpu", smp_cpus);
++    qdev_prop_set_uint32(vms->gic, "num-cpu", ms->smp.cpus);
+     /* Note that the num-irq property counts both internal and external
+      * interrupts; there are always 32 of the former (mandated by GIC spec).
+      */
+@@ -641,7 +640,7 @@ static void create_gic(VirtMachineState *vms)
+     if (type == 3) {
+         uint32_t redist0_capacity =
+                     vms->memmap[VIRT_GIC_REDIST].size / GICV3_REDIST_SIZE;
+-        uint32_t redist0_count = MIN(smp_cpus, redist0_capacity);
++        uint32_t redist0_count = MIN(ms->smp.cpus, redist0_capacity);
+ 
+         nb_redist_regions = virt_gicv3_redist_region_count(vms);
+ 
+@@ -654,7 +653,7 @@ static void create_gic(VirtMachineState *vms)
+                     vms->memmap[VIRT_HIGH_GIC_REDIST2].size / GICV3_REDIST_SIZE;
+ 
+             qdev_prop_set_uint32(vms->gic, "redist-region-count[1]",
+-                MIN(smp_cpus - redist0_count, redist1_capacity));
++                MIN(ms->smp.cpus - redist0_count, redist1_capacity));
+         }
+     } else {
+         if (!kvm_irqchip_in_kernel()) {
+@@ -683,7 +682,7 @@ static void create_gic(VirtMachineState *vms)
+      * maintenance interrupt signal to the appropriate GIC PPI inputs,
+      * and the GIC's IRQ/FIQ/VIRQ/VFIQ interrupt outputs to the CPU's inputs.
+      */
+-    for (i = 0; i < smp_cpus; i++) {
++    for (i = 0; i < ms->smp.cpus; i++) {
+         DeviceState *cpudev = DEVICE(qemu_get_cpu(i));
+         int ppibase = NUM_IRQS + i * GIC_INTERNAL + GIC_NR_SGIS;
+         int irq;
+@@ -711,7 +710,7 @@ static void create_gic(VirtMachineState *vms)
+         } else if (vms->virt) {
+             qemu_irq irq = qdev_get_gpio_in(vms->gic,
+                                             ppibase + ARCH_GIC_MAINT_IRQ);
+-            sysbus_connect_irq(gicbusdev, i + 4 * smp_cpus, irq);
++            sysbus_connect_irq(gicbusdev, i + 4 * ms->smp.cpus, irq);
+         }
+ 
+         qdev_connect_gpio_out_named(cpudev, "pmu-interrupt", 0,
+@@ -719,11 +718,11 @@ static void create_gic(VirtMachineState *vms)
+                                                      + VIRTUAL_PMU_IRQ));
+ 
+         sysbus_connect_irq(gicbusdev, i, qdev_get_gpio_in(cpudev, ARM_CPU_IRQ));
+-        sysbus_connect_irq(gicbusdev, i + smp_cpus,
++        sysbus_connect_irq(gicbusdev, i + ms->smp.cpus,
+                            qdev_get_gpio_in(cpudev, ARM_CPU_FIQ));
+-        sysbus_connect_irq(gicbusdev, i + 2 * smp_cpus,
++        sysbus_connect_irq(gicbusdev, i + 2 * ms->smp.cpus,
+                            qdev_get_gpio_in(cpudev, ARM_CPU_VIRQ));
+-        sysbus_connect_irq(gicbusdev, i + 3 * smp_cpus,
++        sysbus_connect_irq(gicbusdev, i + 3 * ms->smp.cpus,
+                            qdev_get_gpio_in(cpudev, ARM_CPU_VFIQ));
+     }
+ 
+@@ -1572,7 +1571,7 @@ static void virt_set_memmap(VirtMachineState *vms)
+  */
+ static void finalize_gic_version(VirtMachineState *vms)
+ {
+-    unsigned int max_cpus = MACHINE(vms)->smp.max_cpus;
++    MachineState *ms = MACHINE(vms);
+ 
+     if (kvm_enabled()) {
+         int probe_bitmap;
+@@ -1613,7 +1612,8 @@ static void finalize_gic_version(VirtMachineState *vms)
+             }
+             return;
+         case VIRT_GIC_VERSION_NOSEL:
+-            if ((probe_bitmap & KVM_ARM_VGIC_V2) && max_cpus <= GIC_NCPU) {
++            if ((probe_bitmap & KVM_ARM_VGIC_V2) &&
++                ms->smp.max_cpus <= GIC_NCPU) {
+                 vms->gic_version = VIRT_GIC_VERSION_2;
+             } else if (probe_bitmap & KVM_ARM_VGIC_V3) {
+                 /*
+@@ -1622,7 +1622,7 @@ static void finalize_gic_version(VirtMachineState *vms)
+                  * to v3. In any case defaulting to v2 would be broken.
+                  */
+                 vms->gic_version = VIRT_GIC_VERSION_3;
+-            } else if (max_cpus > GIC_NCPU) {
++            } else if (ms->smp.max_cpus > GIC_NCPU) {
+                 error_report("host only supports in-kernel GICv2 emulation "
+                              "but more than 8 vcpus are requested");
+                 exit(1);
+@@ -1743,8 +1743,6 @@ static void machvirt_init(MachineState *machine)
+     bool firmware_loaded;
+     bool aarch64 = true;
+     bool has_ged = !vmc->no_ged;
+-    unsigned int smp_cpus = machine->smp.cpus;
+-    unsigned int max_cpus = machine->smp.max_cpus;
+ 
+     /*
+      * In accelerated mode, the memory map is computed earlier in kvm_type()
+@@ -1815,10 +1813,10 @@ static void machvirt_init(MachineState *machine)
+         virt_max_cpus = GIC_NCPU;
+     }
+ 
+-    if (max_cpus > virt_max_cpus) {
++    if (machine->smp.max_cpus > virt_max_cpus) {
+         error_report("Number of SMP CPUs requested (%d) exceeds max CPUs "
+                      "supported by machine 'mach-virt' (%d)",
+-                     max_cpus, virt_max_cpus);
++                     machine->smp.max_cpus, virt_max_cpus);
+         exit(1);
+     }
+ 
+@@ -1843,7 +1841,7 @@ static void machvirt_init(MachineState *machine)
+         Object *cpuobj;
+         CPUState *cs;
+ 
+-        if (n >= smp_cpus) {
++        if (n >= machine->smp.cpus) {
+             break;
+         }
+ 
+@@ -2015,7 +2013,7 @@ static void machvirt_init(MachineState *machine)
+     }
+ 
+     vms->bootinfo.ram_size = machine->ram_size;
+-    vms->bootinfo.nb_cpus = smp_cpus;
++    vms->bootinfo.nb_cpus = machine->smp.cpus;
+     vms->bootinfo.board_id = -1;
+     vms->bootinfo.loader_start = vms->memmap[VIRT_MEM].base;
+     vms->bootinfo.get_dtb = machvirt_dtb;
+@@ -2208,17 +2206,16 @@ static int64_t virt_get_default_cpu_node_id(const MachineState *ms, int idx)
+ static const CPUArchIdList *virt_possible_cpu_arch_ids(MachineState *ms)
+ {
+     int n;
+-    unsigned int max_cpus = ms->smp.max_cpus;
+     VirtMachineState *vms = VIRT_MACHINE(ms);
+ 
+     if (ms->possible_cpus) {
+-        assert(ms->possible_cpus->len == max_cpus);
++        assert(ms->possible_cpus->len == ms->smp.max_cpus);
+         return ms->possible_cpus;
+     }
+ 
+     ms->possible_cpus = g_malloc0(sizeof(CPUArchIdList) +
+-                                  sizeof(CPUArchId) * max_cpus);
+-    ms->possible_cpus->len = max_cpus;
++                                  sizeof(CPUArchId) * ms->smp.max_cpus);
++    ms->possible_cpus->len = ms->smp.max_cpus;
+     for (n = 0; n < ms->possible_cpus->len; n++) {
+         ms->possible_cpus->cpus[n].type = ms->cpu_type;
+         ms->possible_cpus->cpus[n].arch_id =
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index aad6d69841..953d94acc0 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -181,7 +181,7 @@ static inline int virt_gicv3_redist_region_count(VirtMachineState *vms)
+ 
+     assert(vms->gic_version == VIRT_GIC_VERSION_3);
+ 
+-    return vms->smp_cpus > redist0_capacity ? 2 : 1;
++    return MACHINE(vms)->smp.cpus > redist0_capacity ? 2 : 1;
  }
  
+ #endif /* QEMU_ARM_VIRT_H */
 -- 
-2.21.3
+2.23.0
 
 
