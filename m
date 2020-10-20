@@ -2,83 +2,93 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1ACDEC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 05:51:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FD87C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:20:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 245A122283
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 05:51:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 245A122283
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9E67C22282
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 06:20:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QH0qFvJo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9E67C22282
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49104 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUkY6-0007ol-P2
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 01:51:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40258)
+	id 1kUl0G-0007DL-Fb
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 02:20:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kUkWx-0007GD-U1
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 01:49:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41474)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kUkWv-0001vr-2t
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 01:49:55 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kUkWt-0001uU-C7
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 05:49:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 547AD2E811E
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 05:49:51 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <eskultet@redhat.com>)
+ id 1kUkzJ-0006nG-0o
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 02:19:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32706)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eskultet@redhat.com>)
+ id 1kUkzG-0003nH-IN
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 02:19:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603174748;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4VAb+EjEzON8PgNpxMn6cLylIYUNg16lSbxziOAj6eQ=;
+ b=QH0qFvJordx0NrbT2uHCu5amRaVI98CyWypa6saOlajvO1EJEncip6qCxltXga5egh9vDM
+ W5gc2xc22JyAbiCx6DnNmm2V9FtU2XayEmNaaIvNKr5JETJcjoMjprPXRf+CgnlEJHTo4a
+ nMIPRCFs2cO7/5D2x1X79c9ZfOVRj+s=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-296-ezntz6nrOam2mPu4mC6PmA-1; Tue, 20 Oct 2020 02:19:04 -0400
+X-MC-Unique: ezntz6nrOam2mPu4mC6PmA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 47DF01084D61;
+ Tue, 20 Oct 2020 06:19:03 +0000 (UTC)
+Received: from nautilus (unknown [10.40.192.244])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2F01310013D0;
+ Tue, 20 Oct 2020 06:18:57 +0000 (UTC)
+Date: Tue, 20 Oct 2020 08:18:54 +0200
+From: Erik Skultety <eskultet@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Subject: Re: [PATCH v4 2/4] Jobs based on custom runners: build environment
+ docs and playbook
+Message-ID: <20201020061854.GD495479@nautilus>
+References: <20201019015003.1527746-1-crosa@redhat.com>
+ <20201019015003.1527746-3-crosa@redhat.com>
+ <20201019102741.GC495479@nautilus>
+ <20201019202531.GB1617151@localhost.localdomain>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Oct 2020 05:37:30 -0000
-From: Thomas Huth <1414466@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Incomplete; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Tags: hostfwd qemu trusty ubuntu xenial
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: nagaraju-goruganti pconstantine piotr.orzechowski
- sergey-e srinirap88 th-huth
-X-Launchpad-Bug-Reporter: Sergey V. Lobanov (sergey-e)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <20150125172405.12316.8764.malonedeb@soybean.canonical.com>
-Message-Id: <160317225090.7133.6892292057322475296.malone@chaenomeles.canonical.com>
-Subject: [Bug 1414466] Re: -net user,
- hostfwd=... is not working(qemu-system-aarch64)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="58bb2f3096f16f0e0acc917602669aecb4ffaf54"; Instance="production"
-X-Launchpad-Hash: 8f19904e2eef8534ee3d901285e82878401806aa
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 00:25:40
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201019202531.GB1617151@localhost.localdomain>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eskultet@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eskultet@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -87,88 +97,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1414466 <1414466@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ Daniel P =?utf-8?B?LiBCZXJyYW5nw6k=?= <berrange@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>, Stefan Hajnoczi <stefanha@gmail.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>, Willian Rampazzo <wrampazz@redhat.com>,
+ Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-So is this now working for everybody with the correct ssh config (maybe
-also check your firewall settings)? Could we close this ticket nowadays?
-Or is somebody still having trouble?
+On Mon, Oct 19, 2020 at 04:25:31PM -0400, Cleber Rosa wrote:
+> On Mon, Oct 19, 2020 at 12:27:41PM +0200, Erik Skultety wrote:
+> > ...
+> > 
+> > > diff --git a/scripts/ci/setup/inventory b/scripts/ci/setup/inventory
+> > > new file mode 100644
+> > > index 0000000000..8bb7ba6b33
+> > > --- /dev/null
+> > > +++ b/scripts/ci/setup/inventory
+> > > @@ -0,0 +1,2 @@
+> > > +[local]
+> > 
+> > Nit pick, is a group for localhost actually needed?
+> >
+> 
+> You're right, it's not needed... I just thought it gave the
+> "localhost" entry some "shelter" and "context". :)
+> 
+> And, I think a mostly "ini-like" file without a section triggers an OCD
+> reaction in me.  I can remove it if it does something similar to you! :)
+> 
+> Thanks!
+> - Cleber.
 
-** Changed in: qemu
-       Status: Confirmed =3D> Incomplete
+I understand, but even though it may be an ini-like config, "sections" have a
+very distinct meaning in Ansible and that is grouping, so unless there are
+hosts to group, I'd keep the inventory in a form of a simple list of individual
+hosts.
 
--- =
+Regards,
+Erik
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1414466
-
-Title:
-  -net user,hostfwd=3D... is not working(qemu-system-aarch64)
-
-Status in QEMU:
-  Incomplete
-
-Bug description:
-  QEMU version: git a46b3aaf6bb038d4f6f192a84df204f10929e75c
-
-   /opt/qemu.git/bin/qemu-system-aarch64 --version
-  QEMU emulator version 2.2.50, Copyright (c) 2003-2008 Fabrice Bellard
-
-  Hosts:
-  ovs - host machine (Ubuntu 14.04.1, x86_64)
-  debian8-arm64 - guest =
-
-
-  Guest start:
-  user@ovs:~$ /opt/qemu.git/bin/qemu-system-aarch64 -machine virt -cpu cort=
-ex-a57 -nographic -smp 1 -m 512 -kernel vmlinuz-run -initrd initrd-run.img =
--append "root=3D/dev/sda2 console=3DttyAMA0" -global virtio-blk-device.scsi=
-=3Doff -device virtio-scsi-device,id=3Dscsi -drive file=3Ddebian8-arm64.img=
-,id=3Drootimg,cache=3Dunsafe,if=3Dnone -device scsi-hd,drive=3Drootimg -net=
-dev user,id=3Dunet -device virtio-net-device,netdev=3Dunet -net user,hostfw=
-d=3Dtcp:127.0.0.1:1122-:22
-
-  root@debian8-arm64:~# netstat -ntplu | grep ssh
-  tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTE=
-N      410/sshd        =
-
-  tcp6       0      0 :::22                   :::*                    LISTE=
-N      410/sshd       =
-
-
-  (no firewall in guest vm)
-
-  user@ovs:~$ netstat -ntplu | grep 1122
-  tcp        0      0 127.0.0.1:1122          0.0.0.0:*               LISTE=
-N      18722/qemu-system-a
-
-  user@ovs:~$ time ssh user@127.0.0.1 -p 1122
-  ssh_exchange_identification: read: Connection reset by peer
-
-  real	1m29.341s
-  user	0m0.005s
-  sys	0m0.000s
-
-  Inside guest vm sshd works fine:
-  root@debian8-arm64:~# ssh user@127.0.0.1 -p 22
-  user@127.0.0.1's password: =
-
-  ....
-  user@debian8-arm64:~$ exit
-  logout
-  Connection to 127.0.0.1 closed.
-
-  root@debian8-arm64:~# ssh user@10.0.2.15 -p 22
-  user@10.0.2.15's password: =
-
-  ...
-  user@debian8-arm64:~$ exit
-  logout
-  Connection to 10.0.2.15 closed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1414466/+subscriptions
 
