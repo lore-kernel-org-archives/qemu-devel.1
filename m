@@ -6,100 +6,118 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2DCC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:32:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BD1C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:39:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C9D51206DD
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:32:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 88A1522244
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:39:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipQ4Dwfp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D51206DD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fh4jiw1T"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A1522244
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38074 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUzF7-0000rL-JI
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 17:32:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38278)
+	id 1kUzMA-0002re-52
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 17:39:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUzDi-00007a-NZ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:31:02 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29256)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUzDb-0006hM-Jq
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:31:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603229452;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=0tqzKZskTJk/TP19maEsUbn5Y2e6JitJZMQA3Z8uknw=;
- b=ipQ4DwfpY7I/OcwtjspKBDGkroEn9oHm4pt8CpXTNti127vV+shptSElH/SR9fnjCCzNGU
- MlfzYrDNfHJaXTsJBiTzgQCfxFdc18L5deyTvbabLSA+c19Yjcp4nUlUToJ2XQPjG2h0uI
- GFNVFI2qKrYckx81Ab52J3J5ZO/G2sA=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-421-u5KCRnmEPQCULN4MJwTM-A-1; Tue, 20 Oct 2020 17:30:51 -0400
-X-MC-Unique: u5KCRnmEPQCULN4MJwTM-A-1
-Received: by mail-qv1-f70.google.com with SMTP id k6so8013qvg.9
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 14:30:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=0tqzKZskTJk/TP19maEsUbn5Y2e6JitJZMQA3Z8uknw=;
- b=tYOEo9YOZ3bVphqIMaaUrRw8Q3Cel6spYiLhz3HuOEpBJzSg1gm4utryB2Hp0Qgs1X
- OLuOtxU462uwUK5LG26TdyqqeMo4gFbiXlFibITOL1TMdscaXrxK+sUC1Q4+nieQhMWz
- 5OYbHcg+DfW7N07S0960frh9BuGHnRC+leoUbGALL9F1IGkTdgoqYtUAaMn2uaztZppC
- jb1AAZ4vD4KsytGVeoLVKzM04CjF9+zy9xXcE8xTYzbg/+mgFNBQRa8Pt1fPrB8/BCnr
- iz1r7kPLrMK0eQHwx9QCvfbz2OgtXjjAxHX03JqZAOReXl349sjoveAwnEk6+3+VzBzj
- 2rjA==
-X-Gm-Message-State: AOAM531ayllsqyYEAIRg+8VZT+jSDa1JW0pyti8IQC0D2p1DHjWTQbGL
- p88VI9Oa/SCgvNQuGFcL5ftPFq2OWYOBYNgf5pAE4V1eo2GlckpbA52Gfx0rWlGY3OXgex2H0NZ
- btkQpSBxkyXOxAlA=
-X-Received: by 2002:ae9:c310:: with SMTP id n16mr270530qkg.318.1603229450879; 
- Tue, 20 Oct 2020 14:30:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzISUUV3meprK3VrG4Tp23PDeugF3vheEGp7b2CLGzret4raHnGu1Pu3I2p7GiEaYJsxtR9UQ==
-X-Received: by 2002:ae9:c310:: with SMTP id n16mr270493qkg.318.1603229450503; 
- Tue, 20 Oct 2020 14:30:50 -0700 (PDT)
-Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
- [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id f187sm95318qke.60.2020.10.20.14.30.49
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 14:30:49 -0700 (PDT)
-Date: Tue, 20 Oct 2020 17:30:48 -0400
-From: Peter Xu <peterx@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Subject: Re: [PATCH PROTOTYPE 4/6] memory: Extend
- ram_block_discard_(require|disable) by two discard types
-Message-ID: <20201020213048.GG200400@xz-x1>
-References: <20200924160423.106747-1-david@redhat.com>
- <20200924160423.106747-5-david@redhat.com>
- <20201020191706.GB200400@xz-x1>
- <ea4d0acb-7ee5-7a4b-61aa-f139e0cbf585@redhat.com>
- <20201020204929.GF200400@xz-x1>
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kUzKk-0002QX-Id
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:38:19 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62540)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kUzKi-0007TZ-0M
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:38:18 -0400
+Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09KLWwXY054802; Tue, 20 Oct 2020 17:38:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=mime-version :
+ content-type : content-transfer-encoding : date : from : to : cc : subject
+ : in-reply-to : references : message-id; s=pp1;
+ bh=i0PnR+F0kwJanYLavo+Y6fZ1vWPX4WFyyqb/awbHcLc=;
+ b=Fh4jiw1TEE1pZ2046IhfsJusz5gYA7+cLIWDAldNDuml1lEqUj2COTr8k24CwTFyNMup
+ 8Gechi4BCf0NNLI3GHfD4goZc1ewhrpmRxdsSgaeClWbgGAZIf6zDXmapujXh0y5Far3
+ Mphu9f/Ufh62xpZLV4Y/ou8osrCHTin1RtEWKXmdD2iBCLHZcc3xA/9MW50uLPey8kyU
+ hMbGL+vICcTDM3qEnmj/03ot+zpBx/EV6jKIQg9BNa2NxRzVUw6tofDV5vX7BmNSvT/p
+ +oLDEUtZjQS/XkOKEHbFnLFEfU0j/65adzViAsPnAM05qLxgTmABR1VoXuI+9aENpETI VQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34a79y94hu-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 20 Oct 2020 17:38:09 -0400
+Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09KLXkCv056925;
+ Tue, 20 Oct 2020 17:38:08 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34a79y94he-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 20 Oct 2020 17:38:08 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09KLW2LX009148;
+ Tue, 20 Oct 2020 21:33:07 GMT
+Received: from b03cxnp08027.gho.boulder.ibm.com
+ (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
+ by ppma03dal.us.ibm.com with ESMTP id 347r899uuy-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 20 Oct 2020 21:33:07 +0000
+Received: from b03ledav004.gho.boulder.ibm.com
+ (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
+ by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09KLX1nm29295298
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 20 Oct 2020 21:33:01 GMT
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 1453F7805E;
+ Tue, 20 Oct 2020 21:33:06 +0000 (GMT)
+Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 980E678060;
+ Tue, 20 Oct 2020 21:33:05 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
+ by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Tue, 20 Oct 2020 21:33:05 +0000 (GMT)
 MIME-Version: 1.0
-In-Reply-To: <20201020204929.GF200400@xz-x1>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Tue, 20 Oct 2020 17:33:05 -0400
+From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH v5] sev: add sev-inject-launch-secret
+In-Reply-To: <e4bc6348-cda5-e7f5-3753-61f4d3ba0116@redhat.com>
+References: <20201015143713.14682-1-tobin@linux.ibm.com>
+ <2f1be055-58c8-dcf8-debc-8956636d8ef8@redhat.com>
+ <20201020135444.GR5733@habkost.net>
+ <e4bc6348-cda5-e7f5-3753-61f4d3ba0116@redhat.com>
+Message-ID: <dd1b07f9d596432ee5d4ebd740a98c5d@linux.vnet.ibm.com>
+X-Sender: tobin@linux.ibm.com
+User-Agent: Roundcube Webmail/1.0.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
+ definitions=2020-10-20_12:2020-10-20,
+ 2020-10-20 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ impostorscore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0
+ clxscore=1015 bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2010200146
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=tobin@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 17:38:11
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,72 +130,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Luiz Capitulino <lcapitulino@redhat.com>, Auger Eric <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com,
+ Eduardo Habkost <ehabkost@redhat.com>, jejb@linux.ibm.com, tobin@ibm.com,
+ dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 20, 2020 at 04:49:29PM -0400, Peter Xu wrote:
-> On Tue, Oct 20, 2020 at 09:58:34PM +0200, David Hildenbrand wrote:
-> > I remember there were some !BQL users (but I might be confusing it with
-> > postcopy code that once used to inhibit the balloon without BQL). Will
-> > double-check. Simplifying it is certainly a good idea.
-> > 
-> > (we want to be able to check from virtio-balloon code repeatedly without
-> > taking a mutex over and over again :) )
+On 2020-10-20 11:56, Paolo Bonzini wrote:
+> On 20/10/20 15:54, Eduardo Habkost wrote:
+>> On Tue, Oct 20, 2020 at 11:03:51AM +0200, Paolo Bonzini wrote:
+>>> On 15/10/20 16:37, tobin@linux.ibm.com wrote:
+>>>> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error 
+>>>> **errp)
+>>>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, 
+>>>> Error **errp)
+>>>>  {
+>>>>      MemoryRegionSection mrs = 
+>>>> memory_region_find(get_system_memory(),
+>>>> -                                                 addr, 1);
+>>>> +                                                 addr, size);
+>>> 
+>>> You need to check size against mrs.size and fail if mrs.size is 
+>>> smaller.
+>>>  Otherwise, the ioctl can access memory out of range.
+>> 
+>> Good catch!  I'm dequeuing it.
+>> 
+>> Is there a reason memory_region_find() doesn't ensure that by
+>> default?
 > 
-> Right.  Again I've no strong opinion so feel free to keep the codes as wish.
-> However if we'd go the other way (either BQL or another mutex) IMHO we can
-> simply read that flag directly without taking mutex.  IMHO here the mutex can
-> be used to protect write concurrency and should be enough. Considering that
-> this flag should rarely change and it should never flip (e.g., positive would
-> never go negative, and vise versa), then READ_ONCE() whould be safe enough on
-> read side (e.g., balloon).
+> IIRC memory_region_find() was used to do DMA in the very first versions
+> of "virtio-blk dataplane" so you would call it multiple times in a 
+> loop.
+>  So it's like that because it maps the way address_space_map() works.
+> 
+>> The call at virtio_balloon_handle_output() looks suspicious,
+>> though, because it looks for a BALLOON_PAGE_SIZE range, but
+>> there's no check for the returned section size.
+> 
+> I think it's not a bug because ultimately it's checked in
+> ram_block_discard_range, but it's not pretty.
+> 
+> Paolo
 
-Btw, what we've discussed is all about serialzation of the flag.  I'm also
-thinking about whether we can make the flag clearer on what it means.  Frankly
-speaking on the first glance it confused me quite a bit..
+Ok, it seems like the best solution is, as Paolo suggested, to add a
+simple check at the end of gpa2hva that makes sure mr.size is equal
+to size. gpa2hva is used one other place where the size is hard-coded
+as 1, so adding the check isn't going to break anything.
 
-IMHO what we may want is not some complicated counter on "disablement", but
-some simple counters on "someone that provided the cap to discard pages", and
-"someone that won't work if we _might_ discard pages".  I'm thinking what if we
-split the "disable" counter into two:
+Would you like me to resubmit with this tweak?
 
-  - ram_discard_providers ("Who allows ram discard"): balloon, virtio-mem
-
-  - ram_discard_opposers ("Who forbids ram discard"): vfio, rdma, ...
-
-The major benefit is, the counters should always be >=0, as what a usual
-counter would do.  Each device/caller should only/majorly increase the counter.
-Also we don't need the cmpxchg() loops too since the check is easier - just
-read the other side of the counters to know whether we should fail now.
-
-So after this patch to introduce "coordinated discards", the counters can also
-grows into four (we can still define some arrays):
-
-        |---------------------------+------------+-----------|
-        | counters                  | provider   | opposer   |
-        |---------------------------+------------+-----------|
-        | RAM_DISCARD_COORDINATED   | virtio-mem | rdma, ... |
-        | RAM_DISCARD_UNCOORDINATED | balloon    | vfio      |
-        |---------------------------+------------+-----------|
-
-Some examples: for vfio, it only needs to make sure no UNCOORDINATE providers.
-For rdma, it needs to make sure no COORDINATE/UNCOORDINATE providers.  The
-check helper could simply be done using a similar ANY bitmask as introduced in
-the current patch.
-
-Not sure whether this may help.
-
-Thanks,
-
--- 
-Peter Xu
-
+-Tobin
 
