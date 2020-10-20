@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F1BDC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:14:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF6BC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:15:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 932552224B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:14:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA4182224A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:15:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VSpgnK1L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 932552224B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FDFhhZi5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA4182224A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuHP-0002A2-KB
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:14:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37488)
+	id 1kUuIH-00030E-VF
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:15:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0r-0004hM-Lc
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:25 -0400
-Received: from mail-wm1-x32b.google.com ([2a00:1450:4864:20::32b]:56274)
+ id 1kUu10-00055k-UQ
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:34 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:33401)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0p-0003tJ-3z
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:25 -0400
-Received: by mail-wm1-x32b.google.com with SMTP id a72so2329650wme.5
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:22 -0700 (PDT)
+ id 1kUu0z-0003vG-66
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:34 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id z22so1452718wmi.0
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=L0lYmOUonCsI2H/sVY4IV71YZ7WBk/jN9yG1LepsCeQ=;
- b=VSpgnK1LEpn0kGA3tyU60mbWTI15NvlO9OZqUz/GPAqw/w6xLBJ5J5Lrlphy/szOBP
- fcGUMkCjVJYYEM6i+TDKoyXwQy+R0yCl/Fz9Z6AGBurZMrWCu94DSZSn5oyu6FTwuj5M
- CvZg+Yv7P0kcw4J7cvY2wI450FDjglYedmDTl64NGIBBxDVEPhllVso/Tp3nOo/smaLO
- zIp3OHTi6IiNgFrm2ZNiiOd2dabrTiqhvtn0T2lvU8WAYBHJxf7qY8+/wFKfHng6lHiM
- BV/stjT/Wv8J7WNeTvVIW+tjG4pQRFtCPKvhSEutNoSuTp0fR6v7ACJzOGRqKgh5HXxo
- Q4Ig==
+ bh=j7iHUHHmz4RqWM4N7aL1RyNr3+GkDqXbbSx38e4eHPk=;
+ b=FDFhhZi552G8FOW7VGye7skGMFplaIeIkGpSIrjLAipuhcxJ2LiDWQT5GLPk2alpG8
+ VvidlP6SyB9WeqEX4oBPv7/dra1j/QwbpqVrzMvMV6yH82RytcAAQjgvUK7VDlTIZbj9
+ OV4HUl8iyb8Zm9Ka4J1r/1D+Y1XAASGhomqH58gPi1dUhcUr1UQiP7LmbrwASQW69Ndh
+ pUfGSO/+e/jTjsztyMCOlz/LVApttd+/vO/cgs6bf8xuJ+9LxexnaXgwWbzEpt2HoxF6
+ Ai3KCrNtXv0qpvPmuSdhtA6Qd8wxjMmde/x/BTZzDVeapzkBIxREAFDYdrCEhU32xHat
+ 0sig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=L0lYmOUonCsI2H/sVY4IV71YZ7WBk/jN9yG1LepsCeQ=;
- b=N2iDOgcxzc97zsBTJ52PuGJrkdIL3HbGAX++WpjZzBbIPAchD93SL6YRp1DPep/1ea
- /6JagGoCy/sQnMFZ45abchq16l4cV7n2YyacP1q8cpkDVyoA1Cs06df3yymsDCNCTVKl
- g5arT3rQOJGJRTTf+IDFk6zL6ScJ8t7cVo2MLGwjOxXsG/J9kfXafDAm/7znJV3Q9QGT
- HbxqUmqspDgWSeMij1kgmP02q7/bxBRx9OhVeohbu6mqBk65AK2rNtKpFd0opEhi7uXN
- lG+nqUsZwpPjzqs3DDbPffwFCdV9Bi6InsHHToX3mV8lXU18wQw0BX/QLtH6G/6UWjvC
- NXsA==
-X-Gm-Message-State: AOAM5307SiPs2mzldfi0n4/HIXgMXhxiFg9kLT3bh2jA+rYL+3NT3Ys2
- IPSxHye5sExRGRPH8Yq1013ElPWXwykgyA==
-X-Google-Smtp-Source: ABdhPJw9xpDEM6/8lvjdRXuPRhqj3rooHKWmbhCBef9cHUlvi+ezrysOKpV6h2RyDPY10GnD5rFM0A==
-X-Received: by 2002:a1c:b40b:: with SMTP id d11mr3543359wmf.152.1603209441497; 
- Tue, 20 Oct 2020 08:57:21 -0700 (PDT)
+ bh=j7iHUHHmz4RqWM4N7aL1RyNr3+GkDqXbbSx38e4eHPk=;
+ b=kaXNz4ZtdhrdbggYxw2XLeL2WzPjXB2qowuQyCRYSsvJNrGK7C0DUULbgGTawOFBlh
+ wl3raSIrbYwJRcEMsHguy7bH0RWaPPHy9MzAEsoBtrkgEmpTxSUWDuBolOjE2wXegERx
+ walo8I8lRkyB6GzkYxJQ1f7Q8+z1ZtiFxutw+TSVsqP/uOSNxfd0I9otpq7Zg+Xc58JS
+ rSPV8lLWE9/nMadGOkKEUgBHGpk2yufy5xo3Nbk1AYJu8kz6vAirMiy53HJRFQPoqa3G
+ 9psVS9c+1xfGq9PELHKe3temiRrzJAFFEdHanXg+ph3bqw2tcGjEj2FdWhVobP0/dQYl
+ +tgQ==
+X-Gm-Message-State: AOAM532AunQ8bdPcFm35ui89FXK1BCMXesWnhJYzc5JIfjB9D4FfFo7I
+ u46TTH4a8FMHDV7ayZU0YWzUG7hEUMXJ/A==
+X-Google-Smtp-Source: ABdhPJw69PPnfpgH/b51BCXEhsOGBDodEkHEcE/DCRJul8Hekp64jpPLuAuLl+XedIcARyxoXmXAbQ==
+X-Received: by 2002:a1c:2b05:: with SMTP id r5mr3592839wmr.179.1603209451522; 
+ Tue, 20 Oct 2020 08:57:31 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.20
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.30
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:20 -0700 (PDT)
+ Tue, 20 Oct 2020 08:57:30 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/41] hw/intc/bcm2835_ic: Trace GPU/CPU IRQ handlers
-Date: Tue, 20 Oct 2020 16:56:28 +0100
-Message-Id: <20201020155656.8045-14-peter.maydell@linaro.org>
+Subject: [PULL 20/41] decodetree: Fix codegen for non-overlapping group inside
+ overlapping group
+Date: Tue, 20 Oct 2020 16:56:35 +0100
+Message-Id: <20201020155656.8045-21-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
 References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32b;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32b.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,67 +105,51 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+For nested groups like:
 
-Add trace events for GPU and CPU IRQs.
+  {
+    [
+      pattern 1
+      pattern 2
+    ]
+    pattern 3
+  }
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201017180731.1165871-2-f4bug@amsat.org
+the intended behaviour is that patterns 1 and 2 must not
+overlap with each other; if the insn matches neither then
+we fall through to pattern 3 as the next thing in the
+outer overlapping group.
+
+Currently we generate incorrect code for this situation,
+because in the code path for a failed match inside the
+inner non-overlapping group we generate a "return" statement,
+which causes decode to stop entirely rather than continuing
+to the next thing in the outer group.
+
+Generate a "break" instead, so that decode flow behaves
+as required for this nested group case.
+
+Suggested-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20201019151301.2046-2-peter.maydell@linaro.org
 ---
- hw/intc/bcm2835_ic.c | 4 +++-
- hw/intc/trace-events | 4 ++++
- 2 files changed, 7 insertions(+), 1 deletion(-)
+ scripts/decodetree.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/intc/bcm2835_ic.c b/hw/intc/bcm2835_ic.c
-index 53ab8f58810..9000d995e81 100644
---- a/hw/intc/bcm2835_ic.c
-+++ b/hw/intc/bcm2835_ic.c
-@@ -18,6 +18,7 @@
- #include "migration/vmstate.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
-+#include "trace.h"
+diff --git a/scripts/decodetree.py b/scripts/decodetree.py
+index 60fd3b5e5f6..c1bf3cfa85f 100644
+--- a/scripts/decodetree.py
++++ b/scripts/decodetree.py
+@@ -548,7 +548,7 @@ class Tree:
+             output(ind, '    /* ',
+                    str_match_bits(innerbits, innermask), ' */\n')
+             s.output_code(i + 4, extracted, innerbits, innermask)
+-            output(ind, '    return false;\n')
++            output(ind, '    break;\n')
+         output(ind, '}\n')
+ # end Tree
  
- #define GPU_IRQS 64
- #define ARM_IRQS 8
-@@ -51,7 +52,6 @@ static void bcm2835_ic_update(BCM2835ICState *s)
-     set = (s->gpu_irq_level & s->gpu_irq_enable)
-         || (s->arm_irq_level & s->arm_irq_enable);
-     qemu_set_irq(s->irq, set);
--
- }
- 
- static void bcm2835_ic_set_gpu_irq(void *opaque, int irq, int level)
-@@ -59,6 +59,7 @@ static void bcm2835_ic_set_gpu_irq(void *opaque, int irq, int level)
-     BCM2835ICState *s = opaque;
- 
-     assert(irq >= 0 && irq < 64);
-+    trace_bcm2835_ic_set_gpu_irq(irq, level);
-     s->gpu_irq_level = deposit64(s->gpu_irq_level, irq, 1, level != 0);
-     bcm2835_ic_update(s);
- }
-@@ -68,6 +69,7 @@ static void bcm2835_ic_set_arm_irq(void *opaque, int irq, int level)
-     BCM2835ICState *s = opaque;
- 
-     assert(irq >= 0 && irq < 8);
-+    trace_bcm2835_ic_set_cpu_irq(irq, level);
-     s->arm_irq_level = deposit32(s->arm_irq_level, irq, 1, level != 0);
-     bcm2835_ic_update(s);
- }
-diff --git a/hw/intc/trace-events b/hw/intc/trace-events
-index 527c3f76cae..22782b3f089 100644
---- a/hw/intc/trace-events
-+++ b/hw/intc/trace-events
-@@ -199,3 +199,7 @@ nvic_sysreg_write(uint64_t addr, uint32_t value, unsigned size) "NVIC sysreg wri
- heathrow_write(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
- heathrow_read(uint64_t addr, unsigned int n, uint64_t value) "0x%"PRIx64" %u: 0x%"PRIx64
- heathrow_set_irq(int num, int level) "set_irq: num=0x%02x level=%d"
-+
-+# bcm2835_ic.c
-+bcm2835_ic_set_gpu_irq(int irq, int level) "GPU irq #%d level %d"
-+bcm2835_ic_set_cpu_irq(int irq, int level) "CPU irq #%d level %d"
 -- 
 2.20.1
 
