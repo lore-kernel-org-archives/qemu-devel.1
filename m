@@ -2,91 +2,77 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F32D1C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:33:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90037C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3A813222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:33:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78A71222C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:36:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZcLu0rag"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3A813222C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=aepfle.de header.i=@aepfle.de header.b="RqWmEFqO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78A71222C8
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=aepfle.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33172 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUo1b-0004yu-5R
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:33:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58216)
+	id 1kUo42-00065E-5Y
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:36:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58556)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUo0V-0004QO-NP
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:32:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30745)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUo0T-00055E-DH
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:32:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603186356;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UlEKJ79dcr1pukruJ43uNJIJG1sN3bVAlZly5Rj6j74=;
- b=ZcLu0ragNBYN3dAx/+olkrpOt4hrNU+zxxeCVQxkPTa3DQ18ZN7ghG3DUaDRlluUQIGfrP
- lRF+apwyCfXwpQntEApSVn2JeUQXn13YO9JS3EVfmn6GDwVliBc5vY/NhZ+YlmEudTVZ1u
- ZqX03dWU5iZN1DKL8KhDvOjcx/KCEow=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-Cerpf4byO6C4SnyDl6uW_Q-1; Tue, 20 Oct 2020 05:32:34 -0400
-X-MC-Unique: Cerpf4byO6C4SnyDl6uW_Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 77B1186ABCF;
- Tue, 20 Oct 2020 09:32:33 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 27E2E1A4D7;
- Tue, 20 Oct 2020 09:32:33 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 6274C1132A08; Tue, 20 Oct 2020 11:32:31 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 0/5] qapi: Restrict machine (and migration) specific
- commands
-References: <20201012121536.3381997-1-philmd@redhat.com>
-Date: Tue, 20 Oct 2020 11:32:31 +0200
-In-Reply-To: <20201012121536.3381997-1-philmd@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Mon, 12 Oct 2020 14:15:31
- +0200")
-Message-ID: <87a6whw8cw.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ (Exim 4.90_1) (envelope-from <olaf@aepfle.de>) id 1kUo3P-0005dp-LY
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:35:39 -0400
+Received: from mo4-p00-ob.smtp.rzone.de ([81.169.146.162]:14634)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <olaf@aepfle.de>) id 1kUo3N-0006A8-Er
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:35:39 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1603186534;
+ s=strato-dkim-0002; d=aepfle.de;
+ h=References:In-Reply-To:Message-ID:Subject:Cc:To:From:Date:
+ X-RZG-CLASS-ID:X-RZG-AUTH:From:Subject:Sender;
+ bh=c5dxMUrcRrDEr02ipUI6N/QKbEkGkqX40EsMniFEi0Y=;
+ b=RqWmEFqONwDD7QeRxwIcrWt5GFhMaHi/SLfE4ef1hfG3BS0J4QlEi4ly2VjoStOi9R
+ sQIaMsMrBE+F0EXBTE/qN9xELNCVkq8GfnbAPqGCs9N/HRmQKBDDHaH9CHd1s6+7bYCz
+ NMHWc6OVIfVjE6ZG4CH8FC9rPsPrKCEZomKFy/0yDXk+TWBeT1isBk/+xVoaS0/rd6D1
+ H4ppoLmPB20zPdBgheuh1+sqRpxp1FBlFrejzH1g1DR9I1sVKdbMedpZqLk8NunlvvYw
+ hrfarDnEXKriaiQFiyzI8IdC9V6qeUxLZwHzoj+EltzxerddZT8QyXWt1/5QHX9Wt1zY
+ 809g==
+X-RZG-AUTH: ":P2EQZWCpfu+qG7CngxMFH1J+3q8wa/QLpd5ylWvMDXdoX8l8pYAcz5OTW+r+/A=="
+X-RZG-CLASS-ID: mo00
+Received: from sender by smtp.strato.de (RZmta 47.2.1 DYNA|AUTH)
+ with ESMTPSA id e003b5w9K9ZXB0m
+ (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+ (Client did not present a certificate);
+ Tue, 20 Oct 2020 11:35:33 +0200 (CEST)
+Date: Tue, 20 Oct 2020 11:35:19 +0200
+From: Olaf Hering <olaf@aepfle.de>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
+Subject: Re: roms/efirom, tests/uefi-test-tools: update edk2's own
+ submodules first
+Message-ID: <20201020113519.2d11bea6.olaf@aepfle.de>
+In-Reply-To: <3fc07eb7-f99a-516b-9bb9-e48049547928@redhat.com>
+References: <20201020091605.GA2301@aepfle.de>
+ <3fc07eb7-f99a-516b-9bb9-e48049547928@redhat.com>
+X-Mailer: Claws Mail 2020.08.19 (GTK+ 2.24.32; x86_64-suse-linux-gnu)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ boundary="Sig_/gtbut2mncC2N7kvVfQfzFWN"; protocol="application/pgp-signature"
+Received-SPF: none client-ip=81.169.146.162; envelope-from=olaf@aepfle.de;
+ helo=mo4-p00-ob.smtp.rzone.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 05:35:34
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,18 +85,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Eduardo Habkost <ehabkost@redhat.com>
+Cc: Laszlo Ersek <lersek@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+--Sig_/gtbut2mncC2N7kvVfQfzFWN
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-> Reduce the machine code pulled into qemu-storage-daemon.
->
-> The series is fully Acked, but Markus wants it reviewed
-> by the Machine core maintainers.
+Am Tue, 20 Oct 2020 11:29:01 +0200
+schrieb Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>:
 
-Queued, thanks!
+> The EDK2 roms are only used for testing, we certainly don't want them
+> to be used by distributions.=20
 
+You mean 'make -C rom efirom' is something that must not be done?
+
+Olaf
+
+--Sig_/gtbut2mncC2N7kvVfQfzFWN
+Content-Type: application/pgp-signature
+Content-Description: Digitale Signatur von OpenPGP
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE97o7Um30LT3B+5b/86SN7mm1DoAFAl+Or1cACgkQ86SN7mm1
+DoAOFxAAhMttczprrTOOHaKrqrra+u756BQ9DZ5QtXnOSFYv/hPLxyobjyJKOmX0
+q9b76BJgakv8GQUsyKK/dqm8vpdQ9SfG73cyd8X31f46sJbn6Rub+/4RR36p4IT+
+3ULin40hQMtVCYxxctx22Sr80q367XxRI11vxgLeYJruWpPvl5ClmKurfWqCwPwk
+Rt/b/GJ2UvxJjwhIQmmEHK5u66WzjGia+ASfnsapPXgn1mhprLApfksJa02d9h3s
+jgmsYoTmtLIQcAxNfaUkcQMgvjIymWzpkhrCLYTo62C1BgXTmEnqoGxl64j1jnWh
+3wgJDs4D6Qtepg4KOaXwItMBb6M/Jq0qiAe5kplCjjUubfIi/LBHpLApQDtScy4Q
+2gI6pMEIwMmbIBP2qzz2h3yuQ6+qNATcqPtw3iskjKnOLRZKU21Zc+/4DbQ09tXb
+jo/EJFCyx62wka5rN90VWfaSjgoIw8QzFUWawV7ZvHlyCgh9+z8Zumoy4VM4uNmI
+9EKGU34AUaHu2GwxRq10mQ18fjXPuaJaIPybXGQQeGG6xhMiMVD29YEMUPtUqtyQ
+uYAxIVL2Gq496E3j1nVVU/jFBRixzMk5sZ4hDNfmigm1DJXKjpdmc2QGdYZnTWcZ
+NGl5G5jqNF8lMPSRaoL9v7wd3Ou5VZP0Sbe23vq2w4X1hMQUtTo=
+=rSnF
+-----END PGP SIGNATURE-----
+
+--Sig_/gtbut2mncC2N7kvVfQfzFWN--
 
