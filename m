@@ -2,76 +2,88 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56CBAC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:03:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08117C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:03:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9C46422253
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:03:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9C46422253
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6B99422404
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:03:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6dw+Pv8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B99422404
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48572 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUoUL-00088s-Cr
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:03:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37054)
+	id 1kUoUT-0008Rm-5Q
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:03:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUoSE-0006R2-N5
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:01:18 -0400
-Received: from 7.mo52.mail-out.ovh.net ([188.165.59.253]:32941)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUoS8-0006nu-Gv
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:01:18 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.143.58])
- by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 158431FDF77;
- Tue, 20 Oct 2020 12:00:58 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 20 Oct
- 2020 12:00:58 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G00553272c5d-6d8c-4524-bd8f-c9f27462e92e,
- 1DF5E91C91B319FFB92086F2F245FA8D0BCC998A) smtp.auth=groug@kaod.org
-Date: Tue, 20 Oct 2020 12:00:57 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PULL v3 2/6] tests/9pfs: change qtest name prefix to synth
-Message-ID: <20201020120057.42c85b2e@bahia.lan>
-In-Reply-To: <5436271.QZMOO6KbSo@silver>
-References: <cover.1603111175.git.qemu_oss@crudebyte.com>
- <eefd2394efd6ba379d36d80c52de9ad956343b47.1603111175.git.qemu_oss@crudebyte.com>
- <26d3b93c-5dbd-a58c-19e7-060120cfa326@redhat.com>
- <5436271.QZMOO6KbSo@silver>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUoSv-0006zr-3c
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:02:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25345)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUoSt-000756-5w
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:02:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603188118;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=9UrYtwxmdaBxw1xZHh55rFO9CVWvQ2KtwA674zbLBwU=;
+ b=G6dw+Pv8nVxwmNNHTs3kuFUsPD4snlgtLixPIbMmbzFHD0hl8XyMyzaZzabsTbS3uN5lF9
+ pOgGcMfXZgc1COV8cnc2ART2efddkDgAIqlO0HsEW9KqqoJR4tQo4EzxylnFPGAyZZ79eF
+ EXjZWAPXGAnaNSiSWw47VlyBMTQIYdw=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-60-p6Ujo3QnPBmQusUkgSsP9w-1; Tue, 20 Oct 2020 06:01:56 -0400
+X-MC-Unique: p6Ujo3QnPBmQusUkgSsP9w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F7B1100670B;
+ Tue, 20 Oct 2020 10:01:55 +0000 (UTC)
+Received: from kaapi (ovpn-112-157.phx2.redhat.com [10.3.112.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 3789310027A5;
+ Tue, 20 Oct 2020 10:01:52 +0000 (UTC)
+Date: Tue, 20 Oct 2020 15:31:49 +0530 (IST)
+From: P J P <ppandit@redhat.com>
+X-X-Sender: pjp@kaapi
+To: =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH] net: remove an assert call in eth_get_gso_type
+In-Reply-To: <819064ca-8fd2-ebd0-be88-9c5aae111bfb@redhat.com>
+Message-ID: <nycvar.YSQ.7.78.906.2010201520190.1506567@xnncv>
+References: <20201020081119.1578251-1-ppandit@redhat.com>
+ <819064ca-8fd2-ebd0-be88-9c5aae111bfb@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG4EX2.mxp5.local (172.16.2.32) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 754ed4be-35f6-440c-add4-b95491393056
-X-Ovh-Tracer-Id: 13067757272634857949
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgddvudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehphhhilhhmugesrhgvughhrghtrdgtohhm
-Received-SPF: pass client-ip=188.165.59.253; envelope-from=groug@kaod.org;
- helo=7.mo52.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 06:00:59
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/mixed;
+ boundary="-1463810047-1265470051-1603188114=:1506567"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -84,59 +96,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Jason Wang <jasowang@redhat.com>, Gaoning Pan <pgn@zju.edu.cn>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Oct 2020 11:43:18 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+---1463810047-1265470051-1603188114=:1506567
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8BIT
 
-> On Dienstag, 20. Oktober 2020 09:36:10 CEST Philippe Mathieu-Daud=C3=A9 w=
-rote:
-> > On 10/8/20 8:34 PM, Christian Schoenebeck wrote:
-> > > All existing 9pfs test cases are using the 'synth' fs driver so far, =
-which
-> > > means they are not accessing real files, but a purely simulated (in R=
-AM
-> > > only) file system.
-> > >=20
-> > > Let's make this clear by changing the prefix of the individual qtest =
-case
-> > > names from 'fs/' to 'synth/'. That way they'll be easily distinguisha=
-ble
-> > > from upcoming new 9pfs test cases supposed to be using a different fs
-> > > driver.
-> > >=20
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > Message-Id:
-> > > <e04e75acb849b085c6d6320b2433a15fa935bcff.1602182956.git.qemu_oss@cru=
-deby
-> > > te.com> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> >=20
-> > Harmless, but don't need to sign twice ;)
->=20
-> Ah, I thought that's the common way, as Greg's PRs contained 2 SOBs as we=
-ll,=20
-> i.e. I thought this was intended to outline the patch author and submaint=
-ainer=20
-> were the same person.
->=20
-> BTW I actually did not explicitly add the 2nd SOB. It was rather added by=
- the=20
-> patchwork client automatically. So maybe it should be fixed in the client=
- to=20
-> detect an already existing SOB line? Or am missing something here?
->=20
++-- On Tue, 20 Oct 2020, Philippe Mathieu-Daudé wrote --+
+| Maybe LOG_UNIMP with useful fields, so when user send bug report we directly 
+| know what has to be implemented.
 
-Yeah this is the reason why my sob appears twice on patches authored by
-me, and since this is harmless I never really investigated how to fix
-pwclient :)
+  qemu_log("Probably not GSO frame, unknown L3 protocol: %hd\n", l3_proto);
 
-> Best regards,
-> Christian Schoenebeck
->=20
->=20
+Maybe just qemu_log()? LOG_UNIMP seems mismatching.
+
+Thank you.
+--
+Prasad J Pandit / Red Hat Product Security Team
+8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+---1463810047-1265470051-1603188114=:1506567--
 
 
