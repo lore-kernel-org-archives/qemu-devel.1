@@ -2,100 +2,122 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4A7AC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4CEC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DB1D222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB1D222C8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id BA1D7223C6
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:26:36 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="DjgVRjTZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BA1D7223C6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUmy8-0003SV-DQ
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:26:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42692)
+	id 1kUmyZ-0004oL-8Y
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:26:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42758)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUmtg-0007JF-75; Tue, 20 Oct 2020 04:21:32 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:57053)
+ (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
+ id 1kUmtw-0007TJ-Ie; Tue, 20 Oct 2020 04:21:49 -0400
+Received: from mail-am6eur05on2122.outbound.protection.outlook.com
+ ([40.107.22.122]:39360 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUmtc-0004PB-Jz; Tue, 20 Oct 2020 04:21:31 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id 0C439B47;
- Tue, 20 Oct 2020 04:21:22 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 20 Oct 2020 04:21:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=sNjh9PPK3pOaPfYbDpJQNCXgkQR
- cUV4hdxAA544JLN8=; b=XYstEw0WilkQDHYXT7JpkrSe2Unt02YcvkDTS5CGzNv
- o9wiOkS83oraR3SaYpm4iMzm0FcCZuTCM4E8StfXWZt6QpP+oQCSfFPGvi6Dq7zm
- B98cfW79bQblzijAGgBwumiN43d2xj45lH+wwMlX/z9R5Gx6EeGyXib2vGtjP9Uc
- t3IVg69Gb+ydHqUqgIHzq7YJQmOpls1l5ymR8TLM2MLwK9tiPfywCpQLZ3VAA8hw
- Sut+vvACK/AKsAV8OtticVkbOUsfHklE7rtEnh3GbjIc9WMdCU8yCfO50wRKWDtp
- RLQrcBIRvCbgtM+OxDWV67UDm+HKmqjNdGl9Y5bdEnA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-type:date:from:in-reply-to
- :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=sNjh9P
- PK3pOaPfYbDpJQNCXgkQRcUV4hdxAA544JLN8=; b=A1V6Y/q4G0KX3RELiFXjUH
- kc0wI9PAdupcZDpx6g4uGcZGbifLFwe1npFyfegwzl/wBHjKfeKVyGn58Wd5574e
- zhaKU1/LIC/78RD0y9+2AbUNng1MCyI2A7sNKGJd8fe1dJOyUxE8yTHTVaPCs+Tc
- eSSkwIQ08O4EIeELS/8U2qjqxCwU9WCeuxV2fihMawI/RjcT34mBavmWl17L/uaS
- 9oNkBKwKt2d/PoQsLFlNcwO0VHpi4bCwXMt2K7ox9rYW0AtIxigPQYOfQFI/NmT1
- 35MeSNePE3Ac3K1h0C95BpnSFObx7bthr/ji0pk3oH8hNPZqg+pSsv3iLv90A+Rw
- ==
-X-ME-Sender: <xms:AZ6OXwao8WcLiUdfa4NE4Q97_hL5UHayAoFV4iTGF8C8bzCTE3s1Sg>
- <xme:AZ6OX7YKWMCmDxqEp1By5uqHJgJyCbkGctWeiTIBhu2K3Ud5ivVBLUYI_KbatnzfX
- FIoecek0JlT0437aWI>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgddtvdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:AZ6OX69rRKoHhBQb4qsy4HC1q4ly450PSsgBVGOd_iURW3MgpriQyg>
- <xmx:AZ6OX6p_GEQJAznvprU_CBoMSxj5QuaNHid8hn5tZ5w6viVCuPl3iQ>
- <xmx:AZ6OX7rbHFoxUvI5rHOpip64-NpLsdqkkQUb_J2RJ1dFUVqLzUcV2Q>
- <xmx:Ap6OX0QCVoHzvQ-exxWbGBZg4Dr1RjEnRu9b9yB-8wJUyjIpUDfFpSEW3W8>
-Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id EAD7D328005A;
- Tue, 20 Oct 2020 04:21:19 -0400 (EDT)
-Date: Tue, 20 Oct 2020 10:21:18 +0200
-From: Klaus Jensen <its@irrelevant.dk>
-To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v7 04/11] hw/block/nvme: Support allocated CNS command
- variants
-Message-ID: <20201020082118.GA178548@apples.localdomain>
-References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
- <20201019021726.12048-5-dmitry.fomichev@wdc.com>
+ (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
+ id 1kUmts-0004Tm-Go; Tue, 20 Oct 2020 04:21:47 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eZSBSKFFQ+QT8b9F2LDYmLoKsuRkbkm4tXPlzGc6xOPq6Ml8t2IgBMO2fs/BcE/ssBELYB/Pv7OKTWn7ByG61kEhx5YOB9jjCUdUJbn9V9fl4gxB6cQMhglgghVGRD7oz2gDVduBK9g3JVJ2OKqo8whGAL0s1lasdEo8+cO0gwdEn64gyc/ND7VcdUNrx/mTe/K1jPOLh+eSgr0fcMv+HB8kfSPEsUU6wzBZGZCki39on01NgpLMkaqU1VhgOErlheCBaTrIDFyYbQIW2XkvkGEq8I1LQQvgf07AwXqwb8mPOBHcHgCEWVVchzXGmq5XkE2H8to5k8eZ848X1cEF5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j7INr/+evg0Eu0Jyr2qmMFnARtU5LTuIc6mt3Hqm9g8=;
+ b=nYHOKzXiLrAEJEdT2ugsR+gvJ8vwq/RrtbmqYFEVDYKka1UuZoLWDLmk+qeZr/Oi0hIT7Klw67AUYWhVM7/gapySe219R80oz3pdLtXTMld2elhVAVw95ZLHMPmBphwKF6DfsIon2ZoUHMArhgN1r3CqrlCOXeJG0Y0MKfditoMD8s8gn54M/4Mq3mINK9Lvc2XOntwEj9svgyTi0MjJkg1NXl7FEcYewRfZjDe5W+TLItweqPhQHhfewZeREA2WqCOam0oAM+0JbTYWD98iTcoqH5Id6l5PJ0GFGh9Y0T73AScx5zf9vbqX/uKcStWY12tUU8a9Sxtbz3Xs4glEpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j7INr/+evg0Eu0Jyr2qmMFnARtU5LTuIc6mt3Hqm9g8=;
+ b=DjgVRjTZ00D/TAZKTsuDQAs1ihAhfHXy/9Ul2OR91Hiz4aSkwuhRgRKOuv6537dcielyi4UD/2UaVUdliMb2ARtpgMyQA60nZH+RTmDKBowMyLP/+7Uskqo3ivPbgcc5VS3LPzxuRXEWAre19pj4I8+2dLYxMcm9a9ilQBlDH9A=
+Authentication-Results: virtuozzo.com; dkim=none (message not signed)
+ header.d=none;virtuozzo.com; dmarc=none action=none
+ header.from=virtuozzo.com;
+Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com (2603:10a6:3:c4::16)
+ by HE1PR0802MB2601.eurprd08.prod.outlook.com (2603:10a6:3:d8::20)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.27; Tue, 20 Oct
+ 2020 08:21:37 +0000
+Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com
+ ([fe80::d12a:7bcb:c813:55c1]) by HE1PR0802MB2298.eurprd08.prod.outlook.com
+ ([fe80::d12a:7bcb:c813:55c1%10]) with mapi id 15.20.3477.028; Tue, 20 Oct
+ 2020 08:21:37 +0000
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+From: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
+Subject: RFC: tracking valid backing chain issue
+Message-ID: <3b99657c-2016-78cb-4314-27aacb30ca3c@virtuozzo.com>
+Date: Tue, 20 Oct 2020 11:21:35 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [109.252.131.121]
+X-ClientProxiedBy: AM0PR01CA0171.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:aa::40) To HE1PR0802MB2298.eurprd08.prod.outlook.com
+ (2603:10a6:3:c4::16)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2fHTh5uZTiUOsy+g"
-Content-Disposition: inline
-In-Reply-To: <20201019021726.12048-5-dmitry.fomichev@wdc.com>
-Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
- helo=wnew1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:21:24
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.38] (109.252.131.121) by
+ AM0PR01CA0171.eurprd01.prod.exchangelabs.com (2603:10a6:208:aa::40) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21 via Frontend
+ Transport; Tue, 20 Oct 2020 08:21:36 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 668c8b86-d4b5-4012-b4df-08d874d12984
+X-MS-TrafficTypeDiagnostic: HE1PR0802MB2601:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <HE1PR0802MB2601DC4F59EED6089604138DA21F0@HE1PR0802MB2601.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dQNc5U+ER/SFxnhVFovYL8oIww08d7pckM5blb6NTYOswZMAGBaywRGu3+fehvisQBfEU/XhXPbcETjWdjgfKghq07y92CRn9nbV+JYkKSi/nmkKQRlMWXFULZVTA/KkBv3SGHHLMWEIbENghVizwYAkVXoee/A1Pib1DSlfuwXlkzDcJJaWMs8DeaHnWRS6mGWJcWvntIUwxteYYSr6ch9FBAh6zSbS/tSl92UjKHgvpdt1qK9qu0GO1ZQwFXhIzNNmQLPLFcDGUCD3R01fQhEIgjYUgPilNWKs8LAEVsyGo2r2QKHlTczGeVMZJj3xRPOYC5E0GQkNbg7zTx4jyKbOp7Yxo6qoQcYweQxArznWzI/VFtux5REXahGpP6Ey
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:HE1PR0802MB2298.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(376002)(396003)(346002)(39840400004)(366004)(136003)(31686004)(450100002)(107886003)(4326008)(66556008)(66476007)(36756003)(66946007)(2906002)(6916009)(4744005)(5660300002)(478600001)(16576012)(8676002)(2616005)(956004)(83380400001)(16526019)(86362001)(31696002)(6486002)(186003)(26005)(8936002)(52116002)(316002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: XpALd6yk1lM/zrpIAAtsj2QqEP14XsgTYpmMfET9RKXIgC6VRnYf2ZeeAWNOQ6Pzdh99aiSGQ5OXYyBLaLKkBRc0lT8+1eqiyZvOZpaqjqWVJ1fqjvkW3Ik/8mqtJ3sz/ttWX4/gg0LBGgVhCvZIFY/Pv+7/W8j+VB8wPnGYzy+FTT8nrjBYBesV8e84DMswRJEPXubeiRqeTac8LkQQfVWTpuMtkOVhFIIgiIdjuxprC+c+tTbCo0cFpqD3hSy1DE7c/6y0zzXk08rXLbiomVZv4dx0gJLgeE8u/DpKrzA//3GQk4MHi21LF4nBfXXDvZngwHBGSIgaXcZSaZxhirSATWzQsBfs3Fyz+leLM9VVgGBbuAL4ceuxILxIKqJ4xCB770kbNqEDSKj8CZiuK7gtxc7mmFL4N0pI3IqIzxGoFhBN/9BPiGbrT34hORD44dS+GNWLp15AbrQbHu/83THEE8IIei1Kze2q7mdXKQv34VceEzXYy1j/NTWYangu/CY3sjH/xrZchsvB0qowqWwnAfTOpinoTmKJ254jnjH5Xkj8WVgmHFVrssxIACZPV+XVO+uRl1HTW9hGK6MFaOu9Z9I62ActGVb+Aj4kdSzB4/GGbMIkgZEK6pzFla5sGBFFFIeQbcXQ5d9vmQ8XBQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 668c8b86-d4b5-4012-b4df-08d874d12984
+X-MS-Exchange-CrossTenant-AuthSource: HE1PR0802MB2298.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Oct 2020 08:21:36.8693 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iMkBeX29avhF2YYgE90IG0Odnt3BVmjlSufd/HqKuQsXgxejWe79203sdNcyY6xnhk1A6fMYHRELEHfIWZrFUnKywiSb/KpLmYXAczPkD80=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0802MB2601
+Received-SPF: pass client-ip=40.107.22.122;
+ envelope-from=nshirokovskiy@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:21:39
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_PASS=-0.001,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,90 +131,30 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- Damien Le Moal <damien.lemoal@wdc.com>, qemu-block@nongnu.org,
- Niklas Cassel <niklas.cassel@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
- qemu-devel@nongnu.org, Maxim Levitsky <mlevitsk@redhat.com>,
- Alistair Francis <alistair.francis@wdc.com>, Keith Busch <kbusch@kernel.org>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Matias Bjorling <matias.bjorling@wdc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Hi, all.
 
---2fHTh5uZTiUOsy+g
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I recently found a corner case when it is impossible AFAIK to find out valid
+backing chain after block commit operation. Imagine committing top image. After
+commit ready state pivot is sent and then mgmt crashed. So far so good. Upon
+next start mgmt can either check block job status for non-autodissmised job or
+inspect backing chain to infer was pivot was successful or not in case of older
+qemu.
 
-On Oct 19 11:17, Dmitry Fomichev wrote:
+But imagine after mgmt crash qemu process was destroyed too. In this case there
+is no option to know now what is valid backing chain. Yeah libvirt starts qemu
+process with -no-shutdown flags so process is not destroyed in case of shutdown
+but still process can crash.
 
-(snip)
+So corner case is very rare. Mgmt crash in a specific short moment and then
+qemu crash before mgmt is up again.
 
-> CAP.CSS (together with the I/O Command Set data structure) defines
-> what command sets are supported by the controller.
->=20
-> CC.CSS (together with Set Profile) can be set to enable a subset of
-> the available command sets.
->=20
-> Even if a user configures CC.CSS to e.g. Admin only, NVM namespaces
-> will still be attached (and thus marked as active).
-> Similarly, if a user configures CC.CSS to e.g. NVM, ZNS namespaces
-> will still be attached (and thus marked as active).
->=20
-> However, any operation from a disabled command set will result in a
-> Invalid Command Opcode.
->=20
+I guess some 'invalidated' flag for image would help. And also qemu itself
+could check that mgmt is not trying to run on invalid backing chain based
+on this flag.
 
-This part of the commit message seems irrelevant to the patch.
-
-> Add a new Boolean namespace property, "attached", to provide the most
-> basic namespace attachment support. The default value for this new
-> property is true. Also, implement the logic in the new CNS values to
-> include/exclude namespaces based on this new property. The only thing
-> missing is hooking up the actual Namespace Attachment command opcode,
-> which will allow a user to toggle the "attached" flag per namespace.
->=20
-
-Without Namespace Attachment support, the sole purpose of this parameter
-is to allow unusable namespace IDs to be reported. I have no problems
-with adding support for the additional CNS values. They will return
-identical responses, but I think that is good enough for now.
-
-When it is not really needed, we should be wary of adding a parameter
-that is really hard to get rid of again.
-
-> The reason for not hooking up this command completely is because the
-> NVMe specification requires the namespace management command to be
-> supported if the namespace attachment command is supported.
->=20
-
-There are many ways to support Namespace Management, and there are a lot
-of quirks with each of them. Do we use a big blockdev and carve out
-namespaces? Then, what are the semantics of an image resize operation?
-
-Do we dynamically create blockdev devices - thats sounds pretty nice,
-but might have other quirks and the attachment is not really persistent.
-
-I think at least the "attached" parameter should be x-prefixed, but
-better, leave it out for now until we know how we want Namespace
-Attachment and Management to be implemented.
-
---2fHTh5uZTiUOsy+g
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+OnfkACgkQTeGvMW1P
-DelmmggAns78TcOR8S003gbK3JlLkiLL6pfqp0oWBpPzthhfsqIqVjGI2TmCeuDJ
-LksmvI5dWv8uiG6LrGTAFh2R5If2yUnPfqa19oGTvIacLHveubhMQmZj1GYdFFlI
-xq6/sgRINYb2NiCdFJFZFHgyCDp+XDhcIlZ1hNmLDN2aGmsJXyS0KThh4Rz1CXyJ
-yNugoqhQFNBhv+WqC5O/yxBZN2rTa4kK+UFeZ5lXjWlupLEV1cEiysGqQzw0hhF5
-WCJCsbiF7ZPJot7iBqL+5h9RMWTz0vAJC2HUgx0kGwYRAhK3+vxAScpSsAWW1eZ4
-7sumbSs5+X3IweKJyxQ5Oave4Ml7AA==
-=QIyQ
------END PGP SIGNATURE-----
-
---2fHTh5uZTiUOsy+g--
+Nikolay
 
