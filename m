@@ -2,73 +2,69 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C989C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 12:09:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 009DCC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 12:11:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6942D20770
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 12:08:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6942D20770
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1F61D20BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 12:11:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="kSGeRPCs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F61D20BED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46214 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUqRm-0001SV-CI
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 08:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34940)
+	id 1kUqUN-0003E5-0M
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 08:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kUqQs-0000eI-MX; Tue, 20 Oct 2020 08:08:02 -0400
-Received: from szxga03-in.huawei.com ([45.249.212.189]:2549 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <liangpeng10@huawei.com>)
- id 1kUqQq-0006mb-2k; Tue, 20 Oct 2020 08:08:02 -0400
-Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.55])
- by Forcepoint Email with ESMTP id 663D6AEFE741CC3AE9CB;
- Tue, 20 Oct 2020 20:07:49 +0800 (CST)
-Received: from dggema765-chm.china.huawei.com (10.1.198.207) by
- DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
- id 14.3.487.0; Tue, 20 Oct 2020 20:07:49 +0800
-Received: from [10.174.185.187] (10.174.185.187) by
- dggema765-chm.china.huawei.com (10.1.198.207) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.1913.5; Tue, 20 Oct 2020 20:07:48 +0800
-Subject: Re: [PATCH] microbit_i2c: Fix coredump when dump-vmstate
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- <qemu-arm@nongnu.org>, <qemu-devel@nongnu.org>
-References: <20201019093401.2993833-1-liangpeng10@huawei.com>
- <786deb83-b6f4-d778-d5ed-19f3901ad211@redhat.com>
- <0c174303-50bc-128a-26ab-c062f98cd6cd@huawei.com>
- <d45ce658-f628-ae9d-1db2-68a14d815333@redhat.com>
-From: Peng Liang <liangpeng10@huawei.com>
-Message-ID: <db7b6e1e-bd6c-2092-ea7c-af8398e57526@huawei.com>
-Date: Tue, 20 Oct 2020 20:07:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.2.2
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kUqTa-0002XP-L6; Tue, 20 Oct 2020 08:10:50 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:34265)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <berto@igalia.com>)
+ id 1kUqTX-00076n-0X; Tue, 20 Oct 2020 08:10:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
+ s=20170329; 
+ h=Content-Type:MIME-Version:Message-ID:Date:References:In-Reply-To:Subject:Cc:To:From;
+ bh=zgYilRFZ+KzZ0ocjxhZjl606bWDPhCOHs0HByJHz5Lo=; 
+ b=kSGeRPCsmEJXSEnkS3COeKge1Ccpeqmg61L3nFLDZJROHjKbEIETWXqsLx5KchJmaSphRKRuVmrGtEtjd4JDqaElVAa1DQoJr/MBhur7MgEsQJz64WkjQiOPjfqpkb+AEv1bsOMAB2OBQ15q/3+u1I6MhypM59ipc4zbiAOkT7wGfeOUNBNiaBKdpgN4nUh73vg9SxVxvJam/+F9Sx+1mDS/nK3tzravEVV1iy/+HV20AW7F1OJet5PTuFBfYPxk0e3dSBErTIJmFLsEslWx6P+9pm1flvdueDGX81H+w8A4qMLtZ+IGXP89fVdfdkHS+cPFnutQVSClIcLrUX1dEQ==;
+Received: from maestria.local.igalia.com ([192.168.10.14] helo=mail.igalia.com)
+ by fanzine.igalia.com with esmtps 
+ (Cipher TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim)
+ id 1kUqTL-0000Zo-Ku; Tue, 20 Oct 2020 14:10:35 +0200
+Received: from berto by mail.igalia.com with local (Exim)
+ id 1kUqTL-00032r-AX; Tue, 20 Oct 2020 14:10:35 +0200
+From: Alberto Garcia <berto@igalia.com>
+To: Zhengui li <lizhengui@huawei.com>, pbonzini@redhat.com, stefanha@redhat.com,
+ mreitz@redhat.com, kwolf@redhat.com
+Subject: Re: [PATCH v2 1/2] qemu-img: add support for offline rate limit in
+ qemu-img commit
+In-Reply-To: <1603193946-30096-1-git-send-email-lizhengui@huawei.com>
+References: <1603193946-30096-1-git-send-email-lizhengui@huawei.com>
+User-Agent: Notmuch/0.18.2 (http://notmuchmail.org) Emacs/24.4.1
+ (i586-pc-linux-gnu)
+Date: Tue, 20 Oct 2020 14:10:35 +0200
+Message-ID: <w51k0vlm72c.fsf@maestria.local.igalia.com>
 MIME-Version: 1.0
-In-Reply-To: <d45ce658-f628-ae9d-1db2-68a14d815333@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.185.187]
-X-ClientProxiedBy: dggeme704-chm.china.huawei.com (10.1.199.100) To
- dggema765-chm.china.huawei.com (10.1.198.207)
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.189;
- envelope-from=liangpeng10@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:17:20
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+Content-Type: text/plain
+Received-SPF: pass client-ip=178.60.130.6; envelope-from=berto@igalia.com;
+ helo=fanzine.igalia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:53:12
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x (no timestamps) [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,46 +78,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, joel@jms.id.au, xiexiangyou@huawei.com,
- zhang.zhanghailiang@huawei.com
+Cc: xieyingtai@huawei.com, lizhengui@huawei.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/20/2020 7:27 PM, Philippe Mathieu-Daudé wrote:
-> On 10/20/20 1:17 PM, Peng Liang wrote:
->> On 10/19/2020 6:35 PM, Philippe Mathieu-Daudé wrote:
->>> On 10/19/20 11:34 AM, Peng Liang wrote:
->>>> VMStateDescription.fields should be end with VMSTATE_END_OF_LIST().
->>>> However, microbit_i2c_vmstate doesn't follow it.  Let's change it.
->>>
->>> It might be easy to add a Coccinelle script to avoid future errors.
->>>
->>> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->>>
->>
->> I tried to add a Coccinelle script to add VMSTATE_END_OF_LIST() to the
->> end of VMStateDescription.fields.  For those who are not defined as
->> compound literals, it works well.  However, I cannot make it work for
->> those defined as compound literals.  And Julia doesn't think compound
->> literals are supported currently[1].  So maybe currently it's hard to
->> check the error using Coccinelle :(
-> 
-> Interesting.
-> 
->>
->> Thanks for my colleague Biaoxiang Ye, who wrote a shell script to find
->> the errors, I didn't find other similar errors.
-> 
-> Thanks for giving it a try. We could commit and run the script
-> in a gitlab-ci job to avoid such regressions.
-> 
+On Tue 20 Oct 2020 01:39:05 PM CEST, Zhengui li wrote:
+> From: Zhengui <lizhengui@huawei.com>
+>
+> Currently, there is no rate limit for qemu-img commit. This may
+> cause the task of qemu-img commit to consume all the bandwidth
+> of the storage. This will affect the IO performance of other processes
+> and virtual machines under shared storage. So we add support for
+> offline rate limit in qemu-img commit to get better quality of sevice.
+>
+> Signed-off-by: Zhengui <lizhengui@huawei.com>
 
-The script will report all fields not defined as compound literals as
-errors (the number is much smaller than that of all
-VMStateDescription.fields).
+Thanks for the patch!
 
--- 
-Thanks,
-Peng
+When you send more than one patch you should add a cover letter (you can
+use git format-patch --cover-letter).
+
+See https://wiki.qemu.org/Contribute/SubmitAPatch#Include_a_meaningful_cover_letter
+
+> +        case 'r': {
+> +            int64_t sval;
+> +
+> +            sval = cvtnum("rate limit", optarg);
+> +            if (sval < 0) {
+> +                return 1;
+> +            }
+> +            rate_limit = sval;
+> +        }   break;
+
+I don't think you need sval here, do you?
+
+rate_limit = cvtnum(...);
+if (rate_limit < 0) {
+    return 1;
+}
+
+Like that you can also get rid of the extra braces { }
+
+Other than that the patch looks correct.
+
+With that changed,
+
+Reviewed-by: Alberto Garcia <berto@igalia.com>
+
+Berto
 
