@@ -8,79 +8,79 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FB4EC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DDDAC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:04:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A87452177B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:03:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CAAD12177B
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4SWT7SE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A87452177B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="tXJEuhUh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAAD12177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUv2K-0000V0-HQ
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:03:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56406)
+	id 1kUv3p-000278-Nl
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:04:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
- id 1kUv0b-0007oz-7S
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:01:13 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:56089)
+ id 1kUv0Y-0007ml-RY
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:01:10 -0400
+Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:41529)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <ameynarkhede03@gmail.com>)
- id 1kUv0Z-0004rt-IG
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:01:12 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id ds1so1197876pjb.5
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 10:01:11 -0700 (PDT)
+ id 1kUv0W-0004rd-O5
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:01:10 -0400
+Received: by mail-pl1-x641.google.com with SMTP id w11so1331127pll.8
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 10:01:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=9vfxdnRCLsliVllqt/rhZ7KYxjMhIVE68F6rGYVRGI8=;
- b=c4SWT7SE6bL+6PNYDzpJ6TlgbtT73FuFzyvk9J1igWT3KUmasgTurJVm/AIkw3em+h
- MIwe8tfpZu/kigbbr3k5Vct5Pkl65y+DGZZLCmueW5xKQMFgiojz2BupFYiqNGXkl3eB
- bra6py56A4YVL8MTB8KkXcwYVVyRF5CV+nYPbg9D/1ium83fI7UrGIlQ6ZrPfUNxrvYX
- xWSCsaetiSB05dKeeNJoLcZnfxzy1fmVnqG31tqd/0XphHsrGDYeACt0PbJ9V6pkJ3Yc
- TwXKBmaqKi1pkKaoF/NAWDlXsu19WM1H6BooydwZ4tSA2HSpfY2cWZsk+jpsEz/8HlWD
- NUNg==
+ bh=eaYqmjcMx802IYh8As8yQQI4HZLzXd0/F879o5VXjTg=;
+ b=tXJEuhUh/jBCkoIm18hk/J+QQErGA6dM6aodvpm5zAjpd0SMaC9cj5NzSsVeomWwdb
+ uMISMjUWoDPDuNAFVKlYOEfjlphlNV77EnuuF/VObOBaIsCnq0kxkm1iqywQmpNaxH7s
+ RakE6JuJh9Yeru7KCeiEDvMZlJ1ZHkPPdjt2auaANrVz8k8PotKbJibCkHe+VM/CQG/t
+ YyalaEC9NvE8uiwSmit9I57v0mAWMyknlHFF5bNd9XGOeEJ/whGazNu0uiM/t4PgAyvK
+ i+LjYHhxFKarkk6JTNrJKpMFGFJotDXrai7JIvgo6GXWnYfoAmY+DfG4gmom9gteZ5Xu
+ uuQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=9vfxdnRCLsliVllqt/rhZ7KYxjMhIVE68F6rGYVRGI8=;
- b=iwsqq8XnZdQq/5paDVq4SSsZ71Q3Aq8DiYiZ4fF4D8+gm6dYhxQmXByVdz4dANyjup
- l2B6AR6YLhNTo4eKbtdcjl86LefUm6A9erKc4VB0B4+T3Uy/EjqAO0YeGt4xGwrQUghV
- YSwTYYSru8FfXMY/WKCXJal4Rcy1wXZektjmTQ7HP78ivEzyT/iJv/GBB/BhKGsvxBs9
- 3Z69zjfoQ7Yo6jMvXCIgyqb6hRK+va9AxteeqVBOfLe8/W+HOptVYQi/K0LxCc5PpQHK
- oEsYBjjtSh3mZa5nQIb125loTl1KiQlVYVZxWqEnuaBnwvmpb0osDSQAiAeOxgX5WYXD
- x/Ww==
-X-Gm-Message-State: AOAM533bCVqaAL3QVzPiFjt4oBWgmrXHECfC/iNKpXkjVkjKOkRsYcdz
- /TbcskQzdM8hPmNX+76OlctmWusU6og=
-X-Google-Smtp-Source: ABdhPJwiTW478eHb035jsmIY5P9juzumk5Lm7S0w1b/UrmSeJgsmdmd/ZaKLAyxhaadizHpiCeJt9g==
-X-Received: by 2002:a17:90a:bb0e:: with SMTP id
- u14mr3608130pjr.112.1603213269952; 
- Tue, 20 Oct 2020 10:01:09 -0700 (PDT)
+ bh=eaYqmjcMx802IYh8As8yQQI4HZLzXd0/F879o5VXjTg=;
+ b=BaBcypKWiTjqilmdsbD9POXUHccHXr49mlSjE+NyxfJac8DFD1v2bwow/ZwvHloV7X
+ Hh7l+Kk/KVPw074K99oNgRwc1gYdwo3caUCYwepE6CK+4VJApBpyXl5FkKporDtces7L
+ enpRCjE0xqgrj7FlT8zfKc6JGJe6WWujw7NwjrKvVRRHxCr8IHlN3M/o93mYuGCUi42H
+ 0L7Rr43PZxoE64jgI8G6/tLTma6vzXGlRNZUVL+lGvD4Rsyc+xUwqES9W8wuHF43yGns
+ Y4Eqd4VH/ul1vf89HZAgZkS7m6Au6CGeWV01m9xPtIhIwckx3xVW8HiUDVWN1FFCbmE1
+ 1fgg==
+X-Gm-Message-State: AOAM530g7LMAQP1GicwJcApBi3uDFQHSzJM7G9pXWQZxqliu0WxNqzZH
+ F8VC0y2KLWjfjCaqhpfnz/A/ZK/M9Q8=
+X-Google-Smtp-Source: ABdhPJyrIZ0jrQpUiVQiMr6asT4wMDG/t4eFF26d8JnKNK5AR8/YFD8r+JrSG6otU6RLsyXjrWbfiQ==
+X-Received: by 2002:a17:902:c24b:b029:d5:f14a:318d with SMTP id
+ 11-20020a170902c24bb02900d5f14a318dmr932875plg.4.1603213267195; 
+ Tue, 20 Oct 2020 10:01:07 -0700 (PDT)
 Received: from localhost.localdomain ([103.248.31.132])
- by smtp.googlemail.com with ESMTPSA id x29sm2766161pfp.152.2020.10.20.10.01.07
+ by smtp.googlemail.com with ESMTPSA id x29sm2766161pfp.152.2020.10.20.10.01.03
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 10:01:09 -0700 (PDT)
+ Tue, 20 Oct 2020 10:01:06 -0700 (PDT)
 From: Amey Narkhede <ameynarkhede03@gmail.com>
 To: qemu-devel@nongnu.org,
 	ameynarkhede03@gmail.com
-Subject: [PATCH 2/2] kvm: Add ioeventfd read test code
-Date: Tue, 20 Oct 2020 22:30:56 +0530
-Message-Id: <20201020170056.433528-3-ameynarkhede03@gmail.com>
+Subject: [PATCH 1/2] linux-headers: Add support for reads in ioeventfd
+Date: Tue, 20 Oct 2020 22:30:55 +0530
+Message-Id: <20201020170056.433528-2-ameynarkhede03@gmail.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201020170056.433528-1-ameynarkhede03@gmail.com>
 References: <20201020170056.433528-1-ameynarkhede03@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=ameynarkhede03@gmail.com; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
+ envelope-from=ameynarkhede03@gmail.com; helo=mail-pl1-x641.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -2
@@ -109,104 +109,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch adds kvm_set_ioeventfd_read and
-dummy_notifier_read functons to test ioeventfd
-read support. When the guess writes to address
-provided in kvm_set_ioeventfd_read function,
-dummy_notifier_read prints to stdio.
+This patch introduces a new flag KVM_IOEVENTFD_FLAG_DATAREAD
+in ioeventfd to enable receiving a notification when a
+guest reads from registered PIO/MMIO address.
 
 Signed-off-by: Amey Narkhede <ameynarkhede03@gmail.com>
 ---
- accel/kvm/kvm-all.c | 55 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 55 insertions(+)
+ linux-headers/linux/kvm.h | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 9ef5daf4c5..357e74d84c 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -1006,6 +1006,43 @@ static uint32_t adjust_ioeventfd_endianness(uint32_t val, uint32_t size)
-     return val;
- }
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 43580c767c..3e71d15a53 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -695,6 +695,7 @@ struct kvm_guest_debug {
  
-+static void dummy_notifier_read(EventNotifier *n)
-+{
-+    printf("Received ioeventfd read event\n");
-+    event_notifier_test_and_clear(n);
-+}
-+
-+static int kvm_set_ioeventfd_read(int fd, hwaddr addr, uint64_t val,
-+				  uint64_t size, bool datamatch)
-+{
-+	int ret;
-+	struct kvm_ioeventfd ioevent = {
-+        	.datamatch = datamatch ? adjust_ioeventfd_endianness(val, size) : 0,
-+		.dataread = val,
-+		.addr = addr,
-+		.len = size,
-+		.flags = KVM_IOEVENTFD_FLAG_DATAREAD,
-+		.fd = fd,
-+	};
-+
-+	if (!kvm_enabled()) {
-+		return -ENOSYS;
-+	}
-+
-+	if (datamatch) {
-+            ioevent.flags |= KVM_IOEVENTFD_FLAG_DATAMATCH;
-+	}
-+
-+	ret = kvm_vm_ioctl(kvm_state, KVM_IOEVENTFD, &ioevent);
-+
-+	if (ret < 0) {
-+		return -errno;
-+	}
-+
-+	return 0;
-+}
-+
-+
- static int kvm_set_ioeventfd_mmio(int fd, hwaddr addr, uint32_t val,
-                                   bool assign, uint32_t size, bool datamatch)
- {
-@@ -2012,6 +2049,7 @@ static int kvm_init(MachineState *ms)
-     KVMState *s;
-     const KVMCapabilityInfo *missing_cap;
-     int ret;
-+    int efd = -1;
-     int type = 0;
-     const char *kvm_type;
-     uint64_t dirty_log_manual_caps;
-@@ -2253,6 +2291,22 @@ static int kvm_init(MachineState *ms)
-     }
+ enum {
+ 	kvm_ioeventfd_flag_nr_datamatch,
++	kvm_ioeventfd_flag_nr_dataread,
+ 	kvm_ioeventfd_flag_nr_pio,
+ 	kvm_ioeventfd_flag_nr_deassign,
+ 	kvm_ioeventfd_flag_nr_virtio_ccw_notify,
+@@ -703,6 +704,7 @@ enum {
+ };
  
-     cpus_register_accel(&kvm_cpus);
-+
-+    EventNotifier *e = g_malloc0(sizeof(EventNotifier));
-+    ret = event_notifier_init(e, false);
-+    if (ret < 0) {
-+	printf("Failed to initialize EventNotifier\n");
-+    }
-+    else {
-+        AioContext *ctx = qemu_get_aio_context();
-+        efd = event_notifier_get_fd(e);
-+        aio_set_event_notifier(ctx, e, false, dummy_notifier_read, NULL);
-+        ret = kvm_set_ioeventfd_read(efd, 0xff01003f, 123, 8, false);
-+        if (ret < 0)
-+            printf("ioeventfd read failed\n");
-+    }
-+
-+
-     return 0;
+ #define KVM_IOEVENTFD_FLAG_DATAMATCH (1 << kvm_ioeventfd_flag_nr_datamatch)
++#define KVM_IOEVENTFD_FLAG_DATAREAD (1 << kvm_ioeventfd_flag_nr_dataread)
+ #define KVM_IOEVENTFD_FLAG_PIO       (1 << kvm_ioeventfd_flag_nr_pio)
+ #define KVM_IOEVENTFD_FLAG_DEASSIGN  (1 << kvm_ioeventfd_flag_nr_deassign)
+ #define KVM_IOEVENTFD_FLAG_VIRTIO_CCW_NOTIFY \
+@@ -712,11 +714,12 @@ enum {
  
- err:
-@@ -2268,6 +2322,7 @@ err:
-     return ret;
- }
+ struct kvm_ioeventfd {
+ 	__u64 datamatch;
++	__u64 dataread;
+ 	__u64 addr;        /* legal pio/mmio address */
+ 	__u32 len;         /* 1, 2, 4, or 8 bytes; or 0 to ignore length */
+ 	__s32 fd;
+ 	__u32 flags;
+-	__u8  pad[36];
++	__u8  pad[28];
+ };
  
-+
- void kvm_set_sigmask_len(KVMState *s, unsigned int sigmask_len)
- {
-     s->sigmask_len = sigmask_len;
+ #define KVM_X86_DISABLE_EXITS_MWAIT          (1 << 0)
 -- 
 2.28.0
 
