@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FDECC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:41:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2F74C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:41:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D04732225F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:41:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 077BB2225F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:41:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GkbJGqm8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D04732225F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpKzBvbp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 077BB2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57284 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUxVj-0003Ls-QH
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:41:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42630)
+	id 1kUxVr-0003gb-Pr
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:41:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42924)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQg-00066E-FG
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35596)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRE-0006e2-Ux
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44122)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQW-0000xh-W9
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:18 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRB-00013U-LS
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603222567;
+ s=mimecast20190719; t=1603222602;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hq0h35liFZEwbQ62xiQF3KWddmk4JqYuoVH3VpCfoLE=;
- b=GkbJGqm8ywNCplum0d1Xg4i3GaPTjTcd2y2crIVNni4TGCW20K8LdHoUFppR9ITHSGvzIt
- Sf5YzwKYRaP6d5fenCrDcGDNXQiORs1tmc5XaFwofzYiw0xvOxm8f+CDZLpdLUbvt8pbZb
- x21fxfO4tHEoBbN6jsMXUVNcMZCbjLs=
+ bh=2C3iLMNoVy39ly8zC+0jT3LJ1DATRFtwqRkl9/xGlgk=;
+ b=hpKzBvbpoaFUK3gvVr8sC1/mMEq/EQygsssXsyL0cHsRldaG1VAAnHmB33bZdZ3weZAixU
+ SVXxl+zLCkIRsczDaxQrGK5LWH8WDoe/sFrrU72w4Y9m3LbZN/y/w6t9BSNbKZWshMDLFr
+ /4jIo8S18fLiAo0P4IIhnUCxl0g3JAQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-438-dbCYXx5iNLmB68NCDKEiaQ-1; Tue, 20 Oct 2020 15:36:05 -0400
-X-MC-Unique: dbCYXx5iNLmB68NCDKEiaQ-1
+ us-mta-496-h1tfX_9pP-ym03Spi3V-vg-1; Tue, 20 Oct 2020 15:36:40 -0400
+X-MC-Unique: h1tfX_9pP-ym03Spi3V-vg-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 210CF1006C8E;
- Tue, 20 Oct 2020 19:36:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 003C31085945;
+ Tue, 20 Oct 2020 19:36:39 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C0B1A5C1C7;
- Tue, 20 Oct 2020 19:36:01 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 339425C1C2;
+ Tue, 20 Oct 2020 19:36:37 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 01/15] python: create qemu packages
-Date: Tue, 20 Oct 2020 15:35:41 -0400
-Message-Id: <20201020193555.1493936-2-jsnow@redhat.com>
+Subject: [PATCH v3 08/15] python: add pylint to pipenv
+Date: Tue, 20 Oct 2020 15:35:48 -0400
+Message-Id: <20201020193555.1493936-9-jsnow@redhat.com>
 In-Reply-To: <20201020193555.1493936-1-jsnow@redhat.com>
 References: <20201020193555.1493936-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,301 +108,164 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-move python/qemu/*.py to python/qemu/[machine, qmp]/*.py and update import
-directives across the tree.
+We are specifying >= pylint 2.6.x for two reasons:
 
-This is done to create a PEP420 namespace package, in which we may
-create subpackages. To do this, the namespace directory ("qemu") should
-not have any modules in it. Those files will go into new 'machine' and 'qmp'
-subpackages instead.
-
-Implement machine/__init__.py making the top-level classes and functions
-from its various modules available directly inside the package. Change
-qmp.py to qmp/__init__.py similarly, such that all of the useful QMP
-library classes are available directly from "qemu.qmp" instead of
-"qemu.qmp.qmp".
+1. For setup.cfg support, added in pylint 2.5.x
+2. To clarify that we are using a version that has incompatibly dropped
+bad-whitespace checks.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/{qemu => }/.isort.cfg                |  0
- python/qemu/__init__.py                     | 11 ------
- python/qemu/{ => machine}/.flake8           |  0
- python/qemu/machine/__init__.py             | 41 +++++++++++++++++++++
- python/qemu/{ => machine}/accel.py          |  0
- python/qemu/{ => machine}/console_socket.py |  0
- python/qemu/{ => machine}/machine.py        | 16 +++++---
- python/qemu/{ => machine}/pylintrc          |  0
- python/qemu/{ => machine}/qtest.py          |  3 +-
- python/qemu/{qmp.py => qmp/__init__.py}     | 12 +++++-
- tests/acceptance/boot_linux.py              |  3 +-
- tests/qemu-iotests/297                      |  2 +-
- tests/qemu-iotests/300                      |  4 +-
- tests/qemu-iotests/iotests.py               |  2 +-
- tests/vm/basevm.py                          |  3 +-
- 15 files changed, 71 insertions(+), 26 deletions(-)
- rename python/{qemu => }/.isort.cfg (100%)
- delete mode 100644 python/qemu/__init__.py
- rename python/qemu/{ => machine}/.flake8 (100%)
- create mode 100644 python/qemu/machine/__init__.py
- rename python/qemu/{ => machine}/accel.py (100%)
- rename python/qemu/{ => machine}/console_socket.py (100%)
- rename python/qemu/{ => machine}/machine.py (98%)
- rename python/qemu/{ => machine}/pylintrc (100%)
- rename python/qemu/{ => machine}/qtest.py (99%)
- rename python/qemu/{qmp.py => qmp/__init__.py} (96%)
+ python/Pipfile      |   1 +
+ python/Pipfile.lock | 127 ++++++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 128 insertions(+)
+ create mode 100644 python/Pipfile.lock
 
-diff --git a/python/qemu/.isort.cfg b/python/.isort.cfg
-similarity index 100%
-rename from python/qemu/.isort.cfg
-rename to python/.isort.cfg
-diff --git a/python/qemu/__init__.py b/python/qemu/__init__.py
-deleted file mode 100644
-index 4ca06c34a4..0000000000
---- a/python/qemu/__init__.py
-+++ /dev/null
-@@ -1,11 +0,0 @@
--# QEMU library
--#
--# Copyright (C) 2015-2016 Red Hat Inc.
--# Copyright (C) 2012 IBM Corp.
--#
--# Authors:
--#  Fam Zheng <famz@redhat.com>
--#
--# This work is licensed under the terms of the GNU GPL, version 2.  See
--# the COPYING file in the top-level directory.
--#
-diff --git a/python/qemu/.flake8 b/python/qemu/machine/.flake8
-similarity index 100%
-rename from python/qemu/.flake8
-rename to python/qemu/machine/.flake8
-diff --git a/python/qemu/machine/__init__.py b/python/qemu/machine/__init__.py
+diff --git a/python/Pipfile b/python/Pipfile
+index 9534830b5e..1e58986c89 100644
+--- a/python/Pipfile
++++ b/python/Pipfile
+@@ -4,6 +4,7 @@ url = "https://pypi.org/simple"
+ verify_ssl = true
+ 
+ [dev-packages]
++pylint = ">=2.6.0"
+ 
+ [packages]
+ 
+diff --git a/python/Pipfile.lock b/python/Pipfile.lock
 new file mode 100644
-index 0000000000..27b0b19abd
+index 0000000000..71e0d40ffb
 --- /dev/null
-+++ b/python/qemu/machine/__init__.py
-@@ -0,0 +1,41 @@
-+"""
-+QEMU development and testing library.
-+
-+This library provides a few high-level classes for driving QEMU from a
-+test suite, not intended for production use.
-+
-+- QEMUMachine: Configure and Boot a QEMU VM
-+ - QEMUQtestMachine: VM class, with a qtest socket.
-+
-+- QEMUQtestProtocol: Connect to, send/receive qtest messages.
-+
-+- list_accel: List available accelerators
-+- kvm_available: Probe for KVM support
-+- tcg_available: Probe for TCG support
-+"""
-+
-+# Copyright (C) 2020 John Snow for Red Hat Inc.
-+# Copyright (C) 2015-2016 Red Hat Inc.
-+# Copyright (C) 2012 IBM Corp.
-+#
-+# Authors:
-+#  John Snow <jsnow@redhat.com>
-+#  Fam Zheng <fam@euphon.net>
-+#
-+# This work is licensed under the terms of the GNU GPL, version 2.  See
-+# the COPYING file in the top-level directory.
-+#
-+
-+from .accel import kvm_available, list_accel, tcg_available
-+from .machine import QEMUMachine
-+from .qtest import QEMUQtestMachine, QEMUQtestProtocol
-+
-+
-+__all__ = (
-+    'list_accel',
-+    'kvm_available',
-+    'tcg_available',
-+    'QEMUMachine',
-+    'QEMUQtestProtocol',
-+    'QEMUQtestMachine',
-+)
-diff --git a/python/qemu/accel.py b/python/qemu/machine/accel.py
-similarity index 100%
-rename from python/qemu/accel.py
-rename to python/qemu/machine/accel.py
-diff --git a/python/qemu/console_socket.py b/python/qemu/machine/console_socket.py
-similarity index 100%
-rename from python/qemu/console_socket.py
-rename to python/qemu/machine/console_socket.py
-diff --git a/python/qemu/machine.py b/python/qemu/machine/machine.py
-similarity index 98%
-rename from python/qemu/machine.py
-rename to python/qemu/machine/machine.py
-index 6420f01bed..a5dc305539 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine/machine.py
-@@ -38,8 +38,14 @@
-     Type,
- )
- 
--from . import console_socket, qmp
--from .qmp import QMPMessage, QMPReturnValue, SocketAddrT
-+from qemu.qmp import (
-+    QEMUMonitorProtocol,
-+    QMPMessage,
-+    QMPReturnValue,
-+    SocketAddrT,
-+)
-+
-+from . import console_socket
- 
- 
- LOG = logging.getLogger(__name__)
-@@ -139,7 +145,7 @@ def __init__(self,
-         self._events: List[QMPMessage] = []
-         self._iolog: Optional[str] = None
-         self._qmp_set = True   # Enable QMP monitor by default.
--        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
-+        self._qmp_connection: Optional[QEMUMonitorProtocol] = None
-         self._qemu_full_args: Tuple[str, ...] = ()
-         self._temp_dir: Optional[str] = None
-         self._launched = False
-@@ -314,7 +320,7 @@ def _pre_launch(self) -> None:
-             if self._remove_monitor_sockfile:
-                 assert isinstance(self._monitor_address, str)
-                 self._remove_files.append(self._monitor_address)
--            self._qmp_connection = qmp.QEMUMonitorProtocol(
-+            self._qmp_connection = QEMUMonitorProtocol(
-                 self._monitor_address,
-                 server=True,
-                 nickname=self._name
-@@ -534,7 +540,7 @@ def set_qmp_monitor(self, enabled: bool = True) -> None:
-         self._qmp_set = enabled
- 
-     @property
--    def _qmp(self) -> qmp.QEMUMonitorProtocol:
-+    def _qmp(self) -> QEMUMonitorProtocol:
-         if self._qmp_connection is None:
-             raise QEMUMachineError("Attempt to access QMP with no connection")
-         return self._qmp_connection
-diff --git a/python/qemu/pylintrc b/python/qemu/machine/pylintrc
-similarity index 100%
-rename from python/qemu/pylintrc
-rename to python/qemu/machine/pylintrc
-diff --git a/python/qemu/qtest.py b/python/qemu/machine/qtest.py
-similarity index 99%
-rename from python/qemu/qtest.py
-rename to python/qemu/machine/qtest.py
-index 39a0cf62fe..53926e434a 100644
---- a/python/qemu/qtest.py
-+++ b/python/qemu/machine/qtest.py
-@@ -26,8 +26,9 @@
-     TextIO,
- )
- 
-+from qemu.qmp import SocketAddrT
-+
- from .machine import QEMUMachine
--from .qmp import SocketAddrT
- 
- 
- class QEMUQtestProtocol:
-diff --git a/python/qemu/qmp.py b/python/qemu/qmp/__init__.py
-similarity index 96%
-rename from python/qemu/qmp.py
-rename to python/qemu/qmp/__init__.py
-index 2cd4d43036..9606248a3d 100644
---- a/python/qemu/qmp.py
-+++ b/python/qemu/qmp/__init__.py
-@@ -1,4 +1,14 @@
--""" QEMU Monitor Protocol Python class """
-+"""
-+QEMU Monitor Protocol (QMP) development library & tooling.
-+
-+This package provides a fairly low-level class for communicating to QMP
-+protocol servers, as implemented by QEMU, the QEMU Guest Agent, and the
-+QEMU Storage Daemon. This library is not intended for production use.
-+
-+`QEMUMonitorProtocol` is the primary class of interest, and all errors
-+raised derive from `QMPError`.
-+"""
-+
- # Copyright (C) 2009, 2010 Red Hat Inc.
- #
- # Authors:
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
-index 0055dc7cee..54f999e647 100644
---- a/tests/acceptance/boot_linux.py
-+++ b/tests/acceptance/boot_linux.py
-@@ -12,8 +12,7 @@
- 
- from avocado_qemu import Test, BUILD_DIR
- 
--from qemu.accel import kvm_available
--from qemu.accel import tcg_available
-+from qemu.machine import kvm_available, tcg_available
- 
- from avocado.utils import cloudinit
- from avocado.utils import network
-diff --git a/tests/qemu-iotests/297 b/tests/qemu-iotests/297
-index 5c5420712b..8236875222 100755
---- a/tests/qemu-iotests/297
-+++ b/tests/qemu-iotests/297
-@@ -36,7 +36,7 @@ MYPYPATH=../../python/ mypy --warn-unused-configs --disallow-subclassing-any \
-     --disallow-any-generics --disallow-incomplete-defs \
-     --disallow-untyped-decorators --no-implicit-optional \
-     --warn-redundant-casts --warn-unused-ignores \
--    --no-implicit-reexport iotests.py
-+    --no-implicit-reexport --namespace-packages iotests.py
- 
- # success, all done
- echo "*** done"
-diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
-index 5b75121b84..a41fac4e1d 100755
---- a/tests/qemu-iotests/300
-+++ b/tests/qemu-iotests/300
-@@ -23,7 +23,7 @@ import random
- import re
- from typing import Dict, List, Optional, Union
- import iotests
--import qemu
-+from qemu.machine import machine
- 
- BlockBitmapMapping = List[Dict[str, Union[str, List[Dict[str, str]]]]]
- 
-@@ -454,7 +454,7 @@ class TestBlockBitmapMappingErrors(TestDirtyBitmapMigration):
-         # the failed migration
-         try:
-             self.vm_b.shutdown()
--        except qemu.machine.AbnormalShutdown:
-+        except machine.AbnormalShutdown:
-             pass
- 
-     def test_aliased_bitmap_name_too_long(self) -> None:
-diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
-index 63d2ace93c..6574afd735 100644
---- a/tests/qemu-iotests/iotests.py
-+++ b/tests/qemu-iotests/iotests.py
-@@ -37,7 +37,7 @@
- 
- # pylint: disable=import-error, wrong-import-position
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
--from qemu import qtest
-+from qemu.machine import qtest
- from qemu.qmp import QMPMessage
- 
- # Use this logger for logging messages directly from the iotests module
-diff --git a/tests/vm/basevm.py b/tests/vm/basevm.py
-index 3fac20e929..b38969f61f 100644
---- a/tests/vm/basevm.py
-+++ b/tests/vm/basevm.py
-@@ -19,8 +19,7 @@
- import time
- import datetime
- sys.path.append(os.path.join(os.path.dirname(__file__), '..', '..', 'python'))
--from qemu.accel import kvm_available
--from qemu.machine import QEMUMachine
-+from qemu.machine import kvm_available, QEMUMachine
- import subprocess
- import hashlib
- import argparse
++++ b/python/Pipfile.lock
+@@ -0,0 +1,127 @@
++{
++    "_meta": {
++        "hash": {
++            "sha256": "b7ac1f2ad73bc166244c0378298afba64951a16bb749b81a9668dc41f40f941c"
++        },
++        "pipfile-spec": 6,
++        "requires": {
++            "python_version": "3.6"
++        },
++        "sources": [
++            {
++                "name": "pypi",
++                "url": "https://pypi.org/simple",
++                "verify_ssl": true
++            }
++        ]
++    },
++    "default": {},
++    "develop": {
++        "astroid": {
++            "hashes": [
++                "sha256:2f4078c2a41bf377eea06d71c9d2ba4eb8f6b1af2135bec27bbbb7d8f12bb703",
++                "sha256:bc58d83eb610252fd8de6363e39d4f1d0619c894b0ed24603b881c02e64c7386"
++            ],
++            "markers": "python_version >= '3.5'",
++            "version": "==2.4.2"
++        },
++        "isort": {
++            "hashes": [
++                "sha256:dcab1d98b469a12a1a624ead220584391648790275560e1a43e54c5dceae65e7",
++                "sha256:dcaeec1b5f0eca77faea2a35ab790b4f3680ff75590bfcb7145986905aab2f58"
++            ],
++            "markers": "python_version >= '3.6' and python_version < '4.0'",
++            "version": "==5.6.4"
++        },
++        "lazy-object-proxy": {
++            "hashes": [
++                "sha256:0c4b206227a8097f05c4dbdd323c50edf81f15db3b8dc064d08c62d37e1a504d",
++                "sha256:194d092e6f246b906e8f70884e620e459fc54db3259e60cf69a4d66c3fda3449",
++                "sha256:1be7e4c9f96948003609aa6c974ae59830a6baecc5376c25c92d7d697e684c08",
++                "sha256:4677f594e474c91da97f489fea5b7daa17b5517190899cf213697e48d3902f5a",
++                "sha256:48dab84ebd4831077b150572aec802f303117c8cc5c871e182447281ebf3ac50",
++                "sha256:5541cada25cd173702dbd99f8e22434105456314462326f06dba3e180f203dfd",
++                "sha256:59f79fef100b09564bc2df42ea2d8d21a64fdcda64979c0fa3db7bdaabaf6239",
++                "sha256:8d859b89baf8ef7f8bc6b00aa20316483d67f0b1cbf422f5b4dc56701c8f2ffb",
++                "sha256:9254f4358b9b541e3441b007a0ea0764b9d056afdeafc1a5569eee1cc6c1b9ea",
++                "sha256:9651375199045a358eb6741df3e02a651e0330be090b3bc79f6d0de31a80ec3e",
++                "sha256:97bb5884f6f1cdce0099f86b907aa41c970c3c672ac8b9c8352789e103cf3156",
++                "sha256:9b15f3f4c0f35727d3a0fba4b770b3c4ebbb1fa907dbcc046a1d2799f3edd142",
++                "sha256:a2238e9d1bb71a56cd710611a1614d1194dc10a175c1e08d75e1a7bcc250d442",
++                "sha256:a6ae12d08c0bf9909ce12385803a543bfe99b95fe01e752536a60af2b7797c62",
++                "sha256:ca0a928a3ddbc5725be2dd1cf895ec0a254798915fb3a36af0964a0a4149e3db",
++                "sha256:cb2c7c57005a6804ab66f106ceb8482da55f5314b7fcb06551db1edae4ad1531",
++                "sha256:d74bb8693bf9cf75ac3b47a54d716bbb1a92648d5f781fc799347cfc95952383",
++                "sha256:d945239a5639b3ff35b70a88c5f2f491913eb94871780ebfabb2568bd58afc5a",
++                "sha256:eba7011090323c1dadf18b3b689845fd96a61ba0a1dfbd7f24b921398affc357",
++                "sha256:efa1909120ce98bbb3777e8b6f92237f5d5c8ea6758efea36a473e1d38f7d3e4",
++                "sha256:f3900e8a5de27447acbf900b4750b0ddfd7ec1ea7fbaf11dfa911141bc522af0"
++            ],
++            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
++            "version": "==1.4.3"
++        },
++        "mccabe": {
++            "hashes": [
++                "sha256:ab8a6258860da4b6677da4bd2fe5dc2c659cff31b3ee4f7f5d64e79735b80d42",
++                "sha256:dd8d182285a0fe56bace7f45b5e7d1a6ebcbf524e8f3bd87eb0f125271b8831f"
++            ],
++            "version": "==0.6.1"
++        },
++        "pylint": {
++            "hashes": [
++                "sha256:bb4a908c9dadbc3aac18860550e870f58e1a02c9f2c204fdf5693d73be061210",
++                "sha256:bfe68f020f8a0fece830a22dd4d5dddb4ecc6137db04face4c3420a46a52239f"
++            ],
++            "index": "pypi",
++            "version": "==2.6.0"
++        },
++        "six": {
++            "hashes": [
++                "sha256:30639c035cdb23534cd4aa2dd52c3bf48f06e5f4a941509c8bafd8ce11080259",
++                "sha256:8b74bedcbbbaca38ff6d7491d76f2b06b3592611af620f8426e82dddb04a5ced"
++            ],
++            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2'",
++            "version": "==1.15.0"
++        },
++        "toml": {
++            "hashes": [
++                "sha256:926b612be1e5ce0634a2ca03470f95169cf16f939018233a670519cb4ac58b0f",
++                "sha256:bda89d5935c2eac546d648028b9901107a595863cb36bae0c73ac804a9b4ce88"
++            ],
++            "version": "==0.10.1"
++        },
++        "typed-ast": {
++            "hashes": [
++                "sha256:0666aa36131496aed8f7be0410ff974562ab7eeac11ef351def9ea6fa28f6355",
++                "sha256:0c2c07682d61a629b68433afb159376e24e5b2fd4641d35424e462169c0a7919",
++                "sha256:249862707802d40f7f29f6e1aad8d84b5aa9e44552d2cc17384b209f091276aa",
++                "sha256:24995c843eb0ad11a4527b026b4dde3da70e1f2d8806c99b7b4a7cf491612652",
++                "sha256:269151951236b0f9a6f04015a9004084a5ab0d5f19b57de779f908621e7d8b75",
++                "sha256:4083861b0aa07990b619bd7ddc365eb7fa4b817e99cf5f8d9cf21a42780f6e01",
++                "sha256:498b0f36cc7054c1fead3d7fc59d2150f4d5c6c56ba7fb150c013fbc683a8d2d",
++                "sha256:4e3e5da80ccbebfff202a67bf900d081906c358ccc3d5e3c8aea42fdfdfd51c1",
++                "sha256:6daac9731f172c2a22ade6ed0c00197ee7cc1221aa84cfdf9c31defeb059a907",
++                "sha256:715ff2f2df46121071622063fc7543d9b1fd19ebfc4f5c8895af64a77a8c852c",
++                "sha256:73d785a950fc82dd2a25897d525d003f6378d1cb23ab305578394694202a58c3",
++                "sha256:8c8aaad94455178e3187ab22c8b01a3837f8ee50e09cf31f1ba129eb293ec30b",
++                "sha256:8ce678dbaf790dbdb3eba24056d5364fb45944f33553dd5869b7580cdbb83614",
++                "sha256:aaee9905aee35ba5905cfb3c62f3e83b3bec7b39413f0a7f19be4e547ea01ebb",
++                "sha256:bcd3b13b56ea479b3650b82cabd6b5343a625b0ced5429e4ccad28a8973f301b",
++                "sha256:c9e348e02e4d2b4a8b2eedb48210430658df6951fa484e59de33ff773fbd4b41",
++                "sha256:d205b1b46085271b4e15f670058ce182bd1199e56b317bf2ec004b6a44f911f6",
++                "sha256:d43943ef777f9a1c42bf4e552ba23ac77a6351de620aa9acf64ad54933ad4d34",
++                "sha256:d5d33e9e7af3b34a40dc05f498939f0ebf187f07c385fd58d591c533ad8562fe",
++                "sha256:fc0fea399acb12edbf8a628ba8d2312f583bdbdb3335635db062fa98cf71fca4",
++                "sha256:fe460b922ec15dd205595c9b5b99e2f056fd98ae8f9f56b888e7a17dc2b757e7"
++            ],
++            "markers": "implementation_name == 'cpython' and python_version < '3.8'",
++            "version": "==1.4.1"
++        },
++        "wrapt": {
++            "hashes": [
++                "sha256:b62ffa81fb85f4332a4f609cab4ac40709470da05643a082ec1eb88e6d9b97d7"
++            ],
++            "version": "==1.12.1"
++        }
++    }
++}
 -- 
 2.26.2
 
