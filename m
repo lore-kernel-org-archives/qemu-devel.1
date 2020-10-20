@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB3A9C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:53:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B504FC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:55:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3AFA422283
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:53:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CB7422283
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:55:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bqt0ZZmF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AFA422283
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QFDMaCtw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CB7422283
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35032 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUmSU-0000ke-5e
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 03:53:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35818)
+	id 1kUmUb-0003LY-3t
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 03:55:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOL-0005AS-EP
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50590)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOK-00058t-5E
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:08 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37196)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOE-0001qP-EQ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:09 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOE-0001oG-ES
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603180140;
+ s=mimecast20190719; t=1603180137;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=S3YEpD+A54YL0EmstK7u8/+0duVoJMgnQOtRH4CPS8Q=;
- b=Bqt0ZZmF+hiFG5b98kuUD53qRDW5h0vbcrmXwS6x3t1NqhrgU5xP+00I8n4FHoZGwtBBtu
- VoC32omMt9s+7XxAnBihbcNXdflumwWU3jnamNvPsE5RaaNW1WtWm+jAnCFTF01ajmP6o3
- 3tCiiqsSFZ2h8Ep7ecRArEho47aupUY=
+ bh=DsKQ3oWwNtNTg3Wc2O1XvFakQW3Ra/VRPnj5TrWSXJU=;
+ b=QFDMaCtwj3LTby6bkfdvm6bEgbGgebNhBTMpzXH5a0q8zUZ15Svu2LzKihPEEPrSQipafn
+ Prr6kBcN0X2Xbys2EZ1aL5w8rmDvN6Spw/jOhkc0Ca75zcpKzrRPG/mnZxk3AqEFQFpRBN
+ bAYTL3Bcd0ZNFDHmfM4SJpz1L1Da6AI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-494-9DeYJy1gOaClHgVT4hvBtA-1; Tue, 20 Oct 2020 03:48:56 -0400
-X-MC-Unique: 9DeYJy1gOaClHgVT4hvBtA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-130-d1yjuLNwOa-Jy7kG6kOcwg-1; Tue, 20 Oct 2020 03:48:56 -0400
+X-MC-Unique: d1yjuLNwOa-Jy7kG6kOcwg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 226D9803F5E;
- Tue, 20 Oct 2020 07:48:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CD6CB8049D9;
+ Tue, 20 Oct 2020 07:48:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
  [10.36.112.56])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0E82F55763;
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3EB7E60C47;
  Tue, 20 Oct 2020 07:48:46 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 44A4F9D8F; Tue, 20 Oct 2020 09:48:45 +0200 (CEST)
+ id 5583E9D5A; Tue, 20 Oct 2020 09:48:45 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 03/10] usb/xhci: add xhci_sysbus_build_aml() helper
-Date: Tue, 20 Oct 2020 09:48:37 +0200
-Message-Id: <20201020074844.5304-4-kraxel@redhat.com>
+Subject: [PATCH v3 04/10] usb/xhci: fixup xhci kconfig deps
+Date: Tue, 20 Oct 2020 09:48:38 +0200
+Message-Id: <20201020074844.5304-5-kraxel@redhat.com>
 In-Reply-To: <20201020074844.5304-1-kraxel@redhat.com>
 References: <20201020074844.5304-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -106,59 +106,38 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The helper generates an acpi dsdt device entry
-for the xhci sysbus device.
+USB_XHCI does not depend on PCI any more.
+USB_XHCI_SYSBUS must select USB_XHCI not USB.
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- include/hw/usb/xhci.h    |  2 ++
- hw/usb/hcd-xhci-sysbus.c | 15 +++++++++++++++
- 2 files changed, 17 insertions(+)
+ hw/usb/Kconfig | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/hw/usb/xhci.h b/include/hw/usb/xhci.h
-index dc0c29930dcc..5c90e1373e55 100644
---- a/include/hw/usb/xhci.h
-+++ b/include/hw/usb/xhci.h
-@@ -16,4 +16,6 @@
- /* must be power of 2 */
- #define XHCI_LEN_REGS 0x4000
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 4dd2ba9630cb..a674ce4c542e 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -32,8 +32,6 @@ config USB_EHCI_SYSBUS
  
-+void xhci_sysbus_build_aml(Aml *scope, uint32_t mmio, unsigned int irq);
-+
- #endif
-diff --git a/hw/usb/hcd-xhci-sysbus.c b/hw/usb/hcd-xhci-sysbus.c
-index 570618467356..29185d2261fb 100644
---- a/hw/usb/hcd-xhci-sysbus.c
-+++ b/hw/usb/hcd-xhci-sysbus.c
-@@ -13,6 +13,7 @@
- #include "trace.h"
- #include "qapi/error.h"
- #include "hcd-xhci-sysbus.h"
-+#include "hw/acpi/aml-build.h"
- #include "hw/irq.h"
+ config USB_XHCI
+     bool
+-    default y if PCI_DEVICES
+-    depends on PCI
+     select USB
  
- static void xhci_sysbus_intr_raise(XHCIState *xhci, int n, bool level)
-@@ -68,6 +69,20 @@ static void xhci_sysbus_instance_init(Object *obj)
-     s->xhci.intr_raise = xhci_sysbus_intr_raise;
- }
+ config USB_XHCI_PCI
+@@ -50,8 +48,8 @@ config USB_XHCI_NEC
  
-+void xhci_sysbus_build_aml(Aml *scope, uint32_t mmio, unsigned int irq)
-+{
-+    Aml *dev = aml_device("XHCI");
-+    Aml *crs = aml_resource_template();
-+
-+    aml_append(crs, aml_memory32_fixed(mmio, XHCI_LEN_REGS, AML_READ_WRITE));
-+    aml_append(crs, aml_interrupt(AML_CONSUMER, AML_LEVEL, AML_ACTIVE_HIGH,
-+                                  AML_EXCLUSIVE, &irq, 1));
-+
-+    aml_append(dev, aml_name_decl("_HID", aml_eisaid("PNP0D10")));
-+    aml_append(dev, aml_name_decl("_CRS", crs));
-+    aml_append(scope, dev);
-+}
-+
- static Property xhci_sysbus_props[] = {
-     DEFINE_PROP_UINT32("intrs", XHCISysbusState, xhci.numintrs, XHCI_MAXINTRS),
-     DEFINE_PROP_UINT32("slots", XHCISysbusState, xhci.numslots, XHCI_MAXSLOTS),
+ config USB_XHCI_SYSBUS
+     bool
+-    default y if USB_XHCI
+-    select USB
++    default y
++    select USB_XHCI
+ 
+ config USB_MUSB
+     bool
 -- 
 2.27.0
 
