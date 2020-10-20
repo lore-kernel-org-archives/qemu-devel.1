@@ -7,75 +7,75 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94E65C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 20:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C93ABC388F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 20:33:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D074522247
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 20:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E33E122247
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 20:33:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gshesgkw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D074522247
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KF9JLbcK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E33E122247
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36170 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41072 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUyDm-0008Rt-Ct
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 16:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53502)
+	id 1kUyKM-0002l1-QC
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 16:33:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55024)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUyD0-00080j-Cr
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 16:26:14 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:33702)
+ id 1kUyJJ-0001u6-Th
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 16:32:45 -0400
+Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:44611)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUyCv-0007AU-LM
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 16:26:13 -0400
-Received: by mail-ej1-x642.google.com with SMTP id c22so4720027ejx.0
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 13:26:07 -0700 (PDT)
+ id 1kUyJH-0007wG-SO
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 16:32:45 -0400
+Received: by mail-ej1-x643.google.com with SMTP id a3so4700758ejy.11
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 13:32:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
  :cc:content-transfer-encoding;
- bh=/OiOZPnRXROviYwjP5xO4b4/d9l1A4zUf6PAHUUUyAA=;
- b=gshesgkwlkMum2z/Y+1rfsGpqYlpNyiDFMYnjW3vFejR/x9a1hXW92er1YZ57dQAgK
- RwiiaLlZ7vZ1Bkvx8DRpaAqwExyaoEMzApYMAiSYDVEKPV4YV11Q2KnoiLTG+lWdctrQ
- g3WyB9hWynWbXFt1dSOTgcNrPcRYKFlrWbbib2ZjF+op+fuezebh+/85LdsTcoGB3ezR
- BQ+EPsQXv8WgRiMnKpyJaG9eDXJglFlsMk0HxyS1QGHjQQTLx6Rbx5G6z3KRe08eqJqF
- 2ILQ5lyK3y6SqySy1CpJDlEmkMc875fyGWC0bVBkxa1EDgChg0T7f1mNCD0MIWPokpsC
- Oa7w==
+ bh=w6nftQea4QBxC6cEg4nsdSFLiPnljsPKT64/nJzn8Z8=;
+ b=KF9JLbcKS/GZgws8pmUT71HNwlp2SJyVyfszAltLBDvd5iRK6kYR0J3Q/R0kPzDRKX
+ 22zx51m3p9aq7IKgZvzeps8qjfgqfhurqjnzHBGqlqbzDERittcPcRzHfBZiy5eP5JB5
+ DUPpXzTGswXPohpdDoX51T//vWVp2h7j9asr+flUaMDJO7E7ONxkb9kI+ArnuvF8dz9Y
+ +9ehIAOxOmZ6BrKlVMmy6i8NNxo8Yu0WdiPvPJDBGl3mKOUjups/iGleW12Mh+DirJPN
+ 7ev1EZxCwT5wzVsIgXAotdrc72fpznNTauT4mj/BJfZp9qXpEYvLLSDHTH7JhoXBSJAm
+ G9lg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc:content-transfer-encoding;
- bh=/OiOZPnRXROviYwjP5xO4b4/d9l1A4zUf6PAHUUUyAA=;
- b=a9VlKbGBJ2c/KlmGx6/edEwiCPMDo1RuveKY7lZ2BD7T+UkOsLEHv+lAbZqyZQl+AS
- YTU4sc3vPyLV/ZgHDI6+oFwycQbnC2mi9iah4qvWNQWfLK2VdYDzjMiHjgH74eKFk1bP
- D4k9OFI9nv0+f/MEXQRM+gwQKdIAoJL5FYS93h8C3n2AACdBIc0qnZukIASFBwtxAITR
- AHpfz0FRH0vtVryB9D1JMztOtxrVXL8pTG8zEOfbzUjdyhldqGxYCk+uLHiuCCSei2vN
- 4OuXQ4XmBNqudfaUmowuXLun6LGi5axPXlXEAgrTMhMDzk+JgtnRaLQwXz1CZeadRKcg
- U5eg==
-X-Gm-Message-State: AOAM5336fiaF8EkXYqMOrVbNsWC0895o/agsRqJxHjxPYskhzAdsLxeL
- fSfGzb70mnsOydKiL22DJlQRNFXhTUpm6UexezCaMNRFxqo=
-X-Google-Smtp-Source: ABdhPJy1CInQzayAusHT+1xrUlyFhV5Duz95hP69pOcTFMc9Tz50+ROE2M8HOrgF6rAK3OFFGdFA6STHNzNbWt9eij4=
-X-Received: by 2002:a17:906:af8d:: with SMTP id
- mj13mr57800ejb.85.1603225565705; 
- Tue, 20 Oct 2020 13:26:05 -0700 (PDT)
+ bh=w6nftQea4QBxC6cEg4nsdSFLiPnljsPKT64/nJzn8Z8=;
+ b=tX2m/NhUL9DPw/Cw0cn4/aiMod1XBYqBbfWskNVDxmdc12bP8h/Lu6GV9dzp0/FLLX
+ Aqga/E4tTyWy98+LW+8ZgHdZNLc9RCYkawHwmEq8CmzbDe4/w7JxwN8GvNd6dXj9qnY9
+ pdp/RHI/eEe2upfw2LkBk8JK2UFWp+EQX2x7RvwKKmgIwQBgoGIuGrk1RfknsgXpkk7V
+ gyfPfeXoOoWZUSc/277eQaRiSlzTIXOhLfnsctJDH0p1cfWiMLM3Gshru5ZQLynOyBQT
+ Qtu36+S4he64lRDB9OvK/FlZMqHYqduf7JnMjNNZaVGK0WZxx3vVOvLu6dLP3aouive5
+ HM2A==
+X-Gm-Message-State: AOAM5324bt/A8sbGK/vBboNx0vfaOwbzacML/SZzOUvWJvZ2V2z6rxsM
+ VgMcaUn+l/NiEBmhcO3dF9XMq3Meikb5y24yeC1fBg==
+X-Google-Smtp-Source: ABdhPJylUl2ccUMsiKrAGpi27OWaL7z3ar0Y1k8ynAiFepc5ttE7cfTOGiejlBp//9uz2/JnqYIOHqa2Dh0mHE+Z0JI=
+X-Received: by 2002:a17:906:1f42:: with SMTP id
+ d2mr4822528ejk.407.1603225961348; 
+ Tue, 20 Oct 2020 13:32:41 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201020182008.2240590-1-f4bug@amsat.org>
- <20201020182008.2240590-5-f4bug@amsat.org>
-In-Reply-To: <20201020182008.2240590-5-f4bug@amsat.org>
+ <20201020182008.2240590-2-f4bug@amsat.org>
+In-Reply-To: <20201020182008.2240590-2-f4bug@amsat.org>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 20 Oct 2020 21:25:54 +0100
-Message-ID: <CAFEAcA_SjX3OVof0A1fOWNkVT8wc9QEmA=3Wj2RgRKZNMFbQqg@mail.gmail.com>
-Subject: Re: [RFC PATCH 4/4] hw/clock: Inline and remove CLOCK_PERIOD_TO_NS()
+Date: Tue, 20 Oct 2020 21:32:30 +0100
+Message-ID: <CAFEAcA9ibGH9H6W=E4u-29d9Qcdnsv+iUBYawX+B2=7UH09nFw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] qdev-monitor: Display frequencies scaled to SI unit
 To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::643;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x643.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,8 +101,9 @@ Cc: Damien Hedde <damien.hedde@greensocs.com>,
  =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
  Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>,
- Luc Michel <luc.michel@greensocs.com>
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair.francis@wdc.com>, Luc Michel <luc@lmichel.fr>,
+ Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -110,66 +111,74 @@ Sender: "Qemu-devel"
 On Tue, 20 Oct 2020 at 19:20, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
  wrote:
 >
-> This macro is only used once. Inline caring about 64-bit
-> multiplication, and remove it.
+> Since commit 9f2ff99c7f2 ("qdev-monitor: print the device's clock
+> with info qtree") we can display the clock frequencies in the
+> monitor. Use the recently introduced freq_to_str() to display
+> the frequencies using the closest SI unit (human friendlier).
 >
-> Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+> Before:
+>
+>   (qemu) info qtree
+>   [...]
+>   dev: xilinx,zynq_slcr, id ""
+>     clock-in "ps_clk" freq_hz=3D3.333333e+07
+>     mmio 00000000f8000000/0000000000001000
+>
+> After:
+>
+>   dev: xilinx,zynq_slcr, id ""
+>     clock-in "ps_clk" freq_hz=3D33.3 MHz
+>     mmio 00000000f8000000/0000000000001000
+>
+> Reviewed-by: Luc Michel <luc@lmichel.fr>
+> Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
+> Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 > Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 > ---
->  include/hw/clock.h | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+>  softmmu/qdev-monitor.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
 >
-> diff --git a/include/hw/clock.h b/include/hw/clock.h
-> index b58038f1e7d..f329fcf0ea5 100644
-> --- a/include/hw/clock.h
-> +++ b/include/hw/clock.h
-> @@ -16,6 +16,7 @@
->
->  #include "qom/object.h"
->  #include "qemu/queue.h"
-> +#include "qemu/host-utils.h"
->
->  #define TYPE_CLOCK "clock"
->  OBJECT_DECLARE_SIMPLE_TYPE(Clock, CLOCK)
-> @@ -38,7 +39,6 @@ typedef void ClockCallback(void *opaque);
->   * macro helpers to convert to hertz / nanosecond
->   */
->  #define CLOCK_PERIOD_FROM_NS(ns) ((ns) * (CLOCK_PERIOD_1SEC / 1000000000=
-llu))
-> -#define CLOCK_PERIOD_TO_NS(per) ((per) / (CLOCK_PERIOD_1SEC / 1000000000=
-llu))
->  #define CLOCK_PERIOD_FROM_HZ(hz) (((hz) !=3D 0) ? CLOCK_PERIOD_1SEC / (h=
-z) : 0u)
->
->  /**
-> @@ -210,9 +210,14 @@ static inline uint64_t clock_get_hz(Clock *clk)
->      return CLOCK_PERIOD_1SEC / clk->period;
->  }
->
-> -static inline unsigned clock_get_ns(Clock *clk)
-> +static inline uint64_t clock_get_ns(Clock *clk)
->  {
-> -    return CLOCK_PERIOD_TO_NS(clock_get(clk));
-> +    uint64_t lo, hi;
+> diff --git a/softmmu/qdev-monitor.c b/softmmu/qdev-monitor.c
+> index bcfb90a08f3..1c5b509aea2 100644
+> --- a/softmmu/qdev-monitor.c
+> +++ b/softmmu/qdev-monitor.c
+> @@ -747,11 +747,13 @@ static void qdev_print(Monitor *mon, DeviceState *d=
+ev, int indent)
+>          }
+>      }
+>      QLIST_FOREACH(ncl, &dev->clocks, node) {
+> -        qdev_printf("clock-%s%s \"%s\" freq_hz=3D%e\n",
+> +        g_autofree char *freq =3D NULL;
 > +
-> +    mulu64(&lo, &hi, clock_get(clk), 1000000000llu);
-> +    divu128(&lo, &hi, CLOCK_PERIOD_1SEC);
-> +
-> +    return lo;
->  }
+> +        freq =3D freq_to_str(clock_get_hz(ncl->clock));
 
-I think the clock_get_ns() function is still flawed
-regardless of its return type or internal implementation.
-If you have a 2GHz clock then the correct answer is
-"0.5" and so an integer representation is going to be
-wrong by 0.5ns. If the reason why you wanted the period
-in nanoseconds was so you could multiply it by a number
-of ticks in order to work out when to set a timer, you
-cannot live with the error resulting from rounding it
-either way. We need to replace this function with one
-which does the whole job of "tell me how many nanoseconds
-X ticks of this clock will take" and does the entire
-calculation so it can do it without introducing rounding errors.
+I would prefer it if our clock.h API provided a function
+for "return a human readable string representing this clock frequency"
+(which can use freq_to_str() under the hood, of course).
+clock_get_hz() itself is a dangerous API because it may
+not be returning a precise result. In particular if the
+clock has a period of greater than 1 second (eg 0.5Hz) then
+it will unhelpfully return 0.
+
+Having the clock API provide a human-readable representation
+for debug purposes means it can internally produce a nice
+result regardless of the period, and it's clear to callers
+that what they get back is for debug printing and similar
+tracing and not suitable for doing arithmetic on. And it
+reduces the number of places that call clock_get_hz() which
+will make it easier for us to try to delete it entirely.
+
+> +        qdev_printf("clock-%s%s \"%s\" freq_hz=3D%s\n",
+>                      ncl->output ? "out" : "in",
+>                      ncl->alias ? " (alias)" : "",
+> -                    ncl->name,
+> -                    CLOCK_PERIOD_TO_HZ(1.0 * clock_get(ncl->clock)));
+> +                    ncl->name, freq);
+>      }
+>      class =3D object_get_class(OBJECT(dev));
+>      do {
+> --
+> 2.26.2
 
 thanks
 -- PMM
