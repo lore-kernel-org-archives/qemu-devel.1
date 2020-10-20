@@ -2,64 +2,64 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3B37C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:43:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C67DC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FCE62225F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:43:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A399A2225F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YDFSXaUp"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FCE62225F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A/LVqtHd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A399A2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37334 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUxXh-0006pv-LY
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:43:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42680)
+	id 1kUxYB-0007Pr-Vm
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:44:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQh-00067v-UC
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34012)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRB-0006ak-83
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49823)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQe-0000ye-6i
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:19 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxR3-00013D-35
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603222574;
+ s=mimecast20190719; t=1603222600;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=dKUvLoe1F+LpREDo9JJoOt/3t4Y/T5crpLJPTHUXyAk=;
- b=YDFSXaUprt5y4Qvw7TAxTvXi//8JnUocBr7liw4hioJPoNe9TlAcYz5ASLbAm61OcX8k3L
- YAsNXF0QGJGFz8EC4mApbNejiCZHTrhPfzfS6s0mKI8yk/ctj62nbsh4USapgf5VSCI8CL
- KOeTuDB52HSTnjfO8zr6r3wEkJvKO1M=
+ bh=WEYAMuZVmvv6KqsuE25vm/EdjNCrxPlz9x2gzJJ0VG4=;
+ b=A/LVqtHdpltx+QxHRCKJxQaz47UqDkOeKSKg0yZ4x2IPmQBodG/yJu6DrNc9BMgowfHlor
+ 2pk1cJHsTEbKQue5mECcvnRaEznkOMk1/MIPPt11d+th5pRj/MkCxVaKbsQlnVHJ9bY+CS
+ 61RNLFr28NwIzWBA4v8GhgkV3zzEfK0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-193-M6H5cBYPNoy8ezWaUuYugg-1; Tue, 20 Oct 2020 15:36:11 -0400
-X-MC-Unique: M6H5cBYPNoy8ezWaUuYugg-1
+ us-mta-291-05CcJMdZP_WGuSzQqZvDWQ-1; Tue, 20 Oct 2020 15:36:38 -0400
+X-MC-Unique: 05CcJMdZP_WGuSzQqZvDWQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 932B71074649;
- Tue, 20 Oct 2020 19:36:10 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 089FB835B8D;
+ Tue, 20 Oct 2020 19:36:37 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C6E0F5C1C2;
- Tue, 20 Oct 2020 19:36:08 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ACDF15C1C2;
+ Tue, 20 Oct 2020 19:36:14 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 04/15] python: add directory structure README.rst files
-Date: Tue, 20 Oct 2020 15:35:44 -0400
-Message-Id: <20201020193555.1493936-5-jsnow@redhat.com>
+Subject: [PATCH v3 07/15] python: move pylintrc into setup.cfg
+Date: Tue, 20 Oct 2020 15:35:47 -0400
+Message-Id: <20201020193555.1493936-8-jsnow@redhat.com>
 In-Reply-To: <20201020193555.1493936-1-jsnow@redhat.com>
 References: <20201020193555.1493936-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -80,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,103 +108,118 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add short readmes to python/, python/qemu/, python/qemu/machine, and
-python/qemu/machine that explain the directory hierarchy. These readmes
-are visible when browsing the source on e.g. gitlab/github and are
-designed to help new developers/users quickly make sense of the source
-tree.
+Delete the empty settings now that it's sharing a home with settings for
+other tools.
 
-They are not designed for inclusion in a published manual.
-
+pylint can now be run from this folder as "pylint qemu".
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/README.rst              | 27 +++++++++++++++++++++++++++
- python/qemu/README.rst         |  8 ++++++++
- python/qemu/machine/README.rst |  9 +++++++++
- python/qemu/qmp/README.rst     |  9 +++++++++
- 4 files changed, 53 insertions(+)
- create mode 100644 python/README.rst
- create mode 100644 python/qemu/README.rst
- create mode 100644 python/qemu/machine/README.rst
- create mode 100644 python/qemu/qmp/README.rst
+ python/qemu/machine/pylintrc | 58 ------------------------------------
+ python/setup.cfg             | 29 ++++++++++++++++++
+ 2 files changed, 29 insertions(+), 58 deletions(-)
+ delete mode 100644 python/qemu/machine/pylintrc
 
-diff --git a/python/README.rst b/python/README.rst
-new file mode 100644
-index 0000000000..ff40e4c931
---- /dev/null
-+++ b/python/README.rst
-@@ -0,0 +1,27 @@
-+QEMU Python Tooling
-+===================
+diff --git a/python/qemu/machine/pylintrc b/python/qemu/machine/pylintrc
+deleted file mode 100644
+index 3f69205000..0000000000
+--- a/python/qemu/machine/pylintrc
++++ /dev/null
+@@ -1,58 +0,0 @@
+-[MASTER]
+-
+-[MESSAGES CONTROL]
+-
+-# Disable the message, report, category or checker with the given id(s). You
+-# can either give multiple identifiers separated by comma (,) or put this
+-# option multiple times (only on the command line, not in the configuration
+-# file where it should appear only once). You can also use "--disable=all" to
+-# disable everything first and then reenable specific checks. For example, if
+-# you want to run only the similarities checker, you can use "--disable=all
+-# --enable=similarities". If you want to run only the classes checker, but have
+-# no Warning level messages displayed, use "--disable=all --enable=classes
+-# --disable=W".
+-disable=too-many-arguments,
+-        too-many-instance-attributes,
+-        too-many-public-methods,
+-
+-[REPORTS]
+-
+-[REFACTORING]
+-
+-[MISCELLANEOUS]
+-
+-[LOGGING]
+-
+-[BASIC]
+-
+-# Good variable names which should always be accepted, separated by a comma.
+-good-names=i,
+-           j,
+-           k,
+-           ex,
+-           Run,
+-           _,
+-           fd,
+-           c,
+-[VARIABLES]
+-
+-[STRING]
+-
+-[SPELLING]
+-
+-[FORMAT]
+-
+-[SIMILARITIES]
+-
+-# Ignore imports when computing similarities.
+-ignore-imports=yes
+-
+-[TYPECHECK]
+-
+-[CLASSES]
+-
+-[IMPORTS]
+-
+-[DESIGN]
+-
+-[EXCEPTIONS]
+diff --git a/python/setup.cfg b/python/setup.cfg
+index 260f7f4e94..a65802d85e 100755
+--- a/python/setup.cfg
++++ b/python/setup.cfg
+@@ -17,3 +17,32 @@ classifiers =
+ [options]
+ python_requires = >= 3.6
+ packages = find_namespace:
 +
-+This directory houses Python tooling used by the QEMU project to build,
-+configure, and test QEMU. It is organized by namespace (``qemu``), and
-+then by package (``qemu/machine``, ``qemu/qmp``).
++[pylint.messages control]
++# Disable the message, report, category or checker with the given id(s). You
++# can either give multiple identifiers separated by comma (,) or put this
++# option multiple times (only on the command line, not in the configuration
++# file where it should appear only once). You can also use "--disable=all" to
++# disable everything first and then reenable specific checks. For example, if
++# you want to run only the similarities checker, you can use "--disable=all
++# --enable=similarities". If you want to run only the classes checker, but have
++# no Warning level messages displayed, use "--disable=all --enable=classes
++# --disable=W".
++disable=too-many-arguments,
++        too-many-instance-attributes,
++        too-many-public-methods,
 +
-+``setup.py`` is used by ``pip`` to install this tooling to the current
-+environment. You will generally invoke it by doing one of the following:
++[pylint.basic]
++# Good variable names which should always be accepted, separated by a comma.
++good-names=i,
++           j,
++           k,
++           ex,
++           Run,
++           _,
++           fd,
++           c,
 +
-+1. ``pip3 install .`` will install these packages to your current
-+   environment. If you are inside a virtual environment, they will
-+   install there. If you are not, it will attempt to install to the
-+   global environment, which is not recommended.
-+
-+2. ``pip3 install --user .`` will install these packages to your user's
-+   local python packages. If you are inside of a virtual environment,
-+   this will fail.
-+
-+If you amend the ``-e`` argument, pip will install in "editable" mode;
-+which installs a version of the package that uses symlinks to these
-+files, such that the package always reflects the latest version in your
-+git tree.
-+
-+See `Installing packages using pip and virtual environments
-+<https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/>`_
-+for more information.
-diff --git a/python/qemu/README.rst b/python/qemu/README.rst
-new file mode 100644
-index 0000000000..31209c80a5
---- /dev/null
-+++ b/python/qemu/README.rst
-@@ -0,0 +1,8 @@
-+QEMU Python Namespace
-+=====================
-+
-+This directory serves as the root of a `Python PEP 420 implicit
-+namespace package <<https://www.python.org/dev/peps/pep-0420/>`_.
-+
-+Each directory below is assumed to be an installable Python package that
-+is available under the ``qemu.<package>`` namespace.
-diff --git a/python/qemu/machine/README.rst b/python/qemu/machine/README.rst
-new file mode 100644
-index 0000000000..73ad23c501
---- /dev/null
-+++ b/python/qemu/machine/README.rst
-@@ -0,0 +1,9 @@
-+qemu.machine Package
-+====================
-+
-+This package provides core utilities used for testing and debugging
-+QEMU. It is used by the iotests, vm tests, and several other utilities
-+in the ./scripts directory. It is not a fully-fledged SDK and it is
-+subject to change at any time.
-+
-+See the documentation in ``__init__.py`` for more information.
-diff --git a/python/qemu/qmp/README.rst b/python/qemu/qmp/README.rst
-new file mode 100644
-index 0000000000..f35dffe582
---- /dev/null
-+++ b/python/qemu/qmp/README.rst
-@@ -0,0 +1,9 @@
-+qemu.qmp Package
-+================
-+
-+This package provides a library used for connecting to and communicating
-+with QMP servers. It is used extensively by iotests, vm tests, and other
-+utilities in the ./scripts directory. It is not a fully-fledged SDK and
-+is subject to change at any time.
-+
-+See the documentation in ``__init__.py`` for more information.
++[pylint.similarities]
++# Ignore imports when computing similarities.
++ignore-imports=yes
 -- 
 2.26.2
 
