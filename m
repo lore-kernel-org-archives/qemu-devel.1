@@ -2,92 +2,75 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B087C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:46:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BA75C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:46:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C547B21D6C
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 666AC21D6C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:46:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AVhVIRYB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C547B21D6C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ULHAnfSC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 666AC21D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUvhx-0001Bg-Ni
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:46:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35140)
+	id 1kUvij-0002Ll-Cv
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:46:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36154)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUvOT-0007fo-Ke
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:25:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53476)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQp-00033V-6R
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48170)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUvOQ-0008F6-PV
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:25:53 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQf-0000Bc-H5
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603214749;
+ s=mimecast20190719; t=1603214887;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Hs3zGfCdZlBKam4T/j2OWFCOhMeEDGMYaVQGrpVc+SE=;
- b=AVhVIRYB05D/ptEWkFK64Z3i2s04TCZ1LT0kReGbUUonFl9ZfxmXFlKpTo3Kn4otwDtCTL
- pa0YTQ646IO+JnPvxWUjeo6uszDjLJwLh4+rY+AdjKRjTaDegVaMtzRe9EZd7tlwbLr0eV
- ZRe5dKV20vdF8hV2wt1oU+imu6r/5Xg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-202-eg6HDhJGNiKMNu6EjTQ37A-1; Tue, 20 Oct 2020 13:25:48 -0400
-X-MC-Unique: eg6HDhJGNiKMNu6EjTQ37A-1
-Received: by mail-wr1-f71.google.com with SMTP id f11so1068351wro.15
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 10:25:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Hs3zGfCdZlBKam4T/j2OWFCOhMeEDGMYaVQGrpVc+SE=;
- b=CtLJSxUnqsAD7qQmd22bbSLAJ0Vxbfyczu11rWOsjW8DOx44xTgOK+9ABMtXBzigQ9
- BCOyrehK5LMBba+H4WaJWr+XdTcAez0/B8VCLZDa5BtmtPFj3eOLOV6WPqiSvOQGOiHu
- Ly9MBteiElcFNut+XHkMmqpdlZAmGY3z7qqcvpLI7m1ONUxxZ6nrr3ykXaUe1piRZKuU
- oP4avx6jB0t0bhwoAhBz3413GwaxgJot1lLxpnR3XLj28YE8JZEBfTUbWsX917LJfabd
- w99NUCpcm5Hi28SD6QR3c0My8S2zz2atJnH4j+oDAyfMcvJoo5yxgspo8GidAK1xFKyu
- V4Aw==
-X-Gm-Message-State: AOAM531Cq+MCZShAwZmFydwCD4FnRAPtv+T9AGn8m2PJjN6rwNIThUrR
- Axfc3dJAcMU2oVTFm1O+RQsUVbLtGsG7Hq9cSraUIk5NmrPoroVMp1HSE++2Sksskw7i5697bhe
- bh8ubHQTTveObQCY=
-X-Received: by 2002:adf:e681:: with SMTP id r1mr4520766wrm.181.1603214746949; 
- Tue, 20 Oct 2020 10:25:46 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzMj4E/AHJERHS9kwzdxk/tKIGBO/AsaNfcJhduQIrcKzhAhfvSBA1rgRSi61/Gk/T68DYdsA==
-X-Received: by 2002:adf:e681:: with SMTP id r1mr4520753wrm.181.1603214746804; 
- Tue, 20 Oct 2020 10:25:46 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id l6sm2603241wrt.7.2020.10.20.10.25.45
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 10:25:46 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ bh=mU75RHHzFC7gQ5DS7Khzv/NDdxI3ENG1gh7VLj3KTvg=;
+ b=ULHAnfSCZ0N7BKBFyc5tueP+hcxv2u++qHK3zzl1yz+nQrHX/qbg3oLHJHdaHyboMmkfIt
+ YGVVulQLkOQuDIirDCIqkv+Wg0jqBvFgUOzEpB4X+vmCl1tgAxx69DCSEKkYVrRGAhtX74
+ 9NFc9DCEwXO0R8+8U7VosUT5OgybQUs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-224-oBXu5DiqMHOb2KSLuJTHlw-1; Tue, 20 Oct 2020 13:28:04 -0400
+X-MC-Unique: oBXu5DiqMHOb2KSLuJTHlw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B400A803F62;
+ Tue, 20 Oct 2020 17:28:03 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C39DB1992D;
+ Tue, 20 Oct 2020 17:28:02 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 15/16] block/nvme: Switch to using the MSIX API
-Date: Tue, 20 Oct 2020 19:24:27 +0200
-Message-Id: <20201020172428.2220726-16-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201020172428.2220726-1-philmd@redhat.com>
-References: <20201020172428.2220726-1-philmd@redhat.com>
+Subject: [PULL 13/21] python/qemu/console_socket.py: Correct type of recv()
+Date: Tue, 20 Oct 2020 13:27:34 -0400
+Message-Id: <20201020172742.1483258-14-jsnow@redhat.com>
+In-Reply-To: <20201020172742.1483258-1-jsnow@redhat.com>
+References: <20201020172742.1483258-1-jsnow@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,56 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In preparation of using multiple IRQs, switch to using the recently
-introduced MSIX API. Instead of allocating and assigning IRQ in
-a single step, we now have to use two distinct calls.
+The type and parameter names of recv() should match socket.socket().
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+OK, easy enough, but in the cases we don't pass straight through to the
+real socket implementation, we probably can't accept such flags. OK, for
+now, assert that we don't receive flags in such cases.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20201006235817.3280413-13-jsnow@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- block/nvme.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+ python/qemu/console_socket.py | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 428cda620df..a5518ad5bac 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -691,6 +691,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-     Error *local_err = NULL;
-     volatile NvmeBar *regs = NULL;
-     size_t min_page_size = 4096;
-+    unsigned irq_count = MSIX_IRQ_COUNT;
+diff --git a/python/qemu/console_socket.py b/python/qemu/console_socket.py
+index 69f604c77f..cb3400a038 100644
+--- a/python/qemu/console_socket.py
++++ b/python/qemu/console_socket.py
+@@ -92,13 +92,14 @@ def _drain_socket(self):
+         for c in string:
+             self._buffer.extend(c)
  
-     qemu_co_mutex_init(&s->dma_map_lock);
-     qemu_co_queue_init(&s->dma_flush_queue);
-@@ -784,8 +785,17 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-         }
-     }
- 
--    ret = qemu_vfio_pci_init_irq(s->vfio, s->irq_notifier,
--                                 VFIO_PCI_MSIX_IRQ_INDEX, errp);
-+    ret = qemu_vfio_pci_msix_init_irqs(s->vfio, &irq_count, errp);
-+    if (ret) {
-+        if (ret == -EOVERFLOW) {
-+            error_append_hint(errp, "%u IRQs requested but only %u available\n",
-+                              MSIX_IRQ_COUNT, irq_count);
-+        }
-+        goto out;
-+    }
-+
-+    ret = qemu_vfio_pci_msix_set_irq(s->vfio, MSIX_SHARED_IRQ_IDX,
-+                                     s->irq_notifier, errp);
-     if (ret) {
-         goto out;
-     }
+-    def recv(self, bufsize=1):
++    def recv(self, bufsize: int = 1, flags: int = 0) -> bytes:
+         """Return chars from in memory buffer.
+            Maintains the same API as socket.socket.recv.
+         """
+         if self._drain_thread is None:
+             # Not buffering the socket, pass thru to socket.
+-            return socket.socket.recv(self, bufsize)
++            return socket.socket.recv(self, bufsize, flags)
++        assert not flags, "Cannot pass flags to recv() in drained mode"
+         start_time = time.time()
+         while len(self._buffer) < bufsize:
+             time.sleep(self._sleep_time)
 -- 
 2.26.2
 
