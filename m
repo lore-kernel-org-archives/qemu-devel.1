@@ -2,79 +2,93 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A356C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:28:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A290C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:30:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7E7E722247
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:28:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB5562224A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:30:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XsD/gGK8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7E722247
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="m73dAuA1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB5562224A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuUu-0005LR-C6
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:28:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39810)
+	id 1kUuWr-0007Su-CZ
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:30:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUu8S-0006aX-9R
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:05:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29267)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUu8P-0004px-US
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:05:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603209912;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type;
- bh=xbb6Dh3/er+Q2zbv5ZM5XUgt10YicpuOnxH31KDUi1k=;
- b=XsD/gGK8CRxjnolxDqtChS1RMiOGGx3dD9ytj3NY7YJ8cFg9Vm8RzBQu8iGEa8XkPh1mtW
- c8duVZ2f3Y0SL3I8hVO+Z0n3DK1jFlS2qa9p/FYkCfU5xNII+bMGeZuluZ1IwmDt/MrKa2
- 4ecv9E6akGrea3kBOvtIaT6x98FvrOo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-505-6FBlK3QAOV-8dYPK5MpHSw-1; Tue, 20 Oct 2020 12:05:11 -0400
-X-MC-Unique: 6FBlK3QAOV-8dYPK5MpHSw-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15FD68030C4;
- Tue, 20 Oct 2020 16:05:10 +0000 (UTC)
-Received: from thuth.com (dhcp-192-238.str.redhat.com [10.33.192.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DFFDA6EF62;
- Tue, 20 Oct 2020 16:05:05 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUu1F-0005VT-J8
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:50 -0400
+Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50248)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUu1B-0003x7-LN
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:49 -0400
+Received: by mail-wm1-x334.google.com with SMTP id 13so2340673wmf.0
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=Gsl0pskRk7KVMoTzUTHvyTGRlhYkpRENSDWVHkehmtc=;
+ b=m73dAuA1JZ5oC/Y422H3e6Rk5ZBmkNMz4sMcY0MC5dWSCslKWfbnQQtzX9hDvY2F2/
+ C9/xiGkJYw60eRuA0RzDP/M9i1MC+b5woh7CQ6y9UTX949yMB0/zcTqQtv3P0VQ5w6Ak
+ i8CutoqYIW/kxo8YcbBOVwW/6EnmZ/PNYHt1Sip0pnwODXXmlqg6rIBY0+TnRPBLCHbB
+ o0qJrPmpG8T6+nl+K5ZgpQNUWpW7ykGp5QYKJ5ldwPb1b1V+4XHaXfxV1BaePJredD1m
+ 8zAu83+OKnnG+dux4U+kPT1MsxIPkfQQ/5PXmrqql8Y7f5L+ahe0BYpFIyUqYdAxbDYH
+ RDcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Gsl0pskRk7KVMoTzUTHvyTGRlhYkpRENSDWVHkehmtc=;
+ b=f5f6dHwU5qqcBPz84u/G/YEz7RUstZU3H6mUAcsiwXOv68MOTkabtQL5FfKotLpZ5h
+ tnAUTJpcVBmNCl5bu7Y7wwKLIUtNs1zko/Znl5rxIh58WW+s/o+mzbLj0FMzxFrT3kss
+ PNppzyY4FQNSCZl3+1Xa/k/YC1dy60GaT17uI6ZShBv28RuTg93QP/XYWnbO5VKX1ezW
+ fCbJkp8LYnyq03ZPuRCdw6DIEtwQpaaSZvfsJpjpPO75NMxR68eDSxLjxWzfj3ZR76Kl
+ CM081NDnUzlcf/URAobSMvcreqxXw7kEtoCUuW4TNPuFmKj7nmtSbej5deBCl0PgEMGZ
+ GciQ==
+X-Gm-Message-State: AOAM530mjR0LVLVoQUFr2owdjdDauENPS9Y/A5bre+YNb8bOjNHe20UW
+ WmeRB0r2KrwzOXF60bmoM3fYRo8y0KDxGg==
+X-Google-Smtp-Source: ABdhPJy2AbGgFOhJoA08OHIBZHGZpfZyzw6iLTCdbZ69rkSXV4fUkwWScINli6CVCPhuMrx3fn4HKw==
+X-Received: by 2002:a7b:c189:: with SMTP id y9mr3436297wmi.141.1603209463092; 
+ Tue, 20 Oct 2020 08:57:43 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.41
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Oct 2020 08:57:41 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] Remove deprecated -no-kvm option
-Date: Tue, 20 Oct 2020 18:05:04 +0200
-Message-Id: <20201020160504.62460-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Subject: [PULL 29/41] target/arm: Implement FPSCR.LTPSIZE for M-profile LOB
+ extension
+Date: Tue, 20 Oct 2020 16:56:44 +0100
+Message-Id: <20201020155656.8045-30-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
+References: <20201020155656.8045-1-peter.maydell@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::334;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,89 +101,87 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, libvir-list@redhat.com,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The option has never been mentioned in our documentation, it's been
-deprecated since years, it's marked with QEMU_ARCH_I386 (which does
-not make sense anymore since KVM is available on other architectures,
-too), it does not do anything by default in upstream QEMU (since TCG
-is the default here anyway), and we're spending too much precious time
-each year discussing whether it makes sense to keep this option as a
-nice suger or not... let's finally put an end on this and remove it.
+If the M-profile low-overhead-branch extension is implemented, FPSCR
+bits [18:16] are a new field LTPSIZE.  If MVE is not implemented
+(currently always true for us) then this field always reads as 4 and
+ignores writes.
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
+These bits used to be the vector-length field for the old
+short-vector extension, so we need to take care that they are not
+misinterpreted as setting vec_len. We do this with a rearrangement
+of the vfp_set_fpscr() code that deals with vec_len, vec_stride
+and also the QC bit; this obviates the need for the M-profile
+only masking step that we used to have at the start of the function.
+
+We provide a new field in CPUState for LTPSIZE, even though this
+will always be 4, in preparation for MVE, so we don't have to
+come back later and split it out of the vfp.xregs[FPSCR] value.
+(This state struct field will be saved and restored as part of
+the FPSCR value via the vmstate_fpscr in machine.c.)
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201019151301.2046-11-peter.maydell@linaro.org
 ---
- v2: Mention the parameter in the "removed feature" section (thanks Paolo!)
+ target/arm/cpu.h        | 1 +
+ target/arm/cpu.c        | 9 +++++++++
+ target/arm/vfp_helper.c | 6 ++++++
+ 3 files changed, 16 insertions(+)
 
- docs/system/deprecated.rst | 11 ++++++-----
- qemu-options.hx            |  3 ---
- softmmu/vl.c               |  4 ----
- 3 files changed, 6 insertions(+), 12 deletions(-)
-
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 905628f3a0..9bae13bc01 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -27,11 +27,6 @@ System emulator command line arguments
- The ``enforce-config-section`` parameter is replaced by the
- ``-global migration.send-configuration={on|off}`` option.
+diff --git a/target/arm/cpu.h b/target/arm/cpu.h
+index a432f301f11..49cd5cabcf2 100644
+--- a/target/arm/cpu.h
++++ b/target/arm/cpu.h
+@@ -549,6 +549,7 @@ typedef struct CPUARMState {
+         uint32_t fpdscr[M_REG_NUM_BANKS];
+         uint32_t cpacr[M_REG_NUM_BANKS];
+         uint32_t nsacr;
++        int ltpsize;
+     } v7m;
  
--``-no-kvm`` (since 1.3.0)
--'''''''''''''''''''''''''
--
--The ``-no-kvm`` argument is now a synonym for setting ``-accel tcg``.
--
- ``-usbdevice`` (since 2.10.0)
- '''''''''''''''''''''''''''''
+     /* Information associated with an exception about to be taken:
+diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+index 186ee621a65..07492e9f9a4 100644
+--- a/target/arm/cpu.c
++++ b/target/arm/cpu.c
+@@ -255,6 +255,15 @@ static void arm_cpu_reset(DeviceState *dev)
+         uint8_t *rom;
+         uint32_t vecbase;
  
-@@ -504,6 +499,12 @@ System emulator command line arguments
- The ``name`` parameter of the ``-net`` option was a synonym
- for the ``id`` parameter, which should now be used instead.
- 
-+``-no-kvm`` (removed in 5.2)
-+''''''''''''''''''''''''''''
++        if (cpu_isar_feature(aa32_lob, cpu)) {
++            /*
++             * LTPSIZE is constant 4 if MVE not implemented, and resets
++             * to an UNKNOWN value if MVE is implemented. We choose to
++             * always reset to 4.
++             */
++            env->v7m.ltpsize = 4;
++        }
 +
-+The ``-no-kvm`` argument was a synonym for setting ``-accel tcg``.
-+
-+
- QEMU Machine Protocol (QMP) commands
- ------------------------------------
+         if (arm_feature(env, ARM_FEATURE_M_SECURITY)) {
+             env->v7m.secure = true;
+         } else {
+diff --git a/target/arm/vfp_helper.c b/target/arm/vfp_helper.c
+index 364856498c4..01b9d8557f7 100644
+--- a/target/arm/vfp_helper.c
++++ b/target/arm/vfp_helper.c
+@@ -174,6 +174,12 @@ uint32_t HELPER(vfp_get_fpscr)(CPUARMState *env)
+             | (env->vfp.vec_len << 16)
+             | (env->vfp.vec_stride << 20);
  
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 1da52a269c..9e1ace04f7 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -4351,9 +4351,6 @@ SRST
-     Enable FIPS 140-2 compliance mode.
- ERST
++    /*
++     * M-profile LTPSIZE overlaps A-profile Stride; whichever of the
++     * two is not applicable to this CPU will always be zero.
++     */
++    fpscr |= env->v7m.ltpsize << 16;
++
+     fpscr |= vfp_get_fpscr_from_host(env);
  
--HXCOMM Deprecated by -accel tcg
--DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
--
- DEF("msg", HAS_ARG, QEMU_OPTION_msg,
-     "-msg [timestamp[=on|off]][,guest-name=[on|off]]\n"
-     "                control error message format\n"
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index cb476aa70b..6f5b000f07 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -3502,10 +3502,6 @@ void qemu_init(int argc, char **argv, char **envp)
-                     exit(1);
-                 }
-                 break;
--             case QEMU_OPTION_no_kvm:
--                olist = qemu_find_opts("machine");
--                qemu_opts_parse_noisily(olist, "accel=tcg", false);
--                break;
-             case QEMU_OPTION_accel:
-                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
-                                                      optarg, true);
+     i = env->vfp.qc[0] | env->vfp.qc[1] | env->vfp.qc[2] | env->vfp.qc[3];
 -- 
-2.18.2
+2.20.1
 
 
