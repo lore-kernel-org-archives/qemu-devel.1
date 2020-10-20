@@ -2,90 +2,63 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E63A2C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:24:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53C21C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:26:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6786B21534
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:24:29 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ1ma+hb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6786B21534
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id B4E1D20BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:26:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4E1D20BED
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUrcq-0003nn-D1
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:24:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48802)
+	id 1kUreP-0006PP-Df
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:26:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50608)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kUrNf-0007pe-Ms
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:08:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42397)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
- id 1kUrNc-0006Dg-US
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:08:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603199322;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=XVK1MAdhpy7fGwtv3k8eoU66vd8qbMmO5kgnakUq/SY=;
- b=IZ1ma+hbv+9ZCOhmBQY8iAqrBYMRIziAxTXD2QP9Rk7N6ZHV/v34E7/5CPEfqqtlpWYdLw
- dFL5FgltssNgBHcfrb8C9uWTlGjaW4A47gNcXOP8PFjv68F/xmu6tKtvXU5t7fOgsq/BaY
- yYOfDkbx1kGnF2MdhEENFdpiCpl5AQo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-285-4_h4OPBzPUusMhFlxg7J-A-1; Tue, 20 Oct 2020 09:08:41 -0400
-X-MC-Unique: 4_h4OPBzPUusMhFlxg7J-A-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB10E18C520C;
- Tue, 20 Oct 2020 13:08:39 +0000 (UTC)
-Received: from kaapi (ovpn-112-157.phx2.redhat.com [10.3.112.157])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id E92066CE4D;
- Tue, 20 Oct 2020 13:08:22 +0000 (UTC)
-Date: Tue, 20 Oct 2020 18:38:20 +0530 (IST)
-From: P J P <ppandit@redhat.com>
-X-X-Sender: pjp@kaapi
-To: BALATON Zoltan <balaton@eik.bme.hu>
-Subject: Re: [PATCH] ati: mask x y display parameter values
-In-Reply-To: <d43d9494-72c3-eb52-4588-d324f2857c45@eik.bme.hu>
-Message-ID: <nycvar.YSQ.7.78.906.2010201810120.1506567@xnncv>
-References: <20201018120852.1415440-1-ppandit@redhat.com>
- <607d183b-8885-583f-de2a-ee693e641a50@eik.bme.hu>
- <nycvar.YSQ.7.78.906.2010191056550.1472930@xnncv>
- <1e94cbca-121f-52f2-b1e3-6d2fdb59ee42@eik.bme.hu>
- <nycvar.YSQ.7.78.906.2010201220140.1506567@xnncv>
- <d43d9494-72c3-eb52-4588-d324f2857c45@eik.bme.hu>
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kUrU9-0000OR-Sj; Tue, 20 Oct 2020 09:15:29 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5268 helo=huawei.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
+ id 1kUrU0-00077Q-Op; Tue, 20 Oct 2020 09:15:29 -0400
+Received: from DGGEMS409-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 5270886DE4E3BFBC85C7;
+ Tue, 20 Oct 2020 21:15:13 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS409-HUB.china.huawei.com
+ (10.3.19.209) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 21:15:03 +0800
+From: Ying Fang <fangying1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [RFC PATCH v2 09/13] hw/arm/virt-acpi-build: add PPTT table
+Date: Tue, 20 Oct 2020 21:14:36 +0800
+Message-ID: <20201020131440.1090-10-fangying1@huawei.com>
+X-Mailer: git-send-email 2.28.0.windows.1
+In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
+References: <20201020131440.1090-1-fangying1@huawei.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.67]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=fangying1@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:15:07
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,64 +71,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gaoning Pan <pgn@zju.edu.cn>, Gerd Hoffmann <kraxel@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: peter.maydell@linaro.org, drjones@redhat.com,
+ zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
+ qemu-arm@nongnu.org, alistair.francis@wdc.com,
+ Ying Fang <fangying1@huawei.com>, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+-- On Tue, 20 Oct 2020, BALATON Zoltan wrote --+
-| The card has 32 bit registers with values in them interpreted differently for
-| different regs. For dst_x|y lower 14 bits can be set and value should be
-| interpreted as -8192:8191 according to docs. I've got this wrong because all
-| guests I've tried did not actually use negative values. The Solaris driver I
-| was recently shown not to work may use that so I plan to look at it and fix it
-| when I'll have time. 
-... 
-| Docs aren't very clear on that but I think these cannot be negative so 
-| 0:8191 is valid range because it mentions that also bits 0-13 (or maybe 
-| 0-15, the docs have a lot of copy&paste errors) are valid but only 0-12 are 
-| used for rectangles, 13-15 used only for trapezoids (which we don't 
-| emulate). The docs are really bad so we have to guess and see what guest 
-| drivers do most of the time.
+Add the Processor Properties Topology Table (PPTT) to present CPU topology
+information to the guest.
 
-* I see. Are the docs available/accessible online?
+Signed-off-by: Andrew Jones <drjones@redhat.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
+---
+ hw/arm/virt-acpi-build.c | 42 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 42 insertions(+)
 
-| >  dst_y(=4294950914(=-16382)) + s->regs.dst_height(=16383)) overflows to => 1
-| > Ie. (dst_bits + dst_x(=0) + (1) * dst_stride >= end) returns false.
-| 
-| So maybe we should cast something (like dst_stride) to uint64_t here to
-| promote everything to 64 bit and prevent it overflowing which then should
-| catch this as well?
-... 
-| > +    if (dst_x > 0x3fff || dst_y > 0x3fff || dst_bits >= end
-| > +        || dst_bits + dst_x + (dst_y + s->regs.dst_height)
-| > +         * dst_stride >= end) {
-| > ...
-| > +        if (src_x > 0x3fff || src_y > 0x3ff || src_bits >= end
-| > +            || src_bits + src_x + (src_y + s->regs.dst_height)
-| > +             * src_stride >= end) {
-| >             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
-| 
-| I can live with that until I have a chance to rewrite it but are you sure this
-| will catch all possible overflows with all vram sizes that can be set with
-| vgamem_mb property?
-
-* Considering all fields are 'uint32_t' type; And majority of the values 
-  s->regs.[src|dst]_[xy], s->regs.dst_height are masked with '0x3fff', it 
-  should help to avoid overflows.
-
-* Not sure about all vram sizes. What are possible/supported size options?
-
-* Between casting expression to 64 bits & explicit src_[xy] > 0x3fff check, 
-  I'd go with explicit check, as it's easy to follow.
-
-  Will send a revised patch with src_[xy] > 0x3fff if it's okay with you.
-
-
-Thank you.
---
-Prasad J Pandit / Red Hat Product Security Team
-8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
+diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
+index fae5a26741..e1f3ea50ad 100644
+--- a/hw/arm/virt-acpi-build.c
++++ b/hw/arm/virt-acpi-build.c
+@@ -429,6 +429,42 @@ build_srat(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+                  "SRAT", table_data->len - srat_start, 3, NULL, NULL);
+ }
+ 
++static void build_pptt(GArray *table_data, BIOSLinker *linker, MachineState *ms)
++{
++    int pptt_start = table_data->len;
++    int uid = 0, cpus = 0, socket;
++    unsigned int smp_cores = ms->smp.cores;
++    unsigned int smp_threads = ms->smp.threads;
++
++    acpi_data_push(table_data, sizeof(AcpiTableHeader));
++
++    for (socket = 0; cpus < ms->possible_cpus->len; socket++) {
++        uint32_t socket_offset = table_data->len - pptt_start;
++        int core;
++
++        build_socket_hierarchy(table_data, 0, socket);
++
++        for (core = 0; core < smp_cores; core++) {
++            uint32_t core_offset = table_data->len - pptt_start;
++            int thread;
++
++            if (smp_threads <= 1) {
++                build_processor_hierarchy(table_data, 2, socket_offset, uid++);
++             } else {
++                build_processor_hierarchy(table_data, 0, socket_offset, core);
++                for (thread = 0; thread < smp_threads; thread++) {
++                    build_smt_hierarchy(table_data, core_offset, uid++);
++                }
++             }
++        }
++        cpus += smp_cores * smp_threads;
++    }
++
++    build_header(linker, table_data,
++                 (void *)(table_data->data + pptt_start), "PPTT",
++                 table_data->len - pptt_start, 2, NULL, NULL);
++}
++
+ /* GTDT */
+ static void
+ build_gtdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
+@@ -669,6 +705,7 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     unsigned dsdt, xsdt;
+     GArray *tables_blob = tables->table_data;
+     MachineState *ms = MACHINE(vms);
++    bool cpu_topology_enabled = !vmc->ignore_cpu_topology;
+ 
+     table_offsets = g_array_new(false, true /* clear */,
+                                         sizeof(uint32_t));
+@@ -688,6 +725,11 @@ void virt_acpi_build(VirtMachineState *vms, AcpiBuildTables *tables)
+     acpi_add_table(table_offsets, tables_blob);
+     build_madt(tables_blob, tables->linker, vms);
+ 
++    if (cpu_topology_enabled) {
++        acpi_add_table(table_offsets, tables_blob);
++        build_pptt(tables_blob, tables->linker, ms);
++    }
++
+     acpi_add_table(table_offsets, tables_blob);
+     build_gtdt(tables_blob, tables->linker, vms);
+ 
+-- 
+2.23.0
 
 
