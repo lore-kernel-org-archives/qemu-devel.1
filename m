@@ -7,59 +7,59 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DF492C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01169C388F7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:45:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 339CC21D6C
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6532821D6C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:45:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GxWDpSCH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 339CC21D6C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZI68qcG4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6532821D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48918 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51716 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUvgc-0007ez-41
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:44:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35932)
+	id 1kUvhG-0000M9-8t
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:45:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36068)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQa-0002sz-P8
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52564)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQh-00030r-HT
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59661)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQY-00008M-Dr
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:04 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQd-0000BV-Oa
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603214881;
+ s=mimecast20190719; t=1603214887;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=n+ztMi0DbwXldWXPytHFTMvwXYuKk8sRGulzwOqxRN4=;
- b=GxWDpSCHN8S2pAH6uG9iOt7+T/uo+UgCI1wq5vZ631DMxKERArJyKFdMXUAHgTGpJ7K33Z
- Jqdsuz3zLezPLqMW1RsTnAhtXb8zOzyPw8PcwMjMKq0NCryJ5TOcGcrW5B591cpdgKF+3f
- SbiOacOsXmRGm1/CXK1dGZ/cc9ehL/A=
+ bh=bBdogoT+43GpDlWgLtVgXqrakIFcETJ95LGQ2R3LqDU=;
+ b=ZI68qcG4gk2Y9FtjJOgg2MDYSuU7cnX5/JzO5F4MCI1VJMnEal2oFbBmkK9aagHj2Pu5py
+ 8reMNRRXf6NjZP6BuJup+8AhY1fYm5YZwya2FWp8DcfCZuJdCv0ZM1LIZFfmc6hkIE5HEw
+ Vh2iOhiNyqUDdhDWkFVGcJHdzXVrI20=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-2-zomem7_SPQiuia2Wri7Eeg-1; Tue, 20 Oct 2020 13:27:58 -0400
-X-MC-Unique: zomem7_SPQiuia2Wri7Eeg-1
+ us-mta-97-rVVj_EkXNZm4aH4mCzbpkg-1; Tue, 20 Oct 2020 13:28:02 -0400
+X-MC-Unique: rVVj_EkXNZm4aH4mCzbpkg-1
 Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
  [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CAFDD835B47;
- Tue, 20 Oct 2020 17:27:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7622B803F5E;
+ Tue, 20 Oct 2020 17:28:01 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE3B27C29;
- Tue, 20 Oct 2020 17:27:56 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8BA1E1992D;
+ Tue, 20 Oct 2020 17:28:00 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 08/21] python/machine.py: Add _qmp access shim
-Date: Tue, 20 Oct 2020 13:27:29 -0400
-Message-Id: <20201020172742.1483258-9-jsnow@redhat.com>
+Subject: [PULL 11/21] iotests.py: Adjust HMP kwargs typing
+Date: Tue, 20 Oct 2020 13:27:32 -0400
+Message-Id: <20201020172742.1483258-12-jsnow@redhat.com>
 In-Reply-To: <20201020172742.1483258-1-jsnow@redhat.com>
 References: <20201020172742.1483258-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,17 +70,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,88 +101,42 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Like many other Optional[] types, it's not always a given that this
-object will be set. Wrap it in a type-shim that raises a meaningful
-error and will always return a concrete type.
+mypy wants to ensure there's consistency between the kwargs arguments
+types and any unspecified keyword arguments. In this case, conv_keys is
+a bool, but the remaining keys are Any type. Mypy (correctly) infers the
+**kwargs type to be **Dict[str, str], which is not compatible with
+conv_keys: bool.
+
+Because QMP typing is a little fraught right now anyway, re-type kwargs
+to Dict[str, Any] which has the benefit of silencing this check right
+now.
+
+A future re-design might type these more aggressively, but this will
+give us a baseline to work from with minimal disruption.
+
+(Thanks Kevin Wolf for the debugging assist here)
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
-Message-id: 20201006235817.3280413-8-jsnow@redhat.com
+Message-id: 20201006235817.3280413-11-jsnow@redhat.com
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/qemu/machine.py | 24 +++++++++++++-----------
- 1 file changed, 13 insertions(+), 11 deletions(-)
+ tests/qemu-iotests/iotests.py | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/python/qemu/machine.py b/python/qemu/machine.py
-index d788e8aba8..3e9cf09fd2 100644
---- a/python/qemu/machine.py
-+++ b/python/qemu/machine.py
-@@ -135,7 +135,7 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
-         self._events = []
-         self._iolog = None
-         self._qmp_set = True   # Enable QMP monitor by default.
--        self._qmp = None
-+        self._qmp_connection: Optional[qmp.QEMUMonitorProtocol] = None
-         self._qemu_full_args = None
-         self._temp_dir = None
-         self._launched = False
-@@ -302,14 +302,14 @@ def _pre_launch(self):
-             if self._remove_monitor_sockfile:
-                 assert isinstance(self._monitor_address, str)
-                 self._remove_files.append(self._monitor_address)
--            self._qmp = qmp.QEMUMonitorProtocol(
-+            self._qmp_connection = qmp.QEMUMonitorProtocol(
-                 self._monitor_address,
-                 server=True,
-                 nickname=self._name
-             )
+diff --git a/tests/qemu-iotests/iotests.py b/tests/qemu-iotests/iotests.py
+index f212cec446..63d2ace93c 100644
+--- a/tests/qemu-iotests/iotests.py
++++ b/tests/qemu-iotests/iotests.py
+@@ -605,7 +605,7 @@ def add_incoming(self, addr):
  
-     def _post_launch(self):
--        if self._qmp:
-+        if self._qmp_connection:
-             self._qmp.accept()
- 
-     def _post_shutdown(self):
-@@ -320,9 +320,9 @@ def _post_shutdown(self):
-         # Comprehensive reset for the failed launch case:
-         self._early_cleanup()
- 
--        if self._qmp:
-+        if self._qmp_connection:
-             self._qmp.close()
--            self._qmp = None
-+            self._qmp_connection = None
- 
-         self._load_io_log()
- 
-@@ -434,7 +434,7 @@ def _soft_shutdown(self, timeout: Optional[int],
-         """
-         self._early_cleanup()
- 
--        if self._qmp is not None:
-+        if self._qmp_connection:
-             if not has_quit:
-                 # Might raise ConnectionReset
-                 self._qmp.cmd('quit')
-@@ -515,11 +515,13 @@ def set_qmp_monitor(self, enabled=True):
-                         line. Default is True.
-         @note: call this function before launch().
-         """
--        if enabled:
--            self._qmp_set = True
--        else:
--            self._qmp_set = False
--            self._qmp = None
-+        self._qmp_set = enabled
-+
-+    @property
-+    def _qmp(self) -> qmp.QEMUMonitorProtocol:
-+        if self._qmp_connection is None:
-+            raise QEMUMachineError("Attempt to access QMP with no connection")
-+        return self._qmp_connection
- 
-     @classmethod
-     def _qmp_args(cls, _conv_keys: bool = True, **args: Any) -> Dict[str, Any]:
+     def hmp(self, command_line: str, use_log: bool = False) -> QMPMessage:
+         cmd = 'human-monitor-command'
+-        kwargs = {'command-line': command_line}
++        kwargs: Dict[str, Any] = {'command-line': command_line}
+         if use_log:
+             return self.qmp_log(cmd, **kwargs)
+         else:
 -- 
 2.26.2
 
