@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFA72C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:17:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 875CBC43467
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:18:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4492C2223C
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:17:27 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4492C2223C
+	by mail.kernel.org (Postfix) with ESMTPS id 3C05A223BF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:18:36 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C05A223BF
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52136 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUi9O-0006c3-CI
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:17:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41576)
+	id 1kUiAV-0007vT-9f
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:18:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41574)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUi4K-0000KY-8j; Mon, 19 Oct 2020 23:12:12 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:52582 helo=huawei.com)
+ id 1kUi4K-0000Jw-1G; Mon, 19 Oct 2020 23:12:12 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5261 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUi4H-0005EL-4W; Mon, 19 Oct 2020 23:12:11 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 1BA69DAC5D17F78CAC8C;
- Tue, 20 Oct 2020 11:12:05 +0800 (CST)
+ id 1kUi4H-0005EH-8L; Mon, 19 Oct 2020 23:12:11 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id DE48069E624F245234AF;
+ Tue, 20 Oct 2020 11:12:04 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS403-HUB.china.huawei.com
  (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 11:11:56 +0800
+ 11:11:55 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v3 7/8] migration: Open brace '{' following function
- declarations go on the next line
-Date: Tue, 20 Oct 2020 11:10:47 +0800
-Message-ID: <1603163448-27122-8-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v3 5/8] migration: Add braces {} for if statement
+Date: Tue, 20 Oct 2020 11:10:45 +0800
+Message-ID: <1603163448-27122-6-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1603163448-27122-1-git-send-email-yubihong@huawei.com>
 References: <1603163448-27122-1-git-send-email-yubihong@huawei.com>
@@ -49,9 +48,9 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.124.27]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=yubihong@huawei.com;
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=yubihong@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:24:36
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:24:46
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -82,23 +81,32 @@ Signed-off-by: Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/rdma.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ migration/ram.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 0eb42b7..ca4d315 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -273,7 +273,8 @@ static uint64_t htonll(uint64_t v)
-     return u.llv;
+diff --git a/migration/ram.c b/migration/ram.c
+index 0aea78f..09178cc 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -101,14 +101,16 @@ static struct {
+ 
+ static void XBZRLE_cache_lock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_lock(&XBZRLE.lock);
++    }
  }
  
--static uint64_t ntohll(uint64_t v) {
-+static uint64_t ntohll(uint64_t v)
-+{
-     union { uint32_t lv[2]; uint64_t llv; } u;
-     u.llv = v;
-     return ((uint64_t)ntohl(u.lv[0]) << 32) | (uint64_t) ntohl(u.lv[1]);
+ static void XBZRLE_cache_unlock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_unlock(&XBZRLE.lock);
++    }
+ }
+ 
+ /**
 -- 
 1.8.3.1
 
