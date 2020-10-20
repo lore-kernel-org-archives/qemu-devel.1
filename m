@@ -2,72 +2,91 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6330C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:29:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1843C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:39:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EACF2221FC
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:29:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EACF2221FC
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id 143AB22453
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:39:08 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="UNeCv3KT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 143AB22453
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=sifive.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45998 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUiKa-0007uJ-Tf
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:29:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45382)
+	id 1kUiUN-0002P0-Uk
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:39:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47980)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUiJg-00077c-GY; Mon, 19 Oct 2020 23:28:09 -0400
-Resent-Date: Mon, 19 Oct 2020 23:28:04 -0400
-Resent-Message-Id: <E1kUiJg-00077c-GY@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21724)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUiJd-0002Kp-3A; Mon, 19 Oct 2020 23:28:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603164464; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=MHeFRe11wwaYxSXjekwmuLa5APPexu3LoKcG7HaLbVgpNWzYHj4EsYZ8IfUU26IIhF0RyBxwn3N+p6o1OwqhPHR4zD0mZMY7QjCCb7BB+FamcoKqP085PHbBcNyLRtLa9YiBiJ93ZpFYjS7dDylfI+Z7JlgmlvulP+iHVu6TRMo=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603164464;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=m71fKW4pA8XVGxvAhTG3jvu1JGUw5HBPCi/NX7Vb8L0=; 
- b=J5JD7yjGnL2iUVeXAOaAtI33EowoJylrFaPMyBKms0M/H8vPwbF6te62AjLxKoallW1/dEigq7DYQbTlKrFmKTDpQF/B3bBrcbB79gro72Lt76uhSRlTWF3CNE/Hf+9aRkrEixC1j/E2TCT/a7ZCAf++T/8bmOKVF8b51xz+pSc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1603164463689563.7576093448332;
- Mon, 19 Oct 2020 20:27:43 -0700 (PDT)
-Subject: Re: [PATCH v3 0/8] Fix some style problems in migration
-Message-ID: <160316446187.18439.7746821496766547264@66eaa9a8a123>
-In-Reply-To: <1603163448-27122-1-git-send-email-yubihong@huawei.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: yubihong@huawei.com
-Date: Mon, 19 Oct 2020 20:27:43 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 23:27:58
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kUiTB-000124-8t
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 23:37:53 -0400
+Received: from mail-pl1-x636.google.com ([2607:f8b0:4864:20::636]:33788)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <green.wan@sifive.com>)
+ id 1kUiT9-0005ri-Go
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 23:37:52 -0400
+Received: by mail-pl1-x636.google.com with SMTP id b19so267324pld.0
+ for <qemu-devel@nongnu.org>; Mon, 19 Oct 2020 20:37:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sifive.com; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=ZP0P1YsDvhVLDnigTxcAr9bHNAEed+EOs9ZCHTy6oW4=;
+ b=UNeCv3KTmdKm1whUsrV5w9u6rgdnSKwi6+EwtUyPfoh8j47ILXt3HMqUeXTxXHv0Zd
+ jaTHnczn9oOEmCNzhkuf5jaZwkjeDPmoBJJkyMDW5eVlHikjEEqcw3+IIaQBkmMHvxnZ
+ e49M8jGb/gp2FBQVhDj/T9MweqB5DCod17s4Lhy94DVhLYGJbV2vih84bVT4DCc4ktbX
+ QI2XLlO0FeoC/a/INw6gkqZjEjbJSjCygPhLmg6JTAgxIB56wA/mi6nSyXZbmwiOfdpS
+ jGehgujXKk8BW9QgAKacXn/p83AK8tEBWu8RwOLPEV08m8iN8uAcWxMCWUW5uXErU8zP
+ PiFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=ZP0P1YsDvhVLDnigTxcAr9bHNAEed+EOs9ZCHTy6oW4=;
+ b=tG0UWNCFz7BwQJ19ScRzaafL7ZeCb650iwdinrzhHCdLD92up4LFaUsHxxHNIr25/d
+ 22TZocWZkDmc7d54zIzsdwOuxpbnulZMfE855d3pOGSfRjRl0KWkpgL0nRsx9BZx2fho
+ erPaltNdlRRXWsiRBoAmO4wpqMTp3ssG8oW//wW/MXetGqgkXMOGTmr3STnD9ujEZs4A
+ +I4yZ1nLzjEvIfcXj5keIoDfPM5oNncZ1hCZAzZyz6A9kjHhVdiY1SgTU/yVFTa3dkUB
+ we63wB2zzQihiNZOHSH3bXmIjGwR/U1fnkQ7Dv0pXvb0zJwHu29ThykQ+WeEYfeBpByw
+ A9lA==
+X-Gm-Message-State: AOAM533Ryql8iBhetj+Y7pdxJd3IEm9S9Nz+5BYFl7vA07rSxC6QwKVD
+ yRSwAAdFJ45eGuGmRlEaKHLHAhKt+G0AiA==
+X-Google-Smtp-Source: ABdhPJzE+bXKiNVWDVnI6kAWlKNSVHF3eJmNoGR4UZypKQ4GUThjQWsZarP6CloXbnJQw24LrifxIA==
+X-Received: by 2002:a17:902:a40a:b029:d5:a7d7:4ea0 with SMTP id
+ p10-20020a170902a40ab02900d5a7d74ea0mr975262plq.9.1603165069809; 
+ Mon, 19 Oct 2020 20:37:49 -0700 (PDT)
+Received: from localhost.localdomain (111-243-184-51.dynamic-ip.hinet.net.
+ [111.243.184.51])
+ by smtp.gmail.com with ESMTPSA id gd14sm260489pjb.31.2020.10.19.20.37.48
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 19 Oct 2020 20:37:49 -0700 (PDT)
+From: Green Wan <green.wan@sifive.com>
+To: 
+Subject: [PATCH v8 1/2] hw/misc/sifive_u_otp: Add write function and
+ write-once protection
+Date: Tue, 20 Oct 2020 11:37:31 +0800
+Message-Id: <20201020033732.12921-2-green.wan@sifive.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201020033732.12921-1-green.wan@sifive.com>
+References: <20201020033732.12921-1-green.wan@sifive.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::636;
+ envelope-from=green.wan@sifive.com; helo=mail-pl1-x636.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,63 +99,102 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: yubihong@huawei.com, alex.chen@huawei.com, quintela@redhat.com,
- qemu-trivial@nongnu.org, armbru@redhat.com, dgilbert@redhat.com,
- qemu-devel@nongnu.org, zhengchuan@huawei.com, wanghao232@huawei.com
+Cc: alistair23@gmail.com, bmeng.cn@gmail.com, qemu-riscv@nongnu.org,
+ qemu-devel@nongnu.org, green.wan@sifive.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAzMTYzNDQ4LTI3MTIyLTEt
-Z2l0LXNlbmQtZW1haWwteXViaWhvbmdAaHVhd2VpLmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBz
-ZWVtcyB0byBoYXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93
-IGZvcgptb3JlIGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDE2MDMxNjM0
-NDgtMjcxMjItMS1naXQtc2VuZC1lbWFpbC15dWJpaG9uZ0BodWF3ZWkuY29tClN1YmplY3Q6IFtQ
-QVRDSCB2MyAwLzhdIEZpeCBzb21lIHN0eWxlIHByb2JsZW1zIGluIG1pZ3JhdGlvbgoKPT09IFRF
-U1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2
-L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0
-IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZm
-LmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBi
-YXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4Nzgy
-MTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1w
-cm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8xNjAzMTYzNDQ4LTI3MTIy
-LTEtZ2l0LXNlbmQtZW1haWwteXViaWhvbmdAaHVhd2VpLmNvbSAtPiBwYXRjaGV3LzE2MDMxNjM0
-NDgtMjcxMjItMS1naXQtc2VuZC1lbWFpbC15dWJpaG9uZ0BodWF3ZWkuY29tCiAtIFt0YWcgdXBk
-YXRlXSAgICAgIHBhdGNoZXcvY292ZXIuMTYwMjYzNDUyNC5naXQuYWxpc3RhaXIuZnJhbmNpc0B3
-ZGMuY29tIC0+IHBhdGNoZXcvY292ZXIuMTYwMjYzNDUyNC5naXQuYWxpc3RhaXIuZnJhbmNpc0B3
-ZGMuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKYjMzZWRlYSBtaWdyYXRpb246
-IERlbGV0ZSByZWR1bmRhbnQgc3BhY2VzCjI3NzU2M2QgbWlncmF0aW9uOiBPcGVuIGJyYWNlICd7
-JyBmb2xsb3dpbmcgZnVuY3Rpb24gZGVjbGFyYXRpb25zIGdvIG9uIHRoZSBuZXh0IGxpbmUKN2Rk
-MGFkMCBtaWdyYXRpb246IERvIG5vdCBpbml0aWFsaXNlIHN0YXRpY3MgYW5kIGdsb2JhbHMgdG8g
-MCBvciBOVUxMCjU1NDBmZDEgbWlncmF0aW9uOiBBZGQgYnJhY2VzIHt9IGZvciBpZiBzdGF0ZW1l
-bnQKODljMWExMiBtaWdyYXRpb246IE9wZW4gYnJhY2UgJ3snIGZvbGxvd2luZyBzdHJ1Y3QgZ28g
-b24gdGhlIHNhbWUgbGluZQoyM2U3ZjNmIG1pZ3JhdGlvbjogQWRkIHNwYWNlcyBhcm91bmQgb3Bl
-cmF0b3IKY2M5ZWM5OSBtaWdyYXRpb246IERvbid0IHVzZSAnIycgZmxhZyBvZiBwcmludGYgZm9y
-bWF0CjEyMmRjNjggbWlncmF0aW9uOiBEbyBub3QgdXNlIEM5OSAvLyBjb21tZW50cwoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KMS84IENoZWNraW5nIGNvbW1pdCAxMjJkYzY4ZGEzZGYgKG1pZ3JhdGlv
-bjogRG8gbm90IHVzZSBDOTkgLy8gY29tbWVudHMpCjIvOCBDaGVja2luZyBjb21taXQgY2M5ZWM5
-OWM1YWMwIChtaWdyYXRpb246IERvbid0IHVzZSAnIycgZmxhZyBvZiBwcmludGYgZm9ybWF0KQoz
-LzggQ2hlY2tpbmcgY29tbWl0IDIzZTdmM2ZiNTFjMiAobWlncmF0aW9uOiBBZGQgc3BhY2VzIGFy
-b3VuZCBvcGVyYXRvcikKRVJST1I6IHNwYWNlcyByZXF1aXJlZCBhcm91bmQgdGhhdCAnKicgKGN0
-eDpXeFYpCiM2MjogRklMRTogbWlncmF0aW9uL3NhdmV2bS5jOjUyNDoKKyAgICAuc3Vic2VjdGlv
-bnMgPSAoY29uc3QgVk1TdGF0ZURlc2NyaXB0aW9uICpbXSkgewogICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdz
-LCA1OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAzLzggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2Ug
-cmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9y
-dCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4K
-CjQvOCBDaGVja2luZyBjb21taXQgODljMWExMjE1ZWYwIChtaWdyYXRpb246IE9wZW4gYnJhY2Ug
-J3snIGZvbGxvd2luZyBzdHJ1Y3QgZ28gb24gdGhlIHNhbWUgbGluZSkKNS84IENoZWNraW5nIGNv
-bW1pdCA1NTQwZmQxMjFmMTkgKG1pZ3JhdGlvbjogQWRkIGJyYWNlcyB7fSBmb3IgaWYgc3RhdGVt
-ZW50KQo2LzggQ2hlY2tpbmcgY29tbWl0IDdkZDBhZDBjNWI4NiAobWlncmF0aW9uOiBEbyBub3Qg
-aW5pdGlhbGlzZSBzdGF0aWNzIGFuZCBnbG9iYWxzIHRvIDAgb3IgTlVMTCkKNy84IENoZWNraW5n
-IGNvbW1pdCAyNzc1NjNkMjdjMzMgKG1pZ3JhdGlvbjogT3BlbiBicmFjZSAneycgZm9sbG93aW5n
-IGZ1bmN0aW9uIGRlY2xhcmF0aW9ucyBnbyBvbiB0aGUgbmV4dCBsaW5lKQo4LzggQ2hlY2tpbmcg
-Y29tbWl0IGIzM2VkZWE1ODRiNCAobWlncmF0aW9uOiBEZWxldGUgcmVkdW5kYW50IHNwYWNlcykK
-PT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRo
-ZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMTYwMzE2
-MzQ0OC0yNzEyMi0xLWdpdC1zZW5kLWVtYWlsLXl1Ymlob25nQGh1YXdlaS5jb20vdGVzdGluZy5j
-aGVja3BhdGNoLz90eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxs
-eSBieSBQYXRjaGV3IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVl
-ZGJhY2sgdG8gcGF0Y2hldy1kZXZlbEByZWRoYXQuY29t
+ - Add write operation to update fuse data bit when PWE bit is on.
+ - Add array, fuse_wo, to store the 'written' status for all bits
+   of OTP to block the write operation.
+
+Signed-off-by: Green Wan <green.wan@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Tested-by: Bin Meng <bin.meng@windriver.com>
+---
+ hw/misc/sifive_u_otp.c         | 30 +++++++++++++++++++++++++++++-
+ include/hw/misc/sifive_u_otp.h |  3 +++
+ 2 files changed, 32 insertions(+), 1 deletion(-)
+
+diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
+index c2f3c8e129..b9238d64cb 100644
+--- a/hw/misc/sifive_u_otp.c
++++ b/hw/misc/sifive_u_otp.c
+@@ -25,6 +25,14 @@
+ #include "qemu/module.h"
+ #include "hw/misc/sifive_u_otp.h"
+ 
++#define WRITTEN_BIT_ON 0x1
++
++#define SET_FUSEARRAY_BIT(map, i, off, bit)    \
++    map[i] = bit ? (map[i] | bit << off) : (map[i] & ~(0x1 << off))
++
++#define GET_FUSEARRAY_BIT(map, i, off)    \
++    ((map[i] >> off) & 0x1)
++
+ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+ {
+     SiFiveUOTPState *s = opaque;
+@@ -123,7 +131,24 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+         s->ptrim = val32;
+         break;
+     case SIFIVE_U_OTP_PWE:
+-        s->pwe = val32;
++        s->pwe = val32 & SIFIVE_U_OTP_PWE_EN;
++
++        /* PWE is enabled. Ignore PAS=1 (no redundancy cell) */
++        if (s->pwe && !s->pas) {
++            if (GET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio)) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "write once error: idx<%u>, bit<%u>\n",
++                              s->pa, s->paio);
++                break;
++            }
++
++            /* write bit data */
++            SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
++
++            /* update written bit */
++            SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
++        }
++
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%" HWADDR_PRIx
+@@ -165,6 +190,9 @@ static void sifive_u_otp_reset(DeviceState *dev)
+     /* Make a valid content of serial number */
+     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
+     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
++
++    /* Initialize write-once map */
++    memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
+ }
+ 
+ static void sifive_u_otp_class_init(ObjectClass *klass, void *data)
+diff --git a/include/hw/misc/sifive_u_otp.h b/include/hw/misc/sifive_u_otp.h
+index 82c9176c8f..ebffbc1fa5 100644
+--- a/include/hw/misc/sifive_u_otp.h
++++ b/include/hw/misc/sifive_u_otp.h
+@@ -36,6 +36,8 @@
+ #define SIFIVE_U_OTP_PTRIM      0x34
+ #define SIFIVE_U_OTP_PWE        0x38
+ 
++#define SIFIVE_U_OTP_PWE_EN     (1 << 0)
++
+ #define SIFIVE_U_OTP_PCE_EN     (1 << 0)
+ 
+ #define SIFIVE_U_OTP_PDSTB_EN   (1 << 0)
+@@ -75,6 +77,7 @@ struct SiFiveUOTPState {
+     uint32_t ptrim;
+     uint32_t pwe;
+     uint32_t fuse[SIFIVE_U_OTP_NUM_FUSES];
++    uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
+     /* config */
+     uint32_t serial;
+ };
+-- 
+2.17.1
+
 
