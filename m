@@ -1,63 +1,70 @@
-Return-Path: <SRS0=qJMs=D2=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16D65C433DF
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:51:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52119C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 00:03:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 748BB22284
-	for <qemu-devel@archiver.kernel.org>; Mon, 19 Oct 2020 23:51:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 748BB22284
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6888A223FD
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 00:02:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="YuSBPnKt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6888A223FD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60400 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34978 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUevs-00016k-JF
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 19:51:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49492)
+	id 1kUf7C-0003Bs-D6
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 20:02:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kUeql-0006HN-Ml
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:45:59 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:21264)
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kUf5s-0002jJ-HL
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 20:01:36 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:40003)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kUeqh-0003hN-M0
- for qemu-devel@nongnu.org; Mon, 19 Oct 2020 19:45:58 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id CC7F6746383;
- Tue, 20 Oct 2020 01:45:52 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 898E9745953; Tue, 20 Oct 2020 01:45:52 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 87FB974594E;
- Tue, 20 Oct 2020 01:45:52 +0200 (CEST)
-Date: Tue, 20 Oct 2020 01:45:52 +0200 (CEST)
-To: Joelle van Dyne <j@getutm.app>
-Subject: Re: [PATCH v2 6/9] tcg: implement mirror mapped JIT for iOS
-In-Reply-To: <CA+E+eSAYV50ACGaAvd_e-eR3FoSiBq6EXqDVRH7vJZyYHvhA8w@mail.gmail.com>
-Message-ID: <5d2ac3fc-cb2f-4a69-3d6-b834edc8ff8c@eik.bme.hu>
-References: <20201019013928.72770-1-j@getutm.app>
- <20201019013928.72770-7-j@getutm.app>
- <aa4c227-c33-72dc-92c6-75792f60b58e@eik.bme.hu>
- <CA+E+eSAYV50ACGaAvd_e-eR3FoSiBq6EXqDVRH7vJZyYHvhA8w@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
+ id 1kUf5q-0006GN-90
+ for qemu-devel@nongnu.org; Mon, 19 Oct 2020 20:01:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+ d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
+ MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
+ Content-ID:Content-Description;
+ bh=RuOTqBAMk3mm4SdV4HQ5pcyCq4zbV9oz6iHJZftxfzs=; b=YuSBPnKtkjVYSTnfTORgGw1eAn
+ 6XVu9b2kDSGNPtHOHfjk6KrYrbhdFfrCN+Qq64Xpu2zaLLtXObweVfYeuOQmYTnMxtiEBxN8EArSH
+ 1naH2sKAI++7OSQgFcjdK2pmd9HpKCCLT94XaOlwk8Sdp08Ok447KxpdT26eEQX5eaxYVpOO659u1
+ r+NMCGjr9E5ZfFmsce7h+e/xPjZBB8Hvs3hMMkGxVe3+3nUbDC151VCXqxz506EW5+R6t3LLQrXNU
+ vDiwB4KxjsUtDz/7RbZ+ZAFpZ4NZvjOTKnNOWam5N5+9X/WBc84k5HVuR4wjHDlmmzQYRywweG5L6
+ nDKoL45Q==;
+From: Christian Schoenebeck <qemu_oss@crudebyte.com>
+To: qemu-devel@nongnu.org
+Cc: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 7/8] tests/9pfs: add local Tlink test
+Date: Tue, 20 Oct 2020 02:01:30 +0200
+Message-ID: <4187116.WyENfdrYhA@silver>
+In-Reply-To: <ee6d9e1147d05bcf0b51b02ef6757f4b4691ba2d.1603149434.git.qemu_oss@crudebyte.com>
+References: <cover.1603149434.git.qemu_oss@crudebyte.com>
+ <ee6d9e1147d05bcf0b51b02ef6757f4b4691ba2d.1603149434.git.qemu_oss@crudebyte.com>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset=US-ASCII
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
+Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
+ helo=lizzy.crudebyte.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 19:37:26
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -71,96 +78,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-On Mon, 19 Oct 2020, Joelle van Dyne wrote:
->> Explicit cast may not be needed here so this could be a macro if caling it
->> differently helps or why don't you just use tcg_mirror_prr_rw directly
->> everywhere?
->
-> There are quite a bit of code that depends on tcg_insn_unit * type such as
->
-> *tcg_code_ptr_rw(s, code_ptr) = insn;
->
-> and
->
-> (tcg_code_ptr_rw(s, p))[i] = NOP;
+On Dienstag, 20. Oktober 2020 01:13:24 CEST Christian Schoenebeck wrote:
+> This test case uses a Tlink request to create a hard link to a regular
+> file using the 9pfs 'local' fs driver.
+> 
+> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+> ---
+>  tests/qtest/virtio-9p-test.c | 61 ++++++++++++++++++++++++++++++++++++
+>  1 file changed, 61 insertions(+)
+> 
+> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> index f7d18f6274..447d8e3344 100644
+> --- a/tests/qtest/virtio-9p-test.c
+> +++ b/tests/qtest/virtio-9p-test.c
+> @@ -260,6 +260,7 @@ static const char *rmessage_name(uint8_t id)
+>          id == P9_RMKDIR ? "RMKDIR" :
+>          id == P9_RLCREATE ? "RLCREATE" :
+>          id == P9_RSYMLINK ? "RSYMLINK" :
+> +        id == P9_RLINK ? "RLINK" :
+>          id == P9_RUNLINKAT ? "RUNLINKAT" :
+>          id == P9_RFLUSH ? "RFLUSH" :
+>          id == P9_RREADDIR ? "READDIR" :
+> @@ -742,6 +743,33 @@ static void v9fs_rsymlink(P9Req *req, v9fs_qid *qid)
+>      v9fs_req_free(req);
+>  }
+> 
+> +/* size[4] Tlink tag[2] dfid[4] fid[4] name[s] */
+> +static P9Req *v9fs_tlink(QVirtio9P *v9p, uint32_t dfid, uint32_t fid,
+> +                         const char *name, uint16_t tag)
+> +{
 
-OK that explains it, haven't looked at it at that detail.
+This hard-link test was actually motived by an issue that I recently 
+encountered on a machine: it fails to create any hard links with 9p. This 
+particular test case succeeds though.
 
-> I think it's cleaner to not have to manually cast in every one of 30+
-> instances of this. In v1, I used a macro but was told to use an inline
-> function instead.
+I think the problem is that recent libvirt versions enable qemu's sandbox 
+feature by default which filters syscalls. Fact is, any linkat() call fails on 
+that machine with EACCES now. I couldn't reproduce it on my development 
+machine yet though. I guess it's a difference in white/black-list seccomp 
+config or something. Not sure yet if there is some change required on 9p side 
+or whether it's really just a seccomp config issue.
 
-Definitely cleaner to have the cast either in a macro or inline func than 
-manually having it everywhere. The static inline in v2 looks better than 
-the macro in v1 so unless others disagree it's fine this way, I'm not the 
-one who decides, I was just asking if we can avoid having two static 
-inlines relying on casting void * but if you also dereference as above 
-then returning the right type is needed. Let's see what Richard says who 
-suggested the function instead of a macro but it does look more readable 
-than the previous macro.
+P.S. Noisy days from my side, but this is probably the last batch of patches 
+from my side in a while, unless I really need to fix something for that hard 
+link isssue. We'll see ...
 
->> Is that !defined or are you missing an implementation and #else here?
-> No, `flush_dcache_range` is only needed when mirror mapped (after
-> writing to the RW mirror). Now there is no iOS compatible compiler for
-> any other arch than x86 and ARM. However, in the slim chance that
+Best regards,
+Christian Schoenebeck
 
-But this was in tcg/arm/tcg-target.h which is ARM but maybe you mean only 
-x86 and 64bit ARM which is aarch64 but not 32bit ARM. I've noticed this 
-only after sending the question.
 
-> Apple decides to change arch again in the future and moves to RISC-V
-> or something, then we get a nice compiler error.
->
->> Maybe this patch could be split up some more, making the RW offset
->> handling and cache management separate patches even if they don't work
->> separately just to make it easier to review.
->
-> I can probably do that for v3 but imo most of the LOC here is because
-> the same change has to be done to every TCG target. No matter how you
-> split up the patches, it will look like a lot of changes.
-
-Sure but it's easier to review if a single patch has only similar changes 
-even if it touches a lot of files than if it does independent stuff 
-intermixed unless it's a small patch (but even then QEMU tends to prefer a 
-lot of smaller patches instead of combining changes in a single patch). 
-That's also good for bisectability so that's also something to consider 
-when splitting patches. Not sure if in this case this can be split up into 
-two working changes because RW mapping may not work without cache flushes 
-and cache flushes may not be added before having the RW split but having 
-two patches for the review that can be squashed in the final series may 
-still help. But lets see if this gets reviewed without further splitting 
-or what others say.
-
-Not sure you're aware of this: https://wiki.qemu.org/Planning/5.2 but if 
-this series does not get merged this week don't be surprised if your next 
-opportunity to pick it up will be in December (when most people who can 
-review it will be on holyday so it can be easily take longer). So maybe 
-you could try pushing it and do everything to make reviewers' job easier 
-if you want it in the next release. Otherwise you'll have time to polish 
-it until next year.
-
-Also it may be good to fix checkpatch errors (warnings may be OK but 
-errors are not) that are reported even if it's not in your code (it could 
-be a separate clean up patch before your changes or for small things in 
-the same patch) otherwise automated tests may not run which can also delay 
-reviews and merging:
-
-https://patchew.org/QEMU/20201019051953.90107-1-j@getutm.app/
-
-and I assume you already know this:
-
-https://wiki.qemu.org/Contribute/SubmitAPatch
-
-It might be overwhelming and off putting sometimes to try getting series 
-into QEMU but please don't give up.
-
-Regards,
-BALATON Zoltan
 
