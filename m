@@ -7,80 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ADB6C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:58:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 619E4C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:59:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 14CB022249
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:58:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A68CB22249
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:59:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aOmEgptL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 14CB022249
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DxGwIcbn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A68CB22249
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36246 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUu24-0006Sr-0V
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:58:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37300)
+	id 1kUu2g-0007he-He
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:59:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0i-0004KI-9v
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:16 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:55005)
+ id 1kUu0k-0004R6-Vc
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:19 -0400
+Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:46998)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0f-0003rN-Q8
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:15 -0400
-Received: by mail-wm1-x330.google.com with SMTP id c77so2327929wmd.4
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:12 -0700 (PDT)
+ id 1kUu0h-0003rm-IK
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:18 -0400
+Received: by mail-wr1-x434.google.com with SMTP id n6so2772448wrm.13
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=AWepJclKfiAgqPbSX9Qr68AN9+jPvNJVchxr+m/neyg=;
- b=aOmEgptLo8ivpRy4C4v9dFBWdO8AJR1ZGoQiFmcKw+lhRZP/pAdJuKBPEaYBf0v5AX
- S4l1UcwM8WlcTP6cj3KQL6iUipsz5yWGuxTICw2ZnHe4IB64jiIwfHHb/AXZEm2IJ36E
- 5Yug/0mp3qm/anPDSz/5WM7weiR9AvinvCZvvET88MFqGZi+Em7l9S586MnqaMXGund8
- i8AbgeNvurYQq8vYkdjQiFwquAcJhtNcrwMKtkrKMj/sk2cSUFSRQ4z8tRSqCwS/8fva
- rJ1vMhZh5hkcAA8oA8iI6xIqp6s4DHBIY6TTGyAIDdSC1fbWCWOTRdgzrVX8k2WTAi8z
- sNZw==
+ bh=3DJEJXQVy0e3qPp5Ym6ZDssBuQPuQeXX0afaVS4fCT8=;
+ b=DxGwIcbnSlgxI4zVwvpWL+wSunxB+4ztMQdgOjcDock1vhOakwr2zj3V/kV9Nsga54
+ NtbbyBOdqpdxKjtSsvNzp0jTpFdVnhEbSGbJsxJIvtO54RKsLZSsYt3xUtaRaNsAA1AK
+ DQLHTFp7QId7g0ICawWwYAQrjX/29y+JSltBvc2dIrR0RyY74XsHIeXZ9SW1fRYEACuM
+ M+zrTOjWvXB2M2LVvLS++irtWyQMi68kv6nkhgzFovRgb76Lnsou1dwVQnSsCgw2+aMM
+ RDVYsywhQJ5lxu6dF60dGNfKkI4F4oRwkoTLrthCJSX1gMWQWftMMV0t077x/JOqfX67
+ cN8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=AWepJclKfiAgqPbSX9Qr68AN9+jPvNJVchxr+m/neyg=;
- b=Wrzr+AtToU0hUwetzwDN35i/f13Xz03Od1cmWChpYhtpgnPnxgCbDRk2OvHlBg83tU
- X/G9ictEOQDQupau3koxTOO3fVNLBojH2nbf6xoG+EfxcRLt3jH+Ilzn+L7qL37bPdpG
- z45sBuBUKBXVvfIPvlnR9Odi5zwoIAg0fpSOHtZX/eCLXH1kZr1i9vmgN7g+GjQWEC8u
- Y+BCBzmUyOBmRlIoPUmU9GEnyF24jEqhlBqvbYq0KvyI9XHiaJ9M1onoG//dvf0d1fQU
- oyDoDqOyRkvdav3OUCbQQfWpY6JV6aOC5O+9nMWBn3J0rmE+SINgoHyWM+Yq/89XdDTb
- gnzQ==
-X-Gm-Message-State: AOAM532/OuyueP1QWRaPkHdrbL58KiL0jWzPiLrqfWer6NZvYejsIGS+
- aeLse/lkJMTOe3ZVwoSNUNf6LermQ0damw==
-X-Google-Smtp-Source: ABdhPJzo/0yJme5lZisgA92dZ8ogifTeu6MabP+aXJMVSR0tfRARevb8sUkEDoudvAQNnYH2UnE0dQ==
-X-Received: by 2002:a1c:e403:: with SMTP id b3mr2883073wmh.79.1603209429793;
- Tue, 20 Oct 2020 08:57:09 -0700 (PDT)
+ bh=3DJEJXQVy0e3qPp5Ym6ZDssBuQPuQeXX0afaVS4fCT8=;
+ b=s9ZMDd0iSR06WrgmzmQo0Yt7z/qjsZdtvMKbTaSBj3GvY61hflEKUjhVNgQMcrxjqT
+ bdylqwckBkOQ02BnfR1aMC4dbBODcPKiCDty8VAJAN6KcnQEMXC6NgO7rnB2y+I91dfB
+ zG8XABFbd/oWM2Jg1jcg62gQriTO27eZ9kr9ZbxdgAXAC8x9DViyj/DD14Cqng6/WkGs
+ gab1bjjkeVe4wvbNLVHkhICcFdIbJfpPdOPzhSyHGtXGjBCoyqsea7eaIKnRIFoh9A49
+ zUBxNjNW06akhyfycpR4En68zLfSHYkXaeX1yBZOXFkjt2ImRW53ByPPis+jr7paNkGL
+ 07mg==
+X-Gm-Message-State: AOAM533mUdjjXMvoJE4HTUEs2nU37cP767JsX5RXqH38dyzfR6/cQn++
+ UXeWQ3TiR76bdauAH/BU9sAFJ+oiZr1TXA==
+X-Google-Smtp-Source: ABdhPJxdCBefMnOlng6LQUZhOxWF8dP5Q57jSL28pOD6zHFvj/YkcgqA+78Eoh8GeaRhUzi1jSsdbw==
+X-Received: by 2002:a5d:4f0b:: with SMTP id c11mr4204849wru.316.1603209433710; 
+ Tue, 20 Oct 2020 08:57:13 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.08
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.12
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:08 -0700 (PDT)
+ Tue, 20 Oct 2020 08:57:12 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 05/41] hw/timer/bcm2835: Introduce BCM2835_SYSTIMER_COUNT
- definition
-Date: Tue, 20 Oct 2020 16:56:20 +0100
-Message-Id: <20201020155656.8045-6-peter.maydell@linaro.org>
+Subject: [PULL 07/41] hw/timer/bcm2835: Support the timer COMPARE registers
+Date: Tue, 20 Oct 2020 16:56:22 +0100
+Message-Id: <20201020155656.8045-8-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
 References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::330;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::434;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -108,55 +107,178 @@ Sender: "Qemu-devel"
 
 From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Use the BCM2835_SYSTIMER_COUNT definition instead of the
-magic '4' value.
+This peripheral has 1 free-running timer and 4 compare registers.
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Only the free-running timer is implemented. Add support the
+COMPARE registers (each register is wired to an IRQ).
+
+Reference: "BCM2835 ARM Peripherals" datasheet [*]
+            chapter 12 "System Timer":
+
+  The System Timer peripheral provides four 32-bit timer channels
+  and a single 64-bit free running counter. Each channel has an
+  output compare register, which is compared against the 32 least
+  significant bits of the free running counter values. When the
+  two values match, the system timer peripheral generates a signal
+  to indicate a match for the appropriate channel. The match signal
+  is then fed into the interrupt controller.
+
+This peripheral is used since Linux 3.7, commit ee4af5696720
+("ARM: bcm2835: add system timer").
+
+[*] https://www.raspberrypi.org/app/uploads/2012/02/BCM2835-ARM-Peripherals.pdf
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201010203709.3116542-2-f4bug@amsat.org
+Reviewed-by: Luc Michel <luc@lmichel.fr>
+Message-id: 20201010203709.3116542-4-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/timer/bcm2835_systmr.h | 4 +++-
- hw/timer/bcm2835_systmr.c         | 3 ++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
+ include/hw/timer/bcm2835_systmr.h | 11 +++++--
+ hw/timer/bcm2835_systmr.c         | 48 ++++++++++++++++++++-----------
+ hw/timer/trace-events             |  6 ++--
+ 3 files changed, 44 insertions(+), 21 deletions(-)
 
 diff --git a/include/hw/timer/bcm2835_systmr.h b/include/hw/timer/bcm2835_systmr.h
-index 7ce8f6ef4d8..43df7ee488c 100644
+index f15788a78d8..bd3097d746b 100644
 --- a/include/hw/timer/bcm2835_systmr.h
 +++ b/include/hw/timer/bcm2835_systmr.h
-@@ -16,6 +16,8 @@
- #define TYPE_BCM2835_SYSTIMER "bcm2835-sys-timer"
- OBJECT_DECLARE_SIMPLE_TYPE(BCM2835SystemTimerState, BCM2835_SYSTIMER)
+@@ -11,6 +11,7 @@
  
-+#define BCM2835_SYSTIMER_COUNT 4
+ #include "hw/sysbus.h"
+ #include "hw/irq.h"
++#include "qemu/timer.h"
+ #include "qom/object.h"
+ 
+ #define TYPE_BCM2835_SYSTIMER "bcm2835-sys-timer"
+@@ -18,18 +19,24 @@ OBJECT_DECLARE_SIMPLE_TYPE(BCM2835SystemTimerState, BCM2835_SYSTIMER)
+ 
+ #define BCM2835_SYSTIMER_COUNT 4
+ 
++typedef struct {
++    unsigned id;
++    QEMUTimer timer;
++    qemu_irq irq;
++    BCM2835SystemTimerState *state;
++} BCM2835SystemTimerCompare;
 +
  struct BCM2835SystemTimerState {
      /*< private >*/
      SysBusDevice parent_obj;
-@@ -26,7 +28,7 @@ struct BCM2835SystemTimerState {
  
+     /*< public >*/
+     MemoryRegion iomem;
+-    qemu_irq irq;
+-
      struct {
-         uint32_t status;
--        uint32_t compare[4];
-+        uint32_t compare[BCM2835_SYSTIMER_COUNT];
+         uint32_t ctrl_status;
+         uint32_t compare[BCM2835_SYSTIMER_COUNT];
      } reg;
++    BCM2835SystemTimerCompare tmr[BCM2835_SYSTIMER_COUNT];
  };
  
+ #endif
 diff --git a/hw/timer/bcm2835_systmr.c b/hw/timer/bcm2835_systmr.c
-index 3387a6214a2..ff8c5536610 100644
+index b234e83824f..67669a57ff3 100644
 --- a/hw/timer/bcm2835_systmr.c
 +++ b/hw/timer/bcm2835_systmr.c
-@@ -134,7 +134,8 @@ static const VMStateDescription bcm2835_systmr_vmstate = {
-     .minimum_version_id = 1,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(reg.status, BCM2835SystemTimerState),
--        VMSTATE_UINT32_ARRAY(reg.compare, BCM2835SystemTimerState, 4),
-+        VMSTATE_UINT32_ARRAY(reg.compare, BCM2835SystemTimerState,
-+                             BCM2835_SYSTIMER_COUNT),
-         VMSTATE_END_OF_LIST()
-     }
- };
+@@ -28,20 +28,13 @@ REG32(COMPARE1,     0x10)
+ REG32(COMPARE2,     0x14)
+ REG32(COMPARE3,     0x18)
+ 
+-static void bcm2835_systmr_update_irq(BCM2835SystemTimerState *s)
++static void bcm2835_systmr_timer_expire(void *opaque)
+ {
+-    bool enable = !!s->reg.ctrl_status;
++    BCM2835SystemTimerCompare *tmr = opaque;
+ 
+-    trace_bcm2835_systmr_irq(enable);
+-    qemu_set_irq(s->irq, enable);
+-}
+-
+-static void bcm2835_systmr_update_compare(BCM2835SystemTimerState *s,
+-                                          unsigned timer_index)
+-{
+-    /* TODO fow now, since neither Linux nor U-boot use these timers. */
+-    qemu_log_mask(LOG_UNIMP, "COMPARE register %u not implemented\n",
+-                  timer_index);
++    trace_bcm2835_systmr_timer_expired(tmr->id);
++    tmr->state->reg.ctrl_status |= 1 << tmr->id;
++    qemu_set_irq(tmr->irq, 1);
+ }
+ 
+ static uint64_t bcm2835_systmr_read(void *opaque, hwaddr offset,
+@@ -75,19 +68,33 @@ static uint64_t bcm2835_systmr_read(void *opaque, hwaddr offset,
+ }
+ 
+ static void bcm2835_systmr_write(void *opaque, hwaddr offset,
+-                                 uint64_t value, unsigned size)
++                                 uint64_t value64, unsigned size)
+ {
+     BCM2835SystemTimerState *s = BCM2835_SYSTIMER(opaque);
++    int index;
++    uint32_t value = value64;
++    uint32_t triggers_delay_us;
++    uint64_t now;
+ 
+     trace_bcm2835_systmr_write(offset, value);
+     switch (offset) {
+     case A_CTRL_STATUS:
+         s->reg.ctrl_status &= ~value; /* Ack */
+-        bcm2835_systmr_update_irq(s);
++        for (index = 0; index < ARRAY_SIZE(s->tmr); index++) {
++            if (extract32(value, index, 1)) {
++                trace_bcm2835_systmr_irq_ack(index);
++                qemu_set_irq(s->tmr[index].irq, 0);
++            }
++        }
+         break;
+     case A_COMPARE0 ... A_COMPARE3:
+-        s->reg.compare[(offset - A_COMPARE0) >> 2] = value;
+-        bcm2835_systmr_update_compare(s, (offset - A_COMPARE0) >> 2);
++        index = (offset - A_COMPARE0) >> 2;
++        s->reg.compare[index] = value;
++        now = qemu_clock_get_us(QEMU_CLOCK_VIRTUAL);
++        /* Compare lower 32-bits of the free-running counter. */
++        triggers_delay_us = value - now;
++        trace_bcm2835_systmr_run(index, triggers_delay_us);
++        timer_mod(&s->tmr[index].timer, now + triggers_delay_us);
+         break;
+     case A_COUNTER_LOW:
+     case A_COUNTER_HIGH:
+@@ -125,7 +132,14 @@ static void bcm2835_systmr_realize(DeviceState *dev, Error **errp)
+     memory_region_init_io(&s->iomem, OBJECT(dev), &bcm2835_systmr_ops,
+                           s, "bcm2835-sys-timer", 0x20);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->iomem);
+-    sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->irq);
++
++    for (size_t i = 0; i < ARRAY_SIZE(s->tmr); i++) {
++        s->tmr[i].id = i;
++        s->tmr[i].state = s;
++        sysbus_init_irq(SYS_BUS_DEVICE(dev), &s->tmr[i].irq);
++        timer_init_us(&s->tmr[i].timer, QEMU_CLOCK_VIRTUAL,
++                      bcm2835_systmr_timer_expire, &s->tmr[i]);
++    }
+ }
+ 
+ static const VMStateDescription bcm2835_systmr_vmstate = {
+diff --git a/hw/timer/trace-events b/hw/timer/trace-events
+index b996d992000..7a4326d9566 100644
+--- a/hw/timer/trace-events
++++ b/hw/timer/trace-events
+@@ -77,9 +77,11 @@ nrf51_timer_write(uint8_t timer_id, uint64_t addr, uint32_t value, unsigned size
+ nrf51_timer_set_count(uint8_t timer_id, uint8_t counter_id, uint32_t value) "timer %u counter %u count 0x%" PRIx32
+ 
+ # bcm2835_systmr.c
+-bcm2835_systmr_irq(bool enable) "timer irq state %u"
++bcm2835_systmr_timer_expired(unsigned id) "timer #%u expired"
++bcm2835_systmr_irq_ack(unsigned id) "timer #%u acked"
+ bcm2835_systmr_read(uint64_t offset, uint64_t data) "timer read: offset 0x%" PRIx64 " data 0x%" PRIx64
+-bcm2835_systmr_write(uint64_t offset, uint64_t data) "timer write: offset 0x%" PRIx64 " data 0x%" PRIx64
++bcm2835_systmr_write(uint64_t offset, uint32_t data) "timer write: offset 0x%" PRIx64 " data 0x%" PRIx32
++bcm2835_systmr_run(unsigned id, uint64_t delay_us) "timer #%u expiring in %"PRIu64" us"
+ 
+ # avr_timer16.c
+ avr_timer16_read(uint8_t addr, uint8_t value) "timer16 read addr:%u value:%u"
 -- 
 2.20.1
 
