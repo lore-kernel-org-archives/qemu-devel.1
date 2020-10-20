@@ -2,46 +2,46 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49C1C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:29:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A45B4C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:31:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3B11F20BED
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:29:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B11F20BED
+	by mail.kernel.org (Postfix) with ESMTPS id C34BE20BED
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:31:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C34BE20BED
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37546 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUrhj-0003OJ-8B
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:29:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50536)
+	id 1kUrjw-0004vw-KE
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:31:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU5-0000IF-HL; Tue, 20 Oct 2020 09:15:27 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48348 helo=huawei.com)
+ id 1kUrU9-0000N4-5z; Tue, 20 Oct 2020 09:15:29 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:5193 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU0-00076n-NW; Tue, 20 Oct 2020 09:15:25 -0400
-Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 589CC7F92F8E822A84E4;
- Tue, 20 Oct 2020 21:15:10 +0800 (CST)
-Received: from localhost (10.174.186.67) by DGGEMS401-HUB.china.huawei.com
- (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 21:15:02 +0800
+ id 1kUrU0-00076T-Oc; Tue, 20 Oct 2020 09:15:28 -0400
+Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id 46BB0DECF2B6B2EFEA11;
+ Tue, 20 Oct 2020 21:15:07 +0800 (CST)
+Received: from localhost (10.174.186.67) by DGGEMS411-HUB.china.huawei.com
+ (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
+ 21:15:00 +0800
 From: Ying Fang <fangying1@huawei.com>
 To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH v2 07/13] hw/arm/virt-acpi-build: distinguish possible and
- present cpus Message
-Date: Tue, 20 Oct 2020 21:14:34 +0800
-Message-ID: <20201020131440.1090-8-fangying1@huawei.com>
+Subject: [RFC PATCH v2 03/13] hw/arm/virt: Replace smp_parse with one that
+ prefers cores
+Date: Tue, 20 Oct 2020 21:14:30 +0800
+Message-ID: <20201020131440.1090-4-fangying1@huawei.com>
 X-Mailer: git-send-email 2.28.0.windows.1
 In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
 References: <20201020131440.1090-1-fangying1@huawei.com>
@@ -50,9 +50,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.67]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=fangying1@huawei.com;
  helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:04:17
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:15:07
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -74,84 +74,126 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: peter.maydell@linaro.org, drjones@redhat.com,
  zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, alistair.francis@wdc.com,
- Ying Fang <fangying1@huawei.com>, imammedo@redhat.com
+ qemu-arm@nongnu.org, alistair.francis@wdc.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When building ACPI tables regarding CPUs we should always build
-them for the number of possible CPUs, not the number of present
-CPUs. We then ensure only the present CPUs are enabled.
+From: Andrew Jones <drjones@redhat.com>
+
+The virt machine type has never used the CPU topology parameters, other
+than number of online CPUs and max CPUs. When choosing how to allocate
+those CPUs the default has been to assume cores. In preparation for
+using the other CPU topology parameters let's use an smp_parse that
+prefers cores over sockets. We can also enforce the topology matches
+max_cpus check because we have no legacy to preserve.
 
 Signed-off-by: Andrew Jones <drjones@redhat.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
 ---
- hw/arm/virt-acpi-build.c | 17 ++++++++++++-----
- 1 file changed, 12 insertions(+), 5 deletions(-)
+ hw/arm/virt.c | 76 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 76 insertions(+)
 
-diff --git a/hw/arm/virt-acpi-build.c b/hw/arm/virt-acpi-build.c
-index a222981737..fae5a26741 100644
---- a/hw/arm/virt-acpi-build.c
-+++ b/hw/arm/virt-acpi-build.c
-@@ -57,14 +57,18 @@
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index ea24b576c6..ba902b53ba 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -78,6 +78,8 @@
+ #include "hw/virtio/virtio-iommu.h"
+ #include "hw/char/pl011.h"
+ #include "qemu/guest-random.h"
++#include "qapi/qmp/qerror.h"
++#include "sysemu/replay.h"
  
- #define ARM_SPI_BASE 32
- 
--static void acpi_dsdt_add_cpus(Aml *scope, int cpus)
-+static void acpi_dsdt_add_cpus(Aml *scope, VirtMachineState *vms)
- {
-     uint16_t i;
-+    CPUArchIdList *possible_cpus = MACHINE(vms)->possible_cpus;
- 
--    for (i = 0; i < cpus; i++) {
-+    for (i = 0; i < possible_cpus->len; i++) {
-         Aml *dev = aml_device("C%.03X", i);
-         aml_append(dev, aml_name_decl("_HID", aml_string("ACPI0007")));
-         aml_append(dev, aml_name_decl("_UID", aml_int(i)));
-+        if (possible_cpus->cpus[i].cpu == NULL) {
-+            aml_append(dev, aml_name_decl("_STA", aml_int(0)));
-+        }
-         aml_append(scope, dev);
-     }
+ #define DEFINE_VIRT_MACHINE_LATEST(major, minor, latest) \
+     static void virt_##major##_##minor##_class_init(ObjectClass *oc, \
+@@ -2444,6 +2446,79 @@ static int virt_kvm_type(MachineState *ms, const char *type_str)
+     return requested_pa_size > 40 ? requested_pa_size : 0;
  }
-@@ -470,6 +474,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     const int *irqmap = vms->irqmap;
-     AcpiMadtGenericDistributor *gicd;
-     AcpiMadtGenericMsiFrame *gic_msi;
-+    int possible_cpus = MACHINE(vms)->possible_cpus->len;
-     int i;
  
-     acpi_data_push(table_data, sizeof(AcpiMultipleApicTable));
-@@ -480,7 +485,7 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-     gicd->base_address = cpu_to_le64(memmap[VIRT_GIC_DIST].base);
-     gicd->version = vms->gic_version;
- 
--    for (i = 0; i < MACHINE(vms)->smp.cpus; i++) {
-+    for (i = 0; i < possible_cpus; i++) {
-         AcpiMadtGenericCpuInterface *gicc = acpi_data_push(table_data,
-                                                            sizeof(*gicc));
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(i));
-@@ -495,7 +500,9 @@ build_madt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-         gicc->cpu_interface_number = cpu_to_le32(i);
-         gicc->arm_mpidr = cpu_to_le64(armcpu->mp_affinity);
-         gicc->uid = cpu_to_le32(i);
--        gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
-+        if (i < MACHINE(vms)->smp.cpus) {
-+            gicc->flags = cpu_to_le32(ACPI_MADT_GICC_ENABLED);
++/*
++ * Unlike smp_parse() in hw/core/machine.c, we prefer cores over sockets,
++ * e.g. '-smp 8' creates 1 socket with 8 cores.  Whereas '-smp 8' with
++ * hw/core/machine.c's smp_parse() creates 8 sockets, each with 1 core.
++ * Additionally, we can enforce the topology matches max_cpus check,
++ * because we have no legacy to preserve.
++ */
++static void virt_smp_parse(MachineState *ms, QemuOpts *opts)
++{
++    if (opts) {
++        unsigned cpus    = qemu_opt_get_number(opts, "cpus", 0);
++        unsigned sockets = qemu_opt_get_number(opts, "sockets", 0);
++        unsigned cores   = qemu_opt_get_number(opts, "cores", 0);
++        unsigned threads = qemu_opt_get_number(opts, "threads", 0);
++
++        /*
++         * Compute missing values; prefer cores over sockets and
++         * sockets over threads.
++         */
++        if (cpus == 0 || cores == 0) {
++            sockets = sockets > 0 ? sockets : 1;
++            threads = threads > 0 ? threads : 1;
++            if (cpus == 0) {
++                cores = cores > 0 ? cores : 1;
++                cpus = cores * threads * sockets;
++            } else {
++                ms->smp.max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
++                cores = ms->smp.max_cpus / (sockets * threads);
++            }
++        } else if (sockets == 0) {
++            threads = threads > 0 ? threads : 1;
++            sockets = cpus / (cores * threads);
++            sockets = sockets > 0 ? sockets : 1;
++        } else if (threads == 0) {
++            threads = cpus / (cores * sockets);
++            threads = threads > 0 ? threads : 1;
++        } else if (sockets * cores * threads < cpus) {
++            error_report("cpu topology: "
++                         "sockets (%u) * cores (%u) * threads (%u) < "
++                         "smp_cpus (%u)",
++                         sockets, cores, threads, cpus);
++            exit(1);
 +        }
- 
-         if (arm_feature(&armcpu->env, ARM_FEATURE_PMU)) {
-             gicc->performance_interrupt = cpu_to_le32(PPI(VIRTUAL_PMU_IRQ));
-@@ -599,7 +606,7 @@ build_dsdt(GArray *table_data, BIOSLinker *linker, VirtMachineState *vms)
-      * the RTC ACPI device at all when using UEFI.
-      */
-     scope = aml_scope("\\_SB");
--    acpi_dsdt_add_cpus(scope, ms->smp.cpus);
-+    acpi_dsdt_add_cpus(scope, vms);
-     acpi_dsdt_add_uart(scope, &memmap[VIRT_UART],
-                        (irqmap[VIRT_UART] + ARM_SPI_BASE));
-     if (vmc->acpi_expose_flash) {
++
++        ms->smp.max_cpus = qemu_opt_get_number(opts, "maxcpus", cpus);
++
++        if (ms->smp.max_cpus < cpus) {
++            error_report("maxcpus must be equal to or greater than smp");
++            exit(1);
++        }
++
++        if (sockets * cores * threads != ms->smp.max_cpus) {
++            error_report("cpu topology: "
++                         "sockets (%u) * cores (%u) * threads (%u)"
++                         "!= maxcpus (%u)",
++                         sockets, cores, threads,
++                         ms->smp.max_cpus);
++            exit(1);
++        }
++
++        ms->smp.cpus = cpus;
++        ms->smp.cores = cores;
++        ms->smp.threads = threads;
++        ms->smp.sockets = sockets;
++    }
++
++    if (ms->smp.cpus > 1) {
++        Error *blocker = NULL;
++        error_setg(&blocker, QERR_REPLAY_NOT_SUPPORTED, "smp");
++        replay_add_blocker(blocker);
++    }
++}
++
+ static void virt_machine_class_init(ObjectClass *oc, void *data)
+ {
+     MachineClass *mc = MACHINE_CLASS(oc);
+@@ -2469,6 +2544,7 @@ static void virt_machine_class_init(ObjectClass *oc, void *data)
+     mc->cpu_index_to_instance_props = virt_cpu_index_to_props;
+     mc->default_cpu_type = ARM_CPU_TYPE_NAME("cortex-a15");
+     mc->get_default_cpu_node_id = virt_get_default_cpu_node_id;
++    mc->smp_parse = virt_smp_parse;
+     mc->kvm_type = virt_kvm_type;
+     assert(!mc->get_hotplug_handler);
+     mc->get_hotplug_handler = virt_machine_get_hotplug_handler;
 -- 
 2.23.0
 
