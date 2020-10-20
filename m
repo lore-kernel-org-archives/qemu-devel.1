@@ -2,176 +2,110 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1893C433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:37:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8A10C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:39:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0B89E20691
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:37:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 175E020691
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:39:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pA5FpX/S"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B89E20691
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=de.ibm.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jO13lW3j"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 175E020691
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37494 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUo5c-00072I-SL
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:37:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58786)
+	id 1kUo7R-00006w-3X
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:39:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kUo4D-0006PY-ML
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:36:29 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:7300)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <borntraeger@de.ibm.com>)
- id 1kUo4A-0006Qv-S6
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:36:29 -0400
-Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09K9XZtl125605; Tue, 20 Oct 2020 05:35:43 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=IE4tSXNgZJ/A/OkRNfld13XIrViGk4gj+u3fpAw7zwQ=;
- b=pA5FpX/SYFNG/j4PAa+nQoVumZiyGb3JF90uyEIknSgtd12LVxc04HsJI9owM/yssY5r
- FjKCGGXswJSADXtQhevOFhsag0y+6qhwG7rA0L1AA7/x6kzLfOzbp77Kd/dTjqmI3xa6
- GIkg4ISNyPriW1nYiPSlQO8JsDe5ysRFgavViGKLjd9jN3shFUq1pbTNNKng6/1yP9lP
- p4BGaYoYZ+StGxPgu1VxDCACzmY5L3BpN5nRhEhU25EH7SRFelnVkXVYdX6OQt80B3EZ
- gtnXDjCT2EBSFzk/wxtQSB41XU6HNDr4sGRekg2HbZcNiUCSBhRMKdNw6Ja/r3V8pgdl kw== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 349vw0h2rk-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 05:35:43 -0400
-Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09K9Xh4u126306;
- Tue, 20 Oct 2020 05:35:42 -0400
-Received: from ppma06ams.nl.ibm.com (66.31.33a9.ip4.static.sl-reverse.com
- [169.51.49.102])
- by mx0a-001b2d01.pphosted.com with ESMTP id 349vw0h2p0-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 05:35:42 -0400
-Received: from pps.filterd (ppma06ams.nl.ibm.com [127.0.0.1])
- by ppma06ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09K9RkDC007087;
- Tue, 20 Oct 2020 09:35:39 GMT
-Received: from b06cxnps3075.portsmouth.uk.ibm.com
- (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
- by ppma06ams.nl.ibm.com with ESMTP id 347qvhb2hf-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 09:35:39 +0000
-Received: from d06av25.portsmouth.uk.ibm.com (d06av25.portsmouth.uk.ibm.com
- [9.149.105.61])
- by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09K9ZbfV27001324
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 20 Oct 2020 09:35:37 GMT
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 2E3DD11C04A;
- Tue, 20 Oct 2020 09:35:37 +0000 (GMT)
-Received: from d06av25.portsmouth.uk.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id CEF2C11C050;
- Tue, 20 Oct 2020 09:35:35 +0000 (GMT)
-Received: from oc7455500831.ibm.com (unknown [9.145.169.37])
- by d06av25.portsmouth.uk.ibm.com (Postfix) with ESMTP;
- Tue, 20 Oct 2020 09:35:35 +0000 (GMT)
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To: Alexander Graf <graf@amazon.de>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
- Jann Horn <jannh@google.com>
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu>
- <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
- <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu>
- <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu>
- <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
- <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-From: Christian Borntraeger <borntraeger@de.ibm.com>
-Autocrypt: addr=borntraeger@de.ibm.com; prefer-encrypt=mutual; keydata=
- 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
- nS4h0HDFPrrp1C2EMVYIQrMokWvlFZbCpsdYbBI=
-Message-ID: <2e505365-db4a-6054-8bc8-f9a81978c6d4@de.ibm.com>
-Date: Tue, 20 Oct 2020 11:35:35 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.0
-In-Reply-To: <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-X-TM-AS-GCONF: 00
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUo6K-0007hG-V3
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:38:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36863)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUo6H-00072T-Pr
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:38:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603186716;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ih3MpF1Vyc5Pv3YO23GDQCjq/HmmY5DIbkKaS/6NuUU=;
+ b=jO13lW3jpfoORpl5Kysp5tG8WVWOnMOy6E/8ENVHiW+P23GI31GZ3Jeh91AC8vvssiwdrG
+ zNu5RhKc8ns0qyfc6AisU72PJJM/e4ZHS+UQZ54ACTvuQofgyf2jQ6YMrC1E6q8yTgkYUJ
+ o8ORkFUY2VCl+qYg5aI5YQEQKghWtWk=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-112-pmgaNX1lP0m_qNsuLWcMTg-1; Tue, 20 Oct 2020 05:38:33 -0400
+X-MC-Unique: pmgaNX1lP0m_qNsuLWcMTg-1
+Received: by mail-wr1-f70.google.com with SMTP id m20so567751wrb.21
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 02:38:32 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:from:to:references:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Ih3MpF1Vyc5Pv3YO23GDQCjq/HmmY5DIbkKaS/6NuUU=;
+ b=oK5GcEcVLqXXoaYtYeuIhuJhRqEbUXZGSKGX/mOt3HBJdQc9RSqkOt7R48RlyrUH4f
+ ekk3YkkGyUtLlMEzl+THl7pdhvQ5bIThcLTNuebwkP+XQRIW5fJcO42rlMCE3JQormUq
+ MnwsiCymakxoRcKXz+jY3+Rey8qwNGlG5LpzqUJ8YQ4nAVShdvnY0ss3IajPbFv9udp8
+ GvKciHPDCd/X90ilF7BaBhHGsn9ypNYHR/fNOof+jUsFliQ/PSnxnDdyfTLfcqZFRDOK
+ aS7rbLUXydvWuo4G/chNRg9pa+/jRQetbPsBNt7BShrrAQStUkmecXA4h3exCkTzINH7
+ gnDQ==
+X-Gm-Message-State: AOAM531avMRgsxJgiEEaCOKCHmMXoCoLiZu6RDPOafZm0RRGkitao4tB
+ lZxHRHo7lznfWVuwY6Ib8v5rGurb9Mkp/i2l/6JWZVPHcnNS163lRkWDaOGDYtQ/Kh5KlvI5FVK
+ Q3o17F15wdYNS12k=
+X-Received: by 2002:a5d:6110:: with SMTP id v16mr2634436wrt.219.1603186711547; 
+ Tue, 20 Oct 2020 02:38:31 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzZsyHAg+PaiDMK9wee+fT+M1mgMj7menyYCrg/QkzhhUzswNHbgBa1Al+is9PR0zBgVyWfRg==
+X-Received: by 2002:a5d:6110:: with SMTP id v16mr2634418wrt.219.1603186711285; 
+ Tue, 20 Oct 2020 02:38:31 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id 71sm2243859wrm.20.2020.10.20.02.38.29
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Oct 2020 02:38:30 -0700 (PDT)
+Subject: Re: roms/efirom, tests/uefi-test-tools: update edk2's own submodules
+ first
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+To: Olaf Hering <olaf@aepfle.de>, Laszlo Ersek <lersek@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201020091605.GA2301@aepfle.de>
+ <3fc07eb7-f99a-516b-9bb9-e48049547928@redhat.com>
+Message-ID: <d5ac98d6-0fdb-1bbf-bb29-4e23bc364078@redhat.com>
+Date: Tue, 20 Oct 2020 11:38:29 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.687
- definitions=2020-10-20_04:2020-10-20,
- 2020-10-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- suspectscore=0 phishscore=0
- lowpriorityscore=0 clxscore=1011 malwarescore=0 impostorscore=0
- bulkscore=0 spamscore=0 priorityscore=1501 mlxscore=0 adultscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010200064
-Received-SPF: pass client-ip=148.163.156.1;
- envelope-from=borntraeger@de.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 05:36:13
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+In-Reply-To: <3fc07eb7-f99a-516b-9bb9-e48049547928@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -184,185 +118,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: KVM list <kvm@vger.kernel.org>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, ghammer@redhat.com,
- "Weiss, Radu" <raduweis@amazon.com>, Qemu Developers <qemu-devel@nongnu.org>,
- "open list:VIRTIO GPU DRIVER" <virtualization@lists.linux-foundation.org>,
- Pavel Machek <pavel@ucw.cz>, linux-s390 <linux-s390@vger.kernel.org>,
- Colm MacCarthaigh <colmmacc@amazon.com>, Jonathan Corbet <corbet@lwn.net>,
- mpe@ellerman.id.au, "Michael S. Tsirkin" <mst@redhat.com>,
- Eric Biggers <ebiggers@kernel.org>, "Singh, Balbir" <sblbir@amazon.com>,
- bonzini@gnu.org, oridgar@gmail.com, "Catangiu,
- Adrian Costin" <acatan@amazon.com>, Andy Lutomirski <luto@kernel.org>,
- Michal Hocko <mhocko@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- kernel list <linux-kernel@vger.kernel.org>,
- Linux API <linux-api@vger.kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Willy Tarreau <w@1wt.eu>, "Woodhouse, David" <dwmw@amazon.co.uk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/20/20 11:29 AM, Philippe Mathieu-Daudé wrote:
+> Hi Olaf,
+> 
+> On 10/20/20 11:16 AM, Olaf Hering wrote:
+>> This is about qemu.git#ec87b5daca761039bbcf781eedbe4987f790836f
+>>
+>> On Mon, Sep 07, Laszlo Ersek wrote:
+>>
+>>> In edk2 commit 06033f5abad3 ("BaseTools: Make brotli a submodule",
+>>> 2020-04-16), part of edk2-stable202005, the Brotli compressor /
+>>> decompressor source code that edk2 had flattened into BaseTools was
+>>> replaced with a git submodule.
+>>>
+>>> This means we have to initialize edk2's own submodules before building
+>>> BaseTools not just in "roms/Makefile.edk2", but in "roms/Makefile" (for
+>>> the sake of the "efirom" target) and "tests/uefi-test-tools/Makefile" as
+>>> well.
+>>
+>>> +++ b/roms/Makefile
+>>>   edk2-basetools:
+>>> +    cd edk2/BaseTools && git submodule update --init --force
+>>>   build-edk2-tools:
+>>> +    cd $(edk2_dir)/BaseTools && git submodule update --init --force
+>>
+>>
+>> This change can not possibly be correct.
+>>
+>> With current qemu.git#master one is forced to have network access to
+>> build the roms. This fails with exported (and complete) sources in an
+>> offline environment.
+> 
+> The EDK2 roms are only used for testing, we certainly don't want them
+> to be used by distributions. I suppose the question is "why is this
+> rule called if tests are not built?".
+> 
+>> Please revert this patch.
 
+Maybe to clarify the use of this submodule:
 
-On 17.10.20 20:09, Alexander Graf wrote:
-> Hi Jason,
-> 
-> On 17.10.20 15:24, Jason A. Donenfeld wrote:
->>
->> After discussing this offline with Jann a bit, I have a few general
->> comments on the design of this.
->>
->> First, the UUID communicated by the hypervisor should be consumed by
->> the kernel -- added as another input to the rng -- and then userspace
-> 
-> We definitely want a kernel internal notifier as well, yes :).
-> 
->> should be notified that it should reseed any userspace RNGs that it
->> may have, without actually communicating that UUID to userspace. IOW,
-> 
-> I also tend to agree that it makes sense to disconnect the actual UUID we receive from the notification to user space. This would allow us to create a generic mechanism for VM save/restore cycles across different hypervisors. Let me add PPC and s390x people to the CC list to see whether they have anything remotely similar to the VmGenID mechanism. For x86 and aarch64, the ACPI and memory based VmGenID implemented here is the most obvious option to implement IMHO. It's also already implemented in all major hypervisors.
+-- >8 --
+Author: Philippe Mathieu-Daudé <philmd@redhat.com>
+Date:   Tue Oct 20 11:33:22 2020 +0200
 
-Hmm, what we do have configurations (e.g. stfle bits) and we do have a notification mechanism via sclp that notifies guests when things change.
-As of today neither KVM nor Linux implement the sclp change notification mechanism, but I do see value in such a thing.
+     EDK2 submodule should only be used for testing QEMU
 
-> 
->> I agree with Jann there. Then, it's the functioning of this
->> notification mechanism to userspace that is interesting to me.
-> 
-> Absolutely! Please have a look at the previous discussion here:
-> 
-> 
-> https://lore.kernel.org/linux-pm/B7793B7A-3660-4769-9B9A-FFCF250728BB@amazon.com/
-> 
-> The user space interface is absolutely what this is about.
+     Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Yes. Passing a notification to userspace is essential. Where I do not see a solution yet is the race between notification and
-already running with the old knowledge.
-> 
->> There are a few design goals of notifying userspace: it should be
->> fast, because people who are using userspace RNGs are usually doing so
->> in the first place to completely avoid syscall overhead for whatever
->> high performance application they have - e.g. I recall conversations
->> with Colm about his TLS implementation needing to make random IVs
->> _really_ fast. It should also happen as early as possible, with no
->> race or as minimal as possible race window, so that userspace doesn't
->> begin using old randomness and then switch over after the damage is
->> already done.
-> 
-> There are multiple facets and different types of consumers here. For a user space RNG, I agree that fast and as race free as possible is key. That's what the mmap interface is there for.
-> 
-> There are applications way beyond that though. What do you do with applications that already consumed randomness? For example a cached pool of SSL keys. Or a higher level language primitive that consumes randomness and caches its seed somewhere in an internal data structure. Or even worse: your system's host ssh key.
-> 
-> For those types of events, an mmap (or vDSO) interface does not work. We need to actively allow user space applications to readjust to the new environment - either internally (the language primitive case) or through a system event, maybe even as systemd trigger (the ssh host key case).
-> 
-> To give everyone enough time before we consider a system as "updated to the new environment", we have the callback logic with the "Orchestrator" that can check whether all listeners to system wide updates confirms they adjusted themselves.
-> 
-> That's what the rest of the logic is there for: A read+poll interface and all of the orchestration logic. It's not for the user space RNG case, it's for all of its downstream users.
-> 
->> I'm also not wedded to using Microsoft's proprietary hypervisor design
->> for this. If we come up with a better interface, I don't think it's
->> asking too much to implement that and reasonably expect for Microsoft
->> to catch up. Maybe someone here will find that controversial, but
->> whatever -- discussing ideal designs does not seem out of place or
->> inappropriate for how we usually approach things in the kernel, and a
->> closed source hypervisor coming along shouldn't disrupt that.
-> 
-> The main bonus point on this interface is that Hyper-V, VMware and QEMU implement it already. It would be a very natural for into the ecosystem. I agree though that we shouldn't have our user space interface necessarily dictated by it: Other hypervisors may implement different ways such as a simple edge IRQ that gets triggered whenever the VM gets resumed.
-> 
->> So, anyway, here are a few options with some pros and cons for the
->> kernel notifying userspace that its RNG should reseed.
-> 
-> I can only stress again that we should not be laser focused on the RNG case. In a lot of cases, data has already been generated by the RNG before the snapshot and needs to be reinitialized after the snapshot. In other cases such as system UUIDs, it's completely orthogonal to the RNG.
-> 
->>
->> 1. SIGRND - a new signal. Lol.
-> 
-> Doable, but a lot of plumbing in user space. It's also not necessarily a good for for event notification in most user space applications.
-> 
->>
->> 2. Userspace opens a file descriptor that it can epoll on. Pros are
->> that many notification mechanisms already use this. Cons is that this
->> requires syscall and might be more racy than we want. Another con is
->> that this a new thing for userspace programs to do.
-> 
-> That's part of what this patch does, right? This patch implements read+poll as well as mmap() for high speed reads.
-> 
->> 3. We stick an atomic counter in the vDSO, Jann's suggestion. Pros are
->> that this is extremely fast, and also simple to use and implement.
->> There are enough sequence points in typical crypto programs that
->> checking to see whether this counter has changed before doing whatever
->> operation seems easy enough. Cons are that typically we've been
->> conservative about adding things to the vDSO, and this is also a new
->> thing for userspace programs to do.
-> 
-> The big con is that its use is going to be super limited to applications that can be adapted to check their "vm generation" through a vDSO call / read every time they consume data that may potentially need to be regenerated.
-> 
-> This probably works for the pure RNG case. It falls apart for more sophisticated things such as "redo my ssh host keys and restart the service" or "regenerate my samba machine uuid".
-> 
->> 4. We already have a mechanism for this kind of thing, because the
->> same issue comes up when fork()ing. The solution was MADV_WIPEONFORK,
->> where userspace marks a page to be zeroed when forking, for the
->> purposes of the RNG being notified when its world gets split in two.
->> This is basically the same thing as we're discussing here with guest
->> snapshots, except it's on the system level rather than the process
->> level, and a system has many processes. But the problem space is still
->> almost the same, and we could simply reuse that same mechanism. There
->> are a few implementation strategies for that:
-> 
-> Yup, that's where we started from :). And then we ran into resistance by the mm people (on CC here). And then we looked at the problem more in depth and checked what it would take to for example implement this for user space RNGs in Java. It's ... more complicated than one may think at first.
-> 
->> 4a. We mess with the PTEs of all processes' pages that are
->> MADV_WIPEONFORK, like fork does now, when the hypervisor notifies us
->> to do so. Then we wind up reusing the already existing logic for
->> userspace RNGs. Cons might be that this usually requires semaphores,
->> and we're in irq context, so we'd have to hoist to a workqueue, which
->> means either more wake up latency, or a larger race window.
->>
->> 4b. We just memzero all processes' pages that are MADV_WIPEONFORK,
->> when the hypervisor notifies us to do so. Then we wind up reusing the
->> already existing logic for userspace RNGs.
->>
->> 4c. The guest kernel maintains an array of physical addresses that are
->> MADV_WIPEONFORK. The hypervisor knows about this array and its
->> location through whatever protocol, and before resuming a
->> moved/snapshotted/duplicated VM, it takes the responsibility for
->> memzeroing this memory. The huge pro here would be that this
->> eliminates all races, and reduces complexity quite a bit, because the
->> hypervisor can perfectly synchronize its bringup (and SMP bringup)
->> with this, and it can even optimize things like on-disk memory
->> snapshots to simply not write out those pages to disk.
->>
->> A 4c-like approach seems like it'd be a lot of bang for the buck -- we
->> reuse the existing mechanism (MADV_WIPEONFORK), so there's no new
->> userspace API to deal with, and it'd be race free, and eliminate a lot
->> of kernel complexity.
->>
->> But 4b and 3 don't seem too bad either.
->>
->> Any thoughts on 4c? Is that utterly insane, or does that actually get
->> us somewhere close to what we want?
-> 
-> All of the options for "4" are possible and have an RFC out. Please check out the discussion linked above :).
-> 
-> The problem with anything that relies on close loop reads (options 3+4) is not going to work well with the more sophisticated use case of derived data.
-> 
-> IMHO it will boil down to "both". We will need a high-speed interface that with close-to-0 overhead tells you either the generation ID or clears pages (options 3+4) as well as something that is bigger for applications that can either intrinsically (sshd) or by system design (Java) not adopt the mechanisms above easily.
-> 
-> That said, we need to start somewhere. I don't mind which angle we start from. But this is a real world problem and one that will only become more prevalent over time as VMs are used for more than only your traditional enterprise hardware consolidation.
-> 
-> 
-> Alex
-> 
-> 
-> 
-> Amazon Development Center Germany GmbH
-> Krausenstr. 38
-> 10117 Berlin
-> Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-> Eingetragen am Amtsgericht Charlottenburg unter HRB 149173 B
-> Sitz: Berlin
-> Ust-ID: DE 289 237 879
-> 
-> 
+diff --git a/.gitmodules b/.gitmodules
+index 2bdeeacef88..dd9b5ed03e1 100644
+--- a/.gitmodules
++++ b/.gitmodules
+@@ -47,7 +47,7 @@
+         path = tests/fp/berkeley-softfloat-3
+         url = https://git.qemu.org/git/berkeley-softfloat-3.git
+  [submodule "roms/edk2"]
+-       path = roms/edk2
++       path = 
+roms/edk2-unsafe-with-all-security-features-disabled-only-usable-for-testing
+         url = https://git.qemu.org/git/edk2.git
+  [submodule "slirp"]
+         path = slirp
+diff --git a/MAINTAINERS b/MAINTAINERS
+index a7f0acf8663..35f977efbcc 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -2732,7 +2732,7 @@ S: Supported
+  F: pc-bios/descriptors/??-edk2-*.json
+  F: pc-bios/edk2-*
+  F: roms/Makefile.edk2
+-F: roms/edk2
++F: 
+roms/edk2-unsafe-with-all-security-features-disabled-only-usable-for-testing
+  F: roms/edk2-*
+  F: tests/data/uefi-boot-images/
+  F: tests/uefi-test-tools/
+diff --git a/roms/edk2 
+b/roms/edk2-unsafe-with-all-security-features-disabled-only-usable-for-testing
+similarity index 100%
+rename from roms/edk2
+rename to 
+roms/edk2-unsafe-with-all-security-features-disabled-only-usable-for-testing
+---
+
 
