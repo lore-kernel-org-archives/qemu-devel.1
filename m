@@ -7,41 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B451FC433DF
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:16:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 243EAC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:17:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3EA4D222E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:16:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3EA4D222E9
+	by mail.kernel.org (Postfix) with ESMTPS id A3EEA2223C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 03:17:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A3EEA2223C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUi8W-0005C0-BJ
-	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:16:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41570)
+	id 1kUi9L-0006X5-MH
+	for qemu-devel@archiver.kernel.org; Mon, 19 Oct 2020 23:17:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41532)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUi4J-0000Hr-9d; Mon, 19 Oct 2020 23:12:11 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5258 helo=huawei.com)
+ id 1kUi4H-0000FC-TR; Mon, 19 Oct 2020 23:12:09 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:42920 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yubihong@huawei.com>)
- id 1kUi4H-0005EJ-7s; Mon, 19 Oct 2020 23:12:10 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id E8A996BAF2C39A56581D;
- Tue, 20 Oct 2020 11:12:04 +0800 (CST)
+ id 1kUi4E-0005Cx-Fb; Mon, 19 Oct 2020 23:12:09 -0400
+Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id EB88F645E52794F0B16F;
+ Tue, 20 Oct 2020 11:11:59 +0800 (CST)
 Received: from huawei.com (10.175.124.27) by DGGEMS403-HUB.china.huawei.com
  (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
  11:11:54 +0800
 From: Bihong Yu <yubihong@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH v3 4/8] migration: Open brace '{' following struct go on the
- same line
-Date: Tue, 20 Oct 2020 11:10:44 +0800
-Message-ID: <1603163448-27122-5-git-send-email-yubihong@huawei.com>
+Subject: [PATCH v3 3/8] migration: Add spaces around operator
+Date: Tue, 20 Oct 2020 11:10:43 +0800
+Message-ID: <1603163448-27122-4-git-send-email-yubihong@huawei.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1603163448-27122-1-git-send-email-yubihong@huawei.com>
 References: <1603163448-27122-1-git-send-email-yubihong@huawei.com>
@@ -49,7 +48,7 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-Originating-IP: [10.175.124.27]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=yubihong@huawei.com;
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=yubihong@huawei.com;
  helo=huawei.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/19 22:24:46
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
@@ -82,23 +81,98 @@ Signed-off-by: Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ migration/migration.c    |  4 ++--
+ migration/postcopy-ram.c |  2 +-
+ migration/ram.c          |  2 +-
+ migration/savevm.c       |  2 +-
+ migration/vmstate.c      | 10 +++++-----
+ 5 files changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index deb411a..99784b4 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -124,8 +124,7 @@ struct MigrationClass {
-     DeviceClass parent_class;
- };
+diff --git a/migration/migration.c b/migration/migration.c
+index 0575ecb..e050f57 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -2478,8 +2478,8 @@ static void migrate_handle_rp_req_pages(MigrationState *ms, const char* rbname,
+      * Since we currently insist on matching page sizes, just sanity check
+      * we're being asked for whole host pages.
+      */
+-    if (start & (our_host_ps-1) ||
+-       (len & (our_host_ps-1))) {
++    if (start & (our_host_ps - 1) ||
++       (len & (our_host_ps - 1))) {
+         error_report("%s: Misaligned page request, start: " RAM_ADDR_FMT
+                      " len: %zd", __func__, start, len);
+         mark_source_rp_bad(ms);
+diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
+index 0a2f88a8..eea92bb 100644
+--- a/migration/postcopy-ram.c
++++ b/migration/postcopy-ram.c
+@@ -403,7 +403,7 @@ bool postcopy_ram_supported_by_host(MigrationIncomingState *mis)
+                      strerror(errno));
+         goto out;
+     }
+-    g_assert(((size_t)testarea & (pagesize-1)) == 0);
++    g_assert(((size_t)testarea & (pagesize - 1)) == 0);
  
--struct MigrationState
--{
-+struct MigrationState {
-     /*< private >*/
-     DeviceState parent_obj;
+     reg_struct.range.start = (uintptr_t)testarea;
+     reg_struct.range.len = pagesize;
+diff --git a/migration/ram.c b/migration/ram.c
+index 6ed4f9e..0aea78f 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -1563,7 +1563,7 @@ int ram_save_queue_pages(const char *rbname, ram_addr_t start, ram_addr_t len)
+         rs->last_req_rb = ramblock;
+     }
+     trace_ram_save_queue_pages(ramblock->idstr, start, len);
+-    if (start+len > ramblock->used_length) {
++    if (start + len > ramblock->used_length) {
+         error_report("%s request overrun start=" RAM_ADDR_FMT " len="
+                      RAM_ADDR_FMT " blocklen=" RAM_ADDR_FMT,
+                      __func__, start, len, ramblock->used_length);
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d2e141f..b21f1c1 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -521,7 +521,7 @@ static const VMStateDescription vmstate_configuration = {
+         VMSTATE_VBUFFER_ALLOC_UINT32(name, SaveState, 0, NULL, len),
+         VMSTATE_END_OF_LIST()
+     },
+-    .subsections = (const VMStateDescription*[]) {
++    .subsections = (const VMStateDescription *[]) {
+         &vmstate_target_page_bits,
+         &vmstate_capabilites,
+         &vmstate_uuid,
+diff --git a/migration/vmstate.c b/migration/vmstate.c
+index bafa890..e9d2aef 100644
+--- a/migration/vmstate.c
++++ b/migration/vmstate.c
+@@ -32,13 +32,13 @@ static int vmstate_n_elems(void *opaque, const VMStateField *field)
+     if (field->flags & VMS_ARRAY) {
+         n_elems = field->num;
+     } else if (field->flags & VMS_VARRAY_INT32) {
+-        n_elems = *(int32_t *)(opaque+field->num_offset);
++        n_elems = *(int32_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT32) {
+-        n_elems = *(uint32_t *)(opaque+field->num_offset);
++        n_elems = *(uint32_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT16) {
+-        n_elems = *(uint16_t *)(opaque+field->num_offset);
++        n_elems = *(uint16_t *)(opaque + field->num_offset);
+     } else if (field->flags & VMS_VARRAY_UINT8) {
+-        n_elems = *(uint8_t *)(opaque+field->num_offset);
++        n_elems = *(uint8_t *)(opaque + field->num_offset);
+     }
  
+     if (field->flags & VMS_MULTIPLY_ELEMENTS) {
+@@ -54,7 +54,7 @@ static int vmstate_size(void *opaque, const VMStateField *field)
+     int size = field->size;
+ 
+     if (field->flags & VMS_VBUFFER) {
+-        size = *(int32_t *)(opaque+field->size_offset);
++        size = *(int32_t *)(opaque + field->size_offset);
+         if (field->flags & VMS_MULTIPLY) {
+             size *= field->size;
+         }
 -- 
 1.8.3.1
 
