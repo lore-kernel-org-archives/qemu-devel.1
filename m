@@ -2,82 +2,108 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FBFAC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:21:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C2DCC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:32:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46597222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:21:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46597222C8
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id C9D51206DD
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:32:30 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ipQ4Dwfp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9D51206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUz4R-000715-Ur
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 17:21:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36476)
+	id 1kUzF7-0000rL-JI
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 17:32:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38278)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kUz3f-0006St-JK
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:20:39 -0400
-Received: from indium.canonical.com ([91.189.90.7]:41314)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kUz3d-0005Oa-CS
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:20:39 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kUz3b-0000iP-Bi
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 21:20:35 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 561B82E80AB
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 21:20:35 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUzDi-00007a-NZ
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:31:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29256)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kUzDb-0006hM-Jq
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:31:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603229452;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=0tqzKZskTJk/TP19maEsUbn5Y2e6JitJZMQA3Z8uknw=;
+ b=ipQ4DwfpY7I/OcwtjspKBDGkroEn9oHm4pt8CpXTNti127vV+shptSElH/SR9fnjCCzNGU
+ MlfzYrDNfHJaXTsJBiTzgQCfxFdc18L5deyTvbabLSA+c19Yjcp4nUlUToJ2XQPjG2h0uI
+ GFNVFI2qKrYckx81Ab52J3J5ZO/G2sA=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-421-u5KCRnmEPQCULN4MJwTM-A-1; Tue, 20 Oct 2020 17:30:51 -0400
+X-MC-Unique: u5KCRnmEPQCULN4MJwTM-A-1
+Received: by mail-qv1-f70.google.com with SMTP id k6so8013qvg.9
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 14:30:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=0tqzKZskTJk/TP19maEsUbn5Y2e6JitJZMQA3Z8uknw=;
+ b=tYOEo9YOZ3bVphqIMaaUrRw8Q3Cel6spYiLhz3HuOEpBJzSg1gm4utryB2Hp0Qgs1X
+ OLuOtxU462uwUK5LG26TdyqqeMo4gFbiXlFibITOL1TMdscaXrxK+sUC1Q4+nieQhMWz
+ 5OYbHcg+DfW7N07S0960frh9BuGHnRC+leoUbGALL9F1IGkTdgoqYtUAaMn2uaztZppC
+ jb1AAZ4vD4KsytGVeoLVKzM04CjF9+zy9xXcE8xTYzbg/+mgFNBQRa8Pt1fPrB8/BCnr
+ iz1r7kPLrMK0eQHwx9QCvfbz2OgtXjjAxHX03JqZAOReXl349sjoveAwnEk6+3+VzBzj
+ 2rjA==
+X-Gm-Message-State: AOAM531ayllsqyYEAIRg+8VZT+jSDa1JW0pyti8IQC0D2p1DHjWTQbGL
+ p88VI9Oa/SCgvNQuGFcL5ftPFq2OWYOBYNgf5pAE4V1eo2GlckpbA52Gfx0rWlGY3OXgex2H0NZ
+ btkQpSBxkyXOxAlA=
+X-Received: by 2002:ae9:c310:: with SMTP id n16mr270530qkg.318.1603229450879; 
+ Tue, 20 Oct 2020 14:30:50 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzISUUV3meprK3VrG4Tp23PDeugF3vheEGp7b2CLGzret4raHnGu1Pu3I2p7GiEaYJsxtR9UQ==
+X-Received: by 2002:ae9:c310:: with SMTP id n16mr270493qkg.318.1603229450503; 
+ Tue, 20 Oct 2020 14:30:50 -0700 (PDT)
+Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
+ [174.95.215.133])
+ by smtp.gmail.com with ESMTPSA id f187sm95318qke.60.2020.10.20.14.30.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Oct 2020 14:30:49 -0700 (PDT)
+Date: Tue, 20 Oct 2020 17:30:48 -0400
+From: Peter Xu <peterx@redhat.com>
+To: David Hildenbrand <david@redhat.com>
+Subject: Re: [PATCH PROTOTYPE 4/6] memory: Extend
+ ram_block_discard_(require|disable) by two discard types
+Message-ID: <20201020213048.GG200400@xz-x1>
+References: <20200924160423.106747-1-david@redhat.com>
+ <20200924160423.106747-5-david@redhat.com>
+ <20201020191706.GB200400@xz-x1>
+ <ea4d0acb-7ee5-7a4b-61aa-f139e0cbf585@redhat.com>
+ <20201020204929.GF200400@xz-x1>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 20 Oct 2020 21:11:15 -0000
-From: Greg Zdanowski <1869006@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: arm passthrough tcg
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alex-l-williamson costinel dgilbert-h hrw kiler129
- pmaydell
-X-Launchpad-Bug-Reporter: Marcin Juszkiewicz (hrw)
-X-Launchpad-Bug-Modifier: Greg Zdanowski (kiler129)
-References: <158514404728.11288.8869885318197124821.malonedeb@soybean.canonical.com>
-Message-Id: <160322827600.14209.5000894015635345372.malone@gac.canonical.com>
-Subject: [Bug 1869006] Re: PCIe cards passthrough to TCG guest works on 2GB of
- guest memory but fails on 4GB (vfio_dma_map invalid arg)
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="82ef3cb779698368c64f0c310863c3535f60eea0"; Instance="production"
-X-Launchpad-Hash: cc6b3770fee288efaf95d5c910bfef1e3ae6ae3f
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 17:20:35
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201020204929.GF200400@xz-x1>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=peterx@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,103 +112,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1869006 <1869006@bugs.launchpad.net>
+Cc: Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
+ Luiz Capitulino <lcapitulino@redhat.com>, Auger Eric <eric.auger@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>, Igor Mammedov <imammedo@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-@alex-l-williamson: is there any safe(ish) way to ignore RMRR coming
-from BIOS?
+On Tue, Oct 20, 2020 at 04:49:29PM -0400, Peter Xu wrote:
+> On Tue, Oct 20, 2020 at 09:58:34PM +0200, David Hildenbrand wrote:
+> > I remember there were some !BQL users (but I might be confusing it with
+> > postcopy code that once used to inhibit the balloon without BQL). Will
+> > double-check. Simplifying it is certainly a good idea.
+> > 
+> > (we want to be able to check from virtio-balloon code repeatedly without
+> > taking a mutex over and over again :) )
+> 
+> Right.  Again I've no strong opinion so feel free to keep the codes as wish.
+> However if we'd go the other way (either BQL or another mutex) IMHO we can
+> simply read that flag directly without taking mutex.  IMHO here the mutex can
+> be used to protect write concurrency and should be enough. Considering that
+> this flag should rarely change and it should never flip (e.g., positive would
+> never go negative, and vise versa), then READ_ONCE() whould be safe enough on
+> read side (e.g., balloon).
 
-I don't know how IOMMU actually works in the kernel but theoretically if ke=
-rnel had a flag forcing it to ignore certain RMRRs? If I understand this co=
-rrectly ignoring an RMRR entry may cause two things:
-1) DMA failure if remapping is attempted
-2) If something (e.g. KVM) touches that region because we ignored RMRR the =
-device memory may get corrupted
+Btw, what we've discussed is all about serialzation of the flag.  I'm also
+thinking about whether we can make the flag clearer on what it means.  Frankly
+speaking on the first glance it confused me quite a bit..
 
-Linux already has mechanisms to ignore stubborn BIOSes (e.g. disabled
-x2APIC with no option to enable it in the BIOS).
+IMHO what we may want is not some complicated counter on "disablement", but
+some simple counters on "someone that provided the cap to discard pages", and
+"someone that won't work if we _might_ discard pages".  I'm thinking what if we
+split the "disable" counter into two:
 
+  - ram_discard_providers ("Who allows ram discard"): balloon, virtio-mem
 
-The only thing I'm worried about is the thing you said:
-> The more significant aspect when RMRRs are involved in this restriction i=
-s that an RMRR is
-> essentially the platform firmware dictating that the host OS must maintai=
-n an identity map
-> between the device and a range of physical address space. We don't know t=
-he purpose of that
-> mapping, but we can assume that it allows the device to provide ongoing d=
-ata for platform =
+  - ram_discard_opposers ("Who forbids ram discard"): vfio, rdma, ...
 
-> firmware to consume.
+The major benefit is, the counters should always be >=0, as what a usual
+counter would do.  Each device/caller should only/majorly increase the counter.
+Also we don't need the cmpxchg() loops too since the check is easier - just
+read the other side of the counters to know whether we should fail now.
 
-Does this mean that if a kernel is "blind" to a given RMRR region
-something else may break because these regions need to be treated in
-some special manner outside of not touching them for IOMMU?
+So after this patch to introduce "coordinated discards", the counters can also
+grows into four (we can still define some arrays):
 
--- =
+        |---------------------------+------------+-----------|
+        | counters                  | provider   | opposer   |
+        |---------------------------+------------+-----------|
+        | RAM_DISCARD_COORDINATED   | virtio-mem | rdma, ... |
+        | RAM_DISCARD_UNCOORDINATED | balloon    | vfio      |
+        |---------------------------+------------+-----------|
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1869006
+Some examples: for vfio, it only needs to make sure no UNCOORDINATE providers.
+For rdma, it needs to make sure no COORDINATE/UNCOORDINATE providers.  The
+check helper could simply be done using a similar ANY bitmask as introduced in
+the current patch.
 
-Title:
-  PCIe cards passthrough to TCG guest works on 2GB of guest memory but
-  fails on 4GB (vfio_dma_map invalid arg)
+Not sure whether this may help.
 
-Status in QEMU:
-  New
+Thanks,
 
-Bug description:
-  During one meeting coworker asked "did someone tried to passthrough
-  PCIe card to other arch guest?" and I decided to check it.
+-- 
+Peter Xu
 
-  Plugged SATA and USB3 controllers into spare slots on mainboard and
-  started playing. On 1GB VM instance it worked (both cold- and hot-
-  plugged). On 4GB one it did not:
-
-  B=C5=82=C4=85d podczas uruchamiania domeny: internal error: process exite=
-d while connecting to monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarc=
-h64: -device vfio-pci,host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D=
-0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  Traceback (most recent call last):
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 75, in cb_=
-wrapper
-      callback(asyncjob, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/asyncjob.py", line 111, in tm=
-pcb
-      callback(*args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/libvirtobject.py", lin=
-e 66, in newfn
-      ret =3D fn(self, *args, **kwargs)
-    File "/usr/share/virt-manager/virtManager/object/domain.py", line 1279,=
- in startup
-      self._backend.create()
-    File "/usr/lib64/python3.8/site-packages/libvirt.py", line 1234, in cre=
-ate
-      if ret =3D=3D -1: raise libvirtError ('virDomainCreate() failed', dom=
-=3Dself)
-  libvirt.libvirtError: internal error: process exited while connecting to =
-monitor: 2020-03-25T13:43:39.107524Z qemu-system-aarch64: -device vfio-pci,=
-host=3D0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: VFIO_MAP_DMA: -22
-  2020-03-25T13:43:39.107560Z qemu-system-aarch64: -device vfio-pci,host=3D=
-0000:29:00.0,id=3Dhostdev0,bus=3Dpci.3,addr=3D0x0: vfio 0000:29:00.0: faile=
-d to setup container for group 28: memory listener initialization failed: R=
-egion mach-virt.ram: vfio_dma_map(0x563169753c80, 0x40000000, 0x100000000, =
-0x7fb2a3e00000) =3D -22 (Invalid argument)
-
-  =
-
-  I played with memory and 3054 MB is maximum value possible to boot VM wit=
-h coldplugged host PCIe cards.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1869006/+subscriptions
 
