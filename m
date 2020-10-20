@@ -2,93 +2,79 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 639B5C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:26:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A356C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:28:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DB5A2223C
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:26:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E7E722247
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:28:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t8C/dkCs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DB5A2223C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XsD/gGK8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E7E722247
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43626 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuTM-00038o-KJ
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:26:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37722)
+	id 1kUuUu-0005LR-C6
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:28:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu14-0005F6-MX
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:38 -0400
-Received: from mail-wm1-x334.google.com ([2a00:1450:4864:20::334]:50247)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu12-0003vt-SQ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:38 -0400
-Received: by mail-wm1-x334.google.com with SMTP id 13so2340069wmf.0
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=452WvsOKSS6Cw7iRBfcJym1U9FO5tRal3JTyFbLON80=;
- b=t8C/dkCsqvyPn7dIL5MQ1+ppkufVbVX31PaNafhpFmVBC8FN2w+0XCGC/5v45J2kAe
- kQu3TrqlN1x8nyoduLBvZ7HJUyekjKqjoE+cQrvKa44lADmagVmha9I1cf386gJvKwcn
- NiMF8LiQiX7ke9DpL7b3nTi5+79TfKpx7aC4NcKTBwSqzIuL23mYiFlJZPm7cdB8tdn4
- L3MdV1O48E7ScmBGrqbeXGy1TRzOFhMa5iBXdJiA2fGqJTG/ogBoMlp+nF6r0t+iALQU
- /Q3hy2YhjUmf62WVtSZhelM69T0LK4Tn2lv2pQ1ToeG+FKm4zjLeQwxHfRsc8Cr2+njq
- vvhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=452WvsOKSS6Cw7iRBfcJym1U9FO5tRal3JTyFbLON80=;
- b=MjruZ9x2iNaLAq1sXVZMrpN9BvDtecjLSmxTFcQmdmaDmzNdFp7lqMEHnSZS5UyY9n
- dVBqBS5RnIqwL6pA5s9k3UWvswURw3wXXcu+eEMWddlimdnviww2P0cB1pxFe0UZWEuA
- atXFySdjmRbg9smETta7IDQKb1uQjSnq1fnkOgDSYyse+NWRF9g1se3CzTEtSj7WclOD
- qxJ14ndBk8R59NjW1nE+kcHLWY3VxZv1bPf7MHoEbAFfK/nSF5Vb+tSLfhpj0/ixNO+w
- PJvmPPAbsjjca5tiYjVjhMleATXS7zzuTHD99Ths/ij20/KvdxQt9lx8P8mgGxLsk9bP
- s8kA==
-X-Gm-Message-State: AOAM532uB6LAZIeti4rlEZsFKo2+9X49OlELYZ+mRdGHoA2WVSGhG7yO
- FrLNIQ/VD5QCgcqt41n+yEuD4Mt8YwJ+YA==
-X-Google-Smtp-Source: ABdhPJxqfsqKu4dgXXRcUtaqhSzCTKGcflmewb1l12iRqK/YK6gXZXcyvF5+nsBM4KiWNosWH7GWHA==
-X-Received: by 2002:a1c:8093:: with SMTP id b141mr3613022wmd.139.1603209455054; 
- Tue, 20 Oct 2020 08:57:35 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.33
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:34 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUu8S-0006aX-9R
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:05:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29267)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUu8P-0004px-US
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 12:05:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603209912;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:content-type:content-type;
+ bh=xbb6Dh3/er+Q2zbv5ZM5XUgt10YicpuOnxH31KDUi1k=;
+ b=XsD/gGK8CRxjnolxDqtChS1RMiOGGx3dD9ytj3NY7YJ8cFg9Vm8RzBQu8iGEa8XkPh1mtW
+ c8duVZ2f3Y0SL3I8hVO+Z0n3DK1jFlS2qa9p/FYkCfU5xNII+bMGeZuluZ1IwmDt/MrKa2
+ 4ecv9E6akGrea3kBOvtIaT6x98FvrOo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-505-6FBlK3QAOV-8dYPK5MpHSw-1; Tue, 20 Oct 2020 12:05:11 -0400
+X-MC-Unique: 6FBlK3QAOV-8dYPK5MpHSw-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15FD68030C4;
+ Tue, 20 Oct 2020 16:05:10 +0000 (UTC)
+Received: from thuth.com (dhcp-192-238.str.redhat.com [10.33.192.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DFFDA6EF62;
+ Tue, 20 Oct 2020 16:05:05 +0000 (UTC)
+From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 23/41] target/arm: Make the t32 insn[25:23]=111 group
- non-overlapping
-Date: Tue, 20 Oct 2020 16:56:38 +0100
-Message-Id: <20201020155656.8045-24-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
-References: <20201020155656.8045-1-peter.maydell@linaro.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::334;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x334.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Subject: [PATCH v2] Remove deprecated -no-kvm option
+Date: Tue, 20 Oct 2020 18:05:04 +0200
+Message-Id: <20201020160504.62460-1-thuth@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,87 +87,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "Daniel P . Berrange" <berrange@redhat.com>, qemu-trivial@nongnu.org,
+ Markus Armbruster <armbru@redhat.com>, libvir-list@redhat.com,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The t32 decode has a group which represents a set of insns
-which overlap with B_cond_thumb because they have [25:23]=111
-(which is an invalid condition code field for the branch insn).
-This group is currently defined using the {} overlap-OK syntax,
-but it is almost entirely non-overlapping patterns. Switch
-it over to use a non-overlapping group.
+The option has never been mentioned in our documentation, it's been
+deprecated since years, it's marked with QEMU_ARCH_I386 (which does
+not make sense anymore since KVM is available on other architectures,
+too), it does not do anything by default in upstream QEMU (since TCG
+is the default here anyway), and we're spending too much precious time
+each year discussing whether it makes sense to keep this option as a
+nice suger or not... let's finally put an end on this and remove it.
 
-For this to be valid syntactically, CPS must move into the same
-overlapping-group as the hint insns (CPS vs hints was the
-only actual use of the overlap facility for the group).
-
-The non-overlapping subgroup for CLREX/DSB/DMB/ISB/SB is no longer
-necessary and so we can remove it (promoting those insns to
-be members of the parent group).
-
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-id: 20201019151301.2046-5-peter.maydell@linaro.org
+Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- target/arm/t32.decode | 26 ++++++++++++--------------
- 1 file changed, 12 insertions(+), 14 deletions(-)
+ v2: Mention the parameter in the "removed feature" section (thanks Paolo!)
 
-diff --git a/target/arm/t32.decode b/target/arm/t32.decode
-index d8454bd814e..7d5e000e82c 100644
---- a/target/arm/t32.decode
-+++ b/target/arm/t32.decode
-@@ -296,8 +296,8 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
- {
-   # Group insn[25:23] = 111, which is cond=111x for the branch below,
-   # or unconditional, which would be illegal for the branch.
--  {
--    # Hints
-+  [
-+    # Hints, and CPS
-     {
-       YIELD      1111 0011 1010 1111 1000 0000 0000 0001
-       WFE        1111 0011 1010 1111 1000 0000 0000 0010
-@@ -310,20 +310,18 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-       # The canonical nop ends in 0000 0000, but the whole rest
-       # of the space is "reserved hint, behaves as nop".
-       NOP        1111 0011 1010 1111 1000 0000 ---- ----
-+
-+      # If imod == '00' && M == '0' then SEE "Hint instructions", above.
-+      CPS        1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
-+                 &cps
-     }
+ docs/system/deprecated.rst | 11 ++++++-----
+ qemu-options.hx            |  3 ---
+ softmmu/vl.c               |  4 ----
+ 3 files changed, 6 insertions(+), 12 deletions(-)
+
+diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
+index 905628f3a0..9bae13bc01 100644
+--- a/docs/system/deprecated.rst
++++ b/docs/system/deprecated.rst
+@@ -27,11 +27,6 @@ System emulator command line arguments
+ The ``enforce-config-section`` parameter is replaced by the
+ ``-global migration.send-configuration={on|off}`` option.
  
--    # If imod == '00' && M == '0' then SEE "Hint instructions", above.
--    CPS          1111 0011 1010 1111 1000 0 imod:2 M:1 A:1 I:1 F:1 mode:5 \
--                 &cps
+-``-no-kvm`` (since 1.3.0)
+-'''''''''''''''''''''''''
 -
-     # Miscellaneous control
--    [
--      CLREX      1111 0011 1011 1111 1000 1111 0010 1111
--      DSB        1111 0011 1011 1111 1000 1111 0100 ----
--      DMB        1111 0011 1011 1111 1000 1111 0101 ----
--      ISB        1111 0011 1011 1111 1000 1111 0110 ----
--      SB         1111 0011 1011 1111 1000 1111 0111 0000
--    ]
-+    CLREX        1111 0011 1011 1111 1000 1111 0010 1111
-+    DSB          1111 0011 1011 1111 1000 1111 0100 ----
-+    DMB          1111 0011 1011 1111 1000 1111 0101 ----
-+    ISB          1111 0011 1011 1111 1000 1111 0110 ----
-+    SB           1111 0011 1011 1111 1000 1111 0111 0000
+-The ``-no-kvm`` argument is now a synonym for setting ``-accel tcg``.
+-
+ ``-usbdevice`` (since 2.10.0)
+ '''''''''''''''''''''''''''''
  
-     # Note that the v7m insn overlaps both the normal and banked insn.
-     {
-@@ -351,7 +349,7 @@ CLZ              1111 1010 1011 ---- 1111 .... 1000 ....      @rdm
-     HVC          1111 0111 1110 ....  1000 .... .... ....     \
-                  &i imm=%imm16_16_0
-     UDF          1111 0111 1111 ----  1010 ---- ---- ----
--  }
-+  ]
-   B_cond_thumb   1111 0. cond:4 ...... 10.0 ............      &ci imm=%imm21
- }
+@@ -504,6 +499,12 @@ System emulator command line arguments
+ The ``name`` parameter of the ``-net`` option was a synonym
+ for the ``id`` parameter, which should now be used instead.
  
++``-no-kvm`` (removed in 5.2)
++''''''''''''''''''''''''''''
++
++The ``-no-kvm`` argument was a synonym for setting ``-accel tcg``.
++
++
+ QEMU Machine Protocol (QMP) commands
+ ------------------------------------
+ 
+diff --git a/qemu-options.hx b/qemu-options.hx
+index 1da52a269c..9e1ace04f7 100644
+--- a/qemu-options.hx
++++ b/qemu-options.hx
+@@ -4351,9 +4351,6 @@ SRST
+     Enable FIPS 140-2 compliance mode.
+ ERST
+ 
+-HXCOMM Deprecated by -accel tcg
+-DEF("no-kvm", 0, QEMU_OPTION_no_kvm, "", QEMU_ARCH_I386)
+-
+ DEF("msg", HAS_ARG, QEMU_OPTION_msg,
+     "-msg [timestamp[=on|off]][,guest-name=[on|off]]\n"
+     "                control error message format\n"
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index cb476aa70b..6f5b000f07 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -3502,10 +3502,6 @@ void qemu_init(int argc, char **argv, char **envp)
+                     exit(1);
+                 }
+                 break;
+-             case QEMU_OPTION_no_kvm:
+-                olist = qemu_find_opts("machine");
+-                qemu_opts_parse_noisily(olist, "accel=tcg", false);
+-                break;
+             case QEMU_OPTION_accel:
+                 accel_opts = qemu_opts_parse_noisily(qemu_find_opts("accel"),
+                                                      optarg, true);
 -- 
-2.20.1
+2.18.2
 
 
