@@ -2,75 +2,85 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 830CEC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 511E0C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:04:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB14E22251
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:00:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB14E22251
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 9798322249
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 14:04:54 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VywGDImw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9798322249
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35962 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41960 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUsBw-000317-Gg
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:00:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34546)
+	id 1kUsFx-0005wc-I4
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 10:04:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUsB0-00026m-OF
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:59:46 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:45481)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUsAv-0004pb-MQ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:59:44 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.138.210])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 34DAD6DD2516;
- Tue, 20 Oct 2020 15:59:38 +0200 (CEST)
-Received: from kaod.org (37.59.142.105) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 20 Oct
- 2020 15:59:37 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-105G006bc0c9eca-3558-4228-abe5-b65982a39bc2,
- 1DF5E91C91B319FFB92086F2F245FA8D0BCC998A) smtp.auth=groug@kaod.org
-Date: Tue, 20 Oct 2020 15:59:36 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH 1/8] tests/9pfs: simplify fs_mkdir()
-Message-ID: <20201020155936.5dc8bed4@bahia.lan>
-In-Reply-To: <2130426.d1XtYRms3g@silver>
-References: <cover.1603149434.git.qemu_oss@crudebyte.com>
- <03b427019be98d12761924f1e6132eefc82c80ec.1603149434.git.qemu_oss@crudebyte.com>
- <20201020153536.1fe40e32@bahia.lan> <2130426.d1XtYRms3g@silver>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUsEF-0004wn-JC
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:03:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58454)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kUsEB-0005Jp-6D
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 10:03:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603202580;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=pW6yhvOhAl9Ztm+8ZeD4dGC8wSUvMZMPSwt1ok2woCU=;
+ b=VywGDImw58cZvrBm0/uyV8RSBSXlmLaTIi4Ep3MzKQpl0QshlINe+uHlcSOIc3FH2shQ78
+ v4fzjR5gmLdAjm8L0AF6q7ZpbLxCLzBqc/nwxbuiVOsAb5r1MVMu736QJgW0CoTDIdon1Q
+ xHsq3sj2AzQGfW83GX0uX4tAz2qfDWc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-291-NqEqJX-OMS-q8KES_hUFsg-1; Tue, 20 Oct 2020 10:02:57 -0400
+X-MC-Unique: NqEqJX-OMS-q8KES_hUFsg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5F0EF8049D3;
+ Tue, 20 Oct 2020 14:02:56 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-112-157.phx2.redhat.com
+ [10.3.112.157])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id DEF216EF41;
+ Tue, 20 Oct 2020 14:02:53 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Subject: [PATCH v2] net: remove an assert call in eth_get_gso_type
+Date: Tue, 20 Oct 2020 19:30:50 +0530
+Message-Id: <20201020140050.1623109-1-ppandit@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.105]
-X-ClientProxiedBy: DAG3EX2.mxp5.local (172.16.2.22) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: d7599a5f-7bdf-4210-bb49-c6c77ea5bdb0
-X-Ovh-Tracer-Id: 17098197463819065754
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgdeilecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtheenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdguvghvvghlsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:35:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,76 +93,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Gaoning Pan <pgn@zju.edu.cn>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Prasad J Pandit <pjp@fedoraproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Oct 2020 15:43:21 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-> On Dienstag, 20. Oktober 2020 15:35:36 CEST Greg Kurz wrote:
-> > On Tue, 20 Oct 2020 01:13:23 +0200
-> > 
-> > Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
-> > > Split out walking a directory path to a separate new utility function
-> > > fs_walk_fid() and use that function in fs_mkdir().
-> > > 
-> > > The code difference saved this way is not much, but we'll use that new
-> > > fs_walk_fid() function in the upcoming patches, so it will avoid quite
-> > > some code duplication after all.
-> > > 
-> > > Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> > > ---
-> > > 
-> > >  tests/qtest/virtio-9p-test.c | 23 ++++++++++++++++++-----
-> > >  1 file changed, 18 insertions(+), 5 deletions(-)
-> > > 
-> > > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-> > > index c15908f27b..dc724bbb1e 100644
-> > > --- a/tests/qtest/virtio-9p-test.c
-> > > +++ b/tests/qtest/virtio-9p-test.c
-> > > @@ -967,13 +967,12 @@ static void fs_flush_ignored(void *obj, void *data,
-> > > QGuestAllocator *t_alloc)> 
-> > >      g_free(wnames[0]);
-> > >  
-> > >  }
-> > > 
-> > > -static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
-> > > -                     const char *path, const char *cname)
-> > > +/* utility function: walk to requested dir and return fid for that dir */
-> > > +static uint32_t fs_walk_fid(void *obj, void *data, QGuestAllocator
-> > > *t_alloc, +                            const char *path)
-> > > 
-> > >  {
-> > 
-> > Since fs_walk_fid() is a helper function, ie. not passed to qos_add_test(),
-> > any reason to keep the "void *obj, void *data, QGuestAllocator *t_alloc"
-> > based signature ? data and t_alloc aren't used at all and it seems that the
-> > function should rather take a QVirtio9P * directly instead of casting from
-> > a void *.
-> > 
-> > Something like:
-> > 
-> > static uint32_t fs_walk_fid(QVirtio9P *v9p, const char *path)
-> > {
-> > ...
-> > }
-> > 
-> > 
-> > Same remark applies to fs_mkdir() which isn't a top level test function
-> > either BTW (sorry for not having spotted this earlier).
-> 
-> Good point. Typical case of being copy & waste induced. I'll change that.
-> 
+eth_get_gso_type() routine returns segmentation offload type based on
+L3 protocol type. It calls g_assert_not_reached if L3 protocol is
+unknown, making the following return statement unreachable. Remove the
+g_assert call, as it maybe triggered by a guest user.
 
-Well I guess I haven't set a good exemple by calling fs_attach() everywhere
-instead of factoring out an helper in the first place... I have some spare
-time, I'll fix that.
+Reported-by: Gaoning Pan <pgn@zju.edu.cn>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ net/eth.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-> Best regards,
-> Christian Schoenebeck
-> 
-> 
+Update v2: add qemu_log()
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-10/msg05576.html
+
+diff --git a/net/eth.c b/net/eth.c
+index 0c1d413ee2..fd76e349eb 100644
+--- a/net/eth.c
++++ b/net/eth.c
+@@ -16,6 +16,7 @@
+  */
+
+ #include "qemu/osdep.h"
++#include "qemu/log.h"
+ #include "net/eth.h"
+ #include "net/checksum.h"
+ #include "net/tap.h"
+@@ -71,9 +72,7 @@ eth_get_gso_type(uint16_t l3_proto, uint8_t *l3_hdr, uint8_t l4proto)
+             return VIRTIO_NET_HDR_GSO_TCPV6 | ecn_state;
+         }
+     }
+-
+-    /* Unsupported offload */
+-    g_assert_not_reached();
++    qemu_log("Probably not GSO frame, unknown L3 protocol: %hd\n", l3_proto);
+
+     return VIRTIO_NET_HDR_GSO_NONE | ecn_state;
+ }
+--
+2.26.2
 
 
