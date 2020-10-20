@@ -2,92 +2,91 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2C28C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:02:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2A4CC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:04:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1586D2223C
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:02:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0279F22244
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:04:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BeVPdg/J"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1586D2223C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HgAfxC5F"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0279F22244
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUwtf-0008KX-LH
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:02:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60212)
+	id 1kUwvr-0002BG-RO
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:04:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33944)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kUwnT-0001sY-DG
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:55:48 -0400
-Received: from mail-pl1-x629.google.com ([2607:f8b0:4864:20::629]:44739)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kUwnO-0004Fm-Uf
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 14:55:47 -0400
-Received: by mail-pl1-x629.google.com with SMTP id h2so1489948pll.11
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 11:55:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=LXyN5m1R7YUWSPWrPcd4RM3WNmdyUMYrgbTr/k3ruOw=;
- b=BeVPdg/Jr2s/Rk2+yGQ+PRpYMe3hUc5x75LQScetkB8Kx/EPnZ6HG/tdMo362+8iLn
- fPC27dj7Ivg4TMHJR/V/xNsiT4+9+Su+pln6ucyo8UZLNZIwihYOqHZSzGFfeH34j769
- WeP7ZNrq0jDM6t/EnadflzxLB06e27DbLOXOdPQM1uc++NnYVCg/wgKzjIu9PJsHHVyP
- qh2vyjKuJ8dwxnVPCHLRq73OsRsFzI40sZ9cvPGvUq6MOvOKjNBVHrZQoiJGPRoTa/Pb
- QoVk/ZAVFONp8uKcT5z/Gw6y7t1PqgEBPQUE/AzzjNaJ0VYTWbw5jQXwiJkO/9yCd0Ec
- WeHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=LXyN5m1R7YUWSPWrPcd4RM3WNmdyUMYrgbTr/k3ruOw=;
- b=QEETMAhMbjVmjjizcNPT4+T2avZsUqO8BapEpeoVs8PEo+h8CR6PmVwFYFE0GjsWeS
- hiGhF/jIIAIll+VKrudFLddOPIVHulZT5ZGtDzimqXeaLd4Dbbu6IKbYv3kV90GN3V7F
- JwVRNLFUq/wOMIyDuKdFlrwr9yHxXJrVxknwK8ahM4aUWjXp21gU9IPdIeK2I9TgY06a
- 4yR+8sRd4AY3QY+JjZAx3c5R8yMoPTeqs9SZJCpznnXbxG833iwQFVTvFyDjEOHr6tb3
- 4nqLGozxU9ro/TLUR81TNfllxbs2MMATJldx0APgXtdpnfTQjr0fpzbHADjSPJuBPS/E
- 6aLg==
-X-Gm-Message-State: AOAM5329hKhWQ57MMtqCksW8onrr61O3ClOMVJRICx1gztA25wVatuM5
- dXizD9tpVd7fwDkgXvfuQ26FWs/meHFJJg==
-X-Google-Smtp-Source: ABdhPJykRfudsNk2ruaqTQ3uFRNIHVzeLDp7A9lsUSwqPDynaDE0vGFokJYpAwYj11kkv4nEHgBw5w==
-X-Received: by 2002:a17:902:b7c3:b029:d4:bc6e:8aae with SMTP id
- v3-20020a170902b7c3b02900d4bc6e8aaemr1352912plz.12.1603220140334; 
- Tue, 20 Oct 2020 11:55:40 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id y22sm2988962pgj.27.2020.10.20.11.55.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 11:55:39 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2 4/4] target/s390x: Improve SUB LOGICAL WITH BORROW
-Date: Tue, 20 Oct 2020 11:55:33 -0700
-Message-Id: <20201020185533.1508487-5-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201020185533.1508487-1-richard.henderson@linaro.org>
-References: <20201020185533.1508487-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kUwuU-0000pe-IP
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:03:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41314)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kUwuP-0005C5-JP
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:03:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603220574;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=hubMo6M0x/khpqGyllHmSDCVHUKyhzhe5Uw/MsxrcX8=;
+ b=HgAfxC5FM6Pan220Q21VG4TJezSaTbvpWaqIWgHyDu1VmWhIpfvFN+iO35Qs4+qgP4ENLu
+ rjnIATWkHZizZmCJDZSn3qWzTOGTiaJ0DM0h+zGsJC6vqvABs1aVUVs70lKjT0kKjZ2WKa
+ 8HO4my/4du+bTcIw9ZY2qMJDFs+p0Tc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-65-YdtSnZA7NuW678dFBR16-g-1; Tue, 20 Oct 2020 15:02:51 -0400
+X-MC-Unique: YdtSnZA7NuW678dFBR16-g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D512B80402B
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 19:02:50 +0000 (UTC)
+Received: from work-vm (ovpn-113-116.ams2.redhat.com [10.36.113.116])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F261B5B4A3;
+ Tue, 20 Oct 2020 19:02:39 +0000 (UTC)
+Date: Tue, 20 Oct 2020 20:02:37 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [PATCH v3 4/5] tools/virtiofsd: xattr name mapping examples
+Message-ID: <20201020190237.GG2962@work-vm>
+References: <20201014180209.49299-1-dgilbert@redhat.com>
+ <20201014180209.49299-5-dgilbert@redhat.com>
+ <20201020144041.GC380917@redhat.com>
+ <20201020153443.GD2962@work-vm>
+ <20201020175600.GE380917@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::629;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x629.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201020175600.GE380917@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,259 +99,212 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: david@redhat.com
+Cc: dinechin@redhat.com, virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Now that SUB LOGICAL outputs borrow, we can use that as input directly.
-It also means we can re-use CC_OP_SUBU and produce an output borrow
-directly from SUB LOGICAL WITH BORROW.
+* Vivek Goyal (vgoyal@redhat.com) wrote:
+> On Tue, Oct 20, 2020 at 04:34:43PM +0100, Dr. David Alan Gilbert wrote:
+> > * Vivek Goyal (vgoyal@redhat.com) wrote:
+> > > On Wed, Oct 14, 2020 at 07:02:08PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > > > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > > > 
+> > > > Add a few examples of xattrmaps to the documentation.
+> > > > 
+> > > > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > > > ---
+> > > >  docs/tools/virtiofsd.rst | 50 ++++++++++++++++++++++++++++++++++++++++
+> > > >  1 file changed, 50 insertions(+)
+> > > > 
+> > > > diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> > > > index a3a120da2f..5cb64612ed 100644
+> > > > --- a/docs/tools/virtiofsd.rst
+> > > > +++ b/docs/tools/virtiofsd.rst
+> > > > @@ -163,6 +163,56 @@ in which case a 'server' rule will always match on all names from
+> > > >  the server.
+> > > >  
+> > > >  
+> > > > +xattr-mapping Examples
+> > > > +----------------------
+> > > > +
+> > > > +1) Prefix all attributes with 'user.virtiofs.'
+> > > > +
+> > > > +::
+> > > > +
+> > > > +-o xattrmap=":prefix:all::user.virtiofs.::bad:all:::"
+> > > > +
+> > > 
+> > > Staring at rule.
+> > > 
+> > > ":bad:all:::"
+> > > 
+> > > and trying to map this to ":type:scope:key:prepend:"
+> > > 
+> > > type==bad
+> > > scope==all
+> > > key==""
+> > > prepend==""
+> > 
+> > Correct.
+> > 
+> > > > +
+> > > > +This uses two rules, using : as the field separator;
+> > > > +the first rule prefixes and strips 'user.virtiofs.',
+> > > > +the second rule hides any non-prefixed attributes that
+> > > > +the host set.
+> > > 
+> > > What is non-prefixed xattr in this context. If client sends
+> > > "security.selinux", is prefixed or non-prefixed.
+> > 
+> > Note that anything originating at the client (i.e. starting with "")
+> > will get caught by the first rule and be prefixed with 'user.virtiofs.'
+> 
+> So first rule is.
+> 
+> :prefix:all::user.virtiofs.:
+> 
+> scope="all"
+> key==""
+> prepend="user.virtiofs."
+> 
+> Given scope, rule applies to both client and server. Given key is "",
+> any income setxattr() request will be prefixed with "user.virtiofs".
+> And how does this rule work for server (listxattr()). It will match
+> prepend "user.virtiofs" and if that matches it will be stripped?
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- target/s390x/internal.h    |  2 -
- target/s390x/cc_helper.c   | 32 ----------------
- target/s390x/helper.c      |  2 -
- target/s390x/translate.c   | 76 +++++++++++++++++++++-----------------
- target/s390x/insn-data.def |  8 ++--
- 5 files changed, 46 insertions(+), 74 deletions(-)
+Right; 'prefix' strips for server, adds for client (as long as you have
+'all', you can select either one on it's own with server/client rather
+than all).
 
-diff --git a/target/s390x/internal.h b/target/s390x/internal.h
-index 4077047494..11515bb617 100644
---- a/target/s390x/internal.h
-+++ b/target/s390x/internal.h
-@@ -172,14 +172,12 @@ enum cc_op {
- 
-     CC_OP_ADD_64,               /* overflow on add (64bit) */
-     CC_OP_SUB_64,               /* overflow on subtraction (64bit) */
--    CC_OP_SUBB_64,              /* overflow on unsigned sub-borrow (64bit) */
-     CC_OP_ABS_64,               /* sign eval on abs (64bit) */
-     CC_OP_NABS_64,              /* sign eval on nabs (64bit) */
-     CC_OP_MULS_64,              /* overflow on signed multiply (64bit) */
- 
-     CC_OP_ADD_32,               /* overflow on add (32bit) */
-     CC_OP_SUB_32,               /* overflow on subtraction (32bit) */
--    CC_OP_SUBB_32,              /* overflow on unsigned sub-borrow (32bit) */
-     CC_OP_ABS_32,               /* sign eval on abs (64bit) */
-     CC_OP_NABS_32,              /* sign eval on nabs (64bit) */
-     CC_OP_MULS_32,              /* overflow on signed multiply (32bit) */
-diff --git a/target/s390x/cc_helper.c b/target/s390x/cc_helper.c
-index c7728d1225..e7039d0d18 100644
---- a/target/s390x/cc_helper.c
-+++ b/target/s390x/cc_helper.c
-@@ -164,19 +164,6 @@ static uint32_t cc_calc_sub_64(int64_t a1, int64_t a2, int64_t ar)
-     }
- }
- 
--static uint32_t cc_calc_subb_64(uint64_t a1, uint64_t a2, uint64_t ar)
--{
--    int borrow_out;
--
--    if (ar != a1 - a2) {	/* difference means borrow-in */
--        borrow_out = (a2 >= a1);
--    } else {
--        borrow_out = (a2 > a1);
--    }
--
--    return (ar != 0) + 2 * !borrow_out;
--}
--
- static uint32_t cc_calc_abs_64(int64_t dst)
- {
-     if ((uint64_t)dst == 0x8000000000000000ULL) {
-@@ -237,19 +224,6 @@ static uint32_t cc_calc_sub_32(int32_t a1, int32_t a2, int32_t ar)
-     }
- }
- 
--static uint32_t cc_calc_subb_32(uint32_t a1, uint32_t a2, uint32_t ar)
--{
--    int borrow_out;
--
--    if (ar != a1 - a2) {	/* difference means borrow-in */
--        borrow_out = (a2 >= a1);
--    } else {
--        borrow_out = (a2 > a1);
--    }
--
--    return (ar != 0) + 2 * !borrow_out;
--}
--
- static uint32_t cc_calc_abs_32(int32_t dst)
- {
-     if ((uint32_t)dst == 0x80000000UL) {
-@@ -450,9 +424,6 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-     case CC_OP_SUB_64:
-         r =  cc_calc_sub_64(src, dst, vr);
-         break;
--    case CC_OP_SUBB_64:
--        r =  cc_calc_subb_64(src, dst, vr);
--        break;
-     case CC_OP_ABS_64:
-         r =  cc_calc_abs_64(dst);
-         break;
-@@ -472,9 +443,6 @@ static uint32_t do_calc_cc(CPUS390XState *env, uint32_t cc_op,
-     case CC_OP_SUB_32:
-         r =  cc_calc_sub_32(src, dst, vr);
-         break;
--    case CC_OP_SUBB_32:
--        r =  cc_calc_subb_32(src, dst, vr);
--        break;
-     case CC_OP_ABS_32:
-         r =  cc_calc_abs_32(dst);
-         break;
-diff --git a/target/s390x/helper.c b/target/s390x/helper.c
-index fa3aa500e5..7678994feb 100644
---- a/target/s390x/helper.c
-+++ b/target/s390x/helper.c
-@@ -405,12 +405,10 @@ const char *cc_name(enum cc_op cc_op)
-         [CC_OP_LTGT0_64]  = "CC_OP_LTGT0_64",
-         [CC_OP_ADD_64]    = "CC_OP_ADD_64",
-         [CC_OP_SUB_64]    = "CC_OP_SUB_64",
--        [CC_OP_SUBB_64]   = "CC_OP_SUBB_64",
-         [CC_OP_ABS_64]    = "CC_OP_ABS_64",
-         [CC_OP_NABS_64]   = "CC_OP_NABS_64",
-         [CC_OP_ADD_32]    = "CC_OP_ADD_32",
-         [CC_OP_SUB_32]    = "CC_OP_SUB_32",
--        [CC_OP_SUBB_32]   = "CC_OP_SUBB_32",
-         [CC_OP_ABS_32]    = "CC_OP_ABS_32",
-         [CC_OP_NABS_32]   = "CC_OP_NABS_32",
-         [CC_OP_COMP_32]   = "CC_OP_COMP_32",
-diff --git a/target/s390x/translate.c b/target/s390x/translate.c
-index be0532d5dc..cd062c2be8 100644
---- a/target/s390x/translate.c
-+++ b/target/s390x/translate.c
-@@ -601,10 +601,8 @@ static void gen_op_calc_cc(DisasContext *s)
-         /* FALLTHRU */
-     case CC_OP_ADD_64:
-     case CC_OP_SUB_64:
--    case CC_OP_SUBB_64:
-     case CC_OP_ADD_32:
-     case CC_OP_SUB_32:
--    case CC_OP_SUBB_32:
-         local_cc_op = tcg_const_i32(s->cc_op);
-         break;
-     case CC_OP_CONST0:
-@@ -663,10 +661,8 @@ static void gen_op_calc_cc(DisasContext *s)
-         break;
-     case CC_OP_ADD_64:
-     case CC_OP_SUB_64:
--    case CC_OP_SUBB_64:
-     case CC_OP_ADD_32:
-     case CC_OP_SUB_32:
--    case CC_OP_SUBB_32:
-         /* 3 arguments */
-         gen_helper_calc_cc(cc_op, cpu_env, local_cc_op, cc_src, cc_dst, cc_vr);
-         break;
-@@ -4745,29 +4741,51 @@ static DisasJumpType op_subu64(DisasContext *s, DisasOps *o)
-     return DISAS_NEXT;
- }
- 
--static DisasJumpType op_subb(DisasContext *s, DisasOps *o)
-+/* Compute borrow (0, -1) into cc_src. */
-+static void compute_borrow(DisasContext *s)
- {
--    DisasCompare cmp;
--    TCGv_i64 borrow;
--
--    tcg_gen_sub_i64(o->out, o->in1, o->in2);
--
--    /* The !borrow flag is the msb of CC.  Since we want the inverse of
--       that, we ask for a comparison of CC=0 | CC=1 -> mask of 8 | 4.  */
--    disas_jcc(s, &cmp, 8 | 4);
--    borrow = tcg_temp_new_i64();
--    if (cmp.is_64) {
--        tcg_gen_setcond_i64(cmp.cond, borrow, cmp.u.s64.a, cmp.u.s64.b);
--    } else {
--        TCGv_i32 t = tcg_temp_new_i32();
--        tcg_gen_setcond_i32(cmp.cond, t, cmp.u.s32.a, cmp.u.s32.b);
--        tcg_gen_extu_i32_i64(borrow, t);
--        tcg_temp_free_i32(t);
-+    switch (s->cc_op) {
-+    case CC_OP_SUBU:
-+        /* The borrow value is already in cc_src (0,-1). */
-+        break;
-+    default:
-+        gen_op_calc_cc(s);
-+        /* fall through */
-+    case CC_OP_STATIC:
-+        /* The carry flag is the msb of CC; compute into cc_src. */
-+        tcg_gen_extu_i32_i64(cc_src, cc_op);
-+        tcg_gen_shri_i64(cc_src, cc_src, 1);
-+        /* fall through */
-+    case CC_OP_ADDU:
-+        /* Convert carry (1,0) to borrow (0,-1). */
-+        tcg_gen_subi_i64(cc_src, cc_src, 1);
-+        break;
-     }
--    free_compare(&cmp);
-+}
-+
-+static DisasJumpType op_subb32(DisasContext *s, DisasOps *o)
-+{
-+    compute_borrow(s);
-+
-+    /* Borrow is {0, -1}, so add to subtract. */
-+    tcg_gen_add_i64(o->out, o->in1, cc_src);
-+    tcg_gen_sub_i64(o->out, o->out, o->in2);
-+    return DISAS_NEXT;
-+}
-+
-+static DisasJumpType op_subb64(DisasContext *s, DisasOps *o)
-+{
-+    compute_borrow(s);
-+
-+    /*
-+     * Borrow is {0, -1}, so add to subtract; replicate the
-+     * borrow input to produce 128-bit -1 for the addition.
-+     */
-+    TCGv_i64 zero = tcg_const_i64(0);
-+    tcg_gen_add2_i64(o->out, cc_src, o->in1, zero, cc_src, cc_src);
-+    tcg_gen_sub2_i64(o->out, cc_src, o->out, cc_src, o->in2, zero);
-+    tcg_temp_free_i64(zero);
- 
--    tcg_gen_sub_i64(o->out, o->out, borrow);
--    tcg_temp_free_i64(borrow);
-     return DISAS_NEXT;
- }
- 
-@@ -5306,16 +5324,6 @@ static void cout_subu64(DisasContext *s, DisasOps *o)
-     gen_op_update2_cc_i64(s, CC_OP_SUBU, cc_src, o->out);
- }
- 
--static void cout_subb32(DisasContext *s, DisasOps *o)
--{
--    gen_op_update3_cc_i64(s, CC_OP_SUBB_32, o->in1, o->in2, o->out);
--}
--
--static void cout_subb64(DisasContext *s, DisasOps *o)
--{
--    gen_op_update3_cc_i64(s, CC_OP_SUBB_64, o->in1, o->in2, o->out);
--}
--
- static void cout_tm32(DisasContext *s, DisasOps *o)
- {
-     gen_op_update2_cc_i64(s, CC_OP_TM_32, o->in1, o->in2);
-diff --git a/target/s390x/insn-data.def b/target/s390x/insn-data.def
-index 65ee998484..d91051843c 100644
---- a/target/s390x/insn-data.def
-+++ b/target/s390x/insn-data.def
-@@ -916,10 +916,10 @@
-     C(0xc205, SLFI,    RIL_a, EI,  r1_32u, i2_32u, new, r1_32, sub, subu32)
-     C(0xc204, SLGFI,   RIL_a, EI,  r1, i2_32u, r1, 0, subu64, subu64)
- /* SUBTRACT LOGICAL WITH BORROW */
--    C(0xb999, SLBR,    RRE,   Z,   r1, r2, new, r1_32, subb, subb32)
--    C(0xb989, SLBGR,   RRE,   Z,   r1, r2, r1, 0, subb, subb64)
--    C(0xe399, SLB,     RXY_a, Z,   r1, m2_32u, new, r1_32, subb, subb32)
--    C(0xe389, SLBG,    RXY_a, Z,   r1, m2_64, r1, 0, subb, subb64)
-+    C(0xb999, SLBR,    RRE,   Z,   r1_32u, r2_32u, new, r1_32, subb32, subu32)
-+    C(0xb989, SLBGR,   RRE,   Z,   r1, r2, r1, 0, subb64, subu64)
-+    C(0xe399, SLB,     RXY_a, Z,   r1_32u, m2_32u, new, r1_32, subb32, subu32)
-+    C(0xe389, SLBG,    RXY_a, Z,   r1, m2_64, r1, 0, subb64, subu64)
- 
- /* SUPERVISOR CALL */
-     C(0x0a00, SVC,     I,     Z,   0, 0, 0, 0, svc, 0)
+> 
+> 
+> > This second rule will only be triggered by an xattr name coming
+> > from the server (i.e a listxattr) for a name that doesn't begin
+> > with user.virtiofs. (i.e. didn't match the 1st rule for a server xattr).
+> > This makes sure that only guest created xattr's (that were set and
+> > had a prefix added) are then visible to the guest.
+> 
+> Ok, so if an xattr does not match first rule, then second rule says
+> key="", prepend="" and that will match all xattrs. So anything which
+> is not caught by first rule, will be caught by second rule and
+> either rejected or filtered out.
+
+Right.
+
+> > 
+> > > Documentation in first patch said.
+> > > 
+> > > +- 'bad' - If a client tries to use this name it's
+> > > +  denied using EPERM; when the server passes an attribute
+> > > +  name matching it's hidden.
+> > > 
+> > > I am not sure which xattr name will be blocked if key=="" and prepend==""
+> > 
+> > All of them; they're still matched at the beginning; as the first
+> > patch says 'It maybe empty in which case a 'client' rule will always
+> > match on client names'
+> 
+> Ok.
+> 
+> > 
+> > > > +2) Prefix 'trusted.' attributes, allow others through
+> > > > +
+> > > > +::
+> > > > +
+> > > > +   "/prefix/all/trusted./user.virtiofs./
+> > > > +    /bad/server//trusted./
+> > > > +    /bad/client/user.virtiofs.//
+> > > > +    /ok/all///"
+> > > > +
+> > > > +
+> > > > +Here there are four rules, using / as the field
+> > > > +separator, and also demonstrating that new lines can
+> > > > +be included between rules.
+> > > > +The first rule is the prefixing of 'trusted.' and
+> > > > +stripping of 'user.virtiofs.'.
+> > > 
+> > > So this is bidrectional rule, right. For setxattr(), "trusted."
+> > > will be replaced with "user.virtiofs" and for listxattr(),
+> > > server will replace user.virtiofs with trusted. ?
+> > 
+> > prefixed not replaced; so it'll turn "trusted." into
+> > "user.virtiofs.trusted." and strip it back off for listxattr.
+> 
+> Ok. Got it. I am wondering how will I specify these rules so that
+> they work in nested configuration. Say I have L0 host, L1 guest and
+> L2 guest. Say virtiofsd0 is running on L0 and virtiofsd1 is running
+> on L1. 
+> 
+> I am wondering how will I specify the rules on virtiofsd0 and virtiofsd1
+> so that it works. Will it be same or rules are level dependent.
+
+I'm hoping it'll be the same, see below.
+
+> > 
+> > > > +The second rule hides unprefixed 'trusted.' attributes
+> > > > +on the host.
+> > > 
+> > > If host has "trusted.*", we are not hiding it and as per first
+> > > rule we are converting it to "user.virtiofs.trusted.*", right?
+> > > So why this second rule is needed.
+> > 
+> > No, the first rule will only prefix strings provided by the guest
+> > and strip strings provided by the server. This rule hides
+> > existing server 'trusted.' xattrs - so if the guest sets
+> > trusted.foo it's not confused by also seeing a server trusted.foo
+> > 
+> > > > +The third rule stops a guest from explicitly setting
+> > > > +the 'user.viritofs.' path directly.
+> > > > +Finally, the fourth rule lets all remaining attributes
+> > > > +through.
+> > > 
+> > > So If I don't specify third rule, and client does
+> > > setxattr(user.virtiofs.*), it will simply be a passthrough?
+> > 
+> > Right; and that's dangerous, because a non-privileged guest
+> > process can set a user. xattr; so a non-priv guest process could
+> > set user.virtiofs.trusted.foo and then it would get read back
+> > and be used as trusted.foo that has an impact on priviliged processes.
+> 
+> Right. We don't want unpriviliged process to be able to setup
+> user.virtiofs.trusted.*. But that's what precisely happen in
+> a nested configuration.
+> 
+> In above example, L2 will set trusted.foo, virtiofsd1 wil convert it
+> to user.virtiofs.trusted.foo and virtiofsd0 will reject it, breaking
+> the nested virtiofs.
+
+So to allow nesting you need to nest the user.virtiofs. as well, not
+just the trusted. So either you do an all, or if you want to be more
+selective then I think the following would work:
+
+ 1  /prefix/client/trusted./user.virtiofs./
+ 2  /prefix/client/user.virtiofs./user.virtiofs./
+ 3  /prefix/server//user.virtiofs./
+ 4  /bad/server//trusted./
+ 5  /ok/all///
+
+1 causes any getattr/setattr to convert 'trusted.'
+                                   to   'user.virtiofs.trusted.'
+2 causes any getattr/setattr to convert 'user.virtiofs.'
+                                   to   'user.virtiofs.user.virtiofs.'
+3 causes any listattr to lose a layer of user.virtiofs.
+4 blocks any trusted. from the layer beneath
+5 lets anything else through
+
+(I'm trying to convince myself if we need a
+/bad/server//user.virtiofs.trusted.  to stop the previous level being
+visible).
+
+Dave
+
+
+
+> Thanks
+> Vivek
 -- 
-2.25.1
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
