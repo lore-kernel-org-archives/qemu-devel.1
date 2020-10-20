@@ -2,64 +2,64 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E90F6C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93295C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:46:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407592225F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EBE6E2225F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 19:46:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GrwZviTm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407592225F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LhChCN04"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBE6E2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUxYi-00084w-4q
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43094)
+	id 1kUxas-0001xc-Pb
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 15:46:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRR-0006rZ-AU
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28314)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQj-0006Bz-VO
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41380)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxRO-00016a-To
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:37:04 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUxQg-0000zR-Bu
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 15:36:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603222621;
+ s=mimecast20190719; t=1603222577;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=79GMuVmF7GJj2WwzlD3/UxNAdI37gZGCq/ccc0tMkUU=;
- b=GrwZviTmtxIgrMvZUm2poyJYeeLoED1Rqb09O+NqVEhYhYyM5EOVb15NtaTAe5i5TUUUbS
- k6PHzN/2hOLFkr7CWTV6zz0oJoZPNhgWzHTBstb6oV/YVkAb7CiFUHSRhCxto+8djcCWt0
- RfrenQiyUqQTinCmcNOHuyXwtT/eZ+c=
+ bh=kcwfd+/+MZ7OjGERYJDRr402Q9HSZa8LT8zHsdi5Jbo=;
+ b=LhChCN04Usj9TW0G6D2moM6VrENVBQrvutZxXDWPdoNrLfIUOorBYXfPL4a+mBy51tbhf+
+ 7i4TPtPP78xtYhF8sAclk4kMsiEkL4zVnoX16rpKWgd20gUlNXsokudrqg/lx1z8SOnNux
+ TwzInyLXnrzL1Wym+79iI/iE5WBmtlM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-XZD-CJmAPoiP4B644XpuiA-1; Tue, 20 Oct 2020 15:36:58 -0400
-X-MC-Unique: XZD-CJmAPoiP4B644XpuiA-1
+ us-mta-247-BGDhaQoBNBqEImFRPJchHA-1; Tue, 20 Oct 2020 15:36:13 -0400
+X-MC-Unique: BGDhaQoBNBqEImFRPJchHA-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
  [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E3E7810866A4;
- Tue, 20 Oct 2020 19:36:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 879D464084;
+ Tue, 20 Oct 2020 19:36:12 +0000 (UTC)
 Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F3A6A5C1C2;
- Tue, 20 Oct 2020 19:36:51 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BD57F5C1C2;
+ Tue, 20 Oct 2020 19:36:10 +0000 (UTC)
 From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 15/15] python/qemu: add qemu package itself to pipenv
-Date: Tue, 20 Oct 2020 15:35:55 -0400
-Message-Id: <20201020193555.1493936-16-jsnow@redhat.com>
+Subject: [PATCH v3 05/15] python: Add pipenv support
+Date: Tue, 20 Oct 2020 15:35:45 -0400
+Message-Id: <20201020193555.1493936-6-jsnow@redhat.com>
 In-Reply-To: <20201020193555.1493936-1-jsnow@redhat.com>
 References: <20201020193555.1493936-1-jsnow@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,61 +108,60 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds the python qemu packages themselves to the pipenv manifest.
-'pipenv sync' will create a virtual environment sufficient to use the SDK.
-'pipenv sync --dev' will create a virtual environment sufficient to use
-and test the SDK (with pylint, mypy, isort, flake8, etc.)
+pipenv is a tool used for managing virtual environments with pinned,
+explicit dependencies. It is used for precisely recreating python
+virtual environments.
 
-The qemu packages are installed in 'editable' mode; all changes made to
-the python package inside the git tree will be reflected in the
-installed package without reinstallation. This includes changes made
-via git pull and so on.
+pipenv uses two files to do this:
+
+(1) Pipfile, which is similar in purpose and scope to what setup.py
+lists. It specifies the requisite minimum to get a functional
+environment for using this package.
+
+(2) Pipfile.lock, which is similar in purpose to `pip freeze >
+requirements.txt`. It specifies a canonical virtual environment used for
+deployment or testing. This ensures that all users have repeatable
+results.
+
+The primary benefit of using this tool is to ensure repeatable CI
+results with a known set of packages. Although I endeavor to support as
+many versions as I can, the fluid nature of the Python toolchain often
+means tailoring code for fairly specific versions.
+
+Note that pipenv is *not* required to install or use this module; this is
+purely for the sake of repeatable testing by CI or developers.
+
+Here, a "blank" pipfile is added with no dependencies, but specifies
+Python 3.6 for the virtual environment.
+
+Pipfile will specify our version minimums, while Pipfile.lock specifies
+an exact loudout of packages that were known to operate correctly. This
+latter file provides the real value for easy setup of container images
+and CI environments.
 
 Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- python/Pipfile      | 1 +
- python/Pipfile.lock | 9 +++++++--
- 2 files changed, 8 insertions(+), 2 deletions(-)
+ python/Pipfile | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
+ create mode 100644 python/Pipfile
 
 diff --git a/python/Pipfile b/python/Pipfile
-index 75b96f29d8..214fb175e7 100644
---- a/python/Pipfile
+new file mode 100644
+index 0000000000..9534830b5e
+--- /dev/null
 +++ b/python/Pipfile
-@@ -10,6 +10,7 @@ mypy = ">=0.770"
- pylint = ">=2.6.0"
- 
- [packages]
-+qemu = {editable = true,path = "."}
- 
- [requires]
- python_version = "3.6"
-diff --git a/python/Pipfile.lock b/python/Pipfile.lock
-index 74563b444c..386ca54ea6 100644
---- a/python/Pipfile.lock
-+++ b/python/Pipfile.lock
-@@ -1,7 +1,7 @@
- {
-     "_meta": {
-         "hash": {
--            "sha256": "b89c7a1b8a414f2a4cd708964123fb427d55419ee0b39e088bf2e7d4fbc11979"
-+            "sha256": "e38d142c3fadc2f2ed849e86f7ebd14e25974dc12228751490aef5a9ee074f2f"
-         },
-         "pipfile-spec": 6,
-         "requires": {
-@@ -15,7 +15,12 @@
-             }
-         ]
-     },
--    "default": {},
-+    "default": {
-+        "qemu": {
-+            "editable": true,
-+            "path": "."
-+        }
-+    },
-     "develop": {
-         "astroid": {
-             "hashes": [
+@@ -0,0 +1,11 @@
++[[source]]
++name = "pypi"
++url = "https://pypi.org/simple"
++verify_ssl = true
++
++[dev-packages]
++
++[packages]
++
++[requires]
++python_version = "3.6"
 -- 
 2.26.2
 
