@@ -2,89 +2,111 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B19DEC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:01:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 70EAAC43457
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:02:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C620D22242
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:01:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B7775222E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 10:02:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fLjiKN1A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C620D22242
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="fNTYX388"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B7775222E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUoRz-00061K-N7
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:01:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36544)
+	id 1kUoTh-0007Kt-NB
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 06:02:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36986)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kUoQV-0005VN-S3
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:59:31 -0400
-Received: from mail-lf1-x133.google.com ([2a00:1450:4864:20::133]:40635)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kUoQT-00064X-TQ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:59:31 -0400
-Received: by mail-lf1-x133.google.com with SMTP id a9so1362764lfc.7
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 02:59:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=3M99JTkIFEixHdxk6ZYa3yXOpidnjbVahkMrmshiRus=;
- b=fLjiKN1A6fQMZDaCMrvBj/qVf7vqaT9dFbbIQAVM8eIccoQphOtf3P9SwstAbXZjf2
- PzN0c5+Bu2WBS7YZC//sLh2tJiv1si9aslTTx1xU5dQWk9W7r8Saij8KjdysqXb6xWAj
- w5IxOlomAe5iOGSa6qaIE4+yMR1z9ca2Irl+LGH4Ir9jLl1pt6TuohgbS/THW0egddiU
- fx6H0RgdIsjSFL+kehG7A09MHQehI0bet2eN06cgpLQ4m+U6CfXNpI5hsKwDjGvR0ZLr
- X6ca+Uh8bocOjMMGvjO2pTM+kERh6ZRizrZPeQ27vkP2jcKUO7vxynbKtKLP6b1J3yXH
- r8/w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=3M99JTkIFEixHdxk6ZYa3yXOpidnjbVahkMrmshiRus=;
- b=HxmUZa0TNvJjPygxL+9tNgdDtBi5NO682nGm40PKOqiZRu+84Q6SpJy7LTFo1W4mLQ
- 4AN7ZcfGHiLXtO9MYzFGykmrUPDuDqkmnADW5ZHKkh241LXY0gCPuZlWXlgfZntW/2DM
- hYSESQGy8SBlwc7mSaNRIHwBNoUsPRxJcEe53o2wi3x89OOHLcg4coR2Lo/Vrm62+ftc
- 7VdgcOeWbwXKaZinu+NwsVfAXxzBkxia0qxem8SuwIqIJ7F/3Z0//TSdJaSUPvoZa/QF
- ytzbitPFXCV4VZ5iqyMiCoU1FBgkSbb/PPDoikGK82RbSaOti07cDAKY2hbcceRTuDjA
- OqAA==
-X-Gm-Message-State: AOAM533a7YZFX6Xg/ic0kNMPaQgx1t2ClJQZ21k6sIUvdQ7TW4Dfqscj
- FBSNKfdGyS0fDR6CTUAjdDqUATyHsDvGlZo4ebU=
-X-Google-Smtp-Source: ABdhPJyHDb6L5lan7Lm+oHM2rOkfnwrtyMTUL0+AC655fgFZjX11C1ZL7c+mjjY/T3gIa2d5byoHZ05GsZ44lT6J0iE=
-X-Received: by 2002:a19:185:: with SMTP id 127mr717267lfb.356.1603187967613;
- Tue, 20 Oct 2020 02:59:27 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
+ id 1kUoS5-0006M9-F2
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:01:09 -0400
+Received: from smtp-fw-33001.amazon.com ([207.171.190.10]:55877)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
+ id 1kUoS1-0006qF-Tm
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 06:01:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
+ t=1603188066; x=1634724066;
+ h=subject:to:cc:references:from:message-id:date:
+ mime-version:in-reply-to:content-transfer-encoding;
+ bh=xYkebfF5v1VYrfmpt5H76y0GpMhcmAnnFxGU/jvjOsc=;
+ b=fNTYX388k4LHRsmsdnJc25anUbULLDxSImrqSxfVUDE/SVIrOmT1jUtW
+ NYEMUfz2zshTBjSXDBir8KQ97T+QfoHcX7dGuMR3M6jfSlcOEjskgEZd5
+ hDmszs6oZ8tv+5LnXT5f/Qx5fnAqLDDl5YEfEHFdNXzNaXb4VLA1LCtqZ E=;
+X-IronPort-AV: E=Sophos;i="5.77,396,1596499200"; d="scan'208";a="85061117"
+Received: from sea32-co-svc-lb4-vlan3.sea.corp.amazon.com (HELO
+ email-inbound-relay-1a-821c648d.us-east-1.amazon.com) ([10.47.23.38])
+ by smtp-border-fw-out-33001.sea14.amazon.com with ESMTP;
+ 20 Oct 2020 10:00:58 +0000
+Received: from EX13MTAUWC002.ant.amazon.com
+ (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+ by email-inbound-relay-1a-821c648d.us-east-1.amazon.com (Postfix) with ESMTPS
+ id 6FE06A1DBD; Tue, 20 Oct 2020 10:00:50 +0000 (UTC)
+Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
+ EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 20 Oct 2020 10:00:50 +0000
+Received: from Alexanders-MacBook-Air.local (10.43.161.237) by
+ EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
+ id 15.0.1497.2; Tue, 20 Oct 2020 10:00:44 +0000
+Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
+To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Andy Lutomirski
+ <luto@kernel.org>
+CC: Jann Horn <jannh@google.com>, "Catangiu, Adrian Costin"
+ <acatan@amazon.com>, Jason Donenfeld <Jason@zx2c4.com>, Theodore Tso
+ <tytso@mit.edu>, Willy Tarreau <w@1wt.eu>, Eric Biggers
+ <ebiggers@kernel.org>, "open list, DOCUMENTATION"
+ <linux-doc@vger.kernel.org>, linux-kernel <linux-kernel@vger.kernel.org>,
+ <virtualization@lists.linux-foundation.org>, "MacCarthaigh, Colm"
+ <colmmacc@amazon.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
+ <bonzini@gnu.org>, "Singh, Balbir" <sblbir@amazon.com>, "Weiss, Radu"
+ <raduweis@amazon.com>, <oridgar@gmail.com>, <ghammer@redhat.com>, "Jonathan
+ Corbet" <corbet@lwn.net>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ <mst@redhat.com>, <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>,
+ Michal Hocko <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>,
+ Pavel Machek <pavel@ucw.cz>, linux-api <linux-api@vger.kernel.org>
+References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
+ <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
+ <CALCETrViTg_BWvRa+nfDWq=_B_ithzL-anVJNpsgHaXe9VgCNQ@mail.gmail.com>
+ <476895871.28084.1603127702969.JavaMail.zimbra@efficios.com>
+From: Alexander Graf <graf@amazon.de>
+Message-ID: <487fd972-0d45-168b-af3d-6e67eb6d08d3@amazon.de>
+Date: Tue, 20 Oct 2020 12:00:42 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
+ Gecko/20100101 Thunderbird/78.3.3
 MIME-Version: 1.0
-References: <20201019075224.14803-1-kraxel@redhat.com>
-In-Reply-To: <20201019075224.14803-1-kraxel@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Tue, 20 Oct 2020 13:59:15 +0400
-Message-ID: <CAJ+F1CJXt-RLCh5uezLVah4-Mmg1V5Uxx5UaP84Jm4FV1DwGGQ@mail.gmail.com>
-Subject: Re: [PATCH 00/14] ui: build spice and opengl as module.
-To: Gerd Hoffmann <kraxel@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000515e4605b2174912"
-Received-SPF: pass client-ip=2a00:1450:4864:20::133;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-lf1-x133.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <476895871.28084.1603127702969.JavaMail.zimbra@efficios.com>
+Content-Language: en-US
+X-Originating-IP: [10.43.161.237]
+X-ClientProxiedBy: EX13D01UWB003.ant.amazon.com (10.43.161.94) To
+ EX13D20UWC001.ant.amazon.com (10.43.162.244)
+Precedence: Bulk
+Content-Type: text/plain; charset="utf-8"; format="flowed"
+Content-Transfer-Encoding: base64
+Received-SPF: pass client-ip=207.171.190.10;
+ envelope-from=prvs=555e5d02a=graf@amazon.de; helo=smtp-fw-33001.amazon.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 06:01:04
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H3=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,147 +115,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, QEMU <qemu-devel@nongnu.org>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000515e4605b2174912
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+CgpPbiAxOS4xMC4yMCAxOToxNSwgTWF0aGlldSBEZXNub3llcnMgd3JvdGU6Cj4gCj4gCj4gLS0t
+LS0gT24gT2N0IDE3LCAyMDIwLCBhdCAyOjEwIFBNLCBBbmR5IEx1dG9taXJza2kgbHV0b0BrZXJu
+ZWwub3JnIHdyb3RlOgo+IAo+PiBPbiBGcmksIE9jdCAxNiwgMjAyMCBhdCA2OjQwIFBNIEphbm4g
+SG9ybiA8amFubmhAZ29vZ2xlLmNvbT4gd3JvdGU6Cj4+Pgo+Pj4gW2FkZGluZyBzb21lIG1vcmUg
+cGVvcGxlIHdobyBhcmUgaW50ZXJlc3RlZCBpbiBSTkcgc3R1ZmY6IEFuZHksIEphc29uLAo+Pj4g
+VGhlb2RvcmUsIFdpbGx5IFRhcnJlYXUsIEVyaWMgQmlnZ2Vycy4gYWxzbyBsaW51eC1hcGlALCBi
+ZWNhdXNlIHRoaXMKPj4+IGNvbmNlcm5zIHNvbWUgcHJldHR5IGZ1bmRhbWVudGFsIEFQSSBzdHVm
+ZiByZWxhdGVkIHRvIFJORyB1c2FnZV0KPj4+Cj4+PiBPbiBGcmksIE9jdCAxNiwgMjAyMCBhdCA0
+OjMzIFBNIENhdGFuZ2l1LCBBZHJpYW4gQ29zdGluCj4+PiA8YWNhdGFuQGFtYXpvbi5jb20+IHdy
+b3RlOgo+Pj4+IC0gQmFja2dyb3VuZAo+Pj4+Cj4+Pj4gVGhlIFZNIEdlbmVyYXRpb24gSUQgaXMg
+YSBmZWF0dXJlIGRlZmluZWQgYnkgTWljcm9zb2Z0IChwYXBlcjoKPj4+PiBodHRwOi8vZ28ubWlj
+cm9zb2Z0LmNvbS9md2xpbmsvP0xpbmtJZD0yNjA3MDkpIGFuZCBzdXBwb3J0ZWQgYnkKPj4+PiBt
+dWx0aXBsZSBoeXBlcnZpc29yIHZlbmRvcnMuCj4+Pj4KPj4+PiBUaGUgZmVhdHVyZSBpcyByZXF1
+aXJlZCBpbiB2aXJ0dWFsaXplZCBlbnZpcm9ubWVudHMgYnkgYXBwcyB0aGF0IHdvcmsKPj4+PiB3
+aXRoIGxvY2FsIGNvcGllcy9jYWNoZXMgb2Ygd29ybGQtdW5pcXVlIGRhdGEgc3VjaCBhcyByYW5k
+b20gdmFsdWVzLAo+Pj4+IHV1aWRzLCBtb25vdG9uaWNhbGx5IGluY3JlYXNpbmcgY291bnRlcnMs
+IGV0Yy4KPj4+PiBTdWNoIGFwcHMgY2FuIGJlIG5lZ2F0aXZlbHkgYWZmZWN0ZWQgYnkgVk0gc25h
+cHNob3R0aW5nIHdoZW4gdGhlIFZNCj4+Pj4gaXMgZWl0aGVyIGNsb25lZCBvciByZXR1cm5lZCB0
+byBhbiBlYXJsaWVyIHBvaW50IGluIHRpbWUuCj4+Pj4KPj4+PiBUaGUgVk0gR2VuZXJhdGlvbiBJ
+RCBpcyBhIHNpbXBsZSBjb25jZXB0IG1lYW50IHRvIGFsbGV2aWF0ZSB0aGUgaXNzdWUKPj4+PiBi
+eSBwcm92aWRpbmcgYSB1bmlxdWUgSUQgdGhhdCBjaGFuZ2VzIGVhY2ggdGltZSB0aGUgVk0gaXMg
+cmVzdG9yZWQKPj4+PiBmcm9tIGEgc25hcHNob3QuIFRoZSBodyBwcm92aWRlZCBVVUlEIHZhbHVl
+IGNhbiBiZSB1c2VkIHRvCj4+Pj4gZGlmZmVyZW50aWF0ZSBiZXR3ZWVuIFZNcyBvciBkaWZmZXJl
+bnQgZ2VuZXJhdGlvbnMgb2YgdGhlIHNhbWUgVk0uCj4+Pj4KPj4+PiAtIFByb2JsZW0KPj4+Pgo+
+Pj4+IFRoZSBWTSBHZW5lcmF0aW9uIElEIGlzIGV4cG9zZWQgdGhyb3VnaCBhbiBBQ1BJIGRldmlj
+ZSBieSBtdWx0aXBsZQo+Pj4+IGh5cGVydmlzb3IgdmVuZG9ycyBidXQgbmVpdGhlciB0aGUgdmVu
+ZG9ycyBvciB1cHN0cmVhbSBMaW51eCBoYXZlIG5vCj4+Pj4gZGVmYXVsdCBkcml2ZXIgZm9yIGl0
+IGxlYXZpbmcgdXNlcnMgdG8gZmVuZCBmb3IgdGhlbXNlbHZlcy4KPj4+Pgo+Pj4+IEZ1cnRoZXJt
+b3JlLCBzaW1wbHkgZmluZGluZyBvdXQgYWJvdXQgYSBWTSBnZW5lcmF0aW9uIGNoYW5nZSBpcyBv
+bmx5Cj4+Pj4gdGhlIHN0YXJ0aW5nIHBvaW50IG9mIGEgcHJvY2VzcyB0byByZW5ldyBpbnRlcm5h
+bCBzdGF0ZXMgb2YgcG9zc2libHkKPj4+PiBtdWx0aXBsZSBhcHBsaWNhdGlvbnMgYWNyb3NzIHRo
+ZSBzeXN0ZW0uIFRoaXMgcHJvY2VzcyBjb3VsZCBiZW5lZml0Cj4+Pj4gZnJvbSBhIGRyaXZlciB0
+aGF0IHByb3ZpZGVzIGFuIGludGVyZmFjZSB0aHJvdWdoIHdoaWNoIG9yY2hlc3RyYXRpb24KPj4+
+PiBjYW4gYmUgZWFzaWx5IGRvbmUuCj4+Pj4KPj4+PiAtIFNvbHV0aW9uCj4+Pj4KPj4+PiBUaGlz
+IHBhdGNoIGlzIGEgZHJpdmVyIHdoaWNoIGV4cG9zZXMgdGhlIFZpcnR1YWwgTWFjaGluZSBHZW5l
+cmF0aW9uIElECj4+Pj4gdmlhIGEgY2hhci1kZXYgRlMgaW50ZXJmYWNlIHRoYXQgcHJvdmlkZXMg
+SUQgdXBkYXRlIHN5bmMgYW5kIGFzeW5jCj4+Pj4gbm90aWZpY2F0aW9uLCByZXRyaWV2YWwgYW5k
+IGNvbmZpcm1hdGlvbiBtZWNoYW5pc21zOgo+Pj4+Cj4+Pj4gV2hlbiB0aGUgZGV2aWNlIGlzICdv
+cGVuKCknZWQgYSBjb3B5IG9mIHRoZSBjdXJyZW50IHZtIFVVSUQgaXMKPj4+PiBhc3NvY2lhdGVk
+IHdpdGggdGhlIGZpbGUgaGFuZGxlLiAncmVhZCgpJyBvcGVyYXRpb25zIGJsb2NrIHVudGlsIHRo
+ZQo+Pj4+IGFzc29jaWF0ZWQgVVVJRCBpcyBubyBsb25nZXIgdXAgdG8gZGF0ZSAtIHVudGlsIEhX
+IHZtIGdlbiBpZCBjaGFuZ2VzIC0KPj4+PiBhdCB3aGljaCBwb2ludCB0aGUgbmV3IFVVSUQgaXMg
+cHJvdmlkZWQvcmV0dXJuZWQuIE5vbmJsb2NraW5nICdyZWFkKCknCj4+Pj4gdXNlcyBFV09VTERC
+TE9DSyB0byBzaWduYWwgdGhhdCB0aGVyZSBpcyBubyBfbmV3XyBVVUlEIGF2YWlsYWJsZS4KPj4+
+Pgo+Pj4+ICdwb2xsKCknIGlzIGltcGxlbWVudGVkIHRvIGFsbG93IHBvbGxpbmcgZm9yIFVVSUQg
+dXBkYXRlcy4gU3VjaAo+Pj4+IHVwZGF0ZXMgcmVzdWx0IGluICdFUE9MTElOJyBldmVudHMuCj4+
+Pj4KPj4+PiBTdWJzZXF1ZW50IHJlYWQoKXMgZm9sbG93aW5nIGEgVVVJRCB1cGRhdGUgbm8gbG9u
+Z2VyIGJsb2NrLCBidXQgcmV0dXJuCj4+Pj4gdGhlIHVwZGF0ZWQgVVVJRC4gVGhlIGFwcGxpY2F0
+aW9uIG5lZWRzIHRvIGFja25vd2xlZGdlIHRoZSBVVUlEIHVwZGF0ZQo+Pj4+IGJ5IGNvbmZpcm1p
+bmcgaXQgdGhyb3VnaCBhICd3cml0ZSgpJy4KPj4+PiBPbmx5IG9uIHdyaXRpbmcgYmFjayB0byB0
+aGUgZHJpdmVyIHRoZSByaWdodC9sYXRlc3QgVVVJRCwgd2lsbCB0aGUKPj4+PiBkcml2ZXIgbWFy
+ayB0aGlzICJ3YXRjaGVyIiBhcyB1cCB0byBkYXRlIGFuZCByZW1vdmUgRVBPTExJTiBzdGF0dXMu
+Cj4+Pj4KPj4+PiAnbW1hcCgpJyBzdXBwb3J0IGFsbG93cyBtYXBwaW5nIGEgc2luZ2xlIHJlYWQt
+b25seSBzaGFyZWQgcGFnZSB3aGljaAo+Pj4+IHdpbGwgYWx3YXlzIGNvbnRhaW4gdGhlIGxhdGVz
+dCBVVUlEIHZhbHVlIGF0IG9mZnNldCAwLgo+Pj4KPj4+IEl0IHdvdWxkIGJlIG5pY2VyIGlmIHRo
+YXQgcGFnZSBqdXN0IGNvbnRhaW5lZCBhbiBpbmNyZW1lbnRpbmcgY291bnRlciwKPj4+IGluc3Rl
+YWQgb2YgYSBVVUlELiBJdCdzIG5vdCBsaWtlIHRoZSBhcHBsaWNhdGlvbiBjYXJlcyAqd2hhdCog
+dGhlIFVVSUQKPj4+IGNoYW5nZWQgdG8sIGp1c3QgdGhhdCBpdCAqZGlkKiBjaGFuZ2UgYW5kIGFs
+bCBSTkdzIHN0YXRlIG5vdyBuZWVkcyB0bwo+Pj4gYmUgcmVzZWVkZWQgZnJvbSB0aGUga2VybmVs
+LCByaWdodD8gQW5kIGFuIGFwcGxpY2F0aW9uIGNhbid0IHJlbGlhYmx5Cj4+PiByZWFkIHRoZSBl
+bnRpcmUgVVVJRCBmcm9tIHRoZSBtZW1vcnkgbWFwcGluZyBhbnl3YXksIGJlY2F1c2UgdGhlIFZN
+Cj4+PiBtaWdodCBiZSBmb3JrZWQgaW4gdGhlIG1pZGRsZS4KPj4+Cj4+PiBTbyBJIHRoaW5rIHlv
+dXIga2VybmVsIGRyaXZlciBzaG91bGQgZGV0ZWN0IFVVSUQgY2hhbmdlcyBhbmQgdGhlbiB0dXJu
+Cj4+PiB0aG9zZSBpbnRvIGEgbW9ub3RvbmljYWxseSBpbmNyZW1lbnRpbmcgY291bnRlci4gKFBy
+b2JhYmx5IDY0IGJpdHMKPj4+IHdpZGU/KSAoVGhhdCdzIHByb2JhYmx5IGFsc28gYSBsaXR0bGUg
+Yml0IGZhc3RlciB0aGFuIGNvbXBhcmluZyBhbgo+Pj4gZW50aXJlIFVVSUQuKQo+Pj4KPj4+IEFu
+IG9wdGlvbiBtaWdodCBiZSB0byBwdXQgdGhhdCBjb3VudGVyIGludG8gdGhlIHZEU08sIGluc3Rl
+YWQgb2YgYQo+Pj4gc2VwYXJhdGUgVk1BOyBidXQgSSBkb24ndCBrbm93IGhvdyB0aGUgb3RoZXIg
+Zm9sa3MgZmVlbCBhYm91dCB0aGF0Lgo+Pj4gQW5keSwgZG8geW91IGhhdmUgb3BpbmlvbnMgb24g
+dGhpcz8gVGhhdCB3YXksIG5vcm1hbCB1c2Vyc3BhY2UgY29kZQo+Pj4gdGhhdCB1c2VzIHRoaXMg
+aW5mcmFzdHJ1Y3R1cmUgd291bGRuJ3QgaGF2ZSB0byBtZXNzIGFyb3VuZCB3aXRoIGEKPj4+IHNw
+ZWNpYWwgZGV2aWNlIGF0IGFsbC4gQW5kIGl0J2QgYmUgdXNhYmxlIGluIHNlY2NvbXAgc2FuZGJv
+eGVzIGFuZCBzbwo+Pj4gb24gd2l0aG91dCBuZWVkaW5nIHNwZWNpYWwgcGx1bWJpbmcuIEFuZCBs
+aWJyYXJpZXMgd291bGRuJ3QgaGF2ZSB0bwo+Pj4gY2FsbCBvcGVuKCkgYW5kIG1lc3Mgd2l0aCBm
+aWxlIGRlc2NyaXB0b3IgbnVtYmVycy4KPj4KPj4gVGhlIHZEU08gbWlnaHQgYmUgYW5ub3lpbmds
+eSBzbG93IGZvciB0aGlzLiAgU29tZXRoaW5nIGxpa2UgdGhlIHJzZXEKPj4gcGFnZSBtaWdodCBt
+YWtlIHNlbnNlLiAgSXQgY291bGQgYmUgYSBnZW5lcmljIGluZGljYXRpb24gb2YgInN5c3RlbQo+
+PiB3ZW50IHRocm91Z2ggc29tZSBmb3JtIG9mIHN1c3BlbmQiLgo+IAo+IFRoaXMgbWlnaHQgaW5k
+ZWVkIGZpdCBuaWNlbHkgYXMgYW4gZXh0ZW5zaW9uIG9mIG15IEtUTFMgcHJvdG90eXBlIChleHRl
+bnNpYmxlIHJzZXEpOgo+IAo+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xrbWwvMjAyMDA5MjUx
+ODE1MTguNDE0MS0xLW1hdGhpZXUuZGVzbm95ZXJzQGVmZmljaW9zLmNvbS8KPiAKPiBUaGVyZSBh
+cmUgYSBmZXcgd2F5cyB3ZSBjb3VsZCB3aXJlIHRoaW5ncyB1cC4gT25lIG1pZ2h0IGJlIHRvIGFk
+ZCB0aGUKPiBVVUlEIGZpZWxkIGludG8gdGhlIGV4dGVuZGVkIEtUTFMgc3RydWN0dXJlIChzbyBp
+dCdzIGFsd2F5cyB1cGRhdGVkIGFmdGVyIGl0Cj4gY2hhbmdlcyBvbiBuZXh0IHJldHVybiB0byB1
+c2VyLXNwYWNlKS4gRm9yIHRoaXMgSSBhc3N1bWUgdGhhdCB0aGUgTGludXggc2NoZWR1bGVyCgpJ
+IHRoaW5rIG9uZSB0aGF0IHRoYXQgYmVjYW1lIGFwcGFyZW50IGluIHRoZSBkaXNjdXNzaW9uIGlu
+IHRoaXMgdGhyZWFkIAp3YXMgdGhhdCB3ZSB3YW50IGEgTGludXggaW50ZXJuYWwgZ2VuZXJhdGlv
+biBjb3VudGVyIHJhdGhlciB0aGFuIGV4cG9zZSAKdGhlIFVVSUQgdmVyYmF0aW0uIFRoYXQgd2F5
+LCB3ZSBkb24ndCBnaXZlIGF3YXkgcG90ZW50aWFsIHNlY3JldHMgdG8gCnVzZXIgc3BhY2UgYW5k
+IHdlIGNhbiBzdXBwb3J0IG90aGVyIGFyY2hpdGVjdHVyZXMgbW9yZSBlYXNpbHkuCgo+IHdpdGhp
+biB0aGUgZ3Vlc3QgVk0gYWx3YXlzIHByZWVtcHRzIGFsbCB0aHJlYWRzIGJlZm9yZSBhIFZNIGlz
+IHN1c3BlbmRlZCAoaXMgdGhhdAo+IGluZGVlZCB0cnVlID8pLgoKVGhlIFZNIGRvZXMgbm90IGtu
+b3cgdGhhdCBpdCBnZXRzIHNuYXBzaG90dGVkLiBJdCBvbmx5IGtub3dzIHRoYXQgaXQgCmdldHMg
+cmVzdW1lZCAodGhyb3VnaCB0aGlzIGludGVyZmFjZSkuCgo+IFRoaXMgbGVhZHMgdG8gb25lIGlt
+cG9ydGFudCBxdWVzdGlvbiB0aG91Z2g6IGhvdyBpcyB0aGUgVVVJRCBjaGVjayB2cyBjb21taXQg
+b3BlcmF0aW9uCj4gbWFkZSBhdG9taWMgd2l0aCByZXNwZWN0IHRvIHN1c3BlbmQgPyBVbmxlc3Mg
+d2UgdXNlIHJzZXEgY3JpdGljYWwgc2VjdGlvbnMgaW4gYXNzZW1ibHksCj4gd2hlcmUgdGhlIGtl
+cm5lbCB3aWxsIGFib3J0IHRoZSByc2VxIGNyaXRpY2FsIHNlY3Rpb24gb24gcHJlZW1wdGlvbiwg
+SSBkb24ndCBzZWUgaG93IHdlCj4gY2FuIGVuc3VyZSB0aGF0IHRoZSBVVUlEIHZhbHVlIGRvZXMg
+bm90IGNoYW5nZSByaWdodCBhZnRlciBpdCBoYXMgYmVlbiBjaGVja2VkLCBiZWZvcmUKPiB0aGUg
+ImNvbW1pdCIgc2lkZS1lZmZlY3QuIEFuZCB3aGF0IGlzIHRoZSBleHBlY3RlZCAiY29tbWl0IiBz
+aWRlLWVmZmVjdCA/IElzIGl0IGEgc3RvcmUKPiB0byBhIHZhcmlhYmxlIGluIHVzZXItc3BhY2Ug
+bWVtb3J5LCBvciBpcyBpdCBpc3N1aW5nIGEgc3lzdGVtIGNhbGwgd2hpY2ggc2VuZHMgYSBwYWNr
+ZXQgb3Zlcgo+IHRoZSBuZXR3b3JrID8KCkkgdGhpbmsgdGhlIGVhc2llc3QgYW5zd2VyIEkgY291
+bGQgY29tZSB1cCB3aXRoIGhlcmUgd291bGQgYmUgIm1ha2UgaXQgYSAKdTMyIi4gVGhlbiB5b3Ug
+Y2FuIGp1c3QgYWNjZXNzIGl0IGF0b21pY2FsbHkgYW55d2hlcmUsIG5vPwoKVGhlIGJ1cmRlbiBv
+biB1c2VyIHNwYWNlIHdpdGggc3VjaCBhbiBpbnRlcmZhY2UgaXMgc3RpbGwgcHJldHR5IGhpZ2gg
+CnRob3VnaC4gQWxsIHVzZXIgc3BhY2UgdGhhdCB3YW50cyB0byBkbyBhICJ0cmFuc2FjdGlvbiIg
+YmFzZWQgb24gc2VjcmV0cyAKd291bGQgbm93IG5lZWQgdG8gcmVhZCB0aGUgZ2VuZXJhdGlvbiBJ
+RCBhdCB0aGUgYmVnaW5uaW5nIG9mIHRoZSAKdHJhbnNhY3Rpb24gYW5kIGRvdWJsZSBjaGVjayB3
+aGV0aGVyIGl0J3Mgc3RpbGwgdGhlIHNhbWUgYXQgdGhlIGVuZCBvZiAKaXQgKGUuZy4gYmVmb3Jl
+IHNlbmRpbmcgb3V0IGEgbmV0d29yayBwYWNrZXQgYmFzZWQgb24gYSBrZXkgZGVyaXZlZCBmcm9t
+IApyYW5kb21uZXNzPykuCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxvcG1lbnQgQ2VudGVyIEdlcm1h
+bnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2VzY2hhZWZ0c2Z1ZWhydW5nOiBD
+aHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5nZXRyYWdlbiBhbSBBbXRzZ2Vy
+aWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIKU2l0ejogQmVybGluClVzdC1J
+RDogREUgMjg5IDIzNyA4NzkKCgo=
 
-Hi
-
-On Mon, Oct 19, 2020 at 12:06 PM Gerd Hoffmann <kraxel@redhat.com> wrote:
-
-> - Add QemuSpiceOps, reorganize spice stubs.
-> - Add support for module dependencies.
-> - Build spice-core modular, and make the existing spice
->   modules (audio, chardev, qxl) depend on spice-core.
-> - Build egl-headless display and opengl helpers modular
->   (pretty easy thanks to module dependencies).
->
-> Gerd Hoffmann (14):
->   spice: add module helpers
->   spice: add QemuSpiceOps, move migrate_info
->   spice: move qemu_spice_init() to QemuSpiceOps.
->   spice: move display_init() to QemuSpiceOps.
->   spice: move add_interface() to QemuSpiceOps.
->   spice: move auth functions to QemuSpiceOps.
->   spice: move display_add_client() to QemuSpiceOps.
->   spice: wire up monitor in QemuSpiceOps.
->   spice: load module when enabled on the cmdline
->   modules: dependencies infrastructure
->   modules: add spice dependencies
->   spice: flip modules switch
->   opengl: build egl-headless display modular
->   opengl: build opengl helper code modular
->
-
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-
-thanks!
-
-
->  include/ui/qemu-spice-module.h | 44 ++++++++++++++++++
->  include/ui/qemu-spice.h        | 42 +----------------
->  audio/spiceaudio.c             |  4 +-
->  chardev/spice.c                |  2 +-
->  monitor/misc.c                 |  2 +-
->  monitor/qmp-cmds.c             |  6 +--
->  softmmu/vl.c                   | 10 ++--
->  ui/spice-core.c                | 31 +++++++++----
->  ui/spice-input.c               |  6 +--
->  ui/spice-module.c              | 85 ++++++++++++++++++++++++++++++++++
->  util/module.c                  | 44 ++++++++++++++++--
->  ui/meson.build                 | 28 +++++++++--
->  12 files changed, 232 insertions(+), 72 deletions(-)
->  create mode 100644 include/ui/qemu-spice-module.h
->  create mode 100644 ui/spice-module.c
->
-> --
-> 2.27.0
->
->
->
->
-
---=20
-Marc-Andr=C3=A9 Lureau
-
---000000000000515e4605b2174912
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr">Hi<br></div><br><div class=3D"gmail_quote=
-"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Oct 19, 2020 at 12:06 PM Ge=
-rd Hoffmann &lt;<a href=3D"mailto:kraxel@redhat.com">kraxel@redhat.com</a>&=
-gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0=
-px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">- Add=
- QemuSpiceOps, reorganize spice stubs.<br>
-- Add support for module dependencies.<br>
-- Build spice-core modular, and make the existing spice<br>
-=C2=A0 modules (audio, chardev, qxl) depend on spice-core.<br>
-- Build egl-headless display and opengl helpers modular<br>
-=C2=A0 (pretty easy thanks to module dependencies).<br>
-<br>
-Gerd Hoffmann (14):<br>
-=C2=A0 spice: add module helpers<br>
-=C2=A0 spice: add QemuSpiceOps, move migrate_info<br>
-=C2=A0 spice: move qemu_spice_init() to QemuSpiceOps.<br>
-=C2=A0 spice: move display_init() to QemuSpiceOps.<br>
-=C2=A0 spice: move add_interface() to QemuSpiceOps.<br>
-=C2=A0 spice: move auth functions to QemuSpiceOps.<br>
-=C2=A0 spice: move display_add_client() to QemuSpiceOps.<br>
-=C2=A0 spice: wire up monitor in QemuSpiceOps.<br>
-=C2=A0 spice: load module when enabled on the cmdline<br>
-=C2=A0 modules: dependencies infrastructure<br>
-=C2=A0 modules: add spice dependencies<br>
-=C2=A0 spice: flip modules switch<br>
-=C2=A0 opengl: build egl-headless display modular<br>
-=C2=A0 opengl: build opengl helper code modular<br></blockquote><div><br></=
-div><div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandr=
-e.lureau@redhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div><br></di=
-v><div>thanks!</div><div><br></div><blockquote class=3D"gmail_quote" style=
-=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding=
--left:1ex">
-<br>
-=C2=A0include/ui/qemu-spice-module.h | 44 ++++++++++++++++++<br>
-=C2=A0include/ui/qemu-spice.h=C2=A0 =C2=A0 =C2=A0 =C2=A0 | 42 +------------=
-----<br>
-=C2=A0audio/spiceaudio.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
-=C2=A0 4 +-<br>
-=C2=A0chardev/spice.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 |=C2=A0 2 +-<br>
-=C2=A0monitor/misc.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0|=C2=A0 2 +-<br>
-=C2=A0monitor/qmp-cmds.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0|=
-=C2=A0 6 +--<br>
-=C2=A0softmmu/vl.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 =C2=A0| 10 ++--<br>
-=C2=A0ui/spice-core.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 | 31 +++++++++----<br>
-=C2=A0ui/spice-input.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0|=C2=A0 6 +--<br>
-=C2=A0ui/spice-module.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 | 8=
-5 ++++++++++++++++++++++++++++++++++<br>
-=C2=A0util/module.c=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =
-=C2=A0 | 44 ++++++++++++++++--<br>
-=C2=A0ui/meson.build=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0=
- =C2=A0| 28 +++++++++--<br>
-=C2=A012 files changed, 232 insertions(+), 72 deletions(-)<br>
-=C2=A0create mode 100644 include/ui/qemu-spice-module.h<br>
-=C2=A0create mode 100644 ui/spice-module.c<br>
-<br>
--- <br>
-2.27.0<br>
-<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000515e4605b2174912--
 
