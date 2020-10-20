@@ -2,83 +2,75 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D86F0C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:41:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 381E2C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:43:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F3E622247
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:41:50 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PG0EtB1b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F3E622247
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8044E22247
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 15:43:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8044E22247
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUtll-0000Hr-3Q
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:41:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33202)
+	id 1kUtnV-0002t2-IY
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 11:43:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUtjn-0006gr-PZ
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:39:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59091)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kUtjl-0001QL-2j
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:39:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603208383;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=ON/re6l/Dv6x0V1ypsA/2QI8DNbvfVaMF39pigVEdMg=;
- b=PG0EtB1bL8SnFT5H2O+wU9+BUC7UhduQuPbPllQbOkpp1t3hQcaPg2Rpwcxj4M20Bg+ItG
- xWQztp8/G8AxX69Sbk/CckRsSwV1SrpR70FYF1CWNNjoiKKfh5IGhFaby/QlHhrwubMIN1
- ucNdWl9j8AkRnHyiZi2W51Z6eTq9cxU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-124-Y4oR3-4OPq2mmubDsPObNw-1; Tue, 20 Oct 2020 11:39:41 -0400
-X-MC-Unique: Y4oR3-4OPq2mmubDsPObNw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5AE558049DD;
- Tue, 20 Oct 2020 15:39:40 +0000 (UTC)
-Received: from thuth.com (dhcp-192-238.str.redhat.com [10.33.192.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6F2A15B4A1;
- Tue, 20 Oct 2020 15:39:39 +0000 (UTC)
-From: Thomas Huth <thuth@redhat.com>
-To: Yoshinori Sato <ysato@users.sourceforge.jp>,
-	qemu-devel@nongnu.org
-Subject: [PATCH 2/3] hw/timer/sh_timer: Silence warnings about missing
- fallthrough statements
-Date: Tue, 20 Oct 2020 17:39:34 +0200
-Message-Id: <20201020153935.54315-3-thuth@redhat.com>
-In-Reply-To: <20201020153935.54315-1-thuth@redhat.com>
-References: <20201020153935.54315-1-thuth@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtlz-000172-7x
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:42:03 -0400
+Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:57095)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kUtlx-0001wr-5b
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:42:02 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.44])
+ by mo804.mail-out.ovh.net (Postfix) with ESMTPS id CE52D6DDA3E1;
+ Tue, 20 Oct 2020 17:41:57 +0200 (CEST)
+Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Tue, 20 Oct
+ 2020 17:41:57 +0200
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-95G0011d4c026b-4f92-4dcf-b45a-e0cd5136e208,
+ 1DF5E91C91B319FFB92086F2F245FA8D0BCC998A) smtp.auth=groug@kaod.org
+Date: Tue, 20 Oct 2020 17:41:56 +0200
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PATCH 1/5] tests/9pfs: Factor out do_fs_version() helper
+Message-ID: <20201020174156.229f8008@bahia.lan>
+In-Reply-To: <3517148.drKrQmItIC@silver>
+References: <160320655763.255209.3890094487013964615.stgit@bahia.lan>
+ <160320666564.255209.11628044710614310582.stgit@bahia.lan>
+ <3517148.drKrQmItIC@silver>
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+MIME-Version: 1.0
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.95]
+X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: ff9009a7-ff7c-43fb-a98f-fc662f12538b
+X-Ovh-Tracer-Id: 379709747007101338
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: 0
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgdeltdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
+Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo804.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 09:35:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,58 +83,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When compiling with -Werror=implicit-fallthrough, gcc complains about
-missing fallthrough annotations in this file. Looking at the code,
-the fallthrough is very likely intended here, so add some comments
-to silence the compiler warnings.
+On Tue, 20 Oct 2020 17:34:05 +0200
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Signed-off-by: Thomas Huth <thuth@redhat.com>
----
- hw/timer/sh_timer.c | 4 ++++
- 1 file changed, 4 insertions(+)
+> On Dienstag, 20. Oktober 2020 17:11:05 CEST Greg Kurz wrote:
+> > fs_version() is a top level test function. Factor out the sugar
+> > to a separate helper instead of hijacking it in other tests.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> > ---
+> >  tests/qtest/virtio-9p-test.c |   14 +++++++++-----
+> >  1 file changed, 9 insertions(+), 5 deletions(-)
+> > 
+> > diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
+> > index c15908f27b3d..63f91aaf77e6 100644
+> > --- a/tests/qtest/virtio-9p-test.c
+> > +++ b/tests/qtest/virtio-9p-test.c
+> > @@ -567,10 +567,8 @@ static void v9fs_rflush(P9Req *req)
+> >      v9fs_req_free(req);
+> >  }
+> > 
+> > -static void fs_version(void *obj, void *data, QGuestAllocator *t_alloc)
+> > +static void do_fs_version(QVirtio9P *v9p)
+> >  {
+> > -    QVirtio9P *v9p = obj;
+> > -    alloc = t_alloc;
+> >      const char *version = "9P2000.L";
+> >      uint16_t server_len;
+> >      char *server_version;
+> > @@ -585,13 +583,19 @@ static void fs_version(void *obj, void *data,
+> > QGuestAllocator *t_alloc) g_free(server_version);
+> >  }
+> 
+> So the naming convention from now on shall be do_fs_*() for non-toplevel 
+> functions there. Not that I care too much about the precise prefix, but how 
+> about just do_*() for them instead?
+> 
 
-diff --git a/hw/timer/sh_timer.c b/hw/timer/sh_timer.c
-index b09e30f938..934daaa7dc 100644
---- a/hw/timer/sh_timer.c
-+++ b/hw/timer/sh_timer.c
-@@ -122,6 +122,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_EXTCLK) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved TPSC value\n");
-             break;
-@@ -135,6 +136,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_EXTCLK) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved CKEG value\n");
-             break;
-@@ -147,6 +149,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_CAPT) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved ICPE value\n");
-             break;
-@@ -180,6 +183,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             s->tcpr = value;
-             break;
-         }
-+        /* fallthrough */
-     default:
-         hw_error("sh_timer_write: Bad offset %x\n", (int)offset);
-     }
--- 
-2.18.2
+I've prepended "do_" to the existing names by pure laziness but I'm
+fine with any prefix or naming convention actually.
+
+So just tell me what you prefer and I'll send a v2.
+
+> Except of that, your patches look fine to me.
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
 
