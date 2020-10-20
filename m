@@ -7,80 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F91C388F7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01E20C388F2
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:07:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 810FF21707
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5FE9E2085B
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:07:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kd4VcaY0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 810FF21707
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zyunfGmt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FE9E2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60016 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuAk-0000ne-Fy
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:07:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37512)
+	id 1kUuAp-0000zw-B3
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:07:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37732)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0s-0004jX-De
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:26 -0400
-Received: from mail-wr1-x434.google.com ([2a00:1450:4864:20::434]:37994)
+ id 1kUu15-0005Hm-O1
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:39 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:35868)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu0q-0003tZ-Ip
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:26 -0400
-Received: by mail-wr1-x434.google.com with SMTP id n18so2798417wrs.5
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:24 -0700 (PDT)
+ id 1kUu14-0003w6-1I
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:39 -0400
+Received: by mail-wm1-x329.google.com with SMTP id e2so2519114wme.1
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=2iFviitDl5greJ6XddSkN6uHSPkj+fpazfKldoUVZt8=;
- b=kd4VcaY0DFoqvGN15E4DZTFUflmEr6vKYi124fLVdTnq9H7I4/+McAm9p7MKmyNO9B
- Ws4Iac3TfkpZ1PDOe2ZLw9wBayJJJK4Y8gE1d+DbF3VAFlcIpDJ8AGa/qNAY+hJtMfTF
- JzdBtGMQrJ10WH68DUKwCrK3UNFhZ5Mi6d/Fj4jw6GYhVZmfxMzXvEQ6Qpq42Pa7f3u2
- LBatwBJXs7YJY3bqBNO4XqBMePA/JX5Cwqck3rr3S+m0tgxUfe1c72GfqkGaKxROdfSJ
- hzORFx3nyETdKN9I70EhUiuDOHkaKdpx7/QftKRFPj+VFTyQ1RBdXzJ3mKMk/rYEuldt
- 9y5g==
+ bh=1TAKmnrXBfL6eR3DBczCUzOiCIS8y/1ety/iZUsCGWo=;
+ b=zyunfGmtNVncBEf5Ay26fz6kmDe8+2y54N+7Te8xyjAEL/4mySA6rfhOaeouHKj96h
+ TQnT5SLhxbfNDkEqooV/RGvMUGOoR5ND6Wwc39kqW54z1vDtpkIv1+tGJ1FxeYuH+zNO
+ sX2fH6LD6We2gIIbp54wcHrMiSJ6Auc3p4fWhsVei1Pjq9k6FFFssDLGCVUbwLKBxQGe
+ L3sak0MaU68dS+Ye3Y0St+grK20/Q0KC5TS2/3WtRX++Yjkfag6tS81s06fDRRbtXqOM
+ Xv9p7OAWzp2SKnLyFxZoFbUj/ZsMT0tEiMZgFMZ2DczO7KDgp1kvdEKZCfEzHE70cLpT
+ 1D/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=2iFviitDl5greJ6XddSkN6uHSPkj+fpazfKldoUVZt8=;
- b=IkDMnFxnH4reVLVEw26fZDRVWeS5YxpSlX5XtDcT7vWFhVidy7SX5a65HOAKUQqVdo
- cPkWQMoC8o5/laLUOi0CrAjKbDhhjbh91ySl+Mo+FmuCCsVI5oQopZZQygHJdTmkg61U
- zWiEgFdRbwpd3cATkLjEaL96VHcAZjRCk4Xt8IEy8GATp5KC2x7gypC+iLUScO570gkY
- sXNlhRaNocDDLtvkzI72/oO2K2t2Y/e0NES7C//8vH30xnrQrKkqGu3kNdL6f4085nNR
- fpXtusIKioNPKaKeqdjP1n8xSu8S2yITJ0qGJn2OUpRIDhJK4AuNS+vVoH+J7KBQDbBg
- m9Lw==
-X-Gm-Message-State: AOAM533f9JuJiR3ipX1Lqy8Z5Ht4qsFf7kh8wWS7Q/2BRAxBVx0fvB/y
- 8Lebzd8hQdoPDcdfmkQbCo68MtnhHUwZ5Q==
-X-Google-Smtp-Source: ABdhPJyaNyiUXbbVS8jl4Uo4DTPTgpqM5rP7hNatAxHg8K3JKp6D9bb95g4cN/7gd8vj/xU6J6Y4Ag==
-X-Received: by 2002:adf:ee4c:: with SMTP id w12mr4132007wro.22.1603209442814; 
- Tue, 20 Oct 2020 08:57:22 -0700 (PDT)
+ bh=1TAKmnrXBfL6eR3DBczCUzOiCIS8y/1ety/iZUsCGWo=;
+ b=M22bPef0idxIKqdT7WWx28VVL2nCdUYhPcuXIW45/igdi/evX0HwdWebaNGNiD9Rr7
+ 7U1vtg/imNc8ED2SkExQ3GC50u3FdTD4P+61GeNgnp9wEbNArMjwnLhyZgeVJu/PFM7g
+ WF3jHbaH7IA02ck+slEFz8MfN+44rT0L03tkeT3QN+ej5Y8jS0oyKJvXiJoKRUWTGQ+k
+ mftiuHqeCJ87IB3ytS8NGeac8yBKul8Kk8oYgcbtfNywq+wKAum9x6IxAjK828LHMDOF
+ zPYmIRqIMLCMGlqkebt6w5jvyIqgUoyQcv52PHig8zZRiPCewM8eYTOiEanxxV+Mglqu
+ UMuQ==
+X-Gm-Message-State: AOAM533sPXsZDR0k6lP45/xcmusdQLA3mphORMElcvfPLRAVXZC/3c3m
+ Fa7NWZ+a9ukr+VUy0okbqWiCCOWyzeOSfQ==
+X-Google-Smtp-Source: ABdhPJxDYBb9c5svNh/4mW31Tb8OxvkbB05ZzqVYUrOSGXyDRFD6f8XcA0BxLGnzUiFNIzxeZoO/9Q==
+X-Received: by 2002:a1c:e403:: with SMTP id b3mr2884543wmh.79.1603209456318;
+ Tue, 20 Oct 2020 08:57:36 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.21
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.35
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:21 -0700 (PDT)
+ Tue, 20 Oct 2020 08:57:35 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 14/41] hw/intc/bcm2836_control: Use IRQ definitions instead of
- magic numbers
-Date: Tue, 20 Oct 2020 16:56:29 +0100
-Message-Id: <20201020155656.8045-15-peter.maydell@linaro.org>
+Subject: [PULL 24/41] target/arm: Don't allow BLX imm for M-profile
+Date: Tue, 20 Oct 2020 16:56:39 +0100
+Message-Id: <20201020155656.8045-25-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
 References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::434;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x434.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x329.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -106,50 +104,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The BLX immediate insn in the Thumb encoding always performs
+a switch from Thumb to Arm state. This would be totally useless
+in M-profile which has no Arm decoder, and so the instruction
+does not exist at all there. Make the encoding UNDEF for M-profile.
 
-The IRQ values are defined few lines earlier, use them instead of
-the magic numbers.
+(This part of the encoding space is used for the branch-future
+and low-overhead-loop insns in v8.1M.)
 
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201017180731.1165871-3-f4bug@amsat.org
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+Message-id: 20201019151301.2046-6-peter.maydell@linaro.org
 ---
- hw/intc/bcm2836_control.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ target/arm/translate.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/hw/intc/bcm2836_control.c b/hw/intc/bcm2836_control.c
-index 53dba0080ca..2ead76ffdce 100644
---- a/hw/intc/bcm2836_control.c
-+++ b/hw/intc/bcm2836_control.c
-@@ -157,22 +157,22 @@ static void bcm2836_control_set_local_irq(void *opaque, int core, int local_irq,
- 
- static void bcm2836_control_set_local_irq0(void *opaque, int core, int level)
+diff --git a/target/arm/translate.c b/target/arm/translate.c
+index 9f2201ca577..dc3a4031db7 100644
+--- a/target/arm/translate.c
++++ b/target/arm/translate.c
+@@ -7918,6 +7918,14 @@ static bool trans_BLX_i(DisasContext *s, arg_BLX_i *a)
  {
--    bcm2836_control_set_local_irq(opaque, core, 0, level);
-+    bcm2836_control_set_local_irq(opaque, core, IRQ_CNTPSIRQ, level);
- }
+     TCGv_i32 tmp;
  
- static void bcm2836_control_set_local_irq1(void *opaque, int core, int level)
- {
--    bcm2836_control_set_local_irq(opaque, core, 1, level);
-+    bcm2836_control_set_local_irq(opaque, core, IRQ_CNTPNSIRQ, level);
- }
- 
- static void bcm2836_control_set_local_irq2(void *opaque, int core, int level)
- {
--    bcm2836_control_set_local_irq(opaque, core, 2, level);
-+    bcm2836_control_set_local_irq(opaque, core, IRQ_CNTHPIRQ, level);
- }
- 
- static void bcm2836_control_set_local_irq3(void *opaque, int core, int level)
- {
--    bcm2836_control_set_local_irq(opaque, core, 3, level);
-+    bcm2836_control_set_local_irq(opaque, core, IRQ_CNTVIRQ, level);
- }
- 
- static void bcm2836_control_set_gpu_irq(void *opaque, int irq, int level)
++    /*
++     * BLX <imm> would be useless on M-profile; the encoding space
++     * is used for other insns from v8.1M onward, and UNDEFs before that.
++     */
++    if (arm_dc_feature(s, ARM_FEATURE_M)) {
++        return false;
++    }
++
+     /* For A32, ARM_FEATURE_V5 is checked near the start of the uncond block. */
+     if (s->thumb && (a->imm & 2)) {
+         return false;
 -- 
 2.20.1
 
