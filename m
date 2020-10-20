@@ -2,122 +2,84 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83BD1C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:39:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E012C4363D
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 22:03:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 88A1522244
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 21:39:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 33B8622256
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 22:03:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Fh4jiw1T"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 88A1522244
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JxgxdY0K"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33B8622256
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41154 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47778 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUzMA-0002re-52
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 17:39:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40192)
+	id 1kUzjC-0007Uq-UW
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 18:03:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43838)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
- id 1kUzKk-0002QX-Id
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:38:19 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62540)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
- id 1kUzKi-0007TZ-0M
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 17:38:18 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09KLWwXY054802; Tue, 20 Oct 2020 17:38:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=mime-version :
- content-type : content-transfer-encoding : date : from : to : cc : subject
- : in-reply-to : references : message-id; s=pp1;
- bh=i0PnR+F0kwJanYLavo+Y6fZ1vWPX4WFyyqb/awbHcLc=;
- b=Fh4jiw1TEE1pZ2046IhfsJusz5gYA7+cLIWDAldNDuml1lEqUj2COTr8k24CwTFyNMup
- 8Gechi4BCf0NNLI3GHfD4goZc1ewhrpmRxdsSgaeClWbgGAZIf6zDXmapujXh0y5Far3
- Mphu9f/Ufh62xpZLV4Y/ou8osrCHTin1RtEWKXmdD2iBCLHZcc3xA/9MW50uLPey8kyU
- hMbGL+vICcTDM3qEnmj/03ot+zpBx/EV6jKIQg9BNa2NxRzVUw6tofDV5vX7BmNSvT/p
- +oLDEUtZjQS/XkOKEHbFnLFEfU0j/65adzViAsPnAM05qLxgTmABR1VoXuI+9aENpETI VQ== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34a79y94hu-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 17:38:09 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09KLXkCv056925;
- Tue, 20 Oct 2020 17:38:08 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34a79y94he-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 17:38:08 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09KLW2LX009148;
- Tue, 20 Oct 2020 21:33:07 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03dal.us.ibm.com with ESMTP id 347r899uuy-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Tue, 20 Oct 2020 21:33:07 +0000
-Received: from b03ledav004.gho.boulder.ibm.com
- (b03ledav004.gho.boulder.ibm.com [9.17.130.235])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09KLX1nm29295298
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Tue, 20 Oct 2020 21:33:01 GMT
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1453F7805E;
- Tue, 20 Oct 2020 21:33:06 +0000 (GMT)
-Received: from b03ledav004.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 980E678060;
- Tue, 20 Oct 2020 21:33:05 +0000 (GMT)
-Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
- by b03ledav004.gho.boulder.ibm.com (Postfix) with ESMTP;
- Tue, 20 Oct 2020 21:33:05 +0000 (GMT)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kUzhh-0006h6-SZ
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 18:02:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24520)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kUzhf-0001hz-0N
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 18:02:01 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603231317;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=85kHZDvL+9yoxpxYhyHX3J2IWsC8gN+DiR2A160Yq8o=;
+ b=JxgxdY0KHAFGTmksx4838SjpLvQLXOafcOJdO5MTGmBd4mtL6gzgDXbCoUTUO8LZLToVUi
+ PorqMZYpyWNafuZ8kpOj80HxtgYJNy/JJjr7n1bPnnnxQhLumleR5IB6s1Bkbtr7VXG+hd
+ oGIMx8bndMxKRtg4XuojUQYj4A8FUkk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-369-71972FB8Owe9wbUT1HzIOQ-1; Tue, 20 Oct 2020 18:01:53 -0400
+X-MC-Unique: 71972FB8Owe9wbUT1HzIOQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 05C4080365A;
+ Tue, 20 Oct 2020 22:01:52 +0000 (UTC)
+Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A7FDE6EF62;
+ Tue, 20 Oct 2020 22:01:51 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] pc: Implement -no-hpet as sugar for -machine hpet=off
+Date: Tue, 20 Oct 2020 18:01:50 -0400
+Message-Id: <20201020220150.1326086-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 20 Oct 2020 17:33:05 -0400
-From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v5] sev: add sev-inject-launch-secret
-In-Reply-To: <e4bc6348-cda5-e7f5-3753-61f4d3ba0116@redhat.com>
-References: <20201015143713.14682-1-tobin@linux.ibm.com>
- <2f1be055-58c8-dcf8-debc-8956636d8ef8@redhat.com>
- <20201020135444.GR5733@habkost.net>
- <e4bc6348-cda5-e7f5-3753-61f4d3ba0116@redhat.com>
-Message-ID: <dd1b07f9d596432ee5d4ebd740a98c5d@linux.vnet.ibm.com>
-X-Sender: tobin@linux.ibm.com
-User-Agent: Roundcube Webmail/1.0.1
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
- definitions=2020-10-20_12:2020-10-20,
- 2020-10-20 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- impostorscore=0
- suspectscore=0 mlxlogscore=999 priorityscore=1501 spamscore=0
- clxscore=1015 bulkscore=0 mlxscore=0 adultscore=0 lowpriorityscore=0
- phishscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2009150000 definitions=main-2010200146
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=tobin@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 17:38:11
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -130,56 +92,138 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com,
- Eduardo Habkost <ehabkost@redhat.com>, jejb@linux.ibm.com, tobin@ibm.com,
- dgilbert@redhat.com, qemu-devel@nongnu.org, berrange@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 2020-10-20 11:56, Paolo Bonzini wrote:
-> On 20/10/20 15:54, Eduardo Habkost wrote:
->> On Tue, Oct 20, 2020 at 11:03:51AM +0200, Paolo Bonzini wrote:
->>> On 15/10/20 16:37, tobin@linux.ibm.com wrote:
->>>> -static void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, Error 
->>>> **errp)
->>>> +void *gpa2hva(MemoryRegion **p_mr, hwaddr addr, uint64_t size, 
->>>> Error **errp)
->>>>  {
->>>>      MemoryRegionSection mrs = 
->>>> memory_region_find(get_system_memory(),
->>>> -                                                 addr, 1);
->>>> +                                                 addr, size);
->>> 
->>> You need to check size against mrs.size and fail if mrs.size is 
->>> smaller.
->>>  Otherwise, the ioctl can access memory out of range.
->> 
->> Good catch!  I'm dequeuing it.
->> 
->> Is there a reason memory_region_find() doesn't ensure that by
->> default?
-> 
-> IIRC memory_region_find() was used to do DMA in the very first versions
-> of "virtio-blk dataplane" so you would call it multiple times in a 
-> loop.
->  So it's like that because it maps the way address_space_map() works.
-> 
->> The call at virtio_balloon_handle_output() looks suspicious,
->> though, because it looks for a BALLOON_PAGE_SIZE range, but
->> there's no check for the returned section size.
-> 
-> I think it's not a bug because ultimately it's checked in
-> ram_block_discard_range, but it's not pretty.
-> 
-> Paolo
+Get rid of yet another global variable.
 
-Ok, it seems like the best solution is, as Paolo suggested, to add a
-simple check at the end of gpa2hva that makes sure mr.size is equal
-to size. gpa2hva is used one other place where the size is hard-coded
-as 1, so adding the check isn't going to break anything.
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ include/hw/i386/pc.h  |  1 +
+ include/hw/i386/x86.h |  3 ---
+ hw/i386/pc.c          | 21 ++++++++++++++++++++-
+ hw/i386/pc_piix.c     |  2 +-
+ softmmu/vl.c          |  4 ++--
+ 5 files changed, 24 insertions(+), 7 deletions(-)
 
-Would you like me to resubmit with this tweak?
+diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
+index 84639d0ebc..911e460097 100644
+--- a/include/hw/i386/pc.h
++++ b/include/hw/i386/pc.h
+@@ -43,6 +43,7 @@ typedef struct PCMachineState {
+     bool smbus_enabled;
+     bool sata_enabled;
+     bool pit_enabled;
++    bool hpet_enabled;
+ 
+     /* NUMA information: */
+     uint64_t numa_nodes;
+diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
+index d5dcf7a07f..4e66a15ff5 100644
+--- a/include/hw/i386/x86.h
++++ b/include/hw/i386/x86.h
+@@ -124,7 +124,4 @@ qemu_irq x86_allocate_cpu_irq(void);
+ void gsi_handler(void *opaque, int n, int level);
+ void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
+ 
+-/* hpet.c */
+-extern int no_hpet;
+-
+ #endif
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4e323755d0..ff863231e4 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -1142,7 +1142,8 @@ void pc_basic_device_init(struct PCMachineState *pcms,
+      * Without KVM_CAP_PIT_STATE2, we cannot switch off the in-kernel PIT
+      * when the HPET wants to take over. Thus we have to disable the latter.
+      */
+-    if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
++    if (pcms->hpet_enabled && (!kvm_irqchip_in_kernel() ||
++                                kvm_has_pit_state2())) {
+         hpet = qdev_try_new(TYPE_HPET);
+         if (hpet) {
+             /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
+@@ -1535,6 +1536,20 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
+     pcms->pit_enabled = value;
+ }
+ 
++static bool pc_machine_get_hpet(Object *obj, Error **errp)
++{
++    PCMachineState *pcms = PC_MACHINE(obj);
++
++    return pcms->hpet_enabled;
++}
++
++static void pc_machine_set_hpet(Object *obj, bool value, Error **errp)
++{
++    PCMachineState *pcms = PC_MACHINE(obj);
++
++    pcms->hpet_enabled = value;
++}
++
+ static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
+                                             const char *name, void *opaque,
+                                             Error **errp)
+@@ -1585,6 +1600,7 @@ static void pc_machine_initfn(Object *obj)
+     pcms->smbus_enabled = true;
+     pcms->sata_enabled = true;
+     pcms->pit_enabled = true;
++    pcms->hpet_enabled = true;
+ 
+     pc_system_flash_create(pcms);
+     pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
+@@ -1705,6 +1721,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
+ 
+     object_class_property_add_bool(oc, PC_MACHINE_PIT,
+         pc_machine_get_pit, pc_machine_set_pit);
++
++    object_class_property_add_bool(oc, "hpet",
++        pc_machine_get_hpet, pc_machine_set_hpet);
+ }
+ 
+ static const TypeInfo pc_machine_info = {
+diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
+index 0cf22a57ad..13d1628f13 100644
+--- a/hw/i386/pc_piix.c
++++ b/hw/i386/pc_piix.c
+@@ -216,7 +216,7 @@ static void pc_init1(MachineState *machine,
+         i440fx_state = NULL;
+         isa_bus = isa_bus_new(NULL, get_system_memory(), system_io,
+                               &error_abort);
+-        no_hpet = 1;
++        pcms->hpet_enabled = false;
+     }
+     isa_bus_irqs(isa_bus, x86ms->gsi);
+ 
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index cb476aa70b..c2281f45a8 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -146,7 +146,6 @@ static Chardev **serial_hds;
+ Chardev *parallel_hds[MAX_PARALLEL_PORTS];
+ int win2k_install_hack = 0;
+ int singlestep = 0;
+-int no_hpet = 0;
+ int fd_bootchk = 1;
+ static int no_reboot;
+ int no_shutdown = 0;
+@@ -3562,7 +3561,8 @@ void qemu_init(int argc, char **argv, char **envp)
+                 qemu_opts_parse_noisily(olist, "acpi=off", false);
+                 break;
+             case QEMU_OPTION_no_hpet:
+-                no_hpet = 1;
++                olist = qemu_find_opts("machine");
++                qemu_opts_parse_noisily(olist, "hpet=off", false);
+                 break;
+             case QEMU_OPTION_no_reboot:
+                 no_reboot = 1;
+-- 
+2.28.0
 
--Tobin
 
