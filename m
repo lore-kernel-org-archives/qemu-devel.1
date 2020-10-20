@@ -2,84 +2,88 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8843C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A2B5BC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:50:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6058B2224F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:44:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C648F2224F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 07:50:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=lmichel.fr header.i=@lmichel.fr header.b="PEREai9y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6058B2224F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=lmichel.fr
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gOlgcxnl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C648F2224F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56768 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUmJw-0004C0-BP
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 03:44:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34862)
+	id 1kUmPj-0006MY-Ix
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 03:50:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kUmJ2-0003Ns-Ph
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:43:40 -0400
-Received: from pharaoh.lmichel.fr ([149.202.28.74]:56086)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luc@lmichel.fr>) id 1kUmJ0-0008MW-O5
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:43:40 -0400
-Received: from sekoia-pc.home.lmichel.fr (sekoia-pc.home.lmichel.fr
- [192.168.61.100])
- by pharaoh.lmichel.fr (Postfix) with ESMTPS id 1F895C60010;
- Tue, 20 Oct 2020 07:43:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr; s=pharaoh; 
- t=1603179814;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-transfer-encoding:content-transfer-encoding:
- in-reply-to:references; bh=mlIRwhaHDHPVIU5gr1CK/VGLAMYhpYmFtsI2zoTsscE=;
- b=PEREai9yOngZf1GqKDJOEWjrdJaeX99Uer+pHaXjHCDv2TaPk5UmbUmA/O4tGsXF5pPzTC
- NHqqmlEHzKQLrG5N4fJqjSKE91WuOWluBpnuRLogbkqU2TnuJKWYhOT+vWzkLIna5gewM7
- rcbej0puib9BcQJdid/wjf672RAc9+lqHz7XEO7RpAxorZ9s2hUlywQNo5VG4jkAKVQAkt
- gh9dSNlRchzltwiEgULN/BIEMsZHnE/DZp/3TIFCdgczXo5y08u7yTpDhR+p3Mf6uNLSfF
- 1fQ0Z/mFx7kUIr86HAl3WQl2Ez4zUq9U1wbofs+VZCrYS4LwXgOs5MH96TJiUA==
-From: Luc Michel <luc@lmichel.fr>
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOH-00056y-GD
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42865)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kUmOE-0001oP-Ek
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 03:49:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603180139;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=AVMcRRphqLATFdXrbVOHne+0E5XTAVDj3f+GRgBbNV4=;
+ b=gOlgcxnlO96zS+OKQvdNtBgm08re5Wf7F5ZZ+e+tsyrJv063oYjeHw1cmcMB+gX3QVVTzp
+ nm9jCtwVeT/pdaRHLGV56JutvnfeMBtce20DF7NiDPoOWoRnWMfO9m5tWJuR8l7RPED+ch
+ R5s+VxtNtHyyJWnk+CjCB67dgjLRTX0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-214-RaCTtvEnOXm63pUVG341_Q-1; Tue, 20 Oct 2020 03:48:57 -0400
+X-MC-Unique: RaCTtvEnOXm63pUVG341_Q-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5460B64089;
+ Tue, 20 Oct 2020 07:48:56 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-112-56.ams2.redhat.com
+ [10.36.112.56])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DD90455763;
+ Tue, 20 Oct 2020 07:48:55 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id C2C469B31; Tue, 20 Oct 2020 09:48:45 +0200 (CEST)
+From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] hw/core/qdev-clock: add a reference on aliased clocks
-Date: Tue, 20 Oct 2020 09:44:26 +0200
-Message-Id: <20201020074426.105878-1-luc@lmichel.fr>
-X-Mailer: git-send-email 2.28.0
+Subject: [PATCH v3 10/10] tests/acpi: update expected data files
+Date: Tue, 20 Oct 2020 09:48:44 +0200
+Message-Id: <20201020074844.5304-11-kraxel@redhat.com>
+In-Reply-To: <20201020074844.5304-1-kraxel@redhat.com>
+References: <20201020074844.5304-1-kraxel@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=lmichel.fr;
- s=pharaoh; t=1603179814;
- h=from:from:sender:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-transfer-encoding:content-transfer-encoding:
- in-reply-to:references; bh=mlIRwhaHDHPVIU5gr1CK/VGLAMYhpYmFtsI2zoTsscE=;
- b=Yarvetic0tbpnqTec95tfzSiysB7MwOlSiiGYESqICGoxtPWHTwdKr7PX/5zfwrv9q40U6
- wtIfbvo+ach0MvciQvXwWlIA2mLmaQvF3ESjTg/ZpLfr0l7py8F3UIFsrSO7tWPpGdDIJb
- kISD56myzRwAoLsVxbhNx+L646+QSlONy2nErc+/zCPBVza7xkVZGOErKLZIau6ECZXw+U
- du4KXrvCNeVEQkH5uCQvg6crzPsJ8B+yrUZJhn1IPnxrMaodhNYrZFJr6VRozl30RXLz7e
- y6WbnABAOjGRw+m77QuGCRTEVYDHTylZO+dq4Mq/kVFX2Ml5Sn6m6+5Ug1A7kg==
-ARC-Seal: i=1; s=pharaoh; d=lmichel.fr; t=1603179814; a=rsa-sha256; cv=none;
- b=Gv2fTUD+di0dzPaEeafCOf2PettbxhyZhNUnZ85FH5ChIR04b2hqk6U+9a6IvEl1f7v1+SY97ePgHyK5DNcJQbmZAiZ3MI/zQPzojfeO+SmHtSLye4pWNY4lwqzKS6IUNm8T/KUbopW2+S6n3KC5M9HzLfSLBDdHGe8u8eQhh3c39qmOheyJrLxlwbgNpuEu0FfmiatpGxZ3xqlk+wq5vcVd3zL9ceHAwvMkMpVgALxHA6YbvlD7uUKHJdv0haSC5SbKCPRjWm4L/YAJD4qb3/Wa8L1JZ4BULAKp6zuwJnluQ6SjbJmg1R3G//Tt4J9gKyfEOxl96HVcvCd2ZjNjkQ==
-ARC-Authentication-Results: i=1;
-	pharaoh.lmichel.fr
-Received-SPF: pass client-ip=149.202.28.74; envelope-from=luc@lmichel.fr;
- helo=pharaoh.lmichel.fr
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 03:43:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,53 +96,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Damien Hedde <damien.hedde@greensocs.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Luc Michel <luc@lmichel.fr>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When aliasing a clock with the qdev_alias_clock() function, a new link
-property is created on the device aliasing the clock. The link points
-to the aliased clock and use the OBJ_PROP_LINK_STRONG flag. This
-property is read only since it does not provide a check callback for
-modifications.
-
-The object_property_add_link() documentation stats that with
-OBJ_PROP_LINK_STRONG properties, the linked object reference count get
-decremented when the property is deleted. But it is _not_ incremented on
-creation (object_property_add_link() does not actually know the link).
-
-This commit increments the reference count on the aliased clock to
-ensure the aliased clock stays alive during the property lifetime, and
-to avoid a double-free memory error when the property get deleted.
-
-Signed-off-by: Luc Michel <luc@lmichel.fr>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/core/qdev-clock.c | 1 +
- 1 file changed, 1 insertion(+)
+ tests/qtest/bios-tables-test-allowed-diff.h |   2 --
+ tests/data/acpi/microvm/DSDT.rtc            | Bin 0 -> 404 bytes
+ tests/data/acpi/microvm/DSDT.usb            | Bin 0 -> 414 bytes
+ 3 files changed, 2 deletions(-)
 
-diff --git a/hw/core/qdev-clock.c b/hw/core/qdev-clock.c
-index 6a9a340d0f..5f5e143702 100644
---- a/hw/core/qdev-clock.c
-+++ b/hw/core/qdev-clock.c
-@@ -59,10 +59,11 @@ static NamedClockList *qdev_init_clocklist(DeviceState *dev, const char *name,
-     } else {
-         object_property_add_link(OBJECT(dev), name,
-                                  object_get_typename(OBJECT(clk)),
-                                  (Object **) &ncl->clock,
-                                  NULL, OBJ_PROP_LINK_STRONG);
-+        object_ref(OBJECT(clk));
-     }
- 
-     ncl->clock = clk;
- 
-     QLIST_INSERT_HEAD(&dev->clocks, ncl, node);
+diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
+index afd6b04a475a..dfb8523c8bf4 100644
+--- a/tests/qtest/bios-tables-test-allowed-diff.h
++++ b/tests/qtest/bios-tables-test-allowed-diff.h
+@@ -1,3 +1 @@
+ /* List of comma-separated changed AML files to ignore */
+-"tests/data/acpi/microvm/DSDT.usb",
+-"tests/data/acpi/microvm/DSDT.rtc",
+diff --git a/tests/data/acpi/microvm/DSDT.rtc b/tests/data/acpi/microvm/DSDT.rtc
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..5960d6929a2f88d76aaa324b88b80908ff0698dc 100644
+GIT binary patch
+literal 404
+zcmXv~%TB^T6ur|@C{v1~(GX2c2#H%WV2JB>I+P{_YNvonO@>ckYuq3U64&|xe1f0i
+z=ddE)p}Lv-I_KVVCQ?!HMF1=w&cs-C!{<yy*uxf>+(b6L(kj&D_I|V!BUg`;$bXWP
+zIp=%;u2w}rJy(ldo%@u=ggMM1tyd_w12LQQPxw~w;}BQRlL%i!II9SZ`Y}1!2OHcT
+z1H-w?3!(ox9<DcgPp~ztfw(;&2A0-i8C5tx5Lv=`{{g{xz{kNKtxdg;I@qL%CXlp|
+zxs0I&us_mT`R<ugNF~$m<*k;BqPaH3YR^93R@4G&?XqPa(oMO&Hc4eXn`T^aQQblz
+zVQrD~$7+^N^BI21uo}_^iWdPIHWqGZXV(M*?e8O40H}+Q&Pf+zFGx^BebJ~<2V1|a
+Cp;Z9@
+
+literal 0
+HcmV?d00001
+
+diff --git a/tests/data/acpi/microvm/DSDT.usb b/tests/data/acpi/microvm/DSDT.usb
+index e69de29bb2d1d6434b8b29ae775ad8c2e48c5391..14423381ea235ed42f6f0f7d98e793c271a4e7c1 100644
+GIT binary patch
+literal 414
+zcmY+A%}T>S6ov1kO`A@eI*M2ngyI9}v{KxfOr}YoKQZYaM3_E;bSG|V76o^Ld+8(i
+zC_YYC#XB8cxS6^4-1#`?PLKtYPXb`A{IQ6#w!cV3fEr4mYkjlmOl7{xi|hVe^c@w&
+zf%_nbQ_gu89F<KxT6dI4vtyUikT9Fsr11=S(G}xi=kUJaecQxQ(>TCW14jm6)D6k5
+zv@3yg#XvKIN+<(mOgxdqoOf=~1W6YMSZSXot-n>EL~580p|wn92n~Sko|g01x^9Kc
+z<e+_espM=@d(zEv%RXL~)B<X4l6mUWbzYq7!k8tagbOZ=7Y6amvy|VN*<h58aoe65
+z(kiA99&VzuT+r601_YX4d$0g77a=W^tGHQ2BL4dTm;DFeeGm7)06hSVJ)%R_Qzz9j
+HwNd&31|3%c
+
+literal 0
+HcmV?d00001
+
 -- 
-2.28.0
+2.27.0
 
 
