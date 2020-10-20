@@ -6,85 +6,86 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7335FC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C99C433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:33:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7EC172225F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:32:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7EC172225F
+	by mail.kernel.org (Postfix) with ESMTPS id 32E382222F
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 08:33:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E382222F
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54682 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUn4K-0000e5-4m
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:32:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44238)
+	id 1kUn5O-0001Cx-Ue
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 04:33:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44402)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUn0T-0006v1-U1; Tue, 20 Oct 2020 04:28:33 -0400
-Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:35175)
+ id 1kUn18-00076U-8Q; Tue, 20 Oct 2020 04:29:14 -0400
+Received: from wnew1-smtp.messagingengine.com ([64.147.123.26]:56117)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kUn0Q-00071l-RF; Tue, 20 Oct 2020 04:28:33 -0400
+ id 1kUn16-0007Ht-Fl; Tue, 20 Oct 2020 04:29:13 -0400
 Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailnew.west.internal (Postfix) with ESMTP id 0EEC8B84;
- Tue, 20 Oct 2020 04:28:27 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 20 Oct 2020 04:28:28 -0400
+ by mailnew.west.internal (Postfix) with ESMTP id 0D0A79E7;
+ Tue, 20 Oct 2020 04:29:09 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Tue, 20 Oct 2020 04:29:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=date:from:to:cc:subject:message-id:references:mime-version
- :content-type:in-reply-to; s=fm1; bh=ezmvz5MNb9lQvTXKWG862UU6UbI
- Ogy6zNppizjjbM24=; b=0+zv7TmtT/dQOG0zF38eubG3Hu6YRKmcTN9gk29uW65
- QZKt4D5gbUs734zHYuk5aM/OKkJEhOFDOMl/wqogeDI7Nwsym6Febq2h9CgVAk2C
- A7PXh6EH/4sISA22V7bZ7I1YO8AInmmMy9t4Cf4kfsXBS3ulOZm9crIDdoTp2mKL
- V70rEEcgRXgcPtBrn2d78H79dlHI+/W+0k+7hvIvlQteodeaidNDmDiNSVxB4yT7
- kcWunRwiKcD+HbliTuePTMO+mW+2kkIhGV/m+/wsipDL/MUjd7pAcouGeifBlXDk
- ldSKjZlISniPCU0/nXR3nDVNjWwWCW/+/ydkiiDzs6Q==
+ :content-type:in-reply-to; s=fm1; bh=4Md/RH6R/JODYqrDMQ+BP8xCRJW
+ X9txwAmGCTkc9Yw4=; b=VDsV3RIDRCqX0NlmNwh0yvt/W1trFTIBzyK38He6JsJ
+ /3E3w7XVzH89nKIuAAtW0mKB/MVSxZDtNlcyRTC++bf2BLQrGqvNYDU2qj87wDOT
+ r/GTYFgVBk1Gr/4icDVmpTCEfVTbkocJKs24lt0amGpIJpOojW9rfyuXZEK2t/P5
+ GcvFQgwnXiy84siR5DDYt1oVfzzwX2fNwp50+TCBeqlGaWVa/sgCY+0Ak3yMN3l/
+ 6dUUHmIeUAamGtq+M/x7TcGSGOuwVWH6pKBeHkNBuIUp4EfJLbxyiQfe9qfrWZmQ
+ 4cFt9znz+Hd7Bj3CEwnEmYq/BFVu0zrT0Y/dADQFyoA==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
  messagingengine.com; h=cc:content-type:date:from:in-reply-to
  :message-id:mime-version:references:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=ezmvz5
- MNb9lQvTXKWG862UU6UbIOgy6zNppizjjbM24=; b=Dn4AXenK7NB9hfkurp+MgK
- AiNFjs5zDANvp+a5RYdiq10VgFQbEaujI70TqVNPnEQVJDkSz6xHYkgDLtWDuJ80
- 7fqfMQYo0ybSNTJP/C8U0OpRsnYoGv3Ek9dahhzN0hgWvk0BySWoXV7x2XsRVZ+v
- FhGtZ/78Lonk7IjE6a8hzyELcKxY1qsHxTdST/ORd0ouZuqoBE11kiffANVWlQUl
- fOyVtVWw8To7HyGFJsIR8BVf1WojJnmKI49dd7OX6QM7fDB9HsvcUBArp4ydTXhv
- 1bhOjKTcRo18fWRXTS7VFdM6GKAL4xcacZ5lobWzbSRh6F70qlZ9pHaBDs5220Wg
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=4Md/RH
+ 6R/JODYqrDMQ+BP8xCRJWX9txwAmGCTkc9Yw4=; b=Qylv8xthy5Xe4ev7qhE34n
+ EuET6k/03aO/y26BimgdeqNVplUDnI/F22GV2Yx3GfQFiR7JKOR1HaUGDp+vWUAm
+ 93Eouyy/KOYM7iux3RXDIrzm/ExGLtqIhA6wa7lpvM4Z6Hqe0wDuJvwFg3xbGCDp
+ apVDX2Nig9D1bnFXR+EPS8LldjFDGaby5Qq/bL2SoKZXXEzhkTqhW9WIFXtytLMg
+ TQfF0B4w7pMffmByWVN+p90F1TdVI31yRENuAZBGQGHUChRRVbB/KQkLdKha4kvF
+ P+Hlw7mAOLWq8DBuFv+DTJh3Ug6s7t+5G3/zKyboRYtLzSVFUubdQ6VSLzyj/WyA
  ==
-X-ME-Sender: <xms:qp-OX3eTqUrKORZyye8FZoBwzUX-0NPd7Buu4AVlxAC0eX_pYxP-GQ>
- <xme:qp-OX9PPWpB9SYfePd2jnoRsnVm2l20dojYdzRsUt_TFGBlJD5DUslxwMOi-ZJO-m
- BYQ_3pHp6vdc4oZHw8>
+X-ME-Sender: <xms:1Z-OX53jHm4ztqBDgzbMG4PW4RChRT9mNeTVktMzCVSufuyk-6jmUg>
+ <xme:1Z-OXwEUWOYkSHzK8aXXwwW-6jB3ymZmJC2Xa0xI1yN83qv9Wi1DEHGxDv0BGYOcc
+ WHz7Iv-jTQIqDM5a4k>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeefgddtfecutefuodetggdotefrodftvf
  curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
  uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
  fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
  lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
  hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgepudenuc
  frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:qp-OXwhnRpV92BU5cbQVNjk4uKNqtS-e1Pr3qXchiPbIW7eIdw_MVQ>
- <xmx:qp-OX496zv___6OK0kTjpSKQsKswwZDQ-4mnxCuMbPdwwy33R4iRwA>
- <xmx:qp-OXzttHqe7-nnABiar_0ZEia_NH9fdV0k7Ox4ULA0aGjcEqsORmw>
- <xmx:q5-OX3Ex9cnS2CSkjymCDB3w5ajZsg4n5YnlgPzP3CleCYpwYuqtYWtiO6w>
+X-ME-Proxy: <xmx:1Z-OX57CxXuDM-VLhldQwxwv0SItdDci1iINrHPDoxpRHqb9SWlqCA>
+ <xmx:1Z-OX209mRKUjlPs5CVTDvpIST9xBy3WkvO1p13As08kP8goZl_QUA>
+ <xmx:1Z-OX8HZLvtaIhQYP7gKshEyKs5G-w-nKSQtNaT63-gS2nS5DVOa_g>
+ <xmx:1Z-OX_8pLD_EH4o9pnb-KrJPRV57xJ-CloX0RuWUPg1IzdABFNIx8z24YBg>
 Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id C1C413280064;
- Tue, 20 Oct 2020 04:28:24 -0400 (EDT)
-Date: Tue, 20 Oct 2020 10:28:22 +0200
+ by mail.messagingengine.com (Postfix) with ESMTPA id C6B323064684;
+ Tue, 20 Oct 2020 04:29:07 -0400 (EDT)
+Date: Tue, 20 Oct 2020 10:29:06 +0200
 From: Klaus Jensen <its@irrelevant.dk>
 To: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Subject: Re: [PATCH v7 10/11] hw/block/nvme: Separate read and write handlers
-Message-ID: <20201020082822.GB178548@apples.localdomain>
+Subject: Re: [PATCH v7 11/11] hw/block/nvme: Merge nvme_write_zeroes() with
+ nvme_write()
+Message-ID: <20201020082906.GC178548@apples.localdomain>
 References: <20201019021726.12048-1-dmitry.fomichev@wdc.com>
- <20201019021726.12048-11-dmitry.fomichev@wdc.com>
+ <20201019021726.12048-12-dmitry.fomichev@wdc.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="s/l3CgOIzMHHjg/5"
+ protocol="application/pgp-signature"; boundary="E/DnYTRukya0zdZ1"
 Content-Disposition: inline
-In-Reply-To: <20201019021726.12048-11-dmitry.fomichev@wdc.com>
+In-Reply-To: <20201019021726.12048-12-dmitry.fomichev@wdc.com>
 Received-SPF: pass client-ip=64.147.123.26; envelope-from=its@irrelevant.dk;
  helo=wnew1-smtp.messagingengine.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 04:21:24
@@ -120,39 +121,32 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---s/l3CgOIzMHHjg/5
+--E/DnYTRukya0zdZ1
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
 On Oct 19 11:17, Dmitry Fomichev wrote:
-> With ZNS support in place, the majority of code in nvme_rw() has
-> become read- or write-specific. Move these parts to two separate
-> handlers, nvme_read() and nvme_write() to make the code more
-> readable and to remove multiple is_write checks that so far existed
-> in the i/o path.
->=20
-> This is a refactoring patch, no change in functionality.
+> nvme_write() now handles WRITE, WRITE ZEROES and ZONE_APPEND.
 >=20
 
-This makes a lot of sense, totally Acked, but it might be better to move
-it ahead as a preparation patch? It would make the zoned patch easier on
-the eye.
+Same here, Acked, but maybe move it in front as a preparation patch as
+well?
 
---s/l3CgOIzMHHjg/5
+--E/DnYTRukya0zdZ1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+On6UACgkQTeGvMW1P
-DenKOggAtT//AShfjpkaqV0QqsefKh2KVleI1gxsKlt8zAFnL1f/aI7IKw3wgMY1
-QlCAofMQh8Ves413Cg2wErXqo/N/83QVOhSmQ9Rtug57FxR1BvLD59DXhJrzSc7y
-Ykewxz7lpCjaMfI387Dria4HncIRW3QsOdq5h1vz2z8eacwaMioEJeo/8HittwkY
-DfiBHxhf55o71MdAhJQwaPSBsm6jx2uBKZ3w8znSEQHjac9FtwiP370R9jxKvhc/
-Tu1v1iPQp+Gd1t8gNcdxuQpxEnd7ecQpJg2liWdzktoaOIfgjicCmCtFHJQMNeaC
-L59xj/qTF25ZHT63QGY7NYOZ+cKQjg==
-=Uzfs
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+On9AACgkQTeGvMW1P
+DenpIAf/SYhr8M114IqdPYVz9k4rCd10gBTvxqsikdMAifftPlwSEkDliQ3pf9a5
+MK5Lfa0wdVTI/6E2dKZhGE5MQybQ1uj+/sXbXxQHwWLocOv5U1S1GAI1pPrDQsuD
+8PkxbgR33etU6wLthK3IAMNgcT8SohK13P9fTnCVOSFwJ7nigGGdQXF+9QZDQOgI
+rpfXk0Gv0xu9R6hixMxjbx7o9AxoWsMhVFIDTXFauwgYmt9flD6gqjZTNsicHxa5
+iP5D5Ss+L4v9WP8dm5MDc4iE93USlbZqqdX+rVfqg4+dJ6/wMUrRrTY9z0kK6/A8
+LXzuFJqqchnvgUjhPmLT+XOaWMlPpQ==
+=0M6y
 -----END PGP SIGNATURE-----
 
---s/l3CgOIzMHHjg/5--
+--E/DnYTRukya0zdZ1--
 
