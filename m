@@ -2,63 +2,86 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 799B5C433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6F6BC433E7
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:22:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DACDD22247
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:21:49 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DACDD22247
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id 162D722247
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 13:22:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rsirwy54"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 162D722247
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35980 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUraG-00087b-Qk
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:21:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50528)
+	id 1kUraV-0000Fl-3e
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 09:22:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48586)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU5-0000H8-6p; Tue, 20 Oct 2020 09:15:25 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:48472 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <fangying1@huawei.com>)
- id 1kUrU0-00078C-Gv; Tue, 20 Oct 2020 09:15:24 -0400
-Received: from DGGEMS403-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 0243AF11A9764F7FD849;
- Tue, 20 Oct 2020 21:15:15 +0800 (CST)
-Received: from localhost (10.174.186.67) by DGGEMS403-HUB.china.huawei.com
- (10.3.19.203) with Microsoft SMTP Server id 14.3.487.0; Tue, 20 Oct 2020
- 21:15:05 +0800
-From: Ying Fang <fangying1@huawei.com>
-To: <qemu-devel@nongnu.org>
-Subject: [RFC PATCH v2 11/13] hw/arm/virt: add fdt cache information
-Date: Tue, 20 Oct 2020 21:14:38 +0800
-Message-ID: <20201020131440.1090-12-fangying1@huawei.com>
-X-Mailer: git-send-email 2.28.0.windows.1
-In-Reply-To: <20201020131440.1090-1-fangying1@huawei.com>
-References: <20201020131440.1090-1-fangying1@huawei.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUrMu-000689-SW
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:08:00 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:35975)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kUrMl-00067w-To
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 09:08:00 -0400
+Received: by mail-ed1-x544.google.com with SMTP id l16so1772169eds.3
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 06:07:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=pA5MaUprdCYMP2TXqV9bLGLaHfHeBjb6jUfhZDJX5J0=;
+ b=Rsirwy54aP+qgqKmsrt6Ti+sZucPSA24DGVeSBs/kGyCzMxKSXpv+TZOrRKhXeugbU
+ qNRzCf7AmiwP2tZnw5WwpyaN3X1Eo2Yd9doq/gSbY9PR1LZLe0Xr6gfpseAIrIPV90Bi
+ 01hUHOjP56RD7kwA9g2aMbI32Y319zF4ZDwde6qvhlrrpr+pIsQGjxANgKfAfNH2kwVa
+ kExGncG+DyITBfC1YTI3vQNAfzKX+CKG8q2FR9V3GBa6QZOSXU2I4tTqNQOEznNCscGW
+ CsxYhnFT81pKb2nePK1QidC6MWMjD0ILsHOvbmBvuhzAHc0wRwvoWzqV82/LecHs69bF
+ unBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=pA5MaUprdCYMP2TXqV9bLGLaHfHeBjb6jUfhZDJX5J0=;
+ b=mmQY5wbyum820vgVX7rgyD/9STx93OQvKh9u98sVSf98JCakf4pdAXbrNu+2hR7fcL
+ qoVrpAhJRt8pF9M7jdial9cc0Y8xefv9z0/z6UQjeFVDoSDCtgHGU2yRmbzDJonruruy
+ aDu6FoUDeFrJ6AfUGqIbGx9f+Ay0XIsKav91RAhN+l4k8ymeUod7Ur12pjjMsmZvyjbe
+ 2l5QJCsiqh6P+M9NtniBMRc/DChNTcVZqgBCAwWlAaPNmZAVjnL36mon4OfB57KHpVND
+ wNqhuVlFXOPy099Wh0EgPzz6wqVjEBnvjlmG7zMqx+vuDjoumgKn4Qkpi6hiYwphCfYP
+ XvTg==
+X-Gm-Message-State: AOAM531HkOICPUYXtKI4X57XWmx0QqarmsvDvf82XSx9XwsvGlsfasQ/
+ fiauWRPlZBQCEkU6hGUOD+8iRP/eqSH0VmMbEawZuA==
+X-Google-Smtp-Source: ABdhPJwO+mjtvymxyblSo1tL9DNR4TGkftqp0QQq4tXKij9APCRw5rz9zOhsv/sed+wYiWMVPWDC5s92++zWF5KKlmY=
+X-Received: by 2002:aa7:c302:: with SMTP id l2mr2715286edq.204.1603199259672; 
+ Tue, 20 Oct 2020 06:07:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.186.67]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=fangying1@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 07:04:17
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201008232154.94221-1-hskinnemoen@google.com>
+ <20201008232154.94221-7-hskinnemoen@google.com>
+In-Reply-To: <20201008232154.94221-7-hskinnemoen@google.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 20 Oct 2020 14:07:28 +0100
+Message-ID: <CAFEAcA9hp+7puCWvZfCWBUQpFhQ+uoqtTkNno6D2AA9eTVHpGA@mail.gmail.com>
+Subject: Re: [PATCH 6/6] hw/gpio: Add GPIO model for Nuvoton NPCM7xx
+To: Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -71,139 +94,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, drjones@redhat.com,
- zhang.zhanghailiang@huawei.com, alex.chen@huawei.com, shannon.zhaosl@gmail.com,
- qemu-arm@nongnu.org, alistair.francis@wdc.com,
- Ying Fang <fangying1@huawei.com>, imammedo@redhat.com
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>, CS20 KFTing <kfting@nuvoton.com>,
+ qemu-arm <qemu-arm@nongnu.org>,
+ =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>,
+ IS20 Avi Fishman <Avi.Fishman@nuvoton.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support devicetree CPU cache information descriptions
+On Fri, 9 Oct 2020 at 00:22, Havard Skinnemoen <hskinnemoen@google.com> wrote:
+>
+> The NPCM7xx chips have multiple GPIO controllers that are mostly
+> identical except for some minor differences like the reset values of
+> some registers. Each controller controls up to 32 pins.
+>
+> Each individual pin is modeled as a pair of unnamed GPIOs -- one for
+> emitting the actual pin state, and one for driving the pin externally.
+> Like the nRF51 GPIO controller, a gpio level may be negative, which
+> means the pin is not driven, or floating.
+>
+> Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+> Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+> +static void npcm7xx_gpio_class_init(ObjectClass *klass, void *data)
+> +{
+> +    ResettableClass *reset = RESETTABLE_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    QEMU_BUILD_BUG_ON(NPCM7XX_GPIO_REGS_END > NPCM7XX_GPIO_NR_REGS);
+> +
+> +    dc->desc = "NPCM7xx GPIO Controller";
+> +    reset->phases.enter = npcm7xx_gpio_enter_reset;
+> +    reset->phases.hold = npcm7xx_gpio_hold_reset;
+> +    device_class_set_props(dc, npcm7xx_gpio_properties);
+> +}
 
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- hw/arm/virt.c | 92 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 92 insertions(+)
+Missing vmstate struct. Otherwise device looks good.
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index d23b941020..adcfa52854 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -346,6 +346,89 @@ static void fdt_add_timer_nodes(const VirtMachineState *vms)
-                        GIC_FDT_IRQ_TYPE_PPI, ARCH_TIMER_NS_EL2_IRQ, irqflags);
- }
- 
-+static void fdt_add_l3cache_nodes(const VirtMachineState *vms)
-+{
-+    int i;
-+    const MachineState *ms = MACHINE(vms);
-+    ARMCPU *cpu = ARM_CPU(first_cpu);
-+    unsigned int smp_cores = ms->smp.cores;
-+    unsigned int sockets = ms->smp.max_cpus / smp_cores;
-+
-+    for (i = 0; i < sockets; i++) {
-+        char *nodename = g_strdup_printf("/cpus/l3-cache%d", i);
-+        qemu_fdt_add_subnode(vms->fdt, nodename);
-+        qemu_fdt_setprop_string(vms->fdt, nodename, "compatible", "cache");
-+        qemu_fdt_setprop_string(vms->fdt, nodename, "cache-unified", "true");
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-level", 3);
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-size",
-+                              cpu->caches.l3_cache->size);
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-line-size",
-+                              cpu->caches.l3_cache->line_size);
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-sets",
-+                              cpu->caches.l3_cache->sets);
-+        qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle",
-+                              qemu_fdt_alloc_phandle(vms->fdt));
-+        g_free(nodename);
-+    }
-+}
-+
-+static void fdt_add_l2cache_nodes(const VirtMachineState *vms)
-+{
-+    int i, j;
-+    const MachineState *ms = MACHINE(vms);
-+    unsigned int smp_cores = ms->smp.cores;
-+    signed int sockets = ms->smp.max_cpus / smp_cores;
-+    ARMCPU *cpu = ARM_CPU(first_cpu);
-+
-+    for (i = 0; i < sockets; i++) {
-+        char *next_path = g_strdup_printf("/cpus/l3-cache%d", i);
-+        for (j = 0; j < smp_cores; j++) {
-+            char *nodename = g_strdup_printf("/cpus/l2-cache%d",
-+                                  i * smp_cores + j);
-+            qemu_fdt_add_subnode(vms->fdt, nodename);
-+            qemu_fdt_setprop_string(vms->fdt, nodename, "compatible", "cache");
-+            qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-size",
-+                                  cpu->caches.l2_cache->size);
-+            qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-line-size",
-+                                  cpu->caches.l2_cache->line_size);
-+            qemu_fdt_setprop_cell(vms->fdt, nodename, "cache-sets",
-+                                  cpu->caches.l2_cache->sets);
-+            qemu_fdt_setprop_phandle(vms->fdt, nodename,
-+                                  "next-level-cache", next_path);
-+            qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle",
-+                                  qemu_fdt_alloc_phandle(vms->fdt));
-+            g_free(nodename);
-+        }
-+        g_free(next_path);
-+    }
-+}
-+
-+static void fdt_add_l1cache_prop(const VirtMachineState *vms,
-+                            char *nodename, int cpu_index)
-+{
-+
-+    ARMCPU *cpu = ARM_CPU(qemu_get_cpu(cpu_index));
-+    CPUCaches caches = cpu->caches;
-+
-+    char *cachename = g_strdup_printf("/cpus/l2-cache%d", cpu_index);
-+
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "d-cache-size",
-+                          caches.l1d_cache->size);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "d-cache-line-size",
-+                          caches.l1d_cache->line_size);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "d-cache-sets",
-+                          caches.l1d_cache->sets);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "i-cache-size",
-+                          caches.l1i_cache->size);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "i-cache-line-size",
-+                          caches.l1i_cache->line_size);
-+    qemu_fdt_setprop_cell(vms->fdt, nodename, "i-cache-sets",
-+                          caches.l1i_cache->sets);
-+    qemu_fdt_setprop_phandle(vms->fdt, nodename, "next-level-cache",
-+                          cachename);
-+    g_free(cachename);
-+}
-+
- static void fdt_add_cpu_nodes(const VirtMachineState *vms)
- {
-     int cpu;
-@@ -379,6 +462,11 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-     qemu_fdt_setprop_cell(vms->fdt, "/cpus", "#address-cells", addr_cells);
-     qemu_fdt_setprop_cell(vms->fdt, "/cpus", "#size-cells", 0x0);
- 
-+    if (!vmc->ignore_cpu_topology) {
-+        fdt_add_l3cache_nodes(vms);
-+        fdt_add_l2cache_nodes(vms);
-+    }
-+
-     for (cpu = ms->smp.cpus - 1; cpu >= 0; cpu--) {
-         char *nodename = g_strdup_printf("/cpus/cpu@%d", cpu);
-         ARMCPU *armcpu = ARM_CPU(qemu_get_cpu(cpu));
-@@ -408,6 +496,10 @@ static void fdt_add_cpu_nodes(const VirtMachineState *vms)
-                 ms->possible_cpus->cpus[cs->cpu_index].props.node_id);
-         }
- 
-+        if (!vmc->ignore_cpu_topology) {
-+            fdt_add_l1cache_prop(vms, nodename, cpu);
-+        }
-+
-         if (ms->smp.cpus > 1 && !vmc->ignore_cpu_topology) {
-             qemu_fdt_setprop_cell(vms->fdt, nodename, "phandle",
-                                   qemu_fdt_alloc_phandle(vms->fdt));
--- 
-2.23.0
-
+thanks
+-- PMM
 
