@@ -2,73 +2,107 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B31CC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:11:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4AB1C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:15:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 74A282177B
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:11:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74A282177B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id C63BA2222D
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:15:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dIst1Kb0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C63BA2222D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54722 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33784 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUvA4-0005ei-C6
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:11:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59418)
+	id 1kUvEQ-0000go-DY
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:15:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUv9M-00050B-1E
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:10:16 -0400
-Resent-Date: Tue, 20 Oct 2020 13:10:16 -0400
-Resent-Message-Id: <E1kUv9M-00050B-1E@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21784)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUv9J-00060A-Jm
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:10:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603213786; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=NO1THYQT4/SnYBB4YgpAqwV0vSAIvo23hfXel5SNeU0kA8+m49+xLo8+W8Ed5TYi5cAbRHdQzEemggNgwyADgUsMKRwoHgE0wlhvukgfpdpErEL8CHYrXXmzm9pNUfYX6LLDpUq8CuVWp3BDu8P9duc31kuXAMJZIFhoEM4kEwk=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603213786;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=F9zjySQ7eK2n1IxyD0OTvLK0oOuNHLbxG4kQna5/nVg=; 
- b=Q/E9fWSIa8qJZSWvOcdU5PA97KYHah9R2jC9h7yHroCEjiFBHHLOzPnwVc0XW6nKNeZukgDfvXAxRUpwoe4uXg8MLU7Ybq2jBFbo/RuFqYXqdsjiIo9fJ1T5zzTmLu/NaojwRp/VvdW2lMZXiSOI9eTE27oWduXJrBbWVLgyMsk=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1603213784335701.8473065267893;
- Tue, 20 Oct 2020 10:09:44 -0700 (PDT)
-Subject: Re: [PATCH 0/2] KVM: Introduce ioeventfd read support
-Message-ID: <160321378294.32698.10418451773306647758@66eaa9a8a123>
-In-Reply-To: <20201020170056.433528-1-ameynarkhede03@gmail.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUvDS-000092-Fd
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:14:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34748)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kUvDP-0006ga-N0
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:14:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603214066;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dfJtCXCmmdCRg48OPCBRxndOcHP4QR8ZJYw+5Ttjeqk=;
+ b=dIst1Kb0lNhAqGhacwCUWlysBtSkIJ6EfnuiR1+2OmvGnGimlYXSD0vZG/nGbdYfMh0lEx
+ orjw+IRRINxni3bqWOyA2fmd54s/DEdxGymEGqBIHEPBH5R2X8N6bFm7DsDw5vs0A8j4Hf
+ 8jHfM2S4pozNeNz1UJFlQ15oV0sAMvI=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-185-Oh9PzersO16sTd7FPrCKrw-1; Tue, 20 Oct 2020 13:14:24 -0400
+X-MC-Unique: Oh9PzersO16sTd7FPrCKrw-1
+Received: by mail-wr1-f72.google.com with SMTP id 47so1061654wrc.19
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 10:14:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dfJtCXCmmdCRg48OPCBRxndOcHP4QR8ZJYw+5Ttjeqk=;
+ b=cm/rIcQX5rvGWcMVsliE1OuZsSIkyO+FvmDBKATGkLIm4fdoEkSDRw+Wcr5OqxyuXF
+ blYMCs1x81E0srvSA/kI/Hrk4NoYA2Z4A2vWfoOULxM+q8U9kSWSkbunfbZfamiwKwpR
+ HRtW7vreBJD/+0e4imTpmIGpT0Wq60RNfj7LLnV1FPvnASeBW05I/L/gnUq4Xs8Doyrn
+ aCxvHIIimfSKCQCyMhQWNEbY13susBPv/QekhU/Cc9f7lryxyZ+Kc1PZwo6YsMu+TMVp
+ G68oTJ5sY942zVfsRDxhzJZ/lNUTntFEK4R+IQ9lRfV8ccYolVYeBjbYkvPGMk1FanpG
+ s0GA==
+X-Gm-Message-State: AOAM531/G6kCRCm3eKM7N7T/7FqQK464DmD0V7QQVQHIxHbuGOmzNSB5
+ 95TSzX43wPSNUn+oMtRTB3BEs8/NFyC3aKXSQGJjcG1aTaWf60iEh2nnZbmxTn9pTXvElTijo6T
+ mCo5Zf7V5q8/sHIM=
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr2799312wmq.36.1603214063245; 
+ Tue, 20 Oct 2020 10:14:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwM/GhicP9qmjl+s5+517NhMHQT7RKFoL/lJ/+v5nTUwltGpwZkWL67uqFZH4g/Ew0TcjLMHg==
+X-Received: by 2002:a1c:f30d:: with SMTP id q13mr2799294wmq.36.1603214063010; 
+ Tue, 20 Oct 2020 10:14:23 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id i10sm4474948wrq.27.2020.10.20.10.14.22
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 20 Oct 2020 10:14:22 -0700 (PDT)
+Subject: Re: [PATCH 0/1] Do not stop guest when panic event is received
+To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, qemu-devel@nongnu.org
+References: <1601606494-1154-1-git-send-email-alejandro.j.jimenez@oracle.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <74a8c57d-4f2d-64cd-f2d2-32dc88b64f9b@redhat.com>
+Date: Tue, 20 Oct 2020 19:14:21 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: ameynarkhede03@gmail.com
-Date: Tue, 20 Oct 2020 10:09:44 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 13:10:10
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+In-Reply-To: <1601606494-1154-1-git-send-email-alejandro.j.jimenez@oracle.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:16:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,88 +116,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kvm@vger.kernel.org, mst@redhat.com, cohuck@redhat.com,
- qemu-devel@nongnu.org, ameynarkhede03@gmail.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyMDE3MDA1Ni40MzM1
-MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20vCgoKCkhpLAoKVGhpcyBzZXJpZXMgc2VlbXMg
-dG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBiZWxvdyBmb3IK
-bW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAyMDIwMTAyMDE3MDA1
-Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20KU3ViamVjdDogW1BBVENIIDAvMl0g
-S1ZNOiBJbnRyb2R1Y2UgaW9ldmVudGZkIHJlYWQgc3VwcG9ydAoKPT09IFRFU1QgU0NSSVBUIEJF
-R0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhp
-dCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxv
-Y2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBo
-aXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRF
-U1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0
-YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUK
-IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMTAyMDE2MzczOC4yNzcwMC0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcgLT4gcGF0Y2hldy8yMDIwMTAyMDE2MzczOC4yNzcwMC0xLWFsZXgu
-YmVubmVlQGxpbmFyby5vcmcKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIwMTAyMDE3
-MDA1Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20gLT4gcGF0Y2hldy8yMDIwMTAy
-MDE3MDA1Ni40MzM1MjgtMS1hbWV5bmFya2hlZGUwM0BnbWFpbC5jb20KU3dpdGNoZWQgdG8gYSBu
-ZXcgYnJhbmNoICd0ZXN0JwplY2NjYTMzIGt2bTogQWRkIGlvZXZlbnRmZCByZWFkIHRlc3QgY29k
-ZQozM2IzZGU2IGxpbnV4LWhlYWRlcnM6IEFkZCBzdXBwb3J0IGZvciByZWFkcyBpbiBpb2V2ZW50
-ZmQKCj09PSBPVVRQVVQgQkVHSU4gPT09CjEvMiBDaGVja2luZyBjb21taXQgMzNiM2RlNjcyMjE5
-IChsaW51eC1oZWFkZXJzOiBBZGQgc3VwcG9ydCBmb3IgcmVhZHMgaW4gaW9ldmVudGZkKQoyLzIg
-Q2hlY2tpbmcgY29tbWl0IGVjY2NhMzMwOThjNiAoa3ZtOiBBZGQgaW9ldmVudGZkIHJlYWQgdGVz
-dCBjb2RlKQpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzMTogRklM
-RTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDE2OgorXkleSV5JXkkgIHVpbnQ2NF90IHNpemUsIGJv
-b2wgZGF0YW1hdGNoKSQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMK
-IzMzOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjEwMTg6CiteSWludCByZXQ7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzQ6IEZJTEU6IGFjY2VsL2t2bS9r
-dm0tYWxsLmM6MTAxOToKK15Jc3RydWN0IGt2bV9pb2V2ZW50ZmQgaW9ldmVudCA9IHskCgpXQVJO
-SU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojMzU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxs
-LmM6MTAyMDoKKyAgICAgICAgICAgICAgIC5kYXRhbWF0Y2ggPSBkYXRhbWF0Y2ggPyBhZGp1c3Rf
-aW9ldmVudGZkX2VuZGlhbm5lc3ModmFsLCBzaXplKSA6IDAsCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzNTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDIw
-OgorICAgICAgICBeSS5kYXRhbWF0Y2ggPSBkYXRhbWF0Y2ggPyBhZGp1c3RfaW9ldmVudGZkX2Vu
-ZGlhbm5lc3ModmFsLCBzaXplKSA6IDAsJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZl
-ciB1c2UgdGFicwojMzY6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAyMToKK15JXkkuZGF0
-YXJlYWQgPSB2YWwsJAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwoj
-Mzc6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAyMjoKK15JXkkuYWRkciA9IGFkZHIsJAoK
-RVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojMzg6IEZJTEU6IGFjY2Vs
-L2t2bS9rdm0tYWxsLmM6MTAyMzoKK15JXkkubGVuID0gc2l6ZSwkCgpFUlJPUjogY29kZSBpbmRl
-bnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiMzOTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzox
-MDI0OgorXkleSS5mbGFncyA9IEtWTV9JT0VWRU5URkRfRkxBR19EQVRBUkVBRCwkCgpFUlJPUjog
-Y29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0MDogRklMRTogYWNjZWwva3ZtL2t2
-bS1hbGwuYzoxMDI1OgorXkleSS5mZCA9IGZkLCQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQg
-bmV2ZXIgdXNlIHRhYnMKIzQxOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjEwMjY6CiteSX07
-JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDM6IEZJTEU6IGFj
-Y2VsL2t2bS9rdm0tYWxsLmM6MTAyODoKK15JaWYgKCFrdm1fZW5hYmxlZCgpKSB7JAoKRVJST1I6
-IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDQ6IEZJTEU6IGFjY2VsL2t2bS9r
-dm0tYWxsLmM6MTAyOToKK15JXklyZXR1cm4gLUVOT1NZUzskCgpFUlJPUjogY29kZSBpbmRlbnQg
-c2hvdWxkIG5ldmVyIHVzZSB0YWJzCiM0NTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDMw
-OgorXkl9JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNDc6IEZJ
-TEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTAzMjoKK15JaWYgKGRhdGFtYXRjaCkgeyQKCkVSUk9S
-OiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzQ5OiBGSUxFOiBhY2NlbC9rdm0v
-a3ZtLWFsbC5jOjEwMzQ6CiteSX0kCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxkIG5ldmVyIHVz
-ZSB0YWJzCiM1MTogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDM2OgorXklyZXQgPSBrdm1f
-dm1faW9jdGwoa3ZtX3N0YXRlLCBLVk1fSU9FVkVOVEZELCAmaW9ldmVudCk7JAoKRVJST1I6IGNv
-ZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFicwojNTM6IEZJTEU6IGFjY2VsL2t2bS9rdm0t
-YWxsLmM6MTAzODoKK15JaWYgKHJldCA8IDApIHskCgpFUlJPUjogY29kZSBpbmRlbnQgc2hvdWxk
-IG5ldmVyIHVzZSB0YWJzCiM1NDogRklMRTogYWNjZWwva3ZtL2t2bS1hbGwuYzoxMDM5OgorXkle
-SXJldHVybiAtZXJybm87JAoKRVJST1I6IGNvZGUgaW5kZW50IHNob3VsZCBuZXZlciB1c2UgdGFi
-cwojNTU6IEZJTEU6IGFjY2VsL2t2bS9rdm0tYWxsLmM6MTA0MDoKK15JfSQKCkVSUk9SOiBjb2Rl
-IGluZGVudCBzaG91bGQgbmV2ZXIgdXNlIHRhYnMKIzU3OiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFs
-bC5jOjEwNDI6CiteSXJldHVybiAwOyQKCkVSUk9SOiBjb2RlIGluZGVudCBzaG91bGQgbmV2ZXIg
-dXNlIHRhYnMKIzgwOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5jOjIyOTg6CiteSXByaW50Zigi
-RmFpbGVkIHRvIGluaXRpYWxpemUgRXZlbnROb3RpZmllclxuIik7JAoKRVJST1I6IGVsc2Ugc2hv
-dWxkIGZvbGxvdyBjbG9zZSBicmFjZSAnfScKIzgyOiBGSUxFOiBhY2NlbC9rdm0va3ZtLWFsbC5j
-OjIzMDA6CisgICAgfQorICAgIGVsc2UgewoKRVJST1I6IGJyYWNlcyB7fSBhcmUgbmVjZXNzYXJ5
-IGZvciBhbGwgYXJtcyBvZiB0aGlzIHN0YXRlbWVudAojODc6IEZJTEU6IGFjY2VsL2t2bS9rdm0t
-YWxsLmM6MjMwNToKKyAgICAgICAgaWYgKHJldCA8IDApClsuLi5dCgp0b3RhbDogMjMgZXJyb3Jz
-LCAxIHdhcm5pbmdzLCA3OSBsaW5lcyBjaGVja2VkCgpQYXRjaCAyLzIgaGFzIHN0eWxlIHByb2Js
-ZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9z
-aXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBN
-QUlOVEFJTkVSUy4KCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRo
-IGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9y
-Zy9sb2dzLzIwMjAxMDIwMTcwMDU2LjQzMzUyOC0xLWFtZXluYXJraGVkZTAzQGdtYWlsLmNvbS90
-ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+On 02/10/20 04:41, Alejandro Jimenez wrote:
+> The fact that the behavior of hv-crash is also affected is why I chose to implement this change as an independent
+> option, as opposed to making it a property of the pvpanic device (e.g. -device pvpanic,no-panicstop).
+> 
+> Please let me know if you have any comments or suggestions.
+
+Hi Alejandro, sorry for the delayed response.
+
+The concept is fine, and I agree this should not be a device property.
+
+On the other hand, we already have many similar options: -no-reboot,
+-no-shutdown, -watchdog-action and now --no-panicstop.
+
+I think it's time to group them into a single option:
+
+* -action reboot=pause|shutdown|none
+* -action shutdown=pause|poweroff|none
+* -action panic=pause|shutdown|none
+* -action watchdog=reset|shutdown|poweroff|pause|debug|none|inject-nmi
+
+where the existing options would translate to the new option, like:
+
+* -no-reboot "-action reboot=shutdown"
+* -no-shutdown "-action shutdown=pause"
+
+The implementation should be relatively easy too; there's already an
+enum WatchdogAction (that can be renamed to e.g. RunstateAction) and a
+parsing function select_watchdog_action that can be changed to just
+return the RunstateAction.
+
+Would you like to take a look at this?
+
+Thanks,
+
+Paolo
+
 
