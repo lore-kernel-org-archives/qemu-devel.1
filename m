@@ -2,121 +2,91 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5D98C43467
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:57:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66A2BC433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:58:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B7A621741
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:57:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE86122242
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:58:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.de header.i=@amazon.de header.b="vTIK1LAd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B7A621741
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=amazon.de
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G0Pinoyv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE86122242
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37656 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUoOq-00038n-1f
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:57:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35462)
+	id 1kUoPJ-0003ct-Hh
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:58:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35884)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
- id 1kUoMU-00010z-3I
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:55:22 -0400
-Received: from smtp-fw-4101.amazon.com ([72.21.198.25]:14011)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <prvs=555e5d02a=graf@amazon.de>)
- id 1kUoMR-0004Ve-TP
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:55:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amazon.de; i=@amazon.de; q=dns/txt; s=amazon201209;
- t=1603187720; x=1634723720;
- h=subject:to:cc:references:from:message-id:date:
- mime-version:in-reply-to:content-transfer-encoding;
- bh=/DxSLhphaBCVEkABHTKTdeogLf9sDq3PuegJ5sNW2kk=;
- b=vTIK1LAduoSGrkOriTsXWMapExdbqcEj8vj/00ADhht5Xp+Ufv6LRZnK
- 28kiixNggJZHwMLKZTfBWqDGtg44dUYW6MSPob1UQn/FPbwd38Q1i2Afe
- MSgAiUGH35rnsuGvHmDagZCjk+gptHBISgRAZlxQ9U7RF5wfVFggrtdF4 A=;
-X-IronPort-AV: E=Sophos;i="5.77,396,1596499200"; d="scan'208";a="60319327"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO
- email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com) ([10.43.8.6])
- by smtp-border-fw-out-4101.iad4.amazon.com with ESMTP;
- 20 Oct 2020 09:55:12 +0000
-Received: from EX13MTAUWC002.ant.amazon.com
- (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
- by email-inbound-relay-1d-5dd976cd.us-east-1.amazon.com (Postfix) with ESMTPS
- id E637EA2330; Tue, 20 Oct 2020 09:55:04 +0000 (UTC)
-Received: from EX13D20UWC001.ant.amazon.com (10.43.162.244) by
- EX13MTAUWC002.ant.amazon.com (10.43.162.240) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 20 Oct 2020 09:55:04 +0000
-Received: from Alexanders-MacBook-Air.local (10.43.161.71) by
- EX13D20UWC001.ant.amazon.com (10.43.162.244) with Microsoft SMTP Server (TLS)
- id 15.0.1497.2; Tue, 20 Oct 2020 09:54:58 +0000
-Subject: Re: [PATCH] drivers/virt: vmgenid: add vm generation id driver
-To: Christian Borntraeger <borntraeger@de.ibm.com>, "Jason A. Donenfeld"
- <Jason@zx2c4.com>, Jann Horn <jannh@google.com>
-CC: Willy Tarreau <w@1wt.eu>, Colm MacCarthaigh <colmmacc@amazon.com>,
- "Catangiu, Adrian Costin" <acatan@amazon.com>, Andy Lutomirski
- <luto@kernel.org>, "Theodore Y. Ts'o" <tytso@mit.edu>, Eric Biggers
- <ebiggers@kernel.org>, "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
- kernel list <linux-kernel@vger.kernel.org>, "open list:VIRTIO GPU DRIVER"
- <virtualization@lists.linux-foundation.org>, "Woodhouse, David"
- <dwmw@amazon.co.uk>, <bonzini@gnu.org>, "Singh, Balbir" <sblbir@amazon.com>,
- "Weiss, Radu" <raduweis@amazon.com>, <oridgar@gmail.com>,
- <ghammer@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, "Michael S. Tsirkin" <mst@redhat.com>, "Qemu
- Developers" <qemu-devel@nongnu.org>, KVM list <kvm@vger.kernel.org>, "Michal
- Hocko" <mhocko@kernel.org>, "Rafael J. Wysocki" <rafael@kernel.org>, "Pavel
- Machek" <pavel@ucw.cz>, Linux API <linux-api@vger.kernel.org>,
- <mpe@ellerman.id.au>, linux-s390 <linux-s390@vger.kernel.org>
-References: <788878CE-2578-4991-A5A6-669DCABAC2F2@amazon.com>
- <CAG48ez0EanBvDyfthe+hAP0OC8iGLNSq2e5wJVz-=ENNGF97_w@mail.gmail.com>
- <20201017033606.GA14014@1wt.eu>
- <CAG48ez0x2S9XuCrANAQbXNi8Jjwm822-fnQSmr-Zr07JgrEs1g@mail.gmail.com>
- <6CC3DB03-27BA-4F5E-8ADA-BE605D83A85C@amazon.com>
- <CAG48ez1ZtvjOs2CEq8-EMosPCd_o7WQ3Mz_+1mDe7OrH2arxFA@mail.gmail.com>
- <20201017053712.GA14105@1wt.eu>
- <CAG48ez1h0ynXfGap_KiHiPVTfcB8NBQJ-2dnj08ZNfuhrW0jWA@mail.gmail.com>
- <20201017064442.GA14117@1wt.eu>
- <CAG48ez3pXLC+eqAXDCniM0a+5yP2XJODDkZqiUTZUOttCE_LbA@mail.gmail.com>
- <CAHmME9qHGSF8w3DoyCP+ud_N0MAJ5_8zsUWx=rxQB1mFnGcu9w@mail.gmail.com>
- <aacdff7a-2af1-4f46-6ab2-2a9d5b865d35@amazon.de>
- <2e505365-db4a-6054-8bc8-f9a81978c6d4@de.ibm.com>
-From: Alexander Graf <graf@amazon.de>
-Message-ID: <b2f8ecec-35e8-93c6-b4cb-bb89ee8baa2d@amazon.de>
-Date: Tue, 20 Oct 2020 11:54:56 +0200
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.16; rv:78.0)
- Gecko/20100101 Thunderbird/78.3.3
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kUoO6-0002ic-9n
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:57:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53114)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kUoO4-0005Dr-7J
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:57:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603187819;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=4Xw9GMqaWQKFNzrfwP3BjrWOgzWexwEhjMQKUYNqtS0=;
+ b=G0PinoyvqOVQLdmLHDKZAmKrGQSnv1B8GGtm9vRku1R2G4D7UVRmrIDn4daHtTUJjje+WX
+ wcV1mNu97Pj9c0TQNnxYID9AH+EpZrzPNkwpv20G36wIiocWWopWNY2/UwrH1uLHZYkDl5
+ 3fuaAbo0LoXxwdFbt7qXB0yXxmMFLeY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-520-6R-AAlhTNvWGxoBSB-g0zQ-1; Tue, 20 Oct 2020 05:56:56 -0400
+X-MC-Unique: 6R-AAlhTNvWGxoBSB-g0zQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CEB26185B384
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 09:56:55 +0000 (UTC)
+Received: from localhost (ovpn-115-35.ams2.redhat.com [10.36.115.35])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 99AAE10027A5;
+ Tue, 20 Oct 2020 09:56:49 +0000 (UTC)
+Date: Tue, 20 Oct 2020 10:56:48 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 4/5] tools/virtiofsd: xattr name mapping examples
+Message-ID: <20201020095648.GE140014@stefanha-x1.localdomain>
+References: <20201014180209.49299-1-dgilbert@redhat.com>
+ <20201014180209.49299-5-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <2e505365-db4a-6054-8bc8-f9a81978c6d4@de.ibm.com>
-Content-Language: en-US
-X-Originating-IP: [10.43.161.71]
-X-ClientProxiedBy: EX13D04UWA002.ant.amazon.com (10.43.160.31) To
- EX13D20UWC001.ant.amazon.com (10.43.162.244)
-Precedence: Bulk
-Content-Type: text/plain; charset="utf-8"; format="flowed"
-Content-Transfer-Encoding: base64
-Received-SPF: pass client-ip=72.21.198.25;
- envelope-from=prvs=555e5d02a=graf@amazon.de; helo=smtp-fw-4101.amazon.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 05:55:17
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201014180209.49299-5-dgilbert@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="BQPnanjtCNWHyqYD"
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_HI=-5, RCVD_IN_MSPIKE_H3=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -125,61 +95,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: dinechin@redhat.com, virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ck9uIDIwLjEwLjIwIDExOjM1LCBDaHJpc3RpYW4gQm9ybnRyYWVnZXIgd3JvdGU6Cj4gT24gMTcu
-MTAuMjAgMjA6MDksIEFsZXhhbmRlciBHcmFmIHdyb3RlOgo+PiBIaSBKYXNvbiwKPj4KPj4gT24g
-MTcuMTAuMjAgMTU6MjQsIEphc29uIEEuIERvbmVuZmVsZCB3cm90ZToKPj4+Cj4+PiBBZnRlciBk
-aXNjdXNzaW5nIHRoaXMgb2ZmbGluZSB3aXRoIEphbm4gYSBiaXQsIEkgaGF2ZSBhIGZldyBnZW5l
-cmFsCj4+PiBjb21tZW50cyBvbiB0aGUgZGVzaWduIG9mIHRoaXMuCj4+Pgo+Pj4gRmlyc3QsIHRo
-ZSBVVUlEIGNvbW11bmljYXRlZCBieSB0aGUgaHlwZXJ2aXNvciBzaG91bGQgYmUgY29uc3VtZWQg
-YnkKPj4+IHRoZSBrZXJuZWwgLS0gYWRkZWQgYXMgYW5vdGhlciBpbnB1dCB0byB0aGUgcm5nIC0t
-IGFuZCB0aGVuIHVzZXJzcGFjZQo+Pgo+PiBXZSBkZWZpbml0ZWx5IHdhbnQgYSBrZXJuZWwgaW50
-ZXJuYWwgbm90aWZpZXIgYXMgd2VsbCwgeWVzIDopLgo+Pgo+Pj4gc2hvdWxkIGJlIG5vdGlmaWVk
-IHRoYXQgaXQgc2hvdWxkIHJlc2VlZCBhbnkgdXNlcnNwYWNlIFJOR3MgdGhhdCBpdAo+Pj4gbWF5
-IGhhdmUsIHdpdGhvdXQgYWN0dWFsbHkgY29tbXVuaWNhdGluZyB0aGF0IFVVSUQgdG8gdXNlcnNw
-YWNlLiBJT1csCj4+Cj4+IEkgYWxzbyB0ZW5kIHRvIGFncmVlIHRoYXQgaXQgbWFrZXMgc2Vuc2Ug
-dG8gZGlzY29ubmVjdCB0aGUgYWN0dWFsIFVVSUQgd2UgcmVjZWl2ZSBmcm9tIHRoZSBub3RpZmlj
-YXRpb24gdG8gdXNlciBzcGFjZS4gVGhpcyB3b3VsZCBhbGxvdyB1cyB0byBjcmVhdGUgYSBnZW5l
-cmljIG1lY2hhbmlzbSBmb3IgVk0gc2F2ZS9yZXN0b3JlIGN5Y2xlcyBhY3Jvc3MgZGlmZmVyZW50
-IGh5cGVydmlzb3JzLiBMZXQgbWUgYWRkIFBQQyBhbmQgczM5MHggcGVvcGxlIHRvIHRoZSBDQyBs
-aXN0IHRvIHNlZSB3aGV0aGVyIHRoZXkgaGF2ZSBhbnl0aGluZyByZW1vdGVseSBzaW1pbGFyIHRv
-IHRoZSBWbUdlbklEIG1lY2hhbmlzbS4gRm9yIHg4NiBhbmQgYWFyY2g2NCwgdGhlIEFDUEkgYW5k
-IG1lbW9yeSBiYXNlZCBWbUdlbklEIGltcGxlbWVudGVkIGhlcmUgaXMgdGhlIG1vc3Qgb2J2aW91
-cyBvcHRpb24gdG8gaW1wbGVtZW50IElNSE8uIEl0J3MgYWxzbyBhbHJlYWR5IGltcGxlbWVudGVk
-IGluIGFsbCBtYWpvciBoeXBlcnZpc29ycy4KPiAKPiBIbW0sIHdoYXQgd2UgZG8gaGF2ZSBjb25m
-aWd1cmF0aW9ucyAoZS5nLiBzdGZsZSBiaXRzKSBhbmQgd2UgZG8gaGF2ZSBhIG5vdGlmaWNhdGlv
-biBtZWNoYW5pc20gdmlhIHNjbHAgdGhhdCBub3RpZmllcyBndWVzdHMgd2hlbiB0aGluZ3MgY2hh
-bmdlLgo+IEFzIG9mIHRvZGF5IG5laXRoZXIgS1ZNIG5vciBMaW51eCBpbXBsZW1lbnQgdGhlIHNj
-bHAgY2hhbmdlIG5vdGlmaWNhdGlvbiBtZWNoYW5pc20sIGJ1dCBJIGRvIHNlZSB2YWx1ZSBpbiBz
-dWNoIGEgdGhpbmcuCgpzdGZsZSBvbmx5IHN0b3JlcyBhcmNoaXRlY3RlZCBDUFUgY2FwYWJpbGl0
-aWVzLCBubz8gVGhlIFVVSUQgaXMgYWJvdXQgCnVuaXF1ZWx5IGlkZW50aWZ5aW5nIGNsb25lcyBv
-ZiB0aGUgc2FtZSBiYXNlIGltYWdlLCBzbyB0aGV5IGNhbiAKcmVlc3RhYmxpc2ggdGhlaXIgdW5p
-cXVlbmVzcy4KClRoYXQgc2FpZCwgeW91ciBpbnRlcmVzdCBtZWFucyB0aGF0IHRoZXJlIG1heSBi
-ZSBhIG1lY2hhbmlzbSBvbiBzMzkwIG9uZSAKZGF5LCBzbyB3ZSBzaG91bGQgdGhpbmsgYWJvdXQg
-bWFraW5nIGl0IG1vcmUgZ2VuZXJpYy4KCj4gCj4+Cj4+PiBJIGFncmVlIHdpdGggSmFubiB0aGVy
-ZS4gVGhlbiwgaXQncyB0aGUgZnVuY3Rpb25pbmcgb2YgdGhpcwo+Pj4gbm90aWZpY2F0aW9uIG1l
-Y2hhbmlzbSB0byB1c2Vyc3BhY2UgdGhhdCBpcyBpbnRlcmVzdGluZyB0byBtZS4KPj4KPj4gQWJz
-b2x1dGVseSEgUGxlYXNlIGhhdmUgYSBsb29rIGF0IHRoZSBwcmV2aW91cyBkaXNjdXNzaW9uIGhl
-cmU6Cj4+Cj4+Cj4+IGh0dHBzOi8vbG9yZS5rZXJuZWwub3JnL2xpbnV4LXBtL0I3NzkzQjdBLTM2
-NjAtNDc2OS05QjlBLUZGQ0YyNTA3MjhCQkBhbWF6b24uY29tLwo+Pgo+PiBUaGUgdXNlciBzcGFj
-ZSBpbnRlcmZhY2UgaXMgYWJzb2x1dGVseSB3aGF0IHRoaXMgaXMgYWJvdXQuCj4gCj4gWWVzLiBQ
-YXNzaW5nIGEgbm90aWZpY2F0aW9uIHRvIHVzZXJzcGFjZSBpcyBlc3NlbnRpYWwuIFdoZXJlIEkg
-ZG8gbm90IHNlZSBhIHNvbHV0aW9uIHlldCBpcyB0aGUgcmFjZSBiZXR3ZWVuIG5vdGlmaWNhdGlv
-biBhbmQKPiBhbHJlYWR5IHJ1bm5pbmcgd2l0aCB0aGUgb2xkIGtub3dsZWRnZS4KCldpdGggYSBw
-b3N0LW1vcnRlbSBpbnRlcmZhY2UsIHdlIHdpbGwgYWx3YXlzIGhhdmUgYSB0aW55IHJhY2Ugd2lu
-ZG93LiAKSSdtIG5vdCByZWFsbHkgY29udmluY2VkIHRoYXQgdGhpcyBpcyBhIHNlcmlvdXMgcHJv
-YmxlbSB5ZXQgdGhvdWdoLgoKSW4gb3JkZXIgdG8gZG8gZXh0cmFjdCBhbnl0aGluZyBvZmYgYSB2
-aXJ0dWFsIG1hY2hpbmUgdGhhdCB3YXMgY2xvbmVkLCAKeW91IG5lZWQgdG8gY29tbXVuaWNhdGUg
-d2l0aCBpdC4gSWYgeW91IGZvciBleGFtcGxlIHN0b3AgdGhlIG5ldHdvcmsgCmxpbmsgdW50aWwg
-YWxsIG9mIHRoaXMgZGV2aWNlJ3MgdXNlcnMgaGF2ZSBpbmRpY2F0ZWQgdGhleSBhcmUgZmluaXNo
-ZWQgCmFkanVzdGluZywgdGhlIHJhY2Ugc2hvdWxkIGJlIHNtYWxsIGVub3VnaCBmb3IgYW55IHBy
-YWN0aWNhbCBwdXJwb3NlcyBJIApjYW4gdGhpbmsgb2YuCgoKQWxleAoKCgpBbWF6b24gRGV2ZWxv
-cG1lbnQgQ2VudGVyIEdlcm1hbnkgR21iSApLcmF1c2Vuc3RyLiAzOAoxMDExNyBCZXJsaW4KR2Vz
-Y2hhZWZ0c2Z1ZWhydW5nOiBDaHJpc3RpYW4gU2NobGFlZ2VyLCBKb25hdGhhbiBXZWlzcwpFaW5n
-ZXRyYWdlbiBhbSBBbXRzZ2VyaWNodCBDaGFybG90dGVuYnVyZyB1bnRlciBIUkIgMTQ5MTczIEIK
-U2l0ejogQmVybGluClVzdC1JRDogREUgMjg5IDIzNyA4NzkKCgo=
+--BQPnanjtCNWHyqYD
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Oct 14, 2020 at 07:02:08PM +0100, Dr. David Alan Gilbert (git) wrot=
+e:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+>=20
+> Add a few examples of xattrmaps to the documentation.
+>=20
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  docs/tools/virtiofsd.rst | 50 ++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--BQPnanjtCNWHyqYD
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+OtGAACgkQnKSrs4Gr
+c8htDwf/YGHHmPe3DtThJiExnFnADbQqRo9XIjltlLuqGklmBHNuccQQpBJyGTPc
+UIDEeRoARRRDkNP4n2+blbUQ8EhBdZcG8GdUhVWJVKrvHUbazAKK6IzSgCi//Je0
+Otcg4jVMkicZPawUDLQmTOYZEwyAob06Ie0nN43CS8kLD9zAxptZeq2XssSh36Zj
+vDqDdNqrmrTTHUu5jP1m0IgeUYhml9hi2Zc5UowTup5nUi3J22V/LO6rsegPfTmk
+3/qqad6wChpduKY2nfAClOMEZZ+9JuOTV055dku44T3dZ2B/jXqUYsPJzP0IKiOM
+qbd7jd7BWeb0NZuXrDX8k307rRl7ig==
+=k8kN
+-----END PGP SIGNATURE-----
+
+--BQPnanjtCNWHyqYD--
 
 
