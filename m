@@ -7,78 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7819DC388F2
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:22:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A710C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:23:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0C2521D7F
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:22:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F16CE2223C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 16:23:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="excKchh7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C2521D7F
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="RdhuRvpO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F16CE2223C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUuP2-0004td-IS
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:22:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37678)
+	id 1kUuPd-0005qo-OZ
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 12:23:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu12-00059S-Cp
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:36 -0400
-Received: from mail-wm1-x331.google.com ([2a00:1450:4864:20::331]:55009)
+ id 1kUu1Q-0005jt-Th
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:58:00 -0400
+Received: from mail-wr1-x431.google.com ([2a00:1450:4864:20::431]:42977)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kUu10-0003vY-D0
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:57:36 -0400
-Received: by mail-wm1-x331.google.com with SMTP id c77so2329390wmd.4
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:33 -0700 (PDT)
+ id 1kUu1O-0003yt-TK
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 11:58:00 -0400
+Received: by mail-wr1-x431.google.com with SMTP id j7so2774569wrt.9
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 08:57:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sIAi5r7A9lqSQC4Z5WHs2lvugjZeX45vrZcdLwzrlnk=;
- b=excKchh7CPnHdIPj9hzWnwWz8PRaL4flMaXnu4z24a3JKLQUeoRsnXV515y4NcDhBT
- +0Z6nMqQYD1boT04o2n39/ho6ha5H4C/zCj4o1kp0t1xldPdmqPBFYhIpJYqCQ9m5JS3
- FzbJGdgFctAoEBT1hLq3Jb1zypRiW5KfWQU8rJoRWjVt4k1fdq7q1MIw1HblUj4GqQZl
- m2nAryils9q0SzdvEcRrSo9LZ02eKOJZ8QX4MdULBSYSw1jn0H+sfT6frjdqStIFNv57
- kfgTVlOvZZdrFPaCVVA36HqQm0WUNQTbPMWLv8oWEk9D/AhxnP2v7gRTUb1lX9wDJBaZ
- hczw==
+ bh=8R4Ou6ltaxWaVYPwl0wl/jMrZU+UDDkqwU0qcucYDcc=;
+ b=RdhuRvpOrnQ5qr4ztKa5yLNPCj52DQ1E9balA/C6PW6zucqfoFU226FZDcbdJTvGPM
+ OZZhdTr+jgSxem1wMNN1ZDRWbiYDlCUd5lFCpK+8rovHDkBgfpPAiU3P2AGJtQVbNL3W
+ PQWRv6N2HyYKU0ZalMm5XAbN0FwV0raAl/6s5FswlT0QtG12nvzknDIgMSFL/sAtfucu
+ 4THzsPBRm+eADL2a25Gxkw9qvzOzcWotrvVMMzcThPwrqDAbefcX5UQDwl+0+5RfBar7
+ 7g+zGrCu3fdMVM4aZCm86EtH7HvGUUIV1oYcgi6mfkbQJXNJ/Yy7IBsZp8jv+hzfMDNo
+ n9Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sIAi5r7A9lqSQC4Z5WHs2lvugjZeX45vrZcdLwzrlnk=;
- b=NaKfDFuN6r3vAmmxYUV0bU/Kn/YBkDZWCTj2L2vAHtCb0GlnkV6Lfjte+AYsqp+TRK
- Xf0Ajs3bGMgizwwcm2oFkAro+EiC9nPIkQtwRRTz18dsH/xsvPSiitHI4Et7oYGB3D4p
- KGItvp6xM3aJE/uNIIIOaZX3kkAsCYf1UGOkRvQ3h6MO91fug2qG5tKqB8aiQD+5Fh+i
- mABrWSM8YrTPIfTaw+xsw7gbtS/KkVPNrCANPqpAjHI/Sc2BMr7CUpVej3zUAMclnShi
- 1P5SXopuvwXae/vPRMieGY7DTunQUxg2HvcDAMcpsc5bUUIIG9byeKafIDk896qzrTQT
- vvJA==
-X-Gm-Message-State: AOAM5316lIF0HZCAHXEm9NxwOSzaBOO0PPc6oW5r77ebP/9xvMuR5OtZ
- GUigp35Rank0hmrvYjVPaCiLMe3HLr+t8A==
-X-Google-Smtp-Source: ABdhPJw1YzsI7jVeutPfoXD7xhLyaqvtYUCMbKG4ndzdFUsnaVqqG71hO0+xjTsGoooQoXvxvqintw==
-X-Received: by 2002:a1c:6807:: with SMTP id d7mr3515076wmc.38.1603209452643;
- Tue, 20 Oct 2020 08:57:32 -0700 (PDT)
+ bh=8R4Ou6ltaxWaVYPwl0wl/jMrZU+UDDkqwU0qcucYDcc=;
+ b=lFXu6i70z6/20I2c66nMdjizX0gBHOhMB8WImwbsslrETR/RrBgNrNARUEZgHftIeA
+ h10VPwOlF8AVqdcKdK0nnDPKMr6aRm4mzntxxvrtiLpW6hiOuD5bd5fNOQLhrv2GlXSW
+ +SAoLYRLjy2T5Qy9NyK7Gv/Vp3FJ40TOolsdtlYzCnu9PCOAobp19HWjai3bIHxQYL4A
+ uAtdgYyCC3zGTbCTj/NiouR6cF5CPXf+OCw1cLvI+P6uBzTq1gxcIT44cPuY+VsxmBHk
+ nWee6N0xFOE0MnokV8WExDsDzKy08WQlh/GnqDYJgDtLTnOg6rafixl2WO4mrLzxpiC2
+ 0qkw==
+X-Gm-Message-State: AOAM530m7mORaQUKX9x/MU5kWDSxPca7Y71wt3RyCqJWQulWM/CdyZtA
+ Y6FYYhGbOUvk7TgIp62JRlRUAi/y5Pf45w==
+X-Google-Smtp-Source: ABdhPJyJQA8JF5TfCTVSysBO3omCT3pxmJZqyw5XWu2AwXzgVNU7+k5ckDO5aIbutorlg/+Kb2J0Jg==
+X-Received: by 2002:adf:f246:: with SMTP id b6mr4265868wrp.111.1603209477126; 
+ Tue, 20 Oct 2020 08:57:57 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.31
+ by smtp.gmail.com with ESMTPSA id v6sm3780205wrp.69.2020.10.20.08.57.55
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 08:57:31 -0700 (PDT)
+ Tue, 20 Oct 2020 08:57:56 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 21/41] target/arm: Implement v8.1M NOCP handling
-Date: Tue, 20 Oct 2020 16:56:36 +0100
-Message-Id: <20201020155656.8045-22-peter.maydell@linaro.org>
+Subject: [PULL 40/41] linux-user/elfload: Parse
+ GNU_PROPERTY_AARCH64_FEATURE_1_AND
+Date: Tue, 20 Oct 2020 16:56:55 +0100
+Message-Id: <20201020155656.8045-41-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201020155656.8045-1-peter.maydell@linaro.org>
 References: <20201020155656.8045-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::331;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x331.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::431;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x431.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,110 +105,105 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From v8.1M, disabled-coprocessor handling changes slightly:
- * coprocessors 8, 9, 14 and 15 are also governed by the
-   cp10 enable bit, like cp11
- * an extra range of instruction patterns is considered
-   to be inside the coprocessor space
+From: Richard Henderson <richard.henderson@linaro.org>
 
-We previously marked these up with TODO comments; implement the
-correct behaviour.
+Use the new generic support for NT_GNU_PROPERTY_TYPE_0.
 
-Unfortunately there is no ID register field which indicates this
-behaviour.  We could in theory test an unrelated ID register which
-indicates guaranteed-to-be-in-v8.1M behaviour like ID_ISAR0.CmpBranch
->= 3 (low-overhead-loops), but it seems better to simply define a new
-ARM_FEATURE_V8_1M feature flag and use it for this and other
-new-in-v8.1M behaviour that isn't identifiable from the ID registers.
-
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201016184207.786698-12-richard.henderson@linaro.org
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20201019151301.2046-3-peter.maydell@linaro.org
 ---
- target/arm/cpu.h               |  1 +
- target/arm/m-nocp.decode       | 10 ++++++----
- target/arm/translate-vfp.c.inc | 17 +++++++++++++++--
- 3 files changed, 22 insertions(+), 6 deletions(-)
+ linux-user/elfload.c | 48 ++++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 46 insertions(+), 2 deletions(-)
 
-diff --git a/target/arm/cpu.h b/target/arm/cpu.h
-index cfff1b5c8fe..74392fa0295 100644
---- a/target/arm/cpu.h
-+++ b/target/arm/cpu.h
-@@ -1985,6 +1985,7 @@ enum arm_features {
-     ARM_FEATURE_VBAR, /* has cp15 VBAR */
-     ARM_FEATURE_M_SECURITY, /* M profile Security Extension */
-     ARM_FEATURE_M_MAIN, /* M profile Main Extension */
-+    ARM_FEATURE_V8_1M, /* M profile extras only in v8.1M and later */
- };
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index 428dcaa1528..bf8c1bd2533 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -1522,6 +1522,28 @@ static void elf_core_copy_regs(target_elf_gregset_t *regs,
  
- static inline int arm_feature(CPUARMState *env, int feature)
-diff --git a/target/arm/m-nocp.decode b/target/arm/m-nocp.decode
-index 7182d7d1217..28c8ac6b94c 100644
---- a/target/arm/m-nocp.decode
-+++ b/target/arm/m-nocp.decode
-@@ -29,14 +29,16 @@
- # If the coprocessor is not present or disabled then we will generate
- # the NOCP exception; otherwise we let the insn through to the main decode.
+ #include "elf.h"
  
-+&nocp cp
++/* We must delay the following stanzas until after "elf.h". */
++#if defined(TARGET_AARCH64)
 +
- {
-   # Special cases which do not take an early NOCP: VLLDM and VLSTM
-   VLLDM_VLSTM  1110 1100 001 l:1 rn:4 0000 1010 0000 0000
-   # TODO: VSCCLRM (new in v8.1M) is similar:
-   #VSCCLRM      1110 1100 1-01 1111 ---- 1011 ---- ---0
- 
--  NOCP         111- 1110 ---- ---- ---- cp:4 ---- ----
--  NOCP         111- 110- ---- ---- ---- cp:4 ---- ----
--  # TODO: From v8.1M onwards we will also want this range to NOCP
--  #NOCP_8_1     111- 1111 ---- ---- ---- ---- ---- ---- cp=10
-+  NOCP         111- 1110 ---- ---- ---- cp:4 ---- ---- &nocp
-+  NOCP         111- 110- ---- ---- ---- cp:4 ---- ---- &nocp
-+  # From v8.1M onwards this range will also NOCP:
-+  NOCP_8_1     111- 1111 ---- ---- ---- ---- ---- ---- &nocp cp=10
- }
-diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
-index 9b11b81f80d..a7ed9bc81b9 100644
---- a/target/arm/translate-vfp.c.inc
-+++ b/target/arm/translate-vfp.c.inc
-@@ -3459,7 +3459,7 @@ static bool trans_VLLDM_VLSTM(DisasContext *s, arg_VLLDM_VLSTM *a)
-     return true;
- }
- 
--static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-+static bool trans_NOCP(DisasContext *s, arg_nocp *a)
- {
-     /*
-      * Handle M-profile early check for disabled coprocessor:
-@@ -3472,7 +3472,11 @@ static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-     if (a->cp == 11) {
-         a->cp = 10;
-     }
--    /* TODO: in v8.1M cp 8, 9, 14, 15 also are governed by the cp10 enable */
-+    if (arm_dc_feature(s, ARM_FEATURE_V8_1M) &&
-+        (a->cp == 8 || a->cp == 9 || a->cp == 14 || a->cp == 15)) {
-+        /* in v8.1M cp 8, 9, 14, 15 also are governed by the cp10 enable */
-+        a->cp = 10;
-+    }
- 
-     if (a->cp != 10) {
-         gen_exception_insn(s, s->pc_curr, EXCP_NOCP,
-@@ -3489,6 +3493,15 @@ static bool trans_NOCP(DisasContext *s, arg_NOCP *a)
-     return false;
- }
- 
-+static bool trans_NOCP_8_1(DisasContext *s, arg_nocp *a)
++static bool arch_parse_elf_property(uint32_t pr_type, uint32_t pr_datasz,
++                                    const uint32_t *data,
++                                    struct image_info *info,
++                                    Error **errp)
 +{
-+    /* This range needs a coprocessor check for v8.1M and later only */
-+    if (!arm_dc_feature(s, ARM_FEATURE_V8_1M)) {
-+        return false;
++    if (pr_type == GNU_PROPERTY_AARCH64_FEATURE_1_AND) {
++        if (pr_datasz != sizeof(uint32_t)) {
++            error_setg(errp, "Ill-formed GNU_PROPERTY_AARCH64_FEATURE_1_AND");
++            return false;
++        }
++        /* We will extract GNU_PROPERTY_AARCH64_FEATURE_1_BTI later. */
++        info->note_flags = *data;
 +    }
-+    return trans_NOCP(s, a);
++    return true;
 +}
++#define ARCH_USE_GNU_PROPERTY 1
 +
- static bool trans_VINS(DisasContext *s, arg_VINS *a)
++#else
++
+ static bool arch_parse_elf_property(uint32_t pr_type, uint32_t pr_datasz,
+                                     const uint32_t *data,
+                                     struct image_info *info,
+@@ -1531,6 +1553,8 @@ static bool arch_parse_elf_property(uint32_t pr_type, uint32_t pr_datasz,
+ }
+ #define ARCH_USE_GNU_PROPERTY 0
+ 
++#endif
++
+ struct exec
  {
-     TCGv_i32 rd, rm;
+     unsigned int a_info;   /* Use macros N_MAGIC, etc for access */
+@@ -2545,7 +2569,7 @@ static void load_elf_image(const char *image_name, int image_fd,
+     struct elfhdr *ehdr = (struct elfhdr *)bprm_buf;
+     struct elf_phdr *phdr;
+     abi_ulong load_addr, load_bias, loaddr, hiaddr, error;
+-    int i, retval;
++    int i, retval, prot_exec;
+     Error *err = NULL;
+ 
+     /* First of all, some simple consistency checks */
+@@ -2712,6 +2736,26 @@ static void load_elf_image(const char *image_name, int image_fd,
+     info->brk = 0;
+     info->elf_flags = ehdr->e_flags;
+ 
++    prot_exec = PROT_EXEC;
++#ifdef TARGET_AARCH64
++    /*
++     * If the BTI feature is present, this indicates that the executable
++     * pages of the startup binary should be mapped with PROT_BTI, so that
++     * branch targets are enforced.
++     *
++     * The startup binary is either the interpreter or the static executable.
++     * The interpreter is responsible for all pages of a dynamic executable.
++     *
++     * Elf notes are backward compatible to older cpus.
++     * Do not enable BTI unless it is supported.
++     */
++    if ((info->note_flags & GNU_PROPERTY_AARCH64_FEATURE_1_BTI)
++        && (pinterp_name == NULL || *pinterp_name == 0)
++        && cpu_isar_feature(aa64_bti, ARM_CPU(thread_cpu))) {
++        prot_exec |= TARGET_PROT_BTI;
++    }
++#endif
++
+     for (i = 0; i < ehdr->e_phnum; i++) {
+         struct elf_phdr *eppnt = phdr + i;
+         if (eppnt->p_type == PT_LOAD) {
+@@ -2725,7 +2769,7 @@ static void load_elf_image(const char *image_name, int image_fd,
+                 elf_prot |= PROT_WRITE;
+             }
+             if (eppnt->p_flags & PF_X) {
+-                elf_prot |= PROT_EXEC;
++                elf_prot |= prot_exec;
+             }
+ 
+             vaddr = load_bias + eppnt->p_vaddr;
 -- 
 2.20.1
 
