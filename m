@@ -2,93 +2,75 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE1B9C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CC9FC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:38:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D637A2080D
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:37:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0BBCF21D6C
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 17:38:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bVOidU16"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D637A2080D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ip+k46K/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0BBCF21D6C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUvZf-0007GL-6Z
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34920)
+	id 1kUvac-00004x-V6
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 13:38:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35830)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUvO5-000721-8K
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:25:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:33393)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQX-0002jn-OB
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:01 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48658)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kUvO2-00086w-FN
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:25:28 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kUvQS-00006Y-FE
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 13:28:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603214724;
+ s=mimecast20190719; t=1603214875;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=MLOm46KfCEikq86Y3pgvNvo5u9OAutjap0o+dhD/k3Y=;
- b=bVOidU16IldnhHLQjGk+L2d5IKQYnnW4X+PmQ67lfK2E8WrF8LUyELfreEjpVKdZa0pPXd
- lUrIz1PxXrIjutpGcOmGaAHnUAmcJZH0O2OexAnpCtS8wgnLuxe1HcmnpkacwAr+0HLs96
- l0EqMNUaoJCDzPjAJq8ypVAVjumaKr8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-114-QzpgvYIKPfO_IkjCWEt5TA-1; Tue, 20 Oct 2020 13:25:23 -0400
-X-MC-Unique: QzpgvYIKPfO_IkjCWEt5TA-1
-Received: by mail-wr1-f72.google.com with SMTP id 2so1076716wrd.14
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 10:25:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MLOm46KfCEikq86Y3pgvNvo5u9OAutjap0o+dhD/k3Y=;
- b=J26tlQfLO+wT2gzem04c8toBjrtxzDej1ymNEope7W1Fjubj1vUXbxDbkO0W+r9KAk
- l7vRgDjspi/UBZbKonV4K3DuLoypLmHWJ2vMTeQPf+4sqAsmPTAsQRf4lNQeCQHm8+YN
- fR9ftvI4MuHzwQPNUiCeY1U5VeRoiytlQmdfOiTHFD3Wjxg9ZooQpPeIbFAazNq7JvSW
- 7v/EHcv6f1GupvDmIGNwCP8ogtqEYiKYXBkM/+sGveTJRJ/KF2PhHcn2ptWGue3HIJsE
- DwnJDQRNnLSinDtKGAwq1uaVizGJOYoaz7o4uvqJI6F45o/LQRiFvdIxaC79Sb0Jk7OZ
- szMg==
-X-Gm-Message-State: AOAM533ABGDgQ1yIwx7K0EmUyQ2P8h1paEfEQVyX+0SN3xLAwqTbVcDM
- StCwm7pjWv7mbCSHd0EGORGeZDWSCvCxuWi/pAFVc99aB0N1/JQhNVaipSHzx/vA8SJoKMko/o7
- +lMr6JcvCBUOcxX0=
-X-Received: by 2002:a7b:c341:: with SMTP id l1mr4171329wmj.80.1603214721817;
- Tue, 20 Oct 2020 10:25:21 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy4BCYIdH3y+v314ecWJ7QzYvUGZoGOW233TZDHOfC4Nw0fGTCX6iw6Y2XUy6c9lI9/PzLQmQ==
-X-Received: by 2002:a7b:c341:: with SMTP id l1mr4171309wmj.80.1603214721583;
- Tue, 20 Oct 2020 10:25:21 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id y7sm3579711wmg.40.2020.10.20.10.25.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 10:25:20 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+ bh=IM2Kajz9lTZ5ZobaWNoxzDci2hQcR0F3TbzGmFdKRdw=;
+ b=Ip+k46K/O8g2YJPwcsh0czRhjgojuaUY4XWGVGpApaBA4ceeKH9KAAsZ2+QarakEfirtK0
+ hOO7hz52H3QDxsDpQdBBjJwlcISnTY+lbVhZNkjRLihU0QQbdL6HDw6RC+4EgxLUYriOYb
+ gxYPoa2J5rVkDJ2ajY1gxRRMMaEwmkY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-454-3-rjH6E6PeOIIMET74Mv5A-1; Tue, 20 Oct 2020 13:27:52 -0400
+X-MC-Unique: 3-rjH6E6PeOIIMET74Mv5A-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF978186DD20;
+ Tue, 20 Oct 2020 17:27:50 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-115-172.rdu2.redhat.com [10.10.115.172])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C71071992D;
+ Tue, 20 Oct 2020 17:27:49 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 10/16] util/vfio-helpers: Let qemu_vfio_dma_map() propagate
- Error
-Date: Tue, 20 Oct 2020 19:24:22 +0200
-Message-Id: <20201020172428.2220726-11-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201020172428.2220726-1-philmd@redhat.com>
-References: <20201020172428.2220726-1-philmd@redhat.com>
+Subject: [PULL 03/21] python/machine.py: Fix monitor address typing
+Date: Tue, 20 Oct 2020 13:27:24 -0400
+Message-Id: <20201020172742.1483258-4-jsnow@redhat.com>
+In-Reply-To: <20201020172742.1483258-1-jsnow@redhat.com>
+References: <20201020172742.1483258-1-jsnow@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -111,141 +93,116 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Currently qemu_vfio_dma_map() displays errors on stderr.
-When using management interface, this information is simply
-lost. Pass qemu_vfio_dma_map() an Error* argument so it can
-propagate the error to callers.
+Prior to this, it's difficult for mypy to intuit what the concrete type
+of the monitor address is; it has difficulty inferring the type across
+two variables.
 
-Reviewed-by: Fam Zheng <fam@euphon.net>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Create _monitor_address as a property that always returns a valid
+address to simplify static type analysis.
+
+To preserve our ability to clean up, use a simple boolean to indicate
+whether or not we should try to clean up the sock file after execution.
+
+Signed-off-by: John Snow <jsnow@redhat.com>
+Reviewed-by: Kevin Wolf <kwolf@redhat.com>
+Message-id: 20201006235817.3280413-3-jsnow@redhat.com
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- include/qemu/vfio-helpers.h |  2 +-
- block/nvme.c                | 14 +++++++-------
- util/vfio-helpers.c         | 12 +++++++-----
- 3 files changed, 15 insertions(+), 13 deletions(-)
+ python/qemu/machine.py | 40 +++++++++++++++++++++++++---------------
+ 1 file changed, 25 insertions(+), 15 deletions(-)
 
-diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-index 5cb346d8e67..4b97a904e93 100644
---- a/include/qemu/vfio-helpers.h
-+++ b/include/qemu/vfio-helpers.h
-@@ -19,7 +19,7 @@ QEMUVFIOState *qemu_vfio_open_pci(const char *device, size_t *min_page_size,
-                                   Error **errp);
- void qemu_vfio_close(QEMUVFIOState *s);
- int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
--                      bool temporary, uint64_t *iova_list);
-+                      bool temporary, uint64_t *iova_list, Error **errp);
- int qemu_vfio_dma_reset_temporary(QEMUVFIOState *s);
- void qemu_vfio_dma_unmap(QEMUVFIOState *s, void *host);
- void *qemu_vfio_pci_map_bar(QEMUVFIOState *s, int index,
-diff --git a/block/nvme.c b/block/nvme.c
-index 8335f5d70dd..428cda620df 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -167,9 +167,9 @@ static void nvme_init_queue(BDRVNVMeState *s, NVMeQueue *q,
-         return;
-     }
-     memset(q->queue, 0, bytes);
--    r = qemu_vfio_dma_map(s->vfio, q->queue, bytes, false, &q->iova);
-+    r = qemu_vfio_dma_map(s->vfio, q->queue, bytes, false, &q->iova, errp);
-     if (r) {
--        error_setg(errp, "Cannot map queue");
-+        error_prepend(errp, "Cannot map queue: ");
-     }
- }
+diff --git a/python/qemu/machine.py b/python/qemu/machine.py
+index bc83f399c1..3017ec072d 100644
+--- a/python/qemu/machine.py
++++ b/python/qemu/machine.py
+@@ -28,6 +28,7 @@
+ from typing import Optional, Type
  
-@@ -223,7 +223,7 @@ static NVMeQueuePair *nvme_create_queue_pair(BDRVNVMeState *s,
-     q->completion_bh = aio_bh_new(aio_context, nvme_process_completion_bh, q);
-     r = qemu_vfio_dma_map(s->vfio, q->prp_list_pages,
-                           s->page_size * NVME_NUM_REQS,
--                          false, &prp_list_iova);
-+                          false, &prp_list_iova, errp);
-     if (r) {
-         goto fail;
-     }
-@@ -514,9 +514,9 @@ static void nvme_identify(BlockDriverState *bs, int namespace, Error **errp)
-         error_setg(errp, "Cannot allocate buffer for identify response");
-         goto out;
-     }
--    r = qemu_vfio_dma_map(s->vfio, id, sizeof(*id), true, &iova);
-+    r = qemu_vfio_dma_map(s->vfio, id, sizeof(*id), true, &iova, errp);
-     if (r) {
--        error_setg(errp, "Cannot map buffer for DMA");
-+        error_prepend(errp, "Cannot map buffer for DMA: ");
-         goto out;
-     }
+ from . import console_socket, qmp
++from .qmp import SocketAddrT
  
-@@ -990,7 +990,7 @@ try_map:
-         r = qemu_vfio_dma_map(s->vfio,
-                               qiov->iov[i].iov_base,
-                               qiov->iov[i].iov_len,
--                              true, &iova);
-+                              true, &iova, NULL);
-         if (r == -ENOMEM && retry) {
-             retry = false;
-             trace_nvme_dma_flush_queue_wait(s);
-@@ -1437,7 +1437,7 @@ static void nvme_register_buf(BlockDriverState *bs, void *host, size_t size)
-     int ret;
-     BDRVNVMeState *s = bs->opaque;
  
--    ret = qemu_vfio_dma_map(s->vfio, host, size, false, NULL);
-+    ret = qemu_vfio_dma_map(s->vfio, host, size, false, NULL, NULL);
-     if (ret) {
-         /* FIXME: we may run out of IOVA addresses after repeated
-          * bdrv_register_buf/bdrv_unregister_buf, because nvme_vfio_dma_unmap
-diff --git a/util/vfio-helpers.c b/util/vfio-helpers.c
-index 6a5100f4892..8c075d9aae7 100644
---- a/util/vfio-helpers.c
-+++ b/util/vfio-helpers.c
-@@ -486,7 +486,7 @@ static void qemu_vfio_ram_block_added(RAMBlockNotifier *n,
- {
-     QEMUVFIOState *s = container_of(n, QEMUVFIOState, ram_notifier);
-     trace_qemu_vfio_ram_block_added(s, host, size);
--    qemu_vfio_dma_map(s, host, size, false, NULL);
-+    qemu_vfio_dma_map(s, host, size, false, NULL, NULL);
- }
+ LOG = logging.getLogger(__name__)
+@@ -68,7 +69,8 @@ class QEMUMachine:
+     """
  
- static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
-@@ -501,6 +501,7 @@ static void qemu_vfio_ram_block_removed(RAMBlockNotifier *n,
+     def __init__(self, binary, args=None, wrapper=None, name=None,
+-                 test_dir="/var/tmp", monitor_address=None,
++                 test_dir="/var/tmp",
++                 monitor_address: Optional[SocketAddrT] = None,
+                  socket_scm_helper=None, sock_dir=None,
+                  drain_console=False, console_log=None):
+         '''
+@@ -95,8 +97,14 @@ def __init__(self, binary, args=None, wrapper=None, name=None,
+         if sock_dir is None:
+             sock_dir = test_dir
+         self._name = name
+-        self._monitor_address = monitor_address
+-        self._vm_monitor = None
++        if monitor_address is not None:
++            self._monitor_address = monitor_address
++            self._remove_monitor_sockfile = False
++        else:
++            self._monitor_address = os.path.join(
++                sock_dir, f"{name}-monitor.sock"
++            )
++            self._remove_monitor_sockfile = True
+         self._qemu_log_path = None
+         self._qemu_log_file = None
+         self._popen = None
+@@ -241,15 +249,17 @@ def _load_io_log(self):
  
- static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
- {
-+    Error *local_err = NULL;
-     void *host_addr = qemu_ram_get_host_addr(rb);
-     ram_addr_t length = qemu_ram_get_used_length(rb);
-     int ret;
-@@ -509,10 +510,11 @@ static int qemu_vfio_init_ramblock(RAMBlock *rb, void *opaque)
-     if (!host_addr) {
-         return 0;
-     }
--    ret = qemu_vfio_dma_map(s, host_addr, length, false, NULL);
-+    ret = qemu_vfio_dma_map(s, host_addr, length, false, NULL, &local_err);
-     if (ret) {
--        fprintf(stderr, "qemu_vfio_init_ramblock: failed %p %" PRId64 "\n",
--                host_addr, (uint64_t)length);
-+        error_reportf_err(local_err,
-+                          "qemu_vfio_init_ramblock: failed %p %" PRId64 ":",
-+                          host_addr, (uint64_t)length);
-     }
-     return 0;
- }
-@@ -754,7 +756,7 @@ qemu_vfio_find_temp_iova(QEMUVFIOState *s, size_t size, uint64_t *iova)
-  * mapping status within this area is not allowed).
-  */
- int qemu_vfio_dma_map(QEMUVFIOState *s, void *host, size_t size,
--                      bool temporary, uint64_t *iova)
-+                      bool temporary, uint64_t *iova, Error **errp)
- {
-     int ret = 0;
-     int index;
+     def _base_args(self):
+         args = ['-display', 'none', '-vga', 'none']
++
+         if self._qmp_set:
+             if isinstance(self._monitor_address, tuple):
+-                moncdev = "socket,id=mon,host=%s,port=%s" % (
+-                    self._monitor_address[0],
+-                    self._monitor_address[1])
++                moncdev = "socket,id=mon,host={},port={}".format(
++                    *self._monitor_address
++                )
+             else:
+-                moncdev = 'socket,id=mon,path=%s' % self._vm_monitor
++                moncdev = f"socket,id=mon,path={self._monitor_address}"
+             args.extend(['-chardev', moncdev, '-mon',
+                          'chardev=mon,mode=control'])
++
+         if self._machine is not None:
+             args.extend(['-machine', self._machine])
+         for _ in range(self._console_index):
+@@ -274,14 +284,14 @@ def _pre_launch(self):
+         self._qemu_log_file = open(self._qemu_log_path, 'wb')
+ 
+         if self._qmp_set:
+-            if self._monitor_address is not None:
+-                self._vm_monitor = self._monitor_address
+-            else:
+-                self._vm_monitor = os.path.join(self._sock_dir,
+-                                                self._name + "-monitor.sock")
+-                self._remove_files.append(self._vm_monitor)
+-            self._qmp = qmp.QEMUMonitorProtocol(self._vm_monitor, server=True,
+-                                                nickname=self._name)
++            if self._remove_monitor_sockfile:
++                assert isinstance(self._monitor_address, str)
++                self._remove_files.append(self._monitor_address)
++            self._qmp = qmp.QEMUMonitorProtocol(
++                self._monitor_address,
++                server=True,
++                nickname=self._name
++            )
+ 
+     def _post_launch(self):
+         if self._qmp:
 -- 
 2.26.2
 
