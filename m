@@ -2,74 +2,91 @@ Return-Path: <SRS0=1sPN=D3=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C6EC433E7
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:18:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D040C433DF
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:20:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6810522283
-	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:18:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6810522283
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B5D9A22283
+	for <qemu-devel@archiver.kernel.org>; Tue, 20 Oct 2020 09:20:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DF5bqZOQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5D9A22283
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48030 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50990 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kUnmm-0006sz-CP
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:18:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55250)
+	id 1kUnoz-0008AF-Oi
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 05:20:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55712)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUnm2-00068Y-PL
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:17:42 -0400
-Resent-Date: Tue, 20 Oct 2020 05:17:42 -0400
-Resent-Message-Id: <E1kUnm2-00068Y-PL@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21739)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kUnm0-00087x-1s
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:17:42 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603185443; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=BSBL/TVOAdRMUbwWav50Y7Y+VKCmv+q73uSULAxeHtqk8bGy5O4Lc+DUL5cCgFXyrEEGsiGjFld1TLW2VHLZyxPZ34sGWGoXkyGAUYMyZwYoZ33I4GPK/2We9HHoyXyTUg/0vIfsxInqcs51Yu1hx8PuWcig9Z4yyXUSqiOAfB8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603185443;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=aJkLfV2kAAkuJ4m52VH6Xu9PHdHK+5f+F0jka8WLYLI=; 
- b=gUEseeQTtjoJ7uuy/s1n701qeHJEHL6+Q1vOWGdZGxIsIyFAiOkeNsMHlaXQUdC/oLaS5dEydrnI1fJ0SJE85NSZnTP8vWPXUHeaO+LGp679WO/jOp7zMFjbuhRuboSjHuajNZ4o9npSk/TnmnIgWt6/VPRnSyTBKbfHa6NovCc=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1603185440972916.1806768292164;
- Tue, 20 Oct 2020 02:17:20 -0700 (PDT)
-Subject: Re: [PATCH v2] hw/core/qdev-clock: add a reference on aliased clocks
-Message-ID: <160318543901.32698.18309056390234077760@66eaa9a8a123>
-In-Reply-To: <20201020091024.320381-1-luc@lmichel.fr>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUnoI-0007Qr-PK
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:20:02 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39009)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kUnoG-0000VI-Uz
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 05:20:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603185599;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=iTDxXjmmV9SBNQKIIY6Zo0fewLiMnTymBrXdAn8UZNc=;
+ b=DF5bqZOQvO1IDa/NyAsdX/3PvugPYDS+0h2mX+xmI+GMjGefiZRHvHu/FGkhS+h0Y6oOPo
+ /4VW2gIrXSl1YQMn9x/Fu9NoTZQATVDfLZSKQ6CwRskbM9DzUw5K5VGmB5LNoa2VBwulDK
+ 2bzfQF5cXzJLqDkMMrZqP6BvDZ1/kzM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-20-SylAEMSWPw2kby1QamkCUw-1; Tue, 20 Oct 2020 05:19:56 -0400
+X-MC-Unique: SylAEMSWPw2kby1QamkCUw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE7A418BE163;
+ Tue, 20 Oct 2020 09:19:54 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8C0D25D9F3;
+ Tue, 20 Oct 2020 09:19:54 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id ED5571132A08; Tue, 20 Oct 2020 11:19:52 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Stefan Hajnoczi <stefanha@gmail.com>
+Subject: Re: [PATCH] trace/simple: Enable tracing on startup only if the
+ user specifies a trace option
+References: <20200816174610.20253-1-josh@joshdubois.com>
+ <20200911100805.GB81586@stefanha-x1.localdomain>
+ <87lfgt3u0i.fsf@dusky.pond.sub.org>
+Date: Tue, 20 Oct 2020 11:19:52 +0200
+In-Reply-To: <87lfgt3u0i.fsf@dusky.pond.sub.org> (Markus Armbruster's message
+ of "Tue, 29 Sep 2020 09:46:21 +0200")
+Message-ID: <87blgxfe4n.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: luc@lmichel.fr
-Date: Tue, 20 Oct 2020 02:17:20 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 05:17:37
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 01:15:43
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,41 +99,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: damien.hedde@greensocs.com, peter.maydell@linaro.org, berrange@redhat.com,
- ehabkost@redhat.com, armbru@redhat.com, f4bug@amsat.org, qemu-devel@nongnu.org,
- pbonzini@redhat.com, luc@lmichel.fr, marcandre.lureau@redhat.com
+Cc: qemu-trivial@nongnu.org, duboisj@gmail.com, qemu-devel@nongnu.org,
+ Josh DuBois <josh@joshdubois.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyMDA5MTAyNC4zMjAz
-ODEtMS1sdWNAbG1pY2hlbC5mci8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBoYXZlIHNv
-bWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3JlIGluZm9y
-bWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAxMDIwMDkxMDI0LjMyMDM4MS0x
-LWx1Y0BsbWljaGVsLmZyClN1YmplY3Q6IFtQQVRDSCB2Ml0gaHcvY29yZS9xZGV2LWNsb2NrOiBh
-ZGQgYSByZWZlcmVuY2Ugb24gYWxpYXNlZCBjbG9ja3MKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9
-PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApn
-aXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBk
-aWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9n
-cmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFND
-UklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4
-NzEzMzg0CmVycm9yOiBSUEMgZmFpbGVkOyByZXN1bHQ9NywgSFRUUCBjb2RlID0gMApmYXRhbDog
-VGhlIHJlbW90ZSBlbmQgaHVuZyB1cCB1bmV4cGVjdGVkbHkKZXJyb3I6IENvdWxkIG5vdCBmZXRj
-aCAzYzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0ClRyYWNlYmFjayAobW9z
-dCByZWNlbnQgY2FsbCBsYXN0KToKICBGaWxlICJwYXRjaGV3LXRlc3Rlci9zcmMvcGF0Y2hldy1j
-bGkiLCBsaW5lIDUyMSwgaW4gdGVzdF9vbmUKICAgIGdpdF9jbG9uZV9yZXBvKGNsb25lLCByWyJy
-ZXBvIl0sIHJbImhlYWQiXSwgbG9nZiwgVHJ1ZSkKICBGaWxlICJwYXRjaGV3LXRlc3Rlci9zcmMv
-cGF0Y2hldy1jbGkiLCBsaW5lIDQ4LCBpbiBnaXRfY2xvbmVfcmVwbwogICAgc3Rkb3V0PWxvZ2Ys
-IHN0ZGVycj1sb2dmKQogIEZpbGUgIi9vcHQvcmgvcmgtcHl0aG9uMzYvcm9vdC91c3IvbGliNjQv
-cHl0aG9uMy42L3N1YnByb2Nlc3MucHkiLCBsaW5lIDI5MSwgaW4gY2hlY2tfY2FsbAogICAgcmFp
-c2UgQ2FsbGVkUHJvY2Vzc0Vycm9yKHJldGNvZGUsIGNtZCkKc3VicHJvY2Vzcy5DYWxsZWRQcm9j
-ZXNzRXJyb3I6IENvbW1hbmQgJ1snZ2l0JywgJ3JlbW90ZScsICdhZGQnLCAnLWYnLCAnLS1taXJy
-b3I9ZmV0Y2gnLCAnM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcxMzM4NCcsICdo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUnXScgcmV0dXJuZWQgbm9uLXpl
-cm8gZXhpdCBzdGF0dXMgMS4KCgoKVGhlIGZ1bGwgbG9nIGlzIGF2YWlsYWJsZSBhdApodHRwOi8v
-cGF0Y2hldy5vcmcvbG9ncy8yMDIwMTAyMDA5MTAyNC4zMjAzODEtMS1sdWNAbG1pY2hlbC5mci90
-ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
-bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
-eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+Markus Armbruster <armbru@redhat.com> writes:
+
+> Stefan Hajnoczi <stefanha@gmail.com> writes:
+>
+>> On Sun, Aug 16, 2020 at 12:46:10PM -0500, duboisj@gmail.com wrote:
+>>> From: Josh DuBois <josh@joshdubois.com>
+>>> 
+>>> Tracing can be enabled at the command line or via the
+>>> monitor. Command-line trace options are recorded during
+>>> trace_opt_parse(), but tracing is not enabled until the various
+>>> front-ends later call trace_init_file(). If the user passes a trace
+>>> option on the command-line, remember that and enable tracing during
+>>> trace_init_file().  Otherwise, trace_init_file() should record the
+>>> trace file specified by the frontend and avoid enabling traces
+>>> until the user requests them via the monitor.
+>>> 
+>>> This fixes 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4 and also
+>>> db25d56c014aa1a96319c663e0a60346a223b31e, by allowing the user
+>>> to enable traces on the command line and also avoiding
+>>> unwanted trace-<pid> files when the user has not asked for them.
+>>> 
+>>> Fixes: 1b7157be3a8c4300fc8044d40f4b2e64a152a1b4
+>>> Signed-off-by: Josh DuBois <josh@joshdubois.com>
+>>> ---
+>>>  trace/control.c | 6 +++++-
+>>>  1 file changed, 5 insertions(+), 1 deletion(-)
+>>
+>> Thanks, applied to my tracing-next tree:
+>> https://github.com/stefanha/qemu/commits/tracing-next
+>>
+>> Stefan
+>
+> Pull request?
+
+Pretty-please?
+
 
