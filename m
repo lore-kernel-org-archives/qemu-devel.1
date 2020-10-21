@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B2E7C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:17:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54C3C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B20A22177B
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:17:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0FBEE2177B
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="SvqiCEqx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B20A22177B
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="F8Yq/jr/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0FBEE2177B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVFs3-0002fL-GF
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 11:17:47 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58554)
+	id 1kVFt6-0004HZ-Sh
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 11:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVFaL-0005vT-2P; Wed, 21 Oct 2020 10:59:29 -0400
+ id 1kVFaP-00067Z-65; Wed, 21 Oct 2020 10:59:33 -0400
 Received: from mail-eopbgr70109.outbound.protection.outlook.com
  ([40.107.7.109]:36743 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVFaJ-00085a-Am; Wed, 21 Oct 2020 10:59:28 -0400
+ id 1kVFaL-00085a-Or; Wed, 21 Oct 2020 10:59:32 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QYfcZN38Mda6xfAI1a8Yl7pQwqc3GdOCGqwn0EV3Hn4NA6zT5h+1CmdAVfYrE+hSwQx7n5BUWVV9suNtd1Kthi1JNsRTLOpvE8ttAAksPVJ9dKAjW/WeIN3iP8DXcDnzUtvAU6UWvHCUZJD4Uk1VjXVmLiXRjryD1jSVqFB+vacwpkKG9FwIMYaUMygOMIGrZf/5PkT3eiKI7r3ffnBuJSA43DLf4wNWHhq6vlBSTqohE/9YKIUx9mBvMLcTWRzxg/U65VMBKu86qoqnjz1QOpg8STa6YVpvV0SHsXlG35ZNyAe4aZxy0u++8nNaGZlpvUuIlhPv0sWQTlITaOWq7w==
+ b=KiKTGbuwSKknjjZUi2UkwvJRdMjiYMr1Rul5O1K3kWyjLJ7RyUW3+2ZhpNyjuo9Cuw1vzKNe8w4Iseo1U5qK3EuuaTGY3WFUJs6aOqrs1P+jsIvUKlBJqQIxm3f7ZCMDoKcz9dDfcAw3v6xBa1ky0FbR8xjo1tPGWebkhHrZ78UF3QhFyPp3wI+TKgCRcGznM5ETqllA41NJzGxcpRlXHxLLaLHbbDc34o7JjeTNxpqk/j0rILEb8k+4WZRHJVM9y67/cFdURgJBdHqevRjL6NflKw9fyBkL7cT3NQZHpJhSHPyr/PRV+calwC/MUe7mtI4J3ycMhLg4XSr+CRaeIA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WRM09K46Sm9w2OXUgAXBZcu9+8TO9U9eGahMz8wpPjY=;
- b=QzeWLO4J1sQ1VvCInwNkjZ8DP4xxjXW9zB1G5trfjWOD8mVMaNA54UGIi6nYs8QlSEA7kR8BSwH7k0HJvDpRfFJGFIztEjmih7mPTmu847mTWRGm794KFln7dqN06ui8Dpf5omgdFrkwTUJbrfbt5PPqB1y56O8r4gl49wxoygse8H9ip/pMlFqI9ZCFKczE/poxsrkcC4hzjeXgO6uKktZxG+joUGYOuaDUaH5WG/s5vW16Opedd88/yPEPaVpGuq3qGor/DMOXQ8w+QjH1/FPTH8b6zqSK/99VRw9X6Jj1tiodR0y7nQjspBURUIXwuKRd/zg1STOY2DNyxsRs8w==
+ bh=iCsMwp8on7gc4u06kqzDbEnADVRaXIT9MVKHZXcDDWI=;
+ b=LQnPO4VhydCPBmHtdPFADLnJDVQccToA/3dFvY+ZI2Nm4u6OKPpriW0Ufqf6qw/hTrRbsHY8uxlgMnTRYQETGfq9fp75JY2+gPhrK53nKmNMuRqabmbSVo78+r6Berk6W4eP2fD0t1vH1fNQpmwHNkAht/Pny4n7QIVH0gSgR/1dCRaohJQ3Uyg7xaCSGiwCc/LVQG+HK+WNPTFVTp/VTX+dlZQK53weaWoBDd6UZMcNCYd0voA/hNAGkGqKHPO6CPc/rD90iaNMC1S0ADc/5/pTZPAJLQ4NsjspyJ5ly2KmGtOhrnjJNabV0VRQfwt42KJvh0gKmLDEywZ/aQZ9xg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WRM09K46Sm9w2OXUgAXBZcu9+8TO9U9eGahMz8wpPjY=;
- b=SvqiCEqxbphODQMWCDZrEJK+o5r6BnckCC+F8vyjPx4vv4X9mZSFfK4Xerac8XdJAPc8wSOD0R0KRUT7iEqbpTRh9I9vCkLmmv/Obf+xJbCItOdkFiQkS5J0M9kyJruOnwFHNIIGLaijrxmba/RqKLCR5w3+TO6r8Fc34l7dBB4=
+ bh=iCsMwp8on7gc4u06kqzDbEnADVRaXIT9MVKHZXcDDWI=;
+ b=F8Yq/jr/q1/Wa9JF+B59sz4tkem1jPNh/6Hg9tW/as9Uwlk2DpKFb8RXI62rH2YaJ+wBOyEWPdHFWhBn1ut+rQ9K5K4MZ9oQK7ynGjb549o/YlNhKWoTavKJuF5v1QW8EQCH1utmDu71ZT0880AK+2utdivmGf2BapWUBXqzKFg=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB4472.eurprd08.prod.outlook.com (2603:10a6:20b:bf::19)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Wed, 21 Oct
- 2020 14:59:19 +0000
+ 2020 14:59:20 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Wed, 21 Oct 2020
- 14:59:18 +0000
+ 14:59:20 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, eblake@redhat.com,
  armbru@redhat.com, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com,
  kwolf@redhat.com, den@virtuozzo.com
-Subject: [PATCH v7 07/21] block: bdrv_check_perm(): process children anyway
-Date: Wed, 21 Oct 2020 17:58:45 +0300
-Message-Id: <20201021145859.11201-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 09/21] qemu-io: add preallocate mode parameter for truncate
+ command
+Date: Wed, 21 Oct 2020 17:58:47 +0300
+Message-Id: <20201021145859.11201-10-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201021145859.11201-1-vsementsov@virtuozzo.com>
 References: <20201021145859.11201-1-vsementsov@virtuozzo.com>
@@ -81,30 +82,30 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.82) by
  AM0PR03CA0091.eurprd03.prod.outlook.com (2603:10a6:208:69::32) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 14:59:18 +0000
+ 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 14:59:20 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: d5299bfc-104a-4c4c-78b7-08d875d1e2dd
+X-MS-Office365-Filtering-Correlation-Id: 63ffadfa-f7f1-4006-6f41-08d875d1e3eb
 X-MS-TrafficTypeDiagnostic: AM6PR08MB4472:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB44723D5778F5C5CECEA21C49C11C0@AM6PR08MB4472.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2958;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB4472947AFFE2A32B1FECD50AC11C0@AM6PR08MB4472.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: GTMdm3NBw/fU0cpWXfFKe5DB/Imujr6MykdMTACqLg52XHG2bJuREXkt4XtcaNgHNYDI7hMf2rmR2XRSmUMH3OGBWEbfeYTQAXh74jtunPC0N25NAXw15KhkQZN6rohoSKG0Kg5irofQrWj3Ksrw6JAPtYN/Yl8+xrs5SiT5MAxRk3OU8bJD/MZEJvnzMyu8EaLYfdGcKBbtETmqCIyGH8JYvOPlFmiPsihF3tDOHvnIFOzHBOJSwbfbnK0kXbAvHH+fX60EW+0VO3QpGWSSjHCj94MRNdXaJdPavYs3PPFzXZUzXRnwQQctUWOLVkzxD5dA/BJPlT/sr+gsoo2ryg==
+X-Microsoft-Antispam-Message-Info: PoLVBgDrjX+I7+fj4JS7rX1z5uJ60Rtfn4lHlnELnSsnqs/XJIrT4w6fj96jBRoUANVOwgCND4DsbOyPPxhuQ3P4ET29/3/GoBBjKqZ+GhBA4FNdHLPkD77ejLKQ4jaAXw6waF8H/VTxmd2ExBNSO0E48C8JK+nixIoFUx31GaXBruJV7vc2gcjE56kSjUlkv8h3g5MhVzDCJWw+nu2krggZ4RooYDiuVIpza+xw9dXTWO3wFLzhceoALAveoswy6T2X+CzTJdC+A9gb8JDAJJfHx7OPwW1Yl4hfyaKXCviRLwvNatMj8u6xUgQczLIHk/IspaNWk2be0d41H+RKGA==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
  SFS:(4636009)(396003)(376002)(366004)(136003)(346002)(39840400004)(66556008)(16526019)(66476007)(83380400001)(6512007)(26005)(478600001)(66946007)(186003)(6506007)(6916009)(86362001)(1076003)(6486002)(8936002)(2906002)(5660300002)(52116002)(8676002)(2616005)(6666004)(316002)(956004)(107886003)(4326008)(36756003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: cZyAVU3pqPpaKjrYSfvZuuEFndGK66CF6mqNs31TqaD3iJAyDEpV7ZOVxm7vIyWgf0POlvnDqzdmI2qyelTaWMajr9H+teFpbbMQ791GXtDigwKzSXm7nnNlUOo3mgSoXFZ9KCavQYOmmn5ORGcQMhKqo1b4EwLsCzhPTVbjVVs4y/vAg7sVrNaR9dD34UG83y2YRmA8pBJQwShOFf5qKr6WJPoXwgZm1vn+ufm98VM4CpO8qxI+x7GmTVD0sCKBFtATrQwc0KYoY5Q7Qjn9+ZJDj03SO/f7nUht5FIYj1m8qZokhVKthWUMYAesROkmIa3xs2QI9pCZ8H80cqAV6gqI+sK2UDQiUkJ2JmE8c0QX4HC5v1akPqDES9Uzh+NHTXAwHS/zkS0HxQ2+je5jIkEqoviuLM3iPFRKIA/LzRNvEt0AsUdkk7MFOFVxEslLsLCYo0qKC8O6atedhs/DucDGwrjXoGtUplJ0WelFZqfLZh1pob2MbsyVIJAlRe5G6JEv2HM3CWj/rVEHtTsQvQ8m/umEa3LT2bZw5CgQr1xrWUbDcqWZoyMaEGSHEOTLB8n/6qFdSatay2om0xZ38h0BL1LJBDI3i2PIKxLLF5RFhPniJbpER8fKhJU3XXrFzlZu3g2fWyvilnZBZwCQSQ==
+X-MS-Exchange-AntiSpam-MessageData: 9cUe9dtkZHLfliJnfkaK4b+3RN2Q9z50AtudxyElveYyHMJuTiLq2P9j8A5hXNrz2KnJguRDJWXvlSXXrtclZrxgT5JoyiiQXk7yYKXZfsdbvmwdDM8PPLxEC7H3kkfCzN/8uEOolx9YVmXStS6umKOLZ3mW7yHQ+jKoEHvEk0rlpOpUnGRNb/e8FlD7pswcjhTCi1xZojruL7TXHn7kxcImXxyXqPpVVF06ObWsaLXNa0tzgBztIBoUZSsvTtD59Wj5OWKt9ntWDIGyobsEPnVD+pi7oF0JJ0JZ6Equ350tNmRELgosN/SUFTWbAvupdkdvhT1wEUV7+BXselHg7F4wBeMTJmA0lIiA4cm324HDcHMra5AkbnkMCwUKWF36vq27Bkc40/5F+WH06JFJxhJo9b28/WYdwneGYeYjFkYF0Jcl/GD6TsigX5NswpGin5NyvatD+nqZcop+k0KqSq0DWbtlU5ZmS0rTBLdhhwtOz0pOyQUvYlv2npZT9MTmisaAn1dyBHpgdMB1cJNHx8w5JAa3UEAhzSsSM7GM6VYQtXxwn/Mc37O4B7gwInegsgpSWBQrXDdcw+01jL8uPAA5SBDsebyduYOdE+zrM/OoOu/C+DQKkw1GKQ6VPNignnQFTiO97Fd5ugcd9aBBYQ==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5299bfc-104a-4c4c-78b7-08d875d1e2dd
+X-MS-Exchange-CrossTenant-Network-Message-Id: 63ffadfa-f7f1-4006-6f41-08d875d1e3eb
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 14:59:18.9248 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 14:59:20.6751 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: J4fq/VftzF1RC2BuPjPag9BFF8eHvGfsX5pEXT3xhv/JKUipNOGx6cVBXcPi+p+DwRX21veKSdoHrJY2GSEBDpX6IveMbMF5NH/ll4xbkVw=
+X-MS-Exchange-CrossTenant-UserPrincipalName: DGhUmhLFFTHzle/amu3bH/B+uEY0x+ojOlxXR+H1kTRr0g3b/1k9hsWpVNQqHJNkEdbTD3JBVcvVNExFsP4TPvwe+soNSHbV7JkEjRbzLqE=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4472
 Received-SPF: pass client-ip=40.107.7.109;
  envelope-from=vsementsov@virtuozzo.com;
@@ -134,41 +135,90 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Do generic processing even for drivers which define .bdrv_check_perm
-handler. It's needed for further preallocate filter: it will need to do
-additional action on bdrv_check_perm, but don't want to reimplement
-generic logic.
-
-The patch doesn't change existing behaviour: the only driver that
-implements bdrv_check_perm is file-posix, but it never has any
-children.
-
-Also, bdrv_set_perm() don't stop processing if driver has
-.bdrv_set_perm handler as well.
+This will be used in further test.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- block.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
+ qemu-io-cmds.c | 46 ++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 32 insertions(+), 14 deletions(-)
 
-diff --git a/block.c b/block.c
-index 430edf79bb..4f7c27aa6d 100644
---- a/block.c
-+++ b/block.c
-@@ -2048,8 +2048,11 @@ static int bdrv_check_perm(BlockDriverState *bs, BlockReopenQueue *q,
-     }
+diff --git a/qemu-io-cmds.c b/qemu-io-cmds.c
+index 4153f1c0b0..97611969cb 100644
+--- a/qemu-io-cmds.c
++++ b/qemu-io-cmds.c
+@@ -1698,13 +1698,42 @@ static const cmdinfo_t flush_cmd = {
+     .oneline    = "flush all in-core file state to disk",
+ };
  
-     if (drv->bdrv_check_perm) {
--        return drv->bdrv_check_perm(bs, cumulative_perms,
--                                    cumulative_shared_perms, errp);
-+        ret = drv->bdrv_check_perm(bs, cumulative_perms,
-+                                   cumulative_shared_perms, errp);
-+        if (ret < 0) {
-+            return ret;
++static int truncate_f(BlockBackend *blk, int argc, char **argv);
++static const cmdinfo_t truncate_cmd = {
++    .name       = "truncate",
++    .altname    = "t",
++    .cfunc      = truncate_f,
++    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
++    .argmin     = 1,
++    .argmax     = 3,
++    .args       = "[-m prealloc_mode] off",
++    .oneline    = "truncates the current file at the given offset",
++};
++
+ static int truncate_f(BlockBackend *blk, int argc, char **argv)
+ {
+     Error *local_err = NULL;
+     int64_t offset;
+-    int ret;
++    int c, ret;
++    PreallocMode prealloc = PREALLOC_MODE_OFF;
+ 
+-    offset = cvtnum(argv[1]);
++    while ((c = getopt(argc, argv, "m:")) != -1) {
++        switch (c) {
++        case 'm':
++            prealloc = qapi_enum_parse(&PreallocMode_lookup, optarg,
++                                       PREALLOC_MODE__MAX, NULL);
++            if (prealloc == PREALLOC_MODE__MAX) {
++                error_report("Invalid preallocation mode '%s'", optarg);
++                return -EINVAL;
++            }
++            break;
++        default:
++            qemuio_command_usage(&truncate_cmd);
++            return -EINVAL;
 +        }
-     }
++    }
++
++    offset = cvtnum(argv[optind]);
+     if (offset < 0) {
+         print_cvtnum_err(offset, argv[1]);
+         return offset;
+@@ -1715,7 +1744,7 @@ static int truncate_f(BlockBackend *blk, int argc, char **argv)
+      * exact=true.  It is better to err on the "emit more errors" side
+      * than to be overly permissive.
+      */
+-    ret = blk_truncate(blk, offset, false, PREALLOC_MODE_OFF, 0, &local_err);
++    ret = blk_truncate(blk, offset, false, prealloc, 0, &local_err);
+     if (ret < 0) {
+         error_report_err(local_err);
+         return ret;
+@@ -1724,17 +1753,6 @@ static int truncate_f(BlockBackend *blk, int argc, char **argv)
+     return 0;
+ }
  
-     /* Drivers that never have children can omit .bdrv_child_perm() */
+-static const cmdinfo_t truncate_cmd = {
+-    .name       = "truncate",
+-    .altname    = "t",
+-    .cfunc      = truncate_f,
+-    .perm       = BLK_PERM_WRITE | BLK_PERM_RESIZE,
+-    .argmin     = 1,
+-    .argmax     = 1,
+-    .args       = "off",
+-    .oneline    = "truncates the current file at the given offset",
+-};
+-
+ static int length_f(BlockBackend *blk, int argc, char **argv)
+ {
+     int64_t size;
 -- 
 2.21.3
 
