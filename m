@@ -2,92 +2,91 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93A3EC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:09:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84278C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:39:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A82B422249
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:09:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACA802080A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:39:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hbUHGGsK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A82B422249
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NmYjYnVl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACA802080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV9Ba-0008KP-EP
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 04:09:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39666)
+	id 1kV9eo-0005rb-E9
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 04:39:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47818)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV9B1-0007rn-2D
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 04:08:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44992)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kV9dV-0005MN-ST
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 04:38:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51035)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV9Ay-0008QO-N2
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 04:08:54 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kV9dT-0002sj-9W
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 04:38:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603267730;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ s=mimecast20190719; t=1603269496;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Onb2Y6xea9875P0sZWByZpbrzeK4JFN4m0S9fmtXtOg=;
- b=hbUHGGsKFDviCbAv8H6aLD61DUPgxKuHGekDrGrmSkqAhbOr+57sd4bGiivqBxwD6oXQz6
- FaEebQVXLyxNfSoDEeTMF5MBbPSljZn0UbVVE4RcEBhRcS0cE8SkouCWYvBR06k9YZE2sa
- ZA389EpWs3kOtLLaz8gpGieycFRK2vg=
+ bh=+JMNT0BBbV4Y03FucdQxUJ/APlImO+CagJfl/uIS4zA=;
+ b=NmYjYnVlglQ8R3HVRAsr0FfmAxrw/uuZB1WUwHHrPotj6ECSqR0Y4IhrLECS4L7/RTkCSf
+ 0DLo7t7Ragli7qHU0hFNXONyvbgaYXsMqC6/kBNXPMOzGC/s0mjUmstM5h3kkMWIapPptP
+ GCkw8ZDedcZ8gvliYz/B3mMk6XUhN8g=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-6-c6ePYk7rOf-ncSeXwb9zUQ-1; Wed, 21 Oct 2020 04:08:48 -0400
-X-MC-Unique: c6ePYk7rOf-ncSeXwb9zUQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-63-eRC015bXPDmRpxdXKHVBPQ-1; Wed, 21 Oct 2020 04:38:11 -0400
+X-MC-Unique: eRC015bXPDmRpxdXKHVBPQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB9D018A0764;
- Wed, 21 Oct 2020 08:08:47 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 85A205577D;
- Wed, 21 Oct 2020 08:08:44 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 066821132A08; Wed, 21 Oct 2020 10:08:43 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-Subject: Re: [PATCH 1/4] qga: Rename guest-get-devices return member
- 'address' to 'id'
-References: <20201021071520.2168877-1-armbru@redhat.com>
- <20201021071520.2168877-2-armbru@redhat.com>
- <0f29af6e-e134-4ccd-1946-5ababf40eab8@redhat.com>
-Date: Wed, 21 Oct 2020 10:08:42 +0200
-In-Reply-To: <0f29af6e-e134-4ccd-1946-5ababf40eab8@redhat.com> ("Philippe
- =?utf-8?Q?Mathieu-Daud=C3=A9=22's?= message of "Wed, 21 Oct 2020 09:34:35
- +0200")
-Message-ID: <87tuuo57cl.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BEA8180790F
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 08:38:10 +0000 (UTC)
+Received: from redhat.com (ovpn-114-86.ams2.redhat.com [10.36.114.86])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 6AAF65C1BB;
+ Wed, 21 Oct 2020 08:38:06 +0000 (UTC)
+Date: Wed, 21 Oct 2020 09:38:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH] os: deprecate the -enable-fips option and QEMU's FIPS
+ enforcement
+Message-ID: <20201021083803.GC412988@redhat.com>
+References: <20201020162211.401204-1-berrange@redhat.com>
+ <f97dc04a-0cc4-3ba0-ea5e-b185cd0958a7@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <f97dc04a-0cc4-3ba0-ea5e-b185cd0958a7@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,29 +100,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, tgolembi@redhat.com, qemu-devel@nongnu.org,
- mdroth@linux.vnet.ibm.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: libvir-list@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> writes:
+On Tue, Oct 20, 2020 at 07:22:03PM +0200, Paolo Bonzini wrote:
+> On 20/10/20 18:22, Daniel P. Berrangé wrote:
+> > @@ -153,6 +153,9 @@ int os_parse_cmd_args(int index, const char *optarg)
+> >          break;
+> >  #if defined(CONFIG_LINUX)
+> >      case QEMU_OPTION_enablefips:
+> > +        warn_report("-enable-fips is deprecated, please build QEMU with "
+> > +                    "the `libgcrypt` library as the cryptography provider "
+> > +                    "to enable FIPS compliance");
+> >          fips_set_state(true);
+> >          break;
+> >  #endif
+> 
+> Should you also remove fips_set_state(true) and make fips_get_state()
+> return the contents of /proc/sys/crypto/fips_enabled, so that VNC
+> password authentication is disabled?
 
-> On 10/21/20 9:15 AM, Markus Armbruster wrote:
->> Member 'address' is union GuestDeviceAddress with a single branch
->> GuestDeviceAddressPCI, containing PCI vendor ID and device ID.  This
->> is not a PCI address.  Type GuestPCIAddress is.  Messed up in recent
->> commit 2e4211cee4 "qga: add command guest-get-devices for reporting
->> VirtIO devices".
->
-> Out of curiosity, how did you notice?
+I did think about doing that, but decided that since my intention is
+to delete all trace of fips_get_state / fips_set_state at the end of
+the deprecation period, that it'd be saner just to leave the semantics
+unchanged during the deprecation period.
 
-I searched for simple unions to remind myself of the size of that
-problem, and found a new one, i.e. a problem I can still avoid.  I
-started to do PATCH 4, and noticed the other issues.
+Deprecation notices shouldn't really be associated with changes in
+functionality at time they are introduced.
 
-> Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
-
-Thanks!
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
