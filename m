@@ -2,69 +2,94 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B60A3C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:22:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4C4C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:24:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF578206DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:22:35 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF578206DD
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4A9F2206DD
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:24:52 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X/e8p8F/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9F2206DD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50372 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53274 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBGM-0007Zs-99
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:22:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43208)
+	id 1kVBIY-0000QX-TD
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:24:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kVBFQ-0006xa-KD; Wed, 21 Oct 2020 06:21:36 -0400
-Received: from zero.eik.bme.hu ([2001:738:2001:2001::2001]:49553)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <balaton@eik.bme.hu>)
- id 1kVBFN-00059V-6v; Wed, 21 Oct 2020 06:21:35 -0400
-Received: from zero.eik.bme.hu (blah.eik.bme.hu [152.66.115.182])
- by localhost (Postfix) with SMTP id C0F8374760E;
- Wed, 21 Oct 2020 12:21:18 +0200 (CEST)
-Received: by zero.eik.bme.hu (Postfix, from userid 432)
- id 9043A74760D; Wed, 21 Oct 2020 12:21:18 +0200 (CEST)
-Received: from localhost (localhost [127.0.0.1])
- by zero.eik.bme.hu (Postfix) with ESMTP id 8E5F8747604;
- Wed, 21 Oct 2020 12:21:18 +0200 (CEST)
-Date: Wed, 21 Oct 2020 12:21:18 +0200 (CEST)
-To: Markus Armbruster <armbru@redhat.com>
-Subject: Re: [PATCH] hw/pci-host/grackle: Verify PIC link is properly set
-In-Reply-To: <87v9f4qmoh.fsf@dusky.pond.sub.org>
-Message-ID: <805d309c-b8c6-e166-a5ce-7872df9452a@eik.bme.hu>
-References: <20201011190332.3189611-1-f4bug@amsat.org>
- <20201011223446.GA4787@yekko.fritz.box>
- <369509c1-2e90-13cf-8845-892e754516d1@amsat.org>
- <20201012065436.GB71119@yekko.fritz.box>
- <9f7e4847-801d-dcd3-b876-bf2d276251@eik.bme.hu>
- <6e587154-4bc5-c44c-0c85-b46e0dddd3aa@amsat.org>
- <87k0vm1wny.fsf@dusky.pond.sub.org>
- <24bcd4-fde2-22a2-d3f4-cd42d9ee13c6@eik.bme.hu>
- <87d01e48pa.fsf@dusky.pond.sub.org>
- <9968e60e-99fd-3777-62ca-57decb716886@ilande.co.uk>
- <877drl1n2x.fsf@dusky.pond.sub.org>
- <8f27b2b4-1937-305e-af22-2378d1fb3a8@eik.bme.hu>
- <87v9f4qmoh.fsf@dusky.pond.sub.org>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVBHV-0008BN-7Q
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:23:45 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38385)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVBHT-0005Kf-Eu
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:23:44 -0400
+Received: by mail-wr1-x444.google.com with SMTP id n18so2435690wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:23:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=Ad3LWd75S3nxO6z0r5GtDRKanQVJNgns2RHs/rm0bnk=;
+ b=X/e8p8F/AvF3C72tJG+A2ZJI8VXUkpAoAi3nlzB6EEN6EGNVIV7OaXs+BD73ig3H6O
+ ALWEGGDgFXBHslGjVx/cC77eOaGtBsq2YD5pzpUleXrijFKmJRRimga9idvShifajCjf
+ 7n3eH1tPo/xzJ7xcf/TrOH51AduHKr2OfmLfC93xgut1XSO6LZ5aGCdaBmNGPKNWptsX
+ HZy7GvK70zBRPk9mPy9GPUOTtUIhXDmIA/0EmaLQlJTD+qhLn9IdgEaPhQTeVJnC5Uyk
+ CgUP4j/4v11rFy5z2YiSKnnEuDxvdV/GfF8I6PN93Sm1RrTb9D7z7J2DlP4A9B8rbxLr
+ IQhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=Ad3LWd75S3nxO6z0r5GtDRKanQVJNgns2RHs/rm0bnk=;
+ b=NM385oWEf/1Z6yglE+evm2JVfWz+X+icQZAbdTUJ1fHxhOJZMCNohkscNgJsUYcFID
+ 2snK+yKseO8EMm2/zaB914gQxGMNwDH+K4ESl2/bE0Em5PGOJUyR0fsaU7Zzqw7XLXbM
+ 3TBKe8NLYfjZBSpjn4nqU/VwOmfSTSD58k82WwL0bRjZK0shVTd+4rJoRedwNm0fF5Ki
+ CRDASIvXLwwOvSi1LrTajqodyH0jVS28GrYGV1VrWi746tr13x7S9Szk7/AZZPAoV9PT
+ Rz1jbo4oTYNjduzjoXb2MbABXVDi9FUc9putao69VAD9NLabdabjqZ4d6+QquG8g2Rtt
+ 3Y4Q==
+X-Gm-Message-State: AOAM5321zaJkhJ0vKWVx+mKK0hFOKqqz6BQfYu3HZYSNJQwWGQ0E+gJq
+ 8N7XZqjX0Ts8P7yahZQAAiRJGg==
+X-Google-Smtp-Source: ABdhPJyGhvrjz+FLCki86p3F//2mSvNkKxedLOF0Mqh7jjsqMYEXzDHJXj4R9mW+XQKwAjq/FSkxaw==
+X-Received: by 2002:adf:8562:: with SMTP id 89mr3806387wrh.214.1603275821194; 
+ Wed, 21 Oct 2020 03:23:41 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id 30sm3201368wrs.84.2020.10.21.03.23.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 21 Oct 2020 03:23:39 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id AEF0D1FF7E;
+ Wed, 21 Oct 2020 11:23:38 +0100 (BST)
+References: <20201007161940.1478-1-ani@anisinha.ca>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Ani Sinha <ani@anisinha.ca>
+Subject: Re: [PATCH v2] Adding ani's email as an individual contributor
+In-reply-to: <20201007161940.1478-1-ani@anisinha.ca>
+Date: Wed, 21 Oct 2020 11:23:38 +0100
+Message-ID: <87lffzx4gl.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-Received-SPF: pass client-ip=2001:738:2001:2001::2001;
- envelope-from=balaton@eik.bme.hu; helo=zero.eik.bme.hu
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,47 +103,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- =?ISO-8859-15?Q?Philippe_Mathieu-Daud=E9?= <f4bug@amsat.org>,
- BALATON Zoltan via <qemu-devel@nongnu.org>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: qemu-devel@nongnu.org, f4bug@amsat.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: BALATON Zoltan <balaton@eik.bme.hu>
-From: BALATON Zoltan via <qemu-devel@nongnu.org>
 
-On Wed, 21 Oct 2020, Markus Armbruster wrote:
-> BALATON Zoltan via <qemu-devel@nongnu.org> writes:
->> On Tue, 20 Oct 2020, Markus Armbruster wrote:
->>> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
->>>
->>>> One thing I have thought about is being able to mark a link property
->>>> as mandatory so if a value hasn't been set before realize then you
->>>
->>> A non-null value, I presume.
->>
->> Do you mean something like distinguish between NULL and INVALID_VALUE
->> where setting the latter as initial value means property is mandatory?
+
+Ani Sinha <ani@anisinha.ca> writes:
+
+> Ani is an individual contributor into qemu project. Adding my email into =
+the
+> correct file to reflect so.
 >
-> I doubt "somebody must have set some value (which could be null)" is
-> useful here.  I believe Mark was thinking about "somebody must have
-> connected the link (i.e. set a non-null value)".
+> Signed-off-by: Ani Sinha <ani@anisinha.ca>
 
-This is all theoretical, as in this case we have no_user anyway so the 
-problem can only happen through programmer error but if an object has 
-several properties some of which can be NULL while others are mandatory 
-how do you tell which one is mandataory? That's what I thouhgt having 
-initial value some INVALID_VALUE could be used to say these are mandatory 
-while those properties that are initially NULL don't need to have a valie. 
-That way your generic check can work, otherwise it will need another way 
-to describe mandatory properties which is additional complexity and more 
-boilerplate or will make every link property mandatory which may not 
-always work. Anyway, I was just trying to understand your suggestion and 
-since we concluded that we don't really need it for this case we can just 
-say "YAGNI" as I've learned from you and leave it at that.
+Queued to testing/next, thanks.
 
-Regards,
-BALATON Zoltan
+--=20
+Alex Benn=C3=A9e
 
