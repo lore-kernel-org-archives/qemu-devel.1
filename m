@@ -2,119 +2,94 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CB7DC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:44:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E59C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:44:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B1051223C7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:44:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 02455223C7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:44:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="RXj+JM+/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B1051223C7
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="cHsp+BxL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 02455223C7
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59832 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60040 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVLuC-0003ZX-Jk
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:44:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43092)
+	id 1kVLuG-0003fD-0H
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:44:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48856)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVLN7-00044D-R9
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:10:13 -0400
-Received: from mail-eopbgr690121.outbound.protection.outlook.com
- ([40.107.69.121]:59894 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVLN6-000854-8u
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:10:13 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RMRhOEhUrEuPd3tcQirpDCX/hWbqbhrrYx3ZXop6Hi1eXuUzTYy4MmfXHpVOZyfBwYO/g8T/fRw4NmIvtPb5gcRqEURbrLQgvRXb6CQOKQKG9JdsP7Z4LCEkHazLFKdaA7HF846OnER/nmCqx5N0IeIa9E/IPDsLNjTOz/82ADfd1rQdFpANp65GbBlXByj35puMve8THlKYdaZMqYyMROoLkw3a2do4Cn6WpeQtXOiuLvspO3Ds6ASoEjCaAlWnUQoTTyW4DXaMdpIKpgIdrao5MRuCMGxAvZL67J4bAyb1Adb3oIFTfHR1gUx0Ygmtq3oE+9jYXEw5Lf78y2RHGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZxtNA+rxOzB5Fcmwil+SAPPdrZJWlTXOFS/n4CRIGV0=;
- b=ZBqaRSBLAVDgkKJS2MDiSuCzsoHc31JcYlKNEyHB5YKmIvJZJ0oYjkq90jRlXoR89vqq1F5BxxMsNWC7k1HjpEnsMyVDBpOR2eLKf9p6zC6f5N+U1r8gY2Zp/l9LNnskVgXALHzy+28gI97EhFoEBNAE274jxMu3r3IGYro5Vb4Vh+a4U837Sewn41jgMdpb1o5Kohr2dC1LSaz50iYTqNAZqK1H3Wma4QP8kS/X+GuyNukBdkoxIMJrbZswdPeKuWuJdy6VKi5rJglmjwaCBB1wsRAYvySFXDJz68XHgIGaKb0t8rLooAEo4P8w8Cygr8PQ7pcAG7olLPXyNXkmfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
- header.d=bu.edu; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZxtNA+rxOzB5Fcmwil+SAPPdrZJWlTXOFS/n4CRIGV0=;
- b=RXj+JM+/oKZ4LgYzTZFyu/U+D5v4EAe3cr8b6fNsqYawrZNvh2aLt3Kzo7AyeMk5q47tUzOPthti9mfBNz27G2H5VvhLELBGbvO9MpRBomzDImsA3OTFa9Yj1awpjzijYfe+jpXu8XeKKKn6cBOw39VdPSW1y06ifYCJf3Uc/nY=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
- by SN6PR03MB4045.namprd03.prod.outlook.com (2603:10b6:805:b8::30)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21; Wed, 21 Oct
- 2020 21:09:59 +0000
-Received: from SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::d520:4c19:8ce6:7db2]) by SN6PR03MB3871.namprd03.prod.outlook.com
- ([fe80::d520:4c19:8ce6:7db2%2]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
- 21:09:59 +0000
-From: Alexander Bulekov <alxndr@bu.edu>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v6 16/16] scripts/oss-fuzz: remove the generic-fuzz target
-Date: Wed, 21 Oct 2020 17:09:22 -0400
-Message-Id: <20201021210922.572955-17-alxndr@bu.edu>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201021210922.572955-1-alxndr@bu.edu>
-References: <20201021210922.572955-1-alxndr@bu.edu>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [72.93.72.163]
-X-ClientProxiedBy: BL0PR0102CA0064.prod.exchangelabs.com
- (2603:10b6:208:25::41) To SN6PR03MB3871.namprd03.prod.outlook.com
- (2603:10b6:805:6d::32)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from stormtrooper.vrmnet (72.93.72.163) by
- BL0PR0102CA0064.prod.exchangelabs.com (2603:10b6:208:25::41) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 21:09:58 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 4d923693-22ff-47c7-fbb2-08d87605ab26
-X-MS-TrafficTypeDiagnostic: SN6PR03MB4045:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN6PR03MB4045CFEE13C377EDCD25B302BA1C0@SN6PR03MB4045.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: OaBN8lY9n5jlppDxZjNCq7EGe8M87VtS7V+rcgHT6fjmUAMygRrssFXLdivb0GmzN2luKyiEsErK1oIO9Iw1vkkEE+lBjn266D9d9zJEmq9bc3GgQ8wVFoz9Vqhnq6rbXKRe7CQXhS14RX4jctYTeC1pj5iygQ5/ph1PwfHaXYIr7Lo5mss8NfgSV9jd8LP/Y2/6l4XHctMMpFEg/49pTjiD6TAIAhVry6tfDUJb3H1YAePnlFrwZ30b3VFrLOe0AtsZexn3+SdNZSw1YR7Kc7m/Yk/plore4C7hIZXLZp17lX2POg4rgk7oOrdGNxTSeBBEhaL2EvWgFaXuIpWwJOMXuSvdHzZYkQ0IuFqxxxQxEtFKwpCCZW0g8Z5hAMhe
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(86362001)(6506007)(956004)(6666004)(2616005)(52116002)(5660300002)(316002)(75432002)(54906003)(786003)(8936002)(6916009)(6512007)(16526019)(36756003)(26005)(186003)(478600001)(66946007)(6486002)(2906002)(4326008)(66476007)(1076003)(8676002)(66556008)(41533002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: hrgciy6vS0WAp0qyqmqW0DQo1vtElHZdqBJKRdUwu8Gf90wyPCNaq/Wa5fyP7cschVKfczE/MbnN/cBTibW9EkHlY6F/uBUptdJFuT4ECYQCKvF0a80pXDD3xjc4ppM88P2x60o6+kUB3hLB/8ij2wyJgyi2Jco9n1inGlevvg+dJXrjHeNMbwbLCuLSyxuw2iNFkBAp+JOCvPqoKjxBA7eqd3cTbOErEa8+rA7cmUmYej4cvMlWkTL6hqyGAnqYm31WVKTr/bhUqF4KConOehJLd+sSI15dgYn13pVPcXn+CNyJxh3GJZbb3d7uyI6+/oUHXkatSSU2NKJRwCFicPwRZCl5IydM5yU+ZdCA6rSdOtZUIErkMkULMkfFtAjnEZWCh1fvM+n6Q4SF+qrIJjO+ShuJvNxgHVKqsD0qpPggtllNPj+6xLSg8ob1GxGAjNuUEeD3HnwQ0MssjfX8Xbmou5SJTjxVPQhQw92U/x6thYmaPK7Q/x2B6xUYXuq6WkBHf9OUAXSVoGb5aGzo8pnkTAoRBkjk0YGywi5coZdbEMRvymlMBFckQRM9cAmRHqHc5SuW0AdNq/RFiqqY0HHY3uFHm9LIctymvf9MTpVppwiSoujh8neLyDWARBYYQe2vTx++MXlu/HExVFBzYQ==
-X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d923693-22ff-47c7-fbb2-08d87605ab26
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 21:09:59.5795 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: FICF+7mZk4Hf+M9yvyFG/NfE8ZCUCmWD8POpo2wGV1Son5HYregqSygcvw6UZ25b
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4045
-Received-SPF: pass client-ip=40.107.69.121; envelope-from=alxndr@bu.edu;
- helo=NAM04-CO1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 17:09:54
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.454,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ (Exim 4.90_1) (envelope-from
+ <3vKmQXwsKClU4F75AA19B1A3BB381.zB9D19H-01I18ABA3AH.BE3@flex--hskinnemoen.bounces.google.com>)
+ id 1kVLm9-0003d6-Tf
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:36:05 -0400
+Received: from mail-pf1-x44a.google.com ([2607:f8b0:4864:20::44a]:46667)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <3vKmQXwsKClU4F75AA19B1A3BB381.zB9D19H-01I18ABA3AH.BE3@flex--hskinnemoen.bounces.google.com>)
+ id 1kVLm3-00037v-AW
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:36:05 -0400
+Received: by mail-pf1-x44a.google.com with SMTP id j207so2019014pfd.13
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 14:35:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=fhT8RsF+vxQy3l+osAg+t0g/WthRj4Q2Paf4U2VxSFQ=;
+ b=cHsp+BxL4hE5GPg5eVlC2b9QGGHAacZu8JccynpHR2RMdfi9B6ZPzNFW3GZ8vQ7BJj
+ 6KSafoHK/HHV48Gz86p7O6KeBqVBGSLSUL/vutGLeFA6Lro24v8KLgBIOr2lCuq7FyCe
+ 2AYPMrSjJ7JxJiC5vZw8zQhNrAZtyz9Cu/2pJ9TXG7Kj4hu0EyWyIktfNDX9jK59Has1
+ HZ79OTkehgiQmc/dzu+Kr6+SUQ2vd0TIS1YMpOwavSei2TlteTYZMG6rdZnfbnqAIHjB
+ L/ac+VVM8WB0BK/5XBjK6iWUT1qVe+/J3g6vE7QiLxtcHbpPRMRYcvQPLfiekt3+koka
+ 78MA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=fhT8RsF+vxQy3l+osAg+t0g/WthRj4Q2Paf4U2VxSFQ=;
+ b=WLDL7qsrNgkMGwcu1hCYXPnRZmmGknzQeZHiOqnzXnsH5ygUJh8tMt28iiwoJita5p
+ xPRdhVLNkQyJqooKytS0XaPAKs0CgkLtxZI+knU1VOVpPtt7wSwq478KQTI1c2XAwrLe
+ YWOvqijv0SUDR/OQ06OlsNxRCarGRa616dR7JICDZMJ/WdaIv58BouSm7nOQjGpDE25l
+ hAHkN0seOKPcJh2HCnS0Jag4vSG8t8IkAyGdj+stSx/sTk2pvSiXgYQC5J6lPBebKt2o
+ TmFJd1sBCzGLAHjDuYovBRTU3hM1ZTiMKCve5Bc4ICEt5ejZTzwOL/aJ6aAffImPwUoG
+ mDcw==
+X-Gm-Message-State: AOAM531Y7GfQffcJxX6+hjdiF1yPh2usz3dJIlF6+VKd4VVY+AVFqVXk
+ GLJ7KotU8cXKYgk/ij22kBaxXpB5IMkHIwt5Ow==
+X-Google-Smtp-Source: ABdhPJwKCZMgmIni3cOSzN4il1f8uIpVDbU+twrG8MpvlgMuQDmaACbXdN7qKpZjeL/LLCAl3QjJBQavGAe8ILLuSw==
+X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
+ (user=hskinnemoen job=sendgmr) by
+ 2002:a17:902:b40a:b029:d5:f77c:fb4e with
+ SMTP id x10-20020a170902b40ab02900d5f77cfb4emr5425161plr.14.1603316156978;
+ Wed, 21 Oct 2020 14:35:56 -0700 (PDT)
+Date: Wed, 21 Oct 2020 14:35:44 -0700
+In-Reply-To: <20201021213544.3399271-1-hskinnemoen@google.com>
+Message-Id: <20201021213544.3399271-6-hskinnemoen@google.com>
+Mime-Version: 1.0
+References: <20201021213544.3399271-1-hskinnemoen@google.com>
+X-Mailer: git-send-email 2.29.0.rc1.297.gfa9743e501-goog
+Subject: [PATCH v2 5/5] hw/gpio: Add GPIO model for Nuvoton NPCM7xx
+To: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
+ kfting@nuvoton.com, venture@google.com, wuhaotsh@google.com, 
+ Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::44a;
+ envelope-from=3vKmQXwsKClU4F75AA19B1A3BB381.zB9D19H-01I18ABA3AH.BE3@flex--hskinnemoen.bounces.google.com;
+ helo=mail-pf1-x44a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -95
+X-Spam_score: -9.6
+X-Spam_bar: ---------
+X-Spam_report: (-9.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -127,41 +102,1111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
- f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
+From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-generic-fuzz is not a standalone fuzzer - it requires some env variables
-to be set. On oss-fuzz, we set these with some predefined
-generic-fuzz-{...} targets, that are thin wrappers around generic-fuzz.
-Remove generic-fuzz from the oss-fuzz build, so oss-fuzz does not treat
-it as a standalone fuzzer.
+The NPCM7xx chips have multiple GPIO controllers that are mostly
+identical except for some minor differences like the reset values of
+some registers. Each controller controls up to 32 pins.
 
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+Each individual pin is modeled as a pair of unnamed GPIOs -- one for
+emitting the actual pin state, and one for driving the pin externally.
+Like the nRF51 GPIO controller, a gpio level may be negative, which
+means the pin is not driven, or floating.
+
+Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
 ---
- scripts/oss-fuzz/build.sh | 6 ++++++
- 1 file changed, 6 insertions(+)
+ docs/system/arm/nuvoton.rst     |   2 +-
+ include/hw/arm/npcm7xx.h        |   2 +
+ include/hw/gpio/npcm7xx_gpio.h  |  55 +++++
+ hw/arm/npcm7xx.c                |  80 ++++++
+ hw/gpio/npcm7xx_gpio.c          | 424 ++++++++++++++++++++++++++++++++
+ tests/qtest/npcm7xx_gpio-test.c | 385 +++++++++++++++++++++++++++++
+ hw/gpio/meson.build             |   1 +
+ hw/gpio/trace-events            |   7 +
+ tests/qtest/meson.build         |   1 +
+ 9 files changed, 956 insertions(+), 1 deletion(-)
+ create mode 100644 include/hw/gpio/npcm7xx_gpio.h
+ create mode 100644 hw/gpio/npcm7xx_gpio.c
+ create mode 100644 tests/qtest/npcm7xx_gpio-test.c
 
-diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-index 0c3ca9e06f..37cd7f9e25 100755
---- a/scripts/oss-fuzz/build.sh
-+++ b/scripts/oss-fuzz/build.sh
-@@ -97,5 +97,11 @@ do
-     cp qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
- done
+diff --git a/docs/system/arm/nuvoton.rst b/docs/system/arm/nuvoton.rst
+index 99fc61c740..b00d405d52 100644
+--- a/docs/system/arm/nuvoton.rst
++++ b/docs/system/arm/nuvoton.rst
+@@ -40,11 +40,11 @@ Supported devices
+  * Flash Interface Unit (FIU; no protection features)
+  * Random Number Generator (RNG)
+  * USB host (USBH)
++ * GPIO controller
  
-+# Remove the generic-fuzz target, as it requires some environment variables to
-+# be configured. We have some generic-fuzz-{pc-q35, floppy, ...} targets that
-+# are thin wrappers around this target that set the required environment
-+# variables according to predefined configs.
-+rm "$DEST_DIR/qemu-fuzz-i386-target-generic-fuzz"
+ Missing devices
+ ---------------
+ 
+- * GPIO controller
+  * LPC/eSPI host-to-BMC interface, including
+ 
+    * Keyboard and mouse controller interface (KBCI)
+diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
+index aeee1beaaa..5469247e38 100644
+--- a/include/hw/arm/npcm7xx.h
++++ b/include/hw/arm/npcm7xx.h
+@@ -18,6 +18,7 @@
+ 
+ #include "hw/boards.h"
+ #include "hw/cpu/a9mpcore.h"
++#include "hw/gpio/npcm7xx_gpio.h"
+ #include "hw/mem/npcm7xx_mc.h"
+ #include "hw/misc/npcm7xx_clk.h"
+ #include "hw/misc/npcm7xx_gcr.h"
+@@ -79,6 +80,7 @@ typedef struct NPCM7xxState {
+     NPCM7xxOTPState     fuse_array;
+     NPCM7xxMCState      mc;
+     NPCM7xxRNGState     rng;
++    NPCM7xxGPIOState    gpio[8];
+     EHCISysBusState     ehci;
+     OHCISysBusState     ohci;
+     NPCM7xxFIUState     fiu[2];
+diff --git a/include/hw/gpio/npcm7xx_gpio.h b/include/hw/gpio/npcm7xx_gpio.h
+new file mode 100644
+index 0000000000..b1d771bd77
+--- /dev/null
++++ b/include/hw/gpio/npcm7xx_gpio.h
+@@ -0,0 +1,55 @@
++/*
++ * Nuvoton NPCM7xx General Purpose Input / Output (GPIO)
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ */
++#ifndef NPCM7XX_GPIO_H
++#define NPCM7XX_GPIO_H
 +
- echo "Done. The fuzzers are located in $DEST_DIR"
- exit 0
++#include "exec/memory.h"
++#include "hw/sysbus.h"
++
++/* Number of pins managed by each controller. */
++#define NPCM7XX_GPIO_NR_PINS (32)
++
++/*
++ * Number of registers in our device state structure. Don't change this without
++ * incrementing the version_id in the vmstate.
++ */
++#define NPCM7XX_GPIO_NR_REGS (0x80 / sizeof(uint32_t))
++
++typedef struct NPCM7xxGPIOState {
++    SysBusDevice parent;
++
++    /* Properties to be defined by the SoC */
++    uint32_t reset_pu;
++    uint32_t reset_pd;
++    uint32_t reset_osrc;
++    uint32_t reset_odsc;
++
++    MemoryRegion mmio;
++
++    qemu_irq irq;
++    qemu_irq output[NPCM7XX_GPIO_NR_PINS];
++
++    uint32_t pin_level;
++    uint32_t ext_level;
++    uint32_t ext_driven;
++
++    uint32_t regs[NPCM7XX_GPIO_NR_REGS];
++} NPCM7xxGPIOState;
++
++#define TYPE_NPCM7XX_GPIO "npcm7xx-gpio"
++#define NPCM7XX_GPIO(obj) \
++    OBJECT_CHECK(NPCM7xxGPIOState, (obj), TYPE_NPCM7XX_GPIO)
++
++#endif /* NPCM7XX_GPIO_H */
+diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
+index c1d122576b..47e2b6fc40 100644
+--- a/hw/arm/npcm7xx.c
++++ b/hw/arm/npcm7xx.c
+@@ -96,6 +96,14 @@ enum NPCM7xxInterrupt {
+     NPCM7XX_WDG2_IRQ,                   /* Timer Module 2 Watchdog */
+     NPCM7XX_EHCI_IRQ            = 61,
+     NPCM7XX_OHCI_IRQ            = 62,
++    NPCM7XX_GPIO0_IRQ           = 116,
++    NPCM7XX_GPIO1_IRQ,
++    NPCM7XX_GPIO2_IRQ,
++    NPCM7XX_GPIO3_IRQ,
++    NPCM7XX_GPIO4_IRQ,
++    NPCM7XX_GPIO5_IRQ,
++    NPCM7XX_GPIO6_IRQ,
++    NPCM7XX_GPIO7_IRQ,
+ };
+ 
+ /* Total number of GIC interrupts, including internal Cortex-A9 interrupts. */
+@@ -130,6 +138,55 @@ static const hwaddr npcm7xx_fiu3_flash_addr[] = {
+     0xb8000000, /* CS3 */
+ };
+ 
++static const struct {
++    hwaddr regs_addr;
++    uint32_t unconnected_pins;
++    uint32_t reset_pu;
++    uint32_t reset_pd;
++    uint32_t reset_osrc;
++    uint32_t reset_odsc;
++} npcm7xx_gpio[] = {
++    {
++        .regs_addr = 0xf0010000,
++        .reset_pu = 0xff03ffff,
++        .reset_pd = 0x00fc0000,
++    }, {
++        .regs_addr = 0xf0011000,
++        .unconnected_pins = 0x0000001e,
++        .reset_pu = 0xfefffe07,
++        .reset_pd = 0x010001e0,
++    }, {
++        .regs_addr = 0xf0012000,
++        .reset_pu = 0x780fffff,
++        .reset_pd = 0x07f00000,
++        .reset_odsc = 0x00700000,
++    }, {
++        .regs_addr = 0xf0013000,
++        .reset_pu = 0x00fc0000,
++        .reset_pd = 0xff000000,
++    }, {
++        .regs_addr = 0xf0014000,
++        .reset_pu = 0xffffffff,
++    }, {
++        .regs_addr = 0xf0015000,
++        .reset_pu = 0xbf83f801,
++        .reset_pd = 0x007c0000,
++        .reset_osrc = 0x000000f1,
++        .reset_odsc = 0x3f9f80f1,
++    }, {
++        .regs_addr = 0xf0016000,
++        .reset_pu = 0xfc00f801,
++        .reset_pd = 0x000007fe,
++        .reset_odsc = 0x00000800,
++    }, {
++        .regs_addr = 0xf0017000,
++        .unconnected_pins = 0xffffff00,
++        .reset_pu = 0x0000007f,
++        .reset_osrc = 0x0000007f,
++        .reset_odsc = 0x0000007f,
++    },
++};
++
+ static const struct {
+     const char *name;
+     hwaddr regs_addr;
+@@ -269,6 +326,10 @@ static void npcm7xx_init(Object *obj)
+         object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TIMER);
+     }
+ 
++    for (i = 0; i < ARRAY_SIZE(s->gpio); i++) {
++        object_initialize_child(obj, "gpio[*]", &s->gpio[i], TYPE_NPCM7XX_GPIO);
++    }
++
+     object_initialize_child(obj, "ehci", &s->ehci, TYPE_NPCM7XX_EHCI);
+     object_initialize_child(obj, "ohci", &s->ohci, TYPE_SYSBUS_OHCI);
+ 
+@@ -389,6 +450,25 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
+     sysbus_realize(SYS_BUS_DEVICE(&s->rng), &error_abort);
+     sysbus_mmio_map(SYS_BUS_DEVICE(&s->rng), 0, NPCM7XX_RNG_BA);
+ 
++    /* GPIO modules. Cannot fail. */
++    QEMU_BUILD_BUG_ON(ARRAY_SIZE(npcm7xx_gpio) != ARRAY_SIZE(s->gpio));
++    for (i = 0; i < ARRAY_SIZE(s->gpio); i++) {
++        Object *obj = OBJECT(&s->gpio[i]);
++
++        object_property_set_uint(obj, "reset-pullup",
++                                 npcm7xx_gpio[i].reset_pu, &error_abort);
++        object_property_set_uint(obj, "reset-pulldown",
++                                 npcm7xx_gpio[i].reset_pd, &error_abort);
++        object_property_set_uint(obj, "reset-osrc",
++                                 npcm7xx_gpio[i].reset_osrc, &error_abort);
++        object_property_set_uint(obj, "reset-odsc",
++                                 npcm7xx_gpio[i].reset_odsc, &error_abort);
++        sysbus_realize(SYS_BUS_DEVICE(obj), &error_abort);
++        sysbus_mmio_map(SYS_BUS_DEVICE(obj), 0, npcm7xx_gpio[i].regs_addr);
++        sysbus_connect_irq(SYS_BUS_DEVICE(obj), 0,
++                           npcm7xx_irq(s, NPCM7XX_GPIO0_IRQ + i));
++    }
++
+     /* USB Host */
+     object_property_set_bool(OBJECT(&s->ehci), "companion-enable", true,
+                              &error_abort);
+diff --git a/hw/gpio/npcm7xx_gpio.c b/hw/gpio/npcm7xx_gpio.c
+new file mode 100644
+index 0000000000..3376901ab1
+--- /dev/null
++++ b/hw/gpio/npcm7xx_gpio.c
+@@ -0,0 +1,424 @@
++/*
++ * Nuvoton NPCM7xx General Purpose Input / Output (GPIO)
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU General Public License
++ * version 2 as published by the Free Software Foundation.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++ * GNU General Public License for more details.
++ */
++
++#include "qemu/osdep.h"
++
++#include "hw/gpio/npcm7xx_gpio.h"
++#include "hw/irq.h"
++#include "hw/qdev-properties.h"
++#include "migration/vmstate.h"
++#include "qapi/error.h"
++#include "qemu/log.h"
++#include "qemu/module.h"
++#include "qemu/units.h"
++#include "trace.h"
++
++/* 32-bit register indices. */
++enum NPCM7xxGPIORegister {
++    NPCM7XX_GPIO_TLOCK1,
++    NPCM7XX_GPIO_DIN,
++    NPCM7XX_GPIO_POL,
++    NPCM7XX_GPIO_DOUT,
++    NPCM7XX_GPIO_OE,
++    NPCM7XX_GPIO_OTYP,
++    NPCM7XX_GPIO_MP,
++    NPCM7XX_GPIO_PU,
++    NPCM7XX_GPIO_PD,
++    NPCM7XX_GPIO_DBNC,
++    NPCM7XX_GPIO_EVTYP,
++    NPCM7XX_GPIO_EVBE,
++    NPCM7XX_GPIO_OBL0,
++    NPCM7XX_GPIO_OBL1,
++    NPCM7XX_GPIO_OBL2,
++    NPCM7XX_GPIO_OBL3,
++    NPCM7XX_GPIO_EVEN,
++    NPCM7XX_GPIO_EVENS,
++    NPCM7XX_GPIO_EVENC,
++    NPCM7XX_GPIO_EVST,
++    NPCM7XX_GPIO_SPLCK,
++    NPCM7XX_GPIO_MPLCK,
++    NPCM7XX_GPIO_IEM,
++    NPCM7XX_GPIO_OSRC,
++    NPCM7XX_GPIO_ODSC,
++    NPCM7XX_GPIO_DOS = 0x68 / sizeof(uint32_t),
++    NPCM7XX_GPIO_DOC,
++    NPCM7XX_GPIO_OES,
++    NPCM7XX_GPIO_OEC,
++    NPCM7XX_GPIO_TLOCK2 = 0x7c / sizeof(uint32_t),
++    NPCM7XX_GPIO_REGS_END,
++};
++
++#define NPCM7XX_GPIO_REGS_SIZE (4 * KiB)
++
++#define NPCM7XX_GPIO_LOCK_MAGIC1 (0xc0defa73)
++#define NPCM7XX_GPIO_LOCK_MAGIC2 (0xc0de1248)
++
++static void npcm7xx_gpio_update_events(NPCM7xxGPIOState *s, uint32_t din_diff)
++{
++    uint32_t din_new = s->regs[NPCM7XX_GPIO_DIN];
++
++    /* Trigger on high level */
++    s->regs[NPCM7XX_GPIO_EVST] |= din_new & ~s->regs[NPCM7XX_GPIO_EVTYP];
++    /* Trigger on both edges */
++    s->regs[NPCM7XX_GPIO_EVST] |= (din_diff & s->regs[NPCM7XX_GPIO_EVTYP]
++                                   & s->regs[NPCM7XX_GPIO_EVBE]);
++    /* Trigger on rising edge */
++    s->regs[NPCM7XX_GPIO_EVST] |= (din_diff & din_new
++                                   & s->regs[NPCM7XX_GPIO_EVTYP]);
++
++    trace_npcm7xx_gpio_update_events(DEVICE(s)->canonical_path,
++                                     s->regs[NPCM7XX_GPIO_EVST],
++                                     s->regs[NPCM7XX_GPIO_EVEN]);
++    qemu_set_irq(s->irq, !!(s->regs[NPCM7XX_GPIO_EVST]
++                            & s->regs[NPCM7XX_GPIO_EVEN]));
++}
++
++static void npcm7xx_gpio_update_pins(NPCM7xxGPIOState *s, uint32_t diff)
++{
++    uint32_t drive_en;
++    uint32_t drive_lvl;
++    uint32_t not_driven;
++    uint32_t undefined;
++    uint32_t pin_diff;
++    uint32_t din_old;
++
++    /* Calculate level of each pin driven by GPIO controller. */
++    drive_lvl = s->regs[NPCM7XX_GPIO_DOUT] ^ s->regs[NPCM7XX_GPIO_POL];
++    /* If OTYP=1, only drive low (open drain) */
++    drive_en = s->regs[NPCM7XX_GPIO_OE] & ~(s->regs[NPCM7XX_GPIO_OTYP]
++                                            & drive_lvl);
++    /*
++     * If a pin is driven to opposite levels by the GPIO controller and the
++     * external driver, the result is undefined.
++     */
++    undefined = drive_en & s->ext_driven & (drive_lvl ^ s->ext_level);
++    if (undefined) {
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: pins have multiple drivers: 0x%" PRIx32 "\n",
++                      DEVICE(s)->canonical_path, undefined);
++    }
++
++    not_driven = ~(drive_en | s->ext_driven);
++    pin_diff = s->pin_level;
++
++    /* Set pins to externally driven level. */
++    s->pin_level = s->ext_level & s->ext_driven;
++    /* Set internally driven pins, ignoring any conflicts. */
++    s->pin_level |= drive_lvl & drive_en;
++    /* Pull up undriven pins with internal pull-up enabled. */
++    s->pin_level |= not_driven & s->regs[NPCM7XX_GPIO_PU];
++    /* Pins not driven, pulled up or pulled down are undefined */
++    undefined |= not_driven & ~(s->regs[NPCM7XX_GPIO_PU]
++                                | s->regs[NPCM7XX_GPIO_PD]);
++
++    /* If any pins changed state, update the outgoing GPIOs. */
++    pin_diff ^= s->pin_level;
++    pin_diff |= undefined & diff;
++    if (pin_diff) {
++        int i;
++
++        for (i = 0; i < NPCM7XX_GPIO_NR_PINS; i++) {
++            uint32_t mask = BIT(i);
++            if (pin_diff & mask) {
++                int level = (undefined & mask) ? -1 : !!(s->pin_level & mask);
++                trace_npcm7xx_gpio_set_output(DEVICE(s)->canonical_path,
++                                              i, level);
++                qemu_set_irq(s->output[i], level);
++            }
++        }
++    }
++
++    /* Calculate new value of DIN after masking and polarity setting. */
++    din_old = s->regs[NPCM7XX_GPIO_DIN];
++    s->regs[NPCM7XX_GPIO_DIN] = ((s->pin_level & s->regs[NPCM7XX_GPIO_IEM])
++                                 ^ s->regs[NPCM7XX_GPIO_POL]);
++
++    /* See if any new events triggered because of all this. */
++    npcm7xx_gpio_update_events(s, din_old ^ s->regs[NPCM7XX_GPIO_DIN]);
++}
++
++static bool npcm7xx_gpio_is_locked(NPCM7xxGPIOState *s)
++{
++    return s->regs[NPCM7XX_GPIO_TLOCK1] == 1;
++}
++
++static uint64_t npcm7xx_gpio_regs_read(void *opaque, hwaddr addr,
++                                       unsigned int size)
++{
++    hwaddr reg = addr / sizeof(uint32_t);
++    NPCM7xxGPIOState *s = opaque;
++    uint64_t value = 0;
++
++    switch (reg) {
++    case NPCM7XX_GPIO_TLOCK1 ... NPCM7XX_GPIO_EVEN:
++    case NPCM7XX_GPIO_EVST ... NPCM7XX_GPIO_ODSC:
++        value = s->regs[reg];
++        break;
++
++    case NPCM7XX_GPIO_EVENS ... NPCM7XX_GPIO_EVENC:
++    case NPCM7XX_GPIO_DOS ... NPCM7XX_GPIO_TLOCK2:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: read from write-only register 0x%" HWADDR_PRIx "\n",
++                      DEVICE(s)->canonical_path, addr);
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: read from invalid offset 0x%" HWADDR_PRIx "\n",
++                      DEVICE(s)->canonical_path, addr);
++        break;
++    }
++
++    trace_npcm7xx_gpio_read(DEVICE(s)->canonical_path, addr, value);
++
++    return value;
++}
++
++static void npcm7xx_gpio_regs_write(void *opaque, hwaddr addr, uint64_t v,
++                                    unsigned int size)
++{
++    hwaddr reg = addr / sizeof(uint32_t);
++    NPCM7xxGPIOState *s = opaque;
++    uint32_t value = v;
++    uint32_t diff;
++
++    trace_npcm7xx_gpio_write(DEVICE(s)->canonical_path, addr, v);
++
++    if (npcm7xx_gpio_is_locked(s)) {
++        switch (reg) {
++        case NPCM7XX_GPIO_TLOCK1:
++            if (s->regs[NPCM7XX_GPIO_TLOCK2] == NPCM7XX_GPIO_LOCK_MAGIC2 &&
++                value == NPCM7XX_GPIO_LOCK_MAGIC1) {
++                s->regs[NPCM7XX_GPIO_TLOCK1] = 0;
++                s->regs[NPCM7XX_GPIO_TLOCK2] = 0;
++            }
++            break;
++
++        case NPCM7XX_GPIO_TLOCK2:
++            s->regs[reg] = value;
++            break;
++
++        default:
++            qemu_log_mask(LOG_GUEST_ERROR,
++                          "%s: write to locked register @ 0x%" HWADDR_PRIx "\n",
++                          DEVICE(s)->canonical_path, addr);
++            break;
++        }
++
++        return;
++    }
++
++    diff = s->regs[reg] ^ value;
++
++    switch (reg) {
++    case NPCM7XX_GPIO_TLOCK1:
++    case NPCM7XX_GPIO_TLOCK2:
++        s->regs[NPCM7XX_GPIO_TLOCK1] = 1;
++        s->regs[NPCM7XX_GPIO_TLOCK2] = 0;
++        break;
++
++    case NPCM7XX_GPIO_DIN:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: write to read-only register @ 0x%" HWADDR_PRIx "\n",
++                      DEVICE(s)->canonical_path, addr);
++        break;
++
++    case NPCM7XX_GPIO_POL:
++    case NPCM7XX_GPIO_DOUT:
++    case NPCM7XX_GPIO_OE:
++    case NPCM7XX_GPIO_OTYP:
++    case NPCM7XX_GPIO_PU:
++    case NPCM7XX_GPIO_PD:
++    case NPCM7XX_GPIO_IEM:
++        s->regs[reg] = value;
++        npcm7xx_gpio_update_pins(s, diff);
++        break;
++
++    case NPCM7XX_GPIO_DOS:
++        s->regs[NPCM7XX_GPIO_DOUT] |= value;
++        npcm7xx_gpio_update_pins(s, value);
++        break;
++    case NPCM7XX_GPIO_DOC:
++        s->regs[NPCM7XX_GPIO_DOUT] &= ~value;
++        npcm7xx_gpio_update_pins(s, value);
++        break;
++    case NPCM7XX_GPIO_OES:
++        s->regs[NPCM7XX_GPIO_OE] |= value;
++        npcm7xx_gpio_update_pins(s, value);
++        break;
++    case NPCM7XX_GPIO_OEC:
++        s->regs[NPCM7XX_GPIO_OE] &= ~value;
++        npcm7xx_gpio_update_pins(s, value);
++        break;
++
++    case NPCM7XX_GPIO_EVTYP:
++    case NPCM7XX_GPIO_EVBE:
++    case NPCM7XX_GPIO_EVEN:
++        s->regs[reg] = value;
++        npcm7xx_gpio_update_events(s, 0);
++        break;
++
++    case NPCM7XX_GPIO_EVENS:
++        s->regs[NPCM7XX_GPIO_EVEN] |= value;
++        npcm7xx_gpio_update_events(s, 0);
++        break;
++    case NPCM7XX_GPIO_EVENC:
++        s->regs[NPCM7XX_GPIO_EVEN] &= ~value;
++        npcm7xx_gpio_update_events(s, 0);
++        break;
++
++    case NPCM7XX_GPIO_EVST:
++        s->regs[reg] &= ~value;
++        npcm7xx_gpio_update_events(s, 0);
++        break;
++
++    case NPCM7XX_GPIO_MP:
++    case NPCM7XX_GPIO_DBNC:
++    case NPCM7XX_GPIO_OSRC:
++    case NPCM7XX_GPIO_ODSC:
++        /* Nothing to do; just store the value. */
++        s->regs[reg] = value;
++        break;
++
++    case NPCM7XX_GPIO_OBL0:
++    case NPCM7XX_GPIO_OBL1:
++    case NPCM7XX_GPIO_OBL2:
++    case NPCM7XX_GPIO_OBL3:
++        s->regs[reg] = value;
++        qemu_log_mask(LOG_UNIMP, "%s: Blinking is not implemented\n",
++                      __func__);
++        break;
++
++    case NPCM7XX_GPIO_SPLCK:
++    case NPCM7XX_GPIO_MPLCK:
++        qemu_log_mask(LOG_UNIMP, "%s: Per-pin lock is not implemented\n",
++                      __func__);
++        break;
++
++    default:
++        qemu_log_mask(LOG_GUEST_ERROR,
++                      "%s: write to invalid offset 0x%" HWADDR_PRIx "\n",
++                      DEVICE(s)->canonical_path, addr);
++        break;
++    }
++}
++
++static const MemoryRegionOps npcm7xx_gpio_regs_ops = {
++    .read = npcm7xx_gpio_regs_read,
++    .write = npcm7xx_gpio_regs_write,
++    .endianness = DEVICE_NATIVE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++        .unaligned = false,
++    },
++};
++
++static void npcm7xx_gpio_set_input(void *opaque, int line, int level)
++{
++    NPCM7xxGPIOState *s = opaque;
++
++    trace_npcm7xx_gpio_set_input(DEVICE(s)->canonical_path, line, level);
++
++    g_assert(line >= 0 && line < NPCM7XX_GPIO_NR_PINS);
++
++    s->ext_driven = deposit32(s->ext_driven, line, 1, level >= 0);
++    s->ext_level = deposit32(s->ext_level, line, 1, level > 0);
++
++    npcm7xx_gpio_update_pins(s, BIT(line));
++}
++
++static void npcm7xx_gpio_enter_reset(Object *obj, ResetType type)
++{
++    NPCM7xxGPIOState *s = NPCM7XX_GPIO(obj);
++
++    memset(s->regs, 0, sizeof(s->regs));
++
++    s->regs[NPCM7XX_GPIO_PU] = s->reset_pu;
++    s->regs[NPCM7XX_GPIO_PD] = s->reset_pd;
++    s->regs[NPCM7XX_GPIO_OSRC] = s->reset_osrc;
++    s->regs[NPCM7XX_GPIO_ODSC] = s->reset_odsc;
++}
++
++static void npcm7xx_gpio_hold_reset(Object *obj)
++{
++    NPCM7xxGPIOState *s = NPCM7XX_GPIO(obj);
++
++    npcm7xx_gpio_update_pins(s, -1);
++}
++
++static void npcm7xx_gpio_init(Object *obj)
++{
++    NPCM7xxGPIOState *s = NPCM7XX_GPIO(obj);
++    DeviceState *dev = DEVICE(obj);
++
++    memory_region_init_io(&s->mmio, obj, &npcm7xx_gpio_regs_ops, s,
++                          "regs", NPCM7XX_GPIO_REGS_SIZE);
++    sysbus_init_mmio(SYS_BUS_DEVICE(obj), &s->mmio);
++    sysbus_init_irq(SYS_BUS_DEVICE(obj), &s->irq);
++
++    qdev_init_gpio_in(dev, npcm7xx_gpio_set_input, NPCM7XX_GPIO_NR_PINS);
++    qdev_init_gpio_out(dev, s->output, NPCM7XX_GPIO_NR_PINS);
++}
++
++static const VMStateDescription vmstate_npcm7xx_gpio = {
++    .name = "npcm7xx-gpio",
++    .version_id = 0,
++    .minimum_version_id = 0,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32(pin_level, NPCM7xxGPIOState),
++        VMSTATE_UINT32(ext_level, NPCM7xxGPIOState),
++        VMSTATE_UINT32(ext_driven, NPCM7xxGPIOState),
++        VMSTATE_UINT32_ARRAY(regs, NPCM7xxGPIOState, NPCM7XX_GPIO_NR_REGS),
++        VMSTATE_END_OF_LIST(),
++    },
++};
++
++static Property npcm7xx_gpio_properties[] = {
++    /* Bit n set => pin n has pullup enabled by default. */
++    DEFINE_PROP_UINT32("reset-pullup", NPCM7xxGPIOState, reset_pu, 0),
++    /* Bit n set => pin n has pulldown enabled by default. */
++    DEFINE_PROP_UINT32("reset-pulldown", NPCM7xxGPIOState, reset_pd, 0),
++    /* Bit n set => pin n has high slew rate by default. */
++    DEFINE_PROP_UINT32("reset-osrc", NPCM7xxGPIOState, reset_osrc, 0),
++    /* Bit n set => pin n has high drive strength by default. */
++    DEFINE_PROP_UINT32("reset-odsc", NPCM7xxGPIOState, reset_odsc, 0),
++    DEFINE_PROP_END_OF_LIST(),
++};
++
++static void npcm7xx_gpio_class_init(ObjectClass *klass, void *data)
++{
++    ResettableClass *reset = RESETTABLE_CLASS(klass);
++    DeviceClass *dc = DEVICE_CLASS(klass);
++
++    QEMU_BUILD_BUG_ON(NPCM7XX_GPIO_REGS_END > NPCM7XX_GPIO_NR_REGS);
++
++    dc->desc = "NPCM7xx GPIO Controller";
++    dc->vmsd = &vmstate_npcm7xx_gpio;
++    reset->phases.enter = npcm7xx_gpio_enter_reset;
++    reset->phases.hold = npcm7xx_gpio_hold_reset;
++    device_class_set_props(dc, npcm7xx_gpio_properties);
++}
++
++static const TypeInfo npcm7xx_gpio_types[] = {
++    {
++        .name = TYPE_NPCM7XX_GPIO,
++        .parent = TYPE_SYS_BUS_DEVICE,
++        .instance_size = sizeof(NPCM7xxGPIOState),
++        .class_init = npcm7xx_gpio_class_init,
++        .instance_init = npcm7xx_gpio_init,
++    },
++};
++DEFINE_TYPES(npcm7xx_gpio_types);
+diff --git a/tests/qtest/npcm7xx_gpio-test.c b/tests/qtest/npcm7xx_gpio-test.c
+new file mode 100644
+index 0000000000..1004cef812
+--- /dev/null
++++ b/tests/qtest/npcm7xx_gpio-test.c
+@@ -0,0 +1,385 @@
++/*
++ * QTest testcase for the Nuvoton NPCM7xx GPIO modules.
++ *
++ * Copyright 2020 Google LLC
++ *
++ * This program is free software; you can redistribute it and/or modify it
++ * under the terms of the GNU General Public License as published by the
++ * Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful, but WITHOUT
++ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
++ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
++ * for more details.
++ */
++
++#include "qemu/osdep.h"
++#include "libqtest-single.h"
++
++#define NR_GPIO_DEVICES (8)
++#define GPIO(x)         (0xf0010000 + (x) * 0x1000)
++#define GPIO_IRQ(x)     (116 + (x))
++
++/* GPIO registers */
++#define GP_N_TLOCK1     0x00
++#define GP_N_DIN        0x04 /* Data IN */
++#define GP_N_POL        0x08 /* Polarity */
++#define GP_N_DOUT       0x0c /* Data OUT */
++#define GP_N_OE         0x10 /* Output Enable */
++#define GP_N_OTYP       0x14
++#define GP_N_MP         0x18
++#define GP_N_PU         0x1c /* Pull-up */
++#define GP_N_PD         0x20 /* Pull-down */
++#define GP_N_DBNC       0x24 /* Debounce */
++#define GP_N_EVTYP      0x28 /* Event Type */
++#define GP_N_EVBE       0x2c /* Event Both Edge */
++#define GP_N_OBL0       0x30
++#define GP_N_OBL1       0x34
++#define GP_N_OBL2       0x38
++#define GP_N_OBL3       0x3c
++#define GP_N_EVEN       0x40 /* Event Enable */
++#define GP_N_EVENS      0x44 /* Event Set (enable) */
++#define GP_N_EVENC      0x48 /* Event Clear (disable) */
++#define GP_N_EVST       0x4c /* Event Status */
++#define GP_N_SPLCK      0x50
++#define GP_N_MPLCK      0x54
++#define GP_N_IEM        0x58 /* Input Enable */
++#define GP_N_OSRC       0x5c
++#define GP_N_ODSC       0x60
++#define GP_N_DOS        0x68 /* Data OUT Set */
++#define GP_N_DOC        0x6c /* Data OUT Clear */
++#define GP_N_OES        0x70 /* Output Enable Set */
++#define GP_N_OEC        0x74 /* Output Enable Clear */
++#define GP_N_TLOCK2     0x7c
++
++static void gpio_unlock(int n)
++{
++    if (readl(GPIO(n) + GP_N_TLOCK1) != 0) {
++        writel(GPIO(n) + GP_N_TLOCK2, 0xc0de1248);
++        writel(GPIO(n) + GP_N_TLOCK1, 0xc0defa73);
++    }
++}
++
++/* Restore the GPIO controller to a sensible default state. */
++static void gpio_reset(int n)
++{
++    gpio_unlock(0);
++
++    writel(GPIO(n) + GP_N_EVEN, 0x00000000);
++    writel(GPIO(n) + GP_N_EVST, 0xffffffff);
++    writel(GPIO(n) + GP_N_POL, 0x00000000);
++    writel(GPIO(n) + GP_N_DOUT, 0x00000000);
++    writel(GPIO(n) + GP_N_OE, 0x00000000);
++    writel(GPIO(n) + GP_N_OTYP, 0x00000000);
++    writel(GPIO(n) + GP_N_PU, 0xffffffff);
++    writel(GPIO(n) + GP_N_PD, 0x00000000);
++    writel(GPIO(n) + GP_N_IEM, 0xffffffff);
++}
++
++static void test_dout_to_din(void)
++{
++    gpio_reset(0);
++
++    /* When output is enabled, DOUT should be reflected on DIN. */
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    /* PU and PD shouldn't have any impact on DIN. */
++    writel(GPIO(0) + GP_N_PU, 0xffff0000);
++    writel(GPIO(0) + GP_N_PD, 0x0000ffff);
++    writel(GPIO(0) + GP_N_DOUT, 0x12345678);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DOUT), ==, 0x12345678);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x12345678);
++}
++
++static void test_pullup_pulldown(void)
++{
++    gpio_reset(0);
++
++    /*
++     * When output is disabled, and PD is the inverse of PU, PU should be
++     * reflected on DIN. If PD is not the inverse of PU, the state of DIN is
++     * undefined, so we don't test that.
++     */
++    writel(GPIO(0) + GP_N_OE, 0x00000000);
++    /* DOUT shouldn't have any impact on DIN. */
++    writel(GPIO(0) + GP_N_DOUT, 0xffff0000);
++    writel(GPIO(0) + GP_N_PU, 0x23456789);
++    writel(GPIO(0) + GP_N_PD, ~0x23456789U);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_PU), ==, 0x23456789);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_PD), ==, ~0x23456789U);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x23456789);
++}
++
++static void test_output_enable(void)
++{
++    gpio_reset(0);
++
++    /*
++     * With all pins weakly pulled down, and DOUT all-ones, OE should be
++     * reflected on DIN.
++     */
++    writel(GPIO(0) + GP_N_DOUT, 0xffffffff);
++    writel(GPIO(0) + GP_N_PU, 0x00000000);
++    writel(GPIO(0) + GP_N_PD, 0xffffffff);
++    writel(GPIO(0) + GP_N_OE, 0x3456789a);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_OE), ==, 0x3456789a);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x3456789a);
++
++    writel(GPIO(0) + GP_N_OEC, 0x00030002);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_OE), ==, 0x34547898);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x34547898);
++
++    writel(GPIO(0) + GP_N_OES, 0x0000f001);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_OE), ==, 0x3454f899);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x3454f899);
++}
++
++static void test_open_drain(void)
++{
++    gpio_reset(0);
++
++    /*
++     * Upper half of DOUT drives a 1 only if the corresponding bit in OTYP is
++     * not set. If OTYP is set, DIN is determined by PU/PD. Lower half of
++     * DOUT always drives a 0 regardless of OTYP; PU/PD have no effect.  When
++     * OE is 0, output is determined by PU/PD; OTYP has no effect.
++     */
++    writel(GPIO(0) + GP_N_OTYP, 0x456789ab);
++    writel(GPIO(0) + GP_N_OE, 0xf0f0f0f0);
++    writel(GPIO(0) + GP_N_DOUT, 0xffff0000);
++    writel(GPIO(0) + GP_N_PU, 0xff00ff00);
++    writel(GPIO(0) + GP_N_PD, 0x00ff00ff);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_OTYP), ==, 0x456789ab);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0xff900f00);
++}
++
++static void test_polarity(void)
++{
++    gpio_reset(0);
++
++    /*
++     * In push-pull mode, DIN should reflect DOUT because the signal is
++     * inverted in both directions.
++     */
++    writel(GPIO(0) + GP_N_OTYP, 0x00000000);
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_DOUT, 0x56789abc);
++    writel(GPIO(0) + GP_N_POL, 0x6789abcd);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_POL), ==, 0x6789abcd);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0x56789abc);
++
++    /*
++     * When turning off the drivers, DIN should reflect the inverse of the
++     * pulled-up lines.
++     */
++    writel(GPIO(0) + GP_N_OE, 0x00000000);
++    writel(GPIO(0) + GP_N_POL, 0xffffffff);
++    writel(GPIO(0) + GP_N_PU, 0x789abcde);
++    writel(GPIO(0) + GP_N_PD, ~0x789abcdeU);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, ~0x789abcdeU);
++
++    /*
++     * In open-drain mode, DOUT=1 will appear to drive the pin high (since DIN
++     * is inverted), while DOUT=0 will leave the pin floating.
++     */
++    writel(GPIO(0) + GP_N_OTYP, 0xffffffff);
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_PU, 0xffff0000);
++    writel(GPIO(0) + GP_N_PD, 0x0000ffff);
++    writel(GPIO(0) + GP_N_DOUT, 0xff00ff00);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0xff00ffff);
++}
++
++static void test_input_mask(void)
++{
++    gpio_reset(0);
++
++    /* IEM=0 forces the input to zero before polarity inversion. */
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_DOUT, 0xff00ff00);
++    writel(GPIO(0) + GP_N_POL, 0xffff0000);
++    writel(GPIO(0) + GP_N_IEM, 0x87654321);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DIN), ==, 0xff9a4300);
++}
++
++static void test_temp_lock(void)
++{
++    gpio_reset(0);
++
++    writel(GPIO(0) + GP_N_DOUT, 0x98765432);
++
++    /* Make sure we're unlocked initially. */
++    g_assert_cmphex(readl(GPIO(0) + GP_N_TLOCK1), ==, 0);
++    /* Writing any value to TLOCK1 will lock. */
++    writel(GPIO(0) + GP_N_TLOCK1, 0);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_TLOCK1), ==, 1);
++    writel(GPIO(0) + GP_N_DOUT, 0xa9876543);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DOUT), ==, 0x98765432);
++    /* Now, try to unlock. */
++    gpio_unlock(0);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_TLOCK1), ==, 0);
++    writel(GPIO(0) + GP_N_DOUT, 0xa9876543);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DOUT), ==, 0xa9876543);
++
++    /* Try it again, but write TLOCK2 to lock. */
++    writel(GPIO(0) + GP_N_TLOCK2, 0);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_TLOCK1), ==, 1);
++    writel(GPIO(0) + GP_N_DOUT, 0x98765432);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DOUT), ==, 0xa9876543);
++    /* Now, try to unlock. */
++    gpio_unlock(0);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_TLOCK1), ==, 0);
++    writel(GPIO(0) + GP_N_DOUT, 0x98765432);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_DOUT), ==, 0x98765432);
++}
++
++static void test_events_level(void)
++{
++    gpio_reset(0);
++
++    writel(GPIO(0) + GP_N_EVTYP, 0x00000000);
++    writel(GPIO(0) + GP_N_DOUT, 0xba987654);
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_EVST, 0xffffffff);
++
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0xba987654);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_DOUT, 0x00000000);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0xba987654);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0x00007654);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0xba980000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0xba980000);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++}
++
++static void test_events_rising_edge(void)
++{
++    gpio_reset(0);
++
++    writel(GPIO(0) + GP_N_EVTYP, 0xffffffff);
++    writel(GPIO(0) + GP_N_EVBE, 0x00000000);
++    writel(GPIO(0) + GP_N_DOUT, 0xffff0000);
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_EVST, 0xffffffff);
++
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_DOUT, 0xff00ff00);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x0000ff00);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_DOUT, 0x00ff0000);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00ffff00);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0x0000f000);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00ff0f00);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0x00ff0f00);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++}
++
++static void test_events_both_edges(void)
++{
++    gpio_reset(0);
++
++    writel(GPIO(0) + GP_N_EVTYP, 0xffffffff);
++    writel(GPIO(0) + GP_N_EVBE, 0xffffffff);
++    writel(GPIO(0) + GP_N_DOUT, 0xffff0000);
++    writel(GPIO(0) + GP_N_OE, 0xffffffff);
++    writel(GPIO(0) + GP_N_EVST, 0xffffffff);
++
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_DOUT, 0xff00ff00);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00ffff00);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_DOUT, 0xef00ff08);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x10ffff08);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0x0000f000);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x10ff0f08);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++    writel(GPIO(0) + GP_N_EVST, 0x10ff0f08);
++    g_assert_cmphex(readl(GPIO(0) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(0)));
++}
++
++static void test_gpion_irq(gconstpointer test_data)
++{
++    intptr_t n = (intptr_t)test_data;
++
++    gpio_reset(n);
++
++    writel(GPIO(n) + GP_N_EVTYP, 0x00000000);
++    writel(GPIO(n) + GP_N_DOUT, 0x00000000);
++    writel(GPIO(n) + GP_N_OE, 0xffffffff);
++    writel(GPIO(n) + GP_N_EVST, 0xffffffff);
++    writel(GPIO(n) + GP_N_EVEN, 0x00000000);
++
++    /* Trigger an event; interrupts are masked. */
++    g_assert_cmphex(readl(GPIO(n) + GP_N_EVST), ==, 0x00000000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++    writel(GPIO(n) + GP_N_DOS, 0x00008000);
++    g_assert_cmphex(readl(GPIO(n) + GP_N_EVST), ==, 0x00008000);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++
++    /* Unmask all event interrupts; verify that the interrupt fired. */
++    writel(GPIO(n) + GP_N_EVEN, 0xffffffff);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++
++    /* Clear the current bit, set a new bit, irq stays asserted. */
++    writel(GPIO(n) + GP_N_DOC, 0x00008000);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++    writel(GPIO(n) + GP_N_DOS, 0x00000200);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++    writel(GPIO(n) + GP_N_EVST, 0x00008000);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++
++    /* Mask/unmask the event that's currently active. */
++    writel(GPIO(n) + GP_N_EVENC, 0x00000200);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++    writel(GPIO(n) + GP_N_EVENS, 0x00000200);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++
++    /* Clear the input and the status bit, irq is deasserted. */
++    writel(GPIO(n) + GP_N_DOC, 0x00000200);
++    g_assert_true(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++    writel(GPIO(n) + GP_N_EVST, 0x00000200);
++    g_assert_false(qtest_get_irq(global_qtest, GPIO_IRQ(n)));
++}
++
++int main(int argc, char **argv)
++{
++    int ret;
++    int i;
++
++    g_test_init(&argc, &argv, NULL);
++    g_test_set_nonfatal_assertions();
++
++    qtest_add_func("/npcm7xx_gpio/dout_to_din", test_dout_to_din);
++    qtest_add_func("/npcm7xx_gpio/pullup_pulldown", test_pullup_pulldown);
++    qtest_add_func("/npcm7xx_gpio/output_enable", test_output_enable);
++    qtest_add_func("/npcm7xx_gpio/open_drain", test_open_drain);
++    qtest_add_func("/npcm7xx_gpio/polarity", test_polarity);
++    qtest_add_func("/npcm7xx_gpio/input_mask", test_input_mask);
++    qtest_add_func("/npcm7xx_gpio/temp_lock", test_temp_lock);
++    qtest_add_func("/npcm7xx_gpio/events/level", test_events_level);
++    qtest_add_func("/npcm7xx_gpio/events/rising_edge", test_events_rising_edge);
++    qtest_add_func("/npcm7xx_gpio/events/both_edges", test_events_both_edges);
++
++    for (i = 0; i < NR_GPIO_DEVICES; i++) {
++        g_autofree char *test_name =
++            g_strdup_printf("/npcm7xx_gpio/gpio[%d]/irq", i);
++        qtest_add_data_func(test_name, (void *)(intptr_t)i, test_gpion_irq);
++    }
++
++    qtest_start("-machine npcm750-evb");
++    qtest_irq_intercept_in(global_qtest, "/machine/soc/a9mpcore/gic");
++    ret = g_test_run();
++    qtest_end();
++
++    return ret;
++}
+diff --git a/hw/gpio/meson.build b/hw/gpio/meson.build
+index 86cae9a0f3..5c0a7d7b95 100644
+--- a/hw/gpio/meson.build
++++ b/hw/gpio/meson.build
+@@ -6,6 +6,7 @@ softmmu_ss.add(when: 'CONFIG_PUV3', if_true: files('puv3_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_ZAURUS', if_true: files('zaurus.c'))
+ 
+ softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('imx_gpio.c'))
++softmmu_ss.add(when: 'CONFIG_NPCM7XX', if_true: files('npcm7xx_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_NRF51_SOC', if_true: files('nrf51_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files('omap_gpio.c'))
+ softmmu_ss.add(when: 'CONFIG_RASPI', if_true: files('bcm2835_gpio.c'))
+diff --git a/hw/gpio/trace-events b/hw/gpio/trace-events
+index 6e3f048745..46ab9323bd 100644
+--- a/hw/gpio/trace-events
++++ b/hw/gpio/trace-events
+@@ -1,5 +1,12 @@
+ # See docs/devel/tracing.txt for syntax documentation.
+ 
++# npcm7xx_gpio.c
++npcm7xx_gpio_read(const char *id, uint64_t offset, uint64_t value) " %s offset: 0x%04" PRIx64 " value 0x%08" PRIx64
++npcm7xx_gpio_write(const char *id, uint64_t offset, uint64_t value) "%s offset: 0x%04" PRIx64 " value 0x%08" PRIx64
++npcm7xx_gpio_set_input(const char *id, int32_t line, int32_t level) "%s line: %" PRIi32 " level: %" PRIi32
++npcm7xx_gpio_set_output(const char *id, int32_t line, int32_t level) "%s line: %" PRIi32 " level: %" PRIi32
++npcm7xx_gpio_update_events(const char *id, uint32_t evst, uint32_t even) "%s evst: 0x%08" PRIx32 " even: 0x%08" PRIx32
++
+ # nrf51_gpio.c
+ nrf51_gpio_read(uint64_t offset, uint64_t r) "offset 0x%" PRIx64 " value 0x%" PRIx64
+ nrf51_gpio_write(uint64_t offset, uint64_t value) "offset 0x%" PRIx64 " value 0x%" PRIx64
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 473935c3a8..a60e719037 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -138,6 +138,7 @@ qtests_arm = \
+   ['arm-cpu-features',
+    'microbit-test',
+    'm25p80-test',
++   'npcm7xx_gpio-test',
+    'npcm7xx_timer-test',
+    'npcm7xx_watchdog_timer-test',
+    'npcm7xx_rng-test',
 -- 
-2.28.0
+2.29.0.rc1.297.gfa9743e501-goog
 
 
