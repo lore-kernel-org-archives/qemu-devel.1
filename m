@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CB8C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:41:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCD8DC561F8
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:41:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6A0242080A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:41:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A0242080A
+	by mail.kernel.org (Postfix) with ESMTPS id EE4042080A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 08:41:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE4042080A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53842 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV9gV-0008QS-Dp
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 04:41:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58208)
+	id 1kV9gY-000083-P0
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 04:41:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <likejun6@huawei.com>)
- id 1kV8dm-0002mt-LE; Wed, 21 Oct 2020 03:34:34 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5709 helo=huawei.com)
+ id 1kV8do-0002nB-3p; Wed, 21 Oct 2020 03:34:36 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5711 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <likejun6@huawei.com>)
- id 1kV8di-0004Jd-2F; Wed, 21 Oct 2020 03:34:34 -0400
+ id 1kV8dl-0004Je-0p; Wed, 21 Oct 2020 03:34:35 -0400
 Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
- by Forcepoint Email with ESMTP id 09EE45E5C61C7C790572;
+ by Forcepoint Email with ESMTP id 04E976EB4376A049350F;
  Wed, 21 Oct 2020 15:34:19 +0800 (CST)
 Received: from DESKTOP-IB00AOP.china.huawei.com (10.174.184.163) by
  DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
  14.3.487.0; Wed, 21 Oct 2020 15:34:12 +0800
 From: <likejun6@huawei.com>
 To: <qemu-block@nongnu.org>
-Subject: [PATCH 1/4] qemu-iotest: add 308 testcase
-Date: Wed, 21 Oct 2020 15:33:52 +0800
-Message-ID: <20201021073355.2499-2-likejun6@huawei.com>
+Subject: [PATCH 2/4] qemu-iotest: add 309 testcase
+Date: Wed, 21 Oct 2020 15:33:53 +0800
+Message-ID: <20201021073355.2499-3-likejun6@huawei.com>
 X-Mailer: git-send-email 2.22.0.windows.1
 In-Reply-To: <20201021073355.2499-1-likejun6@huawei.com>
 References: <20201021073355.2499-1-likejun6@huawei.com>
@@ -60,7 +60,7 @@ X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Wed, 21 Oct 2020 04:40:10 -0400
+X-Mailman-Approved-At: Wed, 21 Oct 2020 04:40:12 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -80,26 +80,26 @@ Sender: "Qemu-devel"
 
 From: likejun <likejun6@huawei.com>
 
-Test thick image creation, size and rw
+Test raw thin provisioned image creation, size and rw
 
 Signed-off-by: likejun <likejun6@huawei.com>
 ---
- tests/qemu-iotests/308     | 104 +++++++++++++++++++++++++++++++++++++
- tests/qemu-iotests/308.out |  21 ++++++++
+ tests/qemu-iotests/309     | 102 +++++++++++++++++++++++++++++++++++++
+ tests/qemu-iotests/309.out |  21 ++++++++
  tests/qemu-iotests/group   |   1 +
- 3 files changed, 126 insertions(+)
- create mode 100755 tests/qemu-iotests/308
- create mode 100644 tests/qemu-iotests/308.out
+ 3 files changed, 124 insertions(+)
+ create mode 100755 tests/qemu-iotests/309
+ create mode 100644 tests/qemu-iotests/309.out
 
-diff --git a/tests/qemu-iotests/308 b/tests/qemu-iotests/308
+diff --git a/tests/qemu-iotests/309 b/tests/qemu-iotests/309
 new file mode 100755
-index 0000000000..a97e312017
+index 0000000000..7bbe5a1704
 --- /dev/null
-+++ b/tests/qemu-iotests/308
-@@ -0,0 +1,104 @@
++++ b/tests/qemu-iotests/309
+@@ -0,0 +1,102 @@
 +#!/bin/bash
 +#
-+# Test thick image creation, size and rw
++# Test raw thin provisioned image creation, size and rw
 +#
 +# Copyright (C) 2020 Huawei, Inc
 +#
@@ -175,8 +175,6 @@ index 0000000000..a97e312017
 +        done
 +}
 +
-+IMGOPTS="preallocation=full"
-+
 +echo "=== Check qemu-img info output ==="
 +echo
 +size=64M
@@ -201,20 +199,20 @@ index 0000000000..a97e312017
 +echo "*** done"
 +rm -f $seq.full
 +status=0
-diff --git a/tests/qemu-iotests/308.out b/tests/qemu-iotests/308.out
+diff --git a/tests/qemu-iotests/309.out b/tests/qemu-iotests/309.out
 new file mode 100644
-index 0000000000..209237c8c8
+index 0000000000..c5e7757a15
 --- /dev/null
-+++ b/tests/qemu-iotests/308.out
++++ b/tests/qemu-iotests/309.out
 @@ -0,0 +1,21 @@
-+QA output created by 308
++QA output created by 309
 +=== Check qemu-img info output ===
 +
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864 preallocation=full
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
 +image: TEST_DIR/t.IMGFMT
 +file format: IMGFMT
 +virtual size: 64 MiB (67108864 bytes)
-+disk size: 64.3 MiB
++disk size: 196 KiB
 +
 +== reading whole image ==
 +read 67108864/67108864 bytes at offset 0
@@ -229,14 +227,14 @@ index 0000000000..209237c8c8
 +64 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
 +*** done
 diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
-index 3432989283..25a876ef20 100644
+index 25a876ef20..632a05b25e 100644
 --- a/tests/qemu-iotests/group
 +++ b/tests/qemu-iotests/group
-@@ -315,3 +315,4 @@
- 304 rw quick
+@@ -316,3 +316,4 @@
  305 rw quick
  307 rw quick export
-+308 rw auto quick
+ 308 rw auto quick
++309 rw auto quick
 -- 
 2.19.1
 
