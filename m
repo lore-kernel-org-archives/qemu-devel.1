@@ -2,91 +2,99 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0D6DC55179
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:54:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 56703C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:56:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF7B32225F
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:54:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BEBCA222E9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:56:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="U9kPexY1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF7B32225F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ww9SUwIY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEBCA222E9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVIK9-0007Gk-Tj
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 13:54:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51818)
+	id 1kVILf-0000KY-JL
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 13:56:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51938)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kVI3v-0006ZO-7l
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:11 -0400
-Received: from mail-pf1-x444.google.com ([2607:f8b0:4864:20::444]:36929)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kVI3j-0006Ry-2O
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:10 -0400
-Received: by mail-pf1-x444.google.com with SMTP id 144so1896690pfb.4
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 10:37:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=zVLgn+OX/nTD/oUAFauTpXTtA86xiUG6+rSs26rONZM=;
- b=U9kPexY1nq/Hm4lw3Fdn7NfTqK8WOKYh2ekN9hMlZ7HWdAVNSVnYRQV4eoFcIHqxiD
- 99qOzJrBn/7FAKZ/M9ioZn9YHz6yEBxJtPb9p8XeBk1dUhsEQOmB7k2lIUciDKQOPNsN
- 4id0kXPWtHQVkBXmgQIMXQ6tWXmsmBJ/1m+79VSCmRTlyQvtW15dTMe+73bIwpYpl0ja
- onTzwNsd1SDtYt6v/9wODD+EwFKGbolBH3cQtYMRPc+iUxXDPKZi5FpG35smlttpc+xM
- GN0qpi2EoBpC1Qikn/14VEDZsnQMisSTHYoXYlCdwmmfP8Q3K010kVYbGwdC3OkK1axw
- MmRQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVI3z-0006kR-LD
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48123)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVI3u-0006Ud-7G
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603301888;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=8FHdCr9ud0R7GrcxJ2jjx4dLL/9v3p41PCfQyp3MRA8=;
+ b=Ww9SUwIYdkMtCuQS6W4FqTT4brQzqXQAJ4esF5CSCdHoX3Pei3O03rRpoEz2HdYIt6Epdc
+ UO1DWIB0tSTf/T8tyDkD2dAwQ1wYPyOPiOWXnZYT5bQWKnbjegA6t8omlTb/27lAfrokTX
+ Ri9y3jWaHp6YdAydkD3YLw0treT5mww=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-CES3ViPQOOiI88m1yO85ew-1; Wed, 21 Oct 2020 13:38:06 -0400
+X-MC-Unique: CES3ViPQOOiI88m1yO85ew-1
+Received: by mail-wm1-f72.google.com with SMTP id r7so1816105wmr.5
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 10:38:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=zVLgn+OX/nTD/oUAFauTpXTtA86xiUG6+rSs26rONZM=;
- b=Vuun4ag1GQ+hAT+qB37i/pwh8l95rQRn5vWadnSagic4Q6TS9H3FM6zufBndE1Sg/j
- P/V4CSh8XE1pRUpEOkvZ08ibz8rdHtjYXu+qB/x2GTn+Q2j5T4+6Mun3q2HGFovrq/fi
- jk+TsY/Dx/lH7Y40UUQ9lMQfEDile273G8GBzyBPWu8GwZYvZVrCubVvUPf/ufyodgJL
- uMNl2E6fWIDLErCDRScnW221ENPhGbCHPXCu90MUghm9oFh74nJajMonSlFk7iWLkdbm
- 2USlE0E3MQNuBV7nUu4dQZXpiNaiZ8K/HByRxv5PfKnxMtycJUm4mP0Y3/MC7LnH87hL
- 03yQ==
-X-Gm-Message-State: AOAM531SThGOAPchhKf+X5oO75j17i4yvSOksR2cPiX1GMlviZrEzOwC
- bLa5Kvt4vzQOpLjAvsj0kBRxJ6UON/gmRQ==
-X-Google-Smtp-Source: ABdhPJwCYAERfmWmBaVj8bAcgnZiCEfoD7CoC1O2GHqSRO05H2Q/DzUDKZ2G648fH6l2BVURIT6sjQ==
-X-Received: by 2002:a63:160b:: with SMTP id w11mr4365669pgl.110.1603301872971; 
- Wed, 21 Oct 2020 10:37:52 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id h5sm2928829pfh.9.2020.10.21.10.37.51
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=BdY5+cEywpA1c1J3NT7Mr7RHwPmtZc+GMm+breuacYg=;
+ b=YymGpLTzN4kFTv8SsmXYoUoUEmCKzJcZnW+8p5AHO1bTlE2blndVZIpc/9iqODuaNN
+ TYRBo3Jtb+jngQBYSEgz0iPJlv6rTX/Kemj4RWvtPyAcJTjt6ssifej3jmjf3UiCzTEW
+ 1HSSei38n83XRZjpbhaxT7DTEtlrFkPt0NsVI/RNFvIOmPoBeQgvmdsnEbGn1AGNCxeL
+ TAdZC+mP4Lgrv3zNRLCWdSfZql5vNlEcWlcLrRCzhZCpuBa9Zp2wdIRWRYDf80/9+KBz
+ FkqKhlCcuDlF6cu5VZJjgfxOP9rKZ3UEL7OQ3YO9vY17vqM98PzUlE+3LiQ2rFqwHipx
+ Xzwg==
+X-Gm-Message-State: AOAM530EuFsfryph34MUsCyRBcFGD26tnphnuDk4r1OLwfM7To3esCPa
+ T1ZXHEYrhot9WmfzRgn4hWhmJENsNs7jB8IljD/DUxc04P/qCXf+XzT6ugO/rLE0cs1X3N+kcD6
+ fM7VhTGOSNurnftw=
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr3671517wmj.100.1603301885790; 
+ Wed, 21 Oct 2020 10:38:05 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzNXrNhzGHx0nqeZ/xZbGxmW+C5bgoLyJmRB52wlWdmdjs0Ibf1XJIiTdZZMbk2GVpxwVF+fw==
+X-Received: by 2002:a1c:2302:: with SMTP id j2mr3671505wmj.100.1603301885658; 
+ Wed, 21 Oct 2020 10:38:05 -0700 (PDT)
+Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id x81sm4606503wmb.11.2020.10.21.10.38.04
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 10:37:52 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v12 01/12] linux-user/aarch64: Reset btype for signals
-Date: Wed, 21 Oct 2020 10:37:38 -0700
-Message-Id: <20201021173749.111103-2-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201021173749.111103-1-richard.henderson@linaro.org>
-References: <20201021173749.111103-1-richard.henderson@linaro.org>
+ Wed, 21 Oct 2020 10:38:04 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: Richard Henderson <richard.henderson@linaro.org>,
+	qemu-devel@nongnu.org
+Subject: [PATCH v5 0/2] util/oslib: qemu_try_memalign() improvements
+Date: Wed, 21 Oct 2020 19:38:01 +0200
+Message-Id: <20201021173803.2619054-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::444;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,43 +107,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Stefan Weil <sw@weilnetz.de>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The kernel sets btype for the signal handler as if for a call.
-
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/aarch64/signal.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
-
-diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
-index d50c1ae583..b591790c22 100644
---- a/linux-user/aarch64/signal.c
-+++ b/linux-user/aarch64/signal.c
-@@ -506,10 +506,16 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
-             + offsetof(struct target_rt_frame_record, tramp);
-     }
-     env->xregs[0] = usig;
--    env->xregs[31] = frame_addr;
-     env->xregs[29] = frame_addr + fr_ofs;
--    env->pc = ka->_sa_handler;
-     env->xregs[30] = return_addr;
-+    env->xregs[31] = frame_addr;
-+    env->pc = ka->_sa_handler;
-+
-+    /* Invoke the signal handler as if by indirect call.  */
-+    if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
-+        env->btype = 2;
-+    }
-+
-     if (info) {
-         tswap_siginfo(&frame->info, info);
-         env->xregs[1] = frame_addr + offsetof(struct target_rt_sigframe, info);
--- 
-2.25.1
+- Use _aligned_malloc for qemu_try_memalign on win32=0D
+- Assert qemu_try_memalign() alignment is a power of 2=0D
+=0D
+Since v4:=0D
+- Drop superfluous assert (Richard)=0D
+=0D
+Philippe Mathieu-Daud=C3=A9 (1):=0D
+  util/oslib: Assert qemu_try_memalign() alignment is a power of 2=0D
+=0D
+Richard Henderson (1):=0D
+  util/oslib-win32: Use _aligned_malloc for qemu_try_memalign=0D
+=0D
+ util/oslib-posix.c |  2 ++=0D
+ util/oslib-win32.c | 12 +++++-------=0D
+ 2 files changed, 7 insertions(+), 7 deletions(-)=0D
+=0D
+--=20=0D
+2.26.2=0D
+=0D
 
 
