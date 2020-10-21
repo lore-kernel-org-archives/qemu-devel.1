@@ -2,86 +2,109 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 466CEC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 12:41:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89720C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 12:46:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B696E22249
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 12:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 96EB722249
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 12:46:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iKBw/SuJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B696E22249
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TtWHfByJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96EB722249
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVDQR-0003n8-Iw
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 08:41:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46308)
+	id 1kVDV9-0005cI-Eo
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 08:45:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kVDOt-000284-DW
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 08:39:31 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44180)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kVDUB-000573-Bi
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 08:44:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44108)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kVDOr-00061S-50
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 08:39:31 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kVDU9-0006dg-Pu
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 08:44:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603283968;
+ s=mimecast20190719; t=1603284296;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=WIJlE9cT5+K/qZ9crtbHJBqYLO5AJ3/vFzX/iieyvx0=;
- b=iKBw/SuJy7A8OcZstgn6A3SOl3jo6cxVR3/q9sjmNdJ3yPrgOyWpKU0uhgQYJR9auGVKHx
- 7n93c0DY0SCL20K+1FM46Mzcl8uM6m/I3TUCf56hL+8q2KTAznJha4CCnQxHrVq4t5wu+u
- VgK8Mag0zvL828fO4hAHOzpLrIGqEDQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-110-mErIyp93Ov-v_vEjzSx_zQ-1; Wed, 21 Oct 2020 08:39:25 -0400
-X-MC-Unique: mErIyp93Ov-v_vEjzSx_zQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8832D18C5200;
- Wed, 21 Oct 2020 12:39:24 +0000 (UTC)
-Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 141215D9EF;
- Wed, 21 Oct 2020 12:39:20 +0000 (UTC)
-Date: Wed, 21 Oct 2020 08:39:20 -0400
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH] pc: Implement -no-hpet as sugar for -machine hpet=off
-Message-ID: <20201021123920.GS5733@habkost.net>
-References: <20201020220150.1326086-1-ehabkost@redhat.com>
- <50e184db-bf46-48c1-b3a2-f4151d00cdf6@redhat.com>
+ bh=Il08k/FCl+ku1iFiG+fSrcgUS3s9ecpQz+nrDNgQzls=;
+ b=TtWHfByJb32ejuRWrVdEl6KcPf+8XKJZwtaAJfoyc+9XzxeHyDQZZxWdgFIRpjajm8Mbm1
+ OB54pVpOrVQEJxVmTb5g32VbxCmxkGe5Z1BQlR7YsM4g01ZYDiz7UEn5Pv7jpfNmNXofXf
+ GbWllkQ1z7EQjSE4yx7C+6V5m0dO+YY=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-111-HbRku61HP7-k4stXi6Cc4A-1; Wed, 21 Oct 2020 08:44:54 -0400
+X-MC-Unique: HbRku61HP7-k4stXi6Cc4A-1
+Received: by mail-wm1-f72.google.com with SMTP id o15so1473947wmh.1
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 05:44:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Il08k/FCl+ku1iFiG+fSrcgUS3s9ecpQz+nrDNgQzls=;
+ b=XGHeZKucikM4Wde+YzdFOXiy2QCKSW00mYpLTAEGcj4qU5vdmqoV1hkID62AUXUITH
+ FBtNKO91snZK9yleI/RshkXU+upoDOpjJWV4Qa14HLGMOy59owDNGSJJMvO932RpYaWa
+ JKu8MES8rneFKFpiszKI5ZKBgUYvCHpmyuw/5zSADHJD+dER7vQLx+DAoy9WwwIWQJ8p
+ 4tioL6ROOfrkGp/VdkNqjoi27gdQ+G/QBypgEFwnsvjV4SoQ0wzFcOhADSQbfeYD6eIK
+ i8NPBhWKwXSicsX9PRd2YWmhEgMvzcjC3ZATr3gnJqD1NeXtiX88dnBE8nP9rgC5DKAX
+ atZw==
+X-Gm-Message-State: AOAM530XCXklfLXVRoegZdD3jL5yFJp33LEv+FNnv7vSGW7EkxdLpeHX
+ eJPvJUcPcAvnKJsJj16mkcNnsaWWvJmJNfvzCU0MnRQ7hqsr93Fw1P2N8EhCV/7WnvQ5nYORp8u
+ eGrC6+9WUxobQxQU=
+X-Received: by 2002:adf:fc0d:: with SMTP id i13mr4721920wrr.156.1603284293244; 
+ Wed, 21 Oct 2020 05:44:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzqI2XK0EjuG388HLQ9RgY5qP2Z14gEZnDrHXr++Jwqm6WWMuft+mhk9uPjx/OTisSlCq5E7g==
+X-Received: by 2002:adf:fc0d:: with SMTP id i13mr4721895wrr.156.1603284292957; 
+ Wed, 21 Oct 2020 05:44:52 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id t199sm3244214wmt.46.2020.10.21.05.44.51
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Oct 2020 05:44:52 -0700 (PDT)
+Subject: Re: [PATCH v5 02/16] fuzz: Add general virtual-device fuzzer
+To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
+References: <20201021010752.973230-1-alxndr@bu.edu>
+ <20201021010752.973230-3-alxndr@bu.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <675e45e4-3de1-bf0a-b7d3-117710b7fba2@redhat.com>
+Date: Wed, 21 Oct 2020 14:44:50 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <50e184db-bf46-48c1-b3a2-f4151d00cdf6@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201021010752.973230-3-alxndr@bu.edu>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,35 +117,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, qemu-devel@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 21, 2020 at 09:32:59AM +0200, Paolo Bonzini wrote:
-> On 21/10/20 00:01, Eduardo Habkost wrote:
-> > +    pcms->hpet_enabled = true;
-> 
-> Should this be within #ifdef CONFIG_HPET?  [...]
+On 21/10/20 03:07, Alexander Bulekov wrote:
+> +static GString *generic_fuzz_cmdline(FuzzTarget *t)
+                   ^^^^^^^
 
-Oops, I wasn't aware of CONFIG_HPET, and hadn't noticed that
-pc_basic_device_init() uses qdev_try_new().  I agree that not
-failing if hpet=on is explicitly set and CONFIG_HPET=n is wrong.
+> +{
+> +    GString *cmd_line = g_string_new(TARGET_NAME);
+> +    if (!getenv("QEMU_FUZZ_ARGS")) {
+> +        usage();
+> +    }
+> +    g_string_append_printf(cmd_line, " -display none \
+> +                                      -machine accel=qtest, \
+> +                                      -m 512M %s ", getenv("QEMU_FUZZ_ARGS"));
+> +    return cmd_line;
+> +}
+> +
+> +static void register_generic_fuzz_targets(void)
+> +{
+> +    fuzz_add_target(&(FuzzTarget){
+> +            .name = "generic-fuzz",
+> +            .description = "Fuzz based on any qemu command-line args. ",
+> +            .get_init_cmdline = general_fuzz_cmdline,
+                                   ^^^^^^^
 
-Supporting a "require hpet to be on" use case would be a new
-feature and out of scope of this work, though.  I will just
-rename the property to "allow-hpet".  We can still implement a
-OnOfAuto "hpet" property in the future, if we think it's useful.
+Does this actually compile?
 
->                                     [...]  Otherwise
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Paolo
 
-Thanks!
-
--- 
-Eduardo
+> +            .pre_fuzz = general_pre_fuzz,
+> +            .fuzz = general_fuzz});
 
 
