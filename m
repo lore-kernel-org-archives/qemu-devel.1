@@ -7,53 +7,54 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 689EDC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 09:28:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AD6DC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 09:29:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E485C21D6C
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 09:28:53 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E485C21D6C
+	by mail.kernel.org (Postfix) with ESMTPS id 00F6A21D6C
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 09:29:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F6A21D6C
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58218 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVAQO-0007ph-UO
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 05:28:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59484)
+	id 1kVARJ-0000IE-0E
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 05:29:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59610)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVAPd-0007Oa-Lk
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 05:28:05 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39792
+ id 1kVAQH-0007wd-FR
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 05:28:45 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39802
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVAPc-0004KW-3A
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 05:28:05 -0400
+ id 1kVAQE-0004Y8-Pm
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 05:28:45 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVAPb-0005kW-UY; Wed, 21 Oct 2020 10:28:09 +0100
+ id 1kVAQG-0005l2-PZ; Wed, 21 Oct 2020 10:28:48 +0100
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, atar4qemu@gmail.com
-References: <20201011081347.2146-1-mark.cave-ayland@ilande.co.uk>
-Message-ID: <eee17b95-c1ba-cb6b-f687-2ef6e87c80e0@ilande.co.uk>
-Date: Wed, 21 Oct 2020 10:27:56 +0100
+To: qemu-devel@nongnu.org, mst@redhat.com, marcel.apfelbaum@gmail.com
+References: <20201011082022.3016-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <8aab2ada-1410-d64c-2264-877e73140882@ilande.co.uk>
+Date: Wed, 21 Oct 2020 10:28:37 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201011081347.2146-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20201011082022.3016-1-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] sabre: increase number of PCI bus IRQs from 32 to 64
+Subject: Re: [PATCH] pci: assert that irqnum is between 0 and bus->nirqs in
+ pci_change_irq_level()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -82,39 +83,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 11/10/2020 09:13, Mark Cave-Ayland wrote:
+On 11/10/2020 09:20, Mark Cave-Ayland wrote:
 
-> The rework of the sabre IRQs in commit 6864fa3897 "sun4u: update PCI topology to
-> include simba PCI bridges" changed the IRQ routing so that both PCI and legacy
-> OBIO IRQs are routed through the sabre PCI host bridge to the CPU.
+> These assertions similar to those in the adjacent pci_bus_get_irq_level() function
+> ensure that irqnum lies within the valid PCI bus IRQ range.
 > 
-> Unfortunately this commit failed to increase the number of PCI bus IRQs
-> accordingly meaning that access to the legacy IRQs OBIO (irqnum >= 0x20) would
-> overflow the PCI bus IRQ array causing strange failures running qemu-system-sparc64
-> in NetBSD.
-> 
-> Reported-by: Harold Gutch <logix@foobar.franken.de>
-> Fixes: https://bugs.launchpad.net/qemu/+bug/1838658
-> Fixes: 6864fa3897 ("sun4u: update PCI topology to include simba PCI bridges")
 > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 > ---
->   hw/pci-host/sabre.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-> index 5ac6283623..ffdba1d865 100644
-> --- a/hw/pci-host/sabre.c
-> +++ b/hw/pci-host/sabre.c
-> @@ -396,7 +396,7 @@ static void sabre_realize(DeviceState *dev, Error **errp)
->                                        pci_sabre_set_irq, pci_sabre_map_irq, s,
->                                        &s->pci_mmio,
->                                        &s->pci_ioport,
-> -                                     0, 32, TYPE_PCI_BUS);
-> +                                     0, 0x40, TYPE_PCI_BUS);
->   
->       pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
+> This would have immediately picked up on the sabre PCI bus IRQ overflow fixed by
+> the patch I just posted.
+> 
+> ---
+>   hw/pci/pci.c | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/hw/pci/pci.c b/hw/pci/pci.c
+> index 3c8f10b461..b1484b3747 100644
+> --- a/hw/pci/pci.c
+> +++ b/hw/pci/pci.c
+> @@ -258,6 +258,8 @@ static void pci_change_irq_level(PCIDevice *pci_dev, int irq_num, int change)
+>               break;
+>           pci_dev = bus->parent_dev;
+>       }
+> +    assert(irq_num >= 0);
+> +    assert(irq_num < bus->nirq);
+>       bus->irq_count[irq_num] += change;
+>       bus->set_irq(bus->irq_opaque, irq_num, bus->irq_count[irq_num] != 0);
+>   }
 
-Applied to my qemu-sparc branch.
+Ping?
 
 
 ATB,
