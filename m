@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE15BC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F28AC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:55:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 58A7E2098B
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:53:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7548D21534
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:55:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSoX3I/r"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 58A7E2098B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMgHwLzR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7548D21534
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34114 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBkG-0008M6-BA
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:53:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49414)
+	id 1kVBmD-0001iL-Vc
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:55:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBhs-000560-NS
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:51:00 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:54251)
+ id 1kVBi2-0005JQ-69
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:51:10 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:37354)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBhr-0000iM-16
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:51:00 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id d78so1374906wmd.3
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:50:58 -0700 (PDT)
+ id 1kVBi0-0000kW-G3
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:51:09 -0400
+Received: by mail-wm1-x341.google.com with SMTP id c16so1603050wmd.2
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:51:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=u8MIW0fZuo8s+yk9Tsr3op5QbGANqrFw34tCgPBF3cw=;
- b=fSoX3I/r74xELcpRZ3OdZaYY+ZfCUTskrMBMgjWVe4FbwR/txGkVTyawTWQQ+vHKNE
- sBU0L5sSs0pfSJ70pK4frMRhldqv2Z7tXM9WPaoM+mz/tfY6bcD0m1nVIq+YHckx1gNJ
- FP8Tzo8xvRYGx29Ih/bbYAsCTYvE5YGeFOzhaa0kSZjskFdcCmcsWKn32Z/X6jYIMhSc
- WTsXhgxyKPJkLsoL3Px3FdmLCeV8+DsyGvq0S/0DTEr0H6b6cvzq+mR4YMuUWDvxrwg5
- 5zEFwzEe4fiVCPkJPtEilvh2QOIx9tKo51DZ7BB04JQyyxSsqw4GoT+qAN2qPs7qWOoz
- 6LBQ==
+ bh=sya+QU41wlcVkPizrwatYGHt9fWrCDbWxbNEti7h2ho=;
+ b=jMgHwLzRVp9leEB8s/kEGer0DyfE+AbxVEirZvYHl2E/yUqRez5R1+pmLEBZ3arsRr
+ jHY62SfoDw+oRGI2VUqJUGxzQtP006ckJwhWEm7UPa22YurI9YAeWoTQcQsgg2NhPMT7
+ Dcslv7tBd+92iEseNfmLn+hH5m5y8dV3pzZBD2YYW5YfBUIUKifJEuhewhfIA0X98oin
+ n+dCZPQVl4IqbCHTTRhNtIbxuxmrnzVVomCjEybPq/Fr0IR53ftznA8Ld1wnNKlCh96t
+ ftDCroshCCoAPRWGXC4Ha0s/uv6sdL+wPdoeOQxq4n4w2Dhv6RPvxyDtoiB295/Un16i
+ cGxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=u8MIW0fZuo8s+yk9Tsr3op5QbGANqrFw34tCgPBF3cw=;
- b=FstXIH7cQSiZGV8/RpSHssHx6U3TyN2noUedYxFYccEyiHotu5hO2NU6xx63LwqAmr
- LUfkf75apEeQ8Fn398Aox6oBAMzIBIdSz/xPhF4HkkT/q4YMEP4ZFBXeA/8NmQ8YAL/a
- Vm4NOJSLGLw5aZFCrfEeoDH0vuA0Pe9/IAM2WbfEzUy1ALgWN5tcBlAc71KMRNjLYcDK
- uZyojICkLqvHdIKUuRImXw/+5tHaXIW6tMTp24uPjZWC9w/Di+3Uxx9SwLqNa3pK2qDj
- jkmqqh29TIy5IWfg/8jwNxIQO+XcSGdrC6hTZCGepLB5unVhcDjtN1uGMl8umh6HwYwU
- zKMg==
-X-Gm-Message-State: AOAM530TKHeQvjOd7Qnyak5IAf6X/0RI/I6mzTbEgkD9dzSdnPAP1Wh5
- GSHLtBFx8g+o3x+SC0DXJeYH+vxz7Wc=
-X-Google-Smtp-Source: ABdhPJw4WuLXr4fMv1GVowlFCqxkzdgn0xn2wi9PmCKKIJ7Wo0gIYde7vbK77YJLUEIvrk8XzROSRA==
-X-Received: by 2002:a7b:cb81:: with SMTP id m1mr3065574wmi.140.1603277457309; 
- Wed, 21 Oct 2020 03:50:57 -0700 (PDT)
+ bh=sya+QU41wlcVkPizrwatYGHt9fWrCDbWxbNEti7h2ho=;
+ b=I6xH0X8syIG8iW7szcPxZ9c2FrsbazYXhiy5/dERr46mwAZH29DHdIL7UDXXrxFAdw
+ 5FZGYQ8P1jBy2CRJohrl9UBfJSjllna5WaflYRY247+cY7TepkMcMvaPJcgDCfk/MmL+
+ /4ZUiXu3KoDoQyqHJCd+Zj/kEQBO/yaUePGdxIE5n4wh802Ghf0r/ABHQWTwTv9Gm4eI
+ fFYgoDPxHzvdO0+wI1MLg+NBChCrKf+ScoFaQEaES4IPc5Yf6CHL2X04ZcLfwRO8g89I
+ IQL94SKprOmtetClEbs287OUOiu8+cC9yMrT/npy6h2wzbBB/DqDYLBwdwoXNuVGpb+s
+ 9Qsg==
+X-Gm-Message-State: AOAM533obRuv58ZTsMgEc0Ur1U0X9/0JdjAxSslbIZU7Sl+9eisJl9Xr
+ TifP91uj8DFvsMJdO/uOCN5PWWeawKk=
+X-Google-Smtp-Source: ABdhPJzJycn5B1g7AsDVMp+34eLhwlUyclsIsr3EJMP7HBqA9/0L63lah8aQln9vPACzCp9XGHGK0g==
+X-Received: by 2002:a1c:e154:: with SMTP id y81mr2918494wmg.111.1603277466924; 
+ Wed, 21 Oct 2020 03:51:06 -0700 (PDT)
 Received: from localhost.localdomain (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id z6sm2781092wmi.28.2020.10.21.03.50.56
+ by smtp.gmail.com with ESMTPSA id 24sm2665954wmf.44.2020.10.21.03.51.05
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 03:50:56 -0700 (PDT)
+ Wed, 21 Oct 2020 03:51:06 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/6] tests/acceptance: Introduce tesseract_ocr() helper
-Date: Wed, 21 Oct 2020 12:50:33 +0200
-Message-Id: <20201021105035.2477784-5-f4bug@amsat.org>
+Subject: [PATCH 6/6] tests/acceptance: Test PMON on the Fuloong 2E machine
+Date: Wed, 21 Oct 2020 12:50:35 +0200
+Message-Id: <20201021105035.2477784-7-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201021105035.2477784-1-f4bug@amsat.org>
 References: <20201021105035.2477784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -115,99 +115,155 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to reuse the tesseract OCR code.
-Create a new tesseract_ocr() helper and use it.
+Test the PMON firmware. As the firmware is not redistributable,
+it has to be downloaded manually first. Then it can be used by
+providing its path via the PMON_BIN_PATH environment variable:
+
+  $ PMON_BIN_PATH=~/images/fuloong2e/pmon_2e.bin \
+    AVOCADO_ALLOW_UNTRUSTED_CODE=1 \
+    avocado --show=app,console run tests/acceptance/machine_mips_fuloong2e.py
+  Fetching asset from tests/acceptance/machine_mips_fuloong2e.py:MipsFuloong2e.test_linux_kernel_isa_serial
+   (1/3) tests/acceptance/machine_mips_fuloong2e.py:MipsFuloong2e.test_pmon_serial_console:
+  console: PMON2000 MIPS Initializing. Standby...
+  console: ERRORPC=00000000 CONFIG=00030932
+  console: PRID=00006302
+  console: Init SDRAM Done!
+  console: Sizing caches...
+  console: Init caches...
+  console: godson2 caches found
+  console: Init caches done, cfg = 00030932
+  console: Copy PMON to execute location...
+  console: copy text section done.
+  console: Copy PMON to execute location done.
+  Uncompressing Bios........................OK,Booting Bios
+  PASS (0.25 s)
+   (2/3) tests/acceptance/machine_mips_fuloong2e.py:MipsFuloong2e.test_pmon_framebuffer_console:
+  [...]
+  Uncompressing Bios........................OK,Booting Bios
+  console: FREQ
+  console: FREI
+  console: DONE
+  console: TTYI
+  console: TTYD
+  console: ENVI
+  console: MAPV
+  console: Mfg  0, Id 60
+  console: STDV
+  console: SBDD
+  console: PPCIH
+  console: PCIS
+  console: PCIR
+  console: PCIW
+  console: NETI
+  console: RTCL
+  console: PCID
+  console: VGAI
+  console: Default MODE_ID 2
+  console: starting radeon init...
+  console: radeon init done
+  console: FRBI
+  console: cfb_console init,fb=b4000000
+  console: Video: Drawing the logo ...
+  console: CONSOLE_SIZE 450560HSTI
+  PASS (4.10 s)
+   (3/3) tests/acceptance/machine_mips_fuloong2e.py:MipsFuloong2e.test_linux_kernel_isa_serial:
+  console: Linux version 2.6.27.7lemote (root@debian) (gcc version 4.1.3 20080623 (prerelease) (Debian 4.1.2-23)) #6 Fri Dec 12 00:11:25 CST 2008
+  console: busclock=33000000, cpuclock=-2145008360,memsize=256,highmemsize=0
+  console: console [early0] enabled
+  console: CPU revision is: 00006302 (ICT Loongson-2)
+  PASS (0.19 s)
+  RESULTS    : PASS 3 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 5.10 s
 
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/machine_m68k_nextcube.py | 21 +++++----------------
- tests/acceptance/tesseract_utils.py       | 18 ++++++++++++++++++
- 2 files changed, 23 insertions(+), 16 deletions(-)
+Cc: Huacai Chen <chenhc@lemote.com>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Cc: Daniel P. Berrange <berrange@redhat.com>
+Cc: Alex Bennée <alex.bennee@linaro.org>
+---
+ tests/acceptance/machine_mips_fuloong2e.py | 59 ++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptance/machine_m68k_nextcube.py
-index 3c7400c43e4..09e2745cc52 100644
---- a/tests/acceptance/machine_m68k_nextcube.py
-+++ b/tests/acceptance/machine_m68k_nextcube.py
-@@ -7,13 +7,11 @@
+diff --git a/tests/acceptance/machine_mips_fuloong2e.py b/tests/acceptance/machine_mips_fuloong2e.py
+index 5fd3da09e7c..807e38da74a 100644
+--- a/tests/acceptance/machine_mips_fuloong2e.py
++++ b/tests/acceptance/machine_mips_fuloong2e.py
+@@ -8,15 +8,74 @@
+ # SPDX-License-Identifier: GPL-2.0-or-later
  
  import os
- import time
--import logging
++import time
  
- from avocado_qemu import Test
  from avocado import skipUnless
--from avocado.utils import process
+ from avocado_qemu import Test
+ from avocado_qemu import wait_for_console_pattern
  
--from tesseract_utils import tesseract_available
 +from tesseract_utils import tesseract_available, tesseract_ocr
- 
- PIL_AVAILABLE = True
- try:
-@@ -61,12 +59,8 @@ def test_bootrom_framebuffer_size(self):
-     def test_bootrom_framebuffer_ocr_with_tesseract_v3(self):
-         screenshot_path = os.path.join(self.workdir, "dump.ppm")
-         self.check_bootrom_framebuffer(screenshot_path)
--
--        console_logger = logging.getLogger('console')
--        text = process.run("tesseract %s stdout" % screenshot_path).stdout_text
--        for line in text.split('\n'):
--            if len(line):
--                console_logger.debug(line)
-+        lines = tesseract_ocr(screenshot_path, tesseract_version=3)
-+        text = '\n'.join(lines)
-         self.assertIn('Backplane', text)
-         self.assertIn('Ethernet address', text)
- 
-@@ -77,13 +71,8 @@ def test_bootrom_framebuffer_ocr_with_tesseract_v3(self):
-     def test_bootrom_framebuffer_ocr_with_tesseract_v4(self):
-         screenshot_path = os.path.join(self.workdir, "dump.ppm")
-         self.check_bootrom_framebuffer(screenshot_path)
--
--        console_logger = logging.getLogger('console')
--        proc = process.run("tesseract --oem 1 %s stdout" % screenshot_path)
--        text = proc.stdout_text
--        for line in text.split('\n'):
--            if len(line):
--                console_logger.debug(line)
-+        lines = tesseract_ocr(screenshot_path, tesseract_version=4)
-+        text = '\n'.join(lines)
-         self.assertIn('Testing the FPU, SCC', text)
-         self.assertIn('System test failed. Error code', text)
-         self.assertIn('Boot command', text)
-diff --git a/tests/acceptance/tesseract_utils.py b/tests/acceptance/tesseract_utils.py
-index acd6e8c2faa..72cd9ab7989 100644
---- a/tests/acceptance/tesseract_utils.py
-+++ b/tests/acceptance/tesseract_utils.py
-@@ -6,7 +6,9 @@
- # later. See the COPYING file in the top-level directory.
- 
- import re
-+import logging
- 
-+from avocado.utils import process
- from avocado.utils.path import find_command, CmdNotFoundError
- 
- def tesseract_available(expected_version):
-@@ -26,3 +28,19 @@ def tesseract_available(expected_version):
-         return False
-     # now this is guaranteed to be a digit
-     return int(match.groups()[0]) == expected_version
 +
+ class MipsFuloong2e(Test):
+ 
+     timeout = 60
+ 
++    @skipUnless(os.getenv('PMON_BIN_PATH'), 'PMON_BIN_PATH not available')
++    def test_pmon_serial_console(self):
++        """
++        :avocado: tags=arch:mips64el
++        :avocado: tags=machine:fulong2e
++        :avocado: tags=endian:little
++        :avocado: tags=device:bonito64
++        :avocado: tags=device:via686b
++        """
++        pmon_hash = 'c812e1695d7b2320036f3ef494976969' # v1.1.2
++        pmon_path = self.fetch_asset('file://' + os.getenv('PMON_BIN_PATH'),
++                                     asset_hash=pmon_hash, algorithm='md5')
 +
-+def tesseract_ocr(image_path, tesseract_args='', tesseract_version=3):
-+    console_logger = logging.getLogger('tesseract')
-+    console_logger.debug(image_path)
-+    if tesseract_version == 4:
-+        tesseract_args += ' --oem 1'
-+    proc = process.run("tesseract {} {} stdout".format(tesseract_args,
-+                                                       image_path))
-+    lines = []
-+    for line in proc.stdout_text.split('\n'):
-+        sline = line.strip()
-+        if len(sline):
-+            console_logger.debug(sline)
-+            lines += [sline]
-+    return lines
++        self.vm.set_console()
++        self.vm.add_args('-bios', pmon_path)
++        self.vm.launch()
++        wait_for_console_pattern(self, 'PMON2000 MIPS Initializing. Standby...')
++        wait_for_console_pattern(self, 'Booting Bios')
++
++    # Tesseract 4 adds a new OCR engine based on LSTM neural networks. The
++    # new version is faster and more accurate than version 3. The drawback is
++    # that it is still alpha-level software.
++    @skipUnless(tesseract_available(4), 'tesseract v4 OCR tool not available')
++    @skipUnless(os.getenv('PMON_BIN_PATH'), 'PMON_BIN_PATH not available')
++    def test_pmon_framebuffer_console(self):
++        """
++        :avocado: tags=arch:mips64el
++        :avocado: tags=machine:fulong2e
++        :avocado: tags=endian:little
++        :avocado: tags=device:bonito64
++        :avocado: tags=device:ati-vga
++        """
++        screenshot_path = os.path.join(self.workdir, 'dump.ppm')
++
++        pmon_hash = 'c812e1695d7b2320036f3ef494976969' # v1.1.2
++        pmon_path = self.fetch_asset('file://' + os.getenv('PMON_BIN_PATH'),
++                                     asset_hash=pmon_hash, algorithm='md5')
++
++        self.vm.set_console()
++        self.vm.add_args('-bios', pmon_path,
++                         '-vga', 'std')
++        self.vm.launch()
++
++        wait_for_console_pattern(self, 'Video: Drawing the logo ...')
++        self.log.info('VM launched, waiting for logo on display')
++        time.sleep(2)
++        wait_for_console_pattern(self, 'CONSOLE_SIZE')
++        self.vm.command('human-monitor-command', command_line='stop')
++        self.vm.command('human-monitor-command',
++                        command_line='screendump %s' % screenshot_path)
++
++        lines = tesseract_ocr(screenshot_path, tesseract_version=4,
++                              tesseract_args='--dpi 128')
++        pmon_version = 'PNON2000 for Loongson, Version 1.1.2' # PNON is enough
++        self.assertIn(pmon_version, lines)
++
+     @skipUnless(os.getenv('AVOCADO_ALLOW_UNTRUSTED_CODE'), 'untrusted code')
+     def test_linux_kernel_isa_serial(self):
+         """
 -- 
 2.26.2
 
