@@ -2,98 +2,88 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4DA6C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8921FC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:34:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 140E821707
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:32:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C358B21707
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:34:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HPfHm71O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 140E821707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DicPiizV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C358B21707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46828 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50926 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV4rm-0003oY-Uq
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 23:32:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42358)
+	id 1kV4tW-0005pY-RB
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 23:34:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4rC-0003Fb-6F
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:32:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23443)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4s5-0004Hi-J3
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:33:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32463)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4r9-0001BV-CP
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:32:09 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4s3-0001Y8-3E
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:33:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603251124;
+ s=mimecast20190719; t=1603251182;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=BOO4PSXhDHmdUjOeLv7s8gEff9JvuiOTMk3nu4q2Rlc=;
- b=HPfHm71OZIDq/htO3sQJGgo5vUxQ4gN/GMHseMkHQOqndEKDCJjuH69lkWyCHm2irgk1Zp
- Hg1rjMgJYH9juEtVV9DyxrKOu7pDFCxWfd8cfNthyIKCjER4eLG6s8mEUmgUoJJATAJe+k
- iqoQ9k5Jf82WiJpRvOzggQURW/nzV2c=
+ bh=nA0lpC6z+xG0DdUBM6SNAsPlbMblmsB8FWQCEeJdlks=;
+ b=DicPiizVSZES020vtzCnuwGEEeXN+46TVlq9wqHySDMDqMOWZn4mmiEQ6ad/Wa+3eFU9+b
+ zyJ8U4FLPb33KUoY37EKvuU4/19ybyH86SJcw/XR9gzt4jwliGvQ9N0YccNYV5ykUxDWn/
+ oG1rpE2mGSvLx9BaUzwySekv7nFX1hg=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-592-DnQq47r9Oaek-hC5_U-6HQ-1; Tue, 20 Oct 2020 23:32:02 -0400
-X-MC-Unique: DnQq47r9Oaek-hC5_U-6HQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-11-v5p3VvmfO3KVArismKreww-1; Tue, 20 Oct 2020 23:33:00 -0400
+X-MC-Unique: v5p3VvmfO3KVArismKreww-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DC0BB803F6A;
- Wed, 21 Oct 2020 03:32:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2F07857053;
+ Wed, 21 Oct 2020 03:32:59 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id BC5BD5C1C2;
- Wed, 21 Oct 2020 03:31:59 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id EF9951000232;
+ Wed, 21 Oct 2020 03:32:58 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 352081132A08; Wed, 21 Oct 2020 05:31:58 +0200 (CEST)
+ id 8311111275C2; Wed, 21 Oct 2020 05:32:57 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: BALATON Zoltan via <qemu-devel@nongnu.org>
-Subject: Re: [PATCH] hw/pci-host/grackle: Verify PIC link is properly set
-References: <20201011190332.3189611-1-f4bug@amsat.org>
- <20201011223446.GA4787@yekko.fritz.box>
- <369509c1-2e90-13cf-8845-892e754516d1@amsat.org>
- <20201012065436.GB71119@yekko.fritz.box>
- <9f7e4847-801d-dcd3-b876-bf2d276251@eik.bme.hu>
- <6e587154-4bc5-c44c-0c85-b46e0dddd3aa@amsat.org>
- <87k0vm1wny.fsf@dusky.pond.sub.org>
- <24bcd4-fde2-22a2-d3f4-cd42d9ee13c6@eik.bme.hu>
- <87d01e48pa.fsf@dusky.pond.sub.org>
- <9968e60e-99fd-3777-62ca-57decb716886@ilande.co.uk>
- <877drl1n2x.fsf@dusky.pond.sub.org>
- <8f27b2b4-1937-305e-af22-2378d1fb3a8@eik.bme.hu>
-Date: Wed, 21 Oct 2020 05:31:58 +0200
-In-Reply-To: <8f27b2b4-1937-305e-af22-2378d1fb3a8@eik.bme.hu> (BALATON Zoltan
- via's message of "Tue, 20 Oct 2020 13:37:07 +0200 (CEST)")
-Message-ID: <87v9f4qmoh.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+To: qemu-devel@nongnu.org
+Subject: [PULL 4/5] qapi: Restrict 'query-kvm' command to machine code
+Date: Wed, 21 Oct 2020 05:32:56 +0200
+Message-Id: <20201021033257.2126624-5-armbru@redhat.com>
+In-Reply-To: <20201021033257.2126624-1-armbru@redhat.com>
+References: <20201021033257.2126624-1-armbru@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:40:15
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,67 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>, qemu-ppc@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: peter.maydell@linaro.org,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-BALATON Zoltan via <qemu-devel@nongnu.org> writes:
+From: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-> On Tue, 20 Oct 2020, Markus Armbruster wrote:
->> Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk> writes:
->>
->>> One thing I have thought about is being able to mark a link property
->>> as mandatory so if a value hasn't been set before realize then you
->>
->> A non-null value, I presume.
->
-> Do you mean something like distinguish between NULL and INVALID_VALUE
-> where setting the latter as initial value means property is mandatory?
+Restricting query-kvm to machine.json pulls slightly
+less QAPI-generated code into user-mode and tools.
 
-I doubt "somebody must have set some value (which could be null)" is
-useful here.  I believe Mark was thinking about "somebody must have
-connected the link (i.e. set a non-null value)".
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Message-Id: <20201012121536.3381997-5-philmd@redhat.com>
+Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
+---
+ qapi/machine.json | 30 ++++++++++++++++++++++++++++++
+ qapi/misc.json    | 30 ------------------------------
+ 2 files changed, 30 insertions(+), 30 deletions(-)
 
->>> receive a fatal error. This would be for cases like this where 2
->>> internal devices are connected together without any formal interface,
->>> i.e. in cases where -device wouldn't work anyway.
->>
->> Moves the check from code one step closer to data: from the realize
->> method to the object_property_add_link() call.
->>
->> I like doing things in data, because data is easier to reason about than
->> code.
->
-> Except when object initialisation is scattered around in boiler plate
-> code as in QEMU where it may not be obvious why a realize method fails
-> due to something set/documented in a class_init method elsewhere,
-> whereas an assert in the realize method is quite self evident and
-> would document the same requirements.
-
-Two aspects.
-
-One, making sense of an assertion failure.  Whether some ad hoc
-
-    assert(s->some_other_object);
-
-in the device realize method crashes, or a generic
-
-    if (!object_property_get_link(s, prop->name, &error_abort)) {
-        error_setg(errp, "link %s must be connected", prop->name);
-    }
-
-crashes in the error_setg() is all the same to me.  Some developers may
-find the latter's crash message superior (I don't care).
-
-Two, making sense of the code.  You have to consider property definition
-(which might be code in .class_init(), code in .instance_init(), or data
-passed to .device_class_set_props()), property use (in the code that
-sets up the device), and property value checking (generic checks in
-qom/object.c, specific checks in .realize()).  Moving one check from
-"specific" to "generic" won't make much of a difference.
+diff --git a/qapi/machine.json b/qapi/machine.json
+index 5a3bbcae01..7c9a263778 100644
+--- a/qapi/machine.json
++++ b/qapi/machine.json
+@@ -561,6 +561,36 @@
+ ##
+ { 'command': 'inject-nmi' }
+ 
++##
++# @KvmInfo:
++#
++# Information about support for KVM acceleration
++#
++# @enabled: true if KVM acceleration is active
++#
++# @present: true if KVM acceleration is built into this executable
++#
++# Since: 0.14.0
++##
++{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
++
++##
++# @query-kvm:
++#
++# Returns information about KVM acceleration
++#
++# Returns: @KvmInfo
++#
++# Since: 0.14.0
++#
++# Example:
++#
++# -> { "execute": "query-kvm" }
++# <- { "return": { "enabled": true, "present": true } }
++#
++##
++{ 'command': 'query-kvm', 'returns': 'KvmInfo' }
++
+ ##
+ # @NumaOptionsType:
+ #
+diff --git a/qapi/misc.json b/qapi/misc.json
+index 9fa702b0f6..363115c1ed 100644
+--- a/qapi/misc.json
++++ b/qapi/misc.json
+@@ -68,36 +68,6 @@
+ ##
+ { 'command': 'query-name', 'returns': 'NameInfo', 'allow-preconfig': true }
+ 
+-##
+-# @KvmInfo:
+-#
+-# Information about support for KVM acceleration
+-#
+-# @enabled: true if KVM acceleration is active
+-#
+-# @present: true if KVM acceleration is built into this executable
+-#
+-# Since: 0.14.0
+-##
+-{ 'struct': 'KvmInfo', 'data': {'enabled': 'bool', 'present': 'bool'} }
+-
+-##
+-# @query-kvm:
+-#
+-# Returns information about KVM acceleration
+-#
+-# Returns: @KvmInfo
+-#
+-# Since: 0.14.0
+-#
+-# Example:
+-#
+-# -> { "execute": "query-kvm" }
+-# <- { "return": { "enabled": true, "present": true } }
+-#
+-##
+-{ 'command': 'query-kvm', 'returns': 'KvmInfo' }
+-
+ ##
+ # @IOThreadInfo:
+ #
+-- 
+2.26.2
 
 
