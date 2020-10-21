@@ -7,79 +7,76 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE96EC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:35:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F117C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12AB3223C7
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:35:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CBD7A2173E
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TnSffA8/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12AB3223C7
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2xKyXnL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD7A2173E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37230 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVLlW-0002Cf-2I
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:35:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46826)
+	id 1kVLnW-0004gT-PO
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:37:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46836)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLe4-0003H7-Cp
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:27:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35106)
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLe5-0003HX-7N
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:27:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39154)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLdz-00025w-Dk
+ (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLdz-00025l-7x
  for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:27:44 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603315654;
+ s=mimecast20190719; t=1603315652;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cXAIBJAlfQRCJ7NOr2j/4Mg/y+8/XbU5hJsy4VMjNYE=;
- b=TnSffA8/Yd8fxyy965khc32qh7RVMpy2dnai8v58TodwUdlz1KyZe1DzvOUy3XTIfpgbwj
- sLKtUB4BpqZ4Xf3+XmHYvO6mm+RzDDFcnkWRmYBcrIEz8hdoe3MG3C1V8hWv11cMs7lqJV
- aHvtut31aGKFFsOQQcVRZy1a0tokHnk=
+ bh=UNPjhXFw69k7I1uaRrlnu2Tl3UZw4+OZaB4P9a4opmU=;
+ b=S2xKyXnLYn9sr8eyHN8yVDoBZaNYKYOU+UnUWvLzwLEv5NfUAmO0P0Hzv8j1fWG0daEuuD
+ x5wAVCf/SwYlnyiYklgb+w3vHzpAN/7wYJVMRZ5MjyqXEyAp3zMvlT4hjznvYzPPtpwFw1
+ ibtI+LT/Tf2NXHUgRTi93DqVDiv9Lcw=
 Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
  [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-122-FSw4oeMwP4m7bSn8XytjLg-1; Wed, 21 Oct 2020 17:27:33 -0400
-X-MC-Unique: FSw4oeMwP4m7bSn8XytjLg-1
-Received: by mail-qk1-f197.google.com with SMTP id s14so2639859qke.1
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 14:27:33 -0700 (PDT)
+ us-mta-330-TmWsOkTOMPamkTnLXQRIag-1; Wed, 21 Oct 2020 17:27:31 -0400
+X-MC-Unique: TmWsOkTOMPamkTnLXQRIag-1
+Received: by mail-qk1-f197.google.com with SMTP id g184so2628738qke.3
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 14:27:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=cXAIBJAlfQRCJ7NOr2j/4Mg/y+8/XbU5hJsy4VMjNYE=;
- b=MBVMMRFUvD7er3OmNCxYQyI0xx8tlR/ndsJRZkTRKlTYBL7xCiV9marLSEOzplos/J
- yWK7buKLDSsvNvUFmxuu9+lRqQiDuhGkgWoKN4z2tllWyujAn9uVG4kOYd9elUBLAhDo
- LM842EbYq/Gx9ZQpEHBFDTeMSx7Go5MPw7E+7vabxXKfDr9xDRHoicaWw8Flcr9vhdXA
- TQ6b5ax2CvnaMDppOOdXejcIECGK0oswUtsv30Rauc0MQjlGUQrrpwL20TbZl8MsR2XK
- 4a4+i/BV5jU3WzCa/WuB0BPQoIkGKltrxjzrRPsofO+PmjyB8VmLnXiUM0Ygmrki3PMO
- Zu+Q==
-X-Gm-Message-State: AOAM532y3A0nWNdGFxHG6/n1BVr72lYuqqJ9rrTN3ocgBL2dUPRMt1G0
- mZJdfq8MK9NtIRqbSC+5OwfjQafiLZPgje5bnI+7gWWghuAD+yMngI+3nDs0mDaFzkuNVG4OYih
- amrEzIKinArZo3/k=
-X-Received: by 2002:a05:622a:1d4:: with SMTP id
- t20mr5161521qtw.173.1603315652167; 
- Wed, 21 Oct 2020 14:27:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx9vIjo4GQc6sAWwEBA9I+Tq3BUZgW2AY0FmipYOLK3dgBv+KaZ/BZxBqhk58ytGUfUmf04yA==
-X-Received: by 2002:a05:622a:1d4:: with SMTP id
- t20mr5161500qtw.173.1603315651936; 
- Wed, 21 Oct 2020 14:27:31 -0700 (PDT)
+ bh=UNPjhXFw69k7I1uaRrlnu2Tl3UZw4+OZaB4P9a4opmU=;
+ b=rru+ycA7zRfZzgVNT62DQZzJiUrG9e49FaxR/KQYpVgtHgHfUlpGUloZzSWJefdYkt
+ vjpTt4eTXfQc1B57Wo7YnPjuLrCe5Z8RbZhXUspb1B7fwKLmmG/u1TovRhceDlGL12zk
+ lCOVJakLA6pbcr1vLgUgt6PNdHxxEJvZqe5Iv2Yj+eZ5QIf4KBtcSgBTuXlpJdFAlw/6
+ Rep2H2dtYpAtRhpSuIZXE+TAjRGjD1S4eCZCkwLHtUwA5PkysukhiTwu468wJs/QCjvQ
+ 4W8/54AYX6/a+6hZy40pBVoDFY7gc8sFutOak4g9d4Bl7RvuS6KJWSm54QVmvgT7NTG0
+ ePfg==
+X-Gm-Message-State: AOAM531KcuLo6SZarbv7DKiroY1Z91B+Z1r2iALpEwcAbaLCVa4hePvD
+ YEyM0tUPdpQOnv45n4JttDdfHwYlXqpZVM8JKhzJq1VWHMGvMvm4Jogu94Ln5AI1ReSeRWYZyUa
+ pD0ry18D8z5VhROs=
+X-Received: by 2002:a37:ad1a:: with SMTP id f26mr4978543qkm.1.1603315650500;
+ Wed, 21 Oct 2020 14:27:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzFpK/QNHMvS2X+Ioo61Sim5J5yjJ0yRZn6wyzj50T4fJzS6/ZYdI3GHNkyHkhD4VxM2xP6xA==
+X-Received: by 2002:a37:ad1a:: with SMTP id f26mr4978529qkm.1.1603315650243;
+ Wed, 21 Oct 2020 14:27:30 -0700 (PDT)
 Received: from xz-x1.redhat.com
  (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca. [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id p187sm2089145qkf.70.2020.10.21.14.27.30
+ by smtp.gmail.com with ESMTPSA id p187sm2089145qkf.70.2020.10.21.14.27.28
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 14:27:31 -0700 (PDT)
+ Wed, 21 Oct 2020 14:27:29 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 5/6] migration/postcopy: Release fd before going into
- 'postcopy-pause'
-Date: Wed, 21 Oct 2020 17:27:20 -0400
-Message-Id: <20201021212721.440373-6-peterx@redhat.com>
+Subject: [PATCH v6 4/6] migration: Sync requested pages after postcopy recovery
+Date: Wed, 21 Oct 2020 17:27:19 -0400
+Message-Id: <20201021212721.440373-5-peterx@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201021212721.440373-1-peterx@redhat.com>
 References: <20201021212721.440373-1-peterx@redhat.com>
@@ -114,67 +111,111 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com,
- Juan Quintela <quintela@redhat.com>
+ Juan Quintela <quintela@redhat.com>, Xiaohui Li <xiaohli@redhat.com>,
+ "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Logically below race could trigger with the old code:
+We synchronize the requested pages right after a postcopy recovery happens.
+This helps to synchronize the prioritized pages on source so that the faulted
+threads can be served faster.
 
-          test program                        migration thread
-          ------------                        ----------------
-       wait_until('postcopy-pause')
-                                          postcopy_pause()
-                                            set_state('postcopy-pause')
-       do_postcopy_recover()
-         arm s->to_dst_file with new fd
-                                            release s->to_dst_file [1]
-
-Here [1] could have released the just-installed recoverying channel.  Then the
-migration could hang without really resuming.
-
-Instead, it should be very safe to release the fd before setting the state into
-'postcopy-pause', because there's no reason for any other thread to touch it
-during 'postcopy-active'.
-
-Dave reported a very rare postcopy recovery hang that the migration-test
-program waited for the migration to complete in migrate_postcopy_complete().
-We do suspect it's the same thing that we're gonna fix here.  Hard to tell.
-However since we've noticed this, fix this irrelevant of the hang report.
-
-Cc: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Cc: Juan Quintela <quintela@redhat.com>
+Reported-by: Xiaohui Li <xiaohli@redhat.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- migration/migration.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ migration/savevm.c     | 57 ++++++++++++++++++++++++++++++++++++++++++
+ migration/trace-events |  1 +
+ 2 files changed, 58 insertions(+)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index e3a958b299..20e04855d9 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -3178,9 +3178,6 @@ static MigThrError postcopy_pause(MigrationState *s)
-     while (true) {
-         QEMUFile *file;
+diff --git a/migration/savevm.c b/migration/savevm.c
+index d2e141f7b1..33acbba1a4 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2011,6 +2011,49 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
+     return LOADVM_QUIT;
+ }
  
--        migrate_set_state(&s->state, s->state,
--                          MIGRATION_STATUS_POSTCOPY_PAUSED);
--
-         /* Current channel is possibly broken. Release it. */
-         assert(s->to_dst_file);
-         qemu_mutex_lock(&s->qemu_file_lock);
-@@ -3191,6 +3188,9 @@ static MigThrError postcopy_pause(MigrationState *s)
-         qemu_file_shutdown(file);
-         qemu_fclose(file);
- 
-+        migrate_set_state(&s->state, s->state,
-+                          MIGRATION_STATUS_POSTCOPY_PAUSED);
++/* We must be with page_request_mutex held */
++static gboolean postcopy_sync_page_req(gpointer key, gpointer value,
++                                       gpointer data)
++{
++    MigrationIncomingState *mis = data;
++    void *host_addr = (void *) key;
++    ram_addr_t rb_offset;
++    RAMBlock *rb;
++    int ret;
 +
-         error_report("Detected IO failure for postcopy. "
-                      "Migration paused.");
++    rb = qemu_ram_block_from_host(host_addr, true, &rb_offset);
++    if (!rb) {
++        /*
++         * This should _never_ happen.  However be nice for a migrating VM to
++         * not crash/assert.  Post an error (note: intended to not use *_once
++         * because we do want to see all the illegal addresses; and this can
++         * never be triggered by the guest so we're safe) and move on next.
++         */
++        error_report("%s: illegal host addr %p", __func__, host_addr);
++        /* Try the next entry */
++        return FALSE;
++    }
++
++    ret = migrate_send_rp_message_req_pages(mis, rb, rb_offset);
++    if (ret) {
++        /* Please refer to above comment. */
++        error_report("%s: send rp message failed for addr %p",
++                     __func__, host_addr);
++        return FALSE;
++    }
++
++    trace_postcopy_page_req_sync(host_addr);
++
++    return FALSE;
++}
++
++static void migrate_send_rp_req_pages_pending(MigrationIncomingState *mis)
++{
++    WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
++        g_tree_foreach(mis->page_requested, postcopy_sync_page_req, mis);
++    }
++}
++
+ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+ {
+     if (mis->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
+@@ -2033,6 +2076,20 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
+     /* Tell source that "we are ready" */
+     migrate_send_rp_resume_ack(mis, MIGRATION_RESUME_ACK_VALUE);
  
++    /*
++     * After a postcopy recovery, the source should have lost the postcopy
++     * queue, or potentially the requested pages could have been lost during
++     * the network down phase.  Let's re-sync with the source VM by re-sending
++     * all the pending pages that we eagerly need, so these threads won't get
++     * blocked too long due to the recovery.
++     *
++     * Without this procedure, the faulted destination VM threads (waiting for
++     * page requests right before the postcopy is interrupted) can keep hanging
++     * until the pages are sent by the source during the background copying of
++     * pages, or another thread faulted on the same address accidentally.
++     */
++    migrate_send_rp_req_pages_pending(mis);
++
+     return 0;
+ }
+ 
+diff --git a/migration/trace-events b/migration/trace-events
+index e4d5eb94ca..0fbfd2da60 100644
+--- a/migration/trace-events
++++ b/migration/trace-events
+@@ -49,6 +49,7 @@ vmstate_save(const char *idstr, const char *vmsd_name) "%s, %s"
+ vmstate_load(const char *idstr, const char *vmsd_name) "%s, %s"
+ postcopy_pause_incoming(void) ""
+ postcopy_pause_incoming_continued(void) ""
++postcopy_page_req_sync(void *host_addr) "sync page req %p"
+ 
+ # vmstate.c
+ vmstate_load_field_error(const char *field, int ret) "field \"%s\" load failed, ret = %d"
 -- 
 2.26.2
 
