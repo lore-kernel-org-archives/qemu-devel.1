@@ -7,104 +7,94 @@ X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2620C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:06:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19834C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:08:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3A6621789
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:06:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 593A5221FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:08:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dMrNw534"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3A6621789
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="pQ7ygtCB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 593A5221FC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVB0e-000836-JC
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:06:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39906)
+	id 1kVB2u-0000qh-E1
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:08:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40656)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVAzW-0007Qk-2j
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:05:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26839)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVAzN-0000sx-L1
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:05:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603274700;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=8hic2/tl8M3Ytk7mMGy3zniuV3dJWkuNf2i35bbxq+A=;
- b=dMrNw534p8eTJzzZnYH/Jt/6aDFQgpe1Uqslo5NF2eXlo/Rwl02vSweH3PWkNPWdDjIUPd
- rLOLzuD3vq0oXifMeRGZP8n6Cj5BGTdYD6JJCaZvpZAxffdj/l8ciJLheCE4oecP43iAV2
- ArRWMPQUIHpO6+Sx3G0NAW0xJVItpfk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-212-c2Bh6sdiPFKGmnYvNXvZWQ-1; Wed, 21 Oct 2020 06:04:58 -0400
-X-MC-Unique: c2Bh6sdiPFKGmnYvNXvZWQ-1
-Received: by mail-wr1-f72.google.com with SMTP id h8so1848561wrt.9
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:04:58 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kVB2H-0000B5-32; Wed, 21 Oct 2020 06:08:01 -0400
+Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:45422)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kVB2E-0001zJ-MN; Wed, 21 Oct 2020 06:08:00 -0400
+Received: by mail-wr1-x443.google.com with SMTP id e17so2285296wru.12;
+ Wed, 21 Oct 2020 03:07:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=hLGyuiHrDp/2Z+PZgBWHYpwiNi7leOuhJtGLXUFdT08=;
+ b=pQ7ygtCBiqNjRhGzroxr+76M45Sij2EhhkLkBvQuIoyAFVrlj+9U+DzbGycHMYmZxq
+ hSVMwyNRq7a5szQ9CnvmaYh/m1KZOl6k6lLG2bZv+ZoTMx0g9afRXdclUQSNFd/nFB+i
+ 9rkTGXxr2FMYTXO8ssdHAHzRDoINimrzfLswOChRD+tpiuMmtbMUglZD6M9rsmkUzjIK
+ uBiZVZJ0kM9GM85k0xvXAgHhrFyf0j6ahLrioUt2Omp1LZFIf53TMcm3GiLTXqIW3KEe
+ ZjLY4mgpIrtnB92AZO+NzotA6hjz/u+wpaSOvTFHKkUcp6xjJLEb/l3KZ9Dnv8JWYf1b
+ DnAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8hic2/tl8M3Ytk7mMGy3zniuV3dJWkuNf2i35bbxq+A=;
- b=M+s0KoNAboTneRwhplkVj4jJkbyMxGCwSLLxpqIVaAD8toqUI7aovWxe1O5tD7ou1G
- hvfWuHBIbaicH0V0UDOi6cTCqpHQpy/oqeWpxeiJtn60VLiqrB86RbcnIY+TWFC4A14u
- QCbyZVZV8IWlIgyAi+1F6M33rOaop4Ub0JGHjnRJ/FW2IVKHk2jezq9bF30qfncmVDez
- P3dZfdWfQHentm/9K5OmxJiyz8Rc9ttnK95FMvj3ucwClzfX1fn+FwxzR0NeOdN4DA2l
- uGbfYXJwLlu5UJxYifsgC99sTZJORGnW8Q1qZKszI7ZndmfoLH7MTvGXJc4tIYFsJfbS
- EMEA==
-X-Gm-Message-State: AOAM531orYZ3eepXBf7ewOyWi/CNNm5mdL3T7kbZENLHm9gMCz68/aJD
- XSxxm07l1b4V/RCDHmbGh4esmo+YW1W/kz0W4heH5q3ixylIU+YZ72UD5LJT3gK0B7mhrGW+Z0q
- cFOI7M9bVwvXEweY=
-X-Received: by 2002:adf:a455:: with SMTP id e21mr4051925wra.158.1603274697312; 
- Wed, 21 Oct 2020 03:04:57 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzXgW5FuTbdSWhdz6jKNlouD/y07vkyOVB2RYaV25zEL5t3JJoBu4i0K5JuO9iOzEYPrjdUDQ==
-X-Received: by 2002:adf:a455:: with SMTP id e21mr4051884wra.158.1603274697015; 
- Wed, 21 Oct 2020 03:04:57 -0700 (PDT)
+ bh=hLGyuiHrDp/2Z+PZgBWHYpwiNi7leOuhJtGLXUFdT08=;
+ b=OCrV6Gi2XRqiduFuMLN/LjHbRG1rxJVaQSxvEukJgpddCVR4MDarNDQEymKi091ixG
+ OSleBhou9XhnqZD3i6AJ+TOyDNaCrSgAQL9dfgOgLXFnomdWX2jXTTlzp6CnUS2o/vbU
+ UC+aTxva7B3JZQEgdMmdNPnoAxAeUvi4co235zR/MBYz81RPPRGSHnxWVxRrI/uBBNGs
+ XiF6kZ7ABsnjDYRccEGVP0YDu7nmI1tSFe/fST6P1PAhVxYN0yIRcE38e4bqv5JcaBom
+ vExWpNIfC3mzRaoOL05puwsbOvn+C8vlNo+RQYvQjS0cxEODnulNiHTqNgE+Ms7UJyqr
+ ypvQ==
+X-Gm-Message-State: AOAM531I2s3en8si0yYCYJNE5VEITLI04GO4ece/gOPbEISi1RxoArvG
+ Zun+e9vV2fnVKgr3mR7hXFY=
+X-Google-Smtp-Source: ABdhPJzl3F3WUdHiuddTWzE2ycw0wzYZUsdmnV9DSj8qhndRUNBQQ36OE3NWeBpkKe5jkQ61Qm0stw==
+X-Received: by 2002:adf:e94b:: with SMTP id m11mr3722553wrn.35.1603274876391; 
+ Wed, 21 Oct 2020 03:07:56 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id z11sm2821369wrh.70.2020.10.21.03.04.55
+ by smtp.gmail.com with ESMTPSA id 10sm2635331wmn.9.2020.10.21.03.07.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Oct 2020 03:04:56 -0700 (PDT)
-Subject: Re: [PATCH v2 2/3] migration: Make save_snapshot() return bool, not
- 0/-1
-To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
-References: <20201012122743.3390867-1-philmd@redhat.com>
- <20201012122743.3390867-3-philmd@redhat.com>
- <20201021095630.GG412988@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <a9def59c-4d74-4488-8115-61d2f9ee4f94@redhat.com>
-Date: Wed, 21 Oct 2020 12:04:55 +0200
+ Wed, 21 Oct 2020 03:07:55 -0700 (PDT)
+Subject: Re: [PULL 22/23] hw/sd: Fix incorrect populated function switch
+ status data structure
+To: Bin Meng <bmeng.cn@gmail.com>
+References: <20200821172916.1260954-1-f4bug@amsat.org>
+ <20200821172916.1260954-23-f4bug@amsat.org>
+ <e378932a-1de3-83c1-834f-ae6526604cb7@amsat.org>
+ <CAEUhbmVFZ8aWdv48D8acdfFRp6WMYL6n=ENeo4hBZfmqE9TrDA@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <a0ac3805-ec48-2a0e-6511-b142bfc6f214@amsat.org>
+Date: Wed, 21 Oct 2020 12:07:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201021095630.GG412988@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <CAEUhbmVFZ8aWdv48D8acdfFRp6WMYL6n=ENeo4hBZfmqE9TrDA@mail.gmail.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::443;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,53 +107,82 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>,
- qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
- qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ Bin Meng <bin.meng@windriver.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Beniamino Galvani <b.galvani@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Michael Walle <michael@walle.cc>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/21/20 11:56 AM, Daniel P. Berrangé wrote:
-> On Mon, Oct 12, 2020 at 02:27:42PM +0200, Philippe Mathieu-Daudé wrote:
->> Just for consistency, following the example documented since
->> commit e3fe3988d7 ("error: Document Error API usage rules"),
->> return a boolean value indicating an error is set or not.
+On 10/21/20 11:57 AM, Bin Meng wrote:
+> Hi Philippe,
+> 
+> On Tue, Oct 20, 2020 at 11:18 PM Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
 >>
->> Acked-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
->> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
->> ---
->>   include/migration/snapshot.h |  9 ++++++++-
->>   migration/savevm.c           | 16 ++++++++--------
->>   replay/replay-debugging.c    |  2 +-
->>   replay/replay-snapshot.c     |  2 +-
->>   4 files changed, 18 insertions(+), 11 deletions(-)
+>> Hi Bin,
 >>
->> diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
->> index c85b6ec75b7..a40c34307b5 100644
->> --- a/include/migration/snapshot.h
->> +++ b/include/migration/snapshot.h
->> @@ -15,7 +15,14 @@
->>   #ifndef QEMU_MIGRATION_SNAPSHOT_H
->>   #define QEMU_MIGRATION_SNAPSHOT_H
->>   
->> -int save_snapshot(const char *name, Error **errp);
->> +/**
->> + * save_snapshot: Save a snapshot.
->> + * @name: path to snapshot
+>> On 8/21/20 7:29 PM, Philippe Mathieu-Daudé wrote:
+>>> From: Bin Meng <bin.meng@windriver.com>
+>>>
+>>> At present the function switch status data structure bit [399:376]
+>>> are wrongly pupulated. These 3 bytes encode function switch status
+>>> for the 6 function groups, with 4 bits per group, starting from
+>>> function group 6 at bit 399, then followed by function group 5 at
+>>> bit 395, and so on.
+>>>
+>>> However the codes mistakenly fills in the function group 1 status
+>>> at bit 399. This fixes the code logic.
+>>>
+>>> Fixes: a1bb27b1e9 ("SD card emulation (initial implementation)")
+>>> Signed-off-by: Bin Meng <bin.meng@windriver.com>
+>>> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> Tested-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+>>> Message-Id: <1598021136-49525-1-git-send-email-bmeng.cn@gmail.com>
+>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>> ---
+>>>    hw/sd/sd.c | 3 ++-
+>>>    1 file changed, 2 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+>>> index 7c9d956f113..805e21fc883 100644
+>>> --- a/hw/sd/sd.c
+>>> +++ b/hw/sd/sd.c
+>>> @@ -807,11 +807,12 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+>>>        sd->data[11] = 0x43;
+>>>        sd->data[12] = 0x80;    /* Supported group 1 functions */
+>>>        sd->data[13] = 0x03;
+>>> +
+>>>        for (i = 0; i < 6; i ++) {
+>>>            new_func = (arg >> (i * 4)) & 0x0f;
+>>>            if (mode && new_func != 0x0f)
+>>>                sd->function_group[i] = new_func;
+>>> -        sd->data[14 + (i >> 1)] = new_func << ((i * 4) & 4);
+>>> +        sd->data[16 - (i >> 1)] |= new_func << ((i % 2) * 4);
+>>
+>> This patch broke the orangepi machine, reproducible running
+>> test_arm_orangepi_bionic:
+>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg739449.html
+>>
+>> Can you have a look?
 > 
-> This isn't a path, it is a name.
-> 
-> I'll apply this change:
-> 
->    - * save_snapshot: Save a snapshot.
->    - * @name: path to snapshot
->    + * save_snapshot: Save an internal snapshot.
->    + * @name: name of internal snapshot
+> Yes, I can take a look. Could you please send more details on how to
+> run "test_arm_orangepi_bionic"?
 
-Thanks!
+Looking at the previous link, I think this should work:
 
+$ make check-venv qemu-system-arm
+$ AVOCADO_ALLOW_LARGE_STORAGE=1 \
+   tests/venv/bin/python -m \
+     avocado --show=app,console run \
+       run -t machine:orangepi-pc tests/acceptance
+
+> 
+> Regards,
+> Bin
+> 
 
