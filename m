@@ -7,62 +7,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1A99C56201
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:09:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35131C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:12:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD96821481
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:09:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 840C024197
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:12:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNDzNwor"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD96821481
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bsRqYHsu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 840C024197
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34522 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVLLy-0001gC-Mn
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:09:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40514)
+	id 1kVLP4-000504-Ev
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:12:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVLB2-0005jA-Oh
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52788)
+ id 1kVLB1-0005g2-F1
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:43 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21085)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVLAx-0006ip-BN
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:44 -0400
+ id 1kVLAx-0006iI-AZ
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603313858;
+ s=mimecast20190719; t=1603313855;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=1b85d42vwX8iTxar+RM0i1tY3ljNgs7N/FTdg/zYyto=;
- b=UNDzNwor6BTti/GPPvOkyZTfz9i79i7zuMbTiWlhfKIJ+T/Sets+GVM/ehXVsDArkdsOz2
- OCisZ69cgG42xgj1gX01jYqO7L7FhbJqUF1vuOOwuM3vPi2AVeIysTZK7v719scPCgHr0V
- 90+QldT7q5BCcyQV/hu+ZvEgTrGunh0=
+ bh=yUI3M4ipd89OmxngsbbB8zIQpi1LjWQ0a+wUYL8SpBM=;
+ b=bsRqYHsuuyYsxeIkKrKdJhUDmEpi7kcYcgXsTCfiVxycYkuAxup9UzTdeqaMO8IeK6X/ow
+ eUScOOIwy9xBJJ0H7UsWLur3Gh2sKK/Sn2HaSTTkFVn2Bu0OtGfBdsTJjcBQyN9JkzdX3y
+ qhiEH1+nkiZb99Qdf5jIeiP0H4ydBLA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-383-1GrUYk1AP7CT7-rmh-36ww-1; Wed, 21 Oct 2020 16:57:36 -0400
-X-MC-Unique: 1GrUYk1AP7CT7-rmh-36ww-1
+ us-mta-261-8AQQP2oIMbCIkaCTFAHxrQ-1; Wed, 21 Oct 2020 16:57:33 -0400
+X-MC-Unique: 8AQQP2oIMbCIkaCTFAHxrQ-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6657C1006718
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 20:57:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AC8A6186DD23
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 20:57:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E98D96EF62;
- Wed, 21 Oct 2020 20:57:34 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2996F6EF62;
+ Wed, 21 Oct 2020 20:57:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 22/22] vl: separate qemu_create_late_backends
-Date: Wed, 21 Oct 2020 16:57:16 -0400
-Message-Id: <20201021205716.2359430-23-pbonzini@redhat.com>
+Subject: [PATCH 18/22] vl: move semihosting command line fallback to
+ qemu_finish_machine_init
+Date: Wed, 21 Oct 2020 16:57:12 -0400
+Message-Id: <20201021205716.2359430-19-pbonzini@redhat.com>
 In-Reply-To: <20201021205716.2359430-1-pbonzini@redhat.com>
 References: <20201021205716.2359430-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -102,114 +103,45 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-"Late" backends are created after the machine.
+Move more sane parts of the huge qemu_init function out of it.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 64 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 32 insertions(+), 32 deletions(-)
+ softmmu/vl.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 866df5bb7c..f36ec16cad 100644
+index 75e57133ad..e58572dbd8 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -2751,11 +2751,41 @@ static void qemu_create_early_backends(void)
-  * The remainder of object creation happens after the
-  * creation of chardev, fsdev, net clients and device data types.
-  */
--static bool object_create_delayed(const char *type, QemuOpts *opts)
-+static bool object_create_late(const char *type, QemuOpts *opts)
- {
-     return !object_create_early(type, opts);
- }
+@@ -3067,6 +3067,11 @@ void qemu_finish_machine_init(void)
  
-+static void qemu_create_late_backends(void)
-+{
-+    if (qtest_chrdev) {
-+        qtest_server_init(qtest_chrdev, qtest_log, &error_fatal);
+     /* from here on runstate is RUN_STATE_PRELAUNCH */
+ 
++    if (semihosting_enabled() && !semihosting_get_argc() && current_machine->kernel_filename) {
++        /* fall back to the -kernel/-append */
++        semihosting_arg_fallback(current_machine->kernel_filename, current_machine->kernel_cmdline);
 +    }
 +
-+    net_init_clients(&error_fatal);
-+
-+    qemu_opts_foreach(qemu_find_opts("object"),
-+                      user_creatable_add_opts_foreach,
-+                      object_create_late, &error_fatal);
-+
-+    if (tpm_init() < 0) {
-+        exit(1);
-+    }
-+
-+    qemu_opts_foreach(qemu_find_opts("mon"),
-+                      mon_init_func, NULL, &error_fatal);
-+
-+    /* now chardevs have been created we may have semihosting to connect */
-+    qemu_semihosting_connect_chardevs();
-+    qemu_semihosting_console_init();
-+
-+    if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
-+        exit(1);
-+    if (foreach_device_config(DEV_PARALLEL, parallel_parse) < 0)
-+        exit(1);
-+    if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
-+        exit(1);
-+}
- 
- static bool set_memory_options(uint64_t *ram_slots, ram_addr_t *maxram_size,
-                                MachineClass *mc)
-@@ -3372,7 +3402,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     ram_addr_t maxram_size;
-     uint64_t ram_slots = 0;
-     FILE *vmstate_dump_file = NULL;
--    Error *err = NULL;
-     bool have_custom_ram_size;
- 
-     qemu_add_opts(&qemu_drive_opts);
-@@ -4385,10 +4414,6 @@ void qemu_init(int argc, char **argv, char **envp)
-      */
-     migration_object_init();
- 
--    if (qtest_chrdev) {
--        qtest_server_init(qtest_chrdev, qtest_log, &error_fatal);
--    }
--
-     opts = qemu_opts_find(qemu_find_opts("boot-opts"), NULL);
-     if (opts) {
-         boot_order = qemu_opt_get(opts, "order");
-@@ -4409,32 +4434,7 @@ void qemu_init(int argc, char **argv, char **envp)
+     if (machine_class->default_ram_id && current_machine->ram_size &&
+         numa_uses_legacy_mem() && !current_machine->ram_memdev_id) {
+         create_default_memdev(current_machine, mem_path);
+@@ -4372,13 +4377,6 @@ void qemu_init(int argc, char **argv, char **envp)
          boot_order = machine_class->default_boot_order;
      }
  
--    if (net_init_clients(&err) < 0) {
--        error_report_err(err);
--        exit(1);
+-    if (semihosting_enabled() && !semihosting_get_argc()) {
+-        const char *kernel_filename = qemu_opt_get(machine_opts, "kernel");
+-        const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
+-        /* fall back to the -kernel/-append */
+-        semihosting_arg_fallback(kernel_filename, kernel_cmdline);
 -    }
 -
--    qemu_opts_foreach(qemu_find_opts("object"),
--                      user_creatable_add_opts_foreach,
--                      object_create_delayed, &error_fatal);
--
--    if (tpm_init() < 0) {
--        exit(1);
--    }
--
--    qemu_opts_foreach(qemu_find_opts("mon"),
--                      mon_init_func, NULL, &error_fatal);
--
--    /* now chardevs have been created we may have semihosting to connect */
--    qemu_semihosting_connect_chardevs();
--    qemu_semihosting_console_init();
--
--    if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
--        exit(1);
--    if (foreach_device_config(DEV_PARALLEL, parallel_parse) < 0)
--        exit(1);
--    if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
--        exit(1);
-+    qemu_create_late_backends();
- 
-     current_machine->boot_order = boot_order;
- 
+     if (net_init_clients(&err) < 0) {
+         error_report_err(err);
+         exit(1);
 -- 
 2.26.2
+
 
 
