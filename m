@@ -7,55 +7,55 @@ X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C21E5C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:01:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A5BAC00A89
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:01:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1EFC5223AB
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:01:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 068C42231B
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:01:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="RFEONZRV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EFC5223AB
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="IP6vN6kp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068C42231B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWeF-00085e-1Y
+	id 1kZWeF-00085X-1R
 	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:01:11 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49438)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <1d98613d7cd488528bc08260185c03ee078c1347@lizzy.crudebyte.com>)
- id 1kZWUB-0002T7-AE
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:50:52 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:47435)
+ (envelope-from <b37d62d6de08bea1f57e51a4b99938f7994a84d6@lizzy.crudebyte.com>)
+ id 1kZWUW-0002xX-UL
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:08 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:36813)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <1d98613d7cd488528bc08260185c03ee078c1347@lizzy.crudebyte.com>)
- id 1kZWU7-0006vY-TK
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:50:46 -0500
+ (envelope-from <b37d62d6de08bea1f57e51a4b99938f7994a84d6@lizzy.crudebyte.com>)
+ id 1kZWUV-00074b-C7
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:08 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=65TkmXkZ0RhsQI38MI0QUdjZ3VQJ9H7GcpKnYh/cT1Q=; b=RFEON
- ZRVtMMPiigRsuW1OBIA8rHLRjuZsuqmI0neusojE7effhLmk43zs8azjrxdEOK/j1xC+FKCKVAt6u
- AtHfrDiTxEep41WpcIWr3aRg1mitkLHvO1iPoH3VpW+sk1Q7tOFGncd+IxHl9K3slpqxkVLZ/AhKI
- qMJ7/mQL5/AzEzPOKXRenjCyx6JQX5zBrHaJJmRlNG20CpVOoDLql8oCrb2UCSzMh4vklzZ8SMwwD
- RpsGO9qly+V1PUhg5rZCtfIKsatGYN2LOkR9v/CutnJcX2pB1RPZk1KnoGXntjbttFmIOwBEcw0sD
- XaicHYyweI+Kv1yBobpC47MX6/RsA==;
-Message-Id: <1d98613d7cd488528bc08260185c03ee078c1347.1604309512.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=Bc3/R2yv/N+NzR29DMwVvKgof09nkVZ73zOW1DTxNxg=; b=IP6vN
+ 6kpIqZteuxjps65wtcGCCEo1WLP8TLmbxdFA8Yyym93PkAy4yStha56D8C2g0Opo6nC7ZwQ5dfZOc
+ bo9EFyiv+VcH7zjZXXgrMIm5PWaktSwq+GGxI8aK6rwUbfQJCEaokYesQJqiBioMRZAixqi56BvXM
+ R2bnXSZCKK1UPpHt4hj3NKQpd/LDX0DrVBuMDLJlWBl6RmP3z7TZrESpNU2gQrNjHtvx41YdXESm+
+ 0leTw2mpofCEOPcAM7B6Cl2hlnrUQ4y0zJ8QY6I5v7cK9SeIsdujbS2ltFDCxJcN3dM0dAvrWoakg
+ hlzxolxxtqvH6dqBuT+syOi9ymYVw==;
+Message-Id: <b37d62d6de08bea1f57e51a4b99938f7994a84d6.1604309512.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1604309512.git.qemu_oss@crudebyte.com>
 References: <cover.1604309512.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Tue, 20 Oct 2020 18:09:20 +0200
-Subject: [PULL v3 08/17] tests/9pfs: Turn fs_readdir_split() into a helper
+Date: Wed, 21 Oct 2020 14:17:01 +0200
+Subject: [PULL v3 11/17] tests/9pfs: add local Tunlinkat directory test
 To: qemu-devel@nongnu.org,
     Peter Maydell <peter.maydell@linaro.org>
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=1d98613d7cd488528bc08260185c03ee078c1347@lizzy.crudebyte.com;
+ envelope-from=b37d62d6de08bea1f57e51a4b99938f7994a84d6@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:48:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,62 +81,127 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+This test case uses a Tunlinkat 9p request with flag AT_REMOVEDIR
+(see 'man 2 unlink') to remove a directory from host's test directory.
 
-fs_readdir_split() isn't a top level test function and thus shouldn't
-take the "void *obj, void *data, QGuestAllocator *t_alloc" arguments.
-Turn it into a helper to be used by test functions.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <160321016084.266767.9501523425012383531.stgit@bahia.lan>
+Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Reviewed-by: Greg Kurz <groug@kaod.org>
+Message-Id: <3c7c65b476ba44bea6afd0b378b5287e1c671a32.1603285620.git.qemu_oss@crudebyte.com>
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/virtio-9p-test.c | 14 +++++++-------
- 1 file changed, 7 insertions(+), 7 deletions(-)
+ tests/qtest/virtio-9p-test.c | 71 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 9c2738885e..734b4bcb7a 100644
+index db37e31b32..6c8842351f 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -731,11 +731,8 @@ static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
+@@ -258,6 +258,7 @@ static const char *rmessage_name(uint8_t id)
+         id == P9_RLOPEN ? "RLOPEN" :
+         id == P9_RWRITE ? "RWRITE" :
+         id == P9_RMKDIR ? "RMKDIR" :
++        id == P9_RUNLINKAT ? "RUNLINKAT" :
+         id == P9_RFLUSH ? "RFLUSH" :
+         id == P9_RREADDIR ? "READDIR" :
+         "<unknown>";
+@@ -693,6 +694,33 @@ static void v9fs_rmkdir(P9Req *req, v9fs_qid *qid)
+     v9fs_req_free(req);
  }
  
- /* readdir test where overall request is split over several messages */
--static void fs_readdir_split(void *obj, void *data, QGuestAllocator *t_alloc,
--                             uint32_t count)
-+static void do_readdir_split(QVirtio9P *v9p, uint32_t count)
++/* size[4] Tunlinkat tag[2] dirfd[4] name[s] flags[4] */
++static P9Req *v9fs_tunlinkat(QVirtio9P *v9p, uint32_t dirfd, const char *name,
++                             uint32_t flags, uint16_t tag)
++{
++    P9Req *req;
++
++    uint32_t body_size = 4 + 4;
++    uint16_t string_size = v9fs_string_size(name);
++
++    g_assert_cmpint(body_size, <=, UINT32_MAX - string_size);
++    body_size += string_size;
++
++    req = v9fs_req_init(v9p, body_size, P9_TUNLINKAT, tag);
++    v9fs_uint32_write(req, dirfd);
++    v9fs_string_write(req, name);
++    v9fs_uint32_write(req, flags);
++    v9fs_req_send(req);
++    return req;
++}
++
++/* size[4] Runlinkat tag[2] */
++static void v9fs_runlinkat(P9Req *req)
++{
++    v9fs_req_recv(req, P9_RUNLINKAT);
++    v9fs_req_free(req);
++}
++
+ /* basic readdir test where reply fits into a single response message */
+ static void fs_readdir(void *obj, void *data, QGuestAllocator *t_alloc)
  {
--    QVirtio9P *v9p = obj;
--    alloc = t_alloc;
-     char *const wnames[] = { g_strdup(QTEST_V9FS_SYNTH_READDIR_DIR) };
-     uint16_t nqid;
-     v9fs_qid qid;
-@@ -1002,19 +999,22 @@ static void fs_mkdir(void *obj, void *data, QGuestAllocator *t_alloc,
+@@ -1004,6 +1032,22 @@ static void do_mkdir(QVirtio9P *v9p, const char *path, const char *cname)
+     g_free(name);
+ }
+ 
++static void do_unlinkat(QVirtio9P *v9p, const char *atpath, const char *rpath,
++                        uint32_t flags)
++{
++    char *const name = g_strdup(rpath);
++    uint32_t fid;
++    P9Req *req;
++
++    fid = do_walk(v9p, atpath);
++
++    req = v9fs_tunlinkat(v9p, fid, name, flags, 0);
++    v9fs_req_wait_for_reply(req, NULL);
++    v9fs_runlinkat(req);
++
++    g_free(name);
++}
++
  static void fs_readdir_split_128(void *obj, void *data,
                                   QGuestAllocator *t_alloc)
  {
--    fs_readdir_split(obj, data, t_alloc, 128);
-+    alloc = t_alloc;
-+    do_readdir_split(obj, 128);
+@@ -1050,6 +1094,32 @@ static void fs_create_dir(void *obj, void *data, QGuestAllocator *t_alloc)
+     g_free(root_path);
  }
  
- static void fs_readdir_split_256(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
++static void fs_unlinkat_dir(void *obj, void *data, QGuestAllocator *t_alloc)
++{
++    QVirtio9P *v9p = obj;
++    alloc = t_alloc;
++    struct stat st;
++    char *root_path = virtio_9p_test_path("");
++    char *new_dir = virtio_9p_test_path("02");
++
++    g_assert(root_path != NULL);
++
++    do_attach(v9p);
++    do_mkdir(v9p, "/", "02");
++
++    /* check if created directory really exists now ... */
++    g_assert(stat(new_dir, &st) == 0);
++    /* ... and is actually a directory */
++    g_assert((st.st_mode & S_IFMT) == S_IFDIR);
++
++    do_unlinkat(v9p, "/", "02", AT_REMOVEDIR);
++    /* directory should be gone now */
++    g_assert(stat(new_dir, &st) != 0);
++
++    g_free(new_dir);
++    g_free(root_path);
++}
++
+ static void *assign_9p_local_driver(GString *cmd_line, void *arg)
  {
--    fs_readdir_split(obj, data, t_alloc, 256);
-+    alloc = t_alloc;
-+    do_readdir_split(obj, 256);
+     virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
+@@ -1090,6 +1160,7 @@ static void register_virtio_9p_test(void)
+     opts.before = assign_9p_local_driver;
+     qos_add_test("local/config", "virtio-9p", pci_config,  &opts);
+     qos_add_test("local/create_dir", "virtio-9p", fs_create_dir, &opts);
++    qos_add_test("local/unlinkat_dir", "virtio-9p", fs_unlinkat_dir, &opts);
  }
  
- static void fs_readdir_split_512(void *obj, void *data,
-                                  QGuestAllocator *t_alloc)
- {
--    fs_readdir_split(obj, data, t_alloc, 512);
-+    alloc = t_alloc;
-+    do_readdir_split(obj, 512);
- }
- 
- 
+ libqos_init(register_virtio_9p_test);
 -- 
 2.20.1
 
