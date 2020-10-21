@@ -2,102 +2,118 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,HK_RANDOM_FROM,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F117C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6281C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBD7A2173E
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D8DAE223C7
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:37:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S2xKyXnL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBD7A2173E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="wgzKkVnm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8DAE223C7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42454 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43140 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVLnW-0004gT-PO
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:37:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46836)
+	id 1kVLnu-0004xg-Ry
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:37:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43050)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLe5-0003HX-7N
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:27:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39154)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kVLdz-00025l-7x
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:27:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603315652;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=UNPjhXFw69k7I1uaRrlnu2Tl3UZw4+OZaB4P9a4opmU=;
- b=S2xKyXnLYn9sr8eyHN8yVDoBZaNYKYOU+UnUWvLzwLEv5NfUAmO0P0Hzv8j1fWG0daEuuD
- x5wAVCf/SwYlnyiYklgb+w3vHzpAN/7wYJVMRZ5MjyqXEyAp3zMvlT4hjznvYzPPtpwFw1
- ibtI+LT/Tf2NXHUgRTi93DqVDiv9Lcw=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-330-TmWsOkTOMPamkTnLXQRIag-1; Wed, 21 Oct 2020 17:27:31 -0400
-X-MC-Unique: TmWsOkTOMPamkTnLXQRIag-1
-Received: by mail-qk1-f197.google.com with SMTP id g184so2628738qke.3
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 14:27:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=UNPjhXFw69k7I1uaRrlnu2Tl3UZw4+OZaB4P9a4opmU=;
- b=rru+ycA7zRfZzgVNT62DQZzJiUrG9e49FaxR/KQYpVgtHgHfUlpGUloZzSWJefdYkt
- vjpTt4eTXfQc1B57Wo7YnPjuLrCe5Z8RbZhXUspb1B7fwKLmmG/u1TovRhceDlGL12zk
- lCOVJakLA6pbcr1vLgUgt6PNdHxxEJvZqe5Iv2Yj+eZ5QIf4KBtcSgBTuXlpJdFAlw/6
- Rep2H2dtYpAtRhpSuIZXE+TAjRGjD1S4eCZCkwLHtUwA5PkysukhiTwu468wJs/QCjvQ
- 4W8/54AYX6/a+6hZy40pBVoDFY7gc8sFutOak4g9d4Bl7RvuS6KJWSm54QVmvgT7NTG0
- ePfg==
-X-Gm-Message-State: AOAM531KcuLo6SZarbv7DKiroY1Z91B+Z1r2iALpEwcAbaLCVa4hePvD
- YEyM0tUPdpQOnv45n4JttDdfHwYlXqpZVM8JKhzJq1VWHMGvMvm4Jogu94Ln5AI1ReSeRWYZyUa
- pD0ry18D8z5VhROs=
-X-Received: by 2002:a37:ad1a:: with SMTP id f26mr4978543qkm.1.1603315650500;
- Wed, 21 Oct 2020 14:27:30 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzFpK/QNHMvS2X+Ioo61Sim5J5yjJ0yRZn6wyzj50T4fJzS6/ZYdI3GHNkyHkhD4VxM2xP6xA==
-X-Received: by 2002:a37:ad1a:: with SMTP id f26mr4978529qkm.1.1603315650243;
- Wed, 21 Oct 2020 14:27:30 -0700 (PDT)
-Received: from xz-x1.redhat.com
- (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca. [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id p187sm2089145qkf.70.2020.10.21.14.27.28
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 14:27:29 -0700 (PDT)
-From: Peter Xu <peterx@redhat.com>
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVLN3-0003uO-1t
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:10:09 -0400
+Received: from mail-eopbgr690098.outbound.protection.outlook.com
+ ([40.107.69.98]:60229 helo=NAM04-CO1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVLN0-00087u-OZ
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 17:10:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Cmk79XyK9at51ZYYrP9J3D6sBWQAC2dS7hV2YB817vQjj64ncd6YkGVdICM+BonCcPoTGEp3k34whAYdeqjeljKUw1ctNDwfKpfx+EoJQ5x5dlxBlcm75LvB6YwXi7KBccZCRLc750VS2mUMcJAp5qPERhl65sYSorLMvp8lF/FzEW42KUlG4siGZaS59E18LsjGdj0zqpOmEHjv1QZllG7dg5MBgiT2hVSNiERfgcfR56grZgpiLDvKCBcAa8d+NlUiegJU7b8F6hWhub5CFhKFpd3Y8QkwdpScTOrzJ4UJn0qUh1jhKIJLAzvifa/RclMQzI+fAZ8Ky7SCrNm8gw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hrRR7nYIMtECdJdBZYUDCaRERiVxsTzNuITF8efYZ9Q=;
+ b=jtzeqaqlADKFVGEU6BD9iqX6b1dRFSmOFbE1Z4kUXnrg3qSPaLpuf85PgueUkXaPVp6HMKfhbhHhB7XloP+6A6K4J6f9nc5HWOcpC5RrtZs+Bc4059Drdehy6LN+2S9Rx5+yTItXw652RRLhGogDS0cf06O3erHgfNpmZU72YfkdYKTVRY8MQ91QOirKk8pZPY7F3S9u6zpDjMh63Gtl8Z8iN0DdoMuyjf40UPPx2Px2YoCNSdvPviSI696IzE9S1ukTO3lIy5XV9sB/p1NMKHzsErjM3FXDV9lmOOToH4bFjCqswBDMmP+tvOHiLavrCt5jAr6LYE3QeOCfC069sg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
+ header.d=bu.edu; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hrRR7nYIMtECdJdBZYUDCaRERiVxsTzNuITF8efYZ9Q=;
+ b=wgzKkVnmiXt9yAyACiTLPvDHhkEYXsK6hWrgleVY3phOI651vm1kqiQdHNqjGw4PFhjx2m4yXyTcpKX4JPn8nQpJO84reWijP3Bbbl7mb+kZ+2ON84x/pF3SBmv0EbhxAWqnhm+zceqDKcKuL8vJ7FW/vM2XIn3vmS0/fHvY/Xc=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
+ by SN6PR03MB4045.namprd03.prod.outlook.com (2603:10b6:805:b8::30)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21; Wed, 21 Oct
+ 2020 21:09:53 +0000
+Received: from SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::d520:4c19:8ce6:7db2]) by SN6PR03MB3871.namprd03.prod.outlook.com
+ ([fe80::d520:4c19:8ce6:7db2%2]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
+ 21:09:53 +0000
+From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v6 4/6] migration: Sync requested pages after postcopy recovery
-Date: Wed, 21 Oct 2020 17:27:19 -0400
-Message-Id: <20201021212721.440373-5-peterx@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201021212721.440373-1-peterx@redhat.com>
-References: <20201021212721.440373-1-peterx@redhat.com>
-MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+Subject: [PATCH v6 12/16] fuzz: Add instructions for using generic-fuzz
+Date: Wed, 21 Oct 2020 17:09:18 -0400
+Message-Id: <20201021210922.572955-13-alxndr@bu.edu>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201021210922.572955-1-alxndr@bu.edu>
+References: <20201021210922.572955-1-alxndr@bu.edu>
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=peterx@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain
+X-Originating-IP: [72.93.72.163]
+X-ClientProxiedBy: BL0PR0102CA0064.prod.exchangelabs.com
+ (2603:10b6:208:25::41) To SN6PR03MB3871.namprd03.prod.outlook.com
+ (2603:10b6:805:6d::32)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from stormtrooper.vrmnet (72.93.72.163) by
+ BL0PR0102CA0064.prod.exchangelabs.com (2603:10b6:208:25::41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 21:09:52 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 03f08d27-8152-41f1-cb66-08d87605a76a
+X-MS-TrafficTypeDiagnostic: SN6PR03MB4045:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <SN6PR03MB4045517A25A03119232371B7BA1C0@SN6PR03MB4045.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YG21RJVF8KyS7Am8rM3dbjQvdL3BpwdYY/rM0CKrH4U2HZ5jmToMm2m3tWbRNYtP4nw2MI/F6e6oVfhL4iV/UYKgkE9xq8bMoMW0A24KhqM8D3vi38McRe+bOEmGOqwyP7uAhNi+K5D00bs4v0+Odq9BbLNR6oBplxMvm0w0YiHbviqLv5zUeEKCt5Ux8eIMMa9xSdoePdPigizSsD/L1Ag4VnkaLRz0u8TGE3YSXIzjBF0jDwSdTlWlPRnR73/ZMsbFV/xl1VdtIXvdMKxdWUZQKwVOLJTxRIQ13N6lPRynqXdwTeyiIDdvvQbCFwnXbKqq9T1Ht+wV4wsw1mjuCrOm6e1LnGrbWB//TppupUqxkbDONfCAr7U6hgJZzI1r
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(396003)(136003)(366004)(376002)(346002)(39860400002)(83380400001)(86362001)(6506007)(956004)(6666004)(2616005)(52116002)(5660300002)(316002)(75432002)(54906003)(786003)(8936002)(6916009)(6512007)(16526019)(36756003)(26005)(186003)(478600001)(66946007)(6486002)(2906002)(4326008)(66476007)(1076003)(8676002)(66556008)(41533002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: Chd9jt0Tu1obzZvWuWpGA//pqPJGP5sPjH90YCtf296D0vPDiJUw98N0krcf5IsGmZcWz3qOamBlKoENiRF/J0wsdtK64e+s3lcl2gNKe2y3iponrPvvhR1IPqrSpScYW11fY2EzcL27O0VTlPp0piD+KiJKuwkur6wDI92Je94UmEKVCeSGjXUYZOzgyw3NwhmjDQgu05ppoR6/KWA0ZB7/93Z1HCZHmDe+KJpn9I1mmJYqNv4l19HXqjj3eG/q1iogucxF++RgGPKEVWVba1m1yOcqsUwNOWghGBff4EZUyi5Lv2TXO+CRnT+5nsJeYtcfrhkSgxwyLrOXIWSgngxRZo5XA3D9nnUFGib7kETC4YSB8EJm/AMsWhugFxfNvndIlPSxZWPDxPQ6a3U+IK6tk5n+R0o9k0LVyhxG/BVHaR/C3DzOh1EpEox7Q8Tmjcvcg+zEkZDmA+OdEIZgUJ4X5dZ31Quk6bnQW1lfcmXoIQfAGjyglWhsuETff2JMhtAzNrilJJN5NXWjN87UfWPOU6gbrp+lzUbu59tT0Zbo/89sXTHxI1nhO40za++JkuI3bfzlTwXj4q7/48D5rwVMX11w8izaviGM6MIirrBePDZDJ2CdvEXB2WY+UnjJ2YBg1ERv3LsqzkCSlsm1Mg==
+X-OriginatorOrg: bu.edu
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03f08d27-8152-41f1-cb66-08d87605a76a
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 21:09:53.0232 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MzLaZj3W6mVvTndlMfFKSrDENCwaszXCQk9Qdg4sl+lTJPT6bTIhQmTUStNINCSg
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN6PR03MB4045
+Received-SPF: pass client-ip=40.107.69.98; envelope-from=alxndr@bu.edu;
+ helo=NAM04-CO1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 17:10:05
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, HK_RANDOM_ENVFROM=0.001, HK_RANDOM_FROM=0.454,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,113 +126,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Juan Quintela <quintela@redhat.com>, Xiaohui Li <xiaohli@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>, peterx@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We synchronize the requested pages right after a postcopy recovery happens.
-This helps to synchronize the prioritized pages on source so that the faulted
-threads can be served faster.
-
-Reported-by: Xiaohui Li <xiaohli@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 ---
- migration/savevm.c     | 57 ++++++++++++++++++++++++++++++++++++++++++
- migration/trace-events |  1 +
- 2 files changed, 58 insertions(+)
+ docs/devel/fuzzing.txt | 39 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 39 insertions(+)
 
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d2e141f7b1..33acbba1a4 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -2011,6 +2011,49 @@ static int loadvm_postcopy_handle_run(MigrationIncomingState *mis)
-     return LOADVM_QUIT;
- }
+diff --git a/docs/devel/fuzzing.txt b/docs/devel/fuzzing.txt
+index 96d71c94d7..03585c1a9b 100644
+--- a/docs/devel/fuzzing.txt
++++ b/docs/devel/fuzzing.txt
+@@ -125,6 +125,45 @@ provided by libfuzzer. Libfuzzer passes a byte array and length. Commonly the
+ fuzzer loops over the byte-array interpreting it as a list of qtest commands,
+ addresses, or values.
  
-+/* We must be with page_request_mutex held */
-+static gboolean postcopy_sync_page_req(gpointer key, gpointer value,
-+                                       gpointer data)
-+{
-+    MigrationIncomingState *mis = data;
-+    void *host_addr = (void *) key;
-+    ram_addr_t rb_offset;
-+    RAMBlock *rb;
-+    int ret;
++== The Generic Fuzzer ==
++Writing a fuzz target can be a lot of effort (especially if a device driver has
++not be built-out within libqos). Many devices can be fuzzed to some degree,
++without any device-specific code, using the generic-fuzz target.
 +
-+    rb = qemu_ram_block_from_host(host_addr, true, &rb_offset);
-+    if (!rb) {
-+        /*
-+         * This should _never_ happen.  However be nice for a migrating VM to
-+         * not crash/assert.  Post an error (note: intended to not use *_once
-+         * because we do want to see all the illegal addresses; and this can
-+         * never be triggered by the guest so we're safe) and move on next.
-+         */
-+        error_report("%s: illegal host addr %p", __func__, host_addr);
-+        /* Try the next entry */
-+        return FALSE;
-+    }
++The generic-fuzz target is capable of fuzzing devices over their PIO, MMIO,
++and DMA input-spaces. To apply the generic-fuzz to a device, we need to define
++two env-variables, at minimum:
 +
-+    ret = migrate_send_rp_message_req_pages(mis, rb, rb_offset);
-+    if (ret) {
-+        /* Please refer to above comment. */
-+        error_report("%s: send rp message failed for addr %p",
-+                     __func__, host_addr);
-+        return FALSE;
-+    }
++QEMU_FUZZ_ARGS= is the set of QEMU arguments used to configure a machine, with
++the device attached. For example, if we want to fuzz the virtio-net device
++attached to a pc-i440fx machine, we can specify:
++QEMU_FUZZ_ARGS="-M pc -nodefaults -netdev user,id=user0 \
++                -device virtio-net,netdev=user0"
 +
-+    trace_postcopy_page_req_sync(host_addr);
++QEMU_FUZZ_OBJECTS= is a set of space-delimited strings used to identify the
++MemoryRegions that will be fuzzed. These strings are compared against
++MemoryRegion names and MemoryRegion owner names, to decide whether each
++MemoryRegion should be fuzzed. These strings support globbing. For the
++virtio-net example, we could use QEMU_FUZZ_OBJECTS=
++ * 'virtio-net'
++ * 'virtio*'
++ * 'virtio* pcspk' (Fuzz the virtio devices and the PC speaker...)
++ * '*' (Fuzz the whole machine)
 +
-+    return FALSE;
-+}
++The "info mtree" and "info qom-tree" monitor commands can be especially useful
++for identifying the MemoryRegion and Object names used for matching.
 +
-+static void migrate_send_rp_req_pages_pending(MigrationIncomingState *mis)
-+{
-+    WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
-+        g_tree_foreach(mis->page_requested, postcopy_sync_page_req, mis);
-+    }
-+}
++As a generic rule-of-thumb, the more MemoryRegions/Devices we match, the greater
++the input-space, and the smaller the probability of finding crashing inputs for
++individual devices. As such, it is usually a good idea to limit the fuzzer to
++only a few MemoryRegions.
 +
- static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
- {
-     if (mis->state != MIGRATION_STATUS_POSTCOPY_RECOVER) {
-@@ -2033,6 +2076,20 @@ static int loadvm_postcopy_handle_resume(MigrationIncomingState *mis)
-     /* Tell source that "we are ready" */
-     migrate_send_rp_resume_ack(mis, MIGRATION_RESUME_ACK_VALUE);
++To ensure that these env variables have been configured correctly, we can use:
++
++./qemu-fuzz-i386 --fuzz-target=generic-fuzz -runs=0
++
++The output should contain a complete list of matched MemoryRegions.
++
+ = Implementation Details =
  
-+    /*
-+     * After a postcopy recovery, the source should have lost the postcopy
-+     * queue, or potentially the requested pages could have been lost during
-+     * the network down phase.  Let's re-sync with the source VM by re-sending
-+     * all the pending pages that we eagerly need, so these threads won't get
-+     * blocked too long due to the recovery.
-+     *
-+     * Without this procedure, the faulted destination VM threads (waiting for
-+     * page requests right before the postcopy is interrupted) can keep hanging
-+     * until the pages are sent by the source during the background copying of
-+     * pages, or another thread faulted on the same address accidentally.
-+     */
-+    migrate_send_rp_req_pages_pending(mis);
-+
-     return 0;
- }
- 
-diff --git a/migration/trace-events b/migration/trace-events
-index e4d5eb94ca..0fbfd2da60 100644
---- a/migration/trace-events
-+++ b/migration/trace-events
-@@ -49,6 +49,7 @@ vmstate_save(const char *idstr, const char *vmsd_name) "%s, %s"
- vmstate_load(const char *idstr, const char *vmsd_name) "%s, %s"
- postcopy_pause_incoming(void) ""
- postcopy_pause_incoming_continued(void) ""
-+postcopy_page_req_sync(void *host_addr) "sync page req %p"
- 
- # vmstate.c
- vmstate_load_field_error(const char *field, int ret) "field \"%s\" load failed, ret = %d"
+ == The Fuzzer's Lifecycle ==
 -- 
-2.26.2
+2.28.0
 
 
