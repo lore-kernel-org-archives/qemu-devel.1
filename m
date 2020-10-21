@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67443C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:02:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C583C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:04:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AD53320870
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:02:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 99B0C21481
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 21:04:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a6/8k5kj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD53320870
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fSy2OgmH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 99B0C21481
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49134 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVLFa-0002Wc-Ly
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:02:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40368)
+	id 1kVLH7-0003u5-Fj
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 17:04:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVLAx-0005Xa-Qr
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42915)
+ id 1kVLB2-0005hj-3c
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48787)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVLAs-0006f1-3D
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:39 -0400
+ id 1kVLAx-0006iS-BF
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 16:57:43 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603313843;
+ s=mimecast20190719; t=1603313857;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UxOaKWQIo5EvktT7G1cSMndSN819NS7u5edOwbE8ebw=;
- b=a6/8k5kjCP0BB+TCUaYXCCCpbQg3elev/jsbKkSaR17/VrvF7guP+S98nwGI/3KilmxAFM
- VujX5tG6Ddf2ySXhHYVs14lOj3WBK6ZVjn7mqUPh6WDtDCkWiRnq1saddxg58sP3eSIh5a
- 5lpnOXhSlKK+HaDSzVDlVtvxfQb+lCU=
+ bh=xB+pW8wMlRiDeT88aB17Knd4JTsxOyNUrcHOEWW+0Ws=;
+ b=fSy2OgmHUdJuqIjK47lSZQoHHR1hsrIpIUu1b0Ts13ar8QVI1Z7zgi4+8gWtrcKeMau9xO
+ IR3gbTTXi+teRxOSKCD8Rlr+XQbu0dNbrtZRqObFidrNkzn9kv8wUDMvQNFvjAy1rZYzru
+ h27l2W87ZhCFfzlKJK2iLD4Tmr7Ijh8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-406-nFGCVHw3M-mwFNTuH2dT8Q-1; Wed, 21 Oct 2020 16:57:21 -0400
-X-MC-Unique: nFGCVHw3M-mwFNTuH2dT8Q-1
+ us-mta-289-y3KvK72wPGu7IwKAyxJ-Nw-1; Wed, 21 Oct 2020 16:57:35 -0400
+X-MC-Unique: y3KvK72wPGu7IwKAyxJ-Nw-1
 Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
  [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 03DE4804B62
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 20:57:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 401B91005E77
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 20:57:34 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8AF3F6EF62;
- Wed, 21 Oct 2020 20:57:20 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C326F6EF62;
+ Wed, 21 Oct 2020 20:57:33 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/22] vl: extract validation of -smp to machine.c
-Date: Wed, 21 Oct 2020 16:56:59 -0400
-Message-Id: <20201021205716.2359430-6-pbonzini@redhat.com>
+Subject: [PATCH 20/22] vl: move CHECKPOINT_INIT after preconfig
+Date: Wed, 21 Oct 2020 16:57:14 -0400
+Message-Id: <20201021205716.2359430-21-pbonzini@redhat.com>
 In-Reply-To: <20201021205716.2359430-1-pbonzini@redhat.com>
 References: <20201021205716.2359430-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -73,16 +73,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,93 +102,43 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Once smp_parse is done, the validation operates on the MachineState.
-There is no reason for that code to be in vl.c.
+Move CHECKPOINT_INIT right before the machine initialization is
+completed.  Everything before is essentially an extension of
+command line parsing.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/machine.c   | 23 +++++++++++++++++++++++
- include/hw/boards.h |  1 +
- softmmu/vl.c        | 20 ++------------------
- 3 files changed, 26 insertions(+), 18 deletions(-)
+ softmmu/vl.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 7efeac03b3..70b1e5e8e8 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -1073,6 +1073,29 @@ MemoryRegion *machine_consume_memdev(MachineState *machine,
-     return ret;
- }
- 
-+bool machine_smp_parse(MachineState *ms, QemuOpts *opts, Error **errp)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+
-+    mc->smp_parse(ms, opts);
-+
-+    /* sanity-check smp_cpus and max_cpus against mc */
-+    if (ms->smp.cpus < mc->min_cpus) {
-+        error_setg(errp, "Invalid SMP CPUs %d. The min CPUs "
-+                   "supported by machine '%s' is %d",
-+                   ms->smp.cpus,
-+                   mc->name, mc->min_cpus);
-+        return false;
-+    } else if (ms->smp.max_cpus > mc->max_cpus) {
-+        error_setg(errp, "Invalid SMP CPUs %d. The max CPUs "
-+                   "supported by machine '%s' is %d",
-+                   current_machine->smp.max_cpus,
-+                   mc->name, mc->max_cpus);
-+        return false;
-+    }
-+    return true;
-+}
-+
- void machine_run_board_init(MachineState *machine)
- {
-     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index a49e3a6b44..4537cfb5c6 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -26,6 +26,7 @@ OBJECT_DECLARE_TYPE(MachineState, MachineClass, MACHINE)
- extern MachineState *current_machine;
- 
- void machine_run_board_init(MachineState *machine);
-+bool machine_smp_parse(MachineState *ms, QemuOpts *opts, Error **errp);
- bool machine_usb(MachineState *machine);
- int machine_phandle_start(MachineState *machine);
- bool machine_dump_guest_core(MachineState *machine);
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 05422a15ee..8a7d11ef05 100644
+index 0a6f47e7d6..e9391929f6 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -3966,24 +3966,8 @@ void qemu_init(int argc, char **argv, char **envp)
-         exit(0);
+@@ -3194,6 +3194,11 @@ void qemu_finish_machine_init(void)
+         exit(1);
      }
  
--    machine_class->smp_parse(current_machine,
--        qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
--
--    /* sanity-check smp_cpus and max_cpus against machine_class */
--    if (current_machine->smp.cpus < machine_class->min_cpus) {
--        error_report("Invalid SMP CPUs %d. The min CPUs "
--                     "supported by machine '%s' is %d",
--                     current_machine->smp.cpus,
--                     machine_class->name, machine_class->min_cpus);
--        exit(1);
--    }
--    if (current_machine->smp.max_cpus > machine_class->max_cpus) {
--        error_report("Invalid SMP CPUs %d. The max CPUs "
--                     "supported by machine '%s' is %d",
--                     current_machine->smp.max_cpus,
--                     machine_class->name, machine_class->max_cpus);
--        exit(1);
--    }
-+    machine_smp_parse(current_machine,
-+        qemu_opts_find(qemu_find_opts("smp-opts"), NULL), &error_fatal);
++    /* This checkpoint is required by replay to separate prior clock
++       reading from the other reads, because timer polling functions query
++       clock values from the log. */
++    replay_checkpoint(CHECKPOINT_INIT);
++
+     machine_run_board_init(current_machine);
  
-     if (mem_prealloc) {
-         char *val;
+     /*
+@@ -4424,11 +4429,6 @@ void qemu_init(int argc, char **argv, char **envp)
+     if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+         exit(1);
+ 
+-    /* This checkpoint is required by replay to separate prior clock
+-       reading from the other reads, because timer polling functions query
+-       clock values from the log. */
+-    replay_checkpoint(CHECKPOINT_INIT);
+-
+     current_machine->boot_order = boot_order;
+ 
+     /* parse features once if machine provides default cpu_type */
 -- 
 2.26.2
 
