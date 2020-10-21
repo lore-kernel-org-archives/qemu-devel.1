@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56C95C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:09:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 514CFC55178
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:09:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9131C20BED
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:09:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 937F820BED
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 15:09:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="GSXCJod2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9131C20BED
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="qdS48w4t"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 937F820BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37866 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39662 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVFjl-0007Z7-5a
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 11:09:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58556)
+	id 1kVFk3-0008MX-Fs
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 11:09:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58522)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVFaL-0005xa-Rc; Wed, 21 Oct 2020 10:59:29 -0400
-Received: from mail-am6eur05on2139.outbound.protection.outlook.com
- ([40.107.22.139]:50030 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ id 1kVFaI-0005n4-KP; Wed, 21 Oct 2020 10:59:26 -0400
+Received: from mail-eopbgr70109.outbound.protection.outlook.com
+ ([40.107.7.109]:36743 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVFaJ-00087A-Bm; Wed, 21 Oct 2020 10:59:29 -0400
+ id 1kVFaG-00085a-AJ; Wed, 21 Oct 2020 10:59:26 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Poin7yXmanrQJsICL8kwWBaTgtMtm/9fZh7CxKAMR2IZZpOcbMus8feMPPDTl2SMI3KnhH3QZPupy0DIsam5T0KuarL0T4NePPwAEGgJBxKJ8akcrgyngKn+vIkKZrkN5vmmanpwVeFUleu33F2/6Qmw8tjqX0wSr31htcRgd2Km3SQ1jMja4AE5i7eBPWO7VkcDv0qo9xSfVaMpWK+XpwMCxDvMAQzESGRw4lI3+Xc7RnGyN711mRuV9vBBVtTv4yaHxjLjZm7610Dix6r/JJlKL7xeT3/U7SbQgJUGGT0+MZT56aochIWErFOBcfQpF8iw6jAxFk4c4DEG7qOo3g==
+ b=TbDyhYt4ivaH1OpFNXMUEI44ep956FMgBj2EvacG9nbvSnAdPjRQRZ0YbwRYMwU7TqWrLAkHF5l1YuTPrpuLTZq/mCzR5DtYaWNX5Ez9zNj2oRu0m15pAI3jL/ecVYGEpJCI2ql32mtocCWhtRcN9VmMGLjUpZB+51lwlZKNVhf27AzzOemrKQhjztv1MLIn+t/cM9FpnpILc71GoRNzSqWgWb9l4GTfFuweoxgdu9lXi5NnI3QsosJjRD1Z/YNxkcM6JU/qgk1glD2E/DJMfTq1pAQwEkmz5WzxfZsgCOEAm0ZImNcwmhbuXVRARKslqN/tc1maCSupKNgoHv8Z2w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QEXJBxVoOspw464yWfuxZJJdXbTjMB7KDl4x8Lf24Ec=;
- b=OHqvwsamF2dmSS2oj4BiiNuppPL1vnMl2cas4oxapsSiD2MNPsbKjwfE7MFnwWxXZAWwZgAMqPO3RR16T3EwC/0UDEcSvGel18flezrW5DohzLqxnd/EKKmWxLQ0kgD83qI06K8P//h+MNLt/jes2joVZwa3GiVYIf0U8QWGiCneacsDke2TYdV9b+RqkbgzRSETOqJXpbc3QrLWzdQ2GrrR/bhG9G98PaXAxYf0wPbat5/+hvH5x83/RBjXqyGrfZ9A1diq8vWekZD6pVab+5zmvehzv/m3dISNkXA+nOdbL1gZRachaHCxT2BtxUIOxvdzxdkNlNqGdx4GDotOlg==
+ bh=687hmuyWvjwZgQ+nk9PUlLDrOovkaiK6JIJv01VVUMA=;
+ b=NEAd/hUt8rNeucTs924x3KMy5sE33ryL29yWE8k4gteSm0rFicQX6XS9G/CnXUp0k3kvhTlqh0fd+tAH6RPUujAssp81WdxmXz5R0jsVcqVh8t/hfr/aY1+uMKLVyxjDaBUz38IpxLJGeBv12slndvVhsYChYJo/xCvoqnXlRlDA2i0V27py00RfuL3fptzc6hFMcn19iLkxFCX15+o8ZVOE0UBqirVFzbvYYl2CuUeR4jvc/tRrkUZ+F1ZxybLsEEczKzPDITx7p0HH7HEA9izau6JWURNwyl8jW7+lJLpPEaqI8QkGwzYunr3Peu6kqCk8Va0duqPH9DdIO5gvEQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QEXJBxVoOspw464yWfuxZJJdXbTjMB7KDl4x8Lf24Ec=;
- b=GSXCJod26oPP2ClV7nYOce0NvV4k+dK0HHBWkihDRzd0klXpTqGfNvBvzsJG76NjEwVM9fRCFs6XOkoaxpftQ3KSEEN4cwi23thJhjYX4jgBnJtYtQAH1++N13LHf0m5PHSigDCSLej+oudhuhChcW82Y8Kzs0ytIxOEuAZfhho=
+ bh=687hmuyWvjwZgQ+nk9PUlLDrOovkaiK6JIJv01VVUMA=;
+ b=qdS48w4tjrsJi/5iiaIgX4tRv60kfBy3q5rkKQVuVSHpKzQhMqpZFnirf5O7eJYADoKg429YmwaeNKN3uGRUvjsxAm7BCYmlp8s2MJGueidIz+wctVviY6f2Vy+2zGR9atpyyajGC6JHpd3NlL0dXZZumzoeZmdPWOCp6e07xXE=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3541.eurprd08.prod.outlook.com (2603:10a6:20b:51::31)
+ by AM6PR08MB4472.eurprd08.prod.outlook.com (2603:10a6:20b:bf::19)
  with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21; Wed, 21 Oct
- 2020 14:59:24 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Wed, 21 Oct
+ 2020 14:59:17 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Wed, 21 Oct 2020
- 14:59:24 +0000
+ 14:59:17 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, eblake@redhat.com,
  armbru@redhat.com, fam@euphon.net, stefanha@redhat.com, mreitz@redhat.com,
  kwolf@redhat.com, den@virtuozzo.com
-Subject: [PATCH v7 14/21] scripts/simplebench: support iops
-Date: Wed, 21 Oct 2020 17:58:52 +0300
-Message-Id: <20201021145859.11201-15-vsementsov@virtuozzo.com>
+Subject: [PATCH v7 05/21] block: bdrv_mark_request_serialising: split
+ non-waiting function
+Date: Wed, 21 Oct 2020 17:58:43 +0300
+Message-Id: <20201021145859.11201-6-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201021145859.11201-1-vsementsov@virtuozzo.com>
 References: <20201021145859.11201-1-vsementsov@virtuozzo.com>
@@ -81,35 +82,35 @@ X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from kvm.sw.ru (185.215.60.82) by
  AM0PR03CA0091.eurprd03.prod.outlook.com (2603:10a6:208:69::32) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 14:59:24 +0000
+ 15.20.3499.18 via Frontend Transport; Wed, 21 Oct 2020 14:59:16 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 8d1b1a94-9801-4e42-728d-08d875d1e655
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3541:
+X-MS-Office365-Filtering-Correlation-Id: 7067125f-4d9f-462d-2586-08d875d1e1f2
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4472:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3541043B311A7F9660A11D81C11C0@AM6PR08MB3541.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB447207E600FBCFFD6DD00039C11C0@AM6PR08MB4472.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 61w3FXWTIcZsZKpFkAEBM0anAzB74ygnxKX+scqpMFF+oyTC3GNLcB9Agln/g8Asxvl0LE5I408Z2zNJ2Rx8JGYe+vt/Mjy5TDzvTkVIIflcGrm6MJ9dS3v9+K68tznD/FGW9jh7DZ0K1UANMRtsP1RdHuSwd9OqfezSfmfZ3e1UnJ2omn6k5c5Alk0HRXZ+i2X2PbZLMSpoJgxay336L3qlCaCMmLRJqvErZJGUg9f+o09gPAfEvq/1ist9I/YtMR3CzeOB3hW3oL9GpOhRfscunVqzDKpHJny0Lbp7lA7dtQxBUXgiLWcgEWsgbUgHW0wvFGPNKWIi4psbaoxWgg==
+X-Microsoft-Antispam-Message-Info: be/7dvBSVnYT3pshXU8XzSXpVhwrQC90k33tLyWpL0gfvpMJaH1lZs/4aAjT6yPo5DTCii+SI9OwPEx8eMWY67+HTNyu5fWUb7647JZQsiXx3/vbdpGplip1911Y/sIeofu1tpFa4CKk08lXV/RpqRt4KS0GfDeaNFySDniQPdD+LAJ4W9hSih9N0SnmCvqPYnSaQQM+DzIyMkieG1+p6u7Y4G2bEsC8XqFbtK4QgaLi+GIKeFOe8CYpYS+30xVho/dSEEQEMGTV51W/h64t91AFdxXkw4ZDMLM/k4HuBHNFGfewUUYMzj21I63RVK4cgS29auAsk3U+iIpvdpGZ0A==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(346002)(39850400004)(376002)(396003)(136003)(6512007)(8936002)(83380400001)(52116002)(4326008)(478600001)(6486002)(6506007)(8676002)(186003)(16526019)(107886003)(2616005)(956004)(66946007)(66556008)(66476007)(6916009)(36756003)(26005)(2906002)(86362001)(1076003)(5660300002)(6666004)(316002);
+ SFS:(4636009)(396003)(376002)(366004)(136003)(346002)(39840400004)(66556008)(16526019)(66476007)(83380400001)(6512007)(26005)(478600001)(66946007)(186003)(6506007)(6916009)(86362001)(1076003)(6486002)(8936002)(2906002)(5660300002)(52116002)(8676002)(2616005)(6666004)(316002)(956004)(107886003)(4326008)(36756003);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: H413Q3jK0E/6m0U2vIK9JBeq6jqPlG3nmM9Fh3ZqxAhB4YtGoQaJ9ZxcGKYPw8DWHE5+Hr1eZi8MqGijefgH0OmHiHaOHbDvzp9zgVcFvnj7lpvlyfpKDiHqkBjm6O8YiLaURCtXic/VcSR9dAd1bfZUbw11cnNDwYyZvqs3W6rvcwRNlZhbAFrTAa1oJm/NhrOLo7G57ytjhJmGpnI3HoiSPAfRWgv8paaTnFLT/2Om6OMjpX3bq2K9+5FBPsklbB8jKxi/Q5CNXjiKbn/j7wF4Sk0F4lPv91Y66HXQFVRXjAgwATrd7vaPahUAlyTghpaq6NUzfp+XgGBXcynKDzrNoOXLziJm81DOarK9u3iuTdnzo11HLGQicUQmMzuKYN89n01D2WsYEfWo1P9L1YweTeAAaizEJFJ2Pgoz9VgvsB5Au9iaK1hbd4o7XJlNeNa4d2OAcWOT5Xu/XtqevYVna9VmA6p5+7xcxhzk39GIKP8YSKuoVDvPxtZD7z6xMD1Mo7NVox/ZppB6fKN6VHh1GddswiBpqu77XSHzRKwn4XJz/DOYjtoxHVt4B/yaVx08I651JS2rOCOH2IHrk4EpfM28ZClkFo5Yuji636ZA+qMbo2mOy88B66bSzXrqHfhJZI2YEe1iIGayYfqHGw==
+X-MS-Exchange-AntiSpam-MessageData: jF+1M2XdLJjUGkVGPaQK+3IzLw5+aH/U74sSjAs6uaSlxpcm4iopgJ5M1aWOLHtQlTRbg2ecJxZfDVZrfolJmfu7BockoBCTTHipcneT100b772I/TJlawcAyswQ9F4o5sEi/t3ycCMYbjWmBk0VVJGFs9nNE8S2NzeyjDGyYgIIwjKxfYfYBxlv52vUKTgjRO4ttL0T9xbgDjwt5PGbpsx1cQr6KrwhUthZmNUXc2ZeLvG8/q2uN0cbOP/uKwjSd3AcZAa+tvNWC6Ez5iGFNFNKVFVia9G86UmPGKk+Z0n/Rm9wYdcgRddi8/vI7mfQpWO/+aW8g4KsReKMHmFbX8eHdzVl8jaH56DgU/xGu8qX3J9y4/mYq+7p9OCFnZq5NO4m12VAFJGUiIBSucy6FQbeCGVkSujSM/YJ4rMtJBthIHG2ndKEOiELVquMvDMkUSrshXaARISFy6U94g5C6whrkRh06p1WzSKTWFezrpTxt8UrZYl+9hKroBv88qoqikaJJIvbFczcsByqVGeJjqMqDYoBZdnJ91oEBD98Z4siqhwC7EMav9kysgocuIur7LWBaXZzgL/nPhZtahmdQglT9z0DN30R78WPGdTju6OcDfBzcS1G46k5NqljL6bX/MATNTSj2jPqt+VoyYdvOg==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8d1b1a94-9801-4e42-728d-08d875d1e655
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7067125f-4d9f-462d-2586-08d875d1e1f2
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 14:59:24.7313 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 14:59:17.3397 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: eVQc5hVMufC5BeO02wFTqKT3PKOGZ+OISw89ay1P1AHitCCH9qbGKKwwzOeOlZLHTKZ7zCZceq8OMNHPnTBOtuM2OUDh18+AgWVGcwJX1zI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3541
-Received-SPF: pass client-ip=40.107.22.139;
+X-MS-Exchange-CrossTenant-UserPrincipalName: iDJEgl+22iPuiC5dzLDSBEIp9KcvjfNxMHk92uO6QMQGbcoSv12fFgcEC7k/jwJvXHmXd94j54IURnY9usLBTSbIVd9f86uqny/l8WErImM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4472
+Received-SPF: pass client-ip=40.107.7.109;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 10:59:25
+ helo=EUR04-HE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 10:59:15
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -27
 X-Spam_score: -2.8
@@ -134,89 +135,152 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Support benchmarks returning not seconds but iops. We'll use it for
-further new test.
+We'll need a separate function, which will only "mark" request
+serialising with specified align but not wait for conflicting
+requests. So, it will be like old bdrv_mark_request_serialising(),
+before merging bdrv_wait_serialising_requests_locked() into it.
+
+To reduce the possible mess, let's do the following:
+
+Public function that does both marking and waiting will be called
+bdrv_make_request_serialising, and private function which will only
+"mark" will be called tracked_request_set_serialising().
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- scripts/simplebench/simplebench.py | 38 ++++++++++++++++++++++--------
- 1 file changed, 28 insertions(+), 10 deletions(-)
+ include/block/block_int.h |  3 ++-
+ block/file-posix.c        |  2 +-
+ block/io.c                | 35 +++++++++++++++++++++++------------
+ 3 files changed, 26 insertions(+), 14 deletions(-)
 
-diff --git a/scripts/simplebench/simplebench.py b/scripts/simplebench/simplebench.py
-index 2445932fc2..2251cd34ea 100644
---- a/scripts/simplebench/simplebench.py
-+++ b/scripts/simplebench/simplebench.py
-@@ -24,9 +24,12 @@ def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
+diff --git a/include/block/block_int.h b/include/block/block_int.h
+index 38cad9d15c..887b0668d8 100644
+--- a/include/block/block_int.h
++++ b/include/block/block_int.h
+@@ -1052,7 +1052,8 @@ extern unsigned int bdrv_drain_all_count;
+ void bdrv_apply_subtree_drain(BdrvChild *child, BlockDriverState *new_parent);
+ void bdrv_unapply_subtree_drain(BdrvChild *child, BlockDriverState *old_parent);
  
-     test_func   -- benchmarking function with prototype
-                    test_func(env, case), which takes test_env and test_case
--                   arguments and returns {'seconds': int} (which is benchmark
--                   result) on success and {'error': str} on error. Returned
--                   dict may contain any other additional fields.
-+                   arguments and on success returns dict with 'seconds' or
-+                   'iops' (or both) fields, specifying the benchmark result.
-+                   If both 'iops' and 'seconds' provided, the 'iops' is
-+                   considered the main, and 'seconds' is just an additional
-+                   info. On failure test_func should return {'error': str}.
-+                   Returned dict may contain any other additional fields.
-     test_env    -- test environment - opaque first argument for test_func
-     test_case   -- test case - opaque second argument for test_func
-     count       -- how many times to call test_func, to calculate average
-@@ -34,8 +37,9 @@ def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
+-bool coroutine_fn bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align);
++bool coroutine_fn bdrv_make_request_serialising(BdrvTrackedRequest *req,
++                                                uint64_t align);
+ BdrvTrackedRequest *coroutine_fn bdrv_co_get_self_request(BlockDriverState *bs);
  
-     Returns dict with the following fields:
-         'runs':     list of test_func results
--        'average':  average seconds per run (exists only if at least one run
--                    succeeded)
-+        'dimension': dimension of results, may be 'seconds' or 'iops'
-+        'average':  average value (iops or seconds) per run (exists only if at
-+                    least one run succeeded)
-         'delta':    maximum delta between test_func result and the average
-                     (exists only if at least one run succeeded)
-         'n-failed': number of failed runs (exists only if at least one run
-@@ -54,11 +58,19 @@ def bench_one(test_func, test_env, test_case, count=5, initial_run=True):
+ int get_tmp_filename(char *filename, int size);
+diff --git a/block/file-posix.c b/block/file-posix.c
+index c63926d592..37d9266f6a 100644
+--- a/block/file-posix.c
++++ b/block/file-posix.c
+@@ -2953,7 +2953,7 @@ raw_do_pwrite_zeroes(BlockDriverState *bs, int64_t offset, int bytes,
+         req->bytes = end - req->offset;
+         req->overlap_bytes = req->bytes;
  
-     result = {'runs': runs}
+-        bdrv_mark_request_serialising(req, bs->bl.request_alignment);
++        bdrv_make_request_serialising(req, bs->bl.request_alignment);
+     }
+ #endif
  
--    succeeded = [r for r in runs if ('seconds' in r)]
-+    succeeded = [r for r in runs if ('seconds' in r or 'iops' in r)]
-     if succeeded:
--        avg = sum(r['seconds'] for r in succeeded) / len(succeeded)
-+        if 'iops' in succeeded[0]:
-+            assert all('iops' in r for r in succeeded)
-+            dim = 'iops'
-+        else:
-+            assert all('seconds' in r for r in succeeded)
-+            assert all('iops' not in r for r in succeeded)
-+            dim = 'seconds'
-+        avg = sum(r[dim] for r in succeeded) / len(succeeded)
-+        result['dimension'] = dim
-         result['average'] = avg
--        result['delta'] = max(abs(r['seconds'] - avg) for r in succeeded)
-+        result['delta'] = max(abs(r[dim] - avg) for r in succeeded)
+diff --git a/block/io.c b/block/io.c
+index 5c1a1b388b..24ff8d804b 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -779,15 +779,14 @@ bdrv_wait_serialising_requests_locked(BdrvTrackedRequest *self)
+     return waited;
+ }
  
-     if len(succeeded) < count:
-         result['n-failed'] = count - len(succeeded)
-@@ -118,11 +130,17 @@ def ascii(results):
-     """Return ASCII representation of bench() returned dict."""
-     from tabulate import tabulate
+-bool bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
++/* Called with req->bs->reqs_lock held */
++static void tracked_request_set_serialising(BdrvTrackedRequest *req,
++                                            uint64_t align)
+ {
+-    BlockDriverState *bs = req->bs;
+     int64_t overlap_offset = req->offset & ~(align - 1);
+     uint64_t overlap_bytes = ROUND_UP(req->offset + req->bytes, align)
+                                - overlap_offset;
+-    bool waited;
  
-+    dim = None
-     tab = [[""] + [c['id'] for c in results['envs']]]
-     for case in results['cases']:
-         row = [case['id']]
-         for env in results['envs']:
--            row.append(ascii_one(results['tab'][case['id']][env['id']]))
-+            res = results['tab'][case['id']][env['id']]
-+            if dim is None:
-+                dim = res['dimension']
-+            else:
-+                assert dim == res['dimension']
-+            row.append(ascii_one(res))
-         tab.append(row)
+-    qemu_co_mutex_lock(&bs->reqs_lock);
+     if (!req->serialising) {
+         qatomic_inc(&req->bs->serialising_in_flight);
+         req->serialising = true;
+@@ -795,9 +794,6 @@ bool bdrv_mark_request_serialising(BdrvTrackedRequest *req, uint64_t align)
  
--    return tabulate(tab)
-+    return f'All results are in {dim}\n\n' + tabulate(tab)
+     req->overlap_offset = MIN(req->overlap_offset, overlap_offset);
+     req->overlap_bytes = MAX(req->overlap_bytes, overlap_bytes);
+-    waited = bdrv_wait_serialising_requests_locked(req);
+-    qemu_co_mutex_unlock(&bs->reqs_lock);
+-    return waited;
+ }
+ 
+ /**
+@@ -883,6 +879,21 @@ static bool coroutine_fn bdrv_wait_serialising_requests(BdrvTrackedRequest *self
+     return waited;
+ }
+ 
++bool coroutine_fn bdrv_make_request_serialising(BdrvTrackedRequest *req,
++                                                uint64_t align)
++{
++    bool waited;
++
++    qemu_co_mutex_lock(&req->bs->reqs_lock);
++
++    tracked_request_set_serialising(req, align);
++    waited = bdrv_wait_serialising_requests_locked(req);
++
++    qemu_co_mutex_unlock(&req->bs->reqs_lock);
++
++    return waited;
++}
++
+ static int bdrv_check_byte_request(BlockDriverState *bs, int64_t offset,
+                                    size_t size)
+ {
+@@ -1395,7 +1406,7 @@ static int coroutine_fn bdrv_aligned_preadv(BdrvChild *child,
+          * with each other for the same cluster.  For example, in copy-on-read
+          * it ensures that the CoR read and write operations are atomic and
+          * guest writes cannot interleave between them. */
+-        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
++        bdrv_make_request_serialising(req, bdrv_get_cluster_size(bs));
+     } else {
+         bdrv_wait_serialising_requests(req);
+     }
+@@ -1806,7 +1817,7 @@ bdrv_co_write_req_prepare(BdrvChild *child, int64_t offset, uint64_t bytes,
+     assert(!(flags & ~BDRV_REQ_MASK));
+ 
+     if (flags & BDRV_REQ_SERIALISING) {
+-        bdrv_mark_request_serialising(req, bdrv_get_cluster_size(bs));
++        bdrv_make_request_serialising(req, bdrv_get_cluster_size(bs));
+     } else {
+         bdrv_wait_serialising_requests(req);
+     }
+@@ -1972,7 +1983,7 @@ static int coroutine_fn bdrv_co_do_zero_pwritev(BdrvChild *child,
+ 
+     padding = bdrv_init_padding(bs, offset, bytes, &pad);
+     if (padding) {
+-        bdrv_mark_request_serialising(req, align);
++        bdrv_make_request_serialising(req, align);
+ 
+         bdrv_padding_rmw_read(child, req, &pad, true);
+ 
+@@ -2086,7 +2097,7 @@ int coroutine_fn bdrv_co_pwritev_part(BdrvChild *child,
+     }
+ 
+     if (bdrv_pad_request(bs, &qiov, &qiov_offset, &offset, &bytes, &pad)) {
+-        bdrv_mark_request_serialising(&req, align);
++        bdrv_make_request_serialising(&req, align);
+         bdrv_padding_rmw_read(child, &req, &pad, false);
+     }
+ 
+@@ -3139,7 +3150,7 @@ int coroutine_fn bdrv_co_truncate(BdrvChild *child, int64_t offset, bool exact,
+      * new area, we need to make sure that no write requests are made to it
+      * concurrently or they might be overwritten by preallocation. */
+     if (new_bytes) {
+-        bdrv_mark_request_serialising(&req, 1);
++        bdrv_make_request_serialising(&req, 1);
+     }
+     if (bs->read_only) {
+         error_setg(errp, "Image is read-only");
 -- 
 2.21.3
 
