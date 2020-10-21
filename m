@@ -7,77 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6809EC56201
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A79F5C56202
 	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 04:56:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D97DF207FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 04:56:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2712322200
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 04:56:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BfX61ijq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D97DF207FF
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t7YtLAHi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2712322200
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42254 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV6Aj-0005Xf-Qy
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 00:56:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57508)
+	id 1kV6Ak-0005Yz-5j
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 00:56:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kV66R-0000JT-Sv
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:51:59 -0400
-Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:36742)
+ id 1kV66Z-0000dj-4v
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:52:07 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:40874)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kV66Q-0005fk-BF
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:51:59 -0400
-Received: by mail-pg1-x543.google.com with SMTP id b23so745458pgb.3
- for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 21:51:57 -0700 (PDT)
+ id 1kV66X-0005jX-5J
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:52:06 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id l2so499209pjt.5
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 21:52:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=JakqPeHuy5Gs3UHXcz+Lct5dLMIcgU9/NqFcGA7PmDc=;
- b=BfX61ijqLWv4A133fpiWlmS8jxC1DoXKJ8SEK8bOBsShVAADLZkbpZWXbo7iI2LbJr
- TzXXKc7mpJOZM6cLxqsCUBBgTYeiBYTIMNWmgtqgJ0rjfNa0DCQy/eUcg+773hbqQ92Q
- TPjDKX3RYF0k5OKKx2W6NPyGTVgQeFlNU+3S1BkQ3bx6H+g0+ns4SX8LlCauG/kPt3PE
- DRXHv9pUz1vuJ52x+6pSg7DikRhQK61m7yDBz9r6YpRuLi/2o+o+LelUoSkoeej80ohQ
- eozK93PPJX4GIDn+yTczN1JtmW3EcnlCObRK9b/QHD6M/gKKa3m0F+HTQN+H6cT5N9WF
- WqWw==
+ bh=rP/Ck9XlqBeLFMh5U31GkmO/lp+0+vlL//subLjhvvI=;
+ b=t7YtLAHiDU5HiHmbepp4UnO7hvx0qwzDTsq3sEn2Fzvqtvu+hFShib9Af1FNTp2opo
+ LiMgLsuyWpmJCAD0zVTuUDHXxkJHKMnB5KFx2VFE45a1M5hVuyGjFtMvodHlzKcHlfip
+ NWSGYk0yfHo/eaupPhEp6wPLTWtPn0x8GQyes3VXMFGPdNYhwdlfyYUWh9Grgedh8ide
+ yiVrVMDV2aaZQcUJWz+8d9JiWSEbYQI30hdF4R/gg2L59fGKYVeKwQCKmKuqvqN8YwDv
+ jsmOmeTizBZsG6t2OeKGA6ruhw0h8VSgsD51CVe2wPCtfjvkhv/REcz0yxSF9wdcrqb/
+ QFRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=JakqPeHuy5Gs3UHXcz+Lct5dLMIcgU9/NqFcGA7PmDc=;
- b=isoHcObN2TOxjxKU50bu7cnLhZ4UxiPB+MT/F0YlaoXh2ViM+QUMSx79Htptf3TMvG
- 92eh1eIH8cExlgS3cqcDDQohqx07BY1RnOECnqXaFwGofSxjZNsWuofCZyC5A4K+c2i4
- xM4sJd5z1jZNdPPIwEAsE3R52cOWH8JZPDIj9QHUgm+PDjsaGNtvFnZoB22EIP+ONOuG
- 5jWPFhNwk3Xp3P3xnwqSK8v5WtCKbZUl2/B2QFW4yQfK5Uyih8cKHbUnrfKk5fTEjYov
- A8MJpRiJFAJ4nPcM8tMaMjS1ymJ/aD+5AjqNufw0ewd8qWZSqT6PYsA2ho22TW/ydIMS
- pXSg==
-X-Gm-Message-State: AOAM5312WOgYJlvJIF1d4FfBj38QEzinUjFwMPbHDCSojng5duiPLtPE
- SBVC3a/L5K/nUGvW04QGkMm/KAF7SgYEQA==
-X-Google-Smtp-Source: ABdhPJzYAU3SKTrJne1IKGlKirWmcvSnLZArsue8ZznmhTrHxMX0sApQCAfsUpcoRKporxt/SoNPzg==
-X-Received: by 2002:a63:6647:: with SMTP id a68mr1559348pgc.7.1603255916785;
- Tue, 20 Oct 2020 21:51:56 -0700 (PDT)
+ bh=rP/Ck9XlqBeLFMh5U31GkmO/lp+0+vlL//subLjhvvI=;
+ b=PIef2cX3F6K9oKJYqiljM2vl7LnqXIC81Kzg7qG6X94Ih1/Y4DCxVCfzdZfnY9dIdM
+ HkZu5Z3Im1oMLUiYuE98H9OaCqWDWC6/KSQOaN5s7OgNnO7jfi+9v14J7LurRcbQ+yuS
+ AAgfoFyMoR+PWlzXZHSw0zmPh6MvGojxcXmKeDjiW/+5p7KaxjkZ/TZa3+LiPhOA2tjH
+ c1ioC0ZDdeNv+wd0nk6pNaEGH5byLQGvw0oM3SuG9asOEOfvRgNtJL7jGVboufTcU7NX
+ j97w1FDNWgTJqKlXuOp1wMuVh1waH97o6luenZX7yN1UFq6obxgiUNY5A7Gnoa+/dYwj
+ JUsw==
+X-Gm-Message-State: AOAM533ICKq95KyFP4E2QFsrs6gl2uUWXITZOWFROOVCalVGiXPsFXCX
+ r+RdRGU0QFV31lnrc9tYUtXZ4/yh1JwN7g==
+X-Google-Smtp-Source: ABdhPJw73kUhtXqM5rGtRKpgC05bD8aqVXC7uGyo61SmU7a7MeEzyiNzbdHQtYJjvkdMzJYMWKscnw==
+X-Received: by 2002:a17:90a:f617:: with SMTP id
+ bw23mr1413214pjb.95.1603255923354; 
+ Tue, 20 Oct 2020 21:52:03 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id j11sm620070pfh.143.2020.10.20.21.51.55
+ by smtp.gmail.com with ESMTPSA id j11sm620070pfh.143.2020.10.20.21.52.02
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 20 Oct 2020 21:51:56 -0700 (PDT)
+ Tue, 20 Oct 2020 21:52:02 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 04/15] qemu/int128: Add int128_shr
-Date: Tue, 20 Oct 2020 21:51:38 -0700
-Message-Id: <20201021045149.1582203-5-richard.henderson@linaro.org>
+Subject: [RFC PATCH 09/15] softfloat: Add float_cmask and constants
+Date: Tue, 20 Oct 2020 21:51:43 -0700
+Message-Id: <20201021045149.1582203-10-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201021045149.1582203-1-richard.henderson@linaro.org>
 References: <20201021045149.1582203-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
- envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -99,52 +101,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alex.bennee@linaro.org
+Cc: alex.bennee@linaro.org, David Hildenbrand <david@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add unsigned right shift as an operation.
+Testing more than one class at a time is better done with masks.
+This reduces the static branch count.
 
+Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: David Hildenbrand <david@redhat.com>
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- include/qemu/int128.h | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ fpu/softfloat.c | 31 ++++++++++++++++++++++++-------
+ 1 file changed, 24 insertions(+), 7 deletions(-)
 
-diff --git a/include/qemu/int128.h b/include/qemu/int128.h
-index 167f13ae10..c53002039a 100644
---- a/include/qemu/int128.h
-+++ b/include/qemu/int128.h
-@@ -68,6 +68,11 @@ static inline Int128 int128_sar(Int128 a, int n)
-     return a >> n;
- }
+diff --git a/fpu/softfloat.c b/fpu/softfloat.c
+index 9db55d2b11..3e625c47cd 100644
+--- a/fpu/softfloat.c
++++ b/fpu/softfloat.c
+@@ -469,6 +469,20 @@ typedef enum __attribute__ ((__packed__)) {
+     float_class_snan,
+ } FloatClass;
  
-+static inline Int128 int128_shr(Int128 a, int n)
-+{
-+    return (__uint128_t)a >> n;
-+}
++#define float_cmask(bit)  (1u << (bit))
 +
- static inline Int128 int128_shl(Int128 a, int n)
++enum {
++    float_cmask_zero    = float_cmask(float_class_zero),
++    float_cmask_normal  = float_cmask(float_class_normal),
++    float_cmask_inf     = float_cmask(float_class_inf),
++    float_cmask_qnan    = float_cmask(float_class_qnan),
++    float_cmask_snan    = float_cmask(float_class_snan),
++
++    float_cmask_infzero = float_cmask_zero | float_cmask_inf,
++    float_cmask_anynan  = float_cmask_qnan | float_cmask_snan,
++};
++
++
+ /* Simple helpers for checking if, or what kind of, NaN we have */
+ static inline __attribute__((unused)) bool is_nan(FloatClass c)
  {
-     return a << n;
-@@ -232,6 +237,17 @@ static inline Int128 int128_sar(Int128 a, int n)
+@@ -1335,24 +1349,27 @@ bfloat16 QEMU_FLATTEN bfloat16_mul(bfloat16 a, bfloat16 b, float_status *status)
+ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+                                 int flags, float_status *s)
+ {
+-    bool inf_zero = ((1 << a.cls) | (1 << b.cls)) ==
+-                    ((1 << float_class_inf) | (1 << float_class_zero));
+-    bool p_sign;
++    bool inf_zero, p_sign;
+     bool sign_flip = flags & float_muladd_negate_result;
+     FloatClass p_class;
+     uint64_t hi, lo;
+     int p_exp;
++    int ab_mask, abc_mask;
++
++    ab_mask = float_cmask(a.cls) | float_cmask(b.cls);
++    abc_mask = float_cmask(c.cls) | ab_mask;
++    inf_zero = ab_mask == float_cmask_infzero;
+ 
+     /* It is implementation-defined whether the cases of (0,inf,qnan)
+      * and (inf,0,qnan) raise InvalidOperation or not (and what QNaN
+      * they return if they do), so we have to hand this information
+      * off to the target-specific pick-a-NaN routine.
+      */
+-    if (is_nan(a.cls) || is_nan(b.cls) || is_nan(c.cls)) {
++    if (unlikely(abc_mask & float_cmask_anynan)) {
+         return pick_nan_muladd(a, b, c, inf_zero, s);
      }
- }
  
-+static inline Int128 int128_shr(Int128 a, int n)
-+{
-+    uint64_t h = (uint64_t)a.hi >> (n & 63);
-+    if (n >= 64) {
-+        return int128_make64(h);
-+    } else if (n > 0) {
-+        return int128_make128((a.lo >> n) | ((uint64_t)a.hi << (64 - n)), h);
-+    }
-+    return a;
-+}
-+
- static inline Int128 int128_shl(Int128 a, int n)
- {
-     uint64_t l = a.lo << (n & 63);
+-    if (inf_zero) {
++    if (unlikely(inf_zero)) {
+         s->float_exception_flags |= float_flag_invalid;
+         return parts_default_nan(s);
+     }
+@@ -1367,9 +1384,9 @@ static FloatParts muladd_floats(FloatParts a, FloatParts b, FloatParts c,
+         p_sign ^= 1;
+     }
+ 
+-    if (a.cls == float_class_inf || b.cls == float_class_inf) {
++    if (ab_mask & float_cmask_inf) {
+         p_class = float_class_inf;
+-    } else if (a.cls == float_class_zero || b.cls == float_class_zero) {
++    } else if (ab_mask & float_cmask_zero) {
+         p_class = float_class_zero;
+     } else {
+         p_class = float_class_normal;
 -- 
 2.25.1
 
