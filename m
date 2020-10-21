@@ -2,77 +2,83 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98DC9C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:38:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAEB7C4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 04:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7171207FF
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 03:38:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01C3D221FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 04:21:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AS6cgCum"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7171207FF
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tevouu2P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01C3D221FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV4wu-00014h-Ni
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 23:38:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42922)
+	id 1kV5cR-0006OO-Nf
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 00:20:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4s9-0004RH-0i
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:33:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51426)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV5ba-0005n8-38
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:20:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58068)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV4s7-0001b7-3h
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 23:33:08 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kV5bW-0000zE-Di
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:20:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603251186;
+ s=mimecast20190719; t=1603254000;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=vwRWr8Z078fLGPEk6jG64vGfcx35hoT6jcr6yINAhMc=;
- b=AS6cgCumI8xPwodVqYcoNg/URL/4RzEoVL9Vlsx4YFHF2q22XP7C4WDUJQTi+5IRTFhKxt
- vA7WObiF9Pa6hA65Iz/IhNN8X3MNVFao1b7L+it+OfW6EZH9TP9QO5PPdx5s9juHlzj+/8
- +N/RORr5sQiSErlzfsElvoKcLaNlkdg=
+ bh=B6M48ZEmEZg9biLJa9lbXZqwlpORFWxvRtY9CVR/UjQ=;
+ b=Tevouu2PsIpdBSOlRTl/3tap5s2fslFGRBAJPwq2zHuTofkHwRCrIAtO5Q7ga3QpLbNJ10
+ nxFeq/UK0pJalV71NmGlocp/kCERL5udLRT/ex/RWiCA/iIFTspqdX9P9o3W4VonrgJrfW
+ L79yHXycD2NlnLhNpp9eSOd76zKmYiE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-480-aiO3ciLmMDmLqnsVqhyljQ-1; Tue, 20 Oct 2020 23:33:01 -0400
-X-MC-Unique: aiO3ciLmMDmLqnsVqhyljQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-358-BONMoX1sP5SROCeMUoP0bQ-1; Wed, 21 Oct 2020 00:19:58 -0400
+X-MC-Unique: BONMoX1sP5SROCeMUoP0bQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C613880402B;
- Wed, 21 Oct 2020 03:33:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AAC8A1006C97;
+ Wed, 21 Oct 2020 04:19:56 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 6CA435B4A3;
- Wed, 21 Oct 2020 03:33:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 5A6A05D9EF;
+ Wed, 21 Oct 2020 04:19:53 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8686811275C4; Wed, 21 Oct 2020 05:32:57 +0200 (CEST)
+ id B165E1132A08; Wed, 21 Oct 2020 06:19:51 +0200 (CEST)
 From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 5/5] qapi: Restrict Xen migration commands to migration.json
-Date: Wed, 21 Oct 2020 05:32:57 +0200
-Message-Id: <20201021033257.2126624-6-armbru@redhat.com>
-In-Reply-To: <20201021033257.2126624-1-armbru@redhat.com>
-References: <20201021033257.2126624-1-armbru@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v4 4/7] nbd: Update qapi to support exporting multiple
+ bitmaps
+References: <20201009215533.1194742-1-eblake@redhat.com>
+ <20201009215533.1194742-5-eblake@redhat.com>
+ <6ee3ac4f-65c3-fdfd-9adb-9bea5f5739e3@virtuozzo.com>
+ <56b413b5-2213-1b4e-5cac-865d8f0e0689@redhat.com>
+ <87lfg1gu06.fsf@dusky.pond.sub.org>
+ <4d7d4c9b-3b32-0c13-9ec1-b326e49ca7ae@redhat.com>
+Date: Wed, 21 Oct 2020 06:19:51 +0200
+In-Reply-To: <4d7d4c9b-3b32-0c13-9ec1-b326e49ca7ae@redhat.com> (Eric Blake's
+ message of "Tue, 20 Oct 2020 13:26:19 -0500")
+Message-ID: <87v9f48b2w.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
@@ -96,180 +102,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- "Dr . David Alan Gilbert" <dgilbert@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: kwolf@redhat.com, Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, rjones@redhat.com,
+ stefanha@redhat.com, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <philmd@redhat.com>
+Eric Blake <eblake@redhat.com> writes:
 
-Restricting xen-set-global-dirty-log and xen-load-devices-state
-commands migration.json pulls slightly less QAPI-generated code
-into user-mode and tools.
+> On 10/20/20 3:51 AM, Markus Armbruster wrote:
+>
+>>> #define QAPI_LIST_ADD(list, element) do { \
+>>>     typeof(list) _tmp = g_new(typeof(*(list)), 1); \
+>>>     _tmp->value = (element); \
+>>>     _tmp->next = (list); \
+>>>     (list) = _tmp; \
+>>> } while (0)
+>>>
+>>>
+>>> Markus, thoughts on if we should publish this macro,
+>> 
+>> If it's widely useful.
+>> 
+>> "git-grep -- '->value ='" matches ~200 times.  A patch converting these
+>> to the macro where possible would make a strong case for having the
+>> macro.
+>> 
+>>>                                                      and if so, which
+>>> header would be best?
+>> 
+>> The macro is generic: @list's type may be any of the struct TYPEList we
+>> generate for the QAPI type ['TYPE'].
+>> 
+>> We don't want to generate this macro next to each of these struct
+>> definitions.  A non-generic macro would go there, but let's not generate
+>> almost a hundred non-generic macros where a single generic one can do
+>> the job.
+>
+> Agreed.
+>
+>> 
+>> The closest we have to a common base is GenericList.  It's in in
+>> visitor.h because it's only used by visitors so far.  Adding the macro
+>> next it is not so smart, because we don't want non-visitor code to
+>> include visitor.h just for this macro.
+>
+> Also agreed.
+>
+>> 
+>> Perhaps the macro should go into qapi/util.h, and perhaps GenericList
+>> and GenericAlternate should move there, too.
+>
+> GenericList is easy, but GenericAlternate is harder: it would introduce
+> a cyclic declaration dependency (generated qapi-builtin-types.h includes
+> qapi/util.h for the definition of QEnumLookup, but qapi/util.h declaring
+> GenericAlternate would depend on including qapi-builtin-types.h for the
+> definition of QType).
 
-Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Message-Id: <20201012121536.3381997-6-philmd@redhat.com>
-Reviewed-by: Eduardo Habkost <ehabkost@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/migration.json    | 41 +++++++++++++++++++++++++++++++++++++++++
- qapi/misc.json         | 41 -----------------------------------------
- accel/stubs/xen-stub.c |  2 +-
- hw/i386/xen/xen-hvm.c  |  2 +-
- migration/savevm.c     |  1 -
- 5 files changed, 43 insertions(+), 44 deletions(-)
+You're right.
 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index 974021a5c8..a5da513c9e 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -1551,6 +1551,47 @@
- { 'command': 'xen-save-devices-state',
-   'data': {'filename': 'str', '*live':'bool' } }
- 
-+##
-+# @xen-set-global-dirty-log:
-+#
-+# Enable or disable the global dirty log mode.
-+#
-+# @enable: true to enable, false to disable.
-+#
-+# Returns: nothing
-+#
-+# Since: 1.3
-+#
-+# Example:
-+#
-+# -> { "execute": "xen-set-global-dirty-log",
-+#      "arguments": { "enable": true } }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'xen-set-global-dirty-log', 'data': { 'enable': 'bool' } }
-+
-+##
-+# @xen-load-devices-state:
-+#
-+# Load the state of all devices from file. The RAM and the block devices
-+# of the VM are not loaded by this command.
-+#
-+# @filename: the file to load the state of the devices from as binary
-+#            data. See xen-save-devices-state.txt for a description of the binary
-+#            format.
-+#
-+# Since: 2.7
-+#
-+# Example:
-+#
-+# -> { "execute": "xen-load-devices-state",
-+#      "arguments": { "filename": "/tmp/resume" } }
-+# <- { "return": {} }
-+#
-+##
-+{ 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
-+
- ##
- # @xen-set-replication:
- #
-diff --git a/qapi/misc.json b/qapi/misc.json
-index 363115c1ed..40df513856 100644
---- a/qapi/misc.json
-+++ b/qapi/misc.json
-@@ -287,26 +287,6 @@
-   'data': {'device': 'str', 'target': 'str', '*arg': 'str'},
-   'features': [ 'deprecated' ] }
- 
--##
--# @xen-set-global-dirty-log:
--#
--# Enable or disable the global dirty log mode.
--#
--# @enable: true to enable, false to disable.
--#
--# Returns: nothing
--#
--# Since: 1.3
--#
--# Example:
--#
--# -> { "execute": "xen-set-global-dirty-log",
--#      "arguments": { "enable": true } }
--# <- { "return": {} }
--#
--##
--{ 'command': 'xen-set-global-dirty-log', 'data': { 'enable': 'bool' } }
--
- ##
- # @getfd:
- #
-@@ -588,24 +568,3 @@
-  'data': { '*option': 'str' },
-  'returns': ['CommandLineOptionInfo'],
-  'allow-preconfig': true }
--
--##
--# @xen-load-devices-state:
--#
--# Load the state of all devices from file. The RAM and the block devices
--# of the VM are not loaded by this command.
--#
--# @filename: the file to load the state of the devices from as binary
--#            data. See xen-save-devices-state.txt for a description of the binary
--#            format.
--#
--# Since: 2.7
--#
--# Example:
--#
--# -> { "execute": "xen-load-devices-state",
--#      "arguments": { "filename": "/tmp/resume" } }
--# <- { "return": {} }
--#
--##
--{ 'command': 'xen-load-devices-state', 'data': {'filename': 'str'} }
-diff --git a/accel/stubs/xen-stub.c b/accel/stubs/xen-stub.c
-index 7ba0b697f4..7054965c48 100644
---- a/accel/stubs/xen-stub.c
-+++ b/accel/stubs/xen-stub.c
-@@ -7,7 +7,7 @@
- 
- #include "qemu/osdep.h"
- #include "sysemu/xen.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-migration.h"
- 
- bool xen_allowed;
- 
-diff --git a/hw/i386/xen/xen-hvm.c b/hw/i386/xen/xen-hvm.c
-index f3ababf33b..9519c33c09 100644
---- a/hw/i386/xen/xen-hvm.c
-+++ b/hw/i386/xen/xen-hvm.c
-@@ -24,7 +24,7 @@
- #include "hw/xen/xen-bus.h"
- #include "hw/xen/xen-x86.h"
- #include "qapi/error.h"
--#include "qapi/qapi-commands-misc.h"
-+#include "qapi/qapi-commands-migration.h"
- #include "qemu/error-report.h"
- #include "qemu/main-loop.h"
- #include "qemu/range.h"
-diff --git a/migration/savevm.c b/migration/savevm.c
-index d2e141f7b1..ff33e210eb 100644
---- a/migration/savevm.c
-+++ b/migration/savevm.c
-@@ -42,7 +42,6 @@
- #include "postcopy-ram.h"
- #include "qapi/error.h"
- #include "qapi/qapi-commands-migration.h"
--#include "qapi/qapi-commands-misc.h"
- #include "qapi/qmp/qerror.h"
- #include "qemu/error-report.h"
- #include "sysemu/cpus.h"
--- 
-2.26.2
+QType is a built-in QAPI type.  The typedef is generated into
+qapi-builtin-types.h.
+
+It needs to be a QAPI type because it's the type of alternates'
+(implicit) member @type.
+
+I figure the easiest way to move GenericAlternate (if we want to), is
+creating a new header, or rather splitting qapi/util.h into the part
+needed by qapi-builtin-types.h and the part that needs
+qapi-builtin-types.h.
+
+Doesn't seem to be worth our while now.  We can simply put the macro
+into qapi/util.h and call it a day.
 
 
