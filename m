@@ -2,60 +2,59 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D47ABC55178
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:26:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1667C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:26:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A98E221FC
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:26:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5284D221FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:26:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="pKGHs1rX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A98E221FC
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="QIIxRzdF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5284D221FC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39976 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVE84-0006kl-9l
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:26:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59982)
+	id 1kVE8X-0007Su-AU
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:26:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <84ac76937855bf441242372cc3e62df42f0a3dc4@lizzy.crudebyte.com>)
- id 1kVE5N-0003Td-TK
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:23:25 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:55907)
+ (envelope-from <4d7275b2363f122438a443ce079cbb355285e9d6@lizzy.crudebyte.com>)
+ id 1kVE50-0002li-7n
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:23:03 -0400
+Received: from lizzy.crudebyte.com ([91.194.90.13]:56297)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <84ac76937855bf441242372cc3e62df42f0a3dc4@lizzy.crudebyte.com>)
- id 1kVE5M-0003Xf-3W
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:23:25 -0400
+ (envelope-from <4d7275b2363f122438a443ce079cbb355285e9d6@lizzy.crudebyte.com>)
+ id 1kVE4w-0003UE-TV
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:23:01 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=TMZVDqWymrBNxIM0hFUQWZ6jVyyA0ixYlY/+xniKl8c=; b=pKGHs
- 1rXOzho8RKyslr5EEHYzejXovJ02jciHmYaV7Oz291Nzs6pE5KxLPWuGJOYzMs6QMP60UaMoIi2OL
- vtcxlYaZKSEFbFlZkrc5czjLcLB21qJ8HQmSUweXMUW+NRaUa+HSlEpjRXZRT+kN1ZzhGaCmNgu+c
- ki7fRW3eF5WD9rRZyAk+q9UiqZVdyNPImYA52Tr2oPVFiXYmjNjnw1cZtIT1ILR7IQUDC43nsWvAd
- LPVcRC6/hAY68zp7yIhRadGze4QV3W3TlDWWEBJFyI1gnK1jmZhO5jg5p3v2QuDJ6BO5upbTMv3tm
- 6rLd2I922bZ4O4KqCKn2F0fjchFng==;
-Message-Id: <84ac76937855bf441242372cc3e62df42f0a3dc4.1603285620.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=jPv90ogvE1yLkYJEbd3gMSVSQi2C/uVPumjs570j7TA=; b=QIIxR
+ zdFM+boVEyJSeqc1NulY3RUlGNir0cgUUgSuzXwVVPiFtRV9XgOKSm2hrxwJL/FIxM23Oa+rnE45P
+ glmuhuANWGQmGVuWRiqXQmOhe2hLQqWiqVp7YpqB9jliZ4ekq7fEekrnfTa0q5/eutK5WnQoeS1pm
+ LtV5F6i4QYSXI2RUfNguy2nxIkSw8iJ0I31nNQ3r/5D9m73IUiMZxj3Enog2JiotmH6F3ddOZh3zr
+ pjlnBCCY29iBiuAiYvq+UNhp8U84PE3h3v4F+DspJbpfFwUty0WrbFp7a9E4G6h2ajeoQWhXc6A/D
+ IS/UovEd2PZvXCql+/m7bv7Ooux1w==;
+Message-Id: <4d7275b2363f122438a443ce079cbb355285e9d6.1603285620.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1603285620.git.qemu_oss@crudebyte.com>
 References: <cover.1603285620.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Wed, 21 Oct 2020 14:33:34 +0200
-Subject: [PATCH v2 5/8] tests/9pfs: add local Tsymlink test
+Date: Wed, 21 Oct 2020 14:06:53 +0200
+Subject: [PATCH v2 1/8] tests/9pfs: simplify do_mkdir()
 To: qemu-devel@nongnu.org
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=84ac76937855bf441242372cc3e62df42f0a3dc4@lizzy.crudebyte.com;
+ envelope-from=4d7275b2363f122438a443ce079cbb355285e9d6@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 09:21:52
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,130 +80,72 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case uses a Tsymlink 9p request to create a symbolic link using
-the 9pfs 'local' fs driver.
+Split out walking a directory path to a separate new utility function
+do_walk() and use that function in do_mkdir().
+
+The code difference saved this way is not much, but we'll use that new
+do_walk() function in the upcoming patches, so it will avoid quite
+some code duplication after all.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/virtio-9p-test.c | 77 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 77 insertions(+)
+ tests/qtest/virtio-9p-test.c | 27 +++++++++++++++++++--------
+ 1 file changed, 19 insertions(+), 8 deletions(-)
 
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index 6b74a1fd7e..0c11417236 100644
+index 2ea555fa04..21807037df 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -259,6 +259,7 @@ static const char *rmessage_name(uint8_t id)
-         id == P9_RWRITE ? "RWRITE" :
-         id == P9_RMKDIR ? "RMKDIR" :
-         id == P9_RLCREATE ? "RLCREATE" :
-+        id == P9_RSYMLINK ? "RSYMLINK" :
-         id == P9_RUNLINKAT ? "RUNLINKAT" :
-         id == P9_RFLUSH ? "RFLUSH" :
-         id == P9_RREADDIR ? "READDIR" :
-@@ -733,6 +734,39 @@ static void v9fs_rlcreate(P9Req *req, v9fs_qid *qid, uint32_t *iounit)
-     v9fs_req_free(req);
+@@ -583,6 +583,23 @@ static void do_version(QVirtio9P *v9p)
+     g_free(server_version);
  }
  
-+/* size[4] Tsymlink tag[2] fid[4] name[s] symtgt[s] gid[4] */
-+static P9Req *v9fs_tsymlink(QVirtio9P *v9p, uint32_t fid, const char *name,
-+                            const char *symtgt, uint32_t gid, uint16_t tag)
++/* utility function: walk to requested dir and return fid for that dir */
++static uint32_t do_walk(QVirtio9P *v9p, const char *path)
 +{
++    char **wnames;
 +    P9Req *req;
++    const uint32_t fid = genfid();
 +
-+    uint32_t body_size = 4 + 4;
-+    uint16_t string_size = v9fs_string_size(name) + v9fs_string_size(symtgt);
++    int nwnames = split(path, "/", &wnames);
 +
-+    g_assert_cmpint(body_size, <=, UINT32_MAX - string_size);
-+    body_size += string_size;
-+
-+    req = v9fs_req_init(v9p, body_size, P9_TSYMLINK, tag);
-+    v9fs_uint32_write(req, fid);
-+    v9fs_string_write(req, name);
-+    v9fs_string_write(req, symtgt);
-+    v9fs_uint32_write(req, gid);
-+    v9fs_req_send(req);
-+    return req;
-+}
-+
-+/* size[4] Rsymlink tag[2] qid[13] */
-+static void v9fs_rsymlink(P9Req *req, v9fs_qid *qid)
-+{
-+    v9fs_req_recv(req, P9_RSYMLINK);
-+    if (qid) {
-+        v9fs_memread(req, qid, 13);
-+    } else {
-+        v9fs_memskip(req, 13);
-+    }
-+    v9fs_req_free(req);
-+}
-+
- /* size[4] Tunlinkat tag[2] dirfd[4] name[s] flags[4] */
- static P9Req *v9fs_tunlinkat(QVirtio9P *v9p, uint32_t dirfd, const char *name,
-                              uint32_t flags, uint16_t tag)
-@@ -1089,6 +1123,25 @@ static uint32_t do_lcreate(QVirtio9P *v9p, const char *path,
-     return fid;
- }
- 
-+/* create symlink named @a clink in directory @a path pointing to @a to */
-+static void do_symlink(QVirtio9P *v9p, const char *path, const char *clink,
-+                       const char *to)
-+{
-+    char *const name = g_strdup(clink);
-+    char *const dst = g_strdup(to);
-+    uint32_t fid;
-+    P9Req *req;
-+
-+    fid = do_walk(v9p, path);
-+
-+    req = v9fs_tsymlink(v9p, fid, name, dst, 0, 0);
++    req = v9fs_twalk(v9p, 0, fid, nwnames, wnames, 0);
 +    v9fs_req_wait_for_reply(req, NULL);
-+    v9fs_rsymlink(req, NULL);
++    v9fs_rwalk(req, NULL, NULL);
 +
-+    g_free(dst);
-+    g_free(name);
++    split_free(&wnames);
++    return fid;
 +}
 +
- static void do_unlinkat(QVirtio9P *v9p, const char *atpath, const char *rpath,
-                         uint32_t flags)
+ static void fs_version(void *obj, void *data, QGuestAllocator *t_alloc)
  {
-@@ -1219,6 +1272,29 @@ static void fs_unlinkat_file(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(new_file);
+     alloc = t_alloc;
+@@ -974,23 +991,17 @@ static void fs_flush_ignored(void *obj, void *data, QGuestAllocator *t_alloc)
+ 
+ static void do_mkdir(QVirtio9P *v9p, const char *path, const char *cname)
+ {
+-    char **wnames;
+     char *const name = g_strdup(cname);
++    uint32_t fid;
+     P9Req *req;
+-    const uint32_t fid = genfid();
+ 
+-    int nwnames = split(path, "/", &wnames);
+-
+-    req = v9fs_twalk(v9p, 0, fid, nwnames, wnames, 0);
+-    v9fs_req_wait_for_reply(req, NULL);
+-    v9fs_rwalk(req, NULL, NULL);
++    fid = do_walk(v9p, path);
+ 
+     req = v9fs_tmkdir(v9p, fid, name, 0750, 0, 0);
+     v9fs_req_wait_for_reply(req, NULL);
+     v9fs_rmkdir(req, NULL);
+ 
+     g_free(name);
+-    split_free(&wnames);
  }
  
-+static void fs_symlink_file(void *obj, void *data, QGuestAllocator *t_alloc)
-+{
-+    QVirtio9P *v9p = obj;
-+    alloc = t_alloc;
-+    struct stat st;
-+    char *real_file = virtio_9p_test_path("05/real_file");
-+    char *symlink_file = virtio_9p_test_path("05/symlink_file");
-+
-+    do_attach(v9p);
-+    do_mkdir(v9p, "/", "05");
-+    do_lcreate(v9p, "05", "real_file");
-+    g_assert(stat(real_file, &st) == 0);
-+    g_assert((st.st_mode & S_IFMT) == S_IFREG);
-+
-+    do_symlink(v9p, "05", "symlink_file", "real_file");
-+
-+    /* check if created link exists now */
-+    g_assert(stat(symlink_file, &st) == 0);
-+
-+    g_free(symlink_file);
-+    g_free(real_file);
-+}
-+
- static void *assign_9p_local_driver(GString *cmd_line, void *arg)
- {
-     virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-@@ -1262,6 +1338,7 @@ static void register_virtio_9p_test(void)
-     qos_add_test("local/unlinkat_dir", "virtio-9p", fs_unlinkat_dir, &opts);
-     qos_add_test("local/create_file", "virtio-9p", fs_create_file, &opts);
-     qos_add_test("local/unlinkat_file", "virtio-9p", fs_unlinkat_file, &opts);
-+    qos_add_test("local/symlink_file", "virtio-9p", fs_symlink_file, &opts);
- }
- 
- libqos_init(register_virtio_9p_test);
+ static void fs_readdir_split_128(void *obj, void *data,
 -- 
 2.20.1
 
