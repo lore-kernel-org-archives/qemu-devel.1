@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3170C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:53:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5662C55178
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:53:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 17B3C22249
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:53:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1CE9922249
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:53:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YoZcTmRw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 17B3C22249
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FcWpkRKl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CE9922249
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVFUn-0003Rp-0H
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 10:53:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55980)
+	id 1kVFUr-0003cD-1Q
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 10:53:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55974)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQX-0006c9-4v
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57339)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQV-0006nA-3B
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQW-0006at-NF
  for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51163)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQU-0006mn-0w
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603291758;
+ s=mimecast20190719; t=1603291756;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=y1R62GdBNvcK8krhKygspqZWH5w6J/4zx2j2lY/aXZ0=;
- b=YoZcTmRwRRuACnfJrxie0idairvrMiEtmrG8shEF9K1Hn8vxNO5jxOG93Flx9dnk97Y6J1
- G0YbOMr1dU13jbT9at5iu+ADnRGuiG2N3O+RgOem0jNzgfHh0f1WKx+/bf1nTORxLTmf/P
- CH5HmOSq0RMVLCSwkan0YfeUuqvB5l4=
+ bh=0nSxZT2xk1YhiojHLxRheQ1w2vOMqxUcykNd1t8Cfzc=;
+ b=FcWpkRKlxHSMAO6Kyez+5V+VcZDwhPXvmxCQUYqpUHKxK01EqSJiJu2JkW3NmBYJ9FSWae
+ aeAtqTnFcQO3hVAxz8nlrFTjpGb8tbegbJwPlQy4daNOYpTpLk7qqjaGQjTweRO3tJWuUs
+ hYy2xN9VeuXeHwjFA+Zw2V4gXd8b/GM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-Y5sk4E8ePzysVUCrpodD0g-1; Wed, 21 Oct 2020 10:49:15 -0400
-X-MC-Unique: Y5sk4E8ePzysVUCrpodD0g-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-338-NnIn8J3mNA276Q7aJyy1Vg-1; Wed, 21 Oct 2020 10:49:14 -0400
+X-MC-Unique: NnIn8J3mNA276Q7aJyy1Vg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B935B18A072C;
- Wed, 21 Oct 2020 14:48:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AE410425EC;
+ Wed, 21 Oct 2020 14:48:53 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 70EFA5C1C7;
- Wed, 21 Oct 2020 14:48:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 5D3CE6EF6B;
+ Wed, 21 Oct 2020 14:48:53 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id A2E47204B8; Wed, 21 Oct 2020 16:48:52 +0200 (CEST)
+ id 40E8C9D0F; Wed, 21 Oct 2020 16:48:52 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 13/17] tests/acpi: allow updates for expected data files
-Date: Wed, 21 Oct 2020 16:48:48 +0200
-Message-Id: <20201021144852.16665-14-kraxel@redhat.com>
+Subject: [PULL 04/17] microvm: set pci_irq_mask
+Date: Wed, 21 Oct 2020 16:48:39 +0200
+Message-Id: <20201021144852.16665-5-kraxel@redhat.com>
 In-Reply-To: <20201021144852.16665-1-kraxel@redhat.com>
 References: <20201021144852.16665-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -104,20 +104,46 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20201020074844.5304-7-kraxel@redhat.com
----
- tests/qtest/bios-tables-test-allowed-diff.h | 2 ++
- 1 file changed, 2 insertions(+)
+Makes sure the PCI interrupt overrides are added to the
+APIC table in case PCIe is enabled.
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8bf4..afd6b04a475a 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,3 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/microvm/DSDT.usb",
-+"tests/data/acpi/microvm/DSDT.rtc",
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20201016113835.17465-5-kraxel@redhat.com
+---
+ hw/i386/acpi-microvm.c | 2 +-
+ hw/i386/microvm.c      | 6 ++++++
+ 2 files changed, 7 insertions(+), 1 deletion(-)
+
+diff --git a/hw/i386/acpi-microvm.c b/hw/i386/acpi-microvm.c
+index f16f2311955c..8e2d2b7cff83 100644
+--- a/hw/i386/acpi-microvm.c
++++ b/hw/i386/acpi-microvm.c
+@@ -196,7 +196,7 @@ static void acpi_build_microvm(AcpiBuildTables *tables,
+ 
+     acpi_add_table(table_offsets, tables_blob);
+     acpi_build_madt(tables_blob, tables->linker, X86_MACHINE(machine),
+-                    ACPI_DEVICE_IF(x86ms->acpi_dev), false);
++                    ACPI_DEVICE_IF(x86ms->acpi_dev), x86ms->pci_irq_mask != 0);
+ 
+     xsdt = tables_blob->len;
+     build_xsdt(tables_blob, tables->linker, table_offsets, NULL, NULL);
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index 68a7f424acf9..c60ba4e840b0 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -210,6 +210,12 @@ static void microvm_devices_init(MicrovmMachineState *mms)
+         mms->gpex.ecam.size   = PCIE_ECAM_SIZE;
+         mms->gpex.irq         = PCIE_IRQ_BASE;
+         create_gpex(mms);
++        x86ms->pci_irq_mask = ((1 << (PCIE_IRQ_BASE + 0)) |
++                               (1 << (PCIE_IRQ_BASE + 1)) |
++                               (1 << (PCIE_IRQ_BASE + 2)) |
++                               (1 << (PCIE_IRQ_BASE + 3)));
++    } else {
++        x86ms->pci_irq_mask = 0;
+     }
+ 
+     if (mms->pic == ON_OFF_AUTO_ON || mms->pic == ON_OFF_AUTO_AUTO) {
 -- 
 2.27.0
 
