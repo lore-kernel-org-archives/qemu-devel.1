@@ -1,85 +1,83 @@
 Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_NONE autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: **
+X-Spam-Status: No, score=2.5 required=3.0 tests=BAYES_00,
+	CHARSET_FARAWAY_HEADER,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BF77C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:15:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90E31C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:23:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C93E420936
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:15:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dv5aAc27"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C93E420936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5D74A221FC
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:23:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D74A221FC
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53610 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58400 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVDxp-0000QX-ML
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:15:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57364)
+	id 1kVE5V-0003FR-9A
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:23:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kVDwO-0008I1-Nr
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:14:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50657)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
- id 1kVDwM-0002Qz-VR
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:14:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603286045;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=6VuAl8JYhm/kiRIitf2JUIpD+BQiwdpzW9TZ+Y3yVC8=;
- b=dv5aAc27muBXUs+cYwKkPIr9B11S1OsPSqjQyfnNdTEFTPJtczbvEHOS5inP8DwzIacPN0
- E8q7KExHfk/wB466WyjmLAvrSIv4Tsq9gY7B0Qrtbnt7ZCLZfAecJvtA77Mfc6R8PFEJt/
- kJKxcMZ9ChsQKjGVie7CuOEpDyOFwhE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-252-uN2PceVhOB60Drkquq4QWA-1; Wed, 21 Oct 2020 09:14:02 -0400
-X-MC-Unique: uN2PceVhOB60Drkquq4QWA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B22DE10A0B81;
- Wed, 21 Oct 2020 13:14:01 +0000 (UTC)
-Received: from localhost (ovpn-66-44.rdu2.redhat.com [10.10.66.44])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2CBCD60DA0;
- Wed, 21 Oct 2020 13:13:54 +0000 (UTC)
-From: Eduardo Habkost <ehabkost@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v2] pc: Implement -no-hpet as sugar for -machine allow-hpet=no
-Date: Wed, 21 Oct 2020 09:13:53 -0400
-Message-Id: <20201021131353.1450143-1-ehabkost@redhat.com>
+ (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
+ id 1kVE4d-0002TV-Hj
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:22:39 -0400
+Received: from zxshcas1.zhaoxin.com ([203.148.12.81]:16417)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <FelixCui-oc@zhaoxin.com>)
+ id 1kVE4Y-0003YL-Qd
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:22:38 -0400
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHCAS1.zhaoxin.com
+ (10.28.252.161) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 21 Oct
+ 2020 21:16:14 +0800
+Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by zxbjmbx1.zhaoxin.com
+ (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1979.3; Wed, 21 Oct
+ 2020 21:16:13 +0800
+Received: from zxbjmbx1.zhaoxin.com ([fe80::290a:f538:51e7:1416]) by
+ zxbjmbx1.zhaoxin.com ([fe80::290a:f538:51e7:1416%16]) with mapi id
+ 15.01.1979.003; Wed, 21 Oct 2020 21:16:13 +0800
+From: FelixCui-oc <FelixCui-oc@zhaoxin.com>
+To: Paolo Bonzini <pbonzini@redhat.com>, Alex Williamson
+ <alex.williamson@redhat.com>
+Subject: =?gb2312?B?tPC4tDogW1BBVENIIDEvMV0gU2tpcCBmbGF0dmlld19zaW1wbGlmeSgpIGZv?=
+ =?gb2312?Q?r_cpu_vendor_zhaoxin?=
+Thread-Topic: [PATCH 1/1] Skip flatview_simplify() for cpu vendor zhaoxin
+Thread-Index: AQHWo6+lIFwCGFufXkSJFIAohPLGXamZlV6AgAUx0wCAAPEVAIAA32uAgACU/oCAAN+P8Q==
+Date: Wed, 21 Oct 2020 13:16:13 +0000
+Message-ID: <6b7179fb801c4ef1919153ebee85c256@zhaoxin.com>
+References: <20201016112933.14856-1-FelixCui-oc@zhaoxin.com>
+ <20201016112933.14856-2-FelixCui-oc@zhaoxin.com>
+ <a971c9db-469f-ddc0-1a27-3e21958f6ff7@redhat.com>
+ <20201019130206.1d3baffc@w520.home>
+ <4d2b96cb-8f7f-2598-39e6-4cf0f61d567b@redhat.com>
+ <20201020164437.5e3cb4ce@w520.home>,
+ <783b5ef0-277c-363d-f342-7c0351f9ac16@redhat.com>
+In-Reply-To: <783b5ef0-277c-363d-f342-7c0351f9ac16@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.29.8.40]
+Content-Type: multipart/alternative;
+ boundary="_000_6b7179fb801c4ef1919153ebee85c256zhaoxincom_"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=203.148.12.81;
+ envelope-from=FelixCui-oc@zhaoxin.com; helo=ZXSHCAS1.zhaoxin.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 09:16:15
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: 38
+X-Spam_score: 3.8
+X-Spam_bar: +++
+X-Spam_report: (3.8 / 5.0 requ) BAYES_00=-1.9, CHARSET_FARAWAY_HEADER=3.2,
+ HTML_MESSAGE=0.001, MIME_CHARSET_FARAWAY=2.45, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,142 +90,179 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, John Snow <jsnow@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: CobeChen-oc <CobeChen-oc@zhaoxin.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Tony W Wang-oc <TonyWWang-oc@zhaoxin.com>, RockCui-oc <RockCui-oc@zhaoxin.com>,
+ Richard Henderson <rth@twiddle.net>, Eduardo Habkost <ehabkost@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Get rid of yet another global variable.
+--_000_6b7179fb801c4ef1919153ebee85c256zhaoxincom_
+Content-Type: text/plain; charset="gb2312"
+Content-Transfer-Encoding: base64
 
-Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
----
-Changes v1 -> v2:
-* Rename property to "allow-hpet" to make its semantic clearer,
-  as it won't make sure HPET is created if CONFIG_HPET=n
----
- include/hw/i386/pc.h  |  1 +
- include/hw/i386/x86.h |  3 ---
- hw/i386/pc.c          | 21 ++++++++++++++++++++-
- hw/i386/pc_piix.c     |  2 +-
- softmmu/vl.c          |  4 ++--
- 5 files changed, 24 insertions(+), 7 deletions(-)
+aGkgUGFvbG8sDQoNCj5GZWxpeCwgZGlkIHlvdSBpZGVudGlmeSB0aGUgcmVnaW9ucyB3aG9zZSBz
+aW1wbGlmaWNhdGlvbiBjYXVzZXMgdGhlIGJ1Zz8NCj5JcyB0aGlzIFJBTSAoZm9yIGV4YW1wbGUg
+ZHVlIHRvIHRoZSBQQU0gcmVnaXN0ZXJzKSBvciBzb21ldGhpbmcgZWxzZT8NCg0KDQp5ZXMsIHRo
+aXMgYnVnIGlzIGNhdXNlZCBieSB3cml0ZSBQQU0gcmVnaXN0ZXIuVGhlIGFjdHVhbCBzaXR1YXRp
+b24gaXMgdGhhdCB0aGUNCg0KcHJvcGVydGllcyBvZiBzb21lIHJhbmdlcyBhcmUgY2hhbmdlZCBm
+cm9tIFJXIHRvIHJlYWRvbmx5LlRoaXMgc2l0dWF0aW9uDQoNCndpbGwgY2F1c2UgdGhlIG9sZCBy
+YW5nZXMgdG8gYmUgdW5tYXBwZWQuDQoNCg0KQmVzdCByZWdhcmRzDQoNCkZlbGl4Y3VpLW9jDQoN
+Cg0KX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX18NCreivP7IyzogUGFvbG8gQm9uemlu
+aSA8cGJvbnppbmlAcmVkaGF0LmNvbT4NCreiy83KsbzkOiAyMDIwxOoxMNTCMjHI1SAxNTozNzo1
+Mw0KytW8/sjLOiBBbGV4IFdpbGxpYW1zb24NCrOty806IEZlbGl4Q3VpLW9jOyBSaWNoYXJkIEhl
+bmRlcnNvbjsgRWR1YXJkbyBIYWJrb3N0OyBxZW11LWRldmVsQG5vbmdudS5vcmc7IFJvY2tDdWkt
+b2M7IFRvbnkgVyBXYW5nLW9jOyBDb2JlQ2hlbi1vYw0K1vfM4jogUmU6IFtQQVRDSCAxLzFdIFNr
+aXAgZmxhdHZpZXdfc2ltcGxpZnkoKSBmb3IgY3B1IHZlbmRvciB6aGFveGluDQoNCk9uIDIxLzEw
+LzIwIDAwOjQ0LCBBbGV4IFdpbGxpYW1zb24gd3JvdGU6DQo+IERvIHdlIG5lY2Vzc2FyaWx5IG5l
+ZWQgYSBtZW1vcnkgbWFwIGlvY3RsIGZvciB0aGlzIG9yIGNvdWxkIGl0IGJlIHRoZQ0KPiBRRU1V
+IGNvZGUgdGhhdCBjb21wYXJlcyB0aGUgb2xkIGFuZCBuZXcgbWFwcyB0byB0cmlnZ2VyIG1hcCBh
+bmQgdW5tYXANCj4gaW9jdGxzPyAgRm9yIGV4YW1wbGUgKGFpdWkpIG91ciByYWNlIGlzIHRoYXQg
+aWYgd2UgaGF2ZSBjb250aWd1b3VzDQo+IG1lbW9yeSByZWdpb25zIEEgYW5kIEIgYW5kIGZsYXR2
+aWV3X3NpbXBsaWZ5KCkgdHJpZXMgdG8gZXhwYW5kIEEgYW5kDQo+IGRlbGV0ZSBCIHdlJ2xsIHNl
+ZSBhIHNlcmllcyBvZiBsaXN0ZW5lciBub3RpZmljYXRpb25zIGRlbGV0aW5nIEEgYW5kIEINCj4g
+YW5kIGFkZGluZyBBJy4gIEJ1dCB0aGUgdmZpbyBRRU1VIGNvZGUgY291bGQgcGFyc2UgdGhlIG1l
+bW9yeSBtYXAgdG8NCj4gZGV0ZXJtaW5lIHRoYXQgb2xkIEEgKyBCIGlzIGZ1bmN0aW9uYWxseSBl
+cXVpdmFsZW50IHRvIEEnIGFuZCBkbw0KPiBub3RoaW5nLg0KDQpJIHRoaW5rIHRoZSBpc3N1ZSBp
+cyBhIGJpdCBkaWZmZXJlbnQsIGFuZCBpbiBmYWN0IHRoZXJlIGFyZSB0d28gc2lkZXMgb2YNCnRo
+ZSBzYW1lIGlzc3VlLiAgU2F5IHlvdSBoYXZlIEEgKGxhcmdlKSBhbmQgaXQgaXMgcmVwbGFjZWQg
+YnkgQScNCihzbWFsbGVyKSArIEIsIHRoZW46DQoNCiogdGhlIGZpcnN0IHBhcnQgb2YgQSBkaXNh
+cHBlYXJzIGZvciBhIG1vbWVudCBiZWZvcmUgQScgYXBwZWFycy4gIFRoaXMNCmlzIHNvbWV0aGlu
+ZyB0aGF0IFFFTVUgY2FuIHdvcmsgYXJvdW5kLCBieSBub3QgZG9pbmcgYW55dGhpbmcNCg0KKiB0
+aGUgc2Vjb25kIHBhcnQgb2YgQSBkaXNhcHBlYXJzIGZvciBhIG1vbWVudCBiZWZvcmUgQiBhcHBl
+YXJzLiAgVGhpcw0KaXMgdGhlIHJvb3QgQVBJIGlzc3VlIGFuZCBub3Qgc29tZXRoaW5nIHRoYXQg
+UUVNVSBjYW4gd29yayBhcm91bmQ7IGFuZA0KaW4gZmFjdCBpdCBpcyBub3QgZXZlbiBmaXhlZCBi
+eSByZW1vdmluZyBmbGF0dmlld19zaW1wbGlmeS4NCg0KRmVsaXgsIGRpZCB5b3UgaWRlbnRpZnkg
+dGhlIHJlZ2lvbnMgd2hvc2Ugc2ltcGxpZmljYXRpb24gY2F1c2VzIHRoZSBidWc/DQogSXMgdGhp
+cyBSQU0gKGZvciBleGFtcGxlIGR1ZSB0byB0aGUgUEFNIHJlZ2lzdGVycykgb3Igc29tZXRoaW5n
+IGVsc2U/DQoNClBhb2xvDQoNCg==
 
-diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-index 84639d0ebc..b18f83d92f 100644
---- a/include/hw/i386/pc.h
-+++ b/include/hw/i386/pc.h
-@@ -43,6 +43,7 @@ typedef struct PCMachineState {
-     bool smbus_enabled;
-     bool sata_enabled;
-     bool pit_enabled;
-+    bool hpet_allowed;
- 
-     /* NUMA information: */
-     uint64_t numa_nodes;
-diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-index d5dcf7a07f..4e66a15ff5 100644
---- a/include/hw/i386/x86.h
-+++ b/include/hw/i386/x86.h
-@@ -124,7 +124,4 @@ qemu_irq x86_allocate_cpu_irq(void);
- void gsi_handler(void *opaque, int n, int level);
- void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
- 
--/* hpet.c */
--extern int no_hpet;
--
- #endif
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 4e323755d0..48a58fcfb3 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -1142,7 +1142,8 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-      * Without KVM_CAP_PIT_STATE2, we cannot switch off the in-kernel PIT
-      * when the HPET wants to take over. Thus we have to disable the latter.
-      */
--    if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
-+    if (pcms->hpet_allowed && (!kvm_irqchip_in_kernel() ||
-+                               kvm_has_pit_state2())) {
-         hpet = qdev_try_new(TYPE_HPET);
-         if (hpet) {
-             /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
-@@ -1535,6 +1536,20 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
-     pcms->pit_enabled = value;
- }
- 
-+static bool pc_machine_get_hpet_allowed(Object *obj, Error **errp)
-+{
-+    PCMachineState *pcms = PC_MACHINE(obj);
-+
-+    return pcms->hpet_allowed;
-+}
-+
-+static void pc_machine_set_hpet_allowed(Object *obj, bool value, Error **errp)
-+{
-+    PCMachineState *pcms = PC_MACHINE(obj);
-+
-+    pcms->hpet_allowed = value;
-+}
-+
- static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
-                                             const char *name, void *opaque,
-                                             Error **errp)
-@@ -1585,6 +1600,7 @@ static void pc_machine_initfn(Object *obj)
-     pcms->smbus_enabled = true;
-     pcms->sata_enabled = true;
-     pcms->pit_enabled = true;
-+    pcms->hpet_allowed = true;
- 
-     pc_system_flash_create(pcms);
-     pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
-@@ -1705,6 +1721,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
- 
-     object_class_property_add_bool(oc, PC_MACHINE_PIT,
-         pc_machine_get_pit, pc_machine_set_pit);
-+
-+    object_class_property_add_bool(oc, "allow-hpet",
-+        pc_machine_get_hpet_allowed, pc_machine_set_hpet_allowed);
- }
- 
- static const TypeInfo pc_machine_info = {
-diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-index 0cf22a57ad..3b26364dcf 100644
---- a/hw/i386/pc_piix.c
-+++ b/hw/i386/pc_piix.c
-@@ -216,7 +216,7 @@ static void pc_init1(MachineState *machine,
-         i440fx_state = NULL;
-         isa_bus = isa_bus_new(NULL, get_system_memory(), system_io,
-                               &error_abort);
--        no_hpet = 1;
-+        pcms->hpet_allowed = false;
-     }
-     isa_bus_irqs(isa_bus, x86ms->gsi);
- 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index cb476aa70b..2831804290 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -146,7 +146,6 @@ static Chardev **serial_hds;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- int win2k_install_hack = 0;
- int singlestep = 0;
--int no_hpet = 0;
- int fd_bootchk = 1;
- static int no_reboot;
- int no_shutdown = 0;
-@@ -3562,7 +3561,8 @@ void qemu_init(int argc, char **argv, char **envp)
-                 qemu_opts_parse_noisily(olist, "acpi=off", false);
-                 break;
-             case QEMU_OPTION_no_hpet:
--                no_hpet = 1;
-+                olist = qemu_find_opts("machine");
-+                qemu_opts_parse_noisily(olist, "allow-hpet=no", false);
-                 break;
-             case QEMU_OPTION_no_reboot:
-                 no_reboot = 1;
--- 
-2.28.0
+--_000_6b7179fb801c4ef1919153ebee85c256zhaoxincom_
+Content-Type: text/html; charset="gb2312"
+Content-Transfer-Encoding: quoted-printable
 
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Dgb2312">
+<meta name=3D"Generator" content=3D"Microsoft Exchange Server">
+<!-- converted from text --><style><!-- .EmailQuote { margin-left: 1pt; pad=
+ding-left: 4pt; border-left: #800000 2px solid; } --></style>
+</head>
+<body>
+<meta content=3D"text/html; charset=3DUTF-8">
+<style type=3D"text/css" style=3D"">
+<!--
+p
+	{margin-top:0;
+	margin-bottom:0}
+-->
+</style>
+<div dir=3D"ltr">
+<div id=3D"x_divtagdefaultwrapper" dir=3D"ltr" style=3D"font-size:12pt; col=
+or:#000000; font-family:Calibri,Helvetica,sans-serif">
+<p>hi Paolo,</p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">&gt;Felix, did you =
+identify the regions whose simplification causes the bug?</span><br style=
+=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI&quot;,&quot;M=
+icrosoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=CC=E5,sans-seri=
+f,serif,EmojiFont; font-size:13.3333px">
+<span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI&qu=
+ot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=CC=
+=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">&gt;Is this RAM (for e=
+xample due to the PAM registers) or something else?</span><br>
+</p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px"><br>
+</span></p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">yes, this bug is ca=
+used by write PAM register.The actual situation is that the</span></p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">properties of some =
+ranges are changed from RW to readonly.This situation&nbsp;</span></p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">will cause the old =
+ranges to be unmapped.</span></p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px"><br>
+</span></p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">Best regards</span>=
+</p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px">Felixcui-oc</span><=
+/p>
+<p><span style=3D"color:rgb(33,33,33); font-family:&quot;Microsoft YaHei UI=
+&quot;,&quot;Microsoft YaHei&quot;,=CE=A2=C8=ED=D1=C5=BA=DA,SimSun,=CB=CE=
+=CC=E5,sans-serif,serif,EmojiFont; font-size:13.3333px"><br>
+</span></p>
+</div>
+<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
+<div id=3D"x_divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" =
+color=3D"#000000" style=3D"font-size:11pt"><b>=B7=A2=BC=FE=C8=CB:</b> Paolo=
+ Bonzini &lt;pbonzini@redhat.com&gt;<br>
+<b>=B7=A2=CB=CD=CA=B1=BC=E4:</b> 2020=C4=EA10=D4=C221=C8=D5 15:37:53<br>
+<b>=CA=D5=BC=FE=C8=CB:</b> Alex Williamson<br>
+<b>=B3=AD=CB=CD:</b> FelixCui-oc; Richard Henderson; Eduardo Habkost; qemu-=
+devel@nongnu.org; RockCui-oc; Tony W Wang-oc; CobeChen-oc<br>
+<b>=D6=F7=CC=E2:</b> Re: [PATCH 1/1] Skip flatview_simplify() for cpu vendo=
+r zhaoxin</font>
+<div>&nbsp;</div>
+</div>
+</div>
+<font size=3D"2"><span style=3D"font-size:10pt;">
+<div class=3D"PlainText">On 21/10/20 00:44, Alex Williamson wrote:<br>
+&gt; Do we necessarily need a memory map ioctl for this or could it be the<=
+br>
+&gt; QEMU code that compares the old and new maps to trigger map and unmap<=
+br>
+&gt; ioctls?&nbsp; For example (aiui) our race is that if we have contiguou=
+s<br>
+&gt; memory regions A and B and flatview_simplify() tries to expand A and<b=
+r>
+&gt; delete B we'll see a series of listener notifications deleting A and B=
+<br>
+&gt; and adding A'.&nbsp; But the vfio QEMU code could parse the memory map=
+ to<br>
+&gt; determine that old A &#43; B is functionally equivalent to A' and do<b=
+r>
+&gt; nothing.<br>
+<br>
+I think the issue is a bit different, and in fact there are two sides of<br=
+>
+the same issue.&nbsp; Say you have A (large) and it is replaced by A'<br>
+(smaller) &#43; B, then:<br>
+<br>
+* the first part of A disappears for a moment before A' appears.&nbsp; This=
+<br>
+is something that QEMU can work around, by not doing anything<br>
+<br>
+* the second part of A disappears for a moment before B appears.&nbsp; This=
+<br>
+is the root API issue and not something that QEMU can work around; and<br>
+in fact it is not even fixed by removing flatview_simplify.<br>
+<br>
+Felix, did you identify the regions whose simplification causes the bug?<br=
+>
+&nbsp;Is this RAM (for example due to the PAM registers) or something else?=
+<br>
+<br>
+Paolo<br>
+<br>
+</div>
+</span></font>
+</body>
+</html>
+
+--_000_6b7179fb801c4ef1919153ebee85c256zhaoxincom_--
 
