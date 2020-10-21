@@ -7,63 +7,64 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DA78C4363D
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 01:13:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E6EC4363D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 01:13:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B80B720797
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 01:13:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F279420797
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 01:13:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="v0tYHMfc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B80B720797
+	dkim=pass (1024-bit key) header.d=bushare.onmicrosoft.com header.i=@bushare.onmicrosoft.com header.b="i3OaJRYG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F279420797
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51584 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51964 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV2hD-00063u-PC
-	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 21:13:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44388)
+	id 1kV2hG-0006D6-Vm
+	for qemu-devel@archiver.kernel.org; Tue, 20 Oct 2020 21:13:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kV2c7-0000xM-Ar
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 21:08:27 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kV2cH-0001EQ-QT
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 21:08:37 -0400
 Received: from mail-co1nam11on2130.outbound.protection.outlook.com
  ([40.107.220.130]:28640 helo=NAM11-CO1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kV2c5-0004s9-Td
- for qemu-devel@nongnu.org; Tue, 20 Oct 2020 21:08:27 -0400
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kV2cF-0004s9-Vl
+ for qemu-devel@nongnu.org; Tue, 20 Oct 2020 21:08:37 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Auz5SfwJN5rtL88b8Xz2eNv7OGrqipLe8/FtC6E6jtWFxct3cgsylHisVJdOUe67yf1LbIuzDLOL0uWjfptCLrO4K/vQ7n2w+iVOsrSfqPEybh5lEvh+Mn+3NRIKP6HQaBh41X2vNoZeGAsnUFfEDnuRLQC4tRsJlNF5p3VgeHzHT7SRCGXInm9ogmQUgo2FJ19DsuQrp9jJNvBPHbSG3y8h9zf/TVj/fEkDgcugDNAnZ/q7/otEwmSh6mnMsFoLLMyxtvutnybgI394pHUT08p6NIbVOHRREwjyEvb9VEqQuLkTgiy/8EK2a5dacG3YzFG3LA8OG7ioJhKeHLWnzQ==
+ b=dqBnv7FCQHE339pD3btpr9BL7dCyxaM8IN0CKzKL+/TJFbe5qSsK04VLad1b4dsU7SIiivje+47KZAaVJ7wdZuMgbWS+dDkxIX9SaVQx2FRiuNNAIbi8FjaOKdD/PCj83dgX1CZ82BoaU1w78Yfv41M2WBLAYb6UYFFiCjfCvX08oMMnN09OXAlJy7vT8J3wBnlWasLesYqkE6Z+z+FkT0XXhsCoyf7B/r2TIGpVBbSxWiL3MFWEI5DdAuj8stSPOKLFEKQ5lycsqSIR8qV0/ajVsrovyB9lCjAm6LjV+W2bKcmG9EFKJ3tbGr9oMaOwbv4y3CPU5FMXl+WwyRaV8A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RzBnGDRyU66W2x50rl7hIybaGOx/maD6IfktlgFZWW8=;
- b=jccuX/HMqL6HWRjaM5PTLww8l1FHzUGQxvylFrkqoe8kRDnI1it/Qr2H0GrvHbv3MluLK3IdLinFVkyVlTUP5JKtVa8iKNzgMO0O0W0NE/sOvCOYp1DVpzoUGZIRzOut/wo8keUczv2hLqizzxzrDDJMOAlxjQXqpup9ySCu+9st2Yic5yqS5jXwm2UJsUXOWw33xMRYDUrU455NvmWDSOfHoFTdevNm0hjN9R09u1AHoHQxVtRESzDDGAYuwtPya/pc7j6OBqQSfB2cyz8HeGzQXKAow6yFoLFuu8osN2Xe0QcqCihEmRxzalUOMJOTRzYr8jg6dl30/MHKYzUPxQ==
+ bh=+CZ8jI8JlveaKoFzMY2XehdwH81CyN3BV46AVRbR4hk=;
+ b=LGMV0ruOKsOL/6yRtcUqVVZqHkHiErchCG/Iv340fCXisLzNWGKytkc0eyPr2fL2zo/7pTRyIWxs9H1zZKZu3l+AjbL4mjBleMWRwDEg4B8j9ICO2KmD4FYPcH25QvcUGcJl9gE1mXoVqsW3Noujhv5YK6PICKD1BcW3/j7422oLkBOrHAVm9w286CvfhH2Nh77en8/qkPDVRWvCqYHGDBWXqE3lNxaf4be3pIzqBi/QqjfcLCd2Uo/yMjqfnGaNyVc5tbUIKQplhJDacVx5VklbOGgpHUpnFuCN7c3Y4COAZC6HPf2heK1+rM/Y3qNwtS0pUmHsMrPg72TMA23HiA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=bu.edu; dmarc=pass action=none header.from=bu.edu; dkim=pass
  header.d=bu.edu; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=bushare.onmicrosoft.com; s=selector2-bushare-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RzBnGDRyU66W2x50rl7hIybaGOx/maD6IfktlgFZWW8=;
- b=v0tYHMfcVD+Nah2mlzsK5ZlEQgTqMn9W5u7x9V6/Sxn7JMV9ekoIc0yahftzuE3p/970Be+jYhyAetRLyIv/XTRtzZ7waydYROZ3UGzogd1kwSYTVVXf0NZi7MfO5xilpiLbtilKwYRGfB2VrnuiIAbQD3p0tTJCRa54J2Aetmw=
+ bh=+CZ8jI8JlveaKoFzMY2XehdwH81CyN3BV46AVRbR4hk=;
+ b=i3OaJRYGcnAFuKuxAUUGtVcCujd8Dkp4mrWUzxuX3l1B4h6visMKZbT2nW2WuHYdDDQ7OfWwW/worGnVuN8G8+prkf+5S+/jL8SNyOZ25Q85FTUOYCPVmKCghKcUyVm60CABBAxGb4HcqGkTHugGuJktMUBDCgoNtvLrmntHs6c=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=bu.edu;
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com (2603:10b6:805:6d::32)
  by SN2PR03MB2333.namprd03.prod.outlook.com (2603:10b6:804:c::22) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22; Wed, 21 Oct
- 2020 01:08:11 +0000
+ 2020 01:08:18 +0000
 Received: from SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::d520:4c19:8ce6:7db2]) by SN6PR03MB3871.namprd03.prod.outlook.com
  ([fe80::d520:4c19:8ce6:7db2%2]) with mapi id 15.20.3477.028; Wed, 21 Oct 2020
- 01:08:11 +0000
+ 01:08:18 +0000
 From: Alexander Bulekov <alxndr@bu.edu>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 05/16] fuzz: Declare DMA Read callback function
-Date: Tue, 20 Oct 2020 21:07:41 -0400
-Message-Id: <20201021010752.973230-6-alxndr@bu.edu>
+Subject: [PATCH v5 10/16] scripts/oss-fuzz: Add script to reorder a
+ general-fuzzer trace
+Date: Tue, 20 Oct 2020 21:07:46 -0400
+Message-Id: <20201021010752.973230-11-alxndr@bu.edu>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201021010752.973230-1-alxndr@bu.edu>
 References: <20201021010752.973230-1-alxndr@bu.edu>
@@ -79,30 +80,30 @@ Received: from stormtrooper.vrmnet (72.93.72.163) by
  BL1PR13CA0119.namprd13.prod.outlook.com (2603:10b6:208:2b9::34) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.8 via Frontend
- Transport; Wed, 21 Oct 2020 01:08:10 +0000
+ Transport; Wed, 21 Oct 2020 01:08:17 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a90b7bfa-bef2-4517-a453-08d8755dc739
+X-MS-Office365-Filtering-Correlation-Id: 56570c0d-c0cc-407a-a33e-08d8755dcb85
 X-MS-TrafficTypeDiagnostic: SN2PR03MB2333:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <SN2PR03MB23339A80A8371D227D970CFDBA1C0@SN2PR03MB2333.namprd03.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2512;
+X-Microsoft-Antispam-PRVS: <SN2PR03MB233327D110EE0C87D953BCC5BA1C0@SN2PR03MB2333.namprd03.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:9508;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: uvV1R51ZtfYpBGiJmm4+PsSkWfJIqIPhn+3gPXDcYMOtM9ZRPHvi+QRLfNS+ARxmwczcybTYon8klR51IKYca0II6s8SMF5iUKOq3zePdm+kBr2yBFfsJqX9YvH8TfYbHd0SaSbpTbZ8a7vUfDnNCnw2VWt+u3ic8x+omysoN5u412qy9b5lEUF99tAPxK9H7ST4IfWQwN8gq+NLGai8nGI3lvamMtZUJg5D0+X6W4khus9j4ugM6CKA8BtsoVT2IY0WyWuK42q9Zr7t9x5UOHhUDlAfCIoUBUG4tvmWAvLLo0YPUwRpRVknxWxubgvDe40bC+caq8bbkVlYXG8gYw==
+X-Microsoft-Antispam-Message-Info: azzL3Q2hDy6eCA6P8lH2Mx10YB0+SuyNKRtMcIAIRCP0oPCcaArWaPc/vcApan4tfIyFA+Bt4dGJ/T8Trz41rHUjattCy7HgwUqX92frlH1cTCBUv7ctd6uXI/k8bceDherA8YTT7J+o7AJtfAaJUJlDK2UND2pAvTZj69lAzz+2tiTGrcmNzXfI/cub8GcIjUF6/tRrLALpqUycq48NCFxbOxTzpiXnnlKv5Q+WCPKNO+CgjfCWTsIu77tsJc1fyLdi1baeF5fk2fXoWhq5CgXR+vHAJBYnhlosK0OeGJv0Rs4lZWhu7boTb4AEoXtwQukN05oKiwyKfGaA0HYoRA==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:SN6PR03MB3871.namprd03.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39860400002)(396003)(376002)(346002)(366004)(136003)(52116002)(2616005)(8676002)(6512007)(6916009)(6506007)(36756003)(786003)(316002)(956004)(478600001)(1076003)(4326008)(6486002)(75432002)(8936002)(86362001)(5660300002)(26005)(16526019)(186003)(6666004)(66946007)(2906002)(66476007)(66556008);
+ SFS:(4636009)(39860400002)(396003)(376002)(346002)(366004)(136003)(52116002)(2616005)(8676002)(6512007)(6916009)(6506007)(36756003)(786003)(316002)(956004)(83380400001)(478600001)(1076003)(4326008)(6486002)(75432002)(8936002)(54906003)(86362001)(5660300002)(26005)(16526019)(186003)(6666004)(66946007)(2906002)(66476007)(66556008);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: QsF0RNWQn0fIrPOw/pqwaumUSB4z/pss4lG401Ygmuh8yv9s3uBkBPc/Cp4eqWILIFKoe7797WQc5H00DPTro0z6jobjHLtWPYD7h9qBXJTzNtfpLO+az2pTpiG+yZ13UgRq4JyDYKGwF8RlXfwj6dTpmuQS3WvYziTSEwJUAxWDSzzU9HC0Eq9ks3x4Fr2DkbxG/MALv59CitZdjnFd0IhcY7+ydkFQ0BVeESCHuswGC+vsgUDw1P6r2xUZU61GIVYeARn5R+FjtiBZAaW3o7eUCDxQpwFC54r9NXxUWJsw0yGExaR2a2FPYPVaEFWJz9CgtOgsCkpoFZesGulgOVFq/w7XIPXT8VAYkYpn9OMfufd7VcO2IACVYkOPTDkdsNPRy5mJRTVlmMyqXJ01q/qZFMFljFQs9edwC5E5b17CyVLttjfOahb7tgS0Ld0woWUFgV6yDvy/cTjWpxiEZUyJNw58fRcxfW84nMO0cq8t7fTgrjZPjP0z8QSQjSw96UqXL82ctnQa/bGYrwxHLg0JwYX9hWtxel5mJ8vv8ecr6qSkfgDl6crPatB/EmD4ksbRRdZqnbgNQuUZD092uK1e8QD2fR8LxDlXtdsWOV5uKNbV3IY10/CoZplhpV6i+Va+Ii7iRMrkE3c7LTIalg==
+X-MS-Exchange-AntiSpam-MessageData: 6DJBZ/Kpk8z8wGgloEJwVXgepuiHb+D2+fzQPZkDnm9Bs6pZOW2UO8Q5rcxe7HXMlKfur/sVqCCAgyT8ftyFzP4f1++3rURqNIp/wk9otnDNd634q+IvxiFgYwlE2j23IPdGgCxZ8Akq28NYCQXBXm5ntSJSX9J0qw9jA58QDP0wcKURzlyfOftBGVu3vq1v+6lHSH5BOtHvwDb1wrp1D5y0YUGNIvmrGzqnEcqcim76oW2QPjhh8P6wwBExGwSdKUwSxAX5Cb06IfQzffdwzc7OYwdP8teiTRGlCEYzTA21VsZ0d5bt7eyEOhUoCYoTDW4xFHNMyI3EiE5cdmtPKCMcNYxHQQkwDSNptCPYEThRZbDA4b2HBKLrxWhPffLY9hVp4S9QEVNeTlzW37Vbbdqc35ac+AVX4VLIFcfLyW9E5DNJmER0ejh/UU4JDidieySfvK+X0cdki4ZirRh+g2AGP+67r4v2abhzq28WRuBY5DN7x+Aa8T7+GghF9TCz/mF3VKB3cFKSJ35UKI2lkla2jFuQ2/2Yw8fhn1SqfPROQjvgFj93KqFldZtwFdwVpNwkEqC4NQlH+BqT3o9Hdd61aionzvvFafkmG85FJtQ2HmKXkr/KL2RWiqfqV2EjOAt2KVsiUAk2joxEKDDHow==
 X-OriginatorOrg: bu.edu
-X-MS-Exchange-CrossTenant-Network-Message-Id: a90b7bfa-bef2-4517-a453-08d8755dc739
+X-MS-Exchange-CrossTenant-Network-Message-Id: 56570c0d-c0cc-407a-a33e-08d8755dcb85
 X-MS-Exchange-CrossTenant-AuthSource: SN6PR03MB3871.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 01:08:11.1375 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Oct 2020 01:08:18.4343 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: d57d32cc-c121-488f-b07b-dfe705680c71
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GSNXfo1Wuae5O3r+MOna6+LG82r8i3cJ+aGNXDsCWwz+F/qY1gA98qKZEHCUHyRy
+X-MS-Exchange-CrossTenant-UserPrincipalName: z13ocWOo5b3jIg5GiCC5NEJW372CQc9Iu6t6mIOadOtS1lBhP2bB6UZG0mG9sif8
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN2PR03MB2333
 Received-SPF: pass client-ip=40.107.220.130; envelope-from=alxndr@bu.edu;
  helo=NAM11-CO1-obe.outbound.protection.outlook.com
@@ -128,77 +129,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, f4bug@amsat.org, darren.kenny@oracle.com,
- bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- dimastep@yandex-team.ru
+Cc: Thomas Huth <thuth@redhat.com>, Alexander Bulekov <alxndr@bu.edu>,
+ f4bug@amsat.org, darren.kenny@oracle.com, bsd@redhat.com, stefanha@redhat.com,
+ pbonzini@redhat.com, dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patch declares the fuzz_dma_read_cb function and uses the
-preprocessor and linker(weak symbols) to handle these cases:
-
-When we build softmmu/all with --enable-fuzzing, there should be no
-strong symbol defined for fuzz_dma_read_cb, and we link against a weak
-stub function.
-
-When we build softmmu/fuzz with --enable-fuzzing, we link against the
-strong symbol in general_fuzz.c
-
-When we build softmmu/all without --enable-fuzzing, fuzz_dma_read_cb is
-an empty, inlined function. As long as we don't call any other functions
-when building the arguments, there should be no overhead.
+The general-fuzzer uses hooks to fulfill DMA requests just-in-time.
+This means that if we try to use QTEST_LOG=1 to build a reproducer, the
+DMA writes will be logged _after_ the in/out/read/write that triggered
+the DMA read. To work work around this, the general-fuzzer annotates
+these just-in time DMA fulfilments with a tag that we can use to
+discern them. This script simply iterates over a raw qtest
+trace (including log messages, errors, timestamps etc), filters it and
+re-orders it so that DMA fulfillments are placed directly _before_ the
+qtest command that will cause the DMA access.
 
 Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
 Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
 ---
- include/exec/memory.h |  8 ++++++++
- softmmu/memory.c      | 13 +++++++++++++
- 2 files changed, 21 insertions(+)
+ .../oss-fuzz/reorder_fuzzer_qtest_trace.py    | 103 ++++++++++++++++++
+ 1 file changed, 103 insertions(+)
+ create mode 100755 scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 61c2aac943..854480859d 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -47,6 +47,14 @@ void fuzz_dma_read_cb(size_t addr,
-                       size_t len,
-                       MemoryRegion *mr,
-                       bool is_write);
-+#else
-+static inline void fuzz_dma_read_cb(size_t addr,
-+                                    size_t len,
-+                                    MemoryRegion *mr,
-+                                    bool is_write)
-+{
-+    /* Do Nothing */
-+}
- #endif
- 
- extern bool global_dirty_log;
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index c46b0c6d65..d3cdb46459 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -3242,6 +3242,19 @@ void memory_region_init_rom_device(MemoryRegion *mr,
-     vmstate_register_ram(mr, owner_dev);
- }
- 
-+/*
-+ * Support softmmu builds with CONFIG_FUZZ using a weak symbol and a stub for
-+ * the fuzz_dma_read_cb callback
-+ */
-+#ifdef CONFIG_FUZZ
-+void __attribute__((weak)) fuzz_dma_read_cb(size_t addr,
-+                      size_t len,
-+                      MemoryRegion *mr,
-+                      bool is_write)
-+{
-+}
-+#endif
+diff --git a/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
+new file mode 100755
+index 0000000000..47295c9e69
+--- /dev/null
++++ b/scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py
+@@ -0,0 +1,103 @@
++#!/usr/bin/env python3
++# -*- coding: utf-8 -*-
 +
- static const TypeInfo memory_region_info = {
-     .parent             = TYPE_OBJECT,
-     .name               = TYPE_MEMORY_REGION,
++"""
++Use this to convert qtest log info from a generic fuzzer input into a qtest
++trace that you can feed into a standard qemu-system process. Example usage:
++
++QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
++        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
++# .. Finds some crash
++QTEST_LOG=1 FUZZ_SERIALIZE_QTEST=1 \
++QEMU_FUZZ_ARGS="-machine q35,accel=qtest" QEMU_FUZZ_OBJECTS="*" \
++        ./i386-softmmu/qemu-fuzz-i386 --fuzz-target=general-pci-fuzz
++        /path/to/crash 2> qtest_log_output
++scripts/oss-fuzz/reorder_fuzzer_qtest_trace.py qtest_log_output > qtest_trace
++./i386-softmmu/qemu-fuzz-i386 -machine q35,accel=qtest \
++        -qtest stdin < qtest_trace
++
++### Details ###
++
++Some fuzzer make use of hooks that allow us to populate some memory range, just
++before a DMA read from that range. This means that the fuzzer can produce
++activity that looks like:
++    [start] read from mmio addr
++    [end]   read from mmio addr
++    [start] write to pio addr
++        [start] fill a DMA buffer just in time
++        [end]   fill a DMA buffer just in time
++        [start] fill a DMA buffer just in time
++        [end]   fill a DMA buffer just in time
++    [end]   write to pio addr
++    [start] read from mmio addr
++    [end]   read from mmio addr
++
++We annotate these "nested" DMA writes, so with QTEST_LOG=1 the QTest trace
++might look something like:
++[R +0.028431] readw 0x10000
++[R +0.028434] outl 0xc000 0xbeef  # Triggers a DMA read from 0xbeef and 0xbf00
++[DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
++[DMA][R +0.034639] write 0xbf00 0x2 0xBBBB
++[R +0.028431] readw 0xfc000
++
++This script would reorder the above trace so it becomes:
++readw 0x10000
++write 0xbeef 0x2 0xAAAA
++write 0xbf00 0x2 0xBBBB
++outl 0xc000 0xbeef
++readw 0xfc000
++
++I.e. by the time, 0xc000 tries to read from DMA, those DMA buffers have already
++been set up, removing the need for the DMA hooks. We can simply provide this
++reordered trace via -qtest stdio to reproduce the input
++
++Note: this won't work for traces where the device tries to read from the same
++DMA region twice in between MMIO/PIO commands. E.g:
++    [R +0.028434] outl 0xc000 0xbeef
++    [DMA][R +0.034639] write 0xbeef 0x2 0xAAAA
++    [DMA][R +0.034639] write 0xbeef 0x2 0xBBBB
++
++The fuzzer will annotate suspected double-fetches with [DOUBLE-FETCH]. This
++script looks for these tags and warns the users that the resulting trace might
++not reproduce the bug.
++"""
++
++import sys
++
++__author__     = "Alexander Bulekov <alxndr@bu.edu>"
++__copyright__  = "Copyright (C) 2020, Red Hat, Inc."
++__license__    = "GPL version 2 or (at your option) any later version"
++
++__maintainer__ = "Alexander Bulekov"
++__email__      = "alxndr@bu.edu"
++
++
++def usage():
++    sys.exit("Usage: {} /path/to/qtest_log_output".format((sys.argv[0])))
++
++
++def main(filename):
++    with open(filename, "r") as f:
++        trace = f.readlines()
++
++    # Leave only lines that look like logged qtest commands
++    trace[:] = [x.strip() for x in trace if "[R +" in x
++                or "[S +" in x and "CLOSED" not in x]
++
++    for i in range(len(trace)):
++        if i+1 < len(trace):
++            if "[DMA]" in trace[i+1]:
++                if "[DOUBLE-FETCH]" in trace[i+1]:
++                    sys.stderr.write("Warning: Likely double fetch on line"
++                                     "{}.\n There will likely be problems "
++                                     "reproducing behavior with the "
++                                     "resulting qtest trace\n\n".format(i+1))
++                trace[i], trace[i+1] = trace[i+1], trace[i]
++    for line in trace:
++        print(line.split("]")[-1].strip())
++
++
++if __name__ == '__main__':
++    if len(sys.argv) == 1:
++        usage()
++    main(sys.argv[1])
 -- 
 2.28.0
 
