@@ -2,73 +2,86 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF68CC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:41:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDF2C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:41:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D2EE72177B
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:41:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 981B12177B
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:41:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="AH39HwgH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D2EE72177B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=163.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jx5G9Tfd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 981B12177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40578 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41744 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVHBF-0002Ev-LH
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 12:41:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32848)
+	id 1kVHBQ-0002jk-Gy
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 12:41:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59628)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <380121850@163.com>) id 1kVH3b-0008QH-RB
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:33:47 -0400
-Received: from m136.mail.163.com ([220.181.13.6]:6390)
- by eggs.gnu.org with esmtps (TLS1.2:DHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <380121850@163.com>) id 1kVH3X-0005iW-0y
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:33:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
- s=s110527; h=Date:From:Subject:MIME-Version:Message-ID; bh=9E2zG
- WwBINH6XphX5ekzyyOnQa20sF7EKf+6n4CECmc=; b=AH39HwgHAAaEWD4stvoEX
- 2i7bQ5JU7+zsGjLWpoMQef6kfsZPu66cTxGdXdj/sRCpXHTTI8fzZz5QKh9bQm+m
- EsE4kfv2weiFoL0KEb0ZjylpJOnr7om74OvL8Wd6q4I3WTxEy1EFy+YWcitHlKvN
- gXI/wRlLa6JOP6a5h+/7kM=
-Received: from 380121850$163.com ( [101.71.37.77] ) by ajax-webmail-wmsvr6
- (Coremail) ; Thu, 22 Oct 2020 00:32:59 +0800 (CST)
-X-Originating-IP: [101.71.37.77]
-Date: Thu, 22 Oct 2020 00:32:59 +0800 (CST)
-From: Lee  <380121850@163.com>
-To: "Peter Maydell" <peter.maydell@linaro.org>
-Subject: Re:Re: ERROR: glib-2.48 gthread-2.0 is required to compile QEMU
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.10 build 20190724(ac680a23)
- Copyright (c) 2002-2020 www.mailtech.cn 163com
-In-Reply-To: <CAFEAcA8SxSHaofKhmk9ueT_PFN+0rev9+Jjr1NP5sdm7-NXcwQ@mail.gmail.com>
-References: <60400f23.1845.1753c16246c.Coremail.380121850@163.com>
- <CAFEAcA8SxSHaofKhmk9ueT_PFN+0rev9+Jjr1NP5sdm7-NXcwQ@mail.gmail.com>
-Content-Type: multipart/alternative; 
- boundary="----=_Part_106396_1798088804.1603297979684"
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVGyJ-0002SA-3H
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:28:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41514)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVGy8-0004wR-JR
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:28:17 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603297680;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=NmxLmJ7ZkwzAzWfasjsVkMb4P26pEX5CcOTwAqEfhDk=;
+ b=Jx5G9TfdW9eBrNTwmFJYULZb+SQR+GaCSjxF0RUjWbQRVmE8pWGZfh6vI0ovbkBjwRup0f
+ MwZz1mqnFLzgJELvmbGpwKieSWkwh9KwhdcASAOD6y6lNryxxE9F4KeCT/j2pkNB4UghD9
+ VY4KEhRlxSzfNCsUV7XbM3CDyI027tc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-544-igqbVSSRNG-YgDgEiILHBQ-1; Wed, 21 Oct 2020 12:27:58 -0400
+X-MC-Unique: igqbVSSRNG-YgDgEiILHBQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0921E5F9D1;
+ Wed, 21 Oct 2020 16:27:57 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0417610013C1;
+ Wed, 21 Oct 2020 16:27:52 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 09/11] migration: introduce a delete_snapshot wrapper
+Date: Wed, 21 Oct 2020 17:27:02 +0100
+Message-Id: <20201021162704.3652555-10-berrange@redhat.com>
+In-Reply-To: <20201021162704.3652555-1-berrange@redhat.com>
+References: <20201021162704.3652555-1-berrange@redhat.com>
 MIME-Version: 1.0
-Message-ID: <26c3bc44.7321.1754c01ad24.Coremail.380121850@163.com>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID: BsGowADXVHG7YpBf69OJAA--.31219W
-X-CM-SenderInfo: ityqijaryviqqrwthudrp/1tbiEBvEAF8YDmfH0AAAs2
-X-Coremail-Antispam: 1U5529EdanIXcx71UUUUU7vcSsGvfC2KfnxnUU==
-Received-SPF: pass client-ip=220.181.13.6; envelope-from=380121850@163.com;
- helo=m136.mail.163.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 12:33:32
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, HTML_MESSAGE=0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,124 +95,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-------=_Part_106396_1798088804.1603297979684
-Content-Type: text/plain; charset=GBK
-Content-Transfer-Encoding: base64
+Make snapshot deletion consistent with the snapshot save
+and load commands by using a wrapper around the blockdev
+layer. The main difference is that we get upfront validation
+of the passed in device list (if any).
 
-dGhhbmtzCmkgdGhpbmsgeW91IGFyZSBtYXliZSByaWdodDsgCgoKcm9vdEB1YnVudHUtdXBzdGFy
-dC0xOn4jIGRwa2cgLWwgbGliZ2xpYjIuMC1kZXYKRGVzaXJlZD1Vbmtub3duL0luc3RhbGwvUmVt
-b3ZlL1B1cmdlL0hvbGQKfCBTdGF0dXM9Tm90L0luc3QvQ29uZi1maWxlcy9VbnBhY2tlZC9oYWxG
-LWNvbmYvSGFsZi1pbnN0L3RyaWctYVdhaXQvVHJpZy1wZW5kCnwvIEVycj89KG5vbmUpL1JlaW5z
-dC1yZXF1aXJlZCAoU3RhdHVzLEVycjogdXBwZXJjYXNlPWJhZCkKfHwvIE5hbWUgICAgICAgICAg
-ICAgICAgIFZlcnNpb24gICAgICAgICBBcmNoaXRlY3R1cmUgICAgRGVzY3JpcHRpb24KKysrLT09
-PT09PT09PT09PT09PT09PT09LT09PT09PT09PT09PT09PS09PT09PT09PT09PT09PT0tPT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PQppaSAgbGliZ2xpYjIuMC1k
-ZXYgICAgICAgMi40MC4yLTB1YnVudHUxIGFtZDY0ICAgICAgICAgICBEZXZlbG9wbWVudCBmaWxl
-cyBmb3IgdGhlIEdMaWIgbGlicmFyeQoKCgoKCgoKCgoKCgoKCgoKCgoKQXQgMjAyMC0xMC0xOSAw
-MDoyMzoxNCwgIlBldGVyIE1heWRlbGwiIDxwZXRlci5tYXlkZWxsQGxpbmFyby5vcmc+IHdyb3Rl
-Ogo+T24gU3VuLCAxOCBPY3QgMjAyMCBhdCAxNTozOCwgTGVlIDwzODAxMjE4NTBAMTYzLmNvbT4g
-d3JvdGU6Cj4+IFVidW50dSAxNC4wNC42IExUUywgWDg2XzY0Cj4+IEkgIG1ha2Ugc291cmNlIGNv
-ZGUgb2YgdmVyc2lvbiBxZW11IDUuMVw1LjBcNC4yLGFuZCBmb3VkIHRoZSBlcnJvcjpnbGliLTIu
-NDggZ3RocmVhZC0yLjAgaXMgcmVxdWlyZWQgdG8gY29tcGlsZSBRRU1VCj4+IHRyeSBhcHQtZ2V0
-IGluc3RhbGwgbGliZ2xpYjIuMC1kZXYsYW5kIGl0IGlzIHN1Y2VzcyA6Cj4+IFJlYWRpbmcgc3Rh
-dGUgaW5mb3JtYXRpb24uLi4gRG9uZQo+PiBsaWJnbGliMi4wLWRldiBpcyBhbHJlYWR5IHRoZSBu
-ZXdlc3QgdmVyc2lvbi4KPgo+SSBiZWxpZXZlIHRoYXQgVWJ1bnR1IDE0LjA0IHNoaXBwZWQgd2l0
-aCBsaWJnbGliMi4wLWRldgo+dmVyc2lvbiAyLjQwLjIgLS0gdGhpcyBpcyB0b28gb2xkLCBhcyB0
-aGUgUUVNVSBlcnJvcgo+bWVzc2FnZSBzYXlzLgo+Cj5UaGUgc2ltcGxlc3QgdGhpbmcgdG8gZG8g
-d291bGQgYmUgZm9yIHlvdSB0byB1cGdyYWRlIHlvdXIgVWJ1bnR1Cj5pbnN0YWxsIC0tIDE0LjA0
-IGlzIG5vdyB2ZXJ5IG9sZCAoaXQgcmVhY2hlZCAiZW5kIG9mIHN0YW5kYXJkCj5zdXBwb3J0Iiwg
-aWUgbm8gbW9yZSBzZWN1cml0eSBmaXhlcyB1bmxlc3MgeW91J3JlIHBheWluZwo+Q2Fub25pY2Fs
-IGZvciBleHRlbmRlZCBzZWN1cml0eSBtYWludGVuYW5jZSwgaW4gQXByaWwgMjAxOSkuCj4KPlFF
-TVUncyBkaXN0cm8gc3VwcG9ydCBwb2xpY3kgaXMgZG9jdW1lbnRlZCBoZXJlOgo+aHR0cHM6Ly93
-d3cucWVtdS5vcmcvZG9jcy9tYXN0ZXIvc3lzdGVtL2J1aWxkLXBsYXRmb3Jtcy5odG1sCj5Gb3Ig
-ZGlzdHJvcyBsaWtlIFVidW50dSB3aXRoIGEgJ2xvbmctbGlmZXRpbWUnIHR5cGUgcmVsZWFzZQo+
-KGxpa2UgTFRTKSwgd2Ugc3VwcG9ydCB0aGUgbW9zdCByZWNlbnQgbWFqb3IgdmVyc2lvbiwgYW5k
-Cj50aGUgcHJldmlvdXMgbWFqb3IgdmVyc2lvbiB1cCB1bnRpbCAyIHllYXJzIGFmdGVyIHRoZSBu
-ZXh0Cj5tYWpvciB2ZXJzaW9uIHdhcyByZWxlYXNlZC4gU28gd2Ugc3VwcG9ydCAyMC4wNCBMVFMg
-KHRoZQo+bW9zdCByZWNlbnQpIGFuZCBhbHNvIHdpbGwgc3VwcG9ydCAxOC4wNCBMVFMgdW50aWwg
-YXQgbGVhc3QKPkFwcmlsIDIwMjIgKHNpbmNlIDIwLjA0IHdhcyByZWxlYXNlZCBpbiBBcHJpbCAy
-MDIwKSwgYnV0Cj5hbnl0aGluZyBvbGRlciB0aGFuIHRoYXQgaXMgbm90IG9mZmljaWFsbHkgc3Vw
-cG9ydGVkIGFuZAo+bWF5IG9yIG1heSBub3Qgd29yay4KPgo+PiBpIGZvdW5kIHRoYXQgdmVyc2lv
-biBxZW11IDQuMSBpcyBPSyx0aGUgc2FtZSBlbnZpcm9ubWVudAo+Cj5RRU1VIDQuMSBkaWQgbm90
-IHJlcXVpcmUgdGhlIG5ld2VyIHZlcnNpb24gb2YgZ2xpYi4gKEFzIHdlCj5kZXZlbG9wIFFFTVUg
-d2Ugd2FudCB0byBiZSBhYmxlIHRvIHVzZSB0aGUgZXh0cmEgZmVhdHVyZXMKPmluIG5ld2VyIHZl
-cnNpb25zIG9mIG91ciBkZXBlbmRlbnQgbGlicmFyaWVzIGFuZCB0byBiZSBhYmxlCj50byByZW1v
-dmUgYmFja3dhcmRzLWNvbXBhdGliaWxpdHkgY29kZSB0aGF0IGlzIG5lZWRlZCBvbmx5Cj53aGVu
-IHVzaW5nIG9sZGVyIHZlcnNpb25zIG9mIHRob3NlIGxpYnJhcmllcywgc28gc29tZXRpbWVzCj53
-aGVuIGFsbCB0aGUgZGlzdHJvcyBhbmQgdmVyc2lvbnMgd2Ugc3VwcG9ydCBzaGlwIHdpdGggYQo+
-bmV3IGVub3VnaCB2ZXJzaW9uIG9mIGEgbGlicmFyeSB3ZSB3aWxsIGluY3JlYXNlIHRoZQo+bWlu
-aW11bSByZXF1aXJlZCB2ZXJzaW9uIHRoYXQgUUVNVSBuZWVkcyB0byBidWlsZC4pCj4KPnRoYW5r
-cwo+LS0gUE1NCg==
-------=_Part_106396_1798088804.1603297979684
-Content-Type: text/html; charset=GBK
-Content-Transfer-Encoding: base64
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ include/migration/snapshot.h | 13 +++++++++++++
+ migration/savevm.c           | 14 ++++++++++++++
+ monitor/hmp-cmds.c           |  2 +-
+ 3 files changed, 28 insertions(+), 1 deletion(-)
 
-PGRpdiBzdHlsZT0ibGluZS1oZWlnaHQ6MS43O2NvbG9yOiMwMDAwMDA7Zm9udC1zaXplOjE0cHg7
-Zm9udC1mYW1pbHk6QXJpYWwiPjxkaXYgc3R5bGU9Im1hcmdpbjogMDsiPnRoYW5rczwvZGl2Pjxk
-aXYgc3R5bGU9Im1hcmdpbjogMDsiPmkgdGhpbmsgeW91IGFyZSBtYXliZSByaWdodDsmbmJzcDs8
-L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij48YnI+PC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2lu
-OiAwOyI+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+cm9vdEB1YnVudHUtdXBzdGFydC0xOn4jIGRw
-a2cgLWwgbGliZ2xpYjIuMC1kZXY8L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij5EZXNpcmVk
-PVVua25vd24vSW5zdGFsbC9SZW1vdmUvUHVyZ2UvSG9sZDwvZGl2PjxkaXYgc3R5bGU9Im1hcmdp
-bjogMDsiPnwgU3RhdHVzPU5vdC9JbnN0L0NvbmYtZmlsZXMvVW5wYWNrZWQvaGFsRi1jb25mL0hh
-bGYtaW5zdC90cmlnLWFXYWl0L1RyaWctcGVuZDwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjogMDsi
-PnwvIEVycj89KG5vbmUpL1JlaW5zdC1yZXF1aXJlZCAoU3RhdHVzLEVycjogdXBwZXJjYXNlPWJh
-ZCk8L2Rpdj48ZGl2IHN0eWxlPSJtYXJnaW46IDA7Ij58fC8gTmFtZSZuYnNwOyAmbmJzcDsgJm5i
-c3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7VmVyc2lvbiZuYnNw
-OyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDtBcmNoaXRlY3R1cmUmbmJzcDsgJm5ic3A7IERl
-c2NyaXB0aW9uPC9kaXY+PGRpdiBzdHlsZT0ibWFyZ2luOiAwOyI+KysrLT09PT09PT09PT09PT09
-PT09PT09LT09PT09PT09PT09PT09PS09PT09PT09PT09PT09PT0tPT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PTwvZGl2PjxkaXYgc3R5bGU9Im1hcmdpbjogMDsi
-PmlpJm5ic3A7IDxzcGFuIHN0eWxlPSJiYWNrZ3JvdW5kLWNvbG9yOiByZ2IoMTUxLCAyMjIsIDIy
-Myk7Ij5saWJnbGliMi4wLWRldiZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOzIuNDAuMi0wdWJ1
-bnR1MSBhbWQ2NCZuYnNwOyAmbmJzcDsgJm5ic3A7ICZuYnNwOyAmbmJzcDsgJm5ic3A7RGV2ZWxv
-cG1lbnQgZmlsZXMgZm9yIHRoZSBHTGliIGxpYnJhcnk8L3NwYW4+PC9kaXY+PGRpdj48YnI+PC9k
-aXY+PC9kaXY+PHAgc3R5bGU9Im1hcmdpbjogMDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdpbjog
-MDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdpbjogMDsiPjxicj48L3A+PHAgc3R5bGU9Im1hcmdp
-bjogMDsiPjxicj48L3A+PGRpdiBzdHlsZT0icG9zaXRpb246cmVsYXRpdmU7em9vbToxIj48L2Rp
-dj48ZGl2IGlkPSJkaXZOZXRlYXNlTWFpbENhcmQiPjwvZGl2PjxwIHN0eWxlPSJtYXJnaW46IDA7
-Ij48YnI+PC9wPjxwcmU+PGJyPkF0IDIwMjAtMTAtMTkgMDA6MjM6MTQsICJQZXRlciBNYXlkZWxs
-IiAmbHQ7cGV0ZXIubWF5ZGVsbEBsaW5hcm8ub3JnJmd0OyB3cm90ZToKJmd0O09uIFN1biwgMTgg
-T2N0IDIwMjAgYXQgMTU6MzgsIExlZSAmbHQ7MzgwMTIxODUwQDE2My5jb20mZ3Q7IHdyb3RlOgom
-Z3Q7Jmd0OyBVYnVudHUgMTQuMDQuNiBMVFMsIFg4Nl82NAomZ3Q7Jmd0OyBJICBtYWtlIHNvdXJj
-ZSBjb2RlIG9mIHZlcnNpb24gcWVtdSA1LjFcNS4wXDQuMixhbmQgZm91ZCB0aGUgZXJyb3I6Z2xp
-Yi0yLjQ4IGd0aHJlYWQtMi4wIGlzIHJlcXVpcmVkIHRvIGNvbXBpbGUgUUVNVQomZ3Q7Jmd0OyB0
-cnkgYXB0LWdldCBpbnN0YWxsIGxpYmdsaWIyLjAtZGV2LGFuZCBpdCBpcyBzdWNlc3MgOgomZ3Q7
-Jmd0OyBSZWFkaW5nIHN0YXRlIGluZm9ybWF0aW9uLi4uIERvbmUKJmd0OyZndDsgbGliZ2xpYjIu
-MC1kZXYgaXMgYWxyZWFkeSB0aGUgbmV3ZXN0IHZlcnNpb24uCiZndDsKJmd0O0kgYmVsaWV2ZSB0
-aGF0IFVidW50dSAxNC4wNCBzaGlwcGVkIHdpdGggbGliZ2xpYjIuMC1kZXYKJmd0O3ZlcnNpb24g
-Mi40MC4yIC0tIHRoaXMgaXMgdG9vIG9sZCwgYXMgdGhlIFFFTVUgZXJyb3IKJmd0O21lc3NhZ2Ug
-c2F5cy4KJmd0OwomZ3Q7VGhlIHNpbXBsZXN0IHRoaW5nIHRvIGRvIHdvdWxkIGJlIGZvciB5b3Ug
-dG8gdXBncmFkZSB5b3VyIFVidW50dQomZ3Q7aW5zdGFsbCAtLSAxNC4wNCBpcyBub3cgdmVyeSBv
-bGQgKGl0IHJlYWNoZWQgImVuZCBvZiBzdGFuZGFyZAomZ3Q7c3VwcG9ydCIsIGllIG5vIG1vcmUg
-c2VjdXJpdHkgZml4ZXMgdW5sZXNzIHlvdSdyZSBwYXlpbmcKJmd0O0Nhbm9uaWNhbCBmb3IgZXh0
-ZW5kZWQgc2VjdXJpdHkgbWFpbnRlbmFuY2UsIGluIEFwcmlsIDIwMTkpLgomZ3Q7CiZndDtRRU1V
-J3MgZGlzdHJvIHN1cHBvcnQgcG9saWN5IGlzIGRvY3VtZW50ZWQgaGVyZToKJmd0O2h0dHBzOi8v
-d3d3LnFlbXUub3JnL2RvY3MvbWFzdGVyL3N5c3RlbS9idWlsZC1wbGF0Zm9ybXMuaHRtbAomZ3Q7
-Rm9yIGRpc3Ryb3MgbGlrZSBVYnVudHUgd2l0aCBhICdsb25nLWxpZmV0aW1lJyB0eXBlIHJlbGVh
-c2UKJmd0OyhsaWtlIExUUyksIHdlIHN1cHBvcnQgdGhlIG1vc3QgcmVjZW50IG1ham9yIHZlcnNp
-b24sIGFuZAomZ3Q7dGhlIHByZXZpb3VzIG1ham9yIHZlcnNpb24gdXAgdW50aWwgMiB5ZWFycyBh
-ZnRlciB0aGUgbmV4dAomZ3Q7bWFqb3IgdmVyc2lvbiB3YXMgcmVsZWFzZWQuIFNvIHdlIHN1cHBv
-cnQgMjAuMDQgTFRTICh0aGUKJmd0O21vc3QgcmVjZW50KSBhbmQgYWxzbyB3aWxsIHN1cHBvcnQg
-MTguMDQgTFRTIHVudGlsIGF0IGxlYXN0CiZndDtBcHJpbCAyMDIyIChzaW5jZSAyMC4wNCB3YXMg
-cmVsZWFzZWQgaW4gQXByaWwgMjAyMCksIGJ1dAomZ3Q7YW55dGhpbmcgb2xkZXIgdGhhbiB0aGF0
-IGlzIG5vdCBvZmZpY2lhbGx5IHN1cHBvcnRlZCBhbmQKJmd0O21heSBvciBtYXkgbm90IHdvcmsu
-CiZndDsKJmd0OyZndDsgaSBmb3VuZCB0aGF0IHZlcnNpb24gcWVtdSA0LjEgaXMgT0ssdGhlIHNh
-bWUgZW52aXJvbm1lbnQKJmd0OwomZ3Q7UUVNVSA0LjEgZGlkIG5vdCByZXF1aXJlIHRoZSBuZXdl
-ciB2ZXJzaW9uIG9mIGdsaWIuIChBcyB3ZQomZ3Q7ZGV2ZWxvcCBRRU1VIHdlIHdhbnQgdG8gYmUg
-YWJsZSB0byB1c2UgdGhlIGV4dHJhIGZlYXR1cmVzCiZndDtpbiBuZXdlciB2ZXJzaW9ucyBvZiBv
-dXIgZGVwZW5kZW50IGxpYnJhcmllcyBhbmQgdG8gYmUgYWJsZQomZ3Q7dG8gcmVtb3ZlIGJhY2t3
-YXJkcy1jb21wYXRpYmlsaXR5IGNvZGUgdGhhdCBpcyBuZWVkZWQgb25seQomZ3Q7d2hlbiB1c2lu
-ZyBvbGRlciB2ZXJzaW9ucyBvZiB0aG9zZSBsaWJyYXJpZXMsIHNvIHNvbWV0aW1lcwomZ3Q7d2hl
-biBhbGwgdGhlIGRpc3Ryb3MgYW5kIHZlcnNpb25zIHdlIHN1cHBvcnQgc2hpcCB3aXRoIGEKJmd0
-O25ldyBlbm91Z2ggdmVyc2lvbiBvZiBhIGxpYnJhcnkgd2Ugd2lsbCBpbmNyZWFzZSB0aGUKJmd0
-O21pbmltdW0gcmVxdWlyZWQgdmVyc2lvbiB0aGF0IFFFTVUgbmVlZHMgdG8gYnVpbGQuKQomZ3Q7
-CiZndDt0aGFua3MKJmd0Oy0tIFBNTQo8L3ByZT48L2Rpdj4=
-------=_Part_106396_1798088804.1603297979684--
+diff --git a/include/migration/snapshot.h b/include/migration/snapshot.h
+index 3bdbef435b..e72083b117 100644
+--- a/include/migration/snapshot.h
++++ b/include/migration/snapshot.h
+@@ -48,4 +48,17 @@ bool load_snapshot(const char *name,
+                    bool has_devices, strList *devices,
+                    Error **errp);
+ 
++/**
++ * delete_snapshot: Delete a snapshot.
++ * @name: path to snapshot
++ * @has_devices: whether to use explicit device list
++ * @devices: explicit device list to snapshot
++ * @errp: pointer to error object
++ * On success, return %true.
++ * On failure, store an error through @errp and return %false.
++ */
++bool delete_snapshot(const char *name,
++                    bool has_devices, strList *devices,
++                    Error **errp);
++
+ #endif
+diff --git a/migration/savevm.c b/migration/savevm.c
+index 59ad94ed14..303cbcb8ab 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2966,6 +2966,20 @@ err_drain:
+     return false;
+ }
+ 
++bool delete_snapshot(const char *name, bool has_devices,
++                     strList *devices, Error **errp)
++{
++    if (!bdrv_all_can_snapshot(has_devices, devices, errp)) {
++        return false;
++    }
++
++    if (bdrv_all_delete_snapshot(name, has_devices, devices, errp) < 0) {
++        return false;
++    }
++
++    return true;
++}
++
+ void vmstate_register_ram(MemoryRegion *mr, DeviceState *dev)
+ {
+     qemu_ram_set_idstr(mr->ram_block,
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index fdb8188e44..9c2fe40cf0 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -1143,7 +1143,7 @@ void hmp_delvm(Monitor *mon, const QDict *qdict)
+     Error *err = NULL;
+     const char *name = qdict_get_str(qdict, "name");
+ 
+-    bdrv_all_delete_snapshot(name, false, NULL, &err);
++    delete_snapshot(name, false, NULL, &err);
+     hmp_handle_error(mon, err);
+ }
+ 
+-- 
+2.26.2
 
 
