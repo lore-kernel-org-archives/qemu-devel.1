@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4698C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:57:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D715C55178
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:57:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 537AB22249
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:57:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C2B902080D
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 14:57:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eGVOwEW1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 537AB22249
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BC7GLvze"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C2B902080D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVFYj-00020q-Oj
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 10:57:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56112)
+	id 1kVFYh-0001wh-OP
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 10:57:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56044)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQd-0006tp-Oh
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37192)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQZ-0006ii-PA
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34899)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQb-0006oW-RP
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:27 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVFQX-0006nV-0z
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 10:49:23 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603291765;
+ s=mimecast20190719; t=1603291759;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZjGyQAT6RmIf3PbepFrb9lWnpUCbUny94P1zf7Dxet4=;
- b=eGVOwEW1eZH5HiyadJLCfdYX17nfVcThsFBMJEN1mYUIr8BBM+u/PMJ/pOg0oZ+j43lLG+
- 57Ghq8JVrkTxDBIuMmBi9J8nIaWB7Su76JDduNW0g0c0Nw807IGC3EckSVqmszZe3bTwuQ
- A/5uQw1azVCj4e0W5HxGC4T87V9q98s=
+ bh=L3/xjd36rO/UhE3zJqy7mEsWuSSW5Ek96DdfJGwklM4=;
+ b=BC7GLvze3gP5ohJrp95xKua/5dBQ4wk1zqK3G48UxyRdB0VFq7cxnxjrJ1sRRMAUrryInJ
+ Az1rtOdkDrrrsM3zxbRxBRfx0anXLA8s26oFm7/z9dwjVcV7GXvQI322zhB2KmtwKpnrb8
+ dJxRuEUvtjbhnFhDe0DF9w/tYPLA4uk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-595-m5oZTKWpNjSluFW72lHl8A-1; Wed, 21 Oct 2020 10:49:21 -0400
-X-MC-Unique: m5oZTKWpNjSluFW72lHl8A-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-415-tsSuh5gANiaszzLo1Sy_-w-1; Wed, 21 Oct 2020 10:49:14 -0400
+X-MC-Unique: tsSuh5gANiaszzLo1Sy_-w-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 99A0B8CD3C3;
- Wed, 21 Oct 2020 14:48:53 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D673D100E23E;
+ Wed, 21 Oct 2020 14:48:54 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5C7195B4A9;
- Wed, 21 Oct 2020 14:48:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 808B85C22A;
+ Wed, 21 Oct 2020 14:48:54 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 237FE9D74; Wed, 21 Oct 2020 16:48:52 +0200 (CEST)
+ id 670F0204A1; Wed, 21 Oct 2020 16:48:52 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/17] tests/acpi: allow changes for microvm/APIC.pcie
-Date: Wed, 21 Oct 2020 16:48:36 +0200
-Message-Id: <20201021144852.16665-2-kraxel@redhat.com>
+Subject: [PULL 08/17] acpi: add aml builder stubs
+Date: Wed, 21 Oct 2020 16:48:43 +0200
+Message-Id: <20201021144852.16665-9-kraxel@redhat.com>
 In-Reply-To: <20201021144852.16665-1-kraxel@redhat.com>
 References: <20201021144852.16665-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -104,19 +104,40 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
-Message-id: 20201016113835.17465-2-kraxel@redhat.com
----
- tests/qtest/bios-tables-test-allowed-diff.h | 1 +
- 1 file changed, 1 insertion(+)
+Add stubs for aml_interrupt and aml_memory32_fixed,
+these will be needed by followup patches,
 
-diff --git a/tests/qtest/bios-tables-test-allowed-diff.h b/tests/qtest/bios-tables-test-allowed-diff.h
-index dfb8523c8bf4..0c37ccebc5ba 100644
---- a/tests/qtest/bios-tables-test-allowed-diff.h
-+++ b/tests/qtest/bios-tables-test-allowed-diff.h
-@@ -1 +1,2 @@
- /* List of comma-separated changed AML files to ignore */
-+"tests/data/acpi/microvm/APIC.pcie",
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+Message-id: 20201020074844.5304-2-kraxel@redhat.com
+---
+ hw/acpi/aml-build-stub.c | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
+
+diff --git a/hw/acpi/aml-build-stub.c b/hw/acpi/aml-build-stub.c
+index 58b2e162277f..8d8ad1a31497 100644
+--- a/hw/acpi/aml-build-stub.c
++++ b/hw/acpi/aml-build-stub.c
+@@ -57,6 +57,20 @@ Aml *aml_irq_no_flags(uint8_t irq)
+     return NULL;
+ }
+ 
++Aml *aml_interrupt(AmlConsumerAndProducer con_and_pro,
++                   AmlLevelAndEdge level_and_edge,
++                   AmlActiveHighAndLow high_and_low, AmlShared shared,
++                   uint32_t *irq_list, uint8_t irq_count)
++{
++    return NULL;
++}
++
++Aml *aml_memory32_fixed(uint32_t addr, uint32_t size,
++                        AmlReadAndWrite read_and_write)
++{
++    return NULL;
++}
++
+ Aml *aml_int(const uint64_t val)
+ {
+     return NULL;
 -- 
 2.27.0
 
