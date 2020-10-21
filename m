@@ -2,95 +2,84 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A4AAC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:31:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61B0FC388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:41:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C1CD20795
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:31:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6CFD522251
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:41:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z6dG4RqS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C1CD20795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MG6z66b5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6CFD522251
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBOn-0004cw-GW
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:31:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45140)
+	id 1kVBYZ-0008MR-6d
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:41:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47508)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kVBMx-0003Nn-AN
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:29:23 -0400
-Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39745)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kVBMu-0006JN-Jx
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:29:23 -0400
-Received: by mail-wm1-x343.google.com with SMTP id d3so1474014wma.4
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=TdwRZ7rBOCFE2n6etOekAvQgVo9aP4FW3zOA1tprhPU=;
- b=z6dG4RqSmhgjjR2RWdaq19fNbob688fijZ5wB3tWpfTfoWeBMuKtkCkoXas3FjwLbs
- AraKrcvLUP46D3ppaIdzFDlnLbLj0LwBaiJjubcEHZbPl4IMXki0gkpcpg6sc+mOQZSo
- iKD1hOonZR6s4xGPjYTeU/HuVM+U6uH88hRTLWO8+Ie1/q4WCvtdBcR/EwDUjdesB/ve
- +3LlQsCVWhGbQhzMTy8a2fYw4tayQz/gXNuMuCB1QHFsTohpcMxZ+Arc24lSQ8DRAI8O
- +KCnRzjOK/0Cp8unP85rkHDE2Y2sxoOT7OFzNwdoD7LGttM/pCM8ikJKcJRPLzYkfNrV
- ZVsA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=TdwRZ7rBOCFE2n6etOekAvQgVo9aP4FW3zOA1tprhPU=;
- b=pcE8XIZHazIfdO8j1qrPUJe4XDSvhnGgLm55dYp3UIUdeDhpjH6XaPz+2g1/ukgQTu
- 6qfA4cAqtgcc5GnXgubA+ikc2UiwvD3G2XJFRbTJG6eJ6DhlfCUWN3b7gfWDH415KPiQ
- IyVOeH/XmdJazgaKBRD7MZCgAHCYUaiLvej4wZdacMGbO+fiZ4n9kqfJVCI8VVfvxyKd
- 4GkYHF1iVVleplVjufel4dbX6Ac9yBp76tdzNYZL71LsGF6llE6Bc8YoVrHOPjNIjBFu
- i7hW5L6xCV33Q/kSWUojpl6+ySSJga/hbUfHxFKsfWHLLfGwoVXWfopdYJbmx+1k01wt
- oTNA==
-X-Gm-Message-State: AOAM532IAsPmQkVCmBw8+ZEKKkV96pGmGW0wEOlOJjqUbdb9izK4L+VH
- /oRNe+9CtB6MDxc2luF190cumg==
-X-Google-Smtp-Source: ABdhPJz+pHG3pYnYl0+pfFO6cqgMzh+Tzh4fqyOJcFIYbEF6qigFDOLLsUQRoIDiANyt1YLp62ZKDA==
-X-Received: by 2002:a1c:2905:: with SMTP id p5mr2834925wmp.187.1603276159140; 
- Wed, 21 Oct 2020 03:29:19 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n9sm3235529wrq.72.2020.10.21.03.29.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 03:29:17 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 23FE71FF7E;
- Wed, 21 Oct 2020 11:29:17 +0100 (BST)
-References: <20201021072308.9224-1-thuth@redhat.com>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH] tests/docker/dockerfiles/centos: Use SDL2 instead of SDL1
-In-reply-to: <20201021072308.9224-1-thuth@redhat.com>
-Date: Wed, 21 Oct 2020 11:29:17 +0100
-Message-ID: <87imb3x476.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kVBXp-0007vD-GP
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:40:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21182)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <ppandit@redhat.com>)
+ id 1kVBXm-0007uG-KM
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:40:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603276832;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=5ywdHMngM8fAhFHKpQAdFGy8Vffg0ktwnuGgEhnS9SY=;
+ b=MG6z66b5FFaPEl8f8HTvNjj6blQHMM5gYKZvxj4OOG3ql4tUJZ1DZxzdHLnbCyZ3qVbIQo
+ /34mVyb6AP58HGAG/tuRzO3BEtrBp/DMGzv6lhEUwJOJVlbjnJDCXlE/aLgqXLPr6tcCcT
+ pi1P2pt65dkN8pv/Po6EcGTufC0Pnjk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-537-jlXLl6VzPWiC5ZIpIUdM6g-1; Wed, 21 Oct 2020 06:40:29 -0400
+X-MC-Unique: jlXLl6VzPWiC5ZIpIUdM6g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3E3A31074662;
+ Wed, 21 Oct 2020 10:40:28 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.40.195.95])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 83F3310013D0;
+ Wed, 21 Oct 2020 10:40:21 +0000 (UTC)
+From: P J P <ppandit@redhat.com>
+To: BALATON Zoltan <balaton@eik.bme.hu>
+Subject: [PATCH v2] ati: check x y display parameter values
+Date: Wed, 21 Oct 2020 16:08:18 +0530
+Message-Id: <20201021103818.1704030-1-ppandit@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::343;
- envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x343.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ppandit@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ppandit@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,57 +92,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, qemu-trivial@nongnu.org,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, Gaoning Pan <pgn@zju.edu.cn>,
+ Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Prasad J Pandit <pjp@fedoraproject.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+The source and destination x,y display parameters in ati_2d_blt()
+may run off the vga limits if either of s->regs.[src|dst]_[xy] is
+zero. Check the parameter values to avoid potential crash.
 
-> We do not support SDL1 in QEMU anymore. Use SDL2 instead.
+Reported-by: Gaoning Pan <pgn@zju.edu.cn>
+Signed-off-by: Prasad J Pandit <pjp@fedoraproject.org>
+---
+ hw/display/ati_2d.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Queued to testing/next, thanks.
+Update v2: add [dst|src]_[xy] > 0x3fff check
+  -> https://lists.nongnu.org/archive/html/qemu-devel/2020-10/msg05698.html
 
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  tests/docker/dockerfiles/centos7.docker | 2 +-
->  tests/docker/dockerfiles/centos8.docker | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/tests/docker/dockerfiles/centos7.docker b/tests/docker/docke=
-rfiles/centos7.docker
-> index 8b273725ee..6f11af1989 100644
-> --- a/tests/docker/dockerfiles/centos7.docker
-> +++ b/tests/docker/dockerfiles/centos7.docker
-> @@ -31,7 +31,7 @@ ENV PACKAGES \
->      perl-Test-Harness \
->      pixman-devel \
->      python3 \
-> -    SDL-devel \
-> +    SDL2-devel \
->      spice-glib-devel \
->      spice-server-devel \
->      tar \
-> diff --git a/tests/docker/dockerfiles/centos8.docker b/tests/docker/docke=
-rfiles/centos8.docker
-> index 585dfad9be..f86931f955 100644
-> --- a/tests/docker/dockerfiles/centos8.docker
-> +++ b/tests/docker/dockerfiles/centos8.docker
-> @@ -2,7 +2,7 @@ FROM centos:8.1.1911
->=20=20
->  RUN dnf -y update
->  ENV PACKAGES \
-> -    SDL-devel \
-> +    SDL2-devel \
->      bzip2 \
->      bzip2-devel \
->      dbus-daemon \
+diff --git a/hw/display/ati_2d.c b/hw/display/ati_2d.c
+index 23a8ae0cd8..4dc10ea795 100644
+--- a/hw/display/ati_2d.c
++++ b/hw/display/ati_2d.c
+@@ -75,8 +75,9 @@ void ati_2d_blt(ATIVGAState *s)
+         dst_stride *= bpp;
+     }
+     uint8_t *end = s->vga.vram_ptr + s->vga.vram_size;
+-    if (dst_bits >= end || dst_bits + dst_x + (dst_y + s->regs.dst_height) *
+-        dst_stride >= end) {
++    if (dst_x > 0x3fff || dst_y > 0x3fff || dst_bits >= end
++        || dst_bits + dst_x
++         + (dst_y + s->regs.dst_height) * dst_stride >= end) {
+         qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
+         return;
+     }
+@@ -107,8 +108,9 @@ void ati_2d_blt(ATIVGAState *s)
+             src_bits += s->regs.crtc_offset & 0x07ffffff;
+             src_stride *= bpp;
+         }
+-        if (src_bits >= end || src_bits + src_x +
+-            (src_y + s->regs.dst_height) * src_stride >= end) {
++        if (src_x > 0x3fff || src_y > 0x3fff || src_bits >= end
++            || src_bits + src_x
++             + (src_y + s->regs.dst_height) * src_stride >= end) {
+             qemu_log_mask(LOG_UNIMP, "blt outside vram not implemented\n");
+             return;
+         }
+--
+2.26.2
 
-
---=20
-Alex Benn=C3=A9e
 
