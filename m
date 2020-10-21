@@ -4,58 +4,58 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DATE_IN_PAST_96_XX,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 56648C00A89
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F13C388F2
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:03:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6B5272225E
-	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 098442225E
+	for <qemu-devel@archiver.kernel.org>; Mon,  2 Nov 2020 10:03:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="WuJ6R2MB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B5272225E
+	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="FNH8u0l3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098442225E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44058 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44476 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kZWge-00033p-Dw
-	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:03:40 -0500
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49736)
+	id 1kZWgv-0003E3-UU
+	for qemu-devel@archiver.kernel.org; Mon, 02 Nov 2020 05:03:57 -0500
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <5b28ab8bda41768acb6be05c8949a0bc8e6b9cd8@lizzy.crudebyte.com>)
- id 1kZWV6-0004BN-VC
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:44 -0500
-Received: from lizzy.crudebyte.com ([91.194.90.13]:48135)
+ (envelope-from <472c18b8bf20f111b02abc403407efd88b6281d7@lizzy.crudebyte.com>)
+ id 1kZWUp-0003ZY-5i
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:27 -0500
+Received: from lizzy.crudebyte.com ([91.194.90.13]:35155)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
- (envelope-from <5b28ab8bda41768acb6be05c8949a0bc8e6b9cd8@lizzy.crudebyte.com>)
- id 1kZWV5-0007JH-FY
- for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:44 -0500
+ (envelope-from <472c18b8bf20f111b02abc403407efd88b6281d7@lizzy.crudebyte.com>)
+ id 1kZWUl-0007DM-1z
+ for qemu-devel@nongnu.org; Mon, 02 Nov 2020 04:51:26 -0500
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
  d=crudebyte.com; s=lizzy; h=Cc:To:Subject:Date:From:References:In-Reply-To:
  Message-Id:Content-Type:Content-Transfer-Encoding:MIME-Version:Content-ID:
- Content-Description; bh=1eWTmw6rgsM4fWFXaDo3RDUQrv3Oj1xC7+iJ3Crw4bQ=; b=WuJ6R
- 2MBqhJQBDUH87ygFygGw/aB2YaQZimH+J1mH7G+c/tzcQKvIINpvU2Q8SEsbCkKFIj+GoLaT7biKA
- /KphnKoJxfZ0AzO02duAz7uLMkukzG7AxsUQiCpSKuy0K80doLvuwxBv1yx0t334vZCl/PJ9rLarT
- vBQuYsWUH5pM3kiOFtm1H2NHs/YnxI51s1koO3sPoRvPzP8fq3JA5BtPbpnAfjuTPwZnH1yjrKCCH
- ycxRBDMibxfThDbDN0dH0ROKWAreUBjXEeAim6oLmvE2xXReU7eWkbuYNjx3tw1MHXHyNTJCeG6OL
- eojrIHhobNZ9v6iLCgaYC8kH5p9iA==;
-Message-Id: <5b28ab8bda41768acb6be05c8949a0bc8e6b9cd8.1604309512.git.qemu_oss@crudebyte.com>
+ Content-Description; bh=7g6F1Ukgu57xGK4R3WuXTx4Ntw5GtnOnSXJXaKwMoTw=; b=FNH8u
+ 0l3W/maBlBi/GkNampWLkTOhUArzo46dwlrPJhUbZqfPfyxDpKh7R8BrPmufW25/7cPFjCUhSDARy
+ T0F7RB1MOLmxJx4+tieKWNHDXH0rhIg0kFEP1iW5AsOzj041/Xm7+6BDshlyv6mNJ0LQ1wOsJNYOv
+ hQl5qsBJumMVnslctuc/0XifpAVszCcWf6UD0yiqdlg3/KdPKJecqZREhBK1aKssnZDh/sEyMSMt3
+ WzxJLgHCrM27ygQZFvJHr04AR+HwhjyyXx9G+26E1VlFuFlXyGHbNlIBrY8vi01rTaSh8Eb4FvDNQ
+ rkIRkEPoji+eeJHQGMJoxRpL6z24A==;
+Message-Id: <472c18b8bf20f111b02abc403407efd88b6281d7.1604309512.git.qemu_oss@crudebyte.com>
 In-Reply-To: <cover.1604309512.git.qemu_oss@crudebyte.com>
 References: <cover.1604309512.git.qemu_oss@crudebyte.com>
 From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Date: Wed, 21 Oct 2020 14:36:23 +0200
-Subject: [PULL v3 15/17] tests/9pfs: add local Tunlinkat symlink test
+Date: Wed, 21 Oct 2020 14:28:37 +0200
+Subject: [PULL v3 13/17] tests/9pfs: add local Tunlinkat file test
 To: qemu-devel@nongnu.org,
     Peter Maydell <peter.maydell@linaro.org>
 Cc: Greg Kurz <groug@kaod.org>
 Received-SPF: none client-ip=91.194.90.13;
- envelope-from=5b28ab8bda41768acb6be05c8949a0bc8e6b9cd8@lizzy.crudebyte.com;
+ envelope-from=472c18b8bf20f111b02abc403407efd88b6281d7@lizzy.crudebyte.com;
  helo=lizzy.crudebyte.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/11/02 04:48:35
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -81,60 +81,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This test case uses a Tunlinkat request to remove a symlink using
+This test case uses a Tunlinkat request to remove a regular file using
 the 9pfs 'local' fs driver.
 
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 Reviewed-by: Greg Kurz <groug@kaod.org>
-Message-Id: <a23cd4d2ab6d8d3048addab8cbf0416fe5ead43e.1603285620.git.qemu_oss@crudebyte.com>
+Message-Id: <4eabeed7f662721dd5664cb77fe36ea0aa08b1ec.1603285620.git.qemu_oss@crudebyte.com>
 Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
 ---
- tests/qtest/virtio-9p-test.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ tests/qtest/virtio-9p-test.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-index d61e7d244d..fb08db1dde 100644
+index c685db27d9..52ecdfab7a 100644
 --- a/tests/qtest/virtio-9p-test.c
 +++ b/tests/qtest/virtio-9p-test.c
-@@ -1295,6 +1295,32 @@ static void fs_symlink_file(void *obj, void *data, QGuestAllocator *t_alloc)
-     g_free(real_file);
+@@ -1196,6 +1196,29 @@ static void fs_create_file(void *obj, void *data, QGuestAllocator *t_alloc)
+     g_free(new_file);
  }
  
-+static void fs_unlinkat_symlink(void *obj, void *data,
-+                                QGuestAllocator *t_alloc)
++static void fs_unlinkat_file(void *obj, void *data, QGuestAllocator *t_alloc)
 +{
 +    QVirtio9P *v9p = obj;
 +    alloc = t_alloc;
 +    struct stat st;
-+    char *real_file = virtio_9p_test_path("06/real_file");
-+    char *symlink_file = virtio_9p_test_path("06/symlink_file");
++    char *new_file = virtio_9p_test_path("04/doa_file");
 +
 +    do_attach(v9p);
-+    do_mkdir(v9p, "/", "06");
-+    do_lcreate(v9p, "06", "real_file");
-+    g_assert(stat(real_file, &st) == 0);
++    do_mkdir(v9p, "/", "04");
++    do_lcreate(v9p, "04", "doa_file");
++
++    /* check if created file exists now ... */
++    g_assert(stat(new_file, &st) == 0);
++    /* ... and is a regular file */
 +    g_assert((st.st_mode & S_IFMT) == S_IFREG);
 +
-+    do_symlink(v9p, "06", "symlink_file", "real_file");
-+    g_assert(stat(symlink_file, &st) == 0);
++    do_unlinkat(v9p, "04", "doa_file", 0);
++    /* file should be gone now */
++    g_assert(stat(new_file, &st) != 0);
 +
-+    do_unlinkat(v9p, "06", "symlink_file", 0);
-+    /* symlink should be gone now */
-+    g_assert(stat(symlink_file, &st) != 0);
-+
-+    g_free(symlink_file);
-+    g_free(real_file);
++    g_free(new_file);
 +}
 +
  static void *assign_9p_local_driver(GString *cmd_line, void *arg)
  {
      virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-@@ -1339,6 +1365,8 @@ static void register_virtio_9p_test(void)
+@@ -1238,6 +1261,7 @@ static void register_virtio_9p_test(void)
+     qos_add_test("local/create_dir", "virtio-9p", fs_create_dir, &opts);
+     qos_add_test("local/unlinkat_dir", "virtio-9p", fs_unlinkat_dir, &opts);
      qos_add_test("local/create_file", "virtio-9p", fs_create_file, &opts);
-     qos_add_test("local/unlinkat_file", "virtio-9p", fs_unlinkat_file, &opts);
-     qos_add_test("local/symlink_file", "virtio-9p", fs_symlink_file, &opts);
-+    qos_add_test("local/unlinkat_symlink", "virtio-9p", fs_unlinkat_symlink,
-+                 &opts);
++    qos_add_test("local/unlinkat_file", "virtio-9p", fs_unlinkat_file, &opts);
  }
  
  libqos_init(register_virtio_9p_test);
