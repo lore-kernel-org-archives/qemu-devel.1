@@ -2,92 +2,88 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0ADFAC55179
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:58:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17349C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:59:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 535802098B
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:58:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7FFE92098B
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 17:59:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hTfU1Yq5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 535802098B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OhVspkTm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7FFE92098B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33220 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37386 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVINO-00049d-Ah
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 13:58:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51888)
+	id 1kVIOt-00060m-Ga
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 13:59:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kVI3x-0006fO-9b
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:13 -0400
-Received: from mail-pl1-x644.google.com ([2607:f8b0:4864:20::644]:34891)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kVI3u-0006T5-5C
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:38:12 -0400
-Received: by mail-pl1-x644.google.com with SMTP id 1so1583148ple.2
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 10:38:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=i9e477C0zg/4lfiSUJ/DUA8jokwPxP/mv4JJb8OtKrE=;
- b=hTfU1Yq5A14rUMvyRNdxWZNn5fDVheCb/WYZeB/u5humMA4BjkoEg2kBSvgzsjEPut
- gWry1Tk0U7AWQtqrNFphogmL4BzUqrkLeUOqF1h+/8NrPfxsaBOWsbTMyGNjuzfTzGiw
- 0hTKb6+JHFhg0Bd+Tg6az9QNdqxpAe1VLfbF2Bh7/X+cdXyr+6ItqMAiU0URS3E8zje3
- k96aE8D0MU4t9rIjI3mP4P+XE/krI5GxqxKQwP+Hfph1yLL/ATcxdriI0jKJCP0vQHfu
- ijKIzSuY7U/25BrKcpqAW2sz9zu7676XGGfOhUjH5Pxf79DkET30EUhEgkNiIWN0rwfh
- q7tQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=i9e477C0zg/4lfiSUJ/DUA8jokwPxP/mv4JJb8OtKrE=;
- b=dIrENPTeVRcK0MwaD10KzWKZG1D17TJUZ3GOtn/TNCPCcr9VC0ykmOK7QW3FL52U1M
- dYHYPIEYLbletTEyuSw5EIYYZZgKTzfaicqN73cv4AMr5ucq4Y6Xfnq7BFrJ+9Foq7GJ
- YTwSGmJYxgliRdtCxo3zH3wJrGFGXh7DDZYJsV8lJbo8lga8/9Z9h1t2m8TgP/LzT8/N
- yk0j/yOFzN+SGqWw4wNyeaqldOfxRGdOZExZL1JsIKXYZlR8qcSKfp1EJlTHiudg/7B+
- qYYp3/K3dRaMhWcf8jsJDb8ThnV4mFQK78hxUsN1vg30I2tyKBnJyBOV1E319D9Qc4aE
- mI5g==
-X-Gm-Message-State: AOAM533omyUlmztM289qBZ0iXnbgVX3kKOPAeSHmRtSnIz0km1RFW2Ae
- fK7oAQSMowBodnxmUQf+Tsq3Am9Ba8XGGQ==
-X-Google-Smtp-Source: ABdhPJzvI5PtwUlcSlkNe+Wivj4+f2aHNxepKoXFvghkFrTMH5B2fgYKqgE4/87j2SMQ4LN03TB/EQ==
-X-Received: by 2002:a17:902:9f96:b029:d4:c459:a181 with SMTP id
- g22-20020a1709029f96b02900d4c459a181mr4759859plq.28.1603301882721; 
- Wed, 21 Oct 2020 10:38:02 -0700 (PDT)
-Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id h5sm2928829pfh.9.2020.10.21.10.38.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 10:38:01 -0700 (PDT)
-From: Richard Henderson <richard.henderson@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH v12 08/12] linux-user/elfload: Use Error for load_elf_image
-Date: Wed, 21 Oct 2020 10:37:45 -0700
-Message-Id: <20201021173749.111103-9-richard.henderson@linaro.org>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201021173749.111103-1-richard.henderson@linaro.org>
-References: <20201021173749.111103-1-richard.henderson@linaro.org>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVI89-0001Ye-66
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:42:34 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:23044)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVI85-0007BA-EF
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 13:42:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603302148;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=kq8dSN2DFw31Xq/yOPUrrXkVW9zONSQ+3288eTjfptY=;
+ b=OhVspkTmuykmdKHXxj1+KkdExh/s0TgHkRe0IBFy6PbWyhAJHcHYyXf3VnWbZFGdbOdosl
+ v7BZbD/t6MR8Bnl40AQ4qD44BLit4HIJ9O/A2cqFFyZB4PP6M9dAwSKhtCmYYBBX0en0em
+ kOX0cxZNs4di4bf+Ex6D8ekQNGZVG78=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-137-oBqj0aBNMxi1gc3gpu6Y3Q-1; Wed, 21 Oct 2020 13:42:27 -0400
+X-MC-Unique: oBqj0aBNMxi1gc3gpu6Y3Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0F80804032;
+ Wed, 21 Oct 2020 17:42:25 +0000 (UTC)
+Received: from work-vm (ovpn-114-232.ams2.redhat.com [10.36.114.232])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 986875C225;
+ Wed, 21 Oct 2020 17:42:21 +0000 (UTC)
+Date: Wed, 21 Oct 2020 18:42:19 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Peter Xu <peterx@redhat.com>
+Subject: Re: [PATCH v5 3/6] migration: Maintain postcopy faulted addresses
+Message-ID: <20201021174219.GG3671@work-vm>
+References: <20201019225720.172743-1-peterx@redhat.com>
+ <20201019225720.172743-4-peterx@redhat.com>
+ <20201021142345.GC3671@work-vm> <20201021155016.GH200400@xz-x1>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::644;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x644.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201021155016.GH200400@xz-x1>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,139 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This is a bit clearer than open-coding some of this
-with a bare c string.
+* Peter Xu (peterx@redhat.com) wrote:
+> On Wed, Oct 21, 2020 at 03:23:45PM +0100, Dr. David Alan Gilbert wrote:
+> > > @@ -354,8 +368,33 @@ int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
+> > >  }
+> > >  
+> > >  int migrate_send_rp_req_pages(MigrationIncomingState *mis,
+> > > -                              RAMBlock *rb, ram_addr_t start)
+> > > +                              RAMBlock *rb, ram_addr_t start, uint64_t haddr)
+> > >  {
+> > > +    void *aligned = (void *)(uintptr_t)(haddr & qemu_real_host_page_mask);
+> > 
+> > Can you remind me, what happens here for hugepages?
+> 
+> Sure.  Previously it was:
+> 
+>   (haddr & (-qemu_target_page_size())
+> 
+> Now it is:
+> 
+>   (haddr & qemu_real_host_page_mask)
+> 
+> Basically we changed the psize alignment from guest to host.
+> 
+> The bug triggered previously on ppc64 where host_psize=64k, then when guest
+> psize is smaller, e.g., 4k, we can have some addr that aligned to 4k rather
+> than 64k, so we failed later on checking the host psize alignment (because this
+> pointer should point to a host page, so it should align with host psize).
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
----
- linux-user/elfload.c | 37 ++++++++++++++++++++-----------------
- 1 file changed, 20 insertions(+), 17 deletions(-)
+But my question is what happens when we have say a 2MB hugepage?
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 107a628a9e..56fbda93d0 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -12,6 +12,7 @@
- #include "qemu/guest-random.h"
- #include "qemu/units.h"
- #include "qemu/selfmap.h"
-+#include "qapi/error.h"
- 
- #ifdef _ARCH_PPC64
- #undef ARCH_DLINFO
-@@ -2392,15 +2393,16 @@ static void load_elf_image(const char *image_name, int image_fd,
-     struct elf_phdr *phdr;
-     abi_ulong load_addr, load_bias, loaddr, hiaddr, error;
-     int i, retval;
--    const char *errmsg;
-+    Error *err = NULL;
- 
-     /* First of all, some simple consistency checks */
--    errmsg = "Invalid ELF image for this architecture";
-     if (!elf_check_ident(ehdr)) {
-+        error_setg(&err, "Invalid ELF image for this architecture");
-         goto exit_errmsg;
-     }
-     bswap_ehdr(ehdr);
-     if (!elf_check_ehdr(ehdr)) {
-+        error_setg(&err, "Invalid ELF image for this architecture");
-         goto exit_errmsg;
-     }
- 
-@@ -2444,13 +2446,11 @@ static void load_elf_image(const char *image_name, int image_fd,
-             g_autofree char *interp_name = NULL;
- 
-             if (*pinterp_name) {
--                errmsg = "Multiple PT_INTERP entries";
-+                error_setg(&err, "Multiple PT_INTERP entries");
-                 goto exit_errmsg;
-             }
-+
-             interp_name = g_malloc(eppnt->p_filesz);
--            if (!interp_name) {
--                goto exit_perror;
--            }
- 
-             if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
-                 memcpy(interp_name, bprm_buf + eppnt->p_offset,
-@@ -2459,11 +2459,11 @@ static void load_elf_image(const char *image_name, int image_fd,
-                 retval = pread(image_fd, interp_name, eppnt->p_filesz,
-                                eppnt->p_offset);
-                 if (retval != eppnt->p_filesz) {
--                    goto exit_perror;
-+                    goto exit_read;
-                 }
-             }
-             if (interp_name[eppnt->p_filesz - 1] != 0) {
--                errmsg = "Invalid PT_INTERP entry";
-+                error_setg(&err, "Invalid PT_INTERP entry");
-                 goto exit_errmsg;
-             }
-             *pinterp_name = g_steal_pointer(&interp_name);
-@@ -2520,7 +2520,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-                             (ehdr->e_type == ET_EXEC ? MAP_FIXED : 0),
-                             -1, 0);
-     if (load_addr == -1) {
--        goto exit_perror;
-+        goto exit_mmap;
-     }
-     load_bias = load_addr - loaddr;
- 
-@@ -2587,7 +2587,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-                                     image_fd, eppnt->p_offset - vaddr_po);
- 
-                 if (error == -1) {
--                    goto exit_perror;
-+                    goto exit_mmap;
-                 }
-             }
- 
-@@ -2623,7 +2623,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-         } else if (eppnt->p_type == PT_MIPS_ABIFLAGS) {
-             Mips_elf_abiflags_v0 abiflags;
-             if (eppnt->p_filesz < sizeof(Mips_elf_abiflags_v0)) {
--                errmsg = "Invalid PT_MIPS_ABIFLAGS entry";
-+                error_setg(&err, "Invalid PT_MIPS_ABIFLAGS entry");
-                 goto exit_errmsg;
-             }
-             if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
-@@ -2633,7 +2633,7 @@ static void load_elf_image(const char *image_name, int image_fd,
-                 retval = pread(image_fd, &abiflags, sizeof(Mips_elf_abiflags_v0),
-                                eppnt->p_offset);
-                 if (retval != sizeof(Mips_elf_abiflags_v0)) {
--                    goto exit_perror;
-+                    goto exit_read;
-                 }
-             }
-             bswap_mips_abiflags(&abiflags);
-@@ -2658,13 +2658,16 @@ static void load_elf_image(const char *image_name, int image_fd,
- 
-  exit_read:
-     if (retval >= 0) {
--        errmsg = "Incomplete read of file header";
--        goto exit_errmsg;
-+        error_setg(&err, "Incomplete read of file header");
-+    } else {
-+        error_setg_errno(&err, errno, "Error reading file header");
-     }
-- exit_perror:
--    errmsg = strerror(errno);
-+    goto exit_errmsg;
-+ exit_mmap:
-+    error_setg_errno(&err, errno, "Error mapping file");
-+    goto exit_errmsg;
-  exit_errmsg:
--    fprintf(stderr, "%s: %s\n", image_name, errmsg);
-+    error_reportf_err(err, "%s: ", image_name);
-     exit(-1);
- }
- 
+Dave
+
+> -- 
+> Peter Xu
+> 
 -- 
-2.25.1
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
