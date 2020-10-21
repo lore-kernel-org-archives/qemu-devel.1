@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA0EC56202
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAABEC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 475E320795
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0248A20795
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShXjz51L"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475E320795
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bK5GYPDt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0248A20795
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53092 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBim-00069M-2b
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:51:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49356)
+	id 1kVBio-0006DZ-0Y
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:51:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49394)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBhh-0004u9-4k
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:49 -0400
-Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38903)
+ id 1kVBho-0004wP-Aq
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:56 -0400
+Received: from mail-wm1-x32a.google.com ([2a00:1450:4864:20::32a]:54820)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBhd-0000bw-9y
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:48 -0400
-Received: by mail-wr1-x42d.google.com with SMTP id n18so2530717wrs.5
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:50:44 -0700 (PDT)
+ id 1kVBhm-0000hz-CM
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:55 -0400
+Received: by mail-wm1-x32a.google.com with SMTP id c77so1373840wmd.4
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:50:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=SenI/m4MVR8+NEEf8DYCWuc6xCFneoK33J1yat7CMnQ=;
- b=ShXjz51LTHeUnMo9Z93PYgblwftpUaBC/j4xroc7mvpmzWc2GAXbMBcCPni1SkOsMs
- 9KWoQ2TUawPOR9a/jQDWpuEk7h3dlgh6k4Ns2b5oO68YHu0464xnwY71MyQP+rMrtcXc
- ruQ3jsGIEeFPFxDiVPZXJb78/qv/5BXrkJCbd3Ac5wkCxFXAq+NSiv5sdjpEGLMIPnZA
- 611QuJz73yRGUvYznoKIL8KIqjPCYWiQNFU1nuqdE0ylSRsg9avsT+dYla056KKoMfy9
- menkbXbaSM/eSygNX8e1VwbTQjpCW+8qaJNi7T6KolXNwsA7vyLvPP/lZz0IA3HaRjvW
- 0cVQ==
+ bh=HDkuFBTSf9PfxMFUSQsII/3TQvG3KWBBsCKA4dEtXq0=;
+ b=bK5GYPDt7cantE00Sw1249BE4KvqtYpbDr/Sxxt37k1cYqjeoedUB9/p/VtP/1D/KI
+ m3E0hXW/+KVxc2P/tN97AlUpI6+1yTl8tLlF9+yOQQcisHdqhqAdi6QM4BVVaZixINIp
+ jwTtaBGqKy970mkL+1ibPoNXAesw2opNEyqpazTtjET4JHgAFRViNRlyuP9nFbkz7Wik
+ u7twqUTVs834DOPVD2MA5034WsZCG7105beHpA0ROkiIDfEVKBObR7kMTZTYPaE2W6Us
+ uq/S1s+0Haoi+7YiCj9gOzI9Pt8ZAt7eewDcy6hdbiSb9QpLraHRSCcMw81493gXcZr/
+ 8DuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=SenI/m4MVR8+NEEf8DYCWuc6xCFneoK33J1yat7CMnQ=;
- b=jEnOJPML1/EK5pRvb7VpQ8NaeHziszzf73QcvVWYf8c4kcV6Nv/5YxaP2CQ+/CWiK0
- QQVCY5FMMnRurFIawYckm4/WKz9lbiSG85yhthLwYrsC6xcLHbz5/kjGa978sY21/Bcs
- wyo0/a93k82A2HKDZNblKK+LshxZtP7skZTC6CTBx6bA7dguWDq2iBcC+aiEfs9qs4oo
- SeJSBP9PYHcYMtWsduXjZQof5j4gRr36PzsMISRlloDNt7M5grgmCFqy/Yi/s1ah2+G9
- TyRyGvJadGwO6lrjUMcMZXmAXA9y6NTvxCLZSt1WAwVMxzXiiUobQNI7sMYH6aUZQJKB
- fjyw==
-X-Gm-Message-State: AOAM531j4r4xMejHowaIa7FhMcW2C1/Dt5LZqa1sTIBhhW7pLdXn6VJu
- GyFlztFHcUZpX4FOoqS/a4t47dzA/dA=
-X-Google-Smtp-Source: ABdhPJzQASHdZneSo8xHkPK+4PCMLsJ7tmRs70aOHofxRuo8HOc8WbWzB7eED4dEA/gGy3O6E6J6xA==
-X-Received: by 2002:adf:e685:: with SMTP id r5mr4302071wrm.340.1603277442931; 
- Wed, 21 Oct 2020 03:50:42 -0700 (PDT)
+ bh=HDkuFBTSf9PfxMFUSQsII/3TQvG3KWBBsCKA4dEtXq0=;
+ b=LFzxA63yP0uHEMDjhvd/5dYCb5cRByyTG5xkfxXeUEVqD63+OmCbozRwS2FB5zgKBx
+ fyyaMPh4fu24th6sQpUfy0ruf7geAWr8z0l8NA3R9v2M7Twnn/GWD0Jc/4QQ9WG6UZtD
+ WFMTiYEncdqvLCLlJAfRuZ/F5qFY+nSNLmM4ueCJPpmSgu4soMnye5WhIBfjZT+z0eI0
+ uOD3UhRomj7GNCUHa2WIkekesBsQKXMOMOOf+OSAGQsZdACazFWTLtRfle4tHws2yTtf
+ GW0ZTlqLrQOaUhegWzPUOTMpybuJjB1IsGunkbbMx+iaWZwHTdD3upj4c7JdrakWDmrf
+ D++Q==
+X-Gm-Message-State: AOAM530Ys9W2TVUHyadL+oB0Drajj78TdvZBgmBmCfwru3Q947peZKR3
+ vfEHE06GBSCld5XRvl8z6uOu3XSQNQA=
+X-Google-Smtp-Source: ABdhPJx5HxH9RBzULE6fqH/E7B8THu1Q/w0fZwryntr0toSwRMSG3bwXy1kqIBv6rjpDEHop8wuKjg==
+X-Received: by 2002:a1c:4856:: with SMTP id v83mr2948606wma.118.1603277452507; 
+ Wed, 21 Oct 2020 03:50:52 -0700 (PDT)
 Received: from localhost.localdomain (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id u195sm2910068wmu.18.2020.10.21.03.50.41
+ by smtp.gmail.com with ESMTPSA id x65sm3079700wmg.1.2020.10.21.03.50.51
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 03:50:42 -0700 (PDT)
+ Wed, 21 Oct 2020 03:50:51 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 1/6] tests/acceptance: Remove unused import
-Date: Wed, 21 Oct 2020 12:50:30 +0200
-Message-Id: <20201021105035.2477784-2-f4bug@amsat.org>
+Subject: [PATCH 3/6] tests/acceptance: Extract tesseract_available() helper in
+ new namespace
+Date: Wed, 21 Oct 2020 12:50:32 +0200
+Message-Id: <20201021105035.2477784-4-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201021105035.2477784-1-f4bug@amsat.org>
 References: <20201021105035.2477784-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42d.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::32a;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x32a.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -115,23 +116,103 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+We are going to reuse tesseract_available(). Extract it to
+a new 'tesseract_utils' namespace.
+
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- tests/acceptance/machine_m68k_nextcube.py | 1 -
- 1 file changed, 1 deletion(-)
+ tests/acceptance/machine_m68k_nextcube.py | 25 +++-----------------
+ tests/acceptance/tesseract_utils.py       | 28 +++++++++++++++++++++++
+ 2 files changed, 31 insertions(+), 22 deletions(-)
+ create mode 100644 tests/acceptance/tesseract_utils.py
 
 diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptance/machine_m68k_nextcube.py
-index 32cf571f948..9d289f2fab7 100644
+index 2baba5fdc26..3c7400c43e4 100644
 --- a/tests/acceptance/machine_m68k_nextcube.py
 +++ b/tests/acceptance/machine_m68k_nextcube.py
-@@ -9,7 +9,6 @@
- import re
+@@ -1,19 +1,19 @@
+ # Functional test that boots a VM and run OCR on the framebuffer
+ #
+-# Copyright (c) Philippe Mathieu-Daudé <f4bug@amsat.org>
++# Copyright (c) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
+ #
+ # This work is licensed under the terms of the GNU GPL, version 2 or
+ # later.  See the COPYING file in the top-level directory.
+ 
+ import os
+-import re
  import time
  import logging
--import distutils.spawn
  
  from avocado_qemu import Test
  from avocado import skipUnless
+ from avocado.utils import process
+-from avocado.utils.path import find_command, CmdNotFoundError
++
++from tesseract_utils import tesseract_available
+ 
+ PIL_AVAILABLE = True
+ try:
+@@ -22,25 +22,6 @@
+     PIL_AVAILABLE = False
+ 
+ 
+-def tesseract_available(expected_version):
+-    try:
+-        find_command('tesseract')
+-    except CmdNotFoundError:
+-        return False
+-    res = process.run('tesseract --version')
+-    try:
+-        version = res.stdout_text.split()[1]
+-    except IndexError:
+-        version = res.stderr_text.split()[1]
+-    return int(version.split('.')[0]) == expected_version
+-
+-    match = re.match(r'tesseract\s(\d)', res)
+-    if match is None:
+-        return False
+-    # now this is guaranteed to be a digit
+-    return int(match.groups()[0]) == expected_version
+-
+-
+ class NextCubeMachine(Test):
+     """
+     :avocado: tags=arch:m68k
+diff --git a/tests/acceptance/tesseract_utils.py b/tests/acceptance/tesseract_utils.py
+new file mode 100644
+index 00000000000..acd6e8c2faa
+--- /dev/null
++++ b/tests/acceptance/tesseract_utils.py
+@@ -0,0 +1,28 @@
++# ...
++#
++# Copyright (c) 2019 Philippe Mathieu-Daudé <f4bug@amsat.org>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later. See the COPYING file in the top-level directory.
++
++import re
++
++from avocado.utils.path import find_command, CmdNotFoundError
++
++def tesseract_available(expected_version):
++    try:
++        find_command('tesseract')
++    except CmdNotFoundError:
++        return False
++    res = process.run('tesseract --version')
++    try:
++        version = res.stdout_text.split()[1]
++    except IndexError:
++        version = res.stderr_text.split()[1]
++    return int(version.split('.')[0]) == expected_version
++
++    match = re.match(r'tesseract\s(\d)', res)
++    if match is None:
++        return False
++    # now this is guaranteed to be a digit
++    return int(match.groups()[0]) == expected_version
 -- 
 2.26.2
 
