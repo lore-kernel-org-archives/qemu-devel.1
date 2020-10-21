@@ -2,82 +2,84 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 279A8C561F8
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDA0EC56202
 	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5731320795
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 475E320795
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:51:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GjvgNUaX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5731320795
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ShXjz51L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 475E320795
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52978 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53092 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBil-00066N-0R
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:51:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49336)
+	id 1kVBim-00069M-2b
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:51:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49356)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBha-0004sz-7M
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:43 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38751)
+ id 1kVBhh-0004u9-4k
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:49 -0400
+Received: from mail-wr1-x42d.google.com ([2a00:1450:4864:20::42d]:38903)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVBhY-0000bh-4j
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:41 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n18so2530492wrs.5
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:50:39 -0700 (PDT)
+ id 1kVBhd-0000bw-9y
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:50:48 -0400
+Received: by mail-wr1-x42d.google.com with SMTP id n18so2530717wrs.5
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aRi4yxGHxJMjWj+a3RYEFO3OTElqHl7OZ1xj3cdSFVI=;
- b=GjvgNUaX99trRaNwXa5YF5zSnMGTYy6yR9xZiSz293oRw8n1I1d3IFZLQwACrj34at
- lyKcE7iKDdtU0OmprjDz9rwvYKr1BHUVJD+8kxsuzt/DLGafEgQ12yan2kbi1h5aFl7U
- 6zOaV1TcU17OKj71It5yDRFPcHWkhHqeBd5DrjcabmQWZ7KvewaiP6qDYn9k2w47glgu
- sE3eSULC2jo3GCeYaF9BTcfG55CeucSU3KDH73vylvRs1VMw2IQJWiIwe/VZ2J6lctky
- nVuK/eQzgClPFr/SIo30atgUD6hrwN6uu72BuISQlgmUwJFB/O2HCNYjg7aazdDAij0G
- x16g==
+ h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=SenI/m4MVR8+NEEf8DYCWuc6xCFneoK33J1yat7CMnQ=;
+ b=ShXjz51LTHeUnMo9Z93PYgblwftpUaBC/j4xroc7mvpmzWc2GAXbMBcCPni1SkOsMs
+ 9KWoQ2TUawPOR9a/jQDWpuEk7h3dlgh6k4Ns2b5oO68YHu0464xnwY71MyQP+rMrtcXc
+ ruQ3jsGIEeFPFxDiVPZXJb78/qv/5BXrkJCbd3Ac5wkCxFXAq+NSiv5sdjpEGLMIPnZA
+ 611QuJz73yRGUvYznoKIL8KIqjPCYWiQNFU1nuqdE0ylSRsg9avsT+dYla056KKoMfy9
+ menkbXbaSM/eSygNX8e1VwbTQjpCW+8qaJNi7T6KolXNwsA7vyLvPP/lZz0IA3HaRjvW
+ 0cVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=aRi4yxGHxJMjWj+a3RYEFO3OTElqHl7OZ1xj3cdSFVI=;
- b=B1oss5+sXIh0WFET3c+nl3P6xxDSTA++AMVombQCi1RRwxKzzatucPRNhpJpKD/fXR
- k8qtBhuWuS17U/T1+Wi6Paw38pIRZNufRxFrLRQJ+U2XqE9VyTvtzU1GWh5QdEKx8peY
- PPA/hMaQSYq28cgPjTH3o+PeNJSBlViiL0Pv1UQJcALqcRgMQ3F5REV+xx2SwOzyPkG5
- N8NcAUkTA2iZFs78Zkze5xbtfAMD8rOWrtfX4dRdgsl6phcSfaTMqLVPTfazZeCUMeWb
- pQoFwphJcyFAtDQ5UTJWmvHHC6IxBwv8NaoZ2miGlIUqpR5uRAA58Ua665ru7BL0OcJH
- meNA==
-X-Gm-Message-State: AOAM533XkJzbIKxWouimfgSdREem9jNKi+KaARRQ8YQvOV8Gy3m23I+b
- ApO7QMHzEDvBDH/TIRa3Pe8PgPosISo=
-X-Google-Smtp-Source: ABdhPJzD/Ty0bOHlpyCDIMHKKl+uDfRAMxXfQVEI81K/B4hnF3c8TnOYKfDcZMjBSxpzhlTfB3lqWg==
-X-Received: by 2002:adf:b19c:: with SMTP id q28mr3887890wra.119.1603277438245; 
- Wed, 21 Oct 2020 03:50:38 -0700 (PDT)
+ :in-reply-to:references:mime-version:content-transfer-encoding;
+ bh=SenI/m4MVR8+NEEf8DYCWuc6xCFneoK33J1yat7CMnQ=;
+ b=jEnOJPML1/EK5pRvb7VpQ8NaeHziszzf73QcvVWYf8c4kcV6Nv/5YxaP2CQ+/CWiK0
+ QQVCY5FMMnRurFIawYckm4/WKz9lbiSG85yhthLwYrsC6xcLHbz5/kjGa978sY21/Bcs
+ wyo0/a93k82A2HKDZNblKK+LshxZtP7skZTC6CTBx6bA7dguWDq2iBcC+aiEfs9qs4oo
+ SeJSBP9PYHcYMtWsduXjZQof5j4gRr36PzsMISRlloDNt7M5grgmCFqy/Yi/s1ah2+G9
+ TyRyGvJadGwO6lrjUMcMZXmAXA9y6NTvxCLZSt1WAwVMxzXiiUobQNI7sMYH6aUZQJKB
+ fjyw==
+X-Gm-Message-State: AOAM531j4r4xMejHowaIa7FhMcW2C1/Dt5LZqa1sTIBhhW7pLdXn6VJu
+ GyFlztFHcUZpX4FOoqS/a4t47dzA/dA=
+X-Google-Smtp-Source: ABdhPJzQASHdZneSo8xHkPK+4PCMLsJ7tmRs70aOHofxRuo8HOc8WbWzB7eED4dEA/gGy3O6E6J6xA==
+X-Received: by 2002:adf:e685:: with SMTP id r5mr4302071wrm.340.1603277442931; 
+ Wed, 21 Oct 2020 03:50:42 -0700 (PDT)
 Received: from localhost.localdomain (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id m12sm2989889wrs.92.2020.10.21.03.50.37
+ by smtp.gmail.com with ESMTPSA id u195sm2910068wmu.18.2020.10.21.03.50.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 03:50:37 -0700 (PDT)
+ Wed, 21 Oct 2020 03:50:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/6] tests/acceptance: Test the Fuloong 2E machine
-Date: Wed, 21 Oct 2020 12:50:29 +0200
-Message-Id: <20201021105035.2477784-1-f4bug@amsat.org>
+Subject: [PATCH 1/6] tests/acceptance: Remove unused import
+Date: Wed, 21 Oct 2020 12:50:30 +0200
+Message-Id: <20201021105035.2477784-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201021105035.2477784-1-f4bug@amsat.org>
+References: <20201021105035.2477784-1-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::42d;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x42d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -113,43 +115,24 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series add tests for the MIPS Fuloong 2E machine.=0D
-=0D
-I have been using these tests for over 1 year now.=0D
-After recent discussions with Huacai and Mark regarding=0D
-how to contribute tests for machines using private blob,=0D
-I think it is time to publish this series, to see how=0D
-the final part will be discussed, as it tests a blob=0D
-which Lemote company doesn't publish the sources. The=0D
-binary is know to work and has been used for various=0D
-years on real hardware. Its MD5 is also know (I am not=0D
-using SHA-1 because it has been published with MD5).=0D
-=0D
-The idea is to be able to share tests without infringing=0D
-licenses issues.=0D
-=0D
-Please comment :)=0D
-=0D
-Phil.=0D
-=0D
-Philippe Mathieu-Daud=C3=A9 (6):=0D
-  tests/acceptance: Remove unused import=0D
-  tests/acceptance: Use .ppm extention for Portable PixMap files=0D
-  tests/acceptance: Extract tesseract_available() helper in new=0D
-    namespace=0D
-  tests/acceptance: Introduce tesseract_ocr() helper=0D
-  tests/acceptance: Test Linux on the Fuloong 2E machine=0D
-  tests/acceptance: Test PMON on the Fuloong 2E machine=0D
-=0D
- MAINTAINERS                                |   1 +=0D
- tests/acceptance/machine_m68k_nextcube.py  |  51 ++---------=0D
- tests/acceptance/machine_mips_fuloong2e.py | 101 +++++++++++++++++++++=0D
- tests/acceptance/tesseract_utils.py        |  46 ++++++++++=0D
- 4 files changed, 158 insertions(+), 41 deletions(-)=0D
- create mode 100644 tests/acceptance/machine_mips_fuloong2e.py=0D
- create mode 100644 tests/acceptance/tesseract_utils.py=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ tests/acceptance/machine_m68k_nextcube.py | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/tests/acceptance/machine_m68k_nextcube.py b/tests/acceptance/machine_m68k_nextcube.py
+index 32cf571f948..9d289f2fab7 100644
+--- a/tests/acceptance/machine_m68k_nextcube.py
++++ b/tests/acceptance/machine_m68k_nextcube.py
+@@ -9,7 +9,6 @@
+ import re
+ import time
+ import logging
+-import distutils.spawn
+ 
+ from avocado_qemu import Test
+ from avocado import skipUnless
+-- 
+2.26.2
+
 
