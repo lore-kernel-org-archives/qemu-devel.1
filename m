@@ -2,86 +2,79 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4C4C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:24:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B887C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:29:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4A9F2206DD
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:24:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7C2720795
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 10:29:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="X/e8p8F/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4A9F2206DD
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lvON8LSL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7C2720795
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVBIY-0000QX-TD
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:24:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43644)
+	id 1kVBNC-0003Sz-Cp
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 06:29:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45006)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kVBHV-0008BN-7Q
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:23:45 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:38385)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVBMX-0002nU-T8
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:28:57 -0400
+Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:40034)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kVBHT-0005Kf-Eu
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:23:44 -0400
-Received: by mail-wr1-x444.google.com with SMTP id n18so2435690wrs.5
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:23:42 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVBMW-0006G3-3F
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 06:28:57 -0400
+Received: by mail-ed1-x544.google.com with SMTP id p13so2035232edi.7
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 03:28:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=Ad3LWd75S3nxO6z0r5GtDRKanQVJNgns2RHs/rm0bnk=;
- b=X/e8p8F/AvF3C72tJG+A2ZJI8VXUkpAoAi3nlzB6EEN6EGNVIV7OaXs+BD73ig3H6O
- ALWEGGDgFXBHslGjVx/cC77eOaGtBsq2YD5pzpUleXrijFKmJRRimga9idvShifajCjf
- 7n3eH1tPo/xzJ7xcf/TrOH51AduHKr2OfmLfC93xgut1XSO6LZ5aGCdaBmNGPKNWptsX
- HZy7GvK70zBRPk9mPy9GPUOTtUIhXDmIA/0EmaLQlJTD+qhLn9IdgEaPhQTeVJnC5Uyk
- CgUP4j/4v11rFy5z2YiSKnnEuDxvdV/GfF8I6PN93Sm1RrTb9D7z7J2DlP4A9B8rbxLr
- IQhA==
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=GmGPm80VdT0j5JTW7R5DnrwtZRK+dlil9/eIFkBb5zQ=;
+ b=lvON8LSLLacsiQvkD02mZEgSbnTM+MtTaNPKKyyI/NKiog02duoTSKCf+1dl8w3q8a
+ 6vsNL24H6iYt9za3tujs97MfhFt1hyS/T9gLGpdEH/+dnv7XH2655RqQm4AuECGnGHe9
+ foyZ0KXoR+4W/+tyYp7ijMq6/yU9rW0ZPE841eXFFRgAOvRobMreI52p3iDyDuE9vzWM
+ 0Jsk3gv498MKDOlkb/UWzv+vkx/0DJfREAIaMabihIkgD+7J+b526cssd1zmt7+FDcV9
+ SDWduIsaHgUQP8X2p1J/3Q3QQCmn+mJfH9BaWC7/bkw8ovxFzIfiwUQ95vWMfo7yLrwl
+ fQwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=Ad3LWd75S3nxO6z0r5GtDRKanQVJNgns2RHs/rm0bnk=;
- b=NM385oWEf/1Z6yglE+evm2JVfWz+X+icQZAbdTUJ1fHxhOJZMCNohkscNgJsUYcFID
- 2snK+yKseO8EMm2/zaB914gQxGMNwDH+K4ESl2/bE0Em5PGOJUyR0fsaU7Zzqw7XLXbM
- 3TBKe8NLYfjZBSpjn4nqU/VwOmfSTSD58k82WwL0bRjZK0shVTd+4rJoRedwNm0fF5Ki
- CRDASIvXLwwOvSi1LrTajqodyH0jVS28GrYGV1VrWi746tr13x7S9Szk7/AZZPAoV9PT
- Rz1jbo4oTYNjduzjoXb2MbABXVDi9FUc9putao69VAD9NLabdabjqZ4d6+QquG8g2Rtt
- 3Y4Q==
-X-Gm-Message-State: AOAM5321zaJkhJ0vKWVx+mKK0hFOKqqz6BQfYu3HZYSNJQwWGQ0E+gJq
- 8N7XZqjX0Ts8P7yahZQAAiRJGg==
-X-Google-Smtp-Source: ABdhPJyGhvrjz+FLCki86p3F//2mSvNkKxedLOF0Mqh7jjsqMYEXzDHJXj4R9mW+XQKwAjq/FSkxaw==
-X-Received: by 2002:adf:8562:: with SMTP id 89mr3806387wrh.214.1603275821194; 
- Wed, 21 Oct 2020 03:23:41 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 30sm3201368wrs.84.2020.10.21.03.23.39
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 21 Oct 2020 03:23:39 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id AEF0D1FF7E;
- Wed, 21 Oct 2020 11:23:38 +0100 (BST)
-References: <20201007161940.1478-1-ani@anisinha.ca>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Ani Sinha <ani@anisinha.ca>
-Subject: Re: [PATCH v2] Adding ani's email as an individual contributor
-In-reply-to: <20201007161940.1478-1-ani@anisinha.ca>
-Date: Wed, 21 Oct 2020 11:23:38 +0100
-Message-ID: <87lffzx4gl.fsf@linaro.org>
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=GmGPm80VdT0j5JTW7R5DnrwtZRK+dlil9/eIFkBb5zQ=;
+ b=YEszLmURRG52JBHjS4dzxIjP2+RH++Vb8G+JXFOo9tttwnZgSq6yBpgNWrwHc/FsKA
+ cEjWsoLToi+M567WGVJaQYMIL+amjwf+lDwWuoxCf32A1jGGzbR5x/BdTdkuKyxBm7Kv
+ 8ceMx5FxS03rBBGuChih91ecQef5ewGrb/PWuFBuZysydMVfR/uf2VZS8hZaKChksBJM
+ P+veg40V45faqQESxYBQnGiQ8xRxWnWgLb34QOe0H38NJIs3ioKA3vbCUcV/25rz8USk
+ ShJQLhTJOgPny6BLsEIaPI53giXTNvSCmy/IcF+75o9yNemKBGWsS3uOSpf7M+oDHPng
+ mSVg==
+X-Gm-Message-State: AOAM53245WsWfmi3Y+C4HiOTzjYjV/BbvLtkgaSKJaVaeL8dt/AwLOX1
+ 193ZH2GKDSwadQztbYgSBAQIWYYtJQ7SxCynEtN8XA==
+X-Google-Smtp-Source: ABdhPJz7mR9EZUCMqAXu6SeVYX+rqXiYcNFEaQuvTDJdJwLuATJex7tjfr6HIMQpw5+hcRRBMXMhGoVFzmhxuMnomYA=
+X-Received: by 2002:a50:9ea6:: with SMTP id a35mr2480545edf.52.1603276133988; 
+ Wed, 21 Oct 2020 03:28:53 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20201020140050.1623109-1-ppandit@redhat.com>
+ <CAFEAcA_Bg12kvGAjg127_XpfeJdj9er-e2VEF9YnkNyVUDQ9OQ@mail.gmail.com>
+ <7e971323-0b9a-2c32-2e09-705249f3f2de@redhat.com>
+In-Reply-To: <7e971323-0b9a-2c32-2e09-705249f3f2de@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 21 Oct 2020 11:28:42 +0100
+Message-ID: <CAFEAcA_yHu88Wf7YgP9gpZ-kQXcSHRV82FX0bE5ScXfMU+7U_g@mail.gmail.com>
+Subject: Re: [PATCH v2] net: remove an assert call in eth_get_gso_type
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::544;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -103,22 +96,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, f4bug@amsat.org
+Cc: Prasad J Pandit <pjp@fedoraproject.org>, Jason Wang <jasowang@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ P J P <ppandit@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Gaoning Pan <pgn@zju.edu.cn>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-Ani Sinha <ani@anisinha.ca> writes:
-
-> Ani is an individual contributor into qemu project. Adding my email into =
-the
-> correct file to reflect so.
+On Wed, 21 Oct 2020 at 07:29, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
+m> wrote:
+> During the last 2 years I've been sending patches touching
+> various QEMU areas, but I never used qemu_log(). I always
+> used:
+> - qemu_log_mask(LOG_GUEST_ERROR/LOG_UNIMP, ...
+> - error_report/warn_report from "qemu/error-report.h"
+> - error_setg* from "qapi/error.h"
+> - trace events
 >
-> Signed-off-by: Ani Sinha <ani@anisinha.ca>
+> $ git grep qemu_log\( | wc -l
+> 661
+>
+> This function seems used mostly by very old code.
+>
+> It is declared in "qemu/log-for-trace.h" which looks like
+> an internal API.
+>
+> Should we add a checkpatch rule to refuse new uses of qemu_log()?
 
-Queued to testing/next, thanks.
+The major use for qemu_log() is when you're constructing
+a multi-line log message or a log message which needs to
+do some expensive calculations to work out what it is going
+to print. In that case the pattern is:
 
---=20
-Alex Benn=C3=A9e
+    if (qemu_loglevel_mask(LOG_WHATEVER)) {
+        int x =3D do_my_expensive_calculations();
+        qemu_log("line one: foo: 0x%x\n", x);
+        for (some loop over a list) {
+           qemu_log("and another line per list item\n");
+        }
+    }
+
+For really complicated logging you might abstract out
+the middle bit into functions which call qemu_log()
+directly and which are only called inside a check that
+some particular log level is enabled.
+
+The uses in tcg/tcg.c are examples of this pattern.
+
+The thing to avoid is a plain qemu_log() call which is
+not already guarded by some check on the log-level mask.
+You're right that the really common case is fine with
+just qemu_log_mask(), but sometimes you need to be
+able to split up the "is log level X enabled" and
+"log" parts of the task.
+
+thanks
+-- PMM
 
