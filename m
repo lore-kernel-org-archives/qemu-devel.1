@@ -2,109 +2,83 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D4AEC55179
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:23:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD668C388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:29:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0608A21D7B
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:23:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EA9D420870
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 16:29:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6Lc1BBe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0608A21D7B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUTELQ3B"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EA9D420870
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVGtn-0000MM-T0
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 12:23:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57644)
+	id 1kVGzO-0003da-05
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 12:29:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59188)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVGsC-0007bD-Fu
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:22:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40975)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVGxJ-0001lT-G3
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:27:17 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47219)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVGsA-0003yC-55
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:21:59 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVGxH-0004r8-EE
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 12:27:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603297316;
+ s=mimecast20190719; t=1603297634;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Tf2GOavOs4XjPb5miOMUuacqpIENacbEkRZV9R+fots=;
- b=G6Lc1BBeQcI7GPmAR1OIXG1PDeC8S1nQz3b7JyY9b4/jvNASS1xUgbpCHPHzl0hdVMOLsS
- 7n3KuUyXmQEGhMWQOZbeWYch4m0J3i84usGoiYa5/S43L8gakjW0jC6E80GSSSCoqjsm1h
- VMoSwTqfSanoO1J/KAhzuE68crH59kw=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-166-XJ9JSCuUO8mwlmdzQstrQA-1; Wed, 21 Oct 2020 12:21:53 -0400
-X-MC-Unique: XJ9JSCuUO8mwlmdzQstrQA-1
-Received: by mail-wr1-f71.google.com with SMTP id b6so2907881wrn.17
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 09:21:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Tf2GOavOs4XjPb5miOMUuacqpIENacbEkRZV9R+fots=;
- b=K7FKw6F5jOWcnj9bIn4JSPrfZGcKGT93rSBHx8WV+nVq6qJrL7q60BtiDE6jtMvMk2
- 34ht/5RyQj1pyhLiXUmpdNBo8WCGon1TkrT2JoVuZRblek7cyjUBSJZ57QGjEpR3SkuH
- D/gQ3s7E2hKE/sRg2uzsrUN2hDQF8O3MaA7O9J5G3fJMWXy5cFyAbaafAK/AiR+Jy3d6
- d38MeoFRzidm0LOQwoQyaJ1f9kdxfwLrAPGN2lI6m9PoK53fQC4Z1F6ztJcBXvK8YkTm
- VNxxECyCGndgoiqDKuRwZQ1HBOu1thoMbNSClQI/pVq5epXfiJqUeKQrPc5+izA2D5x3
- J1Zw==
-X-Gm-Message-State: AOAM530rk8WOQyYC13l7vaHYr34A1qmpDWzqxS1TQ9O46ny1PVu7Xsof
- YPY6qvTtfrMnENevPtsYlLnJyDa25ZgnlgFDCiofQWoSaaOxcOAAj2r7eHJwHD+SsJvJy95Mxzp
- LeMY5wa/QbLpDZdw=
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr4205169wml.99.1603297309515; 
- Wed, 21 Oct 2020 09:21:49 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzX+chci9MIHkAQfSDy2YDVhWBd2piFaQN3DgREzDS4FghCnux9GAQwttroL4BfgXNIjr7ERA==
-X-Received: by 2002:a7b:c935:: with SMTP id h21mr4205154wml.99.1603297309218; 
- Wed, 21 Oct 2020 09:21:49 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id o3sm4849029wru.15.2020.10.21.09.21.48
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Oct 2020 09:21:48 -0700 (PDT)
-Subject: Re: [PATCH v4 2/2] util/oslib: Assert qemu_try_memalign() alignment
- is a power of 2
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-References: <20201020111743.2074694-1-philmd@redhat.com>
- <20201020111743.2074694-3-philmd@redhat.com>
- <9c578c16-ad57-33d8-9900-b6513cf207e1@linaro.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <53fe6833-719c-9449-79b7-a6b7dddd63ee@redhat.com>
-Date: Wed, 21 Oct 2020 18:21:47 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ content-transfer-encoding:content-transfer-encoding;
+ bh=+Yr2Q8JnzLSCFDrPaSlvO5t4dNpfXXKLArO6rsxbTmY=;
+ b=KUTELQ3BuK3PhotWZLua5f8hyuBfkOAGZY9UNla3EvAlmhVLSQRibwj1ELAFF9zEmWIyDa
+ fqMVDaGYcuo/WtNeM/WTVmUupk74yG+xPhlcdd2NljtM89ir6dwglM/ehWooIBlWRukVvL
+ DGxYm/XEb/g9BHGaX5zK2hWfq91BNyA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-329-uTcvREGkOwGpbEzCG_GI0w-1; Wed, 21 Oct 2020 12:27:11 -0400
+X-MC-Unique: uTcvREGkOwGpbEzCG_GI0w-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7DCBD5F9D4;
+ Wed, 21 Oct 2020 16:27:10 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.36.110.19])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B3261002388;
+ Wed, 21 Oct 2020 16:27:05 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v7 00/11] migration: bring improved savevm/loadvm/delvm to QMP
+Date: Wed, 21 Oct 2020 17:26:53 +0100
+Message-Id: <20201021162704.3652555-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <9c578c16-ad57-33d8-9900-b6513cf207e1@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,29 +91,181 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Stefan Weil <sw@weilnetz.de>
+Cc: Kevin Wolf <kwolf@redhat.com>, Peter Krempa <pkrempa@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ "Denis V. Lunev" <den@virtuozzo.com>, qemu-block@nongnu.org,
+ Juan Quintela <quintela@redhat.com>, John Snow <jsnow@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
+ Paolo Bonzini <pbonzini@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/21/20 6:01 PM, Richard Henderson wrote:
-> On 10/20/20 4:17 AM, Philippe Mathieu-Daudé wrote:
->> @@ -200,6 +200,9 @@ void *qemu_try_memalign(size_t alignment, size_t size)
->>   
->>       if (alignment < sizeof(void*)) {
->>           alignment = sizeof(void*);
->> +    } else {
->> +        g_assert(QEMU_IS_ALIGNED(alignment, sizeof(void *)));
-> 
-> This is redundant with the if above, and the assert below.
-
-Indeed, thanks =)
-
-> 
->> +        g_assert(is_power_of_2(alignment));
-> 
-> 
-> r~
-> 
+ v1: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg00866.html=0D
+ v2: https://lists.gnu.org/archive/html/qemu-devel/2020-07/msg07523.html=0D
+ v3: https://lists.gnu.org/archive/html/qemu-devel/2020-08/msg07076.html=0D
+ v4: https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg05221.html=0D
+ v5: https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg00587.html=0D
+ v6: https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg02158.html=0D
+=0D
+This series aims to provide a better designed replacement for the=0D
+savevm/loadvm/delvm HMP commands, which despite their flaws continue=0D
+to be actively used in the QMP world via the HMP command passthrough=0D
+facility.=0D
+=0D
+The main problems addressed are:=0D
+=0D
+ - The logic to pick which disk to store the vmstate in is not=0D
+   satsifactory.=0D
+=0D
+   The first block driver state cannot be assumed to be the root disk=0D
+   image, it might be OVMF varstore and we don't want to store vmstate=0D
+   in there.=0D
+=0D
+ - The logic to decide which disks must be snapshotted is hardwired=0D
+   to all disks which are writable=0D
+=0D
+   Again with OVMF there might be a writable varstore, but this can be=0D
+   raw rather than qcow2 format, and thus unable to be snapshotted.=0D
+   While users might wish to snapshot their varstore, in some/many/most=0D
+   cases it is entirely uneccessary. Users are blocked from snapshotting=0D
+   their VM though due to this varstore.=0D
+=0D
+ - The commands are synchronous blocking execution and returning=0D
+   errors immediately.=0D
+=0D
+   This is partially addressed by integrating with the job framework.=0D
+   This forces the client to use the async commands to determine=0D
+   the completion status or error message from the operations.=0D
+=0D
+In the block code I've only dealt with node names for block devices, as=0D
+IIUC, this is all that libvirt should need in the -blockdev world it now=0D
+lives in. IOW, I've made not attempt to cope with people wanting to use=0D
+these QMP commands in combination with -drive args, as libvirt will=0D
+never use -drive with a QEMU new enough to have these new commands.=0D
+=0D
+The main limitations of this current impl=0D
+=0D
+ - The snapshot process runs serialized in the main thread. ie QEMU=0D
+   guest execution is blocked for the duration. The job framework=0D
+   lets us fix this in future without changing the QMP semantics=0D
+   exposed to the apps.=0D
+=0D
+ - Most vmstate loading errors just go to stderr, as they are not=0D
+   using Error **errp reporting. Thus the job framework just=0D
+   reports a fairly generic message=0D
+=0D
+     "Error -22 while loading VM state"=0D
+=0D
+   Again this can be fixed later without changing the QMP semantics=0D
+   exposed to apps.=0D
+=0D
+I've done some minimal work in libvirt to start to make use of the new=0D
+commands to validate their functionality, but this isn't finished yet.=0D
+=0D
+My ultimate goal is to make the GNOME Boxes maintainer happy again by=0D
+having internal snapshots work with OVMF:=0D
+=0D
+  https://gitlab.gnome.org/GNOME/gnome-boxes/-/commit/c486da262f6566326fbcb=
+5e=3D=0D
+f45c5f64048f16a6e=0D
+=0D
+Changed in v7:=0D
+=0D
+ - Incorporate changes from:=0D
+=0D
+     https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg03165.html=0D
+=0D
+ - Tweaked error message=0D
+=0D
+Changed in v6:=0D
+=0D
+ - Resolve many conflicts with recent replay changes=0D
+ - Misc typos in QAPI=0D
+=0D
+Changed in v5:=0D
+=0D
+ - Fix prevention of tag overwriting=0D
+ - Refactor and expand test suite coverage to validate=0D
+   more negative scenarios=0D
+=0D
+Changed in v4:=0D
+=0D
+ - Make the device lists mandatory, dropping all support for=0D
+   QEMU's built-in heuristics to select devices.=0D
+=0D
+ - Improve some error reporting and I/O test coverage=0D
+=0D
+Changed in v3:=0D
+=0D
+ - Schedule a bottom half to escape from coroutine context in=0D
+   the jobs. This is needed because the locking in the snapshot=0D
+   code goes horribly wrong when run from a background coroutine=0D
+   instead of the main event thread.=0D
+=0D
+ - Re-factor way we iterate over devices, so that we correctly=0D
+   report non-existant devices passed by the user over QMP.=0D
+=0D
+ - Add QAPI docs notes about limitations wrt vmstate error=0D
+   reporting (it all goes to stderr not an Error **errp)=0D
+   so QMP only gets a fairly generic error message currently.=0D
+=0D
+ - Add I/O test to validate many usage scenarios / errors=0D
+=0D
+ - Add I/O test helpers to handle QMP events with a deterministic=0D
+   ordering=0D
+=0D
+ - Ensure 'delete-snapshot' reports an error if requesting=0D
+   delete from devices that don't support snapshot, instead of=0D
+   silently succeeding with no erro.=0D
+=0D
+Changed in v2:=0D
+=0D
+ - Use new command names "snapshot-{load,save,delete}" to make it=0D
+   clear that these are different from the "savevm|loadvm|delvm"=0D
+   as they use the Job framework=0D
+=0D
+ - Use an include list for block devs, not an exclude list=0D
+=0D
+Daniel P. Berrang=3DC3=3DA9 (10):=0D
+  block: push error reporting into bdrv_all_*_snapshot functions=0D
+  migration: stop returning errno from load_snapshot()=0D
+  block: add ability to specify list of blockdevs during snapshot=0D
+  block: allow specifying name of block device for vmstate storage=0D
+  block: rename and alter bdrv_all_find_snapshot semantics=0D
+  migration: control whether snapshots are ovewritten=0D
+  migration: wire up support for snapshot device selection=0D
+  migration: introduce a delete_snapshot wrapper=0D
+  iotests: add support for capturing and matching QMP events=0D
+  migration: introduce snapshot-{save,load,delete} QMP commands=0D
+=0D
+Philippe Mathieu-Daud=3DC3=3DA9 (1):=0D
+  migration: Make save_snapshot() return bool, not 0/-1=0D
+=0D
+ block/monitor/block-hmp-cmds.c |   7 +-=0D
+ block/snapshot.c               | 256 +++++++++++++++------=0D
+ include/block/snapshot.h       |  23 +-=0D
+ include/migration/snapshot.h   |  47 +++-=0D
+ migration/savevm.c             | 294 ++++++++++++++++++++----=0D
+ monitor/hmp-cmds.c             |  12 +-=0D
+ qapi/job.json                  |   9 +-=0D
+ qapi/migration.json            | 121 ++++++++++=0D
+ replay/replay-debugging.c      |  12 +-=0D
+ replay/replay-snapshot.c       |   5 +-=0D
+ softmmu/vl.c                   |   2 +-=0D
+ tests/qemu-iotests/267.out     |  12 +-=0D
+ tests/qemu-iotests/310         | 385 +++++++++++++++++++++++++++++++=0D
+ tests/qemu-iotests/310.out     | 407 +++++++++++++++++++++++++++++++++=0D
+ tests/qemu-iotests/common.qemu | 107 ++++++++-=0D
+ tests/qemu-iotests/group       |   1 +=0D
+ 16 files changed, 1548 insertions(+), 152 deletions(-)=0D
+ create mode 100755 tests/qemu-iotests/310=0D
+ create mode 100644 tests/qemu-iotests/310.out=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
 
