@@ -2,81 +2,95 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 14B59C5517A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 05:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED966C5517A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 05:03:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2221721707
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 05:02:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2221721707
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 307B221707
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 05:03:39 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Q9ULPFU8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 307B221707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58272 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60234 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV6H4-00040U-6D
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 01:02:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58934)
+	id 1kV6Hi-0004pf-9d
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 01:03:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kV6F5-0002iF-1g
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 01:00:55 -0400
-Received: from indium.canonical.com ([91.189.90.7]:34740)
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kV66a-0000g0-1h
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:52:08 -0400
+Received: from mail-pg1-x543.google.com ([2607:f8b0:4864:20::543]:38172)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kV6F2-0000Dn-6Z
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 01:00:54 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kV6Ez-0002tW-C4
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 05:00:49 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 57E8D2E80AB
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 05:00:49 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 21 Oct 2020 04:51:44 -0000
-From: Andrej Krutak <1856834@bugs.launchpad.net>
+ (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
+ id 1kV66Y-0005kU-5M
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 00:52:07 -0400
+Received: by mail-pg1-x543.google.com with SMTP id j7so738718pgk.5
+ for <qemu-devel@nongnu.org>; Tue, 20 Oct 2020 21:52:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=8KTCdxjlJBVxcdguTe2Cz9K9OkOOhurBPmgTH8Me1bg=;
+ b=Q9ULPFU8dhQw8aiJGgYBOPJtq9wfe5Y/nkpSCRWc0b9hS+uuRrQBDhaiwFLxkebz7Q
+ BvyJ4CQdbsDtYKNPEdsudjEICs17QD7dPrnFC6eTyceSTzhOStPCUD7WoAnduVZeVeNG
+ KEG5dV4D0mzCOqCdt7lfk84o5IHXLEfGRONYOzb/v4+GK659F96XYuxIl80PF5K1bS1m
+ DlpccO7S9B+FEroeiCMjSe2Wg/jgoa0F+hLDGRT314I1CvBcWmzJxaSZ0/KOw7128abF
+ SpIKqiA3VGU0PuDc6+qgANbkrZxtwHokkvSyD93ZPMJOyC80jadiCcUlT8kNNRna6Lyd
+ KS0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=8KTCdxjlJBVxcdguTe2Cz9K9OkOOhurBPmgTH8Me1bg=;
+ b=lGJUTycOwao7GQp8AvUrIlI5LokxVu0NJi2z9B/vmP8vhElfSTLMGBV21qezy3un0i
+ M1NXPYo6ttL3BPaHxnkcCQbS+MBaq0tMAzJs5CKb0eBIsRPMsU12bmbDexgiVFA0+YjI
+ w/+QKgs+v2oGuKDOpS2KevyqIAOBSF0ZKB5dYnVzUYTYvCv3Q7HxnKGa4EgZEEh9J8z0
+ O/1kbTAZY8GykGsBZ5gALr/9JQGgR3JW29AX/a6CbJ5KkClE9xEf+0NiAB6oCtStpeIO
+ LS2Pka4v5+Fd4FEOhQcvRIDhJJfPlINSbWR95d01Dvzs4oBOwg4L7nYuOw5+opjUdfpk
+ NPqQ==
+X-Gm-Message-State: AOAM530Gl+ae/EhLRC6LZiCaHwpHnf2b6tYreK8VkUK/x6WftcmBG5XI
+ W0YmpL6MaLOED7zEYiS4DR7gUm5Kg0n/rw==
+X-Google-Smtp-Source: ABdhPJxv9HR9jQfJSI1CernTrstBJpGbZogKVZKFP3IX7GUn7gY4D3rky8UONoDdZwVncc0xUZ3ZOA==
+X-Received: by 2002:a63:3fc7:: with SMTP id m190mr1556251pga.293.1603255924565; 
+ Tue, 20 Oct 2020 21:52:04 -0700 (PDT)
+Received: from localhost.localdomain ([71.212.141.89])
+ by smtp.gmail.com with ESMTPSA id j11sm620070pfh.143.2020.10.20.21.52.03
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 20 Oct 2020 21:52:03 -0700 (PDT)
+From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: powerpc ppc softmmu virtio
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: andree182 ecsdn laurent-vivier
-X-Launchpad-Bug-Reporter: ecsdn (ecsdn)
-X-Launchpad-Bug-Modifier: Andrej Krutak (andree182)
-References: <157666458990.14847.6716769636962803095.malonedeb@wampee.canonical.com>
-Message-Id: <160325590462.26910.4506787046271023299.malone@wampee.canonical.com>
-Subject: [Bug 1856834] Re: PCI broken in qemu ppc e500 in v2.12.0 and other
- versions
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="82ef3cb779698368c64f0c310863c3535f60eea0"; Instance="production"
-X-Launchpad-Hash: 984371916144405a072c249bc2e545191fa8f4c4
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 01:00:49
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Subject: [RFC PATCH 10/15] softfloat: Inline float_raise
+Date: Tue, 20 Oct 2020 21:51:44 -0700
+Message-Id: <20201021045149.1582203-11-richard.henderson@linaro.org>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201021045149.1582203-1-richard.henderson@linaro.org>
+References: <20201021045149.1582203-1-richard.henderson@linaro.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::543;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pg1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,72 +99,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1856834 <1856834@bugs.launchpad.net>
+Cc: alex.bennee@linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sorry, above I meant "virtio-blk freeze" (no virtio_rng). But in any
-case it's obviously not directly related to this bug, so disregard it...
-Sorry for the noise.
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+---
+ include/fpu/softfloat.h        |  5 ++++-
+ fpu/softfloat-specialize.c.inc | 12 ------------
+ 2 files changed, 4 insertions(+), 13 deletions(-)
 
--- =
+diff --git a/include/fpu/softfloat.h b/include/fpu/softfloat.h
+index 78ad5ca738..019c2ec66d 100644
+--- a/include/fpu/softfloat.h
++++ b/include/fpu/softfloat.h
+@@ -100,7 +100,10 @@ typedef enum {
+ | Routine to raise any or all of the software IEC/IEEE floating-point
+ | exception flags.
+ *----------------------------------------------------------------------------*/
+-void float_raise(uint8_t flags, float_status *status);
++static inline void float_raise(uint8_t flags, float_status *status)
++{
++    status->float_exception_flags |= flags;
++}
+ 
+ /*----------------------------------------------------------------------------
+ | If `a' is denormal and we are in flush-to-zero mode then set the
+diff --git a/fpu/softfloat-specialize.c.inc b/fpu/softfloat-specialize.c.inc
+index c2f87addb2..0fe8ce408d 100644
+--- a/fpu/softfloat-specialize.c.inc
++++ b/fpu/softfloat-specialize.c.inc
+@@ -225,18 +225,6 @@ floatx80 floatx80_default_nan(float_status *status)
+ const floatx80 floatx80_infinity
+     = make_floatx80_init(floatx80_infinity_high, floatx80_infinity_low);
+ 
+-/*----------------------------------------------------------------------------
+-| Raises the exceptions specified by `flags'.  Floating-point traps can be
+-| defined here if desired.  It is currently not possible for such a trap
+-| to substitute a result value.  If traps are not implemented, this routine
+-| should be simply `float_exception_flags |= flags;'.
+-*----------------------------------------------------------------------------*/
+-
+-void float_raise(uint8_t flags, float_status *status)
+-{
+-    status->float_exception_flags |= flags;
+-}
+-
+ /*----------------------------------------------------------------------------
+ | Internal canonical NaN format.
+ *----------------------------------------------------------------------------*/
+-- 
+2.25.1
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1856834
-
-Title:
-  PCI broken in qemu ppc e500 in v2.12.0 and other versions
-
-Status in QEMU:
-  New
-
-Bug description:
-  The same qemu -M mpc... command that works on qemu-system-ppc version
-  2.8.0 freezes guest on bootup and shows error for qemu-system-ppc
-  version 4.2.0release and 4.19dirtygit:
-
-  qemu-system-ppc: virtio-blk failed to set guest notifier (-24), ensure -a=
-ccel kvm is set.
-  qemu-system-ppc: virtio_bus_start_ioeventfd: failed. Fallback to userspac=
-e (slower).
-
-  ends/freezes at:
-  nbd: registered device at major 43
-  =C2=A0vda:
-
-  I'm using -drive file=3D/home/me/rawimage.dd,if=3Dvirtio and works fine in
-  version 2.8.0 installed with apt-get install (Ubuntu 17.04) and also
-  with 2.8.0 official release from git/github that I compiled/built
-  myself. But both of the newer releases fail on the same exact machine
-  same config.
-
-  I also noticed that qemu-2.8.0 was fine with mtd but the newer ones I tri=
-ed weren't, ie gave
-  qemu-system-ppc: -drive if=3Dmtd: machine type does not support if=3Dmtd,=
-bus=3D0,unit=3D0
-  (but I removed -drive if=3Dmtd since wasn't using it anyway)
-
-  I also tried on windows but I think virtio doesn't work on windows
-  hosts at all? On windows host it fails the same way, even version 2.12
-  as well as 4.1.10...
-
-  used:
-  ./configure --prefix=3D/opt/... --enable-fdt --enable-kvm --enable-debug
-
-  (basically all steps the same on same exact system same config, yet
-  2.8.0 works fine whether apt-get installed or built from source while
-  the others I built, 4.19/4.2.0 or 2.12/4.1.10(win) don't.)
-
-  In case newer qemu versions act weird on various kernels, I did try with =
-both vmlinuz-4.10.0-19-generic and vmlinuz-4.13.12-041312-generic (I didn't=
- compile them but I can provide config-..files. This is on Ubuntu 17.04 x86=
-_64 host emulating e500v2 cpm guest, ie -M mpc... GUEST kernel 2.6.32.44 wh=
-ich is why I can't use -M ppce500 instead..)
-  tx
-  =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0ecs
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1856834/+subscriptions
 
