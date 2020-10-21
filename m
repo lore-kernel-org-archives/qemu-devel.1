@@ -2,87 +2,112 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7B5C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 07:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E776C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 07:39:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9AE3622249
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 07:39:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5956022249
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 07:39:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BEYsfuiV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9AE3622249
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E4l+Foir"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5956022249
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49444 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kV8i4-0006Cz-IQ
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 03:39:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59180)
+	id 1kV8iV-0006vF-D8
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 03:39:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59406)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kV8gC-0005Fp-9j
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 03:37:04 -0400
-Received: from mail-ej1-x643.google.com ([2a00:1450:4864:20::643]:39553)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
- id 1kV8gA-0005QJ-8R
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 03:37:03 -0400
-Received: by mail-ej1-x643.google.com with SMTP id lw21so1748327ejb.6
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 00:37:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=nQFgrTOS09pTXFb0Fm5sIX6jY0r0sw83iMxZrEr+tvQ=;
- b=BEYsfuiVM6RrYgfgfddVrWYOBndeo9RKfLym9IitQtAtuNs+MCnlLpcn94RkY8pSw+
- uh31Q92atEr3UL/FOmhlOhOcHzsYMILylpMo1sGpD1ySIuNp2epUPNWQYhx7zPDdZzpn
- AUT9YQ/w5qLqAHrgHw/vXKFuxXHqkpUzNTtPLnWpgOykIpQMq+aX9QoVJ/HBRy3x4DLt
- KxBSlJlOdpcEf5RwnKd/GFHxN4sZhT6ia1HVSRE0PaQad+r3ozsmkmA+TxrMUuCNWX+H
- E/Mk4Mf+hDNnTK+g1o0dqLhKDIBC/9lJBS0h2vuKUWREvWRcOFaOB4UQKTIe91lTHSgt
- al6A==
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kV8hD-0005o7-3g
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 03:38:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55974)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kV8h9-0005hy-OK
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 03:38:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603265878;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=tsBvKrF9yFaxeg5LaqOccXuiuNBlghcD9UOQytUvFRI=;
+ b=E4l+FoirhaqmvoGIOYRIcEF4lqyxtstGFqQJWK0htRcQpHw6mT85vfi+6Hbbmtg8UJqNpE
+ 4HiUVqjbu+NeqSAEumprAbRF2DBJJuZahKzYfx6fdnXuFoVVD6T5eqEGk9x/YmIJJfm3l+
+ M9gYeoMpQNAJXVJj+o9rsJeuiiwdJU0=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-536-m4HK_4nbO5-vFdep9OGlPQ-1; Wed, 21 Oct 2020 03:37:56 -0400
+X-MC-Unique: m4HK_4nbO5-vFdep9OGlPQ-1
+Received: by mail-wr1-f72.google.com with SMTP id 47so1109269wrc.19
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 00:37:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=nQFgrTOS09pTXFb0Fm5sIX6jY0r0sw83iMxZrEr+tvQ=;
- b=isIdgrlX8TbA3mtsbvbT4LXdjl6I77blb/9meZ+glii8siIldCJEurKEjk3eKdBOYk
- n/HVQTEuF8a20HoWpb1HemUUrsnlD1gGyOMJ/XAOqRIPPIe0/RkNPQB95Z4N+CjTCJXC
- DiWrQrRcqUuX/8q1a551E7ITObLiWC2a1aLXjCFp7Garvg/GKh7jsDDGhVGxyi82YM5x
- lGHMqcwmdZBq1K61fbEzNeudOuf2ysK5n2fBUQfY/JXGqM7ExQQ6aeJqBPc+lu8GumFv
- BUlq+9hWm2WGobo2y+CEQs+a9Pn27AY3xYmlPexC5KBZuf5z4GKz4svm/xgrWP+Bym0H
- Aj3A==
-X-Gm-Message-State: AOAM530AJeVtvVZ2vqfMd4ZCDCE9/x/w2yy4U57n81kHm0zsSXp56auL
- v9/SOsgo8KDvHDfq4XR2hQ56npBJEP4dYq2xUmU=
-X-Google-Smtp-Source: ABdhPJyeP0Uc4M2FpwasZUqROncsgcrnTJbLxnJB0lCCEhYZqFHJIPdk5hedg1bKEiL86Ihnr0nSeyvIfaDi4eLesQ8=
-X-Received: by 2002:a17:906:1a11:: with SMTP id
- i17mr2080114ejf.381.1603265820066; 
- Wed, 21 Oct 2020 00:37:00 -0700 (PDT)
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=tsBvKrF9yFaxeg5LaqOccXuiuNBlghcD9UOQytUvFRI=;
+ b=fQb93xC5e6/lb7t+09R9uQ6/AqBsYB2Y2Mnua/hK/tx3JD8pN6mQND80zE4CYTFlCi
+ webe1T6JjIfNLmsWhi7yY6WDcgjLGQwrbEodwQBnhNghjXq9BPeT/FiH+sbzdDPHkS3z
+ nO/NAyNq2++FvoLSr/06bZ/zSn1m3Nd6xpYXvwhp1V66V68rewSt1v1NuptZsHU0FljD
+ byBmEDKx2VgSI+9DeDxCvSkU3Lnae1JsBoR+CXuXD43gYfO/VYeeTIFV/5S2BZMal51x
+ dbr4ZZxrfqXcnbhatXBHA+e9o6sjl4hlGX8kG2PBqmQRXTf9Umj572mskN3c1zaDdNd0
+ vD2w==
+X-Gm-Message-State: AOAM530MN3wJSCBgsNqM4vnRRravtlAUXO2brCtC1J0y0OevX3yuIect
+ 7XwflXdbv+uoXsJjam5bHLnzZUOjubuyef/CcIPdtIiivsPlbEQTb9seJa9VARdLIskfM8vg4r8
+ YGc8FKu1log13d3E=
+X-Received: by 2002:a5d:6341:: with SMTP id b1mr2921367wrw.373.1603265875359; 
+ Wed, 21 Oct 2020 00:37:55 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxA7Hx2bRRw4PE5VdLC8wBQ0TD5+wp/HrJC4gzZrbI7Jboj80gHvwfNgwQLqr/9UnemkgpqTg==
+X-Received: by 2002:a5d:6341:: with SMTP id b1mr2921342wrw.373.1603265875102; 
+ Wed, 21 Oct 2020 00:37:55 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id y7sm1863687wmg.40.2020.10.21.00.37.53
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Oct 2020 00:37:54 -0700 (PDT)
+Subject: Re: [PATCH 1/1] Skip flatview_simplify() for cpu vendor zhaoxin
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <20201016112933.14856-1-FelixCui-oc@zhaoxin.com>
+ <20201016112933.14856-2-FelixCui-oc@zhaoxin.com>
+ <a971c9db-469f-ddc0-1a27-3e21958f6ff7@redhat.com>
+ <20201019130206.1d3baffc@w520.home>
+ <4d2b96cb-8f7f-2598-39e6-4cf0f61d567b@redhat.com>
+ <20201020164437.5e3cb4ce@w520.home>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <783b5ef0-277c-363d-f342-7c0351f9ac16@redhat.com>
+Date: Wed, 21 Oct 2020 09:37:53 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201021071520.2168877-1-armbru@redhat.com>
- <20201021071520.2168877-5-armbru@redhat.com>
-In-Reply-To: <20201021071520.2168877-5-armbru@redhat.com>
-From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
-Date: Wed, 21 Oct 2020 11:36:48 +0400
-Message-ID: <CAJ+F1C+Pp72UX1wDAxirOpaJbg0SBO9r2dGWKcRf2ynG-VKh5g@mail.gmail.com>
-Subject: Re: [PATCH 4/4] qga: Flatten simple union GuestDeviceId
-To: Markus Armbruster <armbru@redhat.com>
-Content-Type: multipart/alternative; boundary="000000000000af89c705b2296956"
-Received-SPF: pass client-ip=2a00:1450:4864:20::643;
- envelope-from=marcandre.lureau@gmail.com; helo=mail-ej1-x643.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201020164437.5e3cb4ce@w520.home>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,203 +121,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?B?VG9tw6HFoSBHb2xlbWJpb3Zza8O9?= <tgolembi@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
- QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Cc: FelixCuioc <FelixCui-oc@zhaoxin.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ CobeChen-oc@zhaoxin.com, qemu-devel@nongnu.org, TonyWWang-oc@zhaoxin.com,
+ RockCui-oc@zhaoxin.com, Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---000000000000af89c705b2296956
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On 21/10/20 00:44, Alex Williamson wrote:
+> Do we necessarily need a memory map ioctl for this or could it be the
+> QEMU code that compares the old and new maps to trigger map and unmap
+> ioctls?  For example (aiui) our race is that if we have contiguous
+> memory regions A and B and flatview_simplify() tries to expand A and
+> delete B we'll see a series of listener notifications deleting A and B
+> and adding A'.  But the vfio QEMU code could parse the memory map to
+> determine that old A + B is functionally equivalent to A' and do
+> nothing.
 
-On Wed, Oct 21, 2020 at 11:16 AM Markus Armbruster <armbru@redhat.com>
-wrote:
+I think the issue is a bit different, and in fact there are two sides of
+the same issue.  Say you have A (large) and it is replaced by A'
+(smaller) + B, then:
 
-> Simple unions are simpler than flat unions in the schema, but more
-> complicated in C and on the QMP wire: there's extra indirection in C
-> and extra nesting on the wire, both pointless.  They should be avoided
-> in new code.
->
-> GuestDeviceId was recently added for guest-get-devices.  Convert it to
-> a flat union.
->
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
->
+* the first part of A disappears for a moment before A' appears.  This
+is something that QEMU can work around, by not doing anything
 
-Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+* the second part of A disappears for a moment before B appears.  This
+is the root API issue and not something that QEMU can work around; and
+in fact it is not even fixed by removing flatview_simplify.
 
----
->  qga/qapi-schema.json | 8 ++++++++
->  qga/commands-win32.c | 9 ++++-----
->  2 files changed, 12 insertions(+), 5 deletions(-)
->
-> diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-> index c7bfb8bf6a..fe10631e4c 100644
-> --- a/qga/qapi-schema.json
-> +++ b/qga/qapi-schema.json
-> @@ -1256,6 +1256,12 @@
->  { 'command': 'guest-get-osinfo',
->    'returns': 'GuestOSInfo' }
->
-> +##
-> +# @GuestDeviceType:
-> +##
-> +{ 'enum': 'GuestDeviceType',
-> +  'data': [ 'pci' ] }
-> +
->  ##
->  # @GuestDeviceIdPCI:
->  #
-> @@ -1276,6 +1282,8 @@
->  # Since: 5.2
->  ##
->  { 'union': 'GuestDeviceId',
-> +  'base': { 'type': 'GuestDeviceType' },
-> +  'discriminator': 'type',
->    'data': { 'pci': 'GuestDeviceIdPCI' } }
->
->  ##
-> diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-> index 1efe3ba076..0c33d48aaa 100644
-> --- a/qga/commands-win32.c
-> +++ b/qga/commands-win32.c
-> @@ -2400,16 +2400,15 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error
-> **errp)
->              }
->              skip =3D false;
->
-> -            id =3D g_new0(GuestDeviceIdPCI, 1);
->              vendor_id =3D g_match_info_fetch(match_info, 1);
->              device_id =3D g_match_info_fetch(match_info, 2);
-> -            id->vendor_id =3D g_ascii_strtoull(vendor_id, NULL, 16);
-> -            id->device_id =3D g_ascii_strtoull(device_id, NULL, 16);
->
->              device->id =3D g_new0(GuestDeviceId, 1);
->              device->has_id =3D true;
-> -            device->id->type =3D GUEST_DEVICE_ID_KIND_PCI;
-> -            device->id->u.pci.data =3D id;
-> +            device->id->type =3D GUEST_DEVICE_TYPE_PCI;
-> +            id =3D &device->id->u.pci;
-> +            id->vendor_id =3D g_ascii_strtoull(vendor_id, NULL, 16);
-> +            id->device_id =3D g_ascii_strtoull(device_id, NULL, 16);
->
->              g_match_info_free(match_info);
->              break;
-> --
-> 2.26.2
->
->
->
+Felix, did you identify the regions whose simplification causes the bug?
+ Is this RAM (for example due to the PAM registers) or something else?
 
---=20
-Marc-Andr=C3=A9 Lureau
+Paolo
 
---000000000000af89c705b2296956
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
-<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Oct 21, 2020 at 11:16 AM Mark=
-us Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.com</a=
->&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px=
- 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Sim=
-ple unions are simpler than flat unions in the schema, but more<br>
-complicated in C and on the QMP wire: there&#39;s extra indirection in C<br=
->
-and extra nesting on the wire, both pointless.=C2=A0 They should be avoided=
-<br>
-in new code.<br>
-<br>
-GuestDeviceId was recently added for guest-get-devices.=C2=A0 Convert it to=
-<br>
-a flat union.<br>
-<br>
-Signed-off-by: Markus Armbruster &lt;<a href=3D"mailto:armbru@redhat.com" t=
-arget=3D"_blank">armbru@redhat.com</a>&gt;<br></blockquote><div><br></div><=
-div>Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lur=
-eau@redhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div> <br></div><b=
-lockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-le=
-ft:1px solid rgb(204,204,204);padding-left:1ex">
----<br>
-=C2=A0qga/qapi-schema.json | 8 ++++++++<br>
-=C2=A0qga/commands-win32.c | 9 ++++-----<br>
-=C2=A02 files changed, 12 insertions(+), 5 deletions(-)<br>
-<br>
-diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json<br>
-index c7bfb8bf6a..fe10631e4c 100644<br>
---- a/qga/qapi-schema.json<br>
-+++ b/qga/qapi-schema.json<br>
-@@ -1256,6 +1256,12 @@<br>
-=C2=A0{ &#39;command&#39;: &#39;guest-get-osinfo&#39;,<br>
-=C2=A0 =C2=A0&#39;returns&#39;: &#39;GuestOSInfo&#39; }<br>
-<br>
-+##<br>
-+# @GuestDeviceType:<br>
-+##<br>
-+{ &#39;enum&#39;: &#39;GuestDeviceType&#39;,<br>
-+=C2=A0 &#39;data&#39;: [ &#39;pci&#39; ] }<br>
-+<br>
-=C2=A0##<br>
-=C2=A0# @GuestDeviceIdPCI:<br>
-=C2=A0#<br>
-@@ -1276,6 +1282,8 @@<br>
-=C2=A0# Since: 5.2<br>
-=C2=A0##<br>
-=C2=A0{ &#39;union&#39;: &#39;GuestDeviceId&#39;,<br>
-+=C2=A0 &#39;base&#39;: { &#39;type&#39;: &#39;GuestDeviceType&#39; },<br>
-+=C2=A0 &#39;discriminator&#39;: &#39;type&#39;,<br>
-=C2=A0 =C2=A0&#39;data&#39;: { &#39;pci&#39;: &#39;GuestDeviceIdPCI&#39; } =
-}<br>
-<br>
-=C2=A0##<br>
-diff --git a/qga/commands-win32.c b/qga/commands-win32.c<br>
-index 1efe3ba076..0c33d48aaa 100644<br>
---- a/qga/commands-win32.c<br>
-+++ b/qga/commands-win32.c<br>
-@@ -2400,16 +2400,15 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **=
-errp)<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0skip =3D false;<br>
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id =3D g_new0(GuestDeviceIdPCI, =
-1);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0vendor_id =3D g_match_info_=
-fetch(match_info, 1);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0device_id =3D g_match_info_=
-fetch(match_info, 2);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id-&gt;vendor_id =3D g_ascii_str=
-toull(vendor_id, NULL, 16);<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id-&gt;device_id =3D g_ascii_str=
-toull(device_id, NULL, 16);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0device-&gt;id =3D g_new0(Gu=
-estDeviceId, 1);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0device-&gt;has_id =3D true;=
-<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 device-&gt;id-&gt;type =3D GUEST=
-_DEVICE_ID_KIND_PCI;<br>
--=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 device-&gt;id-&gt;u.pci.data =3D=
- id;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 device-&gt;id-&gt;type =3D GUEST=
-_DEVICE_TYPE_PCI;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id =3D &amp;device-&gt;id-&gt;u.=
-pci;<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id-&gt;vendor_id =3D g_ascii_str=
-toull(vendor_id, NULL, 16);<br>
-+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 id-&gt;device_id =3D g_ascii_str=
-toull(device_id, NULL, 16);<br>
-<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0g_match_info_free(match_inf=
-o);<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0break;<br>
--- <br>
-2.26.2<br>
-<br>
-<br>
-</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
-mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
-
---000000000000af89c705b2296956--
 
