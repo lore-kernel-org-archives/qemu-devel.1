@@ -2,109 +2,111 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D0AC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:36:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A6BFC388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:45:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1E8132080A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:36:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 66C4D2065C
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 13:45:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J6M+gyEZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E8132080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="sPg5GOOI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66C4D2065C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47030 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVEHa-0002XK-2z
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:36:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34744)
+	id 1kVEQU-0006sB-Br
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 09:45:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37514)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVEFL-0000kD-29
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:33:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41881)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kVEFH-00057h-Pf
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 09:33:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603287219;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EP3Z3L9MkqOU66HQnEjwd5+BYLBLuaH8zmp+qPSjKxU=;
- b=J6M+gyEZhD49Ps56ORoOin34qFogJxY75T3AmtNXscVDWFchLsKNiwSu+cQSkB87vD/liz
- d4z5qIad44OoY81oRpswJgjs9spBMy9nXnOM7J8unyHz23ZGPbQsV2mT90IUbIt3Olqcab
- R3DrEkD3jTecFQWAq1v6do8DwlG258c=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-QHPxvlBrMhq7wBoyv9amYQ-1; Wed, 21 Oct 2020 09:33:34 -0400
-X-MC-Unique: QHPxvlBrMhq7wBoyv9amYQ-1
-Received: by mail-wr1-f69.google.com with SMTP id i1so2663211wrb.18
- for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 06:33:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=EP3Z3L9MkqOU66HQnEjwd5+BYLBLuaH8zmp+qPSjKxU=;
- b=rJwY3t2XMaXJGxafJbD5Xu/khJbnkoAwmzBQIH0UIRNf8eL0BSSPtjzvGEcWURe/Ma
- qQFNCLOIWgg/5nVLdCzLHjshZEBqRPPs8srjEHMA1Ardrjsz5PSaTb0baVcOhC2sKt+B
- LGBqqLlLpWHpqdnRHxYmG4FSHh7Jgq2Qg0W2H3HwXtiIt99JNe8cRk8lAS4C45rhiO8o
- LykAwkBadPyOtLRgeDapWqKNoV84SulE+wQTuyA/5OgsTAetseJeNDPWXmTE599zFEQC
- KNzNuxPKptQFoqJaP7xwt4/k64vPn6sYvJw1I7CPCCIJcSLzkS66mhu23IkeFgsg3VJP
- XAkw==
-X-Gm-Message-State: AOAM531VeCJDVo7zvmJG3FPpflT4S8RkjyaaGzZFhCa2fz0R2t6UMIPw
- u9WnABdY0j7o67BYCsUKxFrzkdvz9hMsy3vAweLoj/h3mDHRkieER24N3hbjdODTGpqzf8qwwRD
- /mmBHY5qYjH3W+W8=
-X-Received: by 2002:a5d:6cad:: with SMTP id a13mr5207814wra.347.1603287212328; 
- Wed, 21 Oct 2020 06:33:32 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJy48Vd0aC9ygdhE7YJx6jdA93D3IqDTEIb8e8QQdoM0yt+p5/68jLq3qeMfmf+PyoDmQfVpNw==
-X-Received: by 2002:a5d:6cad:: with SMTP id a13mr5207796wra.347.1603287212111; 
- Wed, 21 Oct 2020 06:33:32 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id y14sm3312925wma.48.2020.10.21.06.33.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 21 Oct 2020 06:33:30 -0700 (PDT)
-Subject: Re: [PATCH 0/1] Do not stop guest when panic event is received
-To: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, qemu-devel@nongnu.org
-References: <1601606494-1154-1-git-send-email-alejandro.j.jimenez@oracle.com>
- <74a8c57d-4f2d-64cd-f2d2-32dc88b64f9b@redhat.com>
- <1c9cdb1d-5dd5-a783-96e9-8f62a498951a@oracle.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <e197a153-43e9-d517-de09-2ce163571453@redhat.com>
-Date: Wed, 21 Oct 2020 15:33:30 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1kVEPM-0005qz-2A; Wed, 21 Oct 2020 09:44:04 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:23454)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <frankja@linux.ibm.com>)
+ id 1kVEPJ-0006UI-1y; Wed, 21 Oct 2020 09:44:03 -0400
+Received: from pps.filterd (m0098410.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09LDgOis135602; Wed, 21 Oct 2020 09:43:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=bKB6udZMWtCgjH9Tpw96tTQmdAJylB6xHYEExSsQV+k=;
+ b=sPg5GOOIZM9c2gKrSWrc6Fo2y2mqYe3s6duxMbVrEAidY+mg3hcuyTgdmuh1Iqwou2SI
+ yMedjR1PMPeGtO/7A/rSAaeRXnr6FYApUV55JzQzn0czNmFMDhfQjOrQOM1YTNBVPYIw
+ J3ud7cFotx/DXB2RgpE+/5VI5DGgC0X8ahWASjplLcPutvi7yQnEWHM7O/U+Pt2YnWXa
+ OCTDc1wirBwA8ielNkj01g2nQ0TZSHvvTvz0sJYtxAU7BnfCrtBsmaIBKhVPDcyouXB3
+ JfxWf5ruSCDlDuY7TSaKQLcYyxVcb6r4vEkReLLfZqz4Z9yT+SkfA3APb5ojYan7bihy gA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ap3q01jn-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 21 Oct 2020 09:43:56 -0400
+Received: from m0098410.ppops.net (m0098410.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09LDhT7P138894;
+ Wed, 21 Oct 2020 09:43:56 -0400
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com
+ [169.51.49.98])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ap3q01hh-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 21 Oct 2020 09:43:56 -0400
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+ by ppma03ams.nl.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09LDb0c6009352;
+ Wed, 21 Oct 2020 13:43:53 GMT
+Received: from b06cxnps3074.portsmouth.uk.ibm.com
+ (d06relay09.portsmouth.uk.ibm.com [9.149.109.194])
+ by ppma03ams.nl.ibm.com with ESMTP id 348d5quh38-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Wed, 21 Oct 2020 13:43:53 +0000
+Received: from d06av23.portsmouth.uk.ibm.com (d06av23.portsmouth.uk.ibm.com
+ [9.149.105.59])
+ by b06cxnps3074.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09LDhoxJ27591074
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Wed, 21 Oct 2020 13:43:51 GMT
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id BF118A4053;
+ Wed, 21 Oct 2020 13:43:50 +0000 (GMT)
+Received: from d06av23.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id C025AA4055;
+ Wed, 21 Oct 2020 13:43:49 +0000 (GMT)
+Received: from linux01.pok.stglabs.ibm.com (unknown [9.114.17.81])
+ by d06av23.portsmouth.uk.ibm.com (Postfix) with ESMTP;
+ Wed, 21 Oct 2020 13:43:49 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] s390x: pv: Diag318 fixes
+Date: Wed, 21 Oct 2020 09:43:43 -0400
+Message-Id: <20201021134345.110173-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <1c9cdb1d-5dd5-a783-96e9-8f62a498951a@oracle.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 02:16:02
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
+ definitions=2020-10-21_06:2020-10-20,
+ 2020-10-21 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ clxscore=1011
+ lowpriorityscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ priorityscore=1501 phishscore=0 bulkscore=0 adultscore=0 mlxlogscore=796
+ impostorscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2009150000 definitions=main-2010210099
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=frankja@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/21 09:43:57
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -118,56 +120,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ walling@linux.ibm.com, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, mhartmay@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/10/20 15:26, Alejandro Jimenez wrote:
-> 
-> 
-> On 10/20/2020 1:14 PM, Paolo Bonzini wrote:
->> On 02/10/20 04:41, Alejandro Jimenez wrote:
->>> The fact that the behavior of hv-crash is also affected is why I
->>> chose to implement this change as an independent
->>> option, as opposed to making it a property of the pvpanic device
->>> (e.g. -device pvpanic,no-panicstop).
->>>
->>> Please let me know if you have any comments or suggestions.
->> Hi Alejandro, sorry for the delayed response.
->>
->> The concept is fine, and I agree this should not be a device property.
->>
->> On the other hand, we already have many similar options: -no-reboot,
->> -no-shutdown, -watchdog-action and now --no-panicstop.
->>
->> I think it's time to group them into a single option:
->>
->> * -action reboot=pause|shutdown|none
->> * -action shutdown=pause|poweroff|none
->> * -action panic=pause|shutdown|none
->> * -action watchdog=reset|shutdown|poweroff|pause|debug|none|inject-nmi
->>
->> where the existing options would translate to the new option, like:
->>
->> * -no-reboot "-action reboot=shutdown"
->> * -no-shutdown "-action shutdown=pause"
->>
->> The implementation should be relatively easy too; there's already an
->> enum WatchdogAction (that can be renamed to e.g. RunstateAction) and a
->> parsing function select_watchdog_action that can be changed to just
->> return the RunstateAction.
->>
->> Would you like to take a look at this?
-> Hi Paolo,
-> 
-> Thank you for your reply and the advice/hints above. I'll take a look
-> and try to implement what you propose.
+Here are two fixes for the diag318 support that fix crashes when
+booting PV guests.
 
-Just one thing, for the parsing you can place it close to the existing
+We're working on extending our testing to catch problems like these
+earlier.
 
-    qemu_opts_foreach(qemu_find_opts("name"),
-                      parse_name, NULL, &error_fatal);
 
-Paolo
+Branch:
+https://gitlab.com/frankja/qemu/-/commits/bb/frankja/diag318_fixes
+
+CI:
+https://gitlab.com/frankja/qemu/-/pipelines/205771933
+
+Janosch Frank (2):
+  s390x: pv: Remove sclp boundary checks
+  s390x: pv: Fix diag318 PV fencing
+
+ hw/s390x/sclp.c    | 15 ++++++++++-----
+ target/s390x/kvm.c |  3 +--
+ 2 files changed, 11 insertions(+), 7 deletions(-)
+
+-- 
+2.25.1
 
 
