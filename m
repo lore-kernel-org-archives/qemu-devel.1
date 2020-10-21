@@ -2,66 +2,113 @@ Return-Path: <SRS0=0rPh=D4=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1186C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 11:45:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0242C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 11:48:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED42A20872
-	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 11:45:56 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED42A20872
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id D263220872
+	for <qemu-devel@archiver.kernel.org>; Wed, 21 Oct 2020 11:48:14 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FKs7gb5O"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D263220872
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38824 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVCZ1-0003Uz-Lg
-	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 07:45:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59840)
+	id 1kVCbF-0004eH-OV
+	for qemu-devel@archiver.kernel.org; Wed, 21 Oct 2020 07:48:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60534)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVCX9-0001tJ-O8
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 07:44:00 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:39968
- helo=mail.default.ilande.uk0.bigv.io)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVCWN-00074X-0R
- for qemu-devel@nongnu.org; Wed, 21 Oct 2020 07:43:57 -0400
-Received: from host86-148-246-80.range86-148.btcentralplus.com
- ([86.148.246.80] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kVCWM-0006Zv-Uo; Wed, 21 Oct 2020 12:43:15 +0100
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org,
-	f4bug@amsat.org
-Date: Wed, 21 Oct 2020 12:43:00 +0100
-Message-Id: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kVCaX-0004Bd-Eh
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 07:47:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44631)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kVCaT-0007a4-PQ
+ for qemu-devel@nongnu.org; Wed, 21 Oct 2020 07:47:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603280843;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=dvUfupnFdBi7nza7FvTqTdzldq5fzd9seTHFXQAFEF8=;
+ b=FKs7gb5Og9Fdcu2+RnCdZUymMtrCOL1G6yGx4mYyyjfo/1tJdkswgJsLzW0lppmrD4+Lz8
+ SBixejjLO2kmGYwNPYygGjpYSf2unkZxANSF1XvDLmrBR//cZHdRbix03EtqmHPU7wu+tb
+ CxBUaI5a9vRmZe5LiC6qQqjjJanxriM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-576--hjR_xBtPFyV5wZM1iognA-1; Wed, 21 Oct 2020 07:47:21 -0400
+X-MC-Unique: -hjR_xBtPFyV5wZM1iognA-1
+Received: by mail-wr1-f72.google.com with SMTP id u15so2338163wrn.4
+ for <qemu-devel@nongnu.org>; Wed, 21 Oct 2020 04:47:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=dvUfupnFdBi7nza7FvTqTdzldq5fzd9seTHFXQAFEF8=;
+ b=mZ09YjA7lKhJtQyDYHXmOC+H+l0qmkHKKvjE49nG5zW28OBWuQPjS0Vkv8hq3t40BJ
+ +kAui+jNNRLdOgTgVVw0nK7kxH50t90D7LXhvR75AzHvIDKPY7tCKd8JKa77C7T3Fl7X
+ ryy2PY8uXQDRkXXL/9pjh0qOdm7YINIP+udWy+Usv4AmDVbjDkBNg/+dzQQgLMcTfKsa
+ 2G5ciSpM9gU9P/wEl7uHNB21QdI+BI99durvoAddNqbxq75OjYkNmrn4p2Jq+Kw8EMAb
+ moh/iNLZjJClBVmYJT+W72Da07ZFvky8GAVxl8g+QrTMEzUbEYCsVRpQez8D86juFtNy
+ uTfg==
+X-Gm-Message-State: AOAM531pi25R3kz6uj/5z2aNMIyP8+4OuA3D1QbTOQGTlznF1OZ7xsJX
+ Jo61ItIdyx+3owDGhJTdmsrMdzVewGbJNSyTC31i8u8B01LeIzy4ImLVTLT5FHUidBjoHfYutu8
+ jeuGsL47xlmUA4Sw=
+X-Received: by 2002:adf:de91:: with SMTP id w17mr4205391wrl.84.1603280839946; 
+ Wed, 21 Oct 2020 04:47:19 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxtq8GsPqh2dvZIrOCjm+qbOhhMqe1oggpW+4jIXMHETCjiRefXyQK4mKwdkGiE52eKSpwlWA==
+X-Received: by 2002:adf:de91:: with SMTP id w17mr4205366wrl.84.1603280839674; 
+ Wed, 21 Oct 2020 04:47:19 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id z11sm3280682wrh.70.2020.10.21.04.47.18
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 21 Oct 2020 04:47:18 -0700 (PDT)
+Subject: Re: [PATCH] os: deprecate the -enable-fips option and QEMU's FIPS
+ enforcement
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20201020162211.401204-1-berrange@redhat.com>
+ <f97dc04a-0cc4-3ba0-ea5e-b185cd0958a7@redhat.com>
+ <20201021083803.GC412988@redhat.com>
+ <aae2164f-0973-f7b3-3146-1ea659c00922@redhat.com>
+ <20201021101743.GI412988@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <eaafe94d-1bf5-c2a5-a02a-bb56d5c45bdc@redhat.com>
+Date: Wed, 21 Oct 2020 13:47:18 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <20201021101743.GI412988@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.246.80
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH] sabre: use object_initialize_child() for iommu child object
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/20 22:12:28
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,96 +121,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: libvir-list@redhat.com, John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Store the child object directly within the sabre object rather than using
-link properties.
+On 21/10/20 12:17, Daniel P. Berrangé wrote:
+>> But would it be correct?  In order to have the advertised behavior of
+>> "enable FIPS compliance just with procfs, no need to do anything in
+>> QEMU" you need to disable VNC password authentication; so while
+>> fips_set_state is an abomination, fips_get_state should remain.
+> There's no need for fips_get_state. Once you build QEMU with
+> libgcrypt, when  VNC requests a DES cipher handle, gcrypt will
+> return an error as that algorithm is forbidden in FIPS mode.
 
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/pci-host/sabre.c         | 10 ++++------
- hw/sparc64/sun4u.c          |  8 +-------
- include/hw/pci-host/sabre.h |  2 +-
- 3 files changed, 6 insertions(+), 14 deletions(-)
+Oh, I thought we were still using our own code for the modified DES but
+it _is_ actually using gcrypt or nettle if available.  Sorry for the noise.
 
-diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index f41a0cc301..aaa93acd6e 100644
---- a/hw/pci-host/sabre.c
-+++ b/hw/pci-host/sabre.c
-@@ -383,9 +383,10 @@ static void sabre_realize(DeviceState *dev, Error **errp)
-     pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
- 
-     /* IOMMU */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->iommu), &error_fatal);
-     memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
--                    sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
--    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
-+                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->iommu), 0), 1);
-+    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, &s->iommu);
- 
-     /* APB secondary busses */
-     pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
-@@ -422,10 +423,7 @@ static void sabre_init(Object *obj)
-     s->pci_irq_in = 0ULL;
- 
-     /* IOMMU */
--    object_property_add_link(obj, "iommu", TYPE_SUN4U_IOMMU,
--                             (Object **) &s->iommu,
--                             qdev_prop_allow_set_link_before_realize,
--                             0);
-+    object_initialize_child(obj, "iommu", &s->iommu, TYPE_SUN4U_IOMMU);
- 
-     /* sabre_config */
-     memory_region_init_io(&s->sabre_config, OBJECT(s), &sabre_config_ops, s,
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 2f8fc670cf..a33f1eccfd 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -562,7 +562,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     PCIBus *pci_bus, *pci_busA, *pci_busB;
-     PCIDevice *ebus, *pci_dev;
-     SysBusDevice *s;
--    DeviceState *iommu, *dev;
-+    DeviceState *dev;
-     FWCfgState *fw_cfg;
-     NICInfo *nd;
-     MACAddr macaddr;
-@@ -571,10 +571,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     /* init CPUs */
-     cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
- 
--    /* IOMMU */
--    iommu = qdev_new(TYPE_SUN4U_IOMMU);
--    sysbus_realize_and_unref(SYS_BUS_DEVICE(iommu), &error_fatal);
--
-     /* set up devices */
-     ram_init(0, machine->ram_size);
- 
-@@ -584,8 +580,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     sabre = SABRE(qdev_new(TYPE_SABRE));
-     qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
-     qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
--    object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
--                             &error_abort);
-     sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
- 
-     /* sabre_config */
-diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
-index 01190241bb..05bf741cde 100644
---- a/include/hw/pci-host/sabre.h
-+++ b/include/hw/pci-host/sabre.h
-@@ -34,7 +34,7 @@ struct SabreState {
-     MemoryRegion pci_mmio;
-     MemoryRegion pci_ioport;
-     uint64_t pci_irq_in;
--    IOMMUState *iommu;
-+    IOMMUState iommu;
-     PCIBridge *bridgeA;
-     PCIBridge *bridgeB;
-     uint32_t pci_control[16];
--- 
-2.20.1
+> This is the primary reason for outsourcing all crypto to a
+> separate library and ignoring the impls in QEMU.
+> 
+> Claiming QEMU is FIPS compliant without using libgcrypt is a
+> bit of joke since we don't do any self-tests of ciphers, hence
+> this deprecation notice is warning people that libgcrypt is
+> going to be mandatory if you care about FIPS.
+
+Yes, agreed.
+
+Paolo
 
 
