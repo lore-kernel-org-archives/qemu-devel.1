@@ -2,86 +2,103 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 18740C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 69B75C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:48:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 676B624630
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:45:19 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nbGjXqep"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 676B624630
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 2AF0224630
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:48:25 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2AF0224630
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35670 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVfaO-00042U-NJ
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:45:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54494)
+	id 1kVfdQ-00056c-KF
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:48:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54788)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kVfXI-0002Ci-D8; Thu, 22 Oct 2020 14:42:05 -0400
-Received: from mail-il1-x144.google.com ([2607:f8b0:4864:20::144]:36032)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kVfXG-0005ep-7O; Thu, 22 Oct 2020 14:42:04 -0400
-Received: by mail-il1-x144.google.com with SMTP id p10so2665476ile.3;
- Thu, 22 Oct 2020 11:42:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=RRQirIiF1yuIgWCad5dqcb+mARLJmIJ+lMNO+sRWVAg=;
- b=nbGjXqepvlht+dXj31z3XCL9Fbv681ZdI6mJDcocc+chH9ZcKRwH02I5gCsJxmIfQ4
- /0NnumDDpEsROIEyO76BVKbLB2BMz8cvw5wbyq82QvL6xZ9iEJ70BPaF2MtpeDYN5O3u
- elYogTPq51izcVxEsHqSOwb68MRVqrACoKxGEmOgXItn71NEJVY2T05UPMwpyKbTIYv2
- czcDiDNPEVRL4643QYHw3qVrqmjh79TJ/ivjOjhrvfzl4M3Tlq7D0u/h24cgLcqIu+AY
- DKIecIuHhbxx5R4n9gtRtf+AmaEU+78bEOEE99RrQoCZp36fXPlB1eH1LmsCDluGlL4W
- VuMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=RRQirIiF1yuIgWCad5dqcb+mARLJmIJ+lMNO+sRWVAg=;
- b=R+iz2+9HTytn4wNMGPTisSXlnC2fj8sCDLfremgrCC7Vqj0f8uGFManu4ja4wKEpLU
- 3ipoV74+ABE56oGTEbbtlSQEicFj7SbPgJXWZcgloZB5hGTN4tgUAxZbF+4yEkY/U9PU
- kOO54hjXoPTDRqjy3NnAc1pyJNTZI7B2K7zO8FqL94AiNbX0fXHvsG71pCzFrr/OBpe4
- 3oHgOCfGRPg2FqEe1DhUwpPFj9DF5KjilV5f69Igpy3AskGY7Ppab1s37t6+QBebwTXv
- bu0VI62X/ulWbzrUz7QRH6dYUpVtX5SQcPBNjeMTYkpa10LVlgDIiqbEQZqAdO0+/S8I
- tkqA==
-X-Gm-Message-State: AOAM530enPMnYcV6+qHKG6eyl/r3z85M1D46/Ej7e3gDccMfGfNof/Z4
- 1paUxOZjLApscWOkd08vWg+JeyMOzEx6urEEADg=
-X-Google-Smtp-Source: ABdhPJwM8/mRl8r/0YBqv6FC8eh8NbuLzL3gvpPHq18u5hsC643Ug+xMDdmtyLcOVBw3fiksD9nXmlCIafL0EBPe6Hs=
-X-Received: by 2002:a92:dd0f:: with SMTP id n15mr3069665ilm.227.1603392119593; 
- Thu, 22 Oct 2020 11:41:59 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kVfYo-0003Th-Ap; Thu, 22 Oct 2020 14:43:39 -0400
+Received: from out5-smtp.messagingengine.com ([66.111.4.29]:34515)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kVfYk-0005mY-L6; Thu, 22 Oct 2020 14:43:37 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id CCCA75C00C6;
+ Thu, 22 Oct 2020 14:43:31 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Thu, 22 Oct 2020 14:43:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=nbVA8FVxi7D+ac6Isya3SbmKAus
+ O2gAtCXx7x5hslD4=; b=RwjjNDTuFbzmI/gzOnf4oIa/KBoPysPHbizPexlHbSV
+ qMpXY2G+/6OYNlZcdUgqwlhHZB9j3msla8w0OfeQ2gi2efO+v0tshslzEbePEGDu
+ 5U3NwqyZ6iSWjCOxC3x/NWI+xufGJcKmvIAygrjYUSNVuXliUYrKZf2epSFpoGMk
+ qGMJ9yrJ/ltuXpnSflNfW2zqKI8PXU4qABMC741hFpzq6KH/KdaKqmW5zjbBYpyx
+ HKajnD0WmUabiQEjYzJMbhQni8l5zMfIQDGwDw1AZrYSgd1O0G1x4Xbk9z79GWJ4
+ eaSLhlAgNKMxz0GwU0WI6Cvaz4s4eZ994xH7mn95P6w==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=nbVA8F
+ Vxi7D+ac6Isya3SbmKAusO2gAtCXx7x5hslD4=; b=j2TFUdBp4ni6rFm7xDVeSn
+ Bmm88WBMAIO0qWA0/B8LapBNMAxHAUxLqxPsZmf5pP6JRxUPOJpeFtlhSo0loScZ
+ 2EKNioqp46yl2fen8OsnJgUJ950uaU+gkmYMy08Ee7h3u2X2/RW+nbfuK50ADdd5
+ ZWat/scl+2pz/Hfx/ILFtVShLl0/6QVC9A1t1MzeAlGdPeTP+3fP2z6wW6qW0XCY
+ yu0hDKcefKnR10bG9otwJ+dFIsTu+E7Uf/nOTy8N6Mi5byudWgFYCNqsmco5xt86
+ bCL6uO0z8btKt4KWWAoJigo+7GeHllktXjqXCj4tNCICU85nAgwNh11jnNU7obRw
+ ==
+X-ME-Sender: <xms:0tKRX2oIlAf-TWsn8NcFNPwO_sLl76K3FQx_Zk2xl_Uy2ch0gFUmiw>
+ <xme:0tKRX0rtRC-ek-5BZNS99-7AAnul5Kf7ULKAu4ibkt0ewA3ZVW-lS5U8d5U3zlzb4
+ 9OdQQryrOfNdvVBHDE>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeekgdegjecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:0tKRX7PcIfFwZdx3mUnjBbUS-00mjSZcVCGghPILdaJS5wyInfVKhw>
+ <xmx:0tKRX142mwv_HYIn8CUMn_57WIn7_emJ2bBZp-nrKwHqCgSGMFHtzA>
+ <xmx:0tKRX15e2kINaia1G7GCZZqd4YAUdNZcUiHMNLsoYqBPYXn5uqYaeQ>
+ <xmx:09KRX40d9_HJcr04YdFBivqvoHui7JesnsdVqY_Rgjq2KWy5AGH9sA>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id E0BD6328005D;
+ Thu, 22 Oct 2020 14:43:29 -0400 (EDT)
+Date: Thu, 22 Oct 2020 20:43:28 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH v4 2/2] hw/block/nvme: add the dataset management command
+Message-ID: <20201022184328.GC209677@apples.localdomain>
+References: <20201022073313.143794-1-its@irrelevant.dk>
+ <20201022073313.143794-3-its@irrelevant.dk>
+ <20201022150103.GA1665151@dhcp-10-100-145-180.wdc.com>
+ <20201022174333.GA209677@apples.localdomain>
+ <20201022175023.GA1694294@dhcp-10-100-145-180.wdc.com>
 MIME-Version: 1.0
-References: <20201020033732.12921-1-green.wan@sifive.com>
- <20201020033732.12921-3-green.wan@sifive.com>
-In-Reply-To: <20201020033732.12921-3-green.wan@sifive.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Thu, 22 Oct 2020 11:30:14 -0700
-Message-ID: <CAKmqyKM=ePemA8XL8fY_VnuGp+_B7YySa+Dw524o-PWYuWw8mA@mail.gmail.com>
-Subject: Re: [PATCH v8 2/2] hw/misc/sifive_u_otp: Add backend drive support
-To: Green Wan <green.wan@sifive.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::144;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x144.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="WfZ7S8PLGjBY9Voh"
+Content-Disposition: inline
+In-Reply-To: <20201022175023.GA1694294@dhcp-10-100-145-180.wdc.com>
+Received-SPF: pass client-ip=66.111.4.29; envelope-from=its@irrelevant.dk;
+ helo=out5-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 13:43:37
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,177 +111,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bmeng.cn@gmail.com>, "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Klaus Jensen <k.jensen@samsung.com>,
+ qemu-devel@nongnu.org, qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, Oct 19, 2020 at 8:37 PM Green Wan <green.wan@sifive.com> wrote:
->
-> Add '-drive' support to OTP device. Allow users to assign a raw file
-> as OTP image.
->
-> test commands for 16k otp.img filled with zero:
->
-> $ dd if=/dev/zero of=./otp.img bs=1k count=16
-> $ ./qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none \
-> -kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf \
-> -d guest_errors -drive if=none,format=raw,file=otp.img
->
-> Signed-off-by: Green Wan <green.wan@sifive.com>
-> Reviewed-by: Bin Meng <bin.meng@windriver.com>
-> Tested-by: Bin Meng <bin.meng@windriver.com>
 
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
+--WfZ7S8PLGjBY9Voh
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Alistair
+On Oct 22 10:50, Keith Busch wrote:
+> On Thu, Oct 22, 2020 at 07:43:33PM +0200, Klaus Jensen wrote:
+> > On Oct 22 08:01, Keith Busch wrote:
+> > > On Thu, Oct 22, 2020 at 09:33:13AM +0200, Klaus Jensen wrote:
+> > > > +        if (--(*discards)) {
+> > > > +            status =3D NVME_NO_COMPLETE;
+> > > > +        } else {
+> > > > +            g_free(discards);
+> > > > +            req->opaque =3D NULL;
+> > >=20
+> > > This case needs a
+> > >=20
+> > >             status =3D req->status;
+> > >=20
+> > > So that we get the error set in the callback.
+> > >=20
+> >=20
+> > There are no cases that result in a non-zero status code here.
+>=20
+> Your callback has a case that sets NVME_INTERNAL_DEV_ERROR status. That
+> would get ignored if the final discard reference is dropped from the
+> submission side.
+>=20
 
-> ---
->  hw/misc/sifive_u_otp.c         | 65 ++++++++++++++++++++++++++++++++++
->  include/hw/misc/sifive_u_otp.h |  2 ++
->  2 files changed, 67 insertions(+)
->
-> diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
-> index b9238d64cb..60066375ab 100644
-> --- a/hw/misc/sifive_u_otp.c
-> +++ b/hw/misc/sifive_u_otp.c
-> @@ -19,11 +19,14 @@
->   */
->
->  #include "qemu/osdep.h"
-> +#include "qapi/error.h"
->  #include "hw/qdev-properties.h"
->  #include "hw/sysbus.h"
->  #include "qemu/log.h"
->  #include "qemu/module.h"
->  #include "hw/misc/sifive_u_otp.h"
-> +#include "sysemu/blockdev.h"
-> +#include "sysemu/block-backend.h"
->
->  #define WRITTEN_BIT_ON 0x1
->
-> @@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
->          if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
->              (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
->              (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
+Oh. Crap. You are right. Nice catch!
+
+> +static void nvme_aio_discard_cb(void *opaque, int ret)
+> +{
+> +    NvmeRequest *req =3D opaque;
+> +    int *discards =3D req->opaque;
 > +
-> +            /* read from backend */
-> +            if (s->blk) {
-> +                int32_t buf;
+> +    trace_pci_nvme_aio_discard_cb(nvme_cid(req));
 > +
-> +                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-> +                          SIFIVE_U_OTP_FUSE_WORD);
-> +                return buf;
-> +            }
-> +
->              return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
->          } else {
->              return 0xff;
-> @@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
->              /* write bit data */
->              SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
->
-> +            /* write to backend */
-> +            if (s->blk) {
-> +                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
-> +                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
-> +            }
-> +
->              /* update written bit */
->              SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
->          }
-> @@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
->
->  static Property sifive_u_otp_properties[] = {
->      DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-> +    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
->      DEFINE_PROP_END_OF_LIST(),
->  };
->
->  static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
->  {
->      SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-> +    DriveInfo *dinfo;
->
->      memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
->                            TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
->      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-> +
-> +    dinfo = drive_get_next(IF_NONE);
-> +    if (dinfo) {
-> +        int ret;
-> +        uint64_t perm;
-> +        int filesize;
-> +        BlockBackend *blk;
-> +
-> +        blk = blk_by_legacy_dinfo(dinfo);
-> +        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
-> +        if (blk_getlength(blk) < filesize) {
-> +            error_setg(errp, "OTP drive size < 16K");
-> +            return;
-> +        }
-> +
-> +        qdev_prop_set_drive_err(dev, "drive", blk, errp);
-> +
-> +        if (s->blk) {
-> +            perm = BLK_PERM_CONSISTENT_READ |
-> +                   (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
-> +            ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
-> +            if (ret < 0) {
-> +                return;
-> +            }
-> +
-> +            if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
-> +                error_setg(errp, "failed to read the initial flash content");
-> +            }
-> +        }
+> +    if (ret) {
+> +        req->status =3D NVME_INTERNAL_DEV_ERROR;
+> +        trace_pci_nvme_err_aio(nvme_cid(req), strerror(ret),
+> +                               req->status);
 > +    }
->  }
->
->  static void sifive_u_otp_reset(DeviceState *dev)
-> @@ -191,6 +242,20 @@ static void sifive_u_otp_reset(DeviceState *dev)
->      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
->      s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
->
-> +    if (s->blk) {
-> +        /* Put serial number to backend as well*/
-> +        uint32_t serial_data;
-> +        int index = SIFIVE_U_OTP_SERIAL_ADDR;
-> +
-> +        serial_data = s->serial;
-> +        blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
-> +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-> +
-> +        serial_data = ~(s->serial);
-> +        blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
-> +                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-> +    }
-> +
->      /* Initialize write-once map */
->      memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
->  }
-> diff --git a/include/hw/misc/sifive_u_otp.h b/include/hw/misc/sifive_u_otp.h
-> index ebffbc1fa5..5d0d7df455 100644
-> --- a/include/hw/misc/sifive_u_otp.h
-> +++ b/include/hw/misc/sifive_u_otp.h
-> @@ -46,6 +46,7 @@
->
->  #define SIFIVE_U_OTP_PA_MASK        0xfff
->  #define SIFIVE_U_OTP_NUM_FUSES      0x1000
-> +#define SIFIVE_U_OTP_FUSE_WORD      4
->  #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
->
->  #define SIFIVE_U_OTP_REG_SIZE       0x1000
-> @@ -80,6 +81,7 @@ struct SiFiveUOTPState {
->      uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
->      /* config */
->      uint32_t serial;
-> +    BlockBackend *blk;
->  };
->
->  #endif /* HW_SIFIVE_U_OTP_H */
-> --
-> 2.17.1
->
+
+--WfZ7S8PLGjBY9Voh
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+R0s4ACgkQTeGvMW1P
+DenAWwgArVP/fMR8EKwOYJU633J4aGagglNF9VDj7o9cSf+dDTogysYYPGh98p4f
+YuPc9qAn5lTkufHCbgMXFJIeJpdB+juwa7fNXO+NItU4Fs32DsScpHRC7CpSRwCs
+RRvZeNUUbSdYvqD+FlLtvoZXxbSx4ea0R6RTaehPk2LGST0hob7I5WFJhisyHyf5
+/+tuKJCW2nPfJ5F5NH5Eemk1Co2fZ0EP6Jg/WnqduTWbUyP1DAEQaXoxCGCXHEFL
+ggTWqs5zfZG30OhAa4U37R9g9EVqjVeB4qNFDuehZ58sSXXVHjOoMX88odBtiy/E
+v96iJMP1+/Hnkbk4z5bjkSVNlH5HDw==
+=Wuuy
+-----END PGP SIGNATURE-----
+
+--WfZ7S8PLGjBY9Voh--
 
