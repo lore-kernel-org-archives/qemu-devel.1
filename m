@@ -2,64 +2,87 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C038FC388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:14:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F3CC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:17:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B4F12417D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:14:16 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B4F12417D
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id BBCAB2177B
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:17:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GaYsFAHF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BBCAB2177B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48256 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVaQ3-0000JL-NC
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:14:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57270)
+	id 1kVaTU-0002fu-Er
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:17:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60042)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kVaG7-00052v-It; Thu, 22 Oct 2020 09:03:59 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:5715 helo=huawei.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kVaFx-0000gn-Rm; Thu, 22 Oct 2020 09:03:59 -0400
-Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 1F3A5716043171552079;
- Thu, 22 Oct 2020 21:03:43 +0800 (CST)
-Received: from localhost (10.174.184.155) by DGGEMS404-HUB.china.huawei.com
- (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 22 Oct 2020
- 21:03:34 +0800
-From: Jiahui Cen <cenjiahui@huawei.com>
-To: <qemu-devel@nongnu.org>, <kwolf@redhat.com>, <mreitz@redhat.com>,
- <eblake@redhat.com>
-Subject: [PATCH v3 9/9] docs: add a doc about I/O hang
-Date: Thu, 22 Oct 2020 21:03:03 +0800
-Message-ID: <20201022130303.1092-10-cenjiahui@huawei.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20201022130303.1092-1-cenjiahui@huawei.com>
-References: <20201022130303.1092-1-cenjiahui@huawei.com>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVaRY-0001TC-16
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:15:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25830)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVaRU-0002Dg-C0
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:15:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603372539;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=Wnj7eDLYQb68RxOKX0qL9Uk3bXQYXvYL8lznyRGCBTA=;
+ b=GaYsFAHFSp9myesC88/75JYzqiXABQ7VOzjCjdwFJiIKrLJPFHEMhLGdJiHcPI5EsLHka1
+ FDr7UgTJ3VPiA24JuPf0CPx/GBVhZN5TAfHZLtdfsRUEc3D+3tk3MvlwL5CDx1lEzgr1bb
+ y9eLomVfZeKVviIc9iJz2/123gzc1IA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-447-vzNnW07kMfaQPgA01TMH8g-1; Thu, 22 Oct 2020 09:15:37 -0400
+X-MC-Unique: vzNnW07kMfaQPgA01TMH8g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B99B18B9EC3;
+ Thu, 22 Oct 2020 13:15:36 +0000 (UTC)
+Received: from redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 0BCB36EF42;
+ Thu, 22 Oct 2020 13:15:31 +0000 (UTC)
+Date: Thu, 22 Oct 2020 09:15:28 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: David Gibson <dgibson@redhat.com>
+Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
+ not ready
+Message-ID: <20201022091500-mutt-send-email-mst@kernel.org>
+References: <20201022114026.31968-1-marcel.apfelbaum@gmail.com>
+ <20201022080354-mutt-send-email-mst@kernel.org>
+ <20201022235632.7f69ddc9@yekko.fritz.box>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.174.184.155]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191; envelope-from=cenjiahui@huawei.com;
- helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:03:44
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201022235632.7f69ddc9@yekko.fritz.box>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -72,73 +95,75 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cenjiahui@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
- stefanha@redhat.com, fangying1@huawei.com, jsnow@redhat.com
+Cc: jusual@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Give some details about the I/O hang and how to use it.
+On Thu, Oct 22, 2020 at 11:56:32PM +1100, David Gibson wrote:
+> On Thu, 22 Oct 2020 08:06:55 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Thu, Oct 22, 2020 at 02:40:26PM +0300, Marcel Apfelbaum wrote:
+> > > From: Marcel Apfelbaum <marcel@redhat.com>
+> > > 
+> > > During PCIe Root Port's transition from Power-Off to Power-ON (or vice-versa)
+> > > the "Slot Control Register" has the "Power Indicator Control"
+> > > set to "Blinking" expressing a "power transition" mode.
+> > > 
+> > > Any hotplug operation during the "power transition" mode is not permitted
+> > > or at least not expected by the Guest OS leading to strange failures.
+> > > 
+> > > Detect and refuse hotplug operations in such case.
+> > > 
+> > > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > > ---
+> > >  hw/pci/pcie.c | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > > 
+> > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > > index 5b48bae0f6..2fe5c1473f 100644
+> > > --- a/hw/pci/pcie.c
+> > > +++ b/hw/pci/pcie.c
+> > > @@ -410,6 +410,7 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > >      PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
+> > >      uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
+> > >      uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
+> > > +    uint32_t sltctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
+> > >  
+> > >      /* Check if hot-plug is disabled on the slot */
+> > >      if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
+> > > @@ -418,6 +419,12 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+> > >          return;
+> > >      }
+> > >  
+> > > +    if ((sltctl & PCI_EXP_SLTCTL_PIC) == PCI_EXP_SLTCTL_PWR_IND_BLINK) {
+> > > +        error_setg(errp, "Hot-plug failed: %s is in Power Transition",
+> > > +                   DEVICE(hotplug_pdev)->id);
+> > > +        return;
+> > > +    }
+> > > +
+> > >      pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
+> > >  }  
+> > 
+> > Probably the only way to handle for existing machine types.
+> > For new ones, can't we queue it in host memory somewhere?
+> 
+> I'm not actually convinced we can't do that even for existing machine
+> types.
 
-Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
-Signed-off-by: Ying Fang <fangying1@huawei.com>
----
- docs/io-hang.rst | 45 +++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
- create mode 100644 docs/io-hang.rst
+The difficulty would be in migrating the extra "reuested but defferred"
+state.
 
-diff --git a/docs/io-hang.rst b/docs/io-hang.rst
-new file mode 100644
-index 0000000000..53356ceed2
---- /dev/null
-+++ b/docs/io-hang.rst
-@@ -0,0 +1,45 @@
-+========
-+I/O hang
-+========
-+
-+Introduction
-+============
-+
-+I/O hang is a mechanism to automatically rehandle AIOs when an error occurs on
-+the backend block device, which is unperceivable for Guest. If the error on the
-+backend device is temporary, like NFS returns EIO due to network fluctuations,
-+once the device is recovered, the AIOs will be resent automatically and done
-+successfully. If the error on the device is unrecoverable, the failed AIOs will
-+be returned to Guest after rehandle timeout.
-+
-+This mechanism can provide self-recovery and high availability to VM. From the
-+view of Guest, AIOs sent to the device are hung for a time and the finished, and
-+any other unrelated service in Guest can work as usual.
-+
-+Implementation
-+==============
-+
-+Each BlockBackend will have a list to store AIOs which need be rehandled and a
-+timer to monitor the timeout.
-+
-+If I/O hang is enabled, all returned AIOs will be checked and the failed ones
-+will be inserted into BlockBackend's list. The timer will be started and the
-+AIOs in the list will be resent to the backend device. Once the result of AIOs
-+relevant to this backend device is success, the AIOs will be returned back to
-+Guest. Otherwise, those AIOs will be rehandled periodically until timeout.
-+
-+I/O hang provides interfaces to drain all the AIOs in BlockBackend's list. There
-+are some situations to drain the rehandling AIOs, eg. resetting virtio-blk.
-+
-+I/O hang also provides qapi events, which can be used for manager tools like
-+libvirt to monitor.
-+
-+Examples
-+========
-+
-+Enable I/O hang when launching QEMU::
-+
-+      $ qemu-system-x86_64                                      \
-+          -machine pc,accel=kvm -smp 1 -m 2048                  \
-+          -drive file=shared.img,format=raw,cache=none,aio=native,iohang-timeout=60
-+
--- 
-2.19.1
+>  So I'm a bit hesitant to suggest going ahead with this without
+> looking a bit closer at whether we can implement a wait-for-ready in
+> qemu, rather than forcing every user of qemu (human or machine) to do
+> so.
+> 
+> 
+> -- 
+> David Gibson <dgibson@redhat.com>
+> Principal Software Engineer, Virtualization, Red Hat
+
 
 
