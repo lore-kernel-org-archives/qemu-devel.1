@@ -2,106 +2,91 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFDA8C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A113C388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:11:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A4FC20936
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:10:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6B84620936
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:11:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="kmX4brtI"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A4FC20936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9br2KJT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B84620936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43060 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVVg7-0007AE-3Q
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 04:10:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43464)
+	id 1kVVhD-00005G-FJ
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 04:11:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43584)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVVfN-0006Iw-Mg
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:09:45 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:55622)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVVfL-00007w-Bn
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:09:45 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M84Dn2168772;
- Thu, 22 Oct 2020 08:09:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=AVv61J62gDAOs/38d+6midlTJ2E2oTEM1s3L/RZIloY=;
- b=kmX4brtI1mNzOkeM0e9mZ9EWL/ygFWlU2ijlHoA8CSNS8JnBKTrL9LyGTFLlkUq//c1H
- XlhbqxEpdJt2pjglXH/kc/rS8gvSHF1MX+JlBR/FougxqWrRjNw/zoR+KSJjLtwAi4wF
- CSIEMt358UtIvUpRJOemnwPSK3imTKJ0ZZWf7XyAkJIoNk1dBt13FagJFJ2fOYQ0/5hI
- 8jR8BcH57NnwbxyoYV2+bmBTCdCCs7b4XyqCvvovHm6QdTa5mjuhVq1GmX1DLuvDDxV5
- qJgv7Ur/KI4IO9xV0LUHbveDzIbNSSFQW2flM4iIMzO0f4V87nmohd6G49nNdqIDHJzt QQ== 
-Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
- by userp2120.oracle.com with ESMTP id 34ak16msys-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 22 Oct 2020 08:09:34 +0000
-Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
- by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M85xXe191366;
- Thu, 22 Oct 2020 08:09:34 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
- by userp3020.oracle.com with ESMTP id 34ak19k1yj-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 22 Oct 2020 08:09:33 +0000
-Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
- by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09M89VAs011909;
- Thu, 22 Oct 2020 08:09:32 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 22 Oct 2020 01:09:31 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 988FC1D6B84C; Thu, 22 Oct 2020 09:09:26 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 01/16] memory: Add FlatView foreach function
-In-Reply-To: <20201021210922.572955-2-alxndr@bu.edu>
-References: <20201021210922.572955-1-alxndr@bu.edu>
- <20201021210922.572955-2-alxndr@bu.edu>
-Date: Thu, 22 Oct 2020 09:09:26 +0100
-Message-ID: <m24kmm8yx5.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kVVgS-0007ly-Hk
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:10:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32862)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kVVgK-0000cY-CJ
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:10:51 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603354240;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=W4menn46JEe0tHk8zdMP/xpl7sYIJxXvoGqmU3Un7AQ=;
+ b=f9br2KJTCgWRrhvX2gk1BLksC6auZlJraF0ipH3VYA7ATyVzHWQdicDgPb85erJ46caqa6
+ euCfcbWZV+BeqPC+Uj1Usf4tthPfdEQZaK87NghbokhpIt1ryMczkndpUkmz4fiQ5C/4tS
+ hXfJyhDM6T+ckx19HMa0lE0bmakwj+4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-379-1_xwl2v4MVaeTuooLd4WlA-1; Thu, 22 Oct 2020 04:10:39 -0400
+X-MC-Unique: 1_xwl2v4MVaeTuooLd4WlA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D230B86ABDB;
+ Thu, 22 Oct 2020 08:10:37 +0000 (UTC)
+Received: from [10.36.113.152] (ovpn-113-152.ams2.redhat.com [10.36.113.152])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9CCAB5B4C1;
+ Thu, 22 Oct 2020 08:10:33 +0000 (UTC)
+Subject: Re: [PATCH v3 0/6] virtio-mem: block size and address-assignment
+ optimizations
+To: qemu-devel@nongnu.org
+References: <20201008083029.9504-1-david@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <242d30e9-f22b-d570-0186-629792f5bdf1@redhat.com>
+Date: Thu, 22 Oct 2020 10:10:32 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- mlxscore=0 phishscore=0
- spamscore=0 adultscore=0 mlxlogscore=999 malwarescore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010220053
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0
- phishscore=0
- priorityscore=1501 clxscore=1015 malwarescore=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 impostorscore=0 spamscore=0 mlxlogscore=999
- suspectscore=1 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010220053
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=darren.kenny@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:09:38
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201008083029.9504-1-david@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=david@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 00:54:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,69 +99,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: f4bug@amsat.org, Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, dimastep@yandex-team.ru
+Cc: Igor Mammedov <imammedo@redhat.com>,
+ Wei Yang <richardw.yang@linux.intel.com>,
+ Pankaj Gupta <pankaj.gupta.linux@gmail.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+On 08.10.20 10:30, David Hildenbrand wrote:
+> 
+> 
+> Let's try to detect the actual THP size and use it as default block size
+> (unless the page size of the backend indicates that THP don't apply).
+> Always allow to set a block size of 1 MiB, but warn if the configured block
+> size is smaller than the default. Handle large block sizes better, avoiding
+> a virtio-spec violation and optimizing address auto-detection.
+> 
+> For existing setups (x86-64), the default block size won't change (was, and
+> will be 2 MiB on anonymous memory). For existing x86-64 setups, the address
+> auto-detection won't change in relevant setups (esp., anonymous memory
+> and hugetlbfs with 2 MiB pages and no manual configuration of the block
+> size). I don't see the need for compatibility handling (especially, as
+> virtio-mem is still not considered production-ready).
+> 
+> Most of this is a preparation for future architectures, using hugetlbfs
+> to full extend, and using manually configured, larger block sizes
+> (relevant for vfio in the future).
 
-On Wednesday, 2020-10-21 at 17:09:07 -04, Alexander Bulekov wrote:
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-> ---
->  include/exec/memory.h | 5 +++++
->  softmmu/memory.c      | 9 +++++++++
->  2 files changed, 14 insertions(+)
->
-> diff --git a/include/exec/memory.h b/include/exec/memory.h
-> index 622207bde1..042918dd16 100644
-> --- a/include/exec/memory.h
-> +++ b/include/exec/memory.h
-> @@ -719,6 +719,11 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
->      return qatomic_rcu_read(&as->current_map);
->  }
->  
-> +typedef int (*flatview_cb)(Int128 start,
-> +                           Int128 len,
-> +                           const MemoryRegion*, void*);
-> +
-> +void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque);
->  
->  /**
->   * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index 403ff3abc9..c46b0c6d65 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -656,6 +656,15 @@ static void render_memory_region(FlatView *view,
->      }
->  }
->  
-> +void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque)
-> +{
-> +    FlatRange *fr;
+Ping.
 
-Just to be complete, you probably should check that both fv and cb are
-not NULL here - if not using an explicit if/return, at least with
-assertions just in case a developer does something silly...
-
-> +    FOR_EACH_FLAT_RANGE(fr, fv) {
-> +        if (cb(fr->addr.start, fr->addr.size, fr->mr, opaque))
-> +            break;
-> +    }
-> +}
-> +
->  static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
->  {
->      while (mr->enabled) {
-
-Otherwise, all looks good, so:
-
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-
+-- 
 Thanks,
 
-Darren.
+David / dhildenb
+
 
