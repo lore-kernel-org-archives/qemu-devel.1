@@ -2,128 +2,89 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09C35C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:36:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F14F0C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60AA624640
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:36:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 390F824640
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:38:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="EDeevUen"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60AA624640
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqU+tl+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 390F824640
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40230 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVhKM-0004uH-DE
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 16:36:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48994)
+	id 1kVhMN-0006M7-5k
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 16:38:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVhJ7-00048w-Hl; Thu, 22 Oct 2020 16:35:33 -0400
-Received: from mail-vi1eur05on2100.outbound.protection.outlook.com
- ([40.107.21.100]:5089 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVhIx-0002TT-41; Thu, 22 Oct 2020 16:35:31 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PrzRBKEQtL/8GHzvol22zMCHkpLHeL40uFvbD+yb3GB5dmGX7GDbJ8wTm237VOp81/D+EbhyUqjkrFHZKcrwXycda2NaeNeT3aUoTd1syqNObal1RM1eSRDaC0Aql4aTOUR3wlp3tCJZFmQSn4KXcg3BOo7XbFo6nMhfyyoN3O7t2cA7in1K43N3f8j6xpFk+nxYT6V7Me6th+P3xrx0JkY3BvvNIG6CNQmQIinFjKo378kYxmi1Yy3Ef8UZjmypUJG4dWeDhmIM3Kf6h3GK7bPJkPl/QZNxyy6kJ/toq+1JQHaKgqPCND3U47erJOkHHF1SepEkAQgcz/Gpmfxf+w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vrrvy0ntq4StyU3GGtaNcIaHIYQ1cLSYPqDuXFtRLSY=;
- b=B/nU5ebveypcYcOQI6vwb2T2PTNsTTrtEoSIXMmTz9qJXGp5rKIDbOOvDBSLyl4oIqSuwqIM+0usC+aadlKRsuy8PZXpTFs7lk+NsDRMnmrV3y2x0cDiy+XuQNVTowdZsZTEgxjiTP4O1YXq+ickGTNQ2Xg0i3/9rCbo1lxY4vQcadheWzapx/rV4O1PVeTtmBtNhvRVR213hJR3uG9poF1TqKrHGgsE+iFsjZaxQUwoQ0sykN3fFOb9txbtABNF251oLK3DNzn7v+9mC0Aqy1wl0VenyTMgBpI4efDmJJv5BwAlROKhq3qUgGN7dz7lSIDJMlgdNqnGOd0OxfIpRw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Vrrvy0ntq4StyU3GGtaNcIaHIYQ1cLSYPqDuXFtRLSY=;
- b=EDeevUentE6ZotQsBIuxN7D7Z7V4djopFdpYSAyHUcZSekPKeZZuohlwoOJ84Wgeak3rz/OHkE0tywU3OfzMQaJ0GIhWX0Bk6Adi9SBaumliY+MvrPPplrA1/d7hI+kIOtgMFn/L8m3Um3NnHIQ+hh2fWk91AcBVhP7Tnj7dTUQ=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM5PR0802MB2420.eurprd08.prod.outlook.com (2603:10a6:203:9e::15)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 22 Oct
- 2020 20:35:18 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
- 20:35:18 +0000
-Subject: Re: [PATCH v2 11/20] qapi: backup: add x-max-chunk and x-max-workers
- parameters
-To: Max Reitz <mreitz@redhat.com>, qemu-block@nongnu.org
-Cc: kwolf@redhat.com, jsnow@redhat.com, wencongyang2@huawei.com,
- xiechanglong.d@gmail.com, armbru@redhat.com, eblake@redhat.com,
- qemu-devel@nongnu.org, den@openvz.org
-References: <20200601181118.579-1-vsementsov@virtuozzo.com>
- <20200601181118.579-12-vsementsov@virtuozzo.com>
- <2117c54a-c9b3-59c6-c0b2-9fd84cb965b6@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <b0334bde-2e84-9833-8228-a578dc064e32@virtuozzo.com>
-Date: Thu, 22 Oct 2020 23:35:15 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.3
-In-Reply-To: <2117c54a-c9b3-59c6-c0b2-9fd84cb965b6@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [185.215.60.82]
-X-ClientProxiedBy: FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::20) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kVhL2-0005aF-A8
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 16:37:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44751)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kVhKy-0002kc-TP
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 16:37:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603399047;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fK2GZy5nx0OA5KrccwcRbz4El81A9H/le3Q+6Yk+1ks=;
+ b=MqU+tl+sUSk6F6rLXR6vEeR7gD8VmQCfWA3bXFX4BUmqo+2RVP99MTRGGIkz0COmJRE+n7
+ 5hdRKkhZUFsrYlexlXalZQaA8hMbNlw4U2sQpjmGfEmZ9y184XtIFCIbpeQNp7/XSOTPT4
+ JEhCy5yMCLP5oQOET7AekAX0pi9OPuQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-283-MsSospjLNn2P-tf-fkb-ww-1; Thu, 22 Oct 2020 16:37:23 -0400
+X-MC-Unique: MsSospjLNn2P-tf-fkb-ww-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8BC1F10866A8;
+ Thu, 22 Oct 2020 20:37:20 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B52245B4A9;
+ Thu, 22 Oct 2020 20:37:10 +0000 (UTC)
+Date: Thu, 22 Oct 2020 14:37:10 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v27 14/17] vfio: Dirty page tracking when vIOMMU is enabled
+Message-ID: <20201022143710.6a11facc@w520.home>
+In-Reply-To: <1603365127-14202-15-git-send-email-kwankhede@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+ <1603365127-14202-15-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.82) by
- FR2P281CA0010.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:a::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.10 via Frontend Transport; Thu, 22 Oct 2020 20:35:17 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 5e2ec4b5-a3f4-4971-92a5-08d876c9fd59
-X-MS-TrafficTypeDiagnostic: AM5PR0802MB2420:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM5PR0802MB2420CCBA64AEFEA3ADE831D2C11D0@AM5PR0802MB2420.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4714;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: NyxXvGfVVgVC91hgjdlEqiXxChZaeelVM6LchT7msQPjVDFumNv4C0VCF5WGc6la67v4Ikd3aOnWVnFxFeTWPVqSUGF69RLCdiArQj5ikx6SQ/BhLFk7kcTUdeK6gZgcN5iFuJbq1Mm8otmWwwlSIEUh4ioTfDcp9w/VshL0i+u0rWLZn9y/8se6CaFzI7jET3CY97DryPH/OhX+UfVbA5UWY4IjykbeiW6+2uooe5VVzetD+K/1SihxT2EWA5D1bDXPBc2RSNbn7wrb1WohqJHegBd07R1K5l8Kg4H3Gb+q3CTWY4WYQo3iwbIFJKxkxufiXfLi7omuBX27c4SetArmLb+oV004KIJ49HbApcfJETgf0ytCqpSczWddlp9H
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(396003)(39840400004)(346002)(366004)(376002)(136003)(107886003)(6486002)(66476007)(66556008)(31686004)(83380400001)(2616005)(8936002)(86362001)(2906002)(16576012)(956004)(52116002)(8676002)(5660300002)(36756003)(478600001)(16526019)(186003)(31696002)(66946007)(26005)(4326008)(316002)(53546011)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: 1VzpoUPj0UWT48KJdABRQbWQ/1+bp3AA0TWZENXWTmEovHKyetsoxUudu5cgsKMLHSz5geDrc3dVK9IYz4NLpL0p3QslRXUEC1mjdhGdnFOEahWn8HnoqFvpU2CqMXVTPIJhN8cA7vS8aUEQJ8f8LrZG8W8okMzFBa7SgqzKQeKumV+VfDOO7fgJmIjMiMQPXlbwYxBsJfXEva6lUE0XDymM0mERQbtE/jN/BkXVVm+O5bV5eTYZriIKz4Bwo7KwVXfpSqLx0rOE9a1CBZynoufn+y+vRJ0b3vd5QUTUbIysShr56F7UVRWjqVEkJ07qNLwE5G/d8xvTykgBdDY37GPIRuGK200+mgUUaEN2tC3S7OtpB/V3IIIuDZz5bJwx6USczo7IqN9Mm3BstRm/klxH5mCswSae87bJUHL4cGg+WsWql2/9F99CiIWoBdb+A30sY97Wy7AXJlkEBsBfp9fPtCPJ06t8p6VITTnRU1sfI+IGd4teMKfsT9R08Zn95kxHJXnln+ToLA5pXE588731pdyxQSPDgmyNa2tthH8TLFEMDIzdi+A6lDmYJgw7tcqvHBdWBTv1IiSJD43c0VnnNX8DEdc43FwyHy1u+B1cSUZYh/C/wC9DnXb4UAP2W3z1vcSS43KivYv3neA9xA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5e2ec4b5-a3f4-4971-92a5-08d876c9fd59
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 20:35:18.4950 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: NEWMJYCpt0mTjC0mOj914WVVXgprfsZgOAeKLY8eKp1Cxto2EyrXQIwm0SJaA/w0MD0x13BBDEvbTz734IK6XqXEoazTnUnghux07oSHlfM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM5PR0802MB2420
-Received-SPF: pass client-ip=40.107.21.100;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 16:35:20
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,64 +97,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-22.07.2020 15:22, Max Reitz wrote:
-> On 01.06.20 20:11, Vladimir Sementsov-Ogievskiy wrote:
->> Add new parameters to configure future backup features. The patch
->> doesn't introduce aio backup requests (so we actually have only one
->> worker) neither requests larger than one cluster. Still, formally we
->> satisfy these maximums anyway, so add the parameters now, to facilitate
->> further patch which will really change backup job behavior.
->>
->> Options are added with x- prefixes, as the only use for them are some
->> very conservative iotests which will be updated soon.
->>
->> Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
->> ---
->>   qapi/block-core.json      |  9 ++++++++-
->>   include/block/block_int.h |  7 +++++++
->>   block/backup.c            | 21 +++++++++++++++++++++
->>   block/replication.c       |  2 +-
->>   blockdev.c                |  5 +++++
->>   5 files changed, 42 insertions(+), 2 deletions(-)
->>
+On Thu, 22 Oct 2020 16:42:04 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-[..]
-
->> @@ -422,6 +436,11 @@ BlockJob *backup_job_create(const char *job_id, BlockDriverState *bs,
->>       if (cluster_size < 0) {
->>           goto error;
->>       }
->> +    if (max_chunk && max_chunk < cluster_size) {
->> +        error_setg(errp, "Required max-chunk (%" PRIi64") is less than backup "
+> When vIOMMU is enabled, register MAP notifier from log_sync when all
+> devices in container are in stop and copy phase of migration. Call replay
+> and get dirty pages from notifier callback.
 > 
-> (missing a space after PRIi64)
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> ---
+>  hw/vfio/common.c              | 95 ++++++++++++++++++++++++++++++++++++++++---
+>  hw/vfio/trace-events          |  1 +
+>  include/hw/vfio/vfio-common.h |  1 +
+>  3 files changed, 91 insertions(+), 6 deletions(-)
 > 
->> +                   "cluster size (%" PRIi64 ")", max_chunk, cluster_size);
-> 
-> Should this be noted in the QAPI documentation?
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 2634387df948..98c2b1f9b190 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -442,8 +442,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+>  }
+>  
+>  /* Called with rcu_read_lock held.  */
+> -static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> -                           bool *read_only)
+> +static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                               ram_addr_t *ram_addr, bool *read_only)
+>  {
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+> @@ -474,8 +474,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+>          return false;
+>      }
+>  
+> -    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> -    *read_only = !writable || mr->readonly;
+> +    if (vaddr) {
+> +        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    }
+> +
+> +    if (ram_addr) {
+> +        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
+> +    }
+> +
+> +    if (read_only) {
+> +        *read_only = !writable || mr->readonly;
+> +    }
+>  
+>      return true;
+>  }
+> @@ -485,7 +494,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+>      VFIOContainer *container = giommu->container;
+>      hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> -    bool read_only;
+>      void *vaddr;
+>      int ret;
+>  
+> @@ -501,7 +509,9 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>  
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        bool read_only;
+> +
+> +        if (!vfio_get_xlat_addr(iotlb, &vaddr, NULL, &read_only)) {
+>              goto out;
+>          }
+>          /*
+> @@ -899,11 +909,84 @@ err_out:
+>      return ret;
+>  }
+>  
+> +static void vfio_iommu_map_dirty_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +{
+> +    VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, dirty_notify);
+> +    VFIOContainer *container = giommu->container;
+> +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> +    ram_addr_t translated_addr;
+> +
+> +    trace_vfio_iommu_map_dirty_notify(iova, iova + iotlb->addr_mask);
+> +
+> +    if (iotlb->target_as != &address_space_memory) {
+> +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> +        return;
+> +    }
+> +
+> +    rcu_read_lock();
+> +
+> +    if (vfio_get_xlat_addr(iotlb, NULL, &translated_addr, NULL)) {
+> +        int ret;
+> +
+> +        ret = vfio_get_dirty_bitmap(container, iova, iotlb->addr_mask + 1,
+> +                                    translated_addr);
+> +        if (ret) {
+> +            error_report("vfio_iommu_map_dirty_notify(%p, 0x%"HWADDR_PRIx", "
+> +                         "0x%"HWADDR_PRIx") = %d (%m)",
+> +                         container, iova,
+> +                         iotlb->addr_mask + 1, ret);
+> +        }
+> +    }
+> +
+> +    rcu_read_unlock();
+> +}
+> +
+>  static int vfio_sync_dirty_bitmap(VFIOContainer *container,
+>                                    MemoryRegionSection *section)
+>  {
+>      ram_addr_t ram_addr;
+>  
+> +    if (memory_region_is_iommu(section->mr)) {
+> +        VFIOGuestIOMMU *giommu;
+> +        int ret = 0;
+> +
+> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
+> +                giommu->n.start == section->offset_within_region) {
+> +                Int128 llend;
+> +                Error *err = NULL;
+> +                int idx = memory_region_iommu_attrs_to_index(giommu->iommu,
+> +                                                       MEMTXATTRS_UNSPECIFIED);
+> +
+> +                llend = int128_add(int128_make64(section->offset_within_region),
+> +                                   section->size);
+> +                llend = int128_sub(llend, int128_one());
+> +
+> +                iommu_notifier_init(&giommu->dirty_notify,
+> +                                    vfio_iommu_map_dirty_notify,
+> +                                    IOMMU_NOTIFIER_MAP,
+> +                                    section->offset_within_region,
+> +                                    int128_get64(llend),
+> +                                    idx);
+> +                ret = memory_region_register_iommu_notifier(section->mr,
+> +                                                  &giommu->dirty_notify, &err);
+> +                if (ret) {
+> +                    error_report_err(err);
+> +                    break;
+> +                }
+> +
+> +                memory_region_iommu_replay(giommu->iommu,
+> +                                           &giommu->dirty_notify);
+> +
+> +                memory_region_unregister_iommu_notifier(section->mr,
+> +                                                        &giommu->dirty_notify);
 
-Hmm.. It makes sense, but I don't know what to write: should be >= job cluster_size? But then I'll have to describe the logic of backup_calculate_cluster_size()...
 
->  (And perhaps the fact
-> that without copy offloading, we’ll never copy anything bigger than one
-> cluster at a time anyway?)
+Is it necessary to do the register/unregister?  It seemed to me that
+perhaps we could do a replay independent of those.
 
-This is a parameter for background copying. Look at block_copy_task_create(), if call_state has own max_chunk, it's used instead of common copy_size (derived from cluster_size). But at a moment of this patch background process through async block-copy is not  yet implemented, and the parameter doesn't work, which is described in commit message.
+I'd also be tempted to move dirty_notify to a temporary object rather
+than store it on the giommu for such a brief usage, ie. define:
 
-> 
->> +        return NULL;
->> +    }
->>   
->>       /*
+struct giommu_dirty_notfier {
+    IOMMUNotifier n;
+    VFIOGuestIOMMU *giommu;
+}
 
-[..]
+struct giommu_dirty_notfier n = { .giommu = giommu };
 
+iommu_notifier_init(&n,...);
 
--- 
-Best regards,
-Vladimir
+memory_region_iommu_replay(giommu->iommu, &n);
+...
+
+struct giommu_dirty_notfier *ndnotifier = container_of(n, struct giommu_dirty_notfier, n);
+VFIOGuestIOMMU *giommu = n->giommu;
+
+It's nice that we remove the extra bloat of the list/tree entirely with
+this approach.  Thanks,
+
+Alex
+
+> +                break;
+> +            }
+> +        }
+> +        return ret;
+> +    }
+> +
+>      ram_addr = memory_region_get_ram_addr(section->mr) +
+>                 section->offset_within_region;
+>  
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index c3b35aa2cce8..d9cb8998a228 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -163,3 +163,4 @@ vfio_load_device_config_state(const char *name) " (%s)"
+>  vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
+>  vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+>  vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
+> +vfio_iommu_map_dirty_notify(uint64_t iova_start, uint64_t iova_end) "iommu dirty @ 0x%"PRIx64" - 0x%"PRIx64
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index b1c1b18fd228..92872fae59ee 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -99,6 +99,7 @@ typedef struct VFIOGuestIOMMU {
+>      IOMMUMemoryRegion *iommu;
+>      hwaddr iommu_offset;
+>      IOMMUNotifier n;
+> +    IOMMUNotifier dirty_notify;
+>      QLIST_ENTRY(VFIOGuestIOMMU) giommu_next;
+>  } VFIOGuestIOMMU;
+>  
+
 
