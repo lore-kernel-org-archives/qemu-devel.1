@@ -2,88 +2,78 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB4C2C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:57:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E4FC388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:57:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CFB20936
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:57:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C66E0221FE
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:57:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cBEpiBxB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CFB20936
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="nwW0MNnf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C66E0221FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50082 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51808 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZDP-0006C9-26
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:57:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36874)
+	id 1kVZEA-0006uC-Ij
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:57:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmv-0006Ty-29
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21297)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmp-0005Ba-1d
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603366176;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ISLk/f/qup/bAzietY5lmdfvNvFxUIRufnIKhOcUOfM=;
- b=cBEpiBxBw/6N+FKARD1+D7mAOZBCfqKQ4ONje8v8QGFq5dVFcbvGW0GJZJy7zIDBkk5UfT
- SUfmZecezk2Z6qd8T7+897cb5xLzQnGlWnbN5ORRh64PZmYqavT5+lcYHZl3U50XRnThLt
- Bpx/CEN8VjEC/VKu/ndIPTAYhUsjt4w=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-wgXrpmsOOWuW7oeUulwiug-1; Thu, 22 Oct 2020 07:29:34 -0400
-X-MC-Unique: wgXrpmsOOWuW7oeUulwiug-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7241918C89D7;
- Thu, 22 Oct 2020 11:29:33 +0000 (UTC)
-Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0700210013D0;
- Thu, 22 Oct 2020 11:29:29 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 22/28] block/export: add iothread and fixed-iothread options
-Date: Thu, 22 Oct 2020 12:27:20 +0100
-Message-Id: <20201022112726.736757-23-stefanha@redhat.com>
-In-Reply-To: <20201022112726.736757-1-stefanha@redhat.com>
-References: <20201022112726.736757-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ36-0001Zy-6v
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:46:28 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15082)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ33-0007QF-Nn
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:46:27 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f9170b20000>; Thu, 22 Oct 2020 04:44:50 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
+ 2020 11:46:12 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 22 Oct 2020 11:46:03 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v27 11/17] vfio: Get migration capability flags for container
+Date: Thu, 22 Oct 2020 16:42:01 +0530
+Message-ID: <1603365127-14202-12-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 06:53:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603367090; bh=+ZtZEoys5pMkAU3zCjgZH0ObiN31k81jwatqeae6sQw=;
+ h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+ References:X-NVConfidentiality:MIME-Version:Content-Type;
+ b=nwW0MNnfSU9c8pKdUyVmU0C43YuZSFjKHzUBgSPGB+ImILazhfEjKC3ktlINp0cPN
+ 5TEc5Bn37AZdsoFB/V3qMs9q0t9IrWfZsi5VqImy3GyOgG7HQLCpFqWu4ukV2jlYG1
+ PiKN7Q14eRcce636MZYTGViluKTu+H/0+srMIwzWUvjC+ZZ7U/494XzVywE1vYlKW6
+ MpTAp9TSDAcU0X4wUc/8ap96KE5H1WWE8LFHwDsoE+F1i3yl3nl29D9AC8axW0t+Vf
+ luGdIAhgTirryDPjxwpBJpadDY6q9+NfbKSovMA9OnXq2Uk/97w2fX1uvp1vFSyxB5
+ Eu/dxqgWrdrcg==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:44:48
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,111 +87,199 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, Eric Auger <eric.auger@redhat.com>,
+ changpeng.liu@intel.com, eskultet@redhat.com,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-TWFrZSBpdCBwb3NzaWJsZSB0byBzcGVjaWZ5IHRoZSBpb3RocmVhZCB3aGVyZSB0aGUgZXhwb3J0
-IHdpbGwgcnVuLiBCeQpkZWZhdWx0IHRoZSBibG9jayBub2RlIGNhbiBiZSBtb3ZlZCB0byBvdGhl
-ciBBaW9Db250ZXh0cyBsYXRlciBhbmQgdGhlCmV4cG9ydCB3aWxsIGZvbGxvdy4gVGhlIGZpeGVk
-LWlvdGhyZWFkIG9wdGlvbiBmb3JjZXMgc3RyaWN0IGJlaGF2aW9yCnRoYXQgcHJldmVudHMgY2hh
-bmdpbmcgQWlvQ29udGV4dCB3aGlsZSB0aGUgZXhwb3J0IGlzIGFjdGl2ZS4gU2VlIHRoZQpRQVBJ
-IGRvY3MgZm9yIGRldGFpbHMuCgpTaWduZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZh
-bmhhQHJlZGhhdC5jb20+Ck1lc3NhZ2UtaWQ6IDIwMjAwOTI5MTI1NTE2LjE4NjcxNS01LXN0ZWZh
-bmhhQHJlZGhhdC5jb20KW0ZpeCBzdHJheSAnIycgY2hhcmFjdGVyIGluIGJsb2NrLWV4cG9ydC5q
-c29uIGFuZCBhZGQgbWlzc2luZyAiKHNpbmNlOgo1LjIpIiBhcyBzdWdnZXN0ZWQgYnkgRXJpYyBC
-bGFrZS4KLS1TdGVmYW5dClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFA
-cmVkaGF0LmNvbT4KLS0tCiBxYXBpL2Jsb2NrLWV4cG9ydC5qc29uICAgICAgICAgICAgICAgfCAx
-MSArKysrKysrKysrCiBibG9jay9leHBvcnQvZXhwb3J0LmMgICAgICAgICAgICAgICAgfCAzMSAr
-KysrKysrKysrKysrKysrKysrKysrKysrKystCiBibG9jay9leHBvcnQvdmhvc3QtdXNlci1ibGst
-c2VydmVyLmMgfCAgNSArKysrLQogbmJkL3NlcnZlci5jICAgICAgICAgICAgICAgICAgICAgICAg
-IHwgIDIgLS0KIDQgZmlsZXMgY2hhbmdlZCwgNDUgaW5zZXJ0aW9ucygrKSwgNCBkZWxldGlvbnMo
-LSkKCmRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWV4cG9ydC5qc29uIGIvcWFwaS9ibG9jay1leHBv
-cnQuanNvbgppbmRleCBhNzkzZTM0YWY5Li44YTRjZWQ4MTdmIDEwMDY0NAotLS0gYS9xYXBpL2Js
-b2NrLWV4cG9ydC5qc29uCisrKyBiL3FhcGkvYmxvY2stZXhwb3J0Lmpzb24KQEAgLTIxOSwxMSAr
-MjE5LDIyIEBACiAjICAgICAgICAgICAgICAgIGV4cG9ydCBiZWZvcmUgY29tcGxldGlvbiBpcyBz
-aWduYWxsZWQuIChzaW5jZTogNS4yOwogIyAgICAgICAgICAgICAgICBkZWZhdWx0OiBmYWxzZSkK
-ICMKKyMgQGlvdGhyZWFkOiBUaGUgbmFtZSBvZiB0aGUgaW90aHJlYWQgb2JqZWN0IHdoZXJlIHRo
-ZSBleHBvcnQgd2lsbCBydW4uIFRoZQorIyAgICAgICAgICAgIGRlZmF1bHQgaXMgdG8gdXNlIHRo
-ZSB0aHJlYWQgY3VycmVudGx5IGFzc29jaWF0ZWQgd2l0aCB0aGUKKyMgICAgICAgICAgICBibG9j
-ayBub2RlLiAoc2luY2U6IDUuMikKKyMKKyMgQGZpeGVkLWlvdGhyZWFkOiBUcnVlIHByZXZlbnRz
-IHRoZSBibG9jayBub2RlIGZyb20gYmVpbmcgbW92ZWQgdG8gYW5vdGhlcgorIyAgICAgICAgICAg
-ICAgICAgIHRocmVhZCB3aGlsZSB0aGUgZXhwb3J0IGlzIGFjdGl2ZS4gSWYgdHJ1ZSBhbmQgQGlv
-dGhyZWFkIGlzCisjICAgICAgICAgICAgICAgICAgZ2l2ZW4sIGV4cG9ydCBjcmVhdGlvbiBmYWls
-cyBpZiB0aGUgYmxvY2sgbm9kZSBjYW5ub3QgYmUKKyMgICAgICAgICAgICAgICAgICBtb3ZlZCB0
-byB0aGUgaW90aHJlYWQuIFRoZSBkZWZhdWx0IGlzIGZhbHNlLiAoc2luY2U6IDUuMikKKyMKICMg
-U2luY2U6IDQuMgogIyMKIHsgJ3VuaW9uJzogJ0Jsb2NrRXhwb3J0T3B0aW9ucycsCiAgICdiYXNl
-JzogeyAndHlwZSc6ICdCbG9ja0V4cG9ydFR5cGUnLAogICAgICAgICAgICAgJ2lkJzogJ3N0cics
-CisJICAgICcqZml4ZWQtaW90aHJlYWQnOiAnYm9vbCcsCisJICAgICcqaW90aHJlYWQnOiAnc3Ry
-JywKICAgICAgICAgICAgICdub2RlLW5hbWUnOiAnc3RyJywKICAgICAgICAgICAgICcqd3JpdGFi
-bGUnOiAnYm9vbCcsCiAgICAgICAgICAgICAnKndyaXRldGhyb3VnaCc6ICdib29sJyB9LApkaWZm
-IC0tZ2l0IGEvYmxvY2svZXhwb3J0L2V4cG9ydC5jIGIvYmxvY2svZXhwb3J0L2V4cG9ydC5jCmlu
-ZGV4IDU1MDg5N2UyMzYuLmE1YjZiMDI3MDMgMTAwNjQ0Ci0tLSBhL2Jsb2NrL2V4cG9ydC9leHBv
-cnQuYworKysgYi9ibG9jay9leHBvcnQvZXhwb3J0LmMKQEAgLTE1LDYgKzE1LDcgQEAKIAogI2lu
-Y2x1ZGUgImJsb2NrL2Jsb2NrLmgiCiAjaW5jbHVkZSAic3lzZW11L2Jsb2NrLWJhY2tlbmQuaCIK
-KyNpbmNsdWRlICJzeXNlbXUvaW90aHJlYWQuaCIKICNpbmNsdWRlICJibG9jay9leHBvcnQuaCIK
-ICNpbmNsdWRlICJibG9jay9uYmQuaCIKICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiCkBAIC02Mywx
-MCArNjQsMTEgQEAgc3RhdGljIGNvbnN0IEJsb2NrRXhwb3J0RHJpdmVyICpibGtfZXhwX2ZpbmRf
-ZHJpdmVyKEJsb2NrRXhwb3J0VHlwZSB0eXBlKQogCiBCbG9ja0V4cG9ydCAqYmxrX2V4cF9hZGQo
-QmxvY2tFeHBvcnRPcHRpb25zICpleHBvcnQsIEVycm9yICoqZXJycCkKIHsKKyAgICBib29sIGZp
-eGVkX2lvdGhyZWFkID0gZXhwb3J0LT5oYXNfZml4ZWRfaW90aHJlYWQgJiYgZXhwb3J0LT5maXhl
-ZF9pb3RocmVhZDsKICAgICBjb25zdCBCbG9ja0V4cG9ydERyaXZlciAqZHJ2OwogICAgIEJsb2Nr
-RXhwb3J0ICpleHAgPSBOVUxMOwogICAgIEJsb2NrRHJpdmVyU3RhdGUgKmJzOwotICAgIEJsb2Nr
-QmFja2VuZCAqYmxrOworICAgIEJsb2NrQmFja2VuZCAqYmxrID0gTlVMTDsKICAgICBBaW9Db250
-ZXh0ICpjdHg7CiAgICAgdWludDY0X3QgcGVybTsKICAgICBpbnQgcmV0OwpAQCAtMTAyLDYgKzEw
-NCwyOCBAQCBCbG9ja0V4cG9ydCAqYmxrX2V4cF9hZGQoQmxvY2tFeHBvcnRPcHRpb25zICpleHBv
-cnQsIEVycm9yICoqZXJycCkKICAgICBjdHggPSBiZHJ2X2dldF9haW9fY29udGV4dChicyk7CiAg
-ICAgYWlvX2NvbnRleHRfYWNxdWlyZShjdHgpOwogCisgICAgaWYgKGV4cG9ydC0+aGFzX2lvdGhy
-ZWFkKSB7CisgICAgICAgIElPVGhyZWFkICppb3RocmVhZDsKKyAgICAgICAgQWlvQ29udGV4dCAq
-bmV3X2N0eDsKKworICAgICAgICBpb3RocmVhZCA9IGlvdGhyZWFkX2J5X2lkKGV4cG9ydC0+aW90
-aHJlYWQpOworICAgICAgICBpZiAoIWlvdGhyZWFkKSB7CisgICAgICAgICAgICBlcnJvcl9zZXRn
-KGVycnAsICJpb3RocmVhZCBcIiVzXCIgbm90IGZvdW5kIiwgZXhwb3J0LT5pb3RocmVhZCk7Cisg
-ICAgICAgICAgICBnb3RvIGZhaWw7CisgICAgICAgIH0KKworICAgICAgICBuZXdfY3R4ID0gaW90
-aHJlYWRfZ2V0X2Fpb19jb250ZXh0KGlvdGhyZWFkKTsKKworICAgICAgICByZXQgPSBiZHJ2X3Ry
-eV9zZXRfYWlvX2NvbnRleHQoYnMsIG5ld19jdHgsIGVycnApOworICAgICAgICBpZiAocmV0ID09
-IDApIHsKKyAgICAgICAgICAgIGFpb19jb250ZXh0X3JlbGVhc2UoY3R4KTsKKyAgICAgICAgICAg
-IGFpb19jb250ZXh0X2FjcXVpcmUobmV3X2N0eCk7CisgICAgICAgICAgICBjdHggPSBuZXdfY3R4
-OworICAgICAgICB9IGVsc2UgaWYgKGZpeGVkX2lvdGhyZWFkKSB7CisgICAgICAgICAgICBnb3Rv
-IGZhaWw7CisgICAgICAgIH0KKyAgICB9CisKICAgICAvKgogICAgICAqIEJsb2NrIGV4cG9ydHMg
-YXJlIHVzZWQgZm9yIG5vbi1zaGFyZWQgc3RvcmFnZSBtaWdyYXRpb24uIE1ha2Ugc3VyZQogICAg
-ICAqIHRoYXQgQkRSVl9PX0lOQUNUSVZFIGlzIGNsZWFyZWQgYW5kIHRoZSBpbWFnZSBpcyByZWFk
-eSBmb3Igd3JpdGUKQEAgLTExNiw2ICsxNDAsMTEgQEAgQmxvY2tFeHBvcnQgKmJsa19leHBfYWRk
-KEJsb2NrRXhwb3J0T3B0aW9ucyAqZXhwb3J0LCBFcnJvciAqKmVycnApCiAgICAgfQogCiAgICAg
-YmxrID0gYmxrX25ldyhjdHgsIHBlcm0sIEJMS19QRVJNX0FMTCk7CisKKyAgICBpZiAoIWZpeGVk
-X2lvdGhyZWFkKSB7CisgICAgICAgIGJsa19zZXRfYWxsb3dfYWlvX2NvbnRleHRfY2hhbmdlKGJs
-aywgdHJ1ZSk7CisgICAgfQorCiAgICAgcmV0ID0gYmxrX2luc2VydF9icyhibGssIGJzLCBlcnJw
-KTsKICAgICBpZiAocmV0IDwgMCkgewogICAgICAgICBnb3RvIGZhaWw7CmRpZmYgLS1naXQgYS9i
-bG9jay9leHBvcnQvdmhvc3QtdXNlci1ibGstc2VydmVyLmMgYi9ibG9jay9leHBvcnQvdmhvc3Qt
-dXNlci1ibGstc2VydmVyLmMKaW5kZXggZjcwMjFjYmQ3Yi4uMjg2ZWI1ZmI5YSAxMDA2NDQKLS0t
-IGEvYmxvY2svZXhwb3J0L3Zob3N0LXVzZXItYmxrLXNlcnZlci5jCisrKyBiL2Jsb2NrL2V4cG9y
-dC92aG9zdC11c2VyLWJsay1zZXJ2ZXIuYwpAQCAtMzIzLDEzICszMjMsMTcgQEAgc3RhdGljIGNv
-bnN0IFZ1RGV2SWZhY2UgdnVfYmxrX2lmYWNlID0gewogc3RhdGljIHZvaWQgYmxrX2Fpb19hdHRh
-Y2hlZChBaW9Db250ZXh0ICpjdHgsIHZvaWQgKm9wYXF1ZSkKIHsKICAgICBWdUJsa0V4cG9ydCAq
-dmV4cCA9IG9wYXF1ZTsKKworICAgIHZleHAtPmV4cG9ydC5jdHggPSBjdHg7CiAgICAgdmhvc3Rf
-dXNlcl9zZXJ2ZXJfYXR0YWNoX2Fpb19jb250ZXh0KCZ2ZXhwLT52dV9zZXJ2ZXIsIGN0eCk7CiB9
-CiAKIHN0YXRpYyB2b2lkIGJsa19haW9fZGV0YWNoKHZvaWQgKm9wYXF1ZSkKIHsKICAgICBWdUJs
-a0V4cG9ydCAqdmV4cCA9IG9wYXF1ZTsKKwogICAgIHZob3N0X3VzZXJfc2VydmVyX2RldGFjaF9h
-aW9fY29udGV4dCgmdmV4cC0+dnVfc2VydmVyKTsKKyAgICB2ZXhwLT5leHBvcnQuY3R4ID0gTlVM
-TDsKIH0KIAogc3RhdGljIHZvaWQKQEAgLTM4NCw3ICszODgsNiBAQCBzdGF0aWMgaW50IHZ1X2Js
-a19leHBfY3JlYXRlKEJsb2NrRXhwb3J0ICpleHAsIEJsb2NrRXhwb3J0T3B0aW9ucyAqb3B0cywK
-ICAgICB2dV9ibGtfaW5pdGlhbGl6ZV9jb25maWcoYmxrX2JzKGV4cC0+YmxrKSwgJnZleHAtPmJs
-a2NmZywKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBsb2dpY2FsX2Jsb2NrX3NpemUp
-OwogCi0gICAgYmxrX3NldF9hbGxvd19haW9fY29udGV4dF9jaGFuZ2UoZXhwLT5ibGssIHRydWUp
-OwogICAgIGJsa19hZGRfYWlvX2NvbnRleHRfbm90aWZpZXIoZXhwLT5ibGssIGJsa19haW9fYXR0
-YWNoZWQsIGJsa19haW9fZGV0YWNoLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-dmV4cCk7CiAKZGlmZiAtLWdpdCBhL25iZC9zZXJ2ZXIuYyBiL25iZC9zZXJ2ZXIuYwppbmRleCBl
-NzVjODI1ODc5Li4wOGI2MjFmNzBhIDEwMDY0NAotLS0gYS9uYmQvc2VydmVyLmMKKysrIGIvbmJk
-L3NlcnZlci5jCkBAIC0xNTE3LDggKzE1MTcsNiBAQCBzdGF0aWMgaW50IG5iZF9leHBvcnRfY3Jl
-YXRlKEJsb2NrRXhwb3J0ICpibGtfZXhwLCBCbG9ja0V4cG9ydE9wdGlvbnMgKmV4cF9hcmdzLAog
-ICAgICAgICByZXR1cm4gcmV0OwogICAgIH0KIAotICAgIGJsa19zZXRfYWxsb3dfYWlvX2NvbnRl
-eHRfY2hhbmdlKGJsaywgdHJ1ZSk7Ci0KICAgICBRVEFJTFFfSU5JVCgmZXhwLT5jbGllbnRzKTsK
-ICAgICBleHAtPm5hbWUgPSBnX3N0cmR1cChhcmctPm5hbWUpOwogICAgIGV4cC0+ZGVzY3JpcHRp
-b24gPSBnX3N0cmR1cChhcmctPmRlc2NyaXB0aW9uKTsKLS0gCjIuMjYuMgoK
+Added helper functions to get IOMMU info capability chain.
+Added function to get migration capability information from that
+capability chain for IOMMU container.
+
+Similar change was proposed earlier:
+https://lists.gnu.org/archive/html/qemu-devel/2018-05/msg03759.html
+
+Disable migration for devices if IOMMU module doesn't support migration
+capability.
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Cc: Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>
+Cc: Eric Auger <eric.auger@redhat.com>
+---
+ hw/vfio/common.c              | 90 +++++++++++++++++++++++++++++++++++++++----
+ hw/vfio/migration.c           |  7 +++-
+ include/hw/vfio/vfio-common.h |  3 ++
+ 3 files changed, 91 insertions(+), 9 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index c6e98b8d61be..d4959c036dd1 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -1228,6 +1228,75 @@ static int vfio_init_container(VFIOContainer *container, int group_fd,
+     return 0;
+ }
+ 
++static int vfio_get_iommu_info(VFIOContainer *container,
++                               struct vfio_iommu_type1_info **info)
++{
++
++    size_t argsz = sizeof(struct vfio_iommu_type1_info);
++
++    *info = g_new0(struct vfio_iommu_type1_info, 1);
++again:
++    (*info)->argsz = argsz;
++
++    if (ioctl(container->fd, VFIO_IOMMU_GET_INFO, *info)) {
++        g_free(*info);
++        *info = NULL;
++        return -errno;
++    }
++
++    if (((*info)->argsz > argsz)) {
++        argsz = (*info)->argsz;
++        *info = g_realloc(*info, argsz);
++        goto again;
++    }
++
++    return 0;
++}
++
++static struct vfio_info_cap_header *
++vfio_get_iommu_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
++{
++    struct vfio_info_cap_header *hdr;
++    void *ptr = info;
++
++    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
++        return NULL;
++    }
++
++    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
++        if (hdr->id == id) {
++            return hdr;
++        }
++    }
++
++    return NULL;
++}
++
++static void vfio_get_iommu_info_migration(VFIOContainer *container,
++                                         struct vfio_iommu_type1_info *info)
++{
++    struct vfio_info_cap_header *hdr;
++    struct vfio_iommu_type1_info_cap_migration *cap_mig;
++
++    hdr = vfio_get_iommu_info_cap(info, VFIO_IOMMU_TYPE1_INFO_CAP_MIGRATION);
++    if (!hdr) {
++        return;
++    }
++
++    cap_mig = container_of(hdr, struct vfio_iommu_type1_info_cap_migration,
++                            header);
++
++    /*
++     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
++     * TARGET_PAGE_SIZE to mark those dirty.
++     */
++    if (cap_mig->pgsize_bitmap & TARGET_PAGE_SIZE) {
++        container->dirty_pages_supported = true;
++        container->max_dirty_bitmap_size = cap_mig->max_dirty_bitmap_size;
++        container->dirty_pgsizes = cap_mig->pgsize_bitmap;
++    }
++}
++
+ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+                                   Error **errp)
+ {
+@@ -1297,6 +1366,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     container->space = space;
+     container->fd = fd;
+     container->error = NULL;
++    container->dirty_pages_supported = false;
+     QLIST_INIT(&container->giommu_list);
+     QLIST_INIT(&container->hostwin_list);
+ 
+@@ -1309,7 +1379,7 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+     case VFIO_TYPE1v2_IOMMU:
+     case VFIO_TYPE1_IOMMU:
+     {
+-        struct vfio_iommu_type1_info info;
++        struct vfio_iommu_type1_info *info;
+ 
+         /*
+          * FIXME: This assumes that a Type1 IOMMU can map any 64-bit
+@@ -1318,15 +1388,19 @@ static int vfio_connect_container(VFIOGroup *group, AddressSpace *as,
+          * existing Type1 IOMMUs generally support any IOVA we're
+          * going to actually try in practice.
+          */
+-        info.argsz = sizeof(info);
+-        ret = ioctl(fd, VFIO_IOMMU_GET_INFO, &info);
+-        /* Ignore errors */
+-        if (ret || !(info.flags & VFIO_IOMMU_INFO_PGSIZES)) {
++        ret = vfio_get_iommu_info(container, &info);
++
++        if (ret || !(info->flags & VFIO_IOMMU_INFO_PGSIZES)) {
+             /* Assume 4k IOVA page size */
+-            info.iova_pgsizes = 4096;
++            info->iova_pgsizes = 4096;
+         }
+-        vfio_host_win_add(container, 0, (hwaddr)-1, info.iova_pgsizes);
+-        container->pgsizes = info.iova_pgsizes;
++        vfio_host_win_add(container, 0, (hwaddr)-1, info->iova_pgsizes);
++        container->pgsizes = info->iova_pgsizes;
++
++        if (!ret) {
++            vfio_get_iommu_info_migration(container, info);
++        }
++        g_free(info);
+         break;
+     }
+     case VFIO_SPAPR_TCE_v2_IOMMU:
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 46d05d230e2a..ea5e0f1b8489 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -828,9 +828,14 @@ err:
+ 
+ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+ {
++    VFIOContainer *container = vbasedev->group->container;
+     struct vfio_region_info *info = NULL;
+     Error *local_err = NULL;
+-    int ret;
++    int ret = -ENOTSUP;
++
++    if (!container->dirty_pages_supported) {
++        goto add_blocker;
++    }
+ 
+     ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
+                                    VFIO_REGION_SUBTYPE_MIGRATION, &info);
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index f4ebdae013ad..b1c1b18fd228 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -84,6 +84,9 @@ typedef struct VFIOContainer {
+     unsigned iommu_type;
+     Error *error;
+     bool initialized;
++    bool dirty_pages_supported;
++    uint64_t dirty_pgsizes;
++    uint64_t max_dirty_bitmap_size;
+     unsigned long pgsizes;
+     QLIST_HEAD(, VFIOGuestIOMMU) giommu_list;
+     QLIST_HEAD(, VFIOHostDMAWindow) hostwin_list;
+-- 
+2.7.0
 
 
