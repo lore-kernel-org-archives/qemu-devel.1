@@ -2,91 +2,68 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.2 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,GAPPY_SUBJECT,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DATE_IN_PAST_03_06,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1A61C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:08:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65C86C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:08:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CE05223BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:08:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qiq7Drf2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CE05223BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id EE98920936
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 08:08:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EE98920936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37024 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37126 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVVdo-0004gI-Vf
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 04:08:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42426)
+	id 1kVVdq-0004jA-1t
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 04:08:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42724)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kVVag-0008AI-20; Thu, 22 Oct 2020 04:04:54 -0400
-Received: from mail-lf1-x134.google.com ([2a00:1450:4864:20::134]:38589)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <baturo.alexey@gmail.com>)
- id 1kVVac-0006v1-DE; Thu, 22 Oct 2020 04:04:53 -0400
-Received: by mail-lf1-x134.google.com with SMTP id c141so1104165lfg.5;
- Thu, 22 Oct 2020 01:04:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=Lc9QIvOC4BQ5aEV3wggBnbdGYDm7vcPEJjFI1O17k4M=;
- b=Qiq7Drf2laNmiX53MT2AsQNeoyksKO5LlNs4Q14aVx6oeRd4ZJjsmvGVpnqVR2cvSA
- 5JzHfIwGMZeTFZn6Kgfu8QyCPIH2tQxuYAOyd24gm1mfNOFOMp2bG/d1Ef1V45CI6NYh
- 8fi+cl9TWL3HI512PtGcMqkLBGbb7+WQCUuCzVhvsL9j3aj3jaocBdbp5w3Ll/tfwdk6
- QTIGxOE1Khw468VyFfIhPBdChqrY6JE4CNXEDqBnyQLhhvRUvV839YxPn9cMahuHbFOR
- b5qUuvhrnx1Xi3jqkvf/ydSVXdNd0x4NMuVBDvl41kDWnV1qEwjs/OCZfGU/KiqZz1+j
- wR9A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Lc9QIvOC4BQ5aEV3wggBnbdGYDm7vcPEJjFI1O17k4M=;
- b=nM3bV3a6WFjkw5E2bS9KEk7DPdimK+KG0hSIpPyBiB40kyp4iuIkdNa1FMhBVosX/s
- uL7CzK6XJDomGTGBroig5u8fMoHDFY8jaOPfjuQNktw9rAXDO9KvUUlF34Qz9rYuEwxc
- HtPvupw6hRl/EE3cNbesF11HKg4EgDXLAd1Xyoh5pLRVy5A+ESHAB6yVrKEaEq0vmm30
- /5D/uu7G+33T58e+T/zTnzlfpA2vswu9oOUseeiIoiFEhb/XVls0hDIzXusJaP0ylOKz
- L2wrDK5W9GnIx40FWSwLz9lDDkfbTk1J06c7wfz/rT56TCE9NvOOmLLMUSVhwgIccpbO
- AjsA==
-X-Gm-Message-State: AOAM532V5PkLuxxU32aO7pYVf1wEsjQmiMhFLivMayd6pmgY8J44jcr5
- md8mkAUaHXGScZ5N+63QsfA=
-X-Google-Smtp-Source: ABdhPJzSKorU8kpeaFyMx56TGdt63GmRnPbz3Rl73E0quPJxpn8lZAvNc9QbiCyXPrhA4K7jaqkUfA==
-X-Received: by 2002:ac2:44bb:: with SMTP id c27mr390201lfm.223.1603353887237; 
- Thu, 22 Oct 2020 01:04:47 -0700 (PDT)
-Received: from neptune.lab ([46.39.229.104])
- by smtp.googlemail.com with ESMTPSA id l8sm143682lfk.203.2020.10.22.01.04.46
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 22 Oct 2020 01:04:46 -0700 (PDT)
-From: Alexey Baturo <baturo.alexey@gmail.com>
-X-Google-Original-From: Alexey Baturo <space.monkey.delivers@gmail.com>
-To: 
-Subject: [PATCH v6 4/6] [RISCV_PM] Support pointer masking for RISC-V for
- i/c/f/d/a types of instructions
-Date: Thu, 22 Oct 2020 11:04:38 +0300
-Message-Id: <20201022080440.10069-5-space.monkey.delivers@gmail.com>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201022080440.10069-1-space.monkey.delivers@gmail.com>
-References: <20201022080440.10069-1-space.monkey.delivers@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::134;
- envelope-from=baturo.alexey@gmail.com; helo=mail-lf1-x134.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+ (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
+ id 1kVVbh-0001aJ-TB
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:05:57 -0400
+Received: from mga12.intel.com ([192.55.52.136]:38762)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <luwei.kang@intel.com>)
+ id 1kVVbe-0007JK-Uu
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 04:05:57 -0400
+IronPort-SDR: IM5g/lqCN+NeXTqdy8pS4WbRPy7WxL12hbDPkbMaxMqHY8myAUzxuqczmXdEKXAQcGcc2CWa0T
+ NNTfnmdsaaqQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9781"; a="146781853"
+X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; d="scan'208";a="146781853"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+ by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 22 Oct 2020 01:05:49 -0700
+IronPort-SDR: k14XtTapjmKLOa6BMnS2F5bJ/PmZ1K3rw6SOZZwc345LdLYChOsC4D+mo6+DO1ftatLCadcAib
+ 0Gg3clNXJwNQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.77,404,1596524400"; d="scan'208";a="524188772"
+Received: from snr.bj.intel.com ([10.240.192.237])
+ by fmsmga005.fm.intel.com with ESMTP; 22 Oct 2020 01:05:47 -0700
+From: Luwei Kang <luwei.kang@intel.com>
+To: pbonzini@redhat.com,
+	rth@twiddle.net,
+	ehabkost@redhat.com
+Subject: [PATCH] i386/cpu: Expose the PTWRITE to the guest
+Date: Thu, 22 Oct 2020 12:01:22 +0800
+Message-Id: <20201022040122.30086-1-luwei.kang@intel.com>
+X-Mailer: git-send-email 2.18.4
+Received-SPF: pass client-ip=192.55.52.136; envelope-from=luwei.kang@intel.com;
+ helo=mga12.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:05:49
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -25
+X-Spam_score: -2.6
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- GAPPY_SUBJECT=0.1, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DATE_IN_PAST_03_06=1.592,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,165 +77,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: baturo.alexey@gmail.com, qemu-riscv@nongnu.org, sagark@eecs.berkeley.edu,
- kbastian@mail.uni-paderborn.de, richard.henderson@linaro.org,
- qemu-devel@nongnu.org, space.monkey.delivers@gmail.com,
- Alistair.Francis@wdc.com, kupokupokupopo@gmail.com, palmer@dabbelt.com
+Cc: Luwei Kang <luwei.kang@intel.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alexey Baturo <space.monkey.delivers@gmail.com>
----
- target/riscv/insn_trans/trans_rva.c.inc |  3 +++
- target/riscv/insn_trans/trans_rvd.c.inc |  2 ++
- target/riscv/insn_trans/trans_rvf.c.inc |  2 ++
- target/riscv/insn_trans/trans_rvi.c.inc |  2 ++
- target/riscv/translate.c                | 14 ++++++++++++++
- 5 files changed, 23 insertions(+)
+PTWRITE provides a mechanism by which software can instrument the
+Intel PT trace. The current implementation will mask off this
+feature when the PTWRITE is supported on the host because of the
+Intel PT CPUID is a constant value(ICX CPUID) in qemu. This patch
+will expose the PTWRITE feature to the guest.
 
-diff --git a/target/riscv/insn_trans/trans_rva.c.inc b/target/riscv/insn_trans/trans_rva.c.inc
-index be8a9f06dd..5559e347ba 100644
---- a/target/riscv/insn_trans/trans_rva.c.inc
-+++ b/target/riscv/insn_trans/trans_rva.c.inc
-@@ -26,6 +26,7 @@ static inline bool gen_lr(DisasContext *ctx, arg_atomic *a, MemOp mop)
-     if (a->rl) {
-         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_STRL);
-     }
-+    gen_pm_adjust_address(ctx, src1, src1);
-     tcg_gen_qemu_ld_tl(load_val, src1, ctx->mem_idx, mop);
-     if (a->aq) {
-         tcg_gen_mb(TCG_MO_ALL | TCG_BAR_LDAQ);
-@@ -46,6 +47,7 @@ static inline bool gen_sc(DisasContext *ctx, arg_atomic *a, MemOp mop)
-     TCGLabel *l2 = gen_new_label();
+Signed-off-by: Luwei Kang <luwei.kang@intel.com>
+---
+ target/i386/cpu.c | 24 ++++++++++++++++++++++++
+ target/i386/cpu.h |  4 ++++
+ 2 files changed, 28 insertions(+)
+
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index aeabdd5bd4..242ba8a870 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -672,6 +672,7 @@ static void x86_cpu_vendor_words2str(char *dst, uint32_t vendor1,
+ #define TCG_XSAVE_FEATURES (CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XGETBV1)
+           /* missing:
+           CPUID_XSAVE_XSAVEC, CPUID_XSAVE_XSAVES */
++#define TCG_14_0_EBX_FEATURES 0
+ #define TCG_14_0_ECX_FEATURES 0
  
-     gen_get_gpr(src1, a->rs1);
-+    gen_pm_adjust_address(ctx, src1, src1);
-     tcg_gen_brcond_tl(TCG_COND_NE, load_res, src1, l1);
+ typedef enum FeatureWordType {
+@@ -1302,6 +1303,26 @@ static FeatureWordInfo feature_word_info[FEATURE_WORDS] = {
+         }
+     },
  
-     gen_get_gpr(src2, a->rs2);
-@@ -91,6 +93,7 @@ static bool gen_amo(DisasContext *ctx, arg_atomic *a,
-     gen_get_gpr(src1, a->rs1);
-     gen_get_gpr(src2, a->rs2);
- 
-+    gen_pm_adjust_address(ctx, src1, src1);
-     (*func)(src2, src1, src2, ctx->mem_idx, mop);
- 
-     gen_set_gpr(a->rd, src2);
-diff --git a/target/riscv/insn_trans/trans_rvd.c.inc b/target/riscv/insn_trans/trans_rvd.c.inc
-index 4f832637fa..935342f66d 100644
---- a/target/riscv/insn_trans/trans_rvd.c.inc
-+++ b/target/riscv/insn_trans/trans_rvd.c.inc
-@@ -25,6 +25,7 @@ static bool trans_fld(DisasContext *ctx, arg_fld *a)
-     TCGv t0 = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEQ);
- 
-@@ -40,6 +41,7 @@ static bool trans_fsd(DisasContext *ctx, arg_fsd *a)
-     TCGv t0 = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEQ);
- 
-diff --git a/target/riscv/insn_trans/trans_rvf.c.inc b/target/riscv/insn_trans/trans_rvf.c.inc
-index 3dfec8211d..04b3c3eb3d 100644
---- a/target/riscv/insn_trans/trans_rvf.c.inc
-+++ b/target/riscv/insn_trans/trans_rvf.c.inc
-@@ -30,6 +30,7 @@ static bool trans_flw(DisasContext *ctx, arg_flw *a)
-     TCGv t0 = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     tcg_gen_qemu_ld_i64(cpu_fpr[a->rd], t0, ctx->mem_idx, MO_TEUL);
-     gen_nanbox_s(cpu_fpr[a->rd], cpu_fpr[a->rd]);
-@@ -47,6 +48,7 @@ static bool trans_fsw(DisasContext *ctx, arg_fsw *a)
-     gen_get_gpr(t0, a->rs1);
- 
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     tcg_gen_qemu_st_i64(cpu_fpr[a->rs2], t0, ctx->mem_idx, MO_TEUL);
- 
-diff --git a/target/riscv/insn_trans/trans_rvi.c.inc b/target/riscv/insn_trans/trans_rvi.c.inc
-index d04ca0394c..bee7f6be46 100644
---- a/target/riscv/insn_trans/trans_rvi.c.inc
-+++ b/target/riscv/insn_trans/trans_rvi.c.inc
-@@ -141,6 +141,7 @@ static bool gen_load(DisasContext *ctx, arg_lb *a, MemOp memop)
-     TCGv t1 = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     tcg_gen_qemu_ld_tl(t1, t0, ctx->mem_idx, memop);
-     gen_set_gpr(a->rd, t1);
-@@ -180,6 +181,7 @@ static bool gen_store(DisasContext *ctx, arg_sb *a, MemOp memop)
-     TCGv dat = tcg_temp_new();
-     gen_get_gpr(t0, a->rs1);
-     tcg_gen_addi_tl(t0, t0, a->imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
-     gen_get_gpr(dat, a->rs2);
- 
-     tcg_gen_qemu_st_tl(dat, t0, ctx->mem_idx, memop);
-diff --git a/target/riscv/translate.c b/target/riscv/translate.c
-index 79dca2291b..a7cbf909f3 100644
---- a/target/riscv/translate.c
-+++ b/target/riscv/translate.c
-@@ -101,6 +101,16 @@ static void gen_nanbox_s(TCGv_i64 out, TCGv_i64 in)
-     tcg_gen_ori_i64(out, in, MAKE_64BIT_MASK(32, 32));
- }
- 
-+/*
-+ * Temp stub: generates address adjustment for PointerMasking
-+ */
-+static void gen_pm_adjust_address(DisasContext *s,
-+                                  TCGv_i64      dst,
-+                                  TCGv_i64      src)
-+{
-+    tcg_gen_mov_i64(dst, src);
-+}
++    [FEAT_14_0_EBX] = {
++        .type = CPUID_FEATURE_WORD,
++        .feat_names = {
++            NULL, NULL, NULL, NULL,
++            "ptwrite", NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++            NULL, NULL, NULL, NULL,
++        },
++        .cpuid = {
++            .eax = 0x14,
++            .needs_ecx = true, .ecx = 0,
++            .reg = R_EBX,
++        },
++        .tcg_features = TCG_14_0_EBX_FEATURES,
++    },
 +
- /*
-  * A narrow n-bit operation, where n < FLEN, checks that input operands
-  * are correctly Nan-boxed, i.e., all upper FLEN - n bits are 1.
-@@ -380,6 +390,7 @@ static void gen_load_c(DisasContext *ctx, uint32_t opc, int rd, int rs1,
-     TCGv t1 = tcg_temp_new();
-     gen_get_gpr(t0, rs1);
-     tcg_gen_addi_tl(t0, t0, imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
-     int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
+     [FEAT_14_0_ECX] = {
+         .type = CPUID_FEATURE_WORD,
+         .feat_names = {
+@@ -5764,6 +5785,9 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
+             *eax = INTEL_PT_MAX_SUBLEAF;
+             *ebx = INTEL_PT_MINIMAL_EBX;
+             *ecx = INTEL_PT_MINIMAL_ECX;
++            if (env->features[FEAT_14_0_EBX] & CPUID_14_0_EBX_PTWRITE) {
++                *ebx |= CPUID_14_0_EBX_PTWRITE;
++            }
+             if (env->features[FEAT_14_0_ECX] & CPUID_14_0_ECX_LIP) {
+                 *ecx |= CPUID_14_0_ECX_LIP;
+             }
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index 1fcd93e39a..9fffe6eb6f 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -541,6 +541,7 @@ typedef enum FeatureWord {
+     FEAT_VMX_EPT_VPID_CAPS,
+     FEAT_VMX_BASIC,
+     FEAT_VMX_VMFUNC,
++    FEAT_14_0_EBX,
+     FEAT_14_0_ECX,
+     FEATURE_WORDS,
+ } FeatureWord;
+@@ -798,6 +799,9 @@ typedef uint64_t FeatureWordArray[FEATURE_WORDS];
+ /* AVX512 BFloat16 Instruction */
+ #define CPUID_7_1_EAX_AVX512_BF16       (1U << 5)
  
-     if (memop < 0) {
-@@ -400,6 +411,7 @@ static void gen_store_c(DisasContext *ctx, uint32_t opc, int rs1, int rs2,
-     TCGv dat = tcg_temp_new();
-     gen_get_gpr(t0, rs1);
-     tcg_gen_addi_tl(t0, t0, imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
-     gen_get_gpr(dat, rs2);
-     int memop = tcg_memop_lookup[(opc >> 12) & 0x7];
++/* Intel PT support PTWRITE */
++#define CPUID_14_0_EBX_PTWRITE          (1U << 4)
++
+ /* Packets which contain IP payload have LIP values */
+ #define CPUID_14_0_ECX_LIP              (1U << 31)
  
-@@ -459,6 +471,7 @@ static void gen_fp_load(DisasContext *ctx, uint32_t opc, int rd,
-     t0 = tcg_temp_new();
-     gen_get_gpr(t0, rs1);
-     tcg_gen_addi_tl(t0, t0, imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     switch (opc) {
-     case OPC_RISC_FLW:
-@@ -498,6 +511,7 @@ static void gen_fp_store(DisasContext *ctx, uint32_t opc, int rs1,
-     t0 = tcg_temp_new();
-     gen_get_gpr(t0, rs1);
-     tcg_gen_addi_tl(t0, t0, imm);
-+    gen_pm_adjust_address(ctx, t0, t0);
- 
-     switch (opc) {
-     case OPC_RISC_FSW:
 -- 
-2.20.1
+2.18.4
 
 
