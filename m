@@ -2,106 +2,115 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69DE0C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C56C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:55:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90920223BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:33:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2300C223FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:55:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="p7EwxAe5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90920223BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="akK0Y08/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2300C223FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59020 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVWyT-0001d3-95
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:33:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38382)
+	id 1kVXJs-0004SC-Vu
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:55:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVWxs-0001CI-UZ
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:32:56 -0400
-Received: from aserp2120.oracle.com ([141.146.126.78]:34886)
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1kVXJ3-0003uY-T9; Thu, 22 Oct 2020 05:54:50 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:18522)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVWxq-0005OP-Vt
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:32:56 -0400
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
- by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M9SjOo103032;
- Thu, 22 Oct 2020 09:32:51 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=PpHkrQWGQ52EFuf2dejkCEHGVDWX23AjfS+zSHupCMc=;
- b=p7EwxAe52G+1DBWtOSBashvnhkXhXzzKjpycIaHsb+zwSVDrUr1qrXr+MkQ9gIjVjmEe
- Anr7glFdYQIKUzekYzHyIfFhJaF4M3WseQyV9OHjv44/X+sOWNTfZD1jcmiMuoyZUDar
- YLe+UaGYjj0ohma/jGuuTrYKtCzYPSGYCOixpe0z1ySatNAxqvPOoY85gK2BilSlQWzu
- Tm7PcZDCvPt+prZCubJL9Vxad1P0JwBpIy6lLbBFzf++sN+vyDYW/AMA4tkpot7Nx3+5
- kVsoel/mVbALLWQI1oSRbhQT934a1rJc0xragbLhExh339C7/MylgXrf50gOchFSPcqu 0w== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by aserp2120.oracle.com with ESMTP id 349jrpw34n-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 22 Oct 2020 09:32:51 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M9V2wX153539;
- Thu, 22 Oct 2020 09:32:51 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 348ahyjqyg-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 22 Oct 2020 09:32:51 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09M9WnFY032335;
- Thu, 22 Oct 2020 09:32:49 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 22 Oct 2020 02:32:49 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 88E861D6E206; Thu, 22 Oct 2020 10:32:43 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 16/16] scripts/oss-fuzz: remove the generic-fuzz target
-In-Reply-To: <20201021210922.572955-17-alxndr@bu.edu>
-References: <20201021210922.572955-1-alxndr@bu.edu>
- <20201021210922.572955-17-alxndr@bu.edu>
-Date: Thu, 22 Oct 2020 10:32:43 +0100
-Message-ID: <m2o8ku7ghw.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <pasic@linux.ibm.com>)
+ id 1kVXIz-0004ma-Pd; Thu, 22 Oct 2020 05:54:49 -0400
+Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09M9XULS182304; Thu, 22 Oct 2020 05:54:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=date : from : to : cc :
+ subject : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=iiOxbqSYs3Den1G8WZBAjpPVL8ixID24++LhoOZQlUs=;
+ b=akK0Y08/1iprbaPNGTEiBfmsi2kHVFP4mgIoiJTR/kDEfh8EGuXJymVjlKyOx001KoQg
+ Ud/rA4wUpu3oRXUV6ai+Hegs+mOV0Oq1EsFlKRZo2CMR8fXmDNEtjVhPodT6MZye746S
+ X6Y+vS0xQpVh6/QuK9qOCtTtX5Yx1IyKDxmIALWYmj6LQ13wr+7+vRGG83MUvN2q5AVb
+ 82s9W31+w4KjAWwDKUGXo+Nr5tEBUCZfoKbInPgzSOiqUoPBW8tWzENAwtsco370IJGG
+ KOCxgee3+S0v7mQ98JYsLzLLpGgwRNzbLlMIcC8QvsiflvR69socKetiecbBkukO4N5h lg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34b0vrk1wf-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 22 Oct 2020 05:54:43 -0400
+Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09M9XjGq183637;
+ Thu, 22 Oct 2020 05:54:42 -0400
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com
+ [159.122.73.70])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34b0vrk1vv-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 22 Oct 2020 05:54:42 -0400
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+ by ppma01fra.de.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09M9m0ns006035;
+ Thu, 22 Oct 2020 09:54:40 GMT
+Received: from b06cxnps3075.portsmouth.uk.ibm.com
+ (d06relay10.portsmouth.uk.ibm.com [9.149.109.195])
+ by ppma01fra.de.ibm.com with ESMTP id 347r882r8h-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Thu, 22 Oct 2020 09:54:40 +0000
+Received: from d06av21.portsmouth.uk.ibm.com (d06av21.portsmouth.uk.ibm.com
+ [9.149.105.232])
+ by b06cxnps3075.portsmouth.uk.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09M9sbOa33030460
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Thu, 22 Oct 2020 09:54:37 GMT
+Received: from d06av21.portsmouth.uk.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id B3B5952051;
+ Thu, 22 Oct 2020 09:54:37 +0000 (GMT)
+Received: from oc2783563651 (unknown [9.145.38.109])
+ by d06av21.portsmouth.uk.ibm.com (Postfix) with ESMTP id 3E4485204F;
+ Thu, 22 Oct 2020 09:54:37 +0000 (GMT)
+Date: Thu, 22 Oct 2020 11:54:30 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH] s390x: pv: Fix diag318 PV fencing
+Message-ID: <20201022115430.507743ed.pasic@linux.ibm.com>
+In-Reply-To: <20201022082312.124708-1-frankja@linux.ibm.com>
+References: <74c4631b-735c-e5ad-77a3-0bbd9c63c4db@redhat.com>
+ <20201022082312.124708-1-frankja@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.11.1 (GTK+ 2.24.31; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- phishscore=0 bulkscore=0
- malwarescore=0 spamscore=0 mlxlogscore=999 mlxscore=0 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010220063
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- lowpriorityscore=0
- priorityscore=1501 impostorscore=0 adultscore=0 bulkscore=0 malwarescore=0
- mlxlogscore=999 mlxscore=0 spamscore=0 suspectscore=2 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010220063
-Received-SPF: pass client-ip=141.146.126.78;
- envelope-from=darren.kenny@oracle.com; helo=aserp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:25:28
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
+ definitions=2020-10-22_02:2020-10-20,
+ 2020-10-22 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ spamscore=0 clxscore=1015
+ lowpriorityscore=0 suspectscore=0 impostorscore=0 malwarescore=0
+ mlxscore=0 adultscore=0 mlxlogscore=999 phishscore=0 bulkscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010220061
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=pasic@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:23:26
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
+X-Spam_bar: --
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,72 +123,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, f4bug@amsat.org,
- Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com, stefanha@redhat.com,
- pbonzini@redhat.com, dimastep@yandex-team.ru
+Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com,
+ qemu-devel@nongnu.org, borntraeger@de.ibm.com, qemu-s390x@nongnu.org,
+ mhartmay@linux.ibm.com, walling@linux.ibm.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alex,
+On Thu, 22 Oct 2020 04:23:12 -0400
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-On Wednesday, 2020-10-21 at 17:09:22 -04, Alexander Bulekov wrote:
-> generic-fuzz is not a standalone fuzzer - it requires some env variables
-> to be set. On oss-fuzz, we set these with some predefined
-> generic-fuzz-{...} targets, that are thin wrappers around generic-fuzz.
-> Remove generic-fuzz from the oss-fuzz build, so oss-fuzz does not treat
-> it as a standalone fuzzer.
->
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> Diag318 fencing needs to be determined on the current VM PV state and
+> not on the state that the VM has when we create the CPU model.
+> 
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> Reviewed-by: Christian Borntraeger <borntraeger@de.ibm.com>
+> Fixes: fabdada935 ("s390: guest support for diagnose 0x318")
 > ---
->  scripts/oss-fuzz/build.sh | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-> index 0c3ca9e06f..37cd7f9e25 100755
-> --- a/scripts/oss-fuzz/build.sh
-> +++ b/scripts/oss-fuzz/build.sh
-> @@ -97,5 +97,11 @@ do
-
-I'm presuming that the target that you're removing is being created by
-this line, maybe we should just specifically skip it here instead?
-
-The comment below on the removal probably would still apply though.
-
->      cp qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
-
-Also, did you look into using hard-links, or even sym-links - they would
-require less duplication of the binaries, which may be important, or may
-not, and quicker creation too, e.g.
-
-      ln qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
-
-It's something that has been done for years, for example if you do:
-
-      ls -il /sbin/{e2fsck,fsck.ext*}
-
-you will see they share the same inode. Similarly for vi and ex, they
-use symlinks (hardlinks on some OSes, but seems not Linux):
-
-      ls -il /bin/{vi,ex}
-
-The main point is that argv[0] will be the name of link itself, not the
-thing pointed to.
-
-Thanks,
-
-Darren.
-
->  done
+> 
+> If you're sure that this is what you want, then I'll send a v2 of the
+> patch set.
+> 
+> ---
+>  target/s390x/cpu_features.c | 5 +++++
+>  target/s390x/cpu_features.h | 4 ++++
+>  target/s390x/cpu_models.c   | 4 ++++
+>  target/s390x/kvm.c          | 3 +--
+>  4 files changed, 14 insertions(+), 2 deletions(-)
+> 
+> diff --git a/target/s390x/cpu_features.c b/target/s390x/cpu_features.c
+> index 31ea8df246..42fe0bf4ca 100644
+> --- a/target/s390x/cpu_features.c
+> +++ b/target/s390x/cpu_features.c
+> @@ -14,6 +14,7 @@
+>  #include "qemu/osdep.h"
+>  #include "qemu/module.h"
+>  #include "cpu_features.h"
+> +#include "hw/s390x/pv.h"
 >  
-> +# Remove the generic-fuzz target, as it requires some environment variables to
-> +# be configured. We have some generic-fuzz-{pc-q35, floppy, ...} targets that
-> +# are thin wrappers around this target that set the required environment
-> +# variables according to predefined configs.
-> +rm "$DEST_DIR/qemu-fuzz-i386-target-generic-fuzz"
+>  #define DEF_FEAT(_FEAT, _NAME, _TYPE, _BIT, _DESC) \
+>      [S390_FEAT_##_FEAT] = {                        \
+> @@ -105,6 +106,10 @@ void s390_fill_feat_block(const S390FeatBitmap features, S390FeatType type,
+>          }
+>          feat = find_next_bit(features, S390_FEAT_MAX, feat + 1);
+>      }
 > +
->  echo "Done. The fuzzers are located in $DEST_DIR"
->  exit 0
-> -- 
-> 2.28.0
+> +    if (type == S390_FEAT_TYPE_SCLP_FAC134 && s390_is_pv()) {
+> +        clear_be_bit(s390_feat_def(S390_FEAT_DIAG_318)->bit, data);
+> +    }
+>  }
+
+Sorry, I'm a little rusty with cpu models. Does this affect the outcome
+of the corresponding QMP commands?
+
+I would guess it does...
+
+Regards,
+Halil
 
