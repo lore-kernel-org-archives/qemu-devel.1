@@ -2,99 +2,86 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA25C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4080C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:48:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90D2D20BED
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:44:07 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90D2D20BED
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id 1157621D43
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:48:56 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nh1ZR8TS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1157621D43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35152 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42194 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVasv-0002xq-TB
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:44:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33794)
+	id 1kVaxb-0006BU-WB
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:48:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34192)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kVaZh-0007lM-HP; Thu, 22 Oct 2020 09:24:13 -0400
-Received: from out4-smtp.messagingengine.com ([66.111.4.28]:42525)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kVaZf-0003Ou-2V; Thu, 22 Oct 2020 09:24:13 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 4A3B75C00C4;
- Thu, 22 Oct 2020 09:24:10 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
- by compute4.internal (MEProxy); Thu, 22 Oct 2020 09:24:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=rDmengqHKe1VY
- 9G06a15wup3LUz8qjNGDmc2bf6/D5A=; b=oSrU8Nd5e+DULZOYbQP5Jkq9M8EP4
- 77YSP03NWnVsxtD7GSRRtWWPCkY+erz2TGjKU5PuVoHITvvtPTf2QS63Fw7H7gmA
- G2Dw7T6HV4VOlPlkPDePsZHkyiSt5Z5PsYI3VcLRbro2hoqrg4L9B5mRuRrV+c6S
- +z71KvlMs+TEholVaXmtzEIyw5ejaUuB9+m6xjVDQE87D2J6gMzksAw0yoZcKfXf
- tb5cXTochDMUw6tVNxQDx46u6yXHO5PfolHaSF7Dqt3/T9LZV2Kcd8kdBCkZFWpx
- whb1q6vvbE7DnYwFcxZKq4YLpBL1ml/s/c4gCBmOyAKrNZh75X3/EAOBQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=rDmengqHKe1VY9G06a15wup3LUz8qjNGDmc2bf6/D5A=; b=RnCh2yjk
- fX+Ou2E4S3+IbjW5xjCo6LA93MxhOkaVT+aGELqG2JW7SjSVOFePUaN/nePSqwBD
- z9uiY1RPSopmmh18NddsDDwdyy+HOQQ+msKLEmCi4eFULfrtLjMQn0pZW5Lt1bpS
- mQa0g4xWq0amWGNpoEvLOhwZdH+7roQ1fJLxi7lvQaoCmEWHUJvs7AMqNJRDQ1a7
- s7HWCpT2sBMYH0Z9ao2fqsEJzOX8KmNupyJ1N3sD3bq+XV4UCu8RfPGVroKz3QeG
- QRzjjAElVNz8TC7NZwI2geOYNsRB4uBn+fmwDxRGaaAH9TZ7SnDfrgtb40ZygyG9
- O6Rxphkcsf3vUA==
-X-ME-Sender: <xms:-oeRX0L54t03OH0dRC9S1vTsYa3h3GvAIb6rH4iuSxv01MPt1UodIQ>
- <xme:-oeRX0KJY7LTWtHwbE3cVCOXvn40adtoj7u6VqXcEs-O3LobffbFTLOLoO-E91aXS
- 7Pr-ZzzzImDB67eMgg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeejgdeivdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepueelteegieeuhffgkeefgfevjeeigfetkeeitdfgtdeifefhtdfhfeeuffevgfek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:-oeRX0sV6x0w5eF1Ksd7geKtoJcXTY1JJuQUsjZRL57jCE_CZhj_fw>
- <xmx:-oeRXxbfQOJFhbB0s71m1D2oQnKB1DWvW5z9ccAIlnqipAc0clKYZg>
- <xmx:-oeRX7aEmJYt97CCgYAAG9xXa4L4g1e2SWAURVZCwGSmzfDPNylfcg>
- <xmx:-oeRX2wEFJqYIOIWCInoymTOAxoRX0m6Gvfaku6eoBgT6S41aWMBDg>
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id F2D2F3064610;
- Thu, 22 Oct 2020 09:24:08 -0400 (EDT)
-From: Klaus Jensen <its@irrelevant.dk>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] nvme: fix queue identifer validation
-Date: Thu, 22 Oct 2020 15:24:04 +0200
-Message-Id: <20201022132404.190695-3-its@irrelevant.dk>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201022132404.190695-1-its@irrelevant.dk>
-References: <20201022132404.190695-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVabR-0000sz-A2
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:26:01 -0400
+Received: from mail-ej1-x636.google.com ([2a00:1450:4864:20::636]:46798)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVabM-0003mr-EQ
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:26:01 -0400
+Received: by mail-ej1-x636.google.com with SMTP id t25so2249991ejd.13
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 06:25:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=TGj3HoAw7PUUs9OQI/jw8PoEuv9IHgZCa+gYWMPA1J0=;
+ b=nh1ZR8TS1SKVfD2Gid6rDz+BdFbTmNpAdXmGyjMZZvpmp76BBfwpuvGz9mrAWdXCtV
+ 7BYhtpHRTWx7H0XaKFIYo+mMU1kS16o/GArSGds2osDWhtDWjpVoDdRLH80AskYisPvD
+ 0OIXTtwb0W2ArLuW/PAjN0EY70FSWO0dUYmsx7PQcdMuEwqT7zl3WrWopDOB9njHs/Hi
+ ikh62X7gy3Q4jXsMKBJe7VQi2SdqVpiprX0145vEOaI/M0Q1wrQLIc1j7EPPzmkcBgBo
+ 1YctpGz6QFahqrmelu9RgujoaQWXydsaASUQns0aQxXHVxgE0g8mDMNMy4JVC3u8w2Fg
+ SpOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=TGj3HoAw7PUUs9OQI/jw8PoEuv9IHgZCa+gYWMPA1J0=;
+ b=jMrXYLAYth8jpAcTQ3i34fPo1DgUQwMZUwFx6ZoKywEmOmLKCnN/RBUjU28SU+v8pr
+ +XQX/cFAUzH+By6fwLN/RWk5q1rH2cDhdZJMFZ2OXr/6lQ3+rf+Bh8AgGwXLaWuRHyKm
+ ibPiRtxBMoHJWHWk3VPNBzZ9uph8fQMvNI7P5FeoCfWIFanLCWOL7uzbQXYIGcXO5SId
+ Q9nQBB5bQU8iDl269ZpHq/CpWK8B6QFBVuzOf9x/OFsk04i6k9C32u2q5odk/t0eRUyv
+ FzoVq96iyIBgqXD2epWvuyg4R0dtnQi3A8yYkk9Uyycj+GfoBEhqYyRwtn1QUmw234G6
+ lNLQ==
+X-Gm-Message-State: AOAM533Zy2L/o/wu2duld1/QEFAevS4wwVgaqzD11yMZRjoGuFn4eOEK
+ Ef6fRO3u5UapziMVLxJpM8kCeF0t1tnN6bQq3Mnr7Q==
+X-Google-Smtp-Source: ABdhPJx9qvGsRnE3HdL19FcQspQh3+pTy8vnkZrG2RAk9Uoof0ob6EjbC009cYqCRQGclBr2wygT88Bls7EdgBAUa08=
+X-Received: by 2002:a17:906:af8d:: with SMTP id
+ mj13mr2192626ejb.85.1603373154259; 
+ Thu, 22 Oct 2020 06:25:54 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=66.111.4.28; envelope-from=its@irrelevant.dk;
- helo=out4-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:17:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+References: <20201022051223.6181-1-kraxel@redhat.com>
+In-Reply-To: <20201022051223.6181-1-kraxel@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 22 Oct 2020 14:25:43 +0100
+Message-ID: <CAFEAcA_ePborUKqju78BjtJcYvVXLWcU1rmKFVesaYwNYZfXhA@mail.gmail.com>
+Subject: Re: [PULL 00/14] Modules 20201022 patches
+To: Gerd Hoffmann <kraxel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::636;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x636.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,54 +94,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Klaus Jensen <k.jensen@samsung.com>,
- Gollu Appalanaidu <anaidu.gollu@samsung.com>, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Klaus Jensen <its@irrelevant.dk>
+Cc: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Gollu Appalanaidu <anaidu.gollu@samsung.com>
+On Thu, 22 Oct 2020 at 06:16, Gerd Hoffmann <kraxel@redhat.com> wrote:
+>
+> The following changes since commit 4c41341af76cfc85b5a6c0f87de4838672ab9f89:
+>
+>   Merge remote-tracking branch 'remotes/aperard/tags/pull-xen-20201020' into staging (2020-10-20 11:20:36 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://git.kraxel.org/qemu tags/modules-20201022-pull-request
+>
+> for you to fetch changes up to c8263659f1268a0f3502568d7663f722b2461935:
+>
+>   opengl: build opengl helper code modular (2020-10-21 15:46:14 +0200)
+>
+> ----------------------------------------------------------------
+> modules: build spice and opengl as module.
+>
+> ----------------------------------------------------------------
 
-The nvme_check_{sq,cq} functions check if the given queue identifer is
-valid *and* that the queue exists. Thus, the function return value
-cannot simply be inverted to check if the identifer is valid and that
-the queue does *not* exist.
 
-Replace the call with an OR'ed version of the checks.
+Applied, thanks.
 
-Signed-off-by: Gollu Appalanaidu <anaidu.gollu@samsung.com>
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
----
- hw/block/nvme.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 5dfef0204c2c..fa2cba744b57 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1143,7 +1143,8 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeRequest *req)
-         trace_pci_nvme_err_invalid_create_sq_cqid(cqid);
-         return NVME_INVALID_CQID | NVME_DNR;
-     }
--    if (unlikely(!sqid || !nvme_check_sqid(n, sqid))) {
-+    if (unlikely(!sqid || sqid > n->params.max_ioqpairs ||
-+        n->sq[sqid] != NULL)) {
-         trace_pci_nvme_err_invalid_create_sq_sqid(sqid);
-         return NVME_INVALID_QID | NVME_DNR;
-     }
-@@ -1398,7 +1399,8 @@ static uint16_t nvme_create_cq(NvmeCtrl *n, NvmeRequest *req)
-     trace_pci_nvme_create_cq(prp1, cqid, vector, qsize, qflags,
-                              NVME_CQ_FLAGS_IEN(qflags) != 0);
- 
--    if (unlikely(!cqid || !nvme_check_cqid(n, cqid))) {
-+    if (unlikely(!cqid || cqid > n->params.max_ioqpairs ||
-+        n->cq[cqid] != NULL)) {
-         trace_pci_nvme_err_invalid_create_cq_cqid(cqid);
-         return NVME_INVALID_QID | NVME_DNR;
-     }
--- 
-2.28.0
-
+-- PMM
 
