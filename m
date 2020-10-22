@@ -2,69 +2,63 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C37AC388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:10:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72BCFC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:10:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A1D602417D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:10:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="VkEXzPOk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A1D602417D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	by mail.kernel.org (Postfix) with ESMTPS id CAC4324178
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:10:49 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CAC4324178
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38838 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39918 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVaMW-0004l4-FY
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:10:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58688)
+	id 1kVaMi-0005FS-PH
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:10:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57186)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kVaLF-00031o-Hw
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:09:17 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:38963)
+ (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
+ id 1kVaG3-0004wB-HP; Thu, 22 Oct 2020 09:03:55 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:57162 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kVaLD-0001WP-95
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:09:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=MWUHg3jkjck8QMMoh3MU2EGpI3cw2pWWMdnHQXPFJ2I=; b=VkEXzPOktEqUdkl1Qbc7+vAJwB
- UxK/pz07MqKnRpOTa5fHDIfVPAnfY3DNYeW2EjKSmoh3t9ipNzvj8fkB+MT1RtvLngMjzRPUJqiD3
- EsACAaVJ+zcTCcc4ufyeUEuD+wOcGMWiZC5uD89oqi/OTusRa5daxwemkcLxXxmFobotq8oXuB5oy
- R+HDetn+/eUs1FvUXv5QYZlNzHQlP2ohdYl/OPKX2TSzH+8oBXKe6O/PlWYLD202Ct92od1loWSWe
- HbKpDtzJI2S3nFa4OBuq0EUDHWdLCGHL1DgR5YZk+kIWycKwuxlAffNmVkvTmnmepi+4u7e7/vOjO
- //pUXnOA==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: qemu-devel@nongnu.org
-Cc: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH v2 7/8] tests/9pfs: add local Tlink test
-Date: Thu, 22 Oct 2020 15:09:09 +0200
-Message-ID: <17621213.e7m4f8aTQE@silver>
-In-Reply-To: <20201022110749.15488113@bahia.lan>
-References: <cover.1603285620.git.qemu_oss@crudebyte.com>
- <5874251.7R3Ejnc4BG@silver> <20201022110749.15488113@bahia.lan>
+ (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
+ id 1kVaFx-0000gF-MT; Thu, 22 Oct 2020 09:03:55 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
+ by Forcepoint Email with ESMTP id E437CE30195E75003329;
+ Thu, 22 Oct 2020 21:03:38 +0800 (CST)
+Received: from localhost (10.174.184.155) by DGGEMS408-HUB.china.huawei.com
+ (10.3.19.208) with Microsoft SMTP Server id 14.3.487.0; Thu, 22 Oct 2020
+ 21:03:32 +0800
+From: Jiahui Cen <cenjiahui@huawei.com>
+To: <qemu-devel@nongnu.org>, <kwolf@redhat.com>, <mreitz@redhat.com>,
+ <eblake@redhat.com>
+Subject: [PATCH v3 5/9] block-backend: enable I/O hang when timeout is set
+Date: Thu, 22 Oct 2020 21:02:59 +0800
+Message-ID: <20201022130303.1092-6-cenjiahui@huawei.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20201022130303.1092-1-cenjiahui@huawei.com>
+References: <20201022130303.1092-1-cenjiahui@huawei.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:09:12
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.184.155]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=cenjiahui@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:03:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -78,81 +72,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: cenjiahui@huawei.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ stefanha@redhat.com, fangying1@huawei.com, jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Donnerstag, 22. Oktober 2020 11:07:49 CEST Greg Kurz wrote:
-> > Ok, I found the problem on the mentioned box that failed to create hard
-> > links with 9p: it is libvirt auto generating AppArmor policy rules for 9p
-> > export pathes, which libvirt generates with "rw" AA (AppArmor)
-> > permissions. Once I manually adjusted the AA rule to "rwl", creating hard
-> > links worked again.
-> > 
-> > I guess I'll send a patch for libvirt to change that. At least IMO
-> > creating
-> > hard links with 9pfs is a very basic operation and should be enabled for
-> > the respective 9p export path by default.
-> > 
-> > Actually I think it should also include "k" which means "file locking", as
-> > file locking is also a fundamental operation with 9pfs, right?
-> 
-> Well, I don't know exactly why libvirt is generating a strict AppArmor
-> policy but I'm not that surprised. If the user can _easily_ change the
-> policy to fit its needs, it's fine to have a "better safe than sorry"
-> default.
+Setting a non-zero timeout of I/O hang indicates I/O hang is enabled for the
+block backend. And when the block backend is going to be deleted, we should
+disable I/O hang.
 
-Alone identifying the root cause of this is not that easy I would say. And if
-it takes me quite some time to find it, then I imagine that other people would
-struggle with this even more.
+Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
+Signed-off-by: Ying Fang <fangying1@huawei.com>
+---
+ block/block-backend.c          | 40 ++++++++++++++++++++++++++++++++++
+ include/sysemu/block-backend.h |  1 +
+ 2 files changed, 41 insertions(+)
 
-A large portion of software, even scripts, rely on being able to create hard
-links and locking files. Right now they typically error out on guest with no
-helpful error message.
-
-So you start looking into the logs, don't find something obvious, then strace
-on guest side to find the most relevant failing syscall on guest side and see
-it was probably link(). Then you have to check several security layers: file
-permissions on guest, file permissions on host, effective UID of qemu process.
-You try creating hard links directly on host with that UID, works. Next you
-check is it qemu's seccomp? Is it host's SELinux? Is it AppArmor?
-
-Even for an experienced sysadmin I doubt it'll be a matter of minutes to
-resolve this issue. Now imagine a regular user who just wants to sandbox
-something on a workstation.
-
-Looking at libvirt git log, it seems this security policy exists more or less
-since day one (SHA-1 29ea8a9b64aac60251d283f74d57690e4edb5a6b, Mar 9 2014).
-And I don't see an explanation that would suggest a specific reason for
-exactly "rw".
-
-I think something has to be improved here, so I'll challenge by sending a
-simple libvirt patch, CCing involved authors, and seeing the feedback:
-
-diff --git a/src/security/virt-aa-helper.c b/src/security/virt-aa-helper.c
-index 12429278fb..ce243e304b 100644
---- a/src/security/virt-aa-helper.c
-+++ b/src/security/virt-aa-helper.c
-@@ -1142,7 +1142,7 @@ get_files(vahControl * ctl)
-             /* We don't need to add deny rw rules for readonly mounts,
-              * this can only lead to troubles when mounting / readonly.
-              */
--            if (vah_add_path(&buf, fs->src->path, fs->readonly ? "R" : "rw", true) != 0)
-+            if (vah_add_path(&buf, fs->src->path, fs->readonly ? "R" : "rwlk", true) != 0)
-                 goto cleanup;
-         }
+diff --git a/block/block-backend.c b/block/block-backend.c
+index c16d95a2c9..c812b3a9c7 100644
+--- a/block/block-backend.c
++++ b/block/block-backend.c
+@@ -34,6 +34,7 @@
+ #define NOT_DONE 0x7fffffff /* used while emulated sync operation in progress */
+ 
+ static AioContext *blk_aiocb_get_aio_context(BlockAIOCB *acb);
++static void blk_rehandle_disable(BlockBackend *blk);
+ 
+ /* block backend rehandle timer interval 5s */
+ #define BLOCK_BACKEND_REHANDLE_TIMER_INTERVAL   5000
+@@ -476,6 +477,8 @@ static void blk_delete(BlockBackend *blk)
+     assert(!blk->refcnt);
+     assert(!blk->name);
+     assert(!blk->dev);
++    assert(qatomic_read(&blk->reinfo.in_flight) == 0);
++    blk_rehandle_disable(blk);
+     if (blk->public.throttle_group_member.throttle_state) {
+         blk_io_limits_disable(blk);
      }
-
-Even after this change, this is not a global policy. Allowing hard links and
-file locks would only be lifted for the 9p export path.
-
-There would be other options as well of course: e.g. detecting on 9pfs side
-whether AppArmor and co are enabled, and log a warning to the user a syscall
-failed for that reason. But that would be much more complicated and I wonder
-whether it would be worth it.
-
-Best regards,
-Christian Schoenebeck
-
+@@ -2629,6 +2632,42 @@ static void blk_rehandle_aio_complete(BlkAioEmAIOCB *acb)
+     }
+ }
+ 
++static void blk_rehandle_enable(BlockBackend *blk)
++{
++    BlockBackendRehandleInfo *reinfo = &blk->reinfo;
++
++    aio_context_acquire(blk_get_aio_context(blk));
++    if (reinfo->enable) {
++        aio_context_release(blk_get_aio_context(blk));
++        return;
++    }
++
++    reinfo->ts = aio_timer_new(blk_get_aio_context(blk), QEMU_CLOCK_REALTIME,
++                               SCALE_MS, blk_rehandle_timer_cb, blk);
++    reinfo->timer_interval_ms = BLOCK_BACKEND_REHANDLE_TIMER_INTERVAL;
++    reinfo->status = BLOCK_BACKEND_REHANDLE_NORMAL;
++    reinfo->enable = true;
++    aio_context_release(blk_get_aio_context(blk));
++}
++
++static void blk_rehandle_disable(BlockBackend *blk)
++{
++    if (!blk->reinfo.enable) {
++        return;
++    }
++
++    blk_rehandle_pause(blk);
++    timer_del(blk->reinfo.ts);
++    timer_free(blk->reinfo.ts);
++    blk->reinfo.ts = NULL;
++    blk->reinfo.enable = false;
++}
++
++bool blk_iohang_is_enabled(BlockBackend *blk)
++{
++    return blk->iohang_timeout != 0;
++}
++
+ void blk_iohang_init(BlockBackend *blk, int64_t iohang_timeout)
+ {
+     if (!blk) {
+@@ -2641,6 +2680,7 @@ void blk_iohang_init(BlockBackend *blk, int64_t iohang_timeout)
+     blk->iohang_status = BLOCK_IO_HANG_STATUS_NORMAL;
+     if (iohang_timeout > 0) {
+         blk->iohang_timeout = iohang_timeout;
++        blk_rehandle_enable(blk);
+     }
+ }
+ 
+diff --git a/include/sysemu/block-backend.h b/include/sysemu/block-backend.h
+index 391a047444..851b90b99b 100644
+--- a/include/sysemu/block-backend.h
++++ b/include/sysemu/block-backend.h
+@@ -270,6 +270,7 @@ int blk_make_empty(BlockBackend *blk, Error **errp);
+ 
+ void blk_rehandle_pause(BlockBackend *blk);
+ void blk_rehandle_unpause(BlockBackend *blk);
++bool blk_iohang_is_enabled(BlockBackend *blk);
+ void blk_iohang_init(BlockBackend *blk, int64_t iohang_timeout);
+ 
+ #endif
+-- 
+2.19.1
 
 
