@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C69C388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:27:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19963C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:28:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7D38A24171
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:27:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7E60624171
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:28:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O8MgaR3j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D38A24171
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hZJRmMU9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7E60624171
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVbYU-0006CB-FI
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:27:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48726)
+	id 1kVbaK-0007l7-Bk
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:28:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48442)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVbXX-0005He-Ok
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:26:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45827)
+ id 1kVbWa-0003mC-6f
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:25:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:58647)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVbXV-0003Ih-Ii
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:26:03 -0400
+ id 1kVbWY-0002zK-69
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:25:03 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603376760;
+ s=mimecast20190719; t=1603376701;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=iQ4WrcFNvJ8dmTMpNhwmM6EFIuFk4PAiptX23NZxVTw=;
- b=O8MgaR3j6jk6qoPHyS4KeYBnTMPlYHy56USMsyNLcPaBlaunIIiYStuElFQM/JST+H9NHK
- N0mf6cX4ZCHBzSnESz7xBGk22FVzkKphWxXArQ2xjyvaT7X1wecW9QYdxgolh+b7lyx1gn
- FuUf4j57hNsiEtnYMy8trIWp66EwOA8=
+ bh=wiruZQYFSU9RAoAUXSt6S5m44i/FbjGvNSoeojhvHmE=;
+ b=hZJRmMU9eXTuijE4uhpuosllRtyAph/CmHSgrgJtItbj1tPxSLpAU0772QalV4tP4Qllu0
+ 7No6R9ZO/w0l5jJ3HskyjIAbsKAfxyvMjuvZh2JcqFqGhcj2D+9dpvF3jGVQvHdipQb1wH
+ eL6UrigB8R9fduYYJdhARjAE5UokHV0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-56-tDT-o5eDOS29Oqz_fDfCMw-1; Thu, 22 Oct 2020 10:25:57 -0400
-X-MC-Unique: tDT-o5eDOS29Oqz_fDfCMw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-274-NTdAVj71Np6CgsCBBQIgkQ-1; Thu, 22 Oct 2020 10:24:58 -0400
+X-MC-Unique: NTdAVj71Np6CgsCBBQIgkQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3010107ACF5;
- Thu, 22 Oct 2020 14:25:55 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7C92818BA281;
+ Thu, 22 Oct 2020 14:24:57 +0000 (UTC)
 Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 68EC65579F;
- Thu, 22 Oct 2020 14:25:52 +0000 (UTC)
-Date: Thu, 22 Oct 2020 15:25:51 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D7FFB5D9FC;
+ Thu, 22 Oct 2020 14:24:53 +0000 (UTC)
+Date: Thu, 22 Oct 2020 15:24:52 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 12/16] util/vfio-helpers: Let qemu_vfio_verify_mappings()
- use error_report()
-Message-ID: <20201022142551.GL761187@stefanha-x1.localdomain>
+Subject: Re: [PATCH 11/16] util/vfio-helpers: Let qemu_vfio_do_mapping()
+ propagate Error
+Message-ID: <20201022142452.GK761187@stefanha-x1.localdomain>
 References: <20201020172428.2220726-1-philmd@redhat.com>
- <20201020172428.2220726-13-philmd@redhat.com>
+ <20201020172428.2220726-12-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201020172428.2220726-13-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201020172428.2220726-12-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="tv2SIFopg1r47n4a"
+ protocol="application/pgp-signature"; boundary="huBJOJF9BsF479P6"
 Content-Disposition: inline
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -104,38 +104,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---tv2SIFopg1r47n4a
+--huBJOJF9BsF479P6
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 20, 2020 at 07:24:24PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> Instead of displaying the error on stderr, use error_report()
-> which also report to the monitor.
+On Tue, Oct 20, 2020 at 07:24:23PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> Pass qemu_vfio_do_mapping() an Error* argument so it can propagate
+> any error to callers. Replace error_report() which only report
+> to the monitor by the more generic error_setg_errno().
 >=20
 > Reviewed-by: Fam Zheng <fam@euphon.net>
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  util/vfio-helpers.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  util/vfio-helpers.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
---tv2SIFopg1r47n4a
+--huBJOJF9BsF479P6
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+Rlm4ACgkQnKSrs4Gr
-c8gNNwgAgWvLtsJaMjrp+Gpo3HlSN3t88LGdnRtK9HsheDvUJmkkfX773wlZD+C/
-x7oolB5V6kzN3idpEKmBqQQcxwteLFTTnrc8Fc/LXhdY59RFmEMPH4anCCjImKpE
-7GVZv58fG7wSgCDEPyTJQOo7c+epjL/Jvs7tX6rsPUeihPFbpbQQQE9yGyfkExCH
-6YwwjGThTgfZXe4eviHLDU+wNNaAQ9VH5QMONP9g+VCorqIhW9qHPaBO/wkTbvmS
-0CVJh/NeZHtNqiL/0oIudXEMhqELdDIx4efu6d0jZsIn/dErF/5G6u5cVCC/20Oi
-FOPB/BlPu6BrCD0BOyQzOCD2TryT4g==
-=D7U+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+RljQACgkQnKSrs4Gr
+c8gFtwf+Kmuth9bIxKjZRDXR/hYxHPsvtqxGOaVUITpZXP/TvWfruNwsspsg2NWZ
+QK5kI9hNrmYxU4/dkQo5P42Xd7Vh3lE/AxX93ILkLYsBjKbdn8arppAuT5mnOoHN
+mUiISxs4Pzo3MRsBakGw9CfHRywVilFsCYH2c4/METI7CIJbLJHPkXkdhdvVpkOz
+P7ByN+XmnIVBoPACzsQ834L8tGZ+ITpVAQCtFun4oiD/3jnNkZqp3jxM40T5GyIe
+J5UGdHJ5x+yzH969M6yQDZ9JfKuxr1k8T1R8qKEsqCCzk/58lR1XoXtqy/NNihJt
+aNMpwZzEVRLGVJ2SpC7nEW1JcNff0A==
+=siAe
 -----END PGP SIGNATURE-----
 
---tv2SIFopg1r47n4a--
+--huBJOJF9BsF479P6--
 
 
