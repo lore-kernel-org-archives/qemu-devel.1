@@ -2,74 +2,97 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE619C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D9ADC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:05:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 431F222249
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:03:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 431F222249
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id CFCCC22249
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:05:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CFCCC22249
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVWUt-0003fd-8e
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58784)
+	id 1kVWX2-0004dP-O8
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:05:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58592)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVWTS-0002a5-Pk
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:01:30 -0400
-Received: from 4.mo51.mail-out.ovh.net ([188.165.42.229]:53808)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kVWT0-0002BJ-Bg
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:01:02 -0400
+Received: from wout4-smtp.messagingengine.com ([64.147.123.20]:41243)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVWTN-0002Hf-2M
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:01:30 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.52])
- by mo51.mail-out.ovh.net (Postfix) with ESMTPS id D4FFA22E828;
- Thu, 22 Oct 2020 11:01:21 +0200 (CEST)
-Received: from kaod.org (37.59.142.95) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Thu, 22 Oct
- 2020 11:01:21 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-95G001e0398319-34a5-4305-a30a-8f5ff5f17d37,
- 519BB44447FDA57395BBEBCDF0C34CC9BD4694BF) smtp.auth=groug@kaod.org
-Date: Thu, 22 Oct 2020 11:01:20 +0200
-From: Greg Kurz <groug@kaod.org>
-To: Christian Schoenebeck <qemu_oss@crudebyte.com>
-Subject: Re: [PATCH v2 6/8] tests/9pfs: add local Tunlinkat symlink test
-Message-ID: <20201022110120.6ea5bcba@bahia.lan>
-In-Reply-To: <a23cd4d2ab6d8d3048addab8cbf0416fe5ead43e.1603285620.git.qemu_oss@crudebyte.com>
-References: <cover.1603285620.git.qemu_oss@crudebyte.com>
- <a23cd4d2ab6d8d3048addab8cbf0416fe5ead43e.1603285620.git.qemu_oss@crudebyte.com>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>) id 1kVWSs-00028Z-Ai
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:01:01 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.west.internal (Postfix) with ESMTP id 59C8F734;
+ Thu, 22 Oct 2020 05:00:49 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+ by compute4.internal (MEProxy); Thu, 22 Oct 2020 05:00:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding; s=fm1; bh=vl35n298E8f0GAkn5LSmKqMamj
+ Y8tCk5cGUNtVmfpHI=; b=rkQQL1rEvsX+e1DwDqTZsbsVbyGq5P9DO0QzANLE4I
+ MD+7oHxVVd0muFXTkPP0uB9RCkCdjzm8XkXMZyNcSoFoSJdVnvo1KhsHbbh5ZkAd
+ 6eo2mgEmCsbjT7LcIfBqppIE2uyeLNDEQaEM8Y8X90EcrPwsAkc/xaCeFoMLjdU0
+ IZoJIFe4eEw4RHJ3wngvmsObPj/fcM7b1QIYDJgJRnjF54DlN/5m2BSBD9FMTWGh
+ 1wINRwRjgbMdQ0CE2PWEe2cqOXPs6igGpcELg5KZAIEcg1gzwXqtLRNvssqAZEd8
+ MqTYtXVasDevZh2nemoXCE8kwhD70wcrP+4bXDEq2dKg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-transfer-encoding:date:from
+ :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+ :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=vl35n298E8f0GAkn5
+ LSmKqMamjY8tCk5cGUNtVmfpHI=; b=nQMAtualbtk6A/xOY63JpV/yPA7B0jo/L
+ a7zJ6KWH2GlCZM66rb8sWmZdDDIqH319dKVMHEmE1hfKXgDqM3V4ljC09Rugeu1p
+ P6/7PPDZyFYTOCctWYLzfN7/8mkJ16BvHTnMr111ohK+LU1y3bgqBjKpSbfYuIlt
+ o1NCK865k8RjznNuNFzM99AZVSotlSNsSSG3GjXXg1aXaxs1ZyLjxCUXV+6h4chn
+ lZWPOjxzknzjihBghX6vijGtpJrGmz5baSXgViUrYWzW79kq4+ScqqP2bdq0Cj3r
+ zqXc0TShnbAPsZTro7CMWnUJ2BQMS1i/0WrUDfkSzus8kC5K22wwA==
+X-ME-Sender: <xms:P0qRX3KJr6Qm-NOy84QCAgXNBUaPEpfmqtqop65eSgd3D1ZyGylJig>
+ <xme:P0qRX7INSK2gvLXyZzrevdCaSGIQkA5MRUZ0A8jqnI_HY3d_QfhtEvU0X5HaTRqeW
+ CQKPrhaOoxxcFQKtn4>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeejgddutdcutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpefhvffufffkofgggfestdekredtredttdenucfhrhhomhepmfhlrghushculfgv
+ nhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvghrnh
+ epleefledufeeuieduvdffueefveekffetteeiheevlefffeejleeivedtuefgjeeunecu
+ ffhomhgrihhnpehinhhfrhgruggvrggurdhorhhgpdhgihhthhhusgdrtghomhenucfkph
+ epkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgr
+ mhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:P0qRX_sYdHfKC2-F5a_NehsP0-T2nk2FCGBHD7w2qNsGnjUU2j-KPg>
+ <xmx:P0qRXwaRJyHPt45JR_I_QcX8gRL4zK0lQOtKc1FZsxL4O9r9mGH6GQ>
+ <xmx:P0qRX-bn78vN4ZAqXQFoMTAgC1C7ghsXUZ0Q1eDgA6oa6x98XKqC-g>
+ <xmx:QEqRX1Unb2j4HOw3WJsyCmVT_r-V7BZ0sl5pgjhcVUkiXgoLvPjDkQ>
+Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id CA7F73064687;
+ Thu, 22 Oct 2020 05:00:46 -0400 (EDT)
+From: Klaus Jensen <its@irrelevant.dk>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] MAINTAINERS: Update nvme entries
+Date: Thu, 22 Oct 2020 11:00:45 +0200
+Message-Id: <20201022090045.158261-1-its@irrelevant.dk>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [37.59.142.95]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 2815ae9f-980c-4b0f-a386-39064e6d1f1c
-X-Ovh-Tracer-Id: 5359565032456296858
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: 0
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrjeejgdduudcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecunecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleehnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=188.165.42.229; envelope-from=groug@kaod.org;
- helo=4.mo51.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 05:01:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=64.147.123.20; envelope-from=its@irrelevant.dk;
+ helo=wout4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:37:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -82,70 +105,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Klaus Jensen <k.jensen@samsung.com>, Klaus Jensen <its@irrelevant.dk>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Oct 2020 14:36:23 +0200
-Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
+From: Klaus Jensen <k.jensen@samsung.com>
 
-> This test case uses a Tunlinkat request to remove a symlink using
-> the 9pfs 'local' fs driver.
-> 
-> Signed-off-by: Christian Schoenebeck <qemu_oss@crudebyte.com>
-> ---
+Make sure that maintainers of both the nvme block driver and the
+emulated nvme device is notified about changes to the shared nvme.h.
 
-Reviewed-by: Greg Kurz <groug@kaod.org>
+Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+---
+ MAINTAINERS | 2 ++
+ 1 file changed, 2 insertions(+)
 
->  tests/qtest/virtio-9p-test.c | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/tests/qtest/virtio-9p-test.c b/tests/qtest/virtio-9p-test.c
-> index 0c11417236..33cba24b18 100644
-> --- a/tests/qtest/virtio-9p-test.c
-> +++ b/tests/qtest/virtio-9p-test.c
-> @@ -1295,6 +1295,32 @@ static void fs_symlink_file(void *obj, void *data, QGuestAllocator *t_alloc)
->      g_free(real_file);
->  }
->  
-> +static void fs_unlinkat_symlink(void *obj, void *data,
-> +                                QGuestAllocator *t_alloc)
-> +{
-> +    QVirtio9P *v9p = obj;
-> +    alloc = t_alloc;
-> +    struct stat st;
-> +    char *real_file = virtio_9p_test_path("06/real_file");
-> +    char *symlink_file = virtio_9p_test_path("06/symlink_file");
-> +
-> +    do_attach(v9p);
-> +    do_mkdir(v9p, "/", "06");
-> +    do_lcreate(v9p, "06", "real_file");
-> +    g_assert(stat(real_file, &st) == 0);
-> +    g_assert((st.st_mode & S_IFMT) == S_IFREG);
-> +
-> +    do_symlink(v9p, "06", "symlink_file", "real_file");
-> +    g_assert(stat(symlink_file, &st) == 0);
-> +
-> +    do_unlinkat(v9p, "06", "symlink_file", 0);
-> +    /* symlink should be gone now */
-> +    g_assert(stat(symlink_file, &st) != 0);
-> +
-> +    g_free(symlink_file);
-> +    g_free(real_file);
-> +}
-> +
->  static void *assign_9p_local_driver(GString *cmd_line, void *arg)
->  {
->      virtio_9p_assign_local_driver(cmd_line, "security_model=mapped-xattr");
-> @@ -1339,6 +1365,8 @@ static void register_virtio_9p_test(void)
->      qos_add_test("local/create_file", "virtio-9p", fs_create_file, &opts);
->      qos_add_test("local/unlinkat_file", "virtio-9p", fs_unlinkat_file, &opts);
->      qos_add_test("local/symlink_file", "virtio-9p", fs_symlink_file, &opts);
-> +    qos_add_test("local/unlinkat_symlink", "virtio-9p", fs_unlinkat_symlink,
-> +                 &opts);
->  }
->  
->  libqos_init(register_virtio_9p_test);
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6a197bd358d6..f546ac6840f0 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -1876,6 +1876,7 @@ M: Klaus Jensen <its@irrelevant.dk>
+ L: qemu-block@nongnu.org
+ S: Supported
+ F: hw/block/nvme*
++F: include/block/nvme.h
+ F: tests/qtest/nvme-test.c
+ T: git git://git.infradead.org/qemu-nvme.git nvme-next
+ 
+@@ -2953,6 +2954,7 @@ R: Fam Zheng <fam@euphon.net>
+ L: qemu-block@nongnu.org
+ S: Supported
+ F: block/nvme*
++F: include/block/nvme.h
+ T: git https://github.com/stefanha/qemu.git block
+ 
+ Bootdevice
+-- 
+2.28.0
 
 
