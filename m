@@ -2,87 +2,87 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63065C55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:25:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97215C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:30:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A82A223BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:25:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8671B223BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:30:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCDxtDJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A82A223BF
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GUijZLal"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8671B223BF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56180 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVcTI-0005hX-Ho
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 11:25:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37112)
+	id 1kVcXj-0008R0-BS
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 11:30:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVcPM-0002Je-AU
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:21:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52128)
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kVcWc-0007G3-6e
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:29:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27664)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVcPJ-0003UX-Sz
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:21:39 -0400
+ (Exim 4.90_1) (envelope-from <vgoyal@redhat.com>) id 1kVcWZ-0004nW-QG
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:29:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603380096;
+ s=mimecast20190719; t=1603380545;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=NYOjVx/7YrGStOnf1CzkbJ+zvjunVbq3qkEL3290TTQ=;
- b=JCDxtDJLz7lIM5UGIkxzblEf5JW0jRJfp2NUFmun3mUVQEiBwvmXDfhoiRhMHN3RnPWBDS
- mRoMVt0hQ0+Js5MIaGW7xOR72mIP1Hol4ho7TnbCErTlJ6+BWk7dMXtwne5v10MHncZCFT
- esZLnXxq3o6U1F8c207bN8b6uT/CPEA=
+ bh=ZjaBXpCi50QUKdprf0Z1NBDbQv++rRSWW7L2YG1G71I=;
+ b=GUijZLalkvAfxLp+NpkKIguNHQZ7BWmV/5o1OJ/IM0mejvM+xzbXKEMQ78j9EJ3+WL2zgr
+ RulGokX8tPWX3UfHRC4xNPEKI6QEiz6HExbHS7M0D2QaSJMj7j+H8RiCRZ2JaYMto0lZ45
+ rH5nNIxuHVMbjdDo2+6ZhPM1vNeyO9A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-tXYwgCYiNXeRJBW5qOd4fA-1; Thu, 22 Oct 2020 11:21:33 -0400
-X-MC-Unique: tXYwgCYiNXeRJBW5qOd4fA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-316-RG7wKXXtMayQigbjvexQQw-1; Thu, 22 Oct 2020 11:29:04 -0400
+X-MC-Unique: RG7wKXXtMayQigbjvexQQw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0CBC1804B69;
- Thu, 22 Oct 2020 15:21:26 +0000 (UTC)
-Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 911875C1C7;
- Thu, 22 Oct 2020 15:21:22 +0000 (UTC)
-Date: Thu, 22 Oct 2020 16:21:21 +0100
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 04/16] util/vfio-helpers: Report error when IOMMU page
- size is not supported
-Message-ID: <20201022152121.GR761187@stefanha-x1.localdomain>
-References: <20201020172428.2220726-1-philmd@redhat.com>
- <20201020172428.2220726-5-philmd@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C8039CC04
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 15:29:03 +0000 (UTC)
+Received: from horse.redhat.com (ovpn-116-67.rdu2.redhat.com [10.10.116.67])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 68CBF10013D0;
+ Thu, 22 Oct 2020 15:28:54 +0000 (UTC)
+Received: by horse.redhat.com (Postfix, from userid 10451)
+ id 8E192222F9C; Thu, 22 Oct 2020 11:28:53 -0400 (EDT)
+Date: Thu, 22 Oct 2020 11:28:53 -0400
+From: Vivek Goyal <vgoyal@redhat.com>
+To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+Subject: Re: [PATCH v3 2/5] tools/virtiofsd: xattr name mappings: Map client
+ xattr names
+Message-ID: <20201022152853.GC512900@redhat.com>
+References: <20201014180209.49299-1-dgilbert@redhat.com>
+ <20201014180209.49299-3-dgilbert@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201020172428.2220726-5-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201014180209.49299-3-dgilbert@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vgoyal@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="0Qexx6XJGNEACt6j"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=vgoyal@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,48 +96,85 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
+Cc: dinechin@redhat.com, virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0Qexx6XJGNEACt6j
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 20, 2020 at 07:24:16PM +0200, Philippe Mathieu-Daud=E9 wrote:
-> This driver uses the host page size to align its memory regions,
-> but this size is not always compatible with the IOMMU. Add a
-> check if the size matches, and bails out providing a hint what
-> is the minimum page size the driver should use.
->=20
-> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+On Wed, Oct 14, 2020 at 07:02:06PM +0100, Dr. David Alan Gilbert (git) wrote:
+> From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> 
+> Map xattr names originating at the client; from get/set/remove xattr.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  util/vfio-helpers.c | 28 ++++++++++++++++++++++++++--
->  util/trace-events   |  1 +
->  2 files changed, 27 insertions(+), 2 deletions(-)
+>  tools/virtiofsd/passthrough_ll.c | 101 ++++++++++++++++++++++++++++++-
+>  1 file changed, 98 insertions(+), 3 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index f5a33014f9..57ebe17ed6 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -2183,20 +2183,80 @@ static XattrMapEntry *parse_xattrmap(struct lo_data *lo)
+>      return res;
+>  }
+>  
+> -static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
+> +/*
+> + * For use with getxattr/setxattr/removexattr, where the client
+> + * gives us a name and we may need to choose a different one.
+> + * Allocates a buffer for the result placing it in *out_name.
+> + *   If there's no change then *out_name is not set.
+> + * Returns 0 on success
+> + * Can return -EPERM to indicate we block a given attribute
+> + *   (in which case out_name is not allocated)
+> + * Can return -ENOMEM to indicate out_name couldn't be allocated.
+> + */
+> +static int xattr_map_client(const struct lo_data *lo, const char *client_name,
+> +                            char **out_name)
+> +{
+> +    const XattrMapEntry *cur_entry;
+> +
+> +    for (cur_entry = lo->xattr_map_list; ; cur_entry++) {
+> +        if ((cur_entry->flags & XATTR_MAP_FLAG_CLIENT) &&
+> +            (strstart(client_name, cur_entry->key, NULL))) {
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_END_BAD) {
+> +                return -EPERM;
+> +            }
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_END_OK) {
+> +                /* Unmodified name */
+> +                return 0;
+> +            }
+> +            if (cur_entry->flags & XATTR_MAP_FLAG_PREFIX) {
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+I am wondering why do have "END" substring in BAD and OK flags while
+we don't have one in PREFIX flag. IOW, why not simply call these
+flags as XATTR_MAP_FLAG_OK and XATTR_MAP_FLAG_BAD respectively.
 
---0Qexx6XJGNEACt6j
-Content-Type: application/pgp-signature; name="signature.asc"
+> +                *out_name = g_try_malloc(strlen(client_name) +
+> +                                         strlen(cur_entry->prepend) + 1);
 
------BEGIN PGP SIGNATURE-----
+Should we check for cur_entry->prepend to be NULL before we try to
+allocate out_name. One could say.
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+Ro3EACgkQnKSrs4Gr
-c8gQTAf/eCOVjSt/KqXrKGRtlWUY723Si7y/OIyjaXDDOxhZU4nPmp9htEJlrASX
-zSEBVrJxxfHr3M190hnC+8larUi6AD29bCYbE3cXbDz8ZuyORPBL4OyYjmcEAGtD
-8UjeKigHyCsN/k33FNQ0Ti8tboCnu0EDKDpYX80SOZ09RCtQjmSd37Il1FmMGKZa
-wddGXfnq1NANAd152E70UUsTcCJBCmnsLmNfu6SJjI9xrE0Yu9WXgarTpL3HwcnA
-/lKFNV9dn63TIcdiqWAvNncWb9evP8WWyr1fiBCu6YKPSBwTLpP9D0uPNjXcmMPB
-AajxSK54cx6VWOYdowiTMS/lRHlNcQ==
-=g/2F
------END PGP SIGNATURE-----
+"prefix:client:trusted.::". In that case we are not supposed to prefix
+anything?
 
---0Qexx6XJGNEACt6j--
+> +                if (!*out_name) {
+> +                    return -ENOMEM;
+> +                }
+> +                sprintf(*out_name, "%s%s", cur_entry->prepend, client_name);
+> +                return 0;
+> +            }
+> +        }
+> +    }
+> +
+> +    /* Shouldn't get here - rules should have an END_* */
+> +    abort();
+> +}
+
+Thanks
+Vivek
 
 
