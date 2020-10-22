@@ -2,146 +2,80 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAD5C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:22:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D551C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:23:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AA1B20770
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:22:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 76575221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:22:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="L1Ktskaa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AA1B20770
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jprt8kr0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76575221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZbw-0006hk-S3
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:22:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42324)
+	id 1kVZcQ-0007SN-5K
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:22:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kVZTF-0007h2-W7
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:30 -0400
-Received: from mail-mw2nam10on2068.outbound.protection.outlook.com
- ([40.107.94.68]:23921 helo=NAM10-MW2-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ3y-0002y8-Td
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:47:24 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15219)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kVZRZ-00013E-Oc
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:29 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kRHCrAULw/HZVHEVhVbFrvBjupRG4YaQhRyj51726O7j47nXM7MVJIcnkHSeEalSpnotGRuRNvzmESlHp5pZw3VCpebqK4f7PhOq1XQVj+Q7EuKLTwDeyHwjw3+m91NuLG1IPak8Fqb0pWfFZgQhr8C5JLZwMDO7ufYvHHu5d5zwRXCtP8mdDNI57DX8Ub3JpCuGh9j05UDMmQYhr/0CuCkm03hxTeaDw9xRRlfmQYFaB2WZ331TdFBW5ZcoDcLRqb2GmdS6w2+3cmH+1buydFyOFmQFUbGn/a1arWHGaRcr3aYGNlXxxkugx5kqldPRtVRGQZn3Q0E9uDiWb+oUhg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CpS5wTrc2KnbUEerqqlBfQebpwWGtlC+idsmUxiPWHU=;
- b=aYeMxAAbU+rbmlE0RwAKLOoHyHhqIGMwLJzJ/t8cE77ucJH62xcETqQkSE6zMUQiFglB81rifTMIoh18QNDyEuy/l8ape654I/7lWOsqwQNP8W6R0IC6nsjit5M/oFdNH5QkIBC7w7W9dVoMTEqOlXJxi+22QBRHHNtlksRD6W48RCier515wt6xGr0+TtAPHpmFd+LVfeYirmHB/abOIu1hTFaQvldYahWgz1HnBngMIo5PwlJajajY96KTIl9D1xAGsMHIxJ3EzQhoxA9VNZ/+WEiDryKOyW0V8tIA28GQO9K78zxo4Ym17w1l+NWfUMkcRVdjayd4a0CWfP7FUw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CpS5wTrc2KnbUEerqqlBfQebpwWGtlC+idsmUxiPWHU=;
- b=L1KtskaapEV6XGVsJZJemuYUfkWIrunHgq+E/xHwEo0M0x1MXIFt3p6pTg09TZRsAa/EVcG4DJcUltX6eIe0BHIaRDfWyE0vNV+qHvRBKpP6nIzLmxjgGWCajffUWtkkYLrqNUbcXnPLCX5tnHi0mAUVd90640Y3T8PBeARA7sI=
-Received: from MN2PR06CA0001.namprd06.prod.outlook.com (2603:10b6:208:23d::6)
- by MWHPR02MB2383.namprd02.prod.outlook.com (2603:10b6:300:5c::10)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Thu, 22 Oct
- 2020 12:11:42 +0000
-Received: from BL2NAM02FT064.eop-nam02.prod.protection.outlook.com
- (2603:10b6:208:23d:cafe::9) by MN2PR06CA0001.outlook.office365.com
- (2603:10b6:208:23d::6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Thu, 22 Oct 2020 12:11:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
- header.d=none;wdc.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- BL2NAM02FT064.mail.protection.outlook.com (10.152.77.119) with Microsoft SMTP
- Server id 15.20.3477.23 via Frontend Transport; Thu, 22 Oct 2020 12:11:41
- +0000
-Received: from [149.199.38.66] (port=56481 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kVZQY-0001kC-NU; Thu, 22 Oct 2020 05:10:42 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
- by smtp.xilinx.com with esmtp (Exim 4.63)
- (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kVZRU-0005qS-GQ; Thu, 22 Oct 2020 05:11:40 -0700
-Received: from xsj-pvapsmtp01 (xsj-smtp1.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09MCBdkv022867; 
- Thu, 22 Oct 2020 05:11:39 -0700
-Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1kVZRS-0005pv-VX; Thu, 22 Oct 2020 05:11:39 -0700
-Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 47BD913C0964; Thu, 22 Oct 2020 17:47:51 +0530 (IST)
-From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
- Markus Armbruster <armbru@redhat.com>,
- =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- Edgar Iglesias <edgari@xilinx.com>,
- Francisco Eduardo Iglesias <figlesia@xilinx.com>
-Subject: [PATCH v12 3/3] Versal: Connect DWC3 controller with virt-versal
-Date: Thu, 22 Oct 2020 17:47:36 +0530
-Message-Id: <1603369056-4168-4-git-send-email-sai.pavan.boddu@xilinx.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
-References: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ3u-0007X1-QU
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:47:22 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f9170e10002>; Thu, 22 Oct 2020 04:45:37 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
+ 2020 11:47:03 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 22 Oct 2020 11:46:55 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v27 17/17] qapi: Add VFIO devices migration stats in Migration
+ stats
+Date: Thu, 22 Oct 2020 16:42:07 +0530
+Message-ID: <1603365127-14202-18-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: c4fdbe98-34d1-49b4-af85-08d87683a27d
-X-MS-TrafficTypeDiagnostic: MWHPR02MB2383:
-X-Microsoft-Antispam-PRVS: <MWHPR02MB2383E880B730F19435997AE2CA1D0@MWHPR02MB2383.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:142;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: sQcjN1E85REXmzKP2nJzGjJkvzbyWHdl3zYrkhGuO3c2EnKcruNNTYsYiSoGxmn6WijuWf2Kuh7ajax4aYLKUaQ/CuIXfRaenmsb/pvUsxVRBflCBkHB2iCld8xkV9P7S/1PXk87vygy1GpWZ6EvHauY9aX5AhQr8thP4sJQlraSJ9AUyRtCpVDyrWR/XjRPbgyt/P2K7lpwuBaQKs966Kf2oM0XrhjyHJR+HVhhBASY7GiQknGsQLWh0FT25ezRlSYviCWFER37aX5mft1hX9nh868NSiwFCM6lKtUNoS/f3ezJLJtD+Ud6VTdV5BetlOh6a1qd8Wm3Lz84MA8GAcf7XhqCIPWYGQA9uTETWm0OkeZLA88YUEerkIX9MERkmhLqv15GoJ4eVy1gU8n08w==
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:ErrorRetry; CAT:NONE;
- SFS:(39860400002)(376002)(396003)(346002)(136003)(46966005)(36756003)(2906002)(5660300002)(336012)(82310400003)(110136005)(316002)(70586007)(70206006)(42186006)(83380400001)(356005)(6666004)(8676002)(26005)(2616005)(8936002)(4326008)(7416002)(82740400003)(186003)(54906003)(6636002)(426003)(19627235002)(47076004)(6266002)(478600001)(107886003)(81166007);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 12:11:41.1684 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4fdbe98-34d1-49b4-af85-08d87683a27d
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT064.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR02MB2383
-Received-SPF: pass client-ip=40.107.94.68; envelope-from=saipava@xilinx.com;
- helo=NAM10-MW2-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:11:44
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603367137; bh=OFspOLIjCQHaYlRP5L/Rg+M8yveUe+Q4XGbnX2cIMQc=;
+ h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+ References:X-NVConfidentiality:MIME-Version:Content-Type;
+ b=jprt8kr0wnNMBpIfuEmajAh7iwRR77Vh8ZZ6GuAvG8kN09/qxVomab+yAsy2aHqE8
+ a7Ps4tg9KF1Y5InVXOhOE1hrhu94gEvgDWGzC1ersl1iz9gwa/T/betDwSiA+slsjN
+ retsFwIywqgldUTVDh5PYEqbNI1XQNfbUqAYMstKUwnPXR1VuFe1WPldkDHD0F0frB
+ Uyc94U8aOmwc4QF3Gt2FJwxy8naCYOjhF66aPJBXC8uRj1frhA++qRMxs+vVntvxT0
+ ed0vY38+H8lWIAVh99kXHn6kHvjuO+YUTXfhYxH3WERHjog4xPZTPkMeg6sMDWcDDx
+ P7ZlW1kHVnv2Q==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:44:48
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -154,218 +88,237 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
- qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
- Sai Pavan Boddu <saipava@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>, Ying Fang <fangying1@huawei.com>,
- =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
+Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Vikram Garhwal <fnu.vikram@xilinx.com>
+Added amount of bytes transferred to the VM at destination by all VFIO
+devices
 
-Connect dwc3 controller and usb2-reg module to xlnx-versal SOC, its placed
-in iou of lpd domain and configure it as dual port host controller. Add the
-respective guest dts nodes for "xlnx-versal-virt" machine.
-
-Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- hw/arm/xlnx-versal-virt.c    | 58 ++++++++++++++++++++++++++++++++++++++++++++
- hw/arm/xlnx-versal.c         | 34 ++++++++++++++++++++++++++
- include/hw/arm/xlnx-versal.h | 14 +++++++++++
- 3 files changed, 106 insertions(+)
+ hw/vfio/common.c            | 20 ++++++++++++++++++++
+ hw/vfio/migration.c         | 10 ++++++++++
+ include/qemu/vfio-helpers.h |  3 +++
+ migration/migration.c       | 14 ++++++++++++++
+ monitor/hmp-cmds.c          |  6 ++++++
+ qapi/migration.json         | 17 +++++++++++++++++
+ 6 files changed, 70 insertions(+)
 
-diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
-index 03e2320..f0ac5ba 100644
---- a/hw/arm/xlnx-versal-virt.c
-+++ b/hw/arm/xlnx-versal-virt.c
-@@ -39,6 +39,8 @@ struct VersalVirt {
-         uint32_t ethernet_phy[2];
-         uint32_t clk_125Mhz;
-         uint32_t clk_25Mhz;
-+        uint32_t usb;
-+        uint32_t dwc;
-     } phandle;
-     struct arm_boot_info binfo;
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 9c879e5c0f62..8d0758eda9fa 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -39,6 +39,7 @@
+ #include "trace.h"
+ #include "qapi/error.h"
+ #include "migration/migration.h"
++#include "qemu/vfio-helpers.h"
  
-@@ -66,6 +68,8 @@ static void fdt_create(VersalVirt *s)
-     s->phandle.clk_25Mhz = qemu_fdt_alloc_phandle(s->fdt);
-     s->phandle.clk_125Mhz = qemu_fdt_alloc_phandle(s->fdt);
+ VFIOGroupList vfio_group_list =
+     QLIST_HEAD_INITIALIZER(vfio_group_list);
+@@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
+  * Device state interfaces
+  */
  
-+    s->phandle.usb = qemu_fdt_alloc_phandle(s->fdt);
-+    s->phandle.dwc = qemu_fdt_alloc_phandle(s->fdt);
-     /* Create /chosen node for load_dtb.  */
-     qemu_fdt_add_subnode(s->fdt, "/chosen");
- 
-@@ -148,6 +152,59 @@ static void fdt_add_timer_nodes(VersalVirt *s)
-                      compat, sizeof(compat));
- }
- 
-+static void fdt_add_usb_xhci_nodes(VersalVirt *s)
++bool vfio_mig_active(void)
 +{
-+    const char clocknames[] = "bus_clk\0ref_clk";
-+    char *name = g_strdup_printf("/usb@%" PRIx32, MM_USB2_CTRL_REGS);
-+    const char compat[] = "xlnx,versal-dwc3";
++    VFIOGroup *group;
++    VFIODevice *vbasedev;
 +
-+    qemu_fdt_add_subnode(s->fdt, name);
-+    qemu_fdt_setprop(s->fdt, name, "compatible",
-+                         compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
-+                                 2, MM_USB2_CTRL_REGS,
-+                                 2, MM_USB2_CTRL_REGS_SIZE);
-+    qemu_fdt_setprop(s->fdt, name, "clock-names",
-+                         clocknames, sizeof(clocknames));
-+    qemu_fdt_setprop_cells(s->fdt, name, "clocks",
-+                               s->phandle.clk_25Mhz, s->phandle.clk_125Mhz);
-+    qemu_fdt_setprop(s->fdt, name, "ranges", NULL, 0);
-+    qemu_fdt_setprop_cell(s->fdt, name, "#address-cells", 2);
-+    qemu_fdt_setprop_cell(s->fdt, name, "#size-cells", 2);
-+    qemu_fdt_setprop_cell(s->fdt, name, "phandle", s->phandle.usb);
-+    g_free(name);
-+
-+    {
-+        const char irq_name[] = "dwc_usb3";
-+        const char compat[] = "snps,dwc3";
-+
-+        name = g_strdup_printf("/usb@%" PRIx32 "/dwc3@%" PRIx32,
-+                               MM_USB2_CTRL_REGS, MM_USB_XHCI_0);
-+        qemu_fdt_add_subnode(s->fdt, name);
-+        qemu_fdt_setprop(s->fdt, name, "compatible",
-+                         compat, sizeof(compat));
-+        qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
-+                                     2, MM_USB_XHCI_0, 2, MM_USB_XHCI_0_SIZE);
-+        qemu_fdt_setprop(s->fdt, name, "interrupt-names",
-+                         irq_name, sizeof(irq_name));
-+        qemu_fdt_setprop_cells(s->fdt, name, "interrupts",
-+                                   GIC_FDT_IRQ_TYPE_SPI, VERSAL_USB0_IRQ_0,
-+                                   GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+        qemu_fdt_setprop_cell(s->fdt, name,
-+                              "snps,quirk-frame-length-adjustment", 0x20);
-+        qemu_fdt_setprop_cells(s->fdt, name, "#stream-id-cells", 1);
-+        qemu_fdt_setprop_string(s->fdt, name, "dr_mode", "host");
-+        qemu_fdt_setprop_string(s->fdt, name, "phy-names", "usb3-phy");
-+        qemu_fdt_setprop(s->fdt, name, "snps,dis_u2_susphy_quirk", NULL, 0);
-+        qemu_fdt_setprop(s->fdt, name, "snps,dis_u3_susphy_quirk", NULL, 0);
-+        qemu_fdt_setprop(s->fdt, name, "snps,refclk_fladj", NULL, 0);
-+        qemu_fdt_setprop(s->fdt, name, "snps,mask_phy_reset", NULL, 0);
-+        qemu_fdt_setprop_cell(s->fdt, name, "phandle", s->phandle.dwc);
-+        qemu_fdt_setprop_string(s->fdt, name, "maximum-speed", "high-speed");
-+        g_free(name);
++    if (QLIST_EMPTY(&vfio_group_list)) {
++        return false;
 +    }
++
++    QLIST_FOREACH(group, &vfio_group_list, next) {
++        QLIST_FOREACH(vbasedev, &group->device_list, next) {
++            if (vbasedev->migration_blocker) {
++                return false;
++            }
++        }
++    }
++    return true;
 +}
 +
- static void fdt_add_uart_nodes(VersalVirt *s)
+ static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
  {
-     uint64_t addrs[] = { MM_UART1, MM_UART0 };
-@@ -515,6 +572,7 @@ static void versal_virt_init(MachineState *machine)
-     fdt_add_gic_nodes(s);
-     fdt_add_timer_nodes(s);
-     fdt_add_zdma_nodes(s);
-+    fdt_add_usb_xhci_nodes(s);
-     fdt_add_sd_nodes(s);
-     fdt_add_rtc_node(s);
-     fdt_add_cpu_nodes(s, psci_conduit);
-diff --git a/hw/arm/xlnx-versal.c b/hw/arm/xlnx-versal.c
-index 12ba6c4..ddf43db 100644
---- a/hw/arm/xlnx-versal.c
-+++ b/hw/arm/xlnx-versal.c
-@@ -145,6 +145,39 @@ static void versal_create_uarts(Versal *s, qemu_irq *pic)
+     VFIOGroup *group;
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 77ee60a43ea5..b23e21c6de2b 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -28,6 +28,7 @@
+ #include "pci.h"
+ #include "trace.h"
+ #include "hw/hw.h"
++#include "qemu/vfio-helpers.h"
+ 
+ /*
+  * Flags to be used as unique delimiters for VFIO devices in the migration
+@@ -45,6 +46,8 @@
+ #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+ #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+ 
++static int64_t bytes_transferred;
++
+ static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
+                                   off_t off, bool iswrite)
+ {
+@@ -255,6 +258,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
+         *size = data_size;
+     }
+ 
++    bytes_transferred += data_size;
+     return ret;
+ }
+ 
+@@ -776,6 +780,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+     case MIGRATION_STATUS_CANCELLING:
+     case MIGRATION_STATUS_CANCELLED:
+     case MIGRATION_STATUS_FAILED:
++        bytes_transferred = 0;
+         ret = vfio_migration_set_state(vbasedev,
+                       ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
+                       VFIO_DEVICE_STATE_RUNNING);
+@@ -862,6 +867,11 @@ err:
+ 
+ /* ---------------------------------------------------------------------- */
+ 
++int64_t vfio_mig_bytes_transferred(void)
++{
++    return bytes_transferred;
++}
++
+ int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+ {
+     VFIOContainer *container = vbasedev->group->container;
+diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+index 4491c8e1a6e9..7f7a46e6ef2d 100644
+--- a/include/qemu/vfio-helpers.h
++++ b/include/qemu/vfio-helpers.h
+@@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+ int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+                            int irq_type, Error **errp);
+ 
++bool vfio_mig_active(void);
++int64_t vfio_mig_bytes_transferred(void);
++
+ #endif
+diff --git a/migration/migration.c b/migration/migration.c
+index 0575ecb37953..8b2865d25ef4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -56,6 +56,7 @@
+ #include "net/announce.h"
+ #include "qemu/queue.h"
+ #include "multifd.h"
++#include "qemu/vfio-helpers.h"
+ 
+ #define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
+ 
+@@ -1002,6 +1003,17 @@ static void populate_disk_info(MigrationInfo *info)
      }
  }
  
-+static void versal_create_usbs(Versal *s, qemu_irq *pic)
++static void populate_vfio_info(MigrationInfo *info)
 +{
-+    DeviceState *dev, *xhci_dev;
-+    MemoryRegion *mr;
-+
-+    object_initialize_child(OBJECT(s), "dwc3-0", &s->lpd.iou.usb.dwc3,
-+                            TYPE_USB_DWC3);
-+    dev = DEVICE(&s->lpd.iou.usb.dwc3);
-+    xhci_dev = DEVICE(&s->lpd.iou.usb.dwc3.sysbus_xhci);
-+
-+    object_property_set_link(OBJECT(xhci_dev), "dma", OBJECT(&s->mr_ps),
-+                             &error_abort);
-+    qdev_prop_set_uint32(xhci_dev, "intrs", 1);
-+    qdev_prop_set_uint32(xhci_dev, "slots", 2);
-+
-+    sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
-+
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+    memory_region_add_subregion(&s->mr_ps, MM_USB_XHCI_0_DWC3_GLOBAL, mr);
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(xhci_dev), 0);
-+    memory_region_add_subregion(&s->mr_ps, MM_USB_XHCI_0, mr);
-+
-+    sysbus_connect_irq(SYS_BUS_DEVICE(xhci_dev), 0, pic[VERSAL_USB0_IRQ_0]);
-+
-+    object_initialize_child(OBJECT(s), "usb2ctrl-0", &s->lpd.iou.usb.ctrl,
-+                           TYPE_XILINX_VERSAL_USB2_CTRL_REGS);
-+    dev = DEVICE(&s->lpd.iou.usb.ctrl);
-+    sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
-+
-+    mr = sysbus_mmio_get_region(SYS_BUS_DEVICE(dev), 0);
-+    memory_region_add_subregion(&s->mr_ps, MM_USB2_CTRL_REGS, mr);
++#ifdef CONFIG_LINUX
++    if (vfio_mig_active()) {
++        info->has_vfio = true;
++        info->vfio = g_malloc0(sizeof(*info->vfio));
++        info->vfio->transferred = vfio_mig_bytes_transferred();
++    }
++#endif
 +}
 +
- static void versal_create_gems(Versal *s, qemu_irq *pic)
+ static void fill_source_migration_info(MigrationInfo *info)
  {
-     int i;
-@@ -333,6 +366,7 @@ static void versal_realize(DeviceState *dev, Error **errp)
-     versal_create_apu_cpus(s);
-     versal_create_apu_gic(s, pic);
-     versal_create_uarts(s, pic);
-+    versal_create_usbs(s, pic);
-     versal_create_gems(s, pic);
-     versal_create_admas(s, pic);
-     versal_create_sds(s, pic);
-diff --git a/include/hw/arm/xlnx-versal.h b/include/hw/arm/xlnx-versal.h
-index 8ce8e63..e0a6c66 100644
---- a/include/hw/arm/xlnx-versal.h
-+++ b/include/hw/arm/xlnx-versal.h
-@@ -21,6 +21,8 @@
- #include "hw/net/cadence_gem.h"
- #include "hw/rtc/xlnx-zynqmp-rtc.h"
- #include "qom/object.h"
-+#include "hw/usb/hcd-dwc3.h"
-+#include "hw/misc/xlnx-versal-usb2-ctrl-regs.h"
- 
- #define TYPE_XLNX_VERSAL "xlnx-versal"
- OBJECT_DECLARE_SIMPLE_TYPE(Versal, XLNX_VERSAL)
-@@ -59,6 +61,10 @@ struct Versal {
-             PL011State uart[XLNX_VERSAL_NR_UARTS];
-             CadenceGEMState gem[XLNX_VERSAL_NR_GEMS];
-             XlnxZDMA adma[XLNX_VERSAL_NR_ADMAS];
-+            struct {
-+                USBDWC3 dwc3;
-+                VersalUsb2CtrlRegs ctrl;
-+            } usb;
-         } iou;
-     } lpd;
- 
-@@ -88,6 +94,7 @@ struct Versal {
- 
- #define VERSAL_UART0_IRQ_0         18
- #define VERSAL_UART1_IRQ_0         19
-+#define VERSAL_USB0_IRQ_0          22
- #define VERSAL_GEM0_IRQ_0          56
- #define VERSAL_GEM0_WAKE_IRQ_0     57
- #define VERSAL_GEM1_IRQ_0          58
-@@ -125,6 +132,13 @@ struct Versal {
- #define MM_OCM                      0xfffc0000U
- #define MM_OCM_SIZE                 0x40000
- 
-+#define MM_USB2_CTRL_REGS           0xFF9D0000
-+#define MM_USB2_CTRL_REGS_SIZE      0x10000
+     MigrationState *s = migrate_get_current();
+@@ -1026,6 +1038,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+         populate_time_info(info, s);
+         populate_ram_info(info, s);
+         populate_disk_info(info);
++        populate_vfio_info(info);
+         break;
+     case MIGRATION_STATUS_COLO:
+         info->has_status = true;
+@@ -1034,6 +1047,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+     case MIGRATION_STATUS_COMPLETED:
+         populate_time_info(info, s);
+         populate_ram_info(info, s);
++        populate_vfio_info(info);
+         break;
+     case MIGRATION_STATUS_FAILED:
+         info->has_status = true;
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 9789f4277f50..56e9bad33d94 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -357,6 +357,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+         }
+         monitor_printf(mon, "]\n");
+     }
 +
-+#define MM_USB_XHCI_0               0xFE200000
-+#define MM_USB_XHCI_0_SIZE          0x10000
-+#define MM_USB_XHCI_0_DWC3_GLOBAL   (MM_USB_XHCI_0 + 0xC100)
++    if (info->has_vfio) {
++        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
++                       info->vfio->transferred >> 10);
++    }
 +
- #define MM_TOP_DDR                  0x0
- #define MM_TOP_DDR_SIZE             0x80000000U
- #define MM_TOP_DDR_2                0x800000000ULL
+     qapi_free_MigrationInfo(info);
+ }
+ 
+diff --git a/qapi/migration.json b/qapi/migration.json
+index a5da513c9e05..3c7582052725 100644
+--- a/qapi/migration.json
++++ b/qapi/migration.json
+@@ -147,6 +147,18 @@
+             'active', 'postcopy-active', 'postcopy-paused',
+             'postcopy-recover', 'completed', 'failed', 'colo',
+             'pre-switchover', 'device', 'wait-unplug' ] }
++##
++# @VfioStats:
++#
++# Detailed VFIO devices migration statistics
++#
++# @transferred: amount of bytes transferred to the target VM by VFIO devices
++#
++# Since: 5.2
++#
++##
++{ 'struct': 'VfioStats',
++  'data': {'transferred': 'int' } }
+ 
+ ##
+ # @MigrationInfo:
+@@ -208,11 +220,16 @@
+ #
+ # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
+ #
++# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
++#        only returned if VFIO device is present, migration is supported by all
++#        VFIO devices and status is 'active' or 'completed' (since 5.2)
++#
+ # Since: 0.14.0
+ ##
+ { 'struct': 'MigrationInfo',
+   'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+            '*disk': 'MigrationStats',
++           '*vfio': 'VfioStats',
+            '*xbzrle-cache': 'XBZRLECacheStats',
+            '*total-time': 'int',
+            '*expected-downtime': 'int',
 -- 
-2.7.4
+2.7.0
 
 
