@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2872C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C0FC388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43A0E223C7
+	by mail.kernel.org (Postfix) with ESMTPS id 9DE9124640
 	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43A0E223C7
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE9124640
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51518 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51606 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVfAB-0002uN-NK
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:18:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48520)
+	id 1kVfAC-0002wU-DY
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf60-0000Vn-KS; Thu, 22 Oct 2020 14:13:52 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52086 helo=relay3.sw.ru)
+ id 1kVf60-0000Vo-HL; Thu, 22 Oct 2020 14:13:52 -0400
+Received: from relay.sw.ru ([185.231.240.75]:52102 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf5x-0001no-HP; Thu, 22 Oct 2020 14:13:51 -0400
+ id 1kVf5x-0001ns-JX; Thu, 22 Oct 2020 14:13:52 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf5r-005dVw-Gt; Thu, 22 Oct 2020 21:13:43 +0300
+ id 1kVf5r-005dVw-M5; Thu, 22 Oct 2020 21:13:43 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
  kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
  andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v12 04/14] qapi: add filter-node-name to block-stream
-Date: Thu, 22 Oct 2020 21:13:33 +0300
-Message-Id: <1603390423-980205-5-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v12 07/14] copy-on-read: limit COR operations to bottom node
+Date: Thu, 22 Oct 2020 21:13:36 +0300
+Message-Id: <1603390423-980205-8-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,120 +72,70 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Provide the possibility to pass the 'filter-node-name' parameter to the
-block-stream job as it is done for the commit block job.
+Limit COR operations to the bottom node (inclusively) in the backing
+chain when the bottom node name is given. It will be useful for a block
+stream job when the COR-filter is applied. The bottom node is passed as
+the base itself may change due to concurrent commit jobs on the same
+backing chain.
 
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/monitor/block-hmp-cmds.c | 4 ++--
- block/stream.c                 | 4 +++-
- blockdev.c                     | 4 +++-
- include/block/block_int.h      | 7 ++++++-
- qapi/block-core.json           | 6 ++++++
- 5 files changed, 20 insertions(+), 5 deletions(-)
+ block/copy-on-read.c | 42 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 40 insertions(+), 2 deletions(-)
 
-diff --git a/block/monitor/block-hmp-cmds.c b/block/monitor/block-hmp-cmds.c
-index d15a2be..e8a58f3 100644
---- a/block/monitor/block-hmp-cmds.c
-+++ b/block/monitor/block-hmp-cmds.c
-@@ -508,8 +508,8 @@ void hmp_block_stream(Monitor *mon, const QDict *qdict)
- 
-     qmp_block_stream(true, device, device, base != NULL, base, false, NULL,
-                      false, NULL, qdict_haskey(qdict, "speed"), speed, true,
--                     BLOCKDEV_ON_ERROR_REPORT, false, false, false, false,
--                     &error);
-+                     BLOCKDEV_ON_ERROR_REPORT, false, NULL, false, false, false,
-+                     false, &error);
- 
-     hmp_handle_error(mon, error);
- }
-diff --git a/block/stream.c b/block/stream.c
-index 8ce6729..e0540ee 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -221,7 +221,9 @@ static const BlockJobDriver stream_job_driver = {
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp)
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp)
+diff --git a/block/copy-on-read.c b/block/copy-on-read.c
+index 3d8e4db..8178a91 100644
+--- a/block/copy-on-read.c
++++ b/block/copy-on-read.c
+@@ -123,8 +123,46 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
+                                            size_t qiov_offset,
+                                            int flags)
  {
-     StreamBlockJob *s;
-     BlockDriverState *iter;
-diff --git a/blockdev.c b/blockdev.c
-index fe6fb5d..c917625 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2499,6 +2499,7 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-                       bool has_backing_file, const char *backing_file,
-                       bool has_speed, int64_t speed,
-                       bool has_on_error, BlockdevOnError on_error,
-+                      bool has_filter_node_name, const char *filter_node_name,
-                       bool has_auto_finalize, bool auto_finalize,
-                       bool has_auto_dismiss, bool auto_dismiss,
-                       Error **errp)
-@@ -2581,7 +2582,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     }
+-    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
+-                               flags | BDRV_REQ_COPY_ON_READ);
++    int64_t n = 0;
++    int local_flags;
++    int ret;
++    BDRVStateCOR *state = bs->opaque;
++
++    if (!state->bottom_bs) {
++        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
++                                   flags | BDRV_REQ_COPY_ON_READ);
++    }
++
++    while (bytes) {
++        local_flags = flags;
++
++        /* In case of failure, try to copy-on-read anyway */
++        ret = bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
++        if (!ret || ret < 0) {
++            ret = bdrv_is_allocated_above(bdrv_backing_chain_next(bs->file->bs),
++                                          state->bottom_bs, true, offset,
++                                          n, &n);
++            if (ret == 1 || ret < 0) {
++                local_flags |= BDRV_REQ_COPY_ON_READ;
++            }
++            /* Finish earlier if the end of a backing file has been reached */
++            if (ret == 0 && n == 0) {
++                break;
++            }
++        }
++
++        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
++                                  local_flags);
++        if (ret < 0) {
++            return ret;
++        }
++
++        offset += n;
++        qiov_offset += n;
++        bytes -= n;
++    }
++
++    return 0;
+ }
  
-     stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
--                 job_flags, has_speed ? speed : 0, on_error, &local_err);
-+                 job_flags, has_speed ? speed : 0, on_error,
-+                 filter_node_name, &local_err);
-     if (local_err) {
-         error_propagate(errp, local_err);
-         goto out;
-diff --git a/include/block/block_int.h b/include/block/block_int.h
-index 38cad9d..f782737 100644
---- a/include/block/block_int.h
-+++ b/include/block/block_int.h
-@@ -1134,6 +1134,9 @@ int is_windows_drive(const char *filename);
-  *                  See @BlockJobCreateFlags
-  * @speed: The maximum speed, in bytes per second, or 0 for unlimited.
-  * @on_error: The action to take upon error.
-+ * @filter_node_name: The node name that should be assigned to the filter
-+ * driver that the commit job inserts into the graph above @bs. NULL means
-+ * that a node name should be autogenerated.
-  * @errp: Error object.
-  *
-  * Start a streaming operation on @bs.  Clusters that are unallocated
-@@ -1146,7 +1149,9 @@ int is_windows_drive(const char *filename);
- void stream_start(const char *job_id, BlockDriverState *bs,
-                   BlockDriverState *base, const char *backing_file_str,
-                   int creation_flags, int64_t speed,
--                  BlockdevOnError on_error, Error **errp);
-+                  BlockdevOnError on_error,
-+                  const char *filter_node_name,
-+                  Error **errp);
  
- /**
-  * commit_start:
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ee5ebef..0a64306 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -2542,6 +2542,11 @@
- #            'stop' and 'enospc' can only be used if the block device
- #            supports io-status (see BlockInfo).  Since 1.3.
- #
-+# @filter-node-name: the node name that should be assigned to the
-+#                    filter driver that the stream job inserts into the graph
-+#                    above @device. If this option is not given, a node name is
-+#                    autogenerated. (Since: 5.2)
-+#
- # @auto-finalize: When false, this job will wait in a PENDING state after it has
- #                 finished its work, waiting for @block-job-finalize before
- #                 making any block graph changes.
-@@ -2572,6 +2577,7 @@
-   'data': { '*job-id': 'str', 'device': 'str', '*base': 'str',
-             '*base-node': 'str', '*backing-file': 'str', '*speed': 'int',
-             '*on-error': 'BlockdevOnError',
-+            '*filter-node-name': 'str',
-             '*auto-finalize': 'bool', '*auto-dismiss': 'bool' } }
- 
- ##
 -- 
 1.8.3.1
 
