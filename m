@@ -2,90 +2,62 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F02EC55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2696CC388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:03:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B4F223FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:01:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MJvnWI7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B4F223FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4EBAF22267
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:03:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4EBAF22267
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43798 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46350 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVaE4-0003L1-KX
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:01:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56124)
+	id 1kVaG1-0004Zn-5v
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:03:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVaCs-0002jT-4Q
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:00:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30011)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVaCh-0000E6-8w
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:00:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603371624;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=DmC3zdoigyALlNSczRucJILPm3iF3wo7HYx6XkYJ92s=;
- b=MJvnWI7qfSFb3RLVYP30BSxhP8uE3S4lYc2HWBQn7vUx5HNwytPz4UnYobbt9ZxXgbqKIb
- zYW7y+KVPgbefl6y992hG1maoja0rOjN8XoSRoCqabV6B/LAQR1YFgV9kOGjFSR83wKXRV
- QxJPb30rSoLo2sVcOA8Xr6i74R9HgBY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-142-dGnkL0o9PK68vaibVuhCiw-1; Thu, 22 Oct 2020 09:00:21 -0400
-X-MC-Unique: dGnkL0o9PK68vaibVuhCiw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18DC68049EF;
- Thu, 22 Oct 2020 13:00:20 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-115-72.ams2.redhat.com [10.36.115.72])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 02FDA5D9F1;
- Thu, 22 Oct 2020 13:00:11 +0000 (UTC)
-Subject: Re: [PATCH] gitlab-ci: Clone from GitLab itself
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201022123302.2884788-1-philmd@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <e79f57e6-d307-0d1f-027d-d2006c1c94b2@redhat.com>
-Date: Thu, 22 Oct 2020 15:00:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVaE6-0003We-Hh
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:01:54 -0400
+Received: from relay68.bu.edu ([128.197.228.73]:43673)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kVaE3-0000Y2-8p
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 09:01:53 -0400
+X-Envelope-From: alxndr@bu.edu
+X-BU-AUTH: mozz.bu.edu [128.197.127.33]
+Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
+ bits=0)
+ by relay68.bu.edu (8.14.3/8.14.3) with ESMTP id 09MD1NO7017845
+ (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+ Thu, 22 Oct 2020 09:01:26 -0400
+Date: Thu, 22 Oct 2020 09:01:23 -0400
+From: Alexander Bulekov <alxndr@bu.edu>
+To: Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH v6 16/16] scripts/oss-fuzz: remove the generic-fuzz target
+Message-ID: <20201022130123.5bjijh5cupwujeox@mozz.bu.edu>
+References: <20201021210922.572955-1-alxndr@bu.edu>
+ <20201021210922.572955-17-alxndr@bu.edu>
+ <m2o8ku7ghw.fsf@oracle.com>
 MIME-Version: 1.0
-In-Reply-To: <20201022123302.2884788-1-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <m2o8ku7ghw.fsf@oracle.com>
+Received-SPF: pass client-ip=128.197.228.73; envelope-from=alxndr@bu.edu;
+ helo=relay68.bu.edu
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:01:48
+X-ACL-Warn: Detected OS   = Linux 2.6.x
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
+ HK_RANDOM_FROM=0.502, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,38 +70,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org, f4bug@amsat.org,
+ bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
+ dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 22/10/2020 14.33, Philippe Mathieu-Daudé wrote:
-> Let GitLab runners use GitLab repository directly.
+On 201022 1032, Darren Kenny wrote:
+> Hi Alex,
 > 
-> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> ---
->  .gitlab-ci.yml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
-> index 66ad7aa5c22..ba77af51f2f 100644
-> --- a/.gitlab-ci.yml
-> +++ b/.gitlab-ci.yml
-> @@ -24,6 +24,7 @@ include:
->    image: $CI_REGISTRY_IMAGE/qemu/$IMAGE:latest
->    before_script:
->      - JOBS=$(expr $(nproc) + 1)
-> +    - sed -i s,git.qemu.org/git,gitlab.com/qemu-project, .gitmodules
->    script:
->      - mkdir build
->      - cd build
+> On Wednesday, 2020-10-21 at 17:09:22 -04, Alexander Bulekov wrote:
+> > generic-fuzz is not a standalone fuzzer - it requires some env variables
+> > to be set. On oss-fuzz, we set these with some predefined
+> > generic-fuzz-{...} targets, that are thin wrappers around generic-fuzz.
+> > Remove generic-fuzz from the oss-fuzz build, so oss-fuzz does not treat
+> > it as a standalone fuzzer.
+> >
+> > Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+> > ---
+> >  scripts/oss-fuzz/build.sh | 6 ++++++
+> >  1 file changed, 6 insertions(+)
+> >
+> > diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
+> > index 0c3ca9e06f..37cd7f9e25 100755
+> > --- a/scripts/oss-fuzz/build.sh
+> > +++ b/scripts/oss-fuzz/build.sh
+> > @@ -97,5 +97,11 @@ do
 > 
 
-Good idea!
+Hi Darren,
 
-Reviewed-by: Thomas Huth <thuth@redhat.com>
+> I'm presuming that the target that you're removing is being created by
+> this line, maybe we should just specifically skip it here instead?
 
+Sounds good.
+
+> The comment below on the removal probably would still apply though.
+> 
+> >      cp qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
+> 
+> Also, did you look into using hard-links, or even sym-links - they would
+> require less duplication of the binaries, which may be important, or may
+> not, and quicker creation too, e.g.
+> 
+>       ln qemu-fuzz-i386 "$DEST_DIR/qemu-fuzz-i386-target-$target"
+
+This is what I tried, when I was putting together the patch-series, and
+it raised an error when I was testing it in the oss-fuzz
+docker-containers. I blamed it on Docker, originally, but I just took a
+closer look, and the problem was that "qemu-fuzz-i386" isn't on the same
+file-system as $DEST_DIR in the oss-fuzz Docker. If I copy
+qemu-fuzz-i386 to $DEST_DIR/lib, and do 
+    ln "$DEST_DIR/lib/qemu-fuzz-i386" \
+       "$DEST_DIR/qemu-fuzz-i386-target-$target"
+everything works :)
+Thanks
+-Alex
+
+> 
+> It's something that has been done for years, for example if you do:
+> 
+>       ls -il /sbin/{e2fsck,fsck.ext*}
+> 
+> you will see they share the same inode. Similarly for vi and ex, they
+> use symlinks (hardlinks on some OSes, but seems not Linux):
+> 
+>       ls -il /bin/{vi,ex}
+> 
+> The main point is that argv[0] will be the name of link itself, not the
+> thing pointed to.
+> 
+> Thanks,
+> 
+> Darren.
+> 
+> >  done
+> >  
+> > +# Remove the generic-fuzz target, as it requires some environment variables to
+> > +# be configured. We have some generic-fuzz-{pc-q35, floppy, ...} targets that
+> > +# are thin wrappers around this target that set the required environment
+> > +# variables according to predefined configs.
+> > +rm "$DEST_DIR/qemu-fuzz-i386-target-generic-fuzz"
+> > +
+> >  echo "Done. The fuzzers are located in $DEST_DIR"
+> >  exit 0
+> > -- 
+> > 2.28.0
 
