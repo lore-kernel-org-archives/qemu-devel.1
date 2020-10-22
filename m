@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C0FC388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54613C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9DE9124640
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9DE9124640
+	by mail.kernel.org (Postfix) with ESMTPS id D27A724641
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:18:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D27A724641
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVfAC-0002wU-DY
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:18:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48528)
+	id 1kVfAI-0003CL-Gq
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:18:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf60-0000Vo-HL; Thu, 22 Oct 2020 14:13:52 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52102 helo=relay3.sw.ru)
+ id 1kVf60-0000Vm-OT; Thu, 22 Oct 2020 14:13:56 -0400
+Received: from relay.sw.ru ([185.231.240.75]:52070 helo=relay3.sw.ru)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf5x-0001ns-JX; Thu, 22 Oct 2020 14:13:52 -0400
+ id 1kVf5x-0001nf-Mt; Thu, 22 Oct 2020 14:13:51 -0400
 Received: from [172.16.25.136] (helo=localhost.sw.ru)
  by relay3.sw.ru with esmtp (Exim 4.94)
  (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf5r-005dVw-M5; Thu, 22 Oct 2020 21:13:43 +0300
+ id 1kVf5r-005dVw-Eb; Thu, 22 Oct 2020 21:13:43 +0300
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
  kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
  eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
  andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v12 07/14] copy-on-read: limit COR operations to bottom node
-Date: Thu, 22 Oct 2020 21:13:36 +0300
-Message-Id: <1603390423-980205-8-git-send-email-andrey.shinkevich@virtuozzo.com>
+Subject: [PATCH v12 02/14] block: add insert/remove node functions
+Date: Thu, 22 Oct 2020 21:13:31 +0300
+Message-Id: <1603390423-980205-3-git-send-email-andrey.shinkevich@virtuozzo.com>
 X-Mailer: git-send-email 1.8.3.1
 In-Reply-To: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
 References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
@@ -72,70 +72,89 @@ Sender: "Qemu-devel"
 Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Limit COR operations to the bottom node (inclusively) in the backing
-chain when the bottom node name is given. It will be useful for a block
-stream job when the COR-filter is applied. The bottom node is passed as
-the base itself may change due to concurrent commit jobs on the same
-backing chain.
+Provide API for a node insertion to and removal from a backing chain.
 
+Suggested-by: Max Reitz <mreitz@redhat.com>
 Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 ---
- block/copy-on-read.c | 42 ++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 40 insertions(+), 2 deletions(-)
+ block.c               | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+ include/block/block.h |  3 +++
+ 2 files changed, 52 insertions(+)
 
-diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-index 3d8e4db..8178a91 100644
---- a/block/copy-on-read.c
-+++ b/block/copy-on-read.c
-@@ -123,8 +123,46 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
-                                            size_t qiov_offset,
-                                            int flags)
- {
--    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
--                               flags | BDRV_REQ_COPY_ON_READ);
-+    int64_t n = 0;
-+    int local_flags;
-+    int ret;
-+    BDRVStateCOR *state = bs->opaque;
-+
-+    if (!state->bottom_bs) {
-+        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-+                                   flags | BDRV_REQ_COPY_ON_READ);
-+    }
-+
-+    while (bytes) {
-+        local_flags = flags;
-+
-+        /* In case of failure, try to copy-on-read anyway */
-+        ret = bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
-+        if (!ret || ret < 0) {
-+            ret = bdrv_is_allocated_above(bdrv_backing_chain_next(bs->file->bs),
-+                                          state->bottom_bs, true, offset,
-+                                          n, &n);
-+            if (ret == 1 || ret < 0) {
-+                local_flags |= BDRV_REQ_COPY_ON_READ;
-+            }
-+            /* Finish earlier if the end of a backing file has been reached */
-+            if (ret == 0 && n == 0) {
-+                break;
-+            }
-+        }
-+
-+        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
-+                                  local_flags);
-+        if (ret < 0) {
-+            return ret;
-+        }
-+
-+        offset += n;
-+        qiov_offset += n;
-+        bytes -= n;
-+    }
-+
-+    return 0;
+diff --git a/block.c b/block.c
+index 430edf7..502b483 100644
+--- a/block.c
++++ b/block.c
+@@ -4670,6 +4670,55 @@ static void bdrv_delete(BlockDriverState *bs)
+     g_free(bs);
  }
  
++BlockDriverState *bdrv_insert_node(BlockDriverState *bs, QDict *node_options,
++                                   int flags, Error **errp)
++{
++    BlockDriverState *new_node_bs;
++    Error *local_err = NULL;
++
++    new_node_bs =  bdrv_open(NULL, NULL, node_options, flags, errp);
++    if (new_node_bs == NULL) {
++        error_prepend(errp, "Could not create node: ");
++        return NULL;
++    }
++
++    bdrv_drained_begin(bs);
++    bdrv_replace_node(bs, new_node_bs, &local_err);
++    bdrv_drained_end(bs);
++
++    if (local_err) {
++        bdrv_unref(new_node_bs);
++        error_propagate(errp, local_err);
++        return NULL;
++    }
++
++    return new_node_bs;
++}
++
++void bdrv_remove_node(BlockDriverState *bs)
++{
++    BdrvChild *child;
++    BlockDriverState *inferior_bs;
++
++    child = bdrv_filter_or_cow_child(bs);
++    if (!child) {
++        return;
++    }
++    inferior_bs = child->bs;
++
++    /* Retain the BDS until we complete the graph change. */
++    bdrv_ref(inferior_bs);
++    /* Hold a guest back from writing while permissions are being reset. */
++    bdrv_drained_begin(inferior_bs);
++    /* Refresh permissions before the graph change. */
++    bdrv_child_refresh_perms(bs, child, &error_abort);
++    bdrv_replace_node(bs, inferior_bs, &error_abort);
++
++    bdrv_drained_end(inferior_bs);
++    bdrv_unref(inferior_bs);
++    bdrv_unref(bs);
++}
++
+ /*
+  * Run consistency checks on an image
+  *
+diff --git a/include/block/block.h b/include/block/block.h
+index d16c401..ae7612f 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -350,6 +350,9 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+                  Error **errp);
+ void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
+                        Error **errp);
++BlockDriverState *bdrv_insert_node(BlockDriverState *bs, QDict *node_options,
++                                   int flags, Error **errp);
++void bdrv_remove_node(BlockDriverState *bs);
  
+ int bdrv_parse_aio(const char *mode, int *flags);
+ int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough);
 -- 
 1.8.3.1
 
