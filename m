@@ -2,88 +2,78 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C264C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:49:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EFBC388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:50:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2DBE223BF
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:49:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D42A0223BF
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:50:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="itMzGb8q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2DBE223BF
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="EQveibdv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D42A0223BF
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53056 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56364 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZ6B-00047f-NX
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:49:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36796)
+	id 1kVZ77-0005V2-F6
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:50:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40218)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmj-0006Md-3G
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55358)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmh-0005Ax-DQ
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:32 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603366168;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ogDc78Da3pGyWDfyJyhV89iS65RlQAvah2kWaoor87s=;
- b=itMzGb8q2W2UwaopiFV6KZ0AlVKbOrkngxtki86E5J+VPJwG1gEottRq7g4Q7o4+mEvm8A
- 7/2ST/IeHspt58EMxdiNHn3wZ0YUmehaOTW6swnczjWsb/1+AaD8HwBJ6YBZfChojyjook
- Q/Oz9hU969MudhSQLEYW5A5g859yQjg=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-506-vnrzL1k7NXawBdGvwXnzAA-1; Thu, 22 Oct 2020 07:29:24 -0400
-X-MC-Unique: vnrzL1k7NXawBdGvwXnzAA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 509A7AD741;
- Thu, 22 Oct 2020 11:29:23 +0000 (UTC)
-Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6D3819C4F;
- Thu, 22 Oct 2020 11:29:19 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 20/28] qemu-storage-daemon: avoid compiling blockdev_ss twice
-Date: Thu, 22 Oct 2020 12:27:18 +0100
-Message-Id: <20201022112726.736757-21-stefanha@redhat.com>
-In-Reply-To: <20201022112726.736757-1-stefanha@redhat.com>
-References: <20201022112726.736757-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ2I-0000yG-Va
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:45:39 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16356)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ1a-00074a-GM
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:45:38 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f9170840000>; Thu, 22 Oct 2020 04:44:04 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
+ 2020 11:44:46 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 22 Oct 2020 11:44:38 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v27 01/17] vfio: Add function to unmap VFIO region
+Date: Thu, 22 Oct 2020 16:41:51 +0530
+Message-ID: <1603365127-14202-2-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 06:53:39
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603367044; bh=xtSQlqXVxqY0Ii7mEm8QI0dDKK/m5fS9hZu49+0IBfE=;
+ h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+ References:X-NVConfidentiality:MIME-Version:Content-Type;
+ b=EQveibdv51pMclqzF19MWG8ONzfJtsmAMWNIivVvauqJwQBjnx1ba/0BHb1O1DKlo
+ OOBYIVCre7vpf2XQlEO7G0tYjm8UWqmuB2p+sKubS2tqCzBYHAq1N57VJoylwA2ebI
+ fCZ0S1gRC4AQNuQBRWDTZrAT4rTdgye5+8DPMJTnLfKk9p8jGM2IdQTTPnEyBGvNrP
+ hK/zQIyCyJCwlzBbl5AuhFH15NVx23+vVHsdwRoiiezCYuGZjddv8JRbAh4HzF7Qzv
+ s3NrSQl3anfVDU05ze4VFGDS0ZgROiZCoOyCWBtRtT2RetHSHmDir5EhM8jMcUDOoY
+ M5Z9f7EYS453A==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:44:53
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,58 +87,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-SW50cm9kdWNlIGxpYmJsa2Rldi5mYSB0byBhdm9pZCByZWNvbXBpbGluZyBibG9ja2Rldl9zcyB0
-d2ljZS4KClN1Z2dlc3RlZC1ieTogUGFvbG8gQm9uemluaSA8cGJvbnppbmlAcmVkaGF0LmNvbT4K
-UmV2aWV3ZWQtYnk6IFBhb2xvIEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+ClNpZ25lZC1v
-ZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KTWVzc2FnZS1pZDog
-MjAyMDA5MjkxMjU1MTYuMTg2NzE1LTMtc3RlZmFuaGFAcmVkaGF0LmNvbQpTaWduZWQtb2ZmLWJ5
-OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogbWVzb24uYnVpbGQg
-ICAgICAgICAgICAgICAgfCAxMiArKysrKysrKysrLS0KIHN0b3JhZ2UtZGFlbW9uL21lc29uLmJ1
-aWxkIHwgIDMgKy0tCiAyIGZpbGVzIGNoYW5nZWQsIDExIGluc2VydGlvbnMoKyksIDQgZGVsZXRp
-b25zKC0pCgpkaWZmIC0tZ2l0IGEvbWVzb24uYnVpbGQgYi9tZXNvbi5idWlsZAppbmRleCAyZWM0
-ZjExNGNlLi44ODA2ODM0MDdmIDEwMDY0NAotLS0gYS9tZXNvbi5idWlsZAorKysgYi9tZXNvbi5i
-dWlsZApAQCAtMTQ2NCw3ICsxNDY0LDYgQEAgYmxvY2tkZXZfc3MuYWRkKGZpbGVzKAogIyBvcy13
-aW4zMi5jIGRvZXMgbm90CiBibG9ja2Rldl9zcy5hZGQod2hlbjogJ0NPTkZJR19QT1NJWCcsIGlm
-X3RydWU6IGZpbGVzKCdvcy1wb3NpeC5jJykpCiBzb2Z0bW11X3NzLmFkZCh3aGVuOiAnQ09ORklH
-X1dJTjMyJywgaWZfdHJ1ZTogW2ZpbGVzKCdvcy13aW4zMi5jJyldKQotc29mdG1tdV9zcy5hZGRf
-YWxsKGJsb2NrZGV2X3NzKQogCiBjb21tb25fc3MuYWRkKGZpbGVzKCdjcHVzLWNvbW1vbi5jJykp
-CiAKQEAgLTE1OTYsNiArMTU5NSwxNSBAQCBibG9jayA9IGRlY2xhcmVfZGVwZW5kZW5jeShsaW5r
-X3dob2xlOiBbbGliYmxvY2tdLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgbGlua19hcmdz
-OiAnQGJsb2NrLnN5bXMnLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgZGVwZW5kZW5jaWVz
-OiBbY3J5cHRvLCBpb10pCiAKK2Jsb2NrZGV2X3NzID0gYmxvY2tkZXZfc3MuYXBwbHkoY29uZmln
-X2hvc3QsIHN0cmljdDogZmFsc2UpCitsaWJibG9ja2RldiA9IHN0YXRpY19saWJyYXJ5KCdibG9j
-a2RldicsIGJsb2NrZGV2X3NzLnNvdXJjZXMoKSArIGdlbmgsCisgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgIGRlcGVuZGVuY2llczogYmxvY2tkZXZfc3MuZGVwZW5kZW5jaWVzKCksCisgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgIG5hbWVfc3VmZml4OiAnZmEnLAorICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICBidWlsZF9ieV9kZWZhdWx0OiBmYWxzZSkKKworYmxvY2tkZXYgPSBk
-ZWNsYXJlX2RlcGVuZGVuY3kobGlua193aG9sZTogW2xpYmJsb2NrZGV2XSwKKyAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIGRlcGVuZGVuY2llczogW2Jsb2NrXSkKKwogcW1wX3NzID0gcW1w
-X3NzLmFwcGx5KGNvbmZpZ19ob3N0LCBzdHJpY3Q6IGZhbHNlKQogbGlicW1wID0gc3RhdGljX2xp
-YnJhcnkoJ3FtcCcsIHFtcF9zcy5zb3VyY2VzKCkgKyBnZW5oLAogICAgICAgICAgICAgICAgICAg
-ICAgICAgZGVwZW5kZW5jaWVzOiBxbXBfc3MuZGVwZW5kZW5jaWVzKCksCkBAIC0xNjI4LDcgKzE2
-MzYsNyBAQCBmb3JlYWNoIG0gOiBibG9ja19tb2RzICsgc29mdG1tdV9tb2RzCiAgICAgICAgICAg
-ICAgICAgaW5zdGFsbF9kaXI6IGNvbmZpZ19ob3N0WydxZW11X21vZGRpciddKQogZW5kZm9yZWFj
-aAogCi1zb2Z0bW11X3NzLmFkZChhdXRoeiwgYmxvY2ssIGNoYXJkZXYsIGNyeXB0bywgaW8sIHFt
-cCkKK3NvZnRtbXVfc3MuYWRkKGF1dGh6LCBibG9ja2RldiwgY2hhcmRldiwgY3J5cHRvLCBpbywg
-cW1wKQogY29tbW9uX3NzLmFkZChxb20sIHFlbXV1dGlsKQogCiBjb21tb25fc3MuYWRkX2FsbCh3
-aGVuOiAnQ09ORklHX1NPRlRNTVUnLCBpZl90cnVlOiBbc29mdG1tdV9zc10pCmRpZmYgLS1naXQg
-YS9zdG9yYWdlLWRhZW1vbi9tZXNvbi5idWlsZCBiL3N0b3JhZ2UtZGFlbW9uL21lc29uLmJ1aWxk
-CmluZGV4IDA0MDlhY2MzZjUuLmM1YWRjZTgxYzMgMTAwNjQ0Ci0tLSBhL3N0b3JhZ2UtZGFlbW9u
-L21lc29uLmJ1aWxkCisrKyBiL3N0b3JhZ2UtZGFlbW9uL21lc29uLmJ1aWxkCkBAIC0xLDcgKzEs
-NiBAQAogcXNkX3NzID0gc3Muc291cmNlX3NldCgpCiBxc2Rfc3MuYWRkKGZpbGVzKCdxZW11LXN0
-b3JhZ2UtZGFlbW9uLmMnKSkKLXFzZF9zcy5hZGQoYmxvY2ssIGNoYXJkZXYsIHFtcCwgcW9tLCBx
-ZW11dXRpbCkKLXFzZF9zcy5hZGRfYWxsKGJsb2NrZGV2X3NzKQorcXNkX3NzLmFkZChibG9ja2Rl
-diwgY2hhcmRldiwgcW1wLCBxb20sIHFlbXV1dGlsKQogCiBzdWJkaXIoJ3FhcGknKQogCi0tIAoy
-LjI2LjIKCg==
+This function will be used for migration region.
+Migration region is mmaped when migration starts and will be unmapped when
+migration is complete.
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/vfio/common.c              | 32 ++++++++++++++++++++++++++++----
+ hw/vfio/trace-events          |  1 +
+ include/hw/vfio/vfio-common.h |  1 +
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 13471ae29436..c6e98b8d61be 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -924,6 +924,18 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
+     return 0;
+ }
+ 
++static void vfio_subregion_unmap(VFIORegion *region, int index)
++{
++    trace_vfio_region_unmap(memory_region_name(&region->mmaps[index].mem),
++                            region->mmaps[index].offset,
++                            region->mmaps[index].offset +
++                            region->mmaps[index].size - 1);
++    memory_region_del_subregion(region->mem, &region->mmaps[index].mem);
++    munmap(region->mmaps[index].mmap, region->mmaps[index].size);
++    object_unparent(OBJECT(&region->mmaps[index].mem));
++    region->mmaps[index].mmap = NULL;
++}
++
+ int vfio_region_mmap(VFIORegion *region)
+ {
+     int i, prot = 0;
+@@ -954,10 +966,7 @@ int vfio_region_mmap(VFIORegion *region)
+             region->mmaps[i].mmap = NULL;
+ 
+             for (i--; i >= 0; i--) {
+-                memory_region_del_subregion(region->mem, &region->mmaps[i].mem);
+-                munmap(region->mmaps[i].mmap, region->mmaps[i].size);
+-                object_unparent(OBJECT(&region->mmaps[i].mem));
+-                region->mmaps[i].mmap = NULL;
++                vfio_subregion_unmap(region, i);
+             }
+ 
+             return ret;
+@@ -982,6 +991,21 @@ int vfio_region_mmap(VFIORegion *region)
+     return 0;
+ }
+ 
++void vfio_region_unmap(VFIORegion *region)
++{
++    int i;
++
++    if (!region->mem) {
++        return;
++    }
++
++    for (i = 0; i < region->nr_mmaps; i++) {
++        if (region->mmaps[i].mmap) {
++            vfio_subregion_unmap(region, i);
++        }
++    }
++}
++
+ void vfio_region_exit(VFIORegion *region)
+ {
+     int i;
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 93a0bc2522f8..a0c7b49a2ebc 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -113,6 +113,7 @@ vfio_region_mmap(const char *name, unsigned long offset, unsigned long end) "Reg
+ vfio_region_exit(const char *name, int index) "Device %s, region %d"
+ vfio_region_finalize(const char *name, int index) "Device %s, region %d"
+ vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps enabled: %d"
++vfio_region_unmap(const char *name, unsigned long offset, unsigned long end) "Region %s unmap [0x%lx - 0x%lx]"
+ vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
+ vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
+ vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index c78f3ff5593c..dc95f527b583 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -171,6 +171,7 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
+                       int index, const char *name);
+ int vfio_region_mmap(VFIORegion *region);
+ void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
++void vfio_region_unmap(VFIORegion *region);
+ void vfio_region_exit(VFIORegion *region);
+ void vfio_region_finalize(VFIORegion *region);
+ void vfio_reset_handler(void *opaque);
+-- 
+2.7.0
 
 
