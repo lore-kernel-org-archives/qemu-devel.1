@@ -7,75 +7,84 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D551C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:23:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C25E3C388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:26:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76575221FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:22:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0B857221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:26:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jprt8kr0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76575221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="KbNEXuCO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0B857221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60294 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZcQ-0007SN-5K
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:22:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40764)
+	id 1kVZfN-0001ay-Rz
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:26:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVZ3y-0002y8-Td
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:47:24 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:15219)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVZ3u-0007X1-QU
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:47:22 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f9170e10002>; Thu, 22 Oct 2020 04:45:37 -0700
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
- 2020 11:47:03 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 22 Oct 2020 11:46:55 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v27 17/17] qapi: Add VFIO devices migration stats in Migration
- stats
-Date: Thu, 22 Oct 2020 16:42:07 +0530
-Message-ID: <1603365127-14202-18-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVZOh-00026a-Ok
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:08:48 -0400
+Received: from mail-wm1-x343.google.com ([2a00:1450:4864:20::343]:39176)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kVZOV-0000Zm-Co
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:08:47 -0400
+Received: by mail-wm1-x343.google.com with SMTP id d3so1887105wma.4
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 05:08:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qLPB1dB+Oklmp5dhgjQooB7fphLzdqsSaIVwxQvRp+M=;
+ b=KbNEXuCOgFL3tTz71uZbBvC1OR2lqbN0QcpMKadeHeRWZIWq/JTCwpuOA9I5m1IwSS
+ mblPC6h1rGx/DJBqcK/ZW0FWa5mqdVF1+jRJoQxPyZWvBW04supVKea5SI40qBFbUMgv
+ urdd7dfr0cU/ertF2YEhbVRj4aMqBVJnDZKMvNHoNDmmK1aQeD2sFMbSYyg65c6t/1P0
+ gN7HFtWWRD6ITmO4MdiOdVAfYUkmALCBu1aR5LkEaPZk9oWzb8r0ZkLXT06RAPILEqm3
+ rSp43X7yO7Sj0SxTY1iKfG4PddIB1NscMAzkRsnSUWmkjCcq/VOsx/lrP5j0yk9ZE/Sd
+ T8OQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=qLPB1dB+Oklmp5dhgjQooB7fphLzdqsSaIVwxQvRp+M=;
+ b=qzuUTPFvjgGrn70EZvcOQNCUsV/YYIGcCfQbe/6qwcXsSS7r4iJzWi/jRZhZXi/krj
+ AV1Xy7swISpAHpBvdLxfmuysxeuOceLzHpAAL5HSngY6G3SE00f1c4eoTnh80+ayEx9H
+ xaX3+BQrHGjmrwqLli/+ZsNsYIw9p1MCNt4Y+bnE1nOROT/jZtMFaEy9J0G0kwNnKDEl
+ /c2n+eEpHhxRTrYR7XZZl01xMltBFUTAmEsV+rwxlmB26lPCVsfYS3z8KjD5zmuKcUHq
+ pJRn9eglbEkJnoZYa4KAWjZdk7kT4QfvSI4pRxPYGpMBKQnbvnFLt8DKvfIWAcjKaYI2
+ fdxg==
+X-Gm-Message-State: AOAM531Hp0/BeKPVK+SL5xLM7gtz2NZ4DED50iM70Ta7n1VhlICklxN/
+ HkJoPenYzeb1+xHFl4D1q1PuVbv2/GXlYA==
+X-Google-Smtp-Source: ABdhPJyWAOBkCwluaG2Ot0edeqAf0H0GjO3K8ziM7CC4S2epV3Yd692Ehtl6jl1SMHFevFoKVHWyWw==
+X-Received: by 2002:a1c:1946:: with SMTP id 67mr2215910wmz.15.1603368513039;
+ Thu, 22 Oct 2020 05:08:33 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id x81sm3406210wmb.11.2020.10.22.05.08.31
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Oct 2020 05:08:31 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] migration: Drop unused VMSTATE_FLOAT64 support
+Date: Thu, 22 Oct 2020 13:08:30 +0100
+Message-Id: <20201022120830.5938-1-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603367137; bh=OFspOLIjCQHaYlRP5L/Rg+M8yveUe+Q4XGbnX2cIMQc=;
- h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
- References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=jprt8kr0wnNMBpIfuEmajAh7iwRR77Vh8ZZ6GuAvG8kN09/qxVomab+yAsy2aHqE8
- a7Ps4tg9KF1Y5InVXOhOE1hrhu94gEvgDWGzC1ersl1iz9gwa/T/betDwSiA+slsjN
- retsFwIywqgldUTVDh5PYEqbNI1XQNfbUqAYMstKUwnPXR1VuFe1WPldkDHD0F0frB
- Uyc94U8aOmwc4QF3Gt2FJwxy8naCYOjhF66aPJBXC8uRj1frhA++qRMxs+vVntvxT0
- ed0vY38+H8lWIAVh99kXHn6kHvjuO+YUTXfhYxH3WERHjog4xPZTPkMeg6sMDWcDDx
- P7ZlW1kHVnv2Q==
-Received-SPF: pass client-ip=216.228.121.143;
- envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:44:48
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::343;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x343.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,237 +97,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com, dnigam@nvidia.com
+Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Juan Quintela <quintela@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Added amount of bytes transferred to the VM at destination by all VFIO
-devices
+Commit ef96e3ae9698d6 in January 2019 removed the last user of the
+VMSTATE_FLOAT64* macros. These were used by targets which defined
+their floating point register file as an array of 'float64'.
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+We used to try to maintain a stricter distinction between
+'float64' (a type for holding an integer representing an IEEE float)
+and 'uint64_t', including having a debug option for 'float64' being
+a struct and supposedly mandatory macros for converting between
+float64 and uint64_t. We no longer think that's a usefully
+strong distinction to draw and we allow ourselves to freely
+assume that float64 really is just a 64-bit integer type, so
+for new targets we would simply recommend use of the uint64_t type
+for a floating point register file. The float64 type remains
+as a useful way of documenting in the type signature of helper
+functions and the like that they expect to receive an IEEE float
+from the TCG generated code rather than an arbitrary integer.
+
+Since the VMSTATE_FLOAT64* macros have no remaining users and
+we don't recommend new code uses them, delete them.
+
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/vfio/common.c            | 20 ++++++++++++++++++++
- hw/vfio/migration.c         | 10 ++++++++++
- include/qemu/vfio-helpers.h |  3 +++
- migration/migration.c       | 14 ++++++++++++++
- monitor/hmp-cmds.c          |  6 ++++++
- qapi/migration.json         | 17 +++++++++++++++++
- 6 files changed, 70 insertions(+)
+ include/migration/vmstate.h | 13 -------------
+ migration/vmstate-types.c   | 26 --------------------------
+ 2 files changed, 39 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 9c879e5c0f62..8d0758eda9fa 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -39,6 +39,7 @@
- #include "trace.h"
- #include "qapi/error.h"
- #include "migration/migration.h"
-+#include "qemu/vfio-helpers.h"
+diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
+index f68ed7db13c..4d71dc8fbaa 100644
+--- a/include/migration/vmstate.h
++++ b/include/migration/vmstate.h
+@@ -219,7 +219,6 @@ extern const VMStateInfo vmstate_info_uint64;
+ #define VMS_NULLPTR_MARKER (0x30U) /* '0' */
+ extern const VMStateInfo vmstate_info_nullptr;
  
- VFIOGroupList vfio_group_list =
-     QLIST_HEAD_INITIALIZER(vfio_group_list);
-@@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
-  * Device state interfaces
-  */
+-extern const VMStateInfo vmstate_info_float64;
+ extern const VMStateInfo vmstate_info_cpudouble;
  
-+bool vfio_mig_active(void)
-+{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
-+
-+    if (QLIST_EMPTY(&vfio_group_list)) {
-+        return false;
-+    }
-+
-+    QLIST_FOREACH(group, &vfio_group_list, next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            if (vbasedev->migration_blocker) {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
- static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
- {
-     VFIOGroup *group;
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 77ee60a43ea5..b23e21c6de2b 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -28,6 +28,7 @@
- #include "pci.h"
- #include "trace.h"
- #include "hw/hw.h"
-+#include "qemu/vfio-helpers.h"
+ extern const VMStateInfo vmstate_info_timer;
+@@ -997,12 +996,6 @@ extern const VMStateInfo vmstate_info_qlist;
+     VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_uint64, uint64_t)
  
- /*
-  * Flags to be used as unique delimiters for VFIO devices in the migration
-@@ -45,6 +46,8 @@
- #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
- #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
  
-+static int64_t bytes_transferred;
-+
- static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
-                                   off_t off, bool iswrite)
- {
-@@ -255,6 +258,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
-         *size = data_size;
-     }
+-#define VMSTATE_FLOAT64_V(_f, _s, _v)                                 \
+-    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_float64, float64)
+-
+-#define VMSTATE_FLOAT64(_f, _s)                                       \
+-    VMSTATE_FLOAT64_V(_f, _s, 0)
+-
+ #define VMSTATE_TIMER_PTR_TEST(_f, _s, _test)                             \
+     VMSTATE_POINTER_TEST(_f, _s, _test, vmstate_info_timer, QEMUTimer *)
  
-+    bytes_transferred += data_size;
-     return ret;
- }
+@@ -1114,12 +1107,6 @@ extern const VMStateInfo vmstate_info_qlist;
+ #define VMSTATE_INT64_ARRAY(_f, _s, _n)                               \
+     VMSTATE_INT64_ARRAY_V(_f, _s, _n, 0)
  
-@@ -776,6 +780,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-     case MIGRATION_STATUS_CANCELLING:
-     case MIGRATION_STATUS_CANCELLED:
-     case MIGRATION_STATUS_FAILED:
-+        bytes_transferred = 0;
-         ret = vfio_migration_set_state(vbasedev,
-                       ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
-                       VFIO_DEVICE_STATE_RUNNING);
-@@ -862,6 +867,11 @@ err:
+-#define VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, _v)                       \
+-    VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_float64, float64)
+-
+-#define VMSTATE_FLOAT64_ARRAY(_f, _s, _n)                             \
+-    VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, 0)
+-
+ #define VMSTATE_CPUDOUBLE_ARRAY_V(_f, _s, _n, _v)                     \
+     VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_cpudouble, CPU_DoubleU)
  
- /* ---------------------------------------------------------------------- */
+diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
+index 35e784c9d93..e22d41d73d6 100644
+--- a/migration/vmstate-types.c
++++ b/migration/vmstate-types.c
+@@ -420,32 +420,6 @@ const VMStateInfo vmstate_info_uint16_equal = {
+     .put  = put_uint16,
+ };
  
-+int64_t vfio_mig_bytes_transferred(void)
-+{
-+    return bytes_transferred;
-+}
-+
- int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
- {
-     VFIOContainer *container = vbasedev->group->container;
-diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
-index 4491c8e1a6e9..7f7a46e6ef2d 100644
---- a/include/qemu/vfio-helpers.h
-+++ b/include/qemu/vfio-helpers.h
-@@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
- int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
-                            int irq_type, Error **errp);
+-/* floating point */
+-
+-static int get_float64(QEMUFile *f, void *pv, size_t size,
+-                       const VMStateField *field)
+-{
+-    float64 *v = pv;
+-
+-    *v = make_float64(qemu_get_be64(f));
+-    return 0;
+-}
+-
+-static int put_float64(QEMUFile *f, void *pv, size_t size,
+-                       const VMStateField *field, QJSON *vmdesc)
+-{
+-    uint64_t *v = pv;
+-
+-    qemu_put_be64(f, float64_val(*v));
+-    return 0;
+-}
+-
+-const VMStateInfo vmstate_info_float64 = {
+-    .name = "float64",
+-    .get  = get_float64,
+-    .put  = put_float64,
+-};
+-
+ /* CPU_DoubleU type */
  
-+bool vfio_mig_active(void);
-+int64_t vfio_mig_bytes_transferred(void);
-+
- #endif
-diff --git a/migration/migration.c b/migration/migration.c
-index 0575ecb37953..8b2865d25ef4 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -56,6 +56,7 @@
- #include "net/announce.h"
- #include "qemu/queue.h"
- #include "multifd.h"
-+#include "qemu/vfio-helpers.h"
- 
- #define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
- 
-@@ -1002,6 +1003,17 @@ static void populate_disk_info(MigrationInfo *info)
-     }
- }
- 
-+static void populate_vfio_info(MigrationInfo *info)
-+{
-+#ifdef CONFIG_LINUX
-+    if (vfio_mig_active()) {
-+        info->has_vfio = true;
-+        info->vfio = g_malloc0(sizeof(*info->vfio));
-+        info->vfio->transferred = vfio_mig_bytes_transferred();
-+    }
-+#endif
-+}
-+
- static void fill_source_migration_info(MigrationInfo *info)
- {
-     MigrationState *s = migrate_get_current();
-@@ -1026,6 +1038,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-         populate_disk_info(info);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_COLO:
-         info->has_status = true;
-@@ -1034,6 +1047,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-     case MIGRATION_STATUS_COMPLETED:
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_FAILED:
-         info->has_status = true;
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 9789f4277f50..56e9bad33d94 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -357,6 +357,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
-         }
-         monitor_printf(mon, "]\n");
-     }
-+
-+    if (info->has_vfio) {
-+        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
-+                       info->vfio->transferred >> 10);
-+    }
-+
-     qapi_free_MigrationInfo(info);
- }
- 
-diff --git a/qapi/migration.json b/qapi/migration.json
-index a5da513c9e05..3c7582052725 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -147,6 +147,18 @@
-             'active', 'postcopy-active', 'postcopy-paused',
-             'postcopy-recover', 'completed', 'failed', 'colo',
-             'pre-switchover', 'device', 'wait-unplug' ] }
-+##
-+# @VfioStats:
-+#
-+# Detailed VFIO devices migration statistics
-+#
-+# @transferred: amount of bytes transferred to the target VM by VFIO devices
-+#
-+# Since: 5.2
-+#
-+##
-+{ 'struct': 'VfioStats',
-+  'data': {'transferred': 'int' } }
- 
- ##
- # @MigrationInfo:
-@@ -208,11 +220,16 @@
- #
- # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
- #
-+# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
-+#        only returned if VFIO device is present, migration is supported by all
-+#        VFIO devices and status is 'active' or 'completed' (since 5.2)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationInfo',
-   'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
-            '*disk': 'MigrationStats',
-+           '*vfio': 'VfioStats',
-            '*xbzrle-cache': 'XBZRLECacheStats',
-            '*total-time': 'int',
-            '*expected-downtime': 'int',
+ static int get_cpudouble(QEMUFile *f, void *pv, size_t size,
 -- 
-2.7.0
+2.20.1
 
 
