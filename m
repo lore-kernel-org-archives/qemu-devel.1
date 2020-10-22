@@ -2,118 +2,106 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2D4FC388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:50:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5FDFC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:59:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6C57922267
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:50:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06256223FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:59:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bpWPzxIB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C57922267
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gTWzrNKo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06256223FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33608 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40944 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVa3U-0006xk-5k
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:50:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52528)
+	id 1kVaBR-0001w6-Uf
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:59:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54504)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kVa2m-0006Rs-1J; Thu, 22 Oct 2020 08:50:12 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:62374)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <walling@linux.ibm.com>)
- id 1kVa2j-0006xL-QY; Thu, 22 Oct 2020 08:50:11 -0400
-Received: from pps.filterd (m0098393.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09MCXT0M031188; Thu, 22 Oct 2020 08:50:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=subject : to : cc :
- references : from : message-id : date : mime-version : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=qNyFhLFWw94r/iBWbkivCOOtM6+sUhDVC5NAlw9CwqA=;
- b=bpWPzxIB5WRrxF8sOo1iWNm2/ktTWXgbUh9fkQ92MDc0V8Bi7N9l028v9Z8TIcvFSa1I
- EU6bxz14phPtYvhJPo5qjwqvC+72eqeYfxTFY397fFFaYazYCRDIPvOW2yhvLJHDtcbu
- yTXgF1qLA7LW639NIPSch85fDNC7iCah+5dQis1tiYRnh61dJiIuNMm4yl0MdpJyzrYh
- L/y3UH2o6Sm9OB97fWCQYI4kXu/uaSuE2PrlkdPxhq8fPDFZac6m7a4RWbgqHGv4LkAT
- lnn7IBHIo5CCeKtWsx89J+G2ddycJgr7MOv+1WNO45/TU2pIRsdIr7zxI2Vg5h7wajxL BA== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34b5pd126g-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 22 Oct 2020 08:50:05 -0400
-Received: from m0098393.ppops.net (m0098393.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09MCXTRb031190;
- Thu, 22 Oct 2020 08:50:05 -0400
-Received: from ppma01wdc.us.ibm.com (fd.55.37a9.ip4.static.sl-reverse.com
- [169.55.85.253])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34b5pd125p-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 22 Oct 2020 08:50:05 -0400
-Received: from pps.filterd (ppma01wdc.us.ibm.com [127.0.0.1])
- by ppma01wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09MCYrk7021855;
- Thu, 22 Oct 2020 12:50:04 GMT
-Received: from b03cxnp08025.gho.boulder.ibm.com
- (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
- by ppma01wdc.us.ibm.com with ESMTP id 347r89g3nb-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Thu, 22 Oct 2020 12:50:04 +0000
-Received: from b03ledav005.gho.boulder.ibm.com
- (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
- by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09MCnu2A64094696
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 22 Oct 2020 12:49:56 GMT
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 48BC9BE056;
- Thu, 22 Oct 2020 12:50:01 +0000 (GMT)
-Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7C93DBE054;
- Thu, 22 Oct 2020 12:50:00 +0000 (GMT)
-Received: from localhost.localdomain (unknown [9.85.200.244])
- by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
- Thu, 22 Oct 2020 12:50:00 +0000 (GMT)
-Subject: Re: [PATCH v2 0/2] s390x: pv: Diag318 fixes
-To: Janosch Frank <frankja@linux.ibm.com>, qemu-devel@nongnu.org
-References: <20201022103135.126033-1-frankja@linux.ibm.com>
-From: Collin Walling <walling@linux.ibm.com>
-Message-ID: <56891e08-68d4-6d5a-8525-f33ff0a0e2d7@linux.ibm.com>
-Date: Thu, 22 Oct 2020 08:50:00 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <dgibson@redhat.com>)
+ id 1kVaAP-0001RB-Jp
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:58:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57180)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgibson@redhat.com>)
+ id 1kVaAM-0008Ej-Kl
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:58:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603371481;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=rnFwiBjaaVlYoZLAPNhtJgVfJQSMRQpIjTqX0JC2Di8=;
+ b=gTWzrNKoIqEfSMfAsImvAXkJN3Lkzs9DZZSU61eP3zLE5cIAvVE/ppkx0U+SER8N9Y3m3+
+ W/G6DHexIP4kFnOcLaQxJS/GEAATqGgY3R20acO5yhhMZK/SkOZiZCln7uVmfnls8fyepH
+ GFq3wAzFnqbFkZGXCy3mixQMbD2logo=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-242-kP9xSqHjNjey5IBcIui4eA-1; Thu, 22 Oct 2020 08:56:43 -0400
+X-MC-Unique: kP9xSqHjNjey5IBcIui4eA-1
+Received: by mail-pj1-f72.google.com with SMTP id 21so1003614pje.1
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 05:56:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:in-reply-to
+ :references:mime-version;
+ bh=rnFwiBjaaVlYoZLAPNhtJgVfJQSMRQpIjTqX0JC2Di8=;
+ b=b8udW0p12fooY1iHGk/zo4moxOP/IB2cImMLQ8asLCSSa6aWxMxyr8lC73kX1EuFR0
+ TFkNd2fVdkxuA0SFy2H/+lDv3+zswzNNfkH0ZjIeDm9Zv5hSDLdfYNSB4jfkAmXXUBU7
+ eePoyKIxac2P1f29+eFjve0G+rAWS1QnBeC1uCLACfKz/R8pYH45GRU97K8aOVFANDBF
+ Lid11ZEmBxSzeUuEI/4q0OFfanID//vt/OA42Z5laXMQ5Lzgl793o/EFLcj+YjsMUKE3
+ XzJk/vQrgp16Ss2Tm0qmn9sYDLYc0dzrYboZNnoHY5g3kITuQs4YeXMxWhmV95irqr71
+ itUA==
+X-Gm-Message-State: AOAM531eU560UoJMSWzgjcEsx4tm4+4yD74eJ9ETr1wuG/aghvHSBiV4
+ Mt5g7vuaT2xSjHrcZNTdF5a4vZ3SOA/Yvfd7MqrnHrFLqXjtas5dUvHl35qSQR3VRO5Jn1o8wW+
+ 1tEcGMeKGTI3K1HI=
+X-Received: by 2002:a62:7609:0:b029:152:b31e:6aed with SMTP id
+ r9-20020a6276090000b0290152b31e6aedmr2438168pfc.10.1603371402389; 
+ Thu, 22 Oct 2020 05:56:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJy9zEr3kx6JkbyK3eEI3os/ni8SUtxB0Z7fM+NzojPslvoZZtVzj4JmE0KeqtXsG5OO4nIBdQ==
+X-Received: by 2002:a62:7609:0:b029:152:b31e:6aed with SMTP id
+ r9-20020a6276090000b0290152b31e6aedmr2438140pfc.10.1603371402004; 
+ Thu, 22 Oct 2020 05:56:42 -0700 (PDT)
+Received: from yekko.fritz.box ([2001:4479:e200:1100:3c24:4d96:ea81:be55])
+ by smtp.gmail.com with ESMTPSA id q14sm2206860pjp.43.2020.10.22.05.56.39
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Oct 2020 05:56:41 -0700 (PDT)
+Date: Thu, 22 Oct 2020 23:56:32 +1100
+From: David Gibson <dgibson@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
+ not ready
+Message-ID: <20201022235632.7f69ddc9@yekko.fritz.box>
+In-Reply-To: <20201022080354-mutt-send-email-mst@kernel.org>
+References: <20201022114026.31968-1-marcel.apfelbaum@gmail.com>
+ <20201022080354-mutt-send-email-mst@kernel.org>
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201022103135.126033-1-frankja@linux.ibm.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
- definitions=2020-10-22_06:2020-10-20,
- 2020-10-22 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- malwarescore=0 clxscore=1011
- mlxscore=0 spamscore=0 mlxlogscore=999 adultscore=0 bulkscore=0
- suspectscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010220087
-Received-SPF: pass client-ip=148.163.156.1; envelope-from=walling@linux.ibm.com;
- helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:40:49
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgibson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; boundary="Sig_/=gSePKt+auwNee_V5sngHSA";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgibson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.107,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,52 +114,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, david@redhat.com, cohuck@redhat.com, pasic@linux.ibm.com,
- borntraeger@de.ibm.com, qemu-s390x@nongnu.org, mhartmay@linux.ibm.com
+Cc: jusual@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/22/20 6:31 AM, Janosch Frank wrote:
-> Here are two fixes for the diag318 support that fix crashes when
-> booting PV guests.
-> 
-> We're working on extending our testing to catch problems like these
-> earlier.
-> 
-> 
-> Branch:
-> https://gitlab.com/frankja/qemu/-/commits/bb/frankja/diag318_fixes
-> 
-> CI:
-> https://gitlab.com/frankja/qemu/-/pipelines/206174979
-> 
-> 
-> V2:
-> 	* Moved fencing nto cpu model functions
-> 	* Added rev-by and acks
-> 
-> 
-> Janosch Frank (2):
->   s390x: pv: Remove sclp boundary checks
->   s390x: pv: Fix diag318 PV fencing
-> 
->  hw/s390x/sclp.c             | 5 -----
->  target/s390x/cpu_features.c | 5 +++++
->  target/s390x/cpu_features.h | 4 ++++
->  target/s390x/cpu_models.c   | 4 ++++
->  target/s390x/kvm.c          | 3 +--
->  5 files changed, 14 insertions(+), 7 deletions(-)
-> 
+--Sig_/=gSePKt+auwNee_V5sngHSA
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Thanks for correcting this. You've certainly received plenty of reviews
-and ack's, but since this touches code I worked on:
+On Thu, 22 Oct 2020 08:06:55 -0400
+"Michael S. Tsirkin" <mst@redhat.com> wrote:
 
-Reviewed-by: Collin Walling <walling@linux.ibm.com>
+> On Thu, Oct 22, 2020 at 02:40:26PM +0300, Marcel Apfelbaum wrote:
+> > From: Marcel Apfelbaum <marcel@redhat.com>
+> >=20
+> > During PCIe Root Port's transition from Power-Off to Power-ON (or vice-=
+versa)
+> > the "Slot Control Register" has the "Power Indicator Control"
+> > set to "Blinking" expressing a "power transition" mode.
+> >=20
+> > Any hotplug operation during the "power transition" mode is not permitt=
+ed
+> > or at least not expected by the Guest OS leading to strange failures.
+> >=20
+> > Detect and refuse hotplug operations in such case.
+> >=20
+> > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+> > ---
+> >  hw/pci/pcie.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> >=20
+> > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+> > index 5b48bae0f6..2fe5c1473f 100644
+> > --- a/hw/pci/pcie.c
+> > +++ b/hw/pci/pcie.c
+> > @@ -410,6 +410,7 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotp=
+lug_dev, DeviceState *dev,
+> >      PCIDevice *hotplug_pdev =3D PCI_DEVICE(hotplug_dev);
+> >      uint8_t *exp_cap =3D hotplug_pdev->config + hotplug_pdev->exp.exp_=
+cap;
+> >      uint32_t sltcap =3D pci_get_word(exp_cap + PCI_EXP_SLTCAP);
+> > +    uint32_t sltctl =3D pci_get_word(exp_cap + PCI_EXP_SLTCTL);
+> > =20
+> >      /* Check if hot-plug is disabled on the slot */
+> >      if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) =3D=3D 0) {
+> > @@ -418,6 +419,12 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hot=
+plug_dev, DeviceState *dev,
+> >          return;
+> >      }
+> > =20
+> > +    if ((sltctl & PCI_EXP_SLTCTL_PIC) =3D=3D PCI_EXP_SLTCTL_PWR_IND_BL=
+INK) {
+> > +        error_setg(errp, "Hot-plug failed: %s is in Power Transition",
+> > +                   DEVICE(hotplug_pdev)->id);
+> > +        return;
+> > +    }
+> > +
+> >      pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
+> >  } =20
+>=20
+> Probably the only way to handle for existing machine types.
+> For new ones, can't we queue it in host memory somewhere?
 
--- 
-Regards,
-Collin
+I'm not actually convinced we can't do that even for existing machine
+types.  So I'm a bit hesitant to suggest going ahead with this without
+looking a bit closer at whether we can implement a wait-for-ready in
+qemu, rather than forcing every user of qemu (human or machine) to do
+so.
 
-Stay safe and stay healthy
+
+--=20
+David Gibson <dgibson@redhat.com>
+Principal Software Engineer, Virtualization, Red Hat
+
+--Sig_/=gSePKt+auwNee_V5sngHSA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+RgYAACgkQbDjKyiDZ
+s5Li2xAAiMBMK8k3xMO45SPh7jclMiaCzM6pFglFICX3hGtaYa7bJUoIeyw2fpVf
+YroJXfBsLJus2rZfMvCmY94+pTVE0EL+a1cpsuoM3iGAYCQGsTnCtTVYPdSQ60Df
+PoOWPObk3z3bHIoiW9WYjMzU9GrgRxchC+PEUhZjNIxEod0SBuEHSlsbroiaoPbK
+4GMeokGzMNHZKCc3Z2JJsxvxVJgwLElwm15KGGtkRkvu+u4pATdRUxy4UYrjVCBD
+qnCkmBIqnoHpN1nMPNHnHMK+HIB5imyvWHO5oFfwR9QCDPH/U1B3E+pqlYhToL3M
+wnArIezQC2z0gTD0JAfgx3ZxsQzQhAUD8ApuOLQ+iCTQNYohbiAc9BmG3Y7CFmLj
+Xmk6OxbmmEBth3un3RL8M4bWUeouIhsGZHVnyWM+kpCSgqM+PfZ0/vgeuDQshIAk
+/V/bt4k+D9WX/uQD7RGIxh2Ppx0dQGt1hFtXG0xU0kZwJAMSnF+rrQT/BnnDiNs1
+Q7YB/GrNWdgOuSD43hzQnIw6wVUn1Jv3Mch0cjsd1BefPnKBdgo+BEautN53y9Ja
+UejpyX3lIiPIBWRrtrJKvdcJj09he/ckFzBuoKi/gISzPkFP5+ruWdMJG9NiGIQ+
+1/y9h8PGAdHI4HmHkRMqSbfJ/RrH4530ISuD6rjpi71AWgJMmBo=
+=zqzf
+-----END PGP SIGNATURE-----
+
+--Sig_/=gSePKt+auwNee_V5sngHSA--
+
 
