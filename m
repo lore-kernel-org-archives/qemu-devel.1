@@ -2,89 +2,124 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 238C9C388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8214C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:00:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CB9624656
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:59:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 967EB24656
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:00:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="djzj0hUn"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CB9624656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Yi5c55M5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 967EB24656
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50252 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50860 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVfoL-0002YM-37
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:59:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56496)
+	id 1kVfoe-0002nb-JL
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:00:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57676)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kVfgK-0006a7-Ha
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 14:51:24 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20759)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kVfgH-0006l5-Jd
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 14:51:23 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603392681;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mqSdji05VzyezNfyvMtPfPWDBtwjtehJD9JR0yKy8kc=;
- b=djzj0hUnjsLqhc2cTBJD+jCvqF7UnSdVRZfijCcs/anGG007kaqsolgI5HzBz0M73FJNoo
- IONo2DCb8ucQe7OR+uspFZlbuF9a24DsjeIMhlhVwezWWase/hrtoG970SonWMmeuUybT8
- YFCQIfGAll7oBvRkJv4D+ChKw9x+vwU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-151-Y2_iOSI5NNeRx_ner3P9kA-1; Thu, 22 Oct 2020 14:51:17 -0400
-X-MC-Unique: Y2_iOSI5NNeRx_ner3P9kA-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 519D987505D;
- Thu, 22 Oct 2020 18:51:14 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 962D919D61;
- Thu, 22 Oct 2020 18:51:08 +0000 (UTC)
-Date: Thu, 22 Oct 2020 12:51:08 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v27 07/17] vfio: Register SaveVMHandlers for VFIO device
-Message-ID: <20201022125108.6137e462@w520.home>
-In-Reply-To: <1603365127-14202-8-git-send-email-kwankhede@nvidia.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
- <1603365127-14202-8-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVflb-0000fb-3k; Thu, 22 Oct 2020 14:56:51 -0400
+Received: from mail-am6eur05on2108.outbound.protection.outlook.com
+ ([40.107.22.108]:5089 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVflY-0007Y8-7k; Thu, 22 Oct 2020 14:56:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g0Xrr7LQrA9GAcO6KnPgR4pPPT86uwuqHgWYnOZMLbbftCLeYtNpRORzjm9Em03BNxlOpH/7aA17xbJZzpPjloQsKSgfJTan6WDrjcZrWup45YhwMl9eFn8Z6O1LMHAovmXjLy06esRORHgqcDsHuHumHd9AA/GDaTdENycR/kfbT1/Hctgo8WezpApEoyezypUq0wdWsTvuI+nK0qxQqDnSx22l7xmk6HaYnuQOP/jeO6OPfvNII0JNawQSGkq/uRKK/05bER1/Kc9P8Z/7ftf2whQ4RwmDZQFWYaQB3F1TyCAuR4pM0aX4FzjK7K+wFJhKElggykIR883VvWtBDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6xQVPK1UX3aflvNnzU6pFswPdts+z4pNlC4ZInZDxms=;
+ b=TY21xUrkEjVqnHIedB4CHvxe4zVPtKYgYQN37vL3gxGOLkdCoaFxUvcgHR2Ci15HFEk5Kpz4B5OzGyMVsKseIEHATzYNJpScOk3VAqciLUjoDityX9ctlA2LuXEj7aRWtWz2n7a3QL5XJCM7P5J+vDvUDrrB6ruK1Drf3Ojl0GY91cTguxzHe2IIK7gz7z+O0E4oTA5o+amfMHtTd/O3I+kd3UVut/q3VsVwA5bOaKWAnXIT9os3HI/1SWrRyCyEg6eaKD6UZ8rdijYeDjCyP9yKKzw8x+4PkoY8/Ds3HNghJ6tA1rA81TTjw4GC6XkRuKQEDxGV+mLxqO16TGjJlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6xQVPK1UX3aflvNnzU6pFswPdts+z4pNlC4ZInZDxms=;
+ b=Yi5c55M5WJJULvrR5C1uQnBBONeRWlvVim88vI8J6J0kk4HqWj/JG+zfRwG5oToViqT3FmCBLO/ZPtXO6iWYBD7oVLsC0+Oft+tLWhIbeXhXJCTkVDHyPAeOyVSVwdHIrLo6PRVRQ+a06SIdLJV19PKD6PXu9LyhThYTx3neU58=
+Authentication-Results: nongnu.org; dkim=none (message not signed)
+ header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AS8PR08MB6309.eurprd08.prod.outlook.com (2603:10a6:20b:29f::7)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 22 Oct
+ 2020 18:56:41 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
+ 18:56:41 +0000
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+To: qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com,
+ vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com,
+ jsnow@redhat.com
+Subject: [PATCH v5 02/12] iotests/303: use dot slash for qcow2.py running
+Date: Thu, 22 Oct 2020 21:56:17 +0300
+Message-Id: <20201022185627.16987-3-vsementsov@virtuozzo.com>
+X-Mailer: git-send-email 2.21.3
+In-Reply-To: <20201022185627.16987-1-vsementsov@virtuozzo.com>
+References: <20201022185627.16987-1-vsementsov@virtuozzo.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [185.215.60.82]
+X-ClientProxiedBy: AM0PR01CA0089.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from kvm.sw.ru (185.215.60.82) by
+ AM0PR01CA0089.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::30) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend
+ Transport; Thu, 22 Oct 2020 18:56:41 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: d7a82ace-0415-4cc1-41a0-08d876bc36b9
+X-MS-TrafficTypeDiagnostic: AS8PR08MB6309:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AS8PR08MB6309F99796F6592EF50E6230C11D0@AS8PR08MB6309.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4502;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: LQ+PwZhlsWb0/uAEqtk5PfH7c/POP19o2s371YyRve7Qzv7dZiPw6vc4EFS4Mp7hun8kQoSUcKUSIDMs0OeqYv12YY5gOUjxoqNJf92QLcVhjCnmKWQQjybiq3YHynkdQoY/NRJiKqhpGmSuFAJfgTZI/UjsVnp0uSmQedGuXDsDoOKdbrzXYvBAPX27IcpS70cKbBEblBMd9xDw97BwSMOcF4++/DJFvmsRGpsxKYq9R7fUpT8Cv/ub+n7FOByZ0ACxJHgqH6iWIz1vXjN+YG3JaH6QvpZN1FWgn+504M/nDgFgaNV92ioZJ8FzcLOOC6N+qqqMvOQ+T3E/LwY+WQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39840400004)(366004)(346002)(396003)(136003)(376002)(478600001)(6512007)(36756003)(2906002)(52116002)(4326008)(5660300002)(4744005)(26005)(16526019)(2616005)(956004)(186003)(6916009)(6666004)(8936002)(66476007)(83380400001)(316002)(66946007)(1076003)(6506007)(8676002)(86362001)(66556008)(6486002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: nsotcn//V2AsK/XDoyiCSuBda6Ji0ZMHQ9t7zVVAQ17Vkw873/fc5X/S4vz2zvxitoFeh9FPL0CTMiIdttw13rzAA3Pm/F0H2X6mK/5GzIHXfQiAhBnw9V3Gqm+3v0GgvHuCJ21ZXfayXloCiPJmyUddGdA/xAqgfOvqJenariLt3rKnEDxChYnEIAdcoQdpx0l4tpKgnqKr3n051dshpJF1y0UPd5cj74HklFsijUMS2sqqUhND9fCHYPjBs3gDXe+hOi1B2LoMNwzfiPLcHMk3NXfOG4ONV0Z+l1lDp+4czVW8BvTgCydyRkipfCDTNfQl3WrVAoRsBZGb9T5bdz5hxQGj4CNVo+WraIVTAmsNee2DlBYbqFeN45jO0AWRX5iWCERCMo+gJMlJYRUmqLFo7IJ+FwYy9yb3vidkDLZXhNMTgzCOhx9Z1t+VVGrTXQ05IgEypjUp2BHg/tBM4UKgA4G0veo9NI6HsDY4S+zg4+rYDvosTjffelFqLawA4FegP6wl8BQI5z2LKy7dKjGHt9XmWWuBa8sBBwX5H5grDoxEWZWTUjTh9GppX+OWmGy6GLQCVgsKel9W/DF1eTZ9873zjGwHk6i7VFQq/oIHBFSLqrNBSuTth75hyqhav7eaKnqE8Y6N3RDvld+0jg==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7a82ace-0415-4cc1-41a0-08d876bc36b9
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 18:56:41.8229 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: bq8tqvb0K8TAe/X9380jkapMsthS6irddQcyw50H+6HRBNdZuApQgxD7qncq8IoN5GL0lTmCRWj/8ryRTGpsQtUkCQbdwg0DRkPwl8UoTdk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6309
+Received-SPF: pass client-ip=40.107.22.108;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR05-AM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 14:56:41
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,214 +132,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 22 Oct 2020 16:41:57 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+If you run './check 303', check includes common.config which adjusts
+$PATH to include '.' first, and therefore finds qcow2.py on PATH.  But
+if you run './303' directly, there is nothing to adjust PATH, and if
+'.' is not already on your PATH by other means, the test fails because
+the executable is not found.  Adjust how we invoke the helper
+executable to avoid needing a PATH search in the first place.
 
-> Define flags to be used as delimiter in migration stream for VFIO devices.
-> Added .save_setup and .save_cleanup functions. Map & unmap migration
-> region from these functions at source during saving or pre-copy phase.
-> 
-> Set VFIO device state depending on VM's state. During live migration, VM is
-> running when .save_setup is called, _SAVING | _RUNNING state is set for VFIO
-> device. During save-restore, VM is paused, _SAVING state is set for VFIO device.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
-> ---
->  hw/vfio/migration.c  | 96 ++++++++++++++++++++++++++++++++++++++++++++++++++++
->  hw/vfio/trace-events |  2 ++
->  2 files changed, 98 insertions(+)
-> 
-> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-> index 7c4fa0d08ea6..2e1054bf7f43 100644
-> --- a/hw/vfio/migration.c
-> +++ b/hw/vfio/migration.c
-> @@ -8,12 +8,15 @@
->   */
->  
->  #include "qemu/osdep.h"
-> +#include "qemu/main-loop.h"
-> +#include "qemu/cutils.h"
->  #include <linux/vfio.h>
->  
->  #include "sysemu/runstate.h"
->  #include "hw/vfio/vfio-common.h"
->  #include "cpu.h"
->  #include "migration/migration.h"
-> +#include "migration/vmstate.h"
->  #include "migration/qemu-file.h"
->  #include "migration/register.h"
->  #include "migration/blocker.h"
-> @@ -25,6 +28,22 @@
->  #include "trace.h"
->  #include "hw/hw.h"
->  
-> +/*
-> + * Flags to be used as unique delimiters for VFIO devices in the migration
-> + * stream. These flags are composed as:
-> + * 0xffffffff => MSB 32-bit all 1s
-> + * 0xef10     => Magic ID, represents emulated (virtual) function IO
-> + * 0x0000     => 16-bits reserved for flags
-> + *
-> + * The beginning of state information is marked by _DEV_CONFIG_STATE,
-> + * _DEV_SETUP_STATE, or _DEV_DATA_STATE, respectively. The end of a
-> + * certain state information is marked by _END_OF_STATE.
-> + */
-> +#define VFIO_MIG_FLAG_END_OF_STATE      (0xffffffffef100001ULL)
-> +#define VFIO_MIG_FLAG_DEV_CONFIG_STATE  (0xffffffffef100002ULL)
-> +#define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
-> +#define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
-> +
->  static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
->                                    off_t off, bool iswrite)
->  {
-> @@ -129,6 +148,69 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
->      return 0;
->  }
->  
-> +/* ---------------------------------------------------------------------- */
-> +
-> +static int vfio_save_setup(QEMUFile *f, void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +    int ret;
-> +
-> +    trace_vfio_save_setup(vbasedev->name);
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_SETUP_STATE);
-> +
-> +    if (migration->region.mmaps) {
-> +        /*
-> +         * vfio_region_mmap() called from migration thread. Memory API called
-> +         * from vfio_regio_mmap() need it when called from outdide the main loop
-> +         * thread.
-> +         */
+Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+---
+ tests/qemu-iotests/303 | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks for adding this detail, maybe refine slightly as:
-
-  Calling vfio_region_mmap() from migration thread.  Memory APIs called
-  from this function require locking the iothread when called from
-  outside the main loop thread.
-
-Does that capture the intent?
-
-> +        qemu_mutex_lock_iothread();
-> +        ret = vfio_region_mmap(&migration->region);
-> +        qemu_mutex_unlock_iothread();
-> +        if (ret) {
-> +            error_report("%s: Failed to mmap VFIO migration region: %s",
-> +                         vbasedev->name, strerror(-ret));
-> +            error_report("%s: Falling back to slow path", vbasedev->name);
-> +        }
-> +    }
-> +
-> +    ret = vfio_migration_set_state(vbasedev, VFIO_DEVICE_STATE_MASK,
-> +                                   VFIO_DEVICE_STATE_SAVING);
-> +    if (ret) {
-> +        error_report("%s: Failed to set state SAVING", vbasedev->name);
-> +        return ret;
-> +    }
-> +
-> +    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
-> +
-> +    ret = qemu_file_get_error(f);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    return 0;
-> +}
-> +
-> +static void vfio_save_cleanup(void *opaque)
-> +{
-> +    VFIODevice *vbasedev = opaque;
-> +    VFIOMigration *migration = vbasedev->migration;
-> +
-> +    if (migration->region.mmaps) {
-> +        vfio_region_unmap(&migration->region);
-> +    }
-
-
-Are we in a different thread context here that we don't need that same
-iothread locking?
-
-
-> +    trace_vfio_save_cleanup(vbasedev->name);
-> +}
-> +
-> +static SaveVMHandlers savevm_vfio_handlers = {
-> +    .save_setup = vfio_save_setup,
-> +    .save_cleanup = vfio_save_cleanup,
-> +};
-> +
-> +/* ---------------------------------------------------------------------- */
-> +
->  static void vfio_vmstate_change(void *opaque, int running, RunState state)
->  {
->      VFIODevice *vbasedev = opaque;
-> @@ -219,6 +301,8 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->      int ret;
->      Object *obj;
->      VFIOMigration *migration;
-> +    char id[256] = "";
-> +    g_autofree char *path = NULL, *oid;
-
-
-AIUI, oid must also be initialized as a g_autofree variable.
-
->  
->      if (!vbasedev->ops->vfio_get_object) {
->          return -EINVAL;
-> @@ -248,6 +332,18 @@ static int vfio_migration_init(VFIODevice *vbasedev,
->  
->      vbasedev->migration = migration;
->      migration->vbasedev = vbasedev;
-> +
-> +    oid = vmstate_if_get_id(VMSTATE_IF(DEVICE(obj)));
-> +    if (oid) {
-> +        path = g_strdup_printf("%s/vfio", oid);
-> +    } else {
-> +        path = g_strdup("vfio");
-
-
-If we get here then all vfio devices have the same id string.  Isn't
-that a problem?  Thanks,
-
-Alex
-
-
-> +    }
-> +    strpadcpy(id, sizeof(id), path, '\0');
-> +
-> +    register_savevm_live(id, VMSTATE_INSTANCE_ID_ANY, 1, &savevm_vfio_handlers,
-> +                         vbasedev);
-> +
->      migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
->                                                            vbasedev);
->      migration->migration_state.notify = vfio_migration_state_notifier;
-> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-> index 78d7d83b5ef8..f148b5e828c1 100644
-> --- a/hw/vfio/trace-events
-> +++ b/hw/vfio/trace-events
-> @@ -151,3 +151,5 @@ vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
->  vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
->  vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
->  vfio_migration_state_notifier(const char *name, const char *state) " (%s) state %s"
-> +vfio_save_setup(const char *name) " (%s)"
-> +vfio_save_cleanup(const char *name) " (%s)"
+diff --git a/tests/qemu-iotests/303 b/tests/qemu-iotests/303
+index 6c21774483..11cd9eeb26 100755
+--- a/tests/qemu-iotests/303
++++ b/tests/qemu-iotests/303
+@@ -56,7 +56,7 @@ qemu_img_create('-f', iotests.imgfmt, disk, '10M')
+ 
+ add_bitmap(1, 0, 6, False)
+ add_bitmap(2, 6, 8, True)
+-dump = ['qcow2.py', disk, 'dump-header']
++dump = ['./qcow2.py', disk, 'dump-header']
+ subprocess.run(dump)
+ # Dump the metadata in JSON format
+ dump.append('-j')
+-- 
+2.21.3
 
 
