@@ -2,59 +2,92 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4F2C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:32:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E61AC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:32:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 86FA72417D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:32:12 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86FA72417D
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 4D1FD2417D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 18:32:20 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G3nFooB4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D1FD2417D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52080 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52474 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVfNj-0006sa-Br
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:32:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48678)
+	id 1kVfNr-00072P-55
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 14:32:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51952)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf6W-0000qG-5Y; Thu, 22 Oct 2020 14:14:28 -0400
-Received: from relay.sw.ru ([185.231.240.75]:52080 helo=relay3.sw.ru)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf6K-0001nj-EP; Thu, 22 Oct 2020 14:14:23 -0400
-Received: from [172.16.25.136] (helo=localhost.sw.ru)
- by relay3.sw.ru with esmtp (Exim 4.94)
- (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVf5r-005dVw-Vk; Thu, 22 Oct 2020 21:13:43 +0300
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- eblake@redhat.com, den@openvz.org, vsementsov@virtuozzo.com,
- andrey.shinkevich@virtuozzo.com
-Subject: [PATCH v12 13/14] stream: skip filters when writing backing file name
- to QCOW2 header
-Date: Thu, 22 Oct 2020 21:13:42 +0300
-Message-Id: <1603390423-980205-14-git-send-email-andrey.shinkevich@virtuozzo.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
-Received-SPF: pass client-ip=185.231.240.75;
- envelope-from=andrey.shinkevich@virtuozzo.com; helo=relay3.sw.ru
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 14:13:46
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kVfLR-0005uE-Ep
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 14:29:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57184)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kVfLN-00042D-Rr
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 14:29:48 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603391384;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+NqMipaByKtvNQWB92Feam8XSbTHTBwdXIkHF2mHKrM=;
+ b=G3nFooB4IdZwTtKOzajZzGfjbQZZKHrfA8GB3qSTVthSWAlTGJ3XD8WCpbpSFbpFI/AQ6/
+ JVnw66jLhlIo/Fa1n18jRe/tvPZsV501rMK9x7BJUXa3M2q8YFNY7iqb0kNjA7Vwtx+JQ3
+ b/+0dD1iySEp0Mk5xEKpAGnBsuTGDos=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-305-jj7CQOHFPt-L97xC82i6Eg-1; Thu, 22 Oct 2020 14:29:41 -0400
+X-MC-Unique: jj7CQOHFPt-L97xC82i6Eg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78D0718CBC55;
+ Thu, 22 Oct 2020 18:29:28 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2203460C04;
+ Thu, 22 Oct 2020 18:29:26 +0000 (UTC)
+Date: Thu, 22 Oct 2020 12:29:25 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v27 05/17] vfio: Add VM state change handler to know
+ state of VM
+Message-ID: <20201022122925.1ab124d9@w520.home>
+In-Reply-To: <41a47e87-50f9-8c16-7c2b-598ca77c06f0@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+ <1603365127-14202-6-git-send-email-kwankhede@nvidia.com>
+ <20201022103524.1e567cb2@w520.home>
+ <41a47e87-50f9-8c16-7c2b-598ca77c06f0@nvidia.com>
+MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -67,107 +100,313 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-From: Andrey Shinkevich via <qemu-devel@nongnu.org>
 
-Avoid writing a filter JSON file name and a filter format name to QCOW2
-image when the backing file is changed after the block stream job.
-A user is still able to assign the 'backing-file' parameter for a
-block-stream job keeping in mind the possible issue mentioned above.
-If the user does not specify the 'backing-file' parameter, QEMU will
-assign it automatically.
+On Thu, 22 Oct 2020 23:11:39 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
----
- block/stream.c | 15 +++++++++++++--
- blockdev.c     |  9 ++-------
- 2 files changed, 15 insertions(+), 9 deletions(-)
+> On 10/22/2020 10:05 PM, Alex Williamson wrote:
+> > On Thu, 22 Oct 2020 16:41:55 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> VM state change handler is called on change in VM's state. Based on
+> >> VM state, VFIO device state should be changed.
+> >> Added read/write helper functions for migration region.
+> >> Added function to set device_state.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> ---
+> >>   hw/vfio/migration.c           | 158 ++++++++++++++++++++++++++++++++++++++++++
+> >>   hw/vfio/trace-events          |   2 +
+> >>   include/hw/vfio/vfio-common.h |   4 ++
+> >>   3 files changed, 164 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> >> index 5f74a3ad1d72..34f39c7e2e28 100644
+> >> --- a/hw/vfio/migration.c
+> >> +++ b/hw/vfio/migration.c
+> >> @@ -10,6 +10,7 @@
+> >>   #include "qemu/osdep.h"
+> >>   #include <linux/vfio.h>
+> >>   
+> >> +#include "sysemu/runstate.h"
+> >>   #include "hw/vfio/vfio-common.h"
+> >>   #include "cpu.h"
+> >>   #include "migration/migration.h"
+> >> @@ -22,6 +23,157 @@
+> >>   #include "exec/ram_addr.h"
+> >>   #include "pci.h"
+> >>   #include "trace.h"
+> >> +#include "hw/hw.h"
+> >> +
+> >> +static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
+> >> +                                  off_t off, bool iswrite)
+> >> +{
+> >> +    int ret;
+> >> +
+> >> +    ret = iswrite ? pwrite(vbasedev->fd, val, count, off) :
+> >> +                    pread(vbasedev->fd, val, count, off);
+> >> +    if (ret < count) {
+> >> +        error_report("vfio_mig_%s %d byte %s: failed at offset 0x%lx, err: %s",
+> >> +                     iswrite ? "write" : "read", count,
+> >> +                     vbasedev->name, off, strerror(errno));
+> >> +        return (ret < 0) ? ret : -EINVAL;
+> >> +    }
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static int vfio_mig_rw(VFIODevice *vbasedev, __u8 *buf, size_t count,
+> >> +                       off_t off, bool iswrite)
+> >> +{
+> >> +    int ret, done = 0;
+> >> +    __u8 *tbuf = buf;
+> >> +
+> >> +    while (count) {
+> >> +        int bytes = 0;
+> >> +
+> >> +        if (count >= 8 && !(off % 8)) {
+> >> +            bytes = 8;
+> >> +        } else if (count >= 4 && !(off % 4)) {
+> >> +            bytes = 4;
+> >> +        } else if (count >= 2 && !(off % 2)) {
+> >> +            bytes = 2;
+> >> +        } else {
+> >> +            bytes = 1;
+> >> +        }
+> >> +
+> >> +        ret = vfio_mig_access(vbasedev, tbuf, bytes, off, iswrite);
+> >> +        if (ret) {
+> >> +            return ret;
+> >> +        }
+> >> +
+> >> +        count -= bytes;
+> >> +        done += bytes;
+> >> +        off += bytes;
+> >> +        tbuf += bytes;
+> >> +    }
+> >> +    return done;
+> >> +}
+> >> +
+> >> +#define vfio_mig_read(f, v, c, o)       vfio_mig_rw(f, (__u8 *)v, c, o, false)
+> >> +#define vfio_mig_write(f, v, c, o)      vfio_mig_rw(f, (__u8 *)v, c, o, true)
+> >> +
+> >> +#define VFIO_MIG_STRUCT_OFFSET(f)       \
+> >> +                                 offsetof(struct vfio_device_migration_info, f)
+> >> +/*
+> >> + * Change the device_state register for device @vbasedev. Bits set in @mask
+> >> + * are preserved, bits set in @value are set, and bits not set in either @mask
+> >> + * or @value are cleared in device_state. If the register cannot be accessed,
+> >> + * the resulting state would be invalid, or the device enters an error state,
+> >> + * an error is returned.
+> >> + */
+> >> +
+> >> +static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+> >> +                                    uint32_t value)
+> >> +{
+> >> +    VFIOMigration *migration = vbasedev->migration;
+> >> +    VFIORegion *region = &migration->region;
+> >> +    off_t dev_state_off = region->fd_offset +
+> >> +                          VFIO_MIG_STRUCT_OFFSET(device_state);
+> >> +    uint32_t device_state;
+> >> +    int ret;
+> >> +
+> >> +    ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
+> >> +                        dev_state_off);
+> >> +    if (ret < 0) {
+> >> +        return ret;
+> >> +    }
+> >> +
+> >> +    device_state = (device_state & mask) | value;
+> >> +
+> >> +    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
+> >> +        return -EINVAL;
+> >> +    }
+> >> +
+> >> +    ret = vfio_mig_write(vbasedev, &device_state, sizeof(device_state),
+> >> +                         dev_state_off);
+> >> +    if (ret < 0) {
+> >> +        int rret;
+> >> +
+> >> +        rret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
+> >> +                             dev_state_off);
+> >> +
+> >> +        if ((rret < 0) || (VFIO_DEVICE_STATE_IS_ERROR(device_state))) {
+> >> +            hw_error("%s: Device in error state 0x%x", vbasedev->name,
+> >> +                     device_state);
+> >> +            return rret ? rret : -EIO;
+> >> +        }
+> >> +        return ret;
+> >> +    }
+> >> +
+> >> +    migration->device_state = device_state;
+> >> +    trace_vfio_migration_set_state(vbasedev->name, device_state);
+> >> +    return 0;
+> >> +}
+> >> +
+> >> +static void vfio_vmstate_change(void *opaque, int running, RunState state)
+> >> +{
+> >> +    VFIODevice *vbasedev = opaque;
+> >> +    VFIOMigration *migration = vbasedev->migration;
+> >> +    uint32_t value, mask;
+> >> +    int ret;
+> >> +
+> >> +    if ((vbasedev->migration->vm_running == running)) {
+> >> +        return;
+> >> +    }
+> >> +
+> >> +    if (running) {
+> >> +        /*
+> >> +         * Here device state can have one of _SAVING, _RESUMING or _STOP bit.
+> >> +         * Transition from _SAVING to _RUNNING can happen if there is migration
+> >> +         * failure, in that case clear _SAVING bit.
+> >> +         * Transition from _RESUMING to _RUNNING occurs during resuming
+> >> +         * phase, in that case clear _RESUMING bit.
+> >> +         * In both the above cases, set _RUNNING bit.
+> >> +         */
+> >> +        mask = ~VFIO_DEVICE_STATE_MASK;
+> >> +        value = VFIO_DEVICE_STATE_RUNNING;
+> >> +    } else {
+> >> +        /*
+> >> +         * Here device state could be either _RUNNING or _SAVING|_RUNNING. Reset
+> >> +         * _RUNNING bit
+> >> +         */
+> >> +        mask = ~VFIO_DEVICE_STATE_RUNNING;
+> >> +        value = 0;
+> >> +    }
+> >> +
+> >> +    ret = vfio_migration_set_state(vbasedev, mask, value);
+> >> +    if (ret) {
+> >> +        /*
+> >> +         * Migration should be aborted in this case, but vm_state_notify()
+> >> +         * currently does not support reporting failures.
+> >> +         */
+> >> +        error_report("%s: Failed to set device state 0x%x", vbasedev->name,
+> >> +                     (migration->device_state & mask) | value);
+> >> +        qemu_file_set_error(migrate_get_current()->to_dst_file, ret);
+> >> +    }
+> >> +    vbasedev->migration->vm_running = running;
+> >> +    trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
+> >> +            (migration->device_state & mask) | value);
+> >> +}
+> >>   
+> >>   static void vfio_migration_region_exit(VFIODevice *vbasedev)
+> >>   {
+> >> @@ -71,6 +223,8 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+> >>       }
+> >>   
+> >>       vbasedev->migration = migration;
+> >> +    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> >> +                                                          vbasedev);
+> >>       return 0;
+> >>   
+> >>   err:
+> >> @@ -118,6 +272,10 @@ add_blocker:
+> >>   
+> >>   void vfio_migration_finalize(VFIODevice *vbasedev)
+> >>   {
+> >> +    if (vbasedev->migration->vm_state) {
+> >> +        qemu_del_vm_change_state_handler(vbasedev->migration->vm_state);
+> >> +    }  
+> > 
+> > 
+> > This looks like a segfault, vfio_migration_teardown() is eventually
+> > called unconditionally.  The next patch modifies this function further,
+> > but never checks that vbasedev->migration is non-NULL.  Thanks,
+> >   
+> 
+> Yup.
+> Updated patch 4, 5 and 6. So now vfio_migration_finalize() looks like:
+> 
+> void vfio_migration_finalize(VFIODevice *vbasedev)
+> {
+>      VFIOMigration *migration = vbasedev->migration;
+> 
+>      if (migration) {
+>          if (migration->migration_state.notify) {
+>  
+> remove_migration_state_change_notifier(&migration->migration_state);
+>          }
+> 
+>          if (migration->vm_state) {
+>              qemu_del_vm_change_state_handler(migration->vm_state);
+>          }
 
-diff --git a/block/stream.c b/block/stream.c
-index e0540ee..1ba74ab 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -65,6 +65,7 @@ static int stream_prepare(Job *job)
-     BlockDriverState *bs = blk_bs(bjob->blk);
-     BlockDriverState *unfiltered_bs = bdrv_skip_filters(bs);
-     BlockDriverState *base = bdrv_filter_or_cow_bs(s->above_base);
-+    BlockDriverState *base_unfiltered = NULL;
-     Error *local_err = NULL;
-     int ret = 0;
- 
-@@ -75,8 +76,18 @@ static int stream_prepare(Job *job)
-         const char *base_id = NULL, *base_fmt = NULL;
-         if (base) {
-             base_id = s->backing_file_str;
--            if (base->drv) {
--                base_fmt = base->drv->format_name;
-+            if (base_id) {
-+                if (base->drv) {
-+                    base_fmt = base->drv->format_name;
-+                }
-+            } else {
-+                base_unfiltered = bdrv_skip_filters(base);
-+                if (base_unfiltered) {
-+                    base_id = base_unfiltered->filename;
-+                    if (base_unfiltered->drv) {
-+                        base_fmt = base_unfiltered->drv->format_name;
-+                    }
-+                }
-             }
-         }
-         bdrv_set_backing_hd(unfiltered_bs, base, &local_err);
-diff --git a/blockdev.c b/blockdev.c
-index c917625..0e9c783 100644
---- a/blockdev.c
-+++ b/blockdev.c
-@@ -2508,7 +2508,6 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-     BlockDriverState *base_bs = NULL;
-     AioContext *aio_context;
-     Error *local_err = NULL;
--    const char *base_name = NULL;
-     int job_flags = JOB_DEFAULT;
- 
-     if (!has_on_error) {
-@@ -2536,7 +2535,6 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-             goto out;
-         }
-         assert(bdrv_get_aio_context(base_bs) == aio_context);
--        base_name = base;
-     }
- 
-     if (has_base_node) {
-@@ -2551,7 +2549,6 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         }
-         assert(bdrv_get_aio_context(base_bs) == aio_context);
-         bdrv_refresh_filename(base_bs);
--        base_name = base_bs->filename;
-     }
- 
-     /* Check for op blockers in the whole chain between bs and base */
-@@ -2571,9 +2568,6 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         goto out;
-     }
- 
--    /* backing_file string overrides base bs filename */
--    base_name = has_backing_file ? backing_file : base_name;
--
-     if (has_auto_finalize && !auto_finalize) {
-         job_flags |= JOB_MANUAL_FINALIZE;
-     }
-@@ -2581,7 +2575,8 @@ void qmp_block_stream(bool has_job_id, const char *job_id, const char *device,
-         job_flags |= JOB_MANUAL_DISMISS;
-     }
- 
--    stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
-+    stream_start(has_job_id ? job_id : NULL, bs, base_bs,
-+                 has_backing_file ? backing_file : NULL,
-                  job_flags, has_speed ? speed : 0, on_error,
-                  filter_node_name, &local_err);
-     if (local_err) {
--- 
-1.8.3.1
+We should be able to remove these based only on migration being
+non-NULL, their setup cannot fail once we've setup the migration
+pointer.  Thanks,
+
+Alex
+
+> 
+>          vfio_migration_region_exit(vbasedev);
+>          g_free(vbasedev->migration);
+>          vbasedev->migration = NULL;
+>      }
+> 
+>      if (vbasedev->migration_blocker) {
+>          migrate_del_blocker(vbasedev->migration_blocker);
+>          error_free(vbasedev->migration_blocker);
+>          vbasedev->migration_blocker = NULL;
+>      }
+> }
+> 
+> Thanks,
+> Kirti
+> 
+> > Alex
+> > 
+> >   
+> >> +
+> >>       if (vbasedev->migration_blocker) {
+> >>           migrate_del_blocker(vbasedev->migration_blocker);
+> >>           error_free(vbasedev->migration_blocker);
+> >> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> >> index 9ced5ec6277c..41de81f12f60 100644
+> >> --- a/hw/vfio/trace-events
+> >> +++ b/hw/vfio/trace-events
+> >> @@ -148,3 +148,5 @@ vfio_display_edid_write_error(void) ""
+> >>   
+> >>   # migration.c
+> >>   vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
+> >> +vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
+> >> +vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+> >> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> >> index 8275c4c68f45..9a571f1fb552 100644
+> >> --- a/include/hw/vfio/vfio-common.h
+> >> +++ b/include/hw/vfio/vfio-common.h
+> >> @@ -29,6 +29,7 @@
+> >>   #ifdef CONFIG_LINUX
+> >>   #include <linux/vfio.h>
+> >>   #endif
+> >> +#include "sysemu/sysemu.h"
+> >>   
+> >>   #define VFIO_MSG_PREFIX "vfio %s: "
+> >>   
+> >> @@ -58,7 +59,10 @@ typedef struct VFIORegion {
+> >>   } VFIORegion;
+> >>   
+> >>   typedef struct VFIOMigration {
+> >> +    VMChangeStateEntry *vm_state;
+> >>       VFIORegion region;
+> >> +    uint32_t device_state;
+> >> +    int vm_running;
+> >>   } VFIOMigration;
+> >>   
+> >>   typedef struct VFIOAddressSpace {  
+> >   
+> 
 
 
