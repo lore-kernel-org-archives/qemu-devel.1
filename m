@@ -2,124 +2,88 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CBF9C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 888F8C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:22:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E5E124656
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7BE7221534
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:22:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Zs8oi0iZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E5E124656
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UdsG1nDV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BE7221534
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51088 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60290 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVg1g-0006pd-Bk
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:13:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57836)
+	id 1kVgAQ-00030Q-3q
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:22:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34648)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVflo-0000vH-8f; Thu, 22 Oct 2020 14:57:05 -0400
-Received: from mail-am6eur05on2090.outbound.protection.outlook.com
- ([40.107.22.90]:46561 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVflm-0007YP-Ea; Thu, 22 Oct 2020 14:57:03 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EyjqjcAS0jSJqLtpxS9i9W+wZRVgV16wWGJ9k3eYfSQo29wLQNqotaG1/Q8AaIucizq10F+zJnUQ/4MuGUlwoLfodHzTjrVXPQv44jyafLv8pg6IvOUG9F0sD2gfwTZWaaE0IxLoDrpbFeoQ3hIKpy5F2U9muCTJAEHO9XYjum84UOL0sl6tur5uIGepmYb/s/uDQV7vqg7TgTr8m1DFUO2QWA3GAZZ8YnqyWe3QLPPgP/zsbNSHaDyrz7gS6MYK5F7YFms4hPGlXe1nWSHJUWuQC6VlLcV+Bkh801unBpQ6Vgvtk1Qq2DNqk4hLKnPsE4Zyg+vo72cTBu5fIhyMJg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PVb2/G5cA3NX4Zl6Gn5EEMYIcvjcsEKJPQ9DggVODqU=;
- b=JVtQcjBXP4wkgXxzU+DWJ52tUVeOhnNnA+L2VzXcQwPRmV/lMWUWEFicskCj807USQL9xVbEzXHwzsGxJMwCwI9Y7/zP+M1Xakd5tCjfwnUqjCqJeRnTHqJOA+whBUSHLcpabtMQ/lhLosmHVjcBomxougfe9CrbTlP37Vbvz834vyalo4CZLtBOZxK1pxz4nMQ3xggkbIP7gRUWRsWK10BNgYNOonO8Y9kaFVfCeWAdGw/918Eb5M79fSPkGKgmyrKDvDHADRvBadh5lM5O5RH5H+ZZHNb9R5AWryspDnVS1sCgxlw4yfUXqW/Do/9tG7AFl5/LTpf9TUj8hUG1UQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PVb2/G5cA3NX4Zl6Gn5EEMYIcvjcsEKJPQ9DggVODqU=;
- b=Zs8oi0iZ1uf15/C/NtWKNtcKfpUcuK7uMZTwlavgP2nGcx929ohhtRnFPFhVA9vPKCXLcYWj38+AEHqiyy9b5sTLqxpeUSqJcJsm7lqyPwl4erSdnjZPLakvYlRjb3Cjpk8TTPBG9EB3tnBlCvicSD0gdYolgtjLBfT5K9HspQ0=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AS8PR08MB6309.eurprd08.prod.outlook.com (2603:10a6:20b:29f::7)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 22 Oct
- 2020 18:56:49 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
- 18:56:49 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com,
- vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com,
- jsnow@redhat.com
-Subject: [PATCH RFC v5 12/12] iotests: rename and move 169 and 199 tests
-Date: Thu, 22 Oct 2020 21:56:27 +0300
-Message-Id: <20201022185627.16987-13-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201022185627.16987-1-vsementsov@virtuozzo.com>
-References: <20201022185627.16987-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [185.215.60.82]
-X-ClientProxiedBy: AM0PR01CA0089.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:10e::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVg8G-0002KR-78
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 15:20:16 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42781)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVg8C-0001o9-Fv
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 15:20:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603394410;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=EVQTsA2lJqovr4AdxqYGYk6ZsfXRdPPK7Pm1jHBpUhU=;
+ b=UdsG1nDVkHGyWcD78Wf88b7nIeQo5STKVNRDweyq5X8D/EIogTKKW/mV5nLviS+eKQ2Dd1
+ Vu8R8inlLa0sNk+tmlbhU69gwlImxwrNeM6/ZQLYntBwfVMtcku3GTfFmLypa2CqWho7XG
+ H8lahniTDPdcXoji8Z1i10wkn+H49cI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-408-vrr54_qIOF2E6X36cEoLMw-1; Thu, 22 Oct 2020 15:20:06 -0400
+X-MC-Unique: vrr54_qIOF2E6X36cEoLMw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7E1CE80400B;
+ Thu, 22 Oct 2020 19:20:05 +0000 (UTC)
+Received: from work-vm (ovpn-114-253.ams2.redhat.com [10.36.114.253])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id E5D535C1D7;
+ Thu, 22 Oct 2020 19:19:56 +0000 (UTC)
+Date: Thu, 22 Oct 2020 20:19:54 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v3] virtiofsd: add container-friendly -o sandbox=chroot
+ option
+Message-ID: <20201022191954.GK2951@work-vm>
+References: <20201008085534.16070-1-stefanha@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.82) by
- AM0PR01CA0089.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::30) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend
- Transport; Thu, 22 Oct 2020 18:56:49 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 03fec3be-3364-4551-9f89-08d876bc3b78
-X-MS-TrafficTypeDiagnostic: AS8PR08MB6309:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AS8PR08MB630980CF94740B8A213532C7C11D0@AS8PR08MB6309.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:497;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: eLtlPb2xhNfWIfH8nPb3iNEQmx0RFfR11H9+ODhZRNIK8wBwEc+TcRhtZSs3gKl6CNVxtZwIE31G4KoCaw5ddMU7P+ABbWV0CiJNQZvDZDwY0W7Fh18TJfYyZJCrIz+MnK0Lu0TD68aIzxromuUAx+VGZSaqAJpjG1dPv2bffbNtkdJGaCqBdTGDgodxvtFeXjf2KhgxuPTzIWoMl+ofkzhTF8fbDufL+4Qc8nidDu+00CKi4tIf9uPeRU42Mv4DE0HGN4/tc0fr+nbyWs29GHeJ7an9mkZO56g6W66KUwKf7C9kcQFjuSSrRtiAbMI9q1wUJ8I3rV7mQbSCXpnzdA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(366004)(346002)(396003)(136003)(376002)(478600001)(6512007)(36756003)(2906002)(52116002)(4326008)(5660300002)(26005)(16526019)(2616005)(956004)(186003)(6916009)(6666004)(8936002)(66476007)(83380400001)(316002)(66946007)(1076003)(6506007)(8676002)(86362001)(66556008)(6486002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: jwioV09Juxi0FOAXssYix87BmS+K8NiJQVIjGeYmGT1uMObXrxl3wq+oIAYR+Jyx5MJlauA+fFUxPuTm6wX9NMBVF3PTIzSYS/uFs3Ld0hb917tsigAuS2SKYNdaGSdGrD77TjUg7XejVRlUlnshUMYAvNQa1eUfNjN13GAPh8lMM3eVc6mqcgm70XGFMRpoZ5DT/FWHHMWItcTpsYc4U9u9rGWrrMuflqRKlxOuRB0BeQshzI2/Z2Yk+lwLjgTPrKLzIG4ESHnPu3n29/udZXa5Bwscj6J8rLZ81SSj4Tvusq2LYc2IsxOAi0xeg+X7RoSUCi2UZYBHvSmMgh6zXY/6B1W3mT/4gE7U9DPdSYo/dNL9LOel6aqwWPGBYLk2VY9y2Mo5zj+ipBYOCJiB2Ipn5LE37YFIchC6G/yUwMIKL8aOc90ic2eqhu/Ekx628WcNQo/bmLTaNsFHx1ILYtXKt0SKMsWrPpfS4FlTa43WqoVEcG3ui9iplr/UHyNu0wOxb5pGzHa6+QyDGL5Kv5hMh/p82CBkPHHze3+w6Rf0bZ+sJMlXwNRZeaNZtTe4fnRZ0Oj6ty8Z5iOHFSzRzm6A8IKT5p86ySIq7lIUMs1QiLc8r6FNwpBpggR5e352FtFJ1NiDj9V3ZWkCyVjjTw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03fec3be-3364-4551-9f89-08d876bc3b78
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 18:56:49.8088 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9M5almqQ7+j80Lk8bSVL4gvABpkxRfbxtEmNNecCpdi5k9DDf0ozqiT2e6uAfe1wU96WpJ95BK/qP8ve7lXKl8t37Wqs4gSmCSQRd/wyhtk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6309
-Received-SPF: pass client-ip=40.107.22.90;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 14:56:45
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+In-Reply-To: <20201008085534.16070-1-stefanha@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -132,42 +96,230 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: vromanso@redhat.com, Daniel Walsh <dwalsh@redhat.com>,
+ qemu-devel@nongnu.org, rmohr@redhat.com, virtio-fs@redhat.com,
+ Al Viro <viro@zeniv.linux.org.uk>, mpatel@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Rename bitmaps migration tests and move them to tests subdirectory to
-demonstrate new human-friendly test naming.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> virtiofsd cannot run in a container because CAP_SYS_ADMIN is required to
+> create namespaces.
+> 
+> Introduce a weaker sandbox mode that is sufficient in container
+> environments because the container runtime already sets up namespaces.
+> Use chroot to restrict path traversal to the shared directory.
+> 
+> virtiofsd loses the following:
+> 
+> 1. Mount namespace. The process chroots to the shared directory but
+>    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+>    syscalls.
+> 
+> 2. Pid namespace. This should be fine because virtiofsd is the only
+>    process running in the container.
+> 
+> 3. Network namespace. This should be fine because seccomp already
+>    rejects the connect(2) syscall, but an additional layer of security
+>    is lost. Container runtime-specific network security policies can be
+>    used drop network traffic (except for the vhost-user UNIX domain
+>    socket).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test}   | 0
- .../{199.out => tests/migrate-bitmaps-postcopy-test.out}          | 0
- tests/qemu-iotests/{169 => tests/migrate-bitmaps-test}            | 0
- tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out}    | 0
- 4 files changed, 0 insertions(+), 0 deletions(-)
- rename tests/qemu-iotests/{199 => tests/migrate-bitmaps-postcopy-test} (100%)
- rename tests/qemu-iotests/{199.out => tests/migrate-bitmaps-postcopy-test.out} (100%)
- rename tests/qemu-iotests/{169 => tests/migrate-bitmaps-test} (100%)
- rename tests/qemu-iotests/{169.out => tests/migrate-bitmaps-test.out} (100%)
+I've just tripped over another case where this probably helps (but not
+yet tested...); pivot_root doesn't work if your current / isn't a
+mountpoint - so you can't currently run the existing virtiofsd inside
+a chroot.
 
-diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
-similarity index 100%
-rename from tests/qemu-iotests/199
-rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test
-diff --git a/tests/qemu-iotests/199.out b/tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
-similarity index 100%
-rename from tests/qemu-iotests/199.out
-rename to tests/qemu-iotests/tests/migrate-bitmaps-postcopy-test.out
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/tests/migrate-bitmaps-test
-similarity index 100%
-rename from tests/qemu-iotests/169
-rename to tests/qemu-iotests/tests/migrate-bitmaps-test
-diff --git a/tests/qemu-iotests/169.out b/tests/qemu-iotests/tests/migrate-bitmaps-test.out
-similarity index 100%
-rename from tests/qemu-iotests/169.out
-rename to tests/qemu-iotests/tests/migrate-bitmaps-test.out
+(pivot_root is awful for telling you this - it has 6 different manpage
+listed reasons it might return EINVAL and leaves you to figure out how
+you offended it).
+
+Dave
+
+> ---
+> v3:
+>  * Rebased onto David Gilbert's latest migration & virtiofsd pull
+>    request
+> 
+>  tools/virtiofsd/helper.c         |  8 +++++
+>  tools/virtiofsd/passthrough_ll.c | 57 ++++++++++++++++++++++++++++++--
+>  docs/tools/virtiofsd.rst         | 32 ++++++++++++++----
+>  3 files changed, 88 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 85770d63f1..2e181a49b5 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -166,6 +166,14 @@ void fuse_cmdline_help(void)
+>             "                               enable/disable readirplus\n"
+>             "                               default: readdirplus except with "
+>             "cache=none\n"
+> +           "    -o sandbox=namespace|chroot\n"
+> +           "                               sandboxing mode:\n"
+> +           "                               - namespace: mount, pid, and net\n"
+> +           "                                 namespaces with pivot_root(2)\n"
+> +           "                                 into shared directory\n"
+> +           "                               - chroot: chroot(2) into shared\n"
+> +           "                                 directory (use in containers)\n"
+> +           "                               default: namespace\n"
+>             "    -o timeout=<number>        I/O timeout (seconds)\n"
+>             "                               default: depends on cache= option.\n"
+>             "    -o writeback|no_writeback  enable/disable writeback cache\n"
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index ff53df4451..5b9064278a 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -137,8 +137,14 @@ enum {
+>      CACHE_ALWAYS,
+>  };
+>  
+> +enum {
+> +    SANDBOX_NAMESPACE,
+> +    SANDBOX_CHROOT,
+> +};
+> +
+>  struct lo_data {
+>      pthread_mutex_t mutex;
+> +    int sandbox;
+>      int debug;
+>      int writeback;
+>      int flock;
+> @@ -163,6 +169,12 @@ struct lo_data {
+>  };
+>  
+>  static const struct fuse_opt lo_opts[] = {
+> +    { "sandbox=namespace",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_NAMESPACE },
+> +    { "sandbox=chroot",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_CHROOT },
+>      { "writeback", offsetof(struct lo_data, writeback), 1 },
+>      { "no_writeback", offsetof(struct lo_data, writeback), 0 },
+>      { "source=%s", offsetof(struct lo_data, source), 0 },
+> @@ -2660,6 +2672,41 @@ static void setup_capabilities(char *modcaps_in)
+>      pthread_mutex_unlock(&cap.mutex);
+>  }
+>  
+> +/*
+> + * Use chroot as a weaker sandbox for environments where the process is
+> + * launched without CAP_SYS_ADMIN.
+> + */
+> +static void setup_chroot(struct lo_data *lo)
+> +{
+> +    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
+> +    if (lo->proc_self_fd == -1) {
+> +        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
+> +        exit(1);
+> +    }
+> +
+> +    /*
+> +     * Make the shared directory the file system root so that FUSE_OPEN
+> +     * (lo_open()) cannot escape the shared directory by opening a symlink.
+> +     *
+> +     * The chroot(2) syscall is later disabled by seccomp and the
+> +     * CAP_SYS_CHROOT capability is dropped so that tampering with the chroot
+> +     * is not possible.
+> +     *
+> +     * However, it's still possible to escape the chroot via lo->proc_self_fd
+> +     * but that requires first gaining control of the process.
+> +     */
+> +    if (chroot(lo->source) != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chroot(\"%s\"): %m\n", lo->source);
+> +        exit(1);
+> +    }
+> +
+> +    /* Move into the chroot */
+> +    if (chdir("/") != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chdir(\"/\"): %m\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /*
+>   * Lock down this process to prevent access to other processes or files outside
+>   * source directory.  This reduces the impact of arbitrary code execution bugs.
+> @@ -2667,8 +2714,13 @@ static void setup_capabilities(char *modcaps_in)
+>  static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+>                            bool enable_syslog)
+>  {
+> -    setup_namespaces(lo, se);
+> -    setup_mounts(lo->source);
+> +    if (lo->sandbox == SANDBOX_NAMESPACE) {
+> +        setup_namespaces(lo, se);
+> +        setup_mounts(lo->source);
+> +    } else {
+> +        setup_chroot(lo);
+> +    }
+> +
+>      setup_seccomp(enable_syslog);
+>      setup_capabilities(g_strdup(lo->modcaps));
+>  }
+> @@ -2815,6 +2867,7 @@ int main(int argc, char *argv[])
+>      struct fuse_session *se;
+>      struct fuse_cmdline_opts opts;
+>      struct lo_data lo = {
+> +        .sandbox = SANDBOX_NAMESPACE,
+>          .debug = 0,
+>          .writeback = 0,
+>          .posix_lock = 0,
+> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> index 7ecee49834..65f8e76569 100644
+> --- a/docs/tools/virtiofsd.rst
+> +++ b/docs/tools/virtiofsd.rst
+> @@ -17,13 +17,24 @@ This program is designed to work with QEMU's ``--device vhost-user-fs-pci``
+>  but should work with any virtual machine monitor (VMM) that supports
+>  vhost-user.  See the Examples section below.
+>  
+> -This program must be run as the root user.  Upon startup the program will
+> -switch into a new file system namespace with the shared directory tree as its
+> -root.  This prevents "file system escapes" due to symlinks and other file
+> -system objects that might lead to files outside the shared directory.  The
+> -program also sandboxes itself using seccomp(2) to prevent ptrace(2) and other
+> -vectors that could allow an attacker to compromise the system after gaining
+> -control of the virtiofsd process.
+> +This program must be run as the root user.  The program drops privileges where
+> +possible during startup although it must be able to create and access files
+> +with any uid/gid:
+> +
+> +* The ability to invoke syscalls is limited using seccomp(2).
+> +* Linux capabilities(7) are dropped.
+> +
+> +In "namespace" sandbox mode the program switches into a new file system
+> +namespace and invokes pivot_root(2) to make the shared directory tree its root.
+> +A new pid and net namespace is also created to isolate the process.
+> +
+> +In "chroot" sandbox mode the program invokes chroot(2) to make the shared
+> +directory tree its root. This mode is intended for container environments where
+> +the container runtime has already set up the namespaces and the program does
+> +not have permission to create namespaces itself.
+> +
+> +Both sandbox modes prevent "file system escapes" due to symlinks and other file
+> +system objects that might lead to files outside the shared directory.
+>  
+>  Options
+>  -------
+> @@ -69,6 +80,13 @@ Options
+>    * readdirplus|no_readdirplus -
+>      Enable/disable readdirplus.  The default is ``readdirplus``.
+>  
+> +  * sandbox=namespace|chroot -
+> +    Sandbox mode:
+> +    - namespace: Create mount, pid, and net namespaces and pivot_root(2) into
+> +    the shared directory.
+> +    - chroot: chroot(2) into shared directory (use in containers).
+> +    The default is "namespace".
+> +
+>    * source=PATH -
+>      Share host directory tree located at PATH.  This option is required.
+>  
+> -- 
+> 2.26.2
+> 
 -- 
-2.21.3
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
