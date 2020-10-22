@@ -4,44 +4,44 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UPPERCASE_50_75,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF17FC388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:19:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12A54C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:20:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBB51221FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:19:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 428E0221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:20:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="p9gPimYg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB51221FB
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="YiwgIpsV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 428E0221FB
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46328 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48758 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZZ4-0003tC-Hw
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:19:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42314)
+	id 1kVZZs-0004qi-8A
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:20:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kVZTD-0007bX-NO
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:27 -0400
-Received: from mail-bn8nam11on2059.outbound.protection.outlook.com
- ([40.107.236.59]:38043 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
+ id 1kVZT3-0007C9-6B
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:17 -0400
+Received: from mail-bn7nam10on2057.outbound.protection.outlook.com
+ ([40.107.92.57]:30305 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
- id 1kVZRZ-000134-1U
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:27 -0400
+ id 1kVZRY-000137-Tq
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:16 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LovYXxCX6elJGFhEbuYK7JDjUX5GOTMMQG8Z8rJrWAk229sSbBc+FMih+4v7o9aXjwtwdMR9zoZ+3s0FXp5a599kP14xULyFD8/lsxGw7Zf1ogVcb8fLIuKwN2xrHYkchRZKP4hv59GDshoIjO27dWGXlnOnyL85ekmvtLSo78NG+UfTQo3S0x9wKIOrsB/HTHJRVZFfxH5jT5lLL+IBK3cDgTKxI4vNYoGimSbQ1ktlaa+0uPmTuJb3hd9MR5MpAY1ZCCfbyCm7S/pkqlcAVOdi3ig1T6rU4A3t5AX8Q+XsTtiS2ylnysqUNp4iTNsSNftsPBhhsJ+lIlHRXbzMWw==
+ b=l5VBa0eA2ACYp2ogay8W4PjXD9hVnbacuHlVZga19+Wqxzt6dztGcHToFdeJILPau+urhCwcR4a12M/s5nbQEjHMrL6vgvz1a6XIORVfHZYEvcOhKPQve5z5YU9Lhj3oOhdZxUGT7B9kZnfo5CnsiHYa/X1dW5xT3lU9JfXoC5a2sRQFNy6eDamVhg7GopiZ5gwbRGSuXRtpivfRfNxG47jOvyb1ZF8IKWilP2lcgszLFUemukOo2lWG6oWvD1oKaMMGGm5SX6oz0KJVrBCKP6hoWbrY45DecgCEFzZyqrbK9CosEFAP3hXrmIcq801I17sbYy//CnBGRXS08BzO1Q==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tPE4yAZzRCS2xIAjbDyfxY1KJd6LsnrNfOtf5P6Gq4o=;
- b=iyOt7FtAyxv30dpeBx+Z5vl3UYPA0AxL9nEck3ir9V73CfR0qMvt1dOGIA0Efd2gaPGeC8NkveFrVT2EvcOWLLHeAgz0btcj5mDajEORgekvRnOncCw9p81AszQ1xQ50i9FUrYfn5/qMWlI7jtvWVJtgUtp9hqwx7H1u7jPtr9aE43zjAPR+qEKZ+kN/e0ibx/eaKk8XtMKZu3Ar9MVWHhLPUAXl9obVMf/miKjhk46oN/O24hlSwvCt1DYy9+3+mJ0RtkkgHfkBZYrVrThbIUuIuLEsSFV9evZxxpkGzK6tjJIPIoYh6zZlLlNuAiUbQa2egN+JRxJ5D7AcQFC/uA==
+ bh=SvVho3XztQ2OTXdj8vZ3iYymzDSo7QbgvwZEfnExtAg=;
+ b=SJAaKKAv7NoLRBvQez9oLdSLzOdnIIaZZhfFsRp+IqpF0XnVcxQP3gGRr5wX+UJxzDxYkUOKGJN/qxN5pkJ5KcKjBrLql9yu/TfjaTsoB+M31hAos48zUWXwDrLQSwHNr/wW5/sUeLTpQS989yEmgBJs0Hzd3vj1Lh+hExfkNt6g7L+g4xnLaqd1G/XZXvCMZxpEw6uf/LlMgOzNycj2cGYLLqR7WoaT4ncLwSr1k6tmOJJT4vvycXYPfCHaHW+1N0m0BDeMI9XctJDzG+YsQqBWMiMV3qO5RCB8wnteSzb89FE9KFnGAweH6nWfOyJ76Ztnjvw/Ozc86tY0gTwSOA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
  dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
@@ -49,17 +49,17 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tPE4yAZzRCS2xIAjbDyfxY1KJd6LsnrNfOtf5P6Gq4o=;
- b=p9gPimYgCx5fKMCBZQzXePhRoKzebY47jWOdqWKg274HM26mtAC4G10KA1Jvg64k4xjD2j/Hf3nghFn3K9MLyQ/QCdRj+aqdBuyrO4aU+2M1rrQO/MaWwRNBt+sVuzrwzhGtRtzUuKAIZXqEmAjU+iaB/TD1y9aUk5vnKsZCHCI=
-Received: from DM3PR08CA0023.namprd08.prod.outlook.com (2603:10b6:0:52::33) by
- SN4PR0201MB3583.namprd02.prod.outlook.com (2603:10b6:803:45::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Thu, 22 Oct
+ bh=SvVho3XztQ2OTXdj8vZ3iYymzDSo7QbgvwZEfnExtAg=;
+ b=YiwgIpsVmxUcVpNQv4L0WeTuT787avhJC50sPXWVOWNYDGLwDvanJQedOX/5f6SlwWpyrUwRpm0aLPLvBZSGDUG77+pVRvlowfDcGSrbHlx1WGJzBdXYOY2KAqPOZn9IEhzJylQbC0yTC+7abHj8UpLS1IAd7WmaP7iWBeFZLi4=
+Received: from MN2PR03CA0024.namprd03.prod.outlook.com (2603:10b6:208:23a::29)
+ by BL0PR02MB6547.namprd02.prod.outlook.com (2603:10b6:208:1c8::17)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.27; Thu, 22 Oct
  2020 12:11:41 +0000
-Received: from CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
- (2603:10b6:0:52:cafe::ca) by DM3PR08CA0023.outlook.office365.com
- (2603:10b6:0:52::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
+Received: from BL2NAM02FT047.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:208:23a:cafe::db) by MN2PR03CA0024.outlook.office365.com
+ (2603:10b6:208:23a::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend
  Transport; Thu, 22 Oct 2020 12:11:41 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
  smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
@@ -69,26 +69,26 @@ Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
  149.199.60.83 as permitted sender) receiver=protection.outlook.com;
  client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
 Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT062.mail.protection.outlook.com (10.152.75.60) with Microsoft SMTP
+ BL2NAM02FT047.mail.protection.outlook.com (10.152.77.9) with Microsoft SMTP
  Server id 15.20.3499.20 via Frontend Transport; Thu, 22 Oct 2020 12:11:41
  +0000
-Received: from [149.199.38.66] (port=56480 helo=smtp.xilinx.com)
+Received: from [149.199.38.66] (port=56482 helo=smtp.xilinx.com)
  by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kVZQY-0001kB-NR; Thu, 22 Oct 2020 05:10:42 -0700
-Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
+ id 1kVZQY-0001kJ-Q2; Thu, 22 Oct 2020 05:10:42 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp2.xlnx.xilinx.com)
  by smtp.xilinx.com with esmtp (Exim 4.63)
  (envelope-from <sai.pavan.boddu@xilinx.com>)
- id 1kVZRU-0005qR-GR; Thu, 22 Oct 2020 05:11:40 -0700
-Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09MCBdkW022865; 
+ id 1kVZRU-0005qU-O9; Thu, 22 Oct 2020 05:11:40 -0700
+Received: from xsj-pvapsmtp01 (maildrop.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp2.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09MCBdlw015660; 
  Thu, 22 Oct 2020 05:11:39 -0700
 Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
  by xsj-pvapsmtp01 with esmtp (Exim 4.63)
  (envelope-from <saipava@xhdsaipava40.xilinx.com>)
- id 1kVZRS-0005pq-TB; Thu, 22 Oct 2020 05:11:39 -0700
+ id 1kVZRS-0005ps-UA; Thu, 22 Oct 2020 05:11:39 -0700
 Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
- id 38CC113C02EE; Thu, 22 Oct 2020 17:47:51 +0530 (IST)
+ id 4044013C0939; Thu, 22 Oct 2020 17:47:51 +0530 (IST)
 From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 To: Peter Maydell <peter.maydell@linaro.org>,
  Markus Armbruster <armbru@redhat.com>,
@@ -96,9 +96,9 @@ To: Peter Maydell <peter.maydell@linaro.org>,
  Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
  Edgar Iglesias <edgari@xilinx.com>,
  Francisco Eduardo Iglesias <figlesia@xilinx.com>
-Subject: [PATCH v12 1/3] misc: Add versal-usb2-ctrl-regs module
-Date: Thu, 22 Oct 2020 17:47:34 +0530
-Message-Id: <1603369056-4168-2-git-send-email-sai.pavan.boddu@xilinx.com>
+Subject: [PATCH v12 2/3] usb: Add DWC3 model
+Date: Thu, 22 Oct 2020 17:47:35 +0530
+Message-Id: <1603369056-4168-3-git-send-email-sai.pavan.boddu@xilinx.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
 References: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
@@ -110,38 +110,39 @@ X-MS-Office365-Filtering-HT: Tenant
 X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
 Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: 68a20da4-a881-4b6b-b709-08d87683a278
-X-MS-TrafficTypeDiagnostic: SN4PR0201MB3583:
-X-Microsoft-Antispam-PRVS: <SN4PR0201MB35837AD06C03E53517A4601CCA1D0@SN4PR0201MB3583.namprd02.prod.outlook.com>
+X-MS-Office365-Filtering-Correlation-Id: afc3d5e9-429c-43a4-fb4a-08d87683a28c
+X-MS-TrafficTypeDiagnostic: BL0PR02MB6547:
+X-Microsoft-Antispam-PRVS: <BL0PR02MB6547212496B98BE55BFC27DBCA1D0@BL0PR02MB6547.namprd02.prod.outlook.com>
 X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:352;
+X-MS-Oob-TLC-OOBClassifiers: OLM:254;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 0bqu25b3y1zeZgHX5efs3PGvnVB5tR3Xh/UtxXB6h1lWY1fiCV4gP3Lv2N4RIjmkuj2MM5Yd512hLp1+nfkhkDYPymFLUGUobtxAj7C4d1u9T1wLtPYCGE8vdyBE24cN/thjRqgpIZCCBXXpsWAehsWzkNcG6SEjSA3vHIccVtj4Fjsf6Qu4i4Jb6FBxII065PE8inpZY3lC/Q3zjI4DQYIjRLiMwIRoxQ+p4PyNKyO0/Pz/IHuP/5ecTjj5ETEE3o/w6Pny88Z1Bd4JY2fm3lvCuOBNR0uRSFJ6Nfx8QKF2VH5OEgVhNh+oZy16V8RpAzTCw3jW/DfHnUeqaHBOxC8xRMgVVcUuleIeJ1dw0TDZekzBi8iC6I0NRI3KOwG/yl5HsS+OwyvsQIhEWOGk1g==
+X-Microsoft-Antispam-Message-Info: iPP8+Fm6z9n64V9vm0S/oppak60iMToq6tGGYsaHqt9HFjVnrSK6FSbL+MzWhMBMkHOhfZLeeVHrj16y4txrJv1umezkWuiCp99hRO8iePkfrVhLk3ZtBEr1orO993+4TLOhxoxFVeAbrKEGHpXHgzjkFelL7uQq+enbekxK1hk5BrBf/qFKx7tzoS6+NNVbrbFth1P1O1na8xGPrUzovQvdgOFsYFFBcTH3bVPLIAWLfSvdV7mhHXQ/Zw4M57ur4h3Cv5bN+v/yPJJaCo4SWfBDDZJ09izNrN45xHzlqhvdcETniXqZUUCGDdsVXiT/0OndozPfH2Oj5oOZK03xhcYuzsq0YcAUgDV0Wx1w86XFqxEO9w2YF87pKQHpCycBbujw4gwPngpcCHPsB3nK7Q==
 X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(346002)(396003)(376002)(136003)(39860400002)(46966005)(83380400001)(6266002)(356005)(81166007)(336012)(8676002)(36756003)(82740400003)(426003)(6666004)(6636002)(19627235002)(186003)(47076004)(8936002)(478600001)(82310400003)(2616005)(54906003)(2906002)(26005)(4326008)(42186006)(316002)(110136005)(70586007)(5660300002)(30864003)(70206006)(7416002)(107886003);
+ SFS:(376002)(136003)(39860400002)(396003)(346002)(46966005)(2906002)(110136005)(426003)(356005)(6666004)(8676002)(8936002)(336012)(82310400003)(42186006)(70586007)(36756003)(70206006)(7416002)(186003)(82740400003)(2616005)(4326008)(54906003)(81166007)(30864003)(107886003)(83380400001)(478600001)(5660300002)(6266002)(6636002)(26005)(47076004)(316002);
  DIR:OUT; SFP:1101; 
 X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 12:11:41.1393 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 68a20da4-a881-4b6b-b709-08d87683a278
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 12:11:41.2716 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: afc3d5e9-429c-43a4-fb4a-08d87683a28c
 X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
  Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthSource: BL2NAM02FT047.eop-nam02.prod.protection.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0201MB3583
-Received-SPF: pass client-ip=40.107.236.59; envelope-from=saipava@xilinx.com;
- helo=NAM11-BN8-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:11:43
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL0PR02MB6547
+Received-SPF: pass client-ip=40.107.92.57; envelope-from=saipava@xilinx.com;
+ helo=NAM10-BN7-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:11:44
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
 X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001,
+ UPPERCASE_50_75=0.008 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -163,45 +164,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This module emulates control registers of versal usb2 controller, this is added
-just to make guest happy. In general this module would control the phy-reset
-signal from usb controller, data coherency of the transactions, signals
-the host system errors received from controller.
+From: Vikram Garhwal <fnu.vikram@xilinx.com>
 
-Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+This patch adds skeleton model of dwc3 usb controller attached to
+xhci-sysbus device. It defines global register space of DWC3 controller,
+global registers control the AXI/AHB interfaces properties, external FIFO
+support and event count support. All of which are unimplemented at
+present,we are only supporting core reset and read of ID register.
+
 Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
 ---
- hw/misc/meson.build                          |   1 +
- hw/misc/xlnx-versal-usb2-ctrl-regs.c         | 229 +++++++++++++++++++++++++++
- include/hw/misc/xlnx-versal-usb2-ctrl-regs.h |  45 ++++++
- 3 files changed, 275 insertions(+)
- create mode 100644 hw/misc/xlnx-versal-usb2-ctrl-regs.c
- create mode 100644 include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
+ hw/usb/Kconfig            |   6 +
+ hw/usb/hcd-dwc3.c         | 666 ++++++++++++++++++++++++++++++++++++++++++++++
+ hw/usb/meson.build        |   1 +
+ include/hw/usb/hcd-dwc3.h |  55 ++++
+ 4 files changed, 728 insertions(+)
+ create mode 100644 hw/usb/hcd-dwc3.c
+ create mode 100644 include/hw/usb/hcd-dwc3.h
 
-diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-index 793d45b..b336dd1 100644
---- a/hw/misc/meson.build
-+++ b/hw/misc/meson.build
-@@ -109,3 +109,4 @@ specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cp
- specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
- 
- specific_ss.add(when: 'CONFIG_SBSA_REF', if_true: files('sbsa_ec.c'))
-+specific_ss.add(when: 'CONFIG_XLNX_VERSAL', if_true: files('xlnx-versal-usb2-ctrl-regs.c'))
-diff --git a/hw/misc/xlnx-versal-usb2-ctrl-regs.c b/hw/misc/xlnx-versal-usb2-ctrl-regs.c
+diff --git a/hw/usb/Kconfig b/hw/usb/Kconfig
+index 4dd2ba9..f5762f0 100644
+--- a/hw/usb/Kconfig
++++ b/hw/usb/Kconfig
+@@ -116,3 +116,9 @@ config IMX_USBPHY
+     bool
+     default y
+     depends on USB
++
++config USB_DWC3
++    bool
++    default y if USB_XHCI_SYSBUS
++    select USB
++    select REGISTER
+diff --git a/hw/usb/hcd-dwc3.c b/hw/usb/hcd-dwc3.c
 new file mode 100644
-index 0000000..0d09dd2
+index 0000000..775b7a7
 --- /dev/null
-+++ b/hw/misc/xlnx-versal-usb2-ctrl-regs.c
-@@ -0,0 +1,229 @@
++++ b/hw/usb/hcd-dwc3.c
+@@ -0,0 +1,666 @@
 +/*
-+ * QEMU model of the VersalUsb2CtrlRegs Register control/Status block for
-+ * USB2.0 controller
++ * QEMU model of the USB DWC3 host controller emulation.
 + *
-+ * This module should control phy_reset, permanent device plugs, frame length
-+ * time adjust & setting of coherency paths. None of which are emulated in
-+ * present model.
++ * This model defines global register space of DWC3 controller. Global
++ * registers control the AXI/AHB interfaces properties, external FIFO support
++ * and event count support. All of which are unimplemented at present. We are
++ * only supporting core reset and read of ID register.
 + *
-+ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal <fnu.vikram@xilinx.com>
++ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal<fnu.vikram@xilinx.com>
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -224,139 +234,566 @@ index 0000000..0d09dd2
 +
 +#include "qemu/osdep.h"
 +#include "hw/sysbus.h"
-+#include "hw/irq.h"
 +#include "hw/register.h"
 +#include "qemu/bitops.h"
 +#include "qemu/log.h"
 +#include "qom/object.h"
 +#include "migration/vmstate.h"
-+#include "hw/misc/xlnx-versal-usb2-ctrl-regs.h"
++#include "hw/qdev-properties.h"
++#include "hw/usb/hcd-dwc3.h"
++#include "qapi/error.h"
 +
-+#ifndef XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG
-+#define XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG 0
++#ifndef USB_DWC3_ERR_DEBUG
++#define USB_DWC3_ERR_DEBUG 0
 +#endif
 +
-+REG32(BUS_FILTER, 0x30)
-+    FIELD(BUS_FILTER, BYPASS, 0, 4)
-+REG32(PORT, 0x34)
-+    FIELD(PORT, HOST_SMI_BAR_WR, 4, 1)
-+    FIELD(PORT, HOST_SMI_PCI_CMD_REG_WR, 3, 1)
-+    FIELD(PORT, HOST_MSI_ENABLE, 2, 1)
-+    FIELD(PORT, PWR_CTRL_PRSNT, 1, 1)
-+    FIELD(PORT, HUB_PERM_ATTACH, 0, 1)
-+REG32(JITTER_ADJUST, 0x38)
-+    FIELD(JITTER_ADJUST, FLADJ, 0, 6)
-+REG32(BIGENDIAN, 0x40)
-+    FIELD(BIGENDIAN, ENDIAN_GS, 0, 1)
-+REG32(COHERENCY, 0x44)
-+    FIELD(COHERENCY, USB_COHERENCY, 0, 1)
-+REG32(XHC_BME, 0x48)
-+    FIELD(XHC_BME, XHC_BME, 0, 1)
-+REG32(REG_CTRL, 0x60)
-+    FIELD(REG_CTRL, SLVERR_ENABLE, 0, 1)
-+REG32(IR_STATUS, 0x64)
-+    FIELD(IR_STATUS, HOST_SYS_ERR, 1, 1)
-+    FIELD(IR_STATUS, ADDR_DEC_ERR, 0, 1)
-+REG32(IR_MASK, 0x68)
-+    FIELD(IR_MASK, HOST_SYS_ERR, 1, 1)
-+    FIELD(IR_MASK, ADDR_DEC_ERR, 0, 1)
-+REG32(IR_ENABLE, 0x6c)
-+    FIELD(IR_ENABLE, HOST_SYS_ERR, 1, 1)
-+    FIELD(IR_ENABLE, ADDR_DEC_ERR, 0, 1)
-+REG32(IR_DISABLE, 0x70)
-+    FIELD(IR_DISABLE, HOST_SYS_ERR, 1, 1)
-+    FIELD(IR_DISABLE, ADDR_DEC_ERR, 0, 1)
-+REG32(USB3, 0x78)
++#define HOST_MODE           1
++#define FIFO_LEN         0x1000
 +
-+static void ir_update_irq(VersalUsb2CtrlRegs *s)
-+{
-+    bool pending = s->regs[R_IR_STATUS] & ~s->regs[R_IR_MASK];
-+    qemu_set_irq(s->irq_ir, pending);
-+}
++REG32(GSBUSCFG0, 0x00)
++    FIELD(GSBUSCFG0, DATRDREQINFO, 28, 4)
++    FIELD(GSBUSCFG0, DESRDREQINFO, 24, 4)
++    FIELD(GSBUSCFG0, DATWRREQINFO, 20, 4)
++    FIELD(GSBUSCFG0, DESWRREQINFO, 16, 4)
++    FIELD(GSBUSCFG0, RESERVED_15_12, 12, 4)
++    FIELD(GSBUSCFG0, DATBIGEND, 11, 1)
++    FIELD(GSBUSCFG0, DESBIGEND, 10, 1)
++    FIELD(GSBUSCFG0, RESERVED_9_8, 8, 2)
++    FIELD(GSBUSCFG0, INCR256BRSTENA, 7, 1)
++    FIELD(GSBUSCFG0, INCR128BRSTENA, 6, 1)
++    FIELD(GSBUSCFG0, INCR64BRSTENA, 5, 1)
++    FIELD(GSBUSCFG0, INCR32BRSTENA, 4, 1)
++    FIELD(GSBUSCFG0, INCR16BRSTENA, 3, 1)
++    FIELD(GSBUSCFG0, INCR8BRSTENA, 2, 1)
++    FIELD(GSBUSCFG0, INCR4BRSTENA, 1, 1)
++    FIELD(GSBUSCFG0, INCRBRSTENA, 0, 1)
++REG32(GSBUSCFG1, 0x04)
++    FIELD(GSBUSCFG1, RESERVED_31_13, 13, 19)
++    FIELD(GSBUSCFG1, EN1KPAGE, 12, 1)
++    FIELD(GSBUSCFG1, PIPETRANSLIMIT, 8, 4)
++    FIELD(GSBUSCFG1, RESERVED_7_0, 0, 8)
++REG32(GTXTHRCFG, 0x08)
++    FIELD(GTXTHRCFG, RESERVED_31, 31, 1)
++    FIELD(GTXTHRCFG, RESERVED_30, 30, 1)
++    FIELD(GTXTHRCFG, USBTXPKTCNTSEL, 29, 1)
++    FIELD(GTXTHRCFG, RESERVED_28, 28, 1)
++    FIELD(GTXTHRCFG, USBTXPKTCNT, 24, 4)
++    FIELD(GTXTHRCFG, USBMAXTXBURSTSIZE, 16, 8)
++    FIELD(GTXTHRCFG, RESERVED_15, 15, 1)
++    FIELD(GTXTHRCFG, RESERVED_14, 14, 1)
++    FIELD(GTXTHRCFG, RESERVED_13_11, 11, 3)
++    FIELD(GTXTHRCFG, RESERVED_10_0, 0, 11)
++REG32(GRXTHRCFG, 0x0c)
++    FIELD(GRXTHRCFG, RESERVED_31_30, 30, 2)
++    FIELD(GRXTHRCFG, USBRXPKTCNTSEL, 29, 1)
++    FIELD(GRXTHRCFG, RESERVED_28, 28, 1)
++    FIELD(GRXTHRCFG, USBRXPKTCNT, 24, 4)
++    FIELD(GRXTHRCFG, USBMAXRXBURSTSIZE, 19, 5)
++    FIELD(GRXTHRCFG, RESERVED_18_16, 16, 3)
++    FIELD(GRXTHRCFG, RESERVED_15, 15, 1)
++    FIELD(GRXTHRCFG, RESERVED_14_13, 13, 2)
++    FIELD(GRXTHRCFG, RESVISOCOUTSPC, 0, 13)
++REG32(GCTL, 0x10)
++    FIELD(GCTL, PWRDNSCALE, 19, 13)
++    FIELD(GCTL, MASTERFILTBYPASS, 18, 1)
++    FIELD(GCTL, BYPSSETADDR, 17, 1)
++    FIELD(GCTL, U2RSTECN, 16, 1)
++    FIELD(GCTL, FRMSCLDWN, 14, 2)
++    FIELD(GCTL, PRTCAPDIR, 12, 2)
++    FIELD(GCTL, CORESOFTRESET, 11, 1)
++    FIELD(GCTL, U1U2TIMERSCALE, 9, 1)
++    FIELD(GCTL, DEBUGATTACH, 8, 1)
++    FIELD(GCTL, RAMCLKSEL, 6, 2)
++    FIELD(GCTL, SCALEDOWN, 4, 2)
++    FIELD(GCTL, DISSCRAMBLE, 3, 1)
++    FIELD(GCTL, U2EXIT_LFPS, 2, 1)
++    FIELD(GCTL, GBLHIBERNATIONEN, 1, 1)
++    FIELD(GCTL, DSBLCLKGTNG, 0, 1)
++REG32(GPMSTS, 0x14)
++REG32(GSTS, 0x18)
++    FIELD(GSTS, CBELT, 20, 12)
++    FIELD(GSTS, RESERVED_19_12, 12, 8)
++    FIELD(GSTS, SSIC_IP, 11, 1)
++    FIELD(GSTS, OTG_IP, 10, 1)
++    FIELD(GSTS, BC_IP, 9, 1)
++    FIELD(GSTS, ADP_IP, 8, 1)
++    FIELD(GSTS, HOST_IP, 7, 1)
++    FIELD(GSTS, DEVICE_IP, 6, 1)
++    FIELD(GSTS, CSRTIMEOUT, 5, 1)
++    FIELD(GSTS, BUSERRADDRVLD, 4, 1)
++    FIELD(GSTS, RESERVED_3_2, 2, 2)
++    FIELD(GSTS, CURMOD, 0, 2)
++REG32(GUCTL1, 0x1c)
++    FIELD(GUCTL1, RESUME_OPMODE_HS_HOST, 10, 1)
++REG32(GSNPSID, 0x20)
++REG32(GGPIO, 0x24)
++    FIELD(GGPIO, GPO, 16, 16)
++    FIELD(GGPIO, GPI, 0, 16)
++REG32(GUID, 0x28)
++REG32(GUCTL, 0x2c)
++    FIELD(GUCTL, REFCLKPER, 22, 10)
++    FIELD(GUCTL, NOEXTRDL, 21, 1)
++    FIELD(GUCTL, RESERVED_20_18, 18, 3)
++    FIELD(GUCTL, SPRSCTRLTRANSEN, 17, 1)
++    FIELD(GUCTL, RESBWHSEPS, 16, 1)
++    FIELD(GUCTL, RESERVED_15, 15, 1)
++    FIELD(GUCTL, USBHSTINAUTORETRYEN, 14, 1)
++    FIELD(GUCTL, ENOVERLAPCHK, 13, 1)
++    FIELD(GUCTL, EXTCAPSUPPTEN, 12, 1)
++    FIELD(GUCTL, INSRTEXTRFSBODI, 11, 1)
++    FIELD(GUCTL, DTCT, 9, 2)
++    FIELD(GUCTL, DTFT, 0, 9)
++REG32(GBUSERRADDRLO, 0x30)
++REG32(GBUSERRADDRHI, 0x34)
++REG32(GHWPARAMS0, 0x40)
++    FIELD(GHWPARAMS0, GHWPARAMS0_31_24, 24, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_23_16, 16, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_15_8, 8, 8)
++    FIELD(GHWPARAMS0, GHWPARAMS0_7_6, 6, 2)
++    FIELD(GHWPARAMS0, GHWPARAMS0_5_3, 3, 3)
++    FIELD(GHWPARAMS0, GHWPARAMS0_2_0, 0, 3)
++REG32(GHWPARAMS1, 0x44)
++    FIELD(GHWPARAMS1, GHWPARAMS1_31, 31, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_30, 30, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_29, 29, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_28, 28, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_27, 27, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_26, 26, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_25_24, 24, 2)
++    FIELD(GHWPARAMS1, GHWPARAMS1_23, 23, 1)
++    FIELD(GHWPARAMS1, GHWPARAMS1_22_21, 21, 2)
++    FIELD(GHWPARAMS1, GHWPARAMS1_20_15, 15, 6)
++    FIELD(GHWPARAMS1, GHWPARAMS1_14_12, 12, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_11_9, 9, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_8_6, 6, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_5_3, 3, 3)
++    FIELD(GHWPARAMS1, GHWPARAMS1_2_0, 0, 3)
++REG32(GHWPARAMS2, 0x48)
++REG32(GHWPARAMS3, 0x4c)
++    FIELD(GHWPARAMS3, GHWPARAMS3_31, 31, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_30_23, 23, 8)
++    FIELD(GHWPARAMS3, GHWPARAMS3_22_18, 18, 5)
++    FIELD(GHWPARAMS3, GHWPARAMS3_17_12, 12, 6)
++    FIELD(GHWPARAMS3, GHWPARAMS3_11, 11, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_10, 10, 1)
++    FIELD(GHWPARAMS3, GHWPARAMS3_9_8, 8, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_7_6, 6, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_5_4, 4, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_3_2, 2, 2)
++    FIELD(GHWPARAMS3, GHWPARAMS3_1_0, 0, 2)
++REG32(GHWPARAMS4, 0x50)
++    FIELD(GHWPARAMS4, GHWPARAMS4_31_28, 28, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_27_24, 24, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_23, 23, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_22, 22, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_21, 21, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_20_17, 17, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_16_13, 13, 4)
++    FIELD(GHWPARAMS4, GHWPARAMS4_12, 12, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_11, 11, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_10_9, 9, 2)
++    FIELD(GHWPARAMS4, GHWPARAMS4_8_7, 7, 2)
++    FIELD(GHWPARAMS4, GHWPARAMS4_6, 6, 1)
++    FIELD(GHWPARAMS4, GHWPARAMS4_5_0, 0, 6)
++REG32(GHWPARAMS5, 0x54)
++    FIELD(GHWPARAMS5, GHWPARAMS5_31_28, 28, 4)
++    FIELD(GHWPARAMS5, GHWPARAMS5_27_22, 22, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_21_16, 16, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_15_10, 10, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_9_4, 4, 6)
++    FIELD(GHWPARAMS5, GHWPARAMS5_3_0, 0, 4)
++REG32(GHWPARAMS6, 0x58)
++    FIELD(GHWPARAMS6, GHWPARAMS6_31_16, 16, 16)
++    FIELD(GHWPARAMS6, BUSFLTRSSUPPORT, 15, 1)
++    FIELD(GHWPARAMS6, BCSUPPORT, 14, 1)
++    FIELD(GHWPARAMS6, OTG_SS_SUPPORT, 13, 1)
++    FIELD(GHWPARAMS6, ADPSUPPORT, 12, 1)
++    FIELD(GHWPARAMS6, HNPSUPPORT, 11, 1)
++    FIELD(GHWPARAMS6, SRPSUPPORT, 10, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_9_8, 8, 2)
++    FIELD(GHWPARAMS6, GHWPARAMS6_7, 7, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_6, 6, 1)
++    FIELD(GHWPARAMS6, GHWPARAMS6_5_0, 0, 6)
++REG32(GHWPARAMS7, 0x5c)
++    FIELD(GHWPARAMS7, GHWPARAMS7_31_16, 16, 16)
++    FIELD(GHWPARAMS7, GHWPARAMS7_15_0, 0, 16)
++REG32(GDBGFIFOSPACE, 0x60)
++    FIELD(GDBGFIFOSPACE, SPACE_AVAILABLE, 16, 16)
++    FIELD(GDBGFIFOSPACE, RESERVED_15_9, 9, 7)
++    FIELD(GDBGFIFOSPACE, FIFO_QUEUE_SELECT, 0, 9)
++REG32(GUCTL2, 0x9c)
++    FIELD(GUCTL2, RESERVED_31_26, 26, 6)
++    FIELD(GUCTL2, EN_HP_PM_TIMER, 19, 7)
++    FIELD(GUCTL2, NOLOWPWRDUR, 15, 4)
++    FIELD(GUCTL2, RST_ACTBITLATER, 14, 1)
++    FIELD(GUCTL2, RESERVED_13, 13, 1)
++    FIELD(GUCTL2, DISABLECFC, 11, 1)
++REG32(GUSB2PHYCFG, 0x100)
++    FIELD(GUSB2PHYCFG, U2_FREECLK_EXISTS, 30, 1)
++    FIELD(GUSB2PHYCFG, ULPI_LPM_WITH_OPMODE_CHK, 29, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_25, 25, 1)
++    FIELD(GUSB2PHYCFG, LSTRD, 22, 3)
++    FIELD(GUSB2PHYCFG, LSIPD, 19, 3)
++    FIELD(GUSB2PHYCFG, ULPIEXTVBUSINDIACTOR, 18, 1)
++    FIELD(GUSB2PHYCFG, ULPIEXTVBUSDRV, 17, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_16, 16, 1)
++    FIELD(GUSB2PHYCFG, ULPIAUTORES, 15, 1)
++    FIELD(GUSB2PHYCFG, RESERVED_14, 14, 1)
++    FIELD(GUSB2PHYCFG, USBTRDTIM, 10, 4)
++    FIELD(GUSB2PHYCFG, XCVRDLY, 9, 1)
++    FIELD(GUSB2PHYCFG, ENBLSLPM, 8, 1)
++    FIELD(GUSB2PHYCFG, PHYSEL, 7, 1)
++    FIELD(GUSB2PHYCFG, SUSPENDUSB20, 6, 1)
++    FIELD(GUSB2PHYCFG, FSINTF, 5, 1)
++    FIELD(GUSB2PHYCFG, ULPI_UTMI_SEL, 4, 1)
++    FIELD(GUSB2PHYCFG, PHYIF, 3, 1)
++    FIELD(GUSB2PHYCFG, TOUTCAL, 0, 3)
++REG32(GUSB2I2CCTL, 0x140)
++REG32(GUSB2PHYACC_ULPI, 0x180)
++    FIELD(GUSB2PHYACC_ULPI, RESERVED_31_27, 27, 5)
++    FIELD(GUSB2PHYACC_ULPI, DISUIPIDRVR, 26, 1)
++    FIELD(GUSB2PHYACC_ULPI, NEWREGREQ, 25, 1)
++    FIELD(GUSB2PHYACC_ULPI, VSTSDONE, 24, 1)
++    FIELD(GUSB2PHYACC_ULPI, VSTSBSY, 23, 1)
++    FIELD(GUSB2PHYACC_ULPI, REGWR, 22, 1)
++    FIELD(GUSB2PHYACC_ULPI, REGADDR, 16, 6)
++    FIELD(GUSB2PHYACC_ULPI, EXTREGADDR, 8, 8)
++    FIELD(GUSB2PHYACC_ULPI, REGDATA, 0, 8)
++REG32(GTXFIFOSIZ0, 0x200)
++    FIELD(GTXFIFOSIZ0, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ0, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ1, 0x204)
++    FIELD(GTXFIFOSIZ1, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ1, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ2, 0x208)
++    FIELD(GTXFIFOSIZ2, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ2, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ3, 0x20c)
++    FIELD(GTXFIFOSIZ3, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ3, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ4, 0x210)
++    FIELD(GTXFIFOSIZ4, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ4, TXFDEP_N, 0, 16)
++REG32(GTXFIFOSIZ5, 0x214)
++    FIELD(GTXFIFOSIZ5, TXFSTADDR_N, 16, 16)
++    FIELD(GTXFIFOSIZ5, TXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ0, 0x280)
++    FIELD(GRXFIFOSIZ0, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ0, RXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ1, 0x284)
++    FIELD(GRXFIFOSIZ1, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ1, RXFDEP_N, 0, 16)
++REG32(GRXFIFOSIZ2, 0x288)
++    FIELD(GRXFIFOSIZ2, RXFSTADDR_N, 16, 16)
++    FIELD(GRXFIFOSIZ2, RXFDEP_N, 0, 16)
++REG32(GEVNTADRLO_0, 0x300)
++REG32(GEVNTADRHI_0, 0x304)
++REG32(GEVNTSIZ_0, 0x308)
++    FIELD(GEVNTSIZ_0, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_0, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_0, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_0, 0x30c)
++    FIELD(GEVNTCOUNT_0, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_0, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_0, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_1, 0x310)
++REG32(GEVNTADRHI_1, 0x314)
++REG32(GEVNTSIZ_1, 0x318)
++    FIELD(GEVNTSIZ_1, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_1, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_1, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_1, 0x31c)
++    FIELD(GEVNTCOUNT_1, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_1, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_1, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_2, 0x320)
++REG32(GEVNTADRHI_2, 0x324)
++REG32(GEVNTSIZ_2, 0x328)
++    FIELD(GEVNTSIZ_2, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_2, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_2, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_2, 0x32c)
++    FIELD(GEVNTCOUNT_2, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_2, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_2, EVNTCOUNT, 0, 16)
++REG32(GEVNTADRLO_3, 0x330)
++REG32(GEVNTADRHI_3, 0x334)
++REG32(GEVNTSIZ_3, 0x338)
++    FIELD(GEVNTSIZ_3, EVNTINTRPTMASK, 31, 1)
++    FIELD(GEVNTSIZ_3, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTSIZ_3, EVENTSIZ, 0, 16)
++REG32(GEVNTCOUNT_3, 0x33c)
++    FIELD(GEVNTCOUNT_3, EVNT_HANDLER_BUSY, 31, 1)
++    FIELD(GEVNTCOUNT_3, RESERVED_30_16, 16, 15)
++    FIELD(GEVNTCOUNT_3, EVNTCOUNT, 0, 16)
++REG32(GHWPARAMS8, 0x500)
++REG32(GTXFIFOPRIDEV, 0x510)
++    FIELD(GTXFIFOPRIDEV, RESERVED_31_N, 6, 26)
++    FIELD(GTXFIFOPRIDEV, GTXFIFOPRIDEV, 0, 6)
++REG32(GTXFIFOPRIHST, 0x518)
++    FIELD(GTXFIFOPRIHST, RESERVED_31_16, 3, 29)
++    FIELD(GTXFIFOPRIHST, GTXFIFOPRIHST, 0, 3)
++REG32(GRXFIFOPRIHST, 0x51c)
++    FIELD(GRXFIFOPRIHST, RESERVED_31_16, 3, 29)
++    FIELD(GRXFIFOPRIHST, GRXFIFOPRIHST, 0, 3)
++REG32(GDMAHLRATIO, 0x524)
++    FIELD(GDMAHLRATIO, RESERVED_31_13, 13, 19)
++    FIELD(GDMAHLRATIO, HSTRXFIFO, 8, 5)
++    FIELD(GDMAHLRATIO, RESERVED_7_5, 5, 3)
++    FIELD(GDMAHLRATIO, HSTTXFIFO, 0, 5)
++REG32(GFLADJ, 0x530)
++    FIELD(GFLADJ, GFLADJ_REFCLK_240MHZDECR_PLS1, 31, 1)
++    FIELD(GFLADJ, GFLADJ_REFCLK_240MHZ_DECR, 24, 7)
++    FIELD(GFLADJ, GFLADJ_REFCLK_LPM_SEL, 23, 1)
++    FIELD(GFLADJ, RESERVED_22, 22, 1)
++    FIELD(GFLADJ, GFLADJ_REFCLK_FLADJ, 8, 14)
++    FIELD(GFLADJ, GFLADJ_30MHZ_SDBND_SEL, 7, 1)
++    FIELD(GFLADJ, GFLADJ_30MHZ, 0, 6)
 +
-+static void ir_status_postw(RegisterInfo *reg, uint64_t val64)
++static void reset_csr(USBDWC3 * s)
 +{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
++    int i = 0;
 +    /*
-+     * TODO: This should also clear USBSTS.HSE field in USB XHCI register.
-+     * May be combine both the modules.
++     * We reset all CSR regs except GCTL, GUCTL, GSTS, GSNPSID, GGPIO, GUID,
++     * GUSB2PHYCFGn registers and GUSB3PIPECTLn registers. We will skip PHY
++     * register as we don't implement them.
 +     */
-+    ir_update_irq(s);
++    for (i = 0; i < USB_DWC3_R_MAX; i++) {
++        switch (i) {
++        case R_GCTL:
++            break;
++        case R_GSTS:
++            break;
++        case R_GSNPSID:
++            break;
++        case R_GGPIO:
++            break;
++        case R_GUID:
++            break;
++        case R_GUCTL:
++            break;
++        case R_GHWPARAMS0...R_GHWPARAMS7:
++            break;
++        case R_GHWPARAMS8:
++            break;
++        default:
++            register_reset(&s->regs_info[i]);
++            break;
++        }
++    }
++
++    xhci_sysbus_reset(DEVICE(&s->sysbus_xhci));
 +}
 +
-+static uint64_t ir_enable_prew(RegisterInfo *reg, uint64_t val64)
++static void usb_dwc3_gctl_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
-+    uint32_t val = val64;
++    USBDWC3 *s = USB_DWC3(reg->opaque);
 +
-+    s->regs[R_IR_MASK] &= ~val;
-+    ir_update_irq(s);
-+    return 0;
++    if (ARRAY_FIELD_EX32(s->regs, GCTL, CORESOFTRESET)) {
++        reset_csr(s);
++    }
 +}
 +
-+static uint64_t ir_disable_prew(RegisterInfo *reg, uint64_t val64)
++static void usb_dwc3_guid_postw(RegisterInfo *reg, uint64_t val64)
 +{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
-+    uint32_t val = val64;
++    USBDWC3 *s = USB_DWC3(reg->opaque);
 +
-+    s->regs[R_IR_MASK] |= val;
-+    ir_update_irq(s);
-+    return 0;
++    s->regs[R_GUID] = s->cfg.dwc_usb3_user;
 +}
 +
-+static const RegisterAccessInfo usb2_ctrl_regs_regs_info[] = {
-+    {   .name = "BUS_FILTER",  .addr = A_BUS_FILTER,
-+        .rsvd = 0xfffffff0,
-+    },{ .name = "PORT",  .addr = A_PORT,
-+        .rsvd = 0xffffffe0,
-+    },{ .name = "JITTER_ADJUST",  .addr = A_JITTER_ADJUST,
-+        .reset = 0x20,
-+        .rsvd = 0xffffffc0,
-+    },{ .name = "BIGENDIAN",  .addr = A_BIGENDIAN,
-+        .rsvd = 0xfffffffe,
-+    },{ .name = "COHERENCY",  .addr = A_COHERENCY,
-+        .rsvd = 0xfffffffe,
-+    },{ .name = "XHC_BME",  .addr = A_XHC_BME,
-+        .reset = 0x1,
-+        .rsvd = 0xfffffffe,
-+    },{ .name = "REG_CTRL",  .addr = A_REG_CTRL,
-+        .rsvd = 0xfffffffe,
-+    },{ .name = "IR_STATUS",  .addr = A_IR_STATUS,
-+        .rsvd = 0xfffffffc,
-+        .w1c = 0x3,
-+        .post_write = ir_status_postw,
-+    },{ .name = "IR_MASK",  .addr = A_IR_MASK,
-+        .reset = 0x3,
-+        .rsvd = 0xfffffffc,
-+        .ro = 0x3,
-+    },{ .name = "IR_ENABLE",  .addr = A_IR_ENABLE,
-+        .rsvd = 0xfffffffc,
-+        .pre_write = ir_enable_prew,
-+    },{ .name = "IR_DISABLE",  .addr = A_IR_DISABLE,
-+        .rsvd = 0xfffffffc,
-+        .pre_write = ir_disable_prew,
-+    },{ .name = "USB3",  .addr = A_USB3,
++static const RegisterAccessInfo usb_dwc3_regs_info[] = {
++    {   .name = "GSBUSCFG0",  .addr = A_GSBUSCFG0,
++        .ro = 0xf300,
++        .unimp = 0xffffffff,
++    },{ .name = "GSBUSCFG1",  .addr = A_GSBUSCFG1,
++        .reset = 0x300,
++        .ro = 0xffffe0ff,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXTHRCFG",  .addr = A_GTXTHRCFG,
++        .ro = 0xd000ffff,
++        .unimp = 0xffffffff,
++    },{ .name = "GRXTHRCFG",  .addr = A_GRXTHRCFG,
++        .ro = 0xd007e000,
++        .unimp = 0xffffffff,
++    },{ .name = "GCTL",  .addr = A_GCTL,
++        .reset = 0x30c13004, .post_write = usb_dwc3_gctl_postw,
++    },{ .name = "GPMSTS",  .addr = A_GPMSTS,
++        .ro = 0xfffffff,
++        .unimp = 0xffffffff,
++    },{ .name = "GSTS",  .addr = A_GSTS,
++        .reset = 0x7e800000,
++        .ro = 0xffffffcf,
++        .w1c = 0x30,
++        .unimp = 0xffffffff,
++    },{ .name = "GUCTL1",  .addr = A_GUCTL1,
++        .reset = 0x198a,
++        .ro = 0x7800,
++        .unimp = 0xffffffff,
++    },{ .name = "GSNPSID",  .addr = A_GSNPSID,
++        .reset = 0x5533330a,
++        .ro = 0xffffffff,
++    },{ .name = "GGPIO",  .addr = A_GGPIO,
++        .ro = 0xffff,
++        .unimp = 0xffffffff,
++    },{ .name = "GUID",  .addr = A_GUID,
++        .reset = 0x12345678, .post_write = usb_dwc3_guid_postw,
++    },{ .name = "GUCTL",  .addr = A_GUCTL,
++        .reset = 0x0c808010,
++        .ro = 0x1c8000,
++        .unimp = 0xffffffff,
++    },{ .name = "GBUSERRADDRLO",  .addr = A_GBUSERRADDRLO,
++        .ro = 0xffffffff,
++    },{ .name = "GBUSERRADDRHI",  .addr = A_GBUSERRADDRHI,
++        .ro = 0xffffffff,
++    },{ .name = "GHWPARAMS0",  .addr = A_GHWPARAMS0,
++        .ro = 0xffffffff,
++        .reset = 0x40204048,
++    },{ .name = "GHWPARAMS1",  .addr = A_GHWPARAMS1,
++        .ro = 0xffffffff,
++        .reset = 0x222493b,
++    },{ .name = "GHWPARAMS2",  .addr = A_GHWPARAMS2,
++        .ro = 0xffffffff,
++        .reset = 0x12345678,
++    },{ .name = "GHWPARAMS3",  .addr = A_GHWPARAMS3,
++        .ro = 0xffffffff,
++        .reset = 0x618c088,
++    },{ .name = "GHWPARAMS4",  .addr = A_GHWPARAMS4,
++        .ro = 0xffffffff,
++        .reset = 0x47822004,
++    },{ .name = "GHWPARAMS5",  .addr = A_GHWPARAMS5,
++        .ro = 0xffffffff,
++        .reset = 0x4202088,
++    },{ .name = "GHWPARAMS6",  .addr = A_GHWPARAMS6,
++        .ro = 0xffffffff,
++        .reset = 0x7850c20,
++    },{ .name = "GHWPARAMS7",  .addr = A_GHWPARAMS7,
++        .ro = 0xffffffff,
++        .reset = 0x0,
++    },{ .name = "GDBGFIFOSPACE",  .addr = A_GDBGFIFOSPACE,
++        .reset = 0xa0000,
++        .ro = 0xfffffe00,
++        .unimp = 0xffffffff,
++    },{ .name = "GUCTL2",  .addr = A_GUCTL2,
++        .reset = 0x40d,
++        .ro = 0x2000,
++        .unimp = 0xffffffff,
++    },{ .name = "GUSB2PHYCFG",  .addr = A_GUSB2PHYCFG,
++        .reset = 0x40102410,
++        .ro = 0x1e014030,
++        .unimp = 0xffffffff,
++    },{ .name = "GUSB2I2CCTL",  .addr = A_GUSB2I2CCTL,
++        .ro = 0xffffffff,
++        .unimp = 0xffffffff,
++    },{ .name = "GUSB2PHYACC_ULPI",  .addr = A_GUSB2PHYACC_ULPI,
++        .ro = 0xfd000000,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ0",  .addr = A_GTXFIFOSIZ0,
++        .reset = 0x2c7000a,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ1",  .addr = A_GTXFIFOSIZ1,
++        .reset = 0x2d10103,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ2",  .addr = A_GTXFIFOSIZ2,
++        .reset = 0x3d40103,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ3",  .addr = A_GTXFIFOSIZ3,
++        .reset = 0x4d70083,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ4",  .addr = A_GTXFIFOSIZ4,
++        .reset = 0x55a0083,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOSIZ5",  .addr = A_GTXFIFOSIZ5,
++        .reset = 0x5dd0083,
++        .unimp = 0xffffffff,
++    },{ .name = "GRXFIFOSIZ0",  .addr = A_GRXFIFOSIZ0,
++        .reset = 0x1c20105,
++        .unimp = 0xffffffff,
++    },{ .name = "GRXFIFOSIZ1",  .addr = A_GRXFIFOSIZ1,
++        .reset = 0x2c70000,
++        .unimp = 0xffffffff,
++    },{ .name = "GRXFIFOSIZ2",  .addr = A_GRXFIFOSIZ2,
++        .reset = 0x2c70000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRLO_0",  .addr = A_GEVNTADRLO_0,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRHI_0",  .addr = A_GEVNTADRHI_0,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTSIZ_0",  .addr = A_GEVNTSIZ_0,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTCOUNT_0",  .addr = A_GEVNTCOUNT_0,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRLO_1",  .addr = A_GEVNTADRLO_1,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRHI_1",  .addr = A_GEVNTADRHI_1,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTSIZ_1",  .addr = A_GEVNTSIZ_1,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTCOUNT_1",  .addr = A_GEVNTCOUNT_1,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRLO_2",  .addr = A_GEVNTADRLO_2,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRHI_2",  .addr = A_GEVNTADRHI_2,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTSIZ_2",  .addr = A_GEVNTSIZ_2,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTCOUNT_2",  .addr = A_GEVNTCOUNT_2,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRLO_3",  .addr = A_GEVNTADRLO_3,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTADRHI_3",  .addr = A_GEVNTADRHI_3,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTSIZ_3",  .addr = A_GEVNTSIZ_3,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GEVNTCOUNT_3",  .addr = A_GEVNTCOUNT_3,
++        .ro = 0x7fff0000,
++        .unimp = 0xffffffff,
++    },{ .name = "GHWPARAMS8",  .addr = A_GHWPARAMS8,
++        .ro = 0xffffffff,
++        .reset = 0x478,
++    },{ .name = "GTXFIFOPRIDEV",  .addr = A_GTXFIFOPRIDEV,
++        .ro = 0xffffffc0,
++        .unimp = 0xffffffff,
++    },{ .name = "GTXFIFOPRIHST",  .addr = A_GTXFIFOPRIHST,
++        .ro = 0xfffffff8,
++        .unimp = 0xffffffff,
++    },{ .name = "GRXFIFOPRIHST",  .addr = A_GRXFIFOPRIHST,
++        .ro = 0xfffffff8,
++        .unimp = 0xffffffff,
++    },{ .name = "GDMAHLRATIO",  .addr = A_GDMAHLRATIO,
++        .ro = 0xffffe0e0,
++        .unimp = 0xffffffff,
++    },{ .name = "GFLADJ",  .addr = A_GFLADJ,
++        .reset = 0xc83f020,
++        .rsvd = 0x40,
++        .ro = 0x400040,
++        .unimp = 0xffffffff,
 +    }
 +};
 +
-+static void usb2_ctrl_regs_reset_init(Object *obj, ResetType type)
++static void usb_dwc3_reset(DeviceState *dev)
 +{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
++    USBDWC3 *s = USB_DWC3(dev);
 +    unsigned int i;
 +
 +    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
 +        register_reset(&s->regs_info[i]);
 +    }
++
++    /*
++     * Device Configuration
++     */
++    s->regs[R_GHWPARAMS0] |= s->cfg.mode;
++    xhci_sysbus_reset(DEVICE(&s->sysbus_xhci));
 +}
 +
-+static void usb2_ctrl_regs_reset_hold(Object *obj)
-+{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
-+
-+    ir_update_irq(s);
-+}
-+
-+static const MemoryRegionOps usb2_ctrl_regs_ops = {
++static const MemoryRegionOps usb_dwc3_ops = {
 +    .read = register_read_memory,
 +    .write = register_write_memory,
 +    .endianness = DEVICE_LITTLE_ENDIAN,
@@ -366,73 +803,96 @@ index 0000000..0d09dd2
 +    },
 +};
 +
-+static void usb2_ctrl_regs_init(Object *obj)
++static void usb_dwc3_realize(DeviceState *dev, Error **errp)
 +{
-+    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
++    USBDWC3 *s = USB_DWC3(dev);
++    Error *err = NULL;
++
++    sysbus_realize(SYS_BUS_DEVICE(&s->sysbus_xhci), &err);
++    if (err) {
++        error_propagate(errp, err);
++        return;
++    }
++}
++
++static void usb_dwc3_init(Object *obj)
++{
++    USBDWC3 *s = USB_DWC3(obj);
 +    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
 +    RegisterInfoArray *reg_array;
 +
-+    memory_region_init(&s->iomem, obj, TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
-+                       USB2_REGS_R_MAX * 4);
++    memory_region_init(&s->iomem, obj, TYPE_USB_DWC3, USB_DWC3_R_MAX * 4);
 +    reg_array =
-+        register_init_block32(DEVICE(obj), usb2_ctrl_regs_regs_info,
-+                              ARRAY_SIZE(usb2_ctrl_regs_regs_info),
++        register_init_block32(DEVICE(obj), usb_dwc3_regs_info,
++                              ARRAY_SIZE(usb_dwc3_regs_info),
 +                              s->regs_info, s->regs,
-+                              &usb2_ctrl_regs_ops,
-+                              XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG,
-+                              USB2_REGS_R_MAX * 4);
++                              &usb_dwc3_ops,
++                              USB_DWC3_ERR_DEBUG,
++                              USB_DWC3_R_MAX * 4);
 +    memory_region_add_subregion(&s->iomem,
 +                                0x0,
 +                                &reg_array->mem);
 +    sysbus_init_mmio(sbd, &s->iomem);
-+    sysbus_init_irq(sbd, &s->irq_ir);
++    object_initialize_child(obj, "dwc3-xhci", &s->sysbus_xhci,
++                            TYPE_XHCI_SYSBUS);
++    qdev_alias_all_properties(DEVICE(&s->sysbus_xhci), obj);
++
++    s->cfg.mode = HOST_MODE;
 +}
 +
-+static const VMStateDescription vmstate_usb2_ctrl_regs = {
-+    .name = TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
-+    .version_id = 1,
-+    .minimum_version_id = 1,
-+    .fields = (VMStateField[]) {
-+        VMSTATE_UINT32_ARRAY(regs, VersalUsb2CtrlRegs, USB2_REGS_R_MAX),
-+        VMSTATE_END_OF_LIST(),
-+    }
++static Property usb_dwc3_properties[] = {
++    DEFINE_PROP_UINT32("DWC_USB3_USERID", USBDWC3, cfg.dwc_usb3_user,
++                       0x12345678),
++    DEFINE_PROP_END_OF_LIST(),
 +};
 +
-+static void usb2_ctrl_regs_class_init(ObjectClass *klass, void *data)
++static void usb_dwc3_class_init(ObjectClass *klass, void *data)
 +{
 +    DeviceClass *dc = DEVICE_CLASS(klass);
-+    ResettableClass *rc = RESETTABLE_CLASS(klass);
 +
-+    rc->phases.enter = usb2_ctrl_regs_reset_init;
-+    rc->phases.hold  = usb2_ctrl_regs_reset_hold;
-+    dc->vmsd = &vmstate_usb2_ctrl_regs;
++    dc->reset = usb_dwc3_reset;
++    dc->realize = usb_dwc3_realize;
++    device_class_set_props(dc, usb_dwc3_properties);
 +}
 +
-+static const TypeInfo usb2_ctrl_regs_info = {
-+    .name          = TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
++static const TypeInfo usb_dwc3_info = {
++    .name          = TYPE_USB_DWC3,
 +    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(VersalUsb2CtrlRegs),
-+    .class_init    = usb2_ctrl_regs_class_init,
-+    .instance_init = usb2_ctrl_regs_init,
++    .instance_size = sizeof(USBDWC3),
++    .class_init    = usb_dwc3_class_init,
++    .instance_init = usb_dwc3_init,
 +};
 +
-+static void usb2_ctrl_regs_register_types(void)
++static void usb_dwc3_register_types(void)
 +{
-+    type_register_static(&usb2_ctrl_regs_info);
++    type_register_static(&usb_dwc3_info);
 +}
 +
-+type_init(usb2_ctrl_regs_register_types)
-diff --git a/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h b/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
++type_init(usb_dwc3_register_types)
+diff --git a/hw/usb/meson.build b/hw/usb/meson.build
+index 934e4fa..962fbc0 100644
+--- a/hw/usb/meson.build
++++ b/hw/usb/meson.build
+@@ -26,6 +26,7 @@ softmmu_ss.add(when: 'CONFIG_USB_XHCI_SYSBUS', if_true: files('hcd-xhci-sysbus.c
+ softmmu_ss.add(when: 'CONFIG_USB_XHCI_NEC', if_true: files('hcd-xhci-nec.c'))
+ softmmu_ss.add(when: 'CONFIG_USB_MUSB', if_true: files('hcd-musb.c'))
+ softmmu_ss.add(when: 'CONFIG_USB_DWC2', if_true: files('hcd-dwc2.c'))
++softmmu_ss.add(when: 'CONFIG_USB_DWC3', if_true: files('hcd-dwc3.c'))
+ 
+ softmmu_ss.add(when: 'CONFIG_TUSB6010', if_true: files('tusb6010.c'))
+ softmmu_ss.add(when: 'CONFIG_IMX', if_true: files('chipidea.c'))
+diff --git a/include/hw/usb/hcd-dwc3.h b/include/hw/usb/hcd-dwc3.h
 new file mode 100644
-index 0000000..975a717
+index 0000000..586968d
 --- /dev/null
-+++ b/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
-@@ -0,0 +1,45 @@
++++ b/include/hw/usb/hcd-dwc3.h
+@@ -0,0 +1,55 @@
 +/*
-+ * QEMU model of the VersalUsb2CtrlRegs Register control/Status block for
-+ * USB2.0 controller
++ * QEMU model of the USB DWC3 host controller emulation.
 + *
-+ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal <fnu.vikram@xilinx.com>
++ * Copyright (c) 2020 Xilinx Inc.
++ *
++ * Written by Vikram Garhwal<fnu.vikram@xilinx.com>
 + *
 + * Permission is hereby granted, free of charge, to any person obtaining a copy
 + * of this software and associated documentation files (the "Software"), to deal
@@ -452,25 +912,34 @@ index 0000000..975a717
 + * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 + * THE SOFTWARE.
 + */
++#ifndef HCD_DWC3_H
++#define HCD_DWC3_H
 +
-+#ifndef _XLNX_USB2_REGS_H_
-+#define _XLNX_USB2_REGS_H_
++#include "hw/usb/hcd-xhci.h"
++#include "hw/usb/hcd-xhci-sysbus.h"
 +
-+#define TYPE_XILINX_VERSAL_USB2_CTRL_REGS "xlnx.versal-usb2-ctrl-regs"
++#define TYPE_USB_DWC3 "usb_dwc3"
 +
-+#define XILINX_VERSAL_USB2_CTRL_REGS(obj) \
-+     OBJECT_CHECK(VersalUsb2CtrlRegs, (obj), TYPE_XILINX_VERSAL_USB2_CTRL_REGS)
++#define USB_DWC3(obj) \
++     OBJECT_CHECK(USBDWC3, (obj), TYPE_USB_DWC3)
 +
-+#define USB2_REGS_R_MAX ((0x78 / 4) + 1)
++#define USB_DWC3_R_MAX ((0x530 / 4) + 1)
 +
-+typedef struct VersalUsb2CtrlRegs {
++typedef struct USBDWC3 {
 +    SysBusDevice parent_obj;
 +    MemoryRegion iomem;
-+    qemu_irq irq_ir;
++    MemoryRegion fifos;
++    XHCISysbusState sysbus_xhci;
 +
-+    uint32_t regs[USB2_REGS_R_MAX];
-+    RegisterInfo regs_info[USB2_REGS_R_MAX];
-+} VersalUsb2CtrlRegs;
++    uint32_t regs[USB_DWC3_R_MAX];
++    RegisterInfo regs_info[USB_DWC3_R_MAX];
++
++    struct {
++        uint8_t     mode;
++        uint32_t    dwc_usb3_user;
++    } cfg;
++
++} USBDWC3;
 +
 +#endif
 -- 
