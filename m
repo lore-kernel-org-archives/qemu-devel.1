@@ -2,125 +2,91 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_2 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DFB1AC55179
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E115FC388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:59:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6B382072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA74B21707
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 15:59:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="fAqTuOOw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6B382072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Gipor9Bn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA74B21707
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38130 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41086 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVcwE-0008Nj-Ns
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 11:55:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45634)
+	id 1kVczz-0001P6-9R
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 11:59:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
- id 1kVcvN-0007s6-4m; Thu, 22 Oct 2020 11:54:45 -0400
-Received: from mail-eopbgr50126.outbound.protection.outlook.com
- ([40.107.5.126]:50437 helo=EUR03-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <nshirokovskiy@virtuozzo.com>)
- id 1kVcvI-00006i-Kf; Thu, 22 Oct 2020 11:54:44 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VjQEU3SFlHrXRU51JWRwLzjNVXe0rNL012mhSB+Lo1DkVq9d7iu4COnfhc++Dg1NlF+egFyr75QIjilaKG993L7F7Un9xDl/tVFqZrlLBvWP8jAKoGTnuiIUA6c2KlDysXIBpJibM7yyrEMHb03OLXLPQ+ixY/TFc99OgPRvUA5Q51mbmpWZH4j5FI4p+UNyeLjYLBw9pGs9o7jCw3qwGnGSRzD9rIHm3XB1jG8dzjRblzw1BnGzkNIOlC0ZCrlZZ9tj3oxWEi9nN6FQWpBg6+bswWgULocvwFRiVvKbWm1cGnqxAK4w5ItCB76jlYxtXS+YCj3b2ibN+kpmzWL3Fg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6OvloVZccptKVNopjo9sl980X6oPnD9guwflZRtgrcY=;
- b=LWAwfpwZFkNR9ellpvCYmqyFR8mZk4dFZ8K+WDQd3wX3n2XGv3FAMnz/MWD26oM87ir+hgt/Ifj89SgU8Kek+YDr2R1GOc3po/U1uVqGtyj1hU9qrTGLI32//Nj1u0+6VLlbM2cNBXzNuUuvYsXx4jGuWNFGD1LB+X5uo56u0+RfxHPkuANSlB6z9wUQXDE2qJruWzXZ2S4MiTgfz3/oTJrorjI925ue0uatf3ND5iGkYSXyUrYD8UVDlwCy3HQ3znKRL/FlckQVmp19G/VxBlk/XnnspKUyzFv+Y4A940rwTQLiosFAKz2xswhsTqfy18HlaTMlrWkeH/7Upl39gQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6OvloVZccptKVNopjo9sl980X6oPnD9guwflZRtgrcY=;
- b=fAqTuOOwNECl3UkrcaIrQERbAvGW1oCdTvvR3j4XuL/e/QdH1206TmmPT9/nxmleKFGAdBYgbp9wfZVCNcE7FxPv4yp1Zyx3icEd/BEqhYIYDCpN2jOlWPWHDdeBE1noQWQtA3Udb628a1K/Nd8nPOVVZNcuKI0/fYrLy3DECuM=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com (2603:10a6:3:c4::16)
- by HE1PR08MB2634.eurprd08.prod.outlook.com (2603:10a6:7:30::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Thu, 22 Oct
- 2020 15:54:33 +0000
-Received: from HE1PR0802MB2298.eurprd08.prod.outlook.com
- ([fe80::d12a:7bcb:c813:55c1]) by HE1PR0802MB2298.eurprd08.prod.outlook.com
- ([fe80::d12a:7bcb:c813:55c1%10]) with mapi id 15.20.3499.018; Thu, 22 Oct
- 2020 15:54:33 +0000
-Subject: Re: RFC: tracking valid backing chain issue
-To: Kevin Wolf <kwolf@redhat.com>
-Cc: qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <3b99657c-2016-78cb-4314-27aacb30ca3c@virtuozzo.com>
- <20201020085029.GC4452@merkur.fritz.box>
- <a996a3cc-387a-8847-17b8-72a714d47776@virtuozzo.com>
- <3fe1dd27-7720-2846-2658-e4aadab9a9ff@virtuozzo.com>
- <20201021105612.GB8958@merkur.fritz.box>
-From: Nikolay Shirokovskiy <nshirokovskiy@virtuozzo.com>
-Message-ID: <3cfee0dd-f08a-d943-a8bf-bc85a827e6e4@virtuozzo.com>
-Date: Thu, 22 Oct 2020 18:54:31 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-In-Reply-To: <20201021105612.GB8958@merkur.fritz.box>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+ (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
+ id 1kVczA-0000nF-S0
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:58:40 -0400
+Received: from mail-qt1-x842.google.com ([2607:f8b0:4864:20::842]:37554)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <shashi.mallela@linaro.org>)
+ id 1kVcz7-0000hF-UJ
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 11:58:40 -0400
+Received: by mail-qt1-x842.google.com with SMTP id h19so1425545qtq.4
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 08:58:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=message-id:subject:from:to:cc:date:in-reply-to:mime-version
+ :content-transfer-encoding;
+ bh=oyCTo2y4/JQNPo8GuNKg459uXEO7WofQaokeDdbQbxU=;
+ b=Gipor9BnAQMHD6xrcE1hGVPGv/7DFJFXHhp81B2svXGzfnh7FxXw0Ss0ktr5EA4bdR
+ o9t4pV+8fQ3fQ7BGfHo+b6/RKwY+yypIuOzpNKDP/jVUb5C0SDF+KeZR1g67IsDGpzll
+ 3l546aCZ+deN9o8+0TxqpZvz5vLaGIZnJ3m6KtqH60GsvzyiRfVVCC/vU2/fXhbgKq7/
+ x2B21uG1VO9is/hAI9cIjHK7e/EQzR5N3Eyh0qraRDnaAPZu57Z/Dbjo+9Jpi8I3QP5/
+ Qf2dwkdVmAPq5x8Kei20TaK3yOobjXaBVK+3h/zVzPwKhvmNzrzKvC/FcmcRhNQd2/qL
+ ba+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+ :mime-version:content-transfer-encoding;
+ bh=oyCTo2y4/JQNPo8GuNKg459uXEO7WofQaokeDdbQbxU=;
+ b=OP7tiaBN/PLOpXDWcaI1W50s1ArZK0ZMtSVXojF7r5VunFVDawlGBGPHVhag+0uKki
+ Cg+v4DMqmVoIDgHYVrsLQ6YochbYgdfC+f6rQFe8I/WZIwlb4rXZjj8mbriGekfCo3Tm
+ usr+idEZvt9YJvGSmHXrRGS53pyznTePlGa+q4xC8I2BvuzHhRlDtvApdSwhLXd1ZseU
+ EdfeI4zYnWMW15IevQ/rtFkeIItH26nXgFPd/ESQzj+PYhinqj2ikskhy6eWx0hUqNAT
+ MmdAwHbydH9PahT6Zt0I3GzsbGG8M3yIZ7sodA+87JQIfylPrqxgSRGUU1nI76O2TCg6
+ 55dA==
+X-Gm-Message-State: AOAM532XL2vWadOKeL2qIKA9FVRRVunhYbywlLy8NwLEbbLcQYm/Vc6d
+ I9nmqZV/TFdI/qR5vieRiW46llSy+GInx3ei
+X-Google-Smtp-Source: ABdhPJzQNtWrWeq/U+1ztycVJJJLFK6IK+CVEr4xmkyFR84CkiCYTIt7u3l3psbQCzlIu0aI48zIzw==
+X-Received: by 2002:ac8:5141:: with SMTP id h1mr2555588qtn.139.1603382315229; 
+ Thu, 22 Oct 2020 08:58:35 -0700 (PDT)
+Received: from localhost.localdomain
+ (stsvon1503w-lp130-06-174-91-97-36.dsl.bell.ca. [174.91.97.36])
+ by smtp.gmail.com with ESMTPSA id k3sm1226425qtj.84.2020.10.22.08.58.34
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Thu, 22 Oct 2020 08:58:34 -0700 (PDT)
+Message-ID: <581f003b5c57586d00dcf5fe90ce40a87c04ecc4.camel@linaro.org>
+Subject: Re: [PATCH v6 1/2] hw/watchdog: Implement SBSA watchdog device
+From: shashi.mallela@linaro.org
+To: peter.maydell@linaro.org
+Date: Thu, 22 Oct 2020 11:58:33 -0400
+In-Reply-To: <CAFEAcA_FjpV-SeO8t=DSgk8S5MCasi6iF-uzpUuEdx8eY9564A@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Mailer: Evolution 3.28.5 (3.28.5-12.el8) 
+Mime-Version: 1.0
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [109.252.131.121]
-X-ClientProxiedBy: AM0PR07CA0034.eurprd07.prod.outlook.com
- (2603:10a6:208:ac::47) To HE1PR0802MB2298.eurprd08.prod.outlook.com
- (2603:10a6:3:c4::16)
-MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.38] (109.252.131.121) by
- AM0PR07CA0034.eurprd07.prod.outlook.com (2603:10a6:208:ac::47) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.11 via Frontend Transport; Thu, 22 Oct 2020 15:54:32 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 850f1517-13fb-482a-b566-08d876a2c498
-X-MS-TrafficTypeDiagnostic: HE1PR08MB2634:
-X-Microsoft-Antispam-PRVS: <HE1PR08MB26341296540538AE89C4B02FA21D0@HE1PR08MB2634.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XdJZ/QcDbm9SoNpbmfz0tnEVcaOxRfkUAg2jmbBInAzAi7HUkIb7ZZponUkWI2PlpEORRDJJz1sTLPKDpB0+2HmCQMTinj8oIYSKsOY+vMrJGpS4rtk4B7xdk5DGnXWAgfQi18srjeoYoI6eVvcqE6ycNJEXA71mwxMfuCDuNfTv3XBYNXaeOigemtxCe3IrQ/zs1raT4eRm/TcB+qs/z6qSy3Ea8zbFLN3EH3DIzKTjemPT8glq1DUgYmT+ASsAO4Li2F1JuoSSSeVriJV0GzvZuo7D+HUn6nTvIEEek+kispkTExuGQUGs4ndgG8IHq0yf5fNaUgLdtR57jZqljC571SAJJ0T5uYLeu8G57MSwu+T970YELpX9H/7hH4nz
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0802MB2298.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(376002)(346002)(136003)(366004)(39830400003)(396003)(5660300002)(6486002)(83380400001)(31696002)(86362001)(186003)(956004)(36756003)(31686004)(4326008)(53546011)(16526019)(26005)(66946007)(52116002)(66556008)(66476007)(8936002)(316002)(6916009)(8676002)(478600001)(2906002)(16576012)(2616005)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: uTtmpmxagMry/A9EBeXNX028wgOsTXyeP6tprqpv293lByhGzJICBsTE7v6tvT4GWazQGjreR9+deIqiP7b5rz3xRZWys1zSQARDbbhgfsGeW7X+k5tcMox0upv80Xx9TBH1bHQHru6GmQ6SiwPdPUcOEsCMLjYIMPU8KSB1lZ6KV0tdKvi2UxFGPT0OBcrk4DoKcZEcQnXPisUSaJ/t8s39QLBMWNoaa88cN9Zi/37mZGJWdXHMBo3I/qb9gEUvFMbkdu9sTu5GHgfwMzFYEHDQE4rPbfIufyUc0BKuRKV2ttWnDTG2h+qg4G51hKHYTiraALERmncatemFWr32H7Wd/LgWSONcvYJr0rr2+0PnsChpmFO3mIfp3XgceEp5eUKNdjfPos1gV3i407YF1HXEWJiKVsDpdnRnmV1krrG4GcRDxNa9Oh5lPUaZdQr+W5/S/G5dlJ8y9RMwluQNX3EAdWq1Ekku6al3zqXtCA0bfCGo2FvIKxBmKhqEWhZD5hocd2Xjhv04kktIIf6ns5ZbTOSGF9F2dcWV4PhDK7YevuK17OHuATl6kGP2wXVEZ3yu+ry77hRuuQ4fqSP93FPoHuHyPaiobVo9k/WdF1N0tTZx4PHq9voo7ZyB8EWQEV2NlWhzWIcoTkFWRi2KjQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 850f1517-13fb-482a-b566-08d876a2c498
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0802MB2298.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 15:54:33.0875 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5yL1qTARNGVQjcD6fPkjMGJ/B7eeG45HXlAzVhit8Vl20riaRwTnTYCa9KmZxpc2lQkIG9ld6wq3QsJcS+HrIQJo50QP6pe6WhU1K2HulDc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2634
-Received-SPF: pass client-ip=40.107.5.126;
- envelope-from=nshirokovskiy@virtuozzo.com;
- helo=EUR03-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 11:54:36
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+Received-SPF: pass client-ip=2607:f8b0:4864:20::842;
+ envelope-from=shashi.mallela@linaro.org; helo=mail-qt1-x842.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -134,62 +100,718 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Thu, 15 Oct 2020 at 17:35, Shashi Mallela <shashi.mall...@linaro.org
+> wrote:
+>
+> Generic watchdog device model has been implemented as per ARM BSAv0.9
 
 
-On 21.10.2020 13:56, Kevin Wolf wrote:
-> Am 20.10.2020 um 12:29 hat Nikolay Shirokovskiy geschrieben:
->>
->>
->> On 20.10.2020 13:23, Nikolay Shirokovskiy wrote:
->>>
->>>
->>> On 20.10.2020 11:50, Kevin Wolf wrote:
->>>> Am 20.10.2020 um 10:21 hat Nikolay Shirokovskiy geschrieben:
->>>>> Hi, all.
->>>>>
->>>>> I recently found a corner case when it is impossible AFAIK to find out valid
->>>>> backing chain after block commit operation. Imagine committing top image. After
->>>>> commit ready state pivot is sent and then mgmt crashed. So far so good. Upon
->>>>> next start mgmt can either check block job status for non-autodissmised job or
->>>>> inspect backing chain to infer was pivot was successful or not in case of older
->>>>> qemu.
->>>>>
->>>>> But imagine after mgmt crash qemu process was destroyed too. In this case there
->>>>> is no option to know now what is valid backing chain. Yeah libvirt starts qemu
->>>>> process with -no-shutdown flags so process is not destroyed in case of shutdown
->>>>> but still process can crash.
->>>>
->>>> I don't think this is a problem.
->>>>
->>>> Between completion of the job and finalising it, both the base node and
->>>> the top node are equivalent. You can access either and you'll always get
->>>> the same data.
->>>>
->>>> So if libvirt didn't save that the job was already completed, it will
->>>> use the old image file, and it's fine. And if libvirt already sent the
->>>> job-finalize command, it will first have saved that the job was
->>>> completed and therefore use the new image, and it's fine, too.
->>>
->>> So finalizing can't fail? Otherwise libvirt can save that job is completed and
->>> graph is changed while is was really wasn't
->>
->> Hmm, it is even not the matter of qemu. Libvirt can save that job is completed
->> and then crash before sending command to finalize to qemu. So after qemu crash
->> and libvirt start libvirt would think that valid backing chain is without
->> top image which is not true.
-> 
-> Why not? During this time the top and base image are equally valid to be
-> used as the active image.
-> 
-> If QEMU hadn't switched from top to base yet when it crashed, it's still
-> no problem if libvirt does the switch when restarting QEMU.
-> 
+Hmm, so the patch title, filenames, etc, refer to the SBSA,
+which is the Server Base System Architecture spec. Is the BSA
+a different spec ? We should be consistent with our terminology
+and clear about what spec we're implementing.
 
-Now it clear. Thanx for explanation.
+(I've used the SBSA v6.0 as reference in the review comments below.)
 
-Nikolay
+Shashi,The implementation is based on SBSA v6.0, i will change the
+commit message accordingly
+
+> Signed-off-by: Shashi Mallela <shashi.mall...@linaro.org>
+> ---
+>  hw/arm/Kconfig                      |   1 +
+>  hw/watchdog/Kconfig                 |   4 +
+>  hw/watchdog/meson.build             |   1 +
+>  hw/watchdog/wdt_sbsa_gwdt.c         | 346
+++++++++++++++++++++++++++++
+
+This filename is rather redundant as it says "watchdog" three
+times. hw/watchdog/sbsa_gwdt.c will do (similarly the .h file).
+
+Shashi,Done
+
+>  include/hw/watchdog/wdt_sbsa_gwdt.h |  70 ++++++
+>  5 files changed, 422 insertions(+)
+>  create mode 100644 hw/watchdog/wdt_sbsa_gwdt.c
+>  create mode 100644 include/hw/watchdog/wdt_sbsa_gwdt.h
+>
+> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
+> index f303c6bead25..6b97e64595d3 100644
+> --- a/hw/arm/Kconfig
+> +++ b/hw/arm/Kconfig
+> @@ -210,6 +210,7 @@ config SBSA_REF
+>      select PL031 # RTC
+>      select PL061 # GPIO
+>      select USB_EHCI_SYSBUS
+> +    select WDT_SBSA_GWDT
+>
+>  config SABRELITE
+>      bool
+> diff --git a/hw/watchdog/Kconfig b/hw/watchdog/Kconfig
+> index 293209b291d6..ea9cadd66f22 100644
+> --- a/hw/watchdog/Kconfig
+> +++ b/hw/watchdog/Kconfig
+> @@ -17,3 +17,7 @@ config WDT_DIAG288
+>
+>  config WDT_IMX2
+>      bool
+> +
+> +config WDT_SBSA_GWDT
+> +    bool
+> +    default y if SBSA_REF
+
+I don't think you need the "default" line here. The board
+config "select"s the device, so if the user enables the board
+they'll get the device, which is all you need.
+
+Shashi,Done
+
+> diff --git a/hw/watchdog/meson.build b/hw/watchdog/meson.build
+> index 9b8725e64288..a9a23307acfe 100644
+> --- a/hw/watchdog/meson.build
+> +++ b/hw/watchdog/meson.build
+> @@ -5,3 +5,4 @@ softmmu_ss.add(when: 'CONFIG_WDT_IB700', if_true: 
+> files('wdt_ib700.c'))
+>  softmmu_ss.add(when: 'CONFIG_WDT_DIAG288', if_true:
+files('wdt_diag288.c'))
+>  softmmu_ss.add(when: 'CONFIG_ASPEED_SOC', if_true:
+files('wdt_aspeed.c'))
+>  softmmu_ss.add(when: 'CONFIG_WDT_IMX2', if_true:
+files('wdt_imx2.c'))
+> +softmmu_ss.add(when: 'CONFIG_WDT_SBSA_GWDT', if_true: 
+> files('wdt_sbsa_gwdt.c'))
+> diff --git a/hw/watchdog/wdt_sbsa_gwdt.c
+b/hw/watchdog/wdt_sbsa_gwdt.c
+> new file mode 100644
+> index 000000000000..1c2fe04db7c7
+> --- /dev/null
+> +++ b/hw/watchdog/wdt_sbsa_gwdt.c
+> @@ -0,0 +1,346 @@
+> +/*
+> + * Generic watchdog device model for SBSA
+> + *
+> + * Copyright Linaro.org 2020
+> + *
+> + * Authors:
+> + *  Shashi Mallela <shashi.mall...@linaro.org>
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2
+or (at 
+> your
+> + * option) any later version.  See the COPYING file in the top-
+level 
+> directory.
+> + *
+> + */
+
+This is a good place for a comment which gives the title and
+a URL for the specification the device is based on.
+
+It would also be helpful to say what revision of the watchdog
+we implement (the SBSA 6.0 spec says there is a "revision 0"
+and also a "revision 1"; looks like we're revision 1 ?)
+
+Shashi, Added a comment at the top of the file indicating the SBSA 6.0
+spec and revision 1
+
+> +
+> +#include "qemu/osdep.h"
+> +#include "sysemu/reset.h"
+> +#include "sysemu/watchdog.h"
+> +#include "hw/watchdog/wdt_sbsa_gwdt.h"
+> +#include "qemu/timer.h"
+> +#include "migration/vmstate.h"
+> +#include "qemu/log.h"
+> +#include "qemu/module.h"
+> +
+> +static WatchdogTimerModel model = {
+> +    .wdt_name = TYPE_WDT_SBSA_GWDT,
+> +    .wdt_description = "sbsa_gwdt device for sbsa_ref platform",
+
+Other wdt_description strings use the human-facing name
+of the device, so something like
+  "Generic SBSA-compliant watchdog device"
+seems a better match to the others.
+(The board name is 'sbsa-ref' with a hyphen, by the way.)
+
+Shashi,Done
+
+> +};
+> +
+> +static const VMStateDescription vmstate_sbsa_gwdt = {
+> +    .name = "vmstate_sbsa_gwdt",
+
+You can drop the 'vmstate_' prefix. Just "sbsa-gwdt" will do.
+
+Shashi,Done
+
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_TIMER_PTR(timer, SBSA_GWDTState),
+> +        VMSTATE_BOOL(enabled, SBSA_GWDTState),
+> +        VMSTATE_BOOL(ws0, SBSA_GWDTState),
+> +        VMSTATE_BOOL(ws1, SBSA_GWDTState),
+> +        VMSTATE_UINT32(wrr, SBSA_GWDTState),
+> +        VMSTATE_UINT32(wcs, SBSA_GWDTState),
+> +        VMSTATE_UINT32(worl, SBSA_GWDTState),
+> +        VMSTATE_UINT32(woru, SBSA_GWDTState),
+> +        VMSTATE_UINT32(wcvl, SBSA_GWDTState),
+> +        VMSTATE_UINT32(wcvu, SBSA_GWDTState),
+> +        VMSTATE_END_OF_LIST()
+
+This is missing 'ptimer' (but see below for a review comment
+where I recommend dropping 'ptimer' entirely).
+
+Shashi, Removed ptimer usage as in the other comment
+
+> +    }
+> +};
+> +
+> +static uint64_t sbsa_gwdt_rread(void *opaque, hwaddr addr, unsigned
+int size)
+> +{
+> +    uint32_t ret = 0;
+> +
+> +    if (addr == SBSA_GWDT_WRR) {
+> +        /* watch refresh read has no effect and returns 0 */
+> +        ret = 0;
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in refresh frame
+read :"
+> +                        " 0x%x\n", (int)addr);
+> +    }
+
+The spec says that reading from 0xfcc is valid in both the
+refresh and the control frame (returning the same ID value in
+both cases).
+
+Shashi, Added 0xfcc ID value read for refresh frame offset as well
+
+> +    return ret;
+> +}
+> +
+> +static uint64_t sbsa_gwdt_read(void *opaque, hwaddr addr, unsigned
+int size)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(opaque);
+> +    uint32_t ret = 0;
+> +
+> +    switch (addr) {
+> +    case SBSA_GWDT_WCS:
+> +        ret = s->wcs;
+> +        break;
+> +    case SBSA_GWDT_WOR:
+> +        ret = s->worl;
+> +        break;
+> +    case SBSA_GWDT_WORU:
+> +         ret = s->woru;
+> +         break;
+> +    case SBSA_GWDT_WCV:
+> +        ret = s->wcvl;
+> +        break;
+> +    case SBSA_GWDT_WCVU:
+> +        ret = s->wcvu;
+> +        break;
+> +    case SBSA_GWDT_W_IIDR:
+> +        ret = s->id;
+> +        break;
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in control frame
+read :"
+> +                        " 0x%x\n", (int)addr);
+> +    }
+> +    return ret;
+> +}
+> +
+> +static void sbsa_gwdt_update_timer(SBSA_GWDTState *s)
+> +{
+> +    uint64_t timeout = 0;
+
+The spec talks about "explicit refresh" and "timeout refresh"
+events. Is this function implementing both of those ?
+If so, a function name indicating that would be helpful
+to the reader. If it's only implementing part of the refresh
+semantics then an explanatory comment would help.
+
+Shashi, Have updated this function signature to include an enum type
+(to indicate EXPLICIT_REFRESH & TIMEOUT_REFRESH ) as additional
+parameter (below)
+"static void sbsa_gwdt_update_timer(SBSA_GWDTState *s, WdtRefreshType
+rtype)"
+and the caller does "sbsa_gwdt_update_timer(s, TIMEOUT_REFRESH)".
+
+> +
+> +    if (s->enabled) {
+> +        /*
+> +         * Extract the upper 16 bits from woru & 32 bits from worl
+> +         * registers to construct the 48 bit offset value
+> +         */
+> +        timeout = s->woru & SBSA_GWDT_WOR_MASK;
+> +        timeout <<= 32;
+> +        timeout |= s->worl;
+> +        timeout = muldiv64(timeout, NANOSECONDS_PER_SECOND,
+SBSA_TIMER_FREQ);
+> +        timeout += qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +
+> +        /* store the current timeout value into compare registers */
+> +        s->wcvu = timeout >> 32;
+> +        s->wcvl = timeout;
+
+The spec says that for an SBSA level 2 or higher system, the
+compare value shouldn't be updated for a timeout-refresh when
+WS0 is asserted (and for SBSA level 0 or 1 the level 2 behaviour
+is permitted as an IMPDEF option).
+
+Shashi, The qemu sbsa-ref platform code is based for levels 2 or
+higher.Hence,have now added logic to not update compare value for
+timeout-refresh.
+
+> +
+> +        if (!s->ws0) {
+> +            timer_del(s->timer);
+> +            timer_mod(s->ptimer, timeout);
+> +        } else {
+> +            timer_del(s->ptimer);
+> +            timer_mod(s->timer, timeout);
+> +        }
+> +    } else {
+> +        timer_del(s->ptimer);
+> +        timer_del(s->timer);
+
+Here you have two timers, "timer" and "ptimer", which are set up
+so that you always have exactly one running. It would be simpler
+to have a single timer, and then decide what you're doing on
+expiry by looking at the device state in its callback function.
+
+Shashi, Done.Removed ptimer and adapted code for single timer usage
+
+> +    }
+> +}
+> +
+> +static void sbsa_gwdt_rwrite(void *opaque, hwaddr offset, uint64_t
+data,
+> +                             unsigned size) {
+> +    SBSA_GWDTState *s = SBSA_GWDT(opaque);
+> +
+> +    if (offset == SBSA_GWDT_WRR) {
+> +        s->wrr = data;
+
+There is no code path which allows the guest to read s->wrr
+and nothing in the device model does anything with it,
+so there is no need to have it be state at all. That is,
+a write to WRR is a trigger for behaviour, but no state
+is stored.
+
+Shashi, removed wrr from state
+
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS0;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS1;
+> +        s->ws0 = false;
+> +        s->ws1 = false;
+> +        sbsa_gwdt_update_timer(s);
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in refresh frame
+write :"
+> +                        " 0x%x\n", (int)offset);
+> +    }
+> +}
+> +
+> +static void sbsa_gwdt_write(void *opaque, hwaddr offset, uint64_t
+data,
+> +                             unsigned size) {
+> +    SBSA_GWDTState *s = SBSA_GWDT(opaque);
+> +    bool enable;
+> +
+> +    switch (offset) {
+> +    case SBSA_GWDT_WCS:
+> +        enable = data & SBSA_GWDT_WCS_EN;
+> +        if (enable) {
+> +            s->wcs |= SBSA_GWDT_WCS_EN;
+> +            s->enabled = true;
+> +        } else {
+> +            s->wcs &= ~SBSA_GWDT_WCS_EN;
+> +            s->enabled = false;
+> +        }
+> +        s->ws0 = false;
+> +        s->ws1 = false;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS0;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS1;
+
+You are storing state duplicated in two places here. You can either:
+ * store the state of bits like the WS0, WS1, Enable as bits inside
+   an s->wcs register value -- in this case reads and writes are
+   easy, and if you want to test for "is device enabled" you do
+   it with a logical operation on s->wcs; there would be no
+   separate ws0/ws1/enabled fields in the state struct
+ * or you can store them as separate boolean fields, in which case
+   you don't need an s->wcs at all. Instead in the read function
+   you assemble the value the guest reads from the ws0/ws1/enable
+   booleans
+Which one is preferable depends on the device and whether there's
+a lot of code that often tests the various bits. You can pick
+either option, but don't do both at once the way this code is.
+
+Similarly, you have a choice of whether you prefer to
+hold the WCV and WOR values in the state struct as a
+pair of uint32_t (trivial to read/write, need to reassemble
+into the full value whenever you want to operate on it)
+or as a single uint64_t (easier for the device to operate
+on, register reads/writes become extract64/deposit64 operations).
+
+Shashi, Done,removed bool flags like ws0,ws1,enabled from state and
+made use of s->wcs with relevant bit fields for all accesses
+
+> +        sbsa_gwdt_update_timer(s);
+> +        break;
+> +
+> +    case SBSA_GWDT_WOR:
+> +        s->worl = data;
+> +        s->ws0 = false;
+> +        s->ws1 = false;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS0;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS1;
+> +        /*
+> +         * TODO:- setting woru to 0 and triggering update
+timer(below) is a
+> +         * temporary workaround to handle current linux driver which
+is
+> +         * based on earlier version of BSA specification.Once the
+linux
+> +         * driver is updated to BSA v0.9 will remove these next 2
+lines.
+> +         */
+
+No workarounds for buggy Linux guest drivers, please. Once they
+get into the code base they are almost impossible to ever
+get out again. You can either:
+1) just implement the newer version of the specification,
+   and fix the guest drivers
+2) if you must have a system that works with older guests,
+   then implement *both* older and newer specs, using a
+   QOM property on the device to select which one. You'd
+   need to implement the details of the older version of
+   the spec completely, not just "this is the one thing that
+   the Linux driver happens to care about". You'd also need
+   a machine property on the sbsa-ref board so the user could
+   select whether they wanted the old or new watchdog device.
+
+I'd recommend option 1, really.
+
+Shashi, Done.implemented option 1
+
+> +        s->woru = 0;
+> +        sbsa_gwdt_update_timer(s);
+> +        break;
+> +
+> +    case SBSA_GWDT_WORU:
+> +        s->woru = data;
+
+This and WCVU have the top 16 bits RAZ/WI, so you should
+mask out the top half of 'data' so the guest can't write
+an over-large value.
+
+Shashi, The top 16 bits only applies to WORU(of the total 48 bits for
+WOR).Will mask the top half of data as you suggested.                
+But,WCV is 64 bits overall (with upper 32 bits in WCVU & lower 32 bits
+in WCV).Hence there is no need to mask 16 bits for WCVU since it is not
+applicable.
+
+> +        s->ws0 = false;
+> +        s->ws1 = false;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS0;
+> +        s->wcs &= ~SBSA_GWDT_WCS_WS1;
+> +        sbsa_gwdt_update_timer(s);
+> +        break;
+> +
+> +    case SBSA_GWDT_WCV:
+> +        s->wcvl = data;
+> +        break;
+> +
+> +    case SBSA_GWDT_WCVU:
+> +        s->wcvu = data;
+> +        break;
+> +
+> +    default:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "bad address in control frame
+write :"
+> +                " 0x%x\n", (int)offset);
+> +    }
+> +    return;
+> +}
+> +
+> +static void wdt_sbsa_gwdt_reset(DeviceState *dev)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(dev);
+> +
+> +    timer_del(s->ptimer);
+> +    timer_del(s->timer);
+> +
+> +    s->enabled = false;
+> +    s->ws0 = false;
+> +    s->ws1 = false;
+> +    s->wcs &= ~SBSA_GWDT_WCS_EN;
+> +    s->wcs &= ~SBSA_GWDT_WCS_WS0;
+> +    s->wcs &= ~SBSA_GWDT_WCS_WS1;
+> +    s->wcvl = 0;
+> +    s->wcvu = 0;
+> +    s->worl = 0;
+> +    s->woru = 0;
+> +    s->id = SBSA_GWDT_ID;
+> +}
+> +
+> +static void sbsa_gwdt_reset(void *opaque)
+> +{
+> +    DeviceState *sbsa_gwdt = opaque;
+> +
+> +    wdt_sbsa_gwdt_reset(sbsa_gwdt);
+> +}
+
+Why do you have two reset functions which do the same thing ?
+
+Shashi, Done.Removed 1 of the reset function
+
+> +
+> +static void sbsa_gwdt_timer_sysinterrupt(void *opaque)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(opaque);
+> +
+> +    s->wcs |= SBSA_GWDT_WCS_WS0;
+> +    s->ws0 = true;
+> +    qemu_set_irq(s->irq, 1);
+> +    sbsa_gwdt_update_timer(s);
+> +}
+> +
+> +static void sbsa_gwdt_timer_sysreset(void *dev)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(dev);
+> +
+> +    s->wcs |= SBSA_GWDT_WCS_WS1;
+> +    s->ws1 = true;
+> +    qemu_log_mask(CPU_LOG_RESET, "Watchdog timer expired.\n");
+> +    /*
+> +     * Reset the watchdog only if the guest gets notified about
+> +     * expiry. watchdog_perform_action() may temporarily relinquish
+> +     * the BQL; reset before triggering the action to avoid races
+with
+> +     * sbsa_gwdt instructions.
+> +     */
+> +    switch (get_watchdog_action()) {
+> +    case WATCHDOG_ACTION_DEBUG:
+> +    case WATCHDOG_ACTION_NONE:
+> +    case WATCHDOG_ACTION_PAUSE:
+> +        break;
+> +    default:
+> +        wdt_sbsa_gwdt_reset(dev);
+> +    }
+> +    watchdog_perform_action();
+> +}
+> +
+> +static const MemoryRegionOps sbsa_gwdt_rops = {
+> +    .read = sbsa_gwdt_rread,
+> +    .write = sbsa_gwdt_rwrite,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid.min_access_size = 4,
+> +    .valid.max_access_size = 4,
+> +    .valid.unaligned = false,
+> +};
+> +
+> +static const MemoryRegionOps sbsa_gwdt_ops = {
+> +    .read = sbsa_gwdt_read,
+> +    .write = sbsa_gwdt_write,
+> +    .endianness = DEVICE_LITTLE_ENDIAN,
+> +    .valid.min_access_size = 4,
+> +    .valid.max_access_size = 4,
+> +    .valid.unaligned = false,
+> +};
+> +
+> +static void wdt_sbsa_gwdt_realize(DeviceState *dev, Error **errp)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(dev);
+> +    SysBusDevice *sbd = SYS_BUS_DEVICE(dev);
+> +
+> +    memory_region_init_io(&s->rmmio, OBJECT(dev),
+> +                          &sbsa_gwdt_rops, s,
+> +                          "sbsa_gwdt.refresh",
+> +                          SBSA_GWDT_RMMIO_SIZE);
+> +
+> +    memory_region_init_io(&s->cmmio, OBJECT(dev),
+> +                          &sbsa_gwdt_ops, s,
+> +                          "sbsa_gwdt.control",
+> +                          SBSA_GWDT_CMMIO_SIZE);
+> +
+> +    sysbus_init_mmio(sbd, &s->rmmio);
+> +    sysbus_init_mmio(sbd, &s->cmmio);
+> +
+> +    sysbus_init_irq(sbd, &s->irq);
+> +
+> +    qemu_register_reset(sbsa_gwdt_reset, s);
+
+No new code should call qemu_register_reset(). You can
+provide a reset function via dc->reset in your DeviceClass,
+and in fact you have.
+
+Shashi, Done.Removed qemu_register_reset() call
+
+> +
+> +    s->ptimer = timer_new_ns(QEMU_CLOCK_VIRTUAL, 
+> sbsa_gwdt_timer_sysinterrupt,
+> +            dev);
+> +    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL,
+sbsa_gwdt_timer_sysreset,
+> +                dev);
+> +}
+> +
+> +static void wdt_sbsa_gwdt_unrealize(DeviceState *dev)
+> +{
+> +    SBSA_GWDTState *s = SBSA_GWDT(dev);
+> +
+> +    timer_del(s->ptimer);
+> +    timer_free(s->ptimer);
+> +
+> +    timer_del(s->timer);
+> +    timer_free(s->timer);
+> +}
+
+This device isn't hot-pluggable, so this unrealize method
+is unreachable code, I think.
+
+Shashi, Done.Removed unrealize
+
+> +
+> +static void wdt_sbsa_gwdt_class_init(ObjectClass *klass, void *data)
+> +{
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    dc->realize = wdt_sbsa_gwdt_realize;
+> +    dc->unrealize = wdt_sbsa_gwdt_unrealize;
+> +    dc->reset = wdt_sbsa_gwdt_reset;
+> +    dc->hotpluggable = false;
+> +    set_bit(DEVICE_CATEGORY_MISC, dc->categories);
+> +    dc->vmsd = &vmstate_sbsa_gwdt;
+> +}
+> +
+> +static const TypeInfo wdt_sbsa_gwdt_info = {
+> +    .class_init = wdt_sbsa_gwdt_class_init,
+> +    .parent = TYPE_SYS_BUS_DEVICE,
+> +    .name  = TYPE_WDT_SBSA_GWDT,
+> +    .instance_size  = sizeof(SBSA_GWDTState),
+> +};
+> +
+> +static void wdt_sbsa_gwdt_register_types(void)
+> +{
+> +    watchdog_add_model(&model);
+> +    type_register_static(&wdt_sbsa_gwdt_info);
+> +}
+> +
+> +type_init(wdt_sbsa_gwdt_register_types)
+> diff --git a/include/hw/watchdog/wdt_sbsa_gwdt.h 
+> b/include/hw/watchdog/wdt_sbsa_gwdt.h
+> new file mode 100644
+> index 000000000000..70ba7abb3ace
+> --- /dev/null
+> +++ b/include/hw/watchdog/wdt_sbsa_gwdt.h
+> @@ -0,0 +1,70 @@
+
+New files, including .h files, should start with a
+copyright-and-license comment.
+
+Shashi, Done
+
+> +#ifndef WDT_SBSA_GWDT_H
+> +#define WDT_SBSA_GWDT_H
+> +
+> +#include "qemu/bitops.h"
+> +#include "hw/sysbus.h"
+> +#include "hw/irq.h"
+> +
+> +#define TYPE_WDT_SBSA_GWDT "sbsa_gwdt"
+> +#define SBSA_GWDT(obj) \
+> +    OBJECT_CHECK(SBSA_GWDTState, (obj), TYPE_WDT_SBSA_GWDT)
+> +#define SBSA_GWDT_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(SBSA_GWDTClass, (klass), TYPE_WDT_SBSA_GWDT)
+> +#define SBSA_GWDT_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(SBSA_GWDTClass, (obj), TYPE_WDT_SBSA_GWDT)
+> +
+> +/* SBSA Generic Watchdog register definitions */
+> +/* refresh frame */
+> +#define SBSA_GWDT_WRR       0x000
+> +
+> +/* control frame */
+> +#define SBSA_GWDT_WCS       0x000
+> +#define SBSA_GWDT_WOR       0x008
+> +#define SBSA_GWDT_WORU      0x00C
+> +#define SBSA_GWDT_WCV       0x010
+> +#define SBSA_GWDT_WCVU      0x014
+> +
+> +/* Watchdog Interface Identification Register */
+> +#define SBSA_GWDT_W_IIDR    0xFCC
+> +
+> +/* Watchdog Control and Status Register Bits */
+> +#define SBSA_GWDT_WCS_EN    BIT(0)
+> +#define SBSA_GWDT_WCS_WS0   BIT(1)
+> +#define SBSA_GWDT_WCS_WS1   BIT(2)
+> +
+> +#define SBSA_GWDT_WOR_MASK  0x0000FFFF
+> +
+> +/* Watchdog Interface Identification Register definition*/
+
+Missing space before '*/'
+
+Shashi, Done
+
+> +#define SBSA_GWDT_ID        0x1043B
+
+Bits [11:0] in this field are a JEP106 code for the company
+that implemented the device. Who are we claiming to be here ?
+
+Shashi,have added JEP106 code considering "ARM" as the company(since
+this is an ARM SBSA and Linaro doesnt have its own code)
+
+> +
+> +/* 2 Separate memory regions for each of refresh & control register
+frames */
+> +#define SBSA_GWDT_RMMIO_SIZE 0x1000
+> +#define SBSA_GWDT_CMMIO_SIZE 0x1000
+> +
+> +#define SBSA_TIMER_FREQ      62500000 /* Hz */
+> +
+> +typedef struct SBSA_GWDTState {
+> +    /* <private> */
+> +    SysBusDevice parent_obj;
+> +
+> +    /*< public >*/
+> +    MemoryRegion rmmio;
+> +    MemoryRegion cmmio;
+> +    qemu_irq irq;
+> +
+> +    QEMUTimer *ptimer, *timer;
+> +
+> +    uint32_t id;
+> +    uint32_t wrr;
+> +    uint32_t wcs;
+> +    uint32_t worl;
+> +    uint32_t woru;
+> +    uint32_t wcvl;
+> +    uint32_t wcvu;
+> +    bool enabled;
+> +    bool ws0, ws1;
+> +
+> +    /*< public >*/
+
+What's this extra 'public' comment for ?
+
+Shashi, Done.Removed
+
+> +} SBSA_GWDTState;
+> +
+> +#endif /* WDT_SBSA_GWDT_H */
+> --
+> 2.18.4
+>
+
 
