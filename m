@@ -2,90 +2,66 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3D28C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DC7C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:32:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 18BD821D43
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:53:15 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dmyojQ5Z"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 18BD821D43
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 4DA6721534
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 20:32:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4DA6721534
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60164 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVgeA-0003TB-SZ
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:53:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41000)
+	id 1kVhGI-0002R6-Ay
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 16:32:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47846)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kVgdX-000346-PB
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 15:52:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48232)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kVgdW-0005q3-5k
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 15:52:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603396353;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=X8bKYnqzc3K+ojw6ozZmWvkDfdVKnz1A6MNsbT1Xal4=;
- b=dmyojQ5ZacJCtZu7FH9UbBJkE4SADJkzFcxl7NbSrRdtwZK5xHu6n3U4rHIG5ulKS97vmH
- DkLMjP5zW/f3DUwicNSMxvFb/caknzvWPRoOTf+zAoe0YXg8od5lujd79dCn2IB5AJGBAK
- rSfpGdiR7AeqTP4PLctbUdMeWPH+JDQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-303-NeDQNJZmPSaAQpeqfhb9_w-1; Thu, 22 Oct 2020 15:52:31 -0400
-X-MC-Unique: NeDQNJZmPSaAQpeqfhb9_w-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A840F1006CB2;
- Thu, 22 Oct 2020 19:52:28 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2537219D61;
- Thu, 22 Oct 2020 19:52:24 +0000 (UTC)
-Date: Thu, 22 Oct 2020 13:52:23 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>, <pbonzini@redhat.com>
-Subject: Re: [PATCH v27 10/17] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU
- is enabled
-Message-ID: <20201022135223.480ca831@w520.home>
-In-Reply-To: <1603365127-14202-11-git-send-email-kwankhede@nvidia.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
- <1603365127-14202-11-git-send-email-kwankhede@nvidia.com>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVhDs-0000zy-Vq
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 16:30:08 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:51499)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVhDr-0001rZ-16
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 16:30:08 -0400
+Received: from localhost.localdomain ([82.252.139.38]) by
+ mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
+ id 1MaIGB-1ksR9L3N0n-00WB0O; Thu, 22 Oct 2020 22:30:03 +0200
+From: Laurent Vivier <laurent@vivier.eu>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 0/2] target/m68k: add vmstate structure to migrate M68kCPU
+Date: Thu, 22 Oct 2020 22:29:58 +0200
+Message-Id: <20201022203000.1922749-1-laurent@vivier.eu>
+X-Mailer: git-send-email 2.26.2
+Content-Type: text/plain; charset="utf-8"
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:33:10
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:bUMDWJkDK7mduUXAa/e2w1ntsW1vitRRi9P6+8MVgSZWIX8q7N3
+ HVewYeghkpvYR6g+/RH5Isld7JADV1o2i7SNXYNhHDqH8QdQ8Bg619NNYG2S5UYjabJgyog
+ mAuGdYdFRFCYP1BiC6v9oo3kveKVqhfeBoKzCssZIM6AP/wfy6sP60s6HvwQoOcJjXiONGp
+ f/peCGX9ovOZFBtgowZ0w==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:BWMqoUZlxtM=:GH2daR4cBJVBBQLnALS5NZ
+ u7+pjYHjq7IyDkIKenUgyrlTH0bj4H87+6v38paDfDSvTH6YY6LrrbetTW6tsy4x7MqhliofQ
+ mutO1QYc3JnzY1QdFj8vgE+7pwBqzQT5NHa0qKIBgyDJp314CGujW29CYXxXoe8T5uwKtFC1V
+ 2fjETGgmvq23WKgheYvfU8tpL68SxEyX/EOL9dPnTb46S11eV64idjfmPJjoST8Esn7Sl1jDz
+ spzKFPa7GpGPcPdGQp0V63czQ9NjJXl93SvLooSIODpLjRJf4j3liI0LOc570o13yUE6ytUlO
+ VY4WM+ewGS0o6gFTMeGsk/53t8XxAyFqaxI97tzxNUbp1ViD1F6DZ3KEQap99qyiZkkn6oTxO
+ CObKA8/chxP+LpyNVzxTQC7h3rXCsFwlWotsAI4l7eGq4ktwiCVTnZpmC0zRr
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 16:30:03
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,52 +74,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, dnigam@nvidia.com
+Cc: Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Paolo,
-
-I think this would need your ack.  Thanks,
-
-Alex
-
-
-On Thu, 22 Oct 2020 16:42:00 +0530
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
-
-> mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
-> wasn't set correctly due to which memory listener's log_sync doesn't
-> get called.
-> This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
-> IOMMU is enabled.
-> 
-> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> ---
->  softmmu/memory.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/softmmu/memory.c b/softmmu/memory.c
-> index 403ff3abc99b..94f606e9d9d9 100644
-> --- a/softmmu/memory.c
-> +++ b/softmmu/memory.c
-> @@ -1792,7 +1792,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
->  uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
->  {
->      uint8_t mask = mr->dirty_log_mask;
-> -    if (global_dirty_log && mr->ram_block) {
-> +    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
->          mask |= (1 << DIRTY_MEMORY_MIGRATION);
->      }
->      return mask;
-
+First patch is a cleanup patch.=0D
+=0D
+The second patch defines the vmstate structure for M68kCPU.=0D
+=0D
+I have tested the migration with my experimental machine virt-m68k.=0D
+=0D
+I didn't check if q800 machine type has all the needed vmstates=0D
+for all the hardware devices it uses.=0D
+=0D
+Thanks,=0D
+Laurent=0D
+=0D
+Laurent Vivier (2):=0D
+  target/m68k: remove useless qregs array=0D
+  target/m68k: Add vmstate definition for M68kCPU=0D
+=0D
+ target/m68k/cpu.h        |   5 +-=0D
+ target/m68k/cpu.c        | 193 ++++++++++++++++++++++++++++++++++++++-=0D
+ target/m68k/fpu_helper.c |  10 +-=0D
+ 3 files changed, 198 insertions(+), 10 deletions(-)=0D
+=0D
+-- =0D
+2.26.2=0D
+=0D
 
