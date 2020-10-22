@@ -2,85 +2,144 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2405C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9565C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:14:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 43CBD221FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:13:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1F30D221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:14:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="et+5e0wh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 43CBD221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="qlPw1cFv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F30D221FB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZT8-0006xY-VP
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:13:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38974)
+	id 1kVZUR-000073-0U
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:14:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVYxi-0004Mw-5L
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:40:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60473)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVYxf-0006Ub-Qc
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:40:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603366850;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=iWeXlNTiFAr6wkuGZqlcOeFGaxIuwe4iLNUNnDB/oR0=;
- b=et+5e0wh0yUl7RGO4xoLv29FZ0o6tQkLSjf4HkzRsXQWmdAWmOtMZuBtBMgXa9P61iZ3Fn
- kWQBNh6MmsjJpgTkZ7W6y2F/9QL5vh6VODdC8HWHuHVivhtRP60n/xHbRixHtq1Yz5J8OH
- gKk00WTLTw25eQzcZ8iu0YUKCclnQxY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-439-mA6KebaQN3ulg3L3HpI5Tg-1; Thu, 22 Oct 2020 07:40:48 -0400
-X-MC-Unique: mA6KebaQN3ulg3L3HpI5Tg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FEE3804B62;
- Thu, 22 Oct 2020 11:40:47 +0000 (UTC)
-Received: from redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 212416EF48;
- Thu, 22 Oct 2020 11:40:44 +0000 (UTC)
-Date: Thu, 22 Oct 2020 07:40:42 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v3] pc: Implement -no-hpet as sugar for -machine hpet=on
-Message-ID: <20201022074002-mutt-send-email-mst@kernel.org>
-References: <20201021144716.1536388-1-ehabkost@redhat.com>
- <6a325b01-542e-a5fa-00d6-2d3e1847bfc8@redhat.com>
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kVZSg-0006v8-QI
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:12:55 -0400
+Received: from mail-dm6nam10on2071.outbound.protection.outlook.com
+ ([40.107.93.71]:28897 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kVZRY-000133-Uz
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:12:53 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Y0BbS6bx8SUVQgx5+19zf7amMaM78W7cbq1UOdbx7IFOgZT8XcYo7Dm31x9QC8yTki/kAmH27JKZuRNMGGrUUYRT97PNxD7ZwToqhCmbyCs5NXlxHfLCwvpBvovsC1/Esk2W1SeN273fdmmr1wAGyZbvUJpMfrjtkv/4NIe9eYtLqKT5JTpx2C8VmjqsXmC/qzXc5qgXnMwctrgG2rVzGmDVcmz5Emp9DqlADJ1EiwXdI6J4tLdfU4WnN8sOA53JyJds/jBCRO7gFtnEOpX4pWwx23k/I/sXizgiitlcuWWxn5gB6LqrypKmp1CIgJ9oBuXiBa//g17SzIE7yp0vLw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NjgeiTgbDfvzrGxWJTqV4qJL/0x1mLzxj5FRevztxoY=;
+ b=migXg9O/1/iou7WQ3FV0l0LREzzx4QPpq9YZplmrQcVsd+LzargaDQvvw3ruIDSVcK+byVW1V6gwdfx6q0cMVyT1sdaE7JCJEGe9ddyN4YogtfyrSXx+D+hedV4d5nOn/TsKCVHcVrhlTyKzZZWLasUQLs8jRiLd9S/8bE8lml/WE6O8XzBqUoPp4XmEVA9n+5rbM7MhiDt5LFq75aB6yY06jhKRIQlycx/7m4v9AMUAcSkMSCkrnafnDi0VRymd/REt9M06YmBFvpe+dcC6ucQ+VZQdyU/hgU+BhSLUEviS/XodpxZA+ikFwTihmwlVpSa7JpZOndBvo/natqghtQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NjgeiTgbDfvzrGxWJTqV4qJL/0x1mLzxj5FRevztxoY=;
+ b=qlPw1cFvwyonSiKofOjBpZnnOh4Fu9tNpJL8Huq1bQtsHwEi7h6ctm3Ae5NJodQGtfT0hwePokQwpthh/Gq6SFCNH3degKBs2/e1amNqLVidwvmWzO+alVWAW5Q6peHEZxlJGN6r3Vom45rIlOWhasjnEVHnvlmeCKMMUsig7fg=
+Received: from DM3PR08CA0015.namprd08.prod.outlook.com (2603:10b6:0:52::25) by
+ SN1PR02MB3728.namprd02.prod.outlook.com (2603:10b6:802:31::10) with
+ Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.18; Thu, 22 Oct 2020 12:11:41 +0000
+Received: from CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:0:52:cafe::5b) by DM3PR08CA0015.outlook.office365.com
+ (2603:10b6:0:52::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.25 via Frontend
+ Transport; Thu, 22 Oct 2020 12:11:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT062.mail.protection.outlook.com (10.152.75.60) with Microsoft SMTP
+ Server id 15.20.3499.20 via Frontend Transport; Thu, 22 Oct 2020 12:11:41
+ +0000
+Received: from [149.199.38.66] (port=56479 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1kVZQY-0001kA-NQ; Thu, 22 Oct 2020 05:10:42 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1kVZRU-0005qN-DQ; Thu, 22 Oct 2020 05:11:40 -0700
+Received: from xsj-pvapsmtp01 (xsj-smtp.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09MCBdZB022859; 
+ Thu, 22 Oct 2020 05:11:39 -0700
+Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <saipava@xhdsaipava40.xilinx.com>)
+ id 1kVZRS-0005pp-Ss; Thu, 22 Oct 2020 05:11:39 -0700
+Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
+ id 3302013C0913; Thu, 22 Oct 2020 17:47:51 +0530 (IST)
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgari@xilinx.com>,
+ Francisco Eduardo Iglesias <figlesia@xilinx.com>
+Subject: [PATCH v12 0/3] Add Versal usb model
+Date: Thu, 22 Oct 2020 17:47:33 +0530
+Message-Id: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
-In-Reply-To: <6a325b01-542e-a5fa-00d6-2d3e1847bfc8@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 00:54:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 471c7c80-b190-4678-f18d-08d87683a278
+X-MS-TrafficTypeDiagnostic: SN1PR02MB3728:
+X-Microsoft-Antispam-PRVS: <SN1PR02MB37285F08FDA7A04F310D1299CA1D0@SN1PR02MB3728.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:1775;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: dJndr3ZpZaq6R1PYjdRFuh/LF4VT2JdUO8IXT1aUvJw9dcQ0BVnSP7EDoAtqFtvWUCGW+Mf/rbkNpiWicXXG7jLRAvQHrqVEjrsIyMl6UG5Wa2PdIwP4OGSflxMop10NfDGadlqT+JT1xohp9qfN1JILEB+oW6fOwiegh0MPj8UrkQz6ffmBN+WV0joSjrobjDlgTu1VDww8YRllTzPL7o14DEAPlmRDRDZchCgBQ3E8BTkZHKxhlpQBPCTEBqm+zGxpzC2Wn6Yqc2UbVdOu1UxbZNPzMBOXAKo23yvqSuZ6TsuBGfLaIMDjyMbG7Ajo4pvcBe2dNYDmB1FZ/d8vdWYoA8ldsOmVSe18Vmuv1OYO4Y4kbvdaoOla+9hOEh083c37DpYjxtw34FgCayifDQ==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(39860400002)(136003)(376002)(396003)(346002)(46966005)(2616005)(47076004)(426003)(107886003)(7416002)(478600001)(356005)(82740400003)(6266002)(36756003)(2906002)(26005)(186003)(83380400001)(82310400003)(70206006)(54906003)(81166007)(336012)(4326008)(6636002)(8676002)(110136005)(316002)(42186006)(70586007)(6666004)(8936002)(5660300002);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 12:11:41.1398 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 471c7c80-b190-4678-f18d-08d87683a278
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN1PR02MB3728
+Received-SPF: pass client-ip=40.107.93.71; envelope-from=saipava@xilinx.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:11:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: 6
+X-Spam_score: 0.6
+X-Spam_bar: /
+X-Spam_report: (0.6 / 5.0 requ) AC_FROM_MANY_DOTS=2.478, BAYES_00=-1.9,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,203 +152,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- John Snow <jsnow@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
+ Sai Pavan Boddu <saipava@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Ying Fang <fangying1@huawei.com>,
+ =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 21, 2020 at 05:28:24PM +0200, Paolo Bonzini wrote:
-> On 21/10/20 16:47, Eduardo Habkost wrote:
-> > Get rid of yet another global variable.
-> > 
-> > The default will be hpet=on only if CONFIG_HPET=y.
-> > 
-> > Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
-> > ---
-> > Changes v2 -> v3:
-> > * Revert v2 changes (use "hpet" property), plus:
-> > * Default to hpet=off if CONFIG_HPET=n
-> > * Error out if creation of HPET device fails and hpet=on
-> > 
-> > Changes v1 -> v2:
-> > * Rename property to "allow-hpet" to make its semantic clearer,
-> >   as it won't make sure HPET is created if CONFIG_HPET=n
-> > * Use qdev_new(TYPE_HPET) at pc_basic_device_init()
-> > ---
-> >  include/hw/i386/pc.h  |  1 +
-> >  include/hw/i386/x86.h |  3 ---
-> >  hw/i386/pc.c          | 61 +++++++++++++++++++++++++++++--------------
-> >  hw/i386/pc_piix.c     |  2 +-
-> >  softmmu/vl.c          |  4 +--
-> >  5 files changed, 46 insertions(+), 25 deletions(-)
-> > 
-> > diff --git a/include/hw/i386/pc.h b/include/hw/i386/pc.h
-> > index 84639d0ebc..911e460097 100644
-> > --- a/include/hw/i386/pc.h
-> > +++ b/include/hw/i386/pc.h
-> > @@ -43,6 +43,7 @@ typedef struct PCMachineState {
-> >      bool smbus_enabled;
-> >      bool sata_enabled;
-> >      bool pit_enabled;
-> > +    bool hpet_enabled;
-> >  
-> >      /* NUMA information: */
-> >      uint64_t numa_nodes;
-> > diff --git a/include/hw/i386/x86.h b/include/hw/i386/x86.h
-> > index d5dcf7a07f..4e66a15ff5 100644
-> > --- a/include/hw/i386/x86.h
-> > +++ b/include/hw/i386/x86.h
-> > @@ -124,7 +124,4 @@ qemu_irq x86_allocate_cpu_irq(void);
-> >  void gsi_handler(void *opaque, int n, int level);
-> >  void ioapic_init_gsi(GSIState *gsi_state, const char *parent_name);
-> >  
-> > -/* hpet.c */
-> > -extern int no_hpet;
-> > -
-> >  #endif
-> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> > index 4e323755d0..416fb0e0f6 100644
-> > --- a/hw/i386/pc.c
-> > +++ b/hw/i386/pc.c
-> > @@ -1142,28 +1142,31 @@ void pc_basic_device_init(struct PCMachineState *pcms,
-> >       * Without KVM_CAP_PIT_STATE2, we cannot switch off the in-kernel PIT
-> >       * when the HPET wants to take over. Thus we have to disable the latter.
-> >       */
-> > -    if (!no_hpet && (!kvm_irqchip_in_kernel() || kvm_has_pit_state2())) {
-> > +    if (pcms->hpet_enabled && (!kvm_irqchip_in_kernel() ||
-> > +                               kvm_has_pit_state2())) {
-> >          hpet = qdev_try_new(TYPE_HPET);
-> > -        if (hpet) {
-> > -            /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
-> > -             * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
-> > -             * IRQ8 and IRQ2.
-> > -             */
-> > -            uint8_t compat = object_property_get_uint(OBJECT(hpet),
-> > -                    HPET_INTCAP, NULL);
-> > -            if (!compat) {
-> > -                qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
-> > -            }
-> > -            sysbus_realize_and_unref(SYS_BUS_DEVICE(hpet), &error_fatal);
-> > -            sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
-> > +        if (!hpet) {
-> > +            error_report("couldn't create HPET device");
-> > +            exit(1);
-> > +        }
-> > +        /* For pc-piix-*, hpet's intcap is always IRQ2. For pc-q35-1.7
-> > +            * and earlier, use IRQ2 for compat. Otherwise, use IRQ16~23,
-> > +            * IRQ8 and IRQ2.
-> > +            */
-> > +        uint8_t compat = object_property_get_uint(OBJECT(hpet),
-> > +                HPET_INTCAP, NULL);
-> > +        if (!compat) {
-> > +            qdev_prop_set_uint32(hpet, HPET_INTCAP, hpet_irqs);
-> > +        }
-> > +        sysbus_realize_and_unref(SYS_BUS_DEVICE(hpet), &error_fatal);
-> > +        sysbus_mmio_map(SYS_BUS_DEVICE(hpet), 0, HPET_BASE);
-> >  
-> > -            for (i = 0; i < GSI_NUM_PINS; i++) {
-> > -                sysbus_connect_irq(SYS_BUS_DEVICE(hpet), i, gsi[i]);
-> > -            }
-> > -            pit_isa_irq = -1;
-> > -            pit_alt_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_PIT_INT);
-> > -            rtc_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_RTC_INT);
-> > +        for (i = 0; i < GSI_NUM_PINS; i++) {
-> > +            sysbus_connect_irq(SYS_BUS_DEVICE(hpet), i, gsi[i]);
-> >          }
-> > +        pit_isa_irq = -1;
-> > +        pit_alt_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_PIT_INT);
-> > +        rtc_irq = qdev_get_gpio_in(hpet, HPET_LEGACY_RTC_INT);
-> >      }
-> >      *rtc_state = mc146818_rtc_init(isa_bus, 2000, rtc_irq);
-> >  
-> > @@ -1535,6 +1538,20 @@ static void pc_machine_set_pit(Object *obj, bool value, Error **errp)
-> >      pcms->pit_enabled = value;
-> >  }
-> >  
-> > +static bool pc_machine_get_hpet(Object *obj, Error **errp)
-> > +{
-> > +    PCMachineState *pcms = PC_MACHINE(obj);
-> > +
-> > +    return pcms->hpet_enabled;
-> > +}
-> > +
-> > +static void pc_machine_set_hpet(Object *obj, bool value, Error **errp)
-> > +{
-> > +    PCMachineState *pcms = PC_MACHINE(obj);
-> > +
-> > +    pcms->hpet_enabled = value;
-> > +}
-> > +
-> >  static void pc_machine_get_max_ram_below_4g(Object *obj, Visitor *v,
-> >                                              const char *name, void *opaque,
-> >                                              Error **errp)
-> > @@ -1585,6 +1602,9 @@ static void pc_machine_initfn(Object *obj)
-> >      pcms->smbus_enabled = true;
-> >      pcms->sata_enabled = true;
-> >      pcms->pit_enabled = true;
-> > +#ifdef CONFIG_HPET
-> > +    pcms->hpet_enabled = true;
-> > +#endif
-> >  
-> >      pc_system_flash_create(pcms);
-> >      pcms->pcspk = isa_new(TYPE_PC_SPEAKER);
-> > @@ -1705,6 +1725,9 @@ static void pc_machine_class_init(ObjectClass *oc, void *data)
-> >  
-> >      object_class_property_add_bool(oc, PC_MACHINE_PIT,
-> >          pc_machine_get_pit, pc_machine_set_pit);
-> > +
-> > +    object_class_property_add_bool(oc, "hpet",
-> > +        pc_machine_get_hpet, pc_machine_set_hpet);
-> >  }
-> >  
-> >  static const TypeInfo pc_machine_info = {
-> > diff --git a/hw/i386/pc_piix.c b/hw/i386/pc_piix.c
-> > index 0cf22a57ad..13d1628f13 100644
-> > --- a/hw/i386/pc_piix.c
-> > +++ b/hw/i386/pc_piix.c
-> > @@ -216,7 +216,7 @@ static void pc_init1(MachineState *machine,
-> >          i440fx_state = NULL;
-> >          isa_bus = isa_bus_new(NULL, get_system_memory(), system_io,
-> >                                &error_abort);
-> > -        no_hpet = 1;
-> > +        pcms->hpet_enabled = false;
-> >      }
-> >      isa_bus_irqs(isa_bus, x86ms->gsi);
-> >  
-> > diff --git a/softmmu/vl.c b/softmmu/vl.c
-> > index cb476aa70b..c2281f45a8 100644
-> > --- a/softmmu/vl.c
-> > +++ b/softmmu/vl.c
-> > @@ -146,7 +146,6 @@ static Chardev **serial_hds;
-> >  Chardev *parallel_hds[MAX_PARALLEL_PORTS];
-> >  int win2k_install_hack = 0;
-> >  int singlestep = 0;
-> > -int no_hpet = 0;
-> >  int fd_bootchk = 1;
-> >  static int no_reboot;
-> >  int no_shutdown = 0;
-> > @@ -3562,7 +3561,8 @@ void qemu_init(int argc, char **argv, char **envp)
-> >                  qemu_opts_parse_noisily(olist, "acpi=off", false);
-> >                  break;
-> >              case QEMU_OPTION_no_hpet:
-> > -                no_hpet = 1;
-> > +                olist = qemu_find_opts("machine");
-> > +                qemu_opts_parse_noisily(olist, "hpet=off", false);
-> >                  break;
-> >              case QEMU_OPTION_no_reboot:
-> >                  no_reboot = 1;
-> > 
-> 
-> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-> 
-> Thanks!
-> 
-> Paolo
+This patch series attempts to make 'hcd-xhci' an independent model so it can be used by both pci and system-bus interface.
 
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Changes for V2:
+    Make XHCIState non-qom
+    Use container_of functions for retriving pci device instance
+    Initialize the AddressSpace pointer in PATCH 1/3 itself Changes for V3:
+    Convert XHCIState to TYPE_DEVICE and register as a child of XHCIPciState.
+Changes for V4:
+    Add DWC3 usb controller
+    Add versal, usb2-reg module
+    Connect sysbus xhci to versal virt board Changes for V5:
+    Add extra info about dwc3 and usb2_regs devices in commit messages
+    Use only one irq for versal usb controller
+    Mark the unimplemented registers in dwc3 controller
+    Rebase the patches over master.
+    Move few mispalced contents from patch 2/7 to 3/7.
+    Fix the author names in the header.
+    Move the inclusion of "sysemu/dma.h" from patch 1/7 to 3/7 Changes for V6:
+    Fixed style issue in patch 7/7
+    Renamed usb2_reg model to VersalUsb2CtrlReg
+    Fixed author in headers
+Changes for V7:
+    Create a usb structure to keep things clean
+    Remove the repeated patch in the series i.e 5/7 Changes for V8:
+    Fix vmstate sturcts to support cross version migration.
+Changes for V9:
+    Added recommended changes to fix vmstate migration.
+    Fixed commit message on 3/7.
+Changes for V10:
+    use vmstate_post_load avaialble in VMStateDescription
+    tested vmstate cross migration.
+Changes for V11:
+    Removed the patches which got accepted
+    Changed object name "USB2Reg" -> "ctrl"
+    Updated Subject line on cover letter.
+Changes for V12:
+    Use reset class for usb2-ctrl-regs module
+    Move the few register update to realize
+    Marked registers which are unimplemented in regapi model
 
-I will queue this, thanks!
+
+Sai Pavan Boddu (1):
+  misc: Add versal-usb2-ctrl-regs module
+
+Vikram Garhwal (2):
+  usb: Add DWC3 model
+  Versal: Connect DWC3 controller with virt-versal
+
+ hw/arm/xlnx-versal-virt.c                    |  58 +++
+ hw/arm/xlnx-versal.c                         |  34 ++
+ hw/misc/meson.build                          |   1 +
+ hw/misc/xlnx-versal-usb2-ctrl-regs.c         | 229 +++++++++
+ hw/usb/Kconfig                               |   6 +
+ hw/usb/hcd-dwc3.c                            | 666 +++++++++++++++++++++++++++
+ hw/usb/meson.build                           |   1 +
+ include/hw/arm/xlnx-versal.h                 |  14 +
+ include/hw/misc/xlnx-versal-usb2-ctrl-regs.h |  45 ++
+ include/hw/usb/hcd-dwc3.h                    |  55 +++
+ 10 files changed, 1109 insertions(+)
+ create mode 100644 hw/misc/xlnx-versal-usb2-ctrl-regs.c
+ create mode 100644 hw/usb/hcd-dwc3.c
+ create mode 100644 include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
+ create mode 100644 include/hw/usb/hcd-dwc3.h
+
+-- 
+2.7.4
 
 
