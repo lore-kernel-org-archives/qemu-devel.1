@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9037CC5517A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB72C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 83BA724656
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5841E24656
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 19:13:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lMSyvNr8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83BA724656
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="lgyDP0Lz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5841E24656
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49880 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50630 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVg1L-0006LJ-Dc
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:13:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57862)
+	id 1kVg1R-0006e1-AO
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 15:13:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVflu-0000xk-Rn; Thu, 22 Oct 2020 14:57:11 -0400
-Received: from mail-am6eur05on2090.outbound.protection.outlook.com
- ([40.107.22.90]:46561 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
+ id 1kVflp-0000vi-V8; Thu, 22 Oct 2020 14:57:09 -0400
+Received: from mail-am6eur05on2108.outbound.protection.outlook.com
+ ([40.107.22.108]:5089 helo=EUR05-AM6-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVflo-0007YP-PL; Thu, 22 Oct 2020 14:57:10 -0400
+ id 1kVflm-0007Y8-8l; Thu, 22 Oct 2020 14:57:05 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lofY+Vp1t8S9J9r69U7HvGy8Gf3UxqJ5yCpvN0WXVMUNuJt9V55akpZaoQMQiJTq7wUY2IT1xKqw2AEaneNJx9sCFocHoGULtwIRCwI8tscz6PXhkqC69YYuMNJaIk6KISyD/apWfCXUD2ttF63hZjEIJCJX+Dqm1L/Z+ygN9gbMjMA7T66OduGITtqDNUGJZ1jn2AlTRQdvf89tzJnjWl4FIvBQ1jWchjJScBK4bfAu0+7WaAvpZzR1wiKNkjmNWsFpLYjBElc4F1CWV9MC48Qs8H/9MmaW/y8/wU2tWIX4KPeC5yu+szjlhGVUnG43Acbh7tZEgn34httFH83YpA==
+ b=RClMpP2dmGwCGJE072oMPMbkb9PODMsec8toZoprb1cInaLCtDSGl64E1NeyUOoME1gAszb06gQK/lO0BqU9ll5K+heWjZ48CoE0EfbDUnPryHC5rW5UyZuocsY0QvrLvXS26tw/+F9H16KVOzWjTlBOFAaOLCkDaA4nWgBc4aagVBEaLiBbtuN238uwtSMDTJOfJCr/ZBp+b5A99K7XwFpKQ2iehgdYPgVhkWvv2iMqco3EkcXLNHwz8dX+9Tg1NSvo7mstqQORTRZoQXO5VNaViP6QIwsYIbVmsOBQlsIdPmJHJEmaxpr4IWSBeFVaUzqtKF2INUkNIqDv7TTNUA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2SFc2QnlSSbIlic62/U61w2DqRt/q0QccyYMqiWOl9o=;
- b=bKyBDk+opW8E1ECJVXSWFiu8U88P2NJdjxnBv+JE8t71uXzvZ7101Vqov/kyl/CNcyVPWYNXYnYIUHx7axmYBAR2alzAtK0kO/gYyPs0t0jV4x8ecYUMsx1cExE/hzdTG/ALSmEDOPuwPNTxZBxD7JaggE2MLUFaXuuGbYPxVFw6EVBBPr3ucXPS4Wsb7pxADNeC017J/oB7JPP77dGygb3uE5pk43PRJOvs1Qjy39yWMUaaElR9qBQnN9kAag5MP1sQcyPf4gJOEUyld25iqg04zfQmB8YGrC4nHump3AtD1t4dGs23UPjvN/6OA2m5jtLbjfnOf6shZrDAD3E2SA==
+ bh=4ISTEaQFcAYgXIMTkH+PJ3kCLXOxUs4QNHe2XMiq5M0=;
+ b=aFY0Uy7dPakk2Ls8B2p3UOigsotOgYVyPrpRVItcRMkhokRd1LFmbBACExys3xCi+E5om0xB40amcWw/q2lC6ev8EGRGAbPn7fzkxd8gpxUs/BFfKE/4TH/reyTYHRNzACB/JGp5B+10iVSqtP+2LBTiujM7nxtTvoE/8mz3epSUK6jME4Lfs4tIsF/hyPBzZk/jQjlJWLsMPHwyFz0MQqjYhK4I1cqtUHTTYSc3w5Cvcln3/PV9I4Nl5igDUMIWct4OXGwXvzDqHt+6UzFnE5KCs8AuWXzGol+mIPDUjAaL8mcHraXOyAyVSGJVMxel0pf5BChAB9OCAX4ewuglZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2SFc2QnlSSbIlic62/U61w2DqRt/q0QccyYMqiWOl9o=;
- b=lMSyvNr8iKXEcu/rGjdKNZovVbmH/A6lumIYtv8MB2OU6bYCwF9lTNSpmfQIooYDWCizD6U6ArsdnjARPCmcb3JWLvvqtMlkVNHw+O5qp1jT/054cQapsXwafZlY6D1G7mN4LQ2t1fCJyXSayUUULTXQtvSPA9iipgrtgF+nQ5Y=
+ bh=4ISTEaQFcAYgXIMTkH+PJ3kCLXOxUs4QNHe2XMiq5M0=;
+ b=lgyDP0Lzc8GuEjslYFzZh3vSZLGb2PfixCElRtVo5c2qQ8DBHM5fu3Z9ymUNfeGT8F/KsAFS1tOWQshbo5bA/NgdI5xF4rcwzOr9ZZIj9LmE2fGaeUSzG/R0Dk0Q59HBr82Si7eL+pKImZHrn9O+xSR5CXiCfDi/XVTaLG/qrUI=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AS8PR08MB6309.eurprd08.prod.outlook.com (2603:10a6:20b:29f::7)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Thu, 22 Oct
- 2020 18:56:45 +0000
+ 2020 18:56:49 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
- 18:56:45 +0000
+ 18:56:49 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, mreitz@redhat.com, kwolf@redhat.com,
  vsementsov@virtuozzo.com, den@openvz.org, eblake@redhat.com,
  jsnow@redhat.com
-Subject: [PATCH v5 07/12] iotests: define group in each iotest
-Date: Thu, 22 Oct 2020 21:56:22 +0300
-Message-Id: <20201022185627.16987-8-vsementsov@virtuozzo.com>
+Subject: [PATCH v5 11/12] iotests: rewrite check into python
+Date: Thu, 22 Oct 2020 21:56:26 +0300
+Message-Id: <20201022185627.16987-12-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201022185627.16987-1-vsementsov@virtuozzo.com>
 References: <20201022185627.16987-1-vsementsov@virtuozzo.com>
@@ -82,35 +82,35 @@ Received: from kvm.sw.ru (185.215.60.82) by
  AM0PR01CA0089.eurprd01.prod.exchangelabs.com (2603:10a6:208:10e::30) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.22 via Frontend
- Transport; Thu, 22 Oct 2020 18:56:45 +0000
+ Transport; Thu, 22 Oct 2020 18:56:48 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 15bfa4a2-5378-4614-8844-08d876bc3908
+X-MS-Office365-Filtering-Correlation-Id: 686306f5-c24f-434b-49d9-08d876bc3afb
 X-MS-TrafficTypeDiagnostic: AS8PR08MB6309:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AS8PR08MB6309FFDCFD86A8E2E4BA3B1EC11D0@AS8PR08MB6309.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2803;
+X-Microsoft-Antispam-PRVS: <AS8PR08MB6309C47A43F21C4C40BAADC8C11D0@AS8PR08MB6309.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:1051;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: IeDQqQxNmZG0IVdokdHOpKh+nc+5OUsDvtzoNe9xuOEsjHGmsgXkbA2+4B1Debj1fMizzsNJ7wLWxygNs/ivK19LDdeowz/o64u3oFEFyUmMncnPVQbOh6jV9P+aZ3xAasyowrbcJ/BWokJ3oOXZm/tUfUn5eZTXxpYqdsQwkjlO3hcikSWPzeMp3NC5VRVP94N6jxseeJ+skV7N8zThA9GusDcdEaw1ZLJh0pBhJhHMXTOLMMTRv+Ukkokor2Gf7w9193d8H7RL3thnko3nEzWLfcBOGdkuLOMGc3A6FY0OZm1y41xpckq3fqYVzSaEfmAVlFLsMLyMK7A/mqpPLA==
+X-Microsoft-Antispam-Message-Info: dikPoIHEELfpWk2WREiV+fMuR86J3giTS5qtF7ODYmQCD2GG40WsRJjBfnOHHLHE16EFF3u1biw3yuAiePLFpdXG0pSnvW56bJXjT+pRHK1yB8OTS+hq/wCK7OG6YtZu4GuOqhP6TIIuxzLgYlCn2KH0UFWvrm6wtm0d6gNFBvFtByr6hjIKnQElq+y9M/begfWuJhb4LdBCxXu+OoOokHMgAlS/wugMsRFeSd0Gn3uFmEM6UZOx1Y3sMAyKsYRK46URqv/I83aLwMhKqIwRkiLX872uDssi4si3dXuOYcGXjQoOYtcXFQx5E49BxNbEYFcx7kNx4HQ2a7wfYbgOaR47MBdsa/ECv2ksJJUXuoXEZnqIc95M7BSWub8Lw823L2vX4imkHF7FZ/STCWKUM3z27zlrtV1PWifgA7r1vrImggQQZMR0/ezooNWqlj8T4BGOTKquw7eSIJFRqfM+kg==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(366004)(346002)(396003)(136003)(376002)(478600001)(6512007)(36756003)(2906002)(30864003)(52116002)(4326008)(5660300002)(26005)(16526019)(2616005)(956004)(186003)(6916009)(6666004)(8936002)(66476007)(83380400001)(316002)(66946007)(1076003)(6506007)(8676002)(86362001)(66556008)(6486002)(559001)(579004);
+ SFS:(4636009)(39840400004)(366004)(346002)(396003)(136003)(376002)(478600001)(6512007)(36756003)(2906002)(30864003)(52116002)(4326008)(5660300002)(26005)(16526019)(2616005)(956004)(186003)(6916009)(6666004)(8936002)(66476007)(83380400001)(316002)(66946007)(1076003)(6506007)(8676002)(86362001)(66556008)(6486002)(2004002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: g4qlIVjBf5hK3Q3H5OMenK6bNulgLhrXD838Bt7uhQNJaNFzZjIM/9JHcWlHO499UzT5p496iKw2BlXsxQHghv1bS+GmeQeeK0g3RZ3yZDC9VIuABjOhMbz0dCgPEBkKo4cV4g4gYZ/FlfnwdEqbyz9IQsNOE6t7UnmET/z55l6sTpxnNod0X3fExR/SXg/xNtnPZN4bxNwVnuOkP0/5bJpkMZ92Gpu++k4fUVp7u4rffAJ9f1jTeiQhSY8kwIu+UR0XTfDlaVH3A4jz3H8jRLhfK1m++DBQ0S34XHa/mJpwEKuIWI1F6GqJBcX0EmEBuYMpPps8q5gECrQGGKEMwxcxjBVKH2yyN8pIoR7jsFkFeCsVA1I2iXLHheycrWgU0zZ1y0tCnDB/QXls4BT+9DPLfIGS6TtBoBp0qmWPu6kk/w7WEVjjacaN72CRhVRrf5onGNeGQ76t6kQGL3KbyjX6IMyQ1nV+GdXlq9R3fFbCi8ghuN7kA5HGYgaSWVYE1sFWJypib30O3INWy2ZlFA25K+k8vqhin+nGUVDTtajS1xCJTN33amgG15vDfDlCAsYj1hppYTuB2B5inLTxHUnJHGMpwrjdiGD31nu6WB1Y0VsaIkVSSzXDaiB0dA4/8KBo5laXt/9ibqhnlmhlwA==
+X-MS-Exchange-AntiSpam-MessageData: sqsY6ruRua0lLVu7vqRaWsx6sOKqgH3Z9S88I5RjWW204Ea38B9/3nlW5vNX2g69zySh6gItnu++WMB0yQKMnc1B5M4H2+sw3ABwL+fszDeLynR5yeOr25eQzQKqJ9joa2RbYt7Oj+/j3EYjOqdS4E2yD929371JDPhi0EYep3uQgN4rsfMw4D9dR4GLOPfNQfnAHHkqyk+xEme10tALGwd/GYKP1tt3XU3YeMXgpOOpJ9g0j2lh9SGQWfRMBlYWFov4+XZT1MOqS9gJxfnO8YrMPwS9pYR7pG/1NBu3xrwxQax22i99FgtwLSmsDXWuayqV1+4Nmb0eX68+eMcgDeNhNSlI861wUUrBVO3+JuSS0fJ2DM0iS+FjDrZIBj2+fRtfXbiNnqAIQfeGysa6VYcDMAZb4HerCSmPbLh93MOFHqtoHQN4+fQRGKPtCMAXWJgtS4Tfu4pzZ11adbXycSHZoLDLqnCp9MZkfG8zFT3VwhaDlMJuk9hRJoNjFFYsH98LEF2ZD1uEVFTW9yswCT0LJ4AoR7vtspVJaqCiQdGwrHDqfjOca13UrSoYVCVytYip0tNZ/snRLTyyjaNhwOdRLRJg+j4KfqTDHEXkDQn7I5rG8+QOah+DKTeH1kKjjLWRnOkfnsfi7Sad6MamMA==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 15bfa4a2-5378-4614-8844-08d876bc3908
+X-MS-Exchange-CrossTenant-Network-Message-Id: 686306f5-c24f-434b-49d9-08d876bc3afb
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 18:56:45.8980 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 18:56:49.0253 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: b01/OYbMPm77lzaSoEte2shSfFsWslym0wLBsckJMBFzASA+CocSfi+q3QcwtIr2akgQ5foLaCxehFNArQ55dY9m2OWEhsoclBYWb8LwuE4=
+X-MS-Exchange-CrossTenant-UserPrincipalName: PPyMgfv+YNlZ4OJz0NbA0ACVIftIRH8p6EvW326SZ0D/bLYomg+jV+sXx7uJuJYePR3MRuo0fqiMx6bdc9CIEqJ5QPMQLnN1GkWa6XbqOQE=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB6309
-Received-SPF: pass client-ip=40.107.22.90;
+Received-SPF: pass client-ip=40.107.22.108;
  envelope-from=vsementsov@virtuozzo.com;
  helo=EUR05-AM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 14:56:45
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 14:56:41
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
@@ -136,3192 +136,1332 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to drop group file. Define group in tests as a preparatory
-step.
+Just use classes introduced in previous three commits. Behavior
+difference is described in these three commits.
 
-The patch is generated by
-
-    cd tests/qemu-iotests
-
-    grep '^[0-9]\{3\} ' group | while read line; do
-        file=$(awk '{print $1}' <<< "$line");
-        groups=$(sed -e 's/^... //' <<< "$line");
-        awk "NR==2{print \"# group: $groups\"}1" $file > tmp;
-        cat tmp > $file;
-    done
+Drop group file, as it becomes unused.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- tests/qemu-iotests/001 | 1 +
- tests/qemu-iotests/002 | 1 +
- tests/qemu-iotests/003 | 1 +
- tests/qemu-iotests/004 | 1 +
- tests/qemu-iotests/005 | 1 +
- tests/qemu-iotests/007 | 1 +
- tests/qemu-iotests/008 | 1 +
- tests/qemu-iotests/009 | 1 +
- tests/qemu-iotests/010 | 1 +
- tests/qemu-iotests/011 | 1 +
- tests/qemu-iotests/012 | 1 +
- tests/qemu-iotests/013 | 1 +
- tests/qemu-iotests/014 | 1 +
- tests/qemu-iotests/015 | 1 +
- tests/qemu-iotests/017 | 1 +
- tests/qemu-iotests/018 | 1 +
- tests/qemu-iotests/019 | 1 +
- tests/qemu-iotests/020 | 1 +
- tests/qemu-iotests/021 | 1 +
- tests/qemu-iotests/022 | 1 +
- tests/qemu-iotests/023 | 1 +
- tests/qemu-iotests/024 | 1 +
- tests/qemu-iotests/025 | 1 +
- tests/qemu-iotests/026 | 1 +
- tests/qemu-iotests/027 | 1 +
- tests/qemu-iotests/028 | 1 +
- tests/qemu-iotests/029 | 1 +
- tests/qemu-iotests/030 | 1 +
- tests/qemu-iotests/031 | 1 +
- tests/qemu-iotests/032 | 1 +
- tests/qemu-iotests/033 | 1 +
- tests/qemu-iotests/034 | 1 +
- tests/qemu-iotests/035 | 1 +
- tests/qemu-iotests/036 | 1 +
- tests/qemu-iotests/037 | 1 +
- tests/qemu-iotests/038 | 1 +
- tests/qemu-iotests/039 | 1 +
- tests/qemu-iotests/040 | 1 +
- tests/qemu-iotests/041 | 1 +
- tests/qemu-iotests/042 | 1 +
- tests/qemu-iotests/043 | 1 +
- tests/qemu-iotests/044 | 1 +
- tests/qemu-iotests/045 | 1 +
- tests/qemu-iotests/046 | 1 +
- tests/qemu-iotests/047 | 1 +
- tests/qemu-iotests/048 | 1 +
- tests/qemu-iotests/049 | 1 +
- tests/qemu-iotests/050 | 1 +
- tests/qemu-iotests/051 | 1 +
- tests/qemu-iotests/052 | 1 +
- tests/qemu-iotests/053 | 1 +
- tests/qemu-iotests/054 | 1 +
- tests/qemu-iotests/055 | 1 +
- tests/qemu-iotests/056 | 1 +
- tests/qemu-iotests/057 | 1 +
- tests/qemu-iotests/058 | 1 +
- tests/qemu-iotests/059 | 1 +
- tests/qemu-iotests/060 | 1 +
- tests/qemu-iotests/061 | 1 +
- tests/qemu-iotests/062 | 1 +
- tests/qemu-iotests/063 | 1 +
- tests/qemu-iotests/064 | 1 +
- tests/qemu-iotests/065 | 1 +
- tests/qemu-iotests/066 | 1 +
- tests/qemu-iotests/068 | 1 +
- tests/qemu-iotests/069 | 1 +
- tests/qemu-iotests/070 | 1 +
- tests/qemu-iotests/071 | 1 +
- tests/qemu-iotests/072 | 1 +
- tests/qemu-iotests/073 | 1 +
- tests/qemu-iotests/074 | 1 +
- tests/qemu-iotests/075 | 1 +
- tests/qemu-iotests/076 | 1 +
- tests/qemu-iotests/077 | 1 +
- tests/qemu-iotests/078 | 1 +
- tests/qemu-iotests/079 | 1 +
- tests/qemu-iotests/080 | 1 +
- tests/qemu-iotests/081 | 1 +
- tests/qemu-iotests/082 | 1 +
- tests/qemu-iotests/083 | 1 +
- tests/qemu-iotests/084 | 1 +
- tests/qemu-iotests/085 | 1 +
- tests/qemu-iotests/086 | 1 +
- tests/qemu-iotests/087 | 1 +
- tests/qemu-iotests/088 | 1 +
- tests/qemu-iotests/089 | 1 +
- tests/qemu-iotests/090 | 1 +
- tests/qemu-iotests/091 | 1 +
- tests/qemu-iotests/092 | 1 +
- tests/qemu-iotests/093 | 1 +
- tests/qemu-iotests/094 | 1 +
- tests/qemu-iotests/095 | 1 +
- tests/qemu-iotests/096 | 1 +
- tests/qemu-iotests/097 | 1 +
- tests/qemu-iotests/098 | 1 +
- tests/qemu-iotests/099 | 1 +
- tests/qemu-iotests/101 | 1 +
- tests/qemu-iotests/102 | 1 +
- tests/qemu-iotests/103 | 1 +
- tests/qemu-iotests/104 | 1 +
- tests/qemu-iotests/105 | 1 +
- tests/qemu-iotests/106 | 1 +
- tests/qemu-iotests/107 | 1 +
- tests/qemu-iotests/108 | 1 +
- tests/qemu-iotests/109 | 1 +
- tests/qemu-iotests/110 | 1 +
- tests/qemu-iotests/111 | 1 +
- tests/qemu-iotests/112 | 1 +
- tests/qemu-iotests/113 | 1 +
- tests/qemu-iotests/114 | 1 +
- tests/qemu-iotests/115 | 1 +
- tests/qemu-iotests/116 | 1 +
- tests/qemu-iotests/117 | 1 +
- tests/qemu-iotests/118 | 1 +
- tests/qemu-iotests/119 | 1 +
- tests/qemu-iotests/120 | 1 +
- tests/qemu-iotests/121 | 1 +
- tests/qemu-iotests/122 | 1 +
- tests/qemu-iotests/123 | 1 +
- tests/qemu-iotests/124 | 1 +
- tests/qemu-iotests/125 | 1 +
- tests/qemu-iotests/126 | 1 +
- tests/qemu-iotests/127 | 1 +
- tests/qemu-iotests/128 | 1 +
- tests/qemu-iotests/129 | 1 +
- tests/qemu-iotests/130 | 1 +
- tests/qemu-iotests/131 | 1 +
- tests/qemu-iotests/132 | 1 +
- tests/qemu-iotests/133 | 1 +
- tests/qemu-iotests/134 | 1 +
- tests/qemu-iotests/135 | 1 +
- tests/qemu-iotests/136 | 1 +
- tests/qemu-iotests/137 | 1 +
- tests/qemu-iotests/138 | 1 +
- tests/qemu-iotests/139 | 1 +
- tests/qemu-iotests/140 | 1 +
- tests/qemu-iotests/141 | 1 +
- tests/qemu-iotests/143 | 1 +
- tests/qemu-iotests/144 | 1 +
- tests/qemu-iotests/145 | 1 +
- tests/qemu-iotests/146 | 1 +
- tests/qemu-iotests/147 | 1 +
- tests/qemu-iotests/148 | 1 +
- tests/qemu-iotests/149 | 1 +
- tests/qemu-iotests/150 | 1 +
- tests/qemu-iotests/151 | 1 +
- tests/qemu-iotests/152 | 1 +
- tests/qemu-iotests/153 | 1 +
- tests/qemu-iotests/154 | 1 +
- tests/qemu-iotests/155 | 1 +
- tests/qemu-iotests/156 | 1 +
- tests/qemu-iotests/157 | 1 +
- tests/qemu-iotests/158 | 1 +
- tests/qemu-iotests/159 | 1 +
- tests/qemu-iotests/160 | 1 +
- tests/qemu-iotests/161 | 1 +
- tests/qemu-iotests/162 | 1 +
- tests/qemu-iotests/163 | 1 +
- tests/qemu-iotests/165 | 1 +
- tests/qemu-iotests/169 | 1 +
- tests/qemu-iotests/170 | 1 +
- tests/qemu-iotests/171 | 1 +
- tests/qemu-iotests/172 | 1 +
- tests/qemu-iotests/173 | 1 +
- tests/qemu-iotests/174 | 1 +
- tests/qemu-iotests/175 | 1 +
- tests/qemu-iotests/176 | 1 +
- tests/qemu-iotests/177 | 1 +
- tests/qemu-iotests/178 | 1 +
- tests/qemu-iotests/179 | 1 +
- tests/qemu-iotests/181 | 1 +
- tests/qemu-iotests/182 | 1 +
- tests/qemu-iotests/183 | 1 +
- tests/qemu-iotests/184 | 1 +
- tests/qemu-iotests/185 | 1 +
- tests/qemu-iotests/186 | 1 +
- tests/qemu-iotests/187 | 1 +
- tests/qemu-iotests/188 | 1 +
- tests/qemu-iotests/189 | 1 +
- tests/qemu-iotests/190 | 1 +
- tests/qemu-iotests/191 | 1 +
- tests/qemu-iotests/192 | 1 +
- tests/qemu-iotests/194 | 1 +
- tests/qemu-iotests/195 | 1 +
- tests/qemu-iotests/196 | 1 +
- tests/qemu-iotests/197 | 1 +
- tests/qemu-iotests/198 | 1 +
- tests/qemu-iotests/199 | 1 +
- tests/qemu-iotests/200 | 1 +
- tests/qemu-iotests/201 | 1 +
- tests/qemu-iotests/202 | 1 +
- tests/qemu-iotests/203 | 1 +
- tests/qemu-iotests/204 | 1 +
- tests/qemu-iotests/205 | 1 +
- tests/qemu-iotests/206 | 1 +
- tests/qemu-iotests/207 | 1 +
- tests/qemu-iotests/208 | 1 +
- tests/qemu-iotests/209 | 1 +
- tests/qemu-iotests/210 | 1 +
- tests/qemu-iotests/211 | 1 +
- tests/qemu-iotests/212 | 1 +
- tests/qemu-iotests/213 | 1 +
- tests/qemu-iotests/214 | 1 +
- tests/qemu-iotests/215 | 1 +
- tests/qemu-iotests/216 | 1 +
- tests/qemu-iotests/217 | 1 +
- tests/qemu-iotests/218 | 1 +
- tests/qemu-iotests/219 | 1 +
- tests/qemu-iotests/220 | 1 +
- tests/qemu-iotests/221 | 1 +
- tests/qemu-iotests/222 | 1 +
- tests/qemu-iotests/223 | 1 +
- tests/qemu-iotests/224 | 1 +
- tests/qemu-iotests/225 | 1 +
- tests/qemu-iotests/226 | 1 +
- tests/qemu-iotests/227 | 1 +
- tests/qemu-iotests/228 | 1 +
- tests/qemu-iotests/229 | 1 +
- tests/qemu-iotests/231 | 1 +
- tests/qemu-iotests/232 | 1 +
- tests/qemu-iotests/233 | 1 +
- tests/qemu-iotests/234 | 1 +
- tests/qemu-iotests/235 | 1 +
- tests/qemu-iotests/236 | 1 +
- tests/qemu-iotests/237 | 1 +
- tests/qemu-iotests/238 | 1 +
- tests/qemu-iotests/239 | 1 +
- tests/qemu-iotests/240 | 1 +
- tests/qemu-iotests/241 | 1 +
- tests/qemu-iotests/242 | 1 +
- tests/qemu-iotests/243 | 1 +
- tests/qemu-iotests/244 | 1 +
- tests/qemu-iotests/245 | 1 +
- tests/qemu-iotests/246 | 1 +
- tests/qemu-iotests/247 | 1 +
- tests/qemu-iotests/248 | 1 +
- tests/qemu-iotests/249 | 1 +
- tests/qemu-iotests/250 | 1 +
- tests/qemu-iotests/251 | 1 +
- tests/qemu-iotests/252 | 1 +
- tests/qemu-iotests/253 | 1 +
- tests/qemu-iotests/254 | 1 +
- tests/qemu-iotests/255 | 1 +
- tests/qemu-iotests/256 | 1 +
- tests/qemu-iotests/257 | 1 +
- tests/qemu-iotests/258 | 1 +
- tests/qemu-iotests/259 | 1 +
- tests/qemu-iotests/260 | 1 +
- tests/qemu-iotests/261 | 1 +
- tests/qemu-iotests/262 | 1 +
- tests/qemu-iotests/263 | 1 +
- tests/qemu-iotests/264 | 1 +
- tests/qemu-iotests/265 | 1 +
- tests/qemu-iotests/266 | 1 +
- tests/qemu-iotests/267 | 1 +
- tests/qemu-iotests/268 | 1 +
- tests/qemu-iotests/270 | 1 +
- tests/qemu-iotests/271 | 1 +
- tests/qemu-iotests/272 | 1 +
- tests/qemu-iotests/273 | 1 +
- tests/qemu-iotests/274 | 1 +
- tests/qemu-iotests/277 | 1 +
- tests/qemu-iotests/279 | 1 +
- tests/qemu-iotests/280 | 1 +
- tests/qemu-iotests/281 | 1 +
- tests/qemu-iotests/282 | 1 +
- tests/qemu-iotests/283 | 1 +
- tests/qemu-iotests/284 | 1 +
- tests/qemu-iotests/286 | 1 +
- tests/qemu-iotests/287 | 1 +
- tests/qemu-iotests/288 | 1 +
- tests/qemu-iotests/289 | 1 +
- tests/qemu-iotests/290 | 1 +
- tests/qemu-iotests/291 | 1 +
- tests/qemu-iotests/292 | 1 +
- tests/qemu-iotests/293 | 1 +
- tests/qemu-iotests/294 | 1 +
- tests/qemu-iotests/295 | 1 +
- tests/qemu-iotests/296 | 1 +
- tests/qemu-iotests/297 | 1 +
- tests/qemu-iotests/299 | 1 +
- tests/qemu-iotests/300 | 1 +
- tests/qemu-iotests/301 | 1 +
- tests/qemu-iotests/302 | 1 +
- tests/qemu-iotests/303 | 1 +
- tests/qemu-iotests/304 | 1 +
- tests/qemu-iotests/305 | 1 +
- tests/qemu-iotests/307 | 1 +
- 288 files changed, 288 insertions(+)
+ tests/qemu-iotests/check | 977 ++-------------------------------------
+ tests/qemu-iotests/group | 317 -------------
+ 2 files changed, 28 insertions(+), 1266 deletions(-)
+ delete mode 100644 tests/qemu-iotests/group
 
-diff --git a/tests/qemu-iotests/001 b/tests/qemu-iotests/001
-index 696726e45f..6f980fd34d 100755
---- a/tests/qemu-iotests/001
-+++ b/tests/qemu-iotests/001
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test simple read/write using plain bdrv_pread/bdrv_pwrite
- #
-diff --git a/tests/qemu-iotests/002 b/tests/qemu-iotests/002
-index 1a0d411df5..5ce1647531 100755
---- a/tests/qemu-iotests/002
-+++ b/tests/qemu-iotests/002
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test simple read/write using plain bdrv_pread/bdrv_pwrite
- #
-diff --git a/tests/qemu-iotests/003 b/tests/qemu-iotests/003
-index 33eeade0de..03f902a83c 100755
---- a/tests/qemu-iotests/003
-+++ b/tests/qemu-iotests/003
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test simple read/write using bdrv_aio_readv/bdrv_aio_writev
- #
-diff --git a/tests/qemu-iotests/004 b/tests/qemu-iotests/004
-index d308dc4b49..e955579a67 100755
---- a/tests/qemu-iotests/004
-+++ b/tests/qemu-iotests/004
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Make sure we can't read and write outside of the image size.
- #
-diff --git a/tests/qemu-iotests/005 b/tests/qemu-iotests/005
-index b6d03ac37d..40e64a9a8f 100755
---- a/tests/qemu-iotests/005
-+++ b/tests/qemu-iotests/005
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: img auto quick
- #
- # Make sure qemu-img can create 5TB images
- #
-diff --git a/tests/qemu-iotests/007 b/tests/qemu-iotests/007
-index 160683adf8..936d3f14fb 100755
---- a/tests/qemu-iotests/007
-+++ b/tests/qemu-iotests/007
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: snapshot auto
- #
- # Check for one possible case of qcow2 refcount corruption.
- #
-diff --git a/tests/qemu-iotests/008 b/tests/qemu-iotests/008
-index 2b81b119bf..fa4990b513 100755
---- a/tests/qemu-iotests/008
-+++ b/tests/qemu-iotests/008
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test simple asynchronous read/write operations.
- #
-diff --git a/tests/qemu-iotests/009 b/tests/qemu-iotests/009
-index 4dc7d210f9..efa852bad3 100755
---- a/tests/qemu-iotests/009
-+++ b/tests/qemu-iotests/009
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Nolan I qcow2 corruption - incorrectly reports free clusters
- #
-diff --git a/tests/qemu-iotests/010 b/tests/qemu-iotests/010
-index df809b3088..4ae9027b47 100755
---- a/tests/qemu-iotests/010
-+++ b/tests/qemu-iotests/010
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Nolan II qcow2 corruption - wrong used cluster
- #
-diff --git a/tests/qemu-iotests/011 b/tests/qemu-iotests/011
-index 57b99ae4a9..5c99ac987f 100755
---- a/tests/qemu-iotests/011
-+++ b/tests/qemu-iotests/011
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test for AIO allocation on the same cluster
- #
-diff --git a/tests/qemu-iotests/012 b/tests/qemu-iotests/012
-index 12957285b3..3a24d2ca8d 100755
---- a/tests/qemu-iotests/012
-+++ b/tests/qemu-iotests/012
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # Make sure we can open read-only images
- #
-diff --git a/tests/qemu-iotests/013 b/tests/qemu-iotests/013
-index 5cb9032f16..d39d0cd88b 100755
---- a/tests/qemu-iotests/013
-+++ b/tests/qemu-iotests/013
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # qcow2 pattern test, empty and compressed image - 4k cluster patterns
- #
-diff --git a/tests/qemu-iotests/014 b/tests/qemu-iotests/014
-index e1221c0fff..2d23469332 100755
---- a/tests/qemu-iotests/014
-+++ b/tests/qemu-iotests/014
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # qcow2 pattern test, complex patterns including compression and snapshots
- # Using patterns for 4k cluster size.
-diff --git a/tests/qemu-iotests/015 b/tests/qemu-iotests/015
-index 4d8effd0ae..40c23235a6 100755
---- a/tests/qemu-iotests/015
-+++ b/tests/qemu-iotests/015
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw snapshot
- #
- # Combined test to grow the refcount table and test snapshots.
- #
-diff --git a/tests/qemu-iotests/017 b/tests/qemu-iotests/017
-index 3413e34f27..2024b85e79 100755
---- a/tests/qemu-iotests/017
-+++ b/tests/qemu-iotests/017
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing auto quick
- #
- # Simple backing file reads
- #
-diff --git a/tests/qemu-iotests/018 b/tests/qemu-iotests/018
-index 191b461a4d..6fcebbb40e 100755
---- a/tests/qemu-iotests/018
-+++ b/tests/qemu-iotests/018
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing auto quick
- #
- # Merge backing file into test image when converting the image
- #
-diff --git a/tests/qemu-iotests/019 b/tests/qemu-iotests/019
-index d3c11256dc..fa4458fd27 100755
---- a/tests/qemu-iotests/019
-+++ b/tests/qemu-iotests/019
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing auto quick
- #
- # When using a backing file for the output image in qemu-img convert,
- # the backing file clusters must not copied. The data must still be
-diff --git a/tests/qemu-iotests/020 b/tests/qemu-iotests/020
-index 596505be2d..60c672e17b 100755
---- a/tests/qemu-iotests/020
-+++ b/tests/qemu-iotests/020
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing auto quick
- #
- # Commit changes to backing file
- #
-diff --git a/tests/qemu-iotests/021 b/tests/qemu-iotests/021
-index f888269fd4..0fc89df2fe 100755
---- a/tests/qemu-iotests/021
-+++ b/tests/qemu-iotests/021
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: io auto quick
- #
- # Test handling of invalid patterns arguments to qemu-io
- #
-diff --git a/tests/qemu-iotests/022 b/tests/qemu-iotests/022
-index 99eb08f57f..a116cfe255 100755
---- a/tests/qemu-iotests/022
-+++ b/tests/qemu-iotests/022
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw snapshot auto
- #
- # Test bdrv_load/save_vmstate using the usual patterns
- #
-diff --git a/tests/qemu-iotests/023 b/tests/qemu-iotests/023
-index 02ed047820..d19d13ff5d 100755
---- a/tests/qemu-iotests/023
-+++ b/tests/qemu-iotests/023
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # qcow2 pattern test with various cluster sizes
- #
-diff --git a/tests/qemu-iotests/024 b/tests/qemu-iotests/024
-index 12aceb2d41..25a564a150 100755
---- a/tests/qemu-iotests/024
-+++ b/tests/qemu-iotests/024
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing auto quick
- #
- # Rebasing COW images
- #
-diff --git a/tests/qemu-iotests/025 b/tests/qemu-iotests/025
-index e05d833452..0047969d17 100755
---- a/tests/qemu-iotests/025
-+++ b/tests/qemu-iotests/025
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Resizing images
- #
-diff --git a/tests/qemu-iotests/026 b/tests/qemu-iotests/026
-index b9713eb591..204af667b3 100755
---- a/tests/qemu-iotests/026
-+++ b/tests/qemu-iotests/026
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw blkdbg
- #
- # qcow2 error path testing
- #
-diff --git a/tests/qemu-iotests/027 b/tests/qemu-iotests/027
-index 494be0921f..b279c88f33 100755
---- a/tests/qemu-iotests/027
-+++ b/tests/qemu-iotests/027
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test that sub-cluster allocating writes zero the rest of the cluster
- #
-diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
-index 6dd3ae09a3..624e501250 100755
---- a/tests/qemu-iotests/028
-+++ b/tests/qemu-iotests/028
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing quick
- #
- # Test that backing files can be smaller than the image
- #
-diff --git a/tests/qemu-iotests/029 b/tests/qemu-iotests/029
-index 61d78c00a4..bd71dd2f22 100755
---- a/tests/qemu-iotests/029
-+++ b/tests/qemu-iotests/029
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # qcow2 internal snapshots/VM state tests
- #
-diff --git a/tests/qemu-iotests/030 b/tests/qemu-iotests/030
-index dcb4b5d6a6..890784b116 100755
---- a/tests/qemu-iotests/030
-+++ b/tests/qemu-iotests/030
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw auto backing
- #
- # Tests for image streaming.
- #
-diff --git a/tests/qemu-iotests/031 b/tests/qemu-iotests/031
-index 646ecd593f..af167e85be 100755
---- a/tests/qemu-iotests/031
-+++ b/tests/qemu-iotests/031
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test that all qcow2 header extensions survive a header rewrite
- #
-diff --git a/tests/qemu-iotests/032 b/tests/qemu-iotests/032
-index 8337a4d825..ebbe7cb0ba 100755
---- a/tests/qemu-iotests/032
-+++ b/tests/qemu-iotests/032
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test that AIO requests are drained before an image is closed. This used
- # to segfault because the request coroutine kept running even after the
-diff --git a/tests/qemu-iotests/033 b/tests/qemu-iotests/033
-index 8b40991d55..da9133c44b 100755
---- a/tests/qemu-iotests/033
-+++ b/tests/qemu-iotests/033
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test aligned and misaligned write zeroes operations.
- #
-diff --git a/tests/qemu-iotests/034 b/tests/qemu-iotests/034
-index ac2d687c71..150adafc6c 100755
---- a/tests/qemu-iotests/034
-+++ b/tests/qemu-iotests/034
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test bdrv_pwrite_zeroes with backing files (see also 154)
- #
-diff --git a/tests/qemu-iotests/035 b/tests/qemu-iotests/035
-index d950a0dd1e..0c0c4fdd42 100755
---- a/tests/qemu-iotests/035
-+++ b/tests/qemu-iotests/035
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Let a few AIO requests run in parallel and have them access different L2
- # tables so that the cache has a chance to get used up.
-diff --git a/tests/qemu-iotests/036 b/tests/qemu-iotests/036
-index cf522de7a1..a27d4125d2 100755
---- a/tests/qemu-iotests/036
-+++ b/tests/qemu-iotests/036
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qcow2 feature bits
- #
-diff --git a/tests/qemu-iotests/037 b/tests/qemu-iotests/037
-index e1187ac24a..b780024c57 100755
---- a/tests/qemu-iotests/037
-+++ b/tests/qemu-iotests/037
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test COW from backing files
- #
-diff --git a/tests/qemu-iotests/038 b/tests/qemu-iotests/038
-index a253231f5b..e7064344c9 100755
---- a/tests/qemu-iotests/038
-+++ b/tests/qemu-iotests/038
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test COW from backing files with AIO
- #
-diff --git a/tests/qemu-iotests/039 b/tests/qemu-iotests/039
-index 42f6503138..10563825d9 100755
---- a/tests/qemu-iotests/039
-+++ b/tests/qemu-iotests/039
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qcow2 lazy refcounts
- #
-diff --git a/tests/qemu-iotests/040 b/tests/qemu-iotests/040
-index caf286571a..2af60a7802 100755
---- a/tests/qemu-iotests/040
-+++ b/tests/qemu-iotests/040
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw auto
- #
- # Tests for image block commit.
- #
-diff --git a/tests/qemu-iotests/041 b/tests/qemu-iotests/041
-index a7780853cd..5cc02b24fc 100755
---- a/tests/qemu-iotests/041
-+++ b/tests/qemu-iotests/041
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw auto backing
- #
- # Tests for image mirroring.
- #
-diff --git a/tests/qemu-iotests/042 b/tests/qemu-iotests/042
-index e8f23a174c..411e54ae04 100755
---- a/tests/qemu-iotests/042
-+++ b/tests/qemu-iotests/042
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qemu-img operation on zero size images
- #
-diff --git a/tests/qemu-iotests/043 b/tests/qemu-iotests/043
-index 3271737f69..f8ce3288db 100755
---- a/tests/qemu-iotests/043
-+++ b/tests/qemu-iotests/043
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing
- #
- # Test that qemu-img info --backing-chain detects infinite loops
- #
-diff --git a/tests/qemu-iotests/044 b/tests/qemu-iotests/044
-index 7e99ea7c68..64b18eb7c8 100755
---- a/tests/qemu-iotests/044
-+++ b/tests/qemu-iotests/044
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests growing a large refcount table.
- #
-diff --git a/tests/qemu-iotests/045 b/tests/qemu-iotests/045
-index 5acc89099c..45eb239baa 100755
---- a/tests/qemu-iotests/045
-+++ b/tests/qemu-iotests/045
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for fdsets and getfd.
- #
-diff --git a/tests/qemu-iotests/046 b/tests/qemu-iotests/046
-index 88b3363c19..5f96c48ba8 100755
---- a/tests/qemu-iotests/046
-+++ b/tests/qemu-iotests/046
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto aio quick
- #
- # Test concurrent cluster allocations
- #
-diff --git a/tests/qemu-iotests/047 b/tests/qemu-iotests/047
-index 4528465fb0..8dd21e0a81 100755
---- a/tests/qemu-iotests/047
-+++ b/tests/qemu-iotests/047
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Regression test for commit b7ab0fea (which was a corruption fix,
- # despite the commit message claiming otherwise)
-diff --git a/tests/qemu-iotests/048 b/tests/qemu-iotests/048
-index 2af6b74b41..bf8e4bf528 100755
---- a/tests/qemu-iotests/048
-+++ b/tests/qemu-iotests/048
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: img auto quick
- ##
- ## qemu-img compare test
- ##
-diff --git a/tests/qemu-iotests/049 b/tests/qemu-iotests/049
-index 82b1e6c202..ed12fa49d7 100755
---- a/tests/qemu-iotests/049
-+++ b/tests/qemu-iotests/049
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Check qemu-img option parsing
- #
-diff --git a/tests/qemu-iotests/050 b/tests/qemu-iotests/050
-index 4b0a390c43..5ec2321bde 100755
---- a/tests/qemu-iotests/050
-+++ b/tests/qemu-iotests/050
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test qemu-img rebase with zero clusters
- #
-diff --git a/tests/qemu-iotests/051 b/tests/qemu-iotests/051
-index bee26075b2..7cbd1415ce 100755
---- a/tests/qemu-iotests/051
-+++ b/tests/qemu-iotests/051
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test command line configuration of block devices and driver-specific options
- #
-diff --git a/tests/qemu-iotests/052 b/tests/qemu-iotests/052
-index 8d5c10601f..2f23ac9b65 100755
---- a/tests/qemu-iotests/052
-+++ b/tests/qemu-iotests/052
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test bdrv_pread/bdrv_pwrite using BDRV_O_SNAPSHOT
- #
-diff --git a/tests/qemu-iotests/053 b/tests/qemu-iotests/053
-index 71d299c4f9..9a2958d42d 100755
---- a/tests/qemu-iotests/053
-+++ b/tests/qemu-iotests/053
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qemu-img convert when image length is not a multiple of cluster size
- #
-diff --git a/tests/qemu-iotests/054 b/tests/qemu-iotests/054
-index a8905b60d0..a796f565e0 100755
---- a/tests/qemu-iotests/054
-+++ b/tests/qemu-iotests/054
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test huge qcow2 images
- #
-diff --git a/tests/qemu-iotests/055 b/tests/qemu-iotests/055
-index 4d3744b0d3..5d6b607051 100755
---- a/tests/qemu-iotests/055
-+++ b/tests/qemu-iotests/055
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests for drive-backup and blockdev-backup
- #
-diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
-index 052456aa00..0e6b8591e7 100755
---- a/tests/qemu-iotests/056
-+++ b/tests/qemu-iotests/056
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw backing
- #
- # Tests for drive-backup
- #
-diff --git a/tests/qemu-iotests/057 b/tests/qemu-iotests/057
-index a8b4bb60e0..b0d431999e 100755
---- a/tests/qemu-iotests/057
-+++ b/tests/qemu-iotests/057
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests for internal snapshot.
- #
-diff --git a/tests/qemu-iotests/058 b/tests/qemu-iotests/058
-index d84740ed9f..ce35ff4ee0 100755
---- a/tests/qemu-iotests/058
-+++ b/tests/qemu-iotests/058
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test export internal snapshot by qemu-nbd, convert it by qemu-img.
- #
-diff --git a/tests/qemu-iotests/059 b/tests/qemu-iotests/059
-index dcc442be9f..65c0c32b26 100755
---- a/tests/qemu-iotests/059
-+++ b/tests/qemu-iotests/059
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for vmdk
- #
-diff --git a/tests/qemu-iotests/060 b/tests/qemu-iotests/060
-index 94c0d5accc..6742e9195a 100755
---- a/tests/qemu-iotests/060
-+++ b/tests/qemu-iotests/060
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for image corruption (overlapping data structures) in qcow2
- #
-diff --git a/tests/qemu-iotests/061 b/tests/qemu-iotests/061
-index 5747beb7ed..e26d94a0df 100755
---- a/tests/qemu-iotests/061
-+++ b/tests/qemu-iotests/061
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test case for image option amendment in qcow2.
- #
-diff --git a/tests/qemu-iotests/062 b/tests/qemu-iotests/062
-index f26b88df9d..321252298d 100755
---- a/tests/qemu-iotests/062
-+++ b/tests/qemu-iotests/062
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for snapshotting images with unallocated zero clusters in
- # qcow2
-diff --git a/tests/qemu-iotests/063 b/tests/qemu-iotests/063
-index c750b3806e..3a44758053 100755
---- a/tests/qemu-iotests/063
-+++ b/tests/qemu-iotests/063
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # test of qemu-img convert -n - convert without creation
- #
-diff --git a/tests/qemu-iotests/064 b/tests/qemu-iotests/064
-index 90673186ec..71fc575b21 100755
---- a/tests/qemu-iotests/064
-+++ b/tests/qemu-iotests/064
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test VHDX read/write from a sample image created with Hyper-V
- #
-diff --git a/tests/qemu-iotests/065 b/tests/qemu-iotests/065
-index 29a7f7ad60..3c2ca27627 100755
---- a/tests/qemu-iotests/065
-+++ b/tests/qemu-iotests/065
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test for additional information emitted by qemu-img info on qcow2
- # images
-diff --git a/tests/qemu-iotests/066 b/tests/qemu-iotests/066
-index a4ac613f8e..a780ed7ab5 100755
---- a/tests/qemu-iotests/066
-+++ b/tests/qemu-iotests/066
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for preallocated zero clusters in qcow2
- #
-diff --git a/tests/qemu-iotests/068 b/tests/qemu-iotests/068
-index ccd1a9f1db..03e03508a6 100755
---- a/tests/qemu-iotests/068
-+++ b/tests/qemu-iotests/068
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for loading a saved VM state from a qcow2 image
- #
-diff --git a/tests/qemu-iotests/069 b/tests/qemu-iotests/069
-index a4da83b2d9..222dcba741 100755
---- a/tests/qemu-iotests/069
-+++ b/tests/qemu-iotests/069
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for deleting a backing file
- #
-diff --git a/tests/qemu-iotests/070 b/tests/qemu-iotests/070
-index cb0f927c16..b181e00f9b 100755
---- a/tests/qemu-iotests/070
-+++ b/tests/qemu-iotests/070
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test VHDX log replay from an image with a journal that needs to be
- # replayed
-diff --git a/tests/qemu-iotests/071 b/tests/qemu-iotests/071
-index 88faebcc1d..1d92f7f4a6 100755
---- a/tests/qemu-iotests/071
-+++ b/tests/qemu-iotests/071
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for the QMP blkdebug and blkverify interfaces
- #
-diff --git a/tests/qemu-iotests/072 b/tests/qemu-iotests/072
-index f0b73e7e65..c492ab8a78 100755
---- a/tests/qemu-iotests/072
-+++ b/tests/qemu-iotests/072
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for nested image formats
- #
-diff --git a/tests/qemu-iotests/073 b/tests/qemu-iotests/073
-index 68517821e8..90afd420bd 100755
---- a/tests/qemu-iotests/073
-+++ b/tests/qemu-iotests/073
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test count_contiguous_clusters in qcow2
- #
-diff --git a/tests/qemu-iotests/074 b/tests/qemu-iotests/074
-index db03edf0b0..c32c94b50d 100755
---- a/tests/qemu-iotests/074
-+++ b/tests/qemu-iotests/074
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- ##
- ## qemu-img compare test (qcow2 only ones)
- ##
-diff --git a/tests/qemu-iotests/075 b/tests/qemu-iotests/075
-index 389d5675fa..ca2ed2a05c 100755
---- a/tests/qemu-iotests/075
-+++ b/tests/qemu-iotests/075
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # cloop format input validation tests
- #
-diff --git a/tests/qemu-iotests/076 b/tests/qemu-iotests/076
-index 0d405ef3f2..1a8927d765 100755
---- a/tests/qemu-iotests/076
-+++ b/tests/qemu-iotests/076
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: io
- #
- # parallels format input validation tests
- #
-diff --git a/tests/qemu-iotests/077 b/tests/qemu-iotests/077
-index c284952082..fbb90d8036 100755
---- a/tests/qemu-iotests/077
-+++ b/tests/qemu-iotests/077
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test concurrent pread/pwrite
- #
-diff --git a/tests/qemu-iotests/078 b/tests/qemu-iotests/078
-index 54fc654d8e..0b48b7f137 100755
---- a/tests/qemu-iotests/078
-+++ b/tests/qemu-iotests/078
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # bochs format input validation tests
- #
-diff --git a/tests/qemu-iotests/079 b/tests/qemu-iotests/079
-index 3642b51feb..e00a3cda2f 100755
---- a/tests/qemu-iotests/079
-+++ b/tests/qemu-iotests/079
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test qcow2 preallocation with different cluster_sizes
- #
-diff --git a/tests/qemu-iotests/080 b/tests/qemu-iotests/080
-index 7588c63b6c..04ef826960 100755
---- a/tests/qemu-iotests/080
-+++ b/tests/qemu-iotests/080
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # qcow2 format input validation tests
- #
-diff --git a/tests/qemu-iotests/081 b/tests/qemu-iotests/081
-index 537d40dfd5..a8185036cb 100755
---- a/tests/qemu-iotests/081
-+++ b/tests/qemu-iotests/081
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test Quorum block driver
- #
-diff --git a/tests/qemu-iotests/082 b/tests/qemu-iotests/082
-index 2135581867..021b9bef06 100755
---- a/tests/qemu-iotests/082
-+++ b/tests/qemu-iotests/082
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-img command line parsing
- #
-diff --git a/tests/qemu-iotests/083 b/tests/qemu-iotests/083
-index 10fdfc8ebb..bc32b537b2 100755
---- a/tests/qemu-iotests/083
-+++ b/tests/qemu-iotests/083
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test NBD client unexpected disconnect
- #
-diff --git a/tests/qemu-iotests/084 b/tests/qemu-iotests/084
-index c29d7395e9..e51e91a7c8 100755
---- a/tests/qemu-iotests/084
-+++ b/tests/qemu-iotests/084
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: img quick
- #
- # Test case for VDI header corruption; image too large, and too many blocks.
- # Also simple test for creating dynamic and static VDI images.
-diff --git a/tests/qemu-iotests/085 b/tests/qemu-iotests/085
-index e99eb44581..d557522943 100755
---- a/tests/qemu-iotests/085
-+++ b/tests/qemu-iotests/085
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Live snapshot tests
- #
-diff --git a/tests/qemu-iotests/086 b/tests/qemu-iotests/086
-index fea1a7bd8a..c055e7bfe1 100755
---- a/tests/qemu-iotests/086
-+++ b/tests/qemu-iotests/086
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qemu-img progress output
- #
-diff --git a/tests/qemu-iotests/087 b/tests/qemu-iotests/087
-index 678e748c58..edd43f1a28 100755
---- a/tests/qemu-iotests/087
-+++ b/tests/qemu-iotests/087
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test unsupported blockdev-add cases
- #
-diff --git a/tests/qemu-iotests/088 b/tests/qemu-iotests/088
-index ef1163346c..e3102fe888 100755
---- a/tests/qemu-iotests/088
-+++ b/tests/qemu-iotests/088
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # vpc (VHD) format input validation tests
- #
-diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
-index 66c5415abe..686138ce99 100755
---- a/tests/qemu-iotests/089
-+++ b/tests/qemu-iotests/089
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for support of JSON filenames
- #
-diff --git a/tests/qemu-iotests/090 b/tests/qemu-iotests/090
-index 1246e4f910..cda38eeef2 100755
---- a/tests/qemu-iotests/090
-+++ b/tests/qemu-iotests/090
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test for discarding compressed clusters on qcow2 images
- #
-diff --git a/tests/qemu-iotests/091 b/tests/qemu-iotests/091
-index 68fbfd777b..e5eb25c11a 100755
---- a/tests/qemu-iotests/091
-+++ b/tests/qemu-iotests/091
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw migration quick
- #
- # Live migration test
- #
-diff --git a/tests/qemu-iotests/092 b/tests/qemu-iotests/092
-index 40ec62b6f1..bfa116d191 100755
---- a/tests/qemu-iotests/092
-+++ b/tests/qemu-iotests/092
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # qcow1 format input validation tests
- #
-diff --git a/tests/qemu-iotests/093 b/tests/qemu-iotests/093
-index 32ded11430..7745cb04b6 100755
---- a/tests/qemu-iotests/093
-+++ b/tests/qemu-iotests/093
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: throttle
- #
- # Tests for IO throttling
- #
-diff --git a/tests/qemu-iotests/094 b/tests/qemu-iotests/094
-index 2d3e1004d3..a295fb20ef 100755
---- a/tests/qemu-iotests/094
-+++ b/tests/qemu-iotests/094
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for drive-mirror to NBD
- #
-diff --git a/tests/qemu-iotests/095 b/tests/qemu-iotests/095
-index 77a5f0f3f5..00e004c45f 100755
---- a/tests/qemu-iotests/095
-+++ b/tests/qemu-iotests/095
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test for commit of larger active layer
- #
-diff --git a/tests/qemu-iotests/096 b/tests/qemu-iotests/096
-index 5915f92786..b5d7636bdc 100755
---- a/tests/qemu-iotests/096
-+++ b/tests/qemu-iotests/096
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test that snapshots move the throttling configuration to the active
- # layer
-diff --git a/tests/qemu-iotests/097 b/tests/qemu-iotests/097
-index d910a8b107..ace814ee77 100755
---- a/tests/qemu-iotests/097
-+++ b/tests/qemu-iotests/097
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing
- #
- # Commit changes into backing chains and empty the top image if the
- # backing image is not explicitly specified
-diff --git a/tests/qemu-iotests/098 b/tests/qemu-iotests/098
-index f2ccdd7909..4368c0c7b7 100755
---- a/tests/qemu-iotests/098
-+++ b/tests/qemu-iotests/098
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test qcow2's bdrv_make_empty for images without internal snapshots
- #
-diff --git a/tests/qemu-iotests/099 b/tests/qemu-iotests/099
-index 65e8e92572..2f1199ce04 100755
---- a/tests/qemu-iotests/099
-+++ b/tests/qemu-iotests/099
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test valid filenames for blkdebug and blkverify representatively for
- # other protocols (such as NBD) when queried
-diff --git a/tests/qemu-iotests/101 b/tests/qemu-iotests/101
-index a4c1b6366a..4c4a8cea11 100755
---- a/tests/qemu-iotests/101
-+++ b/tests/qemu-iotests/101
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test short file I/O
- #
-diff --git a/tests/qemu-iotests/102 b/tests/qemu-iotests/102
-index b898df436f..0dd3cee426 100755
---- a/tests/qemu-iotests/102
-+++ b/tests/qemu-iotests/102
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for qemu-io -c map and qemu-img map
- #
-diff --git a/tests/qemu-iotests/103 b/tests/qemu-iotests/103
-index 8c1ebe0443..5fee8a0119 100755
---- a/tests/qemu-iotests/103
-+++ b/tests/qemu-iotests/103
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for qcow2 metadata cache size specification
- #
-diff --git a/tests/qemu-iotests/104 b/tests/qemu-iotests/104
-index c70f28a9a1..3ebb74cf6e 100755
---- a/tests/qemu-iotests/104
-+++ b/tests/qemu-iotests/104
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test image creation with aligned and unaligned sizes
- #
-diff --git a/tests/qemu-iotests/105 b/tests/qemu-iotests/105
-index 4d55a2d3ef..d804685110 100755
---- a/tests/qemu-iotests/105
-+++ b/tests/qemu-iotests/105
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Create, read, write big image
- #
-diff --git a/tests/qemu-iotests/106 b/tests/qemu-iotests/106
-index a20659d443..9b489d64d3 100755
---- a/tests/qemu-iotests/106
-+++ b/tests/qemu-iotests/106
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test preallocated resize of raw images
- #
-diff --git a/tests/qemu-iotests/107 b/tests/qemu-iotests/107
-index 268ba27688..86dc27343e 100755
---- a/tests/qemu-iotests/107
-+++ b/tests/qemu-iotests/107
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Tests updates of the qcow2 L1 table
- #
-diff --git a/tests/qemu-iotests/108 b/tests/qemu-iotests/108
-index 5f7076fba4..6b1ddbb5b6 100755
---- a/tests/qemu-iotests/108
-+++ b/tests/qemu-iotests/108
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for repairing qcow2 images which cannot be repaired using
- # the on-disk refcount structures
-diff --git a/tests/qemu-iotests/109 b/tests/qemu-iotests/109
-index 3ffeaf3c55..e207a555f3 100755
---- a/tests/qemu-iotests/109
-+++ b/tests/qemu-iotests/109
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test writing image headers of other formats into raw images
- #
-diff --git a/tests/qemu-iotests/110 b/tests/qemu-iotests/110
-index f1813d0dfb..1fa36ccdb7 100755
---- a/tests/qemu-iotests/110
-+++ b/tests/qemu-iotests/110
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test case for relative backing file names in complex BDS trees
- #
-diff --git a/tests/qemu-iotests/111 b/tests/qemu-iotests/111
-index 3b43d1bd83..1a3d1ee741 100755
---- a/tests/qemu-iotests/111
-+++ b/tests/qemu-iotests/111
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for non-existing backing file when creating a qcow2 image
- # and not specifying the size
-diff --git a/tests/qemu-iotests/112 b/tests/qemu-iotests/112
-index 20ff5c224a..7a5b859c81 100755
---- a/tests/qemu-iotests/112
-+++ b/tests/qemu-iotests/112
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test cases for different refcount_bits values
- #
-diff --git a/tests/qemu-iotests/113 b/tests/qemu-iotests/113
-index 71a65de2e7..ee59b9a4b8 100755
---- a/tests/qemu-iotests/113
-+++ b/tests/qemu-iotests/113
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for accessing creation options on image formats and
- # protocols not supporting image creation
-diff --git a/tests/qemu-iotests/114 b/tests/qemu-iotests/114
-index 80e5e5e591..43cb0bc6c3 100755
---- a/tests/qemu-iotests/114
-+++ b/tests/qemu-iotests/114
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test invalid backing file format in qcow2 images
- #
-diff --git a/tests/qemu-iotests/115 b/tests/qemu-iotests/115
-index d254b18342..5c3f60bc1b 100755
---- a/tests/qemu-iotests/115
-+++ b/tests/qemu-iotests/115
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test case for non-self-referential qcow2 refcount blocks
- #
-diff --git a/tests/qemu-iotests/116 b/tests/qemu-iotests/116
-index 941b07a1a9..4f40fcb3d2 100755
---- a/tests/qemu-iotests/116
-+++ b/tests/qemu-iotests/116
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test error code paths for invalid QED images
- #
-diff --git a/tests/qemu-iotests/117 b/tests/qemu-iotests/117
-index f37b34f8b1..8210a0f70d 100755
---- a/tests/qemu-iotests/117
-+++ b/tests/qemu-iotests/117
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test case for shared BDS between backend trees
- #
-diff --git a/tests/qemu-iotests/118 b/tests/qemu-iotests/118
-index 2350929fd8..1a2e219057 100755
---- a/tests/qemu-iotests/118
-+++ b/tests/qemu-iotests/118
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test case for the QMP 'change' command and all other associated
- # commands
-diff --git a/tests/qemu-iotests/119 b/tests/qemu-iotests/119
-index ea6770a484..5770b50045 100755
---- a/tests/qemu-iotests/119
-+++ b/tests/qemu-iotests/119
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # NBD test case for overriding BDRV_O_PROTOCOL by explicitly specifying
- # a driver
-diff --git a/tests/qemu-iotests/120 b/tests/qemu-iotests/120
-index 2931a7550f..03d5a3ba33 100755
---- a/tests/qemu-iotests/120
-+++ b/tests/qemu-iotests/120
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Non-NBD test cases for overriding BDRV_O_PROTOCOL by explicitly
- # specifying a driver
-diff --git a/tests/qemu-iotests/121 b/tests/qemu-iotests/121
-index 90ea0db737..0abe27f9f7 100755
---- a/tests/qemu-iotests/121
-+++ b/tests/qemu-iotests/121
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test cases for qcow2 refcount table growth
- #
-diff --git a/tests/qemu-iotests/122 b/tests/qemu-iotests/122
-index 0f3d4ca851..5d550ed13e 100755
---- a/tests/qemu-iotests/122
-+++ b/tests/qemu-iotests/122
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test some qemu-img convert cases
- #
-diff --git a/tests/qemu-iotests/123 b/tests/qemu-iotests/123
-index 01b771c76e..e19111f70d 100755
---- a/tests/qemu-iotests/123
-+++ b/tests/qemu-iotests/123
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for qemu-img convert to NBD
- #
-diff --git a/tests/qemu-iotests/124 b/tests/qemu-iotests/124
-index 3705cbb6b3..3b21bc497f 100755
---- a/tests/qemu-iotests/124
-+++ b/tests/qemu-iotests/124
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw backing
- #
- # Tests for incremental drive-backup
- #
-diff --git a/tests/qemu-iotests/125 b/tests/qemu-iotests/125
-index 5720e86dce..bd390b3a99 100755
---- a/tests/qemu-iotests/125
-+++ b/tests/qemu-iotests/125
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test preallocated growth of qcow2 images
- #
-diff --git a/tests/qemu-iotests/126 b/tests/qemu-iotests/126
-index dd5a211227..92c0547746 100755
---- a/tests/qemu-iotests/126
-+++ b/tests/qemu-iotests/126
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing
- #
- # Tests handling of colons in filenames (which may be confused with protocol
- # prefixes)
-diff --git a/tests/qemu-iotests/127 b/tests/qemu-iotests/127
-index e2ac2f5536..e60476f247 100755
---- a/tests/qemu-iotests/127
-+++ b/tests/qemu-iotests/127
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Test case for mirroring with dataplane
- #
-diff --git a/tests/qemu-iotests/128 b/tests/qemu-iotests/128
-index 3606c41760..d0e00d24b1 100755
---- a/tests/qemu-iotests/128
-+++ b/tests/qemu-iotests/128
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test that opening O_DIRECT succeeds when image file I/O produces EIO
- #
-diff --git a/tests/qemu-iotests/129 b/tests/qemu-iotests/129
-index 0e13244d85..f57a2e19f6 100755
---- a/tests/qemu-iotests/129
-+++ b/tests/qemu-iotests/129
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests that "bdrv_drain_all" doesn't drain block jobs
- #
-diff --git a/tests/qemu-iotests/130 b/tests/qemu-iotests/130
-index a7b365701c..7257f09677 100755
---- a/tests/qemu-iotests/130
-+++ b/tests/qemu-iotests/130
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test that temporary backing file overrides (on the command line or in
- # blockdev-add) don't replace the original path stored in the image during
-diff --git a/tests/qemu-iotests/131 b/tests/qemu-iotests/131
-index 27870231cf..d7456cae5b 100755
---- a/tests/qemu-iotests/131
-+++ b/tests/qemu-iotests/131
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # parallels format validation tests (created by QEMU)
- #
-diff --git a/tests/qemu-iotests/132 b/tests/qemu-iotests/132
-index 39ea43067e..367ea08036 100755
---- a/tests/qemu-iotests/132
-+++ b/tests/qemu-iotests/132
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test mirror with unmap
- #
-diff --git a/tests/qemu-iotests/133 b/tests/qemu-iotests/133
-index 4070fd9457..d100ffba79 100755
---- a/tests/qemu-iotests/133
-+++ b/tests/qemu-iotests/133
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # Test for reopen
- #
-diff --git a/tests/qemu-iotests/134 b/tests/qemu-iotests/134
-index 17fe1d6ed4..ded153c0b9 100755
---- a/tests/qemu-iotests/134
-+++ b/tests/qemu-iotests/134
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
- #
-diff --git a/tests/qemu-iotests/135 b/tests/qemu-iotests/135
-index 3b3d1dc2a5..299075b4c9 100755
---- a/tests/qemu-iotests/135
-+++ b/tests/qemu-iotests/135
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test VPC open of image with large Max Table Entries value.
- #
-diff --git a/tests/qemu-iotests/136 b/tests/qemu-iotests/136
-index d59400c9fc..8fce88bd67 100755
---- a/tests/qemu-iotests/136
-+++ b/tests/qemu-iotests/136
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests for block device statistics
- #
-diff --git a/tests/qemu-iotests/137 b/tests/qemu-iotests/137
-index 7ae86892f7..1cb2fe1653 100755
---- a/tests/qemu-iotests/137
-+++ b/tests/qemu-iotests/137
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test qcow2 reopen
- #
-diff --git a/tests/qemu-iotests/138 b/tests/qemu-iotests/138
-index 1d5b0bed6d..04d0bb5487 100755
---- a/tests/qemu-iotests/138
-+++ b/tests/qemu-iotests/138
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # General test case for qcow2's image check
- #
-diff --git a/tests/qemu-iotests/139 b/tests/qemu-iotests/139
-index 1452fd24b3..e79b3c21fd 100755
---- a/tests/qemu-iotests/139
-+++ b/tests/qemu-iotests/139
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test cases for the QMP 'blockdev-del' command
- #
-diff --git a/tests/qemu-iotests/140 b/tests/qemu-iotests/140
-index 309b177e77..8a7baf4131 100755
---- a/tests/qemu-iotests/140
-+++ b/tests/qemu-iotests/140
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for ejecting a BlockBackend with an NBD server attached to it
- #
-diff --git a/tests/qemu-iotests/141 b/tests/qemu-iotests/141
-index 21aa0b42d8..115cc1691e 100755
---- a/tests/qemu-iotests/141
-+++ b/tests/qemu-iotests/141
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for ejecting BDSs with block jobs still running on them
- #
-diff --git a/tests/qemu-iotests/143 b/tests/qemu-iotests/143
-index d2349903b1..72151acf27 100755
---- a/tests/qemu-iotests/143
-+++ b/tests/qemu-iotests/143
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # Test case for connecting to a non-existing NBD export name
- #
-diff --git a/tests/qemu-iotests/144 b/tests/qemu-iotests/144
-index 4569ac0b4b..60e9ddd75f 100755
---- a/tests/qemu-iotests/144
-+++ b/tests/qemu-iotests/144
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- # Check live snapshot, followed by active commit, and another snapshot.
- #
- # This test is to catch the error case of BZ #1300209:
-diff --git a/tests/qemu-iotests/145 b/tests/qemu-iotests/145
-index 9427549651..a2ce92516d 100755
---- a/tests/qemu-iotests/145
-+++ b/tests/qemu-iotests/145
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test the combination of -incoming and snapshot=on
- #
-diff --git a/tests/qemu-iotests/146 b/tests/qemu-iotests/146
-index ddc3c1fd80..98aca96732 100755
---- a/tests/qemu-iotests/146
-+++ b/tests/qemu-iotests/146
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test VHD image format creator detection and override
- #
-diff --git a/tests/qemu-iotests/147 b/tests/qemu-iotests/147
-index d7a9f31089..47dfa62e6b 100755
---- a/tests/qemu-iotests/147
-+++ b/tests/qemu-iotests/147
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: img
- #
- # Test case for NBD's blockdev-add interface
- #
-diff --git a/tests/qemu-iotests/148 b/tests/qemu-iotests/148
-index 5e14a455b1..7ccbde4633 100755
---- a/tests/qemu-iotests/148
-+++ b/tests/qemu-iotests/148
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test the rate limit of QMP events
- #
-diff --git a/tests/qemu-iotests/149 b/tests/qemu-iotests/149
-index 852768f80a..328fd05a4c 100755
---- a/tests/qemu-iotests/149
-+++ b/tests/qemu-iotests/149
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw sudo
- #
- # Copyright (C) 2016 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/150 b/tests/qemu-iotests/150
-index 3b1f32197a..ac6930ae20 100755
---- a/tests/qemu-iotests/150
-+++ b/tests/qemu-iotests/150
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test that qemu-img convert -S 0 fully allocates the target image
- #
-diff --git a/tests/qemu-iotests/151 b/tests/qemu-iotests/151
-index f2df72c29c..182f6b5321 100755
---- a/tests/qemu-iotests/151
-+++ b/tests/qemu-iotests/151
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests for active mirroring
- #
-diff --git a/tests/qemu-iotests/152 b/tests/qemu-iotests/152
-index cc2ea09654..4e179c340f 100755
---- a/tests/qemu-iotests/152
-+++ b/tests/qemu-iotests/152
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for drive-mirror with source size unaligned to granularity
- #
-diff --git a/tests/qemu-iotests/153 b/tests/qemu-iotests/153
-index 34045ea3cf..607af59091 100755
---- a/tests/qemu-iotests/153
-+++ b/tests/qemu-iotests/153
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test image locking
- #
-diff --git a/tests/qemu-iotests/154 b/tests/qemu-iotests/154
-index 7f1c0d9bd9..dc86753533 100755
---- a/tests/qemu-iotests/154
-+++ b/tests/qemu-iotests/154
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # qcow2 specific bdrv_pwrite_zeroes tests with backing files (complements 034)
- #
-diff --git a/tests/qemu-iotests/155 b/tests/qemu-iotests/155
-index 988f986144..bafef9dd9a 100755
---- a/tests/qemu-iotests/155
-+++ b/tests/qemu-iotests/155
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test whether the backing BDSs are correct after completion of a
- # mirror block job; in "existing" modes (drive-mirror with
-diff --git a/tests/qemu-iotests/156 b/tests/qemu-iotests/156
-index 9c7878dd2d..65dcedd493 100755
---- a/tests/qemu-iotests/156
-+++ b/tests/qemu-iotests/156
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Tests oVirt-like storage migration:
- #  - Create snapshot
-diff --git a/tests/qemu-iotests/157 b/tests/qemu-iotests/157
-index 7cbac38099..0dc9ba68d2 100755
---- a/tests/qemu-iotests/157
-+++ b/tests/qemu-iotests/157
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test command line configuration of block devices with qdev
- #
-diff --git a/tests/qemu-iotests/158 b/tests/qemu-iotests/158
-index cf23742c59..a95878e4ce 100755
---- a/tests/qemu-iotests/158
-+++ b/tests/qemu-iotests/158
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test encrypted read/write using backing files
- #
-diff --git a/tests/qemu-iotests/159 b/tests/qemu-iotests/159
-index f9690053a2..4eb476d3a8 100755
---- a/tests/qemu-iotests/159
-+++ b/tests/qemu-iotests/159
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # qemu-img dd test with different block sizes
- #
-diff --git a/tests/qemu-iotests/160 b/tests/qemu-iotests/160
-index 0572b5ae9a..7984a9c6f7 100755
---- a/tests/qemu-iotests/160
-+++ b/tests/qemu-iotests/160
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # qemu-img dd test for the skip option
- #
-diff --git a/tests/qemu-iotests/161 b/tests/qemu-iotests/161
-index e270976d87..ae22e555e3 100755
---- a/tests/qemu-iotests/161
-+++ b/tests/qemu-iotests/161
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test reopening a backing image after block-stream and block-commit
- #
-diff --git a/tests/qemu-iotests/162 b/tests/qemu-iotests/162
-index c0053ed975..cf17f494d8 100755
---- a/tests/qemu-iotests/162
-+++ b/tests/qemu-iotests/162
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test case for specifying runtime options of the wrong type to some
- # block drivers
-diff --git a/tests/qemu-iotests/163 b/tests/qemu-iotests/163
-index 5a3cc840a5..dedce8ef43 100755
---- a/tests/qemu-iotests/163
-+++ b/tests/qemu-iotests/163
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Tests for shrinking images
- #
-diff --git a/tests/qemu-iotests/165 b/tests/qemu-iotests/165
-index fb56a769b4..abc4ffadd5 100755
---- a/tests/qemu-iotests/165
-+++ b/tests/qemu-iotests/165
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for persistent dirty bitmaps.
- #
-diff --git a/tests/qemu-iotests/169 b/tests/qemu-iotests/169
-index 40afb15299..a5c7bc83e0 100755
---- a/tests/qemu-iotests/169
-+++ b/tests/qemu-iotests/169
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw migration
- #
- # Tests for dirty bitmaps migration.
- #
-diff --git a/tests/qemu-iotests/170 b/tests/qemu-iotests/170
-index 6c8f0e8085..41387e4d66 100755
---- a/tests/qemu-iotests/170
-+++ b/tests/qemu-iotests/170
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # qemu-img dd test
- #
-diff --git a/tests/qemu-iotests/171 b/tests/qemu-iotests/171
-index 341064a1c6..babfe98753 100755
---- a/tests/qemu-iotests/171
-+++ b/tests/qemu-iotests/171
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test 'offset' and 'size' options of the raw driver. Make sure we can't
- # (or can) read and write outside of the image size.
-diff --git a/tests/qemu-iotests/172 b/tests/qemu-iotests/172
-index 3abfa72948..b3ecf195f1 100755
---- a/tests/qemu-iotests/172
-+++ b/tests/qemu-iotests/172
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto
- #
- # Test floppy configuration
- #
-diff --git a/tests/qemu-iotests/173 b/tests/qemu-iotests/173
-index ec6d1705e5..9594f3c5ea 100755
---- a/tests/qemu-iotests/173
-+++ b/tests/qemu-iotests/173
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test QAPI commands looking up protocol based images with relative
- # filename backing strings
-diff --git a/tests/qemu-iotests/174 b/tests/qemu-iotests/174
-index e2f14a38c6..1a141fbc0f 100755
---- a/tests/qemu-iotests/174
-+++ b/tests/qemu-iotests/174
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto
- #
- # Test that qemu-io fail with non-zero exit code
- #
-diff --git a/tests/qemu-iotests/175 b/tests/qemu-iotests/175
-index 00a626aa63..6f4780ec40 100755
---- a/tests/qemu-iotests/175
-+++ b/tests/qemu-iotests/175
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test creating raw image preallocation mode
- #
-diff --git a/tests/qemu-iotests/176 b/tests/qemu-iotests/176
-index 2565ff12ee..d79ef91992 100755
---- a/tests/qemu-iotests/176
-+++ b/tests/qemu-iotests/176
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing
- #
- # Commit changes into backing chains and empty the top image if the
- # backing image is not explicitly specified.
-diff --git a/tests/qemu-iotests/177 b/tests/qemu-iotests/177
-index 5d4a77a6ab..7cf36117c5 100755
---- a/tests/qemu-iotests/177
-+++ b/tests/qemu-iotests/177
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test corner cases with unusual block geometries
- #
-diff --git a/tests/qemu-iotests/178 b/tests/qemu-iotests/178
-index f09b27caac..3b1a7adce4 100755
---- a/tests/qemu-iotests/178
-+++ b/tests/qemu-iotests/178
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: img
- #
- # qemu-img measure sub-command tests
- #
-diff --git a/tests/qemu-iotests/179 b/tests/qemu-iotests/179
-index 11a20cb1bf..01f213755a 100755
---- a/tests/qemu-iotests/179
-+++ b/tests/qemu-iotests/179
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test case for write zeroes with unmap
- #
-diff --git a/tests/qemu-iotests/181 b/tests/qemu-iotests/181
-index 438c2dcd80..820c53ef35 100755
---- a/tests/qemu-iotests/181
-+++ b/tests/qemu-iotests/181
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto migration quick
- #
- # Test postcopy live migration with shared storage
- #
-diff --git a/tests/qemu-iotests/182 b/tests/qemu-iotests/182
-index 56a2dd58e6..55a0384c08 100755
---- a/tests/qemu-iotests/182
-+++ b/tests/qemu-iotests/182
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test image locking for POSIX locks
- #
-diff --git a/tests/qemu-iotests/183 b/tests/qemu-iotests/183
-index acdbefa310..da42030e4e 100755
---- a/tests/qemu-iotests/183
-+++ b/tests/qemu-iotests/183
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw migration quick
- #
- # Test old-style block migration (migrate -b)
- #
-diff --git a/tests/qemu-iotests/184 b/tests/qemu-iotests/184
-index eebb53faed..513d167098 100755
---- a/tests/qemu-iotests/184
-+++ b/tests/qemu-iotests/184
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test I/O throttle block filter driver interface
- #
-diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
-index fd5e6ebe11..7bc8fe5767 100755
---- a/tests/qemu-iotests/185
-+++ b/tests/qemu-iotests/185
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test exiting qemu while jobs are still running
- #
-diff --git a/tests/qemu-iotests/186 b/tests/qemu-iotests/186
-index 3ea0442d44..66f2418182 100755
---- a/tests/qemu-iotests/186
-+++ b/tests/qemu-iotests/186
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test 'info block' with all kinds of configurations
- #
-diff --git a/tests/qemu-iotests/187 b/tests/qemu-iotests/187
-index c6e1dc57a0..46fd5678c7 100755
---- a/tests/qemu-iotests/187
-+++ b/tests/qemu-iotests/187
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test switching between read-only and read-write
- #
-diff --git a/tests/qemu-iotests/188 b/tests/qemu-iotests/188
-index 13b225fded..ce087d1873 100755
---- a/tests/qemu-iotests/188
-+++ b/tests/qemu-iotests/188
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test encrypted read/write using plain bdrv_pread/bdrv_pwrite
- #
-diff --git a/tests/qemu-iotests/189 b/tests/qemu-iotests/189
-index 3e5ded14c6..4e463385b2 100755
---- a/tests/qemu-iotests/189
-+++ b/tests/qemu-iotests/189
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test encrypted read/write using backing files
- #
-diff --git a/tests/qemu-iotests/190 b/tests/qemu-iotests/190
-index c22d8d64f9..7fb8447354 100755
---- a/tests/qemu-iotests/190
-+++ b/tests/qemu-iotests/190
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # qemu-img measure sub-command tests on huge qcow2 files
- #
-diff --git a/tests/qemu-iotests/191 b/tests/qemu-iotests/191
-index d17462e1e4..c62486d151 100755
---- a/tests/qemu-iotests/191
-+++ b/tests/qemu-iotests/191
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test commit block job where top has two parents
- #
-diff --git a/tests/qemu-iotests/192 b/tests/qemu-iotests/192
-index d2ba55dd90..d809187fca 100755
---- a/tests/qemu-iotests/192
-+++ b/tests/qemu-iotests/192
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test NBD export with -incoming (non-shared storage migration use case from
- # libvirt)
-diff --git a/tests/qemu-iotests/194 b/tests/qemu-iotests/194
-index 7a4863ab18..3889266afa 100755
---- a/tests/qemu-iotests/194
-+++ b/tests/qemu-iotests/194
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw migration quick
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/195 b/tests/qemu-iotests/195
-index 2351d55fe1..0203c067de 100755
---- a/tests/qemu-iotests/195
-+++ b/tests/qemu-iotests/195
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test change-backing-file command
- #
-diff --git a/tests/qemu-iotests/196 b/tests/qemu-iotests/196
-index e8fcf37273..2451515094 100755
---- a/tests/qemu-iotests/196
-+++ b/tests/qemu-iotests/196
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick migration
- #
- # Test clearing unknown autoclear_features flag by qcow2 after
- # migration. This test mimics migration to older qemu.
-diff --git a/tests/qemu-iotests/197 b/tests/qemu-iotests/197
-index a161c89816..a2547bc280 100755
---- a/tests/qemu-iotests/197
-+++ b/tests/qemu-iotests/197
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for copy-on-read into qcow2
- #
-diff --git a/tests/qemu-iotests/198 b/tests/qemu-iotests/198
-index 46f0c54537..b333a8f281 100755
---- a/tests/qemu-iotests/198
-+++ b/tests/qemu-iotests/198
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test commit of encrypted qcow2 files
- #
-diff --git a/tests/qemu-iotests/199 b/tests/qemu-iotests/199
-index 58fad872a1..dbf10e58d3 100755
---- a/tests/qemu-iotests/199
-+++ b/tests/qemu-iotests/199
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw migration
- #
- # Tests for dirty bitmaps postcopy migration.
- #
-diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-index 59f7854b9f..c72cd72e56 100755
---- a/tests/qemu-iotests/200
-+++ b/tests/qemu-iotests/200
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Block job co-routine race condition test.
- #
-diff --git a/tests/qemu-iotests/201 b/tests/qemu-iotests/201
-index 483eb189c5..1b8eb51d8f 100755
---- a/tests/qemu-iotests/201
-+++ b/tests/qemu-iotests/201
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw migration quick
- #
- # Test savevm and loadvm after live migration with postcopy flag
- #
-diff --git a/tests/qemu-iotests/202 b/tests/qemu-iotests/202
-index e3900a44d1..8eb5f32d15 100755
---- a/tests/qemu-iotests/202
-+++ b/tests/qemu-iotests/202
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/203 b/tests/qemu-iotests/203
-index 4b4bd3307d..ea30e50497 100755
---- a/tests/qemu-iotests/203
-+++ b/tests/qemu-iotests/203
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw auto migration quick
- #
- # Copyright (C) 2017 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/204 b/tests/qemu-iotests/204
-index 6770fa9b96..0916208089 100755
---- a/tests/qemu-iotests/204
-+++ b/tests/qemu-iotests/204
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test corner cases with unusual block geometries
- #
-diff --git a/tests/qemu-iotests/205 b/tests/qemu-iotests/205
-index 43432cb599..c0e107328f 100755
---- a/tests/qemu-iotests/205
-+++ b/tests/qemu-iotests/205
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for qmp command nbd-server-remove.
- #
-diff --git a/tests/qemu-iotests/206 b/tests/qemu-iotests/206
-index 11bc51f256..80f16511a3 100755
---- a/tests/qemu-iotests/206
-+++ b/tests/qemu-iotests/206
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test qcow2 and file image creation
- #
-diff --git a/tests/qemu-iotests/207 b/tests/qemu-iotests/207
-index a6621410da..f9f3fd7131 100755
---- a/tests/qemu-iotests/207
-+++ b/tests/qemu-iotests/207
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test ssh image creation
- #
-diff --git a/tests/qemu-iotests/208 b/tests/qemu-iotests/208
-index 54aa4be273..6117f165fa 100755
---- a/tests/qemu-iotests/208
-+++ b/tests/qemu-iotests/208
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/209 b/tests/qemu-iotests/209
-index 8c804f4a30..ff7efea11b 100755
---- a/tests/qemu-iotests/209
-+++ b/tests/qemu-iotests/209
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for NBD BLOCK_STATUS extension
- #
-diff --git a/tests/qemu-iotests/210 b/tests/qemu-iotests/210
-index 7bf591f313..5a62ed4dd1 100755
---- a/tests/qemu-iotests/210
-+++ b/tests/qemu-iotests/210
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test luks and file image creation
- #
-diff --git a/tests/qemu-iotests/211 b/tests/qemu-iotests/211
-index 4969edb00c..f52cadade1 100755
---- a/tests/qemu-iotests/211
-+++ b/tests/qemu-iotests/211
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test VDI and file image creation
- #
-diff --git a/tests/qemu-iotests/212 b/tests/qemu-iotests/212
-index 45d08842bb..d4af0c4ac8 100755
---- a/tests/qemu-iotests/212
-+++ b/tests/qemu-iotests/212
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test parallels and file image creation
- #
-diff --git a/tests/qemu-iotests/213 b/tests/qemu-iotests/213
-index cf638eb927..78d839ab64 100755
---- a/tests/qemu-iotests/213
-+++ b/tests/qemu-iotests/213
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test vhdx and file image creation
- #
-diff --git a/tests/qemu-iotests/214 b/tests/qemu-iotests/214
-index af677d90b8..4c0e8f2b48 100755
---- a/tests/qemu-iotests/214
-+++ b/tests/qemu-iotests/214
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test qcow2 image compression
- #
-diff --git a/tests/qemu-iotests/215 b/tests/qemu-iotests/215
-index f99bae78c7..d464596f14 100755
---- a/tests/qemu-iotests/215
-+++ b/tests/qemu-iotests/215
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for copy-on-read into qcow2, using the COR filter driver
- #
-diff --git a/tests/qemu-iotests/216 b/tests/qemu-iotests/216
-index f93c61aad6..c02f8d2880 100755
---- a/tests/qemu-iotests/216
-+++ b/tests/qemu-iotests/216
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Copy-on-read tests using a COR filter node
- #
-diff --git a/tests/qemu-iotests/217 b/tests/qemu-iotests/217
-index d89116ccad..df370549f8 100755
---- a/tests/qemu-iotests/217
-+++ b/tests/qemu-iotests/217
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # I/O errors when working with internal qcow2 snapshots, and repairing
- # the result
-diff --git a/tests/qemu-iotests/218 b/tests/qemu-iotests/218
-index 5586870456..ae7c4fb187 100755
---- a/tests/qemu-iotests/218
-+++ b/tests/qemu-iotests/218
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # This test covers what happens when a mirror block job is cancelled
- # in various phases of its existence.
-diff --git a/tests/qemu-iotests/219 b/tests/qemu-iotests/219
-index db272c5249..16c3ca7fff 100755
---- a/tests/qemu-iotests/219
-+++ b/tests/qemu-iotests/219
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/220 b/tests/qemu-iotests/220
-index a9259b7127..126749c707 100755
---- a/tests/qemu-iotests/220
-+++ b/tests/qemu-iotests/220
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # max limits on compression in huge qcow2 files
- #
-diff --git a/tests/qemu-iotests/221 b/tests/qemu-iotests/221
-index 0e9096fec7..2db84a3962 100755
---- a/tests/qemu-iotests/221
-+++ b/tests/qemu-iotests/221
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-img vs. unaligned images
- # (See also 253, which is the O_DIRECT version)
-diff --git a/tests/qemu-iotests/222 b/tests/qemu-iotests/222
-index 14d67c875b..b48afe623e 100755
---- a/tests/qemu-iotests/222
-+++ b/tests/qemu-iotests/222
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # This test covers the basic fleecing workflow, which provides a
- # point-in-time snapshot of a node that can be queried over NBD.
-diff --git a/tests/qemu-iotests/223 b/tests/qemu-iotests/223
-index d68bc3cb6f..da87f2f4a2 100755
---- a/tests/qemu-iotests/223
-+++ b/tests/qemu-iotests/223
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test reading dirty bitmap over NBD
- #
-diff --git a/tests/qemu-iotests/224 b/tests/qemu-iotests/224
-index 017b0685ba..38dd153625 100755
---- a/tests/qemu-iotests/224
-+++ b/tests/qemu-iotests/224
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test json:{} filenames with qemu-internal BDSs
- # (the one of commit, to be precise)
-diff --git a/tests/qemu-iotests/225 b/tests/qemu-iotests/225
-index 0186ec8156..c0053790db 100755
---- a/tests/qemu-iotests/225
-+++ b/tests/qemu-iotests/225
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test vmdk backing file correlation
- #
-diff --git a/tests/qemu-iotests/226 b/tests/qemu-iotests/226
-index c1e1fb2b1c..6a9adb4a0b 100755
---- a/tests/qemu-iotests/226
-+++ b/tests/qemu-iotests/226
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # This test covers expected filetypes for the file, host_cdrom and
- # host_device drivers.
-diff --git a/tests/qemu-iotests/227 b/tests/qemu-iotests/227
-index 637d7c3726..7e45a47ac6 100755
---- a/tests/qemu-iotests/227
-+++ b/tests/qemu-iotests/227
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test query-blockstats with different ways to create a BB
- #
-diff --git a/tests/qemu-iotests/228 b/tests/qemu-iotests/228
-index 266fce6cda..a5eda2e149 100755
---- a/tests/qemu-iotests/228
-+++ b/tests/qemu-iotests/228
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test for when a backing file is considered overridden (thus, a
- # json:{} filename is generated for the overlay) and when it is not
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-index 89a5359f32..4983aaddde 100755
---- a/tests/qemu-iotests/229
-+++ b/tests/qemu-iotests/229
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # Test for force canceling a running blockjob that is paused in
- # an error state.
-diff --git a/tests/qemu-iotests/231 b/tests/qemu-iotests/231
-index c0b053ac30..0f66d0ca36 100755
---- a/tests/qemu-iotests/231
-+++ b/tests/qemu-iotests/231
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test legacy and modern option parsing for rbd/ceph.  This will not
- # actually connect to a ceph server, but rather looks for the appropriate
-diff --git a/tests/qemu-iotests/232 b/tests/qemu-iotests/232
-index 685356ac3b..b30faaa218 100755
---- a/tests/qemu-iotests/232
-+++ b/tests/qemu-iotests/232
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test for auto-read-only
- #
-diff --git a/tests/qemu-iotests/233 b/tests/qemu-iotests/233
-index a5c17c3963..7ce5764903 100755
---- a/tests/qemu-iotests/233
-+++ b/tests/qemu-iotests/233
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test NBD TLS certificate / authorization integration
- #
-diff --git a/tests/qemu-iotests/234 b/tests/qemu-iotests/234
-index 73c899ddae..cb5f1753e0 100755
---- a/tests/qemu-iotests/234
-+++ b/tests/qemu-iotests/234
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: quick migration
- #
- # Copyright (C) 2018 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/235 b/tests/qemu-iotests/235
-index d1b10ac36b..20d16dbf38 100755
---- a/tests/qemu-iotests/235
-+++ b/tests/qemu-iotests/235
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: quick
- #
- # Simple mirror test
- #
-diff --git a/tests/qemu-iotests/236 b/tests/qemu-iotests/236
-index 6f5cee2444..f6c44517d6 100755
---- a/tests/qemu-iotests/236
-+++ b/tests/qemu-iotests/236
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: quick
- #
- # Test bitmap merges.
- #
-diff --git a/tests/qemu-iotests/237 b/tests/qemu-iotests/237
-index 5b21ad3509..43dfd3bd40 100755
---- a/tests/qemu-iotests/237
-+++ b/tests/qemu-iotests/237
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test vmdk and file image creation
- #
-diff --git a/tests/qemu-iotests/238 b/tests/qemu-iotests/238
-index b8fcf15a1f..8a10af57f1 100755
---- a/tests/qemu-iotests/238
-+++ b/tests/qemu-iotests/238
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: quick
- #
- # Regression test for throttle group member unregister segfault with iothread
- #
-diff --git a/tests/qemu-iotests/239 b/tests/qemu-iotests/239
-index b0991ffe59..4f0037148d 100755
---- a/tests/qemu-iotests/239
-+++ b/tests/qemu-iotests/239
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test case for dmg
- #
-diff --git a/tests/qemu-iotests/240 b/tests/qemu-iotests/240
-index 8b4337b58d..d9428e50bc 100755
---- a/tests/qemu-iotests/240
-+++ b/tests/qemu-iotests/240
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # Test hot plugging and unplugging with iothreads
- #
-diff --git a/tests/qemu-iotests/241 b/tests/qemu-iotests/241
-index 8dae8d39e4..c962c8b607 100755
---- a/tests/qemu-iotests/241
-+++ b/tests/qemu-iotests/241
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-nbd vs. unaligned images
- #
-diff --git a/tests/qemu-iotests/242 b/tests/qemu-iotests/242
-index 64f1bd95e4..d89e1c391e 100755
---- a/tests/qemu-iotests/242
-+++ b/tests/qemu-iotests/242
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test for qcow2 bitmap printed information
- #
-diff --git a/tests/qemu-iotests/243 b/tests/qemu-iotests/243
-index 17388a4644..8bbb510120 100755
---- a/tests/qemu-iotests/243
-+++ b/tests/qemu-iotests/243
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qcow2 preallocation
- #
-diff --git a/tests/qemu-iotests/244 b/tests/qemu-iotests/244
-index f2b2dddf1c..a46b441627 100755
---- a/tests/qemu-iotests/244
-+++ b/tests/qemu-iotests/244
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qcow2 with external data files
- #
-diff --git a/tests/qemu-iotests/245 b/tests/qemu-iotests/245
-index e60c8326d3..86f00f290f 100755
---- a/tests/qemu-iotests/245
-+++ b/tests/qemu-iotests/245
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test cases for the QMP 'x-blockdev-reopen' command
- #
-diff --git a/tests/qemu-iotests/246 b/tests/qemu-iotests/246
-index 58a479cc1f..fa3102c546 100755
---- a/tests/qemu-iotests/246
-+++ b/tests/qemu-iotests/246
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test persistent bitmap resizing.
- #
-diff --git a/tests/qemu-iotests/247 b/tests/qemu-iotests/247
-index 87e37b39e2..70b9a42a33 100755
---- a/tests/qemu-iotests/247
-+++ b/tests/qemu-iotests/247
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test for auto-read-only with commit block job
- #
-diff --git a/tests/qemu-iotests/248 b/tests/qemu-iotests/248
-index 18ba03467e..4daaed1530 100755
---- a/tests/qemu-iotests/248
-+++ b/tests/qemu-iotests/248
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test resume mirror after auto pause on ENOSPC
- #
-diff --git a/tests/qemu-iotests/249 b/tests/qemu-iotests/249
-index 68f13ed328..4d735f484c 100755
---- a/tests/qemu-iotests/249
-+++ b/tests/qemu-iotests/249
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test that a backing image is put back in read-only mode after
- # block-commit (both when it fails and when it succeeds).
-diff --git a/tests/qemu-iotests/250 b/tests/qemu-iotests/250
-index 9bb6b94d74..b9ee43214a 100755
---- a/tests/qemu-iotests/250
-+++ b/tests/qemu-iotests/250
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test big discard in qcow2 shrink
- #
-diff --git a/tests/qemu-iotests/251 b/tests/qemu-iotests/251
-index 294773bdc1..8bdec37d32 100755
---- a/tests/qemu-iotests/251
-+++ b/tests/qemu-iotests/251
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test qemu-img convert --salvage
- #
-diff --git a/tests/qemu-iotests/252 b/tests/qemu-iotests/252
-index 6662f4c9de..49e7841165 100755
---- a/tests/qemu-iotests/252
-+++ b/tests/qemu-iotests/252
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto backing quick
- #
- # Tests for rebasing COW images that require zero cluster support
- #
-diff --git a/tests/qemu-iotests/253 b/tests/qemu-iotests/253
-index d88d5afa45..35039d20a8 100755
---- a/tests/qemu-iotests/253
-+++ b/tests/qemu-iotests/253
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-img vs. unaligned images; O_DIRECT version
- # (Originates from 221)
-diff --git a/tests/qemu-iotests/254 b/tests/qemu-iotests/254
-index 150e58be8e..49da948407 100755
---- a/tests/qemu-iotests/254
-+++ b/tests/qemu-iotests/254
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw backing quick
- #
- # Test external snapshot with bitmap copying and moving.
- #
-diff --git a/tests/qemu-iotests/255 b/tests/qemu-iotests/255
-index 8f08f741da..c43aa9c67a 100755
---- a/tests/qemu-iotests/255
-+++ b/tests/qemu-iotests/255
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test commit job graph modifications while requests are active
- #
-diff --git a/tests/qemu-iotests/256 b/tests/qemu-iotests/256
-index db8d6f31cf..8d82a1dd86 100755
---- a/tests/qemu-iotests/256
-+++ b/tests/qemu-iotests/256
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw auto quick
- #
- # Test incremental/backup across iothread contexts
- #
-diff --git a/tests/qemu-iotests/257 b/tests/qemu-iotests/257
-index c80e06ae28..a2f4b5afe6 100755
---- a/tests/qemu-iotests/257
-+++ b/tests/qemu-iotests/257
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test bitmap-sync backups (incremental, differential, and partials)
- #
-diff --git a/tests/qemu-iotests/258 b/tests/qemu-iotests/258
-index e305a1502f..9a2d33ae5e 100755
---- a/tests/qemu-iotests/258
-+++ b/tests/qemu-iotests/258
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Very specific tests for adjacent commit/stream block jobs
- #
-diff --git a/tests/qemu-iotests/259 b/tests/qemu-iotests/259
-index 62e29af05f..76cde429c4 100755
---- a/tests/qemu-iotests/259
-+++ b/tests/qemu-iotests/259
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test generic image creation fallback (by using NBD)
- #
-diff --git a/tests/qemu-iotests/260 b/tests/qemu-iotests/260
-index 804a7addb9..a35cb7b61f 100755
---- a/tests/qemu-iotests/260
-+++ b/tests/qemu-iotests/260
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests for temporary external snapshot when we have bitmaps.
- #
-diff --git a/tests/qemu-iotests/261 b/tests/qemu-iotests/261
-index 847b4c6a37..d1c8037ab1 100755
---- a/tests/qemu-iotests/261
-+++ b/tests/qemu-iotests/261
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test case for qcow2's handling of extra data in snapshot table entries
- # (and more generally, how certain cases of broken snapshot tables are
-diff --git a/tests/qemu-iotests/262 b/tests/qemu-iotests/262
-index 03af061f94..32d69988ef 100755
---- a/tests/qemu-iotests/262
-+++ b/tests/qemu-iotests/262
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick migration
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/263 b/tests/qemu-iotests/263
-index f598a12899..ec09b41405 100755
---- a/tests/qemu-iotests/263
-+++ b/tests/qemu-iotests/263
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test encrypted write that crosses cluster boundary of two unallocated clusters
- # Based on 188
-diff --git a/tests/qemu-iotests/264 b/tests/qemu-iotests/264
-index 666f164ed8..960f0449a4 100755
---- a/tests/qemu-iotests/264
-+++ b/tests/qemu-iotests/264
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test nbd reconnect
- #
-diff --git a/tests/qemu-iotests/265 b/tests/qemu-iotests/265
-index 00f2ec769e..f796361903 100755
---- a/tests/qemu-iotests/265
-+++ b/tests/qemu-iotests/265
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test reverse-ordered qcow2 writes on a sub-cluster level
- #
-diff --git a/tests/qemu-iotests/266 b/tests/qemu-iotests/266
-index 91bdf8729e..71ce81d0df 100755
---- a/tests/qemu-iotests/266
-+++ b/tests/qemu-iotests/266
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test VPC and file image creation
- #
-diff --git a/tests/qemu-iotests/267 b/tests/qemu-iotests/267
-index e44be49c77..2e2afdad9c 100755
---- a/tests/qemu-iotests/267
-+++ b/tests/qemu-iotests/267
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick snapshot
- #
- # Test which nodes are involved in internal snapshots
- #
-diff --git a/tests/qemu-iotests/268 b/tests/qemu-iotests/268
-index 78c3f4db3a..4fce2ef75f 100755
---- a/tests/qemu-iotests/268
-+++ b/tests/qemu-iotests/268
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test write request with required alignment larger than the cluster size
- #
-diff --git a/tests/qemu-iotests/270 b/tests/qemu-iotests/270
-index 00339c0f78..74352342db 100755
---- a/tests/qemu-iotests/270
-+++ b/tests/qemu-iotests/270
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing quick
- #
- # Test large write to a qcow2 image
- #
-diff --git a/tests/qemu-iotests/271 b/tests/qemu-iotests/271
-index e242b28b58..599b849cc6 100755
---- a/tests/qemu-iotests/271
-+++ b/tests/qemu-iotests/271
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto
- #
- # Test qcow2 images with extended L2 entries
- #
-diff --git a/tests/qemu-iotests/272 b/tests/qemu-iotests/272
-index c2f782d47b..015347a0c9 100755
---- a/tests/qemu-iotests/272
-+++ b/tests/qemu-iotests/272
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test compressed write to a qcow2 image at an offset above 4 GB
- #
-diff --git a/tests/qemu-iotests/273 b/tests/qemu-iotests/273
-index 41ffbf39c4..30517e29f0 100755
---- a/tests/qemu-iotests/273
-+++ b/tests/qemu-iotests/273
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: backing quick
- #
- # Test multiple blockdev-snapshot calls with 'backing': null
- #
-diff --git a/tests/qemu-iotests/274 b/tests/qemu-iotests/274
-index d4571c5465..a417e4975d 100755
---- a/tests/qemu-iotests/274
-+++ b/tests/qemu-iotests/274
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw backing
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/277 b/tests/qemu-iotests/277
-index a39ce2d873..24833e7eb6 100755
---- a/tests/qemu-iotests/277
-+++ b/tests/qemu-iotests/277
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test NBD client reconnection
- #
-diff --git a/tests/qemu-iotests/279 b/tests/qemu-iotests/279
-index 5515d4ed01..f4de409cda 100755
---- a/tests/qemu-iotests/279
-+++ b/tests/qemu-iotests/279
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw backing quick
- #
- # Test qemu-img --backing-chain --image-opts
- #
-diff --git a/tests/qemu-iotests/280 b/tests/qemu-iotests/280
-index f594bb9ed2..628f3c33ca 100755
---- a/tests/qemu-iotests/280
-+++ b/tests/qemu-iotests/280
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw migration quick
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/281 b/tests/qemu-iotests/281
-index 0bf973bca6..956698083f 100755
---- a/tests/qemu-iotests/281
-+++ b/tests/qemu-iotests/281
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test cases for blockdev + IOThread interactions
- #
-diff --git a/tests/qemu-iotests/282 b/tests/qemu-iotests/282
-index 27da2a0023..3140445989 100755
---- a/tests/qemu-iotests/282
-+++ b/tests/qemu-iotests/282
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw img quick
- #
- # Test qemu-img file cleanup for LUKS when using a non-UTF8 secret
- #
-diff --git a/tests/qemu-iotests/283 b/tests/qemu-iotests/283
-index 383797ed62..79643e375b 100755
---- a/tests/qemu-iotests/283
-+++ b/tests/qemu-iotests/283
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: auto quick
- #
- # Test for backup-top filter permission activation failure
- #
-diff --git a/tests/qemu-iotests/284 b/tests/qemu-iotests/284
-index 9f6c29a79c..5a82639e7f 100755
---- a/tests/qemu-iotests/284
-+++ b/tests/qemu-iotests/284
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test ref count checks on encrypted images
- #
-diff --git a/tests/qemu-iotests/286 b/tests/qemu-iotests/286
-index f14445ba4a..1fd24d5f74 100755
---- a/tests/qemu-iotests/286
-+++ b/tests/qemu-iotests/286
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-img snapshot -l
- #
-diff --git a/tests/qemu-iotests/287 b/tests/qemu-iotests/287
-index f98a4cadc1..3ba068901a 100755
---- a/tests/qemu-iotests/287
-+++ b/tests/qemu-iotests/287
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: auto quick
- #
- # Test case for an image using zstd compression
- #
-diff --git a/tests/qemu-iotests/288 b/tests/qemu-iotests/288
-index 6c62065aef..47aca6592a 100755
---- a/tests/qemu-iotests/288
-+++ b/tests/qemu-iotests/288
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: quick
- #
- # qemu-img measure tests for LUKS images
- #
-diff --git a/tests/qemu-iotests/289 b/tests/qemu-iotests/289
-index 1c11d4030e..2710ce882b 100755
---- a/tests/qemu-iotests/289
-+++ b/tests/qemu-iotests/289
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # qcow2 v3-exclusive error path testing
- # (026 tests paths common to v2 and v3)
-diff --git a/tests/qemu-iotests/290 b/tests/qemu-iotests/290
-index 01ee14dcfb..55c46ee336 100755
---- a/tests/qemu-iotests/290
-+++ b/tests/qemu-iotests/290
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test how 'qemu-io -c discard' behaves on v2 and v3 qcow2 images
- #
-diff --git a/tests/qemu-iotests/291 b/tests/qemu-iotests/291
-index 4f837b2056..de3d9da84b 100755
---- a/tests/qemu-iotests/291
-+++ b/tests/qemu-iotests/291
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test qemu-img bitmap handling
- #
-diff --git a/tests/qemu-iotests/292 b/tests/qemu-iotests/292
-index 83ab19231d..8107b4d5d2 100755
---- a/tests/qemu-iotests/292
-+++ b/tests/qemu-iotests/292
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw auto quick
- #
- # Test resizing a qcow2 image with a backing file
- #
-diff --git a/tests/qemu-iotests/293 b/tests/qemu-iotests/293
-index f86fe3b413..563824ab95 100755
---- a/tests/qemu-iotests/293
-+++ b/tests/qemu-iotests/293
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw
- #
- # Test encryption key management with luks
- # Based on 134
-diff --git a/tests/qemu-iotests/294 b/tests/qemu-iotests/294
-index 4bdb7364af..d5c6337ddc 100755
---- a/tests/qemu-iotests/294
-+++ b/tests/qemu-iotests/294
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Copyright (C) 2019 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/295 b/tests/qemu-iotests/295
-index 59e674fa85..01a6c0b31f 100755
---- a/tests/qemu-iotests/295
-+++ b/tests/qemu-iotests/295
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test case QMP's encrypted key management
- #
-diff --git a/tests/qemu-iotests/296 b/tests/qemu-iotests/296
-index fb7dec88aa..0bc3c6c7d7 100755
---- a/tests/qemu-iotests/296
-+++ b/tests/qemu-iotests/296
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw
- #
- # Test case for encryption key management versus image sharing
- #
-diff --git a/tests/qemu-iotests/297 b/tests/qemu-iotests/297
-index 5c5420712b..85bc1c0c85 100755
---- a/tests/qemu-iotests/297
-+++ b/tests/qemu-iotests/297
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: meta
- #
- # Copyright (C) 2020 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/299 b/tests/qemu-iotests/299
-index e129c7f7cb..a7122941fd 100755
---- a/tests/qemu-iotests/299
-+++ b/tests/qemu-iotests/299
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: auto quick
- #
- # Test shutdown when bitmap is exported through NBD server
- #
-diff --git a/tests/qemu-iotests/300 b/tests/qemu-iotests/300
-index 5b75121b84..23aca59d9c 100755
---- a/tests/qemu-iotests/300
-+++ b/tests/qemu-iotests/300
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: migration
- #
- # Copyright (C) 2020 Red Hat, Inc.
- #
-diff --git a/tests/qemu-iotests/301 b/tests/qemu-iotests/301
-index 3823e95617..9f943cadbe 100755
---- a/tests/qemu-iotests/301
-+++ b/tests/qemu-iotests/301
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: backing quick
- #
- # Test qcow backing file warnings
- #
-diff --git a/tests/qemu-iotests/302 b/tests/qemu-iotests/302
-index a8506bda15..5695af4914 100755
---- a/tests/qemu-iotests/302
-+++ b/tests/qemu-iotests/302
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: quick
- #
- # Tests converting qcow2 compressed to NBD
- #
-diff --git a/tests/qemu-iotests/303 b/tests/qemu-iotests/303
-index 11cd9eeb26..425544c064 100755
---- a/tests/qemu-iotests/303
-+++ b/tests/qemu-iotests/303
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Test for dumping of qcow2 image metadata
- #
-diff --git a/tests/qemu-iotests/304 b/tests/qemu-iotests/304
-index aaf9e14617..198f282087 100755
---- a/tests/qemu-iotests/304
-+++ b/tests/qemu-iotests/304
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick
- #
- # Tests dirty-bitmap backup with unaligned bitmap granularity
- #
-diff --git a/tests/qemu-iotests/305 b/tests/qemu-iotests/305
-index 768818af4a..c16e27b44e 100755
---- a/tests/qemu-iotests/305
-+++ b/tests/qemu-iotests/305
-@@ -1,4 +1,5 @@
- #!/usr/bin/env bash
-+# group: rw quick
- #
- # Test the handling of errors in write requests with multiple allocations
- #
-diff --git a/tests/qemu-iotests/307 b/tests/qemu-iotests/307
-index de7c25fcfc..9008974346 100755
---- a/tests/qemu-iotests/307
-+++ b/tests/qemu-iotests/307
-@@ -1,4 +1,5 @@
- #!/usr/bin/env python3
-+# group: rw quick export
- #
- # Copyright (C) 2020 Red Hat, Inc.
- #
+diff --git a/tests/qemu-iotests/check b/tests/qemu-iotests/check
+index 678b6e4910..48bb3128c3 100755
+--- a/tests/qemu-iotests/check
++++ b/tests/qemu-iotests/check
+@@ -1,7 +1,8 @@
+-#!/usr/bin/env bash
++#!/usr/bin/env python3
+ #
+-# Copyright (C) 2009 Red Hat, Inc.
+-# Copyright (c) 2000-2002,2006 Silicon Graphics, Inc.  All Rights Reserved.
++# Configure environment and run group of tests in it.
++#
++# Copyright (c) 2020 Virtuozzo International GmbH
+ #
+ # This program is free software; you can redistribute it and/or
+ # modify it under the terms of the GNU General Public License as
+@@ -14,950 +15,28 @@
+ #
+ # You should have received a copy of the GNU General Public License
+ # along with this program.  If not, see <http://www.gnu.org/licenses/>.
+-#
+-#
+-# Control script for QA
+-#
+-
+-status=0
+-needwrap=true
+-try=0
+-n_bad=0
+-bad=""
+-notrun=""
+-casenotrun=""
+-interrupt=true
+-makecheck=false
+-
+-_init_error()
+-{
+-    echo "check: $1" >&2
+-    exit 1
+-}
+-
+-if [ -L "$0" ]
+-then
+-    # called from the build tree
+-    source_iotests=$(dirname "$(readlink "$0")")
+-    if [ -z "$source_iotests" ]
+-    then
+-        _init_error "failed to obtain source tree name from check symlink"
+-    fi
+-    source_iotests=$(cd "$source_iotests"; pwd) || _init_error "failed to enter source tree"
+-    build_iotests=$(cd "$(dirname "$0")"; pwd)
+-else
+-    # called from the source tree
+-    source_iotests=$PWD
+-    # this may be an in-tree build (note that in the following code we may not
+-    # assume that it truly is and have to test whether the build results
+-    # actually exist)
+-    build_iotests=$PWD
+-fi
+-
+-build_root="$build_iotests/../.."
+-
+-# we need common.env
+-if ! . "$build_iotests/common.env"
+-then
+-    _init_error "failed to source common.env (make sure the qemu-iotests are run from tests/qemu-iotests in the build tree)"
+-fi
+-
+-# we need common.config
+-if ! . "$source_iotests/common.config"
+-then
+-    _init_error "failed to source common.config"
+-fi
+-
+-_full_imgfmt_details()
+-{
+-    if [ -n "$IMGOPTS" ]; then
+-        echo "$IMGFMT ($IMGOPTS)"
+-    else
+-        echo "$IMGFMT"
+-    fi
+-}
+-
+-_full_platform_details()
+-{
+-    os=$(uname -s)
+-    host=$(hostname -s)
+-    kernel=$(uname -r)
+-    platform=$(uname -m)
+-    echo "$os/$platform $host $kernel"
+-}
+-
+-_full_env_details()
+-{
+-    cat <<EOF
+-QEMU          -- "$QEMU_PROG" $QEMU_OPTIONS
+-QEMU_IMG      -- "$QEMU_IMG_PROG" $QEMU_IMG_OPTIONS
+-QEMU_IO       -- "$QEMU_IO_PROG" $QEMU_IO_OPTIONS
+-QEMU_NBD      -- "$QEMU_NBD_PROG" $QEMU_NBD_OPTIONS
+-IMGFMT        -- $FULL_IMGFMT_DETAILS
+-IMGPROTO      -- $IMGPROTO
+-PLATFORM      -- $FULL_HOST_DETAILS
+-TEST_DIR      -- $TEST_DIR
+-SOCK_DIR      -- $SOCK_DIR
+-SOCKET_SCM_HELPER -- $SOCKET_SCM_HELPER
+-
+-EOF
+-}
+-
+-# $1 = prog to look for
+-set_prog_path()
+-{
+-    p=$(command -v $1 2> /dev/null)
+-    if [ -n "$p" -a -x "$p" ]; then
+-        type -p "$p"
+-    else
+-        return 1
+-    fi
+-}
+-
+-if [ -z "$TEST_DIR" ]; then
+-        TEST_DIR=$PWD/scratch
+-fi
+-mkdir -p "$TEST_DIR" || _init_error 'Failed to create TEST_DIR'
+-
+-tmp_sock_dir=false
+-if [ -z "$SOCK_DIR" ]; then
+-    SOCK_DIR=$(mktemp -d)
+-    tmp_sock_dir=true
+-fi
+-mkdir -p "$SOCK_DIR" || _init_error 'Failed to create SOCK_DIR'
+-
+-diff="diff -u"
+-verbose=false
+-debug=false
+-group=false
+-xgroup=false
+-imgopts=false
+-showme=false
+-sortme=false
+-expunge=true
+-have_test_arg=false
+-cachemode=false
+-aiomode=false
+-
+-tmp="${TEST_DIR}"/$$
+-rm -f $tmp.list $tmp.tmp $tmp.sed
+-
+-export IMGFMT=raw
+-export IMGFMT_GENERIC=true
+-export IMGPROTO=file
+-export IMGOPTS=""
+-export CACHEMODE="writeback"
+-export AIOMODE="threads"
+-export QEMU_IO_OPTIONS=""
+-export QEMU_IO_OPTIONS_NO_FMT=""
+-export CACHEMODE_IS_DEFAULT=true
+-export VALGRIND_QEMU=
+-export IMGKEYSECRET=
+-export IMGOPTSSYNTAX=false
+-
+-# Save current tty settings, since an aborting qemu call may leave things
+-# screwed up
+-STTY_RESTORE=
+-if test -t 0; then
+-    STTY_RESTORE=$(stty -g)
+-fi
+-
+-for r
+-do
+-
+-    if $group
+-    then
+-        # arg after -g
+-        group_list=$(sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
+-s/ .*//p
+-}')
+-        if [ -z "$group_list" ]
+-        then
+-            echo "Group \"$r\" is empty or not defined?"
+-            exit 1
+-        fi
+-        [ ! -s $tmp.list ] && touch $tmp.list
+-        for t in $group_list
+-        do
+-            if grep -s "^$t\$" $tmp.list >/dev/null
+-            then
+-                :
+-            else
+-                echo "$t" >>$tmp.list
+-            fi
+-        done
+-        group=false
+-        continue
+-
+-    elif $xgroup
+-    then
+-        # arg after -x
+-        # Populate $tmp.list with all tests
+-        awk '/^[0-9]{3,}/ {print $1}' "${source_iotests}/group" > $tmp.list 2>/dev/null
+-        group_list=$(sed -n <"$source_iotests/group" -e 's/$/ /' -e "/^[0-9][0-9][0-9].* $r /"'{
+-s/ .*//p
+-}')
+-        if [ -z "$group_list" ]
+-        then
+-            echo "Group \"$r\" is empty or not defined?"
+-            exit 1
+-        fi
+-        numsed=0
+-        rm -f $tmp.sed
+-        for t in $group_list
+-        do
+-            if [ $numsed -gt 100 ]
+-            then
+-                sed -f $tmp.sed <$tmp.list >$tmp.tmp
+-                mv $tmp.tmp $tmp.list
+-                numsed=0
+-                rm -f $tmp.sed
+-            fi
+-            echo "/^$t\$/d" >>$tmp.sed
+-            numsed=$(expr $numsed + 1)
+-        done
+-        sed -f $tmp.sed <$tmp.list >$tmp.tmp
+-        mv $tmp.tmp $tmp.list
+-        xgroup=false
+-        continue
+-
+-    elif $imgopts
+-    then
+-        IMGOPTS="$r"
+-        imgopts=false
+-        continue
+-    elif $cachemode
+-    then
+-        CACHEMODE="$r"
+-        CACHEMODE_IS_DEFAULT=false
+-        cachemode=false
+-        continue
+-    elif $aiomode
+-    then
+-        AIOMODE="$r"
+-        aiomode=false
+-        continue
+-    fi
+-
+-    xpand=true
+-    case "$r"
+-    in
+-
+-        -\? | -h | --help)        # usage
+-            echo "Usage: $0 [options] [testlist]"'
+-
+-common options
+-    -v                  verbose
+-    -d                  debug
+-
+-image format options
+-    -raw                test raw (default)
+-    -bochs              test bochs
+-    -cloop              test cloop
+-    -parallels          test parallels
+-    -qcow               test qcow
+-    -qcow2              test qcow2
+-    -qed                test qed
+-    -vdi                test vdi
+-    -vpc                test vpc
+-    -vhdx               test vhdx
+-    -vmdk               test vmdk
+-    -luks               test luks
+-    -dmg                test dmg
+-
+-image protocol options
+-    -file               test file (default)
+-    -rbd                test rbd
+-    -sheepdog           test sheepdog
+-    -nbd                test nbd
+-    -ssh                test ssh
+-    -nfs                test nfs
+-
+-other options
+-    -xdiff              graphical mode diff
+-    -nocache            use O_DIRECT on backing file
+-    -misalign           misalign memory allocations
+-    -n                  show me, do not run tests
+-    -o options          -o options to pass to qemu-img create/convert
+-    -c mode             cache mode
+-    -i mode             AIO mode
+-    -makecheck          pretty print output for make check
+-
+-testlist options
+-    -g group[,group...]        include tests from these groups
+-    -x group[,group...]        exclude tests from these groups
+-    NNN                        include test NNN
+-    NNN-NNN                    include test range (eg. 012-021)
+-'
+-            exit 0
+-            ;;
+-
+-        -raw)
+-            IMGFMT=raw
+-            xpand=false
+-            ;;
+-
+-        -bochs)
+-            IMGFMT=bochs
+-            IMGFMT_GENERIC=false
+-            xpand=false
+-            ;;
+-
+-        -cloop)
+-            IMGFMT=cloop
+-            IMGFMT_GENERIC=false
+-            xpand=false
+-            ;;
+-
+-        -parallels)
+-            IMGFMT=parallels
+-            xpand=false
+-            ;;
+-
+-        -qcow)
+-            IMGFMT=qcow
+-            xpand=false
+-            ;;
+-
+-        -qcow2)
+-            IMGFMT=qcow2
+-            xpand=false
+-            ;;
+-
+-        -luks)
+-            IMGOPTSSYNTAX=true
+-            IMGFMT=luks
+-            IMGKEYSECRET=123456
+-            xpand=false
+-            ;;
+-
+-        -dmg)
+-            IMGFMT=dmg
+-            IMGFMT_GENERIC=false
+-            xpand=false
+-            ;;
+-
+-        -qed)
+-            IMGFMT=qed
+-            xpand=false
+-            ;;
+-
+-        -vdi)
+-            IMGFMT=vdi
+-            xpand=false
+-            ;;
+-
+-        -vmdk)
+-            IMGFMT=vmdk
+-            xpand=false
+-            ;;
+-
+-        -vpc)
+-            IMGFMT=vpc
+-            xpand=false
+-            ;;
+-
+-        -vhdx)
+-            IMGFMT=vhdx
+-            xpand=false
+-            ;;
+-
+-        -file)
+-            IMGPROTO=file
+-            xpand=false
+-            ;;
+-
+-        -rbd)
+-            IMGPROTO=rbd
+-            xpand=false
+-            ;;
+-
+-        -sheepdog)
+-            IMGPROTO=sheepdog
+-            xpand=false
+-            ;;
+-
+-        -nbd)
+-            IMGPROTO=nbd
+-            xpand=false
+-            ;;
+-
+-        -ssh)
+-            IMGPROTO=ssh
+-            xpand=false
+-            ;;
+-
+-        -nfs)
+-            IMGPROTO=nfs
+-            xpand=false
+-            ;;
+-
+-        -nocache)
+-            CACHEMODE="none"
+-            CACHEMODE_IS_DEFAULT=false
+-            xpand=false
+-            ;;
+-
+-        -misalign)
+-            QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --misalign"
+-            xpand=false
+-            ;;
+-
+-        -valgrind)
+-            VALGRIND_QEMU='y'
+-            xpand=false
+-            ;;
+-
+-        -g)        # -g group ... pick from group file
+-            group=true
+-            xpand=false
+-            ;;
+-
+-        -xdiff)        # graphical diff mode
+-            xpand=false
+-
+-            if [ ! -z "$DISPLAY" ]
+-            then
+-                command -v xdiff >/dev/null 2>&1 && diff=xdiff
+-                command -v gdiff >/dev/null 2>&1 && diff=gdiff
+-                command -v tkdiff >/dev/null 2>&1 && diff=tkdiff
+-                command -v xxdiff >/dev/null 2>&1 && diff=xxdiff
+-            fi
+-            ;;
+-        -makecheck)   # makecheck friendly output
+-            makecheck=true
+-            xpand=false
+-            ;;
+-        -n)        # show me, don't do it
+-            showme=true
+-            xpand=false
+-            ;;
+-        -o)
+-            imgopts=true
+-            xpand=false
+-            ;;
+-        -c)
+-            cachemode=true
+-            xpand=false
+-            ;;
+-        -i)
+-            aiomode=true
+-            xpand=false
+-            ;;
+-        -T)        # deprecated timestamp option
+-            xpand=false
+-            ;;
+-        -v)
+-            verbose=true
+-            xpand=false
+-            ;;
+-        -d)
+-            debug=true
+-            xpand=false
+-            ;;
+-        -x)        # -x group ... exclude from group file
+-            xgroup=true
+-            xpand=false
+-            ;;
+-        '[0-9][0-9][0-9] [0-9][0-9][0-9][0-9]')
+-            echo "No tests?"
+-            status=1
+-            exit $status
+-            ;;
+-
+-        [0-9]*-[0-9]*)
+-            eval $(echo $r | sed -e 's/^/start=/' -e 's/-/ end=/')
+-            ;;
+-
+-        [0-9]*-)
+-            eval $(echo $r | sed -e 's/^/start=/' -e 's/-//')
+-            end=$(echo [0-9][0-9][0-9] [0-9][0-9][0-9][0-9] | sed -e 's/\[0-9]//g' -e 's/  *$//' -e 's/.* //')
+-            if [ -z "$end" ]
+-            then
+-                echo "No tests in range \"$r\"?"
+-                status=1
+-                exit $status
+-            fi
+-            ;;
+-
+-        *)
+-            start=$r
+-            end=$r
+-            ;;
+-
+-    esac
+-
+-    # get rid of leading 0s as can be interpreted as octal
+-    start=$(echo $start | sed 's/^0*//')
+-    end=$(echo $end | sed 's/^0*//')
+-
+-    if $xpand
+-    then
+-        have_test_arg=true
+-        awk </dev/null '
+-BEGIN        { for (t='$start'; t<='$end'; t++) printf "%03d\n",t }' \
+-        | while read id
+-        do
+-            if grep -s "^$id\( \|\$\)" "$source_iotests/group" >/dev/null
+-            then
+-                # in group file ... OK
+-                echo $id >>$tmp.list
+-            else
+-                if [ -f expunged ] && $expunge && egrep "^$id([         ]|\$)" expunged >/dev/null
+-                then
+-                    # expunged ... will be reported, but not run, later
+-                    echo $id >>$tmp.list
+-                else
+-                    # oops
+-                    if [ "$start" == "$end" -a "$id" == "$end" ]
+-                    then
+-                        echo "$id - unknown test"
+-                        exit 1
+-                    else
+-                        echo "$id - unknown test, ignored"
+-                    fi
+-                fi
+-            fi
+-        done || exit 1
+-    fi
+-
+-done
+-
+-# Set qemu-io cache mode with $CACHEMODE we have
+-QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --cache $CACHEMODE"
+-# Set qemu-io aio mode with $AIOMODE we have
+-QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS --aio $AIOMODE"
+-
+-QEMU_IO_OPTIONS_NO_FMT="$QEMU_IO_OPTIONS"
+-if [ "$IMGOPTSSYNTAX" != "true" ]; then
+-    QEMU_IO_OPTIONS="$QEMU_IO_OPTIONS -f $IMGFMT"
+-fi
+-
+-# Set default options for qemu-img create -o if they were not specified
+-if [ "$IMGFMT" == "qcow2" ] && ! (echo "$IMGOPTS" | grep "compat=" > /dev/null); then
+-    IMGOPTS=$(_optstr_add "$IMGOPTS" "compat=1.1")
+-fi
+-if [ "$IMGFMT" == "luks" ] && ! (echo "$IMGOPTS" | grep "iter-time=" > /dev/null); then
+-    IMGOPTS=$(_optstr_add "$IMGOPTS" "iter-time=10")
+-fi
+-if [ "$IMGFMT" == "vmdk" ] && ! (echo "$IMGOPTS" | grep "zeroed_grain=" > /dev/null); then
+-    IMGOPTS=$(_optstr_add "$IMGOPTS" "zeroed_grain=on")
+-fi
+-
+-if [ -z "$SAMPLE_IMG_DIR" ]; then
+-        SAMPLE_IMG_DIR="$source_iotests/sample_images"
+-fi
+-
+-export TEST_DIR
+-export SOCK_DIR
+-export SAMPLE_IMG_DIR
+-
+-if [ -s $tmp.list ]
+-then
+-    # found some valid test numbers ... this is good
+-    :
+-else
+-    if $have_test_arg
+-    then
+-        # had test numbers, but none in group file ... do nothing
+-        touch $tmp.list
+-    else
+-        # no test numbers, do everything from group file
+-        sed -n -e '/^[0-9][0-9][0-9]*/s/^\([0-9]*\).*/\1/p' <"$source_iotests/group" >$tmp.list
+-    fi
+-fi
+-
+-# should be sort -n, but this did not work for Linux when this
+-# was ported from IRIX
+-#
+-list=$(sort $tmp.list)
+-rm -f $tmp.list $tmp.tmp $tmp.sed
+-
+-if [ -z "$QEMU_PROG" ]
+-then
+-    if [ -x "$build_iotests/qemu" ]; then
+-        export QEMU_PROG="$build_iotests/qemu"
+-    elif [ -x "$build_root/qemu-system-${qemu_arch}" ]; then
+-        export QEMU_PROG="$build_root/qemu-system-${qemu_arch}"
+-    else
+-        pushd "$build_root" > /dev/null
+-        for binary in qemu-system-*
+-        do
+-            if [ -x "$binary" ]
+-            then
+-                export QEMU_PROG="$build_root/$binary"
+-                break
+-            fi
+-        done
+-        popd > /dev/null
+-        [ "$QEMU_PROG" = "" ] && _init_error "qemu not found"
+-    fi
+-fi
+-export QEMU_PROG="$(type -p "$QEMU_PROG")"
+-
+-export QEMU_OPTIONS="-nodefaults -display none -accel qtest"
+-case "$QEMU_PROG" in
+-    *qemu-system-arm|*qemu-system-aarch64)
+-        export QEMU_OPTIONS="$QEMU_OPTIONS -machine virt"
+-        ;;
+-    *qemu-system-avr)
+-        export QEMU_OPTIONS="$QEMU_OPTIONS -machine mega2560"
+-        ;;
+-    *qemu-system-rx)
+-        export QEMU_OPTIONS="$QEMU_OPTIONS -machine gdbsim-r5f562n8"
+-        ;;
+-    *qemu-system-tricore)
+-        export QEMU_OPTIONS="-$QEMU_OPTIONS -machine tricore_testboard"
+-        ;;
+-esac
+-
+-if [ -z "$QEMU_IMG_PROG" ]; then
+-    if [ -x "$build_iotests/qemu-img" ]; then
+-        export QEMU_IMG_PROG="$build_iotests/qemu-img"
+-    elif [ -x "$build_root/qemu-img" ]; then
+-        export QEMU_IMG_PROG="$build_root/qemu-img"
+-    else
+-        _init_error "qemu-img not found"
+-    fi
+-fi
+-export QEMU_IMG_PROG="$(type -p "$QEMU_IMG_PROG")"
+-
+-if [ -z "$QEMU_IO_PROG" ]; then
+-    if [ -x "$build_iotests/qemu-io" ]; then
+-        export QEMU_IO_PROG="$build_iotests/qemu-io"
+-    elif [ -x "$build_root/qemu-io" ]; then
+-        export QEMU_IO_PROG="$build_root/qemu-io"
+-    else
+-        _init_error "qemu-io not found"
+-    fi
+-fi
+-export QEMU_IO_PROG="$(type -p "$QEMU_IO_PROG")"
+-
+-if [ -z $QEMU_NBD_PROG ]; then
+-    if [ -x "$build_iotests/qemu-nbd" ]; then
+-        export QEMU_NBD_PROG="$build_iotests/qemu-nbd"
+-    elif [ -x "$build_root/qemu-nbd" ]; then
+-        export QEMU_NBD_PROG="$build_root/qemu-nbd"
+-    else
+-        _init_error "qemu-nbd not found"
+-    fi
+-fi
+-export QEMU_NBD_PROG="$(type -p "$QEMU_NBD_PROG")"
+-
+-if [ -x "$build_iotests/socket_scm_helper" ]
+-then
+-    export SOCKET_SCM_HELPER="$build_iotests/socket_scm_helper"
+-fi
+-
+-python_usable=false
+-if $PYTHON -c 'import sys; sys.exit(0 if sys.version_info >= (3,6) else 1)'
+-then
+-    # Our python framework also requires virtio-blk
+-    if "$QEMU_PROG" -M none -device help | grep -q virtio-blk >/dev/null 2>&1
+-    then
+-        python_usable=true
+-    else
+-        python_unusable_because="Missing virtio-blk in QEMU binary"
+-    fi
+-else
+-    python_unusable_because="Unsupported Python version"
+-fi
+-
+-default_machine=$($QEMU_PROG -machine help | sed -n '/(default)/ s/ .*//p')
+-default_alias_machine=$($QEMU_PROG -machine help | \
+-   sed -n "/(alias of $default_machine)/ { s/ .*//p; q; }")
+-if [[ "$default_alias_machine" ]]; then
+-    default_machine="$default_alias_machine"
+-fi
+-
+-export QEMU_DEFAULT_MACHINE="$default_machine"
+-
+-TIMESTAMP_FILE=check.time-$IMGPROTO-$IMGFMT
+-
+-_wallclock()
+-{
+-    date "+%H %M %S" | awk '{ print $1*3600 + $2*60 + $3 }'
+-}
+-
+-_wrapup()
+-{
+-    if $showme
+-    then
+-        :
+-    elif $needwrap
+-    then
+-        if [ -f $TIMESTAMP_FILE -a -f $tmp.time ]
+-        then
+-            cat $TIMESTAMP_FILE $tmp.time \
+-            | awk '
+-        { t[$1] = $2 }
+-END        { if (NR > 0) {
+-            for (i in t) print i " " t[i]
+-          }
+-        }' \
+-            | sort -n >$tmp.out
+-            mv $tmp.out $TIMESTAMP_FILE
+-        fi
+-
+-        if [ -f $tmp.expunged ]
+-        then
+-            notrun=$(wc -l <$tmp.expunged | sed -e 's/  *//g')
+-            try=$(expr $try - $notrun)
+-            list=$(echo "$list" | sed -f $tmp.expunged)
+-        fi
+-
+-        echo "" >>check.log
+-        date >>check.log
+-        echo $list | fmt | sed -e 's/^/    /' >>check.log
+-        $interrupt && echo "Interrupted!" >>check.log
+-
+-        if [ ! -z "$notrun" ]
+-        then
+-            echo "Not run:$notrun"
+-            echo "Not run:$notrun" >>check.log
+-        fi
+-        if [ ! -z "$casenotrun" ]
+-        then
+-            echo "Some cases not run in:$casenotrun"
+-            echo "Some cases not run in:$casenotrun" >>check.log
+-        fi
+-        if [ ! -z "$n_bad" -a $n_bad != 0 ]
+-        then
+-            echo "Failures:$bad"
+-            echo "Failed $n_bad of $try iotests"
+-            echo "Failures:$bad" | fmt >>check.log
+-            echo "Failed $n_bad of $try iotests" >>check.log
+-        else
+-            echo "Passed all $try iotests"
+-            echo "Passed all $try iotests" >>check.log
+-        fi
+-        needwrap=false
+-    fi
+-
+-    if test -n "$STTY_RESTORE"; then
+-        stty $STTY_RESTORE
+-    fi
+-    rm -f "${TEST_DIR}"/*.out "${TEST_DIR}"/*.err "${TEST_DIR}"/*.time
+-    rm -f "${TEST_DIR}"/check.pid "${TEST_DIR}"/check.sts
+-    rm -f $tmp.*
+-
+-    if $tmp_sock_dir
+-    then
+-        rm -rf "$SOCK_DIR"
+-    fi
+-}
+-
+-trap "_wrapup; exit \$status" 0 1 2 3 15
+-
+-# Report the test start and results. For makecheck we want to pretty
+-# print the whole report at the end of the execution.
+-# args: $seq, $starttime, $lasttime
+-_report_test_start()
+-{
+-    if ! $makecheck; then
+-        if [ -n "$3" ]; then
+-            local lasttime=" (last: $3s)"
+-        fi
+-        printf "%-8s %-10s [%s]            %4s%-14s\r" "$1" "..." "$2" "..." "$lasttime"
+-    fi
+-}
+-# args:$seq $status $starttime $lasttime $thistime $details
+-_report_test_result()
+-{
+-    local status lasttime thistime
+-    if $makecheck; then
+-        if [ -n "$2" ] && [ "$2" != "pass" ]; then
+-            status=" [$2]"
+-        fi
+-        printf "  TEST    iotest-$IMGFMT: %s%s\n" "$1" "$status"
+-        return
+-    fi
+-
+-    if [ -n "$4" ]; then
+-        lasttime=" (last: $4s)"
+-    fi
+-    if [ -n "$5" ]; then
+-        thistime=" $5s"
+-    fi
+-    case "$2" in
+-        "pass")     status=$(printf "\e[32m%-10s\e[0m" "$2") ;;
+-        "fail")     status=$(printf "\e[1m\e[31m%-10s\e[0m" "$2") ;;
+-        "not run")  status=$(printf "\e[33m%-10s\e[0m" "$2") ;;
+-        *)          status=$(printf "%-10s" "$2") ;;
+-    esac
+-
+-    printf "%-8s %s [%s] [%s] %4s%-14s %s\n" "$1" "$status" "$3" "$(date '+%T')" "$thistime" "$lasttime" "$6"
+-}
+-
+-[ -f $TIMESTAMP_FILE ] || touch $TIMESTAMP_FILE
+-
+-FULL_IMGFMT_DETAILS=$(_full_imgfmt_details)
+-FULL_HOST_DETAILS=$(_full_platform_details)
+-
+-if ! $makecheck; then
+-    _full_env_details
+-fi
+-
+-seq="check"
+-
+-[ -n "$TESTS_REMAINING_LOG" ] && echo $list > $TESTS_REMAINING_LOG
+-
+-for seq in $list
+-do
+-    err=false       # error flag
+-    printdiff=false # show diff to reference output?
+-    status=""       # test result summary
+-    results=""      # test result details
+-    thistime=""     # time the test took
+-
+-    if [ -n "$TESTS_REMAINING_LOG" ] ; then
+-        sed -e "s/$seq//" -e 's/  / /' -e 's/^ *//' $TESTS_REMAINING_LOG > $TESTS_REMAINING_LOG.tmp
+-        mv $TESTS_REMAINING_LOG.tmp $TESTS_REMAINING_LOG
+-        sync
+-    fi
+-
+-    lasttime=$(sed -n -e "/^$seq /s/.* //p" <$TIMESTAMP_FILE)
+-    starttime=$(date "+%T")
+-    _report_test_start $seq $starttime $lasttime
+-
+-    if $showme
+-    then
+-        status="not run"
+-    elif [ -f expunged ] && $expunge && egrep "^$seq([         ]|\$)" expunged >/dev/null
+-    then
+-        status="not run"
+-        results="expunged"
+-        rm -f $seq.out.bad
+-        echo "/^$seq\$/d" >>$tmp.expunged
+-    elif [ ! -f "$source_iotests/$seq" ]
+-    then
+-        status="not run"
+-        results="no such test?"
+-        echo "/^$seq\$/d" >>$tmp.expunged
+-    else
+-        # really going to try and run this one
+-        #
+-        rm -f $seq.out.bad
+-        rm -f core $seq.notrun
+-        rm -f $seq.casenotrun
+-
+-        start=$(_wallclock)
+-
+-        if [ "$(head -n 1 "$source_iotests/$seq")" == "#!/usr/bin/env python3" ]; then
+-            if $python_usable; then
+-                run_command="$PYTHON $seq"
+-            else
+-                run_command="false"
+-                echo "$python_unusable_because" > $seq.notrun
+-            fi
+-        else
+-            run_command="./$seq"
+-        fi
+-        export OUTPUT_DIR=$PWD
+-        if $debug; then
+-            (cd "$source_iotests";
+-            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+-                    $run_command -d 2>&1 | tee $tmp.out)
+-        else
+-            (cd "$source_iotests";
+-            MALLOC_PERTURB_=${MALLOC_PERTURB_:-$(($RANDOM % 255 + 1))} \
+-                    $run_command >$tmp.out 2>&1)
+-        fi
+-        sts=$?
+-        stop=$(_wallclock)
+-
+-        if [ -f core ]
+-        then
+-            mv core $seq.core
+-            status="fail"
+-            results="[dumped core] $seq.core"
+-            err=true
+-        fi
+-
+-        if [ -f $seq.notrun ]
+-        then
+-            # overwrites timestamp output
+-            status="not run"
+-            results="$(cat $seq.notrun)"
+-        else
+-            if [ $sts -ne 0 ]
+-            then
+-                status="fail"
+-                results=$(printf %s "[failed, exit status $sts]")
+-                err=true
+-            fi
+-
+-            reference="$source_iotests/$seq.out"
+-            reference_machine="$source_iotests/$seq.$QEMU_DEFAULT_MACHINE.out"
+-            if [ -f "$reference_machine" ]; then
+-                reference="$reference_machine"
+-            fi
+-
+-            reference_format="$source_iotests/$seq.out.$IMGFMT"
+-            if [ -f "$reference_format" ]; then
+-                reference="$reference_format"
+-            fi
+-
+-            if [ "$CACHEMODE" = "none" ]; then
+-                [ -f "$source_iotests/$seq.out.nocache" ] && reference="$source_iotests/$seq.out.nocache"
+-            fi
+-
+-            if [ ! -f "$reference" ]
+-            then
+-                status="fail"
+-                results="no qualified output"
+-                err=true
+-            else
+-                if diff -w "$reference" $tmp.out >/dev/null 2>&1
+-                then
+-                    if ! $err; then
+-                        status="pass"
+-                        thistime=$(expr $stop - $start)
+-                        echo "$seq $thistime" >>$tmp.time
+-                    fi
+-                else
+-                    mv $tmp.out $seq.out.bad
+-                    status="fail"
+-                    results="output mismatch (see $seq.out.bad)"
+-                    printdiff=true
+-                    err=true
+-                fi
+-            fi
+-        fi
+-        if [ -f $seq.casenotrun ]
+-        then
+-            cat $seq.casenotrun
+-            casenotrun="$casenotrun $seq"
+-        fi
+-    fi
+-
+-    # come here for each test, except when $showme is true
+-    #
+-    _report_test_result $seq "$status" "$starttime" "$lasttime" "$thistime" "$results"
+-    case "$status" in
+-        "pass")
+-            try=$(expr $try + 1)
+-            ;;
+-        "fail")
+-            try=$(expr $try + 1)
+-            if $makecheck; then
+-                _full_env_details
+-            fi
+-            if $printdiff; then
+-                $diff -w "$reference" "$PWD"/$seq.out.bad
+-            fi
+-            bad="$bad $seq"
+-            n_bad=$(expr $n_bad + 1)
+-            quick=false
+-            ;;
+-        "not run")
+-            notrun="$notrun $seq"
+-            ;;
+-    esac
+-
+-    seq="after_$seq"
+-done
+ 
+-interrupt=false
+-status=$(expr $n_bad)
+-exit
++import sys
++import os
++from findtests import find_tests, TestFinder
++from testenv import TestEnv
++from testrunner import TestRunner
++
++if __name__ == '__main__':
++    if len(sys.argv) == 2 and sys.argv[1] in ['-h', '--help']:
++        print('Usage: ./check [options] [testlist]')
++        print()
++        TestFinder.get_argparser().print_help()
++        print()
++        TestEnv.get_argparser().print_help()
++        print()
++        TestRunner.get_argparser().print_help()
++        exit()
++
++    env = TestEnv(sys.argv[1:])
++    tests, remaining_argv = find_tests(env.remaining_argv,
++                                       test_dir=env.source_iotests)
++
++    with TestRunner(remaining_argv, env) as tr:
++        assert not tr.remaining_argv
++        tr.run_tests([os.path.join(env.source_iotests, t) for t in tests])
+diff --git a/tests/qemu-iotests/group b/tests/qemu-iotests/group
+deleted file mode 100644
+index 3432989283..0000000000
+--- a/tests/qemu-iotests/group
++++ /dev/null
+@@ -1,317 +0,0 @@
+-#
+-# QA groups control file
+-# Defines test groups
+-#
+-# Some notes about the groups:
+-#
+-# - do not start group names with a digit
+-#
+-# - quick : Tests in this group should finish within some few seconds.
+-#
+-# - img : Tests in this group can be used to excercise the qemu-img tool.
+-#
+-# - auto : Tests in this group are used during "make check" and should be
+-#   runnable in any case. That means they should run with every QEMU binary
+-#   (also non-x86), with every QEMU configuration (i.e. must not fail if
+-#   an optional feature is not compiled in - but reporting a "skip" is ok),
+-#   work at least with the qcow2 file format, work with all kind of host
+-#   filesystems and users (e.g. "nobody" or "root") and must not take too
+-#   much memory and disk space (since CI pipelines tend to fail otherwise).
+-#
+-
+-#
+-# test-group association ... one line per test
+-#
+-001 rw auto quick
+-002 rw auto quick
+-003 rw auto
+-004 rw auto quick
+-005 img auto quick
+-# 006 was removed, do not reuse
+-007 snapshot auto
+-008 rw auto quick
+-009 rw auto quick
+-010 rw auto quick
+-011 rw auto quick
+-012 auto quick
+-013 rw auto
+-014 rw
+-015 rw snapshot
+-# 016 was removed, do not reuse
+-017 rw backing auto quick
+-018 rw backing auto quick
+-019 rw backing auto quick
+-020 rw backing auto quick
+-021 io auto quick
+-022 rw snapshot auto
+-023 rw
+-024 rw backing auto quick
+-025 rw auto quick
+-026 rw blkdbg
+-027 rw auto quick
+-028 rw backing quick
+-029 rw auto quick
+-030 rw auto backing
+-031 rw auto quick
+-032 rw auto quick
+-033 rw auto quick
+-034 rw auto backing quick
+-035 rw auto quick
+-036 rw auto quick
+-037 rw auto backing quick
+-038 rw auto backing quick
+-039 rw auto quick
+-040 rw auto
+-041 rw auto backing
+-042 rw auto quick
+-043 rw auto backing
+-044 rw
+-045 rw quick
+-046 rw auto aio quick
+-047 rw auto quick
+-048 img auto quick
+-049 rw auto
+-050 rw auto backing quick
+-051 rw
+-052 rw auto backing quick
+-053 rw auto quick
+-054 rw auto quick
+-055 rw
+-056 rw backing
+-057 rw
+-058 rw quick
+-059 rw quick
+-060 rw auto quick
+-061 rw auto
+-062 rw auto quick
+-063 rw auto quick
+-064 rw quick
+-065 rw quick
+-066 rw auto quick
+-# 067 was removed, do not reuse
+-068 rw quick
+-069 rw auto quick
+-070 rw quick
+-071 rw auto quick
+-072 rw auto quick
+-073 rw auto quick
+-074 rw auto quick
+-075 rw quick
+-076 io
+-077 rw quick
+-078 rw quick
+-079 rw auto
+-080 rw auto
+-081 rw quick
+-082 rw quick
+-083 rw
+-084 img quick
+-085 rw
+-086 rw auto quick
+-087 rw quick
+-088 rw quick
+-089 rw auto quick
+-090 rw auto quick
+-091 rw migration quick
+-092 rw quick
+-093 throttle
+-094 rw quick
+-095 rw quick
+-096 rw quick
+-097 rw auto backing
+-098 rw auto backing quick
+-099 rw auto quick
+-# 100 was removed, do not reuse
+-101 rw quick
+-102 rw quick
+-103 rw auto quick
+-104 rw auto
+-105 rw auto quick
+-106 rw quick
+-107 rw auto quick
+-108 rw auto quick
+-109 rw
+-110 rw auto backing quick
+-111 rw auto quick
+-112 rw
+-113 rw quick
+-114 rw auto quick
+-115 rw
+-116 rw quick
+-117 rw auto
+-118 rw
+-119 rw quick
+-120 rw auto quick
+-121 rw
+-122 rw
+-123 rw quick
+-124 rw backing
+-125 rw
+-126 rw auto backing
+-127 rw auto backing quick
+-128 rw quick
+-129 rw quick
+-130 rw quick
+-131 rw quick
+-132 rw quick
+-133 auto quick
+-134 rw auto quick
+-135 rw
+-136 rw
+-137 rw auto
+-138 rw auto quick
+-139 rw quick
+-140 rw auto quick
+-141 rw auto quick
+-142
+-143 auto quick
+-144 rw quick
+-145 quick
+-146 quick
+-147 img
+-148 rw quick
+-149 rw sudo
+-150 rw auto quick
+-151 rw
+-152 rw quick
+-153 rw quick
+-154 rw auto backing quick
+-155 rw
+-156 rw auto quick
+-157 quick
+-158 rw auto quick
+-159 rw auto quick
+-160 rw quick
+-161 rw auto quick
+-162 quick
+-163 rw
+-165 rw quick
+-169 rw migration
+-170 rw auto quick
+-171 rw quick
+-172 auto
+-173 rw
+-174 auto
+-175 quick
+-176 rw auto backing
+-177 rw auto quick
+-178 img
+-179 rw auto quick
+-181 rw auto migration quick
+-182 rw quick
+-183 rw migration quick
+-184 rw auto quick
+-185 rw
+-186 rw auto
+-187 rw auto
+-188 rw quick
+-189 rw
+-190 rw auto quick
+-191 rw auto
+-192 rw auto quick
+-194 rw migration quick
+-195 rw auto quick
+-196 rw quick migration
+-197 rw quick
+-198 rw
+-199 rw migration
+-200 rw
+-201 rw migration quick
+-202 rw quick
+-203 rw auto migration quick
+-204 rw quick
+-205 rw quick
+-206 rw
+-207 rw
+-208 rw quick
+-209 rw quick
+-210 rw
+-211 rw quick
+-212 rw quick
+-213 rw quick
+-214 rw auto
+-215 rw quick
+-216 rw quick
+-217 rw auto quick
+-218 rw quick
+-219 rw
+-220 rw auto
+-221 rw quick
+-222 rw quick
+-223 rw quick
+-224 rw quick
+-225 rw quick
+-226 auto quick
+-227 quick
+-228 rw quick
+-229 auto quick
+-231 quick
+-232 quick
+-233 quick
+-234 quick migration
+-235 quick
+-236 quick
+-237 rw quick
+-238 quick
+-239 rw quick
+-240 quick
+-241 rw quick
+-242 rw quick
+-243 rw quick
+-244 rw auto quick
+-245 rw
+-246 rw quick
+-247 rw quick
+-248 rw quick
+-249 rw auto quick
+-250 rw quick
+-251 rw auto quick
+-252 rw auto backing quick
+-253 rw quick
+-254 rw backing quick
+-255 rw quick
+-256 rw auto quick
+-257 rw
+-258 rw quick
+-259 rw auto quick
+-260 rw quick
+-261 rw
+-262 rw quick migration
+-263 rw quick
+-264 rw
+-265 rw auto quick
+-266 rw quick
+-267 rw auto quick snapshot
+-268 rw auto quick
+-270 rw backing quick
+-271 rw auto
+-272 rw
+-273 backing quick
+-274 rw backing
+-277 rw quick
+-279 rw backing quick
+-280 rw migration quick
+-281 rw quick
+-282 rw img quick
+-283 auto quick
+-284 rw
+-286 rw quick
+-287 auto quick
+-288 quick
+-289 rw quick
+-290 rw auto quick
+-291 rw quick
+-292 rw auto quick
+-293 rw
+-294 rw quick
+-295 rw
+-296 rw
+-297 meta
+-299 auto quick
+-300 migration
+-301 backing quick
+-302 quick
+-303 rw quick
+-304 rw quick
+-305 rw quick
+-307 rw quick export
 -- 
 2.21.3
 
