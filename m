@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C42A8C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C038FC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:14:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1B17E24178
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:12:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B17E24178
+	by mail.kernel.org (Postfix) with ESMTPS id 2B4F12417D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 13:14:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B4F12417D
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44922 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48256 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVaOh-0007Ka-4E
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:12:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57264)
+	id 1kVaQ3-0000JL-NC
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 09:14:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kVaG7-00052N-7H; Thu, 22 Oct 2020 09:03:59 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:54542 helo=huawei.com)
+ id 1kVaG7-00052v-It; Thu, 22 Oct 2020 09:03:59 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5715 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <cenjiahui@huawei.com>)
- id 1kVaFx-0000gm-NV; Thu, 22 Oct 2020 09:03:58 -0400
-Received: from DGGEMS411-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id BAD02AAE5A4B24B0CAAF;
+ id 1kVaFx-0000gn-Rm; Thu, 22 Oct 2020 09:03:59 -0400
+Received: from DGGEMS404-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 1F3A5716043171552079;
  Thu, 22 Oct 2020 21:03:43 +0800 (CST)
-Received: from localhost (10.174.184.155) by DGGEMS411-HUB.china.huawei.com
- (10.3.19.211) with Microsoft SMTP Server id 14.3.487.0; Thu, 22 Oct 2020
- 21:03:33 +0800
+Received: from localhost (10.174.184.155) by DGGEMS404-HUB.china.huawei.com
+ (10.3.19.204) with Microsoft SMTP Server id 14.3.487.0; Thu, 22 Oct 2020
+ 21:03:34 +0800
 From: Jiahui Cen <cenjiahui@huawei.com>
 To: <qemu-devel@nongnu.org>, <kwolf@redhat.com>, <mreitz@redhat.com>,
  <eblake@redhat.com>
-Subject: [PATCH v3 8/9] qapi: add I/O hang and I/O hang timeout qapi event
-Date: Thu, 22 Oct 2020 21:03:02 +0800
-Message-ID: <20201022130303.1092-9-cenjiahui@huawei.com>
+Subject: [PATCH v3 9/9] docs: add a doc about I/O hang
+Date: Thu, 22 Oct 2020 21:03:03 +0800
+Message-ID: <20201022130303.1092-10-cenjiahui@huawei.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201022130303.1092-1-cenjiahui@huawei.com>
 References: <20201022130303.1092-1-cenjiahui@huawei.com>
@@ -50,7 +50,7 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.184.155]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32; envelope-from=cenjiahui@huawei.com;
+Received-SPF: pass client-ip=45.249.212.191; envelope-from=cenjiahui@huawei.com;
  helo=huawei.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 09:03:44
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
@@ -78,77 +78,66 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sometimes hypervisor management tools like libvirt may need to monitor
-I/O hang events. Let's report I/O hang and I/O hang timeout event via qapi.
+Give some details about the I/O hang and how to use it.
 
 Signed-off-by: Jiahui Cen <cenjiahui@huawei.com>
 Signed-off-by: Ying Fang <fangying1@huawei.com>
 ---
- block/block-backend.c |  3 +++
- qapi/block-core.json  | 26 ++++++++++++++++++++++++++
- 2 files changed, 29 insertions(+)
+ docs/io-hang.rst | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
+ create mode 100644 docs/io-hang.rst
 
-diff --git a/block/block-backend.c b/block/block-backend.c
-index c812b3a9c7..42337ceb04 100644
---- a/block/block-backend.c
-+++ b/block/block-backend.c
-@@ -2556,6 +2556,7 @@ static bool blk_iohang_handle(BlockBackend *blk, int new_status)
-             /* Case when I/O Hang is recovered */
-             blk->is_iohang_timeout = false;
-             blk->iohang_time = 0;
-+            qapi_event_send_block_io_hang(false);
-         }
-         break;
-     case BLOCK_IO_HANG_STATUS_HANG:
-@@ -2563,12 +2564,14 @@ static bool blk_iohang_handle(BlockBackend *blk, int new_status)
-             /* Case when I/O hang is first triggered */
-             blk->iohang_time = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) / 1000;
-             need_rehandle = true;
-+            qapi_event_send_block_io_hang(true);
-         } else {
-             if (!blk->is_iohang_timeout) {
-                 now = qemu_clock_get_ms(QEMU_CLOCK_REALTIME) / 1000;
-                 if (now >= (blk->iohang_time + blk->iohang_timeout)) {
-                     /* Case when I/O hang is timeout */
-                     blk->is_iohang_timeout = true;
-+                    qapi_event_send_block_io_hang_timeout(true);
-                 } else {
-                     /* Case when I/O hang is continued */
-                     need_rehandle = true;
-diff --git a/qapi/block-core.json b/qapi/block-core.json
-index ee5ebef7f2..709514498c 100644
---- a/qapi/block-core.json
-+++ b/qapi/block-core.json
-@@ -5379,3 +5379,29 @@
- { 'command': 'blockdev-snapshot-delete-internal-sync',
-   'data': { 'device': 'str', '*id': 'str', '*name': 'str'},
-   'returns': 'SnapshotInfo' }
+diff --git a/docs/io-hang.rst b/docs/io-hang.rst
+new file mode 100644
+index 0000000000..53356ceed2
+--- /dev/null
++++ b/docs/io-hang.rst
+@@ -0,0 +1,45 @@
++========
++I/O hang
++========
 +
-+##
-+# @BLOCK_IO_HANG:
-+#
-+# Emitted when device I/O hang trigger event begin or end
-+#
-+# @set: true if I/O hang begin; false if I/O hang end.
-+#
-+# Since: 5.2
-+#
-+##
-+{ 'event': 'BLOCK_IO_HANG',
-+  'data': { 'set': 'bool' }}
++Introduction
++============
 +
-+##
-+# @BLOCK_IO_HANG_TIMEOUT:
-+#
-+# Emitted when device I/O hang timeout event set or clear
-+#
-+# @set: true if set; false if clear.
-+#
-+# Since: 5.2
-+#
-+##
-+{ 'event': 'BLOCK_IO_HANG_TIMEOUT',
-+  'data': { 'set': 'bool' }}
++I/O hang is a mechanism to automatically rehandle AIOs when an error occurs on
++the backend block device, which is unperceivable for Guest. If the error on the
++backend device is temporary, like NFS returns EIO due to network fluctuations,
++once the device is recovered, the AIOs will be resent automatically and done
++successfully. If the error on the device is unrecoverable, the failed AIOs will
++be returned to Guest after rehandle timeout.
++
++This mechanism can provide self-recovery and high availability to VM. From the
++view of Guest, AIOs sent to the device are hung for a time and the finished, and
++any other unrelated service in Guest can work as usual.
++
++Implementation
++==============
++
++Each BlockBackend will have a list to store AIOs which need be rehandled and a
++timer to monitor the timeout.
++
++If I/O hang is enabled, all returned AIOs will be checked and the failed ones
++will be inserted into BlockBackend's list. The timer will be started and the
++AIOs in the list will be resent to the backend device. Once the result of AIOs
++relevant to this backend device is success, the AIOs will be returned back to
++Guest. Otherwise, those AIOs will be rehandled periodically until timeout.
++
++I/O hang provides interfaces to drain all the AIOs in BlockBackend's list. There
++are some situations to drain the rehandling AIOs, eg. resetting virtio-blk.
++
++I/O hang also provides qapi events, which can be used for manager tools like
++libvirt to monitor.
++
++Examples
++========
++
++Enable I/O hang when launching QEMU::
++
++      $ qemu-system-x86_64                                      \
++          -machine pc,accel=kvm -smp 1 -m 2048                  \
++          -drive file=shared.img,format=raw,cache=none,aio=native,iohang-timeout=60
++
 -- 
 2.19.1
 
