@@ -2,66 +2,147 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04B28C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:18:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF17FC388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:19:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 341C7221FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:18:43 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 341C7221FB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id CBB51221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:19:31 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="p9gPimYg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBB51221FB
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43672 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46328 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZYI-0002hz-5I
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:18:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42660)
+	id 1kVZZ4-0003tC-Hw
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:19:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42314)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kVZUx-0000x8-Mp; Thu, 22 Oct 2020 08:15:49 -0400
-Resent-Date: Thu, 22 Oct 2020 08:15:15 -0400
-Resent-Message-Id: <E1kVZUx-0000x8-Mp@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21759)
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kVZTD-0007bX-NO
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:27 -0400
+Received: from mail-bn8nam11on2059.outbound.protection.outlook.com
+ ([40.107.236.59]:38043 helo=NAM11-BN8-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kVZT1-00018k-1S; Thu, 22 Oct 2020 08:15:15 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603368773; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=bG5Ue5mfQkfkgL1EI5TpWHHeP95XwrtHkG32OGITdOVSZTZnr6NQpDCaHzia1ZYvSO0kF+jtBx604yuhmRNvJUF1o2882TwzenhUVtG4jpMxyqloXLajKlS8tarJgPTOdDU86a1Vuf2XCHCsnxEl2Ju1riixsEopapZkW455dvc=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603368773;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=mzyO4H0IeJ7GoVQqh03u4Q00vZnGxWrNgwhBTzYwrZY=; 
- b=BxFVktQPyiBIwYCngmbk2KaG/Pbax/ZNHT2+arb2ticUvjgBmEjtJDDgmZtj2buDN8YFAb+8GWB26laePId7BEaFV5BJseO+O8igDpT30HrqivxoVXefKk2rIqRBcZjeIShjWv7EFvfFVV8bXRtTGX28dXpfR2oQy4jjZnaat5I=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1603368772013131.24501821932756;
- Thu, 22 Oct 2020 05:12:52 -0700 (PDT)
-Subject: Re: [PULL v2 00/28] Block patches
-Message-ID: <160336876996.26284.4541047192746309850@66eaa9a8a123>
-In-Reply-To: <20201022112726.736757-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <saipava@xilinx.com>)
+ id 1kVZRZ-000134-1U
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 08:13:27 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LovYXxCX6elJGFhEbuYK7JDjUX5GOTMMQG8Z8rJrWAk229sSbBc+FMih+4v7o9aXjwtwdMR9zoZ+3s0FXp5a599kP14xULyFD8/lsxGw7Zf1ogVcb8fLIuKwN2xrHYkchRZKP4hv59GDshoIjO27dWGXlnOnyL85ekmvtLSo78NG+UfTQo3S0x9wKIOrsB/HTHJRVZFfxH5jT5lLL+IBK3cDgTKxI4vNYoGimSbQ1ktlaa+0uPmTuJb3hd9MR5MpAY1ZCCfbyCm7S/pkqlcAVOdi3ig1T6rU4A3t5AX8Q+XsTtiS2ylnysqUNp4iTNsSNftsPBhhsJ+lIlHRXbzMWw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tPE4yAZzRCS2xIAjbDyfxY1KJd6LsnrNfOtf5P6Gq4o=;
+ b=iyOt7FtAyxv30dpeBx+Z5vl3UYPA0AxL9nEck3ir9V73CfR0qMvt1dOGIA0Efd2gaPGeC8NkveFrVT2EvcOWLLHeAgz0btcj5mDajEORgekvRnOncCw9p81AszQ1xQ50i9FUrYfn5/qMWlI7jtvWVJtgUtp9hqwx7H1u7jPtr9aE43zjAPR+qEKZ+kN/e0ibx/eaKk8XtMKZu3Ar9MVWHhLPUAXl9obVMf/miKjhk46oN/O24hlSwvCt1DYy9+3+mJ0RtkkgHfkBZYrVrThbIUuIuLEsSFV9evZxxpkGzK6tjJIPIoYh6zZlLlNuAiUbQa2egN+JRxJ5D7AcQFC/uA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 149.199.60.83) smtp.rcpttodomain=wdc.com smtp.mailfrom=xilinx.com;
+ dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
+ not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tPE4yAZzRCS2xIAjbDyfxY1KJd6LsnrNfOtf5P6Gq4o=;
+ b=p9gPimYgCx5fKMCBZQzXePhRoKzebY47jWOdqWKg274HM26mtAC4G10KA1Jvg64k4xjD2j/Hf3nghFn3K9MLyQ/QCdRj+aqdBuyrO4aU+2M1rrQO/MaWwRNBt+sVuzrwzhGtRtzUuKAIZXqEmAjU+iaB/TD1y9aUk5vnKsZCHCI=
+Received: from DM3PR08CA0023.namprd08.prod.outlook.com (2603:10b6:0:52::33) by
+ SN4PR0201MB3583.namprd02.prod.outlook.com (2603:10b6:803:45::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Thu, 22 Oct
+ 2020 12:11:41 +0000
+Received: from CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
+ (2603:10b6:0:52:cafe::ca) by DM3PR08CA0023.outlook.office365.com
+ (2603:10b6:0:52::33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
+ Transport; Thu, 22 Oct 2020 12:11:41 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
+ smtp.mailfrom=xilinx.com; wdc.com; dkim=none (message not signed)
+ header.d=none;wdc.com; dmarc=bestguesspass action=none
+ header.from=xilinx.com;
+Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
+ 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
+ client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
+Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
+ CY1NAM02FT062.mail.protection.outlook.com (10.152.75.60) with Microsoft SMTP
+ Server id 15.20.3499.20 via Frontend Transport; Thu, 22 Oct 2020 12:11:41
+ +0000
+Received: from [149.199.38.66] (port=56480 helo=smtp.xilinx.com)
+ by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1kVZQY-0001kB-NR; Thu, 22 Oct 2020 05:10:42 -0700
+Received: from [127.0.0.1] (helo=xsj-smtp-dlp1.xlnx.xilinx.com)
+ by smtp.xilinx.com with esmtp (Exim 4.63)
+ (envelope-from <sai.pavan.boddu@xilinx.com>)
+ id 1kVZRU-0005qR-GR; Thu, 22 Oct 2020 05:11:40 -0700
+Received: from xsj-pvapsmtp01 (mailman.xilinx.com [149.199.38.66])
+ by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09MCBdkW022865; 
+ Thu, 22 Oct 2020 05:11:39 -0700
+Received: from [10.140.6.35] (helo=xhdsaipava40.xilinx.com)
+ by xsj-pvapsmtp01 with esmtp (Exim 4.63)
+ (envelope-from <saipava@xhdsaipava40.xilinx.com>)
+ id 1kVZRS-0005pq-TB; Thu, 22 Oct 2020 05:11:39 -0700
+Received: by xhdsaipava40.xilinx.com (Postfix, from userid 14131)
+ id 38CC113C02EE; Thu, 22 Oct 2020 17:47:51 +0530 (IST)
+From: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+To: Peter Maydell <peter.maydell@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ =?UTF-8?q?=27Marc-Andr=C3=A9=20Lureau=27?= <marcandre.lureau@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ Edgar Iglesias <edgari@xilinx.com>,
+ Francisco Eduardo Iglesias <figlesia@xilinx.com>
+Subject: [PATCH v12 1/3] misc: Add versal-usb2-ctrl-regs module
+Date: Thu, 22 Oct 2020 17:47:34 +0530
+Message-Id: <1603369056-4168-2-git-send-email-sai.pavan.boddu@xilinx.com>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
+References: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
+X-RCIS-Action: ALLOW
+X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
+X-TM-AS-User-Approved-Sender: Yes;Yes
+X-EOPAttributedMessage: 0
+X-MS-Office365-Filtering-HT: Tenant
+X-MS-PublicTrafficType: Email
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: stefanha@redhat.com
-Date: Thu, 22 Oct 2020 05:12:52 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:13:11
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 68a20da4-a881-4b6b-b709-08d87683a278
+X-MS-TrafficTypeDiagnostic: SN4PR0201MB3583:
+X-Microsoft-Antispam-PRVS: <SN4PR0201MB35837AD06C03E53517A4601CCA1D0@SN4PR0201MB3583.namprd02.prod.outlook.com>
+X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
+X-MS-Oob-TLC-OOBClassifiers: OLM:352;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 0bqu25b3y1zeZgHX5efs3PGvnVB5tR3Xh/UtxXB6h1lWY1fiCV4gP3Lv2N4RIjmkuj2MM5Yd512hLp1+nfkhkDYPymFLUGUobtxAj7C4d1u9T1wLtPYCGE8vdyBE24cN/thjRqgpIZCCBXXpsWAehsWzkNcG6SEjSA3vHIccVtj4Fjsf6Qu4i4Jb6FBxII065PE8inpZY3lC/Q3zjI4DQYIjRLiMwIRoxQ+p4PyNKyO0/Pz/IHuP/5ecTjj5ETEE3o/w6Pny88Z1Bd4JY2fm3lvCuOBNR0uRSFJ6Nfx8QKF2VH5OEgVhNh+oZy16V8RpAzTCw3jW/DfHnUeqaHBOxC8xRMgVVcUuleIeJ1dw0TDZekzBi8iC6I0NRI3KOwG/yl5HsS+OwyvsQIhEWOGk1g==
+X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
+ SFS:(346002)(396003)(376002)(136003)(39860400002)(46966005)(83380400001)(6266002)(356005)(81166007)(336012)(8676002)(36756003)(82740400003)(426003)(6666004)(6636002)(19627235002)(186003)(47076004)(8936002)(478600001)(82310400003)(2616005)(54906003)(2906002)(26005)(4326008)(42186006)(316002)(110136005)(70586007)(5660300002)(30864003)(70206006)(7416002)(107886003);
+ DIR:OUT; SFP:1101; 
+X-OriginatorOrg: xilinx.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 12:11:41.1393 (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 68a20da4-a881-4b6b-b709-08d87683a278
+X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
+ Helo=[xsj-pvapsmtpgw01]
+X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT062.eop-nam02.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR0201MB3583
+Received-SPF: pass client-ip=40.107.236.59; envelope-from=saipava@xilinx.com;
+ helo=NAM11-BN8-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:11:43
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -73,158 +154,326 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, peter.maydell@linaro.org, berrange@redhat.com,
- ehabkost@redhat.com, qemu-block@nongnu.org, armbru@redhat.com,
- qemu-devel@nongnu.org, Coiby.Xu@gmail.com, dgilbert@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, fam@euphon.net, mreitz@redhat.com
+Cc: Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
+ qemu-devel@nongnu.org, Paul Zimmerman <pauldzim@gmail.com>,
+ Sai Pavan Boddu <saipava@xilinx.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Ying Fang <fangying1@huawei.com>,
+ =?UTF-8?q?=27Philippe=20Mathieu-Daud=C3=A9=27?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyMjExMjcyNi43MzY3
-NTctMS1zdGVmYW5oYUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhh
-dmUgc29tZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUg
-aW5mb3JtYXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMjIxMTI3MjYuNzM2
-NzU3LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUFVMTCB2MiAwMC8yOF0gQmxvY2sg
-cGF0Y2hlcwoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFzaApnaXQgcmV2LXBh
-cnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJl
-bmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBUcnVlCmdpdCBjb25m
-aWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRzL2NoZWNrcGF0Y2gu
-cGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0KClVwZGF0aW5nIDNj
-OGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBodHRwczovL2dpdGh1
-Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8y
-MDIwMTAyMjExMjcyNi43MzY3NTctMS1zdGVmYW5oYUByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAy
-MDEwMjIxMTI3MjYuNzM2NzU3LTEtc3RlZmFuaGFAcmVkaGF0LmNvbQpTd2l0Y2hlZCB0byBhIG5l
-dyBicmFuY2ggJ3Rlc3QnCjA3MGNiODcgaW90ZXN0czogYWRkIGNvbW1pdCB0b3AtPmJhc2UgY2Fz
-ZXMgdG8gMjc0CjIzODFhOWQgYmxvY2svaW86IGZpeCBiZHJ2X2lzX2FsbG9jYXRlZF9hYm92ZQo1
-MzE0MTU1IGJsb2NrL2lvOiBiZHJ2X2NvbW1vbl9ibG9ja19zdGF0dXNfYWJvdmU6IHN1cHBvcnQg
-YnMgPT0gYmFzZQo4MjRkNmY2IGJsb2NrL2lvOiBiZHJ2X2NvbW1vbl9ibG9ja19zdGF0dXNfYWJv
-dmU6IHN1cHBvcnQgaW5jbHVkZV9iYXNlCjhmMTM4MzAgYmxvY2svaW86IGZpeCBiZHJ2X2NvX2Js
-b2NrX3N0YXR1c19hYm92ZQozODRiYTIyIGJsb2NrL2V4cG9ydDogYWRkIHZob3N0LXVzZXItYmxr
-IG11bHRpLXF1ZXVlIHN1cHBvcnQKZTEwOTcyZCBibG9jay9leHBvcnQ6IGFkZCBpb3RocmVhZCBh
-bmQgZml4ZWQtaW90aHJlYWQgb3B0aW9ucwo1MzFkNzNiIGJsb2NrOiBtb3ZlIGJsb2NrIGV4cG9y
-dHMgdG8gbGliYmxvY2tkZXYKMTNlODU0NiBxZW11LXN0b3JhZ2UtZGFlbW9uOiBhdm9pZCBjb21w
-aWxpbmcgYmxvY2tkZXZfc3MgdHdpY2UKOTE0NGMyYiB1dGlsL3Zob3N0LXVzZXItc2VydmVyOiB1
-c2Ugc3RhdGljIGxpYnJhcnkgaW4gbWVzb24uYnVpbGQKOWFmYWE3NiB1dGlsL3Zob3N0LXVzZXIt
-c2VydmVyOiBtb3ZlIGhlYWRlciB0byBpbmNsdWRlLwoxZGVkOTI1IGJsb2NrL2V4cG9ydDogY29u
-dmVydCB2aG9zdC11c2VyLWJsayBzZXJ2ZXIgdG8gYmxvY2sgZXhwb3J0IEFQSQo1YmZhNzI2IGJs
-b2NrL2V4cG9ydDogcmVwb3J0IGZsdXNoIGVycm9ycwo0NTY1OTY2IHV0aWwvdmhvc3QtdXNlci1z
-ZXJ2ZXI6IHJld29yayB2dV9jbGllbnRfdHJpcCgpIGNvcm91dGluZSBsaWZlY3ljbGUKN2QzZTQ5
-OSB1dGlsL3Zob3N0LXVzZXItc2VydmVyOiBjaGVjayBFT0Ygd2hlbiByZWFkaW5nIHBheWxvYWQK
-NzE5YWI2ZCB1dGlsL3Zob3N0LXVzZXItc2VydmVyOiBmaXggbWVtb3J5IGxlYWsgaW4gdnVfbWVz
-c2FnZV9yZWFkKCkKMGFmYmIyYyB1dGlsL3Zob3N0LXVzZXItc2VydmVyOiBkcm9wIHVudXNlZCBE
-ZXZpY2VQYW5pY05vdGlmaWVyCjljM2ExYjMwIGJsb2NrL2V4cG9ydDogY29uc29saWRhdGUgcmVx
-dWVzdCBzdHJ1Y3RzIGludG8gVnVCbG9ja1JlcQpkN2Y5MDY4IHV0aWwvdmhvc3QtdXNlci1zZXJ2
-ZXI6IGRyb3AgdW5uZWNlc3Nhcnkgd2F0Y2ggZGVsZXRpb24KZWIwMzgyODggdXRpbC92aG9zdC11
-c2VyLXNlcnZlcjogZHJvcCB1bm5lY2Vzc2FyeSBRT00gY2FzdApiNmE4YzQxIHV0aWwvdmhvc3Qt
-dXNlci1zZXJ2ZXI6IHMvZmlsZWRzL2ZpZWxkcy8gdHlwbyBmaXgKZWYwNmJmNCBNQUlOVEFJTkVS
-UzogQWRkIHZob3N0LXVzZXIgYmxvY2sgZGV2aWNlIGJhY2tlbmQgc2VydmVyIG1haW50YWluZXIK
-M2ZlZDRkOSBibG9jay9leHBvcnQ6IHZob3N0LXVzZXIgYmxvY2sgZGV2aWNlIGJhY2tlbmQgc2Vy
-dmVyCjU1NzBiNjEgYmxvY2s6IG1vdmUgbG9naWNhbCBibG9jayBzaXplIGNoZWNrIGZ1bmN0aW9u
-IHRvIGEgY29tbW9uIHV0aWxpdHkgZnVuY3Rpb24KYjAzYTVkMiB1dGlsL3Zob3N0LXVzZXItc2Vy
-dmVyOiBnZW5lcmljIHZob3N0IHVzZXIgc2VydmVyCmE5NDBiODggbGlidmhvc3QtdXNlcjogcmVt
-b3ZlIHdhdGNoIGZvciBraWNrX2ZkIHdoZW4gZGUtaW5pdGlhbGl6ZSB2dS1kZXYKYjM2N2IzYSBs
-aWJ2aG9zdC11c2VyOiBBbGxvdyB2dV9tZXNzYWdlX3JlYWQgdG8gYmUgcmVwbGFjZWQKZDYxYWY4
-OCBibG9jay9udm1lOiBBZGQgZHJpdmVyIHN0YXRpc3RpY3MgZm9yIGFjY2VzcyBhbGlnbm1lbnQg
-YW5kIGh3IGVycm9ycwoKPT09IE9VVFBVVCBCRUdJTiA9PT0KMS8yOCBDaGVja2luZyBjb21taXQg
-ZDYxYWY4ODU2ZTFkIChibG9jay9udm1lOiBBZGQgZHJpdmVyIHN0YXRpc3RpY3MgZm9yIGFjY2Vz
-cyBhbGlnbm1lbnQgYW5kIGh3IGVycm9ycykKMi8yOCBDaGVja2luZyBjb21taXQgYjM2N2IzYTBj
-OTU0IChsaWJ2aG9zdC11c2VyOiBBbGxvdyB2dV9tZXNzYWdlX3JlYWQgdG8gYmUgcmVwbGFjZWQp
-CldBUk5JTkc6IEJsb2NrIGNvbW1lbnRzIHVzZSBhIGxlYWRpbmcgLyogb24gYSBzZXBhcmF0ZSBs
-aW5lCiMxMzA6IEZJTEU6IGNvbnRyaWIvbGlidmhvc3QtdXNlci9saWJ2aG9zdC11c2VyLmg6Mzk1
-OgorICAgIC8qIEByZWFkX21zZzogY3VzdG9tIG1ldGhvZCB0byByZWFkIHZob3N0LXVzZXIgbWVz
-c2FnZQoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMzkgbGluZXMgY2hlY2tlZAoKUGF0
-Y2ggMi8yOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkgb2YgdGhl
-c2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1haW50YWlu
-ZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgozLzI4IENoZWNraW5nIGNvbW1pdCBh
-OTQwYjg4NWViZmMgKGxpYnZob3N0LXVzZXI6IHJlbW92ZSB3YXRjaCBmb3Iga2lja19mZCB3aGVu
-IGRlLWluaXRpYWxpemUgdnUtZGV2KQo0LzI4IENoZWNraW5nIGNvbW1pdCBiMDNhNWQyYjU0MTcg
-KHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXI6IGdlbmVyaWMgdmhvc3QgdXNlciBzZXJ2ZXIpCldBUk5J
-Tkc6IGFkZGVkLCBtb3ZlZCBvciBkZWxldGVkIGZpbGUocyksIGRvZXMgTUFJTlRBSU5FUlMgbmVl
-ZCB1cGRhdGluZz8KIzM1OiAKbmV3IGZpbGUgbW9kZSAxMDA2NDQKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM4NzogRklMRTogdXRpbC92aG9zdC11c2VyLXNlcnZlci5jOjQ4Ogor
-ICAgIC8qIFdoZW4gdGhpcyBpcyBzZXQgdnVfY2xpZW50X3RyaXAgd2lsbCBzdG9wIG5ldyBwcm9j
-ZXNzaW5nIHZob3N0LXVzZXIgbWVzc2FnZSAqLwoKdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdz
-LCA1MDAgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8yOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFz
-ZSByZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVw
-b3J0IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJT
-Lgo1LzI4IENoZWNraW5nIGNvbW1pdCA1NTcwYjYxNmUzNjYgKGJsb2NrOiBtb3ZlIGxvZ2ljYWwg
-YmxvY2sgc2l6ZSBjaGVjayBmdW5jdGlvbiB0byBhIGNvbW1vbiB1dGlsaXR5IGZ1bmN0aW9uKQpX
-QVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1BSU5UQUlORVJT
-IG5lZWQgdXBkYXRpbmc/CiM4NTogCm5ldyBmaWxlIG1vZGUgMTAwNjQ0Cgp0b3RhbDogMCBlcnJv
-cnMsIDEgd2FybmluZ3MsIDEyOSBsaW5lcyBjaGVja2VkCgpQYXRjaCA1LzI4IGhhcyBzdHlsZSBw
-cm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNl
-IHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0gg
-aW4gTUFJTlRBSU5FUlMuCjYvMjggQ2hlY2tpbmcgY29tbWl0IDNmZWQ0ZDkwYTFhNiAoYmxvY2sv
-ZXhwb3J0OiB2aG9zdC11c2VyIGJsb2NrIGRldmljZSBiYWNrZW5kIHNlcnZlcikKV0FSTklORzog
-YWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVw
-ZGF0aW5nPwojMzA6IApuZXcgZmlsZSBtb2RlIDEwMDY0NAoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzQ3NjogRklMRTogYmxvY2svZXhwb3J0L3Zob3N0LXVzZXItYmxrLXNlcnZl
-ci5jOjQ0MjoKKyAgICAgICAgYmxrX3JlbW92ZV9haW9fY29udGV4dF9ub3RpZmllcih2dV9ibG9j
-a19kZXZpY2UtPmJhY2tlbmQsIGJsa19haW9fYXR0YWNoZWQsCgpFUlJPUjogZ19mcmVlKE5VTEwp
-IGlzIHNhZmUgdGhpcyBjaGVjayBpcyBwcm9iYWJseSBub3QgcmVxdWlyZWQKIzUzNjogRklMRTog
-YmxvY2svZXhwb3J0L3Zob3N0LXVzZXItYmxrLXNlcnZlci5jOjUwMjoKKyAgICBpZiAodnVzLT5u
-b2RlX25hbWUpIHsKKyAgICAgICAgZ19mcmVlKHZ1cy0+bm9kZV9uYW1lKTsKCnRvdGFsOiAxIGVy
-cm9ycywgMiB3YXJuaW5ncywgNzE0IGxpbmVzIGNoZWNrZWQKClBhdGNoIDYvMjggaGFzIHN0eWxl
-IHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFs
-c2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRD
-SCBpbiBNQUlOVEFJTkVSUy4KCjcvMjggQ2hlY2tpbmcgY29tbWl0IGVmMDZiZjQ5OGNlMCAoTUFJ
-TlRBSU5FUlM6IEFkZCB2aG9zdC11c2VyIGJsb2NrIGRldmljZSBiYWNrZW5kIHNlcnZlciBtYWlu
-dGFpbmVyKQo4LzI4IENoZWNraW5nIGNvbW1pdCBiNmE4YzQxMWJkMGUgKHV0aWwvdmhvc3QtdXNl
-ci1zZXJ2ZXI6IHMvZmlsZWRzL2ZpZWxkcy8gdHlwbyBmaXgpCjkvMjggQ2hlY2tpbmcgY29tbWl0
-IGViMDM4Mjg4NzNlNSAodXRpbC92aG9zdC11c2VyLXNlcnZlcjogZHJvcCB1bm5lY2Vzc2FyeSBR
-T00gY2FzdCkKMTAvMjggQ2hlY2tpbmcgY29tbWl0IGQ3ZjkwNjhiNzdhMyAodXRpbC92aG9zdC11
-c2VyLXNlcnZlcjogZHJvcCB1bm5lY2Vzc2FyeSB3YXRjaCBkZWxldGlvbikKMTEvMjggQ2hlY2tp
-bmcgY29tbWl0IDljM2ExYjMwNmRlNCAoYmxvY2svZXhwb3J0OiBjb25zb2xpZGF0ZSByZXF1ZXN0
-IHN0cnVjdHMgaW50byBWdUJsb2NrUmVxKQoxMi8yOCBDaGVja2luZyBjb21taXQgMGFmYmIyYzIx
-NTU0ICh1dGlsL3Zob3N0LXVzZXItc2VydmVyOiBkcm9wIHVudXNlZCBEZXZpY2VQYW5pY05vdGlm
-aWVyKQoxMy8yOCBDaGVja2luZyBjb21taXQgNzE5YWI2ZDY5YTEyICh1dGlsL3Zob3N0LXVzZXIt
-c2VydmVyOiBmaXggbWVtb3J5IGxlYWsgaW4gdnVfbWVzc2FnZV9yZWFkKCkpCjE0LzI4IENoZWNr
-aW5nIGNvbW1pdCA3ZDNlNDk5Nzc0NzIgKHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXI6IGNoZWNrIEVP
-RiB3aGVuIHJlYWRpbmcgcGF5bG9hZCkKMTUvMjggQ2hlY2tpbmcgY29tbWl0IDQ1NjU5NjZhMDA4
-YiAodXRpbC92aG9zdC11c2VyLXNlcnZlcjogcmV3b3JrIHZ1X2NsaWVudF90cmlwKCkgY29yb3V0
-aW5lIGxpZmVjeWNsZSkKMTYvMjggQ2hlY2tpbmcgY29tbWl0IDViZmE3MjZiMTc0NiAoYmxvY2sv
-ZXhwb3J0OiByZXBvcnQgZmx1c2ggZXJyb3JzKQoxNy8yOCBDaGVja2luZyBjb21taXQgMWRlZDky
-NTBlODllIChibG9jay9leHBvcnQ6IGNvbnZlcnQgdmhvc3QtdXNlci1ibGsgc2VydmVyIHRvIGJs
-b2NrIGV4cG9ydCBBUEkpCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM4NDg6IEZJ
-TEU6IHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuYzo0MTU6CisgICAgICAgIGVycm9yX3NldGcoZXJy
-cCwgIk9ubHkgc29ja2V0IGFkZHJlc3MgdHlwZXMgJ3VuaXgnIGFuZCAnZmQnIGFyZSBzdXBwb3J0
-ZWQiKTsKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgNzUwIGxpbmVzIGNoZWNrZWQKClBh
-dGNoIDE3LzI4IGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0
-aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRh
-aW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjE4LzI4IENoZWNraW5nIGNvbW1p
-dCA5YWZhYTc2NTMxNGIgKHV0aWwvdmhvc3QtdXNlci1zZXJ2ZXI6IG1vdmUgaGVhZGVyIHRvIGlu
-Y2x1ZGUvKQpXQVJOSU5HOiBhZGRlZCwgbW92ZWQgb3IgZGVsZXRlZCBmaWxlKHMpLCBkb2VzIE1B
-SU5UQUlORVJTIG5lZWQgdXBkYXRpbmc/CiM0NjogCnJlbmFtZSBmcm9tIHV0aWwvdmhvc3QtdXNl
-ci1zZXJ2ZXIuaAoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAyOCBsaW5lcyBjaGVja2Vk
-CgpQYXRjaCAxOC8yOCBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJZiBhbnkg
-b2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8gdGhlIG1h
-aW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoxOS8yOCBDaGVja2luZyBj
-b21taXQgOTE0NGMyYjQ2NmYxICh1dGlsL3Zob3N0LXVzZXItc2VydmVyOiB1c2Ugc3RhdGljIGxp
-YnJhcnkgaW4gbWVzb24uYnVpbGQpCjIwLzI4IENoZWNraW5nIGNvbW1pdCAxM2U4NTQ2NzIyNGIg
-KHFlbXUtc3RvcmFnZS1kYWVtb246IGF2b2lkIGNvbXBpbGluZyBibG9ja2Rldl9zcyB0d2ljZSkK
-MjEvMjggQ2hlY2tpbmcgY29tbWl0IDUzMWQ3M2JjNmNmOCAoYmxvY2s6IG1vdmUgYmxvY2sgZXhw
-b3J0cyB0byBsaWJibG9ja2RldikKV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmls
-ZShzKSwgZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojMTI3OiAKbmV3IGZpbGUgbW9k
-ZSAxMDA2NDQKCnRvdGFsOiAwIGVycm9ycywgMSB3YXJuaW5ncywgODYgbGluZXMgY2hlY2tlZAoK
-UGF0Y2ggMjEvMjggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9m
-IHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWlu
-dGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KMjIvMjggQ2hlY2tpbmcgY29t
-bWl0IGUxMDk3MmQ3NmE2ZCAoYmxvY2svZXhwb3J0OiBhZGQgaW90aHJlYWQgYW5kIGZpeGVkLWlv
-dGhyZWFkIG9wdGlvbnMpCjIzLzI4IENoZWNraW5nIGNvbW1pdCAzODRiYTIyMDYxNDYgKGJsb2Nr
-L2V4cG9ydDogYWRkIHZob3N0LXVzZXItYmxrIG11bHRpLXF1ZXVlIHN1cHBvcnQpCjI0LzI4IENo
-ZWNraW5nIGNvbW1pdCA4ZjEzODMwYTBmZjAgKGJsb2NrL2lvOiBmaXggYmRydl9jb19ibG9ja19z
-dGF0dXNfYWJvdmUpCjI1LzI4IENoZWNraW5nIGNvbW1pdCA4MjRkNmY2NjFiNDIgKGJsb2NrL2lv
-OiBiZHJ2X2NvbW1vbl9ibG9ja19zdGF0dXNfYWJvdmU6IHN1cHBvcnQgaW5jbHVkZV9iYXNlKQoy
-Ni8yOCBDaGVja2luZyBjb21taXQgNTMxNDE1NTdmNDE1IChibG9jay9pbzogYmRydl9jb21tb25f
-YmxvY2tfc3RhdHVzX2Fib3ZlOiBzdXBwb3J0IGJzID09IGJhc2UpCjI3LzI4IENoZWNraW5nIGNv
-bW1pdCAyMzgxYTlkYmUwMzQgKGJsb2NrL2lvOiBmaXggYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUp
-CjI4LzI4IENoZWNraW5nIGNvbW1pdCAwNzBjYjg3ODAzMDkgKGlvdGVzdHM6IGFkZCBjb21taXQg
-dG9wLT5iYXNlIGNhc2VzIHRvIDI3NCkKPT09IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQg
-ZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDov
-L3BhdGNoZXcub3JnL2xvZ3MvMjAyMDEwMjIxMTI3MjYuNzM2NzU3LTEtc3RlZmFuaGFAcmVkaGF0
-LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRl
-ZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNl
-IHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
+This module emulates control registers of versal usb2 controller, this is added
+just to make guest happy. In general this module would control the phy-reset
+signal from usb controller, data coherency of the transactions, signals
+the host system errors received from controller.
+
+Signed-off-by: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
+Signed-off-by: Vikram Garhwal <fnu.vikram@xilinx.com>
+---
+ hw/misc/meson.build                          |   1 +
+ hw/misc/xlnx-versal-usb2-ctrl-regs.c         | 229 +++++++++++++++++++++++++++
+ include/hw/misc/xlnx-versal-usb2-ctrl-regs.h |  45 ++++++
+ 3 files changed, 275 insertions(+)
+ create mode 100644 hw/misc/xlnx-versal-usb2-ctrl-regs.c
+ create mode 100644 include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
+
+diff --git a/hw/misc/meson.build b/hw/misc/meson.build
+index 793d45b..b336dd1 100644
+--- a/hw/misc/meson.build
++++ b/hw/misc/meson.build
+@@ -109,3 +109,4 @@ specific_ss.add(when: 'CONFIG_MIPS_CPS', if_true: files('mips_cmgcr.c', 'mips_cp
+ specific_ss.add(when: 'CONFIG_MIPS_ITU', if_true: files('mips_itu.c'))
+ 
+ specific_ss.add(when: 'CONFIG_SBSA_REF', if_true: files('sbsa_ec.c'))
++specific_ss.add(when: 'CONFIG_XLNX_VERSAL', if_true: files('xlnx-versal-usb2-ctrl-regs.c'))
+diff --git a/hw/misc/xlnx-versal-usb2-ctrl-regs.c b/hw/misc/xlnx-versal-usb2-ctrl-regs.c
+new file mode 100644
+index 0000000..0d09dd2
+--- /dev/null
++++ b/hw/misc/xlnx-versal-usb2-ctrl-regs.c
+@@ -0,0 +1,229 @@
++/*
++ * QEMU model of the VersalUsb2CtrlRegs Register control/Status block for
++ * USB2.0 controller
++ *
++ * This module should control phy_reset, permanent device plugs, frame length
++ * time adjust & setting of coherency paths. None of which are emulated in
++ * present model.
++ *
++ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal <fnu.vikram@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#include "qemu/osdep.h"
++#include "hw/sysbus.h"
++#include "hw/irq.h"
++#include "hw/register.h"
++#include "qemu/bitops.h"
++#include "qemu/log.h"
++#include "qom/object.h"
++#include "migration/vmstate.h"
++#include "hw/misc/xlnx-versal-usb2-ctrl-regs.h"
++
++#ifndef XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG
++#define XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG 0
++#endif
++
++REG32(BUS_FILTER, 0x30)
++    FIELD(BUS_FILTER, BYPASS, 0, 4)
++REG32(PORT, 0x34)
++    FIELD(PORT, HOST_SMI_BAR_WR, 4, 1)
++    FIELD(PORT, HOST_SMI_PCI_CMD_REG_WR, 3, 1)
++    FIELD(PORT, HOST_MSI_ENABLE, 2, 1)
++    FIELD(PORT, PWR_CTRL_PRSNT, 1, 1)
++    FIELD(PORT, HUB_PERM_ATTACH, 0, 1)
++REG32(JITTER_ADJUST, 0x38)
++    FIELD(JITTER_ADJUST, FLADJ, 0, 6)
++REG32(BIGENDIAN, 0x40)
++    FIELD(BIGENDIAN, ENDIAN_GS, 0, 1)
++REG32(COHERENCY, 0x44)
++    FIELD(COHERENCY, USB_COHERENCY, 0, 1)
++REG32(XHC_BME, 0x48)
++    FIELD(XHC_BME, XHC_BME, 0, 1)
++REG32(REG_CTRL, 0x60)
++    FIELD(REG_CTRL, SLVERR_ENABLE, 0, 1)
++REG32(IR_STATUS, 0x64)
++    FIELD(IR_STATUS, HOST_SYS_ERR, 1, 1)
++    FIELD(IR_STATUS, ADDR_DEC_ERR, 0, 1)
++REG32(IR_MASK, 0x68)
++    FIELD(IR_MASK, HOST_SYS_ERR, 1, 1)
++    FIELD(IR_MASK, ADDR_DEC_ERR, 0, 1)
++REG32(IR_ENABLE, 0x6c)
++    FIELD(IR_ENABLE, HOST_SYS_ERR, 1, 1)
++    FIELD(IR_ENABLE, ADDR_DEC_ERR, 0, 1)
++REG32(IR_DISABLE, 0x70)
++    FIELD(IR_DISABLE, HOST_SYS_ERR, 1, 1)
++    FIELD(IR_DISABLE, ADDR_DEC_ERR, 0, 1)
++REG32(USB3, 0x78)
++
++static void ir_update_irq(VersalUsb2CtrlRegs *s)
++{
++    bool pending = s->regs[R_IR_STATUS] & ~s->regs[R_IR_MASK];
++    qemu_set_irq(s->irq_ir, pending);
++}
++
++static void ir_status_postw(RegisterInfo *reg, uint64_t val64)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
++    /*
++     * TODO: This should also clear USBSTS.HSE field in USB XHCI register.
++     * May be combine both the modules.
++     */
++    ir_update_irq(s);
++}
++
++static uint64_t ir_enable_prew(RegisterInfo *reg, uint64_t val64)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
++    uint32_t val = val64;
++
++    s->regs[R_IR_MASK] &= ~val;
++    ir_update_irq(s);
++    return 0;
++}
++
++static uint64_t ir_disable_prew(RegisterInfo *reg, uint64_t val64)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(reg->opaque);
++    uint32_t val = val64;
++
++    s->regs[R_IR_MASK] |= val;
++    ir_update_irq(s);
++    return 0;
++}
++
++static const RegisterAccessInfo usb2_ctrl_regs_regs_info[] = {
++    {   .name = "BUS_FILTER",  .addr = A_BUS_FILTER,
++        .rsvd = 0xfffffff0,
++    },{ .name = "PORT",  .addr = A_PORT,
++        .rsvd = 0xffffffe0,
++    },{ .name = "JITTER_ADJUST",  .addr = A_JITTER_ADJUST,
++        .reset = 0x20,
++        .rsvd = 0xffffffc0,
++    },{ .name = "BIGENDIAN",  .addr = A_BIGENDIAN,
++        .rsvd = 0xfffffffe,
++    },{ .name = "COHERENCY",  .addr = A_COHERENCY,
++        .rsvd = 0xfffffffe,
++    },{ .name = "XHC_BME",  .addr = A_XHC_BME,
++        .reset = 0x1,
++        .rsvd = 0xfffffffe,
++    },{ .name = "REG_CTRL",  .addr = A_REG_CTRL,
++        .rsvd = 0xfffffffe,
++    },{ .name = "IR_STATUS",  .addr = A_IR_STATUS,
++        .rsvd = 0xfffffffc,
++        .w1c = 0x3,
++        .post_write = ir_status_postw,
++    },{ .name = "IR_MASK",  .addr = A_IR_MASK,
++        .reset = 0x3,
++        .rsvd = 0xfffffffc,
++        .ro = 0x3,
++    },{ .name = "IR_ENABLE",  .addr = A_IR_ENABLE,
++        .rsvd = 0xfffffffc,
++        .pre_write = ir_enable_prew,
++    },{ .name = "IR_DISABLE",  .addr = A_IR_DISABLE,
++        .rsvd = 0xfffffffc,
++        .pre_write = ir_disable_prew,
++    },{ .name = "USB3",  .addr = A_USB3,
++    }
++};
++
++static void usb2_ctrl_regs_reset_init(Object *obj, ResetType type)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
++    unsigned int i;
++
++    for (i = 0; i < ARRAY_SIZE(s->regs_info); ++i) {
++        register_reset(&s->regs_info[i]);
++    }
++}
++
++static void usb2_ctrl_regs_reset_hold(Object *obj)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
++
++    ir_update_irq(s);
++}
++
++static const MemoryRegionOps usb2_ctrl_regs_ops = {
++    .read = register_read_memory,
++    .write = register_write_memory,
++    .endianness = DEVICE_LITTLE_ENDIAN,
++    .valid = {
++        .min_access_size = 4,
++        .max_access_size = 4,
++    },
++};
++
++static void usb2_ctrl_regs_init(Object *obj)
++{
++    VersalUsb2CtrlRegs *s = XILINX_VERSAL_USB2_CTRL_REGS(obj);
++    SysBusDevice *sbd = SYS_BUS_DEVICE(obj);
++    RegisterInfoArray *reg_array;
++
++    memory_region_init(&s->iomem, obj, TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
++                       USB2_REGS_R_MAX * 4);
++    reg_array =
++        register_init_block32(DEVICE(obj), usb2_ctrl_regs_regs_info,
++                              ARRAY_SIZE(usb2_ctrl_regs_regs_info),
++                              s->regs_info, s->regs,
++                              &usb2_ctrl_regs_ops,
++                              XILINX_VERSAL_USB2_CTRL_REGS_ERR_DEBUG,
++                              USB2_REGS_R_MAX * 4);
++    memory_region_add_subregion(&s->iomem,
++                                0x0,
++                                &reg_array->mem);
++    sysbus_init_mmio(sbd, &s->iomem);
++    sysbus_init_irq(sbd, &s->irq_ir);
++}
++
++static const VMStateDescription vmstate_usb2_ctrl_regs = {
++    .name = TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINT32_ARRAY(regs, VersalUsb2CtrlRegs, USB2_REGS_R_MAX),
++        VMSTATE_END_OF_LIST(),
++    }
++};
++
++static void usb2_ctrl_regs_class_init(ObjectClass *klass, void *data)
++{
++    DeviceClass *dc = DEVICE_CLASS(klass);
++    ResettableClass *rc = RESETTABLE_CLASS(klass);
++
++    rc->phases.enter = usb2_ctrl_regs_reset_init;
++    rc->phases.hold  = usb2_ctrl_regs_reset_hold;
++    dc->vmsd = &vmstate_usb2_ctrl_regs;
++}
++
++static const TypeInfo usb2_ctrl_regs_info = {
++    .name          = TYPE_XILINX_VERSAL_USB2_CTRL_REGS,
++    .parent        = TYPE_SYS_BUS_DEVICE,
++    .instance_size = sizeof(VersalUsb2CtrlRegs),
++    .class_init    = usb2_ctrl_regs_class_init,
++    .instance_init = usb2_ctrl_regs_init,
++};
++
++static void usb2_ctrl_regs_register_types(void)
++{
++    type_register_static(&usb2_ctrl_regs_info);
++}
++
++type_init(usb2_ctrl_regs_register_types)
+diff --git a/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h b/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
+new file mode 100644
+index 0000000..975a717
+--- /dev/null
++++ b/include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
+@@ -0,0 +1,45 @@
++/*
++ * QEMU model of the VersalUsb2CtrlRegs Register control/Status block for
++ * USB2.0 controller
++ *
++ * Copyright (c) 2020 Xilinx Inc. Vikram Garhwal <fnu.vikram@xilinx.com>
++ *
++ * Permission is hereby granted, free of charge, to any person obtaining a copy
++ * of this software and associated documentation files (the "Software"), to deal
++ * in the Software without restriction, including without limitation the rights
++ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
++ * copies of the Software, and to permit persons to whom the Software is
++ * furnished to do so, subject to the following conditions:
++ *
++ * The above copyright notice and this permission notice shall be included in
++ * all copies or substantial portions of the Software.
++ *
++ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
++ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
++ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
++ * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
++ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
++ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
++ * THE SOFTWARE.
++ */
++
++#ifndef _XLNX_USB2_REGS_H_
++#define _XLNX_USB2_REGS_H_
++
++#define TYPE_XILINX_VERSAL_USB2_CTRL_REGS "xlnx.versal-usb2-ctrl-regs"
++
++#define XILINX_VERSAL_USB2_CTRL_REGS(obj) \
++     OBJECT_CHECK(VersalUsb2CtrlRegs, (obj), TYPE_XILINX_VERSAL_USB2_CTRL_REGS)
++
++#define USB2_REGS_R_MAX ((0x78 / 4) + 1)
++
++typedef struct VersalUsb2CtrlRegs {
++    SysBusDevice parent_obj;
++    MemoryRegion iomem;
++    qemu_irq irq_ir;
++
++    uint32_t regs[USB2_REGS_R_MAX];
++    RegisterInfo regs_info[USB2_REGS_R_MAX];
++} VersalUsb2CtrlRegs;
++
++#endif
+-- 
+2.7.4
+
 
