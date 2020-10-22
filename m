@@ -6,43 +6,43 @@ X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 652D6C388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:14:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68C15C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 718432225F
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:14:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 718432225F
+	by mail.kernel.org (Postfix) with ESMTPS id 86E6B24182
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:18:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 86E6B24182
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37546 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVbM5-0000td-FI
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:14:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44862)
+	id 1kVbPr-0003qp-8A
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:18:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44866)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVbJI-0007OD-W3
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:11:21 -0400
-Received: from indium.canonical.com ([91.189.90.7]:54776)
+ id 1kVbJL-0007Os-3B
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:11:24 -0400
+Received: from indium.canonical.com ([91.189.90.7]:54798)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVbJ9-0001In-VF
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:11:17 -0400
+ id 1kVbJ9-0001Iu-VP
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:11:20 -0400
 Received: from loganberry.canonical.com ([91.189.90.37])
  by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kVbJ6-0003a2-C7
+ id 1kVbJ6-0003Zc-TP
  for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 14:11:08 +0000
 Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 339842E8133
+ by loganberry.canonical.com (Postfix) with ESMTP id B0FD02E8133
  for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 14:11:08 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Oct 2020 14:00:50 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1895310@bugs.launchpad.net>
+Date: Thu, 22 Oct 2020 14:00:12 -0000
+From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1892960@bugs.launchpad.net>
 To: qemu-devel@nongnu.org
 X-Launchpad-Notification-Type: bug
 X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
@@ -50,19 +50,20 @@ X-Launchpad-Bug: product=qemu; status=Fix Committed; importance=Undecided;
 X-Launchpad-Bug-Information-Type: Public
 X-Launchpad-Bug-Private: no
 X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr philmd
+X-Launchpad-Bug-Commenters: a1xndr philmd pjps
 X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
 X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
  =?utf-8?q?=29?=
-References: <159983760940.22223.155030952574347545.malonedeb@wampee.canonical.com>
-Message-Id: <160337525067.29818.9898310961213857448.malone@chaenomeles.canonical.com>
-Subject: [Bug 1895310] Re: Heap-overflow (read) in sd_erase
+References: <159840512781.15369.16521722289936881073.malonedeb@soybean.canonical.com>
+Message-Id: <160337521275.12136.176592982852335126.malone@soybean.canonical.com>
+Subject: [Bug 1892960] Re: Heap-overflow in flatview_read through
+ sdhci_data_transfer
 X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
 X-Launchpad-Message-For: qemu-devel-ml
 Precedence: bulk
 X-Generated-By: Launchpad (canonical.com);
  Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
-X-Launchpad-Hash: be5fd5aa9829e14b55b0c9e0967bbc0911caa334
+X-Launchpad-Hash: f01015cb9d96da5c714cbfb2c842b51489ecd986
 Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
  helo=indium.canonical.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:20:54
@@ -85,12 +86,12 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895310 <1895310@bugs.launchpad.net>
+Reply-To: Bug 1892960 <1892960@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Fixed in commit 1bd6fd8ed5933bfba53e5f5eadebd845094c3707.
+Fixed in commit dfba99f17feb6d4a129da19d38df1bcd8579d1c3.
 
 ** Changed in: qemu
        Status: New =3D> Fix Committed
@@ -99,176 +100,302 @@ Fixed in commit 1bd6fd8ed5933bfba53e5f5eadebd845094c3707.
 
 You received this bug notification because you are a member of qemu-
 devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895310
+https://bugs.launchpad.net/bugs/1892960
 
 Title:
-  Heap-overflow (read) in sd_erase
+  Heap-overflow in flatview_read through sdhci_data_transfer
 
 Status in QEMU:
   Fix Committed
 
 Bug description:
   Hello,
-  One more bug in sd ...
-
+  Reproducer:
   cat << EOF | ./qemu-system-i386 -nodefaults \
   -device sdhci-pci,sd-spec-version=3D3 \
   -device sd-card,drive=3Dmydrive \
   -drive if=3Dsd,index=3D0,file=3Dnull-co://,format=3Draw,id=3Dmydrive \
-  -nographic -qtest stdio -m 64m -trace 'sd*'
+  -nographic -qtest stdio -accel qtest =
+
+  outl 0xcf8 0x80001010
+  outl 0xcfc 0xd7055dba
   outl 0xcf8 0x80001003
-  outl 0xcfc 0xd735d735
-  outl 0xcf8 0x80001011
-  outl 0xcfc 0x3405064c
-  write 0x5064c2c 0x1 0xd7
-  write 0x5064c0f 0x1 0xf7
-  write 0x5064c05 0x1 0xd7
-  write 0x5064c0a 0x1 0x84
-  write 0x5064c0b 0x1 0x4c
-  write 0x5064c0c 0x1 0x11
-  write 0x5064c0f 0x1 0xa9
-  write 0x5064c0f 0x1 0x02
-  write 0x5064c0f 0x1 0x03
-  write 0x5064c0e 0x1 0x2c
-  write 0x5064c0f 0x1 0x06
-  write 0x5064c0f 0x1 0xe1
-  write 0x5064c0f 0x1 0x60
-  write 0x5064c0f 0x1 0x26
+  outl 0xcfc 0x86b1d733
+  writeq 0xd7055d2b 0x84126e0ed7d7355e
+  writeq 0xd7055d23 0x13bd7d7346e0129
+  writeq 0xd7055d05 0x615bfb845e05c42c
+  write 0x0 0x1 0x39
+  write 0x5 0x1 0x06
+  write 0x6 0x1 0x35
+  write 0x7 0x1 0x01
+  write 0x1350600 0x1 0x39
+  writew 0xd7055d0e 0x846e
+  write 0x1350600 0x1 0x29
+  write 0x1350602 0x1 0x1a
+  write 0x1350608 0x1 0x39
+  clock_step
+  writeq 0xd7055d03 0x6d00000026000000
+  clock_step
   EOF
 
-  The crash:
-  =3D=3D133840=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
-s 0x607000059e78 at pc 0x55abd1d761e6 bp 0x7ffc12800630 sp 0x7ffc12800628
-  READ of size 8 at 0x607000059e78 thread T0
-  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd1d761e5 in test_bit /home/alxndr/Develo=
-pment/qemu/general-fuzz/include/qemu/bitops.h:135:19
-  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d6cb1e in sd_erase /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:771:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d4c893 in sd_normal_command /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/sd/sd.c:1412:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d33c5d in sd_do_command /home/alxndr/D=
-evelopment/qemu/general-fuzz/build/../hw/sd/sd.c:1724:17
-  =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd20117a4 in sdbus_do_command /home/alxnd=
-r/Development/qemu/general-fuzz/build/../hw/sd/core.c:99:16
-  =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd27ecc90 in sdhci_send_command /home/alx=
-ndr/Development/qemu/general-fuzz/build/../hw/sd/sdhci.c:326:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd27e16ed in sdhci_write /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../hw/sd/sdhci.c:1136:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd43aacc0 in memory_region_write_accessor=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:483:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd43aa19d in access_with_adjusted_size /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:544:18
-  =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd43a7e50 in memory_region_dispatch_write=
- /home/alxndr/Development/qemu/general-fuzz/build/../softmmu/memory.c:1466:=
-16
-  =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd3de5dc6 in flatview_write_continue /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../exec.c:3176:23
-  =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd3dced98 in flatview_write /home/alxndr=
-/Development/qemu/general-fuzz/build/../exec.c:3216:14
-  =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd3dce8c8 in address_space_write /home/a=
-lxndr/Development/qemu/general-fuzz/build/../exec.c:3308:18
-  =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd3ffabbc in qtest_process_command /home=
-/alxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:567:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd3feb8be in qtest_process_inbuf /home/a=
-lxndr/Development/qemu/general-fuzz/build/../softmmu/qtest.c:710:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd3fea663 in qtest_read /home/alxndr/Dev=
-elopment/qemu/general-fuzz/build/../softmmu/qtest.c:722:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd51cb9a2 in qemu_chr_be_write_impl /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../chardev/char.c:188:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd51cbaea in qemu_chr_be_write /home/alx=
-ndr/Development/qemu/general-fuzz/build/../chardev/char.c:200:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd51e6264 in fd_chr_read /home/alxndr/De=
-velopment/qemu/general-fuzz/build/../chardev/char-fd.c:68:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd515bef6 in qio_channel_fd_source_dispa=
-tch /home/alxndr/Development/qemu/general-fuzz/build/../io/channel-watch.c:=
-84:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#20 0x7fd5d58bd4cd in g_main_context_dispatch (/u=
-sr/lib/x86_64-linux-gnu/libglib-2.0.so.0+0x504cd)
-  =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd54db327 in glib_pollfds_poll /home/alx=
-ndr/Development/qemu/general-fuzz/build/../util/main-loop.c:217:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd54d8c27 in os_host_main_loop_wait /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../util/main-loop.c:240:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd54d8607 in main_loop_wait /home/alxndr=
-/Development/qemu/general-fuzz/build/../util/main-loop.c:516:11
-  =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd3d55afd in qemu_main_loop /home/alxndr=
-/Development/qemu/general-fuzz/build/../softmmu/vl.c:1676:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd16df67c in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:50:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#26 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
-  =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd1634e59 in _start (/home/alxndr/Develo=
-pment/qemu/general-fuzz/build/qemu-system-i386+0x2d3ee59)
+  The trace:
 
-  0x607000059e78 is located 0 bytes to the right of 72-byte region [0x60700=
-0059e30,0x607000059e78)
+  [R +0.077745] outl 0xcf8 0x80001010
+  OK
+  [S +0.077773] OK
+  [R +0.077792] outl 0xcfc 0xd7055dba
+  OK
+  [S +0.077813] OK
+  [R +0.077826] outl 0xcf8 0x80001003
+  OK
+  [S +0.077835] OK
+  [R +0.077846] outl 0xcfc 0x86b1d733
+  OK
+  [S +0.080186] OK
+  [R +0.080204] writeq 0xd7055d2b 0x84126e0ed7d7355e
+  752161@1598405049.572123:sdhci_access wr8: addr[0x002b] <- 0x0000005e (94)
+  752161@1598405049.572133:sdhci_access wr32: addr[0x002c] <- 0x0ed7d735 (2=
+49026357)
+  752161@1598405049.572142:sdhci_access wr16: addr[0x0030] <- 0x0000126e (4=
+718)
+  752161@1598405049.572150:sdhci_access wr8: addr[0x0032] <- 0x00000084 (13=
+2)
+  OK
+  [S +0.080255] OK
+  [R +0.080267] writeq 0xd7055d23 0x13bd7d7346e0129
+  752161@1598405049.572176:sdhci_error Non-sequential access to Buffer Data=
+ Port registeris prohibited
+
+  752161@1598405049.572181:sdhci_access wr8: addr[0x0023] <- 0x00000029 (41)
+  752161@1598405049.572187:sdhci_access wr32: addr[0x0024] <- 0xd7346e01 (3=
+610537473)
+  752161@1598405049.572193:sdhci_access wr16: addr[0x0028] <- 0x00003bd7 (1=
+5319)
+  752161@1598405049.572200:sdhci_access wr8: addr[0x002a] <- 0x00000001 (1)
+  OK
+  [S +0.080303] OK
+  [R +0.080316] writeq 0xd7055d05 0x615bfb845e05c42c
+  752161@1598405049.572226:sdhci_access wr8: addr[0x0005] <- 0x0000002c (44)
+  752161@1598405049.572233:sdhci_access wr16: addr[0x0006] <- 0x000005c4 (1=
+476)
+  752161@1598405049.572240:sdhci_access wr32: addr[0x0008] <- 0x5bfb845e (1=
+543210078)
+  752161@1598405049.572247:sdhci_access wr8: addr[0x000c] <- 0x00000061 (97)
+  OK
+  [S +0.080350] OK
+  [R +0.080362] write 0x0 0x1 0x39
+  OK
+  [S +0.080606] OK
+  [R +0.080617] write 0x5 0x1 0x06
+  OK
+  [S +0.080629] OK
+  [R +0.080639] write 0x6 0x1 0x35
+  OK
+  [S +0.080648] OK
+  [R +0.080657] write 0x7 0x1 0x01
+  OK
+  [S +0.080665] OK
+  [R +0.080675] write 0x1350600 0x1 0x39
+  OK
+  [S +0.080863] OK
+  [R +0.080875] writew 0xd7055d0e 0x846e
+  752161@1598405049.572786:sdhci_send_command CMD132 ARG[0x5bfb845e]
+  752161@1598405049.572810:sdhci_error timeout waiting for command response
+  752161@1598405049.572822:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572827:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572833:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572837:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572842:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572845:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572851:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572854:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572859:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572862:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572875:sdhci_access wr16: addr[0x000e] <- 0x0000846e (3=
+3902)
+  OK
+  [S +0.080979] OK
+  [R +0.080991] write 0x1350600 0x1 0x29
+  OK
+  [S +0.081001] OK
+  [R +0.081011] write 0x1350602 0x1 0x1a
+  OK
+  [S +0.081019] OK
+  [R +0.081029] write 0x1350608 0x1 0x39
+  OK
+  [S +0.081037] OK
+  [R +0.081045] clock_step
+  752161@1598405049.572962:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  752161@1598405049.572972:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572977:sdhci_adma link: admasysaddr=3D0x0
+  752161@1598405049.572981:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.572985:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.572989:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  752161@1598405049.572997:sdhci_adma_loop addr=3D0x00000000, len=3D0, attr=
+=3D0x39
+  752161@1598405049.573001:sdhci_adma link: admasysaddr=3D0x0
+  OK 100
+  [S +0.081112] OK 100
+  [R +0.081126] writeq 0xd7055d03 0x6d00000026000000
+  752161@1598405049.573038:sdhci_access wr8: addr[0x0003] <- 0x00000000 (0)
+  752161@1598405049.573045:sdhci_access wr32: addr[0x0004] <- 0x00260000 (2=
+490368)
+  752161@1598405049.573051:sdhci_access wr16: addr[0x0008] <- 0x00000000 (0)
+  752161@1598405049.573057:sdhci_access wr8: addr[0x000a] <- 0x0000006d (10=
+9)
+  OK
+  [S +0.081162] OK
+  [R +0.081171] clock_step
+  752161@1598405049.573085:sdhci_adma_loop addr=3D0x01350600, len=3D0, attr=
+=3D0x39
+  752161@1598405049.573090:sdhci_adma link: admasysaddr=3D0x1350600
+  752161@1598405049.573096:sdhci_adma_loop addr=3D0x00000000, len=3D26, att=
+r=3D0x29
+  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+  =3D=3D752161=3D=3DERROR: AddressSanitizer: heap-buffer-overflow on addres=
+s 0x61500001e500 at pc 0x5651bce1a940 bp 0x7fff16a81f50 sp 0x7fff16a81718
+  WRITE of size 786432 at 0x61500001e500 thread T0
+      #0 0x5651bce1a93f in __asan_memcpy (/home/alxndr/Development/qemu/gen=
+eral-fuzz/build/qemu-system-i386+0x2d2893f)
+      #1 0x5651bf4197ce in flatview_read_continue /home/alxndr/Development/=
+qemu/general-fuzz/build/../exec.c:3246:13
+      #2 0x5651bf41bff3 in flatview_read /home/alxndr/Development/qemu/gene=
+ral-fuzz/build/../exec.c:3279:12
+      #3 0x5651bf41bb48 in address_space_read_full /home/alxndr/Development=
+/qemu/general-fuzz/build/../exec.c:3292:18
+      #4 0x5651bf41cce8 in address_space_rw /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../exec.c:3320:16
+      #5 0x5651bd623b67 in dma_memory_rw_relaxed /home/alxndr/Development/q=
+emu/general-fuzz/include/sysemu/dma.h:87:18
+      #6 0x5651bd623585 in dma_memory_rw /home/alxndr/Development/qemu/gene=
+ral-fuzz/include/sysemu/dma.h:110:12
+      #7 0x5651bd6227b7 in dma_memory_read /home/alxndr/Development/qemu/ge=
+neral-fuzz/include/sysemu/dma.h:116:12
+      #8 0x5651bd61b052 in sdhci_do_adma /home/alxndr/Development/qemu/gene=
+ral-fuzz/build/../hw/sd/sdhci.c:792:21
+      #9 0x5651bd60d3c4 in sdhci_data_transfer /home/alxndr/Development/qem=
+u/general-fuzz/build/../hw/sd/sdhci.c:887:13
+      #10 0x5651c0c4d917 in timerlist_run_timers /home/alxndr/Development/q=
+emu/general-fuzz/build/../util/qemu-timer.c:572:9
+      #11 0x5651c0c4de51 in qemu_clock_run_timers /home/alxndr/Development/=
+qemu/general-fuzz/build/../util/qemu-timer.c:586:12
+      #12 0x5651bf562a13 in qtest_clock_warp /home/alxndr/Development/qemu/=
+general-fuzz/build/../softmmu/cpus.c:507:9
+      #13 0x5651bf74f5d8 in qtest_process_command /home/alxndr/Development/=
+qemu/general-fuzz/build/../softmmu/qtest.c:665:9
+      #14 0x5651bf73d63e in qtest_process_inbuf /home/alxndr/Development/qe=
+mu/general-fuzz/build/../softmmu/qtest.c:710:9
+      #15 0x5651bf73c3e3 in qtest_read /home/alxndr/Development/qemu/genera=
+l-fuzz/build/../softmmu/qtest.c:722:5
+      #16 0x5651c0842762 in qemu_chr_be_write_impl /home/alxndr/Development=
+/qemu/general-fuzz/build/../chardev/char.c:188:9
+      #17 0x5651c08428aa in qemu_chr_be_write /home/alxndr/Development/qemu=
+/general-fuzz/build/../chardev/char.c:200:9
+      #18 0x5651c0868514 in fd_chr_read /home/alxndr/Development/qemu/gener=
+al-fuzz/build/../chardev/char-fd.c:68:9
+      #19 0x5651c0754736 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
+elopment/qemu/general-fuzz/build/../io/channel-watch.c:84:12
+      #20 0x7fac88fad4cd in g_main_context_dispatch (/usr/lib/x86_64-linux-=
+gnu/libglib-2.0.so.0+0x504cd)
+      #21 0x5651c0cdfc67 in glib_pollfds_poll /home/alxndr/Development/qemu=
+/general-fuzz/build/../util/main-loop.c:217:9
+      #22 0x5651c0cdd567 in os_host_main_loop_wait /home/alxndr/Development=
+/qemu/general-fuzz/build/../util/main-loop.c:240:5
+      #23 0x5651c0cdcf47 in main_loop_wait /home/alxndr/Development/qemu/ge=
+neral-fuzz/build/../util/main-loop.c:516:11
+      #24 0x5651bf4bb08d in qemu_main_loop /home/alxndr/Development/qemu/ge=
+neral-fuzz/build/../softmmu/vl.c:1676:9
+      #25 0x5651bce4d51c in main /home/alxndr/Development/qemu/general-fuzz=
+/build/../softmmu/main.c:50:5
+      #26 0x7fac887b6cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
+      #27 0x5651bcda2cf9 in _start (/home/alxndr/Development/qemu/general-f=
+uzz/build/qemu-system-i386+0x2cb0cf9)
+
+  0x61500001e500 is located 0 bytes to the right of 512-byte region [0x6150=
+0001e300,0x61500001e500)
   allocated by thread T0 here:
-  =C2=A0=C2=A0=C2=A0=C2=A0#0 0x55abd16ad712 in calloc (/home/alxndr/Develop=
-ment/qemu/general-fuzz/build/qemu-system-i386+0x2db7712)
-  =C2=A0=C2=A0=C2=A0=C2=A0#1 0x55abd1d75464 in bitmap_try_new /home/alxndr/=
-Development/qemu/general-fuzz/include/qemu/bitmap.h:96:12
-  =C2=A0=C2=A0=C2=A0=C2=A0#2 0x55abd1d74bd4 in bitmap_new /home/alxndr/Deve=
-lopment/qemu/general-fuzz/include/qemu/bitmap.h:101:26
-  =C2=A0=C2=A0=C2=A0=C2=A0#3 0x55abd1d67b68 in sd_reset /home/alxndr/Develo=
-pment/qemu/general-fuzz/build/../hw/sd/sd.c:576:21
-  =C2=A0=C2=A0=C2=A0=C2=A0#4 0x55abd47f34b2 in device_transitional_reset /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:1114:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#5 0x55abd47f8ca9 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:182:13
-  =C2=A0=C2=A0=C2=A0=C2=A0#6 0x55abd47afdbd in bus_reset_child_foreach /hom=
-e/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#7 0x55abd47fdac3 in resettable_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#8 0x55abd47f8685 in resettable_phase_hold /home/=
-alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#9 0x55abd47ec5f8 in device_reset_child_foreach /=
-home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#10 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#11 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#12 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#13 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#14 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#15 0x55abd47ec5f8 in device_reset_child_foreach =
-/home/alxndr/Development/qemu/general-fuzz/build/../hw/core/qdev.c:358:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#16 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#17 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#18 0x55abd47afdbd in bus_reset_child_foreach /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/bus.c:94:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#19 0x55abd47fdac3 in resettable_child_foreach /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:96:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#20 0x55abd47f8685 in resettable_phase_hold /home=
-/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:173:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#21 0x55abd47f6b28 in resettable_assert_reset /ho=
-me/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:60:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#22 0x55abd47f68cf in resettable_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:45:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#23 0x55abd47fb779 in resettable_cold_reset_fn /h=
-ome/alxndr/Development/qemu/general-fuzz/build/../hw/core/resettable.c:269:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#24 0x55abd47f67e5 in qemu_devices_reset /home/al=
-xndr/Development/qemu/general-fuzz/build/../hw/core/reset.c:69:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#25 0x55abd35a5c1e in pc_machine_reset /home/alxn=
-dr/Development/qemu/general-fuzz/build/../hw/i386/pc.c:1901:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#26 0x55abd3d52d9e in qemu_system_reset /home/alx=
-ndr/Development/qemu/general-fuzz/build/../softmmu/vl.c:1403:9
-  =C2=A0=C2=A0=C2=A0=C2=A0#27 0x55abd3d67d2e in qemu_init /home/alxndr/Deve=
-lopment/qemu/general-fuzz/build/../softmmu/vl.c:4458:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#28 0x55abd16df677 in main /home/alxndr/Developme=
-nt/qemu/general-fuzz/build/../softmmu/main.c:49:5
-  =C2=A0=C2=A0=C2=A0=C2=A0#29 0x7fd5d4ec0cc9 in __libc_start_main csu/../cs=
-u/libc-start.c:308:16
+      #0 0x5651bce1b5b2 in calloc (/home/alxndr/Development/qemu/general-fu=
+zz/build/qemu-system-i386+0x2d295b2)
+      #1 0x7fac88fb3210 in g_malloc0 (/usr/lib/x86_64-linux-gnu/libglib-2.0=
+.so.0+0x56210)
+      #2 0x5651bd8cd222 in sdhci_pci_realize /home/alxndr/Development/qemu/=
+general-fuzz/build/../hw/sd/sdhci-pci.c:36:5
+      #3 0x5651bd88c228 in pci_qdev_realize /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../hw/pci/pci.c:2114:9
+      #4 0x5651c07a4ec9 in device_set_realized /home/alxndr/Development/qem=
+u/general-fuzz/build/../hw/core/qdev.c:864:13
+      #5 0x5651bfe384b8 in property_set_bool /home/alxndr/Development/qemu/=
+general-fuzz/build/../qom/object.c:2202:5
+      #6 0x5651bfe2c1cf in object_property_set /home/alxndr/Development/qem=
+u/general-fuzz/build/../qom/object.c:1349:5
+      #7 0x5651bfe49471 in object_property_set_qobject /home/alxndr/Develop=
+ment/qemu/general-fuzz/build/../qom/qom-qobject.c:28:10
+      #8 0x5651bfe2d890 in object_property_set_bool /home/alxndr/Developmen=
+t/qemu/general-fuzz/build/../qom/object.c:1416:15
+      #9 0x5651c078cc64 in qdev_realize /home/alxndr/Development/qemu/gener=
+al-fuzz/build/../hw/core/qdev.c:379:12
+      #10 0x5651bd8bd8cc in qdev_device_add /home/alxndr/Development/qemu/g=
+eneral-fuzz/build/../qdev-monitor.c:676:10
+      #11 0x5651bf4e3e43 in device_init_func /home/alxndr/Development/qemu/=
+general-fuzz/build/../softmmu/vl.c:2101:11
+      #12 0x5651c0af71e4 in qemu_opts_foreach /home/alxndr/Development/qemu=
+/general-fuzz/build/../util/qemu-option.c:1172:14
+      #13 0x5651bf4cd04b in qemu_init /home/alxndr/Development/qemu/general=
+-fuzz/build/../softmmu/vl.c:4384:5
+      #14 0x5651bce4d517 in main /home/alxndr/Development/qemu/general-fuzz=
+/build/../softmmu/main.c:49:5
+      #15 0x7fac887b6cc9 in __libc_start_main csu/../csu/libc-start.c:308:16
 
-  SUMMARY: AddressSanitizer: heap-buffer-overflow
-  /home/alxndr/Development/qemu/general-
-  fuzz/include/qemu/bitops.h:135:19 in test_bit
+  SUMMARY: AddressSanitizer: heap-buffer-overflow (/home/alxndr/Development=
+/qemu/general-fuzz/build/qemu-system-i386+0x2d2893f) in __asan_memcpy
+  Shadow bytes around the buggy address:
+    0x0c2a7fffbc50: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+    0x0c2a7fffbc60: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc70: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    0x0c2a7fffbc90: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+  =3D>0x0c2a7fffbca0:[fa]fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+    0x0c2a7fffbcb0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcc0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcd0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbce0: fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd fd
+    0x0c2a7fffbcf0: fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa fa
+  Shadow byte legend (one shadow byte represents 8 application bytes):
+    Addressable:           00
+    Partially addressable: 01 02 03 04 05 06 07 =
+
+    Heap left redzone:       fa
+    Freed heap region:       fd
+    Stack left redzone:      f1
+    Stack mid redzone:       f2
+    Stack right redzone:     f3
+    Stack after return:      f5
+    Stack use after scope:   f8
+    Global redzone:          f9
+    Global init order:       f6
+    Poisoned by user:        f7
+    Container overflow:      fc
+    Array cookie:            ac
+    Intra object redzone:    bb
+    ASan internal:           fe
+    Left alloca redzone:     ca
+    Right alloca redzone:    cb
+    Shadow gap:              cc
+  =3D=3D752161=3D=3DABORTING
 
   -Alex
 
 To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895310/+subscriptions
+https://bugs.launchpad.net/qemu/+bug/1892960/+subscriptions
 
