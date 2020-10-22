@@ -2,81 +2,110 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8487C388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:23:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAD3AC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:25:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 048EB24171
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:23:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 048EB24171
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 168B424171
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:25:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y/QUqJ3Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 168B424171
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56270 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVbUg-0000we-0G
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:23:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47316)
+	id 1kVbWY-0003I2-Uw
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:25:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVbSU-0006Pv-T9
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:20:50 -0400
-Received: from indium.canonical.com ([91.189.90.7]:56216)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVbSS-0002RK-AL
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:20:50 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kVbSQ-0004eV-7W
- for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 14:20:46 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 08BFF2E8134
- for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 14:20:46 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVbSG-000667-SW
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:20:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38624)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kVbSF-0002Q3-0z
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:20:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603376434;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=2TWaegd2S7RBLRDF0Ip4AR0g6uaYiOMGs1Uzg9tJfec=;
+ b=Y/QUqJ3ZhxKZlntK6pM6Qow/u8AdGiqnanu6jhXWrkZ1BzbOBVuxxduHxM6JeNxQUDIvRn
+ 97sNmazlAcDoCmbG710A3eeqnxyVelqiZ0SY+rvcYubn6/o4pxJT5lQzxvlCY7jtCDZKV/
+ 1kEqYovQS1+0a3impLVNyeTpVL1Gw+I=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-318-FFph0V3mO8mdPg-kPf9eig-1; Thu, 22 Oct 2020 10:20:31 -0400
+X-MC-Unique: FFph0V3mO8mdPg-kPf9eig-1
+Received: by mail-wm1-f70.google.com with SMTP id r19so641011wmh.9
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 07:20:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=2TWaegd2S7RBLRDF0Ip4AR0g6uaYiOMGs1Uzg9tJfec=;
+ b=nxLlDp0r+eGmBV51MN2MDaz76DqLXcaan+f7z3US5ah+/MgKvTR48761rTZmTBOWea
+ quPRFKBrsGvnLuGSRM4Ds4zjtQkVd7cFSU4jZ90iKvvsVzItLfy0nyukHEBI/duf5spq
+ W4f/HNRBi/9hmBYZhbdCdL1kXwrWLkxG5ZTJZ0tepeRaOpFvETq9msxv5agdJUE5Y9+/
+ n/rhuuKnK3jh0/kSlwZkeXrl5+vnKPQgG9zqrNITjlb4cJ7qc3AFw+jsxRE550rS4MF5
+ s/25Ijr092JtyYZLPf603a61n/izVgKuARnaxy+WFEeFvgUWBT9fqlthYRcnzPrf+gg0
+ ruxA==
+X-Gm-Message-State: AOAM530H63Ohr7EGrWAQyDYBoLo2ppbRkRWBgBosRGgBt4zmf5rqrl6y
+ ME00UBsVds9SjxnlhJ3qDrKKC0WTB1x4XjX4RB6b5499CDCpN8LVM3umtUpfmPamOMb4d7pBfog
+ VBT8qVkBrgKTxdHI=
+X-Received: by 2002:a1c:5545:: with SMTP id j66mr2901458wmb.31.1603376430090; 
+ Thu, 22 Oct 2020 07:20:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxmHePokSeOQBoNLL1nZJrY+OBOrH7XZ40IuNWZ5uYmuNfLg+/CelWbLm4ox+uodeiQBFp1vg==
+X-Received: by 2002:a1c:5545:: with SMTP id j66mr2901423wmb.31.1603376429840; 
+ Thu, 22 Oct 2020 07:20:29 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id f8sm4321641wrw.85.2020.10.22.07.20.28
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 22 Oct 2020 07:20:28 -0700 (PDT)
+Subject: Re: [PATCH] MAINTAINERS: Cover "block/nvme.h" file
+To: qemu-devel@nongnu.org, QEMU Trivial <qemu-trivial@nongnu.org>
+References: <20200701140634.25994-1-philmd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <ccdce593-67fc-1ed5-c05c-c64d45cf5515@redhat.com>
+Date: Thu, 22 Oct 2020 16:20:27 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Oct 2020 14:15:17 -0000
-From: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9?= <1878645@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Confirmed; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: a1xndr ajbennee philmd pmaydell
-X-Launchpad-Bug-Reporter: Alexander Bulekov (a1xndr)
-X-Launchpad-Bug-Modifier: =?utf-8?q?Philippe_Mathieu-Daud=C3=A9_=28philmd?=
- =?utf-8?q?=29?=
-References: <158947246472.30762.752698283456022174.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160337611796.29498.16405488529958616029.launchpad@chaenomeles.canonical.com>
-Subject: [Bug 1878645] Re: null-ptr dereference in ich9_apm_ctrl_changed
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
-X-Launchpad-Hash: c5ff13d26d4509cf7ce39967aa639f758f319b39
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:20:54
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20200701140634.25994-1-philmd@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
+X-Spam_bar: --
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,108 +114,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1878645 <1878645@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Niklas Cassel <Niklas.Cassel@wdc.com>,
+ Dmitry Fomichev <Dmitry.Fomichev@wdc.com>, Klaus Jensen <k.jensen@samsung.com>,
+ Max Reitz <mreitz@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ Andrzej Jakowski <andrzej.jakowski@linux.intel.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Maxim Levitsky <mlevitsk@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-** Changed in: qemu
-       Status: New =3D> Confirmed
+Cc'ing qemu-trivial@
 
--- =
+On 7/1/20 4:06 PM, Philippe Mathieu-Daudé wrote:
+> The "block/nvme.h" header is shared by both the NVMe block
+> driver and the NVMe emulated device. Add the 'F:' entry on
+> both sections, so all maintainers/reviewers are notified
+> when it is changed.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+> Cc: Fam Zheng <fam@euphon.net>
+> Cc: Keith Busch <kbusch@kernel.org>
+> Cc: Kevin Wolf <kwolf@redhat.com>
+> Cc: Max Reitz <mreitz@redhat.com>
+> Cc: Niklas Cassel <Niklas.Cassel@wdc.com>
+> Cc: Klaus Jensen <its@irrelevant.dk>
+> Cc: Klaus Jensen <k.jensen@samsung.com>
+> Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> Cc: Dmitry Fomichev <Dmitry.Fomichev@wdc.com>
+> Cc: Andrzej Jakowski <andrzej.jakowski@linux.intel.com>
+> ---
+>   MAINTAINERS | 2 ++
+>   1 file changed, 2 insertions(+)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index dec252f38b..9995cdc805 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -1795,6 +1795,7 @@ M: Keith Busch <kbusch@kernel.org>
+>   L: qemu-block@nongnu.org
+>   S: Supported
+>   F: hw/block/nvme*
+> +F: include/block/nvme.h
+>   F: tests/qtest/nvme-test.c
+>   
+>   megasas
+> @@ -2804,6 +2805,7 @@ M: Fam Zheng <fam@euphon.net>
+>   L: qemu-block@nongnu.org
+>   S: Supported
+>   F: block/nvme*
+> +F: include/block/nvme.h
+>   
+>   Bootdevice
+>   M: Gonglei <arei.gonglei@huawei.com>
+> 
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1878645
-
-Title:
-  null-ptr dereference in ich9_apm_ctrl_changed
-
-Status in QEMU:
-  Confirmed
-
-Bug description:
-  Hello,
-  While fuzzing, I found an input which triggers a NULL pointer dereference=
- in
-  tcg_handle_interrupt. It seems the culprint is a "cpu" pointer - maybe th=
-is bug
-  is specific to QTest?
-
-  =3D=3D23862=3D=3DERROR: AddressSanitizer: SEGV on unknown address 0x00000=
-00000b4 (pc 0x55b9dc7c9dce bp 0x7ffc346a0900 sp 0x7ffc346a0880 T0)
-  =3D=3D23862=3D=3DThe signal is caused by a READ memory access.
-  =3D=3D23862=3D=3DHint: address points to the zero page.
-      #0 0x55b9dc7c9dce in tcg_handle_interrupt /home/alxndr/Development/qe=
-mu/accel/tcg/tcg-all.c:57:21
-      #1 0x55b9dc904799 in cpu_interrupt /home/alxndr/Development/qemu/incl=
-ude/hw/core/cpu.h:872:5
-      #2 0x55b9dc9085e8 in ich9_apm_ctrl_changed /home/alxndr/Development/q=
-emu/hw/isa/lpc_ich9.c:442:13
-      #3 0x55b9dd19cdc8 in apm_ioport_writeb /home/alxndr/Development/qemu/=
-hw/isa/apm.c:50:13
-      #4 0x55b9dc73f8b4 in memory_region_write_accessor /home/alxndr/Develo=
-pment/qemu/memory.c:483:5
-      #5 0x55b9dc73f289 in access_with_adjusted_size /home/alxndr/Developme=
-nt/qemu/memory.c:544:18
-      #6 0x55b9dc73ddf5 in memory_region_dispatch_write /home/alxndr/Develo=
-pment/qemu/memory.c:1476:16
-      #7 0x55b9dc577bf3 in flatview_write_continue /home/alxndr/Development=
-/qemu/exec.c:3137:23
-      #8 0x55b9dc567ad8 in flatview_write /home/alxndr/Development/qemu/exe=
-c.c:3177:14
-      #9 0x55b9dc567608 in address_space_write /home/alxndr/Development/qem=
-u/exec.c:3268:18
-      #10 0x55b9dc723fe7 in cpu_outb /home/alxndr/Development/qemu/ioport.c=
-:60:5
-      #11 0x55b9dc72d3c0 in qtest_process_command /home/alxndr/Development/=
-qemu/qtest.c:392:13
-      #12 0x55b9dc72b186 in qtest_process_inbuf /home/alxndr/Development/qe=
-mu/qtest.c:710:9
-      #13 0x55b9dc72a8b3 in qtest_read /home/alxndr/Development/qemu/qtest.=
-c:722:5
-      #14 0x55b9ddc6e60b in qemu_chr_be_write_impl /home/alxndr/Development=
-/qemu/chardev/char.c:183:9
-      #15 0x55b9ddc6e75a in qemu_chr_be_write /home/alxndr/Development/qemu=
-/chardev/char.c:195:9
-      #16 0x55b9ddc77979 in fd_chr_read /home/alxndr/Development/qemu/chard=
-ev/char-fd.c:68:9
-      #17 0x55b9ddcff0e9 in qio_channel_fd_source_dispatch /home/alxndr/Dev=
-elopment/qemu/io/channel-watch.c:84:12
-      #18 0x7f7161eac897 in g_main_context_dispatch (/usr/lib/x86_64-linux-=
-gnu/libglib-2.0.so.0+0x4e897)
-      #19 0x55b9ddebcb84 in glib_pollfds_poll /home/alxndr/Development/qemu=
-/util/main-loop.c:219:9
-      #20 0x55b9ddebb57d in os_host_main_loop_wait /home/alxndr/Development=
-/qemu/util/main-loop.c:242:5
-      #21 0x55b9ddebb176 in main_loop_wait /home/alxndr/Development/qemu/ut=
-il/main-loop.c:518:11
-      #22 0x55b9dcb4bd1d in qemu_main_loop /home/alxndr/Development/qemu/so=
-ftmmu/vl.c:1664:9
-      #23 0x55b9ddd1629c in main /home/alxndr/Development/qemu/softmmu/main=
-.c:49:5
-      #24 0x7f7160a5ce0a in __libc_start_main /build/glibc-GwnBeO/glibc-2.3=
-0/csu/../csu/libc-start.c:308:16
-      #25 0x55b9dc49c819 in _start (/home/alxndr/Development/qemu/build/i38=
-6-softmmu/qemu-system-i386+0xc9c819)
-
-  =
-
-  I can reproduce this in qemu 5.0 built with AddressSanitizer using these =
-qtest commands:
-
-  cat << EOF | ./qemu-system-i386 \
-  -qtest stdio -nographic -monitor none -serial none \
-  -M pc-q35-5.0
-  outl 0xcf8 0x8400f841
-  outl 0xcfc 0xaa215d6d
-  outl 0x6d30 0x2ef8ffbe
-  outb 0xb2 0x20
-  EOF
-
-  Please let me know if I can provide any further info.
-  -Alex
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1878645/+subscriptions
 
