@@ -2,106 +2,126 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADDAFC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:19:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3DD5C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:23:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3683222E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:19:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C15152417D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 09:23:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="vNKnnJzu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3683222E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="dw996C7d"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C15152417D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVWkn-00067T-Rf
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:19:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34246)
+	id 1kVWp2-0007Mp-CX
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 05:23:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35346)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVWjs-0005Ho-UV
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:18:30 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:34352)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVWnl-0006qa-Sl; Thu, 22 Oct 2020 05:22:29 -0400
+Received: from mail-eopbgr40094.outbound.protection.outlook.com
+ ([40.107.4.94]:23950 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVWjr-0008Jo-8D
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 05:18:28 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M9Exol036808;
- Thu, 22 Oct 2020 09:18:23 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=gkNqXvUxYJAoanXcrRJRBujWXW1VnW2EnDZ02klZrTU=;
- b=vNKnnJzueRN8CGXeIbFUWqP0bg4j6ofv5pwbvigTUUSrmTCYgoSjS4KpYthqZ1snARER
- 57EC8NI3TkUvqbo1AZ8bbXN6bC3n2rAGdZvDKNMjPzM+UJD3JKivXFaxYdJ3WOP+OJ2T
- PUPLfWOPkWYoAwy8FOHPNePLEjXZZux3OR+9M/twcmeeqQA2aaFa1WvgIadheYgSMxul
- yzd056Cecw9o5o9gHpVc0z6j0gJLhjtgoqr3IZEY+Bnk6QoJiyNwEVne7Xl0FQvmnWBy
- j+VYAmMhTYyskRi7ypOhr1xPODR5EbbskbzPIsWwAMoA2gropJQdzF5v+4tzgU8e9pup dw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2130.oracle.com with ESMTP id 347p4b50g3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Thu, 22 Oct 2020 09:18:23 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09M9G82m060373;
- Thu, 22 Oct 2020 09:18:23 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by aserp3030.oracle.com with ESMTP id 348a6qcqru-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Thu, 22 Oct 2020 09:18:23 +0000
-Received: from abhmp0002.oracle.com (abhmp0002.oracle.com [141.146.116.8])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09M9ILtA025897;
- Thu, 22 Oct 2020 09:18:21 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Thu, 22 Oct 2020 02:18:21 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 095651D6DBCA; Thu, 22 Oct 2020 10:18:18 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v6 15/16] fuzz: register predefined generic-fuzz configs
-In-Reply-To: <20201021210922.572955-16-alxndr@bu.edu>
-References: <20201021210922.572955-1-alxndr@bu.edu>
- <20201021210922.572955-16-alxndr@bu.edu>
-Date: Thu, 22 Oct 2020 10:18:18 +0100
-Message-ID: <m2r1pq7h5x.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVWnh-0001L1-SC; Thu, 22 Oct 2020 05:22:28 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KgAOyi9QOvYNrI+g+L/FKGhnKLBXagv8fNqNGJ/j7wseLM2vkwbrkAWoz9x8RPOZRXn8HvefzZCqz/x4Ax+2qrveIbPmP25LLZ1y0kyKWvLSozVhMPzdSmHcZk/0PzXWRHXcowPNKyrFZHTRHaSRPvRIUibdDU0t9NPcAOMaTSA5U7LTdEvPNoHIyWvWTmxp/uDN2lLpsJaarSuDWsGHBTxXLCByAF0y8bEeB6HtVPK4qbjJrC6CnkFiIdlQx6xq/lAtqvwdIxKwwhOQKZF15c93hpH1L/f4uGXGfBYrWA9r4IWCR+wjTxWY7f2FVCSMMsrARo7hH9sWH/y6RU/BKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RtVoQk2ZCfoVpS7FsNm2y0wI4goPC1rqbz5h51SwXMc=;
+ b=FK6W6fmMXWlYOcsbxaBneugbPVMViAxmLow/k9BW1xAqG9dsgfNnokIzsMf2zXC2+nH/dL2bMtZggSIarWDh8smCv8Y+o5VIUQeU2G39UirqXzSXSXL6LnQFCt/cV537u85tcpDGdCpDv0q8exteAjRqM2eaL3z2sQ8uVGJn0b2oxUmmabTDv+2ZN1M1po6WscHRoCVFAvT01mtCUuYMFrJNUw2EM3SL5AnSWB5VSyPRPAnZP1d7DEUcmQnFwVQtjaTqHXFarmoGs+2ug+USQOxv+rj+WTbbEDFdnjmbsG6kmLAwNQInqLoFHTmCQ4teMM9JVqFLDKw1qx43mMmbdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RtVoQk2ZCfoVpS7FsNm2y0wI4goPC1rqbz5h51SwXMc=;
+ b=dw996C7dudMGHQ62/f+lJDEkyxhS32RFRNp7iJmmpcd8u69vZGFoghzBPfUtF0kWeg7WFnvxuqYzFweRgSvP4/V18ZuRSIjc5/xEHF7j1trH91FxnNFryEPQc1pg582G3y0o6pbjqk34USWWRABFHLf11bfJxe+n3xwPn50eZZM=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AS8PR08MB5944.eurprd08.prod.outlook.com (2603:10a6:20b:297::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.28; Thu, 22 Oct
+ 2020 09:22:21 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Thu, 22 Oct 2020
+ 09:22:21 +0000
+Subject: Re: [PATCH v4 1/2] qcow2: Report BDRV_BLOCK_ZERO more accurately in
+ bdrv_co_block_status()
+To: Alberto Garcia <berto@igalia.com>, qemu-devel@nongnu.org
+Cc: qemu-block@nongnu.org, Kevin Wolf <kwolf@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
+References: <cover.1600698425.git.berto@igalia.com>
+ <e12fc2535199ce30c2674132dd62716bbd6359b3.1600698425.git.berto@igalia.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <6c3b1566-2552-fc7f-40e8-1a4ba85fad83@virtuozzo.com>
+Date: Thu, 22 Oct 2020 12:22:20 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.3
+In-Reply-To: <e12fc2535199ce30c2674132dd62716bbd6359b3.1600698425.git.berto@igalia.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.82]
+X-ClientProxiedBy: AM0PR04CA0136.eurprd04.prod.outlook.com
+ (2603:10a6:208:55::41) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxlogscore=999
- bulkscore=0 spamscore=0 adultscore=0 suspectscore=1 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010220062
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9781
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=1
- priorityscore=1501
- clxscore=1015 malwarescore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010220062
-Received-SPF: pass client-ip=141.146.126.79;
- envelope-from=darren.kenny@oracle.com; helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 04:25:28
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.82) by
+ AM0PR04CA0136.eurprd04.prod.outlook.com (2603:10a6:208:55::41) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.18 via Frontend Transport; Thu, 22 Oct 2020 09:22:20 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: e95154d0-032c-4a17-8d7f-08d8766bfaad
+X-MS-TrafficTypeDiagnostic: AS8PR08MB5944:
+X-Microsoft-Antispam-PRVS: <AS8PR08MB5944F475B8A64BC12BBDF261C11D0@AS8PR08MB5944.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4Vk04uoG1caX8NaJv083JWsRgI7vPzhqDtTc3nluO+KTcUgV3ciB6cB64l4cdxs9l7ln/DIowA9PhuBhRNG9T2/t+F9XjSsZE1DPwbbsJP/x89o10qdVkCr8I3N3E3kBpIrAAfyStnC0cYgJcBg5KOfGcM86d6+XEnJFc+nkBsQkd+4iaPF7a0BHuCmBIzKVb/vcKGNBjil194ZTcqLn3Yme3QDNBjpW8WsaBNMlkKGVGWkyon0HgtulrPmMv12d+GYweqwDKu5IqgMaT5S7LRpWAhtyB94ETE9ixYkBdL5xBENQxaes+YpvKlcM6f6Fpu2AkpGsiEqitqqWzln3Zz3BIgDaMeitPQJK7EXDXQcYWhey73TMLUKV/MFORl33
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(136003)(366004)(346002)(376002)(39840400004)(396003)(83380400001)(5660300002)(31686004)(8936002)(66476007)(36756003)(66556008)(54906003)(316002)(16576012)(2906002)(66946007)(31696002)(6486002)(478600001)(16526019)(8676002)(2616005)(86362001)(186003)(26005)(956004)(4326008)(52116002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: GeJuzLwKwku5LJtHtIczsPacJQsv7cItjnHtyfyQy5hoBhlwcJYCTXJ0xABBI3Vl/SCAkCasJQCilrCM1yuosCKPwbextB4EmvY5ZVLMMLCIClcYDIAsrzmN1mDofkp+9pAXH6SCPKrP9POEUAMki/UmOEyM+MbwSJl6hS6H2qloDjGfCYLGt+uAw9UocsuGpj36SH7kwCE4vh4iAh0Oc0ZqgkVupXwUl6hYOThoN5g0OtM7mGBwQc69KXb/yYa5J6QMWo6ygSgM/qgVwVFyErADxQgo/giEgRGogwgyJ+IMChPXvNutoWwM9w8hO8i2/oxyOkxqiN665CxCXgpz/9rwqvcb+TihIPXDQ7skmivlhYJDzchry2PBTwXBF3StcaQo6zwRWz3BYceTVp9BFVCY+mckShtUQLHUIpJZrEa0Gs6T115IkcsqstMhTQoZrUZlhx/2kMgi4GZ+cl9D57T+2URjDVoBMXx/uo5I9vXv1bgyH/QgRmhU18BbZhlLQrJUn8cHshwVpiTLtm88TNYNXKH0miDE4r3dy1XC3hJevn7lOCk+2GRPG+9EYmOJHTy/9+CsgvO9mSGv9SjOUIboDp5J/e+75tMuM2htySHgZ0SAKztmVSsaNDi5XhIrpxhgVFgAiysa5Xa6yvvjPw==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e95154d0-032c-4a17-8d7f-08d8766bfaad
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Oct 2020 09:22:21.3236 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ayTrqc7Ab/mU51Ktmrjb3SoSNwg5Gvu8Lyv5jQKFJsfD1+s1HTfOV7Vp8YE0DyT/qS2K9qQpk0lIUIjpt0UWgiI4MU63NYWa65MG7j4Vu0Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR08MB5944
+Received-SPF: pass client-ip=40.107.4.94;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR03-DB5-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 05:22:22
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,84 +134,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- f4bug@amsat.org, Alexander Bulekov <alxndr@bu.edu>, bsd@redhat.com,
- stefanha@redhat.com, pbonzini@redhat.com, dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wednesday, 2020-10-21 at 17:09:21 -04, Alexander Bulekov wrote:
-> We call get_generic_fuzz_configs, which fills an array with
-> predefined {name, args, objects} triples. For each of these, we add a
-> new FuzzTarget, that uses a small wrapper to set
-> QEMU_FUZZ_{ARGS,OBJECTS} to the corresponding predefined values.
->
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+21.09.2020 17:30, Alberto Garcia wrote:
+> If a BlockDriverState supports backing files but has none then any
+> unallocated area reads back as zeroes.
+> 
+> bdrv_co_block_status() is only reporting this is if want_zero is true,
+> but this is an inexpensive test and there is no reason not to do it in
+> all cases.
+> 
+> Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+> Signed-off-by: Alberto Garcia <berto@igalia.com>
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
 > ---
->  tests/qtest/fuzz/generic_fuzz.c | 32 ++++++++++++++++++++++++++++++++
->  1 file changed, 32 insertions(+)
->
-> diff --git a/tests/qtest/fuzz/generic_fuzz.c b/tests/qtest/fuzz/generic_fuzz.c
-> index f739937827..bff98fe3c8 100644
-> --- a/tests/qtest/fuzz/generic_fuzz.c
-> +++ b/tests/qtest/fuzz/generic_fuzz.c
-> @@ -26,6 +26,7 @@
->  #include "hw/qdev-core.h"
->  #include "hw/pci/pci.h"
->  #include "hw/boards.h"
-> +#include "generic_fuzz_configs.h"
->  
->  /*
->   * SEPARATOR is used to separate "operations" in the fuzz input
-> @@ -901,6 +902,17 @@ static GString *generic_fuzz_cmdline(FuzzTarget *t)
->      return cmd_line;
->  }
->  
-> +static GString *generic_fuzz_predefined_config_cmdline(FuzzTarget *t)
-> +{
-> +    const generic_fuzz_config *config;
-> +    g_assert(t->opaque);
-> +
-> +    config = t->opaque;
-> +    setenv("QEMU_FUZZ_ARGS", config->args, 1);
-> +    setenv("QEMU_FUZZ_OBJECTS", config->objects, 1);
-> +    return generic_fuzz_cmdline(t);
-> +}
-> +
->  static void register_generic_fuzz_targets(void)
->  {
->      fuzz_add_target(&(FuzzTarget){
-> @@ -911,6 +923,26 @@ static void register_generic_fuzz_targets(void)
->              .fuzz = generic_fuzz,
->              .crossover = generic_fuzz_crossover
->      });
-> +
-> +    GString *name;
-> +    const generic_fuzz_config *config;
-> +
-> +    for (int i = 0;
-> +         i < sizeof(predefined_configs) / sizeof(generic_fuzz_config);
-> +         i++) {
-> +        config = predefined_configs + i;
-> +        name = g_string_new("generic-fuzz");
-> +        g_string_append_printf(name, "-%s", config->name);
-> +        fuzz_add_target(&(FuzzTarget){
-> +                .name = name->str,
-> +                .description = "Predefined generic-fuzz config.",
-> +                .get_init_cmdline = generic_fuzz_predefined_config_cmdline,
-> +                .pre_fuzz = generic_pre_fuzz,
-> +                .fuzz = generic_fuzz,
-> +                .crossover = generic_fuzz_crossover,
-> +                .opaque = (void *)config
-> +        });
-> +    }
->  }
->  
->  fuzz_target_init(register_generic_fuzz_targets);
-> -- 
-> 2.28.0
+>   block/io.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/block/io.c b/block/io.c
+> index a2389bb38c..ef1ea806e8 100644
+> --- a/block/io.c
+> +++ b/block/io.c
+> @@ -2391,17 +2391,17 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+>   
+>       if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
+>           ret |= BDRV_BLOCK_ALLOCATED;
+> -    } else if (want_zero && bs->drv->supports_backing) {
+> +    } else if (bs->drv->supports_backing) {
+>           BlockDriverState *cow_bs = bdrv_cow_bs(bs);
+>   
+> -        if (cow_bs) {
+> +        if (!cow_bs) {
+> +            ret |= BDRV_BLOCK_ZERO;
+> +        } else if (want_zero) {
+>               int64_t size2 = bdrv_getlength(cow_bs);
+>   
+>               if (size2 >= 0 && offset >= size2) {
+>                   ret |= BDRV_BLOCK_ZERO;
+>               }
+> -        } else {
+> -            ret |= BDRV_BLOCK_ZERO;
+>           }
+>       }
+>   
+> 
+
+
+-- 
+Best regards,
+Vladimir
 
