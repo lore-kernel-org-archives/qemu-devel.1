@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3EC8C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 05:18:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB801C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 05:18:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12F4F2145D
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 05:18:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 566E72145D
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 05:18:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bvQ4CUob"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12F4F2145D
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KxFfQCUO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 566E72145D
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52872 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVSzP-0003lG-1M
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 01:18:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33012)
+	id 1kVSzQ-0003ny-88
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 01:18:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33118)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVSu0-0003er-FR
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 01:12:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47273)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVSuB-0003qI-DR
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 01:12:51 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVStu-0003vx-DE
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 01:12:40 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVSu6-0003z3-Ea
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 01:12:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603343553;
+ s=mimecast20190719; t=1603343563;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=sSEzA0lt6WFnE/KBczxLWYIGVO/nSAAX0EbUW7irl+M=;
- b=bvQ4CUobowDfhAc1D6SZvQPmUGLCcZVTUrdZ1ZYcFC0GSrPYBkxJVimbL8aZ86aRyBtCaS
- mkDH4MG1rvzTDvgXt21AZ4Mtg9jZqS3iQQu81i8mvl9VexXnW80lhSJzctyI1hwi5JQVwQ
- MXhAxkmjCvss3lYaprwy+kV5OjZM9YE=
+ bh=EHE9b9eKVG1dzNaFL1EsNVc3kfeOK24WmnbkwRy//wk=;
+ b=KxFfQCUOqwmq2xfWbS5Y58Yk3cLrdygs85p6uDeUZphmmfjpB5udlLvLAEXhMM9dRXsBp4
+ JIUgnH4uC05u+si8Q8GtdSzC0fSzMG7C/fnMEShsl9aPQmhqJhcIb46RjS+2IBz4ZEftHa
+ zhPQ9E2QyBAoGXNrYSmTBgbw06kUA1U=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-248-fHnzmxquOzmfID1H_zGs3g-1; Thu, 22 Oct 2020 01:12:31 -0400
-X-MC-Unique: fHnzmxquOzmfID1H_zGs3g-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-492-66_aL5dYNryDdnAoz6cUVw-1; Thu, 22 Oct 2020 01:12:41 -0400
+X-MC-Unique: 66_aL5dYNryDdnAoz6cUVw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9F908186DD24
- for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 05:12:30 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 49465186DD29
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 05:12:40 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 57BCB60C47;
- Thu, 22 Oct 2020 05:12:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A08305B4B8;
+ Thu, 22 Oct 2020 05:12:31 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 8EB129D0E; Thu, 22 Oct 2020 07:12:23 +0200 (CEST)
+ id 21AEF204AD; Thu, 22 Oct 2020 07:12:24 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/14] spice: move qemu_spice_init() to QemuSpiceOps.
-Date: Thu, 22 Oct 2020 07:12:12 +0200
-Message-Id: <20201022051223.6181-4-kraxel@redhat.com>
+Subject: [PULL 14/14] opengl: build opengl helper code modular
+Date: Thu, 22 Oct 2020 07:12:23 +0200
+Message-Id: <20201022051223.6181-15-kraxel@redhat.com>
 In-Reply-To: <20201022051223.6181-1-kraxel@redhat.com>
 References: <20201022051223.6181-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -104,108 +104,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Removes opengl dependency from core qemu.  The number of shared
+libraries for qemu-system-x86_64 goes down from 66 to 60 on my system.
+
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
-Message-id: 20201019075224.14803-4-kraxel@redhat.com
+Message-id: 20201019075224.14803-15-kraxel@redhat.com
 ---
- include/ui/qemu-spice-module.h | 1 +
- include/ui/qemu-spice.h        | 5 -----
- softmmu/vl.c                   | 2 +-
- ui/spice-core.c                | 3 ++-
- ui/spice-module.c              | 5 +++++
- 5 files changed, 9 insertions(+), 7 deletions(-)
+ util/module.c  | 7 +++++++
+ ui/meson.build | 8 +++++++-
+ 2 files changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/include/ui/qemu-spice-module.h b/include/ui/qemu-spice-module.h
-index 7a9963dd5810..b182bc4c21a6 100644
---- a/include/ui/qemu-spice-module.h
-+++ b/include/ui/qemu-spice-module.h
-@@ -19,6 +19,7 @@
- #define QEMU_SPICE_MODULE_H
- 
- struct QemuSpiceOps {
-+    void (*init)(void);
-     int (*migrate_info)(const char *h, int p, int t, const char *s);
- };
- 
-diff --git a/include/ui/qemu-spice.h b/include/ui/qemu-spice.h
-index 3157016c2bb4..e6df0a8715b0 100644
---- a/include/ui/qemu-spice.h
-+++ b/include/ui/qemu-spice.h
-@@ -26,7 +26,6 @@
- #include <spice.h>
- #include "qemu/config-file.h"
- 
--void qemu_spice_init(void);
- void qemu_spice_input_init(void);
- void qemu_spice_display_init(void);
- int qemu_spice_display_add_client(int csock, int skipauth, int tls);
-@@ -74,10 +73,6 @@ static inline void qemu_spice_display_init(void)
-     abort();
- }
- 
--static inline void qemu_spice_init(void)
--{
--}
--
- #endif /* CONFIG_SPICE */
- 
- static inline bool qemu_using_spice(Error **errp)
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index cb476aa70bcc..65c34a6b8a2e 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -4151,7 +4151,7 @@ void qemu_init(int argc, char **argv, char **envp)
-     /* spice needs the timers to be initialized by this point */
-     /* spice must initialize before audio as it changes the default auiodev */
-     /* spice must initialize before chardevs (for spicevmc and spiceport) */
--    qemu_spice_init();
-+    qemu_spice.init();
- 
-     qemu_opts_foreach(qemu_find_opts("chardev"),
-                       chardev_init_func, NULL, &error_fatal);
-diff --git a/ui/spice-core.c b/ui/spice-core.c
-index b03d743cf9b9..6ef66eb387de 100644
---- a/ui/spice-core.c
-+++ b/ui/spice-core.c
-@@ -633,7 +633,7 @@ static void vm_change_state_handler(void *opaque, int running,
-     }
- }
- 
--void qemu_spice_init(void)
-+static void qemu_spice_init(void)
- {
-     QemuOpts *opts = QTAILQ_FIRST(&qemu_spice_opts.head);
-     const char *password, *str, *x509_dir, *addr,
-@@ -994,6 +994,7 @@ int qemu_spice_display_is_running(SimpleSpiceDisplay *ssd)
- }
- 
- static struct QemuSpiceOps real_spice_ops = {
-+    .init         = qemu_spice_init,
-     .migrate_info = qemu_spice_migrate_info,
- };
- 
-diff --git a/ui/spice-module.c b/ui/spice-module.c
-index f1939545a684..a30fa452ea93 100644
---- a/ui/spice-module.c
-+++ b/ui/spice-module.c
-@@ -22,6 +22,10 @@
- 
- int using_spice;
- 
-+static void qemu_spice_init_stub(void)
-+{
-+}
+diff --git a/util/module.c b/util/module.c
+index 21237dcc24df..fe3b82dd4d37 100644
+--- a/util/module.c
++++ b/util/module.c
+@@ -181,6 +181,13 @@ static const struct {
+     { "hw-display-qxl", "ui-spice-core" },
+     { "ui-spice-app",   "ui-spice-core" },
+     { "ui-spice-app",   "chardev-spice" },
 +
- static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
-                                         const char *s)
- {
-@@ -29,5 +33,6 @@ static int qemu_spice_migrate_info_stub(const char *h, int p, int t,
- }
- 
- struct QemuSpiceOps qemu_spice = {
-+    .init         = qemu_spice_init_stub,
-     .migrate_info = qemu_spice_migrate_info_stub,
++#ifdef CONFIG_OPENGL
++    { "ui-egl-headless", "ui-opengl"    },
++    { "ui-gtk",          "ui-opengl"    },
++    { "ui-sdl",          "ui-opengl"    },
++    { "ui-spice-core",   "ui-opengl"    },
++#endif
  };
+ #endif
+ 
+diff --git a/ui/meson.build b/ui/meson.build
+index 537e5e067358..5d4906c023b9 100644
+--- a/ui/meson.build
++++ b/ui/meson.build
+@@ -33,7 +33,6 @@ vnc_ss.add(zlib, png, jpeg)
+ vnc_ss.add(when: sasl, if_true: files('vnc-auth-sasl.c'))
+ softmmu_ss.add_all(when: vnc, if_true: vnc_ss)
+ softmmu_ss.add(when: vnc, if_false: files('vnc-stubs.c'))
+-softmmu_ss.add(when: [opengl, 'CONFIG_OPENGL'], if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
+ specific_ss.add(when: ['CONFIG_SOFTMMU'], if_true: opengl)
+ 
+ ui_modules = {}
+@@ -44,6 +43,13 @@ if curses.found()
+   ui_modules += {'curses' : curses_ss}
+ endif
+ 
++if config_host.has_key('CONFIG_OPENGL')
++  opengl_ss = ss.source_set()
++  opengl_ss.add(when: [opengl, pixman, 'CONFIG_OPENGL'],
++               if_true: files('shader.c', 'console-gl.c', 'egl-helpers.c', 'egl-context.c'))
++  ui_modules += {'opengl' : opengl_ss}
++endif
++
+ if config_host.has_key('CONFIG_OPENGL_DMABUF')
+   egl_headless_ss = ss.source_set()
+   egl_headless_ss.add(when: [opengl, pixman, 'CONFIG_OPENGL_DMABUF'],
 -- 
 2.27.0
 
