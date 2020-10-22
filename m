@@ -2,82 +2,78 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96E82C388F9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:34:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F474C388F9
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:36:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D160A24171
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:34:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ED24A24171
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 14:36:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SSA9AQDS"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D160A24171
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R45I5Nji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED24A24171
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45086 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49324 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVbfw-0002ev-FK
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:34:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50940)
+	id 1kVbht-0004Xi-Ot
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 10:36:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVbeU-0001mQ-VM
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:33:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46944)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVbfV-0002LW-JD
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:34:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40545)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVbeS-0004IP-4Y
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:33:13 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVbfT-0004PP-CS
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 10:34:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603377185;
+ s=mimecast20190719; t=1603377253;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tJ41uY1bS8THbb1a+wysDvKYTbjvrTXCgz9q7trxIN8=;
- b=SSA9AQDSBqzvE9fSTJ3/UPfJb3FNb7h0oR+9ir9G6rbBJNh/R9Kl0cekmb6l09lqCDum1c
- c56o/gSn0oevTDwurxLAehRx4fdnGe5x0j4gBEyYddN9lswzv+ctKssJ7l13jzTXCq7uS/
- lPssVdvHgSnMcBh2cuLOWBu8ivjGoic=
+ bh=SQ3E4o+sAIxzFgxdpx8espYoAaKTdq7IWD9mo1S3r1k=;
+ b=R45I5NjiSdm2JBtMFhin7qhEG1W+UCupiphyySHscDZRS8Kl6hPZjGTtKNSNhL7QALHvdZ
+ 0N5etHsOELZIVFooQ9MgxaaTd4R/f3z5iJrBz+4bXTIK3W9P608ZQHPF+K9MjrLUsvmxiH
+ hjdgG/C5jzj4vvB0qMRLjZ+dFP2qvtM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-502-9wUQnG_5OO24JMVxV4GmDg-1; Thu, 22 Oct 2020 10:33:03 -0400
-X-MC-Unique: 9wUQnG_5OO24JMVxV4GmDg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-192-qUyHfIqKNjK1nnpsBAQGjA-1; Thu, 22 Oct 2020 10:34:11 -0400
+X-MC-Unique: qUyHfIqKNjK1nnpsBAQGjA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4EE96AF9C1;
- Thu, 22 Oct 2020 14:33:02 +0000 (UTC)
-Received: from redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 339616EF42;
- Thu, 22 Oct 2020 14:32:57 +0000 (UTC)
-Date: Thu, 22 Oct 2020 10:32:55 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
- not ready
-Message-ID: <20201022102857-mutt-send-email-mst@kernel.org>
-References: <20201022114026.31968-1-marcel.apfelbaum@gmail.com>
- <20201022080354-mutt-send-email-mst@kernel.org>
- <20201022235632.7f69ddc9@yekko.fritz.box>
- <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
- <20201022100028-mutt-send-email-mst@kernel.org>
- <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5985C80733F;
+ Thu, 22 Oct 2020 14:34:10 +0000 (UTC)
+Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C34855D9F1;
+ Thu, 22 Oct 2020 14:34:06 +0000 (UTC)
+Date: Thu, 22 Oct 2020 15:34:05 +0100
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 13/16] util/vfio-helpers: Introduce
+ qemu_vfio_pci_msix_init_irqs()
+Message-ID: <20201022143405.GM761187@stefanha-x1.localdomain>
+References: <20201020172428.2220726-1-philmd@redhat.com>
+ <20201020172428.2220726-14-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201020172428.2220726-14-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="8c07nsHwQobhlezh"
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -100,170 +96,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 22, 2020 at 05:10:43PM +0300, Marcel Apfelbaum wrote:
-> 
-> 
-> On Thu, Oct 22, 2020 at 5:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> 
->     On Thu, Oct 22, 2020 at 04:55:10PM +0300, Marcel Apfelbaum wrote:
->     > Hi David, Michael,
->     >
->     > On Thu, Oct 22, 2020 at 3:56 PM David Gibson <dgibson@redhat.com> wrote:
->     >
->     >     On Thu, 22 Oct 2020 08:06:55 -0400
->     >     "Michael S. Tsirkin" <mst@redhat.com> wrote:
->     >
->     >     > On Thu, Oct 22, 2020 at 02:40:26PM +0300, Marcel Apfelbaum wrote:
->     >     > > From: Marcel Apfelbaum <marcel@redhat.com>
->     >     > >
->     >     > > During PCIe Root Port's transition from Power-Off to Power-ON (or
->     >     vice-versa)
->     >     > > the "Slot Control Register" has the "Power Indicator Control"
->     >     > > set to "Blinking" expressing a "power transition" mode.
->     >     > >
->     >     > > Any hotplug operation during the "power transition" mode is not
->     >     permitted
->     >     > > or at least not expected by the Guest OS leading to strange
->     failures.
->     >     > >
->     >     > > Detect and refuse hotplug operations in such case.
->     >     > >
->     >     > > Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
->     >     > > ---
->     >     > >  hw/pci/pcie.c | 7 +++++++
->     >     > >  1 file changed, 7 insertions(+)
->     >     > >
->     >     > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
->     >     > > index 5b48bae0f6..2fe5c1473f 100644
->     >     > > --- a/hw/pci/pcie.c
->     >     > > +++ b/hw/pci/pcie.c
->     >     > > @@ -410,6 +410,7 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler
->     >     *hotplug_dev, DeviceState *dev,
->     >     > >      PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
->     >     > >      uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->
->     >     exp.exp_cap;
->     >     > >      uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
->     >     > > +    uint32_t sltctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
->     >     > > 
->     >     > >      /* Check if hot-plug is disabled on the slot */
->     >     > >      if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
->     >     > > @@ -418,6 +419,12 @@ void pcie_cap_slot_pre_plug_cb
->     (HotplugHandler
->     >     *hotplug_dev, DeviceState *dev,
->     >     > >          return;
->     >     > >      }
->     >     > > 
->     >     > > +    if ((sltctl & PCI_EXP_SLTCTL_PIC) ==
->     PCI_EXP_SLTCTL_PWR_IND_BLINK)
->     >     {
->     >     > > +        error_setg(errp, "Hot-plug failed: %s is in Power
->     Transition",
->     >     > > +                   DEVICE(hotplug_pdev)->id);
->     >     > > +        return;
->     >     > > +    }
->     >     > > +
->     >     > >      pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev,
->     errp);
->     >     > >  } 
->     >     >
->     >     > Probably the only way to handle for existing machine types.
->     >
->     >
->     > I agree
->     >  
->     >
->     >     > For new ones, can't we queue it in host memory somewhere?
->     >
->     >
->     >
->     > I am not sure I understand what will be the flow.
->     >   - The user asks for a hotplug operation.
->     >   -  QEMU deferred operation.
->     > After that the operation may still fail, how would the user know if the
->     > operation
->     > succeeded or not?
-> 
-> 
->     How can it fail? It's just a button press ...
-> 
-> 
-> 
-> Currently we have "Hotplug unsupported."
-> With this change we have "Guest/System not ready"
+--8c07nsHwQobhlezh
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Oct 20, 2020 at 07:24:25PM +0200, Philippe Mathieu-Daud=E9 wrote:
+> qemu_vfio_pci_init_irq() allows us to initialize any type of IRQ,
+> but only one. Introduce qemu_vfio_pci_msix_init_irqs() which is
+> specific to MSIX IRQ type, and allow us to use multiple IRQs
+> (thus passing multiple eventfd notifiers).
+> All eventfd notifiers are initialized with the special '-1' value
+> meaning "un-assigned".
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
+> ---
+>  include/qemu/vfio-helpers.h |  6 +++-
+>  util/vfio-helpers.c         | 65 ++++++++++++++++++++++++++++++++++++-
+>  util/trace-events           |  1 +
+>  3 files changed, 70 insertions(+), 2 deletions(-)
 
-Hotplug unsupported is not an error that can trigger with
-a well behaved management such as libvirt.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
+--8c07nsHwQobhlezh
+Content-Type: application/pgp-signature; name="signature.asc"
 
->  
-> 
->     >  
->     >
->     >     I'm not actually convinced we can't do that even for existing machine
->     >     types. 
->     >
->     >
->     > Is a Guest visible change, I don't think we can do it.
->     >  
->     >
->     >     So I'm a bit hesitant to suggest going ahead with this without
->     >     looking a bit closer at whether we can implement a wait-for-ready in
->     >     qemu, rather than forcing every user of qemu (human or machine) to do
->     >     so.
->     >
->     >
->     > While I agree it is a pain from the usability point of view, hotplug
->     operations
->     > are allowed to fail. This is not more than a corner case, ensuring the
->     right
->     > response (gracefully erroring out) may be enough.
->     >
->     > Thanks,
->     > Marcel
->     >
-> 
-> 
->     I don't think they ever failed in the past so management is unlikely
->     to handle the failure by retrying ...
-> 
-> 
-> That would require some management handling, yes.
-> But even without a "retry", failing is better than strange OS behavior.
-> 
-> Trying a better alternative like deferring the operation for new machines
-> would make sense, however is out of the scope of this patch
+-----BEGIN PGP SIGNATURE-----
 
-Expand the scope please. The scope should be "solve a problem xx" not
-"solve a problem xx by doing abc".
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+RmF0ACgkQnKSrs4Gr
+c8giBQgAo3uyHH8JswOuQfuswx73mdxsSLjokCHJasclgeQOHU7pNkoUdC0F1vaM
+n85KNeQZomqFyXQUMaow3FYW9i+Dld6pSBYxHyOrdAQymsP0REFaD5fMBlpdWoNb
+3Fvz+WcDdcdRhitYyAchyjM5dSxToYkeIRlRBJjmKR/O58El8rJ+DEUJC6xy3bYj
+EoYOh5kFfsSlQtX0P5ZiwG7WwOgeLEfHTLKyXEhvv7WEEXlO8d3jhDnzES33GMPi
+f5YwNCxort9RfK0dIC5M4vUmlTsyQx+30+kSm7Xhgg1oQ2NONpBmDI8JttTayUD1
+Dg3Qb7GYKQ5K2x7c1pgJCLMPA0030w==
+=AJkv
+-----END PGP SIGNATURE-----
 
-> that simply
-> detects the error leaving us in a slightly better state than today.
-> 
-> Thanks,
-> Marcel
-
-Not applying a patch is the only tool we maintainers have to influence
-people to solve the problem fully. That's why I'm not inclined to apply
-"slightly better" patches generally.
-
-
-> 
-> 
->     >
->     >
->     >
->     >     --
->     >     David Gibson <dgibson@redhat.com>
->     >     Principal Software Engineer, Virtualization, Red Hat
->     >
-> 
-> 
+--8c07nsHwQobhlezh--
 
 
