@@ -2,99 +2,96 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADD66C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 21:55:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B2B3C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 22:07:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7EEB2245F
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 21:55:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5DF4F2080C
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 22:07:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="b74CqITh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7EEB2245F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UYCa3vo3"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DF4F2080C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35840 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kViYp-000718-KS
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 17:55:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38184)
+	id 1kVijv-0000xZ-UF
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 18:07:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40674)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kViXu-0006Q2-6T
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 17:54:54 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25630)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kViXq-0003aa-Mb
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 17:54:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603403689;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=HnKRCVfwPWhUVyLxujJZM8l0RZII6ikmbuTK3RTs/G0=;
- b=b74CqIThGF9bRyp3Kjs5SIOra0l/lNB5wc0TsW8mA5UPtA/x5ILPMjhtS50iOiWvyyQAir
- Ex55B5yyWn2+NJuWpegZMVNubyQ8S89t/AGZ6F9ITrfGq9bzDnaxEHztpyZaIPOvBamEN+
- FK627kmqteGHfICRD4qCJZ0jH5ZEMCk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-90-Sb1EXnKFNtaFmyZTHr_FFg-1; Thu, 22 Oct 2020 17:54:44 -0400
-X-MC-Unique: Sb1EXnKFNtaFmyZTHr_FFg-1
-Received: by mail-wr1-f72.google.com with SMTP id h8so1221139wrt.9
- for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 14:54:44 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kViiv-0000Q9-Qj; Thu, 22 Oct 2020 18:06:17 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:45715)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kViit-00051E-O7; Thu, 22 Oct 2020 18:06:17 -0400
+Received: by mail-wr1-x441.google.com with SMTP id e17so5423190wru.12;
+ Thu, 22 Oct 2020 15:06:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=S9oCSIT0bPgiC34+L+hmIouoQfKPSNUNV3gEnPwikTg=;
+ b=UYCa3vo3mVxusJ2+lpJ5/54Cujw7jMcFBPJnidMMXEHNJ9NAwK4Asjh/RX3Zumra4s
+ /X4kaL76xQInFGFVjkhLptUeLhbxXrT4lCar0KE2rYnS2Mqttn/kenzk4g4scsSzEQVm
+ gG7fVNOzhhpA8acTrQbDnVGsdcSXGPTHmIApEpr3WNTBLPjpJWf3r0at6qkErRzXYd85
+ FWDHkzRI5xhLCjagGnkMunA38JLuQn19sd3lWjk5FLwZmRZoRQJDRrTD4k/9EvZMm4ED
+ vN2owbaxYiDnGt7BJLbicuXph6Fe27w01eLVQGljGtpsPjEYGWzwE7cVjkob7F2qOLxI
+ xayA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=HnKRCVfwPWhUVyLxujJZM8l0RZII6ikmbuTK3RTs/G0=;
- b=TP3JqB8b4iNLzi30K3AoURhIiPqoqWSyVkPVL5Z0hMJxIe71b8NOntqP9E9jBIt/e5
- CR4+VSh3AsFgwMH4RRMIFjNjAx1hsNb/ztTVkvuwkvY8ybnLr0ySDuDygxv6HtuhjC5Z
- 1Ixkrz4NOFpotJRq3ZvGuB4kxNpwxqNRZcpL3zcWWIF0RBmLXlZzQ3VYHi4mfuMOkNDJ
- nMl709EdCJOa2QMJx+dlN05GLM/T0Axg70x1sbVPlNpsWzHFdx0m1RUMoJi/GPqqnVau
- PEma1C5W1YEtI0pa86+cGCuXwfeQ4AqD6S4W3R9vufPY7fU6fqL2p2W46fjPZZK3HBSt
- wB6w==
-X-Gm-Message-State: AOAM531zgdtqPFx4am5a5bJ37HZT+9M1NGyq4Bu5/UQvaahpkFHI9Tza
- qgIdTq5MG0cULsEv8nO15C6oymqqFSFfoa6U8pZtf0ZUJKLzc6K7zmxz6mdYuDqXwp8yiFV9hKz
- rRusqBPzsbxmyE/U=
-X-Received: by 2002:adf:d4c5:: with SMTP id w5mr5067390wrk.226.1603403682847; 
- Thu, 22 Oct 2020 14:54:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwTWCbmZI5zE0if7PA6pW9HzE6ZgdytNyBDr7A1EfcxuJ9fFPS76HqjkLyW7HukEOmFBQY1RA==
-X-Received: by 2002:adf:d4c5:: with SMTP id w5mr5067351wrk.226.1603403682389; 
- Thu, 22 Oct 2020 14:54:42 -0700 (PDT)
-Received: from localhost.localdomain (237.red-88-18-140.staticip.rima-tde.net.
+ bh=S9oCSIT0bPgiC34+L+hmIouoQfKPSNUNV3gEnPwikTg=;
+ b=oNmcVele0aqAZhL8Yw/ZqSvzPe/t5gmNeeZr7jcPaNOQEcevQ0AKGcnRipmN3xVZBf
+ t05Z+fvyE3ppdpnEbVp+cqF0YhhfI2eCVF9P8SkgkvHjjmJdyoo344nrTLWu7qMW0/Tl
+ tVgev7OKEONP6ZU0XlzoKxMHpJZn74O2C19dDHfhKsAlag+mvlWT+9TEYdHWVZRknSxt
+ D0QLzrSTNLHwbfQVxcydERoq7xA4jSV7ChhseUT5EHor2e0T3igU6D08B5K1eSlcDas2
+ kWA3DmKS36qpWsfwMqxw79tSUsMTMMx1abqs7CpvcJ4hIPTaxwfstyayJC+NUSm0h/id
+ iZRA==
+X-Gm-Message-State: AOAM530CLKRz7Ji/yAaPtLgpdHlwCHeLNdp6rfeRBj+twxb3WiYZm8JN
+ kNxeQtpSMlb0wvBuMpGAFpk=
+X-Google-Smtp-Source: ABdhPJwBPbTVoFKKbAELq3S/0FYvYpzPffvp1aaRZdoSbRgvvnhHEHA/0Xz49tcLt8bTvHXwM8fhGQ==
+X-Received: by 2002:adf:ed06:: with SMTP id a6mr4604062wro.375.1603404373824; 
+ Thu, 22 Oct 2020 15:06:13 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id s5sm5519601wmc.3.2020.10.22.14.54.41
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 22 Oct 2020 14:54:41 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH] hw/nvme: Move NVMe emulation out of hw/block/ directory
-Date: Thu, 22 Oct 2020 23:54:39 +0200
-Message-Id: <20201022215439.3096306-1-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
+ by smtp.gmail.com with ESMTPSA id i14sm5777945wml.24.2020.10.22.15.06.12
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Thu, 22 Oct 2020 15:06:13 -0700 (PDT)
+Subject: Re: [PATCH v3 00/15] raspi: add the bcm2835 cprman clock manager
+To: Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org,
+ Guenter Roeck <linux@roeck-us.net>
+References: <20201010135759.437903-1-luc@lmichel.fr>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f6c1ad96-ce36-e229-2a9d-d71070b82d82@amsat.org>
+Date: Fri, 23 Oct 2020 00:06:12 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 08:09:01
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+In-Reply-To: <20201010135759.437903-1-luc@lmichel.fr>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,435 +104,159 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Klaus Jensen <its@irrelevant.dk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Havard Skinnemoen <hskinnemoen@google.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As IDE used to be, NVMe emulation is becoming an active
-subsystem. Move it into its own namespace.
+Cc'ing Guenter who had a similar patch and might be interested
+to test :)
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
-sent as RFC, it case it helps NVMe developers. As nvme-next
-has patches queues, if the idea of moving seems useful, this
-patch can resend later.
----
- meson.build                               |   1 +
- hw/{block/nvme.h => nvme/nvme-internal.h} |   4 +-
- hw/{block/nvme.c => nvme/core.c}          |   2 +-
- MAINTAINERS                               |   2 +-
- hw/Kconfig                                |   1 +
- hw/block/Kconfig                          |   5 -
- hw/block/meson.build                      |   1 -
- hw/block/trace-events                     | 124 ---------------------
- hw/meson.build                            |   1 +
- hw/nvme/Kconfig                           |   4 +
- hw/nvme/meson.build                       |   1 +
- hw/nvme/trace-events                      | 125 ++++++++++++++++++++++
- 12 files changed, 137 insertions(+), 134 deletions(-)
- rename hw/{block/nvme.h => nvme/nvme-internal.h} (98%)
- rename hw/{block/nvme.c => nvme/core.c} (99%)
- create mode 100644 hw/nvme/Kconfig
- create mode 100644 hw/nvme/meson.build
- create mode 100644 hw/nvme/trace-events
+patch 16/15 fixup:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg752113.html
 
-diff --git a/meson.build b/meson.build
-index 7627a0ae46e..24234ebd473 100644
---- a/meson.build
-+++ b/meson.build
-@@ -1356,6 +1356,7 @@
-     'hw/misc',
-     'hw/misc/macio',
-     'hw/net',
-+    'hw/nvme',
-     'hw/nvram',
-     'hw/pci',
-     'hw/pci-host',
-diff --git a/hw/block/nvme.h b/hw/nvme/nvme-internal.h
-similarity index 98%
-rename from hw/block/nvme.h
-rename to hw/nvme/nvme-internal.h
-index 52ba794f2e9..824788d9c6e 100644
---- a/hw/block/nvme.h
-+++ b/hw/nvme/nvme-internal.h
-@@ -1,5 +1,5 @@
--#ifndef HW_NVME_H
--#define HW_NVME_H
-+#ifndef HW_NVME_INTERNAL_H
-+#define HW_NVME_INTERNAL_H
- 
- #include "block/nvme.h"
- 
-diff --git a/hw/block/nvme.c b/hw/nvme/core.c
-similarity index 99%
-rename from hw/block/nvme.c
-rename to hw/nvme/core.c
-index 44fa5b90769..04391fbb083 100644
---- a/hw/block/nvme.c
-+++ b/hw/nvme/core.c
-@@ -67,8 +67,8 @@
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "qemu/cutils.h"
-+#include "nvme-internal.h"
- #include "trace.h"
--#include "nvme.h"
- 
- #define NVME_MAX_IOQPAIRS 0xffff
- #define NVME_DB_SIZE  4
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 6a197bd358d..7132bbe3ff4 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1875,7 +1875,7 @@ M: Keith Busch <kbusch@kernel.org>
- M: Klaus Jensen <its@irrelevant.dk>
- L: qemu-block@nongnu.org
- S: Supported
--F: hw/block/nvme*
-+F: hw/nvme/
- F: tests/qtest/nvme-test.c
- T: git git://git.infradead.org/qemu-nvme.git nvme-next
- 
-diff --git a/hw/Kconfig b/hw/Kconfig
-index 4de1797ffda..4ef9ca40ab0 100644
---- a/hw/Kconfig
-+++ b/hw/Kconfig
-@@ -21,6 +21,7 @@ source mem/Kconfig
- source misc/Kconfig
- source net/Kconfig
- source nubus/Kconfig
-+source nvme/Kconfig
- source nvram/Kconfig
- source pci-bridge/Kconfig
- source pci-host/Kconfig
-diff --git a/hw/block/Kconfig b/hw/block/Kconfig
-index 2d17f481adc..c2213173ffe 100644
---- a/hw/block/Kconfig
-+++ b/hw/block/Kconfig
-@@ -22,11 +22,6 @@ config ECC
- config ONENAND
-     bool
- 
--config NVME_PCI
--    bool
--    default y if PCI_DEVICES
--    depends on PCI
--
- config VIRTIO_BLK
-     bool
-     default y
-diff --git a/hw/block/meson.build b/hw/block/meson.build
-index 78cad8f7cba..96697f739c0 100644
---- a/hw/block/meson.build
-+++ b/hw/block/meson.build
-@@ -13,7 +13,6 @@
- softmmu_ss.add(when: 'CONFIG_SWIM', if_true: files('swim.c'))
- softmmu_ss.add(when: 'CONFIG_XEN', if_true: files('xen-block.c'))
- softmmu_ss.add(when: 'CONFIG_SH4', if_true: files('tc58128.c'))
--softmmu_ss.add(when: 'CONFIG_NVME_PCI', if_true: files('nvme.c'))
- 
- specific_ss.add(when: 'CONFIG_VIRTIO_BLK', if_true: files('virtio-blk.c'))
- specific_ss.add(when: 'CONFIG_VHOST_USER_BLK', if_true: files('vhost-user-blk.c'))
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index ec94c56a416..314444be146 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -27,130 +27,6 @@ virtio_blk_submit_multireq(void *vdev, void *mrb, int start, int num_reqs, uint6
- hd_geometry_lchs_guess(void *blk, int cyls, int heads, int secs) "blk %p LCHS %d %d %d"
- hd_geometry_guess(void *blk, uint32_t cyls, uint32_t heads, uint32_t secs, int trans) "blk %p CHS %u %u %u trans %d"
- 
--# nvme.c
--# nvme traces for successful events
--pci_nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
--pci_nvme_irq_pin(void) "pulsing IRQ pin"
--pci_nvme_irq_masked(void) "IRQ is masked"
--pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
--pci_nvme_map_addr(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
--pci_nvme_map_addr_cmb(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
--pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2, int num_prps) "trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64" num_prps %d"
--pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
--pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
--pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
--pci_nvme_rw_cb(uint16_t cid) "cid %"PRIu16""
--pci_nvme_write_zeroes(uint16_t cid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" slba %"PRIu64" nlb %"PRIu32""
--pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
--pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
--pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
--pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
--pci_nvme_identify_ctrl(void) "identify controller"
--pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
--pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
--pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
--pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
--pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
--pci_nvme_setfeat(uint16_t cid, uint8_t fid, uint8_t save, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" save 0x%"PRIx8" cdw11 0x%"PRIx32""
--pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
--pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
--pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
--pci_nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
--pci_nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
--pci_nvme_process_aers(int queued) "queued %d"
--pci_nvme_aer(uint16_t cid) "cid %"PRIu16""
--pci_nvme_aer_aerl_exceeded(void) "aerl exceeded"
--pci_nvme_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x%"PRIx8""
--pci_nvme_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
--pci_nvme_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
--pci_nvme_enqueue_event_noqueue(int queued) "queued %d"
--pci_nvme_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
--pci_nvme_no_outstanding_aers(void) "ignoring event; no outstanding AERs"
--pci_nvme_enqueue_req_completion(uint16_t cid, uint16_t cqid, uint16_t status) "cid %"PRIu16" cqid %"PRIu16" status 0x%"PRIx16""
--pci_nvme_mmio_read(uint64_t addr) "addr 0x%"PRIx64""
--pci_nvme_mmio_write(uint64_t addr, uint64_t data) "addr 0x%"PRIx64" data 0x%"PRIx64""
--pci_nvme_mmio_doorbell_cq(uint16_t cqid, uint16_t new_head) "cqid %"PRIu16" new_head %"PRIu16""
--pci_nvme_mmio_doorbell_sq(uint16_t sqid, uint16_t new_tail) "cqid %"PRIu16" new_tail %"PRIu16""
--pci_nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
--pci_nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
--pci_nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
--pci_nvme_mmio_aqattr(uint64_t data) "wrote MMIO, admin queue attributes=0x%"PRIx64""
--pci_nvme_mmio_asqaddr(uint64_t data) "wrote MMIO, admin submission queue address=0x%"PRIx64""
--pci_nvme_mmio_acqaddr(uint64_t data) "wrote MMIO, admin completion queue address=0x%"PRIx64""
--pci_nvme_mmio_asqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO, admin submission queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
--pci_nvme_mmio_acqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO, admin completion queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
--pci_nvme_mmio_start_success(void) "setting controller enable bit succeeded"
--pci_nvme_mmio_stopped(void) "cleared controller enable bit"
--pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
--pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
--
--# nvme traces for error conditions
--pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
--pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
--pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
--pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
--pci_nvme_err_invalid_prp2_missing(void) "PRP2 is null and more data to be transferred"
--pci_nvme_err_invalid_prp(void) "invalid PRP"
--pci_nvme_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace %u not within 1-%u"
--pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
--pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
--pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
--pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
--pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
--pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
--pci_nvme_err_invalid_create_sq_size(uint16_t qsize) "failed creating submission queue, invalid qsize=%"PRIu16""
--pci_nvme_err_invalid_create_sq_addr(uint64_t addr) "failed creating submission queue, addr=0x%"PRIx64""
--pci_nvme_err_invalid_create_sq_qflags(uint16_t qflags) "failed creating submission queue, qflags=%"PRIu16""
--pci_nvme_err_invalid_del_cq_cqid(uint16_t cqid) "failed deleting completion queue, cqid=%"PRIu16""
--pci_nvme_err_invalid_del_cq_notempty(uint16_t cqid) "failed deleting completion queue, it is not empty, cqid=%"PRIu16""
--pci_nvme_err_invalid_create_cq_cqid(uint16_t cqid) "failed creating completion queue, cqid=%"PRIu16""
--pci_nvme_err_invalid_create_cq_size(uint16_t size) "failed creating completion queue, size=%"PRIu16""
--pci_nvme_err_invalid_create_cq_addr(uint64_t addr) "failed creating completion queue, addr=0x%"PRIx64""
--pci_nvme_err_invalid_create_cq_vector(uint16_t vector) "failed creating completion queue, vector=%"PRIu16""
--pci_nvme_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completion queue, qflags=%"PRIu16""
--pci_nvme_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
--pci_nvme_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
--pci_nvme_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
--pci_nvme_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
--pci_nvme_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
--pci_nvme_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
--pci_nvme_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
--pci_nvme_err_startfail_nbaracq(void) "nvme_start_ctrl failed because the admin completion queue address is null"
--pci_nvme_err_startfail_asq_misaligned(uint64_t addr) "nvme_start_ctrl failed because the admin submission queue address is misaligned: 0x%"PRIx64""
--pci_nvme_err_startfail_acq_misaligned(uint64_t addr) "nvme_start_ctrl failed because the admin completion queue address is misaligned: 0x%"PRIx64""
--pci_nvme_err_startfail_page_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the page size is too small: log2size=%u, min=%u"
--pci_nvme_err_startfail_page_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the page size is too large: log2size=%u, max=%u"
--pci_nvme_err_startfail_cqent_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the completion queue entry size is too small: log2size=%u, min=%u"
--pci_nvme_err_startfail_cqent_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the completion queue entry size is too large: log2size=%u, max=%u"
--pci_nvme_err_startfail_sqent_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the submission queue entry size is too small: log2size=%u, min=%u"
--pci_nvme_err_startfail_sqent_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the submission queue entry size is too large: log2size=%u, max=%u"
--pci_nvme_err_startfail_asqent_sz_zero(void) "nvme_start_ctrl failed because the admin submission queue size is zero"
--pci_nvme_err_startfail_acqent_sz_zero(void) "nvme_start_ctrl failed because the admin completion queue size is zero"
--pci_nvme_err_startfail(void) "setting controller enable bit failed"
--
--# Traces for undefined behavior
--pci_nvme_ub_mmiowr_misaligned32(uint64_t offset) "MMIO write not 32-bit aligned, offset=0x%"PRIx64""
--pci_nvme_ub_mmiowr_toosmall(uint64_t offset, unsigned size) "MMIO write smaller than 32 bits, offset=0x%"PRIx64", size=%u"
--pci_nvme_ub_mmiowr_intmask_with_msix(void) "undefined access to interrupt mask set when MSI-X is enabled"
--pci_nvme_ub_mmiowr_ro_csts(void) "attempted to set a read only bit of controller status"
--pci_nvme_ub_mmiowr_ssreset_w1c_unsupported(void) "attempted to W1C CSTS.NSSRO but CAP.NSSRS is zero (not supported)"
--pci_nvme_ub_mmiowr_ssreset_unsupported(void) "attempted NVM subsystem reset but CAP.NSSRS is zero (not supported)"
--pci_nvme_ub_mmiowr_cmbloc_reserved(void) "invalid write to reserved CMBLOC when CMBSZ is zero, ignored"
--pci_nvme_ub_mmiowr_cmbsz_readonly(void) "invalid write to read only CMBSZ, ignored"
--pci_nvme_ub_mmiowr_pmrcap_readonly(void) "invalid write to read only PMRCAP, ignored"
--pci_nvme_ub_mmiowr_pmrsts_readonly(void) "invalid write to read only PMRSTS, ignored"
--pci_nvme_ub_mmiowr_pmrebs_readonly(void) "invalid write to read only PMREBS, ignored"
--pci_nvme_ub_mmiowr_pmrswtp_readonly(void) "invalid write to read only PMRSWTP, ignored"
--pci_nvme_ub_mmiowr_invalid(uint64_t offset, uint64_t data) "invalid MMIO write, offset=0x%"PRIx64", data=0x%"PRIx64""
--pci_nvme_ub_mmiord_misaligned32(uint64_t offset) "MMIO read not 32-bit aligned, offset=0x%"PRIx64""
--pci_nvme_ub_mmiord_toosmall(uint64_t offset) "MMIO read smaller than 32-bits, offset=0x%"PRIx64""
--pci_nvme_ub_mmiord_invalid_ofs(uint64_t offset) "MMIO read beyond last register, offset=0x%"PRIx64", returning 0"
--pci_nvme_ub_db_wr_misaligned(uint64_t offset) "doorbell write not 32-bit aligned, offset=0x%"PRIx64", ignoring"
--pci_nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for nonexistent queue, cqid=%"PRIu32", ignoring"
--pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
--pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
--pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
--
- # xen-block.c
- xen_block_realize(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
- xen_block_connect(const char *type, uint32_t disk, uint32_t partition) "%s d%up%u"
-diff --git a/hw/meson.build b/hw/meson.build
-index 010de7219c1..dcee944cf05 100644
---- a/hw/meson.build
-+++ b/hw/meson.build
-@@ -21,6 +21,7 @@
- subdir('misc')
- subdir('net')
- subdir('nubus')
-+subdir('nvme')
- subdir('nvram')
- subdir('pci')
- subdir('pci-bridge')
-diff --git a/hw/nvme/Kconfig b/hw/nvme/Kconfig
-new file mode 100644
-index 00000000000..8ac90942e55
---- /dev/null
-+++ b/hw/nvme/Kconfig
-@@ -0,0 +1,4 @@
-+config NVME_PCI
-+    bool
-+    default y if PCI_DEVICES
-+    depends on PCI
-diff --git a/hw/nvme/meson.build b/hw/nvme/meson.build
-new file mode 100644
-index 00000000000..534c6b1dd17
---- /dev/null
-+++ b/hw/nvme/meson.build
-@@ -0,0 +1 @@
-+softmmu_ss.add(when: 'CONFIG_NVME_PCI', if_true: files('core.c'))
-diff --git a/hw/nvme/trace-events b/hw/nvme/trace-events
-new file mode 100644
-index 00000000000..cd82d9a8ca2
---- /dev/null
-+++ b/hw/nvme/trace-events
-@@ -0,0 +1,125 @@
-+# See docs/devel/tracing.txt for syntax documentation.
-+
-+# core.c
-+# nvme traces for successful events
-+pci_nvme_irq_msix(uint32_t vector) "raising MSI-X IRQ vector %u"
-+pci_nvme_irq_pin(void) "pulsing IRQ pin"
-+pci_nvme_irq_masked(void) "IRQ is masked"
-+pci_nvme_dma_read(uint64_t prp1, uint64_t prp2) "DMA read, prp1=0x%"PRIx64" prp2=0x%"PRIx64""
-+pci_nvme_map_addr(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
-+pci_nvme_map_addr_cmb(uint64_t addr, uint64_t len) "addr 0x%"PRIx64" len %"PRIu64""
-+pci_nvme_map_prp(uint64_t trans_len, uint32_t len, uint64_t prp1, uint64_t prp2, int num_prps) "trans_len %"PRIu64" len %"PRIu32" prp1 0x%"PRIx64" prp2 0x%"PRIx64" num_prps %d"
-+pci_nvme_io_cmd(uint16_t cid, uint32_t nsid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" nsid %"PRIu32" sqid %"PRIu16" opc 0x%"PRIx8""
-+pci_nvme_admin_cmd(uint16_t cid, uint16_t sqid, uint8_t opcode) "cid %"PRIu16" sqid %"PRIu16" opc 0x%"PRIx8""
-+pci_nvme_rw(const char *verb, uint32_t blk_count, uint64_t byte_count, uint64_t lba) "%s %"PRIu32" blocks (%"PRIu64" bytes) from LBA %"PRIu64""
-+pci_nvme_rw_cb(uint16_t cid) "cid %"PRIu16""
-+pci_nvme_write_zeroes(uint16_t cid, uint64_t slba, uint32_t nlb) "cid %"PRIu16" slba %"PRIu64" nlb %"PRIu32""
-+pci_nvme_create_sq(uint64_t addr, uint16_t sqid, uint16_t cqid, uint16_t qsize, uint16_t qflags) "create submission queue, addr=0x%"PRIx64", sqid=%"PRIu16", cqid=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16""
-+pci_nvme_create_cq(uint64_t addr, uint16_t cqid, uint16_t vector, uint16_t size, uint16_t qflags, int ien) "create completion queue, addr=0x%"PRIx64", cqid=%"PRIu16", vector=%"PRIu16", qsize=%"PRIu16", qflags=%"PRIu16", ien=%d"
-+pci_nvme_del_sq(uint16_t qid) "deleting submission queue sqid=%"PRIu16""
-+pci_nvme_del_cq(uint16_t cqid) "deleted completion queue, cqid=%"PRIu16""
-+pci_nvme_identify_ctrl(void) "identify controller"
-+pci_nvme_identify_ns(uint32_t ns) "nsid %"PRIu32""
-+pci_nvme_identify_nslist(uint32_t ns) "nsid %"PRIu32""
-+pci_nvme_identify_ns_descr_list(uint32_t ns) "nsid %"PRIu32""
-+pci_nvme_get_log(uint16_t cid, uint8_t lid, uint8_t lsp, uint8_t rae, uint32_t len, uint64_t off) "cid %"PRIu16" lid 0x%"PRIx8" lsp 0x%"PRIx8" rae 0x%"PRIx8" len %"PRIu32" off %"PRIu64""
-+pci_nvme_getfeat(uint16_t cid, uint8_t fid, uint8_t sel, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" sel 0x%"PRIx8" cdw11 0x%"PRIx32""
-+pci_nvme_setfeat(uint16_t cid, uint8_t fid, uint8_t save, uint32_t cdw11) "cid %"PRIu16" fid 0x%"PRIx8" save 0x%"PRIx8" cdw11 0x%"PRIx32""
-+pci_nvme_getfeat_vwcache(const char* result) "get feature volatile write cache, result=%s"
-+pci_nvme_getfeat_numq(int result) "get feature number of queues, result=%d"
-+pci_nvme_setfeat_numq(int reqcq, int reqsq, int gotcq, int gotsq) "requested cq_count=%d sq_count=%d, responding with cq_count=%d sq_count=%d"
-+pci_nvme_setfeat_timestamp(uint64_t ts) "set feature timestamp = 0x%"PRIx64""
-+pci_nvme_getfeat_timestamp(uint64_t ts) "get feature timestamp = 0x%"PRIx64""
-+pci_nvme_process_aers(int queued) "queued %d"
-+pci_nvme_aer(uint16_t cid) "cid %"PRIu16""
-+pci_nvme_aer_aerl_exceeded(void) "aerl exceeded"
-+pci_nvme_aer_masked(uint8_t type, uint8_t mask) "type 0x%"PRIx8" mask 0x%"PRIx8""
-+pci_nvme_aer_post_cqe(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
-+pci_nvme_enqueue_event(uint8_t typ, uint8_t info, uint8_t log_page) "type 0x%"PRIx8" info 0x%"PRIx8" lid 0x%"PRIx8""
-+pci_nvme_enqueue_event_noqueue(int queued) "queued %d"
-+pci_nvme_enqueue_event_masked(uint8_t typ) "type 0x%"PRIx8""
-+pci_nvme_no_outstanding_aers(void) "ignoring event; no outstanding AERs"
-+pci_nvme_enqueue_req_completion(uint16_t cid, uint16_t cqid, uint16_t status) "cid %"PRIu16" cqid %"PRIu16" status 0x%"PRIx16""
-+pci_nvme_mmio_read(uint64_t addr) "addr 0x%"PRIx64""
-+pci_nvme_mmio_write(uint64_t addr, uint64_t data) "addr 0x%"PRIx64" data 0x%"PRIx64""
-+pci_nvme_mmio_doorbell_cq(uint16_t cqid, uint16_t new_head) "cqid %"PRIu16" new_head %"PRIu16""
-+pci_nvme_mmio_doorbell_sq(uint16_t sqid, uint16_t new_tail) "cqid %"PRIu16" new_tail %"PRIu16""
-+pci_nvme_mmio_intm_set(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask set, data=0x%"PRIx64", new_mask=0x%"PRIx64""
-+pci_nvme_mmio_intm_clr(uint64_t data, uint64_t new_mask) "wrote MMIO, interrupt mask clr, data=0x%"PRIx64", new_mask=0x%"PRIx64""
-+pci_nvme_mmio_cfg(uint64_t data) "wrote MMIO, config controller config=0x%"PRIx64""
-+pci_nvme_mmio_aqattr(uint64_t data) "wrote MMIO, admin queue attributes=0x%"PRIx64""
-+pci_nvme_mmio_asqaddr(uint64_t data) "wrote MMIO, admin submission queue address=0x%"PRIx64""
-+pci_nvme_mmio_acqaddr(uint64_t data) "wrote MMIO, admin completion queue address=0x%"PRIx64""
-+pci_nvme_mmio_asqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO, admin submission queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
-+pci_nvme_mmio_acqaddr_hi(uint64_t data, uint64_t new_addr) "wrote MMIO, admin completion queue high half=0x%"PRIx64", new_address=0x%"PRIx64""
-+pci_nvme_mmio_start_success(void) "setting controller enable bit succeeded"
-+pci_nvme_mmio_stopped(void) "cleared controller enable bit"
-+pci_nvme_mmio_shutdown_set(void) "shutdown bit set"
-+pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
-+
-+# nvme traces for error conditions
-+pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
-+pci_nvme_err_invalid_dma(void) "PRP/SGL is too small for transfer size"
-+pci_nvme_err_invalid_prplist_ent(uint64_t prplist) "PRP list entry is null or not page aligned: 0x%"PRIx64""
-+pci_nvme_err_invalid_prp2_align(uint64_t prp2) "PRP2 is not page aligned: 0x%"PRIx64""
-+pci_nvme_err_invalid_prp2_missing(void) "PRP2 is null and more data to be transferred"
-+pci_nvme_err_invalid_prp(void) "invalid PRP"
-+pci_nvme_err_invalid_ns(uint32_t ns, uint32_t limit) "invalid namespace %u not within 1-%u"
-+pci_nvme_err_invalid_opc(uint8_t opc) "invalid opcode 0x%"PRIx8""
-+pci_nvme_err_invalid_admin_opc(uint8_t opc) "invalid admin opcode 0x%"PRIx8""
-+pci_nvme_err_invalid_lba_range(uint64_t start, uint64_t len, uint64_t limit) "Invalid LBA start=%"PRIu64" len=%"PRIu64" limit=%"PRIu64""
-+pci_nvme_err_invalid_del_sq(uint16_t qid) "invalid submission queue deletion, sid=%"PRIu16""
-+pci_nvme_err_invalid_create_sq_cqid(uint16_t cqid) "failed creating submission queue, invalid cqid=%"PRIu16""
-+pci_nvme_err_invalid_create_sq_sqid(uint16_t sqid) "failed creating submission queue, invalid sqid=%"PRIu16""
-+pci_nvme_err_invalid_create_sq_size(uint16_t qsize) "failed creating submission queue, invalid qsize=%"PRIu16""
-+pci_nvme_err_invalid_create_sq_addr(uint64_t addr) "failed creating submission queue, addr=0x%"PRIx64""
-+pci_nvme_err_invalid_create_sq_qflags(uint16_t qflags) "failed creating submission queue, qflags=%"PRIu16""
-+pci_nvme_err_invalid_del_cq_cqid(uint16_t cqid) "failed deleting completion queue, cqid=%"PRIu16""
-+pci_nvme_err_invalid_del_cq_notempty(uint16_t cqid) "failed deleting completion queue, it is not empty, cqid=%"PRIu16""
-+pci_nvme_err_invalid_create_cq_cqid(uint16_t cqid) "failed creating completion queue, cqid=%"PRIu16""
-+pci_nvme_err_invalid_create_cq_size(uint16_t size) "failed creating completion queue, size=%"PRIu16""
-+pci_nvme_err_invalid_create_cq_addr(uint64_t addr) "failed creating completion queue, addr=0x%"PRIx64""
-+pci_nvme_err_invalid_create_cq_vector(uint16_t vector) "failed creating completion queue, vector=%"PRIu16""
-+pci_nvme_err_invalid_create_cq_qflags(uint16_t qflags) "failed creating completion queue, qflags=%"PRIu16""
-+pci_nvme_err_invalid_identify_cns(uint16_t cns) "identify, invalid cns=0x%"PRIx16""
-+pci_nvme_err_invalid_getfeat(int dw10) "invalid get features, dw10=0x%"PRIx32""
-+pci_nvme_err_invalid_setfeat(uint32_t dw10) "invalid set features, dw10=0x%"PRIx32""
-+pci_nvme_err_invalid_log_page(uint16_t cid, uint16_t lid) "cid %"PRIu16" lid 0x%"PRIx16""
-+pci_nvme_err_startfail_cq(void) "nvme_start_ctrl failed because there are non-admin completion queues"
-+pci_nvme_err_startfail_sq(void) "nvme_start_ctrl failed because there are non-admin submission queues"
-+pci_nvme_err_startfail_nbarasq(void) "nvme_start_ctrl failed because the admin submission queue address is null"
-+pci_nvme_err_startfail_nbaracq(void) "nvme_start_ctrl failed because the admin completion queue address is null"
-+pci_nvme_err_startfail_asq_misaligned(uint64_t addr) "nvme_start_ctrl failed because the admin submission queue address is misaligned: 0x%"PRIx64""
-+pci_nvme_err_startfail_acq_misaligned(uint64_t addr) "nvme_start_ctrl failed because the admin completion queue address is misaligned: 0x%"PRIx64""
-+pci_nvme_err_startfail_page_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the page size is too small: log2size=%u, min=%u"
-+pci_nvme_err_startfail_page_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the page size is too large: log2size=%u, max=%u"
-+pci_nvme_err_startfail_cqent_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the completion queue entry size is too small: log2size=%u, min=%u"
-+pci_nvme_err_startfail_cqent_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the completion queue entry size is too large: log2size=%u, max=%u"
-+pci_nvme_err_startfail_sqent_too_small(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the submission queue entry size is too small: log2size=%u, min=%u"
-+pci_nvme_err_startfail_sqent_too_large(uint8_t log2ps, uint8_t maxlog2ps) "nvme_start_ctrl failed because the submission queue entry size is too large: log2size=%u, max=%u"
-+pci_nvme_err_startfail_asqent_sz_zero(void) "nvme_start_ctrl failed because the admin submission queue size is zero"
-+pci_nvme_err_startfail_acqent_sz_zero(void) "nvme_start_ctrl failed because the admin completion queue size is zero"
-+pci_nvme_err_startfail(void) "setting controller enable bit failed"
-+
-+# Traces for undefined behavior
-+pci_nvme_ub_mmiowr_misaligned32(uint64_t offset) "MMIO write not 32-bit aligned, offset=0x%"PRIx64""
-+pci_nvme_ub_mmiowr_toosmall(uint64_t offset, unsigned size) "MMIO write smaller than 32 bits, offset=0x%"PRIx64", size=%u"
-+pci_nvme_ub_mmiowr_intmask_with_msix(void) "undefined access to interrupt mask set when MSI-X is enabled"
-+pci_nvme_ub_mmiowr_ro_csts(void) "attempted to set a read only bit of controller status"
-+pci_nvme_ub_mmiowr_ssreset_w1c_unsupported(void) "attempted to W1C CSTS.NSSRO but CAP.NSSRS is zero (not supported)"
-+pci_nvme_ub_mmiowr_ssreset_unsupported(void) "attempted NVM subsystem reset but CAP.NSSRS is zero (not supported)"
-+pci_nvme_ub_mmiowr_cmbloc_reserved(void) "invalid write to reserved CMBLOC when CMBSZ is zero, ignored"
-+pci_nvme_ub_mmiowr_cmbsz_readonly(void) "invalid write to read only CMBSZ, ignored"
-+pci_nvme_ub_mmiowr_pmrcap_readonly(void) "invalid write to read only PMRCAP, ignored"
-+pci_nvme_ub_mmiowr_pmrsts_readonly(void) "invalid write to read only PMRSTS, ignored"
-+pci_nvme_ub_mmiowr_pmrebs_readonly(void) "invalid write to read only PMREBS, ignored"
-+pci_nvme_ub_mmiowr_pmrswtp_readonly(void) "invalid write to read only PMRSWTP, ignored"
-+pci_nvme_ub_mmiowr_invalid(uint64_t offset, uint64_t data) "invalid MMIO write, offset=0x%"PRIx64", data=0x%"PRIx64""
-+pci_nvme_ub_mmiord_misaligned32(uint64_t offset) "MMIO read not 32-bit aligned, offset=0x%"PRIx64""
-+pci_nvme_ub_mmiord_toosmall(uint64_t offset) "MMIO read smaller than 32-bits, offset=0x%"PRIx64""
-+pci_nvme_ub_mmiord_invalid_ofs(uint64_t offset) "MMIO read beyond last register, offset=0x%"PRIx64", returning 0"
-+pci_nvme_ub_db_wr_misaligned(uint64_t offset) "doorbell write not 32-bit aligned, offset=0x%"PRIx64", ignoring"
-+pci_nvme_ub_db_wr_invalid_cq(uint32_t qid) "completion queue doorbell write for nonexistent queue, cqid=%"PRIu32", ignoring"
-+pci_nvme_ub_db_wr_invalid_cqhead(uint32_t qid, uint16_t new_head) "completion queue doorbell write value beyond queue size, cqid=%"PRIu32", new_head=%"PRIu16", ignoring"
-+pci_nvme_ub_db_wr_invalid_sq(uint32_t qid) "submission queue doorbell write for nonexistent queue, sqid=%"PRIu32", ignoring"
-+pci_nvme_ub_db_wr_invalid_sqtail(uint32_t qid, uint16_t new_tail) "submission queue doorbell write value beyond queue size, sqid=%"PRIu32", new_head=%"PRIu16", ignoring"
--- 
-2.26.2
-
+On 10/10/20 3:57 PM, Luc Michel wrote:
+> v2 -> v3:
+>    - patch 03: moved clock_new definition to hw/core/clock.c [Phil]
+>    - patch 03: commit message typo [Clement]
+>    - patch 10: clarifications around the CM_CTL/CM_DIBV mux registers.
+>                reg_cm replaced with reg_ctl and reg_div. Add some
+>                comments for clarity. [Phil]
+>    - patch 10: fixed update_mux_from_cm not matching the CM_DIV offset
+>                correctly. [Phil]
+>    - patch 11: replaced manual bitfield extraction with extract32 [Phil]
+>    - patch 11: added a visual representation of CM_DIV for clarity [Phil]
+>    - patch 11: added a missing return in clock_mux_update.
+> 
+> v1 -> v2:
+>    - patch 05: Added a comment about MMIO .valid constraints [Phil]
+>    - patch 05: Added MMIO .impl [Phil]
+>    - patch 05: Moved init_internal_clock to the public clock API, renamed
+>      clock_new (new patch 03) [Phil]
+>    - patch 11: use muldiv64 for clock mux frequency output computation [Phil]
+>    - patch 11: add a check for null divisor (Phil: I dropped your r-b)
+>    - Typos, formatting, naming, style [Phil]
+> 
+> Patches without review: 03, 11, 13
+> 
+> Hi,
+> 
+> This series add the BCM2835 CPRMAN clock manager peripheral to the
+> Raspberry Pi machine.
+> 
+> Patches 1-4 are preliminary changes, patches 5-13 are the actual
+> implementation.
+> 
+> The two last patches add a clock input to the PL011 and
+> connect it to the CPRMAN.
+> 
+> This series has been tested with Linux 5.4.61 (the current raspios
+> version). It fixes the kernel Oops at boot time due to invalid UART
+> clock value, and other warnings/errors here and there because of bad
+> clocks or lack of CPRMAN.
+> 
+> Here is the clock tree as seen by Linux when booted in QEMU:
+> (/sys/kernel/debug/clk/clk_summary with some columns removed)
+> 
+>                          enable  prepare
+>     clock                 count    count          rate
+> -----------------------------------------------------
+>   otg                         0        0     480000000
+>   osc                         5        5      19200000
+>      gp2                      1        1         32768
+>      tsens                    0        0       1920000
+>      otp                      0        0       4800000
+>      timer                    0        0       1000002
+>      pllh                     4        4     864000000
+>         pllh_pix_prediv       1        1       3375000
+>            pllh_pix           0        0        337500
+>         pllh_aux              1        1     216000000
+>            vec                0        0     108000000
+>         pllh_rcal_prediv      1        1       3375000
+>            pllh_rcal          0        0        337500
+>      plld                     3        3    2000000024
+>         plld_dsi1             0        0       7812501
+>         plld_dsi0             0        0       7812501
+>         plld_per              3        3     500000006
+>            gp1                1        1      25000000
+>            uart               1        2      47999625
+>         plld_core             2        2     500000006
+>            sdram              0        0     166666668
+>      pllc                     3        3    2400000000
+>         pllc_per              1        1    1200000000
+>            emmc               0        0     200000000
+>         pllc_core2            0        0       9375000
+>         pllc_core1            0        0       9375000
+>         pllc_core0            2        2    1200000000
+>            vpu                1        1     700000000
+>               aux_spi2        0        0     700000000
+>               aux_spi1        0        0     700000000
+>               aux_uart        0        0     700000000
+>               peri_image      0        0     700000000
+>      plla                     2        2    2250000000
+>         plla_ccp2             0        0       8789063
+>         plla_dsi0             0        0       8789063
+>         plla_core             1        1     750000000
+>            h264               0        0     250000000
+>            isp                0        0     250000000
+>   dsi1p                       0        0             0
+>   dsi0p                       0        0             0
+>   dsi1e                       0        0             0
+>   dsi0e                       0        0             0
+>   cam1                        0        0             0
+>   cam0                        0        0             0
+>   dpi                         0        0             0
+>   tec                         0        0             0
+>   smi                         0        0             0
+>   slim                        0        0             0
+>   gp0                         0        0             0
+>   dft                         0        0             0
+>   aveo                        0        0             0
+>   pcm                         0        0             0
+>   pwm                         0        0             0
+>   hsm                         0        0             0
+> 
+> It shows small differences with real hardware due other missing
+> peripherals for which the driver turn the clock off (like tsens).
+> 
+> Luc Michel (15):
+>    hw/core/clock: provide the VMSTATE_ARRAY_CLOCK macro
+>    hw/core/clock: trace clock values in Hz instead of ns
+>    hw/core/clock: add the clock_new helper function
+>    hw/arm/raspi: fix CPRMAN base address
+>    hw/arm/raspi: add a skeleton implementation of the CPRMAN
+>    hw/misc/bcm2835_cprman: add a PLL skeleton implementation
+>    hw/misc/bcm2835_cprman: implement PLLs behaviour
+>    hw/misc/bcm2835_cprman: add a PLL channel skeleton implementation
+>    hw/misc/bcm2835_cprman: implement PLL channels behaviour
+>    hw/misc/bcm2835_cprman: add a clock mux skeleton implementation
+>    hw/misc/bcm2835_cprman: implement clock mux behaviour
+>    hw/misc/bcm2835_cprman: add the DSI0HSCK multiplexer
+>    hw/misc/bcm2835_cprman: add sane reset values to the registers
+>    hw/char/pl011: add a clock input
+>    hw/arm/bcm2835_peripherals: connect the UART clock
+> 
+>   include/hw/arm/bcm2835_peripherals.h       |    5 +-
+>   include/hw/arm/raspi_platform.h            |    5 +-
+>   include/hw/char/pl011.h                    |    1 +
+>   include/hw/clock.h                         |   18 +
+>   include/hw/misc/bcm2835_cprman.h           |  210 ++++
+>   include/hw/misc/bcm2835_cprman_internals.h | 1019 ++++++++++++++++++++
+>   hw/arm/bcm2835_peripherals.c               |   15 +-
+>   hw/char/pl011.c                            |   45 +
+>   hw/core/clock.c                            |   21 +-
+>   hw/misc/bcm2835_cprman.c                   |  808 ++++++++++++++++
+>   hw/char/trace-events                       |    1 +
+>   hw/core/trace-events                       |    4 +-
+>   hw/misc/meson.build                        |    1 +
+>   hw/misc/trace-events                       |    5 +
+>   14 files changed, 2146 insertions(+), 12 deletions(-)
+>   create mode 100644 include/hw/misc/bcm2835_cprman.h
+>   create mode 100644 include/hw/misc/bcm2835_cprman_internals.h
+>   create mode 100644 hw/misc/bcm2835_cprman.c
+> 
 
