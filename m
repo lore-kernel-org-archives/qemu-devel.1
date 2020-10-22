@@ -2,88 +2,90 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B163C388F2
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EE7FC388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:44:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9BD852227F
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:42:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B65442227F
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:44:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kay2GEme"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9BD852227F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bcx4U3N9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B65442227F
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35604 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVYz7-00058H-Ka
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:42:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37756)
+	id 1kVZ1P-0007UW-D5
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:44:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36428)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kVYqS-0002fa-7O
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:33:24 -0400
-Received: from mail-ej1-x635.google.com ([2a00:1450:4864:20::635]:36329)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kVYqQ-0005fr-2O
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:33:23 -0400
-Received: by mail-ej1-x635.google.com with SMTP id w27so1788104ejb.3
- for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 04:33:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=HY1RRuO42kjIT1FTEuIrdY6sp6bVFupsSGnZHU3Xd08=;
- b=Kay2GEmev+JayMkez10Jgo/MkH7yhZkxgYr1EFOERStVnStXHh17Xs6hoqr+yCpYSW
- Y8XGfKwzGG+nIK7acrWk89lVxUFr/txPySOZfiZ383t4/o7jeSJr77qIDBYPxFdKX+vT
- +oh6rP/T0dnaQ9yHF9CkEHcGDN/cDSksCCtCkm/rF0RF0eHDeYcWY0vVNACTHH6kzP3m
- f7wL9crLRBzzqleT0SF9NxWfYjj28whKRZCn822666vnXZUzfUkBNsi0NAzzrgLt3rI6
- vJS4DW+cc8D1xBg8J6HvlKJxKvIdDtJd6oSlTvVsnGzKw3c7ikClz0UJcGvzDrUMgukm
- lULg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=HY1RRuO42kjIT1FTEuIrdY6sp6bVFupsSGnZHU3Xd08=;
- b=cywpgJZ4q19qlkzT/1XKSRmQ6j6kE9xH6LCutIQ5DDfgpNUHmWRzzP9owG2ezfXxju
- AO5o4JPtHY4jy5A6rmi4F04/zamA5TJIAVMhxVJckWG8QWuhtjE3GN2B0vfUjKEcIKTM
- 2nsK7Uu5vBEv4sMzv03FtkG7pFpiilJ+5J3b/aXbbbTt8lFg2L0QAbVwCKBzxJxGXszf
- X7tLjFJ9RfhWkhL0hXh+RUcN0WOTP26XL8mX9NPy3ppbp8/MUVwVH071duhyUxoQPGL5
- kIYwnuSOZ9XmZxdfj5WR6u/31q+TU0XmlTS7tZMZNgz12mR6nVeKFshZ5dBjMWdNEyXB
- E/ww==
-X-Gm-Message-State: AOAM530ZJnL3comBwddgioK+GD30A3shm/4O6ITXl2uF11vSf4xsibKK
- 6at1Nmh1I9fvc2+LQFDnmFDPkkoNpqcntignEeWp2g==
-X-Google-Smtp-Source: ABdhPJzry7VcoZQ0o4G4FmuN2hppEmDIuJmA8vYqxHg+oLHqFchMgyIK8c9kaffPPKtiL4gQxa+Tp/7hP2lUxmrV5hE=
-X-Received: by 2002:a17:906:1f42:: with SMTP id
- d2mr1709294ejk.407.1603366399922; 
- Thu, 22 Oct 2020 04:33:19 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVYm2-0005Ib-3l
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:28:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56111)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVYm0-00055t-C6
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:28:49 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603366127;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=qMFZnj3WKL2Y2KPQIX3botLUm8jWqyo4+G2IcDvsub0=;
+ b=Bcx4U3N9uVkzm6P1hLDoH8Axde7mD2kqX88IbT1yfDWhTgIjm9hQ1GWpXXNAoZMxihcbFx
+ DtU24vckDq+bR6aezxUl591/GE4t38mQcyaOHc5auD/8fArcIgGhYfNfUgy+mRe7UOHlDn
+ bZbwGdNXtpjcODr5eKyRTH9fmWAFeIc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-40-mMSKDRgSNTOgAGtldZThGQ-1; Thu, 22 Oct 2020 07:28:45 -0400
+X-MC-Unique: mMSKDRgSNTOgAGtldZThGQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D44FE835B91;
+ Thu, 22 Oct 2020 11:28:43 +0000 (UTC)
+Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 473AE5D9F7;
+ Thu, 22 Oct 2020 11:28:40 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: qemu-devel@nongnu.org,
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL v2 12/28] util/vhost-user-server: drop unused
+ DevicePanicNotifier
+Date: Thu, 22 Oct 2020 12:27:10 +0100
+Message-Id: <20201022112726.736757-13-stefanha@redhat.com>
+In-Reply-To: <20201022112726.736757-1-stefanha@redhat.com>
+References: <20201022112726.736757-1-stefanha@redhat.com>
 MIME-Version: 1.0
-References: <20201021173450.2616910-1-f4bug@amsat.org>
-In-Reply-To: <20201021173450.2616910-1-f4bug@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Thu, 22 Oct 2020 12:33:08 +0100
-Message-ID: <CAFEAcA9e=u0Wt0mMLo2uWixvPHt7sCX_1JCe95ZGiRPvX5Pt7Q@mail.gmail.com>
-Subject: Re: [PULL 00/13] SD/MMC patches for 2020-10-21
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::635;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x635.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 06:53:39
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,49 +98,73 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, QEMU Developers <qemu-devel@nongnu.org>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, 21 Oct 2020 at 18:37, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->
-> The following changes since commit ac793156f650ae2d77834932d72224175ee690=
-86:
->
->   Merge remote-tracking branch 'remotes/pmaydell/tags/pull-target-arm-202=
-0102=3D
-> 0-1' into staging (2020-10-20 21:11:35 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/philmd/qemu.git tags/sd-next-20201021
->
-> for you to fetch changes up to 84816fb63e5c57159b469a66052d1b2bc862ef77:
->
->   hw/sd/sdcard: Assert if accessing an illegal group (2020-10-21 13:34:27=
- +02=3D
-> 00)
->
-> ----------------------------------------------------------------
-> SD/MMC patches
->
-> Fix two heap-overflow reported by Alexander Bulekov while fuzzing:
-> - https://bugs.launchpad.net/qemu/+bug/1892960
-> - https://bugs.launchpad.net/qemu/+bug/1895310
->
-> CI jobs results:
-> . https://cirrus-ci.com/build/6399328187056128
-> . https://gitlab.com/philmd/qemu/-/pipelines/205701966
-> . https://travis-ci.org/github/philmd/qemu/builds/737708930
-> ----------------------------------------------------------------
+VGhlIGRldmljZSBwYW5pYyBub3RpZmllciBjYWxsYmFjayBpcyBub3QgdXNlZC4gRHJvcCBpdC4K
+ClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KTWVz
+c2FnZS1pZDogMjAyMDA5MjQxNTE1NDkuOTEzNzM3LTctc3RlZmFuaGFAcmVkaGF0LmNvbQpTaWdu
+ZWQtb2ZmLWJ5OiBTdGVmYW4gSGFqbm9jemkgPHN0ZWZhbmhhQHJlZGhhdC5jb20+Ci0tLQogdXRp
+bC92aG9zdC11c2VyLXNlcnZlci5oICAgICAgICAgICAgIHwgMyAtLS0KIGJsb2NrL2V4cG9ydC92
+aG9zdC11c2VyLWJsay1zZXJ2ZXIuYyB8IDMgKy0tCiB1dGlsL3Zob3N0LXVzZXItc2VydmVyLmMg
+ICAgICAgICAgICAgfCA2IC0tLS0tLQogMyBmaWxlcyBjaGFuZ2VkLCAxIGluc2VydGlvbigrKSwg
+MTEgZGVsZXRpb25zKC0pCgpkaWZmIC0tZ2l0IGEvdXRpbC92aG9zdC11c2VyLXNlcnZlci5oIGIv
+dXRpbC92aG9zdC11c2VyLXNlcnZlci5oCmluZGV4IDUyMzJmOTY3MTguLjkyMTc3ZmM5MTEgMTAw
+NjQ0Ci0tLSBhL3V0aWwvdmhvc3QtdXNlci1zZXJ2ZXIuaAorKysgYi91dGlsL3Zob3N0LXVzZXIt
+c2VydmVyLmgKQEAgLTI5LDEyICsyOSwxMCBAQCB0eXBlZGVmIHN0cnVjdCBWdUZkV2F0Y2ggewog
+fSBWdUZkV2F0Y2g7CiAKIHR5cGVkZWYgc3RydWN0IFZ1U2VydmVyIFZ1U2VydmVyOwotdHlwZWRl
+ZiB2b2lkIERldmljZVBhbmljTm90aWZpZXJGbihWdVNlcnZlciAqc2VydmVyKTsKIAogc3RydWN0
+IFZ1U2VydmVyIHsKICAgICBRSU9OZXRMaXN0ZW5lciAqbGlzdGVuZXI7CiAgICAgQWlvQ29udGV4
+dCAqY3R4OwotICAgIERldmljZVBhbmljTm90aWZpZXJGbiAqZGV2aWNlX3BhbmljX25vdGlmaWVy
+OwogICAgIGludCBtYXhfcXVldWVzOwogICAgIGNvbnN0IFZ1RGV2SWZhY2UgKnZ1X2lmYWNlOwog
+ICAgIFZ1RGV2IHZ1X2RldjsKQEAgLTU0LDcgKzUyLDYgQEAgYm9vbCB2aG9zdF91c2VyX3NlcnZl
+cl9zdGFydChWdVNlcnZlciAqc2VydmVyLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICBT
+b2NrZXRBZGRyZXNzICp1bml4X3NvY2tldCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+QWlvQ29udGV4dCAqY3R4LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICB1aW50MTZfdCBt
+YXhfcXVldWVzLAotICAgICAgICAgICAgICAgICAgICAgICAgICAgICBEZXZpY2VQYW5pY05vdGlm
+aWVyRm4gKmRldmljZV9wYW5pY19ub3RpZmllciwKICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgY29uc3QgVnVEZXZJZmFjZSAqdnVfaWZhY2UsCiAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgIEVycm9yICoqZXJycCk7CiAKZGlmZiAtLWdpdCBhL2Jsb2NrL2V4cG9ydC92aG9zdC11c2Vy
+LWJsay1zZXJ2ZXIuYyBiL2Jsb2NrL2V4cG9ydC92aG9zdC11c2VyLWJsay1zZXJ2ZXIuYwppbmRl
+eCBkMjI3YjQ2OGQ4Li5jOGZhNGVjYmE5IDEwMDY0NAotLS0gYS9ibG9jay9leHBvcnQvdmhvc3Qt
+dXNlci1ibGstc2VydmVyLmMKKysrIGIvYmxvY2svZXhwb3J0L3Zob3N0LXVzZXItYmxrLXNlcnZl
+ci5jCkBAIC00MzksOCArNDM5LDcgQEAgc3RhdGljIHZvaWQgdmhvc3RfdXNlcl9ibGtfc2VydmVy
+X3N0YXJ0KFZ1QmxvY2tEZXYgKnZ1X2Jsb2NrX2RldmljZSwKICAgICBjdHggPSBiZHJ2X2dldF9h
+aW9fY29udGV4dChibGtfYnModnVfYmxvY2tfZGV2aWNlLT5iYWNrZW5kKSk7CiAKICAgICBpZiAo
+IXZob3N0X3VzZXJfc2VydmVyX3N0YXJ0KCZ2dV9ibG9ja19kZXZpY2UtPnZ1X3NlcnZlciwgYWRk
+ciwgY3R4LAotICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgVkhPU1RfVVNFUl9CTEtf
+TUFYX1FVRVVFUywKLSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIE5VTEwsICZ2dV9i
+bG9ja19pZmFjZSwKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIFZIT1NUX1VTRVJf
+QkxLX01BWF9RVUVVRVMsICZ2dV9ibG9ja19pZmFjZSwKICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGVycnApKSB7CiAgICAgICAgIGdvdG8gZXJyb3I7CiAgICAgfQpkaWZmIC0tZ2l0
+IGEvdXRpbC92aG9zdC11c2VyLXNlcnZlci5jIGIvdXRpbC92aG9zdC11c2VyLXNlcnZlci5jCmlu
+ZGV4IDZlZmUyMjc5ZmQuLjczYTE2NjdiNTQgMTAwNjQ0Ci0tLSBhL3V0aWwvdmhvc3QtdXNlci1z
+ZXJ2ZXIuYworKysgYi91dGlsL3Zob3N0LXVzZXItc2VydmVyLmMKQEAgLTgxLDEwICs4MSw2IEBA
+IHN0YXRpYyB2b2lkIHBhbmljX2NiKFZ1RGV2ICp2dV9kZXYsIGNvbnN0IGNoYXIgKmJ1ZikKICAg
+ICAgICAgY2xvc2VfY2xpZW50KHNlcnZlcik7CiAgICAgfQogCi0gICAgaWYgKHNlcnZlci0+ZGV2
+aWNlX3BhbmljX25vdGlmaWVyKSB7Ci0gICAgICAgIHNlcnZlci0+ZGV2aWNlX3BhbmljX25vdGlm
+aWVyKHNlcnZlcik7Ci0gICAgfQotCiAgICAgLyoKICAgICAgKiBTZXQgdGhlIGNhbGxiYWNrIGZ1
+bmN0aW9uIGZvciBuZXR3b3JrIGxpc3RlbmVyIHNvIGFub3RoZXIKICAgICAgKiB2aG9zdC11c2Vy
+IGNsaWVudCBjYW4gY29ubmVjdCB0byB0aGlzIHNlcnZlcgpAQCAtMzg1LDcgKzM4MSw2IEBAIGJv
+b2wgdmhvc3RfdXNlcl9zZXJ2ZXJfc3RhcnQoVnVTZXJ2ZXIgKnNlcnZlciwKICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgU29ja2V0QWRkcmVzcyAqc29ja2V0X2FkZHIsCiAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgIEFpb0NvbnRleHQgKmN0eCwKICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgdWludDE2X3QgbWF4X3F1ZXVlcywKLSAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgRGV2aWNlUGFuaWNOb3RpZmllckZuICpkZXZpY2VfcGFuaWNfbm90aWZpZXIsCiAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgIGNvbnN0IFZ1RGV2SWZhY2UgKnZ1X2lmYWNlLAogICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICBFcnJvciAqKmVycnApCiB7CkBAIC00MDIsNyArMzk3LDYg
+QEAgYm9vbCB2aG9zdF91c2VyX3NlcnZlcl9zdGFydChWdVNlcnZlciAqc2VydmVyLAogICAgICAg
+ICAudnVfaWZhY2UgICAgICAgICAgICAgID0gdnVfaWZhY2UsCiAgICAgICAgIC5tYXhfcXVldWVz
+ICAgICAgICAgICAgPSBtYXhfcXVldWVzLAogICAgICAgICAuY3R4ICAgICAgICAgICAgICAgICAg
+ID0gY3R4LAotICAgICAgICAuZGV2aWNlX3BhbmljX25vdGlmaWVyID0gZGV2aWNlX3BhbmljX25v
+dGlmaWVyLAogICAgIH07CiAKICAgICBxaW9fbmV0X2xpc3RlbmVyX3NldF9uYW1lKHNlcnZlci0+
+bGlzdGVuZXIsICJ2aG9zdC11c2VyLWJhY2tlbmQtbGlzdGVuZXIiKTsKLS0gCjIuMjYuMgoK
 
-
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
--- PMM
 
