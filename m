@@ -2,79 +2,87 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B74C388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:11:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A273C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:11:33 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 804B8221FB
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:11:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C4679221FB
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 12:11:32 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Xo1WnPNt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 804B8221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJnOPNT6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C4679221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57686 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58272 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZRE-0004ph-A5
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:11:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40650)
+	id 1kVZRL-000561-O9
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 08:11:31 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38936)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVZ3Y-0002eF-D9
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:46:56 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8147)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVZ3W-0007U5-AZ
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:46:56 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f9171200000>; Thu, 22 Oct 2020 04:46:40 -0700
-Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL111.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
- 2020 11:46:46 +0000
-Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
- (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Thu, 22 Oct 2020 11:46:38 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v27 15/17] vfio: Add ioctl to get dirty pages bitmap during
- dma unmap
-Date: Thu, 22 Oct 2020 16:42:05 +0530
-Message-ID: <1603365127-14202-16-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
-MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603367200; bh=ObUgIExkBtETup9UMJTPrHyR0h6A8fwqr+kbqh83/d4=;
- h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
- References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=Xo1WnPNtwppcm5dVn17b/3Lm3x+Soj+58ZF5+mQGHLggJX7aZXsSSh1F1X1rK4OVW
- CBgmtBvVBC3gbgmG0n5cT3VrNrv29QY2/wm3xalbmyDDesYQ1qj6M/YAMKEntW6nKK
- i6Evrs3eDasNCH2eYznTP9cVEJROYKLlBBJyhWeaVF8oWPO6bv5ANYqRAhmQMhzS5L
- XMRmzl8AHnydEMP0isTQpMFg46iyPDMnVjCX4wQE+y2wqJgxF84xvmkhYDa7T72QZi
- lCIKkAguzaRA5gjxZn0scnTdHc6iY1hx8OI5X70tv51/nxLoqnD0MkHAegP64deBX7
- FU7hfYWqhKcCQ==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:45:39
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <marcel.apfelbaum@gmail.com>)
+ id 1kVYxN-0003yd-KX
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:40:33 -0400
+Received: from mail-wm1-x344.google.com ([2a00:1450:4864:20::344]:50872)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcel.apfelbaum@gmail.com>)
+ id 1kVYxL-0006KD-Le
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:40:33 -0400
+Received: by mail-wm1-x344.google.com with SMTP id 13so1705037wmf.0
+ for <qemu-devel@nongnu.org>; Thu, 22 Oct 2020 04:40:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id;
+ bh=7vlc1q9nKe/z3Et5stKE6k9iGpG1kYAK5TMYr8yFI6U=;
+ b=IJnOPNT6M9aESXlBIBLH8wF8A+a3pVAibF5prpKZOGInmHySsj6Ljhc5zCzxfNd2kM
+ gXmNnMSALUNqn7D1fWw72aZ4oOos/7yFufGBDWpYEs/HtQ8w1bjwiB2R09jYE8Urhles
+ QDYZzOcfHLbKPrpyW7TRJPX+5YDJBk0lvosZztgUqqon+PCFrKqt4Lnhdmr3ggHZxupb
+ 4pxXyGny/ZnnuXBpxVumt06HvyUU+7mpevH9RNr8OAH+pgk1B4GxmHdkbem8T29Da5mn
+ fvs/3MVGd22kVlGexR4Bk8kBNGVjTjmbRgosFU5DjZUiN9MNzziU24vZmNm3wPsl4KOA
+ +PCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id;
+ bh=7vlc1q9nKe/z3Et5stKE6k9iGpG1kYAK5TMYr8yFI6U=;
+ b=pvb8Cnc6iqGX6gR1pt2gq5bPiKcu/xY/1dsI8R8wgca7HmEq80tK+lgwjjR6WRcbqO
+ gO3Ii6cUYyDJggBJuS83aepJN2v8aGxdZWWCSh2+4SQunWkwletiMFnMv09HrASRM+IS
+ +18aFZF6D+6v/VaLcrEH0mxtUuqPbt2rchWAHZ3VD8awz2zQIsbYZNehxWyhx7hMvNZb
+ MdEPwNAKbLgKO9s9JU0rvOjr62iAzGD6YUAcvyOKfDssh3O3CtcBUvPmhJRbZNEYicA6
+ wQgDQW9Df//iGHQonmy/t/VaQx+8KCk3Me5t1FXTrxQ1i4R0FKEiEekyHamQY2gE8+V9
+ hNpQ==
+X-Gm-Message-State: AOAM530UrV1P4W5cfj7u0lf19y2+c9NCGvn/sX4ud3PD1O8n4ka8/Ou1
+ 6A5rghpTrvWQDgn44u3axOQKyrLypG0oOA==
+X-Google-Smtp-Source: ABdhPJxVIv8in8tXnH+ulc6zBKfVKk0GJK//JL4+VYtWEENNzdZhz9eafJ+8Vxt9D83ztRDh67Vfbg==
+X-Received: by 2002:a1c:6289:: with SMTP id w131mr2054880wmb.109.1603366829553; 
+ Thu, 22 Oct 2020 04:40:29 -0700 (PDT)
+Received: from localhost.localdomain ([77.138.162.106])
+ by smtp.gmail.com with ESMTPSA id 10sm3574622wmn.9.2020.10.22.04.40.28
+ (version=TLS1_2 cipher=ECDHE-ECDSA-CHACHA20-POLY1305 bits=256/256);
+ Thu, 22 Oct 2020 04:40:28 -0700 (PDT)
+From: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+To: qemu-devel@nongnu.org,
+	mst@redhat.com
+Subject: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is not
+ ready
+Date: Thu, 22 Oct 2020 14:40:26 +0300
+Message-Id: <20201022114026.31968-1-marcel.apfelbaum@gmail.com>
+X-Mailer: git-send-email 2.17.2
+Received-SPF: pass client-ip=2a00:1450:4864:20::344;
+ envelope-from=marcel.apfelbaum@gmail.com; helo=mail-wm1-x344.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -88,172 +96,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
- quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
- mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
- zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
- yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com, dnigam@nvidia.com
+Cc: dgibson@redhat.com, jusual@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With vIOMMU, IO virtual address range can get unmapped while in pre-copy
-phase of migration. In that case, unmap ioctl should return pages pinned
-in that range and QEMU should find its correcponding guest physical
-addresses and report those dirty.
+From: Marcel Apfelbaum <marcel@redhat.com>
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
+During PCIe Root Port's transition from Power-Off to Power-ON (or vice-versa)
+the "Slot Control Register" has the "Power Indicator Control"
+set to "Blinking" expressing a "power transition" mode.
+
+Any hotplug operation during the "power transition" mode is not permitted
+or at least not expected by the Guest OS leading to strange failures.
+
+Detect and refuse hotplug operations in such case.
+
+Signed-off-by: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
 ---
- hw/vfio/common.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 92 insertions(+), 4 deletions(-)
+ hw/pci/pcie.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 98c2b1f9b190..9c879e5c0f62 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -321,11 +321,94 @@ static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
-     return true;
+diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
+index 5b48bae0f6..2fe5c1473f 100644
+--- a/hw/pci/pcie.c
++++ b/hw/pci/pcie.c
+@@ -410,6 +410,7 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+     PCIDevice *hotplug_pdev = PCI_DEVICE(hotplug_dev);
+     uint8_t *exp_cap = hotplug_pdev->config + hotplug_pdev->exp.exp_cap;
+     uint32_t sltcap = pci_get_word(exp_cap + PCI_EXP_SLTCAP);
++    uint32_t sltctl = pci_get_word(exp_cap + PCI_EXP_SLTCTL);
+ 
+     /* Check if hot-plug is disabled on the slot */
+     if (dev->hotplugged && (sltcap & PCI_EXP_SLTCAP_HPC) == 0) {
+@@ -418,6 +419,12 @@ void pcie_cap_slot_pre_plug_cb(HotplugHandler *hotplug_dev, DeviceState *dev,
+         return;
+     }
+ 
++    if ((sltctl & PCI_EXP_SLTCTL_PIC) == PCI_EXP_SLTCTL_PWR_IND_BLINK) {
++        error_setg(errp, "Hot-plug failed: %s is in Power Transition",
++                   DEVICE(hotplug_pdev)->id);
++        return;
++    }
++
+     pcie_cap_slot_plug_common(PCI_DEVICE(hotplug_dev), dev, errp);
  }
  
-+static bool vfio_devices_all_running_and_saving(VFIOContainer *container)
-+{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
-+    MigrationState *ms = migrate_get_current();
-+
-+    if (!migration_is_setup_or_active(ms->state)) {
-+        return false;
-+    }
-+
-+    QLIST_FOREACH(group, &container->group_list, container_next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            VFIOMigration *migration = vbasedev->migration;
-+
-+            if (!migration) {
-+                return false;
-+            }
-+
-+            if ((migration->device_state & VFIO_DEVICE_STATE_SAVING) &&
-+                (migration->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-+                continue;
-+            } else {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
-+static int vfio_dma_unmap_bitmap(VFIOContainer *container,
-+                                 hwaddr iova, ram_addr_t size,
-+                                 IOMMUTLBEntry *iotlb)
-+{
-+    struct vfio_iommu_type1_dma_unmap *unmap;
-+    struct vfio_bitmap *bitmap;
-+    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
-+    int ret;
-+
-+    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
-+
-+    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
-+    unmap->iova = iova;
-+    unmap->size = size;
-+    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
-+    bitmap = (struct vfio_bitmap *)&unmap->data;
-+
-+    /*
-+     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-+     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
-+     * TARGET_PAGE_SIZE.
-+     */
-+
-+    bitmap->pgsize = TARGET_PAGE_SIZE;
-+    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
-+                   BITS_PER_BYTE;
-+
-+    if (bitmap->size > container->max_dirty_bitmap_size) {
-+        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
-+        ret = -E2BIG;
-+        goto unmap_exit;
-+    }
-+
-+    bitmap->data = g_try_malloc0(bitmap->size);
-+    if (!bitmap->data) {
-+        ret = -ENOMEM;
-+        goto unmap_exit;
-+    }
-+
-+    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
-+    if (!ret) {
-+        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
-+                iotlb->translated_addr, pages);
-+    } else {
-+        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
-+    }
-+
-+    g_free(bitmap->data);
-+unmap_exit:
-+    g_free(unmap);
-+    return ret;
-+}
-+
- /*
-  * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
-  */
- static int vfio_dma_unmap(VFIOContainer *container,
--                          hwaddr iova, ram_addr_t size)
-+                          hwaddr iova, ram_addr_t size,
-+                          IOMMUTLBEntry *iotlb)
- {
-     struct vfio_iommu_type1_dma_unmap unmap = {
-         .argsz = sizeof(unmap),
-@@ -334,6 +417,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
-         .size = size,
-     };
- 
-+    if (iotlb && container->dirty_pages_supported &&
-+        vfio_devices_all_running_and_saving(container)) {
-+        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
-+    }
-+
-     while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-         /*
-          * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-@@ -381,7 +469,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
-      * the VGA ROM space.
-      */
-     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
--        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-+        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
-          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-         return 0;
-     }
-@@ -531,7 +619,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-                          iotlb->addr_mask + 1, vaddr, ret);
-         }
-     } else {
--        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
-+        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
-@@ -834,7 +922,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
-     }
- 
-     if (try_unmap) {
--        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
 -- 
-2.7.0
+2.17.2
 
 
