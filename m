@@ -2,89 +2,79 @@ Return-Path: <SRS0=9x1+=D5=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C2BC388F7
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB568C388F2
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:52:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCAFA222E9
-	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D49A20936
+	for <qemu-devel@archiver.kernel.org>; Thu, 22 Oct 2020 11:52:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DTyD6vlU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCAFA222E9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="L/tBW3+P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D49A20936
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36430 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVZ84-0007bM-BI
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:51:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36872)
+	id 1kVZ9H-0000Up-2p
+	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 07:52:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmv-0006Tv-1X
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25159)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVYmp-0005Bn-0g
- for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:29:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603366178;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=PDGU8gIk8Pi7rgM0O/1+uxeO4tyTqhwMmraME3uYtfY=;
- b=DTyD6vlUdEKy274Z8IYDJJ9H5bJR2iUmn0VQRc0nnkZrWgpp8zuoKzPVP0KZKo8K8G4inK
- 8Nx6MKG/kDbGw7S+fPLgIF4FDcnz1F3chxeSx/tLeGEwGCV4DSv11HvvpTWm14+3HrWhWY
- cap5jTE9MhZpXkl0245i3SvPS73lkvU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-493-RLZ2uVi9NuqCMYnPMKD10A-1; Thu, 22 Oct 2020 07:29:36 -0400
-X-MC-Unique: RLZ2uVi9NuqCMYnPMKD10A-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45BA1AD741;
- Thu, 22 Oct 2020 11:29:35 +0000 (UTC)
-Received: from localhost (ovpn-114-229.ams2.redhat.com [10.36.114.229])
- by smtp.corp.redhat.com (Postfix) with ESMTP id CD01110013D0;
- Thu, 22 Oct 2020 11:29:34 +0000 (UTC)
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL v2 23/28] block/export: add vhost-user-blk multi-queue support
-Date: Thu, 22 Oct 2020 12:27:21 +0100
-Message-Id: <20201022112726.736757-24-stefanha@redhat.com>
-In-Reply-To: <20201022112726.736757-1-stefanha@redhat.com>
-References: <20201022112726.736757-1-stefanha@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ2K-00010e-Ih
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:45:40 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:16366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVZ1l-00076s-RA
+ for qemu-devel@nongnu.org; Thu, 22 Oct 2020 07:45:40 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f9170900001>; Thu, 22 Oct 2020 04:44:16 -0700
+Received: from HQMAIL111.nvidia.com (172.20.187.18) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Thu, 22 Oct
+ 2020 11:44:55 +0000
+Received: from kwankhede-dev.nvidia.com (10.124.1.5) by mail.nvidia.com
+ (172.20.187.18) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Thu, 22 Oct 2020 11:44:47 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v27 02/17] vfio: Add vfio_get_object callback to VFIODeviceOps
+Date: Thu, 22 Oct 2020 16:41:52 +0530
+Message-ID: <1603365127-14202-3-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 00:54:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -3
-X-Spam_score: -0.4
-X-Spam_bar: /
-X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603367056; bh=mU8d8K+D3qa+ZRgdEnJg1v/fWKHItlS0NCXLsW8dowA=;
+ h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+ References:X-NVConfidentiality:MIME-Version:Content-Type;
+ b=L/tBW3+PYB7nXmIQvG1m4Gunc9ElJlVvFhyws/vs0QMgmII0LXqJwInWklu4weHWC
+ lZy1s8X7GfnizSM/LH8mmAGIf4mqshudYkaNCGSLmpE2fy82YqXLk4Maxzx43YUTpH
+ NfxESHbAmlq20QzSstS/EvC+wZuu3/6Xll9vg31KjziF2Sihhr/oKiH+eO6XAl6MkB
+ OOOG8UvUzgXgtStHSYycWA2GMUeqpxRbPwDPctVfL+6ZksyVR6dkQuAtEi0pSSQHPH
+ rVBFieeeBo8T+55lss9+ACErJNZSXhJeZgGEEzN7fVKgMvAnBq4xjX+V8yzV13BYZY
+ YgCjr6yumn43A==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/22 07:44:53
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,117 +87,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
- Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
+Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, yi.l.liu@intel.com,
+ quintela@redhat.com, ziye.yang@intel.com, armbru@redhat.com,
+ mlevitsk@redhat.com, pasic@linux.ibm.com, felipe@nutanix.com,
+ zhi.a.wang@intel.com, mcrossley@nvidia.com, kevin.tian@intel.com,
+ yan.y.zhao@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-QWxsb3cgdGhlIG51bWJlciBvZiBxdWV1ZXMgdG8gYmUgY29uZmlndXJlZCB1c2luZyAtLWV4cG9y
-dAp2aG9zdC11c2VyLWJsayxudW0tcXVldWVzPU4uIFRoaXMgc2V0dGluZyBzaG91bGQgbWF0Y2gg
-dGhlIFFFTVUgLS1kZXZpY2UKdmhvc3QtdXNlci1ibGstcGNpLG51bS1xdWV1ZXM9TiBzZXR0aW5n
-IGJ1dCBRRU1VIHZob3N0LXVzZXItYmxrLmMgbG93ZXJzCml0cyBvd24gdmFsdWUgaWYgdGhlIHZo
-b3N0LXVzZXItYmxrIGJhY2tlbmQgb2ZmZXJzIGZld2VyIHF1ZXVlcyB0aGFuClFFTVUuCgpUaGUg
-dmhvc3QtdXNlci1ibGstc2VydmVyLmMgY29kZSBpcyBhbHJlYWR5IGNhcGFibGUgb2YgbXVsdGkt
-cXVldWUuIEFsbAp2aXJ0cXVldWUgcHJvY2Vzc2luZyBydW5zIGluIHRoZSBzYW1lIEFpb0NvbnRl
-eHQuIE5vIG5ldyBsb2NraW5nIGlzCm5lZWRlZC4KCkFkZCB0aGUgbnVtLXF1ZXVlcz1OIG9wdGlv
-biBhbmQgc2V0IHRoZSBWSVJUSU9fQkxLX0ZfTVEgZmVhdHVyZSBiaXQuCk5vdGUgdGhhdCB0aGUg
-ZmVhdHVyZSBiaXQgb25seSBhbm5vdW5jZXMgdGhlIHByZXNlbmNlIG9mIHRoZSBudW1fcXVldWVz
-CmNvbmZpZ3VyYXRpb24gc3BhY2UgZmllbGQuIEl0IGRvZXMgbm90IHByb21pc2UgdGhhdCB0aGVy
-ZSBpcyBtb3JlIHRoYW4gMQp2aXJ0cXVldWUsIHNvIHdlIGNhbiBzZXQgaXQgdW5jb25kaXRpb25h
-bGx5LgoKSSB0ZXN0ZWQgbXVsdGktcXVldWUgYnkgcnVubmluZyBhIHJhbmRvbSByZWFkIGZpbyB0
-ZXN0IHdpdGggbnVtam9icz00IG9uCmFuIC1zbXAgNCBndWVzdC4gQWZ0ZXIgdGhlIGJlbmNobWFy
-ayBmaW5pc2hlZCB0aGUgZ3Vlc3QgL3Byb2MvaW50ZXJydXB0cwpmaWxlIHNob3dlZCBhY3Rpdml0
-eSBvbiBhbGwgNCB2aXJ0aW8tYmxrIE1TSS1YLiBUaGUgL3N5cy9ibG9jay92ZGEvbXEvCmRpcmVj
-dG9yeSBzaG93cyB0aGF0IExpbnV4IGJsay1tcSBoYXMgNCBxdWV1ZXMgY29uZmlndXJlZC4KCkFu
-IGF1dG9tYXRlZCB0ZXN0IGlzIGluY2x1ZGVkIGluIHRoZSBuZXh0IGNvbW1pdC4KClNpZ25lZC1v
-ZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KQWNrZWQtYnk6IE1h
-cmt1cyBBcm1icnVzdGVyIDxhcm1icnVAcmVkaGF0LmNvbT4KTWVzc2FnZS1pZDogMjAyMDEwMDEx
-NDQ2MDQuNTU5NzMzLTItc3RlZmFuaGFAcmVkaGF0LmNvbQpbRml4ZWQgYWNjaWRlbnRhbCB0YWIg
-Y2hhcmFjdGVycyBhcyBzdWdnZXN0ZWQgYnkgTWFya3VzIEFybWJydXN0ZXIKLS1TdGVmYW5dClNp
-Z25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiBx
-YXBpL2Jsb2NrLWV4cG9ydC5qc29uICAgICAgICAgICAgICAgfCAxMCArKysrKysrLS0tCiBibG9j
-ay9leHBvcnQvdmhvc3QtdXNlci1ibGstc2VydmVyLmMgfCAyNCArKysrKysrKysrKysrKysrKyst
-LS0tLS0KIDIgZmlsZXMgY2hhbmdlZCwgMjUgaW5zZXJ0aW9ucygrKSwgOSBkZWxldGlvbnMoLSkK
-CmRpZmYgLS1naXQgYS9xYXBpL2Jsb2NrLWV4cG9ydC5qc29uIGIvcWFwaS9ibG9jay1leHBvcnQu
-anNvbgppbmRleCA4YTRjZWQ4MTdmLi40ODBjNDk3NjkwIDEwMDY0NAotLS0gYS9xYXBpL2Jsb2Nr
-LWV4cG9ydC5qc29uCisrKyBiL3FhcGkvYmxvY2stZXhwb3J0Lmpzb24KQEAgLTkzLDExICs5Mywx
-NSBAQAogIyAgICAgICAgU29ja2V0QWRkcmVzcyB0eXBlcyBhcmUgc3VwcG9ydGVkLiBQYXNzZWQg
-ZmRzIG11c3QgYmUgVU5JWCBkb21haW4KICMgICAgICAgIHNvY2tldHMuCiAjIEBsb2dpY2FsLWJs
-b2NrLXNpemU6IExvZ2ljYWwgYmxvY2sgc2l6ZSBpbiBieXRlcy4gRGVmYXVsdHMgdG8gNTEyIGJ5
-dGVzLgorIyBAbnVtLXF1ZXVlczogTnVtYmVyIG9mIHJlcXVlc3QgdmlydHF1ZXVlcy4gTXVzdCBi
-ZSBncmVhdGVyIHRoYW4gMC4gRGVmYXVsdHMKKyMgICAgICAgICAgICAgIHRvIDEuCiAjCiAjIFNp
-bmNlOiA1LjIKICMjCiB7ICdzdHJ1Y3QnOiAnQmxvY2tFeHBvcnRPcHRpb25zVmhvc3RVc2VyQmxr
-JywKLSAgJ2RhdGEnOiB7ICdhZGRyJzogJ1NvY2tldEFkZHJlc3MnLCAnKmxvZ2ljYWwtYmxvY2st
-c2l6ZSc6ICdzaXplJyB9IH0KKyAgJ2RhdGEnOiB7ICdhZGRyJzogJ1NvY2tldEFkZHJlc3MnLAor
-CSAgICAnKmxvZ2ljYWwtYmxvY2stc2l6ZSc6ICdzaXplJywKKyAgICAgICAgICAgICcqbnVtLXF1
-ZXVlcyc6ICd1aW50MTYnfSB9CiAKICMjCiAjIEBOYmRTZXJ2ZXJBZGRPcHRpb25zOgpAQCAtMjMz
-LDggKzIzNyw4IEBACiB7ICd1bmlvbic6ICdCbG9ja0V4cG9ydE9wdGlvbnMnLAogICAnYmFzZSc6
-IHsgJ3R5cGUnOiAnQmxvY2tFeHBvcnRUeXBlJywKICAgICAgICAgICAgICdpZCc6ICdzdHInLAot
-CSAgICAnKmZpeGVkLWlvdGhyZWFkJzogJ2Jvb2wnLAotCSAgICAnKmlvdGhyZWFkJzogJ3N0cics
-CisgICAgICAgICAgICAnKmZpeGVkLWlvdGhyZWFkJzogJ2Jvb2wnLAorICAgICAgICAgICAgJypp
-b3RocmVhZCc6ICdzdHInLAogICAgICAgICAgICAgJ25vZGUtbmFtZSc6ICdzdHInLAogICAgICAg
-ICAgICAgJyp3cml0YWJsZSc6ICdib29sJywKICAgICAgICAgICAgICcqd3JpdGV0aHJvdWdoJzog
-J2Jvb2wnIH0sCmRpZmYgLS1naXQgYS9ibG9jay9leHBvcnQvdmhvc3QtdXNlci1ibGstc2VydmVy
-LmMgYi9ibG9jay9leHBvcnQvdmhvc3QtdXNlci1ibGstc2VydmVyLmMKaW5kZXggMjg2ZWI1ZmI5
-YS4uNDFmNDkzM2Q2ZSAxMDA2NDQKLS0tIGEvYmxvY2svZXhwb3J0L3Zob3N0LXVzZXItYmxrLXNl
-cnZlci5jCisrKyBiL2Jsb2NrL2V4cG9ydC92aG9zdC11c2VyLWJsay1zZXJ2ZXIuYwpAQCAtMjEs
-NyArMjEsNyBAQAogI2luY2x1ZGUgInV0aWwvYmxvY2staGVscGVycy5oIgogCiBlbnVtIHsKLSAg
-ICBWSE9TVF9VU0VSX0JMS19NQVhfUVVFVUVTID0gMSwKKyAgICBWSE9TVF9VU0VSX0JMS19OVU1f
-UVVFVUVTX0RFRkFVTFQgPSAxLAogfTsKIHN0cnVjdCB2aXJ0aW9fYmxrX2luaGRyIHsKICAgICB1
-bnNpZ25lZCBjaGFyIHN0YXR1czsKQEAgLTI0Miw2ICsyNDIsNyBAQCBzdGF0aWMgdWludDY0X3Qg
-dnVfYmxrX2dldF9mZWF0dXJlcyhWdURldiAqZGV2KQogICAgICAgICAgICAgICAgMXVsbCA8PCBW
-SVJUSU9fQkxLX0ZfRElTQ0FSRCB8CiAgICAgICAgICAgICAgICAxdWxsIDw8IFZJUlRJT19CTEtf
-Rl9XUklURV9aRVJPRVMgfAogICAgICAgICAgICAgICAgMXVsbCA8PCBWSVJUSU9fQkxLX0ZfQ09O
-RklHX1dDRSB8CisgICAgICAgICAgICAgICAxdWxsIDw8IFZJUlRJT19CTEtfRl9NUSB8CiAgICAg
-ICAgICAgICAgICAxdWxsIDw8IFZJUlRJT19GX1ZFUlNJT05fMSB8CiAgICAgICAgICAgICAgICAx
-dWxsIDw8IFZJUlRJT19SSU5HX0ZfSU5ESVJFQ1RfREVTQyB8CiAgICAgICAgICAgICAgICAxdWxs
-IDw8IFZJUlRJT19SSU5HX0ZfRVZFTlRfSURYIHwKQEAgLTMzOCw3ICszMzksOSBAQCBzdGF0aWMg
-dm9pZCBibGtfYWlvX2RldGFjaCh2b2lkICpvcGFxdWUpCiAKIHN0YXRpYyB2b2lkCiB2dV9ibGtf
-aW5pdGlhbGl6ZV9jb25maWcoQmxvY2tEcml2ZXJTdGF0ZSAqYnMsCi0gICAgICAgICAgICAgICAg
-ICAgICAgICAgICBzdHJ1Y3QgdmlydGlvX2Jsa19jb25maWcgKmNvbmZpZywgdWludDMyX3QgYmxr
-X3NpemUpCisgICAgICAgICAgICAgICAgICAgICAgICAgc3RydWN0IHZpcnRpb19ibGtfY29uZmln
-ICpjb25maWcsCisgICAgICAgICAgICAgICAgICAgICAgICAgdWludDMyX3QgYmxrX3NpemUsCisg
-ICAgICAgICAgICAgICAgICAgICAgICAgdWludDE2X3QgbnVtX3F1ZXVlcykKIHsKICAgICBjb25m
-aWctPmNhcGFjaXR5ID0gYmRydl9nZXRsZW5ndGgoYnMpID4+IEJEUlZfU0VDVE9SX0JJVFM7CiAg
-ICAgY29uZmlnLT5ibGtfc2l6ZSA9IGJsa19zaXplOwpAQCAtMzQ2LDcgKzM0OSw3IEBAIHZ1X2Js
-a19pbml0aWFsaXplX2NvbmZpZyhCbG9ja0RyaXZlclN0YXRlICpicywKICAgICBjb25maWctPnNl
-Z19tYXggPSAxMjggLSAyOwogICAgIGNvbmZpZy0+bWluX2lvX3NpemUgPSAxOwogICAgIGNvbmZp
-Zy0+b3B0X2lvX3NpemUgPSAxOwotICAgIGNvbmZpZy0+bnVtX3F1ZXVlcyA9IFZIT1NUX1VTRVJf
-QkxLX01BWF9RVUVVRVM7CisgICAgY29uZmlnLT5udW1fcXVldWVzID0gbnVtX3F1ZXVlczsKICAg
-ICBjb25maWctPm1heF9kaXNjYXJkX3NlY3RvcnMgPSAzMjc2ODsKICAgICBjb25maWctPm1heF9k
-aXNjYXJkX3NlZyA9IDE7CiAgICAgY29uZmlnLT5kaXNjYXJkX3NlY3Rvcl9hbGlnbm1lbnQgPSBj
-b25maWctPmJsa19zaXplID4+IDk7CkBAIC0zNjgsNiArMzcxLDcgQEAgc3RhdGljIGludCB2dV9i
-bGtfZXhwX2NyZWF0ZShCbG9ja0V4cG9ydCAqZXhwLCBCbG9ja0V4cG9ydE9wdGlvbnMgKm9wdHMs
-CiAgICAgQmxvY2tFeHBvcnRPcHRpb25zVmhvc3RVc2VyQmxrICp2dV9vcHRzID0gJm9wdHMtPnUu
-dmhvc3RfdXNlcl9ibGs7CiAgICAgRXJyb3IgKmxvY2FsX2VyciA9IE5VTEw7CiAgICAgdWludDY0
-X3QgbG9naWNhbF9ibG9ja19zaXplOworICAgIHVpbnQxNl90IG51bV9xdWV1ZXMgPSBWSE9TVF9V
-U0VSX0JMS19OVU1fUVVFVUVTX0RFRkFVTFQ7CiAKICAgICB2ZXhwLT53cml0YWJsZSA9IG9wdHMt
-PndyaXRhYmxlOwogICAgIHZleHAtPmJsa2NmZy53Y2UgPSAwOwpAQCAtMzg1LDE1ICszODksMjMg
-QEAgc3RhdGljIGludCB2dV9ibGtfZXhwX2NyZWF0ZShCbG9ja0V4cG9ydCAqZXhwLCBCbG9ja0V4
-cG9ydE9wdGlvbnMgKm9wdHMsCiAgICAgfQogICAgIHZleHAtPmJsa19zaXplID0gbG9naWNhbF9i
-bG9ja19zaXplOwogICAgIGJsa19zZXRfZ3Vlc3RfYmxvY2tfc2l6ZShleHAtPmJsaywgbG9naWNh
-bF9ibG9ja19zaXplKTsKKworICAgIGlmICh2dV9vcHRzLT5oYXNfbnVtX3F1ZXVlcykgeworICAg
-ICAgICBudW1fcXVldWVzID0gdnVfb3B0cy0+bnVtX3F1ZXVlczsKKyAgICB9CisgICAgaWYgKG51
-bV9xdWV1ZXMgPT0gMCkgeworICAgICAgICBlcnJvcl9zZXRnKGVycnAsICJudW0tcXVldWVzIG11
-c3QgYmUgZ3JlYXRlciB0aGFuIDAiKTsKKyAgICAgICAgcmV0dXJuIC1FSU5WQUw7CisgICAgfQor
-CiAgICAgdnVfYmxrX2luaXRpYWxpemVfY29uZmlnKGJsa19icyhleHAtPmJsayksICZ2ZXhwLT5i
-bGtjZmcsCi0gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9naWNhbF9ibG9ja19zaXpl
-KTsKKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbG9naWNhbF9ibG9ja19zaXplLCBudW1f
-cXVldWVzKTsKIAogICAgIGJsa19hZGRfYWlvX2NvbnRleHRfbm90aWZpZXIoZXhwLT5ibGssIGJs
-a19haW9fYXR0YWNoZWQsIGJsa19haW9fZGV0YWNoLAogICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgdmV4cCk7CiAKICAgICBpZiAoIXZob3N0X3VzZXJfc2VydmVyX3N0YXJ0KCZ2ZXhw
-LT52dV9zZXJ2ZXIsIHZ1X29wdHMtPmFkZHIsIGV4cC0+Y3R4LAotICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgVkhPU1RfVVNFUl9CTEtfTUFYX1FVRVVFUywgJnZ1X2Jsa19pZmFjZSwK
-LSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGVycnApKSB7CisgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICBudW1fcXVldWVzLCAmdnVfYmxrX2lmYWNlLCBlcnJwKSkgewog
-ICAgICAgICBibGtfcmVtb3ZlX2Fpb19jb250ZXh0X25vdGlmaWVyKGV4cC0+YmxrLCBibGtfYWlv
-X2F0dGFjaGVkLAogICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJsa19h
-aW9fZGV0YWNoLCB2ZXhwKTsKICAgICAgICAgcmV0dXJuIC1FQUREUk5PVEFWQUlMOwotLSAKMi4y
-Ni4yCgo=
+Hook vfio_get_object callback for PCI devices.
+
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
+Suggested-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/vfio/pci.c                 | 8 ++++++++
+ include/hw/vfio/vfio-common.h | 1 +
+ 2 files changed, 9 insertions(+)
+
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index 0d83eb0e47bb..bffd5bfe3b78 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -2394,10 +2394,18 @@ static void vfio_pci_compute_needs_reset(VFIODevice *vbasedev)
+     }
+ }
+ 
++static Object *vfio_pci_get_object(VFIODevice *vbasedev)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++
++    return OBJECT(vdev);
++}
++
+ static VFIODeviceOps vfio_pci_ops = {
+     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
+     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
+     .vfio_eoi = vfio_intx_eoi,
++    .vfio_get_object = vfio_pci_get_object,
+ };
+ 
+ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index dc95f527b583..fe99c36a693a 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -119,6 +119,7 @@ struct VFIODeviceOps {
+     void (*vfio_compute_needs_reset)(VFIODevice *vdev);
+     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
+     void (*vfio_eoi)(VFIODevice *vdev);
++    Object *(*vfio_get_object)(VFIODevice *vdev);
+ };
+ 
+ typedef struct VFIOGroup {
+-- 
+2.7.0
 
 
