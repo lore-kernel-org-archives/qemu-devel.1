@@ -2,88 +2,97 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 473CEC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:13:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED71C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:14:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 77CC72192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:13:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 478422192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:14:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WnkTbTxH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 77CC72192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dQDTbPOJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 478422192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44778 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48172 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzgn-0006nZ-9N
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:13:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32824)
+	id 1kVzhv-0008DZ-3J
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:14:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35144)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVz1K-0007ht-JJ
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:30:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38255)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVz1G-0001p2-Eu
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:30:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603467017;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=Ofjx9eklJguHvhd4j2ZPUixoPBImc5PsFAy+CiMpW10=;
- b=WnkTbTxH3fg6ryHKQynV7YINEiW9mRY4vwGxE8oHIm/MB/Wz3c7TJ9+KgE/0WQ2Xppgzpy
- M6kYOjbRJVOvR0MsMFJPZCZnc94lRebTR6LVMwA+H551JLgBs2hfsxoHj4xStB9EuLE5lm
- qeqJkO0RZVMUA3A/trATxlKlacYyycE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-365-8b9oN-laNR-F4s0kFUNPtw-1; Fri, 23 Oct 2020 11:30:11 -0400
-X-MC-Unique: 8b9oN-laNR-F4s0kFUNPtw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4D068049F4
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 15:30:08 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-113-189.ams2.redhat.com
- [10.36.113.189])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66E2E5B4AC;
- Fri, 23 Oct 2020 15:30:07 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH 5/7] Simplify and restructure the page footer
-Date: Fri, 23 Oct 2020 16:29:55 +0100
-Message-Id: <20201023152957.488974-6-berrange@redhat.com>
-In-Reply-To: <20201023152957.488974-1-berrange@redhat.com>
-References: <20201023152957.488974-1-berrange@redhat.com>
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVz8D-0000CF-3b; Fri, 23 Oct 2020 11:37:29 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38916)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVz88-0002pW-33; Fri, 23 Oct 2020 11:37:28 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1603467443; x=1635003443;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=+kH0HRDVSR6+Oeh5CZ+4ncx3E9IpH2mTPisXyYIn8rA=;
+ b=dQDTbPOJpz7awwhFk6N9hKekTmOcG/HJIoM5/AR9g4RAbfx1yY05VNTP
+ M2vzMo9K7pA6PBwy+Q2+5jNLTB5lxXxfPlhIw1PO+ErGxFLufNFbs64ne
+ vdQFtqc0aupuzMK8tRnNQFz+a86sUwKZWmECcxP2qOI4272YIPfQPIYj6
+ r8XZP2nUrEod/IbN9/0KPhn1GO2pBrV+vYjWITzdMFFFtR8fD74efxL2I
+ 0AKC4fm6tzn/KAU/S8vIiUSAsYzB2qK70oFJIPidhcAIg6F1PzU2dLyxp
+ ZU7vHtu0DL+gl+aQujhdCHhA45PUTSWjrcXgq54vv3wBOT7+bG80o79+N A==;
+IronPort-SDR: UNLYX+M3OWNpxvLOlrAf2hY/UA/9+aW/tcuKs3Kf3JaJx/ggRHa4ukskEfi4I90UGRRj+Vsu8u
+ Y9zXvGsBLLIEHUMjsppkBoQqpGd7hK0KFSlmPYRXWW1Q5UWyPnXdKV6Z1lG5EMDiPYn0XTShBj
+ Dv4WWfZbZOtytyChqvYpv0J23l25z4cJJxBXcHgiM1GtTNFS5TIbtHtuAN9jM4n5Ji6uqc6jxW
+ gc5IvOXd3oLWo2Dh5x4ie32ehu+iz8hz5jsPU93WuDwd1qnZmLuAMDkS7Fyk1ANHCvReSzffS4
+ +jc=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="260636257"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:37:19 +0800
+IronPort-SDR: fpkBGz/Qi7tu3UGtxG1ZpIpcCeQ1nzA4sJDhgvrdoq/GmC/nubpn81n73meMCS068UdEgN7c+H
+ F5Mi32tR199nkEA4KPa50F0I/audKMgHGm36wO/HPizec3JFkB641Xy5FUmoA05eHczy7uUa/H
+ STt1NAM7E2ERQjt/ydosLej08vPzIjd1YPMzjcDFbDMm42dSR32781gzcKUza3fAvkN7jc8Oyg
+ /rEvmlTa4rWq0dF0UI91HLiGS0K3isRAboS0ErpETz8FsySLLpq5vVbiLt+vDWvjmeV7O77rCN
+ dmc6bSQ4uxcKNXJaFUcT8jHF
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Oct 2020 08:23:42 -0700
+IronPort-SDR: CTzIUKX5P/dQ2il1GVAxigr2o2aiqXEc/GGubgLci8OKpnRduyMmfFxxRGLayRCuqeB07OUarQ
+ JSn4PqL0D/cAqCFaLFtjnnkaFkEDe2r4wCmM/lmRZIHKZ9gR+ezzitPPgR1aM/EvvuZOzYbvaS
+ DN8Tl4HdeiaPJ3MbLLpVCHD0JVl6YVB5DP9lMRrNqc9W/BJAg0ovyUSjC/IMrj6H0Fc2XtPYHj
+ wHq9ldhG0aYTj1m/kj5HSisqDCbJbT0LjjQF5UQi7gCgx+3jVPE9ljbg7DsrOwh2ARJzfh4JPK
+ fms=
+WDCIronportException: Internal
+Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.46])
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:37:20 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 0/5]  Fix the Hypervisor access functions
+Date: Fri, 23 Oct 2020 08:25:59 -0700
+Message-Id: <cover.1603466725.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=558518344=alistair.francis@wdc.com;
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:37:20
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,282 +105,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
+ palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The page footer currently has a large wall of links.
+Richard pointed out that the Hypervisor access functions don't work
+correctly, see:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg751540.html.
+This seris fixes them up by adding a new MMU index for the virtualised
+state.
 
-Many of the links duplicate what is already present in the page header
-navbar. The header is styled to have a fixed position, it will always
-be on screen. The footer meanwhile is often off the bottom of the
-screen.
+Alistair Francis (5):
+  target/riscv: Add a virtualised MMU Mode
+  target/riscv: Set the virtualised MMU mode when doing hyp accesses
+  target/riscv: Remove the HS_TWO_STAGE flag
+  target/riscv: Remove the hyp load and store functions
+  target/riscv: Split the Hypervisor execute load helpers
 
-Other links from the footer are already present in the 'contribute' and
-'documentation' pages, with more descriptive text.
+ target/riscv/cpu-param.h                |   2 +-
+ target/riscv/cpu.h                      |   7 +-
+ target/riscv/cpu_bits.h                 |   1 -
+ target/riscv/helper.h                   |   6 +-
+ target/riscv/cpu_helper.c               |  67 ++++++-------
+ target/riscv/op_helper.c                |  90 ++---------------
+ target/riscv/insn_trans/trans_rvh.c.inc | 127 +++++++-----------------
+ 7 files changed, 82 insertions(+), 218 deletions(-)
 
-The wiki link would be better placed in the top header where it is more
-obviously visible to users.
-
-With this change the footer is slimmed down to avoid link duplication,
-leaving it primarily focused on providing links to the related external
-sites.
-
-The wiki link is moved to the header nav which has extra space after the
-previous patch.
-
-Finally the conservancy link pulled out and placed just below the footer
-adjacent to the licensing link, giving it more prominence.
-
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- _includes/copyright.html     |  8 --------
- _includes/footer.html        | 30 +++++++++---------------------
- _includes/nav.html           |  1 +
- _layouts/blog.html           |  1 -
- _layouts/home.html           |  1 -
- _layouts/page.html           |  1 -
- assets/css/style-desktop.css | 24 ++++--------------------
- assets/css/style-mobile.css  | 13 +------------
- assets/css/style.css         | 36 ++++++++++++++++++++++++++----------
- 9 files changed, 41 insertions(+), 74 deletions(-)
- delete mode 100644 _includes/copyright.html
-
-diff --git a/_includes/copyright.html b/_includes/copyright.html
-deleted file mode 100644
-index cdcd98f..0000000
---- a/_includes/copyright.html
-+++ /dev/null
-@@ -1,8 +0,0 @@
--<div id="copyright">
--	<div id="copyright-inner">
--	  <div class="container">
--	    This site is made available under the terms of
--	    <a href="{{ relative_root }}/license.html">a number of licenses</a>.
--	  </div>
--	</div>
--</div>
-diff --git a/_includes/footer.html b/_includes/footer.html
-index b614795..2dd247b 100644
---- a/_includes/footer.html
-+++ b/_includes/footer.html
-@@ -1,30 +1,18 @@
- <div id="footer">
--	<div id="footer-inner">
-+	<div id="external-links">
- 		<ul class="style">
--			<li><a href="{{ relative_root }}/">Home</a></li>
--			<li><a href="{{ relative_root }}/download">Download</a></li>
--			<li><a href="{{ relative_root }}/conservancy/">Conservancy / Committee</a></li>
--			<li><a href="http://qemu-advent-calendar.org">QEMU advent calendar</a></li>
--		</ul>
--		<ul class="style">
--			<li><a href="{{ relative_root }}/contribute">Contribute</a></li>
--			<li><a href="{{ relative_root }}/contribute/report-a-bug">Reporting a bug</a></li>
--			<li><a href="https://wiki.qemu.org/Documentation/GettingStartedDevelopers">New contributors</a></li>
--			<li><a href="https://wiki.qemu.org/Contribute/SubmitAPatch">Submitting a patch</a></li>
--			<li><a href="https://wiki.qemu.org/Contribute/FAQ">Contributor FAQ</a></li>
--		</ul>
--		<ul class="style">
--			<li><a href="{{ relative_root }}/documentation">Documentation</a></li>
--			<li><a href="https://www.qemu.org/docs/master/">Main docs</a></li>
--			<li><a href="https://wiki.qemu.org/Category:Developer_documentation">Developer docs</a></li>
--			<li><a href="https://wiki.qemu.org/">Wiki</a></li>
--		</ul>
--		<ul class="style">
--			<li><a href="https://planet.virt-tools.org/">virt tools planet</a></li>
-+			<li><a href="http://qemu-advent-calendar.org">Advent calendar</a></li>
-+			<li><a href="https://planet.virt-tools.org/">Blog planet</a></li>
- 			<li><a href="https://www.linux-kvm.org/">KVM</a></li>
- 			<li><a href="http://libguestfs.org/">Libguestfs</a></li>
- 			<li><a href="https://libvirt.org/">Libvirt</a></li>
- 			<li><a href="https://xenproject.org">Xen</a></li>
- 		</ul>
- 	</div>
-+	<div id="conservancy">
-+	  QEMU is a member of <a href="{{ relative_root }}/conservancy/">Software Freedom Conservancy</a>
-+	</div>
-+	<div id="licenses">
-+	  <a href="{{ relative_root }}/license.html">Website licenses</a>
-+	</div>
- </div>
-diff --git a/_includes/nav.html b/_includes/nav.html
-index c66ee92..73b39b3 100644
---- a/_includes/nav.html
-+++ b/_includes/nav.html
-@@ -7,6 +7,7 @@
- 			</li><li {% if current[1] == 'support' %}class='current'{% endif %}><a href="{{ relative_root }}/support">Support</a>
- 			</li><li {% if current[1] == 'contribute' %}class='current'{% endif %}><a href="{{ relative_root }}/contribute">Contribute</a>
- 			</li><li {% if current[1] == 'documentation' %}class='current'{% endif %}><a href="{{ relative_root }}/documentation">Docs</a>
-+			</li><li><a href="https://wiki.qemu.org">Wiki</a>
- 			</li><li {% if current[1] == 'blog' %}class='current'{% endif %}><a href="{{ relative_root }}/blog">Blog</a></li>
- 		</ul>
- 	</nav>
-diff --git a/_layouts/blog.html b/_layouts/blog.html
-index b300636..b7fcdbf 100644
---- a/_layouts/blog.html
-+++ b/_layouts/blog.html
-@@ -21,7 +21,6 @@ Released for free under the Creative Commons Attribution 3.0 license (templated.
- 	
- 	{% include sidebar.html %}
- 	{% include footer.html %}
--	{% include copyright.html %}
- 
- </body>
- </html>
-diff --git a/_layouts/home.html b/_layouts/home.html
-index d94c9b0..f7b6931 100644
---- a/_layouts/home.html
-+++ b/_layouts/home.html
-@@ -18,7 +18,6 @@ Released for free under the Creative Commons Attribution 3.0 license (templated.
- 	{{ content }}
- 
- 	{% include footer.html %}
--	{% include copyright.html %}
- 
- </body>
- </html>
-diff --git a/_layouts/page.html b/_layouts/page.html
-index d650054..765d204 100644
---- a/_layouts/page.html
-+++ b/_layouts/page.html
-@@ -23,7 +23,6 @@ Released for free under the Creative Commons Attribution 3.0 license (templated.
- 	</div>
- 	
- 	{% include footer.html %}
--	{% include copyright.html %}
- 
- </body>
- </html>
-diff --git a/assets/css/style-desktop.css b/assets/css/style-desktop.css
-index b7e403a..d45ec15 100644
---- a/assets/css/style-desktop.css
-+++ b/assets/css/style-desktop.css
-@@ -101,29 +101,13 @@
- /*********************************************************************************/
- /* Footer                                                                        */
- /*********************************************************************************/
--	
--	#footer
--	{
--		padding: 1em 0em;
--	}
--	
--	#footer-inner
--	{
--		width: 95%;
--		display: table;
--		margin: auto;
--	}
- 
--	#footer ul
--	{
--		width: 25%;
--		display: table-cell;
--		padding-left: 2em;
-+	#licenses {
-+		float: right;
- 	}
- 
--	#footer ul:first-child
--	{
--		padding-left: 0px;
-+	#conservancy {
-+		float: left;
- 	}
- 
- /*********************************************************************************/
-diff --git a/assets/css/style-mobile.css b/assets/css/style-mobile.css
-index 8910e71..652650b 100644
---- a/assets/css/style-mobile.css
-+++ b/assets/css/style-mobile.css
-@@ -242,7 +242,7 @@
- /* Columns                                                                       */
- /*********************************************************************************/
- 
--	#main, #footer-inner, #copyright-inner
-+	#main, #copyright-inner
- 	{
- 		margin-left: 0%;
- 		width: 100%;
-@@ -283,19 +283,8 @@
- 	
- 	#footer
- 	{
--		padding: 1em;
--	}
--	
--	#footer ul
--	{
--		padding: 0.6em 0px;
--		border-top: 1px solid white;
- 	}
- 
--	#footer ul:first-child
--	{
--		border-top: 0px;
--	}
- 	
- /*********************************************************************************/
- /* Featured                                                                      */
-diff --git a/assets/css/style.css b/assets/css/style.css
-index e09b383..e2fee29 100644
---- a/assets/css/style.css
-+++ b/assets/css/style.css
-@@ -503,24 +503,40 @@
- 	{
- 		position: relative;
- 		clear: left;
--		background: #401200;
--		color: #FFF;
- 	}
- 	
- 	#footer a
- 	{
- 		color: inherit;
- 	}
--	
--	#footer ul
--	{
--		vertical-align: top;
-+
-+	#footer ul {
-+		margin: 0em;
- 	}
- 
--	#footer ul, #footer ul > li
--	{
--		padding: 0;
--		margin: 0
-+	#conservancy, #licenses {
-+		padding: 0em;
-+		padding-left: 1em;
-+		padding-right: 1em;
-+		font-size: smaller;
-+		color: #707070;
-+		margin: 0em;
-+	}
-+
-+	#external-links {
-+		padding: 0em;
-+		padding-top: 0.3em;
-+		padding-bottom: 0.3em;
-+		background: #401200;
-+		color: #FFF;
-+		text-align: center;
-+	}
-+
-+	#external-links li {
-+		display: inline;
-+	}
-+	#external-links li a {
-+		padding-left: 1em;
- 	}
- 
- /*********************************************************************************/
 -- 
-2.26.2
+2.28.0
 
 
