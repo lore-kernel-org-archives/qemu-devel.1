@@ -2,116 +2,88 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ADA9C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:34:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C676C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:35:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C8A302085B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:34:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C8A302085B
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
+	by mail.kernel.org (Postfix) with ESMTPS id 086E721D43
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:35:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPncezgg"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 086E721D43
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41378 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVwGl-0006UG-TJ
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:34:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40038)
+	id 1kVwHl-0007qn-Tc
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:35:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40088)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVwBZ-0002TX-GY
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 08:28:45 -0400
-Received: from mout.kundenserver.de ([212.227.126.130]:33193)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVwBP-0002N2-Cd
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 08:28:45 -0400
-Received: from [192.168.100.1] ([82.252.139.38]) by mrelayeu.kundenserver.de
- (mreue011 [213.165.67.103]) with ESMTPSA (Nemesis) id
- 1N3bjH-1kMh7T2FiF-010gS9; Fri, 23 Oct 2020 14:28:24 +0200
-Subject: Re: linux-user: Support f_flags in statfs64 when available.
-To: Franz-Josef Haider <franz.haider@jolla.com>,
- Riku Voipio <riku.voipio@iki.fi>
-References: <2e405fe7-efab-dae5-93d6-02575773fd6e@jolla.com>
- <19d426e3-bc5f-7d47-3674-33384b08ab40@vivier.eu>
- <16e7f7fa-1b48-e701-0a5d-853b914917af@jolla.com>
-From: Laurent Vivier <laurent@vivier.eu>
-Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
- 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
-Message-ID: <b690cd03-8b88-094d-42bc-6200b9733fa8@vivier.eu>
-Date: Fri, 23 Oct 2020 14:28:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.11.0
-MIME-Version: 1.0
-In-Reply-To: <16e7f7fa-1b48-e701-0a5d-853b914917af@jolla.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: fr
-Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:iVNLr9at50rvxql2pxRNoskvJIbJ2Zi/RZ7Umj4+gy9B2v3xneQ
- mPV+TDVF4Uwc0V4RkaWkMj6dUEb8El9VP4Vqob4zGqAb8t4LIa0vTkVTuDZjqhNmukkYzW9
- Absw8CouH4oEbW/FW/RFlsk7axxKnczfdVBXgPcY+GI28WyHLb1nqUtJipt/jGDCKdRqkxQ
- RUu3TKI1najL2Jj0qER2Q==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:Gp3fBj+Vxb0=:DnpHtvpnkwhewKL3BOmbsM
- D1Z6AbUzTZX7jFT67q+uwwnbgxwEd4lXTLgbIkPjMrIaO1WVIzsBAc5SgftRZ51h24s8hqxOg
- jntlZ7Jo2UGQqk7zy5TvOCD8FVsjZryvV84PJ2L4xrTJIwZf9hU2wcYUs3/d7SXzmqwNTvLe0
- tWnjIkHFuOx9o6XJ/27qzy6T4+XTRRwRZWfO6GpW/z2yNEX2tdlF1H65+Go1jv9oUrx9sqRf3
- xj5yrJvGAM9pGsgZkADkjFyovIJaGmtUFiLtFLJ+woKW3QhQ9C/LXCaV/jjGuYJ8mu/FYXc3I
- UVeqMwAMhc/y6z3K1naG5AZYscYeG15ZGVFhypuNcG5vZIGd3lOhZa5h6UKiyYgNDndHgxB7A
- V96NDaJPq5RCOg589PgDAb0PyRSj5WX6tk8q4Bu2nRJY1ri/g3FbtSJ5Xs71Q
-Received-SPF: none client-ip=212.227.126.130; envelope-from=laurent@vivier.eu;
- helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 08:28:33
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+ (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
+ id 1kVwBo-0002d4-Ii; Fri, 23 Oct 2020 08:29:00 -0400
+Received: from mail-pg1-x52e.google.com ([2607:f8b0:4864:20::52e]:32768)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
+ id 1kVwBl-0002QF-Cq; Fri, 23 Oct 2020 08:29:00 -0400
+Received: by mail-pg1-x52e.google.com with SMTP id l18so1145717pgg.0;
+ Fri, 23 Oct 2020 05:28:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=I8TcJcetukylqtSiwaulLXqKDBZmUVsoTY3dwBK47u8=;
+ b=gPncezgguCstemAzmqd5TMN4wj1M8vAjMEs55wAvHQSNFnZOiN8e3sjVwoZJt/NVy+
+ YbukPkmNX2Pyd75ylnB4LceQ1Uv0mUgBmj/k0Fn3NkqHTy2bxRwh1wugPer5NstF5oDm
+ aRVQbLmNHq4WQfuzKgk4/2RlWJI0oMvPFRJphdTbjiEesy8IgpQ0DAuVsVtV2eZhqvIr
+ SqGNUyIgw/YX49WlCUuVkIOaqhaLkL0lITqKGkhFxaG8DOuT5RV7Yw4YwlVGOA/UPdWT
+ emMktDBeQX6x5AAIgHZawrdgbXRQmJ1eZacavOFWcG17CC9QmvlVghI5KT1l6wrM3mGJ
+ brDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=I8TcJcetukylqtSiwaulLXqKDBZmUVsoTY3dwBK47u8=;
+ b=XdJ2GrB/mngXy5oaLPNTy2x9LrgV/x0e8q9NxJBHoE2AOJdgr3jJJgxZZHycmY0X5h
+ E7NUEDhAZ8msS2Oa7bUk0lnYeXfguIB2CMw8Weumgp6R6hSrH9ZePRhubaIZNh72HfDx
+ nCWV/4wQT3WDnNsZrUjsJyD/IbLoBac0eeMsk795qv6Rz25YSfVbJAAiK/gpxhvBoyBz
+ vodHTnkBOz8vf9IKW3DdtgEjFkJp434vFyJpe251+cxS+kvR6uLaN1qR2s96uyz+BE50
+ 4O61AWAAXn8H1OXNq4mHvWck3Jb3AidQECcWAx0bqiPnPcuV0D7XfOK6sij653J9wQyD
+ fc6w==
+X-Gm-Message-State: AOAM5312hTi0zQhokKHth6ixB5atWdah8XGvDCLwsVd4r9A3jVkzjDTV
+ yigH8TUhxGu01JFbmjgTRV4NZY87C08I/KdO
+X-Google-Smtp-Source: ABdhPJzcRCPnk9zLi3vhY9aMAn8aOpXP+RTDD7VNTrN2JkK+vK6ykTcD07ZdRGuCF8b5ZqhOV2MVTw==
+X-Received: by 2002:a17:90b:3798:: with SMTP id
+ mz24mr2189004pjb.46.1603456134978; 
+ Fri, 23 Oct 2020 05:28:54 -0700 (PDT)
+Received: from pulp100.localdomain ([103.199.158.131])
+ by smtp.gmail.com with ESMTPSA id q4sm1916868pgj.44.2020.10.23.05.28.52
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Oct 2020 05:28:54 -0700 (PDT)
+From: Chetan Pant <chetan4windows@gmail.com>
+To: qemu-trivial@nongnu.org
+Subject: [PATCH 17/30] x86 tcg cpus: Fix Lesser GPL version number
+Date: Fri, 23 Oct 2020 12:28:01 +0000
+Message-Id: <20201023122801.19514-1-chetan4windows@gmail.com>
+X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20201014134248.14146-1-chetan4windows@gmail.com>
+References: <20201014134248.14146-1-chetan4windows@gmail.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52e;
+ envelope-from=chetan4windows@gmail.com; helo=mail-pg1-x52e.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.108,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -124,69 +96,316 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: pbonzini@redhat.com, qemu-devel@nongnu.org,
+ Chetan Pant <chetan4windows@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+There is no "version 2" of the "Lesser" General Public License.
+It is either "GPL version 2.0" or "Lesser GPL version 2.1".
+This patch replaces all occurrences of "Lesser GPL version 2" with
+"Lesser GPL version 2.1" in comment section.
 
-Le 23/10/2020 à 13:29, Franz-Josef Haider a écrit :
-> Hi, is there anything preventing this from being merged?
+Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
+---
+ target/i386/bpt_helper.c            | 2 +-
+ target/i386/cc_helper.c             | 2 +-
+ target/i386/cc_helper_template.h    | 2 +-
+ target/i386/cpu.c                   | 2 +-
+ target/i386/cpu.h                   | 2 +-
+ target/i386/excp_helper.c           | 2 +-
+ target/i386/fpu_helper.c            | 2 +-
+ target/i386/gdbstub.c               | 2 +-
+ target/i386/helper.c                | 2 +-
+ target/i386/int_helper.c            | 2 +-
+ target/i386/mem_helper.c            | 2 +-
+ target/i386/misc_helper.c           | 2 +-
+ target/i386/mpx_helper.c            | 2 +-
+ target/i386/ops_sse.h               | 2 +-
+ target/i386/ops_sse_header.h        | 2 +-
+ target/i386/seg_helper.c            | 2 +-
+ target/i386/shift_helper_template.h | 2 +-
+ target/i386/smm_helper.c            | 2 +-
+ target/i386/svm_helper.c            | 2 +-
+ target/i386/tcg-stub.c              | 2 +-
+ target/i386/translate.c             | 2 +-
+ 21 files changed, 21 insertions(+), 21 deletions(-)
 
-Nothing except your mail format is a little bit weird and your patch is
-corrupted...
-
-Anyway, I've fixed these problems and it is now applied to my linux-user
-branch. I try to do a pull request soon...
-
-Thanks,
-Laurent
-
-> best regards,
-> Franz-Josef
-> 
-> On 30/01/2020 18:52, Laurent Vivier wrote:
->> Le 30/01/2020 à 14:00, Frajo a écrit :
->>> linux-user: Support f_flags in statfs64 when available.
->>> Same as d4247ec2d79ef2477cb886fa688706b068119736 but for statfs64
->>> When running rpm within qemu-arm-dynamic this could cause rpm fail with
->>> an error like
->>> "installing package A needs B MB on the C filesystem" depending on what
->>> is in memory in f_flags.
->>> https://github.com/rpm-software-management/rpm/blob/af06db1d5558870f7fb8f5c502572c2d27af5c71/lib/transaction.c#L164
->>>
->>>
->>> From 6ceb5662b5fae827d2c0cdd9896eec75997c060a Mon Sep 17 00:00:00 2001
->>> From: Franz-Josef Haider <franz.haider@jolla.com>
->>> Date: Thu, 30 Jan 2020 14:28:24 +0200
->>> Subject: [PATCH 1/1] linux-user: Support f_flags in statfs64 when
->>> available.
->>>
->>> Same as d4247ec2d79ef2477cb886fa688706b068119736 but for statfs64
->>>
->>> Signed-off-by: Franz-Josef Haider <franz.haider@jolla.com>
->>> ---
->>>  linux-user/syscall.c | 5 +++++
->>>  1 file changed, 5 insertions(+)
->>>
->>> diff --git a/linux-user/syscall.c b/linux-user/syscall.c
->>> index d60142f069..45782b1009 100644
->>> --- a/linux-user/syscall.c
->>> +++ b/linux-user/syscall.c
->>> @@ -8997,6 +8997,11 @@ static abi_long do_syscall1(void *cpu_env, int
->>> num, abi_long arg1,
->>>              __put_user(stfs.f_fsid.__val[1], &target_stfs->f_fsid.val[1]);
->>>              __put_user(stfs.f_namelen, &target_stfs->f_namelen);
->>>              __put_user(stfs.f_frsize, &target_stfs->f_frsize);
->>> +#ifdef _STATFS_F_FLAGS
->>> +            __put_user(stfs.f_flags, &target_stfs->f_flags);
->>> +#else
->>> +            __put_user(0, &target_stfs->f_flags);
->>> +#endif
->>>              memset(target_stfs->f_spare, 0, sizeof(target_stfs->f_spare));
->>>              unlock_user_struct(target_stfs, arg3, 1);
->>>          }
->> Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+diff --git a/target/i386/bpt_helper.c b/target/i386/bpt_helper.c
+index c3a8ea7..e6cc292 100644
+--- a/target/i386/bpt_helper.c
++++ b/target/i386/bpt_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/cc_helper.c b/target/i386/cc_helper.c
+index c9c90e1..924dd3c 100644
+--- a/target/i386/cc_helper.c
++++ b/target/i386/cc_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/cc_helper_template.h b/target/i386/cc_helper_template.h
+index 607311f..bb611fe 100644
+--- a/target/i386/cc_helper_template.h
++++ b/target/i386/cc_helper_template.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/cpu.c b/target/i386/cpu.c
+index 3ffd877..3ff1cdf 100644
+--- a/target/i386/cpu.c
++++ b/target/i386/cpu.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index f519d2b..97f2b4b 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/excp_helper.c b/target/i386/excp_helper.c
+index b10c7ec..1914717 100644
+--- a/target/i386/excp_helper.c
++++ b/target/i386/excp_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/fpu_helper.c b/target/i386/fpu_helper.c
+index 4ea7387..03b3544 100644
+--- a/target/i386/fpu_helper.c
++++ b/target/i386/fpu_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/gdbstub.c b/target/i386/gdbstub.c
+index 9ae43bd..4a3de5f 100644
+--- a/target/i386/gdbstub.c
++++ b/target/i386/gdbstub.c
+@@ -7,7 +7,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/helper.c b/target/i386/helper.c
+index 70be53e..d46999b 100644
+--- a/target/i386/helper.c
++++ b/target/i386/helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/int_helper.c b/target/i386/int_helper.c
+index 334469c..4f89436 100644
+--- a/target/i386/int_helper.c
++++ b/target/i386/int_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/mem_helper.c b/target/i386/mem_helper.c
+index 3a6d3ae..21ca3e3 100644
+--- a/target/i386/mem_helper.c
++++ b/target/i386/mem_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/misc_helper.c b/target/i386/misc_helper.c
+index b6b1d41..ae259d9 100644
+--- a/target/i386/misc_helper.c
++++ b/target/i386/misc_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/mpx_helper.c b/target/i386/mpx_helper.c
+index ade5d24..fd96617 100644
+--- a/target/i386/mpx_helper.c
++++ b/target/i386/mpx_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/ops_sse.h b/target/i386/ops_sse.h
+index c7614f8..6f1fc17 100644
+--- a/target/i386/ops_sse.h
++++ b/target/i386/ops_sse.h
+@@ -7,7 +7,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/ops_sse_header.h b/target/i386/ops_sse_header.h
+index 094aafc..6c0c849 100644
+--- a/target/i386/ops_sse_header.h
++++ b/target/i386/ops_sse_header.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/seg_helper.c b/target/i386/seg_helper.c
+index b96de06..16311e5 100644
+--- a/target/i386/seg_helper.c
++++ b/target/i386/seg_helper.c
+@@ -7,7 +7,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/shift_helper_template.h b/target/i386/shift_helper_template.h
+index cf91a2d..54f15d6 100644
+--- a/target/i386/shift_helper_template.h
++++ b/target/i386/shift_helper_template.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/smm_helper.c b/target/i386/smm_helper.c
+index eb5aa6e..d20e8ed 100644
+--- a/target/i386/smm_helper.c
++++ b/target/i386/smm_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/svm_helper.c b/target/i386/svm_helper.c
+index 6224387..3893158 100644
+--- a/target/i386/svm_helper.c
++++ b/target/i386/svm_helper.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/tcg-stub.c b/target/i386/tcg-stub.c
+index b00e23d..8d45579 100644
+--- a/target/i386/tcg-stub.c
++++ b/target/i386/tcg-stub.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/target/i386/translate.c b/target/i386/translate.c
+index caea6f5..4c57307 100644
+--- a/target/i386/translate.c
++++ b/target/i386/translate.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- 
+2.17.1
 
 
