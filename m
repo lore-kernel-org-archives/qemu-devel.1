@@ -2,92 +2,75 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 526E5C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:06:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40C96C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:07:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90C2620795
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:06:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AFD3620795
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:07:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSvJjOPA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90C2620795
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YREgWw7R"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AFD3620795
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0W1-0007iZ-Bq
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:06:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53250)
+	id 1kW0X6-00010G-OS
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:07:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45170)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kW0Df-0004i4-Ch
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:47:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26040)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVzhN-00088y-At
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:13:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23409)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <peterx@redhat.com>) id 1kW0Dc-0003ez-NI
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:47:11 -0400
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVzhF-0007jh-DD
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:13:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603471626;
+ s=mimecast20190719; t=1603469620;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=UrttzmvHmF79uLtAEn1jGxXIZ0AP46F13fIMggVntOs=;
- b=FSvJjOPA6OhxuhFgi/WCfDnRn/JS219haze+AjZYF4PQkVugJgBr8P/mAWdMJC0Mf2afLX
- 1d0z1kGsSId1j2BZYFRLt45NPE6K0sfdfPQ3YwU5kGxfUTMdFaoVFCOUnbD8TAcp0A/XRp
- FhlInS8r8o7+ZSZHhx50qBhDNPw23Os=
-Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
- [209.85.219.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-560-EGDrV68tOQCnpuciAexLbA-1; Fri, 23 Oct 2020 12:47:05 -0400
-X-MC-Unique: EGDrV68tOQCnpuciAexLbA-1
-Received: by mail-qv1-f72.google.com with SMTP id d41so1330185qvc.23
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 09:47:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=UrttzmvHmF79uLtAEn1jGxXIZ0AP46F13fIMggVntOs=;
- b=Fn0+l0ft1A4oO9MMTHTR1JjnOPWh1utxK1sLsLkCyfdf/AcB47F41pbE07QLaksfei
- TBp51gaALz8eDDcJuUvQ6h7hbszRVKxF0Zn2HAm7Wpuj+HaZr7rJ2efCo+m1LGJOZfFd
- hSDTlZwVD9cr5ZYEkJYlZIob3ZBO2Hk6JS9pk35zzzJrGF1qZ19pnCBj09YuhKhBGbYl
- diRMQMnYJdGSbcd5D0LukdsEU+96NWwtzsJhIQ/ZcuOXJOP/myelhGaYoMZYgTiyKB7q
- 4oMBKVVzlVlssoXsnKXlFWO66LRbCgtFzoyiC8N/PG8Bn6qyeEk10Kzq51met2wnZ5vK
- WBVQ==
-X-Gm-Message-State: AOAM532KbKtrm005VlE3HojxjXDQat6Ear/Cvmjox/L4CKdKaCHVBYod
- LAR/HDfW3uEtB86vhHclq9kUj+azWfTRHcPkOVVdoc4jUq0lriTGLi+ySUnjWa/i1XAzpdPGPJS
- M+aiVjeQDKnYy8l4=
-X-Received: by 2002:a0c:9021:: with SMTP id o30mr3146909qvo.1.1603471624661;
- Fri, 23 Oct 2020 09:47:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyeaW9XBBQmxIMcxy+M3qIo4gfsRBG7hGp63DnvoQ1Tjn0HvSYn9Shv0q5AbjbIyDfPtO4b1g==
-X-Received: by 2002:a0c:9021:: with SMTP id o30mr3146887qvo.1.1603471624386;
- Fri, 23 Oct 2020 09:47:04 -0700 (PDT)
-Received: from xz-x1 (toroon474qw-lp140-04-174-95-215-133.dsl.bell.ca.
- [174.95.215.133])
- by smtp.gmail.com with ESMTPSA id v5sm1245968qtd.28.2020.10.23.09.47.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Oct 2020 09:47:03 -0700 (PDT)
-Date: Fri, 23 Oct 2020 12:47:02 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jean-Philippe Brucker <jean-philippe@linaro.org>
-Subject: Re: [PATCH v10 09/10] virtio-iommu: Set supported page size mask
-Message-ID: <20201023164702.GF3208@xz-x1>
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-10-jean-philippe@linaro.org>
- <20201019213539.GC3203@xz-x1> <20201022163937.GB1808268@myrica>
- <20201022205616.GD3208@xz-x1> <20201023074858.GA2265982@myrica>
+ bh=4hAcHBxfAsWMIPxoDg2wZqNqjmzQ3sOup2C/MfbYCi4=;
+ b=YREgWw7RUJwiu1nimnhQM0XeTt7DWsSCPNguyKE8jEMPcDhWzj78PYeyTVwRqspHTbLiEh
+ 4YsGK+LgnF+D/HTxGXEmWHrYl/8kibANihbhIDP5Rbs8U97TuNUXydcnxRlQq+iMMsu4go
+ lHhmoWNi4YqgYbFi5IOIVnHisbOAXzU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-312-MljUXI3yMPylNt4ck-QaqQ-1; Fri, 23 Oct 2020 12:13:38 -0400
+X-MC-Unique: MljUXI3yMPylNt4ck-QaqQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A82101054FB9;
+ Fri, 23 Oct 2020 16:13:31 +0000 (UTC)
+Received: from merkur.redhat.com (ovpn-113-206.ams2.redhat.com [10.36.113.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3DD355C1CF;
+ Fri, 23 Oct 2020 16:13:30 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH v2 1/6] char/stdio: Fix QMP default for 'signal'
+Date: Fri, 23 Oct 2020 18:13:07 +0200
+Message-Id: <20201023161312.460406-2-kwolf@redhat.com>
+In-Reply-To: <20201023161312.460406-1-kwolf@redhat.com>
+References: <20201023161312.460406-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201023074858.GA2265982@myrica>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=peterx@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=peterx@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,34 +93,61 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, bbhushan2@marvell.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 09:48:58AM +0200, Jean-Philippe Brucker wrote:
-> Arm CPUs and SMMU support 4k, 16k and 64k page sizes. I don't think 16k is
-> used anywhere but some distributions chose 64k (RHEL, I think?), others
-> 4k, so we need to support both.
-> 
-> Unfortunately as noted above host64k-guest4k is not possible without
-> adding a negotiation mechanism to virtio-iommu, host VFIO and IOMMU
-> driver.
+Commit 02c4bdf1 tried to make signal=on the default for stdio chardevs
+except for '-serial mon:stdio', but it forgot about QMP and accidentally
+switched the QMP default from true (except for -nographic) to false
+(always). The QMP documentation was kept unchanged and still describes
+the opposite of the old behaviour (which is an even older documentation
+bug).
 
-I see.  Then it seems we would still need to support host4k-guest64k.
+Fix all of this by making signal=true the default in ChardevStdio and
+documenting it as such.
 
-Maybe for assigned case, we can simply AND all the psize_masks of all the vfio
-containers that supported to replace the default psize mask (TARGET_PAGE_SIZE)
-without caring about whether it's shrinking or not?  Note that current patch
-only update config.psize_mask to the new one, but I think we need to calculate
-the subset of all containers rather than a simply update.  Then with the help
-of 39b3b3c9cac1 imho we'll gracefully fail the probe if the psize is not
-suitable anyway, e.g., host64k-guest4k.
+Fixes: 02c4bdf1d2ca8c02a9bae16398f260b5c08d08bf
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+---
+ qapi/char.json       | 3 +--
+ chardev/char-stdio.c | 4 +---
+ 2 files changed, 2 insertions(+), 5 deletions(-)
 
-Thanks,
-
+diff --git a/qapi/char.json b/qapi/char.json
+index b4d66ec90b..43486d1daa 100644
+--- a/qapi/char.json
++++ b/qapi/char.json
+@@ -321,8 +321,7 @@
+ # Configuration info for stdio chardevs.
+ #
+ # @signal: Allow signals (such as SIGINT triggered by ^C)
+-#          be delivered to qemu.  Default: true in -nographic mode,
+-#          false otherwise.
++#          be delivered to qemu.  Default: true.
+ #
+ # Since: 1.5
+ ##
+diff --git a/chardev/char-stdio.c b/chardev/char-stdio.c
+index 82eaebc1db..403da308c9 100644
+--- a/chardev/char-stdio.c
++++ b/chardev/char-stdio.c
+@@ -112,9 +112,7 @@ static void qemu_chr_open_stdio(Chardev *chr,
+ 
+     qemu_chr_open_fd(chr, 0, 1);
+ 
+-    if (opts->has_signal) {
+-        stdio_allow_signal = opts->signal;
+-    }
++    stdio_allow_signal = !opts->has_signal || opts->signal;
+     qemu_chr_set_echo_stdio(chr, false);
+ }
+ #endif
 -- 
-Peter Xu
+2.28.0
 
 
