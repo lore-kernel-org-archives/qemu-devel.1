@@ -2,125 +2,117 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 282FEC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06883C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:37:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 66F652168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:34:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 61EE320878
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:37:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="VJiy7kBR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 66F652168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i84I1ufq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61EE320878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50958 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVy91-0008U0-FM
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 10:34:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43210)
+	id 1kVyC3-0002u0-CX
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 10:37:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43304)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVy7w-0007Sb-Jc; Fri, 23 Oct 2020 10:33:09 -0400
-Received: from mail-eopbgr40119.outbound.protection.outlook.com
- ([40.107.4.119]:23548 helo=EUR03-DB5-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1kVy8G-0007gH-KJ; Fri, 23 Oct 2020 10:33:28 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:63670)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVy7u-00021U-QN; Fri, 23 Oct 2020 10:33:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VfD6N5GOIzLcY1EOUOTEYZr2f68Z9yz3Gj4s+dx6t++pxL3pYMHG4iPyWOrO9XXifp9ggUyJNQqkdbm1V3K8ND1JOE0G3yFlAn+2kp+rZrtMKItIGhbM2f/0EIKTI4kXG0WqsVnKzBsANxPMAavVmb6F0G2OZfC/tywGGCdG85HPWi9jnkvaaLPtZ9/3g5aJZQgHw0ikAX/F/akxt9/5Z8VUaCM+bLs37jF+B9lKIuNTB2vmeTmj1+lC9KMmnSb2u/lIJfpPFdPqn1VYivhxzxUl80GIsgT6nQwXMLG6VJkdPbk4t+5ysrNv509bzt9aRxaYPATH2IlfP6XgTFe1Hw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j72KVG+rRK6/ExgH40LIdeOntKIOpsReyUtlVtwfKMg=;
- b=XXqMQa72z4X/fPlccLO0iugItUyweTCuOaeyvKnWe2MC/gxyQ9M4AywdItPVA7PyhuaVZ94qjvEZTeHRKxN0wsdqieLqhTFhxPNJ5Vos5IHzNerCJUIcxoBRgREMJcsnF6X76/JiGLQdg5Z9/Cjf2vZCtLYfWzjHGao5S2zjQwteMf5V4xRkclnlnTFH7hUm7F5R7IKpo3MYUTKaEGL0LIp82IcyLFacTpCbQgkMI20cUS5+WFfgVsMPPm07S3ndayvpPG9YF+1446VKmqdZnT0o6fb9VrdW2ICWK4J37OL/fSPuXsAJbMw3/vHni+Zk3ztIRfgPDMjnKVyB05kJ6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=j72KVG+rRK6/ExgH40LIdeOntKIOpsReyUtlVtwfKMg=;
- b=VJiy7kBRGF6VMVaY5Idf70g7YCnHTP8IDQqS3HQCe9GC1BCXGz4V3SLa/xeJre1r4IynitfOruzjLzxv0hrZ7iVvMzqJKmtyFCHoiTDEe3ACEptmCXdac3inySh/sers+A5CFPaOlbKTFMyXmnoh27/dh4lcfxnP8HeCIH3NAMI=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB4407.eurprd08.prod.outlook.com (2603:10a6:20b:bd::16)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Fri, 23 Oct
- 2020 14:33:01 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Fri, 23 Oct 2020
- 14:33:01 +0000
-Subject: Re: [PATCH v12 03/14] copy-on-read: add filter drop function
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- eblake@redhat.com, den@openvz.org
-References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1603390423-980205-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <68676cb2-0945-20f0-4f40-23a2471b1ef1@virtuozzo.com>
-Date: Fri, 23 Oct 2020 17:32:59 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-In-Reply-To: <1603390423-980205-4-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [185.215.60.98]
-X-ClientProxiedBy: AM0PR04CA0090.eurprd04.prod.outlook.com
- (2603:10a6:208:be::31) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <stefanb@linux.ibm.com>)
+ id 1kVy8E-00023i-2g; Fri, 23 Oct 2020 10:33:28 -0400
+Received: from pps.filterd (m0098409.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09NEVd3Z044491; Fri, 23 Oct 2020 10:33:22 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=xfB5FtjMEpEG75KhXjFddPVSaii8axiMkw6/7ceAh9g=;
+ b=i84I1ufqfzYBa3qFpYvIB0DQVttzRs3mJII2bG8A8pxddOa7TlScNWKDI8aqcm2FC04a
+ OSFQ3xXVVoDSXz4iHmgHMya1zojcRUnVFryv7U42JQeWRrUZ+zp1Q6f6BrW+J/dtMoXg
+ szj6K8bz9KMsZ29LAzcZFlsGVtwzeO911IfbYjS2Lk8zXnI7WLsO39+pOCw4MR2zoUx9
+ rOXwgae4eBGqP4ceQv/P9K2gj78bLOgolhd3qX0gkS7/9TBbyzBWF+VC766wsFFNDZeh
+ CakQPR5s8C5Q6CBy92s/6GyomVUyV2AATY778t6eMGCY8p+QN/kD/TEKxCm8KN1zOZDp Yw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34by72uqh6-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 23 Oct 2020 10:33:22 -0400
+Received: from m0098409.ppops.net (m0098409.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09NEWC6s051073;
+ Fri, 23 Oct 2020 10:33:21 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34by72uqgm-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 23 Oct 2020 10:33:21 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09NERTjQ030791;
+ Fri, 23 Oct 2020 14:33:20 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma04wdc.us.ibm.com with ESMTP id 347r89rw2e-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Fri, 23 Oct 2020 14:33:20 +0000
+Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
+ [9.57.199.109])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09NEXKYY22479330
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Fri, 23 Oct 2020 14:33:20 GMT
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 00574112075;
+ Fri, 23 Oct 2020 14:33:19 +0000 (GMT)
+Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E5160112062;
+ Fri, 23 Oct 2020 14:33:19 +0000 (GMT)
+Received: from sbct-3.pok.ibm.com (unknown [9.47.158.153])
+ by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
+ Fri, 23 Oct 2020 14:33:19 +0000 (GMT)
+Subject: Re: [PATCH 23/30] tpm: Fix Lesser GPL version number
+To: Chetan Pant <chetan4windows@gmail.com>, qemu-trivial@nongnu.org
+References: <20201014134248.14146-1-chetan4windows@gmail.com>
+ <20201023123516.19843-1-chetan4windows@gmail.com>
+From: Stefan Berger <stefanb@linux.ibm.com>
+Message-ID: <0c40a9a1-062b-073a-c384-0fdb426bd819@linux.ibm.com>
+Date: Fri, 23 Oct 2020 10:33:19 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.98) by
- AM0PR04CA0090.eurprd04.prod.outlook.com (2603:10a6:208:be::31) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.22 via Frontend Transport; Fri, 23 Oct 2020 14:33:00 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3bb40d84-61ba-4966-6e9d-08d877608b65
-X-MS-TrafficTypeDiagnostic: AM6PR08MB4407:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB440706CA34492C2C6A980141C11A0@AM6PR08MB4407.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:2399;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: g6f4ju+orxDaYMR5LGtMzy++2TLu4BBiJwZx+Qte8DGJHnGcXMucsyQRTvgFjoqI18dfTRykn6TeqBpvsaHwVMLaGeMaoAocXiJ6a/N4nUiyw4z8zfAtNBePeqB/SYabkBfYFhv97febfmPPtzD8NGon8xqR/ChgwkHCMTm38cusYDTUvVhPIlb8BJ2VeHs2rgYLWp8zNHVp8ZKn45CzOmqYGLn4NKu6OSoesXt4LwJV/C1JwsGBoYrMHpw/3u4Vn95rZw9GaY6o1NWSrSq0FrE16wzwuGHkq0IV2mVTPlzaHPhxyrI1aCx31cqCHyij3piOlKueqIJm7jK2cdEEL/KDiZ7u5H3KlsgfitzCVpstW1TPhPxvXeUrvoWBX4Dt
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(376002)(396003)(366004)(346002)(39850400004)(316002)(83380400001)(86362001)(107886003)(52116002)(5660300002)(2616005)(31696002)(8676002)(31686004)(956004)(4326008)(66556008)(6486002)(26005)(16526019)(186003)(66946007)(36756003)(2906002)(478600001)(4744005)(8936002)(16576012)(66476007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: jax0uuVHitkRfUY4ixeBKgHub+va3stTO3TspRCAkryz0UO9M1iyNrCreZtQno7j0ip+d+s6dePZ3ztCXYDUEpyvWVTqaeupxVe6uOg0N7WWqWXAXFNI7KhZgXJaV6spDj0FR9lfUXJkafr+uYu9UajfW8PJ/MuDeqo/QZBK3HKP8Br7x3gTQ/tkg7649e222DO3TsFH97v8vZrGbiYPDR1yQjphlV74AMe8Rs5QDNn4j3d72nwsBwtjQEJ+LgLl7o03zN9Y4LEkVGqQ5DRq3kVSPJqzfkv6RseZU6VAsRVXEkSU3vFmNL+PbfnBevgit1K2Rk7x9uItx2CMzi5mce/C9DBgC844aqO3yxrsTnrMDiiGfLP62rbj2GIr1sM/pX6GEK8wrmTvftCL54+zcdwtF9WsP6FBnWZU1OhrXeCBu441KSH+7o84XWql+aANF5+RbObMV46I3EG5vw3w7H7StZTYa2RbRTANTE3M0wQDogdzLf2kN4x9OTweKJrgxciSlYmeI/F0DWGUV08tWHVYFUX0r/FPzwoYL0B9g6stYBaZuHNrs9d5k+UCGIQemRwkIXF5gm18KfRVs0COR+5VgfTAwtsaX9Od7vBfR38axCngx+1b9jOo9UF3srYed2txzW4LPv3HQfbmL7Z1AA==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3bb40d84-61ba-4966-6e9d-08d877608b65
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2020 14:33:01.3077 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Sr0wWMZzo+zvmBba4FJjjIVeEGvwjSQ+Gs7GXozt1a2lOXm1VT9rX+x67bEi4gU0IOVy54CbAyEiSqXCsyzY3EQbVp6jpMt7CfciAyLqmo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4407
-Received-SPF: pass client-ip=40.107.4.119;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR03-DB5-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 10:33:02
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+In-Reply-To: <20201023123516.19843-1-chetan4windows@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
+ definitions=2020-10-23_07:2020-10-23,
+ 2020-10-23 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ lowpriorityscore=0
+ suspectscore=0 mlxscore=0 phishscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 bulkscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010230099
+Received-SPF: pass client-ip=148.163.156.1; envelope-from=stefanb@linux.ibm.com;
+ helo=mx0a-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 10:33:22
+X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.108,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -134,24 +126,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-22.10.2020 21:13, Andrey Shinkevich wrote:
-> Provide API for the COR-filter removal. Also, drop the filter child
-> permissions for an inactive state when the filter node is being
-> removed. This function may be considered as an intermediate solution
-> before we are able to use bdrv_remove_node(). It will be possible once
-> the QEMU permission update system has overhauled.
-> To insert the filter, the block generic layer function
-> bdrv_insert_node() can be used.
-> 
-> Signed-off-by: Andrey Shinkevich<andrey.shinkevich@virtuozzo.com>
+On 10/23/20 8:35 AM, Chetan Pant wrote:
+> There is no "version 2" of the "Lesser" General Public License.
+> It is either "GPL version 2.0" or "Lesser GPL version 2.1".
+> This patch replaces all occurrences of "Lesser GPL version 2" with
+> "Lesser GPL version 2.1" in comment section.
+>
+> Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Stefan Berger <stefanb@linux.ibm.com>
 
--- 
-Best regards,
-Vladimir
+
+> ---
+>   backends/tpm/tpm_emulator.c    | 2 +-
+>   backends/tpm/tpm_passthrough.c | 2 +-
+>   backends/tpm/tpm_util.c        | 2 +-
+>   hw/tpm/tpm_prop.h              | 2 +-
+>   include/sysemu/tpm_util.h      | 2 +-
+>   5 files changed, 5 insertions(+), 5 deletions(-)
+>
+> diff --git a/backends/tpm/tpm_emulator.c b/backends/tpm/tpm_emulator.c
+> index 201cd38..a012adc 100644
+> --- a/backends/tpm/tpm_emulator.c
+> +++ b/backends/tpm/tpm_emulator.c
+> @@ -14,7 +14,7 @@
+>    * This library is free software; you can redistribute it and/or
+>    * modify it under the terms of the GNU Lesser General Public
+>    * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>    *
+>    * This library is distributed in the hope that it will be useful,
+>    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/backends/tpm/tpm_passthrough.c b/backends/tpm/tpm_passthrough.c
+> index 8f6f499..21b7459 100644
+> --- a/backends/tpm/tpm_passthrough.c
+> +++ b/backends/tpm/tpm_passthrough.c
+> @@ -11,7 +11,7 @@
+>    * This library is free software; you can redistribute it and/or
+>    * modify it under the terms of the GNU Lesser General Public
+>    * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>    *
+>    * This library is distributed in the hope that it will be useful,
+>    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/backends/tpm/tpm_util.c b/backends/tpm/tpm_util.c
+> index b58d298..e6aeb63 100644
+> --- a/backends/tpm/tpm_util.c
+> +++ b/backends/tpm/tpm_util.c
+> @@ -8,7 +8,7 @@
+>    * This library is free software; you can redistribute it and/or
+>    * modify it under the terms of the GNU Lesser General Public
+>    * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>    *
+>    * This library is distributed in the hope that it will be useful,
+>    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/hw/tpm/tpm_prop.h b/hw/tpm/tpm_prop.h
+> index 85e1ae5..d19e40c 100644
+> --- a/hw/tpm/tpm_prop.h
+> +++ b/hw/tpm/tpm_prop.h
+> @@ -8,7 +8,7 @@
+>    * This library is free software; you can redistribute it and/or
+>    * modify it under the terms of the GNU Lesser General Public
+>    * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>    *
+>    * This library is distributed in the hope that it will be useful,
+>    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+> diff --git a/include/sysemu/tpm_util.h b/include/sysemu/tpm_util.h
+> index 63e872c..08f0517 100644
+> --- a/include/sysemu/tpm_util.h
+> +++ b/include/sysemu/tpm_util.h
+> @@ -8,7 +8,7 @@
+>    * This library is free software; you can redistribute it and/or
+>    * modify it under the terms of the GNU Lesser General Public
+>    * License as published by the Free Software Foundation; either
+> - * version 2 of the License, or (at your option) any later version.
+> + * version 2.1 of the License, or (at your option) any later version.
+>    *
+>    * This library is distributed in the hope that it will be useful,
+>    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+
+
 
