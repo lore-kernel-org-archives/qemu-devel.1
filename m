@@ -2,70 +2,98 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2CD4C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 774A1C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 145832192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D47B92192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=crudebyte.com header.i=@crudebyte.com header.b="VaiuLswQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 145832192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=crudebyte.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i3Z7GomT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47B92192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49440 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzqf-0004NR-PW
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:23:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36110)
+	id 1kVzqh-0004W6-NU
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:23:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37008)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kVzB3-0004Qw-1P
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:40:26 -0400
-Received: from lizzy.crudebyte.com ([91.194.90.13]:51783)
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVzFA-00021a-KO; Fri, 23 Oct 2020 11:44:42 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <qemu_oss@crudebyte.com>)
- id 1kVzB0-0003Av-Rk
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:40:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
- d=crudebyte.com; s=lizzy; h=Content-Type:Content-Transfer-Encoding:
- MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:
- Content-ID:Content-Description;
- bh=YOh4Y7I8iR4iwmRb1Tv4RepzFuYfoG+/0OBsIE7sL2A=; b=VaiuLswQqdUKYU01K6C1fMCeep
- izyK7hBvgyzc+Yrr6jVA17MQ/G1UAIgFx/KPASnxgt9FunxVtzjp20dwzLqr/JJ/XKYoqkGIBvzkS
- FCRTu83Qbv0oPkNFNF0eaQ5J/+FVFtiqj0yFhnlaNVnHAGoLdlKNnIhRRoCyV64HBSp8mx9gqszjx
- 6S1bnk/Vai/XLHkIyDmvR9L+GwPFAjq/N+5PJ1m4d7/QmNTAClX1lejAKVT5h2p7sfLoFwa3AagVC
- guakAF5mS5yL4qeMwiQOQSxVGNIOrB2QhO+CIufVuaVTVtuA5XR+AwlbtUK8uLn1EtKaRJ8UkyYek
- cb0feKLg==;
-From: Christian Schoenebeck <qemu_oss@crudebyte.com>
-To: Greg Kurz <groug@kaod.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 01/13] tests/9pfs: Factor out do_version() helper
-Date: Fri, 23 Oct 2020 17:40:13 +0200
-Message-ID: <4875106.geqTqo5ub7@silver>
-In-Reply-To: <20201023172950.4b148e3f@bahia.lan>
-References: <cover.1603452058.git.qemu_oss@crudebyte.com>
- <ccc858509ddfa3f6244cc4caf92c4149b7269b43.1603452058.git.qemu_oss@crudebyte.com>
- <20201023172950.4b148e3f@bahia.lan>
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVzF8-0003gM-Sd; Fri, 23 Oct 2020 11:44:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1603467879; x=1635003879;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=BUW2O3MQzdbWJXlqLo0/WE3+BwAoJgBRDfL3DEvuyg4=;
+ b=i3Z7GomTiSermdqZNNGc7BoGFIs9KobiDyM08pY18dh4LrbgQ6SuSCNk
+ WpzWrExUPo8v7Q9pvnv+urB9dBZIyQn+d3h1b7BDd0AqXcwNV+gM1NMO8
+ qI62YnsLQ93JJtjL7NLjZaFnMmOmQ3ucHPcQGaceEHzI/NIw1IMGpISam
+ 5oGsmJfWc618xnqyqfpsMuO6Ye7eYJcSOtjTw+4E/y32TN9y6N3F+cTRm
+ GO4Ek61fXkZGhT3NZw6jeSDbJOKehau3aghYyhdHNRi2Syj1gLRVO+fAY
+ Cv1+XehEFEjZ6riOajd9vrUDZWttZOktLcAjMMsA4XW1MikdyIEL0LdKy A==;
+IronPort-SDR: 4jtoasyk9ithrbxQ33pELpXo/6cPoupWf61WUhJX6Pghm1k377LvOtfsboekUV3iyjDzoV5Tpk
+ qXd/gzY+ARgxS01NlUAGY6hIAkRQJ901n34UWpuYlIlxE/4fMEiiW5fn/HzqDWWPIMY8oBnFk5
+ 4ORYl4DWQCMfktMAkkYx3I1N27UmtxYDqqpJ3MPzBM9qEZd0pB1+79828e0+VpVnIzO3fANs0U
+ rRSZfSvi9xVTtNZ3coo9mD5EsKzlWt70GRNSj822+Vkwh2avey22Vs5e3FZCrXuHQZUi4hyOHd
+ NbQ=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="151960147"
+Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:44:37 +0800
+IronPort-SDR: C9jmEFCbWytfRAtiWbMH2oYXsaYTpsKS2RGqM4IoARnpU5ULSHZYi9v6v/qENur2TVMwwRQyQm
+ Mg3va/E5NHpgsIHG4BCstCNBQcQPZ9Q4OWN4vuOm9cEztyJD0pl3hGOINdvK3O5H+GL3uGs2TJ
+ XfD2oEKoqWdmLboojqZI0MAEzsejDkzz1O11ayfuu4N596BGl0TxScVwB7uLt4st1abNtz7mU2
+ nm9KOZhtgsY29DaKGY7AYFAMr5NX2Ppq+trcbK1tbD721caL3JRRMxc/8B240AeGCdsEotsAGh
+ WbhRjyBuPD45NWzlXUUP201z
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Oct 2020 08:30:59 -0700
+IronPort-SDR: rvdmG/UKbkExbWsfhTm88Wmvrasv4I/baScGhpc4uvcAk9clQYnfuA8pSU6SDXhVhx4M5hqLAM
+ VpGo8GfmcAYw9aAm00EhMnpghFyg6oHMbPOSBrzOtx38GzjMqyynN1wyLTYhYkyMsWSv1nDmD7
+ CsUm0dXUiYcnwhFUpu7hoYJK3cPUa7y3iVKOHfAH8mfdVEg5zHGnpiHidSjYgDaODLfPd21a7d
+ 9SYO+2nX6XYlZEzgOQ8wOrMzeq/N23HLBZzVjqah/EqZTCDUsBgJOCuXDn37p3vg4evfy7CDpu
+ 0PQ=
+WDCIronportException: Internal
+Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.46])
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:44:37 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 01/16] target/riscv: Add a TYPE_RISCV_CPU_BASE CPU
+Date: Fri, 23 Oct 2020 08:33:16 -0700
+Message-Id: <67626d271ea0b75a3c5479f3aaf07c565b1d1d83.1603467169.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1603467169.git.alistair.francis@wdc.com>
+References: <cover.1603467169.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"
-Received-SPF: pass client-ip=91.194.90.13; envelope-from=qemu_oss@crudebyte.com;
- helo=lizzy.crudebyte.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:40:15
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.71.154.45;
+ envelope-from=prvs=558518344=alistair.francis@wdc.com;
+ helo=esa6.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:44:34
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -79,25 +107,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
+ alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Freitag, 23. Oktober 2020 17:32:02 CEST Greg Kurz wrote:
-> It feels weird to receive a mail I didn't send with my address
-> in the top From: header. I would have expected yours instead and
-> another From: with my address in the changelog...
-> 
-> 
-> On Tue, 20 Oct 2020 18:09:14 +0200
-> Greg Kurz <groug@kaod.org> wrote:
-> 
-> ... here.
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.h | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Yep, I noticed that too late. I'll take care about it next time. Sorry!
-
-Best regards,
-Christian Schoenebeck
-
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index de4705bb57..74a236d4bc 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -44,6 +44,12 @@
+ #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
+ #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
+ 
++#if defined(TARGET_RISCV32)
++# define TYPE_RISCV_CPU_BASE            TYPE_RISCV_CPU_BASE32
++#elif defined(TARGET_RISCV64)
++# define TYPE_RISCV_CPU_BASE            TYPE_RISCV_CPU_BASE64
++#endif
++
+ #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
+ #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
+ 
+-- 
+2.28.0
 
 
