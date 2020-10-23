@@ -2,71 +2,72 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B43D7C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:21:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27FCFC55178
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:24:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E546820E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:21:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 70EC720E65
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:24:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O/SoQU+B"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E546820E65
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P6918UvV"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70EC720E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55484 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW2ck-0006rc-Oj
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 15:21:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58914)
+	id 1kW2fz-0008Eu-An
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 15:24:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW2br-0006Gc-AC
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:20:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37092)
+ id 1kW2fP-0007n0-6d
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:23:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53390)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW2bo-0006mN-Ex
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:20:19 -0400
+ id 1kW2fN-0007C6-Ci
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:23:58 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603480815;
+ s=mimecast20190719; t=1603481036;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=W9aV75y4ILQsmdgDEBCj9cbzrtT06USNdAlTJ3P/+AE=;
- b=O/SoQU+B9uJweRFEdec81J6edGzC90yMZSqFQY/MekJtna1KM/qGRUuP2fefDjStLIlwkj
- wuKA6xy6F2DDIHR9DDvxeduyg77x4KKuHAZV7zzzL0bjAX69o5y0QxQIC5xD6xehSMA7ZU
- IyXaTgoFy5E0GGaH+fp0xAhBR+CVaQw=
+ bh=fWeDVo1ItSIjLGvzc9UaK1o9wogPbm/pW1RQgc4FjA4=;
+ b=P6918UvVzr1VUMunHr+p6pMqxwXy+cmP1RLvIl+f5ZZaytuXx7+WeR6R87AKlzUxFgbfiJ
+ EPUoqDskxZ7Iitm02PowoEcWIv2vgqbz+TcjW/drbKiLTgw3wO4gaH5ZL1/xqVEdKOEbn8
+ HQyyg+s/r1jmmPp0ADkvwpKpFiJD97w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-87-2Fh8HbnfNduenk6lsKnhnA-1; Fri, 23 Oct 2020 15:20:13 -0400
-X-MC-Unique: 2Fh8HbnfNduenk6lsKnhnA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-551-YnUE4kmYOtaqJ-JSYa29bQ-1; Fri, 23 Oct 2020 15:23:54 -0400
+X-MC-Unique: YnUE4kmYOtaqJ-JSYa29bQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 813BE8DFFF0;
- Fri, 23 Oct 2020 19:20:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2C0ED1006702;
+ Fri, 23 Oct 2020 19:23:53 +0000 (UTC)
 Received: from localhost (unknown [10.40.208.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2DC6F5C5FE;
- Fri, 23 Oct 2020 19:19:20 +0000 (UTC)
-Date: Fri, 23 Oct 2020 21:19:19 +0200
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1AD3F60BFA;
+ Fri, 23 Oct 2020 19:23:47 +0000 (UTC)
+Date: Fri, 23 Oct 2020 21:23:46 +0200
 From: Igor Mammedov <imammedo@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 1/5] pc-dimm: Drop @errp argument of pc_dimm_plug()
-Message-ID: <20201023211919.77377cb9@redhat.com>
-In-Reply-To: <160309728447.2739814.12831204841251148202.stgit@bahia.lan>
-References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
- <160309728447.2739814.12831204841251148202.stgit@bahia.lan>
+To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Subject: Re: [PATCH] ACPI: Avoid infinite recursion when dump-vmstate
+Message-ID: <20201023212346.79e54986@redhat.com>
+In-Reply-To: <20201023185441.GP3038@work-vm>
+References: <20201019093156.2993284-1-liangpeng10@huawei.com>
+ <20201023180933.2fe23875@redhat.com>
+ <20201023185441.GP3038@work-vm>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -83,7 +84,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,139 +97,98 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Peng Liang <liangpeng10@huawei.com>, mst@redhat.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 19 Oct 2020 10:48:04 +0200
-Greg Kurz <groug@kaod.org> wrote:
+On Fri, 23 Oct 2020 19:54:41 +0100
+"Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
 
-> pc_dimm_plug() doesn't use it. It only aborts on error.
+> * Igor Mammedov (imammedo@redhat.com) wrote:
+> > On Mon, 19 Oct 2020 17:31:56 +0800
+> > Peng Liang <liangpeng10@huawei.com> wrote:
+> >   
+> > > There is a field with vmstate_ghes_state as vmsd in vmstate_ghes_state,
+> > > which will lead to infinite recursion in dump_vmstate_vmsd.
+> > > 
+> > > Fixes: a08a64627b ("ACPI: Record the Generic Error Status Block address")
+> > > Reported-by: Euler Robot <euler.robot@huawei.com>
+> > > Signed-off-by: Peng Liang <liangpeng10@huawei.com>
+> > > ---
+> > >  hw/acpi/generic_event_device.c | 3 +--
+> > >  1 file changed, 1 insertion(+), 2 deletions(-)
+> > > 
+> > > diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
+> > > index 6df400e1ee16..4b6867300a55 100644
+> > > --- a/hw/acpi/generic_event_device.c
+> > > +++ b/hw/acpi/generic_event_device.c
+> > > @@ -334,8 +334,7 @@ static const VMStateDescription vmstate_ghes_state = {
+> > >      .minimum_version_id = 1,
+> > >      .needed = ghes_needed,
+> > >      .fields      = (VMStateField[]) {
+> > > -        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
+> > > -                       vmstate_ghes_state, AcpiGhesState),
+> > > +        VMSTATE_UINT64(ghes_state.ghes_addr_le, AcpiGedState),  
+> > 
+> > not sure its' ok handle it this way,
+> > 
+> > see how it is done with another structure:
+> > 
+> > static const VMStateDescription vmstate_ged_state = {                            
+> >     .name = "acpi-ged-state",                                                    
+> >     .version_id = 1,                                                             
+> >     .minimum_version_id = 1,                                                     
+> >     .fields      = (VMStateField[]) {                                            
+> >         VMSTATE_UINT32(sel, GEDState),                                           
+> >         VMSTATE_END_OF_LIST()                                                    
+> >     }                                                                            
+> > }; 
+> > 
+> > ...
+> > 
+> > VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
+> > 
+> > i.e. it looks like we are missing structure definition for AcpiGhesState
+> > 
+> > CCing David,
+> >  to help with migration magic in case I'm wrong or missed something  
 > 
-> Drop @errp and adapt the callers accordingly.
+> Yeh that's confusing :-)
 > 
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+> Given a:
+> 
+>   VMSTATE_STRUCT(a, B, 1, vmstate_c, C)
+> 
+> We're saying there's a field 'a' in type B, and field 'a'
+> should be of type C and be serialised using vmstate_c.
+> 
+> That also means that in any vmstate_c, we're expecting it
+> to be passed a type C generally.
+> 
+> Having said that; you don't need a struct - you can get away
+> with that VMSTATE_UINT64, there's two problems:
+> 
+>   a) That assumes that your ghes always stays that simple.
+>   b) If you wanted to store a Ghes from a number of different
+> parent structures then you're stuck because your vmstate_ghes_state
+> is bound to being a strict field of AcpiGedState.
+> 
+> So yes, it's neatest to do it using a VMSD for AcpiGhesState
+> 
+> And congratulations on finding a loop; I don't think we've ever had one
+> before :-)
 
-arguably the same should be done in spapr.
+can we make compilation fail in case VMSTATE_STRUCT is used but
+is not actually provided like it was in this case?
 
-> ---
->  hw/arm/virt.c            |    9 +--------
->  hw/i386/pc.c             |    8 +-------
->  hw/mem/pc-dimm.c         |    2 +-
->  hw/ppc/spapr.c           |    5 +----
->  include/hw/mem/pc-dimm.h |    2 +-
->  5 files changed, 5 insertions(+), 21 deletions(-)
 > 
-> diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-> index e465a988d683..27dbeb549ef1 100644
-> --- a/hw/arm/virt.c
-> +++ b/hw/arm/virt.c
-> @@ -2261,12 +2261,8 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
->      MachineState *ms = MACHINE(hotplug_dev);
->      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
-> -    Error *local_err = NULL;
->  
-> -    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms));
->  
->      if (is_nvdimm) {
->          nvdimm_plug(ms->nvdimms_state);
-> @@ -2274,9 +2270,6 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
->  
->      hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
->                           dev, &error_abort);
-> -
-> -out:
-> -    error_propagate(errp, local_err);
->  }
->  
->  static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
-> diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-> index e87be5d29a01..38b1be78e707 100644
-> --- a/hw/i386/pc.c
-> +++ b/hw/i386/pc.c
-> @@ -1265,24 +1265,18 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  static void pc_memory_plug(HotplugHandler *hotplug_dev,
->                             DeviceState *dev, Error **errp)
->  {
-> -    Error *local_err = NULL;
->      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
->      X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
->      MachineState *ms = MACHINE(hotplug_dev);
->      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
->  
-> -    pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> +    pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms));
->  
->      if (is_nvdimm) {
->          nvdimm_plug(ms->nvdimms_state);
->      }
->  
->      hotplug_handler_plug(x86ms->acpi_dev, dev, &error_abort);
-> -out:
-> -    error_propagate(errp, local_err);
->  }
->  
->  static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
-> diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
-> index c30351070bb8..2ffc986734df 100644
-> --- a/hw/mem/pc-dimm.c
-> +++ b/hw/mem/pc-dimm.c
-> @@ -64,7 +64,7 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
->                             errp);
->  }
->  
-> -void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp)
-> +void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine)
->  {
->      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
->      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
-> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ee716a12af73..4edd31b86915 100644
-> --- a/hw/ppc/spapr.c
-> +++ b/hw/ppc/spapr.c
-> @@ -3438,10 +3438,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
->  
->      size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
->  
-> -    pc_dimm_plug(dimm, MACHINE(ms), &local_err);
-> -    if (local_err) {
-> -        goto out;
-> -    }
-> +    pc_dimm_plug(dimm, MACHINE(ms));
->  
->      if (!is_nvdimm) {
->          addr = object_property_get_uint(OBJECT(dimm),
-> diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
-> index aec9527fdd96..3d3db82641f8 100644
-> --- a/include/hw/mem/pc-dimm.h
-> +++ b/include/hw/mem/pc-dimm.h
-> @@ -72,6 +72,6 @@ struct PCDIMMDeviceClass {
->  
->  void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
->                        const uint64_t *legacy_align, Error **errp);
-> -void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp);
-> +void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine);
->  void pc_dimm_unplug(PCDIMMDevice *dimm, MachineState *machine);
->  #endif
+> Dave
 > 
-> 
-> 
+> > >          VMSTATE_END_OF_LIST()
+> > >      }
+> > >  };  
+> >   
 
 
