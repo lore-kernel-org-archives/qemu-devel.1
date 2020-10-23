@@ -8,68 +8,66 @@ X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 32709C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:23:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B6EC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:27:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A2CF420936
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A95320936
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:27:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z3sWi/F/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2CF420936
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dFNbgHIk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A95320936
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37406 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42332 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVrQY-0004g4-Eu
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:23:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33640)
+	id 1kVrUS-0006pW-9i
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:27:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:34722)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrPN-0003fz-Hw
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:22:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55120)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrTs-0006Pv-Sm
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:27:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25435)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrPM-0007jt-1U
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:22:41 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrTr-0001CE-Cv
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:27:20 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603437759;
+ s=mimecast20190719; t=1603438038;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bqxGWt5JpkV51hj7LizaiGC/AD8//soKK+6czc8BQ9M=;
- b=Z3sWi/F/PNwmzYsZ3AqZMc/6eWMOYe4gkGQJna6Pi5HwGthA8lfnkpNrbh2tS251xf4yvi
- IeWtgs/aX0HJ5PdoznozrTIGwbc4wo+plKzr3Vk7hWDI8tiLZy0f0pzokweXLocAMQahfJ
- fRLNPlyBk8gfR0PW5IXKdYes+agDMNk=
+ bh=HDCNW4O3z9IXJVZznxtLrBfYABeKDQkFX3n7P36RL9c=;
+ b=dFNbgHIkr865+vPcTiuiyLSfXQmJhHkc10APwcTYnLC5oLg65DCZo9vRu+Vr3qIfunv2Gg
+ uY7x8GT4d1ng7hd8apVnvGPr+gyy0YJ4E+z36a5HHgDRNrvoGtXzqolr+diucn2RwMIhwR
+ BmfLd4DLl/ULjFkvSywsnzJa43YAQcA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-127-xkoTt1DgMFuKQiX7i5RwwA-1; Fri, 23 Oct 2020 03:22:37 -0400
-X-MC-Unique: xkoTt1DgMFuKQiX7i5RwwA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-73-eu80FjMQOJyQRNYNTlh51w-1; Fri, 23 Oct 2020 03:27:16 -0400
+X-MC-Unique: eu80FjMQOJyQRNYNTlh51w-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E060B5F9CA;
- Fri, 23 Oct 2020 07:22:35 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 73B7E1074640;
+ Fri, 23 Oct 2020 07:27:15 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-123.ams2.redhat.com [10.36.112.123])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3E64D6EF57;
- Fri, 23 Oct 2020 07:22:33 +0000 (UTC)
-Subject: Re: [PATCH RESEND v2 4/7] elf2dmp/pdb: Plug memleak in
- pdb_init_from_file
-To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
- qemu-trivial@nongnu.org
-References: <20201023061218.2080844-1-kuhn.chenqun@huawei.com>
- <20201023061218.2080844-5-kuhn.chenqun@huawei.com>
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CED111C922;
+ Fri, 23 Oct 2020 07:27:14 +0000 (UTC)
+Subject: Re: [PATCH 1/2] target/m68k: remove useless qregs array
+To: Laurent Vivier <laurent@vivier.eu>, qemu-devel@nongnu.org
+References: <20201022203000.1922749-1-laurent@vivier.eu>
+ <20201022203000.1922749-2-laurent@vivier.eu>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <39298804-80b0-31da-fe76-5ef192a68701@redhat.com>
-Date: Fri, 23 Oct 2020 09:22:32 +0200
+Message-ID: <ae05940f-51d3-e7e0-00f1-0377f31a9dc7@redhat.com>
+Date: Fri, 23 Oct 2020 09:27:13 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201023061218.2080844-5-kuhn.chenqun@huawei.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201022203000.1922749-2-laurent@vivier.eu>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -101,42 +99,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, zhang.zhanghailiang@huawei.com,
- Viktor Prutyanov <viktor.prutyanov@phystech.edu>, Li Qiang <liq3ea@gmail.com>,
- pannengyuan@huawei.com, ganqixin@huawei.com,
- Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/10/2020 08.12, Chen Qun wrote:
-> From: Pan Nengyuan <pannengyuan@huawei.com>
+On 22/10/2020 22.29, Laurent Vivier wrote:
+> They are unused since the target has been converted to TCG.
 > 
-> Missing g_error_free in pdb_init_from_file() error path. Fix that.
-> 
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
-> Reviewed-by: Viktor Prutyanov <viktor.prutyanov@phystech.edu>
-> Reviewed-by: Li Qiang <liq3ea@gmail.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> Fixes: e1f3808e03f7 ("Convert m68k target to TCG.")
+> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 > ---
->  contrib/elf2dmp/pdb.c | 1 +
->  1 file changed, 1 insertion(+)
+>  target/m68k/cpu.h | 4 ----
+>  1 file changed, 4 deletions(-)
 > 
-> diff --git a/contrib/elf2dmp/pdb.c b/contrib/elf2dmp/pdb.c
-> index a5bd40c99d..b3a6547068 100644
-> --- a/contrib/elf2dmp/pdb.c
-> +++ b/contrib/elf2dmp/pdb.c
-> @@ -285,6 +285,7 @@ int pdb_init_from_file(const char *name, struct pdb_reader *reader)
->      reader->gmf = g_mapped_file_new(name, TRUE, &gerr);
->      if (gerr) {
->          eprintf("Failed to map PDB file \'%s\'\n", name);
-> +        g_error_free(gerr);
->          return 1;
->      }
+> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+> index 521ac67cdd04..9a6f0400fcfe 100644
+> --- a/target/m68k/cpu.h
+> +++ b/target/m68k/cpu.h
+> @@ -33,8 +33,6 @@
+>  #define OS_PACKED   6
+>  #define OS_UNSIZED  7
 >  
-> 
+> -#define MAX_QREGS 32
+> -
+>  #define EXCP_ACCESS         2   /* Access (MMU) error.  */
+>  #define EXCP_ADDRESS        3   /* Address error.  */
+>  #define EXCP_ILLEGAL        4   /* Illegal instruction.  */
+> @@ -139,8 +137,6 @@ typedef struct CPUM68KState {
+>      int pending_vector;
+>      int pending_level;
+>  
+> -    uint32_t qregs[MAX_QREGS];
+> -
+>      /* Fields up to this point are cleared by a CPU reset */
+>      struct {} end_reset_fields;
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+There are still some references to the term qreg in translate.c:
+
+target/m68k/translate.c:#include "qregs.def"
+target/m68k/translate.c:#include "qregs.def"
+target/m68k/translate.c:/* Generate a jump to the address in qreg DEST.  */
+
+Should these get renamed?
+
+ Thomas
 
 
