@@ -7,79 +7,80 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13096C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4CCBC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:09:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 678C32168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:08:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 345AD2168B
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:09:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HLLNxssj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 678C32168B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="dYgJBg9A"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 345AD2168B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56628 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33508 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzbq-00089I-59
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:08:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60408)
+	id 1kVzdR-0001tA-1v
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:09:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60506)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVyyz-0004Kl-3H
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:27:58 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26169)
+ id 1kVyzH-0004RB-62
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:15 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26170)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVyyv-0001Y4-Bq
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:27:56 -0400
+ id 1kVyzD-0001YB-43
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603466873; x=1635002873;
+ t=1603466890; x=1635002890;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=cHLv6Xa/Mv6eHkYaJhgq25XI2qqlc+Or3T2F3M6qC9c=;
- b=HLLNxssjxeTDBPqNOWWhulH7BhNOi7abuK3/4LVExDdPQh8GpRDEY0to
- Gz7turfQsN9U9jHVNHUrzZlT8AxKLjwVyheHNMgBXZ7B4J6SuWWHb8gWO
- u5JkG+iwnepf3DZ1KICp5O1SVNBh+GCHQYTwsbNtYQJEOPQxg2yz0mZMa
- J0LcQrwWw8tkee5DhzLWfK+RCD/jrInSIuo7i/tYhxqg+SReWmofwt5cV
- ilfzbE43HCZsNI9F/RlUrzsVLrYr+2lYdpSrpFuy4UeHEbFHSdkr6Voqg
- sae10O6EN219259NvfNJit938TU3P/uh1qfb7xfKm4FQIiswB7zsBpxe1 A==;
-IronPort-SDR: hlf1f3EYlArM6YNBdkFhdY2wKQ0c4ZSgV0SAcBnDUlxNavbiHHBlrQKJT/umx3ilBlssbeAdrC
- hsHGHud1dZZrIl5vEWHCKG7x8eqXQITUX4odetFEm080l8Vn+GFYB+XT4ZQ8r2r4dqjR0WfiPl
- i9JNPT2iyciYWcrRWe4Nh3rv+Ct1Jfzt/1C2eVfsE4jYBWCwnCrOY/4K2jMFMIFbY3m+VSZcM2
- 6n+G14J9jjtFCg6KWVauM7TeEoJrsHfhNCKVtlWU83cYOXEC6Xdm/QuHmMaT/QL0wyBrnFh1bb
- dwA=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="150652323"
+ bh=JRKNZm3JZXoXP8vrq/yexaKtcj6lWAF7ME1cCL7Nrn8=;
+ b=dYgJBg9AA8s6emz9tyPzLRSxEH8eLJFfT577Quvn/UVTUM6bLwWHNMuf
+ aaNjS1vhQvA6ybHD+Kd5t313DIiR0s6slUzPkQnS2tEyIiJx25Erlh0ft
+ a44HdlssyhtWAm0wrDmfGMui8YOC/nQnSlV1FbHvyvALUuv0poo8hcvqP
+ sjKa6IgnTM2Cl6D3dhjUdEgTPUK5cPon5+SIrDtXoHRB2mOMdRdz5Ske4
+ 0SMvMyv2q1p7z5/V17KHUqbsujO6NccbiTggTGdoQscvvUCpdEIVZIzBI
+ lk9f4VnDaHGWXwb9eHkrqQvMEe24B9ZCgSrLZ4KCdZTddwBHBOSzP1erP Q==;
+IronPort-SDR: UHO4yr4YXC0c6a2vlnNXYg2kSgvjyRmD14Ql/oTaxi9NLELTqhBtfZULZ2Ua7SHubay86U0WaP
+ J+7jruDt49TNu0VGSi3AbU793uxmE52TL1X53z2UmLOUjZwTP1pFBlN0YJ5g+cn3V+J0jBz70+
+ uCQ4wM8NI7jt3zEywlQ//mwRV8RwCoJJC7dm8XwC5zAh4JyNOjppKXR/n/omYUeMgxWylYwVlP
+ 8eHL/bkvtnxO1w/l7jV8+RFYZAy5t2W6eyVqQBD7Z7aGaTWMmSBPqrVrgtIzasDwLQC7czpe6w
+ jFQ=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="150652329"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:27:44 +0800
-IronPort-SDR: 6/Jc7hSM2D06k3QU+/2tNVxZgo//lt7sUWuFJy17QzrO5seRcGhZV5fwjCBvoMBCN++SCNruGD
- usr2s3R4MFusfvmh6G6j3yFdLwvq0tYdNVsqNzX9wcMHlcTjKiYWJMv8NukhZQND8l5NljtaiJ
- AE9puQw+yQST5LGZ4M4FYCBCDcVL4LbRo48jfKGmHrOYK0blB/TLaoko4mHnnCMvPxO+8WBiLY
- sO+uiDZKduVUAePZf1rxFDyxGCoPFG856SbQbfmDfLOHe/fM+OSiIaFT/gbazgFvdFaeRVt78J
- 9K+NHhjAaPFBy/PU5UW2857X
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:27:45 +0800
+IronPort-SDR: vGyKT9c4tbCtfyWRh+BZ/cljWnU4xDzo6TCw/goddCkZvWR8NB7RKaMy30zZFM3PwhHes4RkUw
+ DQurKe3nn4SzrBfHdoBnkzM6lB091cXq23bKR0wsrCKeYERkmmHBH7HxfIIlQ6BfH1GVf2URk0
+ v74oIMX6oAoPGkUp32Tp4Sa6+kiwKNDo0+C2POJg8iPizXuBtvQ4MwnfCJe/RKieV6ScbcY2x/
+ O9DS1HMXlG++Li/xvOfvghHz+3Ehy/ffMORZICgSsaw6xifcC8AM2Mbh7ycf8u6dWjHn6mE8kx
+ M13oVK2vxW2RHXEf72wkRmuq
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:12:59 -0700
-IronPort-SDR: A7XZXZVrV5KsdZGuYjVAiBL0D+/f2Yd4FNfc3DGOWzxUfUoqmjJO+kk501Fwv9brjl3tkzN1u4
- 6qfA1UZyIhRxhlq/smgtrwQI6GRgS2/37L3XlAPCB5fB0zxQ3ByuR42XpkIGzV00A2fgLGSD7E
- /C70T7uz9m2PQp6ioN3Mz/5YaZUbNB5UsdPF4JDC6qIRduA6TmUY0gOKYyhon6j3H9GVlkVsXI
- Zb+impGNCSeIfqI554piNhi90qDs3G53StYJcpxNYtH/FCyY4qXG4q1zzokUUogSzCP8n0f1zi
- 278=
+ 23 Oct 2020 08:13:00 -0700
+IronPort-SDR: +eIxOTGSppOm9GoWaP874wtpFYoRqx2VvVPHjweMCQ+WLg6aXXseVMloL4vglqUQfP2bbbzE3X
+ gBRZN3+FgFOKaQDMrnJvOh2QAyt8z5DkIfndwloOE4kmJbIcirel1JqAn8zmw/nrbIMuIu48Q2
+ UOsL1+DckO4p2LZmUNcKVlxAJcpq2AGaa+ViiL91/dnX9kV+YyrKiOj2A7+3bX1bsNvNnCXqUj
+ t3gfjVk+mFXu8ngCKmdprWK53L4vPzXFrvfon5QC+6Ouus9XjHBShlZUjZ1K2+zNLaMC9itn3b
+ MZg=
 WDCIronportException: Internal
 Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:27:44 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:27:45 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	peter.maydell@linaro.org
-Subject: [PULL 07/12] hw/riscv: Return the end address of the loaded firmware
-Date: Fri, 23 Oct 2020 08:16:14 -0700
-Message-Id: <20201023151619.3175155-8-alistair.francis@wdc.com>
+Subject: [PULL 11/12] hw/misc/sifive_u_otp: Add write function and write-once
+ protection
+Date: Fri, 23 Oct 2020 08:16:18 -0700
+Message-Id: <20201023151619.3175155-12-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201023151619.3175155-1-alistair.francis@wdc.com>
 References: <20201023151619.3175155-1-alistair.francis@wdc.com>
@@ -109,112 +110,105 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>, alistair23@gmail.com,
- Palmer Dabbelt <palmerdabbelt@google.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
+ Alistair Francis <alistair.francis@wdc.com>, Green Wan <green.wan@sifive.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Instead of returning the unused entry address from riscv_load_firmware()
-instead return the end address. Also return the end address from
-riscv_find_and_load_firmware().
+From: Green Wan <green.wan@sifive.com>
 
-This tells the caller if a firmware was loaded and how big it is. This
-can be used to determine the load address of the next image (usually the
-kernel).
+ - Add write operation to update fuse data bit when PWE bit is on.
+ - Add array, fuse_wo, to store the 'written' status for all bits
+   of OTP to block the write operation.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
-Reviewed-by: Palmer Dabbelt <palmerdabbelt@google.com>
+Signed-off-by: Green Wan <green.wan@sifive.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Reviewed-by: Bin Meng <bin.meng@windriver.com>
 Tested-by: Bin Meng <bin.meng@windriver.com>
-Message-id: 558cf67162342d65a23262248b040563716628b2.1602634524.git.alistair.francis@wdc.com
+Message-id: 20201020033732.12921-2-green.wan@sifive.com
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- include/hw/riscv/boot.h |  8 ++++----
- hw/riscv/boot.c         | 28 +++++++++++++++++-----------
- 2 files changed, 21 insertions(+), 15 deletions(-)
+ include/hw/misc/sifive_u_otp.h |  3 +++
+ hw/misc/sifive_u_otp.c         | 30 +++++++++++++++++++++++++++++-
+ 2 files changed, 32 insertions(+), 1 deletion(-)
 
-diff --git a/include/hw/riscv/boot.h b/include/hw/riscv/boot.h
-index 451338780a..0acbd8aa6e 100644
---- a/include/hw/riscv/boot.h
-+++ b/include/hw/riscv/boot.h
-@@ -23,10 +23,10 @@
- #include "exec/cpu-defs.h"
- #include "hw/loader.h"
+diff --git a/include/hw/misc/sifive_u_otp.h b/include/hw/misc/sifive_u_otp.h
+index 82c9176c8f..ebffbc1fa5 100644
+--- a/include/hw/misc/sifive_u_otp.h
++++ b/include/hw/misc/sifive_u_otp.h
+@@ -36,6 +36,8 @@
+ #define SIFIVE_U_OTP_PTRIM      0x34
+ #define SIFIVE_U_OTP_PWE        0x38
  
--void riscv_find_and_load_firmware(MachineState *machine,
--                                  const char *default_machine_firmware,
--                                  hwaddr firmware_load_addr,
--                                  symbol_fn_t sym_cb);
-+target_ulong riscv_find_and_load_firmware(MachineState *machine,
-+                                          const char *default_machine_firmware,
-+                                          hwaddr firmware_load_addr,
-+                                          symbol_fn_t sym_cb);
- char *riscv_find_firmware(const char *firmware_filename);
- target_ulong riscv_load_firmware(const char *firmware_filename,
-                                  hwaddr firmware_load_addr,
-diff --git a/hw/riscv/boot.c b/hw/riscv/boot.c
-index 21adaae56e..fa699308a0 100644
---- a/hw/riscv/boot.c
-+++ b/hw/riscv/boot.c
-@@ -40,12 +40,13 @@
- #define fw_dynamic_info_data(__val)     cpu_to_le64(__val)
- #endif
- 
--void riscv_find_and_load_firmware(MachineState *machine,
--                                  const char *default_machine_firmware,
--                                  hwaddr firmware_load_addr,
--                                  symbol_fn_t sym_cb)
-+target_ulong riscv_find_and_load_firmware(MachineState *machine,
-+                                          const char *default_machine_firmware,
-+                                          hwaddr firmware_load_addr,
-+                                          symbol_fn_t sym_cb)
- {
-     char *firmware_filename = NULL;
-+    target_ulong firmware_end_addr = firmware_load_addr;
- 
-     if ((!machine->firmware) || (!strcmp(machine->firmware, "default"))) {
-         /*
-@@ -60,9 +61,12 @@ void riscv_find_and_load_firmware(MachineState *machine,
- 
-     if (firmware_filename) {
-         /* If not "none" load the firmware */
--        riscv_load_firmware(firmware_filename, firmware_load_addr, sym_cb);
-+        firmware_end_addr = riscv_load_firmware(firmware_filename,
-+                                                firmware_load_addr, sym_cb);
-         g_free(firmware_filename);
-     }
++#define SIFIVE_U_OTP_PWE_EN     (1 << 0)
 +
-+    return firmware_end_addr;
+ #define SIFIVE_U_OTP_PCE_EN     (1 << 0)
+ 
+ #define SIFIVE_U_OTP_PDSTB_EN   (1 << 0)
+@@ -75,6 +77,7 @@ struct SiFiveUOTPState {
+     uint32_t ptrim;
+     uint32_t pwe;
+     uint32_t fuse[SIFIVE_U_OTP_NUM_FUSES];
++    uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
+     /* config */
+     uint32_t serial;
+ };
+diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
+index c2f3c8e129..b9238d64cb 100644
+--- a/hw/misc/sifive_u_otp.c
++++ b/hw/misc/sifive_u_otp.c
+@@ -25,6 +25,14 @@
+ #include "qemu/module.h"
+ #include "hw/misc/sifive_u_otp.h"
+ 
++#define WRITTEN_BIT_ON 0x1
++
++#define SET_FUSEARRAY_BIT(map, i, off, bit)    \
++    map[i] = bit ? (map[i] | bit << off) : (map[i] & ~(0x1 << off))
++
++#define GET_FUSEARRAY_BIT(map, i, off)    \
++    ((map[i] >> off) & 0x1)
++
+ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
+ {
+     SiFiveUOTPState *s = opaque;
+@@ -123,7 +131,24 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
+         s->ptrim = val32;
+         break;
+     case SIFIVE_U_OTP_PWE:
+-        s->pwe = val32;
++        s->pwe = val32 & SIFIVE_U_OTP_PWE_EN;
++
++        /* PWE is enabled. Ignore PAS=1 (no redundancy cell) */
++        if (s->pwe && !s->pas) {
++            if (GET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio)) {
++                qemu_log_mask(LOG_GUEST_ERROR,
++                              "write once error: idx<%u>, bit<%u>\n",
++                              s->pa, s->paio);
++                break;
++            }
++
++            /* write bit data */
++            SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
++
++            /* update written bit */
++            SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
++        }
++
+         break;
+     default:
+         qemu_log_mask(LOG_GUEST_ERROR, "%s: bad write: addr=0x%" HWADDR_PRIx
+@@ -165,6 +190,9 @@ static void sifive_u_otp_reset(DeviceState *dev)
+     /* Make a valid content of serial number */
+     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
+     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
++
++    /* Initialize write-once map */
++    memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
  }
  
- char *riscv_find_firmware(const char *firmware_filename)
-@@ -91,17 +95,19 @@ target_ulong riscv_load_firmware(const char *firmware_filename,
-                                  hwaddr firmware_load_addr,
-                                  symbol_fn_t sym_cb)
- {
--    uint64_t firmware_entry;
-+    uint64_t firmware_entry, firmware_size, firmware_end;
- 
-     if (load_elf_ram_sym(firmware_filename, NULL, NULL, NULL,
--                         &firmware_entry, NULL, NULL, NULL,
-+                         &firmware_entry, NULL, &firmware_end, NULL,
-                          0, EM_RISCV, 1, 0, NULL, true, sym_cb) > 0) {
--        return firmware_entry;
-+        return firmware_end;
-     }
- 
--    if (load_image_targphys_as(firmware_filename, firmware_load_addr,
--                               ram_size, NULL) > 0) {
--        return firmware_load_addr;
-+    firmware_size = load_image_targphys_as(firmware_filename,
-+                                           firmware_load_addr, ram_size, NULL);
-+
-+    if (firmware_size > 0) {
-+        return firmware_load_addr + firmware_size;
-     }
- 
-     error_report("could not load firmware '%s'", firmware_filename);
+ static void sifive_u_otp_class_init(ObjectClass *klass, void *data)
 -- 
 2.28.0
 
