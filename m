@@ -7,80 +7,83 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D909C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:05:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84ABDC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:05:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBA642168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:05:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 024F321D47
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:05:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="OjF+RzNF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBA642168B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="HOlI6UeF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 024F321D47
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45414 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzZ5-0003Xq-Ru
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:05:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37186)
+	id 1kVzZD-0003qb-Vi
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:05:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60478)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzFZ-0002jQ-UP; Fri, 23 Oct 2020 11:45:05 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:17148)
+ id 1kVyzB-0004Ns-BL
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:11 -0400
+Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26169)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzFW-0003hs-SO; Fri, 23 Oct 2020 11:45:05 -0400
+ id 1kVyz0-0001Y4-S6
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603467902; x=1635003902;
+ t=1603466878; x=1635002878;
  h=from:to:cc:subject:date:message-id:in-reply-to:
  references:mime-version:content-transfer-encoding;
- bh=jVXGCX52Qg+Wgh+2b8CgSjw05597PjIzpeo/Pxlh5yY=;
- b=OjF+RzNFtNQz8EC2OAnWHabMqktpCHh4UX+LKXX9OzejycQDiT4JwKID
- 4HR3t3YlAPrRkovlAswElMoQ9W8si3lHpMVWeBTdKmheBpjgjpDTcf6IH
- CVmWT6qRw+sLODOHRg0d7yFRjG9ogrU/f7mmppFnePLtEMVkUcKVyZ4Ca
- 874Bwae6cC8i2PEubsJ82hz6QegV5yi/Jp3uvmhF9sRPv4LLt7LtGP/nx
- 6zyYripCy/fwaNVlfFd1mDrZNhmFWEsYFUN3/LQXWycf+Q1N1GHgRUAVb
- cIJiTLcVcpuMBFYeB+v0Kk+Hnuc8fChLUG0+CNDeYhIafJahxYiGWEsBY g==;
-IronPort-SDR: jW7EHOBKJlL/zm0VB2IGNNmDPYXplAMCjSPuVhLhbO8+YrmW6F5cZPyADMn9dO/PtS1Zed7jO9
- e4W5Fi+Iu+q5ugW0G43Eslm0PLQi45M3KnHjr2qCZ0JlUU+uLtINAMkI3/MSOGAYTn7hmrC0KO
- vYcO0C3ZeWmAvzngxQy59iM9Qs3lq85Zj+4bggX767X+Rhlh47bupu9DcDw7yPKrgWKFsSDPRZ
- UWCkqquzGzqsPDJo89pFP9hsrGdJ3W/GM/F/2HzLuxIsbaUJ9lhJY1g+2rCNmddPKgYsnxNuuD
- gCU=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="150653291"
+ bh=5LshL2NkcHA1RDGV9snQE3sw9voWmOvgUlT4WW/q4e0=;
+ b=HOlI6UeF90UAztDeBaJm/b+5NEFlGPJyllPKtPPIgyvxVM9UjRGU0Iia
+ 3fnyaTwBB0r6iKtnTWzdaDLvFk6bRPBy7e41WSop6Qscnof9AJkyTmuzP
+ H+0670s3DLeuXK5RecOdD4pwAIv1TGE4blz4e2fbNqUl6cxRcVjXzPDNs
+ 1xI/5fZPzYM6APpeq0c76sRysJxXwWbsF70P2GEZV1d4+48r9wsxACOyl
+ ZMDHsh3ZuxPHu2P5qiphnItFFq5c9q6LYHoQ8YcKWUbVJ/Q5mZAygmiaL
+ Skew3l3ksEEGIo7/DLpQ0YoDry2xtxIe30CrbDSqBnbr40ztrQ2VDpNtu w==;
+IronPort-SDR: 9GdCm0geRiWfAv7p+gTGpiPuFQSVtsnrp1++bP/FJKCLwgRvD3b9QpMx7mnZ5HpKFk4t+1f+rN
+ z0auT74gd/EnK+U/44mjjj1PZsMTWeyUderp7Bwq1+zZR8mPSQo058/pP5Z+MXlgbH2iGkZCrm
+ CrxmWTjkccBNbxTRSLYixnFS/J7bsNlwbqPnFu0UClg1smvUuxbMCudSAYOfI+5R+uPhx8kFvI
+ YkYgPswivvgyK14zKtBeytBiYf+Q85BhrGH7tulp+9bh8x7dU3mJcmSJBplOfnkZW+SGdyALRw
+ 1O4=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="150652326"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:45:01 +0800
-IronPort-SDR: 0Z//29Dfka7e6Vf+GKRw3OriJyH3eXPeIgk5ty6GV72JXbnaqDyhGAikdLYBHyXLmlKz0kLjug
- GN6SVc8rq9VczRCoKWD8t8QMwYLlq8ky47FJqyON5CPTe5hHKAPbhp4dbo0rgu3HVDVM6l1Vgb
- qo7rUzI7A0nztDRnmZM2UjuXO0yQyfW5PyuOLJKj0mHgKAj0U7xD1y9mYXnEKI6sy7cD+GC1aP
- MIUX/cmMjV9fFwxiyc+VkHb8Hzfs8UBT1HFPRdhiYl9uYRZ8iLWx9NEmvIs2+NSvznwivPejuL
- GOhEa/Gh1xKDD6FAjsDIg+6i
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:27:45 +0800
+IronPort-SDR: UxWvT9DUC+oLSgQ0HQwN8Hk2yV48mQnsDKglEm0FLF7O8/i9RYxd5SI9DqGIdazq7JTcpXwgHg
+ l3+CUtNH0Qc60B22v61EF/BPjX3n7dNmWU0SFTxA6OSctqoXXTzCC0qULR2oOvvER+GK2CPd9b
+ Z8koTpWYBrnMoZIlu3o0X/UQHR0lHi7KJGMAB2yUVpVS/E2/g20uBTrW/A59buj2K8jmBgD4i0
+ jGa+YoLBBS1VLlfzGIbukVzm7A/6mBR+udskPPO90qRDybJ/8KqCsdSVYLCoTxgeXirmMyydDH
+ Huo1hCLA1WTNNjkRyFJzmFGq
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:30:16 -0700
-IronPort-SDR: FLzR4j8FIzSH1g9RAeuRHVSquubj5GuEyGt9z3KVLcCbAM5SDONXP2REUZGepe4vH+dEyHe+OJ
- wl9v5/Oa6a5ylXoeCjWOgBYQPlME8Barvc5nd6piWrQO8/ujxvkNc580xP3qcVUBXb2Rduzgf2
- FCg9T3rgeMelHUFUIl+uFOE3kFvjUhjUk7BrvrGujP0KB6dck9Ky5fBemY0D+otoGqnxTz4/aQ
- 7PnvM8JgqHYglLjTK7BBqwYM766uX5pXDzOaSUUWHI6FUNFYdgwt2B561E1TYzM0XHtVcwBXBe
- /zY=
+ 23 Oct 2020 08:13:00 -0700
+IronPort-SDR: zc6MpyBZw7AP1W4jEM4xryJatBXrK2SrJcenL4QGN5jVnf/DRIOojpyDrBFcUYhIZxE4nxmg72
+ jRTxqG6QMZI8W3oUPPSRfb69b7Atw7RBbCQxBD9REoiDtMmHQC0hAky7KG6U9TzZmYy6VQ/L1K
+ cJwbWsLISKUz+f5zxFQtHNdGr9YQo2/Vh1HJ3P1HxeMxxfiWmmDa9EUXlhbSvZLKU0FZUH5Ybo
+ bHQ7j1qkKVrxYxYIULHq5+abLEU26WYPNJk7H5wzJJF9mbdXp3ySN6/rAQ80Xtsx6KjdVYN243
+ 82E=
 WDCIronportException: Internal
 Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:45:01 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:27:45 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 10/16] target/riscv: Specify the XLEN for CPUs
-Date: Fri, 23 Oct 2020 08:33:40 -0700
-Message-Id: <b586d3c656319962c5cd4d73bd17e6d03bdd1301.1603467169.git.alistair.francis@wdc.com>
+	peter.maydell@linaro.org
+Subject: [PULL 10/12] target/riscv: raise exception to HS-mode at
+ get_physical_address
+Date: Fri, 23 Oct 2020 08:16:17 -0700
+Message-Id: <20201023151619.3175155-11-alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603467169.git.alistair.francis@wdc.com>
-References: <cover.1603467169.git.alistair.francis@wdc.com>
+In-Reply-To: <20201023151619.3175155-1-alistair.francis@wdc.com>
+References: <20201023151619.3175155-1-alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.42;
@@ -107,89 +110,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
- alistair23@gmail.com
+Cc: alistair23@gmail.com, Alistair Francis <alistair.francis@wdc.com>,
+ Yifei Jiang <jiangyifei@huawei.com>, Yipeng Yin <yinyipeng1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Yifei Jiang <jiangyifei@huawei.com>
+
+VS-stage translation at get_physical_address needs to translate pte
+address by G-stage translation. But the G-stage translation error
+can not be distinguished from VS-stage translation error in
+riscv_cpu_tlb_fill. On migration, destination needs to rebuild pte,
+and this G-stage translation error must be handled by HS-mode. So
+introduce TRANSLATE_STAGE2_FAIL so that riscv_cpu_tlb_fill could
+distinguish and raise it to HS-mode.
+
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Message-id: 20201014101728.848-1-jiangyifei@huawei.com
+[ Change by AF:
+ - Clarify the fault_pte_addr shift
+]
 Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 ---
- target/riscv/cpu.c | 33 +++++++++++++++++++++++----------
- 1 file changed, 23 insertions(+), 10 deletions(-)
+ target/riscv/cpu.h        | 10 +++++++---
+ target/riscv/cpu_helper.c | 36 +++++++++++++++++++++++++++---------
+ 2 files changed, 34 insertions(+), 12 deletions(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index 32234d4a70..8f8c568974 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -157,22 +157,36 @@ static void riscv_base_cpu_init(Object *obj)
-     set_misa(env, 0);
- }
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index de275782e6..de4705bb57 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -82,9 +82,13 @@ enum {
  
--static void rvxx_sifive_u_cpu_init(Object *obj)
-+#ifdef TARGET_RISCV64
-+static void rv64_sifive_u_cpu_init(Object *obj)
+ #define VEXT_VERSION_0_07_1 0x00000701
+ 
+-#define TRANSLATE_PMP_FAIL 2
+-#define TRANSLATE_FAIL 1
+-#define TRANSLATE_SUCCESS 0
++enum {
++    TRANSLATE_SUCCESS,
++    TRANSLATE_FAIL,
++    TRANSLATE_PMP_FAIL,
++    TRANSLATE_G_STAGE_FAIL
++};
++
+ #define MMU_USER_IDX 3
+ 
+ #define MAX_RISCV_PMPS (16)
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index f363c1013c..4652082df1 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -316,6 +316,9 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+  * @physical: This will be set to the calculated physical address
+  * @prot: The returned protection attributes
+  * @addr: The virtual address to be translated
++ * @fault_pte_addr: If not NULL, this will be set to fault pte address
++ *                  when a error occurs on pte address translation.
++ *                  This will already be shifted to match htval.
+  * @access_type: The type of MMU access
+  * @mmu_idx: Indicates current privilege level
+  * @first_stage: Are we in first stage translation?
+@@ -324,6 +327,7 @@ void riscv_cpu_set_mode(CPURISCVState *env, target_ulong newpriv)
+  */
+ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+                                 int *prot, target_ulong addr,
++                                target_ulong *fault_pte_addr,
+                                 int access_type, int mmu_idx,
+                                 bool first_stage, bool two_stage)
  {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
--    set_misa(env, RVXLEN | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-+    set_misa(env, RV64 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-     set_priv_version(env, PRIV_VERSION_1_10_0);
- }
+@@ -447,11 +451,14 @@ restart:
  
--static void rvxx_sifive_e_cpu_init(Object *obj)
-+static void rv64_sifive_e_cpu_init(Object *obj)
- {
-     CPURISCVState *env = &RISCV_CPU(obj)->env;
--    set_misa(env, RVXLEN | RVI | RVM | RVA | RVC | RVU);
-+    set_misa(env, RV64 | RVI | RVM | RVA | RVC | RVU);
-     set_priv_version(env, PRIV_VERSION_1_10_0);
-     qdev_prop_set_bit(DEVICE(obj), "mmu", false);
- }
-+#else
-+static void rv32_sifive_u_cpu_init(Object *obj)
-+{
-+    CPURISCVState *env = &RISCV_CPU(obj)->env;
-+    set_misa(env, RV32 | RVI | RVM | RVA | RVF | RVD | RVC | RVS | RVU);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-+}
+             /* Do the second stage translation on the base PTE address. */
+             int vbase_ret = get_physical_address(env, &vbase, &vbase_prot,
+-                                                 base, MMU_DATA_LOAD,
++                                                 base, NULL, MMU_DATA_LOAD,
+                                                  mmu_idx, false, true);
  
--#if defined(TARGET_RISCV32)
-+static void rv32_sifive_e_cpu_init(Object *obj)
-+{
-+    CPURISCVState *env = &RISCV_CPU(obj)->env;
-+    set_misa(env, RV32 | RVI | RVM | RVA | RVC | RVU);
-+    set_priv_version(env, PRIV_VERSION_1_10_0);
-+    qdev_prop_set_bit(DEVICE(obj), "mmu", false);
-+}
+             if (vbase_ret != TRANSLATE_SUCCESS) {
+-                return vbase_ret;
++                if (fault_pte_addr) {
++                    *fault_pte_addr = (base + idx * ptesize) >> 2;
++                }
++                return TRANSLATE_G_STAGE_FAIL;
+             }
  
- static void rv32_ibex_cpu_init(Object *obj)
- {
-@@ -190,7 +204,6 @@ static void rv32_imafcu_nommu_cpu_init(Object *obj)
-     set_resetvec(env, DEFAULT_RSTVEC);
-     qdev_prop_set_bit(DEVICE(obj), "mmu", false);
- }
--
- #endif
+             pte_addr = vbase + idx * ptesize;
+@@ -632,13 +639,13 @@ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cs, vaddr addr)
+     int prot;
+     int mmu_idx = cpu_mmu_index(&cpu->env, false);
  
- static ObjectClass *riscv_cpu_class_by_name(const char *cpu_model)
-@@ -647,13 +660,13 @@ static const TypeInfo riscv_cpu_type_infos[] = {
- #if defined(TARGET_RISCV32)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE32,           riscv_base_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_IBEX,             rv32_ibex_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rvxx_sifive_e_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E31,       rv32_sifive_e_cpu_init),
-     DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E34,       rv32_imafcu_nommu_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rvxx_sifive_u_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U34,       rv32_sifive_u_cpu_init),
- #elif defined(TARGET_RISCV64)
-     DEFINE_CPU(TYPE_RISCV_CPU_BASE64,           riscv_base_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rvxx_sifive_e_cpu_init),
--    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rvxx_sifive_u_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_E51,       rv64_sifive_e_cpu_init),
-+    DEFINE_CPU(TYPE_RISCV_CPU_SIFIVE_U54,       rv64_sifive_u_cpu_init),
- #endif
- };
+-    if (get_physical_address(env, &phys_addr, &prot, addr, 0, mmu_idx,
++    if (get_physical_address(env, &phys_addr, &prot, addr, NULL, 0, mmu_idx,
+                              true, riscv_cpu_virt_enabled(env))) {
+         return -1;
+     }
  
+     if (riscv_cpu_virt_enabled(env)) {
+-        if (get_physical_address(env, &phys_addr, &prot, phys_addr,
++        if (get_physical_address(env, &phys_addr, &prot, phys_addr, NULL,
+                                  0, mmu_idx, false, true)) {
+             return -1;
+         }
+@@ -727,19 +734,30 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     if (riscv_cpu_virt_enabled(env) ||
+         (riscv_cpu_two_stage_lookup(env) && access_type != MMU_INST_FETCH)) {
+         /* Two stage lookup */
+-        ret = get_physical_address(env, &pa, &prot, address, access_type,
++        ret = get_physical_address(env, &pa, &prot, address,
++                                   &env->guest_phys_fault_addr, access_type,
+                                    mmu_idx, true, true);
+ 
++        /*
++         * A G-stage exception may be triggered during two state lookup.
++         * And the env->guest_phys_fault_addr has already been set in
++         * get_physical_address().
++         */
++        if (ret == TRANSLATE_G_STAGE_FAIL) {
++            first_stage_error = false;
++            access_type = MMU_DATA_LOAD;
++        }
++
+         qemu_log_mask(CPU_LOG_MMU,
+                       "%s 1st-stage address=%" VADDR_PRIx " ret %d physical "
+                       TARGET_FMT_plx " prot %d\n",
+                       __func__, address, ret, pa, prot);
+ 
+-        if (ret != TRANSLATE_FAIL) {
++        if (ret == TRANSLATE_SUCCESS) {
+             /* Second stage lookup */
+             im_address = pa;
+ 
+-            ret = get_physical_address(env, &pa, &prot2, im_address,
++            ret = get_physical_address(env, &pa, &prot2, im_address, NULL,
+                                        access_type, mmu_idx, false, true);
+ 
+             qemu_log_mask(CPU_LOG_MMU,
+@@ -768,8 +786,8 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+         }
+     } else {
+         /* Single stage lookup */
+-        ret = get_physical_address(env, &pa, &prot, address, access_type,
+-                                   mmu_idx, true, false);
++        ret = get_physical_address(env, &pa, &prot, address, NULL,
++                                   access_type, mmu_idx, true, false);
+ 
+         qemu_log_mask(CPU_LOG_MMU,
+                       "%s address=%" VADDR_PRIx " ret %d physical "
 -- 
 2.28.0
 
