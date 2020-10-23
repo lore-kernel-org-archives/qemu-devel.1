@@ -2,104 +2,90 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD24C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:41:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9A64C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:41:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CE47A21527
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1D4F21527
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:41:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9wlkKuJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE47A21527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fgxq8dN4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1D4F21527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47296 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW14K-00037X-FZ
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:41:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36932)
+	id 1kW14R-0003IN-SN
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:41:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36968)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kW12E-0001cL-1q
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:39:26 -0400
-Received: from mail-wm1-x333.google.com ([2a00:1450:4864:20::333]:36570)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kW12C-00027l-5l
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:39:25 -0400
-Received: by mail-wm1-x333.google.com with SMTP id e2so2722355wme.1
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 10:39:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=O6aqUefLW9GBb8KwKTuT3BFpgSVPbZXotiNam4qAmuQ=;
- b=N9wlkKuJOSDKlGb9kL5kE5gADNOuolwxyT7DOfS53bi5hjpcGbKdzbodNOmCt7tdIP
- vpkcdbsG+8CylJ1s8K1wEaBWJEKYa2k45yrwDUzX5b/F1VvuuN3PEUjoxDQBVE+2btvQ
- jU5yrX5muN8emwvY91r1e7zF+dmMlpkCDiJ0NJxBsNplmLXQLGcUjC2OawZMDYbyHxxd
- Lz1FfJ2u9mnwtnWmqDhT4vYzE3ESNVbvBBf0mKbqO2cd1iQutTr8N4tresRS2CDbhRt9
- E7Sag6lrlF+HKpM1UTseBy3sI9b+KBwzJyH4UDB1Hwe7opOJPMpS3G3OaR29tE/KLoI7
- OzRQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=O6aqUefLW9GBb8KwKTuT3BFpgSVPbZXotiNam4qAmuQ=;
- b=DSePYl3QB5gbLlJ4UAN8BVMGwS9N6Khs6dH8bcfiXPOjTf5wgndqN/gcZvt/QV/UG8
- aIyme1O41Ow7pNksy3k0yesgshHDaCu1M9TnF7ryzOUO4fwXQVAD2WhZFDeRMJkGgmSl
- 50PaVuKscGv6xNMI3TPVYA6TQhRgQ2zYQOMboDwykDJiZrmYb7Q7n6mrXgdP8vWdDp/Q
- nXm8tUbDkSy77cMIieFfbyIJp5/dSFqN/uwfvu7G07obG3bQUQpEx824RACH8CMG3E2Q
- WF7tT8ja025QH4XbZacWx6y8TH7HsQG5aDlBXFOYWqnd0htSDZ1t7Sns212AciVtFBbk
- 8heg==
-X-Gm-Message-State: AOAM530SSAqwybd6kj4n52Z/Jd4u9hqoh6GdkdOXpQCyhcNEcn0Gd+Xb
- 6uDpAGFA5hD1GWw08G8fRrr/c0zrBCQ=
-X-Google-Smtp-Source: ABdhPJwcxQlGBTGOoq8zUwz56z2BsuCnOO27kwbOiulbn46YM1PNJ4JtJL8buAgXt43OnzjkMYcz2g==
-X-Received: by 2002:a7b:cd8f:: with SMTP id y15mr518199wmj.9.1603474758789;
- Fri, 23 Oct 2020 10:39:18 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id 1sm4959362wre.61.2020.10.23.10.39.17
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Oct 2020 10:39:17 -0700 (PDT)
-Subject: Re: [PULL 25/33] tests/acceptance: Add a test for the N800 and N810
- arm machines
-To: Igor Mammedov <imammedo@redhat.com>
-References: <20200228163840.23585-1-peter.maydell@linaro.org>
- <20200228163840.23585-26-peter.maydell@linaro.org>
- <a049110f-b7cb-52bd-de77-6e1193b5b6de@amsat.org>
- <6ce6a790-c68e-e3ed-962e-ba6f49244315@redhat.com>
- <f02d74fb-af6e-6e04-7ce7-48ab09a20e4f@amsat.org>
- <f2f276a9-a6ad-a2f8-2fbc-f1aca5423f79@amsat.org>
- <20201023174351.31838a86@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c80350d2-3591-6541-abf3-960b69cedf7d@amsat.org>
-Date: Fri, 23 Oct 2020 19:39:16 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kW12J-0001g2-L6
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:39:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37522)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kW12G-000286-O2
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:39:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603474766;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=p5szQ9pVeUPzMu8KMWHYrzq0vMDFI59xBrpNUp4nvIM=;
+ b=Fgxq8dN4P1z4CCT5ngv7F1DMnJ7cCI9OEt6FJxZQlVMroSW2o3phjZjqOX2lkPOVVQKo5w
+ x8ix9AxiTSIlVZFdDu12HVavRyabCjKag30LQq+9bOIAGJ9KVIRbdg6u4wYQbhQuqq9PSf
+ iBeESubqUrRAE1KotAsGRLTQhgFHB/I=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-307-72gFNjkuMtGnqo9EECmpBg-1; Fri, 23 Oct 2020 13:39:18 -0400
+X-MC-Unique: 72gFNjkuMtGnqo9EECmpBg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5A23804B71;
+ Fri, 23 Oct 2020 17:39:16 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 857C35D9CC;
+ Fri, 23 Oct 2020 17:39:14 +0000 (UTC)
+Date: Fri, 23 Oct 2020 19:39:13 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v3 8/9] hw/arm/raspi: Add the Raspberry Pi Zero machine
+Message-ID: <20201023193913.3a01f99e@redhat.com>
+In-Reply-To: <af02ebea-0aeb-9e6a-5f79-95aeb10b1bb4@amsat.org>
+References: <20201018203358.1530378-1-f4bug@amsat.org>
+ <20201018203358.1530378-9-f4bug@amsat.org>
+ <20201023175130.50a379bd@redhat.com>
+ <af02ebea-0aeb-9e6a-5f79-95aeb10b1bb4@amsat.org>
 MIME-Version: 1.0
-In-Reply-To: <20201023174351.31838a86@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::333;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x333.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.108,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -112,83 +98,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
+ qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ qemu-arm@nongnu.org, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/20 5:43 PM, Igor Mammedov wrote:
-> On Mon, 19 Oct 2020 11:43:13 +0200
-> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
->>>>> FYI this test is failing:
->>>>>
->>>>> qemu-system-arm: kernel 'meego-arm-n8x0-1.0.80.20100712.1431-vml
->>>>> inuz-2.6.35~rc4-129.1-n8x0' is too large to fit in RAM (kernel size
->>>>> 1964608,
->>>>> RAM size 0)
->>>
->>> FWIW:
->>>
->>> 7998beb9c2e280f0b7424223747941f106e2e854 is the first bad commit
->>> commit 7998beb9c2e280f0b7424223747941f106e2e854
->>> Author: Igor Mammedov <imammedo@redhat.com>
->>> Date:   Wed Feb 19 11:08:59 2020 -0500
->>>
->>>       arm/nseries: use memdev for RAM
->>>
->>>       memory_region_allocate_system_memory() API is going away, so
->>>       replace it with memdev allocated MemoryRegion. The later is
->>>       initialized by generic code, so board only needs to opt in
->>>       to memdev scheme by providing
->>>         MachineClass::default_ram_id
->>>       and using MachineState::ram instead of manually initializing
->>>       RAM memory region.
->>>
->>>       PS:
->>>        while at it add check for user supplied RAM size and error
->>>        out if it mismatches board expected value.
->>>
->>>       Signed-off-by: Igor Mammedov <imammedo@redhat.com>
->>>       Reviewed-by: Andrew Jones <drjones@redhat.com>
->>>       Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
->>>       Message-Id: <20200219160953.13771-26-imammedo@redhat.com>
->>
->> This fixes the issue:
->>
->> -- >8 --
->> diff --git a/hw/arm/nseries.c b/hw/arm/nseries.c
->> index e48092ca047..76fd7fe9854 100644
->> --- a/hw/arm/nseries.c
->> +++ b/hw/arm/nseries.c
->> @@ -1318,6 +1318,7 @@ static void n8x0_init(MachineState *machine,
->>            g_free(sz);
->>            exit(EXIT_FAILURE);
->>        }
->> +    binfo->ram_size = machine->ram_size;
->>
->>        memory_region_add_subregion(get_system_memory(), OMAP2_Q2_BASE,
->>                                    machine->ram);
-> 
-> we really should replace binfo->ram_size with machine->ram_size to avoid
-> duplicating the same data, but as a quick fix this should fix issue.
+On Fri, 23 Oct 2020 19:35:19 +0200
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Hmm this is the 'ARM kernel loader' API in "arm/boot.h":
+> Hi Igor,
+>=20
+> On 10/23/20 5:51 PM, Igor Mammedov wrote:
+> > On Sun, 18 Oct 2020 22:33:57 +0200
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
+> >  =20
+> >> Similarly to the Pi A, the Pi Zero uses a BCM2835 SoC (ARMv6Z core).
+> >>
+> >> Example booting the machine using content from [*]:
+> >>
+> >>    $ qemu-system-arm -M raspi0 -serial stdio \
+> >>        -kernel raspberrypi/firmware/boot/kernel.img \
+> >>        -dtb raspberrypi/firmware/boot/bcm2708-rpi-zero.dtb \
+> >>        -append 'printk.time=3D0 earlycon=3Dpl011,0x20201000 console=3D=
+ttyAMA0'
+> >>    [    0.000000] Booting Linux on physical CPU 0x0
+> >>    [    0.000000] Linux version 4.19.118+ (dom@buildbot) (gcc version =
+4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1311 Mon Apr 27 14:1=
+6:15 BST 2020
+> >>    [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision =
+7 (ARMv7), cr=3D00c5387d
+> >>    [    0.000000] CPU: VIPT aliasing data cache, unknown instruction c=
+ache
+> >>    [    0.000000] OF: fdt: Machine model: Raspberry Pi Zero
+> >>    ...
+> >>
+> >> [*] http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firm=
+ware/raspberrypi-kernel_1.20200512-2_armhf.deb
+> >>
+> >> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+> >> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
+> >> ---
+> >>   hw/arm/raspi.c | 13 +++++++++++++
+> >>   1 file changed, 13 insertions(+)
+> >>
+> >> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> >> index 91a59d1d489..1510ca01afe 100644
+> >> --- a/hw/arm/raspi.c
+> >> +++ b/hw/arm/raspi.c
+> >> @@ -319,6 +319,15 @@ static void raspi_machine_class_common_init(Machi=
+neClass *mc,
+> >>       mc->default_ram_id =3D "ram";
+> >>   };
+> >>  =20
+> >> +static void raspi0_machine_class_init(ObjectClass *oc, void *data)
+> >> +{
+> >> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> >> +    RaspiMachineClass *rmc =3D RASPI_MACHINE_CLASS(oc);
+> >> +
+> >> +    rmc->board_rev =3D 0x900092; =20
+> >=20
+> > shouldn't it be
+> > 920092=09Zero=091.2=09512MB=09Embest
+> > or
+> > 920093  Zero=091.3=09512MB=09Embest =20
+>=20
+> I took the value from the "New-style revision codes"
+> table listed in hw/arm/raspi.c before the REV_CODE
+> register definitions:
+>=20
+> https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-c=
+odes/README.md
+>=20
+> 90009x's manufacturer is "Sony UK", 92009x is "Embest".
+> I guess we don't care much the manufacturer :)
+>=20
+> The Revision 1.3 exposed the MIPI camera interface.
+> As we don't model it, I prefer to use the 1.2 revision
+> which matches better.
+>=20
+> I'll add this information in the commit description.
 
-struct arm_boot_info {
-     uint64_t ram_size;
-     const char *kernel_filename;
-     const char *kernel_cmdline;
-     const char *initrd_filename;
-     const char *dtb_filename;
+With that
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-and:
+>=20
+> Thanks for reviewing!
+>=20
+> >  =20
+> >> +    raspi_machine_class_common_init(mc, rmc->board_rev);
+> >> +};
+> >> +
+> >>   static void raspi1ap_machine_class_init(ObjectClass *oc, void *data)
+> >>   {
+> >>       MachineClass *mc =3D MACHINE_CLASS(oc);
+> >> @@ -352,6 +361,10 @@ static void raspi3b_machine_class_init(ObjectClas=
+s *oc, void *data)
+> >>  =20
+> >>   static const TypeInfo raspi_machine_types[] =3D {
+> >>       {
+> >> +        .name           =3D MACHINE_TYPE_NAME("raspi0"),
+> >> +        .parent         =3D TYPE_RASPI_MACHINE,
+> >> +        .class_init     =3D raspi0_machine_class_init,
+> >> +    }, {
+> >>           .name           =3D MACHINE_TYPE_NAME("raspi1ap"),
+> >>           .parent         =3D TYPE_RASPI_MACHINE,
+> >>           .class_init     =3D raspi1ap_machine_class_init, =20
+> >=20
+> >  =20
+>=20
 
-   void (*write_secondary_boot)(ARMCPU *cpu,
-                                const struct arm_boot_info *info);
-   void (*secondary_cpu_reset_hook)(ARMCPU *cpu,
-                                    const struct arm_boot_info *info);
-
-Are you saying arm_boot_info should hold a pointer to MachineState*
-instead of duplicating?
 
