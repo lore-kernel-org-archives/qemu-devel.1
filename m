@@ -2,85 +2,86 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B18C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:18:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851E2C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:26:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2BB224248
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:18:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BB9F720EDD
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:26:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CECMFLxD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2BB224248
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="sEwOhzzO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9F720EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48882 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVu9F-000381-UC
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:18:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37784)
+	id 1kVuHR-0007HA-6z
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:26:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40280)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVu4O-0005oC-Gm
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:13:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:49791)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVu4H-0001e9-1S
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:13:12 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603447984;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=QXd6dJYpb/1Bwt14bYnbXhWwsGXX1sqMYzVDrAjYroc=;
- b=CECMFLxDk75WZ9EXvmNgRlkvqHKX97xKSZ74WV5eN1cumPjKyP540jA41iurZFv7rkTeo+
- zN4D8WGrxmJIvvXI1HMv1QAPbzyDKvHD5qfcpBxg9Oo6R5yW+sEmOEc6BXtxRUUXLvjXuc
- Wwj8XdrTkICMyRk7gLSx2QL+kkyG5aQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-232-d2DPz0x5Mj6k1sw5mRjWkQ-1; Fri, 23 Oct 2020 06:13:02 -0400
-X-MC-Unique: d2DPz0x5Mj6k1sw5mRjWkQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30FE2804B6E;
- Fri, 23 Oct 2020 10:13:01 +0000 (UTC)
-Received: from merkur.redhat.com (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5731E6EF41;
- Fri, 23 Oct 2020 10:12:59 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH 4/6] qapi: Optionally parse simple unions as flat
-Date: Fri, 23 Oct 2020 12:12:20 +0200
-Message-Id: <20201023101222.250147-5-kwolf@redhat.com>
-In-Reply-To: <20201023101222.250147-1-kwolf@redhat.com>
-References: <20201023101222.250147-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVuEF-0006IJ-PV
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:23:23 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11414)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kVuEB-0005NG-KI
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:23:23 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f92aee5000c>; Fri, 23 Oct 2020 03:22:29 -0700
+Received: from [10.40.101.194] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
+ 2020 10:21:16 +0000
+Subject: Re: [PATCH v27 17/17] qapi: Add VFIO devices migration stats in
+ Migration stats
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
+ <1603365127-14202-18-git-send-email-kwankhede@nvidia.com>
+ <20201022161842.30585c2e@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <4caf6f0b-b291-8e73-fa5f-5357c6f194ff@nvidia.com>
+Date: Fri, 23 Oct 2020 15:51:13 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201022161842.30585c2e@w520.home>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603448549; bh=UhsSn1ZW6BXznN01Ya2ARroLSWrt9aejEMEpApjd9Ug=;
+ h=Subject:To:CC:References:X-Nvconfidentiality:From:Message-ID:Date:
+ User-Agent:MIME-Version:In-Reply-To:Content-Type:Content-Language:
+ Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+ b=sEwOhzzO8W1ocbFbyccF5yGLfF9xMbLL0jTHJgDJSSwd/coLnEZ+9cqKa5yDa5A4Z
+ Zu2d2E5Ax70a84peZgy+f4sG/O2jpN8NQ9987stgaDKz7L3UmMRLUx16N8F5ju5OEx
+ o/o9orRXumAQio18TgEKzN5WuikQ9d1vOh6Jx6ao+T3WomDCaGqvSQ86ZvDZIwIjI+
+ kNlVs//exlsNEiSfxVFIq8sr5REyGXDGHqy7IQ/p3mRr1zvoCfBXT7uGQcQA+A0vPS
+ zKyJk09v6zrrnwfts6AWXAaZLTokGXNaUYYx63emJJH+QPtvvcdBtfH5uesjNiZDr+
+ 2zq/JVHKez2cg==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:23:18
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -71
+X-Spam_score: -7.2
+X-Spam_bar: -------
+X-Spam_report: (-7.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,252 +94,261 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This extends the Visitor interface with an option that can enable flat
-representation (without the 'data' wrapper) for simple unions. This way,
-a command line parser can enable a more user friendly syntax while QMP
-doesn't enable the option and uses the same representation as before.
 
-We need to disable flat representation for ChardevSpiceChannel, which
-has a 'type' option that conflicts with the ChardevBackend 'type'. This
-variant will get nesting even when flat parsing is enabled in the
-Visitor.
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- qapi/char.json               |  3 ++-
- docs/devel/qapi-code-gen.txt | 11 ++++++++++-
- include/qapi/visitor-impl.h  |  3 +++
- include/qapi/visitor.h       | 10 ++++++++++
- qapi/qapi-visit-core.c       | 10 ++++++++++
- scripts/qapi/expr.py         |  7 ++++++-
- scripts/qapi/schema.py       | 25 ++++++++++++++++++-------
- scripts/qapi/visit.py        | 20 ++++++++++++++------
- 8 files changed, 73 insertions(+), 16 deletions(-)
+On 10/23/2020 3:48 AM, Alex Williamson wrote:
+> On Thu, 22 Oct 2020 16:42:07 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> Added amount of bytes transferred to the VM at destination by all VFIO
+>> devices
+>>
+>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>> ---
+>>   hw/vfio/common.c            | 20 ++++++++++++++++++++
+>>   hw/vfio/migration.c         | 10 ++++++++++
+>>   include/qemu/vfio-helpers.h |  3 +++
+>>   migration/migration.c       | 14 ++++++++++++++
+>>   monitor/hmp-cmds.c          |  6 ++++++
+>>   qapi/migration.json         | 17 +++++++++++++++++
+>>   6 files changed, 70 insertions(+)
+>>
+>> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+>> index 9c879e5c0f62..8d0758eda9fa 100644
+>> --- a/hw/vfio/common.c
+>> +++ b/hw/vfio/common.c
+>> @@ -39,6 +39,7 @@
+>>   #include "trace.h"
+>>   #include "qapi/error.h"
+>>   #include "migration/migration.h"
+>> +#include "qemu/vfio-helpers.h"
+>>   
+>>   VFIOGroupList vfio_group_list =
+>>       QLIST_HEAD_INITIALIZER(vfio_group_list);
+>> @@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
+>>    * Device state interfaces
+>>    */
+>>   
+>> +bool vfio_mig_active(void)
+>> +{
+>> +    VFIOGroup *group;
+>> +    VFIODevice *vbasedev;
+>> +
+>> +    if (QLIST_EMPTY(&vfio_group_list)) {
+>> +        return false;
+>> +    }
+>> +
+>> +    QLIST_FOREACH(group, &vfio_group_list, next) {
+>> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
+>> +            if (vbasedev->migration_blocker) {
+>> +                return false;
+>> +            }
+>> +        }
+>> +    }
+>> +    return true;
+>> +}
+>> +
+>>   static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
+>>   {
+>>       VFIOGroup *group;
+>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>> index 77ee60a43ea5..b23e21c6de2b 100644
+>> --- a/hw/vfio/migration.c
+>> +++ b/hw/vfio/migration.c
+>> @@ -28,6 +28,7 @@
+>>   #include "pci.h"
+>>   #include "trace.h"
+>>   #include "hw/hw.h"
+>> +#include "qemu/vfio-helpers.h"
+>>   
+>>   /*
+>>    * Flags to be used as unique delimiters for VFIO devices in the migration
+>> @@ -45,6 +46,8 @@
+>>   #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
+>>   #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+>>   
+>> +static int64_t bytes_transferred;
+>> +
+>>   static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
+>>                                     off_t off, bool iswrite)
+>>   {
+>> @@ -255,6 +258,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
+>>           *size = data_size;
+>>       }
+>>   
+>> +    bytes_transferred += data_size;
+>>       return ret;
+>>   }
+>>   
+>> @@ -776,6 +780,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
+>>       case MIGRATION_STATUS_CANCELLING:
+>>       case MIGRATION_STATUS_CANCELLED:
+>>       case MIGRATION_STATUS_FAILED:
+>> +        bytes_transferred = 0;
+>>           ret = vfio_migration_set_state(vbasedev,
+>>                         ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
+>>                         VFIO_DEVICE_STATE_RUNNING);
+>> @@ -862,6 +867,11 @@ err:
+>>   
+>>   /* ---------------------------------------------------------------------- */
+>>   
+>> +int64_t vfio_mig_bytes_transferred(void)
+>> +{
+>> +    return bytes_transferred;
+>> +}
+>> +
+>>   int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+>>   {
+>>       VFIOContainer *container = vbasedev->group->container;
+>> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
+>> index 4491c8e1a6e9..7f7a46e6ef2d 100644
+>> --- a/include/qemu/vfio-helpers.h
+>> +++ b/include/qemu/vfio-helpers.h
+>> @@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
+>>   int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
+>>                              int irq_type, Error **errp);
+>>   
+>> +bool vfio_mig_active(void);
+>> +int64_t vfio_mig_bytes_transferred(void);
+>> +
+>>   #endif
+> 
+> 
+> I don't think vfio-helpers is the right place for this, this header is
+> specifically for using util/vfio-helpers.c.  Would
+> include/hw/vfio/vfio-common.h work?
+> 
+> 
 
-diff --git a/qapi/char.json b/qapi/char.json
-index 43486d1daa..57ec18220b 100644
---- a/qapi/char.json
-+++ b/qapi/char.json
-@@ -414,7 +414,8 @@
-             'stdio': 'ChardevStdio',
-             'console': 'ChardevCommon',
-             'spicevmc': { 'type': 'ChardevSpiceChannel',
--                          'if': 'defined(CONFIG_SPICE)' },
-+                          'if': 'defined(CONFIG_SPICE)',
-+                          'allow-flat': false },
-             'spiceport': { 'type': 'ChardevSpicePort',
-                            'if': 'defined(CONFIG_SPICE)' },
-             'vc': 'ChardevVC',
-diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
-index 9722c1a204..ee34d39a20 100644
---- a/docs/devel/qapi-code-gen.txt
-+++ b/docs/devel/qapi-code-gen.txt
-@@ -295,7 +295,9 @@ Syntax:
-               '*features': FEATURES }
-     BRANCHES = { BRANCH, ... }
-     BRANCH = STRING : TYPE-REF
--           | STRING : { 'type': TYPE-REF, '*if': COND }
-+           | STRING : { 'type': TYPE-REF,
-+                        '*if': COND,
-+                        '*allow-flat': BOOL }
- 
- Member 'union' names the union type.
- 
-@@ -334,6 +336,13 @@ values to data types like in this example:
-    'data': { 'file': 'BlockdevOptionsFile',
-              'qcow2': 'BlockdevOptionsQcow2' } }
- 
-+Simple unions can support both wrapped and flat representation of
-+branches that have a struct type, unless it is explicitly disabled in
-+the schema with 'allow-flat': false.  Branches of other types are
-+always wrapped.  Which representation is used in the generated visitor
-+C code can be configured per visitor.  Flat representation is
-+appropriate when parsing command line options.
-+
- In the Client JSON Protocol, all simple union branches have wrapped
- representation, as in these examples:
- 
-diff --git a/include/qapi/visitor-impl.h b/include/qapi/visitor-impl.h
-index 7362c043be..f628b6eb36 100644
---- a/include/qapi/visitor-impl.h
-+++ b/include/qapi/visitor-impl.h
-@@ -121,6 +121,9 @@ struct Visitor
- 
-     /* Must be set */
-     void (*free)(Visitor *v);
-+
-+    /* Set to true to make simple unions look like flat unions */
-+    bool flat_simple_unions;
- };
- 
- #endif
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index ebc19ede7f..d41be4df48 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -496,6 +496,16 @@ bool visit_is_input(Visitor *v);
-  */
- bool visit_is_dealloc(Visitor *v);
- 
-+/*
-+ * Check if simple unions should be treated as flat.
-+ */
-+bool visit_flat_simple_unions(Visitor *v);
-+
-+/*
-+ * Set if simple unions should be treated as flat.
-+ */
-+void visit_set_flat_simple_unions(Visitor *v, bool flat);
-+
- /*** Visiting built-in types ***/
- 
- /*
-diff --git a/qapi/qapi-visit-core.c b/qapi/qapi-visit-core.c
-index 7e5f40e7f0..dc6fd78b8c 100644
---- a/qapi/qapi-visit-core.c
-+++ b/qapi/qapi-visit-core.c
-@@ -145,6 +145,16 @@ bool visit_is_dealloc(Visitor *v)
-     return v->type == VISITOR_DEALLOC;
- }
- 
-+bool visit_flat_simple_unions(Visitor *v)
-+{
-+    return v->flat_simple_unions;
-+}
-+
-+void visit_set_flat_simple_unions(Visitor *v, bool flat)
-+{
-+    v->flat_simple_unions = flat;
-+}
-+
- bool visit_type_int(Visitor *v, const char *name, int64_t *obj, Error **errp)
- {
-     assert(obj);
-diff --git a/scripts/qapi/expr.py b/scripts/qapi/expr.py
-index 2fcaaa2497..a39092e4a9 100644
---- a/scripts/qapi/expr.py
-+++ b/scripts/qapi/expr.py
-@@ -248,7 +248,12 @@ def check_union(expr, info):
-     for (key, value) in members.items():
-         source = "'data' member '%s'" % key
-         check_name_str(key, info, source)
--        check_keys(value, info, source, ['type'], ['if'])
-+        check_keys(value, info, source, ['type'], ['if', 'allow-flat'])
-+        if 'allow-flat' in value:
-+            if discriminator is not None:
-+                raise QAPISemError(info, "'allow-flat' requires simple union")
-+            if not isinstance(value['allow-flat'], bool):
-+                raise QAPISemError(info, "'allow-flat' must be a boolean")
-         check_if(value, info, source)
-         check_type(value['type'], info, source, allow_array=not base)
- 
-diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
-index 17525b4216..981d0d659f 100644
---- a/scripts/qapi/schema.py
-+++ b/scripts/qapi/schema.py
-@@ -721,9 +721,9 @@ class QAPISchemaVariant(QAPISchemaObjectTypeMember):
-         self.wrapped = bool(wrapper_type)
-         self.wrapper_type = wrapper_type
- 
--        # For now, unions are either flat or wrapped, never both
-+        # Unions that are both flat and wrapped can look like either one,
-+        # depending on Visitor.flat_simple_unions
-         assert self.flat or self.wrapped
--        assert not (self.flat and self.wrapped)
- 
-     def check(self, schema):
-         super().check(schema)
-@@ -1038,7 +1038,7 @@ class QAPISchema:
-     def _make_variant(self, case, typ, ifcond, info):
-         return QAPISchemaVariant(case, info, typ, ifcond)
- 
--    def _make_simple_variant(self, union_name, case, typ, ifcond, info):
-+    def _make_simple_variant(self, union_name, case, typ, ifcond, flat, info):
-         if isinstance(typ, list):
-             assert len(typ) == 1
-             typ = self._make_array_type(typ[0], info)
-@@ -1049,7 +1049,14 @@ class QAPISchema:
-         wrapper_member = self._make_member('data', typ, None, None, info)
-         wrapper_type = QAPISchemaObjectType(wrapper_name, info, None, ifcond,
-                                             None, None, [wrapper_member], None)
--        return QAPISchemaVariant(case, info, typ, ifcond, flat=False,
-+
-+        # Default to allowing flat representation for object types.
-+        # Other types require a wrapper, so disable flat for them by default.
-+        if flat is None:
-+            variant_type = self.resolve_type(typ, info, 'variant type')
-+            flat = isinstance(variant_type, QAPISchemaObjectType)
-+
-+        return QAPISchemaVariant(case, info, typ, ifcond, flat=flat,
-                                  wrapper_type=wrapper_type)
- 
-     def _def_union_type(self, expr, info, doc):
-@@ -1070,9 +1077,13 @@ class QAPISchema:
-                         for (key, value) in data.items()]
-             members = []
-         else:
--            variants = [self._make_simple_variant(name, key, value['type'],
--                                                  value.get('if'), info)
--                        for (key, value) in data.items()]
-+            variants = [
-+                self._make_simple_variant(name, key, value['type'],
-+                                          value.get('if'),
-+                                          value.get('allow-flat'),
-+                                          info)
-+                for (key, value) in data.items()
-+            ]
-             enum = [{'name': v.name, 'if': v.ifcond} for v in variants]
-             typ = self._make_implicit_enum_type(name, info, ifcond, enum)
-             tag_member = QAPISchemaObjectTypeMember('type', info, typ, False)
-diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
-index f72567cbcc..9d05d6bd08 100644
---- a/scripts/qapi/visit.py
-+++ b/scripts/qapi/visit.py
-@@ -127,23 +127,31 @@ bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
-                              case=case_str,
-                              c_type=var.type.c_name(), c_name=c_name(var.name))
-             elif var.wrapped:
-+                if var.flat:
-+                    cond = "!visit_flat_simple_unions(v)"
-+                else:
-+                    cond = "true"
-                 ret += mcgen('''
-     case %(case)s:
-     {
-         bool ok;
- 
--        if (!visit_start_struct(v, "data", NULL, 0, errp)) {
--            return false;
-+        if (%(cond)s) {
-+            if (!visit_start_struct(v, "data", NULL, 0, errp)) {
-+                return false;
-+            }
-         }
-         ok = visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, errp);
--        if (ok) {
--            ok = visit_check_struct(v, errp);
-+        if (%(cond)s) {
-+            if (ok) {
-+                ok = visit_check_struct(v, errp);
-+            }
-+            visit_end_struct(v, NULL);
-         }
--        visit_end_struct(v, NULL);
-         return ok;
-     }
- ''',
--                             case=case_str,
-+                             case=case_str, cond=cond,
-                              c_type=var.type.c_name(), c_name=c_name(var.name))
- 
-             else:
--- 
-2.28.0
+Yes, works with CONFIG_VFIO check. Changing it.
 
+>> diff --git a/migration/migration.c b/migration/migration.c
+>> index 0575ecb37953..8b2865d25ef4 100644
+>> --- a/migration/migration.c
+>> +++ b/migration/migration.c
+>> @@ -56,6 +56,7 @@
+>>   #include "net/announce.h"
+>>   #include "qemu/queue.h"
+>>   #include "multifd.h"
+>> +#include "qemu/vfio-helpers.h"
+>>   
+>>   #define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
+>>   
+>> @@ -1002,6 +1003,17 @@ static void populate_disk_info(MigrationInfo *info)
+>>       }
+>>   }
+>>   
+>> +static void populate_vfio_info(MigrationInfo *info)
+>> +{
+>> +#ifdef CONFIG_LINUX
+> 
+> Use CONFIG_VFIO?  I get a build failure on qemu-system-avr
+> 
+> /usr/bin/ld: /tmp/tmp.3QbqxgbENl/build/../migration/migration.c:1012:
+> undefined reference to `vfio_mig_bytes_transferred'.  Thanks,
+> 
+
+Ok Changing it.
+
+> Alex
+> 
+>> +    if (vfio_mig_active()) {
+>> +        info->has_vfio = true;
+>> +        info->vfio = g_malloc0(sizeof(*info->vfio));
+>> +        info->vfio->transferred = vfio_mig_bytes_transferred();
+>> +    }
+>> +#endif
+>> +}
+>> +
+>>   static void fill_source_migration_info(MigrationInfo *info)
+>>   {
+>>       MigrationState *s = migrate_get_current();
+>> @@ -1026,6 +1038,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+>>           populate_time_info(info, s);
+>>           populate_ram_info(info, s);
+>>           populate_disk_info(info);
+>> +        populate_vfio_info(info);
+>>           break;
+>>       case MIGRATION_STATUS_COLO:
+>>           info->has_status = true;
+>> @@ -1034,6 +1047,7 @@ static void fill_source_migration_info(MigrationInfo *info)
+>>       case MIGRATION_STATUS_COMPLETED:
+>>           populate_time_info(info, s);
+>>           populate_ram_info(info, s);
+>> +        populate_vfio_info(info);
+>>           break;
+>>       case MIGRATION_STATUS_FAILED:
+>>           info->has_status = true;
+>> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+>> index 9789f4277f50..56e9bad33d94 100644
+>> --- a/monitor/hmp-cmds.c
+>> +++ b/monitor/hmp-cmds.c
+>> @@ -357,6 +357,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+>>           }
+>>           monitor_printf(mon, "]\n");
+>>       }
+>> +
+>> +    if (info->has_vfio) {
+>> +        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
+>> +                       info->vfio->transferred >> 10);
+>> +    }
+>> +
+>>       qapi_free_MigrationInfo(info);
+>>   }
+>>   
+>> diff --git a/qapi/migration.json b/qapi/migration.json
+>> index a5da513c9e05..3c7582052725 100644
+>> --- a/qapi/migration.json
+>> +++ b/qapi/migration.json
+>> @@ -147,6 +147,18 @@
+>>               'active', 'postcopy-active', 'postcopy-paused',
+>>               'postcopy-recover', 'completed', 'failed', 'colo',
+>>               'pre-switchover', 'device', 'wait-unplug' ] }
+>> +##
+>> +# @VfioStats:
+>> +#
+>> +# Detailed VFIO devices migration statistics
+>> +#
+>> +# @transferred: amount of bytes transferred to the target VM by VFIO devices
+>> +#
+>> +# Since: 5.2
+>> +#
+>> +##
+>> +{ 'struct': 'VfioStats',
+>> +  'data': {'transferred': 'int' } }
+>>   
+>>   ##
+>>   # @MigrationInfo:
+>> @@ -208,11 +220,16 @@
+>>   #
+>>   # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
+>>   #
+>> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
+>> +#        only returned if VFIO device is present, migration is supported by all
+>> +#        VFIO devices and status is 'active' or 'completed' (since 5.2)
+>> +#
+>>   # Since: 0.14.0
+>>   ##
+>>   { 'struct': 'MigrationInfo',
+>>     'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
+>>              '*disk': 'MigrationStats',
+>> +           '*vfio': 'VfioStats',
+>>              '*xbzrle-cache': 'XBZRLECacheStats',
+>>              '*total-time': 'int',
+>>              '*expected-downtime': 'int',
+> 
 
