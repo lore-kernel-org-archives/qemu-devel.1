@@ -2,64 +2,64 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D6D4C55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:38:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C82AC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:41:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 00F9020882
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:38:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6068E20882
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:41:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GMlHco+u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00F9020882
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XHVtCNdl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6068E20882
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52504 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW1xY-0002iB-Tn
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 14:38:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50336)
+	id 1kW1zq-0005fs-8y
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 14:41:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1w2-0000sm-2e
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21788)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1w5-0000vD-4b
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:61000)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1vy-0001VH-OS
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:05 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1w3-0001Vr-0F
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603478222;
+ s=mimecast20190719; t=1603478225;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=H+iYBdrcmuhMEl6dRyZK6e93kq9OOvIMvThuPJhzwRI=;
- b=GMlHco+u+SzQ/LpzIXTHN7yQ9OPSt8JZTEz3xHoM2GgWzF222CmXoD0XEpACTYJtm+3U00
- BzwBgYQzLO8pdATV4HaGKZWJ0KhVujwEbUDBmGrytpbwRBdhYX3Y4sGnH9TaIarjryyM1K
- kpFstb5NgseD4Vc48SaCvUrzzaOFWcE=
+ bh=0MiwuAkKEc3FV5+c3ylhbIiHZ/wkTuAFB6ReDkHrQwU=;
+ b=XHVtCNdl0MqbEcdTHXz9C0exc/emTnHKvWubtLoW69u5pnb+v/bNlhpddZTGAS5lVrHAJN
+ Qv/ik3Zu6Ywcj0On1/7u63L+0uOPjWaqVndxJ398EQRileTZTdpVO/lLd05QVb3WOuz7Mo
+ LGh2effcmbnZIsuDNyaXTTEcKkS5jSo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-13-xs528pwvMZO8Ieav4duWDQ-1; Fri, 23 Oct 2020 14:37:00 -0400
-X-MC-Unique: xs528pwvMZO8Ieav4duWDQ-1
+ us-mta-212-sGYTtUpnPDa91tRFpUMM7w-1; Fri, 23 Oct 2020 14:37:04 -0400
+X-MC-Unique: sGYTtUpnPDa91tRFpUMM7w-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02E3487953A;
- Fri, 23 Oct 2020 18:36:59 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E58785F9E1;
+ Fri, 23 Oct 2020 18:37:02 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-7.phx2.redhat.com [10.3.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A9B860BFA;
- Fri, 23 Oct 2020 18:36:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2B6CC60BFA;
+ Fri, 23 Oct 2020 18:36:59 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 01/12] qapi: Move GenericList to qapi/util.h
-Date: Fri, 23 Oct 2020 13:36:41 -0500
-Message-Id: <20201023183652.478921-2-eblake@redhat.com>
+Subject: [PATCH v5 02/12] qapi: Make QAPI_LIST_ADD() public
+Date: Fri, 23 Oct 2020 13:36:42 -0500
+Message-Id: <20201023183652.478921-3-eblake@redhat.com>
 In-Reply-To: <20201023183652.478921-1-eblake@redhat.com>
 References: <20201023183652.478921-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -70,16 +70,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,76 +95,85 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: kwolf@redhat.com, vsementsov@virtuozzo.com,
  Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
- Markus Armbruster <armbru@redhat.com>, rjones@redhat.com, stefanha@redhat.com
+ Markus Armbruster <armbru@redhat.com>, rjones@redhat.com,
+ Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Placing GenericList in util.h will make it easier for the next patch
-to promote QAPI_LIST_ADD() into a public macro without requiring more
-files to include the unrelated visitor.h.
+We have a useful macro for inserting at the front of any
+QAPI-generated list; move it from block.c to qapi/util.h so more
+places can use it, including one earlier place in block.c.
 
-However, we can't also move GenericAlternate; this is because it would
-introduce a circular dependency: qapi-builtin-types.h needs a complete
-definition of QEnumLookup (so it includes qapi/util.h), and
-GenericAlternate needs a complete definition of QType (declared in
-qapi-builtin-types.h).  Leaving GenericAlternate in visitor.h breaks
-the cycle, and doesn't matter since we don't have any further planned
-uses for that type outside of visitors.
-
-Suggested-by: Markus Armbruster <armbru@redhat.com>
+Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- include/qapi/visitor.h | 9 +--------
- include/qapi/util.h    | 8 ++++++++
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ include/qapi/util.h |  8 ++++++++
+ block.c             | 15 +++------------
+ 2 files changed, 11 insertions(+), 12 deletions(-)
 
-diff --git a/include/qapi/visitor.h b/include/qapi/visitor.h
-index ebc19ede7fff..8c2e1c29ad8b 100644
---- a/include/qapi/visitor.h
-+++ b/include/qapi/visitor.h
-@@ -16,6 +16,7 @@
- #define QAPI_VISITOR_H
-
- #include "qapi/qapi-builtin-types.h"
-+#include "qapi/util.h"
-
- /*
-  * The QAPI schema defines both a set of C data types, and a QMP wire
-@@ -228,14 +229,6 @@
-
- /*** Useful types ***/
-
--/* This struct is layout-compatible with all other *List structs
-- * created by the QAPI generator.  It is used as a typical
-- * singly-linked list. */
--typedef struct GenericList {
--    struct GenericList *next;
--    char padding[];
--} GenericList;
--
- /* This struct is layout-compatible with all Alternate types
-  * created by the QAPI generator. */
- typedef struct GenericAlternate {
 diff --git a/include/qapi/util.h b/include/qapi/util.h
-index a7c3c6414874..50201896c7a4 100644
+index 50201896c7a4..b6083055ce69 100644
 --- a/include/qapi/util.h
 +++ b/include/qapi/util.h
-@@ -11,6 +11,14 @@
- #ifndef QAPI_UTIL_H
- #define QAPI_UTIL_H
+@@ -30,4 +30,12 @@ int qapi_enum_parse(const QEnumLookup *lookup, const char *buf,
 
-+/* This struct is layout-compatible with all other *List structs
-+ * created by the QAPI generator.  It is used as a typical
-+ * singly-linked list. */
-+typedef struct GenericList {
-+    struct GenericList *next;
-+    char padding[];
-+} GenericList;
+ int parse_qapi_name(const char *name, bool complete);
+
++/* For any GenericList @list, insert @element at the front. */
++#define QAPI_LIST_ADD(list, element) do { \
++    typeof(list) _tmp = g_new(typeof(*(list)), 1); \
++    _tmp->value = (element); \
++    _tmp->next = (list); \
++    (list) = _tmp; \
++} while (0)
 +
- typedef struct QEnumLookup {
-     const char *const *array;
-     int size;
+ #endif
+diff --git a/block.c b/block.c
+index 430edf79bb10..45bd79299611 100644
+--- a/block.c
++++ b/block.c
+@@ -39,6 +39,7 @@
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qobject-output-visitor.h"
+ #include "qapi/qapi-visit-block-core.h"
++#include "qapi/util.h"
+ #include "sysemu/block-backend.h"
+ #include "sysemu/sysemu.h"
+ #include "qemu/notify.h"
+@@ -5211,7 +5212,7 @@ BlockDriverState *bdrv_find_node(const char *node_name)
+ BlockDeviceInfoList *bdrv_named_nodes_list(bool flat,
+                                            Error **errp)
+ {
+-    BlockDeviceInfoList *list, *entry;
++    BlockDeviceInfoList *list;
+     BlockDriverState *bs;
+
+     list = NULL;
+@@ -5221,22 +5222,12 @@ BlockDeviceInfoList *bdrv_named_nodes_list(bool flat,
+             qapi_free_BlockDeviceInfoList(list);
+             return NULL;
+         }
+-        entry = g_malloc0(sizeof(*entry));
+-        entry->value = info;
+-        entry->next = list;
+-        list = entry;
++        QAPI_LIST_ADD(list, info);
+     }
+
+     return list;
+ }
+
+-#define QAPI_LIST_ADD(list, element) do { \
+-    typeof(list) _tmp = g_new(typeof(*(list)), 1); \
+-    _tmp->value = (element); \
+-    _tmp->next = (list); \
+-    (list) = _tmp; \
+-} while (0)
+-
+ typedef struct XDbgBlockGraphConstructor {
+     XDbgBlockGraph *graph;
+     GHashTable *graph_nodes;
 -- 
 2.29.0
 
