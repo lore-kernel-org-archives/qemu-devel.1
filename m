@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D15DC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:16:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E34CFC5517A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:18:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CDC3720878
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:16:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 524BB21527
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:18:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beUgTGMZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDC3720878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RQwwo5hv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 524BB21527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55384 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVrJL-0007gz-LT
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:16:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60084)
+	id 1kVrKy-0000KX-Ay
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:18:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60214)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDk-0000yB-Ao
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52175)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDu-0001OV-Ri
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37053)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDh-0003dk-Fr
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:39 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDs-0003p1-VX
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603437036;
+ s=mimecast20190719; t=1603437048;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=chRhdyqhJeU3vaWtXMlHrEVu9ohXTyMhht/61+Hx6+4=;
- b=beUgTGMZ8wR7LSW0VDDOb/SzrEfN5KhyvkAnMbPKoz3GE9G/cuiitKDqFDkDyfsQbeFEf3
- 2OK1MY1NunWxH0UpHjpN6PkGD1d9Q6mSI6tPftDpDFf2ppT+J24BXczMDa7D+V+tGwVwvb
- DS+3YGqGxDFnImhHLGizdnAXvT786Xw=
+ bh=sIRSitiRXV4ZAKDiiQHiW+bIFcGn9wQPWQBNLG4Ig0Q=;
+ b=RQwwo5hv910baFZ5UR3Ao74RlXSkh0KpeaP3yNBTOhVhBsOWm4+tS4zd9VWBJQ+5miWPr2
+ 4GIlhjDn6ha+a2+e9qqtZpMPzZEhU4VkcIdblxpilgG2bzNNMaZRLcDrYWO+BjvgWJZgzW
+ fmbbb5cIAZmZKdcAAQTUBQCNAzaAIsI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-488-5COFfMteOtC3aBdiUWBckg-1; Fri, 23 Oct 2020 03:10:33 -0400
-X-MC-Unique: 5COFfMteOtC3aBdiUWBckg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-586-6yP6MddiOdqaLda54WtECw-1; Fri, 23 Oct 2020 03:10:43 -0400
+X-MC-Unique: 6yP6MddiOdqaLda54WtECw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86899186DD41;
- Fri, 23 Oct 2020 07:10:31 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE4BD107B471;
+ Fri, 23 Oct 2020 07:10:41 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 063995D9D5;
- Fri, 23 Oct 2020 07:10:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7FE0610013D7;
+ Fri, 23 Oct 2020 07:10:32 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 41379204A1; Fri, 23 Oct 2020 09:10:22 +0200 (CEST)
+ id 54E5C204A7; Fri, 23 Oct 2020 09:10:22 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 4/8] arm/virt: add device tree node for xhci
-Date: Fri, 23 Oct 2020 09:10:18 +0200
-Message-Id: <20201023071022.24916-5-kraxel@redhat.com>
+Subject: [PATCH 6/8] tests/acpi: add usb testcase for virt
+Date: Fri, 23 Oct 2020 09:10:20 +0200
+Message-Id: <20201023071022.24916-7-kraxel@redhat.com>
 In-Reply-To: <20201023071022.24916-1-kraxel@redhat.com>
 References: <20201023071022.24916-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -110,41 +110,45 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
 ---
- hw/arm/virt.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ tests/qtest/bios-tables-test.c | 18 ++++++++++++++++++
+ 1 file changed, 18 insertions(+)
 
-diff --git a/hw/arm/virt.c b/hw/arm/virt.c
-index f2b34fd33be4..4319dd95ef78 100644
---- a/hw/arm/virt.c
-+++ b/hw/arm/virt.c
-@@ -812,7 +812,10 @@ static void create_rtc(const VirtMachineState *vms)
- static void create_xhci(const VirtMachineState *vms)
- {
-     hwaddr base = base_memmap[VIRT_XHCI].base;
-+    hwaddr size = base_memmap[VIRT_XHCI].size;
-     int irq = vms->irqmap[VIRT_XHCI];
-+    const char compat[] = "generic-xhci";
-+    char *nodename;
-     DeviceState *dev;
- 
-     dev = qdev_new(TYPE_XHCI_SYSBUS);
-@@ -823,6 +826,16 @@ static void create_xhci(const VirtMachineState *vms)
-     sysbus_realize(SYS_BUS_DEVICE(dev), &error_fatal);
-     sysbus_mmio_map(SYS_BUS_DEVICE(dev), 0, base);
-     sysbus_connect_irq(SYS_BUS_DEVICE(dev), 0, qdev_get_gpio_in(vms->gic, irq));
-+
-+    nodename = g_strdup_printf("/usb@%" PRIx64, base);
-+    qemu_fdt_add_subnode(vms->fdt, nodename);
-+    qemu_fdt_setprop(vms->fdt, nodename, "compatible", compat, sizeof(compat));
-+    qemu_fdt_setprop_sized_cells(vms->fdt, nodename, "reg",
-+                                 2, base, 2, size);
-+    qemu_fdt_setprop_cells(vms->fdt, nodename, "interrupts",
-+                           GIC_FDT_IRQ_TYPE_SPI, irq,
-+                           GIC_FDT_IRQ_FLAGS_LEVEL_HI);
-+    g_free(nodename);
+diff --git a/tests/qtest/bios-tables-test.c b/tests/qtest/bios-tables-test.c
+index 3830a40d1041..438cea38a177 100644
+--- a/tests/qtest/bios-tables-test.c
++++ b/tests/qtest/bios-tables-test.c
+@@ -1230,6 +1230,23 @@ static void test_acpi_virt_tcg(void)
+     free_test_data(&data);
  }
  
- static DeviceState *gpio_key_dev;
++static void test_acpi_virt_tcg_usb(void)
++{
++    test_data data = {
++        .machine = "virt",
++        .tcg_only = true,
++        .uefi_fl1 = "pc-bios/edk2-aarch64-code.fd",
++        .uefi_fl2 = "pc-bios/edk2-arm-vars.fd",
++        .cd = "tests/data/uefi-boot-images/bios-tables-test.aarch64.iso.qcow2",
++        .ram_start = 0x40000000ULL,
++        .scan_len = 128ULL * 1024 * 1024,
++    };
++
++    data.variant = ".usb";
++    test_acpi_one("-cpu cortex-a57 -machine usb=on", &data);
++    free_test_data(&data);
++}
++
+ int main(int argc, char *argv[])
+ {
+     const char *arch = qtest_get_arch();
+@@ -1277,6 +1294,7 @@ int main(int argc, char *argv[])
+         qtest_add_func("acpi/virt", test_acpi_virt_tcg);
+         qtest_add_func("acpi/virt/numamem", test_acpi_virt_tcg_numamem);
+         qtest_add_func("acpi/virt/memhp", test_acpi_virt_tcg_memhp);
++        qtest_add_func("acpi/virt/usb", test_acpi_virt_tcg_usb);
+     }
+     ret = g_test_run();
+     boot_sector_cleanup(disk);
 -- 
 2.27.0
 
