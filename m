@@ -7,60 +7,59 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F4F7C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:47:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 949CFC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:49:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E59AF20BED
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:47:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D44D820BED
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 18:49:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LO4RiMX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E59AF20BED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eVC1P22E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D44D820BED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54344 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW26R-0004l0-QU
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 14:47:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50642)
+	id 1kW28H-0007Ke-Qs
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 14:49:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1wU-0001PI-BE
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:34 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54039)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1wV-0001Se-Ia
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35920)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1wS-0001a0-CE
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:33 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW1wS-0001aE-RN
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 14:37:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603478251;
+ s=mimecast20190719; t=1603478252;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=VaZ7LF0H7peiK9lNrwSXJj5y011IaibJBHZpDDbRgSg=;
- b=LO4RiMX4/dAdU0TDR/DzpbY2/01ep7PywT/r1uL8iH+rxfOnMQ1DJex/CD8AnkMqzXgFmP
- kKUCoapHTVKaFuBlUlRWNBY1ifnqlrBudKv6llD7tVQu0Jy35iC0Qli4ZXDhVwwc3e0rV2
- YclP63ogsdJ16CzQkLD8TqHmyjzpAmc=
+ bh=hjlyrNJBhtJZwARkJVhxkHL8wl5BqWygFehP0x3+fuk=;
+ b=eVC1P22ELNVCGMa/5WTW/6kGq/n3eGTqGG7RtuYZ77vmPCYYTLv6TzB/NpatMEreOMRdw6
+ vDmfZifzuKAtPOs+h1+9VLKcOEt7VdWV/Vb03lN0/1+DxkzBoq/M9mCikaRu8mHIbgLZzm
+ QQutz+c+j+K62RW0xKeaERkENYU0z8I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-AFJeY82YMM-vMgxDNuOBuA-1; Fri, 23 Oct 2020 14:37:29 -0400
-X-MC-Unique: AFJeY82YMM-vMgxDNuOBuA-1
+ us-mta-577-7Bvj0BmgNUSdb_ZPRx-m2g-1; Fri, 23 Oct 2020 14:37:29 -0400
+X-MC-Unique: 7Bvj0BmgNUSdb_ZPRx-m2g-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF798640B1;
- Fri, 23 Oct 2020 18:37:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AB37A10866B3;
+ Fri, 23 Oct 2020 18:37:28 +0000 (UTC)
 Received: from blue.redhat.com (ovpn-113-7.phx2.redhat.com [10.3.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2945060BFA;
- Fri, 23 Oct 2020 18:37:24 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1C13A60BFA;
+ Fri, 23 Oct 2020 18:37:28 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 10/12] block: Return depth level during
- bdrv_is_allocated_above
-Date: Fri, 23 Oct 2020 13:36:50 -0500
-Message-Id: <20201023183652.478921-11-eblake@redhat.com>
+Subject: [PATCH v5 11/12] nbd: Expose actual depth in qemu:allocation-depth
+Date: Fri, 23 Oct 2020 13:36:51 -0500
+Message-Id: <20201023183652.478921-12-eblake@redhat.com>
 In-Reply-To: <20201023183652.478921-1-eblake@redhat.com>
 References: <20201023183652.478921-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -94,126 +93,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, Fam Zheng <fam@euphon.net>, vsementsov@virtuozzo.com,
- qemu-block@nongnu.org, rjones@redhat.com, Max Reitz <mreitz@redhat.com>,
- stefanha@redhat.com, John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ rjones@redhat.com, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When checking for allocation across a chain, it's already easy to
-count the depth within the chain at which the allocation is found.
-Instead of throwing that information away, return it to the caller.
-Existing callers only cared about allocated/non-allocated, but having
-a depth available will be used by NBD in the next patch.
+Preserve the tri-state encoding in the low bits, as that still remains
+a valuable way to utilize qemu-img map with x-dirty-bitmap for
+accessing quick information without needing a third-party NBD client.
+But now that the block layer gives us an actual depth, we can easily
+expose it in the remaining bits of our metadata context (leaving two
+bits reserved, to make it easier to read depth out of a raw hex
+number).  This assumes no one runs a backing chain larger than 256M
+elements.
 
-Note that the previous code (since commit 188a7bbf94 in 2012) was
-lazy: for each layer deeper in the backing chain, it was issuing a
-bdrv_is_allocated request on the original 'bytes' amount, rather than
-on any smaller amount 'n' learned from an upper layer.  These
-semantics happened to work, since if you have:
-
-Base <- Active
-XX--    -XX-
-
-the consecutive results are offset 0: '11' with *pnum 2, followed by
-offset 2: '1' with *pnum 1, followed by offset 3: '0' with *pnum 1;
-the resulting sequence 1110 matches reality (the first three clusters
-are indeed allocated somewhere in the given range).  But post-patch,
-we correctly give the results offset 0: '2' with *pnum 1, followed by
-offset 1: '11' with *pnum 2, followed by offset 3: '0' with *pnum 1
-(2110), without over-reporting the length of contributions from the
-backing layers.
+iotest 309 remains unchanged (an example of the above-mentioned
+x-dirty-bitmap hack); actually testing the new bits requires libnbd or
+a similar client, and I didn't want to make iotests depend on libnbd
+at this point in time; rather, see the libnbd project for interop
+tests that exercise this new feature.
 
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- block/io.c     | 11 +++++++----
- block/commit.c |  2 +-
- block/mirror.c |  2 +-
- block/stream.c |  2 +-
- 4 files changed, 10 insertions(+), 7 deletions(-)
+ docs/interop/nbd.txt |  6 +++++-
+ include/block/nbd.h  |  2 ++
+ nbd/server.c         | 27 +++++++++++++++------------
+ 3 files changed, 22 insertions(+), 13 deletions(-)
 
-diff --git a/block/io.c b/block/io.c
-index 54f0968aee27..4a4fa1c9ab1b 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2414,8 +2414,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
- /*
-  * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
-  *
-- * Return 1 if (a prefix of) the given range is allocated in any image
-- * between BASE and TOP (BASE is only included if include_base is set).
-+ * Return a positive depth if (a prefix of) the given range is allocated
-+ * in any image between BASE and TOP (BASE is only included if include_base
-+ * is set).  Depth 1 is TOP, 2 is the first backing layer, and so forth.
-  * BASE can be NULL to check if the given offset is allocated in any
-  * image of the chain.  Return 0 otherwise, or negative errno on
-  * failure.
-@@ -2435,6 +2436,7 @@ int bdrv_is_allocated_above(BlockDriverState *top,
+diff --git a/docs/interop/nbd.txt b/docs/interop/nbd.txt
+index 7e948bd42218..d90723ffe991 100644
+--- a/docs/interop/nbd.txt
++++ b/docs/interop/nbd.txt
+@@ -34,7 +34,8 @@ the image, with a single metadata context named:
+
+     qemu:allocation-depth
+
+-In the allocation depth context, bits 0 and 1 form a tri-state value:
++In the allocation depth context, bits 0 and 1 form a tri-state value,
++along with 28 bits giving an actual depth:
+
+     bits 0-1: 00: NBD_STATE_DEPTH_UNALLOC, the extent is unallocated
+               01: NBD_STATE_DEPTH_LOCAL, the extent is allocated in the
+@@ -42,6 +43,9 @@ In the allocation depth context, bits 0 and 1 form a tri-state value:
+               10: NBD_STATE_DEPTH_BACKING, the extent is inherited from a
+                   backing layer
+               11: invalid, never returned
++    bits 2-3: reserved, always 0
++    bits 4-31: NBD_STATE_DEPTH_RAW, the backing layer depth (0 if
++               UNALLOC, 1 for LOCAL, 2 or more for BACKING)
+
+ For NBD_OPT_LIST_META_CONTEXT the following queries are supported
+ in addition to the specific "qemu:allocation-depth" and
+diff --git a/include/block/nbd.h b/include/block/nbd.h
+index 956687f5c368..3c0692aec642 100644
+--- a/include/block/nbd.h
++++ b/include/block/nbd.h
+@@ -264,6 +264,8 @@ enum {
+ #define NBD_STATE_DEPTH_UNALLOC      0x0
+ #define NBD_STATE_DEPTH_LOCAL        0x1
+ #define NBD_STATE_DEPTH_BACKING      0x2
++#define NBD_STATE_DEPTH_RAW_MASK     0xfffffff0
++#define NBD_STATE_DEPTH_RAW_SHIFT    4
+
+ static inline bool nbd_reply_type_is_error(int type)
  {
-     BlockDriverState *intermediate;
-     int ret;
-+    int depth = 0;
-     int64_t n = bytes;
+diff --git a/nbd/server.c b/nbd/server.c
+index 53526090b0a2..afa79e63a7a6 100644
+--- a/nbd/server.c
++++ b/nbd/server.c
+@@ -2037,22 +2037,25 @@ static int blockalloc_to_extents(BlockDriverState *bs, uint64_t offset,
+     while (bytes) {
+         uint32_t flags;
+         int64_t num;
+-        int ret = bdrv_is_allocated(bs, offset, bytes, &num);
++        int depth = bdrv_is_allocated_above(bs, NULL, false, offset, bytes,
++                                            &num);
 
-     assert(base || !include_base);
-@@ -2444,14 +2446,15 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-         int64_t pnum_inter;
-         int64_t size_inter;
-
-+        depth++;
-         assert(intermediate);
--        ret = bdrv_is_allocated(intermediate, offset, bytes, &pnum_inter);
-+        ret = bdrv_is_allocated(intermediate, offset, n, &pnum_inter);
-         if (ret < 0) {
-             return ret;
-         }
-         if (ret) {
-             *pnum = pnum_inter;
--            return 1;
-+            return depth;
-         }
-
-         size_inter = bdrv_getlength(intermediate);
-diff --git a/block/commit.c b/block/commit.c
-index 1e85c306cc41..71db7ba7472e 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -156,7 +156,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), s->base_overlay, true,
-                                       offset, COMMIT_BUFFER_SIZE, &n);
--        copy = (ret == 1);
-+        copy = (ret > 0);
-         trace_commit_one_iteration(s, offset, n, ret);
-         if (copy) {
-             assert(n < SIZE_MAX);
-diff --git a/block/mirror.c b/block/mirror.c
-index 26acf4af6fb7..8e1ad6eceb57 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -846,7 +846,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         }
-
-         assert(count);
+-        if (ret < 0) {
+-            return ret;
+-        }
+-
 -        if (ret == 1) {
-+        if (ret > 0) {
-             bdrv_set_dirty_bitmap(s->dirty_bitmap, offset, count);
-         }
-         offset += count;
-diff --git a/block/stream.c b/block/stream.c
-index 8ce6729a33da..236384f2f739 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -167,7 +167,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-                 n = len - offset;
++        switch (depth) {
++        case 0:
++            flags = NBD_STATE_DEPTH_UNALLOC;
++            break;
++        case 1:
+             flags = NBD_STATE_DEPTH_LOCAL;
+-        } else {
+-            ret = bdrv_is_allocated_above(bs, NULL, false, offset, num,
+-                                          &num);
+-            if (ret < 0) {
+-                return ret;
++            break;
++        default:
++            if (depth < 0) {
++                return depth;
              }
-
--            copy = (ret == 1);
-+            copy = (ret > 0);
+-            flags = ret ? NBD_STATE_DEPTH_BACKING : NBD_STATE_DEPTH_UNALLOC;
++            flags = NBD_STATE_DEPTH_BACKING;
++            break;
          }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
++        assert(depth <= UINT32_MAX >> NBD_STATE_DEPTH_RAW_SHIFT);
++        flags |= depth << NBD_STATE_DEPTH_RAW_SHIFT;
+
+         if (nbd_extent_array_add(ea, num, flags) < 0) {
+             return 0;
 -- 
 2.29.0
 
