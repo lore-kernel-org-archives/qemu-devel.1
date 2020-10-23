@@ -7,47 +7,48 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9390C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:17:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAAD9C55179
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:17:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 738CD24248
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:17:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 54A8F24182
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:17:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="H4BtcXL/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 738CD24248
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="qSMD5/KC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 54A8F24182
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37534 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVv4x-0002p2-9S
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:17:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50128)
+	id 1kVv4y-0002qb-A9
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:17:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVv0p-0006nk-9c
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:13:35 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14976)
+ id 1kVv2I-0000sq-CH
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:15:06 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:15317)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVv0n-00072K-Fb
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:13:35 -0400
+ id 1kVv2D-0007Wb-Kj
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:15:06 -0400
 Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
  hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f92baab0009>; Fri, 23 Oct 2020 04:12:43 -0700
-Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
- 2020 11:13:24 +0000
+ id <B5f92bb030002>; Fri, 23 Oct 2020 04:14:11 -0700
+Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL109.nvidia.com
+ (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
+ 2020 11:14:49 +0000
 Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Fri, 23 Oct 2020 11:13:15 +0000
+ Transport; Fri, 23 Oct 2020 11:14:40 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v28 01/17] vfio: Add function to unmap VFIO region
-Date: Fri, 23 Oct 2020 16:10:27 +0530
-Message-ID: <1603449643-12851-2-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v28 10/17] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU is
+ enabled
+Date: Fri, 23 Oct 2020 16:10:36 +0530
+Message-ID: <1603449643-12851-11-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
 References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
@@ -55,15 +56,15 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603451563; bh=xtSQlqXVxqY0Ii7mEm8QI0dDKK/m5fS9hZu49+0IBfE=;
+ t=1603451651; bh=YXNa3H8eNeL3Vmem7X3LxVv9sAfs1VFH6OWaXoloGWw=;
  h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
  References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=H4BtcXL/aGgJBGVqZhMRn+kSGitHwALuML2LY8wThGFoNx3XZlkN1hhs5a0LqfiEw
- TKRoKLnIWTYsJLi7SnIm+VzzuzQ7XzdyvGFUEiuJZ2KPiON5//2zcjGUw6Ufm14fMv
- BmdkOrdPxaNHUcXnVwT4eeIj1FjVNUlvu24nufmullkNW9ROscKPmY9n7gOoIzxSwz
- ad8+tlG4PVOFbqJkMEPqBisLNq6J1XgE4/ygyZROgtUnF9SL0gzON1/1ZuFu1LEaTd
- jtgOumDb5DYeItZZwNFVKc/ofzueQRSL54dvpVlfC4XNjB0F1uLiyTaBpXGYex8a1G
- 5SJtmnigJNrrA==
+ b=qSMD5/KCRs98sQafvCwyDgAYdB9oCts2jkhtJLstRoetA8hwscyqIisCi7PCF6SBQ
+ VINnoZ7NTzYp84vrnqzy1yVGt9tV30Q8HihySe3wu8g2tQi2QIYitCHbCwv0JYmtl1
+ +rAwgs5b6EaHM7iPL3VUXdwgNH/h//1vmDPUozNZ5Lmstt9acZ1hxC65JEbFth9FkJ
+ IEUVSQB0rkC/lYvNeQlmDgFhWy4tuI7QNFaUmWcFx88rhImuD68gbamvwRoJx8Lf5f
+ qaLdDhsG3i5mCGL3HtjDNz8fZOBbUE71P0eIUfQI4z3voEdU9A/BudTh+pNcXhV/vp
+ /9bBVBAJHlulw==
 Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
  helo=hqnvemgate25.nvidia.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:23:18
@@ -101,100 +102,30 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This function will be used for migration region.
-Migration region is mmaped when migration starts and will be unmapped when
-migration is complete.
+mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
+wasn't set correctly due to which memory listener's log_sync doesn't
+get called.
+This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
+IOMMU is enabled.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/common.c              | 32 ++++++++++++++++++++++++++++----
- hw/vfio/trace-events          |  1 +
- include/hw/vfio/vfio-common.h |  1 +
- 3 files changed, 30 insertions(+), 4 deletions(-)
+ softmmu/memory.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 13471ae29436..c6e98b8d61be 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -924,6 +924,18 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-     return 0;
- }
- 
-+static void vfio_subregion_unmap(VFIORegion *region, int index)
-+{
-+    trace_vfio_region_unmap(memory_region_name(&region->mmaps[index].mem),
-+                            region->mmaps[index].offset,
-+                            region->mmaps[index].offset +
-+                            region->mmaps[index].size - 1);
-+    memory_region_del_subregion(region->mem, &region->mmaps[index].mem);
-+    munmap(region->mmaps[index].mmap, region->mmaps[index].size);
-+    object_unparent(OBJECT(&region->mmaps[index].mem));
-+    region->mmaps[index].mmap = NULL;
-+}
-+
- int vfio_region_mmap(VFIORegion *region)
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 403ff3abc99b..94f606e9d9d9 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1792,7 +1792,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
  {
-     int i, prot = 0;
-@@ -954,10 +966,7 @@ int vfio_region_mmap(VFIORegion *region)
-             region->mmaps[i].mmap = NULL;
- 
-             for (i--; i >= 0; i--) {
--                memory_region_del_subregion(region->mem, &region->mmaps[i].mem);
--                munmap(region->mmaps[i].mmap, region->mmaps[i].size);
--                object_unparent(OBJECT(&region->mmaps[i].mem));
--                region->mmaps[i].mmap = NULL;
-+                vfio_subregion_unmap(region, i);
-             }
- 
-             return ret;
-@@ -982,6 +991,21 @@ int vfio_region_mmap(VFIORegion *region)
-     return 0;
- }
- 
-+void vfio_region_unmap(VFIORegion *region)
-+{
-+    int i;
-+
-+    if (!region->mem) {
-+        return;
-+    }
-+
-+    for (i = 0; i < region->nr_mmaps; i++) {
-+        if (region->mmaps[i].mmap) {
-+            vfio_subregion_unmap(region, i);
-+        }
-+    }
-+}
-+
- void vfio_region_exit(VFIORegion *region)
- {
-     int i;
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 93a0bc2522f8..a0c7b49a2ebc 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -113,6 +113,7 @@ vfio_region_mmap(const char *name, unsigned long offset, unsigned long end) "Reg
- vfio_region_exit(const char *name, int index) "Device %s, region %d"
- vfio_region_finalize(const char *name, int index) "Device %s, region %d"
- vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps enabled: %d"
-+vfio_region_unmap(const char *name, unsigned long offset, unsigned long end) "Region %s unmap [0x%lx - 0x%lx]"
- vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
- vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
- vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c78f3ff5593c..dc95f527b583 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-                       int index, const char *name);
- int vfio_region_mmap(VFIORegion *region);
- void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
-+void vfio_region_unmap(VFIORegion *region);
- void vfio_region_exit(VFIORegion *region);
- void vfio_region_finalize(VFIORegion *region);
- void vfio_reset_handler(void *opaque);
+     uint8_t mask = mr->dirty_log_mask;
+-    if (global_dirty_log && mr->ram_block) {
++    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
+         mask |= (1 << DIRTY_MEMORY_MIGRATION);
+     }
+     return mask;
 -- 
 2.7.0
 
