@@ -2,70 +2,72 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1B62C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28D5AC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:50:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1576C20FC3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:45:34 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1576C20FC3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 501CE20FC3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:50:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 501CE20FC3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51336 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVuZh-0005u4-He
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:45:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44216)
+	id 1kVueK-0000fQ-18
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:50:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVuWO-0004eb-0w
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:42:09 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:39445)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVuWK-0003tm-Fk
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:42:05 -0400
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-kFnqikVFNqu4hdg0g-AdDw-1; Fri, 23 Oct 2020 06:41:41 -0400
-X-MC-Unique: kFnqikVFNqu4hdg0g-AdDw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A27F6804B6E;
- Fri, 23 Oct 2020 10:41:40 +0000 (UTC)
-Received: from bahia.lan (ovpn-115-53.ams2.redhat.com [10.36.115.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 68B3E10013D7;
- Fri, 23 Oct 2020 10:41:33 +0000 (UTC)
-Subject: [PATCH] block: End quiescent sections when a BDS is deleted
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 23 Oct 2020 12:41:32 +0200
-Message-ID: <160344969243.4091343.14371338409686732879.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kVud3-00006Q-Aa; Fri, 23 Oct 2020 06:49:01 -0400
+Resent-Date: Fri, 23 Oct 2020 06:49:01 -0400
+Resent-Message-Id: <E1kVud3-00006Q-Aa@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21708)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kVud0-0006BT-Vo; Fri, 23 Oct 2020 06:49:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1603450120; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=KzWUDL8nHZ/2lrWX79gjrNFrZqu3t5TBOjElIFceX3mHN/V3B+QGaJFKHUErcjEx+6roBUnIBuM9TDVjMXnILpYX5RFh+Kts+VpTC7BULoQiqsc6HP8plGH4c0PWknSbjQDB+Srk5ipITj3Y6YqC0VUVYJvraRVEs8Jf19HHrAY=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1603450120;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=uqA4m9ElMei4M25seEKM86Qw7I/qi0zwZRbSpLmDQEE=; 
+ b=DY7/HvFNA0qpeJ4vIdV9eItml77fu3BtnnDQvBOIsLTsu52BZejqwe0oTGFrZKWm9FmpRuYW2fJhfHFOpvaGvjGMw+hVkITsT2tLJgv7huWL2W7z/dR/+tw0qP0DVTs+ulkuyjF9ZnCzIyjw1JESHUnJ1XzSjZBT+2qTzBzIAP0=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1603450119536578.9442378563085;
+ Fri, 23 Oct 2020 03:48:39 -0700 (PDT)
+Subject: Re: [PATCH] block: End quiescent sections when a BDS is deleted
+Message-ID: <160345011823.26284.2952209122615820969@66eaa9a8a123>
+In-Reply-To: <160344969243.4091343.14371338409686732879.stgit@bahia.lan>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:41:46
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: groug@kaod.org
+Date: Fri, 23 Oct 2020 03:48:39 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:48:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,128 +80,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Reply-To: qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, qemu-block@nongnu.org, qemu-devel@nongnu.org,
+ stefanha@redhat.com, mreitz@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a BDS gets deleted during blk_drain_all(), it might miss a
-call to bdrv_do_drained_end(). This means missing a call to
-aio_enable_external() and the AIO context remains disabled for
-ever. This can cause a device to become irresponsive and to
-disrupt the guest execution, ie. hang, loop forever or worse.
-
-This scenario is quite easy to encounter with virtio-scsi
-on POWER when punching multiple blockdev-create QMP commands
-while the guest is booting and it is still running the SLOF
-firmware. This happens because SLOF disables/re-enables PCI
-devices multiple times via IO/MEM/MASTER bits of PCI_COMMAND
-register after the initial probe/feature negotiation, as it
-tends to work with a single device at a time at various stages
-like probing and running block/network bootloaders without
-doing a full reset in-between. This naturally generates many
-dataplane stops and starts, and thus many drain sections that
-can race with blockdev_create_run(). In the end, SLOF bails
-out.
-
-It is somehow reproducible on x86 but it requires to generate
-articial dataplane start/stop activity with stop/cont QMP
-commands. In this case, seabios ends up looping for ever,
-waiting for the virtio-scsi device to send a response to
-a command it never received.
-
-Add a helper that pairs all previously called bdrv_do_drained_begin()
-with a bdrv_do_drained_end() and call it from bdrv_close().
-While at it, update the "/bdrv-drain/graph-change/drain_all"
-test in test-bdrv-drain so that it can catch the issue.
-
-BugId: https://bugzilla.redhat.com/show_bug.cgi?id=3D1874441
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
- block.c                 |    9 +++++++++
- block/io.c              |   13 +++++++++++++
- include/block/block.h   |    6 ++++++
- tests/test-bdrv-drain.c |    1 +
- 4 files changed, 29 insertions(+)
-
-diff --git a/block.c b/block.c
-index 430edf79bb10..ddcb36dd48a8 100644
---- a/block.c
-+++ b/block.c
-@@ -4458,6 +4458,15 @@ static void bdrv_close(BlockDriverState *bs)
-     }
-     QLIST_INIT(&bs->aio_notifiers);
-     bdrv_drained_end(bs);
-+
-+    /*
-+     * If we're still inside some bdrv_drain_all_begin()/end() sections, e=
-nd
-+     * them now since this BDS won't exist anymore when bdrv_drain_all_end=
-()
-+     * gets called.
-+     */
-+    if (bs->quiesce_counter) {
-+        bdrv_drained_end_quiesce(bs);
-+    }
- }
-=20
- void bdrv_close_all(void)
-diff --git a/block/io.c b/block/io.c
-index 54f0968aee27..8a0da06bbb14 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -633,6 +633,19 @@ void bdrv_drain_all_begin(void)
-     }
- }
-=20
-+void bdrv_drained_end_quiesce(BlockDriverState *bs)
-+{
-+    int drained_end_counter =3D 0;
-+
-+    g_assert_cmpint(bs->quiesce_counter, >, 0);
-+    g_assert_cmpint(bs->refcnt, =3D=3D, 0);
-+
-+    while (bs->quiesce_counter) {
-+        bdrv_do_drained_end(bs, false, NULL, true, &drained_end_counter);
-+    }
-+    BDRV_POLL_WHILE(bs, qatomic_read(&drained_end_counter) > 0);
-+}
-+
- void bdrv_drain_all_end(void)
- {
-     BlockDriverState *bs =3D NULL;
-diff --git a/include/block/block.h b/include/block/block.h
-index d16c401cb44e..c0ce6e690081 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -779,6 +779,12 @@ void bdrv_drained_end(BlockDriverState *bs);
-  */
- void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_count=
-er);
-=20
-+/**
-+ * End all quiescent sections started by bdrv_drain_all_begin(). This is
-+ * only needed when deleting a BDS before bdrv_drain_all_end() is called.
-+ */
-+void bdrv_drained_end_quiesce(BlockDriverState *bs);
-+
- /**
-  * End a quiescent section started by bdrv_subtree_drained_begin().
-  */
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 1595bbc92e9e..8a29e33e004a 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -594,6 +594,7 @@ static void test_graph_change_drain_all(void)
-=20
-     g_assert_cmpint(bs_b->quiesce_counter, =3D=3D, 0);
-     g_assert_cmpint(b_s->drain_count, =3D=3D, 0);
-+    g_assert_cmpint(qemu_get_aio_context()->external_disable_cnt, =3D=3D, =
-0);
-=20
-     bdrv_unref(bs_b);
-     blk_unref(blk_b);
-
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAzNDQ5NjkyNDMuNDA5MTM0
+My4xNDM3MTMzODQwOTY4NjczMjg3OS5zdGdpdEBiYWhpYS5sYW4vCgoKCkhpLAoKVGhpcyBzZXJp
+ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
+ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNjAz
+NDQ5NjkyNDMuNDA5MTM0My4xNDM3MTMzODQwOTY4NjczMjg3OS5zdGdpdEBiYWhpYS5sYW4KU3Vi
+amVjdDogW1BBVENIXSBibG9jazogRW5kIHF1aWVzY2VudCBzZWN0aW9ucyB3aGVuIGEgQkRTIGlz
+IGRlbGV0ZWQKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1w
+YXJzZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5y
+ZW5hbWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29u
+ZmlnIC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNo
+LnBsIC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAz
+YzhjZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRo
+dWIuY29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcv
+MTYwMzQ0OTY5MjQzLjQwOTEzNDMuMTQzNzEzMzg0MDk2ODY3MzI4Nzkuc3RnaXRAYmFoaWEubGFu
+IC0+IHBhdGNoZXcvMTYwMzQ0OTY5MjQzLjQwOTEzNDMuMTQzNzEzMzg0MDk2ODY3MzI4Nzkuc3Rn
+aXRAYmFoaWEubGFuCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDEwMjMxMDEyMjIu
+MjUwMTQ3LTEta3dvbGZAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAxMDIzMTAxMjIyLjI1MDE0
+Ny0xLWt3b2xmQHJlZGhhdC5jb20KU3dpdGNoZWQgdG8gYSBuZXcgYnJhbmNoICd0ZXN0JwpmOTUw
+MWY4IGJsb2NrOiBFbmQgcXVpZXNjZW50IHNlY3Rpb25zIHdoZW4gYSBCRFMgaXMgZGVsZXRlZAoK
+PT09IE9VVFBVVCBCRUdJTiA9PT0KRVJST1I6IFVzZSBnX2Fzc2VydCBvciBnX2Fzc2VydF9ub3Rf
+cmVhY2hlZAojNzM6IEZJTEU6IGJsb2NrL2lvLmM6NjQwOgorICAgIGdfYXNzZXJ0X2NtcGludChi
+cy0+cXVpZXNjZV9jb3VudGVyLCA+LCAwKTsKCkVSUk9SOiBVc2UgZ19hc3NlcnQgb3IgZ19hc3Nl
+cnRfbm90X3JlYWNoZWQKIzc0OiBGSUxFOiBibG9jay9pby5jOjY0MToKKyAgICBnX2Fzc2VydF9j
+bXBpbnQoYnMtPnJlZmNudCwgPT0sIDApOwoKdG90YWw6IDIgZXJyb3JzLCAwIHdhcm5pbmdzLCA1
+MyBsaW5lcyBjaGVja2VkCgpDb21taXQgZjk1MDFmODQ2ZGUxIChibG9jazogRW5kIHF1aWVzY2Vu
+dCBzZWN0aW9ucyB3aGVuIGEgQkRTIGlzIGRlbGV0ZWQpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxl
+YXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyBy
+ZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5F
+UlMuCj09PSBPVVRQVVQgRU5EID09PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEK
+CgpUaGUgZnVsbCBsb2cgaXMgYXZhaWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE2
+MDM0NDk2OTI0My40MDkxMzQzLjE0MzcxMzM4NDA5Njg2NzMyODc5LnN0Z2l0QGJhaGlhLmxhbi90
+ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRv
+bWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQg
+eW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
