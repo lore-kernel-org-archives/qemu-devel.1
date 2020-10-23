@@ -2,81 +2,93 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 523FEC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 557A0C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:04:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4F8F02192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:02:13 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4F8F02192A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id BE6AB2192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:04:03 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R0z4ysMt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE6AB2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37692 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39942 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVupo-0007H9-2N
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:02:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47302)
+	id 1kVura-0008HN-Ir
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:04:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47480)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVuod-0006qH-FA
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:00:59 -0400
-Received: from indium.canonical.com ([91.189.90.7]:51990)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kVuob-0002JT-0C
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:00:59 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kVuoZ-0000zf-0q
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 11:00:55 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 03E692E811E
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 11:00:55 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVupM-0007LG-Bt
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:01:44 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36588)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVupI-0002Yg-UU
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:01:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603450899;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=PvoB5wXGezv8epvQZdnuV9fA1HDSoEYAe4byGWWcguY=;
+ b=R0z4ysMttt/c8TdAS0EpY1XTYwxRYJWzU2c6Joc1OKRg95UFZrF8q9z3gzccL/b/ftrjpe
+ S90Ly5ixVD/oN2MrmEpU4kZ0obsKY5wqljuMUgnHJAuvZ7YR5eSfU4dphaGKC2y6tW2boG
+ fIrhHlpUA4pN4OgRJ8FgbL/BSsG7gPA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-229-gdTY8utXP3ynUwIEa3SC-Q-1; Fri, 23 Oct 2020 07:01:37 -0400
+X-MC-Unique: gdTY8utXP3ynUwIEa3SC-Q-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E687F107B470;
+ Fri, 23 Oct 2020 11:01:36 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9C7925D9DC;
+ Fri, 23 Oct 2020 11:01:36 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id B3EEB204A1; Fri, 23 Oct 2020 13:01:35 +0200 (CEST)
+Date: Fri, 23 Oct 2020 13:01:35 +0200
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@gmail.com>
+Subject: Re: [PATCH 1/2] virtio-gpu: add virtio-gpu-pci module
+Message-ID: <20201023110135.lrjq5mqvma4fzavi@sirius.home.kraxel.org>
+References: <20201023064618.21409-1-kraxel@redhat.com>
+ <20201023064618.21409-2-kraxel@redhat.com>
+ <CAJ+F1CK0A1+vOMZq55guJi9OPg1zyVyRQ_azYA7NNVg5Kx5hDA@mail.gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 23 Oct 2020 10:54:12 -0000
-From: Petunia <1895053@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: linux-user
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: laurent-vivier pauldzim petunia2000
-X-Launchpad-Bug-Reporter: Petunia (petunia2000)
-X-Launchpad-Bug-Modifier: Petunia (petunia2000)
-References: <159968542073.11462.1191604929312152807.malonedeb@chaenomeles.canonical.com>
-Message-Id: <160345045211.26130.5268274563259111291.malone@wampee.canonical.com>
-Subject: [Bug 1895053] Re: Cannot nspawn raspbian 10 [FAILED] Failed to start
- Journal Service.
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
-X-Launchpad-Hash: 9a3889684927c6f39543bd52926e795d02b43486
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 07:00:55
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAJ+F1CK0A1+vOMZq55guJi9OPg1zyVyRQ_azYA7NNVg5Kx5hDA@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,67 +97,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1895053 <1895053@bugs.launchpad.net>
+Cc: QEMU <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mhm, weird. On my other machine it works.
-There I used the AUR package qemu-user-static instead of qemu-arm-static.
-However that seems not to be the problem since it doesnt even work  after s=
-witching to qemu-user-static.
+  Hi,
 
-With the working setup the log files are also created (which makes sense
-since it loops at "A start job is running for Journal Service")
+> Hmm, I realize we have a different behaviour when building devices as
+> modules shared by different qemu system binaries.
+> 
+> It will attempt to load any kind of modules:
+> 
+> ./qemu-system-m68k  -kernel ~/Downloads/vmlinux-5.8.0-3-m68k  -device
+> virtio-gpu-pci
+> Failed to open module:
+> /home/elmarco/src/qemu/buildnodoc/hw-display-virtio-gpu-pci.so: undefined
+> symbol: virtio_instance_init_common
+> qemu-system-m68k: -device virtio-gpu-pci: 'virtio-gpu-pci' is not a valid
+> device model name
 
--- =
+Yes.  The last line is printed for non-modular builds too.
+The module load error can obviously only happen on modular builds.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1895053
+> $ qemu-system-m68k -device help
+> Failed to open module: /usr/lib64/qemu/hw-usb-smartcard.so: undefined
+> symbol: ccid_card_send_apdu_to_guest
+> Failed to open module: /usr/lib64/qemu/hw-display-qxl.so: undefined symbol:
+> vga_ioport_read
 
-Title:
-  Cannot nspawn raspbian 10 [FAILED] Failed to start Journal Service.
+That one is fixed meanwhile:
 
-Status in QEMU:
-  New
+commit 501093207eb1ed4845e0a65ee1ce7db7b9676e0b
+Author: Gerd Hoffmann <kraxel@redhat.com>
+Date:   Wed Sep 23 11:12:17 2020 +0200
 
-Bug description:
-  Hi, I'm using nspawn and asked the question @systemd-devel. They redirect=
-ed me to you, guessing that nspawn calls a syscall or ioctl qemu isnt aware=
- of and can't implement properly?
-  They were like: "Sorry, that's not my department." ^^
+    module: silence errors for module_load_qom_all().
 
-  Maybe you can reproduce the issue or help me investigating whats wrong
-  or put the ball right back into their court? :D
+take care,
+  Gerd
 
-  Testscript:
-  wget https://downloads.raspberrypi.org/raspios_lite_armhf_latest -o r.zip
-  unzip r.zip
-  LOOP=3D$(losetup --show -Pf *raspios-buster-armhf-lite.img)
-  mount ${LOOP}p2 /mnt
-  mount ${LOOP}p1 /mnt/boot
-  systemd-nspawn --bind /usr/bin/qemu-arm-static --boot --directory=3D/mnt =
--- systemd.log_level=3Ddebug
-
-  Output:
-  see attachment
-
-  System:
-  uname -a
-  Linux MArch 5.8.7-arch1-1 #1 SMP PREEMPT Sat, 05 Sep 2020 12:31:32 +0000
-  x86_64 GNU/Linux
-
-  qemu-arm-static --version
-  qemu-arm version 5.1.0
-
-  systemd-nspawn --version
-  systemd 246 (246.4-1-arch)
-  +PAM +AUDIT -SELINUX -IMA -APPARMOR +SMACK -SYSVINIT +UTMP +LIBCRYPTSETUP
-  +GCRYPT +GNUTLS +ACL +XZ +LZ4 +ZSTD +SECCOMP +BLKID +ELFUTILS +KMOD +IDN2=
- -IDN
-  +PCRE2 default-hierarchy=3Dhybrid
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1895053/+subscriptions
 
