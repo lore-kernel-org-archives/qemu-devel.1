@@ -2,86 +2,87 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 851E2C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CB25C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:37:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB9F720EDD
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3969F20FC3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:37:04 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="sEwOhzzO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB9F720EDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c4WBiS62"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3969F20FC3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34770 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVuHR-0007HA-6z
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:26:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40280)
+	id 1kVuRT-0001cK-90
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:37:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43078)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVuEF-0006IJ-PV
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:23:23 -0400
-Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:11414)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVuEB-0005NG-KI
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:23:23 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f92aee5000c>; Fri, 23 Oct 2020 03:22:29 -0700
-Received: from [10.40.101.194] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
- 2020 10:21:16 +0000
-Subject: Re: [PATCH v27 17/17] qapi: Add VFIO devices migration stats in
- Migration stats
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
- <1603365127-14202-18-git-send-email-kwankhede@nvidia.com>
- <20201022161842.30585c2e@w520.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <4caf6f0b-b291-8e73-fa5f-5357c6f194ff@nvidia.com>
-Date: Fri, 23 Oct 2020 15:51:13 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVuQt-00018d-Ok
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:36:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21292)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kVuQr-0001yN-EJ
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:36:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603449383;
+ h=from:from:reply-to:reply-to:subject:subject:date:date:
+ message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+ content-type:content-type:in-reply-to:in-reply-to:  references:references;
+ bh=UneqABSH2lLBDzFayFpETvwbxHYCL7rMkxpxnYEULes=;
+ b=c4WBiS62RznBmB1+6zjjvQ4WUzydUgXEUv8ECKutvUGo0ZiQNLS4/9BsDeccUooa/r4RPO
+ dg9KPwF8H1589gg4JgrodVHXBZNGKTvNdPa8yn1ovLj5BYggQWBrlz3UMTFTuML7yTq85F
+ JOJHiDFy5o5VNTkKq8LolTX10lW4pH4=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-234-jGTUG-72PLyeoMhiMfj4fw-1; Fri, 23 Oct 2020 06:36:17 -0400
+X-MC-Unique: jGTUG-72PLyeoMhiMfj4fw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B872781C9BE;
+ Fri, 23 Oct 2020 10:36:16 +0000 (UTC)
+Received: from redhat.com (ovpn-114-187.ams2.redhat.com [10.36.114.187])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 2B14527BB4;
+ Fri, 23 Oct 2020 10:36:06 +0000 (UTC)
+Date: Fri, 23 Oct 2020 11:36:03 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH 0/6] qemu-storage-daemon: QAPIfy --chardev
+Message-ID: <20201023103603.GG445638@redhat.com>
+References: <20201023101222.250147-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201022161842.30585c2e@w520.home>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603448549; bh=UhsSn1ZW6BXznN01Ya2ARroLSWrt9aejEMEpApjd9Ug=;
- h=Subject:To:CC:References:X-Nvconfidentiality:From:Message-ID:Date:
- User-Agent:MIME-Version:In-Reply-To:Content-Type:Content-Language:
- Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
- b=sEwOhzzO8W1ocbFbyccF5yGLfF9xMbLL0jTHJgDJSSwd/coLnEZ+9cqKa5yDa5A4Z
- Zu2d2E5Ax70a84peZgy+f4sG/O2jpN8NQ9987stgaDKz7L3UmMRLUx16N8F5ju5OEx
- o/o9orRXumAQio18TgEKzN5WuikQ9d1vOh6Jx6ao+T3WomDCaGqvSQ86ZvDZIwIjI+
- kNlVs//exlsNEiSfxVFIq8sr5REyGXDGHqy7IQ/p3mRr1zvoCfBXT7uGQcQA+A0vPS
- zKyJk09v6zrrnwfts6AWXAaZLTokGXNaUYYx63emJJH+QPtvvcdBtfH5uesjNiZDr+
- 2zq/JVHKez2cg==
-Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate25.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:23:18
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -71
-X-Spam_score: -7.2
-X-Spam_bar: -------
-X-Spam_report: (-7.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201023101222.250147-1-kwolf@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,261 +95,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Cc: marcandre.lureau@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org,
+ qemu-block@nongnu.org, armbru@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On Fri, Oct 23, 2020 at 12:12:16PM +0200, Kevin Wolf wrote:
+> While the qemu-storage-daemon command line is still considered unstable,
+> let's change --chardev from the old QemuOpts-based parser to QAPI, so
+> that it becomes a simple mapping of chardev-add to the command line and
+> will fit in a future fully QAPIfied command line without later
+> incompatible changes or additional compatibility glue.
+
+NB, I am *not* objecting to this series in what I'm about to write,
+but I want to point out that I don't think we should assume that
+this proposed QAPIified CLI is neccessarily the long term end point.
+Below I outline potential incompatible changes that would end up
+turning -chardev into legacy / deprecated syntax.
 
 
-On 10/23/2020 3:48 AM, Alex Williamson wrote:
-> On Thu, 22 Oct 2020 16:42:07 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> Added amount of bytes transferred to the VM at destination by all VFIO
->> devices
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>   hw/vfio/common.c            | 20 ++++++++++++++++++++
->>   hw/vfio/migration.c         | 10 ++++++++++
->>   include/qemu/vfio-helpers.h |  3 +++
->>   migration/migration.c       | 14 ++++++++++++++
->>   monitor/hmp-cmds.c          |  6 ++++++
->>   qapi/migration.json         | 17 +++++++++++++++++
->>   6 files changed, 70 insertions(+)
->>
->> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
->> index 9c879e5c0f62..8d0758eda9fa 100644
->> --- a/hw/vfio/common.c
->> +++ b/hw/vfio/common.c
->> @@ -39,6 +39,7 @@
->>   #include "trace.h"
->>   #include "qapi/error.h"
->>   #include "migration/migration.h"
->> +#include "qemu/vfio-helpers.h"
->>   
->>   VFIOGroupList vfio_group_list =
->>       QLIST_HEAD_INITIALIZER(vfio_group_list);
->> @@ -292,6 +293,25 @@ const MemoryRegionOps vfio_region_ops = {
->>    * Device state interfaces
->>    */
->>   
->> +bool vfio_mig_active(void)
->> +{
->> +    VFIOGroup *group;
->> +    VFIODevice *vbasedev;
->> +
->> +    if (QLIST_EMPTY(&vfio_group_list)) {
->> +        return false;
->> +    }
->> +
->> +    QLIST_FOREACH(group, &vfio_group_list, next) {
->> +        QLIST_FOREACH(vbasedev, &group->device_list, next) {
->> +            if (vbasedev->migration_blocker) {
->> +                return false;
->> +            }
->> +        }
->> +    }
->> +    return true;
->> +}
->> +
->>   static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
->>   {
->>       VFIOGroup *group;
->> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
->> index 77ee60a43ea5..b23e21c6de2b 100644
->> --- a/hw/vfio/migration.c
->> +++ b/hw/vfio/migration.c
->> @@ -28,6 +28,7 @@
->>   #include "pci.h"
->>   #include "trace.h"
->>   #include "hw/hw.h"
->> +#include "qemu/vfio-helpers.h"
->>   
->>   /*
->>    * Flags to be used as unique delimiters for VFIO devices in the migration
->> @@ -45,6 +46,8 @@
->>   #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
->>   #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
->>   
->> +static int64_t bytes_transferred;
->> +
->>   static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
->>                                     off_t off, bool iswrite)
->>   {
->> @@ -255,6 +258,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
->>           *size = data_size;
->>       }
->>   
->> +    bytes_transferred += data_size;
->>       return ret;
->>   }
->>   
->> @@ -776,6 +780,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
->>       case MIGRATION_STATUS_CANCELLING:
->>       case MIGRATION_STATUS_CANCELLED:
->>       case MIGRATION_STATUS_FAILED:
->> +        bytes_transferred = 0;
->>           ret = vfio_migration_set_state(vbasedev,
->>                         ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
->>                         VFIO_DEVICE_STATE_RUNNING);
->> @@ -862,6 +867,11 @@ err:
->>   
->>   /* ---------------------------------------------------------------------- */
->>   
->> +int64_t vfio_mig_bytes_transferred(void)
->> +{
->> +    return bytes_transferred;
->> +}
->> +
->>   int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
->>   {
->>       VFIOContainer *container = vbasedev->group->container;
->> diff --git a/include/qemu/vfio-helpers.h b/include/qemu/vfio-helpers.h
->> index 4491c8e1a6e9..7f7a46e6ef2d 100644
->> --- a/include/qemu/vfio-helpers.h
->> +++ b/include/qemu/vfio-helpers.h
->> @@ -29,4 +29,7 @@ void qemu_vfio_pci_unmap_bar(QEMUVFIOState *s, int index, void *bar,
->>   int qemu_vfio_pci_init_irq(QEMUVFIOState *s, EventNotifier *e,
->>                              int irq_type, Error **errp);
->>   
->> +bool vfio_mig_active(void);
->> +int64_t vfio_mig_bytes_transferred(void);
->> +
->>   #endif
-> 
-> 
-> I don't think vfio-helpers is the right place for this, this header is
-> specifically for using util/vfio-helpers.c.  Would
-> include/hw/vfio/vfio-common.h work?
-> 
-> 
+The chardev QAPI-ification is a good example of the gap between QOM
+and QAPI.
 
-Yes, works with CONFIG_VFIO check. Changing it.
+The chardev backends are QOM classes, but they lack the "user creatable"
+interface.
 
->> diff --git a/migration/migration.c b/migration/migration.c
->> index 0575ecb37953..8b2865d25ef4 100644
->> --- a/migration/migration.c
->> +++ b/migration/migration.c
->> @@ -56,6 +56,7 @@
->>   #include "net/announce.h"
->>   #include "qemu/queue.h"
->>   #include "multifd.h"
->> +#include "qemu/vfio-helpers.h"
->>   
->>   #define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
->>   
->> @@ -1002,6 +1003,17 @@ static void populate_disk_info(MigrationInfo *info)
->>       }
->>   }
->>   
->> +static void populate_vfio_info(MigrationInfo *info)
->> +{
->> +#ifdef CONFIG_LINUX
-> 
-> Use CONFIG_VFIO?  I get a build failure on qemu-system-avr
-> 
-> /usr/bin/ld: /tmp/tmp.3QbqxgbENl/build/../migration/migration.c:1012:
-> undefined reference to `vfio_mig_bytes_transferred'.  Thanks,
-> 
+Thus instead of configuring them using -object / object_add, we have a
+QAPI model, custom args/commands -chardev / chardev_add, and then code
+that populates the object instance properties from the QAPI model. Except
+we've not really exposed them as object instance properties - they are
+mostly just struct fields directly accessed.
 
-Ok Changing it.
 
-> Alex
-> 
->> +    if (vfio_mig_active()) {
->> +        info->has_vfio = true;
->> +        info->vfio = g_malloc0(sizeof(*info->vfio));
->> +        info->vfio->transferred = vfio_mig_bytes_transferred();
->> +    }
->> +#endif
->> +}
->> +
->>   static void fill_source_migration_info(MigrationInfo *info)
->>   {
->>       MigrationState *s = migrate_get_current();
->> @@ -1026,6 +1038,7 @@ static void fill_source_migration_info(MigrationInfo *info)
->>           populate_time_info(info, s);
->>           populate_ram_info(info, s);
->>           populate_disk_info(info);
->> +        populate_vfio_info(info);
->>           break;
->>       case MIGRATION_STATUS_COLO:
->>           info->has_status = true;
->> @@ -1034,6 +1047,7 @@ static void fill_source_migration_info(MigrationInfo *info)
->>       case MIGRATION_STATUS_COMPLETED:
->>           populate_time_info(info, s);
->>           populate_ram_info(info, s);
->> +        populate_vfio_info(info);
->>           break;
->>       case MIGRATION_STATUS_FAILED:
->>           info->has_status = true;
->> diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
->> index 9789f4277f50..56e9bad33d94 100644
->> --- a/monitor/hmp-cmds.c
->> +++ b/monitor/hmp-cmds.c
->> @@ -357,6 +357,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
->>           }
->>           monitor_printf(mon, "]\n");
->>       }
->> +
->> +    if (info->has_vfio) {
->> +        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
->> +                       info->vfio->transferred >> 10);
->> +    }
->> +
->>       qapi_free_MigrationInfo(info);
->>   }
->>   
->> diff --git a/qapi/migration.json b/qapi/migration.json
->> index a5da513c9e05..3c7582052725 100644
->> --- a/qapi/migration.json
->> +++ b/qapi/migration.json
->> @@ -147,6 +147,18 @@
->>               'active', 'postcopy-active', 'postcopy-paused',
->>               'postcopy-recover', 'completed', 'failed', 'colo',
->>               'pre-switchover', 'device', 'wait-unplug' ] }
->> +##
->> +# @VfioStats:
->> +#
->> +# Detailed VFIO devices migration statistics
->> +#
->> +# @transferred: amount of bytes transferred to the target VM by VFIO devices
->> +#
->> +# Since: 5.2
->> +#
->> +##
->> +{ 'struct': 'VfioStats',
->> +  'data': {'transferred': 'int' } }
->>   
->>   ##
->>   # @MigrationInfo:
->> @@ -208,11 +220,16 @@
->>   #
->>   # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
->>   #
->> +# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
->> +#        only returned if VFIO device is present, migration is supported by all
->> +#        VFIO devices and status is 'active' or 'completed' (since 5.2)
->> +#
->>   # Since: 0.14.0
->>   ##
->>   { 'struct': 'MigrationInfo',
->>     'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
->>              '*disk': 'MigrationStats',
->> +           '*vfio': 'VfioStats',
->>              '*xbzrle-cache': 'XBZRLECacheStats',
->>              '*total-time': 'int',
->>              '*expected-downtime': 'int',
-> 
+The benefit of the chardev approach is that we have an introspectable
+QAPI model. The downside is that we have a bunch of conversion code
+for QAPI to QOM mapping.
+
+The benefit of the user creatable object approach is that we dont
+have to add custom CLI args for different types of object, nor write
+code to populate QOM from QAPI. The downside is that we're divorced
+from the QAPI schema, so loose introspection, and have a different
+type of tedious boilerplate code to write.
+
+
+The fact that we have this custom -chardev arg, instead of just using
+-object is related to the ordering problems we have in main() in the
+system emulators.
+
+We have some -object types that need creating before the chardev
+types, and some -object types that need creating after the chardevs.
+
+If -chardev didn't exist, and we used -object for chardev creation,
+then the ordering problem would trivially not exist, as we would
+simply be processing all -object args in order that we receive them.
+
+
+IOW, if we're considering our ideal long term configuration goals
+for QEMU, then I think we should be looking at a solution to bridge
+the gap, so that we can get the best of both worlds, and have a single
+way todo things.
+
+IMHO, ideally none of -netdev, -chardev, -device, etc would exist
+in any "modern" CLI, they would just be considered legacy syntax.
+Essentially everything would be created using the same -object arg
+and object_add  commands.
+
+
+What I think this means is that we need to use QAPI to represent
+the properties of an object, and auto-generate the QOM code to
+register properties, provider setters/getters, constructors, etc.
+
+For existing user creatable objects this would largely involve
+deleting lots of existing code and defining some simple QAPI
+schemas. This is probably quite easy, if tedious.
+
+For the chardev/netdev/etc objects we already have the QAPI schema,
+but would need to add code genration parts to turn them into full
+user creatable object classes. This is likely harder more involved
+work, especially to keep backcompat working well.
+
+Regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
