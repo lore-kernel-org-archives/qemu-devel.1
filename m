@@ -2,98 +2,89 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B7272C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:14:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CBF3C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:17:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D208120E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:14:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6A61520E65
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 19:17:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dDaBlkF+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D208120E65
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EeRqKbcj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6A61520E65
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47394 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW2W0-0003Jw-Ki
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 15:14:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57780)
+	id 1kW2Yd-0004Sa-9n
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 15:16:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58058)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kW2VR-0002rm-E9
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:13:41 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37330)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kW2VP-00068N-75
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:13:41 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 126so1701572pfu.4
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 12:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=w5+o7Fuw8mcegapYPtHZXN+EuScY7pbJOQkVwlCvtJs=;
- b=dDaBlkF+/AUn3FhKuL7sO5xhz2m86yVz52EqhxTwn0pFkv6jCoY01bAwruk4Zmm/qx
- SpMJwP/Rrlae0k81B3RX50KtoEAdUYRXAydgCpP6zdr8gMm5m/1ICI/ECFgyG/5FpH9L
- se/DMKxVFJ2W409wN+QK28acqhGf2bWdN3LFztFQEzY1nfsX+X0Oii+l1Z4kyCEz0n9Z
- EkVU8trMhC4cCoV3vFfjhPwIq1MWq95fu38udVOTCVd5QqLs5Fsy2+frcPyxr5T7hNui
- Xb4JXpu8fDT+aY4JecASTGMD9ptYl1tIxW2vg7hfegZr9fE53G+46or7CDyw+0sgSV7b
- uO6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=w5+o7Fuw8mcegapYPtHZXN+EuScY7pbJOQkVwlCvtJs=;
- b=iuzuXV3dZu00IXj7tEp5wE23yRr2uCe8YGEtcPDIpLlbTWzliAPziqsegih2NMlqy6
- slOYBG0az9+tBOwIL4CfUvuQt6bwIkov4kKknmAcc0wHoibbijsfuLyPyoJFHAChkysl
- PUzQDKywDr/eujb6NU+nhywsqKc3AVxEnAWiaVX4d3UEi9IV1aPDr6sc8w88pXVKOhk4
- OC+hhCDF2U+7u+JCnIUgiEi2251A+CPk/zm7wSmocURH5NyxbJ7wbtfJUT9pwpjJZ81U
- tW1ZOme6t++rTuzIzyIpJZuT9jNPVmdAuXZJdyaQkgu0jg+fDcYSv/+hk0MO/7wPMreT
- /Asg==
-X-Gm-Message-State: AOAM530woue+JVDeDfD9oazMlVKisF+vR0sGTllOnZVy9hif/tc18cJ2
- a2Nf+XXi2pgmcJYy6BAdP04bag==
-X-Google-Smtp-Source: ABdhPJymzrAfSMf6sMXC7gPsBC8wRCCAOljLD3/aS3le+kOLrlA6LJkBj5tO025gwIBQo1ODKV2STQ==
-X-Received: by 2002:a17:90a:17ad:: with SMTP id
- q42mr4417559pja.36.1603480417598; 
- Fri, 23 Oct 2020 12:13:37 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id s141sm3009701pfs.75.2020.10.23.12.13.36
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Oct 2020 12:13:36 -0700 (PDT)
-Subject: Re: [PATCH v1 1/5] target/riscv: Add a virtualised MMU Mode
-To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-References: <cover.1603466725.git.alistair.francis@wdc.com>
- <16213739a6232aa4824c5a008e2f669e6e58fbcf.1603466725.git.alistair.francis@wdc.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <bec11f34-9cfe-4aa2-2f9c-3781d7f5e8ad@linaro.org>
-Date: Fri, 23 Oct 2020 12:13:34 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kW2X7-0003q6-JH
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:15:25 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43977)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kW2X6-0006Lq-2Z
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 15:15:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603480523;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9P/WugInpiDxI82FZZ7oqO3Ss99qjVUoioe3szACTKU=;
+ b=EeRqKbcjkISpr1/obE6K281pqz+kj5nbkR6k466+ckd0/kfm4hPXzF4fJ3e7e0q0mpVQ/R
+ TaYs3PxUBMV9mE/ddii40eirjyAmip8fyIo7cTe5jSHSEo2qacZ8NqKHkx4/Ai/Lntzf1d
+ dBWgftIycHmaNlXO5+JEuDfcfwDxUpc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-577-vz8hByLNN3ugcwowuSuGIg-1; Fri, 23 Oct 2020 15:15:19 -0400
+X-MC-Unique: vz8hByLNN3ugcwowuSuGIg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9E03ADC25;
+ Fri, 23 Oct 2020 19:15:17 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id D689D614F5;
+ Fri, 23 Oct 2020 19:15:10 +0000 (UTC)
+Date: Fri, 23 Oct 2020 21:15:09 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 4/5] spapr: Pass &error_abort when getting some PC DIMM
+ properties
+Message-ID: <20201023211509.5c316c01@redhat.com>
+In-Reply-To: <160309732180.2739814.7243774674998010907.stgit@bahia.lan>
+References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
+ <160309732180.2739814.7243774674998010907.stgit@bahia.lan>
 MIME-Version: 1.0
-In-Reply-To: <16213739a6232aa4824c5a008e2f669e6e58fbcf.1603466725.git.alistair.francis@wdc.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.108,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,29 +97,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, bmeng.cn@gmail.com, palmer@dabbelt.com
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Richard Henderson <rth@twiddle.net>,
+ David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/20 8:26 AM, Alistair Francis wrote:
-> +++ b/target/riscv/cpu-param.h
-> @@ -18,6 +18,6 @@
->  # define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
->  #endif
->  #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
-> -#define NB_MMU_MODES 4
-> +#define NB_MMU_MODES 8
+On Mon, 19 Oct 2020 10:48:41 +0200
+Greg Kurz <groug@kaod.org> wrote:
 
-Is there really a PRV_M + virt enabled state?
+> Both PC_DIMM_SLOT_PROP and PC_DIMM_ADDR_PROP are defined in the
+> default property list of the PC DIMM device class:
+> 
+>     DEFINE_PROP_UINT64(PC_DIMM_ADDR_PROP, PCDIMMDevice, addr, 0),
+> 
+>     DEFINE_PROP_INT32(PC_DIMM_SLOT_PROP, PCDIMMDevice, slot,
+>                       PC_DIMM_UNASSIGNED_SLOT),
+> 
+> They should thus be always gettable for both PC DIMMs and NVDIMMs.
+> An error in getting them can only be the result of a programming
+> error. It doesn't make much sense to propagate the error in this
+> case. Abort instead.
+> 
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
-> +#define TB_FLAGS_PRIV_MMU_MASK                3
-...
-> -    int mode = mmu_idx;
-> +    int mode = mmu_idx & 0x3;
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 
-Use that MASK here?
+TODO for future,
+get rid of local_err in spapr_memory_plug() altogether, it should not fail.
+it needs moving check from spapr_drc_attach() to spapr_memory_pre_plug() time.
 
+that will clear up (a bit) road for dropping errp in spapr_memory_plug()
+> ---
+>  hw/ppc/spapr.c |   17 +++--------------
+>  1 file changed, 3 insertions(+), 14 deletions(-)
+> 
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 1b173861152f..62f217a6b914 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -3443,19 +3443,13 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+>  
+>      if (!is_nvdimm) {
+>          addr = object_property_get_uint(OBJECT(dimm),
+> -                                        PC_DIMM_ADDR_PROP, &local_err);
+> -        if (local_err) {
+> -            goto out_unplug;
+> -        }
+> +                                        PC_DIMM_ADDR_PROP, &error_abort);
+>          spapr_add_lmbs(dev, addr, size,
+>                         spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
+>                         &local_err);
+>      } else {
+>          slot = object_property_get_int(OBJECT(dimm),
+> -                                       PC_DIMM_SLOT_PROP, &local_err);
+> -        if (local_err) {
+> -            goto out_unplug;
+> -        }
+> +                                       PC_DIMM_SLOT_PROP, &error_abort);
+>          /* We should have valid slot number at this point */
+>          g_assert(slot >= 0);
+>          spapr_add_nvdimm(dev, slot, &local_err);
+> @@ -3634,7 +3628,6 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+>                                          DeviceState *dev, Error **errp)
+>  {
+>      SpaprMachineState *spapr = SPAPR_MACHINE(hotplug_dev);
+> -    Error *local_err = NULL;
+>      PCDIMMDevice *dimm = PC_DIMM(dev);
+>      uint32_t nr_lmbs;
+>      uint64_t size, addr_start, addr;
+> @@ -3650,11 +3643,7 @@ static void spapr_memory_unplug_request(HotplugHandler *hotplug_dev,
+>      nr_lmbs = size / SPAPR_MEMORY_BLOCK_SIZE;
+>  
+>      addr_start = object_property_get_uint(OBJECT(dimm), PC_DIMM_ADDR_PROP,
+> -                                         &local_err);
+> -    if (local_err) {
+> -        error_propagate(errp, local_err);
+> -        return;
+> -    }
+> +                                          &error_abort);
+>  
+>      /*
+>       * An existing pending dimm state for this DIMM means that there is an
+> 
+> 
+> 
 
-r~
 
