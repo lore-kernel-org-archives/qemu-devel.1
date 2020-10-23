@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94691C55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A7D2C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0487524182
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0487524182
+	by mail.kernel.org (Postfix) with ESMTPS id F35C324182
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:33 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F35C324182
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43320 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVt9P-0006Jz-Kz
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:14:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54416)
+	id 1kVt9c-0006P1-PP
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:14:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54466)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kVt86-0004YH-Su; Fri, 23 Oct 2020 05:12:58 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:46358 helo=huawei.com)
+ id 1kVt8A-0004dM-0Q; Fri, 23 Oct 2020 05:13:02 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46596 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kVt84-0004iT-Gw; Fri, 23 Oct 2020 05:12:58 -0400
-Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.59])
- by Forcepoint Email with ESMTP id 3456A240EFD79865E185;
- Fri, 23 Oct 2020 17:12:46 +0800 (CST)
+ id 1kVt86-0004mM-Rp; Fri, 23 Oct 2020 05:13:01 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
+ by Forcepoint Email with ESMTP id 4D27CCA9D5FC383C5835;
+ Fri, 23 Oct 2020 17:12:56 +0800 (CST)
 Received: from huawei.com (10.174.186.209) by DGGEMS406-HUB.china.huawei.com
  (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 23 Oct 2020
- 17:12:40 +0800
+ 17:12:47 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH V3 2/6] target/riscv: Add basic vmstate description of CPU
-Date: Fri, 23 Oct 2020 17:12:21 +0800
-Message-ID: <20201023091225.224-3-jiangyifei@huawei.com>
+Subject: [PATCH V3 6/6] target/riscv: Add sifive_plic vmstate
+Date: Fri, 23 Oct 2020 17:12:25 +0800
+Message-ID: <20201023091225.224-7-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20201023091225.224-1-jiangyifei@huawei.com>
 References: <20201023091225.224-1-jiangyifei@huawei.com>
@@ -80,153 +80,91 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add basic CPU state description to the newly created machine.c
+Add sifive_plic vmstate for supporting sifive_plic migration.
+Current vmstate framework only supports one structure parameter
+as num field to describe variable length arrays, so introduce
+num_enables.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
 ---
- target/riscv/cpu.c       |  8 +----
- target/riscv/internals.h |  4 +++
- target/riscv/machine.c   | 74 ++++++++++++++++++++++++++++++++++++++++
- target/riscv/meson.build |  3 +-
- 4 files changed, 81 insertions(+), 8 deletions(-)
- create mode 100644 target/riscv/machine.c
+ hw/intc/sifive_plic.c | 26 +++++++++++++++++++++++++-
+ hw/intc/sifive_plic.h |  1 +
+ 2 files changed, 26 insertions(+), 1 deletion(-)
 
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index dd05a220c7..6a0264fc6b 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -22,6 +22,7 @@
- #include "qemu/ctype.h"
- #include "qemu/log.h"
- #include "cpu.h"
-+#include "internals.h"
- #include "exec/exec-all.h"
- #include "qapi/error.h"
- #include "qemu/error-report.h"
-@@ -498,13 +499,6 @@ static void riscv_cpu_init(Object *obj)
-     cpu_set_cpustate_pointers(cpu);
+diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
+index f42fd695d8..97a1a27a9a 100644
+--- a/hw/intc/sifive_plic.c
++++ b/hw/intc/sifive_plic.c
+@@ -30,6 +30,7 @@
+ #include "hw/intc/sifive_plic.h"
+ #include "target/riscv/cpu.h"
+ #include "sysemu/sysemu.h"
++#include "migration/vmstate.h"
+ 
+ #define RISCV_DEBUG_PLIC 0
+ 
+@@ -448,11 +449,12 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+                           TYPE_SIFIVE_PLIC, plic->aperture_size);
+     parse_hart_config(plic);
+     plic->bitfield_words = (plic->num_sources + 31) >> 5;
++    plic->num_enables = plic->bitfield_words * plic->num_addrs;
+     plic->source_priority = g_new0(uint32_t, plic->num_sources);
+     plic->target_priority = g_new(uint32_t, plic->num_addrs);
+     plic->pending = g_new0(uint32_t, plic->bitfield_words);
+     plic->claimed = g_new0(uint32_t, plic->bitfield_words);
+-    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
++    plic->enable = g_new0(uint32_t, plic->num_enables);
+     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
+     qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
+ 
+@@ -472,12 +474,34 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
+     msi_nonbroken = true;
  }
  
--#ifndef CONFIG_USER_ONLY
--static const VMStateDescription vmstate_riscv_cpu = {
--    .name = "cpu",
--    .unmigratable = 1,
--};
--#endif
--
- static Property riscv_cpu_properties[] = {
-     DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
-     DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
-diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-index f1a546dba6..b15ad394bb 100644
---- a/target/riscv/internals.h
-+++ b/target/riscv/internals.h
-@@ -38,6 +38,10 @@ target_ulong fclass_d(uint64_t frs1);
- #define SEW32 2
- #define SEW64 3
- 
-+#ifndef CONFIG_USER_ONLY
-+extern const VMStateDescription vmstate_riscv_cpu;
-+#endif
-+
- static inline uint64_t nanbox_s(float32 f)
- {
-     return f | MAKE_64BIT_MASK(32, 32);
-diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-new file mode 100644
-index 0000000000..32edbcba7c
---- /dev/null
-+++ b/target/riscv/machine.c
-@@ -0,0 +1,74 @@
-+/*
-+ * RISC-V VMState Description
-+ *
-+ * Copyright (c) 2020 Huawei Technologies Co., Ltd
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms and conditions of the GNU General Public License,
-+ * version 2 or later, as published by the Free Software Foundation.
-+ *
-+ * This program is distributed in the hope it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-+ * more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along with
-+ * this program.  If not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "cpu.h"
-+#include "qemu/error-report.h"
-+#include "sysemu/kvm.h"
-+#include "migration/cpu.h"
-+
-+const VMStateDescription vmstate_riscv_cpu = {
-+    .name = "cpu",
++static const VMStateDescription vmstate_sifive_plic = {
++    .name = "riscv_sifive_plic",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINTTL_ARRAY(env.gpr, RISCVCPU, 32),
-+        VMSTATE_UINT64_ARRAY(env.fpr, RISCVCPU, 32),
-+        VMSTATE_UINTTL(env.pc, RISCVCPU),
-+        VMSTATE_UINTTL(env.load_res, RISCVCPU),
-+        VMSTATE_UINTTL(env.load_val, RISCVCPU),
-+        VMSTATE_UINTTL(env.frm, RISCVCPU),
-+        VMSTATE_UINTTL(env.badaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.guest_phys_fault_addr, RISCVCPU),
-+        VMSTATE_UINTTL(env.priv_ver, RISCVCPU),
-+        VMSTATE_UINTTL(env.vext_ver, RISCVCPU),
-+        VMSTATE_UINTTL(env.misa, RISCVCPU),
-+        VMSTATE_UINTTL(env.misa_mask, RISCVCPU),
-+        VMSTATE_UINT32(env.features, RISCVCPU),
-+        VMSTATE_UINTTL(env.priv, RISCVCPU),
-+        VMSTATE_UINTTL(env.virt, RISCVCPU),
-+        VMSTATE_UINTTL(env.resetvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.mhartid, RISCVCPU),
-+        VMSTATE_UINT64(env.mstatus, RISCVCPU),
-+        VMSTATE_UINTTL(env.mip, RISCVCPU),
-+        VMSTATE_UINT32(env.miclaim, RISCVCPU),
-+        VMSTATE_UINTTL(env.mie, RISCVCPU),
-+        VMSTATE_UINTTL(env.mideleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.sptbr, RISCVCPU),
-+        VMSTATE_UINTTL(env.satp, RISCVCPU),
-+        VMSTATE_UINTTL(env.sbadaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.mbadaddr, RISCVCPU),
-+        VMSTATE_UINTTL(env.medeleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.stvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.sepc, RISCVCPU),
-+        VMSTATE_UINTTL(env.scause, RISCVCPU),
-+        VMSTATE_UINTTL(env.mtvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.mepc, RISCVCPU),
-+        VMSTATE_UINTTL(env.mcause, RISCVCPU),
-+        VMSTATE_UINTTL(env.mtval, RISCVCPU),
-+        VMSTATE_UINTTL(env.scounteren, RISCVCPU),
-+        VMSTATE_UINTTL(env.mcounteren, RISCVCPU),
-+        VMSTATE_UINTTL(env.sscratch, RISCVCPU),
-+        VMSTATE_UINTTL(env.mscratch, RISCVCPU),
-+        VMSTATE_UINT64(env.mfromhost, RISCVCPU),
-+        VMSTATE_UINT64(env.mtohost, RISCVCPU),
-+        VMSTATE_UINT64(env.timecmp, RISCVCPU),
-+
-+        VMSTATE_END_OF_LIST()
-+    }
++            VMSTATE_VARRAY_UINT32(source_priority, SiFivePLICState,
++                                  num_sources, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(target_priority, SiFivePLICState,
++                                  num_addrs, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(pending, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(claimed, SiFivePLICState, bitfield_words, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_VARRAY_UINT32(enable, SiFivePLICState, num_enables, 0,
++                                  vmstate_info_uint32, uint32_t),
++            VMSTATE_END_OF_LIST()
++        }
 +};
-diff --git a/target/riscv/meson.build b/target/riscv/meson.build
-index abd647fea1..14a5c62dac 100644
---- a/target/riscv/meson.build
-+++ b/target/riscv/meson.build
-@@ -27,7 +27,8 @@ riscv_ss.add(files(
- riscv_softmmu_ss = ss.source_set()
- riscv_softmmu_ss.add(files(
-   'pmp.c',
--  'monitor.c'
-+  'monitor.c',
-+  'machine.c'
- ))
++
+ static void sifive_plic_class_init(ObjectClass *klass, void *data)
+ {
+     DeviceClass *dc = DEVICE_CLASS(klass);
  
- target_arch += {'riscv': riscv_ss}
+     device_class_set_props(dc, sifive_plic_properties);
+     dc->realize = sifive_plic_realize;
++    dc->vmsd = &vmstate_sifive_plic;
+ }
+ 
+ static const TypeInfo sifive_plic_info = {
+diff --git a/hw/intc/sifive_plic.h b/hw/intc/sifive_plic.h
+index b75b1f145d..1e451a270c 100644
+--- a/hw/intc/sifive_plic.h
++++ b/hw/intc/sifive_plic.h
+@@ -52,6 +52,7 @@ struct SiFivePLICState {
+     uint32_t num_addrs;
+     uint32_t num_harts;
+     uint32_t bitfield_words;
++    uint32_t num_enables;
+     PLICAddr *addr_config;
+     uint32_t *source_priority;
+     uint32_t *target_priority;
 -- 
 2.19.1
 
