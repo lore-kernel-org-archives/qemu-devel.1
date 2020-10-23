@@ -2,84 +2,92 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ECC7DC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD3D2C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:22:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4D2FD2192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:19:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 06F152192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:22:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iupsXU9s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4D2FD2192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sb8ZgQrH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F152192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58192 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVtEl-0004EO-6V
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:19:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55000)
+	id 1kVtGr-0006i2-Qv
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:22:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55916)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kVtBL-0000Jr-U5
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:16:21 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28980)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kVtBD-0005t4-8p
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:16:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603444569;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=wLqOaose11JnLhrDs68jnz2CUX9OtGn5WkQ0rU1vf1A=;
- b=iupsXU9s8H3r4qhTXm2ZBfckDzO3mZ3zD11p4IfpKXmAVpKPM4CUCxuBKshI9N2Y6tQBby
- HCW7BzUh0F6BdDoxjvsBo9CYSsZc60jEpd72j9i7mrMUCwN7QMZuruFCoZBrgVLNRFGkZS
- uEzkyXxQkuMwrovTJRPz17xdMmoL2Ik=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-482-S8RZQS-8OSSmUBdPFCQX7A-1; Fri, 23 Oct 2020 05:16:07 -0400
-X-MC-Unique: S8RZQS-8OSSmUBdPFCQX7A-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DD0541018F64;
- Fri, 23 Oct 2020 09:16:06 +0000 (UTC)
-Received: from laptop.redhat.com (ovpn-12-21.pek2.redhat.com [10.72.12.21])
- by smtp.corp.redhat.com (Postfix) with ESMTP id F205326335;
- Fri, 23 Oct 2020 09:16:01 +0000 (UTC)
-From: Cindy Lu <lulu@redhat.com>
-To: mst@redhat.com,
-	jasowang@redhat.com,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2] virtio-net: Add check for mac address while peer is vdpa
-Date: Fri, 23 Oct 2020 17:15:59 +0800
-Message-Id: <20201023091559.4858-1-lulu@redhat.com>
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kVtFV-0005Uw-OC
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:20:39 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:44388)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <edgar.iglesias@gmail.com>)
+ id 1kVtFT-0007FC-Ta
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:20:37 -0400
+Received: by mail-lj1-x242.google.com with SMTP id a5so792529ljj.11
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 02:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-disposition:in-reply-to;
+ bh=SdYhznL+gDWQptJESVss5N7QJK7OSdgGQC5qmRJTYPs=;
+ b=Sb8ZgQrHiv68FjlUtuRP/beTA9Pp3n4Mcb9xxlg8dWLx8BmuvBo4JTGuVFb/pGGk0d
+ V9wwEFqxvmAjYQtcEHAcDThC5Y8dlROrFzH+5mBrM4IBL9sdz6NPCdkSuNTCX1+iUVOx
+ e3CyimvYdiEWiJ/XRmJvHJNgJQb4Wl+Nc6DnldfhYmaOOxMi0RbIW/X4oOR5O35ujvm7
+ 3vlr/PNKmuNAO5TWrT0HwiUF1lfcazUGxcah8TrySLDXinDfRW4NuIk2iVFUZJf90mPH
+ rj9QX6fjCAIJUwqiDOFDdsAjLjvJIHg3IofTPdM8MX7E9fwKrmsNn5F5lcSvNC3m0ySh
+ hTyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+ :mime-version:content-disposition:in-reply-to;
+ bh=SdYhznL+gDWQptJESVss5N7QJK7OSdgGQC5qmRJTYPs=;
+ b=UM7dBwZk2Uhp6gIt5Z8z1QYQ5ici0TCXg+ynkCwii+nnZozdcXVOhnqxG6Fm+jfHJU
+ jj5JHQaHae2UQrAcKGPKlCBTP9EeF8NGmE5vOdyIyAUyKg6vXgCID/Ap5VIieaFHtX+O
+ +OuGjAUa+9adsjyfTuUXxzCYchJ7V9s2kCWNziNxjuUBIFWQmpoRUC8SfDyXw8HMLrUV
+ SQhWdk7gy7jx/JNrsRrNJDGNJqANGN6dDwhzjlbgK77yCzktRVxDHs3Hz2DSW/QLpPJM
+ CniWpR3745PX2em6pxbo9bker3Dtq2en9rzM+Nv/MSZR29exuLYsM6ZuSCaRihuvHrjU
+ 9krw==
+X-Gm-Message-State: AOAM533j/Ob7TYhNm+pZNYCUVLevB1g/rCa8uewVHMI37Va7tBNztk0J
+ rE/8nqpP9t7rfuc3xZm5I6A=
+X-Google-Smtp-Source: ABdhPJxwBMTG0r7u+HTNT5Q2OXCAgpRCWyU6qZXx7cx7hWQ18y7S3loqg9Irj9J95J46Jh2ho1cATw==
+X-Received: by 2002:a2e:9bd2:: with SMTP id w18mr496593ljj.186.1603444832542; 
+ Fri, 23 Oct 2020 02:20:32 -0700 (PDT)
+Received: from gmail.com (81-231-232-130-no39.tbcn.telia.com. [81.231.232.130])
+ by smtp.gmail.com with ESMTPSA id c26sm106538lji.18.2020.10.23.02.20.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Oct 2020 02:20:31 -0700 (PDT)
+Date: Fri, 23 Oct 2020 11:20:27 +0200
+From: "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Subject: Re: [PATCH] hw/arm: fix min_cpus for xlnx-versal-virt platform
+Message-ID: <20201023092027.GH2954729@toto>
+References: <160343854912.8460.17915238517799132371.stgit@pasha-ThinkPad-X280>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=lulu@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <160343854912.8460.17915238517799132371.stgit@pasha-ThinkPad-X280>
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=edgar.iglesias@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,46 +100,37 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-stable@nongnu.org, Cindy Lu <lulu@redhat.com>
+Cc: peter.maydell@linaro.org, alistair@alistair23.me, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Sometime vdpa get an all 0 mac address from the hardware, this will cause the traffic down
-So we add the check for this part.
-if we get an 0 mac address we will use the default mac address instead
+On Fri, Oct 23, 2020 at 10:35:49AM +0300, Pavel Dovgalyuk wrote:
+> This patch sets min_cpus field for xlnx-versal-virt platform,
+> because it always creates XLNX_VERSAL_NR_ACPUS cpus even with
+> -smp 1 command line option.
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- hw/net/virtio-net.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
 
-diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
-index 9179013ac4..f1648fc47d 100644
---- a/hw/net/virtio-net.c
-+++ b/hw/net/virtio-net.c
-@@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-     VirtIONet *n = VIRTIO_NET(vdev);
-     struct virtio_net_config netcfg;
-     NetClientState *nc = qemu_get_queue(n->nic);
-+    static const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
- 
-     int ret = 0;
-     memset(&netcfg, 0 , sizeof(struct virtio_net_config));
-@@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
-         ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
-                                    n->config_size);
-         if (ret != -1) {
--            memcpy(config, &netcfg, n->config_size);
-+            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) != 0) {
-+                memcpy(config, &netcfg, n->config_size);
-+        } else {
-+                error_report("Get an all zero mac address from hardware");
-+            }
-         }
-     }
- }
--- 
-2.21.3
 
+
+> 
+> Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+> ---
+>  hw/arm/xlnx-versal-virt.c |    1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+> index 03e23201b1..ee1282241e 100644
+> --- a/hw/arm/xlnx-versal-virt.c
+> +++ b/hw/arm/xlnx-versal-virt.c
+> @@ -561,6 +561,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
+>  
+>      mc->desc = "Xilinx Versal Virtual development board";
+>      mc->init = versal_virt_init;
+> +    mc->min_cpus = XLNX_VERSAL_NR_ACPUS;
+>      mc->max_cpus = XLNX_VERSAL_NR_ACPUS;
+>      mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
+>      mc->no_cdrom = true;
+> 
 
