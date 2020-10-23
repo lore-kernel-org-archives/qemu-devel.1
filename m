@@ -2,89 +2,111 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1213C55179
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:21:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10478C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:21:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4416F20EDD
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:21:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 62A9E20E65
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:21:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dqOIudcU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4416F20EDD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PhTetiBe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 62A9E20E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45552 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0kV-0005wX-8K
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:21:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56108)
+	id 1kW0kg-0006KX-9H
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:21:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kW0Op-0001P4-9S
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:58:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47830)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kW0jI-0004uY-9E
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:19:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22481)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kW0Oi-0005AM-Ki
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:58:42 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kW0jF-0007oz-TD
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:19:51 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603472314;
+ s=mimecast20190719; t=1603473588;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Kmj8Qu9zk6u8styP1oVh44uMPcepAPf0nIT1VcNsAjw=;
- b=dqOIudcUTWnIbGXxEwQkUrzsAM08dfaam2mftWSt/+yt0EqTJRruP84RJTT6P8sApZI+K2
- 3ZCELzalfOWPeuLub0/Z/c1rjQgMDQ1bUEI6S5LtKflSWIMWl0JOeZRQIT9mduh6bf/7Hj
- ya6RIacldXexFs6AY5KktZ3u64H22C0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-35-yMyevcvJPyKXAjlgBScccQ-1; Fri, 23 Oct 2020 12:58:32 -0400
-X-MC-Unique: yMyevcvJPyKXAjlgBScccQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 885091007466
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 16:58:31 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-113-212.ams2.redhat.com
- [10.36.113.212])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 52D4A10013D7;
- Fri, 23 Oct 2020 16:58:30 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
- dinechin@redhat.com, virtio-fs@redhat.com
-Subject: [PATCH v4 4/5] tools/virtiofsd: xattr name mapping examples
-Date: Fri, 23 Oct 2020 17:58:11 +0100
-Message-Id: <20201023165812.36028-5-dgilbert@redhat.com>
-In-Reply-To: <20201023165812.36028-1-dgilbert@redhat.com>
-References: <20201023165812.36028-1-dgilbert@redhat.com>
+ bh=Oxql+6JwcZu4ZUdxGTeI5NLksjNTRzhz/K7SZzv6UTA=;
+ b=PhTetiBepuI/N5dgeNGf1h1sehGxbZB9CxrDSwWUGkzIJVrHCzHfluT9soVk1XCsrLFDEg
+ uevWfUjBDm+T7wurQNvv3M5Y66hyzjZNgXBukLcF2k4AXnxwnsQ1WgwGWFc8h7/kpfrxPT
+ gCgoWXTuvAayXzCUD5bHE+uSh0eEOnI=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-264-w8UtTJRsOgC5-p8DpGpEOw-1; Fri, 23 Oct 2020 13:19:46 -0400
+X-MC-Unique: w8UtTJRsOgC5-p8DpGpEOw-1
+Received: by mail-wm1-f71.google.com with SMTP id r19so698744wmh.9
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 10:19:46 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=Oxql+6JwcZu4ZUdxGTeI5NLksjNTRzhz/K7SZzv6UTA=;
+ b=IsQ4GoP/HPT0Jvh3/VHeqwpiXRcqaBmmUd8SU3USEUhBhQem4hGhmAFvAJ93MelD8P
+ tg0FdoX7YJ3YYJDd4aB5AsDuMP1FOkx2NGfjntAyHxsILLQ8nvu9cwaNxPdrbzL64QPF
+ w/74rOSBAIUTqrXtvwxp4wHAF1fzD+bw6WlnWom6wVi/n4C13a4O5wt7qs3EVAyiYzhq
+ ZYsFuwHQYqUtD0FHiF/el1WF5mqCM37pzT8OuFP7oCOGVjgYaTTC5foL9SyN1RjcpHHy
+ nueb4bMbG/bLRQTVEPGPL68A1XVk1weJV/m5aNdLLJML5nB/kMt9XkFTndQ0QnmJ+Fgu
+ 9UmQ==
+X-Gm-Message-State: AOAM532/FKrLT8C5+HWWjJKz3/60ZcROQI2741S7kD5tRPKPoK6tEPXU
+ QyPLMkzjr2l8ZrH6Ew6f3WgefWFj6qBOZbpg0xyw5q2LUQLFr88RPPOw8H6jNKLpeKADoiTEnIF
+ ruo49yOsILkqkdG8=
+X-Received: by 2002:adf:8462:: with SMTP id 89mr3688405wrf.389.1603473585047; 
+ Fri, 23 Oct 2020 10:19:45 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwarPEeiYzvQl6Js9jmyEcHLPk5hNfLjGrFAD/Wben9AC4OUmA65DA9QpLaL9WK2ZVThwEOow==
+X-Received: by 2002:adf:8462:: with SMTP id 89mr3688391wrf.389.1603473584844; 
+ Fri, 23 Oct 2020 10:19:44 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id 30sm4699568wrr.35.2020.10.23.10.19.42
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 23 Oct 2020 10:19:43 -0700 (PDT)
+Subject: Re: [qemu-web PATCH 5/7] Simplify and restructure the page footer
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20201023152957.488974-1-berrange@redhat.com>
+ <20201023152957.488974-6-berrange@redhat.com>
+ <54f37d84-a66e-bbfa-b410-2dba44d88ac9@redhat.com>
+ <20201023164600.GC463062@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <2879ebb5-8444-572f-4755-be4baf1a60b7@redhat.com>
+Date: Fri, 23 Oct 2020 19:19:42 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20201023164600.GC463062@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,82 +119,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+On 23/10/20 18:46, Daniel P. Berrangé wrote:
+>> I would rather keep this column, the idea is that this information can
+>> be found with a quick Ctrl-F "bug" or "Ctrl-F "faq".
+>
+> If there are useful links that are hidden such that people have to use
+> "Ctrl-f <term>" to search for them, then I think we've failed at design
+> already.
 
-Add a few examples of xattrmaps to the documentation.
+As you said the links are already mostly available from the "contribute"
+page.  "Report a bug" is a bit of an in-the-middle case that is niche
+enough that it should not be too prominent, but still worth being
+available in the home page in some way.
 
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
----
- docs/tools/virtiofsd.rst | 50 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+> IMHO the front page has way too much real estate taken up with the
+> screenshots and big headings, and very little useful content right
+> now.
 
-diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
-index 868fa0e97b..4e74690eca 100644
---- a/docs/tools/virtiofsd.rst
-+++ b/docs/tools/virtiofsd.rst
-@@ -201,6 +201,56 @@ e.g.:
- 
-   would hide 'security.' xattr's in listxattr from the server.
- 
-+xattr-mapping Examples
-+----------------------
-+
-+1) Prefix all attributes with 'user.virtiofs.'
-+
-+::
-+
-+-o xattrmap=":prefix:all::user.virtiofs.::bad:all:::"
-+
-+
-+This uses two rules, using : as the field separator;
-+the first rule prefixes and strips 'user.virtiofs.',
-+the second rule hides any non-prefixed attributes that
-+the host set.
-+
-+2) Prefix 'trusted.' attributes, allow others through
-+
-+::
-+
-+   "/prefix/all/trusted./user.virtiofs./
-+    /bad/server//trusted./
-+    /bad/client/user.virtiofs.//
-+    /ok/all///"
-+
-+
-+Here there are four rules, using / as the field
-+separator, and also demonstrating that new lines can
-+be included between rules.
-+The first rule is the prefixing of 'trusted.' and
-+stripping of 'user.virtiofs.'.
-+The second rule hides unprefixed 'trusted.' attributes
-+on the host.
-+The third rule stops a guest from explicitly setting
-+the 'user.viritofs.' path directly.
-+Finally, the fourth rule lets all remaining attributes
-+through.
-+
-+3) Hide 'security.' attributes, and allow everything else
-+
-+::
-+
-+    "/bad/all/security./security./
-+     /ok/all///'
-+
-+The first rule combines what could be separate client and server
-+rules into a single 'all' rule, matching 'security.' in either
-+client arguments or lists returned from the host.  This stops
-+the client seeing any 'security.' attributes on the server and
-+stops it setting any.
-+
- Examples
- --------
- 
--- 
-2.28.0
+Yeah, that's true (that is something that was inherited from template I
+used, which you can see for reference at https://templated.co/linear).
+
+Paolo
 
 
