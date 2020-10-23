@@ -2,93 +2,116 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8292C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:49:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED22FC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:55:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F2A812085B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:49:57 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="paBA1W8c"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2A812085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 03ADC208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:55:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03ADC208C3
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVrpk-00022b-S3
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:49:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38346)
+	id 1kVrv6-0003KE-H9
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:55:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39136)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kVrpC-0001de-Gl
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:49:22 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40829)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <jean-philippe@linaro.org>)
- id 1kVrpA-0000JT-8h
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:49:22 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h5so687702wrv.7
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 00:49:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=date:from:to:cc:subject:message-id:references:mime-version
- :content-disposition:in-reply-to;
- bh=Sse5QCWJlSqEriI6XJN4D1K2P2RgTMgLRgONhhxjruM=;
- b=paBA1W8cmusUV53CcmoZCYA1GT3QEnmHNzhgubIydmF5WpiBtwyAuS16MmqC7PRF/l
- wj+gpieDWUoyGXFgtZIHNjLf6/Ye7JLdL5jC2GCFc8KCf5NKnXSsMOT5gxSqwq4gLoFc
- OBM1xI66k8RdcuBs+DJV17EXy+XZdYptQvazajWN1dnNIGnZdSlv8dfDLooLuZJ/vJ5U
- S/KiNVr4xZtoTBHIlrH8JKCooLZoNpBGyl52ZFz3UyR5b/FGnwH0z0mq1mf6GUGL8hex
- 6jyURDO/Pn7oYXwfhaxKtcChyx0wqBj3uAiaYMIGWiER1bU11rbm96neYGV/+TyJRYUH
- eWPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:date:from:to:cc:subject:message-id:references
- :mime-version:content-disposition:in-reply-to;
- bh=Sse5QCWJlSqEriI6XJN4D1K2P2RgTMgLRgONhhxjruM=;
- b=quRdz1/x+It6w9dMjyh+mTvAXnc9EqsMPtB5DwbNmjXwIp2CQ0+R8BmVD522mecbrL
- o5hsgG+trargfF7jlyk/Q2kb4Y9VBxgjiTEZBxLtomLDV7I6mu2+MlE69QT2skraVCUL
- Qsp1PLkyegtWUO59TO4KpoI6kXYvHDnxRWvULM9MFO9U2uOzG/YGFIEM5VGtjWwSSsEg
- 0/BAo1kIvHBbmhBxrDg2QLNgb73KPZ4AkPCKtfixIeiWTcewPDvxgBKZwwoUCF6jjb1x
- tA2EdXjT6ONBCXIrv6mRQyM+t+ons3qnwnzKsvWlsVZqD3ZczUCUyWc/9AHfhb+yMW1l
- TvfA==
-X-Gm-Message-State: AOAM5338xF4m74ThClWPXkxOKzh1sbGHxp1NCLpQ8ZqhLPP5kAOjBksY
- kaO3ruKE3lIS0lf51dJSZghLdw==
-X-Google-Smtp-Source: ABdhPJyEJKlBHPDXVUmF17CiMQRqunRAPCUTaCvoS9MqPDmYAHvxZyWYu3YhjaikTSbF9PjN3FqltQ==
-X-Received: by 2002:adf:c501:: with SMTP id q1mr1100350wrf.147.1603439358393; 
- Fri, 23 Oct 2020 00:49:18 -0700 (PDT)
-Received: from myrica ([2001:1715:4e26:a7e0:116c:c27a:3e7f:5eaf])
- by smtp.gmail.com with ESMTPSA id m12sm1521819wmi.33.2020.10.23.00.49.17
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Oct 2020 00:49:17 -0700 (PDT)
-Date: Fri, 23 Oct 2020 09:48:58 +0200
-From: Jean-Philippe Brucker <jean-philippe@linaro.org>
-To: Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v10 09/10] virtio-iommu: Set supported page size mask
-Message-ID: <20201023074858.GA2265982@myrica>
-References: <20201008171558.410886-1-jean-philippe@linaro.org>
- <20201008171558.410886-10-jean-philippe@linaro.org>
- <20201019213539.GC3203@xz-x1> <20201022163937.GB1808268@myrica>
- <20201022205616.GD3208@xz-x1>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVruL-0002v7-Qf
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:54:41 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:58673)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kVruJ-00028K-VK
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:54:41 -0400
+Received: from [192.168.100.1] ([82.252.139.38]) by mrelayeu.kundenserver.de
+ (mreue009 [213.165.67.103]) with ESMTPSA (Nemesis) id
+ 1MqatE-1k0z7b0X4q-00mea3; Fri, 23 Oct 2020 09:54:35 +0200
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201022203000.1922749-1-laurent@vivier.eu>
+ <20201022203000.1922749-2-laurent@vivier.eu>
+ <ae05940f-51d3-e7e0-00f1-0377f31a9dc7@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Autocrypt: addr=laurent@vivier.eu; prefer-encrypt=mutual; keydata=
+ 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
+Subject: Re: [PATCH 1/2] target/m68k: remove useless qregs array
+Message-ID: <7a7a3213-1c01-e13b-4ed6-5dbfdeec3ccb@vivier.eu>
+Date: Fri, 23 Oct 2020 09:54:34 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201022205616.GD3208@xz-x1>
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=jean-philippe@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+In-Reply-To: <ae05940f-51d3-e7e0-00f1-0377f31a9dc7@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:XiwzjHISmk+4aQLrHuzmWCeCTqGyi/vHadB7IQ8oKEg5WAN+CFl
+ gLbuIOtsCKpNUGH1rqCQ/cy4zeQfO0EMmUy47giacaFtk1X/vwSdDtc7W0srlR2hKOl32bV
+ O4YCKqrnJIrCcTqch7We2qbCdRcjOeZy/StKEOxmAG7/vYfPlPGTFmso+/JBV53aXlRNRMv
+ xBRjjbabqq+kA4oiC0ScQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:/lWu3PtGKRo=:aKemcnjcf4IMwjTkRoU8Ir
+ B5+mOAiTtDwa/Km3/vvD8Jw+RP+uMWDDTBBt1adVLgm6dqabOAB9oSfHuq+ZHzdWHPQj+7aG8
+ ClFEY1tns6dR7tcbOG55OjmmbhfSD5+CKFcbAL+jm/pSvf0wo1Ht24uLKIvpmKMrldzLhpkrX
+ i4V5yBJnXzr0VQJx5GCdvzJoVF3szrKrCAeDe2GV7Ysg36OlvPwlDyKaCZgSguPwNWBk5Zal3
+ 9g7mgbc9X8zE+0+Lib8E170tLVNn14bytkBylOGs3gkYcmWg0hMRmLcwUnhkeJR0bQH+sMVFG
+ EcBnHwhNRXQYJr0rnAxjYcX16UGudfBjy4r5xEcObL9zyE+FR1CpTkgXXZHJK5Q9Y2+zC+DWT
+ hmVftI9D9sv/JAJonqeVFkDLEpk5N4mikGPPZdQQfYmMfrluBIw97CvxwZLto2Nyuzn4ulR6W
+ yrGO4+/qMA==
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 03:54:38
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,73 +124,54 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: mst@redhat.com, qemu-devel@nongnu.org, eric.auger@redhat.com,
- alex.williamson@redhat.com, pbonzini@redhat.com, bbhushan2@marvell.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 22, 2020 at 04:56:16PM -0400, Peter Xu wrote:
-> On Thu, Oct 22, 2020 at 06:39:37PM +0200, Jean-Philippe Brucker wrote:
-> > So what I'd like to do for next version:
-> > 
-> > * Set qemu_real_host_page_mask as the default page mask, instead of the
-> >   rather arbitrary TARGET_PAGE_MASK.
+Le 23/10/2020 à 09:27, Thomas Huth a écrit :
+> On 22/10/2020 22.29, Laurent Vivier wrote:
+>> They are unused since the target has been converted to TCG.
+>>
+>> Fixes: e1f3808e03f7 ("Convert m68k target to TCG.")
+>> Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+>> ---
+>>  target/m68k/cpu.h | 4 ----
+>>  1 file changed, 4 deletions(-)
+>>
+>> diff --git a/target/m68k/cpu.h b/target/m68k/cpu.h
+>> index 521ac67cdd04..9a6f0400fcfe 100644
+>> --- a/target/m68k/cpu.h
+>> +++ b/target/m68k/cpu.h
+>> @@ -33,8 +33,6 @@
+>>  #define OS_PACKED   6
+>>  #define OS_UNSIZED  7
+>>  
+>> -#define MAX_QREGS 32
+>> -
+>>  #define EXCP_ACCESS         2   /* Access (MMU) error.  */
+>>  #define EXCP_ADDRESS        3   /* Address error.  */
+>>  #define EXCP_ILLEGAL        4   /* Illegal instruction.  */
+>> @@ -139,8 +137,6 @@ typedef struct CPUM68KState {
+>>      int pending_vector;
+>>      int pending_level;
+>>  
+>> -    uint32_t qregs[MAX_QREGS];
+>> -
+>>      /* Fields up to this point are cleared by a CPU reset */
+>>      struct {} end_reset_fields;
 > 
-> Oh, I thought TARGET_PAGE_MASK was intended - kernel committ 39b3b3c9cac1
-> ("iommu/virtio: Reject IOMMU page granule larger than PAGE_SIZE", 2020-03-27)
-> explicitly introduced a check that virtio-iommu kernel driver will fail
-> directly if this psize is bigger than PAGE_SIZE in the guest.  So it sounds
-> reasonable to have the default value as PAGE_SIZE (if it's the same as
-> TARGET_PAGE_SIZE in QEMU, which seems true?).
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
 > 
-> For example, I'm thinking whether qemu_real_host_page_mask could be bigger than
-> PAGE_SIZE in the guest in some environments, then it seems virtio-iommu won't
-> boot anymore without assigned devices, because that extra check above will
-> always fail.
-
-Right, I missed this problem again. Switching to qemu_real_host_page_mask
-is probably not the best idea until we solve the host64k-guest4k problem.
-
+> There are still some references to the term qreg in translate.c:
 > 
-> >   Otherwise we cannot hotplug assigned
-> >   devices on a 64kB host, since TARGET_PAGE_MASK is pretty much always
-> >   4kB.
-> > 
-> > * Disallow changing the page size. It's simpler and works in
-> >   practice if we default to qemu_real_host_page_mask.
-> > 
-> > * For non-hotplug devices, allow changing the rest of the mask. For
-> >   hotplug devices, only warn about it.
+> target/m68k/translate.c:#include "qregs.def"
+> target/m68k/translate.c:#include "qregs.def"
+> target/m68k/translate.c:/* Generate a jump to the address in qreg DEST.  */
 > 
-> Could I ask what's "the rest of the mask"?
-
-The LSB in the mask defines the page size. The other bits define which
-block sizes are supported, for example 2MB and 1GB blocks with a 4k page
-size. These are only for optimization, the upper bits of the mask could
-also be all 1s. If the guest aligns its mappings on those block sizes,
-then the host can use intermediate levels in the page tables resulting in
-fewer IOTLB entries.
-
-> On the driver side, I see that
-> viommu_domain_finalise() will pick the largest supported page size to use, if
-> so then we seem to be quite restricted on what page size we can use.
-
-In Linux iommu_dma_alloc_remap() tries to allocate blocks based on the
-page mask (copied by viommu_domain_finalise() into domain->pgsize_bitmap)
-
-> I'm also a bit curious about what scenario we plan to support in this initial
-> version, especially for ARM.  For x86, I think it's probably always 4k
-> everywhere so it's fairly simple.  Know little on ARM side...
-
-Arm CPUs and SMMU support 4k, 16k and 64k page sizes. I don't think 16k is
-used anywhere but some distributions chose 64k (RHEL, I think?), others
-4k, so we need to support both.
-
-Unfortunately as noted above host64k-guest4k is not possible without
-adding a negotiation mechanism to virtio-iommu, host VFIO and IOMMU
-driver.
+> Should these get renamed?
+We always have something like qregs but they are implemented differently.
+I don't know if it is worth renaming.
 
 Thanks,
-Jean
+Laurent
 
