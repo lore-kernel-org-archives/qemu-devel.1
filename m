@@ -8,72 +8,73 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DA4DC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:26:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5DCC55179
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:27:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6C0321527
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:26:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7544121527
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:27:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSKII8Qh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6C0321527
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ua8troac"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7544121527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54234 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVw9L-0008D0-Ke
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:26:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38118)
+	id 1kVw9t-0000IQ-C4
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:27:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kVw6J-00067l-GZ; Fri, 23 Oct 2020 08:23:19 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39689)
+ id 1kVw7b-0007QI-G8; Fri, 23 Oct 2020 08:24:39 -0400
+Received: from mail-pg1-x52d.google.com ([2607:f8b0:4864:20::52d]:39657)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kVw6F-0001WZ-BS; Fri, 23 Oct 2020 08:23:19 -0400
-Received: by mail-pf1-x442.google.com with SMTP id e15so1098223pfh.6;
- Fri, 23 Oct 2020 05:23:12 -0700 (PDT)
+ id 1kVw7Y-0001lf-H4; Fri, 23 Oct 2020 08:24:39 -0400
+Received: by mail-pg1-x52d.google.com with SMTP id o7so1116861pgv.6;
+ Fri, 23 Oct 2020 05:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=NDFBUZpID606vkJ6iBUsxOcJOuTJC8GXb8skxlH3lt0=;
- b=mSKII8QhO3yGRdtyObWw8rrdTNcvjAMVEeeJa4/jKNbx4rM6w8kjZMBky0L9YYtmBw
- dbYiDSgqxBi2ohtBLihIdhepTpfhuNt6sNmc8iji+GcYhyyGD+7FrK5pcCrvyMKPDvcp
- gmhD1Gx+0kDQYik0bLgHb9guVsblQkhkiO6kf357Ca8uls6iZokZXz/NLVsTV102hyMp
- SDDPgMT9LD3CnG9CCZ4DJ+av1ektcCsc0Grt/tWl/rvzZu2jVTxFxCyAoLJzu9cqyQJN
- UrJPRBn4uwiOJmTVFYw0u+l8ygLBoewp3kyPHf2zq8BbOeE1MnIJB+09PHkWtJjCpNYv
- kSbg==
+ bh=yrHLQqtBgcnQgqjS774ys+OQHdF6Whk1dHKigZsXCSo=;
+ b=ua8troacuw+EHNIDDuXvdLozzszR+IAma/yn4cWCSVAFSDsY3OcMWj7NC66IPIFl14
+ /fTRZ9rz1HFc7+dlPW65tYHHgD1M50ZV6s8eULUbMSs8fD7y1nTTzIQDMhBQ0rgXt0tK
+ HQe46UR8MMCJpSU6jKaG33DodHaeJ2yka7sPK/9yv+OIWNiBaOmm0wTaQTo1S56GzTm5
+ kN/vm8Sl9JtOLrkhf/RbWuVFR6BwQIo/fIELFW1aI+9uzh8jsEWAfQuCB+rMvZvbIYyE
+ v5mwR5tydFemfebZ0F0QycrNWr3+GE6ZNvsU8T6mwAqn3yXc/OwS5KbnAkJrx+VaUUGN
+ 2sEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=NDFBUZpID606vkJ6iBUsxOcJOuTJC8GXb8skxlH3lt0=;
- b=hfiKWJ7gMkhNgI+d45p1DLJ/i1ijgs+aS5XCIXykSVKc/aR7hfhwp0B6UX2feMudNT
- YL6UBM4dCNHaS1sMyyEkUhAOaAUOzsH2PKQ5tM3zRr8Kr1y4PCgRZjosUuutENeJ8etC
- Xn5B/O5zlpIQUCZ0Z14K+ES7Mp41fRVms5DjHv8zhMV+Os1N9XiPR08tvVUWgfIozmkx
- QL2oavo0fcbr/A/zU+4rfB7m8iLFQ/obgruv51gjt6OSI6SnVTUzqR+PNRGpm/jUQb0z
- H9mFUquU+D3OWkiT+eXNmMWD40U9zvD+Sp9zfyJgHwFqTHNakZfdXCdiBIl9+e7EjPvt
- nakg==
-X-Gm-Message-State: AOAM532ID0IVogbzw8oNwePe1gPcAR5rHsJrvQrbxCYXGP7KhXHwN+U3
- iwN0USJIYpmgAWYZp/5YUJX5wKhG77GqcINo
-X-Google-Smtp-Source: ABdhPJwSGwlaXhBasu3p/tzaoDlz4ONmlfDd+JAstCNntD5z6zKwWDnHd7JJ+lNpdL0lXR3LBr4XIA==
-X-Received: by 2002:a63:531d:: with SMTP id h29mr1636405pgb.301.1603455791019; 
- Fri, 23 Oct 2020 05:23:11 -0700 (PDT)
+ bh=yrHLQqtBgcnQgqjS774ys+OQHdF6Whk1dHKigZsXCSo=;
+ b=uSyjxOWt6vIZwg+uoY605YeLF7g4EOmcLVLO3iONTONt0GS4M2aAYVuqmS4uYpEdch
+ sjxoR53TyaJtdg+gpHqAHihjxdomzG3kMfHCJjYXVYFeRD4/UIaI2dmeiAH0Vp7+JIY/
+ DS6wujHbbGHzsiSIC5UCFaXZGjon5sq+nWiDrljwIvRB7AmigMdmFCXMqR5CwKtkLo+o
+ ILRm6QpkLqGp/DsMZbMUgRpPUtdMMH8wGM9rzBi6hjo4UaVmcVZX6Y95I8LoBebXPtG9
+ gDEZeUlwNDXfTwaMS+iX9k1Ru2E2Gphu9C0YdbK4/zg53csMObKiuJyXWbgjQ+h7mE2U
+ 8rCA==
+X-Gm-Message-State: AOAM533pTJ7//Xt4npAth2IFCT+X4mVTJNa8iqLvhFOJODFRzUg1tFpF
+ BlX8KQG32N6Je2WfJiygS8braw+zzIAbGwq/
+X-Google-Smtp-Source: ABdhPJxMH9+oXAhqIFMaLoRXOxowTHO7yS79t7TEzmDS0zTpeRmt5p54HaVFGYMPuAFx3MAS/JIz/g==
+X-Received: by 2002:a17:90a:c208:: with SMTP id
+ e8mr2215497pjt.142.1603455874408; 
+ Fri, 23 Oct 2020 05:24:34 -0700 (PDT)
 Received: from pulp100.localdomain ([103.199.158.131])
- by smtp.gmail.com with ESMTPSA id s23sm1815877pgl.47.2020.10.23.05.23.08
+ by smtp.gmail.com with ESMTPSA id z26sm2243220pfq.131.2020.10.23.05.24.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Oct 2020 05:23:10 -0700 (PDT)
+ Fri, 23 Oct 2020 05:24:33 -0700 (PDT)
 From: Chetan Pant <chetan4windows@gmail.com>
 To: qemu-trivial@nongnu.org
-Subject: [PATCH 13/30] tricore tcg cpus: Fix Lesser GPL version number
-Date: Fri, 23 Oct 2020 12:21:57 +0000
-Message-Id: <20201023122157.19321-1-chetan4windows@gmail.com>
+Subject: [PATCH 14/30] usb: Fix Lesser GPL version number
+Date: Fri, 23 Oct 2020 12:23:32 +0000
+Message-Id: <20201023122332.19369-1-chetan4windows@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201014134248.14146-1-chetan4windows@gmail.com>
 References: <20201014134248.14146-1-chetan4windows@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=chetan4windows@gmail.com; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::52d;
+ envelope-from=chetan4windows@gmail.com; helo=mail-pg1-x52d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -95,8 +96,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kbastian@mail.uni-paderborn.de, qemu-devel@nongnu.org,
- Chetan Pant <chetan4windows@gmail.com>
+Cc: Chetan Pant <chetan4windows@gmail.com>, qemu-devel@nongnu.org,
+ kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -108,15 +109,19 @@ This patch replaces all occurrences of "Lesser GPL version 2" with
 
 Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
 ---
- hw/tricore/tricore_testboard.c | 2 +-
- target/tricore/gdbstub.c       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ hw/usb/hcd-ohci.c     | 2 +-
+ hw/usb/hcd-xhci-nec.c | 2 +-
+ hw/usb/hcd-xhci-pci.c | 2 +-
+ hw/usb/hcd-xhci-pci.h | 2 +-
+ hw/usb/hcd-xhci.c     | 2 +-
+ hw/usb/hcd-xhci.h     | 2 +-
+ 6 files changed, 6 insertions(+), 6 deletions(-)
 
-diff --git a/hw/tricore/tricore_testboard.c b/hw/tricore/tricore_testboard.c
-index 8ec2b5b..12ea149 100644
---- a/hw/tricore/tricore_testboard.c
-+++ b/hw/tricore/tricore_testboard.c
-@@ -6,7 +6,7 @@
+diff --git a/hw/usb/hcd-ohci.c b/hw/usb/hcd-ohci.c
+index 8b912e9..f8c64c8 100644
+--- a/hw/usb/hcd-ohci.c
++++ b/hw/usb/hcd-ohci.c
+@@ -7,7 +7,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
@@ -125,11 +130,63 @@ index 8ec2b5b..12ea149 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/tricore/gdbstub.c b/target/tricore/gdbstub.c
-index 0f4e612..3ce55ab 100644
---- a/target/tricore/gdbstub.c
-+++ b/target/tricore/gdbstub.c
-@@ -6,7 +6,7 @@
+diff --git a/hw/usb/hcd-xhci-nec.c b/hw/usb/hcd-xhci-nec.c
+index 2efa6fa..65fde63 100644
+--- a/hw/usb/hcd-xhci-nec.c
++++ b/hw/usb/hcd-xhci-nec.c
+@@ -8,7 +8,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/usb/hcd-xhci-pci.c b/hw/usb/hcd-xhci-pci.c
+index a6d746e..3920099 100644
+--- a/hw/usb/hcd-xhci-pci.c
++++ b/hw/usb/hcd-xhci-pci.c
+@@ -12,7 +12,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/usb/hcd-xhci-pci.h b/hw/usb/hcd-xhci-pci.h
+index aa2e890..c193f79 100644
+--- a/hw/usb/hcd-xhci-pci.h
++++ b/hw/usb/hcd-xhci-pci.h
+@@ -10,7 +10,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/usb/hcd-xhci.c b/hw/usb/hcd-xhci.c
+index 5e8bed9..e68ae2a 100644
+--- a/hw/usb/hcd-xhci.c
++++ b/hw/usb/hcd-xhci.c
+@@ -8,7 +8,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/hw/usb/hcd-xhci.h b/hw/usb/hcd-xhci.h
+index f859a17..fbe9981 100644
+--- a/hw/usb/hcd-xhci.h
++++ b/hw/usb/hcd-xhci.h
+@@ -8,7 +8,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
   * License as published by the Free Software Foundation; either
