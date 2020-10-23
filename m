@@ -2,142 +2,102 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 852F4C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 03:57:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEDB6C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 05:28:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 553A120797
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 03:57:38 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rM+3CK3w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 553A120797
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	by mail.kernel.org (Postfix) with ESMTPS id 5D62D20882
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 05:28:39 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5D62D20882
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54330 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVoCv-0006ky-2F
-	for qemu-devel@archiver.kernel.org; Thu, 22 Oct 2020 23:57:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52120)
+	id 1kVpcz-0007zN-Qe
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 01:28:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39908)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1kVoAW-0005lX-K3; Thu, 22 Oct 2020 23:55:08 -0400
-Received: from mail-oi1-x241.google.com ([2607:f8b0:4864:20::241]:43323)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <groeck7@gmail.com>)
- id 1kVoAU-0003F4-5x; Thu, 22 Oct 2020 23:55:08 -0400
-Received: by mail-oi1-x241.google.com with SMTP id f8so424562oij.10;
- Thu, 22 Oct 2020 20:55:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:autocrypt:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=do4MYaznpO15ElDgEE06pFh4NznvHCCm+/CB4DM3A9o=;
- b=rM+3CK3wdZ1c5Uu5Wqe7nOrL8amXYI5Cb9Exs1iuvvG0gBOt0mbRjAqU7gyNqgw6K/
- DyWLmWCCvvrdopjGgJMhtWAIjKRyjHc1YGY/EF9Xbx+6V37u3L2FXMrBzvLX0wBww7ZJ
- 62FUFTVpvrw7DN0pE6FnUYjy8rR6tTLCMik7Cc//RaSJNJ1hv1rfojZ4O2uky3iv08x4
- UOgJ0Y/yQzXqFj1vp5xhHcWy9wQBA8wau7XxGskNYh06BMbEsEOBZ0etIZdX0J+5J3yt
- oYHCoe7xQr7VNax9p524daZzH5+LIEUU8Ptc36jinLGUG6EoG5DbKUsx3irTS965smnF
- kLww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:autocrypt
- :message-id:date:user-agent:mime-version:in-reply-to
- :content-language:content-transfer-encoding;
- bh=do4MYaznpO15ElDgEE06pFh4NznvHCCm+/CB4DM3A9o=;
- b=H14cvETCkK+5Lud4HX0C4hOJUD0SLpLKv9PV+EhECoXUAxnwej/IfG+2VSdCg3c6OZ
- PdB09UiLNNMByK59C8qSIakWJtt5jN0jLHe3eaJgqjm65uNSx5rOfdOsDJ28w2HjDPBR
- HpylIN20zV5pk4iWKSAV8tj3PgrOM5cC6o+SmwoG/27qTZsE+eqZWoQ6aW2Eh2fTGnTd
- dDd3aIvETifIT5zXBhf177TtL/RkK2u5LEEEhunJVVIzyRy+k0v86Jzjl6ScxVZNewPh
- FnIYAVh01WruonPtKNCc3yanYybuDkl0Uo5nEGbXEccPCThyisntjAcT2zKqT7s6ZzCb
- n+Fg==
-X-Gm-Message-State: AOAM532L/4td2Vn85ETEmtpvkd0wXLbT9guabe4r/dWHA911SY9uTkvQ
- kzPl7XC8kcLKsjlbodaIU2Q=
-X-Google-Smtp-Source: ABdhPJw6RY28N73Gdb5MPJccIuhffNrs7dd+UMZ+ZtMEnrBIsCVvryuOlhswKm7TpCMrVsl1XW1jPg==
-X-Received: by 2002:aca:ed90:: with SMTP id l138mr280233oih.178.1603425304681; 
- Thu, 22 Oct 2020 20:55:04 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
- by smtp.gmail.com with ESMTPSA id
- l3sm116841oib.10.2020.10.22.20.55.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Thu, 22 Oct 2020 20:55:03 -0700 (PDT)
-Subject: Re: [PATCH v3 00/15] raspi: add the bcm2835 cprman clock manager
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org
-References: <20201010135759.437903-1-luc@lmichel.fr>
- <f6c1ad96-ce36-e229-2a9d-d71070b82d82@amsat.org>
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-Message-ID: <9a858d15-5335-9036-058c-d752c2689219@roeck-us.net>
-Date: Thu, 22 Oct 2020 20:55:02 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kVpZo-0007Ge-U9; Fri, 23 Oct 2020 01:25:21 -0400
+Received: from out4-smtp.messagingengine.com ([66.111.4.28]:55075)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
+ id 1kVpZl-0001XA-NG; Fri, 23 Oct 2020 01:25:20 -0400
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+ by mailout.nyi.internal (Postfix) with ESMTP id 0B1CC5C00A8;
+ Fri, 23 Oct 2020 01:25:16 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+ by compute4.internal (MEProxy); Fri, 23 Oct 2020 01:25:16 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
+ h=date:from:to:cc:subject:message-id:references:mime-version
+ :content-type:in-reply-to; s=fm1; bh=ItKq3YsCOizz20JB//42WIBo1j2
+ tTvFEFGMK/NxD544=; b=z/KxKGgtPm1dcNQnTNcvEAxwdVIw6bkNMUHwWltyelW
+ GYOCfbDzmzcE04AGMy2YQirr6QAbsVybUvurU9LmxcXl91YQW/Wn6t/YTDTJyOal
+ CfIiQtMs+i1nl7Pl0ogYHl05GsyN0KSeCiMbsCoY8tyrNiljI/dSbc9uG3IZNRKW
+ /RkyRAoPx1NPNWCU6ObuVjtwymjNd4qvbhyKhtB7+JHnWh1lFX6r+ATyzgST8ODr
+ ScUHJPTf0nAH7BKLAj9URVMqY23Kd+G6BrKq6tRDcZW5DqOxar98oK39azVaaDel
+ wWMBzcngRgQSOvAla2ard6sGhy7UiqhWRjwnOcM8EoQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+ messagingengine.com; h=cc:content-type:date:from:in-reply-to
+ :message-id:mime-version:references:subject:to:x-me-proxy
+ :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=ItKq3Y
+ sCOizz20JB//42WIBo1j2tTvFEFGMK/NxD544=; b=Mc3KOYTmzuwgLdosY7+0i2
+ ysARXItskd4TLiScHbHfKTjouEAmIe4U9hlUkw4dNU7BdBzAth40lVYUqm3QrJEB
+ rScK+nKqYrYdWH7lytjOuRtlh6NTZFTFHC/85NzUUZdEr5qgaVPiHdhjA85TPvdT
+ fmZOF8OxEViTuCSUK9aUceP22LGsckiDSbJPAbG/qyRGAdxtAw+0JRhVFdzrvwC7
+ 8VTfdR8hfZU5UdxqU38IzubdLaxKjxbidfuVRVT3L97cFCspktC80YA0ulQvbI4B
+ NR0YoH43isomD+EXmYI7Ar+AeqB6MS4ZMwJr3mfsV6s6A+nFzROCKO/qag4+1LxQ
+ ==
+X-ME-Sender: <xms:O2mSX9bETxlzFqJYhwm7YsjPxQOwjUyWGmkS_BZS3ULCtrFG0Re1FQ>
+ <xme:O2mSX0YvDcOrQvQ3dfdygs7e9_zdhHergap7YdP3rFDSzejlg191mOs1FvnA06hXK
+ 7NIN-Khgk3VpktzNjo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrjeelgdeljecutefuodetggdotefrodftvf
+ curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+ uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+ fjughrpeffhffvuffkfhggtggujgesghdtreertddtjeenucfhrhhomhepmfhlrghushcu
+ lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
+ hrnhepjeegudffueeiteekieelkedvueelteevjeduieeludfffeejgeffhfduvdduffek
+ necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgeptdenuc
+ frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
+X-ME-Proxy: <xmx:O2mSX_9c_iRx67-sePLnKkyDIqRiE8pBN340XG_GUKslm7rsal6zSQ>
+ <xmx:O2mSX7oe0mk2ryLdkDVhsv4PZwwdEINfGq7_zeN7lOQVqOovhEGTOw>
+ <xmx:O2mSX4r1zbErR4j9yV4QT7pKAxCYOSIsQtKxLOifdD_RzFoJi5lF6g>
+ <xmx:PGmSX9BydlxhLz2VB98PUfjxAcAYfP817ibLBxua9XlbZhjjYfTVTQ>
+Received: from apples.localdomain (80-167-98-190-cable.dk.customer.tdc.net
+ [80.167.98.190])
+ by mail.messagingengine.com (Postfix) with ESMTPA id 20F55328005A;
+ Fri, 23 Oct 2020 01:25:14 -0400 (EDT)
+Date: Fri, 23 Oct 2020 07:25:12 +0200
+From: Klaus Jensen <its@irrelevant.dk>
+To: Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Subject: Re: [PATCH v5 2/2] hw/block/nvme: add the dataset management command
+Message-ID: <20201023052512.GA244769@apples.localdomain>
+References: <20201022184959.240505-1-its@irrelevant.dk>
+ <20201022184959.240505-3-its@irrelevant.dk>
+ <05c41ab7-039f-f327-c6a0-5864430f5ba6@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <f6c1ad96-ce36-e229-2a9d-d71070b82d82@amsat.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::241;
- envelope-from=groeck7@gmail.com; helo=mail-oi1-x241.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_ENVFROM_END_DIGIT=0.25,
- FREEMAIL_FORGED_FROMDOMAIN=0.25, FREEMAIL_FROM=0.001,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.107,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="8t9RHnE3ZwKMSgU+"
+Content-Disposition: inline
+In-Reply-To: <05c41ab7-039f-f327-c6a0-5864430f5ba6@redhat.com>
+Received-SPF: pass client-ip=66.111.4.28; envelope-from=its@irrelevant.dk;
+ helo=out4-smtp.messagingengine.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:25:16
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -27
+X-Spam_score: -2.8
+X-Spam_bar: --
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -150,172 +110,307 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Havard Skinnemoen <hskinnemoen@google.com>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-block@nongnu.org,
+ Klaus Jensen <k.jensen@samsung.com>, qemu-devel@nongnu.org,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/22/20 3:06 PM, Philippe Mathieu-Daudé wrote:
-> Cc'ing Guenter who had a similar patch and might be interested
-> to test :)
-> 
-I applied the series on top of qemu mainline and ran all my test with it
-(raspi2 with qemu-system-arm as well as qemu-system-aarch64, and raspi3
-in both big endian and little endian mode with qemu-system-aarch64.
-All tests passed without error or kernel warning.
 
-For the series:
+--8t9RHnE3ZwKMSgU+
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Tested-by: Guenter Roeck <linux@roeck-us.net>
+On Oct 22 23:02, Philippe Mathieu-Daud=C3=A9 wrote:
+> Hi Klaus,
+>=20
 
-Guenter
+Hi Philippe,
 
-> patch 16/15 fixup:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg752113.html
-> 
-> On 10/10/20 3:57 PM, Luc Michel wrote:
->> v2 -> v3:
->>    - patch 03: moved clock_new definition to hw/core/clock.c [Phil]
->>    - patch 03: commit message typo [Clement]
->>    - patch 10: clarifications around the CM_CTL/CM_DIBV mux registers.
->>                reg_cm replaced with reg_ctl and reg_div. Add some
->>                comments for clarity. [Phil]
->>    - patch 10: fixed update_mux_from_cm not matching the CM_DIV offset
->>                correctly. [Phil]
->>    - patch 11: replaced manual bitfield extraction with extract32 [Phil]
->>    - patch 11: added a visual representation of CM_DIV for clarity [Phil]
->>    - patch 11: added a missing return in clock_mux_update.
->>
->> v1 -> v2:
->>    - patch 05: Added a comment about MMIO .valid constraints [Phil]
->>    - patch 05: Added MMIO .impl [Phil]
->>    - patch 05: Moved init_internal_clock to the public clock API, renamed
->>      clock_new (new patch 03) [Phil]
->>    - patch 11: use muldiv64 for clock mux frequency output computation [Phil]
->>    - patch 11: add a check for null divisor (Phil: I dropped your r-b)
->>    - Typos, formatting, naming, style [Phil]
->>
->> Patches without review: 03, 11, 13
->>
->> Hi,
->>
->> This series add the BCM2835 CPRMAN clock manager peripheral to the
->> Raspberry Pi machine.
->>
->> Patches 1-4 are preliminary changes, patches 5-13 are the actual
->> implementation.
->>
->> The two last patches add a clock input to the PL011 and
->> connect it to the CPRMAN.
->>
->> This series has been tested with Linux 5.4.61 (the current raspios
->> version). It fixes the kernel Oops at boot time due to invalid UART
->> clock value, and other warnings/errors here and there because of bad
->> clocks or lack of CPRMAN.
->>
->> Here is the clock tree as seen by Linux when booted in QEMU:
->> (/sys/kernel/debug/clk/clk_summary with some columns removed)
->>
->>                          enable  prepare
->>     clock                 count    count          rate
->> -----------------------------------------------------
->>   otg                         0        0     480000000
->>   osc                         5        5      19200000
->>      gp2                      1        1         32768
->>      tsens                    0        0       1920000
->>      otp                      0        0       4800000
->>      timer                    0        0       1000002
->>      pllh                     4        4     864000000
->>         pllh_pix_prediv       1        1       3375000
->>            pllh_pix           0        0        337500
->>         pllh_aux              1        1     216000000
->>            vec                0        0     108000000
->>         pllh_rcal_prediv      1        1       3375000
->>            pllh_rcal          0        0        337500
->>      plld                     3        3    2000000024
->>         plld_dsi1             0        0       7812501
->>         plld_dsi0             0        0       7812501
->>         plld_per              3        3     500000006
->>            gp1                1        1      25000000
->>            uart               1        2      47999625
->>         plld_core             2        2     500000006
->>            sdram              0        0     166666668
->>      pllc                     3        3    2400000000
->>         pllc_per              1        1    1200000000
->>            emmc               0        0     200000000
->>         pllc_core2            0        0       9375000
->>         pllc_core1            0        0       9375000
->>         pllc_core0            2        2    1200000000
->>            vpu                1        1     700000000
->>               aux_spi2        0        0     700000000
->>               aux_spi1        0        0     700000000
->>               aux_uart        0        0     700000000
->>               peri_image      0        0     700000000
->>      plla                     2        2    2250000000
->>         plla_ccp2             0        0       8789063
->>         plla_dsi0             0        0       8789063
->>         plla_core             1        1     750000000
->>            h264               0        0     250000000
->>            isp                0        0     250000000
->>   dsi1p                       0        0             0
->>   dsi0p                       0        0             0
->>   dsi1e                       0        0             0
->>   dsi0e                       0        0             0
->>   cam1                        0        0             0
->>   cam0                        0        0             0
->>   dpi                         0        0             0
->>   tec                         0        0             0
->>   smi                         0        0             0
->>   slim                        0        0             0
->>   gp0                         0        0             0
->>   dft                         0        0             0
->>   aveo                        0        0             0
->>   pcm                         0        0             0
->>   pwm                         0        0             0
->>   hsm                         0        0             0
->>
->> It shows small differences with real hardware due other missing
->> peripherals for which the driver turn the clock off (like tsens).
->>
->> Luc Michel (15):
->>    hw/core/clock: provide the VMSTATE_ARRAY_CLOCK macro
->>    hw/core/clock: trace clock values in Hz instead of ns
->>    hw/core/clock: add the clock_new helper function
->>    hw/arm/raspi: fix CPRMAN base address
->>    hw/arm/raspi: add a skeleton implementation of the CPRMAN
->>    hw/misc/bcm2835_cprman: add a PLL skeleton implementation
->>    hw/misc/bcm2835_cprman: implement PLLs behaviour
->>    hw/misc/bcm2835_cprman: add a PLL channel skeleton implementation
->>    hw/misc/bcm2835_cprman: implement PLL channels behaviour
->>    hw/misc/bcm2835_cprman: add a clock mux skeleton implementation
->>    hw/misc/bcm2835_cprman: implement clock mux behaviour
->>    hw/misc/bcm2835_cprman: add the DSI0HSCK multiplexer
->>    hw/misc/bcm2835_cprman: add sane reset values to the registers
->>    hw/char/pl011: add a clock input
->>    hw/arm/bcm2835_peripherals: connect the UART clock
->>
->>   include/hw/arm/bcm2835_peripherals.h       |    5 +-
->>   include/hw/arm/raspi_platform.h            |    5 +-
->>   include/hw/char/pl011.h                    |    1 +
->>   include/hw/clock.h                         |   18 +
->>   include/hw/misc/bcm2835_cprman.h           |  210 ++++
->>   include/hw/misc/bcm2835_cprman_internals.h | 1019 ++++++++++++++++++++
->>   hw/arm/bcm2835_peripherals.c               |   15 +-
->>   hw/char/pl011.c                            |   45 +
->>   hw/core/clock.c                            |   21 +-
->>   hw/misc/bcm2835_cprman.c                   |  808 ++++++++++++++++
->>   hw/char/trace-events                       |    1 +
->>   hw/core/trace-events                       |    4 +-
->>   hw/misc/meson.build                        |    1 +
->>   hw/misc/trace-events                       |    5 +
->>   14 files changed, 2146 insertions(+), 12 deletions(-)
->>   create mode 100644 include/hw/misc/bcm2835_cprman.h
->>   create mode 100644 include/hw/misc/bcm2835_cprman_internals.h
->>   create mode 100644 hw/misc/bcm2835_cprman.c
->>
+Thanks for your comments!
 
+> On 10/22/20 8:49 PM, Klaus Jensen wrote:
+> > From: Klaus Jensen <k.jensen@samsung.com>
+> >=20
+> > Add support for the Dataset Management command and the Deallocate
+> > attribute. Deallocation results in discards being sent to the underlying
+> > block device. Whether of not the blocks are actually deallocated is
+> > affected by the same factors as Write Zeroes (see previous commit).
+> >=20
+> >       format | discard | dsm (512b)  dsm (4kb)  dsm (64kb)
+>=20
+> Please use B/KiB units which are unambiguous (kb is for kbits)
+> (if you queue this yourself, you can fix when applying, no need
+> to repost).
+>=20
+
+Thanks, I'll change it.
+
+> >      ------------------------------------------------------
+> >        qcow2    ignore   n           n          n
+> >        qcow2    unmap    n           n          y
+> >        raw      ignore   n           n          n
+> >        raw      unmap    n           y          y
+> >=20
+> > Again, a raw format and 4kb LBAs are preferable.
+> >=20
+> > In order to set the Namespace Preferred Deallocate Granularity and
+> > Alignment fields (NPDG and NPDA), choose a sane minimum discard
+> > granularity of 4kb. If we are using a passthru device supporting discard
+> > at a 512b granularity, user should set the discard_granularity property
+>=20
+> Ditto.
+>=20
+> > explicitly. NPDG and NPDA will also account for the cluster_size of the
+> > block driver if required (i.e. for QCOW2).
+> >=20
+> > See NVM Express 1.3d, Section 6.7 ("Dataset Management command").
+> >=20
+> > Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
+> > ---
+> >   hw/block/nvme.h      |   2 +
+> >   include/block/nvme.h |   7 ++-
+> >   hw/block/nvme-ns.c   |  36 +++++++++++++--
+> >   hw/block/nvme.c      | 101 ++++++++++++++++++++++++++++++++++++++++++-
+> >   4 files changed, 140 insertions(+), 6 deletions(-)
+> >=20
+> > diff --git a/hw/block/nvme.h b/hw/block/nvme.h
+> > index e080a2318a50..574333caa3f9 100644
+> > --- a/hw/block/nvme.h
+> > +++ b/hw/block/nvme.h
+> > @@ -28,6 +28,7 @@ typedef struct NvmeRequest {
+> >       struct NvmeNamespace    *ns;
+> >       BlockAIOCB              *aiocb;
+> >       uint16_t                status;
+> > +    void                    *opaque;
+> >       NvmeCqe                 cqe;
+> >       NvmeCmd                 cmd;
+> >       BlockAcctCookie         acct;
+> > @@ -60,6 +61,7 @@ static inline const char *nvme_io_opc_str(uint8_t opc)
+> >       case NVME_CMD_WRITE:            return "NVME_NVM_CMD_WRITE";
+> >       case NVME_CMD_READ:             return "NVME_NVM_CMD_READ";
+> >       case NVME_CMD_WRITE_ZEROES:     return "NVME_NVM_CMD_WRITE_ZEROES=
+";
+> > +    case NVME_CMD_DSM:              return "NVME_NVM_CMD_DSM";
+> >       default:                        return "NVME_NVM_CMD_UNKNOWN";
+> >       }
+> >   }
+> > diff --git a/include/block/nvme.h b/include/block/nvme.h
+> > index 966c3bb304bd..e95ff6ca9b37 100644
+> > --- a/include/block/nvme.h
+> > +++ b/include/block/nvme.h
+> > @@ -990,7 +990,12 @@ typedef struct QEMU_PACKED NvmeIdNs {
+> >       uint16_t    nabspf;
+> >       uint16_t    noiob;
+> >       uint8_t     nvmcap[16];
+> > -    uint8_t     rsvd64[40];
+> > +    uint16_t    npwg;
+> > +    uint16_t    npwa;
+> > +    uint16_t    npdg;
+> > +    uint16_t    npda;
+> > +    uint16_t    nows;
+> > +    uint8_t     rsvd74[30];
+> >       uint8_t     nguid[16];
+> >       uint64_t    eui64;
+> >       NvmeLBAF    lbaf[16];
+>=20
+> If you consider "block/nvme.h" shared by 2 different subsystems,
+> it is better to add the changes in a separate patch. That way
+> the changes can be acked individually.
+>=20
+
+Sure. Some other stuff here warrents a v6 I think, so I will split it.
+
+> > diff --git a/hw/block/nvme-ns.c b/hw/block/nvme-ns.c
+> > index f1cc734c60f5..840651db7256 100644
+> > --- a/hw/block/nvme-ns.c
+> > +++ b/hw/block/nvme-ns.c
+> > @@ -28,10 +28,14 @@
+> >   #include "nvme.h"
+> >   #include "nvme-ns.h"
+> > -static void nvme_ns_init(NvmeNamespace *ns)
+> > +#define MIN_DISCARD_GRANULARITY (4 * KiB)
+> > +
+> > +static int nvme_ns_init(NvmeNamespace *ns, Error **errp)
+>=20
+> Hmm the Error* argument could be squashed in "hw/block/nvme:
+> support multiple namespaces". Else better split patch in dumb
+> units IMHO (maybe a reviewer's taste).
+>=20
+
+Yeah, I guess I can squash that in.
+
+> >   {
+> > +    BlockDriverInfo bdi;
+> >       NvmeIdNs *id_ns =3D &ns->id_ns;
+> >       int lba_index =3D NVME_ID_NS_FLBAS_INDEX(ns->id_ns.flbas);
+> > +    int npdg, ret;
+> >       ns->id_ns.dlfeat =3D 0x9;
+> > @@ -43,8 +47,25 @@ static void nvme_ns_init(NvmeNamespace *ns)
+> >       id_ns->ncap =3D id_ns->nsze;
+> >       id_ns->nuse =3D id_ns->ncap;
+> > -    /* support DULBE */
+> > -    id_ns->nsfeat |=3D 0x4;
+> > +    /* support DULBE and I/O optimization fields */
+> > +    id_ns->nsfeat |=3D (0x4 | 0x10);
+>=20
+> The comment helps, but isn't needed if you use explicit definitions
+> for these flags. You already introduced the NVME_ID_NS_NSFEAT_DULBE
+> and NVME_ID_NS_FLBAS_EXTENDED but they are restricted to extract bits.
+> This is why I personally prefer the registerfields API (see
+> "hw/registerfields.h").
+>=20
+
+I've been wanting to fix those constants - but the convention that they
+only extract bits pre-dates the nvme device and is from when the nvme
+block driver was introduced - I have just been following the precedence
+by defining them like that.
+
+> > +
+> > +    npdg =3D ns->blkconf.discard_granularity / ns->blkconf.logical_blo=
+ck_size;
+> > +
+> > +    ret =3D bdrv_get_info(blk_bs(ns->blkconf.blk), &bdi);
+> > +    if (ret < 0) {
+> > +        error_setg_errno(errp, -ret, "could not get block driver info"=
+);
+> > +        return ret;
+> > +    }
+> > +
+> > +    if (bdi.cluster_size &&
+> > +        bdi.cluster_size > ns->blkconf.discard_granularity) {
+> > +        npdg =3D bdi.cluster_size / ns->blkconf.logical_block_size;
+> > +    }
+> > +
+> > +    id_ns->npda =3D id_ns->npdg =3D npdg - 1;
+> > +
+> > +    return 0;
+> >   }
+> >   static int nvme_ns_init_blk(NvmeCtrl *n, NvmeNamespace *ns, Error **e=
+rrp)
+> > @@ -59,6 +80,11 @@ static int nvme_ns_init_blk(NvmeCtrl *n, NvmeNamespa=
+ce *ns, Error **errp)
+> >           return -1;
+> >       }
+> > +    if (ns->blkconf.discard_granularity =3D=3D -1) {
+> > +        ns->blkconf.discard_granularity =3D
+> > +            MAX(ns->blkconf.logical_block_size, MIN_DISCARD_GRANULARIT=
+Y);
+> > +    }
+> > +
+> >       ns->size =3D blk_getlength(ns->blkconf.blk);
+> >       if (ns->size < 0) {
+> >           error_setg_errno(errp, -ns->size, "could not get blockdev siz=
+e");
+> > @@ -92,7 +118,9 @@ int nvme_ns_setup(NvmeCtrl *n, NvmeNamespace *ns, Er=
+ror **errp)
+> >           return -1;
+> >       }
+> > -    nvme_ns_init(ns);
+> > +    if (nvme_ns_init(ns, errp)) {
+> > +        return -1;
+> > +    }
+> >       if (nvme_register_namespace(n, ns, errp)) {
+> >           return -1;
+> > diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+> > index 4ab0705f5a92..7acb9e9dc38a 100644
+> > --- a/hw/block/nvme.c
+> > +++ b/hw/block/nvme.c
+> > @@ -959,6 +959,103 @@ static void nvme_rw_cb(void *opaque, int ret)
+> >       nvme_enqueue_req_completion(nvme_cq(req), req);
+> >   }
+> > +static void nvme_aio_discard_cb(void *opaque, int ret)
+> > +{
+> > +    NvmeRequest *req =3D opaque;
+> > +    int *discards =3D req->opaque;
+> > +
+> > +    trace_pci_nvme_aio_discard_cb(nvme_cid(req));
+> > +
+> > +    if (ret) {
+> > +        req->status =3D NVME_INTERNAL_DEV_ERROR;
+> > +        trace_pci_nvme_err_aio(nvme_cid(req), strerror(ret),
+> > +                               req->status);
+> > +    }
+> > +
+> > +    if (discards && --(*discards) > 0) {
+>=20
+> This line is hard to read.
+>=20
+
+Yes. Probably too clever for my own good. I'll fix it up.
+
+> > +        return;
+> > +    }
+> > +
+> > +    g_free(req->opaque);
+> > +    req->opaque =3D NULL;
+> > +
+> > +    nvme_enqueue_req_completion(nvme_cq(req), req);
+> > +}
+> > +
+> > +static uint16_t nvme_dsm(NvmeCtrl *n, NvmeRequest *req)
+> > +{
+> > +    NvmeNamespace *ns =3D req->ns;
+> > +    NvmeDsmCmd *dsm =3D (NvmeDsmCmd *) &req->cmd;
+> > +    NvmeDsmRange *range =3D NULL;
+>=20
+> g_autofree?
+>=20
+
+What sorcery is this?! I think I'll just replace it with a stack
+allocation like Keith suggested.
+
+> > +    int *discards =3D NULL;
+> > +
+> > +    uint32_t attr =3D le32_to_cpu(dsm->attributes);
+> > +    uint32_t nr =3D (le32_to_cpu(dsm->nr) & 0xff) + 1;
+> > +
+> > +    uint16_t status =3D NVME_SUCCESS;
+> > +
+> > +    trace_pci_nvme_dsm(nvme_cid(req), nvme_nsid(ns), nr, attr);
+> > +
+> > +    if (attr & NVME_DSMGMT_AD) {
+> > +        int64_t offset;
+> > +        size_t len;
+> > +
+> > +        range =3D g_new(NvmeDsmRange, nr);
+> > +
+> > +        status =3D nvme_dma(n, (uint8_t *)range, nr * sizeof(NvmeDsmRa=
+nge),
+> > +                          DMA_DIRECTION_TO_DEVICE, req);
+> > +        if (status) {
+> > +            goto out;
+> > +        }
+> > +
+> > +        discards =3D g_new(int, 1);
+> > +        *discards =3D 1;
+> > +        req->opaque =3D discards;
+>=20
+> If opaque is a pointer, why not instead using it as an uintptr_t
+> discards directly without using the heap?
+>=20
+
+It was a "keep it simple, stupid" thing to just do the allocation. DSM
+is typically not on the fast path ;)
+
+But there is really no reason not to use that here.
+
+--8t9RHnE3ZwKMSgU+
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEUigzqnXi3OaiR2bATeGvMW1PDekFAl+SaTMACgkQTeGvMW1P
+Denjkgf+LbO0GuHrhGqdX6MqgVl1zsJHDnmoo2SL+axmVBGa9YAA2Dr2rMaI7vCU
+Haz0FNTzdUkHP8jELoPr5RcngWlxaKGxzamkgH/IRl9ztXfDvZqyE3in/K4nrjGB
+Gf3h2Z3EZStKQxel34jMrcbXL9UAEzPiBQhn1okdlS+GW07ZEgu+VSnx8/teLADU
+YzErRYG0vlkjknrXu1pDAouDljMJ0FZ5qprFGqcwcvjJT2lK5dYKMVpAwPjLdfc4
+sk73xV9GmlbVqWXeJ7OsB/RhDEm83wyqHfwxfMy81+hkK8E1pQtKoXc6GyKpbqFS
+0rUt+gnXr9p+1KiFb7tcDAH0UV/cPQ==
+=Vgn0
+-----END PGP SIGNATURE-----
+
+--8t9RHnE3ZwKMSgU+--
 
