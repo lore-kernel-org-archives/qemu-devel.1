@@ -2,84 +2,127 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11DF9C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:19:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62303C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:25:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 407C221527
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:19:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8016521527
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 14:25:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AQlhv1Vu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 407C221527
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="Y+K65AfM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8016521527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41580 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVxuI-0003IA-0Y
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 10:19:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39564)
+	id 1kVy0o-0005Am-Db
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 10:25:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41026)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVxtb-0002o9-9u
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 10:18:19 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40411)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVxtY-0008V5-KH
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 10:18:18 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603462696;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=3mg8CTFvXVMDZHyjaOTkZVEFCEf9snkyLfDQ4Hjorcg=;
- b=AQlhv1VuU4MpPi55Mgruuk+OYovDcns/9nnoPl0NGwRQLp8Si5gfd7y4CC/v95pHEmpnEu
- luqOFx6XUChVUzF1ttpcghScT0RIg5falWJU1DY505MKDBnVBVzUQg2tp7w7IwhTjEZLeT
- 2YFmmwuz2WPc/xr8trycORprRoOQ+Jc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-1-p0Gmd8_ZN4OoT3LXx-mNww-1; Fri, 23 Oct 2020 10:18:12 -0400
-X-MC-Unique: p0Gmd8_ZN4OoT3LXx-mNww-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02DF4804B6A;
- Fri, 23 Oct 2020 14:18:11 +0000 (UTC)
-Received: from merkur.fritz.box (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DCAEB27BB4;
- Fri, 23 Oct 2020 14:18:06 +0000 (UTC)
-Date: Fri, 23 Oct 2020 16:18:05 +0200
-From: Kevin Wolf <kwolf@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] block: End quiescent sections when a BDS is deleted
-Message-ID: <20201023141805.GE4793@merkur.fritz.box>
-References: <160344969243.4091343.14371338409686732879.stgit@bahia.lan>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVxzQ-0004RT-8T; Fri, 23 Oct 2020 10:24:21 -0400
+Received: from mail-eopbgr60132.outbound.protection.outlook.com
+ ([40.107.6.132]:23108 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kVxzJ-0000nK-RL; Fri, 23 Oct 2020 10:24:18 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Pt4bYcBfsFMokAijkV3UbvXeL4czuLmpmOxAgaD7FPZyYNEkublbedUHa4jHzNbRPaFEuKst46ZqaxiNo/m9m4Rnm2CqiTHzGmOAXVwp3umcwbVnf8J1znMOoUBZjMyDN87SECtn3LfTSweTIlv8xUUAjdX3pNP8cBoJnKR592+8AQHTZ+RceO8GEfyAhtZpemedQ/4LV58G0bSC44r01CPMMdPzXA9+e0MEJ+zox/03c6OSXzSC/DJUitMYBXymNO8nwROjIuhLRxsDC/r0CEjjtYgzFfiy8jzi02Mg0biNBR9+qiiq3LAUWc/vxSjkFKKHcFU8PDRxGpKgMvZ4Ug==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bQv1fFr2gvfGCSeZaXD3xFxEx/V3BPgYMhzP+NoUJRs=;
+ b=WIDUA0k0Mlk0kLepAprqGgiXhEEPNyM3v/tExY4/AXDLft4n3DavxKrulPme3bmCSqoyfarukGjqFLejZHLRV+TcRpmHJ5oxkVR9Zfc0Xd/AusBNjt6hP0zNtlnPqXWQNP/6k9UqXGXKkU6e02BDmCi7fYoFHDwIziAkhSN/TjRiPMK2mBZBjSUz3yJ1/6qXH3eD947/lTtnFYcYKP1oCvdgdVCqD8BMdRAr2i6Lp4Ky2n7vM+wJlGVtZhk3WBQK/uYDZ47XDW6fmoE/4uYYdC4ZcR+YLXgXboUx8gFk8t85SrOjn4gb5qKgFFb+ba+R+Jnf7B7E7MXSaT2CUuqqWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bQv1fFr2gvfGCSeZaXD3xFxEx/V3BPgYMhzP+NoUJRs=;
+ b=Y+K65AfMtZtfuZVlQJSf8MfgRVWKeol5aqb8S0LjIXfwti6DvlAxqJR3JwFHAXwfdAPGRyiAbPN9aBDwV+HK8IbhF+jvJ/BhRxgbAoYh9r/3BPYgLJirq9ryPT57jWS/d9axT6FP3ShAdREz/58Qok8tYKNWEwPY1laFfjJV+lk=
+Authentication-Results: openvz.org; dkim=none (message not signed)
+ header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
+ by AM6PR08MB4071.eurprd08.prod.outlook.com (2603:10a6:20b:a7::19)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Fri, 23 Oct
+ 2020 14:24:10 +0000
+Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
+ ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Fri, 23 Oct 2020
+ 14:24:10 +0000
+Subject: Re: [PATCH v12 02/14] block: add insert/remove node functions
+To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
+Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
+ kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
+ eblake@redhat.com, den@openvz.org
+References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
+ <1603390423-980205-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <187027cf-fe54-f326-525b-59b2e18a31a4@virtuozzo.com>
+Date: Fri, 23 Oct 2020 17:24:08 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+In-Reply-To: <1603390423-980205-3-git-send-email-andrey.shinkevich@virtuozzo.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.98]
+X-ClientProxiedBy: AM0PR04CA0053.eurprd04.prod.outlook.com
+ (2603:10a6:208:1::30) To AM7PR08MB5494.eurprd08.prod.outlook.com
+ (2603:10a6:20b:dc::15)
 MIME-Version: 1.0
-In-Reply-To: <160344969243.4091343.14371338409686732879.stgit@bahia.lan>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.98) by
+ AM0PR04CA0053.eurprd04.prod.outlook.com (2603:10a6:208:1::30) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3477.22 via Frontend Transport; Fri, 23 Oct 2020 14:24:09 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 29163f9c-de5c-41a4-7f9a-08d8775f4ea7
+X-MS-TrafficTypeDiagnostic: AM6PR08MB4071:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM6PR08MB407166C0B0F09AF4829F4540C11A0@AM6PR08MB4071.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: DrhjkPPQYTAQDWOJc0iaEZ2vk7lalbuYL1sDquf2meJg+eM4vq7HQ5uiq+rgHZSqbA2rF0qdG0sIMQola0zHOTU9EIgwl5baRPQRTscuK1lnOpXq5X9BrotMDlydHQTJIp155iawL+jH+Eiq6YAtsnB0fG4wImfRGNRs70Gj7puMhF6GyUKXkInK86bnBw7Kcp7SswfCSK8h5HLZMly1yGXH3X8oeTGeOosJCSgBQK6qriTjpbsHHtbVOQVNi98fIkdPgfyYq8lIy58dgW1UQ9CRzO3DdYekbQSXrwhrUbu0YALK8llr6JFVx9Ys5xm84cwoW8OkkKsUi5OFjPJcfwtGK7R0EhRx4BbPIMfbjnCxw3Xj5iueCwDiPdgpibO2
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(136003)(346002)(39850400004)(396003)(366004)(376002)(8676002)(6486002)(86362001)(52116002)(478600001)(36756003)(66476007)(66556008)(186003)(4326008)(83380400001)(26005)(31696002)(2616005)(66946007)(16526019)(2906002)(8936002)(31686004)(16576012)(956004)(107886003)(5660300002)(316002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: XZ/StWTndmJO2EORa5jtBGY5HfNaUKaCGszoFhbLrCAQ3ICJwJamB4hbTsMXVJbBvj5vy3JUX1xLVCiLB7jzueGj8721k5JKCuVIGrlmAfChPUxT5o1p10b2CRL3cJCO1Dds2oYYHRn6jtPNMcPKoz/TuArHuiIGh+FuehDPwTZwvkOogWo0gICc2fUiyY5Dpy1r75hAVa6JBvHgFAZZS1NFLCsfvKZq8IYJJj54kqouS+YB2+rUmft9fozqra8u8leJXBcyxbVRCbiCr3+2Lyb3CvP36HSalCT0l7H379WkJ0nYovawAjhpa8+ABRVBa3RMK0wHDO5jOLpjyj5MdZ9vUFTOSQ9Z8K7uNQBsMbSj+2u5MwPEkxxua99Kum6/E5GRXYGP7jgcbpdFBWA2SIEWQFEoknwHCwEBkPctRc4IZlpQHR3HKLkznfPe374GwsjfOIlD1c0kna9NWlhPLNjz4UA4Zauj92rOqmAtmm/jTUJyBs7pUQZO4+CfEOAWUX+cD+WC8/vMw6SUD7+zyLmZwDgynqttjh1daYIHqYPBl5LPWdFWV6qyDXdnVf4IrC1AbrWUP9UaU+trqNpVLuR5j7tsXqAa/OsUZy5Ff+xmhHnLT+ZY68CUX9l4mTqqpz4XF9SEMQZAC8lUSkMnOA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29163f9c-de5c-41a4-7f9a-08d8775f4ea7
+X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2020 14:24:10.0294 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: glVaLZ6+X5Tm+/C2Yj2pNwt44MwIJgypiW5fC9Fu4hdnLy2X54jhdqtFxplkvq60QFl/9QhdvcfEpkff8L+25Zcr+YbjvwEVtKPMKQTkdp0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB4071
+Received-SPF: pass client-ip=40.107.6.132;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-DB3-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 10:24:11
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,139 +135,101 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Am 23.10.2020 um 12:41 hat Greg Kurz geschrieben:
-> If a BDS gets deleted during blk_drain_all(), it might miss a
-> call to bdrv_do_drained_end(). This means missing a call to
-> aio_enable_external() and the AIO context remains disabled for
-> ever. This can cause a device to become irresponsive and to
-> disrupt the guest execution, ie. hang, loop forever or worse.
+22.10.2020 21:13, Andrey Shinkevich wrote:
+> Provide API for a node insertion to and removal from a backing chain.
 > 
-> This scenario is quite easy to encounter with virtio-scsi
-> on POWER when punching multiple blockdev-create QMP commands
-> while the guest is booting and it is still running the SLOF
-> firmware. This happens because SLOF disables/re-enables PCI
-> devices multiple times via IO/MEM/MASTER bits of PCI_COMMAND
-> register after the initial probe/feature negotiation, as it
-> tends to work with a single device at a time at various stages
-> like probing and running block/network bootloaders without
-> doing a full reset in-between. This naturally generates many
-> dataplane stops and starts, and thus many drain sections that
-> can race with blockdev_create_run(). In the end, SLOF bails
-> out.
-> 
-> It is somehow reproducible on x86 but it requires to generate
-> articial dataplane start/stop activity with stop/cont QMP
-> commands. In this case, seabios ends up looping for ever,
-> waiting for the virtio-scsi device to send a response to
-> a command it never received.
-> 
-> Add a helper that pairs all previously called bdrv_do_drained_begin()
-> with a bdrv_do_drained_end() and call it from bdrv_close().
-> While at it, update the "/bdrv-drain/graph-change/drain_all"
-> test in test-bdrv-drain so that it can catch the issue.
-> 
-> BugId: https://bugzilla.redhat.com/show_bug.cgi?id=1874441
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+> Suggested-by: Max Reitz <mreitz@redhat.com>
+> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
 > ---
->  block.c                 |    9 +++++++++
->  block/io.c              |   13 +++++++++++++
->  include/block/block.h   |    6 ++++++
->  tests/test-bdrv-drain.c |    1 +
->  4 files changed, 29 insertions(+)
+>   block.c               | 49 +++++++++++++++++++++++++++++++++++++++++++++++++
+>   include/block/block.h |  3 +++
+>   2 files changed, 52 insertions(+)
 > 
 > diff --git a/block.c b/block.c
-> index 430edf79bb10..ddcb36dd48a8 100644
+> index 430edf7..502b483 100644
 > --- a/block.c
 > +++ b/block.c
-> @@ -4458,6 +4458,15 @@ static void bdrv_close(BlockDriverState *bs)
->      }
->      QLIST_INIT(&bs->aio_notifiers);
->      bdrv_drained_end(bs);
-> +
-> +    /*
-> +     * If we're still inside some bdrv_drain_all_begin()/end() sections, end
-> +     * them now since this BDS won't exist anymore when bdrv_drain_all_end()
-> +     * gets called.
-> +     */
-> +    if (bs->quiesce_counter) {
-> +        bdrv_drained_end_quiesce(bs);
-> +    }
->  }
->  
->  void bdrv_close_all(void)
-> diff --git a/block/io.c b/block/io.c
-> index 54f0968aee27..8a0da06bbb14 100644
-> --- a/block/io.c
-> +++ b/block/io.c
-> @@ -633,6 +633,19 @@ void bdrv_drain_all_begin(void)
->      }
->  }
->  
-> +void bdrv_drained_end_quiesce(BlockDriverState *bs)
-
-I think the name should make clear that this is meant as a counterpart
-for bdrv_drain_all_begin(), so maybe bdrv_drain_all_end_quiesce()?
-
-(The function is not suitable for any other kinds of drain because the
-parameters it passes to bdrv_do_drained_end() are only the same as for
-bdrv_drain_all_begin().)
-
+> @@ -4670,6 +4670,55 @@ static void bdrv_delete(BlockDriverState *bs)
+>       g_free(bs);
+>   }
+>   
+> +BlockDriverState *bdrv_insert_node(BlockDriverState *bs, QDict *node_options,
+> +                                   int flags, Error **errp)
 > +{
-> +    int drained_end_counter = 0;
+> +    BlockDriverState *new_node_bs;
+> +    Error *local_err = NULL;
 > +
-> +    g_assert_cmpint(bs->quiesce_counter, >, 0);
-> +    g_assert_cmpint(bs->refcnt, ==, 0);
-
-By the way, I didn't know about the problem with these macros either.
-
-> +    while (bs->quiesce_counter) {
-> +        bdrv_do_drained_end(bs, false, NULL, true, &drained_end_counter);
+> +    new_node_bs =  bdrv_open(NULL, NULL, node_options, flags, errp);
+> +    if (new_node_bs == NULL) {
+> +        error_prepend(errp, "Could not create node: ");
+> +        return NULL;
 > +    }
-> +    BDRV_POLL_WHILE(bs, qatomic_read(&drained_end_counter) > 0);
+> +
+> +    bdrv_drained_begin(bs);
+> +    bdrv_replace_node(bs, new_node_bs, &local_err);
+> +    bdrv_drained_end(bs);
+> +
+> +    if (local_err) {
+> +        bdrv_unref(new_node_bs);
+> +        error_propagate(errp, local_err);
+> +        return NULL;
+> +    }
+> +
+> +    return new_node_bs;
 > +}
 > +
->  void bdrv_drain_all_end(void)
->  {
->      BlockDriverState *bs = NULL;
+> +void bdrv_remove_node(BlockDriverState *bs)
+> +{
+> +    BdrvChild *child;
+> +    BlockDriverState *inferior_bs;
+> +
+> +    child = bdrv_filter_or_cow_child(bs);
+> +    if (!child) {
+> +        return;
+> +    }
+> +    inferior_bs = child->bs;
+> +
+> +    /* Retain the BDS until we complete the graph change. */
+> +    bdrv_ref(inferior_bs);
+> +    /* Hold a guest back from writing while permissions are being reset. */
+> +    bdrv_drained_begin(inferior_bs);
+> +    /* Refresh permissions before the graph change. */
+> +    bdrv_child_refresh_perms(bs, child, &error_abort);
+> +    bdrv_replace_node(bs, inferior_bs, &error_abort);
+> +
+> +    bdrv_drained_end(inferior_bs);
+> +    bdrv_unref(inferior_bs);
+> +    bdrv_unref(bs);
+> +}
+
+The function is unused, and as I understand can't work as intended without s->active handling. I think it should be dropped
+
+> +
+>   /*
+>    * Run consistency checks on an image
+>    *
 > diff --git a/include/block/block.h b/include/block/block.h
-> index d16c401cb44e..c0ce6e690081 100644
+> index d16c401..ae7612f 100644
 > --- a/include/block/block.h
 > +++ b/include/block/block.h
-> @@ -779,6 +779,12 @@ void bdrv_drained_end(BlockDriverState *bs);
->   */
->  void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_counter);
->  
-> +/**
-> + * End all quiescent sections started by bdrv_drain_all_begin(). This is
-> + * only needed when deleting a BDS before bdrv_drain_all_end() is called.
-> + */
-> +void bdrv_drained_end_quiesce(BlockDriverState *bs);
-> +
->  /**
->   * End a quiescent section started by bdrv_subtree_drained_begin().
->   */
-> diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-> index 1595bbc92e9e..8a29e33e004a 100644
-> --- a/tests/test-bdrv-drain.c
-> +++ b/tests/test-bdrv-drain.c
-> @@ -594,6 +594,7 @@ static void test_graph_change_drain_all(void)
->  
->      g_assert_cmpint(bs_b->quiesce_counter, ==, 0);
->      g_assert_cmpint(b_s->drain_count, ==, 0);
-> +    g_assert_cmpint(qemu_get_aio_context()->external_disable_cnt, ==, 0);
+> @@ -350,6 +350,9 @@ void bdrv_append(BlockDriverState *bs_new, BlockDriverState *bs_top,
+>                    Error **errp);
+>   void bdrv_replace_node(BlockDriverState *from, BlockDriverState *to,
+>                          Error **errp);
+> +BlockDriverState *bdrv_insert_node(BlockDriverState *bs, QDict *node_options,
+> +                                   int flags, Error **errp);
+> +void bdrv_remove_node(BlockDriverState *bs);
+>   
+>   int bdrv_parse_aio(const char *mode, int *flags);
+>   int bdrv_parse_cache_mode(const char *mode, int *flags, bool *writethrough);
+> 
 
-But here in the test case we should keep g_assert_cmpint() because it
-gives better error messages when it fails (and checkpatch doesn't warn
-about it in tests).
 
-Apart from the naming and checkpatch, this looks good to me.
-
-Kevin
-
+-- 
+Best regards,
+Vladimir
 
