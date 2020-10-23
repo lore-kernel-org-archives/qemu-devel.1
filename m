@@ -2,92 +2,90 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17274C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:10:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEF26C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:11:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5FFE1208FE
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:10:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4279D208FE
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:11:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmsuOMpP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5FFE1208FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iOnH0KeB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4279D208FE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0aG-0005CF-Sf
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:10:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46536)
+	id 1kW0bO-0006Mu-6U
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:11:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48458)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVznN-0000VC-Uy
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:20:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39614)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVznL-0008Pr-RB
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:20:01 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603469999;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=GI829ZvrWXiramj4WzqAaOzgkvgbs7eYCY/WSWdf2no=;
- b=fmsuOMpPDhMYfES2JwxG86/yZFSWS58w2Av0GKLpHWlBxlDwI9PgIwM5zqI1yfKQUSF/Cx
- o0W59y/Zn5/22Q1TB45IOggbPdUN8nz2PetFxVZbNRJX1nxQBfkKeScmTcwnuUJN3f8hYv
- GRoJHALaYVrhIR2vhLTB4y4u2gdwouA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-205-38Dh8J_FNKCmB4zDkU_eDg-1; Fri, 23 Oct 2020 12:19:53 -0400
-X-MC-Unique: 38Dh8J_FNKCmB4zDkU_eDg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E430835BB8
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 16:19:16 +0000 (UTC)
-Received: from redhat.com (ovpn-113-189.ams2.redhat.com [10.36.113.189])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 2BD5155798;
- Fri, 23 Oct 2020 16:19:14 +0000 (UTC)
-Date: Fri, 23 Oct 2020 17:19:12 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [qemu-web PATCH 6/7] Add link to "edit this page" for all pages
-Message-ID: <20201023161912.GB463062@redhat.com>
-References: <20201023152957.488974-1-berrange@redhat.com>
- <20201023152957.488974-7-berrange@redhat.com>
- <d61c100e-fb49-6f13-77e0-2262cb06946d@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVzvi-0005Bh-Se
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:28:39 -0400
+Received: from mail-lj1-x233.google.com ([2a00:1450:4864:20::233]:41529)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVzvg-0001AZ-Th
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:28:38 -0400
+Received: by mail-lj1-x233.google.com with SMTP id p15so2194411ljj.8
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 09:28:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :content-transfer-encoding;
+ bh=ZngIh3I0UxdpWmpzcKTePZFXrpYnh/iTyYpxYyoY0M0=;
+ b=iOnH0KeB5HgfTQRebijifFaeGPO1RUj6Mca6Zh9LxHKgXCoqWE6Gw5ZI+ziRH7BzrI
+ utNcxs9X2ILOyHLNwuIkCOdIqH88K4jCCQWcYm8cObPDEmzNYWYkg1DMhdaGSlZwFRXU
+ 55kVxm1c8gIdZpKmPLHwInFmoOKGIESsfBUTYwKfWzifDKNeJX5CagxS39g5KgPrJa3e
+ pBq3GCjJ2+wWmz9s5t/ZiJsaMEAGBKiVFn3fqw2l43yQoIKhQnJXyCnbird9QFB/dymc
+ KTL3cyqQwxFHethYqWLjoGYIrHjNrdugcRUE+Z9a4sUt4JpaDMO9pVXLV9AIUd1KbIF2
+ Ejhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:content-transfer-encoding;
+ bh=ZngIh3I0UxdpWmpzcKTePZFXrpYnh/iTyYpxYyoY0M0=;
+ b=pCnMut9U4kb8AhajIYOMV/USPlZXvNX35kH1LJH/TsyYjz3StncbXCeph2a2vtvee1
+ aq6HShlkL8teeNgChniA+MQLOl/WuFoCAjp1iA3YzwKymKPg8RoeTJjfiz+Np4EXeKmj
+ cQw//aIAt6DwcRnTrzPMsvOX2i8CXN2BpXVZCJD4ZLLe9BZG2r2TXojT4lVwjAKbSPTW
+ 99iS6fNbK9TJx21MbFe2CD+Ws7ceOlZpo1wESn5JawAkgynSVudgk1sF7SOaz/zTo9Xc
+ Tcu9BYKZXoBHmnUCz8z9o/yQFa2HS8/eVQqS9Q6ws+fW+PcBaRQodeo5haR8hxhUdpnS
+ kWQQ==
+X-Gm-Message-State: AOAM531XHgkCktzz+RFY/PBz639wvNyv/Gt8qPhTiTb76p/a55k3NLuE
+ GsJRxwy6o3AUNWS79l1+cAtQI+l0aMlXHpRUvsyY/A==
+X-Google-Smtp-Source: ABdhPJzkJdk82uptBRK3p/TqajVDA8Nhq6AI2+KN8wcopmUTTASGt5ci5N1lddVRKU8U0nRhkAkW5t90+OH4lwYTRnQ=
+X-Received: by 2002:a2e:a481:: with SMTP id h1mr1292265lji.207.1603470514580; 
+ Fri, 23 Oct 2020 09:28:34 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <d61c100e-fb49-6f13-77e0-2262cb06946d@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <87o8kttj2e.fsf@linaro.org>
+ <20201023105120.sqharyxujgh7nppk@sirius.home.kraxel.org>
+ <87d019tb0u.fsf@linaro.org> <20201023123217.GA18593@xpredator>
+In-Reply-To: <20201023123217.GA18593@xpredator>
+From: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Date: Fri, 23 Oct 2020 17:28:22 +0100
+Message-ID: <CAHDbmO2_6=MgcJBgy3f8K4tkjHs_c34CvoL_krob+55CwL32hw@mail.gmail.com>
+Subject: Re: [agl-dev-community] Tips for debugging GPU acceleration.
+To: agl-dev-community@lists.automotivelinux.org, 
+ Gerd Hoffmann <kraxel@redhat.com>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::233;
+ envelope-from=alex.bennee@linaro.org; helo=mail-lj1-x233.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,88 +98,93 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 05:47:45PM +0200, Paolo Bonzini wrote:
-> On 23/10/20 17:29, Daniel P. Berrangé wrote:
-> > The link takes the user directly to the source markdown file in gitlab,
-> > where they can press the "Edit" button and make changes directly in the
-> > browser. They will be prompted to fork the project when committing the
-> > changes if they don't already have a fork.  The result is a commit which
-> > can be submitted for review per the contributing guidelines.
-> > 
-> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
-> 
-> I think this is a good idea *if* we switch to merge requests for website
-> edits---which isn't something I'm opposed to.
+Thanks - that seems to do the trick.
+I can't find where in the agl repo that is set. The recipe seems to be in:
 
-Note if you disable merge requests, then the page we link to doesn't
-show a live editor. It merely shows the read-only source. Not as
-useful, at least the user can see which source file they need to
-touch in their fork, which is still a step forwards I think.
+  meta-agl-cluster-demo/recipie-graphics/wayland/weston-ini-conf/virtual-la=
+ndscape.cfg
 
-> 
-> Paolo
-> 
-> > ---
-> >  _includes/footer.html        | 3 +++
-> >  assets/css/style-desktop.css | 4 ++++
-> >  assets/css/style.css         | 2 +-
-> >  3 files changed, 8 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/_includes/footer.html b/_includes/footer.html
-> > index 2dd247b..0a77d8e 100644
-> > --- a/_includes/footer.html
-> > +++ b/_includes/footer.html
-> > @@ -1,4 +1,7 @@
-> >  <div id="footer">
-> > +	<div id="edit-page">
-> > +		<a href="https://gitlab.com/qemu-project/qemu-web/-/blob/master/{{page.path}}">edit this page</a>
-> > +	</div>
-> >  	<div id="external-links">
-> >  		<ul class="style">
-> >  			<li><a href="http://qemu-advent-calendar.org">Advent calendar</a></li>
-> > diff --git a/assets/css/style-desktop.css b/assets/css/style-desktop.css
-> > index d45ec15..19272ad 100644
-> > --- a/assets/css/style-desktop.css
-> > +++ b/assets/css/style-desktop.css
-> > @@ -102,6 +102,10 @@
-> >  /* Footer                                                                        */
-> >  /*********************************************************************************/
-> >  
-> > +	#edit-page {
-> > +		text-align: right;
-> > +	}
-> > +
-> >  	#licenses {
-> >  		float: right;
-> >  	}
-> > diff --git a/assets/css/style.css b/assets/css/style.css
-> > index e2fee29..50bbcd1 100644
-> > --- a/assets/css/style.css
-> > +++ b/assets/css/style.css
-> > @@ -514,7 +514,7 @@
-> >  		margin: 0em;
-> >  	}
-> >  
-> > -	#conservancy, #licenses {
-> > +	#conservancy, #licenses, #edit-page {
-> >  		padding: 0em;
-> >  		padding-left: 1em;
-> >  		padding-right: 1em;
-> > 
-> 
-> 
+but I can't see where the "transform=3D270" got added.
 
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Visually it looks a lot nicer now although I could still do with
+getting rid of the quite large AGL lower banner which is cropping out
+the main display.
 
+On Fri, 23 Oct 2020 at 13:32, Marius Vlad <marius.vlad@collabora.com> wrote=
+:
+>
+> On Fri, Oct 23, 2020 at 12:52:17PM +0100, Alex Benn=C3=A9e wrote:
+> >
+> > Gerd Hoffmann <kraxel@redhat.com> writes:
+> >
+> > >   Hi,
+> > >
+> > >>   [    2.930300] [drm] virgl 3d acceleration not supported by host
+> > >
+> > > Nope, not active.
+> > >
+> > >>     -display gtk,show-cursor=3Don \
+> > >
+> > > Needs -display gtk,gl=3Don for opengl support.
+> >
+> > Awesome - even on TCG the display is now nice and snappy.
+> >
+> > For bonus points:
+> >
+> > The AGL panel display is rotated 90 degrees which is putting a bit of a
+> > crink in my neck. Is their anyway to rotate the view port. I tried
+> > inverting xres and yres but that didn't do anything.
+> Hi,
+>
+> The output is rotated, edit /etc/xdg/weston/weston.ini and comment out
+> transform ini entry from the Virtual-1 output section. Reboot, or
+> restart weston@display service. Note that the apps are optimized for
+> landscape.
+>
+> Enabling 3D with qemu might be something worth adding in the docs.
+> >
+> > >>     -device virtio-gpu-pci,virgl=3Dtrue
+> > >
+> > > virgl is silently turned off in case opengl support is not available.
+> > > Ideally virgl should be OnOffAuto not bool, but I fear changing that
+> > > now (and start throwing errors on virgl=3Don if opengl is not availab=
+le)
+> > > will break stuff ...
+> >
+> > At least a warn_report maybe?
+> >
+> > >
+> > > take care,
+> > >   Gerd
+> >
+> >
+> > --
+> > Alex Benn=C3=A9e
+> >
+> >
+> >
+> >
+> >
+>
+>
+> -=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-
+> Links: You receive all messages sent to this group.
+> View/Reply Online (#8772): https://lists.automotivelinux.org/g/agl-dev-co=
+mmunity/message/8772
+> Mute This Topic: https://lists.automotivelinux.org/mt/77748325/5085169
+> Group Owner: agl-dev-community+owner@lists.automotivelinux.org
+> Unsubscribe: https://lists.automotivelinux.org/g/agl-dev-community/leave/=
+9010164/1597297750/xyzzy [alex.bennee@linaro.org]
+> -=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-=3D-
+>
+>
+
+
+--=20
+Alex Benn=C3=A9e
+KVM/QEMU Hacker for Linaro
 
