@@ -2,85 +2,82 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 774A1C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB7FC5517A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D47B92192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2621121D47
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:23:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="i3Z7GomT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D47B92192A
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="CoFzHsld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2621121D47
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzqh-0004W6-NU
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:23:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37008)
+	id 1kVzrB-0005aQ-3o
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:23:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36994)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzFA-00021a-KO; Fri, 23 Oct 2020 11:44:42 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6152)
+ id 1kVzF8-0001zk-Rn; Fri, 23 Oct 2020 11:44:38 -0400
+Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6144)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzF8-0003gM-Sd; Fri, 23 Oct 2020 11:44:40 -0400
+ id 1kVzF5-0003gF-Uy; Fri, 23 Oct 2020 11:44:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603467879; x=1635003879;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=BUW2O3MQzdbWJXlqLo0/WE3+BwAoJgBRDfL3DEvuyg4=;
- b=i3Z7GomTiSermdqZNNGc7BoGFIs9KobiDyM08pY18dh4LrbgQ6SuSCNk
- WpzWrExUPo8v7Q9pvnv+urB9dBZIyQn+d3h1b7BDd0AqXcwNV+gM1NMO8
- qI62YnsLQ93JJtjL7NLjZaFnMmOmQ3ucHPcQGaceEHzI/NIw1IMGpISam
- 5oGsmJfWc618xnqyqfpsMuO6Ye7eYJcSOtjTw+4E/y32TN9y6N3F+cTRm
- GO4Ek61fXkZGhT3NZw6jeSDbJOKehau3aghYyhdHNRi2Syj1gLRVO+fAY
- Cv1+XehEFEjZ6riOajd9vrUDZWttZOktLcAjMMsA4XW1MikdyIEL0LdKy A==;
-IronPort-SDR: 4jtoasyk9ithrbxQ33pELpXo/6cPoupWf61WUhJX6Pghm1k377LvOtfsboekUV3iyjDzoV5Tpk
- qXd/gzY+ARgxS01NlUAGY6hIAkRQJ901n34UWpuYlIlxE/4fMEiiW5fn/HzqDWWPIMY8oBnFk5
- 4ORYl4DWQCMfktMAkkYx3I1N27UmtxYDqqpJ3MPzBM9qEZd0pB1+79828e0+VpVnIzO3fANs0U
- rRSZfSvi9xVTtNZ3coo9mD5EsKzlWt70GRNSj822+Vkwh2avey22Vs5e3FZCrXuHQZUi4hyOHd
- NbQ=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="151960147"
+ t=1603467876; x=1635003876;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=u23rg6vBDGmDEewsmSCU+NOvC8v3UBs+iesU7HWgke0=;
+ b=CoFzHsldvQ/FTUJkQ37RruFq1e7ZhrSXi8TfdDuKkf5lbzrGVmPa6+X7
+ pYyI+5msqP7LXKqtenqKizeUR8+eIPR+yYiBFoo9FdmusG/C1d6qxzziy
+ 077wada/3uZqwCmMCQrI1uRUX0AVTtvhZIOFGIQmePEsRTgOsaewM6Zv/
+ CoQO4BLkyAzixtaax5LeIq6FqCcRZEDipg4r+gJPg3Wsn/xm69qTAoywp
+ V+yw8gPSXkqT2S1vmVKs7MGQIXmsstU2YkiaV9pYIpFWJ97WvOXUuDWjN
+ ScIX4Ly/tcfGyR8Cqra8t6X8hFGriylzur7ykstYRg98Pb2OZijRBiW5v Q==;
+IronPort-SDR: rwXXBF3ruf3KyE0T+PFqKF1WimZy49vyTrQQP2ctC99G1JjQLx7luCDvA1DVHuqfLqpd48TQDN
+ qMzlYTW3aikmfBWnnJCi15nofxBkCrR1ql5Yw+P1HPkVB8XTwOspB1mY/ZfD1RBnuXJsbmOFU2
+ blGzOa0yJRx7gOtLJTg7qbo+kIsLYiNy2z37imEolqX+0iO/nDjU2d/pemL515rCoU/3tLqvTW
+ xvYDBtuVaJGf+dhVo0nEp8RbqmFSyAlYWGopQC2Rosa9SpJZjOAi45p4TAQw4sxtZjKHja9xNx
+ xB4=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="151960140"
 Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
  ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:44:37 +0800
-IronPort-SDR: C9jmEFCbWytfRAtiWbMH2oYXsaYTpsKS2RGqM4IoARnpU5ULSHZYi9v6v/qENur2TVMwwRQyQm
- Mg3va/E5NHpgsIHG4BCstCNBQcQPZ9Q4OWN4vuOm9cEztyJD0pl3hGOINdvK3O5H+GL3uGs2TJ
- XfD2oEKoqWdmLboojqZI0MAEzsejDkzz1O11ayfuu4N596BGl0TxScVwB7uLt4st1abNtz7mU2
- nm9KOZhtgsY29DaKGY7AYFAMr5NX2Ppq+trcbK1tbD721caL3JRRMxc/8B240AeGCdsEotsAGh
- WbhRjyBuPD45NWzlXUUP201z
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:44:34 +0800
+IronPort-SDR: ixlmnr7PScScj/u/Fm6iWHgwTPDSg50zk6V4W8Myguf7CgqndkUgNfApTKkI388Ochxdii71SI
+ h+NObqC1dGqsBGaP3bpHffsxfnPcHHiaUOp2ojgdaggFHGM2gBJu2QhA7h/xyzQSIKux1PPqzy
+ mwAFr33L7AD3Hfo1aRdKE20XxX9qvsygCT2lQNyaK9uT+Kk0bNrpYBjKCtoje5WhxQXTsGxBoT
+ kK0WKbbQz9G9PN6WLbdrxnL9YAy1RGFVCTdqjETday3dV5y48PAxI6ibhnmAtpS8P+V+t/WVKq
+ dbGq8wHMaGhOXRhlNFhZNwWd
 Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:30:59 -0700
-IronPort-SDR: rvdmG/UKbkExbWsfhTm88Wmvrasv4I/baScGhpc4uvcAk9clQYnfuA8pSU6SDXhVhx4M5hqLAM
- VpGo8GfmcAYw9aAm00EhMnpghFyg6oHMbPOSBrzOtx38GzjMqyynN1wyLTYhYkyMsWSv1nDmD7
- CsUm0dXUiYcnwhFUpu7hoYJK3cPUa7y3iVKOHfAH8mfdVEg5zHGnpiHidSjYgDaODLfPd21a7d
- 9SYO+2nX6XYlZEzgOQ8wOrMzeq/N23HLBZzVjqah/EqZTCDUsBgJOCuXDn37p3vg4evfy7CDpu
- 0PQ=
+ 23 Oct 2020 08:30:56 -0700
+IronPort-SDR: LTJCRavRIiELbkhAUHysGlgtljIbz+0KZC8Q8TxKQRJk6PLvGdeaeYyt1IqJBl3IaWYSJxCNWQ
+ 4qlqDtIe5+rr6nH90LFa2W4LbCO5NFyyzP57b9wWi1VAdIXEjRJgIrJTh2wrw2FFTVOz6u9QUo
+ t/6/weKnbtEqRPtdeZqILFw0T2pK+3o1zHvC8ayiY10RoBtuiZGQdCUB1YPeVJGLyjaUwjEnkG
+ x4e1hI5+KN+tdi+25hl67AyoKh1EW2PGiMbopw6wJff5InvZqIVykT2W3i62974JD2JXrDwnQT
+ dj4=
 WDCIronportException: Internal
 Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:44:37 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:44:34 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v1 01/16] target/riscv: Add a TYPE_RISCV_CPU_BASE CPU
-Date: Fri, 23 Oct 2020 08:33:16 -0700
-Message-Id: <67626d271ea0b75a3c5479f3aaf07c565b1d1d83.1603467169.git.alistair.francis@wdc.com>
+Subject: [PATCH v1 00/16]  RISC-V: Start to remove xlen preprocess
+Date: Fri, 23 Oct 2020 08:33:13 -0700
+Message-Id: <cover.1603467169.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603467169.git.alistair.francis@wdc.com>
-References: <cover.1603467169.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.154.45;
@@ -113,28 +110,49 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.h | 6 ++++++
- 1 file changed, 6 insertions(+)
+The RISC-V QEMU port currently has lot of preprocessor directives that
+check if we are targetting a 32-bit or 64-bit CPU. This means that the
+64-bit RISC-V target can not run 32-bit CPUs. This is different to most
+other QEMU architectures and doesn't allow us to mix xlens (such as when
+running Hypervisors with different xlen guests).
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de4705bb57..74a236d4bc 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -44,6 +44,12 @@
- #define TYPE_RISCV_CPU_SIFIVE_U34       RISCV_CPU_TYPE_NAME("sifive-u34")
- #define TYPE_RISCV_CPU_SIFIVE_U54       RISCV_CPU_TYPE_NAME("sifive-u54")
- 
-+#if defined(TARGET_RISCV32)
-+# define TYPE_RISCV_CPU_BASE            TYPE_RISCV_CPU_BASE32
-+#elif defined(TARGET_RISCV64)
-+# define TYPE_RISCV_CPU_BASE            TYPE_RISCV_CPU_BASE64
-+#endif
-+
- #define RV32 ((target_ulong)1 << (TARGET_LONG_BITS - 2))
- #define RV64 ((target_ulong)2 << (TARGET_LONG_BITS - 2))
- 
+This series is a step toward removing some of those to allow us to use
+32-bit CPUs on 64-bit RISC-V targets.
+
+Alistair Francis (16):
+  target/riscv: Add a TYPE_RISCV_CPU_BASE CPU
+  riscv: spike: Remove target macro conditionals
+  riscv: virt: Remove target macro conditionals
+  hw/riscv: boot: Remove compile time XLEN checks
+  hw/riscv: virt: Remove compile time XLEN checks
+  hw/riscv: spike: Remove compile time XLEN checks
+  hw/riscv: sifive_u: Remove compile time XLEN checks
+  target/riscv: fpu_helper: Match function defs in HELPER macros
+  target/riscv: Add a riscv_cpu_is_32bit() helper function
+  target/riscv: Specify the XLEN for CPUs
+  target/riscv: cpu: Remove compile time XLEN checks
+  target/riscv: cpu_helper: Remove compile time XLEN checks
+  target/riscv: csr: Remove compile time XLEN checks
+  target/riscv: cpu: Set XLEN independently from target
+  target/riscv: Convert the get/set_field() to support 64-bit values
+  target/riscv: Consolidate *statush registers
+
+ include/hw/riscv/boot.h   |   8 +-
+ include/hw/riscv/spike.h  |   6 --
+ include/hw/riscv/virt.h   |   6 --
+ target/riscv/cpu.h        |  36 ++++---
+ target/riscv/cpu_bits.h   |  24 ++---
+ hw/riscv/boot.c           |  55 ++++++-----
+ hw/riscv/sifive_u.c       |  59 ++++++------
+ hw/riscv/spike.c          |  50 +++++-----
+ hw/riscv/virt.c           |  36 +++----
+ target/riscv/cpu.c        |  83 ++++++++++------
+ target/riscv/cpu_helper.c |  47 +++------
+ target/riscv/csr.c        | 197 ++++++++++++++++++++------------------
+ target/riscv/fpu_helper.c |  16 ++--
+ target/riscv/op_helper.c  |  11 +--
+ 14 files changed, 328 insertions(+), 306 deletions(-)
+
 -- 
 2.28.0
 
