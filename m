@@ -2,72 +2,73 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08D54C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:08:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2606C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:10:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3CDB821527
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0D73421527
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:10:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BRbim6/j"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDB821527
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dD7wUJNk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D73421527
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34224 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVrBP-0008I5-7R
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:08:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59446)
+	id 1kVrDt-0000ti-R5
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:10:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrAq-0007tG-7s
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:07:40 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52414)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrD3-0000Lr-9G
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:09:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39973)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrAn-0002YK-89
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:07:39 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kVrD1-0003JP-J6
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:09:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603436856;
+ s=mimecast20190719; t=1603436994;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZwTJ2Amn5BnMCnA7WL3O+6BxGg0CBdmzBl1hEeUKR7g=;
- b=BRbim6/jo1OeH7h7uOWM5g8b5qMvfNjG4HZBSbqoh+sZeRk22JHuj4vv/lFTsmXk7niUIR
- mklx9glbnJrMDTRVZHeriCZ+QDZG5nVWByfZ3eZTklpSbAGGgpJBFyQstc2mY1ujfeZvay
- 2FC4jvYq0lwlhsfVRVzYKOVsrKRzZH0=
+ bh=IEF8a+t6dhaHnwPQStTb7j17q3j6NEA7UkQplxtsOTw=;
+ b=dD7wUJNkgPjWhEmlzeXAq2epluMt0IW9hpUjASxKC6yuWXIhpPOOZFXHjwvbcn1mwvxkE1
+ cIoIFgtScyWlTF+lmme8K1YzAUxVbfRmc4+3kQPyIadYR8WJ24ULFXSppnRidlGSNRK5GO
+ va0fvrbaBBTbadKTfcFbBiyOMVi9vQo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-508-mmeZey8hNoKog1rD_ZN18Q-1; Fri, 23 Oct 2020 03:07:34 -0400
-X-MC-Unique: mmeZey8hNoKog1rD_ZN18Q-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-464-XE4oO9EOOLucvtmUytKZRQ-1; Fri, 23 Oct 2020 03:09:53 -0400
+X-MC-Unique: XE4oO9EOOLucvtmUytKZRQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B7AAF1006CAF;
- Fri, 23 Oct 2020 07:07:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C5EB7425F6;
+ Fri, 23 Oct 2020 07:09:51 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-123.ams2.redhat.com [10.36.112.123])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C40C66EF57;
- Fri, 23 Oct 2020 07:07:30 +0000 (UTC)
-Subject: Re: [PATCH v2 2/3] accel: move qtest CpusAccel functions to a common
- location
-To: Jason Andryuk <jandryuk@gmail.com>, qemu-devel@nongnu.org
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 328A760C04;
+ Fri, 23 Oct 2020 07:09:48 +0000 (UTC)
+Subject: Re: [PATCH v2 0/3] Add Xen CpusAccel
+To: Paolo Bonzini <pbonzini@redhat.com>, Jason Andryuk <jandryuk@gmail.com>
 References: <20201013140511.5681-1-jandryuk@gmail.com>
- <20201013140511.5681-3-jandryuk@gmail.com>
+ <ddb5c9c2-c206-28d6-2d9d-7954e7022c23@redhat.com>
+ <CAKf6xpvpuG1jVdf3+heXzHFd_kc5kVHYdJgC+8iazFLciqOMZw@mail.gmail.com>
+ <d9f23eee-c0af-d2dd-9b9d-f0255fc8e3d1@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <5bf10ae2-dfd1-a6b4-ad75-6dd3b3cd4d1e@redhat.com>
-Date: Fri, 23 Oct 2020 09:07:29 +0200
+Message-ID: <1927b32e-7919-5061-0285-d9c7184d0bae@redhat.com>
+Date: Fri, 23 Oct 2020 09:09:47 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201013140511.5681-3-jandryuk@gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <d9f23eee-c0af-d2dd-9b9d-f0255fc8e3d1@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -99,33 +100,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Claudio Fontana <cfontana@suse.de>, Richard Henderson <rth@twiddle.net>
+Cc: Laurent Vivier <lvivier@redhat.com>,
+ Stefano Stabellini <sstabellini@kernel.org>, Paul Durrant <paul@xen.org>,
+ QEMU <qemu-devel@nongnu.org>, Claudio Fontana <cfontana@suse.de>,
+ Anthony Perard <anthony.perard@citrix.com>,
+ xen-devel <xen-devel@lists.xenproject.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 13/10/2020 16.05, Jason Andryuk wrote:
-> Move and rename accel/qtest/qtest-cpus.c files to accel/dummy-cpus.c so
-> it can be re-used by Xen.
+On 22/10/2020 17.29, Paolo Bonzini wrote:
+> On 22/10/20 17:17, Jason Andryuk wrote:
+>> On Tue, Oct 13, 2020 at 1:16 PM Paolo Bonzini <pbonzini@redhat.com> wrote:
+>>>
+>>> On 13/10/20 16:05, Jason Andryuk wrote:
+>>>> Xen was left behind when CpusAccel became mandatory and fails the assert
+>>>> in qemu_init_vcpu().  It relied on the same dummy cpu threads as qtest.
+>>>> Move the qtest cpu functions to a common location and reuse them for
+>>>> Xen.
+>>>>
+>>>> v2:
+>>>>   New patch "accel: Remove _WIN32 ifdef from qtest-cpus.c"
+>>>>   Use accel/dummy-cpus.c for filename
+>>>>   Put prototype in include/sysemu/cpus.h
+>>>>
+>>>> Jason Andryuk (3):
+>>>>   accel: Remove _WIN32 ifdef from qtest-cpus.c
+>>>>   accel: move qtest CpusAccel functions to a common location
+>>>>   accel: Add xen CpusAccel using dummy-cpus
+>>>>
+>>>>  accel/{qtest/qtest-cpus.c => dummy-cpus.c} | 27 ++++------------------
+>>>>  accel/meson.build                          |  8 +++++++
+>>>>  accel/qtest/meson.build                    |  1 -
+>>>>  accel/qtest/qtest-cpus.h                   | 17 --------------
+>>>>  accel/qtest/qtest.c                        |  5 +++-
+>>>>  accel/xen/xen-all.c                        |  8 +++++++
+>>>>  include/sysemu/cpus.h                      |  3 +++
+>>>>  7 files changed, 27 insertions(+), 42 deletions(-)
+>>>>  rename accel/{qtest/qtest-cpus.c => dummy-cpus.c} (71%)
+>>>>  delete mode 100644 accel/qtest/qtest-cpus.h
+>>>>
+>>>
+>>> Acked-by: Paolo Bonzini <pbonzini@redhat.com>
+>>
+>> Thank you, Paolo.  Also Anthony Acked and Claudio Reviewed patch 3.
+>> How can we get this into the tree?
 > 
-> Signed-off-by: Jason Andryuk <jandryuk@gmail.com>
-> 
-> ---
-> v2:
->  - Use accel/dummy-cpus.c
->  - Put prototype in include/sysemu/cpus.h
-> ---
->  accel/{qtest/qtest-cpus.c => dummy-cpus.c} | 22 ++++------------------
->  accel/meson.build                          |  7 +++++++
->  accel/qtest/meson.build                    |  1 -
->  accel/qtest/qtest-cpus.h                   | 17 -----------------
->  accel/qtest/qtest.c                        |  5 ++++-
->  include/sysemu/cpus.h                      |  3 +++
->  6 files changed, 18 insertions(+), 37 deletions(-)
->  rename accel/{qtest/qtest-cpus.c => dummy-cpus.c} (75%)
->  delete mode 100644 accel/qtest/qtest-cpus.h
+> I think Anthony should send a pull request?
 
-Acked-by: Thomas Huth <thuth@redhat.com>
+Since Anthony acked patch 3, I think I can also take it through the qtest tree.
+
+ Thomas
+
 
 
