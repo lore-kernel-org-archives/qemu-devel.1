@@ -2,88 +2,86 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34FE0C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 13:42:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E397EC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 13:44:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A249521527
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 13:42:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4041720FC3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 13:44:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aSEq+FHu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A249521527
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iYTBoqJm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4041720FC3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42858 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46710 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVxLI-0006dk-Ie
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 09:42:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59066)
+	id 1kVxNE-0008Il-8K
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 09:44:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVxK9-0005LI-Ay
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 09:41:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34186)
+ id 1kVxL6-0006cX-FY
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 09:42:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30152)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kVxK7-00043f-8b
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 09:41:40 -0400
+ id 1kVxL4-00049O-LF
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 09:42:40 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603460497;
+ s=mimecast20190719; t=1603460558;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=Ih0+E/CL8EuV4vGTKRBpCl3T+F4ucIndPKkaeQE7GI0=;
- b=aSEq+FHuQoedleWfp0TEEhhCKg7ffT2vZwszjgCAXxV5wa63S6Oz/c3rmbrjrW/QXu9bPJ
- 3dBrTOm4Dec0HtLv08OJVRckB5rNfQ1m0XKmNvuM+9xkIs0TUElcQZ+CV2vTz+Dc8gEW77
- 1zYbhEH7zWzuRPFBzN+5HK+koWS03Mo=
+ bh=Sq0B16YKFx3uaqcT4qNPZlKGu85eJDGwd1foV2dBtrQ=;
+ b=iYTBoqJmJGmkIO2EHgWCJsPRf4Pj2BCuVsQRxqRAF5+frrJzusg2p8WwuVGqzXjkdmQxhd
+ r2FioRBQazFsKqbxkCR/U8ucSBZqVQi0Io/EsAfPiwhaRg0iY5STGM30LDQ2ur2x/1pP/K
+ y/WiWByBruDizhH/RewLzXyId8RZuLM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-74-fQF1T6tyPq-8mjsXRi8XtQ-1; Fri, 23 Oct 2020 09:41:33 -0400
-X-MC-Unique: fQF1T6tyPq-8mjsXRi8XtQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-585-GmhwO4dyMdO6wr6aB-tZaA-1; Fri, 23 Oct 2020 09:42:32 -0400
+X-MC-Unique: GmhwO4dyMdO6wr6aB-tZaA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B275119080A6;
- Fri, 23 Oct 2020 13:41:14 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3F04192864F;
+ Fri, 23 Oct 2020 13:42:21 +0000 (UTC)
 Received: from localhost (ovpn-114-178.ams2.redhat.com [10.36.114.178])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 2E4206EF42;
- Fri, 23 Oct 2020 13:41:14 +0000 (UTC)
-Date: Fri, 23 Oct 2020 14:41:13 +0100
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 97A061002D4B;
+ Fri, 23 Oct 2020 13:41:56 +0000 (UTC)
+Date: Fri, 23 Oct 2020 14:41:55 +0100
 From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Subject: Re: [RFC] Using gitlab for upstream qemu repo?
-Message-ID: <20201023134113.GA812157@stefanha-x1.localdomain>
+Message-ID: <20201023134155.GB812157@stefanha-x1.localdomain>
 References: <672b8aa0-2128-23e1-b778-01a4d96b209d@redhat.com>
- <9f6c63c6-599b-ac15-42e2-b9c1991fc7ee@redhat.com>
- <20201023085131.GC445638@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201023085131.GC445638@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <672b8aa0-2128-23e1-b778-01a4d96b209d@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="pf9I7BMVVzbSWLtt"
+ protocol="application/pgp-signature"; boundary="+g7M9IMkV8truYOl"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,53 +99,73 @@ Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
  Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
  Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
  qemu-devel <qemu-devel@nongnu.org>,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- "Edgar E. Iglesias" <edgar.iglesias@gmail.com>
+ "Edgar E. Iglesias" <edgar.iglesias@gmail.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---pf9I7BMVVzbSWLtt
-Content-Type: text/plain; charset=iso-8859-1
+--+g7M9IMkV8truYOl
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 23, 2020 at 09:51:31AM +0100, Daniel P. Berrang=E9 wrote:
-> Not commonly known is that GitLab also has support for Git push options,
-> which let you create merge requests using a plain "git push":
+On Thu, Oct 22, 2020 at 06:47:55PM +0200, Paolo Bonzini wrote:
+> Hi all,
 >=20
->   https://docs.gitlab.com/ee/user/project/push_options.html
+> now that Gitlab is the primary CI infrastructure for QEMU, and that all
+> QEMU git repositories (including mirrors) are available on Gitlab, I
+> would like to propose that committers use Gitlab when merging commits to
+> QEMU repositories.
 >=20
-> eg if you have a remote called "gitlab", you can open a MR from the CLI
-> using
+> There are four reasons for this:
 >=20
->  $ git push -o merge_request.create \
->             -o merge_request.title=3D"Do awesome thing" \
->             gitlab my-branch
+> - this would be a step towards ensuring that all commits go through the
+> CI process, and it would also provide a way to run the deployment of the
+> web site via .gitlab-ci.yml.
 >=20
-> This is something that I could see being easily wired up into a
-> "git-publish" like tool for example.
+> - right now Gitlab pulls from upstream repos and qemu.org pulls from
+> gitlab, but this is not true for the qemu, qemu-web and openbios
+> repositories where Gitlab pulls from qemu.org and qemu.org is the main
+> repository.  With this switch, all the main repositories would be on
+> Gitlab and then mirrored to both qemu.org and GitHub.  Having a
+> homogeneous configuration makes it easier to document what's going on.
+>=20
+> - it would limit the number of people with access to qemu.org, since
+> committers would no longer need an account on the machine.
+>=20
+> - by treating gitlab as authoritative, we could include it in the
+> .gitmodules file and remove load on the qemu.org server
+>=20
+> Nothing would change for developers, who would still have access to all
+> three sets of repositories (git.qemu.org, gitlab.com and github.com).
+> Committers however would need to have an account on the
+> https://gitlab.com/qemu-project organization with access to the
+> repositories they care about.  They would also lose write access to
+> /srv/git on qemu.org.
+>=20
+> Of course this is just starting a discussion, so I'm not even proposing
+> a date for the switch.
 
-Nice, thanks for mentioning this GitLab feature.
+Thanks, this sounds good. It will simplify qemu.org administration.
 
 Stefan
 
---pf9I7BMVVzbSWLtt
+--+g7M9IMkV8truYOl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+S3XgACgkQnKSrs4Gr
-c8giYAf+PwdpgEiSHg3ArhN0wmQmxMEWXOfM5LXR5EBRdmb9uwYyfMDPx6E2oyPG
-XAn2o9xR1M1jLlpd9nVhBhh4CvbTLUp7zaESDB0RPTDIzSaF59ba9iQKsds9sw3I
-ov9E2xhCFSot+CMT56wKYLmjkeDo1JaUr51FZNCxJGXIjpChBAzHAwLUZVI0tr8+
-D6VvrssFwQBmqjS86O9zsLo0hTSnMsxF43ZKWVRIkjoNHr+7/qK0O0zAA2007K5/
-H6ZaHKL6tUlCPlwO60gJLC94wgvMJvZjdg/zDpaG9jYUuzSN5tnIjPalk/5g6C5H
-f2Dq/uZYlDuN6dJt4SA6vj4Fa6cfBg==
-=4aot
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+S3aMACgkQnKSrs4Gr
+c8hsgggAjYSAfuym1VOzjXP+ig/bTkxmgd0tBGtldN9yEQ7lwnmshrG3WfsTZBRE
+90DOjeP6OUFpffOTpGpNC18toXlOt/OncS9pb0hRupbdkSHxfl9hsMyYL7x9Suao
+wTMVtkaD9gIHeJbCv5d8eKCnHuKKM8jdLtnUbWI3vn8upj0evZMc+x1wWzzEWafx
+kn1n732kz4pbPEbwOksM6P5DNYee9nZwYUnoR6znhoDfO1heq0FFU+1o8xDIJH7Y
+bXJ0UJkVtBGMgvg+wZnukZV8giBSgpOf+l5PK3ktDWEqxMmwKzI0djIG/k40Pooe
+er4JhWvPHnbdcsruQ8mlZiLmzIfl0Q==
+=PHnH
 -----END PGP SIGNATURE-----
 
---pf9I7BMVVzbSWLtt--
+--+g7M9IMkV8truYOl--
 
 
