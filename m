@@ -2,91 +2,90 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87D83C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AECFC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:53:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E870F20E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:53:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A7F220E65
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:53:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iJrn7q1C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E870F20E65
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XJ0ACi/k"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A7F220E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35410 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36204 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0Jy-0003X2-Tl
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:53:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45706)
+	id 1kW0K8-0003qP-7n
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:53:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kVzjC-0002jT-Aw
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:15:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47623)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kW0JB-0002Xv-1J
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:52:53 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37310)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kVzj7-0007yy-8I
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:15:40 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kW0J7-0004KN-U3
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:52:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603469735;
+ s=mimecast20190719; t=1603471966;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=tzr1vALh4LE1d5YLs8VX3KCFJrsTV0Ga25J1vN8fQ7o=;
- b=iJrn7q1CUvhyw92BkCQn8drmF8+sYqGwVpwVy+/8tZayR73xzbcFJgBwphWe3R6+xDJfth
- p/473U7wXQsgRjvkxyWN5m0bqSQ56mhuyYw2D6U1e5tJ9482ZbheYCofXxC9fxi1aJ5Zqc
- pUcTrwcn58hAUVNbecc21Ns4RlNPKE8=
+ bh=+9ZHDIItoBkNCpoUhd+bx3jiDXyEpQWXHlUfgY02Lso=;
+ b=XJ0ACi/kkwK2xL3JcIuFGlYBJggXrT2ju2O58MbGOsXPt5CnmwFOmqWqkF6b5Hrh3xnXsY
+ p6L82f1nUpfGl+EEh0esdoi8131IrSlyYgbMNwo/vS6ET4Cj6j0k1JB5UKXYHHW5EuYSj5
+ KczYmL4ao9Yn74nXT42uVyNoRujtQc4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-11-XeGeYx_UMLiSG7BwURZ8ow-1; Fri, 23 Oct 2020 12:15:31 -0400
-X-MC-Unique: XeGeYx_UMLiSG7BwURZ8ow-1
+ us-mta-563-2A9So9zCNxiXbJrhwiZeDA-1; Fri, 23 Oct 2020 12:52:45 -0400
+X-MC-Unique: 2A9So9zCNxiXbJrhwiZeDA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EA46519611BC;
- Fri, 23 Oct 2020 16:15:29 +0000 (UTC)
-Received: from [10.3.113.7] (ovpn-113-7.phx2.redhat.com [10.3.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0441F10016DA;
- Fri, 23 Oct 2020 16:15:25 +0000 (UTC)
-Subject: Re: [PATCH v4 1/7] nbd: Utilize QAPI_CLONE for type conversion
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-References: <20201009215533.1194742-1-eblake@redhat.com>
- <20201009215533.1194742-2-eblake@redhat.com>
-Organization: Red Hat, Inc.
-Message-ID: <647e0bc9-b80b-cb68-f0e7-f132ab73bba0@redhat.com>
-Date: Fri, 23 Oct 2020 11:15:24 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0530D107B46F;
+ Fri, 23 Oct 2020 16:52:42 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id ABEBB10013D7;
+ Fri, 23 Oct 2020 16:52:36 +0000 (UTC)
+Date: Fri, 23 Oct 2020 10:52:36 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v28 04/17] vfio: Add migration region initialization and
+ finalize function
+Message-ID: <20201023105236.4e9ae566@w520.home>
+In-Reply-To: <1603449643-12851-5-git-send-email-kwankhede@nvidia.com>
+References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
+ <1603449643-12851-5-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
-In-Reply-To: <20201009215533.1194742-2-eblake@redhat.com>
 X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,68 +98,242 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
- rjones@redhat.com, Max Reitz <mreitz@redhat.com>, stefanha@redhat.com
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/20 4:55 PM, Eric Blake wrote:
-> Rather than open-coding the translation from the deprecated
-> NbdServerAddOptions type to the preferred BlockExportOptionsNbd, it's
-> better to utilize QAPI_CLONE_MEMBERS.  This solves a couple of issues:
-> first, if we do any more refactoring of the base type (which an
-> upcoming patch plans to do), we don't have to revisit the open-coding.
-> Second, our assignment to arg->name is fishy: the generated QAPI code
-> currently does not visit it if arg->has_name is false, but if it DID
-> visit it, we would have introduced a double-free situation when arg is
-> finally freed.
+On Fri, 23 Oct 2020 16:10:30 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
+
+> Whether the VFIO device supports migration or not is decided based of
+> migration region query. If migration region query is successful and migration
+> region initialization is successful then migration is supported else
+> migration is blocked.
 > 
-> Signed-off-by: Eric Blake <eblake@redhat.com>
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 > ---
->  blockdev-nbd.c | 15 ++++++---------
->  1 file changed, 6 insertions(+), 9 deletions(-)
-
-v5 will fix this nasty bug:
-
-
-> @@ -195,7 +197,8 @@ void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
->       * the device name as a default here for compatibility.
->       */
->      if (!arg->has_name) {
-> -        arg->name = arg->device;
-> +        arg->has_name = true;
-> +        arg->name = g_steal_pointer(&arg->device);
->      }
-
-This causes assertion failures visible in at least iotest 149 and 192,
-because arg->device was left NULL.  Using g_strdup() instead fixes that.
-
+>  hw/vfio/meson.build           |   1 +
+>  hw/vfio/migration.c           | 133 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |   3 +
+>  include/hw/vfio/vfio-common.h |   9 +++
+>  4 files changed, 146 insertions(+)
+>  create mode 100644 hw/vfio/migration.c
 > 
->      export_opts = g_new(BlockExportOptions, 1);
-> @@ -205,15 +208,9 @@ void qmp_nbd_server_add(NbdServerAddOptions *arg, Error **errp)
->          .node_name              = g_strdup(bdrv_get_node_name(bs)),
->          .has_writable           = arg->has_writable,
->          .writable               = arg->writable,
-> -        .u.nbd = {
-> -            .has_name           = true,
-> -            .name               = g_strdup(arg->name),
-> -            .has_description    = arg->has_description,
-> -            .description        = g_strdup(arg->description),
-> -            .has_bitmap         = arg->has_bitmap,
-> -            .bitmap             = g_strdup(arg->bitmap),
-> -        },
->      };
-> +    QAPI_CLONE_MEMBERS(BlockExportOptionsNbd, &export_opts->u.nbd,
-> +                       qapi_NbdServerAddOptions_base(arg));
-> 
->      /*
->       * nbd-server-add doesn't complain when a read-only device should be
-> 
+> diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
+> index 37efa74018bc..da9af297a0c5 100644
+> --- a/hw/vfio/meson.build
+> +++ b/hw/vfio/meson.build
+> @@ -2,6 +2,7 @@ vfio_ss = ss.source_set()
+>  vfio_ss.add(files(
+>    'common.c',
+>    'spapr.c',
+> +  'migration.c',
+>  ))
+>  vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
+>    'display.c',
+> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> new file mode 100644
+> index 000000000000..bbe6e0b7a6cc
+> --- /dev/null
+> +++ b/hw/vfio/migration.c
+> @@ -0,0 +1,133 @@
+> +/*
+> + * Migration support for VFIO devices
+> + *
+> + * Copyright NVIDIA, Inc. 2020
+> + *
+> + * This work is licensed under the terms of the GNU GPL, version 2. See
+> + * the COPYING file in the top-level directory.
+> + */
+> +
+> +#include "qemu/osdep.h"
+> +#include <linux/vfio.h>
+> +
+> +#include "hw/vfio/vfio-common.h"
+> +#include "cpu.h"
+> +#include "migration/migration.h"
+> +#include "migration/qemu-file.h"
+> +#include "migration/register.h"
+> +#include "migration/blocker.h"
+> +#include "migration/misc.h"
+> +#include "qapi/error.h"
+> +#include "exec/ramlist.h"
+> +#include "exec/ram_addr.h"
+> +#include "pci.h"
+> +#include "trace.h"
+> +
+> +static void vfio_migration_region_exit(VFIODevice *vbasedev)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +
+> +    if (!migration) {
+> +        return;
+> +    }
+> +
+> +    vfio_region_exit(&migration->region);
+> +    vfio_region_finalize(&migration->region);
 
--- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+I think it would make sense to also:
+
+g_free(migration);
+vbasedev->migration = NULL;
+
+here as well so the callers don't need to.  Not worth a re-spin itself,
+maybe a follow-up if there's no other reason for a re-spin.  Thanks,
+
+Alex
+
+> +}
+> +
+> +static int vfio_migration_init(VFIODevice *vbasedev,
+> +                               struct vfio_region_info *info)
+> +{
+> +    int ret;
+> +    Object *obj;
+> +    VFIOMigration *migration;
+> +
+> +    if (!vbasedev->ops->vfio_get_object) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    obj = vbasedev->ops->vfio_get_object(vbasedev);
+> +    if (!obj) {
+> +        return -EINVAL;
+> +    }
+> +
+> +    migration = g_new0(VFIOMigration, 1);
+> +
+> +    ret = vfio_region_setup(obj, vbasedev, &migration->region,
+> +                            info->index, "migration");
+> +    if (ret) {
+> +        error_report("%s: Failed to setup VFIO migration region %d: %s",
+> +                     vbasedev->name, info->index, strerror(-ret));
+> +        goto err;
+> +    }
+> +
+> +    vbasedev->migration = migration;
+> +
+> +    if (!migration->region.size) {
+> +        error_report("%s: Invalid zero-sized of VFIO migration region %d",
+> +                     vbasedev->name, info->index);
+> +        ret = -EINVAL;
+> +        goto err;
+> +    }
+> +    return 0;
+> +
+> +err:
+> +    vfio_migration_region_exit(vbasedev);
+> +    g_free(migration);
+> +    vbasedev->migration = NULL;
+> +    return ret;
+> +}
+> +
+> +/* ---------------------------------------------------------------------- */
+> +
+> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
+> +{
+> +    struct vfio_region_info *info = NULL;
+> +    Error *local_err = NULL;
+> +    int ret;
+> +
+> +    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
+> +                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
+> +    if (ret) {
+> +        goto add_blocker;
+> +    }
+> +
+> +    ret = vfio_migration_init(vbasedev, info);
+> +    if (ret) {
+> +        goto add_blocker;
+> +    }
+> +
+> +    g_free(info);
+> +    trace_vfio_migration_probe(vbasedev->name, info->index);
+> +    return 0;
+> +
+> +add_blocker:
+> +    error_setg(&vbasedev->migration_blocker,
+> +               "VFIO device doesn't support migration");
+> +    g_free(info);
+> +
+> +    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
+> +    if (local_err) {
+> +        error_propagate(errp, local_err);
+> +        error_free(vbasedev->migration_blocker);
+> +        vbasedev->migration_blocker = NULL;
+> +    }
+> +    return ret;
+> +}
+> +
+> +void vfio_migration_finalize(VFIODevice *vbasedev)
+> +{
+> +    VFIOMigration *migration = vbasedev->migration;
+> +
+> +    if (migration) {
+> +        vfio_migration_region_exit(vbasedev);
+> +        g_free(vbasedev->migration);
+> +        vbasedev->migration = NULL;
+> +    }
+> +
+> +    if (vbasedev->migration_blocker) {
+> +        migrate_del_blocker(vbasedev->migration_blocker);
+> +        error_free(vbasedev->migration_blocker);
+> +        vbasedev->migration_blocker = NULL;
+> +    }
+> +}
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index a0c7b49a2ebc..9ced5ec6277c 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -145,3 +145,6 @@ vfio_display_edid_link_up(void) ""
+>  vfio_display_edid_link_down(void) ""
+>  vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
+>  vfio_display_edid_write_error(void) ""
+> +
+> +# migration.c
+> +vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
+> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> index ba6169cd926e..8275c4c68f45 100644
+> --- a/include/hw/vfio/vfio-common.h
+> +++ b/include/hw/vfio/vfio-common.h
+> @@ -57,6 +57,10 @@ typedef struct VFIORegion {
+>      uint8_t nr; /* cache the region number for debug */
+>  } VFIORegion;
+>  
+> +typedef struct VFIOMigration {
+> +    VFIORegion region;
+> +} VFIOMigration;
+> +
+>  typedef struct VFIOAddressSpace {
+>      AddressSpace *as;
+>      QLIST_HEAD(, VFIOContainer) containers;
+> @@ -113,6 +117,8 @@ typedef struct VFIODevice {
+>      unsigned int num_irqs;
+>      unsigned int num_regions;
+>      unsigned int flags;
+> +    VFIOMigration *migration;
+> +    Error *migration_blocker;
+>  } VFIODevice;
+>  
+>  struct VFIODeviceOps {
+> @@ -204,4 +210,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+>  int vfio_spapr_remove_window(VFIOContainer *container,
+>                               hwaddr offset_within_address_space);
+>  
+> +int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
+> +void vfio_migration_finalize(VFIODevice *vbasedev);
+> +
+>  #endif /* HW_VFIO_VFIO_COMMON_H */
 
 
