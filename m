@@ -2,128 +2,68 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 532E8C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:01:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EEBC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:04:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9797620874
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:01:53 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uZUnglo5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9797620874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 159E1208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:04:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159E1208B6
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55226 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVyZk-000710-44
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:01:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51132)
+	id 1kVycI-0000cV-Rp
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:04:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51696)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVyXn-0005TD-H7; Fri, 23 Oct 2020 10:59:51 -0400
-Received: from mail-eopbgr130092.outbound.protection.outlook.com
- ([40.107.13.92]:47076 helo=EUR01-HE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kVyXh-0005tp-5t; Fri, 23 Oct 2020 10:59:50 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=VE+Bcd51GUl1xApfj29B7i/8F3vVqlJFsCwKg9SZerP/C0lgJZPUtLWFDPPuUdcx7j7CruipuR3nxndZ/zSh/7HqOQii7P/N7rfkSQ9GIO+RUZTsnQh3Fv2rXqAzoy1mkMOcbP5Efa9YvcAFVs8Sp9lhBfTpYvzbWrWYUgEeHbNCZVRcrzQ0Zo/fFjkjQcRL54/PyDh/aUL8j3n0uHyTf1Nxm5MQ6a4PYik8+ypGmR3dkkeuJmP1oIPY4kmsUQB15nApIMZZhnQnnc7DFw7kCVkCMOZz1eFyLvqV3eBGjO+aB11KG+mwOMBRtz4Csjgxy/md7CvPOHGn3g15q1Omgw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vJn55h9ZMOUrQ17oebq4MQG3jtm7UxmtliyT68WXYNE=;
- b=ieC1Uy/uUWISFInjCLZWLzaW0wCgz6dWqcNvy04Wq2qf4RDRvsxyp0ucEVRZ53Vs5PFqFTsDODIs3kMBhyMwtiGPU+X1FRC+BHrH0ihq9x+2oxq1QYOO6P/+VGD5+7iXznPqJ59EqD3RJtdhPL1EB+3KIz05xFhXYk+WRAmET67SrZ7cxXV8/yDBmfA00avvY+9dF+/9ft2t9RD7O0KeHX5sre/MB8pyX/lc2NPRKbR3R0tvuFEPZne18k+BUj3shEJN2MX12YmbX0x4h1Eqi2GfUxf6EVxsIfyVdOAGH7+azdaS2al/DWSnqZmh3HCn3FroWuManXhaZ5cD9p09Jw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vJn55h9ZMOUrQ17oebq4MQG3jtm7UxmtliyT68WXYNE=;
- b=uZUnglo5+aYq71U2tvSe1+NoVPOW5uiX2zapgP4kwd0EpztVCInzfzE7uJ9r7EaqDGZkovEfk/pltFtaA/P9geRroXl0NCx7/aR/sKSTDxC9giWJfK8My6izvytGrhNRI0/2toUxaM0TW5ymhlrGofdcZS+wMv5lYn7FtLlCAmU=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5255.eurprd08.prod.outlook.com (2603:10a6:20b:ef::19)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.27; Fri, 23 Oct
- 2020 14:59:38 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Fri, 23 Oct 2020
- 14:59:38 +0000
-Subject: Re: [PATCH v12 07/14] copy-on-read: limit COR operations to bottom
- node
-To: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>, qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- eblake@redhat.com, den@openvz.org
-References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1603390423-980205-8-git-send-email-andrey.shinkevich@virtuozzo.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <e846885e-3711-217f-29a2-75123f14b53d@virtuozzo.com>
-Date: Fri, 23 Oct 2020 17:59:37 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-In-Reply-To: <1603390423-980205-8-git-send-email-andrey.shinkevich@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [185.215.60.98]
-X-ClientProxiedBy: AM3PR04CA0129.eurprd04.prod.outlook.com (2603:10a6:207::13)
- To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVyZH-00075j-Rp
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:01:23 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:47924)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVyZG-0006IQ-1U
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:01:23 -0400
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-334-stF4zQsjMuqYGaftO4Z7XQ-1; Fri, 23 Oct 2020 11:01:17 -0400
+X-MC-Unique: stF4zQsjMuqYGaftO4Z7XQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30A3A83DC21;
+ Fri, 23 Oct 2020 15:01:15 +0000 (UTC)
+Received: from bahia.lan (ovpn-115-53.ams2.redhat.com [10.36.115.53])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 04A555C1CF;
+ Fri, 23 Oct 2020 15:01:10 +0000 (UTC)
+Subject: [PATCH v2] block: End quiescent sections when a BDS is deleted
+From: Greg Kurz <groug@kaod.org>
+To: qemu-devel@nongnu.org
+Date: Fri, 23 Oct 2020 17:01:10 +0200
+Message-ID: <160346526998.272601.9045392804399803158.stgit@bahia.lan>
+User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.98) by
- AM3PR04CA0129.eurprd04.prod.outlook.com (2603:10a6:207::13) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.19 via Frontend Transport; Fri, 23 Oct 2020 14:59:38 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 831f6428-39db-4582-1a64-08d877644393
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5255:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB52552C589CFEA67E470AD05EC11A0@AM6PR08MB5255.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:1091;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: tpE/3NKObhqQ9jTuKPotx9G5KZKnMj+hfKB3DmpZ4iSKgFDQdJGa40oT5sqV78WlSfsPRfVWaEhgSKohFHI4eWNbpAaKxDhD9pz8uNMqbO1DYcN15kjXAIMBvcZVidNIa/eCupYsQigZCi3ITr9Mk+7D+VtL2R+2UoAHXU0wpwsblvf5MEYn8OgPyIZMsbhDIQYnZ5wLsijCWTWVt38lI7l3aD8ShjSmWSYe/suZ3ufPxCkfJ8ry/IdrRkgbk+yYrM+5fI/YXs+jjsuAmYe4aY042Yi3Z6ZYakPX9WXdf0cKRbVeSuovIGwWjw9gVSUeIvczraylUAk2oGqqNO+Rwg6Scxeu442t1L7BThKXt0SdOFW2rNNodxaQ/gPYDs5F
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(39850400004)(346002)(136003)(396003)(376002)(5660300002)(83380400001)(4326008)(316002)(16576012)(66946007)(16526019)(66476007)(66556008)(186003)(956004)(2616005)(2906002)(36756003)(26005)(478600001)(31696002)(31686004)(8676002)(6486002)(8936002)(86362001)(107886003)(52116002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: scV/fMFsDbWyf8WrwSYeZiET5zWaIbKJ5w3eUvENYfoVVA3C/v77nrJzMzc1TCRXEMQ6/g011R57iRAJYaZYK/bJ5/aZSqY8kvTcTzgyILXXUnWPwxAojHTExIXs8muPCYMLKaujlia3nraPFQYxoQ/SnXB5yPJTkLHvXJ/+uS1lRjJ4LO1rCjI65JTl9t/iKvfS2DjPyPj7xnUcy5js/DkFm9oQqg6ylcjTZOwtIHSSGGbGyZhRalp+EF25K3bLvw2bY48E/HCv5H/a6ryDl7FcFVOyCpdhXD6q6rqU61APVhvpoeobbpjpdAArq8BTx1zBf8rUVbM0r0SpZFOg44IGfjUfIG9a1Yyji0ALNCJE3jAMtdKZR3E1Aqb3iJFbZGPTMdk9Nwn4dM500uNjV7DZlVGchyKnCbHRhtaWxEzCge+Oe2gK3JaH+d20JBCncXy3mrbupX2jnpUEmVe37S9wBtewX56fx8nSkvjZbOGDb8EGinfkBLT2s7tJNzTkVm9V2sBmFQl6kyUko6MNPMMQYP1PjSvfDIhJOi04uGZrCaTEZvhKgq5jx13r87EqNLWxrF9R7MdoDSb5DSWp11/NhXeiJCGML7FTXcmsWrXQV/2px9Za3fBviqHykUIzkaK8ReMuJg7ND8kiTMgkGw==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 831f6428-39db-4582-1a64-08d877644393
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2020 14:59:38.8318 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fb+wv8lT+8XqMcUWu9DHR21gvo8hjl7kpBYMiz84n4eyIp3xLBS6AmehETO0sTwzMJ0ylMiQxTpwcXTGbOTQBVFpOY7hC5O4t131A0IHVpU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5255
-Received-SPF: pass client-ip=40.107.13.92;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 10:59:41
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: kaod.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
+ helo=us-smtp-delivery-44.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:01:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -136,91 +76,131 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-22.10.2020 21:13, Andrey Shinkevich wrote:
-> Limit COR operations to the bottom node (inclusively) in the backing
-> chain when the bottom node name is given. It will be useful for a block
-> stream job when the COR-filter is applied. The bottom node is passed as
-> the base itself may change due to concurrent commit jobs on the same
-> backing chain.
-> 
-> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-> ---
->   block/copy-on-read.c | 42 ++++++++++++++++++++++++++++++++++++++++--
->   1 file changed, 40 insertions(+), 2 deletions(-)
-> 
-> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
-> index 3d8e4db..8178a91 100644
-> --- a/block/copy-on-read.c
-> +++ b/block/copy-on-read.c
-> @@ -123,8 +123,46 @@ static int coroutine_fn cor_co_preadv_part(BlockDriverState *bs,
->                                              size_t qiov_offset,
->                                              int flags)
->   {
-> -    return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-> -                               flags | BDRV_REQ_COPY_ON_READ);
-> +    int64_t n = 0;
+If a BDS gets deleted during blk_drain_all(), it might miss a
+call to bdrv_do_drained_end(). This means missing a call to
+aio_enable_external() and the AIO context remains disabled for
+ever. This can cause a device to become irresponsive and to
+disrupt the guest execution, ie. hang, loop forever or worse.
 
-no need to initialize n actually.
+This scenario is quite easy to encounter with virtio-scsi
+on POWER when punching multiple blockdev-create QMP commands
+while the guest is booting and it is still running the SLOF
+firmware. This happens because SLOF disables/re-enables PCI
+devices multiple times via IO/MEM/MASTER bits of PCI_COMMAND
+register after the initial probe/feature negotiation, as it
+tends to work with a single device at a time at various stages
+like probing and running block/network bootloaders without
+doing a full reset in-between. This naturally generates many
+dataplane stops and starts, and thus many drain sections that
+can race with blockdev_create_run(). In the end, SLOF bails
+out.
 
-> +    int local_flags;
-> +    int ret;
-> +    BDRVStateCOR *state = bs->opaque;
-> +
-> +    if (!state->bottom_bs) {
-> +        return bdrv_co_preadv_part(bs->file, offset, bytes, qiov, qiov_offset,
-> +                                   flags | BDRV_REQ_COPY_ON_READ);
-> +    }
-> +
-> +    while (bytes) {
-> +        local_flags = flags;
-> +
-> +        /* In case of failure, try to copy-on-read anyway */
-> +        ret = bdrv_is_allocated(bs->file->bs, offset, bytes, &n);
-> +        if (!ret || ret < 0) {
+It is somehow reproducible on x86 but it requires to generate
+articial dataplane start/stop activity with stop/cont QMP
+commands. In this case, seabios ends up looping for ever,
+waiting for the virtio-scsi device to send a response to
+a command it never received.
 
-simper: if (ret <= 0) {
+Add a helper that pairs all previously called bdrv_do_drained_begin()
+with a bdrv_do_drained_end() and call it from bdrv_close().
+While at it, update the "/bdrv-drain/graph-change/drain_all"
+test in test-bdrv-drain so that it can catch the issue.
 
-> +            ret = bdrv_is_allocated_above(bdrv_backing_chain_next(bs->file->bs),
-> +                                          state->bottom_bs, true, offset,
-> +                                          n, &n);
-> +            if (ret == 1 || ret < 0) {
-> +                local_flags |= BDRV_REQ_COPY_ON_READ;
-> +            }
-> +            /* Finish earlier if the end of a backing file has been reached */
-> +            if (ret == 0 && n == 0) {
+BugId: https://bugzilla.redhat.com/show_bug.cgi?id=3D1874441
+Signed-off-by: Greg Kurz <groug@kaod.org>
+---
+v2: - use g_assert() in core code (checkpatch)
+    - rename helper to bdrv_drain_all_end_quiesce() (Kevin)
+---
+ block.c                 |    9 +++++++++
+ block/io.c              |   13 +++++++++++++
+ include/block/block.h   |    6 ++++++
+ tests/test-bdrv-drain.c |    1 +
+ 4 files changed, 29 insertions(+)
 
-"n == 0" should be enough
+diff --git a/block.c b/block.c
+index 430edf79bb10..ee5b28a9798d 100644
+--- a/block.c
++++ b/block.c
+@@ -4458,6 +4458,15 @@ static void bdrv_close(BlockDriverState *bs)
+     }
+     QLIST_INIT(&bs->aio_notifiers);
+     bdrv_drained_end(bs);
++
++    /*
++     * If we're still inside some bdrv_drain_all_begin()/end() sections, e=
+nd
++     * them now since this BDS won't exist anymore when bdrv_drain_all_end=
+()
++     * gets called.
++     */
++    if (bs->quiesce_counter) {
++        bdrv_drain_all_end_quiesce(bs);
++    }
+ }
+=20
+ void bdrv_close_all(void)
+diff --git a/block/io.c b/block/io.c
+index 54f0968aee27..c3a345a911e6 100644
+--- a/block/io.c
++++ b/block/io.c
+@@ -633,6 +633,19 @@ void bdrv_drain_all_begin(void)
+     }
+ }
+=20
++void bdrv_drain_all_end_quiesce(BlockDriverState *bs)
++{
++    int drained_end_counter =3D 0;
++
++    g_assert(bs->quiesce_counter > 0);
++    g_assert(!bs->refcnt);
++
++    while (bs->quiesce_counter) {
++        bdrv_do_drained_end(bs, false, NULL, true, &drained_end_counter);
++    }
++    BDRV_POLL_WHILE(bs, qatomic_read(&drained_end_counter) > 0);
++}
++
+ void bdrv_drain_all_end(void)
+ {
+     BlockDriverState *bs =3D NULL;
+diff --git a/include/block/block.h b/include/block/block.h
+index d16c401cb44e..809987017631 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -779,6 +779,12 @@ void bdrv_drained_end(BlockDriverState *bs);
+  */
+ void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_count=
+er);
+=20
++/**
++ * End all quiescent sections started by bdrv_drain_all_begin(). This is
++ * only needed when deleting a BDS before bdrv_drain_all_end() is called.
++ */
++void bdrv_drain_all_end_quiesce(BlockDriverState *bs);
++
+ /**
+  * End a quiescent section started by bdrv_subtree_drained_begin().
+  */
+diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
+index 1595bbc92e9e..8a29e33e004a 100644
+--- a/tests/test-bdrv-drain.c
++++ b/tests/test-bdrv-drain.c
+@@ -594,6 +594,7 @@ static void test_graph_change_drain_all(void)
+=20
+     g_assert_cmpint(bs_b->quiesce_counter, =3D=3D, 0);
+     g_assert_cmpint(b_s->drain_count, =3D=3D, 0);
++    g_assert_cmpint(qemu_get_aio_context()->external_disable_cnt, =3D=3D, =
+0);
+=20
+     bdrv_unref(bs_b);
+     blk_unref(blk_b);
 
-> +                break;
-> +            }
-> +        }
-> +
-> +        ret = bdrv_co_preadv_part(bs->file, offset, n, qiov, qiov_offset,
-> +                                  local_flags);
-> +        if (ret < 0) {
-> +            return ret;
-> +        }
-> +
-> +        offset += n;
-> +        qiov_offset += n;
-> +        bytes -= n;
-> +    }
-> +
-> +    return 0;
->   }
->   
 
-My remarks are minor, so:
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-
-And yes, I still think that this is good to be merged with two previous patches.
-
-
--- 
-Best regards,
-Vladimir
 
