@@ -2,117 +2,91 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60281C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:13:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78E5DC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:24:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 591F120882
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:13:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BE74D20882
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:24:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m/02+aEo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 591F120882
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TFm7aJda"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BE74D20882
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42268 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW3RB-0002YR-A1
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 16:13:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38676)
+	id 1kW3bo-0005Si-9S
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 16:24:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41248)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kW3LC-0004o4-Kd
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:10 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:28402)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kW3LA-0003jf-O7
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:10 -0400
-Received: from pps.filterd (m0187473.ppops.net [127.0.0.1])
- by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09NK2K1V089487; Fri, 23 Oct 2020 16:07:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
- h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=lH1vjam/uAwj77DuuJwX4duoeCbG9KbpZcBIQApIcck=;
- b=m/02+aEovCXl2AejaUP54JsKoFieGN6CyPiX7RgD4JkLjhT1QyxjPRPihrZ3ca6hFFK8
- XDno7annpEQAbkN+6YHCmRfNLuDxOBD9M1Zj5RQJawBpJN9mYDFlNi/ENKQWDfmT5eao
- TVOa+2sXIVzA0VvPANv2Psnp/S+NJ21c70PA5K6szQkdorkLAU9WBifCO3L28s+fFxle
- q0VfGt6mByXZIBk66EA9jWCzpDs9NAgz8MWfgggP12K6KlWs6t0VvzJ60PxCXUWMOy+h
- zPuo80Y2rf6f8xP7aHukxUob5Sgfrak3WBytW6AMTj1k4hoiTg9r+NunoMSSYNDw0sVa 2w== 
-Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34bm6wbssq-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 16:07:07 -0400
-Received: from m0187473.ppops.net (m0187473.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09NK2Rfh089914;
- Fri, 23 Oct 2020 16:07:06 -0400
-Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
- [169.62.189.11])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34bm6wbsse-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 16:07:06 -0400
-Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
- by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09NJwATk003078;
- Fri, 23 Oct 2020 20:07:06 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma03dal.us.ibm.com with ESMTP id 347r8a7wjr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 20:07:05 +0000
-Received: from b03ledav003.gho.boulder.ibm.com
- (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09NK6xJd24838414
- (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 23 Oct 2020 20:06:59 GMT
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id ABD8F6A04D;
- Fri, 23 Oct 2020 20:07:04 +0000 (GMT)
-Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 01A256A047;
- Fri, 23 Oct 2020 20:07:04 +0000 (GMT)
-Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.212.19])
- by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 23 Oct 2020 20:07:03 +0000 (GMT)
-From: Daniele Buono <dbuono@linux.vnet.ibm.com>
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW3b6-0004hM-WA
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:23:37 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29200)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW3b4-0005Vk-94
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:23:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603484612;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=Ihvi2mo5hD+NEe/DKlWqo3YO8djqorywMVnMJdYPyC8=;
+ b=TFm7aJdaEq1W4R6aipO0l7mZ58LhvxyUkTJGj6AE+KVYvqpSl03GlWLI9MPXJqGWH+m0QE
+ mQew6XCD9yRTQUm4AFFtcv5cXP7dGK8/xnmBPTKiIRd6mlT7mWcq0dr74mWO1gMa5u1QAl
+ EoNs94YCl9YlaKiR342w9MPuQnNKh0M=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-148-fcKcyCEmOqyTovmsibG5EQ-1; Fri, 23 Oct 2020 16:23:28 -0400
+X-MC-Unique: fcKcyCEmOqyTovmsibG5EQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4C84E805F19;
+ Fri, 23 Oct 2020 20:23:26 +0000 (UTC)
+Received: from [10.3.113.7] (ovpn-113-7.phx2.redhat.com [10.3.113.7])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7B3BC5B4C1;
+ Fri, 23 Oct 2020 20:23:05 +0000 (UTC)
+From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 5/6] check-block: enable iotests with cfi-icall
-Date: Fri, 23 Oct 2020 16:06:43 -0400
-Message-Id: <20201023200645.1055-6-dbuono@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
-References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
+References: <20201023183652.478921-1-eblake@redhat.com>
+ <20201023183652.478921-13-eblake@redhat.com>
+Organization: Red Hat, Inc.
+Subject: Re: [PATCH v5 12/12] qapi: Use QAPI_LIST_ADD() where possible
+Message-ID: <a8e32a7b-c895-5f3b-14ec-50e5af9426b1@redhat.com>
+Date: Fri, 23 Oct 2020 15:23:04 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <20201023183652.478921-13-eblake@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
- definitions=2020-10-23_14:2020-10-23,
- 2020-10-23 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- adultscore=0 spamscore=0
- malwarescore=0 mlxlogscore=626 mlxscore=0 clxscore=1015 bulkscore=0
- phishscore=0 suspectscore=1 lowpriorityscore=0 impostorscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010230119
-Received-SPF: none client-ip=148.163.156.1;
- envelope-from=dbuono@linux.vnet.ibm.com; helo=mx0a-001b2d01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 16:06:56
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -19
-X-Spam_score: -2.0
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -125,59 +99,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Daniele Buono <dbuono@linux.vnet.ibm.com>, Alexander Bulekov <alxndr@bu.edu>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-block@nongnu.org, Juan Quintela <quintela@redhat.com>,
+ David Hildenbrand <david@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Halil Pasic <pasic@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@de.ibm.com>,
+ =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <rth@twiddle.net>, Thomas Huth <thuth@redhat.com>,
+ Jiri Pirko <jiri@resnulli.us>, Eduardo Habkost <ehabkost@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ "open list:S390 KVM CPUs" <qemu-s390x@nongnu.org>, vsementsov@virtuozzo.com,
+ stefanha@redhat.com, David Gibson <david@gibson.dropbear.id.au>,
+ kwolf@redhat.com, "open list:GLUSTER" <integration@gluster.org>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Cornelia Huck <cohuck@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ Max Reitz <mreitz@redhat.com>, "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
+ "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-cfi-icall is a form of Control-Flow Integrity for indirect function
-calls implemented by llvm. It is enabled with a -fsanitize flag.
+On 10/23/20 1:36 PM, Eric Blake wrote:
+> Anywhere we create a list of just one item or by prepending items
+> (typically because order doesn't matter), we can use the now-public
+> macro.  But places where we must keep the list in order by appending
+> remain open-coded.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  docs/devel/writing-qmp-commands.txt | 13 +++------
 
-iotests are currently disabled when -fsanitize options is used, with the
-exception of SafeStack.
+> +++ b/docs/devel/writing-qmp-commands.txt
+> @@ -531,15 +531,10 @@ TimerAlarmMethodList *qmp_query_alarm_methods(Error **errp)
+>      bool current = true;
+> 
+>      for (p = alarm_timers; p->name; p++) {
+> -        TimerAlarmMethodList *info = g_malloc0(sizeof(*info));
+> -        info->value = g_malloc0(sizeof(*info->value));
+> -        info->value->method_name = g_strdup(p->name);
+> -        info->value->current = current;
+> -
+> -        current = false;
+> -
+> -        info->next = method_list;
+> -        method_list = info;
+> +	TimerAlarmMethod *value = g_new0(TimerAlarmMethod, 1);
+> +        value->method_name = g_strdup(p->name);
 
-This patch implements a generic filtering mechanism to allow iotests
-with a set of known-to-be-safe -fsanitize option. Then marks SafeStack
-and the new options used for cfi-icall safe for iotests
+Oops, tab damage.
 
-Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
----
- tests/check-block.sh | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
-
-diff --git a/tests/check-block.sh b/tests/check-block.sh
-index f6b1bda7b9..fb4c1baae9 100755
---- a/tests/check-block.sh
-+++ b/tests/check-block.sh
-@@ -21,14 +21,18 @@ if grep -q "CONFIG_GPROF=y" config-host.mak 2>/dev/null ; then
-     exit 0
- fi
- 
--# Disable tests with any sanitizer except for SafeStack
--CFLAGS=$( grep "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null )
--SANITIZE_FLAGS=""
--#Remove all occurrencies of -fsanitize=safe-stack
--for i in ${CFLAGS}; do
--        if [ "${i}" != "-fsanitize=safe-stack" ]; then
--                SANITIZE_FLAGS="${SANITIZE_FLAGS} ${i}"
-+# Disable tests with any sanitizer except for specific ones
-+SANITIZE_FLAGS=$( grep "CFLAGS.*-fsanitize" config-host.mak 2>/dev/null )
-+ALLOWED_SANITIZE_FLAGS="safe-stack cfi-icall"
-+#Remove all occurrencies of allowed Sanitize flags
-+for j in ${ALLOWED_SANITIZE_FLAGS}; do
-+    TMP_FLAGS=${SANITIZE_FLAGS}
-+    SANITIZE_FLAGS=""
-+    for i in ${TMP_FLAGS}; do
-+        if ! echo ${i} | grep -q "${j}" 2>/dev/null; then
-+            SANITIZE_FLAGS="${SANITIZE_FLAGS} ${i}"
-         fi
-+    done
- done
- if echo ${SANITIZE_FLAGS} | grep -q "\-fsanitize" 2>/dev/null; then
-     # Have a sanitize flag that is not allowed, stop
 -- 
-2.17.1
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
