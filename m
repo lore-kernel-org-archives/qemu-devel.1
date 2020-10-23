@@ -2,92 +2,72 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADB6CC55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:11:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BEA98C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 28BB024182
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:11:08 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eRF2S3Nv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28BB024182
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 28E6324182
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:14:07 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28E6324182
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42748 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVt6J-0003wi-5W
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:11:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53896)
+	id 1kVt9C-000661-Ss
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:14:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVt5Y-0003QZ-89
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:10:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48294)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kVt5V-0003h3-C5
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:10:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603444216;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=kNWJFvti+E2Sp53qmFb7O2/SOBXYqQ1LluWT5hG2YUA=;
- b=eRF2S3NvqSKyqib64CpoE4s4Nv6Mlh9GH6ZOjtBB6hrcyQDYQ01I506dszp5Inrc83LgY/
- iW3kj21MItRJrmbq7L+iq0m9MqPs/6xuEUxWSV2Qvw+uegAdeZhPUTYTC/OfrniuLWFu5k
- lHPDqJYWIvpQoGIppeNJQaGw4hGFFNM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-207-1jpC6GFFPT2I5hyaXjwCVg-1; Fri, 23 Oct 2020 05:10:12 -0400
-X-MC-Unique: 1jpC6GFFPT2I5hyaXjwCVg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8050A804B92;
- Fri, 23 Oct 2020 09:10:10 +0000 (UTC)
-Received: from redhat.com (ovpn-114-187.ams2.redhat.com [10.36.114.187])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 74E4226335;
- Fri, 23 Oct 2020 09:10:01 +0000 (UTC)
-Date: Fri, 23 Oct 2020 10:09:58 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: Migrate Wiki to Gitlab? (was: Migrating custom qemu.org
- infrastructure to GitLab)
-Message-ID: <20201023090958.GD445638@redhat.com>
-References: <CAJSP0QV3uB4QY6mzw2JFDedr0PJhGkU5FdmLF5PbjMPyxiYSuw@mail.gmail.com>
- <20200708105353.GE3229307@redhat.com>
- <20200709101602.lc2uipjlxobjvjn3@sirius.home.kraxel.org>
- <3dacddaa-c739-445b-a24a-02f9e51b9b0e@redhat.com>
- <436a85e3-a6af-b344-fe04-26acf1dbcb38@redhat.com>
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kVt85-0004Xv-3G; Fri, 23 Oct 2020 05:12:57 -0400
+Resent-Date: Fri, 23 Oct 2020 05:12:57 -0400
+Resent-Message-Id: <E1kVt85-0004Xv-3G@lists.gnu.org>
+Received: from sender4-of-o53.zoho.com ([136.143.188.53]:21332)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kVt82-0004jK-Hb; Fri, 23 Oct 2020 05:12:56 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1603444363; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=QLxUH0ZvgKCmUDJ5SsybGVpw8r6fDSXEhANRw5UUfJ8BJUEqdYq5EfoSTiyeVPs1QTa0dcX3KE0FauFv6pTrMxPn/KXl9QLS9SMwFcziv9aBxJJfjMBePHD161xMwkYJJkdTlLPCfdcXPX50RdYL0X+w+bAd4AIWonnJRpSDqII=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1603444363;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=g8zbOrwzOMrjh5uTA9EO0lQKHF5O6PEBteRMpROlEfI=; 
+ b=mc1WAJ1Pa2prP1xnfkCIlZF0EM7WdRUIIl1zpVmg4kLdYoSUiVGs2iI52hLH5iOa4pPa0EsgK9sg6SKziodhtsbRdCqPnTAcTbGC9ByRPriHbkAYkn8DP7h74ewIu56695m2dCT6V4TwZ+U+M8CeFehEqxj0XKuCLxZ4Wk7B30c=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 1603444360964852.0995928118759;
+ Fri, 23 Oct 2020 02:12:40 -0700 (PDT)
+Subject: Re: [PATCH] virtio-net: Add check for mac address while peer is vdpa
+Message-ID: <160344435949.26284.12794378379370899524@66eaa9a8a123>
+In-Reply-To: <20201023090743.3023-1-lulu@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <436a85e3-a6af-b344-fe04-26acf1dbcb38@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: lulu@redhat.com
+Date: Fri, 23 Oct 2020 02:12:40 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.53; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o53.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:12:48
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,86 +80,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Cleber Rosa <cleber@redhat.com>,
- Jeff Cody <codyprime@gmail.com>, Stefan Hajnoczi <stefanha@gmail.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- qemu-devel <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>,
- Gerd Hoffmann <kraxel@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: jasowang@redhat.com, qemu-stable@nongnu.org, qemu-devel@nongnu.org,
+ lulu@redhat.com, mst@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 07:59:00AM +0200, Thomas Huth wrote:
-> On 09/07/2020 12.22, Thomas Huth wrote:
-> > On 09/07/2020 12.16, Gerd Hoffmann wrote:
-> >>   Hi,
-> >>
-> >>>> 2. wiki.qemu.org is a MediaWiki instance. Account creation is a hurdle
-> >>>> to one-time or new contributors. It is unclear whether GitLab's wiki
-> >>>> is expressive enough for a lossless conversion of the existing QEMU
-> >>>> wiki. Any volunteers interested in evaluating the wiki migration would
-> >>>> be appreciated.
-> >>>
-> >>> Yeah, this is a potentially big piece of work. We didn't finish this
-> >>> in libvirt either. Looking at the libvirt mediawiki though, I decided
-> >>> not todo a straight export/import of all content.
-> >>
-> >> FYI: gitlab wiki is basically just a git repo with markdown pages +
-> >> renderer + gui editor.  You can also update the wiki using git clone +
-> >> edit + git commit + git push.
-> > 
-> > FWIW, seems like we could use the "pandoc" tool to convert Mediawiki
-> > (our old Wiki) to Markdown (Gitlab wiki). I've done a quick test and
-> > converted https://wiki.qemu.org/Contribute/MailingLists into
-> > https://gitlab.com/huth/qemu/-/wikis/Contribute/MailingLists with some
-> > few clicks.
-> 
-> Revisiting this topic after a couple of weeks, I think there is one more
-> thing to consider: If I've got that right, your account has to be a member
-> of the corresponding project to be able to edit a page in the Wiki in
-> gitlab. So unless we want to add lots of persons to the qemu-project as
-> members (which we likely do not really want, do we?), it's maybe better to
-> keep the separate MediaWiki instance with the separate user accounts, I guess?
-
-Yep, manual says it requires "Developer" permissions which is certainly
-not something we want to give out widely, as it grants way too much
-privilege.
-
-I'd still suggest we look at folding the wiki into either the website or
-the main repo documentation as appropriate for the docs in question.
-Having 3 separate sources of documentation just feels wrong to me, and
-we largely lost the "drive by" contributor for the wiki since we had
-to lock new account creation - only a handful of people actually ask us
-to create accounts for them.
-
-The qemu-web.git could be made fairly low overhead for contributors by
-accepting contributions via merge requests, which would let people just
-interatively edit the web pages and submit the changes all from the web
-UI. Not quite as seemless as a wiki, but not far off.
-
-We could even demarcate a subset of the website with a /wiki URL and just
-stuff all current wiki content in there as RST. Then have a much looser
-review policy for merging changes in that subtree. Basically allow anything
-as long as it is well formatted and not grossly incorrect. Could even 100%
-automate approval under that subdir if you want the true wiki experiance
-of having no content review.
-
-
-The main downside with the main qemu.git documentation is that it takes
-a long time to get docs through the contribution workflow and you have
-to deal with the qemu-devel firehose. Use of RST has improved the authoring
-part, but review/merge is still a bit tedious. There is no single docs
-maintainer, and parts of docs are completely lacking maintainer entries.
-So it can be pot-luck whether your docs contribution gets reviewed and
-merged in reasonable time.
-
-Regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
-
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyMzA5MDc0My4zMDIz
+LTEtbHVsdUByZWRoYXQuY29tLwoKCgpIaSwKClRoaXMgc2VyaWVzIHNlZW1zIHRvIGhhdmUgc29t
+ZSBjb2Rpbmcgc3R5bGUgcHJvYmxlbXMuIFNlZSBvdXRwdXQgYmVsb3cgZm9yCm1vcmUgaW5mb3Jt
+YXRpb246CgpUeXBlOiBzZXJpZXMKTWVzc2FnZS1pZDogMjAyMDEwMjMwOTA3NDMuMzAyMy0xLWx1
+bHVAcmVkaGF0LmNvbQpTdWJqZWN0OiBbUEFUQ0hdIHZpcnRpby1uZXQ6IEFkZCBjaGVjayBmb3Ig
+bWFjIGFkZHJlc3Mgd2hpbGUgcGVlciBpcyB2ZHBhCgo9PT0gVEVTVCBTQ1JJUFQgQkVHSU4gPT09
+CiMhL2Jpbi9iYXNoCmdpdCByZXYtcGFyc2UgYmFzZSA+IC9kZXYvbnVsbCB8fCBleGl0IDAKZ2l0
+IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lbGltaXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlm
+Zi5yZW5hbWVzIFRydWUKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYuYWxnb3JpdGhtIGhpc3RvZ3Jh
+bQouL3NjcmlwdHMvY2hlY2twYXRjaC5wbCAtLW1haWxiYWNrIGJhc2UuLgo9PT0gVEVTVCBTQ1JJ
+UFQgRU5EID09PQoKVXBkYXRpbmcgM2M4Y2Y1YTljMjFmZjg3ODIxNjRkMWRlZjdmNDRiZDg4ODcx
+MzM4NApGcm9tIGh0dHBzOi8vZ2l0aHViLmNvbS9wYXRjaGV3LXByb2plY3QvcWVtdQogLSBbdGFn
+IHVwZGF0ZV0gICAgICBwYXRjaGV3LzE2MDM0Mzg1NDkxMi44NDYwLjE3OTE1MjM4NTE3Nzk5MTMy
+MzcxLnN0Z2l0QHBhc2hhLVRoaW5rUGFkLVgyODAgLT4gcGF0Y2hldy8xNjAzNDM4NTQ5MTIuODQ2
+MC4xNzkxNTIzODUxNzc5OTEzMjM3MS5zdGdpdEBwYXNoYS1UaGlua1BhZC1YMjgwCiAtIFt0YWcg
+dXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDEwMjMwNjQ2MTguMjE0MDktMS1rcmF4ZWxAcmVkaGF0
+LmNvbSAtPiBwYXRjaGV3LzIwMjAxMDIzMDY0NjE4LjIxNDA5LTEta3JheGVsQHJlZGhhdC5jb20K
+IC0gW3RhZyB1cGRhdGVdICAgICAgcGF0Y2hldy8yMDIwMTAyMzA3MzM1MS4yNTEzMzItMS10aHV0
+aEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDEwMjMwNzMzNTEuMjUxMzMyLTEtdGh1dGhAcmVk
+aGF0LmNvbQogKiBbbmV3IHRhZ10gICAgICAgICBwYXRjaGV3LzIwMjAxMDIzMDkwNzQzLjMwMjMt
+MS1sdWx1QHJlZGhhdC5jb20gLT4gcGF0Y2hldy8yMDIwMTAyMzA5MDc0My4zMDIzLTEtbHVsdUBy
+ZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKZTFjYzEzYiB2aXJ0aW8t
+bmV0OiBBZGQgY2hlY2sgZm9yIG1hYyBhZGRyZXNzIHdoaWxlIHBlZXIgaXMgdmRwYQoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KRVJST1I6IE1pc3NpbmcgU2lnbmVkLW9mZi1ieTogbGluZShzKQoKdG90
+YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxOSBsaW5lcyBjaGVja2VkCgpDb21taXQgZTFjYzEz
+YjhiYzc3ICh2aXJ0aW8tbmV0OiBBZGQgY2hlY2sgZm9yIG1hYyBhZGRyZXNzIHdoaWxlIHBlZXIg
+aXMgdmRwYSkgaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRo
+ZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFp
+bmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KPT09IE9VVFBVVCBFTkQgPT09CgpU
+ZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBmdWxsIGxvZyBpcyBhdmFpbGFi
+bGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDEwMjMwOTA3NDMuMzAyMy0xLWx1bHVA
+cmVkaGF0LmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdl
+bmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcgW2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4K
+UGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRjaGV3LWRldmVsQHJlZGhhdC5jb20=
 
