@@ -8,70 +8,70 @@ X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0425C55178
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:05:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE361C388F9
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:11:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 47D0C2098B
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:05:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 01EDA214F1
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:11:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VQLN/GGk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47D0C2098B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="keJSdjy6"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 01EDA214F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48090 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW73U-0002ZL-7V
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:05:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52974)
+	id 1kW7A5-0004GP-Vz
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:11:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54210)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kW72I-00022x-6i; Fri, 23 Oct 2020 20:03:54 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:47089)
+ id 1kW79T-0003n3-QG; Fri, 23 Oct 2020 20:11:19 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43759)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kW72G-0006Jx-4H; Fri, 23 Oct 2020 20:03:53 -0400
-Received: by mail-io1-xd41.google.com with SMTP id b15so3976926iod.13;
- Fri, 23 Oct 2020 17:03:51 -0700 (PDT)
+ id 1kW79R-0007I5-69; Fri, 23 Oct 2020 20:11:19 -0400
+Received: by mail-io1-xd44.google.com with SMTP id h21so3999463iob.10;
+ Fri, 23 Oct 2020 17:11:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=GQx9hGiYD65CpSQdgsWAHvzKNzl4z2wiB6rN6LGOFmA=;
- b=VQLN/GGkw4SdY94BcHkp7xLb4s2a77ZFgIT2b8ggIKW4dfOfZI6jN6zgnwJvo1yrDW
- BzZoFuxKm10CYVf9CUtPJoWqRQcERoXioPKV6gs8CPi18tNpe1/hIiK9Z0R14g7qZZ/q
- efS2SK739GEhZF8cPdpE9BQuz+zofTBebsBWD2atE3JlLuUdETMoz9NfDYXXnsRckGJv
- Y0FrboMtx8c1TVls6/fnPTrclas7gFUcpgMgia8cabsooIfybRNU+FNTjx5DbUEswu87
- 76mEvmwSSrwV6QIEfDqu0+4kFJxM9KSVD0ytxQpq/kNUlkqCQcpwkHMB32goWK2BplHZ
- uPkw==
+ :cc; bh=WS/OIwDTHBKjGe1WUtr5aHEiiwLOLl7DRDpvMhBrGTg=;
+ b=keJSdjy6GwyYfCx+pqJlgGpNcD7o0jBRhxodNJfiZSoDuLy+o8B1kCKTJjQ8CczWGq
+ iQSQd7T/rcqAE7OCJsulHdo2n55CKT5TJ3XWs61ccbaEBWfh9bCNgtr/S5hL4RUaVK2o
+ XgJ25K08tHfsmghrrjbiwogSoMOpj/V/f5/Famdxsp40qVGSqt91Fg3XFK5Eos/aCL+e
+ YLttL3ZKXsvs18FXkHUuNkTo/798Amqq+q8yjGOl47ETA4lzeVDrZLFFOjmv84+c6+Ge
+ fH88wfBh4Awewgnr2DoSXFEJC6/1sCML+y2KSm2Tdlbtx4UlgNDkd7t5dPtLuwPZjgcM
+ QkUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=GQx9hGiYD65CpSQdgsWAHvzKNzl4z2wiB6rN6LGOFmA=;
- b=Sv8kNHaByWWXcHUVW1XCfgog63HEA6N3Gyz7uDjhnkLPFTq93SpFMwQaNUoNCBqMhr
- nq/NdOTa5M9PvLexoUQ4ypdhVK3Njy0zMj4iBetkj8LcNv9T7r5AUyCSm58OcDQyYye9
- xHb06uWqGFDzrdD5Us/sTEnWhdGSgJHucYluuiLe67IRPwV/jneHqJnR51Goj81K/6sv
- zVY3vQeyujz/vo4xyEYB6dZ0FfwY6eGdsCschpkpqG7I6lselEvT2QPlJk+0vLAXPzSV
- P2FJfWtN2CcfRHeXNzwl7WELY1Kd/329HgsXi3Udu+/+25/lqt+O9w9U/a8ni1WCpL2k
- R9wA==
-X-Gm-Message-State: AOAM533teUwWif9qooQSt4a7F1b6GhJ1XSCoC6TfMZYnafDD81YPlImK
- tt/Q2//wcbfoCcT0keVrkq+feI0Or/d8LXddlyA=
-X-Google-Smtp-Source: ABdhPJyuBYRByx8vdJRA5tM8kA0D2A0iHOs54jEIv3LUXjp3jUnklYsbpg683wCdGcJg38OGFcYscGk8u6+Z57yof+U=
-X-Received: by 2002:a6b:8ec7:: with SMTP id q190mr3770156iod.42.1603497830635; 
- Fri, 23 Oct 2020 17:03:50 -0700 (PDT)
+ bh=WS/OIwDTHBKjGe1WUtr5aHEiiwLOLl7DRDpvMhBrGTg=;
+ b=FoHl5Kul9/XPKpGtJIOSouKsGoVtCeo8kBt46vbs0uzDSnIkm4BzK6Eng6TPgX8REG
+ /I2jnOX4qXIO6bT7nE6fz/X2XyPe1j4xA5PfnYhEY9KX84QMkuIINm7jEmVq8M/JehTY
+ G345xZrFj4xJSsBlNazk1ZBXb4hNyIrqBK8y/A7A52CtoAwceyv/vNXaLTQi0VIxGP8D
+ fCRqjRZHHY9MqInRflgn9dO7j5lgoIKOhePNd84EG6CzNO8rziTAa/w+TgzubhKb2+9M
+ LSCta9NJReJ3PsNpvl5iLWP2dMiyduRUksq0Y6C1Gx+tDw4DMvzNdqQSBlhp+/QBliWU
+ kxzg==
+X-Gm-Message-State: AOAM532nkfORLNOASv+8RwGFBzixzgxMWHAU5C46aV20VyQpQ7Nu2z20
+ yk0dP0/hmtHbmLBpPLHYpwlV0O0d1yDBdezjubI=
+X-Google-Smtp-Source: ABdhPJwfns4POEh5z0PqsKpkE0NeEtim9h3Ko+Lch3uGuP/C4kIvMehpECfAzzoz9WQt4sHVKTWkFxOQMKCrPpbX+z8=
+X-Received: by 2002:a5d:9a8d:: with SMTP id c13mr3616393iom.176.1603498275057; 
+ Fri, 23 Oct 2020 17:11:15 -0700 (PDT)
 MIME-Version: 1.0
 References: <20201023091225.224-1-jiangyifei@huawei.com>
- <20201023091225.224-3-jiangyifei@huawei.com>
-In-Reply-To: <20201023091225.224-3-jiangyifei@huawei.com>
+ <20201023091225.224-4-jiangyifei@huawei.com>
+In-Reply-To: <20201023091225.224-4-jiangyifei@huawei.com>
 From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 23 Oct 2020 16:52:03 -0700
-Message-ID: <CAKmqyKO+pW_3kU2pph3oUALbeHCZ1E890f+tfiyqsep3FEqyKA@mail.gmail.com>
-Subject: Re: [PATCH V3 2/6] target/riscv: Add basic vmstate description of CPU
+Date: Fri, 23 Oct 2020 16:59:28 -0700
+Message-ID: <CAKmqyKP5MwkzabG3KVmYCKJ=wOLjVPjo5sAkNu_wZkkM53xUrA@mail.gmail.com>
+Subject: Re: [PATCH V3 3/6] target/riscv: Add PMP state description
 To: Yifei Jiang <jiangyifei@huawei.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -17
@@ -108,9 +108,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 2:13 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
+On Fri, Oct 23, 2020 at 2:16 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
 >
-> Add basic CPU state description to the newly created machine.c
+> In the case of supporting PMP feature, add PMP state description
+> to vmstate_riscv_cpu.
+>
+> 'vmstate_pmp_addr' and 'num_rules' could be regenerated by
+> pmp_update_rule(). But there exists the problem of updating
+> num_rules repeatedly in pmp_update_rule(). So here extracts
+> pmp_update_rule_addr() and pmp_update_rule_nums() to update
+> 'vmstate_pmp_addr' and 'num_rules' respectively.
 >
 > Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 > Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
@@ -120,148 +127,146 @@ Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 Alistair
 
 > ---
->  target/riscv/cpu.c       |  8 +----
->  target/riscv/internals.h |  4 +++
->  target/riscv/machine.c   | 74 ++++++++++++++++++++++++++++++++++++++++
->  target/riscv/meson.build |  3 +-
->  4 files changed, 81 insertions(+), 8 deletions(-)
->  create mode 100644 target/riscv/machine.c
+>  target/riscv/machine.c | 50 ++++++++++++++++++++++++++++++++++++++++++
+>  target/riscv/pmp.c     | 29 ++++++++++++++----------
+>  target/riscv/pmp.h     |  2 ++
+>  3 files changed, 70 insertions(+), 11 deletions(-)
 >
-> diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-> index dd05a220c7..6a0264fc6b 100644
-> --- a/target/riscv/cpu.c
-> +++ b/target/riscv/cpu.c
-> @@ -22,6 +22,7 @@
->  #include "qemu/ctype.h"
->  #include "qemu/log.h"
->  #include "cpu.h"
-> +#include "internals.h"
->  #include "exec/exec-all.h"
->  #include "qapi/error.h"
->  #include "qemu/error-report.h"
-> @@ -498,13 +499,6 @@ static void riscv_cpu_init(Object *obj)
->      cpu_set_cpustate_pointers(cpu);
->  }
->
-> -#ifndef CONFIG_USER_ONLY
-> -static const VMStateDescription vmstate_riscv_cpu = {
-> -    .name = "cpu",
-> -    .unmigratable = 1,
-> -};
-> -#endif
-> -
->  static Property riscv_cpu_properties[] = {
->      DEFINE_PROP_BOOL("i", RISCVCPU, cfg.ext_i, true),
->      DEFINE_PROP_BOOL("e", RISCVCPU, cfg.ext_e, false),
-> diff --git a/target/riscv/internals.h b/target/riscv/internals.h
-> index f1a546dba6..b15ad394bb 100644
-> --- a/target/riscv/internals.h
-> +++ b/target/riscv/internals.h
-> @@ -38,6 +38,10 @@ target_ulong fclass_d(uint64_t frs1);
->  #define SEW32 2
->  #define SEW64 3
->
-> +#ifndef CONFIG_USER_ONLY
-> +extern const VMStateDescription vmstate_riscv_cpu;
-> +#endif
-> +
->  static inline uint64_t nanbox_s(float32 f)
->  {
->      return f | MAKE_64BIT_MASK(32, 32);
 > diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-> new file mode 100644
-> index 0000000000..32edbcba7c
-> --- /dev/null
+> index 32edbcba7c..fc1461d88e 100644
+> --- a/target/riscv/machine.c
 > +++ b/target/riscv/machine.c
-> @@ -0,0 +1,74 @@
-> +/*
-> + * RISC-V VMState Description
-> + *
-> + * Copyright (c) 2020 Huawei Technologies Co., Ltd
-> + *
-> + * This program is free software; you can redistribute it and/or modify it
-> + * under the terms and conditions of the GNU General Public License,
-> + * version 2 or later, as published by the Free Software Foundation.
-> + *
-> + * This program is distributed in the hope it will be useful, but WITHOUT
-> + * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-> + * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
-> + * more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along with
-> + * this program.  If not, see <http://www.gnu.org/licenses/>.
-> + */
+> @@ -22,6 +22,52 @@
+>  #include "sysemu/kvm.h"
+>  #include "migration/cpu.h"
+>
+> +static bool pmp_needed(void *opaque)
+> +{
+> +    RISCVCPU *cpu = opaque;
+> +    CPURISCVState *env = &cpu->env;
 > +
-> +#include "qemu/osdep.h"
-> +#include "cpu.h"
-> +#include "qemu/error-report.h"
-> +#include "sysemu/kvm.h"
-> +#include "migration/cpu.h"
+> +    return riscv_feature(env, RISCV_FEATURE_PMP);
+> +}
 > +
-> +const VMStateDescription vmstate_riscv_cpu = {
-> +    .name = "cpu",
+> +static int pmp_post_load(void *opaque, int version_id)
+> +{
+> +    RISCVCPU *cpu = opaque;
+> +    CPURISCVState *env = &cpu->env;
+> +    int i;
+> +
+> +    for (i = 0; i < MAX_RISCV_PMPS; i++) {
+> +        pmp_update_rule_addr(env, i);
+> +    }
+> +    pmp_update_rule_nums(env);
+> +
+> +    return 0;
+> +}
+> +
+> +static const VMStateDescription vmstate_pmp_entry = {
+> +    .name = "cpu/pmp/entry",
 > +    .version_id = 1,
 > +    .minimum_version_id = 1,
 > +    .fields = (VMStateField[]) {
-> +        VMSTATE_UINTTL_ARRAY(env.gpr, RISCVCPU, 32),
-> +        VMSTATE_UINT64_ARRAY(env.fpr, RISCVCPU, 32),
-> +        VMSTATE_UINTTL(env.pc, RISCVCPU),
-> +        VMSTATE_UINTTL(env.load_res, RISCVCPU),
-> +        VMSTATE_UINTTL(env.load_val, RISCVCPU),
-> +        VMSTATE_UINTTL(env.frm, RISCVCPU),
-> +        VMSTATE_UINTTL(env.badaddr, RISCVCPU),
-> +        VMSTATE_UINTTL(env.guest_phys_fault_addr, RISCVCPU),
-> +        VMSTATE_UINTTL(env.priv_ver, RISCVCPU),
-> +        VMSTATE_UINTTL(env.vext_ver, RISCVCPU),
-> +        VMSTATE_UINTTL(env.misa, RISCVCPU),
-> +        VMSTATE_UINTTL(env.misa_mask, RISCVCPU),
-> +        VMSTATE_UINT32(env.features, RISCVCPU),
-> +        VMSTATE_UINTTL(env.priv, RISCVCPU),
-> +        VMSTATE_UINTTL(env.virt, RISCVCPU),
-> +        VMSTATE_UINTTL(env.resetvec, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mhartid, RISCVCPU),
-> +        VMSTATE_UINT64(env.mstatus, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mip, RISCVCPU),
-> +        VMSTATE_UINT32(env.miclaim, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mie, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mideleg, RISCVCPU),
-> +        VMSTATE_UINTTL(env.sptbr, RISCVCPU),
-> +        VMSTATE_UINTTL(env.satp, RISCVCPU),
-> +        VMSTATE_UINTTL(env.sbadaddr, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mbadaddr, RISCVCPU),
-> +        VMSTATE_UINTTL(env.medeleg, RISCVCPU),
-> +        VMSTATE_UINTTL(env.stvec, RISCVCPU),
-> +        VMSTATE_UINTTL(env.sepc, RISCVCPU),
-> +        VMSTATE_UINTTL(env.scause, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mtvec, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mepc, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mcause, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mtval, RISCVCPU),
-> +        VMSTATE_UINTTL(env.scounteren, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mcounteren, RISCVCPU),
-> +        VMSTATE_UINTTL(env.sscratch, RISCVCPU),
-> +        VMSTATE_UINTTL(env.mscratch, RISCVCPU),
-> +        VMSTATE_UINT64(env.mfromhost, RISCVCPU),
-> +        VMSTATE_UINT64(env.mtohost, RISCVCPU),
-> +        VMSTATE_UINT64(env.timecmp, RISCVCPU),
-> +
+> +        VMSTATE_UINTTL(addr_reg, pmp_entry_t),
+> +        VMSTATE_UINT8(cfg_reg, pmp_entry_t),
 > +        VMSTATE_END_OF_LIST()
 > +    }
 > +};
-> diff --git a/target/riscv/meson.build b/target/riscv/meson.build
-> index abd647fea1..14a5c62dac 100644
-> --- a/target/riscv/meson.build
-> +++ b/target/riscv/meson.build
-> @@ -27,7 +27,8 @@ riscv_ss.add(files(
->  riscv_softmmu_ss = ss.source_set()
->  riscv_softmmu_ss.add(files(
->    'pmp.c',
-> -  'monitor.c'
-> +  'monitor.c',
-> +  'machine.c'
->  ))
+> +
+> +static const VMStateDescription vmstate_pmp = {
+> +    .name = "cpu/pmp",
+> +    .version_id = 1,
+> +    .minimum_version_id = 1,
+> +    .needed = pmp_needed,
+> +    .post_load = pmp_post_load,
+> +    .fields = (VMStateField[]) {
+> +        VMSTATE_STRUCT_ARRAY(env.pmp_state.pmp, RISCVCPU, MAX_RISCV_PMPS,
+> +                             0, vmstate_pmp_entry, pmp_entry_t),
+> +        VMSTATE_END_OF_LIST()
+> +    }
+> +};
+> +
+>  const VMStateDescription vmstate_riscv_cpu = {
+>      .name = "cpu",
+>      .version_id = 1,
+> @@ -70,5 +116,9 @@ const VMStateDescription vmstate_riscv_cpu = {
+>          VMSTATE_UINT64(env.timecmp, RISCVCPU),
 >
->  target_arch += {'riscv': riscv_ss}
+>          VMSTATE_END_OF_LIST()
+> +    },
+> +    .subsections = (const VMStateDescription * []) {
+> +        &vmstate_pmp,
+> +        NULL
+>      }
+>  };
+> diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+> index c394e867f8..2eda8e1e2f 100644
+> --- a/target/riscv/pmp.c
+> +++ b/target/riscv/pmp.c
+> @@ -136,18 +136,8 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
+>      }
+>  }
+>
+> -
+> -/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
+> - *   end address values.
+> - *   This function is called relatively infrequently whereas the check that
+> - *   an address is within a pmp rule is called often, so optimise that one
+> - */
+> -static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+> +void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index)
+>  {
+> -    int i;
+> -
+> -    env->pmp_state.num_rules = 0;
+> -
+>      uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
+>      target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
+>      target_ulong prev_addr = 0u;
+> @@ -186,7 +176,13 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+>
+>      env->pmp_state.addr[pmp_index].sa = sa;
+>      env->pmp_state.addr[pmp_index].ea = ea;
+> +}
+>
+> +void pmp_update_rule_nums(CPURISCVState *env)
+> +{
+> +    int i;
+> +
+> +    env->pmp_state.num_rules = 0;
+>      for (i = 0; i < MAX_RISCV_PMPS; i++) {
+>          const uint8_t a_field =
+>              pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+> @@ -196,6 +192,17 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+>      }
+>  }
+>
+> +/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
+> + *   end address values.
+> + *   This function is called relatively infrequently whereas the check that
+> + *   an address is within a pmp rule is called often, so optimise that one
+> + */
+> +static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+> +{
+> +    pmp_update_rule_addr(env, pmp_index);
+> +    pmp_update_rule_nums(env);
+> +}
+> +
+>  static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
+>  {
+>      int result = 0;
+> diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+> index 6a8f072871..6c6b4c9bef 100644
+> --- a/target/riscv/pmp.h
+> +++ b/target/riscv/pmp.h
+> @@ -62,5 +62,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+>      target_ulong size, pmp_priv_t priv, target_ulong mode);
+>  bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
+>                           target_ulong *tlb_size);
+> +void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index);
+> +void pmp_update_rule_nums(CPURISCVState *env);
+>
+>  #endif
 > --
 > 2.19.1
 >
