@@ -2,106 +2,86 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD2EC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:58:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4FCC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:00:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13D6720797
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:58:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 682CC206BE
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:00:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="bAx09n1A"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13D6720797
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P0eyCehn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 682CC206BE
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0O9-0000YI-3g
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:58:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42722)
+	id 1kW0QY-0002ju-BP
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:00:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56018)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVzXO-0001sr-2l
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:03:30 -0400
-Received: from aserp2130.oracle.com ([141.146.126.79]:38142)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <darren.kenny@oracle.com>)
- id 1kVzXM-0006CM-5d
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:03:29 -0400
-Received: from pps.filterd (aserp2130.oracle.com [127.0.0.1])
- by aserp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NFjEfO153935;
- Fri, 23 Oct 2020 16:03:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : in-reply-to : references : date : message-id : mime-version :
- content-type; s=corp-2020-01-29;
- bh=kwa9GtcgnfBcZANafLfHfkXWdQkeqqSZmPiz1NFyYD8=;
- b=bAx09n1A9xOo7id8oqJOv/eHTBDByq5Y/8ZyHW3ro9vdUPh7AgHr15QStpytN6wSdWCV
- ZiqTkrDjJLOvZ6XHUfanhLh3OBfI4Bc2CkQ34RiEIGIlCdANPFWi/OSbZ3/ZP3dVk7l3
- RFn4xxzXZIy9LLs3pv3MfnT6J1d2rl2TokmdJgvBYUhACGk9o9EcLISrAmegCzZ6/MVI
- BS6CpO9XHmrMID0MiKvdXjq6KE+T7QY/iiLWCuV6GWrsX85/NhGL1pc3hhMj4v8qT6ll
- zh9J22a173ja2WTBqkXV59K8OS7hKYofuiBLLNmWZOeiiBXUFc+1LRLsyoV/ObmKjwdg 2Q== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by aserp2130.oracle.com with ESMTP id 347p4bc0vx-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Fri, 23 Oct 2020 16:03:24 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09NFkQBo040209;
- Fri, 23 Oct 2020 16:03:23 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
- by aserp3030.oracle.com with ESMTP id 348a6rvvvr-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 23 Oct 2020 16:03:23 +0000
-Received: from abhmp0009.oracle.com (abhmp0009.oracle.com [141.146.116.15])
- by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09NG3MD3027787;
- Fri, 23 Oct 2020 16:03:22 GMT
-Received: from starbug-mbp.localdomain (/79.97.215.145)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Fri, 23 Oct 2020 09:03:21 -0700
-Received: by starbug-mbp.localdomain (Postfix, from userid 501)
- id 38F571DC1B28; Fri, 23 Oct 2020 17:03:15 +0100 (IST)
-From: Darren Kenny <darren.kenny@oracle.com>
-To: Alexander Bulekov <alxndr@bu.edu>, qemu-devel@nongnu.org
-Subject: Re: [PATCH v7 17/17] scripts/oss-fuzz: ignore the generic-fuzz target
-In-Reply-To: <20201023150746.107063-18-alxndr@bu.edu>
-References: <20201023150746.107063-1-alxndr@bu.edu>
- <20201023150746.107063-18-alxndr@bu.edu>
-Date: Fri, 23 Oct 2020 17:03:15 +0100
-Message-ID: <m2pn59lykc.fsf@oracle.com>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kW0Oi-0001Jz-QI
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:58:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28784)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kW0Oc-000593-7f
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:58:36 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603472308;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=cGyI6PbBRT2ZfE6lx2tGkJ3McXuK4YC1ogOvDjk1Sp8=;
+ b=P0eyCehnZONE+Yf6pW1N21Ky87Ld8mLnqXBM0S0oGSeYvXHkRJu1Dnw651iq10GOiIW5s1
+ M/D8bsdhLkNnImRLID8EDA0i8LvFx2QOuOlratIHI9SRCc4q+kKkW8+mKe6vHXJE/FvLFZ
+ tykrQkAsc1L/dA2HGMtUWVC1bGR/sw8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-166-hssiraGuO-OSjAPw59djyQ-1; Fri, 23 Oct 2020 12:58:26 -0400
+X-MC-Unique: hssiraGuO-OSjAPw59djyQ-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 45FC21842167
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 16:58:25 +0000 (UTC)
+Received: from dgilbert-t580.localhost (ovpn-113-212.ams2.redhat.com
+ [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 88A9B10027A5;
+ Fri, 23 Oct 2020 16:58:15 +0000 (UTC)
+From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
+To: qemu-devel@nongnu.org, stefanha@redhat.com, vgoyal@redhat.com,
+ dinechin@redhat.com, virtio-fs@redhat.com
+Subject: [PATCH v4 0/5] virtiofsd xattr name mappings
+Date: Fri, 23 Oct 2020 17:58:07 +0100
+Message-Id: <20201023165812.36028-1-dgilbert@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0
- mlxlogscore=999
- bulkscore=0 spamscore=0 adultscore=0 suspectscore=2 mlxscore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010230106
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9782
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=2
- priorityscore=1501
- clxscore=1015 malwarescore=0 mlxscore=0 bulkscore=0 lowpriorityscore=0
- phishscore=0 adultscore=0 mlxlogscore=999 impostorscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010230106
-Received-SPF: pass client-ip=141.146.126.79;
- envelope-from=darren.kenny@oracle.com; helo=aserp2130.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 12:03:26
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -114,49 +94,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, f4bug@amsat.org, Alexander Bulekov <alxndr@bu.edu>,
- bsd@redhat.com, stefanha@redhat.com, pbonzini@redhat.com,
- dimastep@yandex-team.ru
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Friday, 2020-10-23 at 11:07:46 -04, Alexander Bulekov wrote:
-> generic-fuzz is not a standalone fuzzer - it requires some env variables
-> to be set. On oss-fuzz, we set these with some predefined
-> generic-fuzz-{...} targets, that are thin wrappers around generic-fuzz.
-> Do not make a link for the generic-fuzz from the oss-fuzz build, so
-> oss-fuzz does not treat it as a standalone fuzzer.
->
-> Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
+This is the 4th cut of an xattr name mapping option for virtiofsd.
+It allows the user of virtiofsd to define a fairly flexible mapping
+from the view of the xattr names the host fs has and the ones that the
+guest sees.
 
-> ---
->  scripts/oss-fuzz/build.sh | 10 ++++++++--
->  1 file changed, 8 insertions(+), 2 deletions(-)
->
-> diff --git a/scripts/oss-fuzz/build.sh b/scripts/oss-fuzz/build.sh
-> index 0ce2867732..40e15985cf 100755
-> --- a/scripts/oss-fuzz/build.sh
-> +++ b/scripts/oss-fuzz/build.sh
-> @@ -99,8 +99,14 @@ cp "./qemu-fuzz-i386" "$DEST_DIR/bin/"
->  # executable name)
->  for target in $(./qemu-fuzz-i386 | awk '$1 ~ /\*/  {print $2}');
->  do
-> -    ln  "$DEST_DIR/bin/qemu-fuzz-i386" \
-> -        "$DEST_DIR/qemu-fuzz-i386-target-$target"
-> +    # Ignore the generic-fuzz target, as it requires some environment variables to
-> +    # be configured. We have some generic-fuzz-{pc-q35, floppy, ...} targets that
-> +    # are thin wrappers around this target that set the required environment
-> +    # variables according to predefined configs.
-> +    if [ "$target" != "generic-fuzz" ]; then
-> +        ln  "$DEST_DIR/bin/qemu-fuzz-i386" \
-> +            "$DEST_DIR/qemu-fuzz-i386-target-$target"
-> +    fi
->  done
->  
->  echo "Done. The fuzzers are located in $DEST_DIR"
-> -- 
-> 2.28.0
+  The hope is this allows things like:
+    a) Different selinux attributes on host/guest
+    b) separation of trusted. attributes that clash on overlayfs
+    c) support for privileged xattr's in guests running with an
+       unprivileged virtiofsd.
+
+There's no apparent standard for this kind of mapping, so I made
+it flexible by specifying a mapping rule in the option.
+
+Prefix's can be added (selectively or globally), xattr's can be
+dropped in either direction or passed through.
+
+v4
+  cleanups from Stefan and Vivek's reviews
+
+Dave
+
+
+Dr. David Alan Gilbert (5):
+  tools/virtiofsd: xattr name mappings: Add option
+  tools/virtiofsd: xattr name mappings: Map client xattr names
+  tools/virtiofsd: xattr name mappings: Map server xattr names
+  tools/virtiofsd: xattr name mapping examples
+  tools/virtiofsd: xattr name mappings: Simple 'map'
+
+ docs/tools/virtiofsd.rst         | 161 +++++++++++
+ tools/virtiofsd/passthrough_ll.c | 474 ++++++++++++++++++++++++++++++-
+ 2 files changed, 632 insertions(+), 3 deletions(-)
+
+-- 
+2.28.0
+
 
