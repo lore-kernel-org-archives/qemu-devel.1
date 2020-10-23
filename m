@@ -5,76 +5,76 @@ X-Spam-Level:
 X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
 	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 727FFC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:38:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A0A4C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:38:43 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5C79208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:38:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 756B021D43
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 12:38:42 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Sx4zEgUR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5C79208C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JVly7Lgd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 756B021D43
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53660 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54516 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVwKz-0003Ca-Nf
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:38:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41972)
+	id 1kVwLB-0003Zc-FF
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 08:38:41 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40820)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kVwHr-0008Tj-9q; Fri, 23 Oct 2020 08:35:15 -0400
-Received: from mail-pf1-x443.google.com ([2607:f8b0:4864:20::443]:37843)
+ id 1kVwE8-0004ZV-6C; Fri, 23 Oct 2020 08:31:24 -0400
+Received: from mail-pf1-x433.google.com ([2607:f8b0:4864:20::433]:45944)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <chetan4windows@gmail.com>)
- id 1kVwHm-0003H1-Kn; Fri, 23 Oct 2020 08:35:13 -0400
-Received: by mail-pf1-x443.google.com with SMTP id 126so710502pfu.4;
- Fri, 23 Oct 2020 05:35:09 -0700 (PDT)
+ id 1kVwE6-0002wH-D0; Fri, 23 Oct 2020 08:31:23 -0400
+Received: by mail-pf1-x433.google.com with SMTP id e7so1104220pfn.12;
+ Fri, 23 Oct 2020 05:31:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=EbW4nnTc8husuNBIbJYp/5azynngGg6HcFeD2OchX8s=;
- b=Sx4zEgURVAj6cZKzVuKRUW8MMLPeKlkPgdtktoyCfOwAsoXZk8QwC1DulpzA33daFB
- cGS4JU+kStnHLHZPUB2EkEvOX/WIPM8zt2ThpSX1ElswVB0pDMj3971xsbdLgB3O8fTF
- mHyubVEI6wXAXLbIeGHFdizAQeEQKWreu/WPfNuL5TX+TYPl/pmdkcjh3OoH4YviMnQR
- cKNpt1iytmwdAXfF6wJrEenAzMirkY5tRtR5WckeNQ+1UwJL08S4KrCb5Iz4LE9Kxytb
- L3FgodwXuhXxwaLdOhK2ShsiIrUQWRO35uwBHCmwQmVa4F+jNJzSnzjWcZY5hXZIA73I
- 7HuA==
+ bh=zUo9CXXWWX8Nd2/DHJoc7p9XRUxdjGA6KuHpwg4iNDI=;
+ b=JVly7LgdSgHuLm6M0j4Zo6tys77qDZYDZ+9JF5uYze5jPzflZjwVvomBx1ojutmZmC
+ zUdRTJPncmyfYancRYRexL43eC5cHQdi329mqvCF+QDYOgx2yunXqBR02ka/h19pmUKX
+ isC1xFPpeQAVBAHh1IEgOJcwZ6W441nwUNxA4CEg1t2/Oz2Xc66WXJPrdahTZd3L/dMn
+ oC2RKGEkCGM7TZUAkEIRyv3zAr0EXBwmqK7wWASwFbnHP4ybXeqR5lRzb+dF+jdwx0iR
+ Ff8Xxv2IcFUu09g4ppUdhezN1YIkzMCZ2QIrc/qOO3pnOXM/LoC9w4H1ZGjRy7196j4O
+ g1Ww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=EbW4nnTc8husuNBIbJYp/5azynngGg6HcFeD2OchX8s=;
- b=T/BH0DdkPV8DcaVoi4/vj3f+BTK4bhs3cJTw/aWIXuVFQiTnHNSu/mV6oeO+in759h
- KfQIBona9fwkGg169f3MIe5gp+ndLXPMywFxBZBwV/uv8N32L7/7ay6HxoF+XA3/Mrg/
- V7vRq/dYL+QaGtc6WNf31m0fVFc7jOU6FLM7Xg1WtrptDczcnmVL+jgTuBvCc2pbQ7RU
- n2l6qMiXkSxEMXLYC/wREi7sfHrJr5sMqWySVL+h8C2+Nzi/5KHZ6Uj+aZkeD9tAG8Af
- kNCF/3+qpZVxPihYMCghSC2HPICkhVjASEjI/P1/5HJGjL8N6RUsxXSH7mjKUiCQSsCw
- JihA==
-X-Gm-Message-State: AOAM530P9/eI7QQ1JIbCCz5Obs5uB5L3O9yTMurH3YEDqPUG97a31O90
- yLBvy57vd6ocOPO0YVTAz9to5jD5kWlHqeQz
-X-Google-Smtp-Source: ABdhPJxvItw5jGISKBzmmH/+N+wz3YZnvDeAHqvXofp/TMrOOP2A7KZfkI2n+ffccmMr10kRCbsUxA==
-X-Received: by 2002:a63:481d:: with SMTP id v29mr1792935pga.448.1603456508131; 
- Fri, 23 Oct 2020 05:35:08 -0700 (PDT)
+ bh=zUo9CXXWWX8Nd2/DHJoc7p9XRUxdjGA6KuHpwg4iNDI=;
+ b=FgHQHc2t5IAuaMtLN7d6bWd+oPrjeuAzE+7GrbVDVyMCTZMxQIMf0iUepTfEq/v/sF
+ mOaZRl9Bo7ACJdmzQ+/tmvQctIRvh8N+Pz5z9ahv/4uYeG8kNr+dWBHiZtyt38CDbr97
+ 3yl7xlzEyr3H0e3zNemZ/b930Jgnny3gQcCLXV2dUkPnP0TKv9gJzg/Q1qoBf0L5YgmJ
+ u3OhPXAaCFYf8WkG5KoWBXrK6h16PgNXGHqElSWzhQ5N7xKJPoh2rxVJyeh+zuD1chH/
+ 0OXFSLa2bG9GiUP6mcJpMHmj83RAedQNu7AjHdVZeOVuaQdw999V7Oh6W3RmM/37U9Bl
+ D+YQ==
+X-Gm-Message-State: AOAM533PRD9ndzFCLQXAzr8xS+PhpFOi5PeRaaCH14dUcVx9MC1E337U
+ y+KBMEowGudZSogIcNT6J5bp8hCL+j+4hBD+
+X-Google-Smtp-Source: ABdhPJw0gB8q2O7Jeph+A/XHyFnoV6WcfCLrvYdrfcBWyo2JMlFRtNCjINKP7BjmEiWUZKUhRDyNNw==
+X-Received: by 2002:a17:90b:110b:: with SMTP id
+ gi11mr2177451pjb.25.1603456280235; 
+ Fri, 23 Oct 2020 05:31:20 -0700 (PDT)
 Received: from pulp100.localdomain ([103.199.158.131])
- by smtp.gmail.com with ESMTPSA id f7sm1981754pfd.111.2020.10.23.05.35.05
+ by smtp.gmail.com with ESMTPSA id l3sm2256472pju.28.2020.10.23.05.31.17
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Fri, 23 Oct 2020 05:35:07 -0700 (PDT)
+ Fri, 23 Oct 2020 05:31:19 -0700 (PDT)
 From: Chetan Pant <chetan4windows@gmail.com>
 To: qemu-trivial@nongnu.org
-Subject: [PATCH 22/30] overall/alpha tcg cpus|hppa: Fix Lesser GPL version
- number
-Date: Fri, 23 Oct 2020 12:33:53 +0000
-Message-Id: <20201023123353.19796-1-chetan4windows@gmail.com>
+Subject: [PATCH 19/30] parallel nor flas...: Fix Lesser GPL version number
+Date: Fri, 23 Oct 2020 12:30:34 +0000
+Message-Id: <20201023123034.19609-1-chetan4windows@gmail.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20201014134248.14146-1-chetan4windows@gmail.com>
 References: <20201014134248.14146-1-chetan4windows@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::443;
- envelope-from=chetan4windows@gmail.com; helo=mail-pf1-x443.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::433;
+ envelope-from=chetan4windows@gmail.com; helo=mail-pf1-x433.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,8 +96,8 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chetan Pant <chetan4windows@gmail.com>, qemu-devel@nongnu.org,
- rth@twiddle.net
+Cc: philmd@redhat.com, qemu-devel@nongnu.org,
+ Chetan Pant <chetan4windows@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -109,168 +109,14 @@ This patch replaces all occurrences of "Lesser GPL version 2" with
 
 Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
 ---
- cpus-common.c             | 2 +-
- include/exec/cpu-all.h    | 2 +-
- include/exec/cpu-defs.h   | 2 +-
- include/exec/cpu_ldst.h   | 2 +-
- include/exec/cputlb.h     | 2 +-
- include/exec/exec-all.h   | 2 +-
- include/exec/tb-hash.h    | 2 +-
- scripts/decodetree.py     | 2 +-
- target/alpha/cpu.h        | 2 +-
- target/alpha/fpu_helper.c | 2 +-
- target/alpha/gdbstub.c    | 2 +-
- target/alpha/helper.c     | 2 +-
- target/alpha/int_helper.c | 2 +-
- target/alpha/mem_helper.c | 2 +-
- target/alpha/sys_helper.c | 2 +-
- target/alpha/translate.c  | 2 +-
- target/alpha/vax_helper.c | 2 +-
- target/hppa/cpu.h         | 2 +-
- target/hppa/gdbstub.c     | 2 +-
- target/hppa/helper.c      | 2 +-
- target/hppa/insns.decode  | 2 +-
- target/hppa/int_helper.c  | 2 +-
- target/hppa/machine.c     | 2 +-
- target/hppa/mem_helper.c  | 2 +-
- target/hppa/op_helper.c   | 2 +-
- target/hppa/translate.c   | 2 +-
- 26 files changed, 26 insertions(+), 26 deletions(-)
+ hw/block/pflash_cfi01.c | 2 +-
+ hw/block/pflash_cfi02.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/cpus-common.c b/cpus-common.c
-index 83475ef..6e73d3e 100644
---- a/cpus-common.c
-+++ b/cpus-common.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/cpu-all.h b/include/exec/cpu-all.h
-index f6439c4..1c92ab6 100644
---- a/include/exec/cpu-all.h
-+++ b/include/exec/cpu-all.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/cpu-defs.h b/include/exec/cpu-defs.h
-index 9185632..d1f5e3f 100644
---- a/include/exec/cpu-defs.h
-+++ b/include/exec/cpu-defs.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/cpu_ldst.h b/include/exec/cpu_ldst.h
-index 30605ed..ef54cb7 100644
---- a/include/exec/cpu_ldst.h
-+++ b/include/exec/cpu_ldst.h
-@@ -4,7 +4,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/cputlb.h b/include/exec/cputlb.h
-index a62cfb2..19b16e5 100644
---- a/include/exec/cputlb.h
-+++ b/include/exec/cputlb.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 1fe28d5..5ebe5d4 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/include/exec/tb-hash.h b/include/exec/tb-hash.h
-index 805235d..0a273d9 100644
---- a/include/exec/tb-hash.h
-+++ b/include/exec/tb-hash.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/scripts/decodetree.py b/scripts/decodetree.py
-index 60fd3b5..157b1e8 100644
---- a/scripts/decodetree.py
-+++ b/scripts/decodetree.py
-@@ -4,7 +4,7 @@
- # This library is free software; you can redistribute it and/or
- # modify it under the terms of the GNU Lesser General Public
- # License as published by the Free Software Foundation; either
--# version 2 of the License, or (at your option) any later version.
-+# version 2.1 of the License, or (at your option) any later version.
- #
- # This library is distributed in the hope that it will be useful,
- # but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/cpu.h b/target/alpha/cpu.h
-index be29bdd..82df108 100644
---- a/target/alpha/cpu.h
-+++ b/target/alpha/cpu.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/fpu_helper.c b/target/alpha/fpu_helper.c
-index df8b589..3ff8bb4 100644
---- a/target/alpha/fpu_helper.c
-+++ b/target/alpha/fpu_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/gdbstub.c b/target/alpha/gdbstub.c
-index 0cd76dd..7db14f4 100644
---- a/target/alpha/gdbstub.c
-+++ b/target/alpha/gdbstub.c
+diff --git a/hw/block/pflash_cfi01.c b/hw/block/pflash_cfi01.c
+index f0fcd63..daae965 100644
+--- a/hw/block/pflash_cfi01.c
++++ b/hw/block/pflash_cfi01.c
 @@ -7,7 +7,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
@@ -280,192 +126,10 @@ index 0cd76dd..7db14f4 100644
   *
   * This library is distributed in the hope that it will be useful,
   * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/helper.c b/target/alpha/helper.c
-index 55d7274..4f56fe4 100644
---- a/target/alpha/helper.c
-+++ b/target/alpha/helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/int_helper.c b/target/alpha/int_helper.c
-index e43b50a..5672696 100644
---- a/target/alpha/int_helper.c
-+++ b/target/alpha/int_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/mem_helper.c b/target/alpha/mem_helper.c
-index 934faa1..75e72bc 100644
---- a/target/alpha/mem_helper.c
-+++ b/target/alpha/mem_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/sys_helper.c b/target/alpha/sys_helper.c
-index 3922923..25f6cb8 100644
---- a/target/alpha/sys_helper.c
-+++ b/target/alpha/sys_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/translate.c b/target/alpha/translate.c
-index 8870284..ba5bba7 100644
---- a/target/alpha/translate.c
-+++ b/target/alpha/translate.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/alpha/vax_helper.c b/target/alpha/vax_helper.c
-index 2b0c178..f94fb51 100644
---- a/target/alpha/vax_helper.c
-+++ b/target/alpha/vax_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/cpu.h b/target/hppa/cpu.h
-index fb6c59d..61178fa 100644
---- a/target/hppa/cpu.h
-+++ b/target/hppa/cpu.h
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/gdbstub.c b/target/hppa/gdbstub.c
-index a6428a2..729c37b 100644
---- a/target/hppa/gdbstub.c
-+++ b/target/hppa/gdbstub.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/helper.c b/target/hppa/helper.c
-index 0dcd105..1ccff57 100644
---- a/target/hppa/helper.c
-+++ b/target/hppa/helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/insns.decode b/target/hppa/insns.decode
-index dceaad6..d4eefc0 100644
---- a/target/hppa/insns.decode
-+++ b/target/hppa/insns.decode
-@@ -6,7 +6,7 @@
- # This library is free software; you can redistribute it and/or
- # modify it under the terms of the GNU Lesser General Public
- # License as published by the Free Software Foundation; either
--# version 2 of the License, or (at your option) any later version.
-+# version 2.1 of the License, or (at your option) any later version.
- #
- # This library is distributed in the hope that it will be useful,
- # but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/int_helper.c b/target/hppa/int_helper.c
-index 462747b..349495d 100644
---- a/target/hppa/int_helper.c
-+++ b/target/hppa/int_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/machine.c b/target/hppa/machine.c
-index 7030101..b60b654 100644
---- a/target/hppa/machine.c
-+++ b/target/hppa/machine.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/mem_helper.c b/target/hppa/mem_helper.c
-index 5a465db..afc5b56 100644
---- a/target/hppa/mem_helper.c
-+++ b/target/hppa/mem_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/op_helper.c b/target/hppa/op_helper.c
-index 39361d3..7ae31e1 100644
---- a/target/hppa/op_helper.c
-+++ b/target/hppa/op_helper.c
-@@ -6,7 +6,7 @@
-  * This library is free software; you can redistribute it and/or
-  * modify it under the terms of the GNU Lesser General Public
-  * License as published by the Free Software Foundation; either
-- * version 2 of the License, or (at your option) any later version.
-+ * version 2.1 of the License, or (at your option) any later version.
-  *
-  * This library is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-diff --git a/target/hppa/translate.c b/target/hppa/translate.c
-index f5765ef..64af1e0 100644
---- a/target/hppa/translate.c
-+++ b/target/hppa/translate.c
+diff --git a/hw/block/pflash_cfi02.c b/hw/block/pflash_cfi02.c
+index eb02fcc..1b3d94e 100644
+--- a/hw/block/pflash_cfi02.c
++++ b/hw/block/pflash_cfi02.c
 @@ -6,7 +6,7 @@
   * This library is free software; you can redistribute it and/or
   * modify it under the terms of the GNU Lesser General Public
