@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B5BAC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 06:19:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9789FC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 06:19:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 590BC20829
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 06:19:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 590BC20829
+	by mail.kernel.org (Postfix) with ESMTPS id 0404C20795
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 06:19:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0404C20795
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54472 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55078 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVqPl-00074D-Au
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 02:19:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49840)
+	id 1kVqPu-0007JE-30
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 02:19:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49842)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kVqJq-0000Cu-FT; Fri, 23 Oct 2020 02:12:54 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:47516 helo=huawei.com)
+ id 1kVqJq-0000Cz-Ji; Fri, 23 Oct 2020 02:12:54 -0400
+Received: from szxga05-in.huawei.com ([45.249.212.191]:5717 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kVqJo-0000wk-EJ; Fri, 23 Oct 2020 02:12:54 -0400
+ id 1kVqJn-0000uw-HR; Fri, 23 Oct 2020 02:12:54 -0400
 Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 8E6D9956478C8FB263FF;
- Fri, 23 Oct 2020 14:12:45 +0800 (CST)
+ by Forcepoint Email with ESMTP id 823479D4F2A21FFD91BE;
+ Fri, 23 Oct 2020 14:12:40 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS402-HUB.china.huawei.com
  (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Fri, 23 Oct 2020
- 14:12:36 +0800
+ 14:12:31 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH RESEND v2 5/7] migration/colo: Plug memleaks in
- colo_process_incoming_thread
-Date: Fri, 23 Oct 2020 14:12:16 +0800
-Message-ID: <20201023061218.2080844-6-kuhn.chenqun@huawei.com>
+Subject: [PATCH RESEND v2 2/7] qga/channel-posix: Plug memory leak in
+ ga_channel_write_all()
+Date: Fri, 23 Oct 2020 14:12:13 +0800
+Message-ID: <20201023061218.2080844-3-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20201023061218.2080844-1-kuhn.chenqun@huawei.com>
 References: <20201023061218.2080844-1-kuhn.chenqun@huawei.com>
@@ -50,9 +50,9 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [10.175.104.175]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
+Received-SPF: pass client-ip=45.249.212.191;
  envelope-from=kuhn.chenqun@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:12:37
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:12:40
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -72,55 +72,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: lvivier@redhat.com, zhang.zhanghailiang@huawei.com,
- Juan Quintela <quintela@redhat.com>, pannengyuan@huawei.com,
- Li Qiang <liq3ea@gmail.com>, "Dr. David
- Alan Gilbert" <dgilbert@redhat.com>, ganqixin@huawei.com,
- Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>
+Cc: lvivier@redhat.com, zhang.zhanghailiang@huawei.com, pannengyuan@huawei.com,
+ Li Qiang <liq3ea@gmail.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Pan Nengyuan <pannengyuan@huawei.com>
 
-'local_err' forgot to free in colo_process_incoming_thread error path.
-Fix that.
+Missing g_error_free on error path in ga_channel_write_all(). Fix that.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Pan Nengyuan <pannengyuan@huawei.com>
 Reviewed-by: Li Qiang <liq3ea@gmail.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
-Cc: Hailiang Zhang <zhang.zhanghailiang@huawei.com>
-Cc: Juan Quintela <quintela@redhat.com>
-Cc: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Michael Roth <mdroth@linux.vnet.ibm.com>
 ---
- migration/colo.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ qga/channel-posix.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-diff --git a/migration/colo.c b/migration/colo.c
-index 3f1d3dfd95..7cc5a37192 100644
---- a/migration/colo.c
-+++ b/migration/colo.c
-@@ -886,7 +886,6 @@ void *colo_process_incoming_thread(void *opaque)
-     while (mis->state == MIGRATION_STATUS_COLO) {
-         colo_wait_handle_message(mis, fb, bioc, &local_err);
-         if (local_err) {
--            error_report_err(local_err);
-             break;
+diff --git a/qga/channel-posix.c b/qga/channel-posix.c
+index 0373975360..8f3821af6d 100644
+--- a/qga/channel-posix.c
++++ b/qga/channel-posix.c
+@@ -249,7 +249,7 @@ GIOStatus ga_channel_write_all(GAChannel *c, const gchar *buf, gsize size)
+             buf += written;
+         } else if (status != G_IO_STATUS_AGAIN) {
+             g_warning("error writing to channel: %s", err->message);
+-            return status;
++            goto out;
          }
- 
-@@ -922,6 +921,10 @@ out:
-         qemu_fclose(fb);
      }
  
-+    if (local_err) {
-+        error_report_err(local_err);
+@@ -261,6 +261,10 @@ GIOStatus ga_channel_write_all(GAChannel *c, const gchar *buf, gsize size)
+         g_warning("error flushing channel: %s", err->message);
+     }
+ 
++out:
++    if (err) {
++        g_error_free(err);
 +    }
-+
-     /* Hope this not to be too long to loop here */
-     qemu_sem_wait(&mis->colo_incoming_sem);
-     qemu_sem_destroy(&mis->colo_incoming_sem);
+     return status;
+ }
+ 
 -- 
 2.23.0
 
