@@ -2,91 +2,94 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C5F52C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:08:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFA2BC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:09:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 236FE2074B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:08:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 093E32074B
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:09:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HRQsuc01"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 236FE2074B
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KNM/HMlP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 093E32074B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57574 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW3MF-00069Z-2v
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 16:08:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38584)
+	id 1kW3N7-0007KA-1T
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 16:09:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kW3L5-0004dS-E8
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:03 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:54522)
+ id 1kW3L8-0004hG-7Y
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:06 -0400
+Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:12188)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dbuono@linux.vnet.ibm.com>)
- id 1kW3L1-0003iJ-OM
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:03 -0400
+ id 1kW3L6-0003is-2G
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:07:05 -0400
 Received: from pps.filterd (m0098396.ppops.net [127.0.0.1])
  by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09NK1i9o099463; Fri, 23 Oct 2020 16:06:55 -0400
+ 09NK1hed099395; Fri, 23 Oct 2020 16:07:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
- : date : message-id : mime-version : content-transfer-encoding; s=pp1;
- bh=OTfcehDknONaImhz4tafuHRcB91Lpv5LpoHNfqLgmAM=;
- b=HRQsuc01Kqn+LEubUVEXYB3wdmrMeXTx09tp5Hdel/QnNVIMme3Eup7peQ/6AXebX4iG
- f5Jw4lhDNGQGx7D8pDN8/HTx1G9eU7HN0ANKf918KZQqkxOWlV8AgFENddB5cE7yKaFp
- Adcc6Ri4nlUQ8rn/+ER1Stp/TxnOQkYfgI9tLDZGujITi/mTaQGv4ZBvM6N6O0lR9ANu
- lC5T2y0ZBWpOuiRoLlAl12gk11LEanV1zybFno0d4aXb76fuiK+EWb1Tm5o70a8HLn8N
- 07DsAYzuz+Yk2jUCwcCd9Ck8kyG/Z2jOuAxtdWeBDO4HMtQkVL2013wWfpfeGHhHtIRo Iw== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=ZLhWKIOW7+EclO3pqiAO+l1ZilF2Tr2SDwD3dq/QbWI=;
+ b=KNM/HMlPfDr5NzLTygwWk5vylwX3BN+vm9CoraTzcOOL66VeR5FRysA7n0MHgON2P15m
+ h6w6tDqDCmT/1K8q1OPYZOqJkKDzgOcezSoVlfzHd3VdmWCfTtOLsaoZjIpiNqjV9IxK
+ TLWJVNU7zUupFwqeN1CdnBovhWn60Xko65/twDaRuUKgoKVBdEBunZeM6zkOjpwvxCmu
+ cRKnHNpai9oHgQMXQjLjDiNkZEo6Kl/r6tb2Z7/iTjcGRkNuA7ZKGMWptjqxChVf9XMS
+ /v3YhMbR2SQ4ZkOwLsKPI4vxSem6g+wl5oPhtrx62tqYv/+giEEXSFWrFG7xUuYJJREe FQ== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34c4t9htf7-1
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34c4t9hthk-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 16:06:55 -0400
+ Fri, 23 Oct 2020 16:07:02 -0400
 Received: from m0098396.ppops.net (m0098396.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09NK1lah101266;
- Fri, 23 Oct 2020 16:06:55 -0400
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com
- [169.63.214.131])
- by mx0a-001b2d01.pphosted.com with ESMTP id 34c4t9htf2-1
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09NK31QA106964;
+ Fri, 23 Oct 2020 16:07:01 -0400
+Received: from ppma02wdc.us.ibm.com (aa.5b.37a9.ip4.static.sl-reverse.com
+ [169.55.91.170])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34c4t9hth5-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 16:06:55 -0400
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
- by ppma01dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09NJv12r011838;
- Fri, 23 Oct 2020 20:06:54 GMT
-Received: from b03cxnp08027.gho.boulder.ibm.com
- (b03cxnp08027.gho.boulder.ibm.com [9.17.130.19])
- by ppma01dal.us.ibm.com with ESMTP id 34bhyqhars-1
+ Fri, 23 Oct 2020 16:07:01 -0400
+Received: from pps.filterd (ppma02wdc.us.ibm.com [127.0.0.1])
+ by ppma02wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09NJv1PY014288;
+ Fri, 23 Oct 2020 20:07:00 GMT
+Received: from b03cxnp08028.gho.boulder.ibm.com
+ (b03cxnp08028.gho.boulder.ibm.com [9.17.130.20])
+ by ppma02wdc.us.ibm.com with ESMTP id 347r89txpe-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Fri, 23 Oct 2020 20:06:54 +0000
+ Fri, 23 Oct 2020 20:07:00 +0000
 Received: from b03ledav003.gho.boulder.ibm.com
  (b03ledav003.gho.boulder.ibm.com [9.17.130.234])
- by b03cxnp08027.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09NK6lbH26280680
+ by b03cxnp08028.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09NK6xOO62456192
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Fri, 23 Oct 2020 20:06:47 GMT
+ Fri, 23 Oct 2020 20:06:59 GMT
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id D341D6A051;
- Fri, 23 Oct 2020 20:06:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id CA2786A047;
+ Fri, 23 Oct 2020 20:06:59 +0000 (GMT)
 Received: from b03ledav003.gho.boulder.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 1C1F86A047;
- Fri, 23 Oct 2020 20:06:52 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 12D746A04D;
+ Fri, 23 Oct 2020 20:06:59 +0000 (GMT)
 Received: from Buonos-Thinkpad-X1.ibm.com (unknown [9.65.212.19])
  by b03ledav003.gho.boulder.ibm.com (Postfix) with ESMTP;
- Fri, 23 Oct 2020 20:06:51 +0000 (GMT)
+ Fri, 23 Oct 2020 20:06:58 +0000 (GMT)
 From: Daniele Buono <dbuono@linux.vnet.ibm.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2 0/6] Add support for Control-Flow Integrity
-Date: Fri, 23 Oct 2020 16:06:38 -0400
-Message-Id: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
+Subject: [PATCH v2 3/6] configure: add option to enable LTO
+Date: Fri, 23 Oct 2020 16:06:41 -0400
+Message-Id: <20201023200645.1055-4-dbuono@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
+References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
@@ -96,7 +99,7 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
  priorityscore=1501
  phishscore=0 spamscore=0 mlxlogscore=999 lowpriorityscore=0 bulkscore=0
- impostorscore=0 suspectscore=0 clxscore=1015 malwarescore=0 mlxscore=0
+ impostorscore=0 suspectscore=1 clxscore=1015 malwarescore=0 mlxscore=0
  adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2009150000 definitions=main-2010230119
 Received-SPF: none client-ip=148.163.156.1;
@@ -129,157 +132,225 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-v2: Several months (and structural changes in QEMU) have passed since v1.
-While the spirit of the patch is similar, the implementation is changed
-in multiple points, and should address most if not all the comments
-received in v1.
-* Instead of disabling CFI in specific functions by using a filter file,
-  disable cfi by using a new decorator to be prefixed to the function
-  definition. The decorator is automatically expanded to an attribute
-  asking clang to disable cfi-icall on the function.
-  This should simplify tracking of sensitive function, compared to
-  keeping the list in a separate file
-  I tentatively added myself as maintainer of a new include file defined for
-  that purpose, in case a maintainer is considered needed.
-* Updated patch to work with the new build system based on meson
-* Split LTO and CFI options. Now LTO can be used independently of CFI.
-  LTO uses the meson option to build and can now work, in general, with
-  any linker (ld, gold, lld). LTO with meson works fine with clang >=6
-  and requires the use of LLVM's ar to handle shared libraries with
-  intermediate code (selectable by setting the environment variable
-  AR to llvm-ar-xx).
-* Introduce a small patch for the linker script used by fuzzing targets,
-  so that it works properly with both bfd and lld >=12
-* Disable a couple of warning check that trigger errors with clang >= 11 
-* Add additional checks for fuzzing and LTO. At the moment, only LLVM's
-  lld linker v12 is able to support fuzzing and LTO, because of a bug in the
-  bfd linker when handling --wrap with LTO. Therefore, automatically
-  select lld if fuzzing and LTO are both enabled.
-* Made sure that fuzzing works with LTO and CFI enabled.
+This patch allows to compile QEMU with link-time optimization (LTO).
+Compilation with LTO is handled directly by meson. This patch adds checks
+in configure to make sure the toolchain supports LTO.
 
------
-v1's cover letter starts here
------
+Currently, allow LTO only with clang, since I have found a couple of issues
+with gcc-based LTO.
 
-LLVM/Clang supports multiple types of forward-edge Control-Flow Integrity
-(CFI), including runtime checks on indirect function calls.
+In case fuzzing is enabled, automatically switch to llvm's linker (lld).
+The standard bfd linker has a bug where function wrapping (used by the fuzz*
+targets) is used in conjunction with LTO.
 
-CFI on indirect function calls can have a huge impact in enhancing QEMU
-security, by significantly limiting one of the most used attack vectors
-for VM Escape. Attacks demonstrated in [1],[2] and [3] will, at some
-point, change a function pointer in a QEMU data structure.
+Tested with all major versions of clang from 6 to 12
 
-At high level, LLVM's implementation relies on compile-time information
-to create a range of consecutive trampolines for "compatible functions".
-At runtime, if the pointer is not in the valid range, it is assumed that
-the control flow was hijacked, and the process is terminated with an
-"Illegal Instruction" exception.
+Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
+---
+ configure   | 128 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+ meson.build |   1 +
+ 2 files changed, 129 insertions(+)
 
-CAVEATS:
-
-1) For this CFI check to work, the code must always respect the function
-signature when using function pointer. While this is generally true
-in QEMU, there are a few instances where pointers are handled as
-generic void* from the caller. Since this is a common approach, Clang
-offer a flag to relax pointer checks and consider all pointer types
-to be compatible.
-
-2) Since CFI relies on compile-time information, it requires using
-link-time optimization (LTO) to support CFI across compilation units.
-This adds a requirement for the gold linker, and LLVM's versions of
-static libraries tools (ar, ranlib, nm).
-
-3) CFI checks cannot be performed on shared libraries (given that functions
-are not known at compile time). This means that indirect function calls
-will fail if the function pointer belong to a shared library.
-This does not seem to be a big issue for a standard QEMU deployment today,
-but QEMU modules won't be able to work when CFI is enabled.
-There is a way to allow shared library pointers, but it is experimental
-in LLVM, requires some work and reduces performance and security. For
-these reasons, I think it's best to start with this version, and discuss
-an extension for modules later.
-
-4) CFI cannot be fully applied to TCG. The purpose of TCG is to transform
-code on-the-fly from one ISA to another. In doing so, binary blobs of
-executable code are created and called with function pointers.
-Since the code did not exist at compile time, runtime CFI checks find such
-functions illegal. To allow the code to keep running, CFI checks are not
-performed in the core function of TCG/TCI, and in the code that
-implements TCG plugins.
-This does not affect QEMU when executed with KVM, and all the device
-emulation code is always protected, even when using TCG.
-
-5) Most of the logic to enable CFI goes in the configure, since it's
-just a matter of checking for dependencies and incompatible options.
-However, I had to disable CFI checks for a few TCG functions.
-This can only be done through a blacklist file. I added a file in the
-root of QEMU, called cfi-blacklist.txt for such purpose. I am open to
-suggestions on where the file should go, and I am willing to become the
-maintainer of it, if deemed necessary.
-
-PERFORMANCE:
-
-Enabling CFI creates a larger binary, which may be an issue in some use
-cases. However, the increase is not exceptionally large. On my Ubuntu
-system, with default options, I see an increase of stripped size from
-14MiB to 15.3MiB when enabling CFI with Clang v9.
-
-There is also a possible performance issue, since for every indirect
-function call, and additional address check is performed, followed by
-an additional indirect call to the trampoline function.
-However, especially in the case of KVM-based virtualization, the impact
-should be minimal, since indirect function pointers should be used mostly
-for device emulation.
-
-I used Kata Container's metrics tests since that is a simple,
-reproducible set of tests to stress storage and network between VMs,
-and run a Lifecycle test to measure VM startup times under a specific
-workload. A full report is available here [4].
-
-The difference between LLVM with and without CFI is generally low.
-Sometimes CFI is actually offering better performance, which may be
-explained by having a different binary layout because of LTO.
-Lifecycle and network do not seem to be affected much. With storage,
-the situation is a bit more variable, but the oscillations seem to be
-more related to the benchmark variability than the CFI overhead.
-
-I also run a quick check-acceptance on full system VMs with and without CFI,
-the results are at [4] and show comparable results, with CFI slightly
-outperforming the default binary produced by LLVM.
-
-----
-
-[1] Mehdi Talbi and Paul Fariello. VM escape - QEMU Case Study
-[2] Nelson Elhage. Virtunoid: Breaking out of KVM
-[3] Marco Grassi and Kira. Vulnerability Discovery and Exploitation
-of Virtualization Solutions for Cloud Computing and Desktops
-[4] https://github.com/dbuono/QEMU-CFI-Performance
-
-*** BLURB HERE ***
-
-Daniele Buono (6):
-  fuzz: Make fork_fuzz.ld compatible with LLVM's LLD
-  configure: avoid new clang 11+ warnings
-  configure: add option to enable LTO
-  cfi: Initial support for cfi-icall in QEMU
-  check-block: enable iotests with cfi-icall
-  configure: add support for Control-Flow Integrity
-
- MAINTAINERS                   |   5 +
- accel/tcg/cpu-exec.c          |   9 ++
- configure                     | 214 ++++++++++++++++++++++++++++++++++
- include/qemu/sanitizers.h     |  22 ++++
- meson.build                   |   3 +
- plugins/core.c                |  25 ++++
- plugins/loader.c              |   5 +
- tcg/tci.c                     |   5 +
- tests/check-block.sh          |  18 +--
- tests/qtest/fuzz/fork_fuzz.ld |  12 +-
- util/main-loop.c              |   9 ++
- util/oslib-posix.c            |   9 ++
- 12 files changed, 328 insertions(+), 8 deletions(-)
- create mode 100644 include/qemu/sanitizers.h
-
+diff --git a/configure b/configure
+index 9dc05cfb8a..e964040522 100755
+--- a/configure
++++ b/configure
+@@ -76,6 +76,7 @@ fi
+ TMPB="qemu-conf"
+ TMPC="${TMPDIR1}/${TMPB}.c"
+ TMPO="${TMPDIR1}/${TMPB}.o"
++TMPA="${TMPDIR1}/lib${TMPB}.a"
+ TMPCXX="${TMPDIR1}/${TMPB}.cxx"
+ TMPE="${TMPDIR1}/${TMPB}.exe"
+ TMPTXT="${TMPDIR1}/${TMPB}.txt"
+@@ -180,6 +181,32 @@ compile_prog() {
+       $LDFLAGS $CONFIGURE_LDFLAGS $QEMU_LDFLAGS $local_ldflags
+ }
+ 
++do_run_filter() {
++    # Run a generic program, capturing its output to the log,
++    # but also filtering the output with grep.
++    # Returns the return value of grep.
++    # First argument is the filter string.
++    # Second argument is binary to execute.
++    local filter="$1"
++    local filter_pattern=""
++    if test "$filter" = "yes"; then
++      shift
++      filter_pattern="$1"
++    fi
++    shift
++    local program="$1"
++    shift
++    echo $program $@ >> config.log
++    $program $@ >> config.log 2>&1 || return $?
++    if test "$filter" = "yes"; then
++      $program $@ 2>&1 | grep "${filter_pattern}" >> /dev/null || return $?
++    fi
++}
++
++create_library() {
++  do_run_filter "no" "$ar" -rc${1} $TMPA $TMPO
++}
++
+ # symbolically link $1 to $2.  Portable version of "ln -sf".
+ symlink() {
+   rm -rf "$2"
+@@ -242,6 +269,7 @@ host_cc="cc"
+ audio_win_int=""
+ libs_qga=""
+ debug_info="yes"
++lto="false"
+ stack_protector=""
+ safe_stack=""
+ use_containers="yes"
+@@ -1159,6 +1187,10 @@ for opt do
+   ;;
+   --disable-werror) werror="no"
+   ;;
++  --enable-lto) lto="true"
++  ;;
++  --disable-lto) lto="false"
++  ;;
+   --enable-stack-protector) stack_protector="yes"
+   ;;
+   --disable-stack-protector) stack_protector="no"
+@@ -1735,6 +1767,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+   module-upgrades try to load modules from alternate paths for upgrades
+   debug-tcg       TCG debugging (default is disabled)
+   debug-info      debugging information
++  lto             Enable Link-Time Optimization.
++                  Depends on clang/llvm >=6.0
+   sparse          sparse checker
+   safe-stack      SafeStack Stack Smash Protection. Depends on
+                   clang/llvm >= 3.7 and requires coroutine backend ucontext.
+@@ -5222,6 +5256,62 @@ if  test "$plugins" = "yes" &&
+ fi
+ 
+ ########################################
++# lto (Link-Time Optimization)
++
++if test "$lto" = "true"; then
++  # Test compiler/ar/linker support for lto.
++  # compilation with lto is handled by meson. Just make sure that compiler
++  # support is fully functional, and add additional compatibility flags
++  # if necessary.
++
++  if ! echo | $cc -dM -E - | grep __clang__ > /dev/null 2>&1 ; then
++    # LTO with GCC and other compilers is not tested, and possibly broken
++    error_exit "QEMU only supports LTO with CLANG"
++  fi
++
++  # Check that lto is supported.
++  # Need to check for:
++  # - Valid compiler, that supports lto flags
++  # - Valid ar, able to support intermediate code
++  # - Valid linker, able to support intermediate code
++
++  #### Check for a valid *ar* for link-time optimization.
++  # Test it by creating a static library and linking it
++  # Compile an object first
++  cat > $TMPC << EOF
++int fun(int val);
++
++int fun(int val) {
++    return val;
++}
++EOF
++  if ! compile_object "-Werror -flto"; then
++    error_exit "LTO is not supported by your compiler"
++  fi
++  # Create a library out of it
++  if ! create_library "s" ; then
++    error_exit "LTO is not supported by ar. This usually happens when mixing GNU and LLVM toolchain."
++  fi
++  # Now create a binary using the library
++  cat > $TMPC << EOF
++int fun(int val);
++
++int main(int argc, char *argv[]) {
++  return fun(0);
++}
++EOF
++  if ! compile_prog "-Werror" "$test_ldflag -flto ${TMPA}"; then
++    error_exit "LTO is not supported by ar or the linker. This usually happens when mixing GNU and LLVM toolchain."
++  fi
++
++  #### All good, add the flags for CFI to our CFLAGS and LDFLAGS
++  # Flag needed both at compilation and at linking
++  QEMU_LDFLAGS="$QEMU_LDFLAGS $test_ldflag"
++  # Add -flto to CONFIGURE_*FLAGS since we need it in configure,
++  # but will be added by meson later
++  CONFIGURE_CFLAGS="$QEMU_CFLAGS -flto"
++  CONFIGURE_LDFLAGS="$QEMU_LDFLAGS -flto"
++fi
+ # See if __attribute__((alias)) is supported.
+ # This false for Xcode 9, but has been remedied for Xcode 10.
+ # Unfortunately, travis uses Xcode 9 by default.
+@@ -5532,6 +5622,43 @@ if test "$fuzzing" = "yes" && test -z "${LIB_FUZZING_ENGINE+xxx}"; then
+     error_exit "Your compiler doesn't support -fsanitize=fuzzer"
+     exit 1
+   fi
++  # Make sure that the linker supports a custom linker script
++  # If LTO is enabled, switch linker to lld, since at the moment
++  # it is the only linker that works with lto and fuzzing:
++  # - gold does not support a custom script
++  # - bfd does not support wrapping functions with LTO
++  cat > $TMPC << EOF
++#include <stdlib.h>
++#include <stdio.h>
++void* __real_malloc(size_t size);
++void* __wrap_malloc(size_t size);
++
++void* __wrap_malloc(size_t size){
++  printf("Inside wrap_malloc\n");
++  return __real_malloc(size);
++}
++
++int main(int argc, char *argv[]) {
++  int *myint = (void*) malloc(sizeof(int));
++  *myint = 0;
++  return *myint;
++}
++EOF
++  extra_cflags="$CPU_CFLAGS -Werror"
++  extra_ldflags="-Wl,-T,${source_path}/tests/qtest/fuzz/fork_fuzz.ld"
++  extra_ldflags="${extra_ldflags} -Wl,--wrap,malloc"
++  if test "$lto" = "true"; then
++     extra_ldflags="${extra_ldflags} -fuse-ld=lld"
++  fi
++  if ! compile_prog "$extra_cflags" "$extra_ldflags"; then
++    error_exit "Your linker does not support our linker script"
++  fi
++  if ! do_run_filter "yes" "Inside wrap_malloc" ${TMPE} ""; then
++    error_exit "Your linker does not support our linker script"
++  fi
++  if test "$lto" = "true"; then
++     QEMU_LDFLAGS="${QEMU_LDFLAGS} -fuse-ld=lld"
++  fi
+ fi
+ 
+ # Thread sanitizer is, for now, much noisier than the other sanitizers;
+@@ -7018,6 +7145,7 @@ NINJA=$ninja $meson setup \
+         -Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
+         -Diconv=$iconv -Dcurses=$curses -Dlibudev=$libudev\
+         -Ddocs=$docs -Dsphinx_build=$sphinx_build \
++        -Db_lto=$lto \
+         $cross_arg \
+         "$PWD" "$source_path"
+ 
+diff --git a/meson.build b/meson.build
+index 7627a0ae46..50e5c527df 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1959,6 +1959,7 @@ summary_info += {'gprof enabled':     config_host.has_key('CONFIG_GPROF')}
+ summary_info += {'sparse enabled':    sparse.found()}
+ summary_info += {'strip binaries':    get_option('strip')}
+ summary_info += {'profiler':          config_host.has_key('CONFIG_PROFILER')}
++summary_info += {'link-time optimization (LTO)': get_option('b_lto')}
+ summary_info += {'static build':      config_host.has_key('CONFIG_STATIC')}
+ if targetos == 'darwin'
+   summary_info += {'Cocoa support': config_host.has_key('CONFIG_COCOA')}
 -- 
 2.17.1
 
