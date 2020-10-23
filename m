@@ -2,99 +2,89 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE664C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:56:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96703C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:56:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2B86320878
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:56:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E5AB120878
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:56:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="ak5WI1nu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B86320878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G4jyxAG8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5AB120878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48066 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzQJ-0000nF-4F
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:56:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35130)
+	id 1kVzQi-00018t-LT
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:56:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59438)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVz8B-0000BK-9z; Fri, 23 Oct 2020 11:37:28 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38922)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVz88-0002ph-FX; Fri, 23 Oct 2020 11:37:26 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603467444; x=1635003444;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=Gv/v2qUHT3RQ9WsyYe/7AJZc4P3ax+SAKTeS6rhbV1o=;
- b=ak5WI1nuLHEzpToJIJl8k0Pe66wqqnxRoE5C/RdYQNOgt+dRJri1nDnq
- wve4McADs+kU3NmcUuiGB68R4IecQfoR1V5F6wc+blEuCbWv3DoB4pNAI
- MdeUaItcMfx84H7qnxq/V2D4TOQJKuGGehvsd5czAKr+Ou5XRdn89DCTD
- vRo/GPfUNAPJspqwlXBBsbKs8zXdNB6FtaLdxw0kiGzVsFzW/iCEVN0XK
- 1Yg7YkV9pPtCdfalvFwJ8TMsBJnaqtPKPnaK+ZxVMtnQ+Y1QPFHIZgvUm
- I6YHI7c1qYZ4tb1S3/EcXOqVHqPl8TJoPE6JeUik2rysjP9Tunp7y7Osr w==;
-IronPort-SDR: en04BjEpHnlWO/LXhI6/EBG9psYbR5u7TdgglpiyLAoh4NUxD3hdvX/KdPTUEtwnWr+IzDKrMs
- 1G8oyPj3hhdf9paDaCTiR/ZPlRHoBCNrKWhxDd9C5lwbMs1j9CjJ+Jf5Kk5fCuwzEcSD563Eox
- mE5WfKeo2/XRhHp12hOHLs8oJz5+i1PSQSPsU7ugiYlrkH1KjxpDbjVwE0lgSdF9A10RcBeby9
- xbgIZm6H8BBF8Q4G/IPQuPKRMZSJsBp4IUbauWK410P60T3yznm/IQVmgY6oxV/EiVUtfSv0WE
- 9p8=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="260636261"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:37:22 +0800
-IronPort-SDR: dvbxy3ehYfy3ufIoWFw5+3IwkBw7BE5wbTzmW2QcYhITo4B4L5iCBe21J/uoUuMSkxdxnEyKUi
- iOhnwNJ7nXGXayPoS2fWgQLNgbRrsITcbrutuOx2XcGJ6D6RhxPqDHBumNZtyDFvxSgsyxaP21
- 2I3wn01BlM3sL2crA/XTEANU0P8o58JQKcOBJ0bffn4/r2O2MaI9yInooXGmhxb0YbNmjz+2Yt
- FZlqP2YqPkC3LkxSyWQnqfRFHxt4AkFL7j7B5IhtohTxGqLvniFnSNGodefupYVCVwcl32yoXw
- CKF8mhQ76/NtEBiDsbhFKJdY
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:23:44 -0700
-IronPort-SDR: 3yLSBvu5kFcoJ8weIUHVZK6cPHs+r5vdDpgjqlIgjvtwkC7gJ6cJVYCC/FvXtNu9qnlfpgZe+7
- t/iwgMBhw8A2d6anSGPC+nlN7QX8YjBTDL6Hi28WNuwvye++zco0BWWF8rE0ZmwOnmtgAzfn6H
- Mr/Tem2ETZLu0z6NIOL50txh9dLIdbjUhZMVnpp6i40mxDd1DG+kcAEmeLJPSfeLFrDKoQP3tx
- X1LXm9KcQAMV2l1HcsbUo7XtIamaXOD+9QtW5k/X5M9XvmlaRF8C9xn3DvZp1yWmns4eGGyYAS
- 1zc=
-WDCIronportException: Internal
-Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:37:22 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVyvd-0007wE-NK
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:24:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58001)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVyvX-00012S-3a
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:24:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603466662;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=0082Lo4MDolrcETSjUoN1/VyBCJMMbq8vm2eo+Y/Rp4=;
+ b=G4jyxAG8yy6xHsRTuKkfmMM8aHt8kVVLF3LZ/UWUMVFNRJMtEzZeaJB+5EjpnitftNXtWh
+ 1LIFwgS5f0sVq5beM4L5okO5oJliPbc1hR7eDxplU9lt9due99P3L+uJks8Jox4UiC4tr8
+ nYpdl7jzfdnNGmFCso1TBdweGAg22FU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-411-_iV1HjC5OUupzwhe3jgImA-1; Fri, 23 Oct 2020 11:24:16 -0400
+X-MC-Unique: _iV1HjC5OUupzwhe3jgImA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 31A2A108A47E;
+ Fri, 23 Oct 2020 15:23:53 +0000 (UTC)
+Received: from localhost (ovpn-114-178.ams2.redhat.com [10.36.114.178])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C707155794;
+ Fri, 23 Oct 2020 15:23:52 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 1/5] target/riscv: Add a virtualised MMU Mode
-Date: Fri, 23 Oct 2020 08:26:01 -0700
-Message-Id: <16213739a6232aa4824c5a008e2f669e6e58fbcf.1603466725.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603466725.git.alistair.francis@wdc.com>
-References: <cover.1603466725.git.alistair.francis@wdc.com>
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL v3 27/28] block/io: fix bdrv_is_allocated_above
+Date: Fri, 23 Oct 2020 16:21:46 +0100
+Message-Id: <20201023152147.1016281-28-stefanha@redhat.com>
+In-Reply-To: <20201023152147.1016281-1-stefanha@redhat.com>
+References: <20201023152147.1016281-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=558518344=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:37:20
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,73 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
- palmer@dabbelt.com, alistair23@gmail.com
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Alberto Garcia <berto@igalia.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new MMU mode that includes the current virt mode.
-
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu-param.h  | 2 +-
- target/riscv/cpu.h        | 4 +++-
- target/riscv/cpu_helper.c | 6 +++++-
- 3 files changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/target/riscv/cpu-param.h b/target/riscv/cpu-param.h
-index 664fc1d371..502ed6489e 100644
---- a/target/riscv/cpu-param.h
-+++ b/target/riscv/cpu-param.h
-@@ -18,6 +18,6 @@
- # define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
- #endif
- #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
--#define NB_MMU_MODES 4
-+#define NB_MMU_MODES 8
- 
- #endif
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index de4705bb57..8ac01f3a64 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -365,7 +365,9 @@ void QEMU_NORETURN riscv_raise_exception(CPURISCVState *env,
- target_ulong riscv_cpu_get_fflags(CPURISCVState *env);
- void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
- 
--#define TB_FLAGS_MMU_MASK   3
-+#define TB_FLAGS_MMU_MASK   7
-+#define TB_FLAGS_PRIV_MMU_MASK                3
-+#define TB_FLAGS_PRIV_HYP_ACCESS_MASK   (1 << 2)
- #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
- 
- typedef CPURISCVState CPUArchState;
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 4652082df1..46b62a0f37 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -30,6 +30,10 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
- #ifdef CONFIG_USER_ONLY
-     return 0;
- #else
-+    if (riscv_cpu_virt_enabled(env)) {
-+        return env->priv | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
-+    }
-+
-     return env->priv;
- #endif
- }
-@@ -336,7 +340,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-      * (riscv_cpu_do_interrupt) is correct */
-     MemTxResult res;
-     MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
--    int mode = mmu_idx;
-+    int mode = mmu_idx & 0x3;
-     bool use_background = false;
- 
-     /*
--- 
-2.28.0
+RnJvbTogVmxhZGltaXIgU2VtZW50c292LU9naWV2c2tpeSA8dnNlbWVudHNvdkB2aXJ0dW96em8u
+Y29tPgoKYmRydl9pc19hbGxvY2F0ZWRfYWJvdmUgd3JvbmdseSBoYW5kbGVzIHNob3J0IGJhY2tp
+bmcgZmlsZXM6IGl0IHJlcG9ydHMKYWZ0ZXItRU9GIHNwYWNlIGFzIFVOQUxMT0NBVEVEIHdoaWNo
+IGlzIHdyb25nLCBhcyBvbiByZWFkIHRoZSBkYXRhIGlzCmdlbmVyYXRlZCBvbiB0aGUgbGV2ZWwg
+b2Ygc2hvcnQgYmFja2luZyBmaWxlIChpZiBhbGwgb3ZlcmxheXMgaGF2ZQp1bmFsbG9jYXRlZCBh
+cmVhcyBhdCB0aGF0IHBsYWNlKS4KClJldXNpbmcgYmRydl9jb21tb25fYmxvY2tfc3RhdHVzX2Fi
+b3ZlIGZpeGVzIHRoZSBpc3N1ZSBhbmQgdW5pZmllcyBjb2RlCnBhdGguCgpTaWduZWQtb2ZmLWJ5
+OiBWbGFkaW1pciBTZW1lbnRzb3YtT2dpZXZza2l5IDx2c2VtZW50c292QHZpcnR1b3p6by5jb20+
+ClJldmlld2VkLWJ5OiBFcmljIEJsYWtlIDxlYmxha2VAcmVkaGF0LmNvbT4KUmV2aWV3ZWQtYnk6
+IEFsYmVydG8gR2FyY2lhIDxiZXJ0b0BpZ2FsaWEuY29tPgpNZXNzYWdlLWlkOiAyMDIwMDkyNDE5
+NDAwMy4yMjA4MC01LXZzZW1lbnRzb3ZAdmlydHVvenpvLmNvbQpbRml4IHMvaGFzL2hhdmUvIGFz
+IHN1Z2dlc3RlZCBieSBFcmljIEJsYWtlLiBGaXggcy9hcmVhL2FyZWFzLy4KLS1TdGVmYW5dClNp
+Z25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiBi
+bG9jay9pby5jIHwgNDMgKysrKystLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0t
+LQogMSBmaWxlIGNoYW5nZWQsIDUgaW5zZXJ0aW9ucygrKSwgMzggZGVsZXRpb25zKC0pCgpkaWZm
+IC0tZ2l0IGEvYmxvY2svaW8uYyBiL2Jsb2NrL2lvLmMKaW5kZXggYjYxNmJjNGFkYS4uMDI1Mjhi
+MzgyMyAxMDA2NDQKLS0tIGEvYmxvY2svaW8uYworKysgYi9ibG9jay9pby5jCkBAIC0yNDc3LDUy
+ICsyNDc3LDE5IEBAIGludCBjb3JvdXRpbmVfZm4gYmRydl9pc19hbGxvY2F0ZWQoQmxvY2tEcml2
+ZXJTdGF0ZSAqYnMsIGludDY0X3Qgb2Zmc2V0LAogICogYXQgJ29mZnNldCArICpwbnVtJyBtYXkg
+cmV0dXJuIHRoZSBzYW1lIGFsbG9jYXRpb24gc3RhdHVzIChpbiBvdGhlcgogICogd29yZHMsIHRo
+ZSByZXN1bHQgaXMgbm90IG5lY2Vzc2FyaWx5IHRoZSBtYXhpbXVtIHBvc3NpYmxlIHJhbmdlKTsK
+ICAqIGJ1dCAncG51bScgd2lsbCBvbmx5IGJlIDAgd2hlbiBlbmQgb2YgZmlsZSBpcyByZWFjaGVk
+LgotICoKICAqLwogaW50IGJkcnZfaXNfYWxsb2NhdGVkX2Fib3ZlKEJsb2NrRHJpdmVyU3RhdGUg
+KnRvcCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBCbG9ja0RyaXZlclN0YXRlICpiYXNl
+LAogICAgICAgICAgICAgICAgICAgICAgICAgICAgIGJvb2wgaW5jbHVkZV9iYXNlLCBpbnQ2NF90
+IG9mZnNldCwKICAgICAgICAgICAgICAgICAgICAgICAgICAgICBpbnQ2NF90IGJ5dGVzLCBpbnQ2
+NF90ICpwbnVtKQogewotICAgIEJsb2NrRHJpdmVyU3RhdGUgKmludGVybWVkaWF0ZTsKLSAgICBp
+bnQgcmV0OwotICAgIGludDY0X3QgbiA9IGJ5dGVzOwotCi0gICAgYXNzZXJ0KGJhc2UgfHwgIWlu
+Y2x1ZGVfYmFzZSk7Ci0KLSAgICBpbnRlcm1lZGlhdGUgPSB0b3A7Ci0gICAgd2hpbGUgKGluY2x1
+ZGVfYmFzZSB8fCBpbnRlcm1lZGlhdGUgIT0gYmFzZSkgewotICAgICAgICBpbnQ2NF90IHBudW1f
+aW50ZXI7Ci0gICAgICAgIGludDY0X3Qgc2l6ZV9pbnRlcjsKLQotICAgICAgICBhc3NlcnQoaW50
+ZXJtZWRpYXRlKTsKLSAgICAgICAgcmV0ID0gYmRydl9pc19hbGxvY2F0ZWQoaW50ZXJtZWRpYXRl
+LCBvZmZzZXQsIGJ5dGVzLCAmcG51bV9pbnRlcik7Ci0gICAgICAgIGlmIChyZXQgPCAwKSB7Ci0g
+ICAgICAgICAgICByZXR1cm4gcmV0OwotICAgICAgICB9Ci0gICAgICAgIGlmIChyZXQpIHsKLSAg
+ICAgICAgICAgICpwbnVtID0gcG51bV9pbnRlcjsKLSAgICAgICAgICAgIHJldHVybiAxOwotICAg
+ICAgICB9Ci0KLSAgICAgICAgc2l6ZV9pbnRlciA9IGJkcnZfZ2V0bGVuZ3RoKGludGVybWVkaWF0
+ZSk7Ci0gICAgICAgIGlmIChzaXplX2ludGVyIDwgMCkgewotICAgICAgICAgICAgcmV0dXJuIHNp
+emVfaW50ZXI7Ci0gICAgICAgIH0KLSAgICAgICAgaWYgKG4gPiBwbnVtX2ludGVyICYmCi0gICAg
+ICAgICAgICAoaW50ZXJtZWRpYXRlID09IHRvcCB8fCBvZmZzZXQgKyBwbnVtX2ludGVyIDwgc2l6
+ZV9pbnRlcikpIHsKLSAgICAgICAgICAgIG4gPSBwbnVtX2ludGVyOwotICAgICAgICB9Ci0KLSAg
+ICAgICAgaWYgKGludGVybWVkaWF0ZSA9PSBiYXNlKSB7Ci0gICAgICAgICAgICBicmVhazsKLSAg
+ICAgICAgfQotCi0gICAgICAgIGludGVybWVkaWF0ZSA9IGJkcnZfZmlsdGVyX29yX2Nvd19icyhp
+bnRlcm1lZGlhdGUpOworICAgIGludCByZXQgPSBiZHJ2X2NvbW1vbl9ibG9ja19zdGF0dXNfYWJv
+dmUodG9wLCBiYXNlLCBpbmNsdWRlX2Jhc2UsIGZhbHNlLAorICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgICAgICAgb2Zmc2V0LCBieXRlcywgcG51bSwgTlVMTCwgTlVMTCk7
+CisgICAgaWYgKHJldCA8IDApIHsKKyAgICAgICAgcmV0dXJuIHJldDsKICAgICB9CiAKLSAgICAq
+cG51bSA9IG47Ci0gICAgcmV0dXJuIDA7CisgICAgcmV0dXJuICEhKHJldCAmIEJEUlZfQkxPQ0tf
+QUxMT0NBVEVEKTsKIH0KIAogaW50IGNvcm91dGluZV9mbgotLSAKMi4yNi4yCgo=
 
 
