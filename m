@@ -2,97 +2,97 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8158C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:29:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 889C2C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:36:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 24C8220EDD
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:29:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C42D720EDD
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:36:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Etknw65e"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 24C8220EDD
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YzyXkEL1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C42D720EDD
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41812 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0su-0005ej-1q
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:29:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35074)
+	id 1kW0zC-0000hm-Nq
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:36:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW0rq-0005Aa-Pl
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:28:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:40154)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW0rn-0000pn-I8
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:28:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603474117;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=s4B9HjSFH3WCMv3APy5oLWe35uzGvHymgqmqQgiBcZo=;
- b=Etknw65eGoupy6RM+PrEaMXK5IGqjGxfgrBrcVir3Kf9vWKwWyxzNl3xUKLWAhHxdezR8r
- Yvg7oLNm6oXsL7NAGi2dyrUZ4SFsTSuYkygrTGMtBzOhB4goIK7LXHUsVS3MAw+ZoSU6N+
- jI1N5ZRWuLPjNslhaBOKQrWC8Qp8/W8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-201-Uv3A92SNOlCZpmVGpZ-Jbg-1; Fri, 23 Oct 2020 13:28:36 -0400
-X-MC-Unique: Uv3A92SNOlCZpmVGpZ-Jbg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 522788DFFF7;
- Fri, 23 Oct 2020 17:28:21 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5040981F41;
- Fri, 23 Oct 2020 17:27:57 +0000 (UTC)
-Date: Fri, 23 Oct 2020 19:27:55 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
- not ready
-Message-ID: <20201023192755.1845b060@redhat.com>
-In-Reply-To: <20201023115029-mutt-send-email-mst@kernel.org>
-References: <20201022080354-mutt-send-email-mst@kernel.org>
- <20201022235632.7f69ddc9@yekko.fritz.box>
- <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
- <20201022100028-mutt-send-email-mst@kernel.org>
- <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
- <20201022102857-mutt-send-email-mst@kernel.org>
- <CAC_L=vX0+H-SfQHneVPd-Mc3wFxHBSbkKHt3SpNOBOY_JsYDUA@mail.gmail.com>
- <20201022110016-mutt-send-email-mst@kernel.org>
- <20201023144901.5bd908a1@yekko.fritz.box>
- <CAC_L=vUh8LU5c8c00OhnbEiW7EzZFWKU61vOdub7c11wDMXeRg@mail.gmail.com>
- <20201023115029-mutt-send-email-mst@kernel.org>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kW0yK-0007sR-Az; Fri, 23 Oct 2020 13:35:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:44343)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kW0yI-0001is-GS; Fri, 23 Oct 2020 13:35:24 -0400
+Received: by mail-wr1-x442.google.com with SMTP id t9so2922173wrq.11;
+ Fri, 23 Oct 2020 10:35:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=fNj5eXTv9uSww8Em5BotaPpbN3t9ohV8mupF1oepGKc=;
+ b=YzyXkEL1uJSfxjHsFprrnb1g503YnEWB83y/X7TVe39JUd3O2jKMwJGnFRJ8BxFEDF
+ ObQlesC8ZqmGwKYlDzug0dD48M0vlD7APoUO1X6///NwffVXZL/TnMtv/4CftYBz8Eos
+ 73VgBMTNoD8i5YSp3YweZugN7StYD/lw0mLt1lMOlDAvLriyhPVTs4JCvEqSlG/+pSA0
+ Qar/ZuCc/1Sc3MgU3+N42YJbGjkauRZhtYThyvI83S5oxbrGtksjiCG/v6a1NXe5U9of
+ JJUDFrHg9lmrMqUdctOnHEB6gi3QVi7oAog+oIhHudStGETydmzCy4l7OPKFBmdRR7vl
+ ESyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=fNj5eXTv9uSww8Em5BotaPpbN3t9ohV8mupF1oepGKc=;
+ b=kFJou2d/BiN9PVR0SP1zE1Mf3BOtb1DEikiOn3qLSsNhKP1mBhj4zUmBRpzM59/LlK
+ N98x0iXFH0OmFTFIs5QKtIP4dpov3nL1GIAR0lnab08aeS0JnCNteGzdD3C4Xpqbr9wM
+ 1RBhA/75Uq8vpxYzODq0EBGVAdmDwfExctOxGGN3b/glFKuwPjN4H+bLI94EB3krdiR3
+ cfLO51XZUjy2AOd/KPDTuik0xhi8A07sSofCG/o3dfK7gIPHsQzWrjjzzimK8H7UVSRy
+ 09osVXMBjk9s21gM6NBS5i8ywLItKkwpLEHUAbC89MDmJqVdRex3cVHY4p0KAjeZ3sBz
+ GxnA==
+X-Gm-Message-State: AOAM531fETJMvdc4FIvPQOKxNqSdkiEY51kRyrBL3nAhimSfXXZkAZeE
+ irD03GEng0qVwBWFGyCsDXg=
+X-Google-Smtp-Source: ABdhPJwQ5N5grPnj9pPCPNUAwQYjFkwEzBJk0i2l1wzre8AwfA3c7goaKPCOm3njjP4uydU5tFO6ug==
+X-Received: by 2002:adf:e447:: with SMTP id t7mr3749423wrm.384.1603474520619; 
+ Fri, 23 Oct 2020 10:35:20 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id g8sm5498228wma.36.2020.10.23.10.35.19
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 23 Oct 2020 10:35:19 -0700 (PDT)
+Subject: Re: [PATCH v3 8/9] hw/arm/raspi: Add the Raspberry Pi Zero machine
+To: Igor Mammedov <imammedo@redhat.com>
+References: <20201018203358.1530378-1-f4bug@amsat.org>
+ <20201018203358.1530378-9-f4bug@amsat.org>
+ <20201023175130.50a379bd@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <af02ebea-0aeb-9e6a-5f79-95aeb10b1bb4@amsat.org>
+Date: Fri, 23 Oct 2020 19:35:19 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201023175130.50a379bd@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.108,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,160 +105,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Libvirt Mailing List <libvir-list@redhat.com>,
- David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, Luc Michel <luc@lmichel.fr>,
+ qemu-devel@nongnu.org, Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ qemu-arm@nongnu.org, Luc Michel <luc.michel@greensocs.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Oct 2020 11:54:40 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+Hi Igor,
 
-> On Fri, Oct 23, 2020 at 09:47:14AM +0300, Marcel Apfelbaum wrote:
-> > Hi David,
-> >=20
-> > On Fri, Oct 23, 2020 at 6:49 AM David Gibson <dgibson@redhat.com> wrote=
-:
-> >=20
-> >     On Thu, 22 Oct 2020 11:01:04 -0400
-> >     "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> >  =20
-> >     > On Thu, Oct 22, 2020 at 05:50:51PM +0300, Marcel Apfelbaum wrote:
-> >     >=C3=83=E2=80=9A=C3=82=C2=A0 [...]=C3=83=E2=80=9A=C3=82=C2=A0
-> >     >
-> >     > Right. After detecting just failing unconditionally it a bit too
-> >     > simplistic IMHO. =20
-> >=20
-> >     There's also another factor here, which I thought I'd mentioned
-> >     already, but looks like I didn't: I think we're still missing some
-> >     details in what's going on.
-> >=20
-> >     The premise for this patch is that plugging while the indicator is =
-in
-> >     transition state is allowed to fail in any way on the guest side.=
-=C3=83=E2=80=9A=C3=82=C2=A0 I
-> >     don't think that's a reasonable interpretation, because it's unwork=
-able
-> >     for physical hotplug.=C3=83=E2=80=9A=C3=82=C2=A0 If the indicator s=
-tarts blinking while you're in
-> >     the middle of shoving a card in, you'd be in trouble.
-> >=20
-> >     So, what I'm assuming here is that while "don't plug while blinking=
-" is
-> >     the instruction for the operator to obey as best they can, on the g=
-uest
-> >     side the rule has to be "start blinking, wait a while and by the ti=
-me
-> >     you leave blinking state again, you can be confident any plugs or
-> >     unplugs have completed".=C3=83=E2=80=9A=C3=82=C2=A0 Obviously still=
- racy in the strict computer
-> >     science sense, but about the best you can do with slow humans in th=
-e
-> >     mix.
-> >=20
-> >     So, qemu should of course endeavour to follow that rule as though i=
-t
-> >     was a human operator on a physical machine and not plug when the
-> >     indicator is blinking.=C3=83=E2=80=9A=C3=82=C2=A0 *But* the qemu pl=
-ug will in practice be fast
-> >     enough that if we're hitting real problems here, it suggests the gu=
-est
-> >     is still doing something wrong.
-> >=20
-> >=20
-> > I personally think there is a little bit of over-engineering=C3=83=E2=
-=80=9A=C3=82=C2=A0here.
-> > Let's start with the spec:
-> >=20
-> > =C3=83=E2=80=9A=C3=82=C2=A0 =C3=83=E2=80=9A=C3=82=C2=A0 Power Indicator=
- Blinking
-> > =C3=83=E2=80=9A=C3=82=C2=A0 =C3=83=E2=80=9A=C3=82=C2=A0 A blinking Powe=
-r Indicator indicates that the slot is powering up or
-> > powering down and that
-> > =C3=83=E2=80=9A=C3=82=C2=A0 =C3=83=E2=80=9A=C3=82=C2=A0 insertion or re=
-moval of the adapter is not permitted.
-> >=20
-> > What exactly is an interpretation here?
-> > As you stated, the races are theoretical, the whole point of the indica=
-tor
-> > is to let the operator know he can't plug the device just yet.
-> >=20
-> > I understand it would be more user friendly if the QEMU would wait inte=
-rnally
-> > for the
-> > blinking to end, but the whole point of the indicator is to let the ope=
-rator=C3=83=E2=80=9A=C3=82=C2=A0
-> > (human or machine)
-> > know they can't plug the device at a specific time.
-> > Should QEMU take the responsibility=C3=83=E2=80=9A=C3=82=C2=A0of the op=
-erator? Is it even correct?
-> >=20
-> > Even if we would want such a feature, how is it related to this patch?
-> > The patch simply refuses to start a hotplug operation when it knows it =
-will not
-> > succeed.=C3=83=E2=80=9A=C3=82=C2=A0
-> > =C3=83=E2=80=9A=C3=82=C2=A0
-> > Another way that would make sense to me would be=C3=83=E2=80=9A=C3=82=
-=C2=A0 is a new QEMU interface other
-> > than
-> > "add_device", let's say "adding_device_allowed", that would return true=
- if the
-> > hotplug is allowed
-> > at this point of time. (I am aware of the theoretical races)=C3=83=E2=
-=80=9A=C3=82=C2=A0 =20
->=20
-> Rather than adding_device_allowed, something like "query slot"
-> might be helpful for debugging. That would help user figure out
-> e.g. why isn't device visible without any races.
+On 10/23/20 5:51 PM, Igor Mammedov wrote:
+> On Sun, 18 Oct 2020 22:33:57 +0200
+> Philippe Mathieu-Daudé <f4bug@amsat.org> wrote:
+> 
+>> Similarly to the Pi A, the Pi Zero uses a BCM2835 SoC (ARMv6Z core).
+>>
+>> Example booting the machine using content from [*]:
+>>
+>>    $ qemu-system-arm -M raspi0 -serial stdio \
+>>        -kernel raspberrypi/firmware/boot/kernel.img \
+>>        -dtb raspberrypi/firmware/boot/bcm2708-rpi-zero.dtb \
+>>        -append 'printk.time=0 earlycon=pl011,0x20201000 console=ttyAMA0'
+>>    [    0.000000] Booting Linux on physical CPU 0x0
+>>    [    0.000000] Linux version 4.19.118+ (dom@buildbot) (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1311 Mon Apr 27 14:16:15 BST 2020
+>>    [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision 7 (ARMv7), cr=00c5387d
+>>    [    0.000000] CPU: VIPT aliasing data cache, unknown instruction cache
+>>    [    0.000000] OF: fdt: Machine model: Raspberry Pi Zero
+>>    ...
+>>
+>> [*] http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-kernel_1.20200512-2_armhf.deb
+>>
+>> Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>> ---
+>>   hw/arm/raspi.c | 13 +++++++++++++
+>>   1 file changed, 13 insertions(+)
+>>
+>> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+>> index 91a59d1d489..1510ca01afe 100644
+>> --- a/hw/arm/raspi.c
+>> +++ b/hw/arm/raspi.c
+>> @@ -319,6 +319,15 @@ static void raspi_machine_class_common_init(MachineClass *mc,
+>>       mc->default_ram_id = "ram";
+>>   };
+>>   
+>> +static void raspi0_machine_class_init(ObjectClass *oc, void *data)
+>> +{
+>> +    MachineClass *mc = MACHINE_CLASS(oc);
+>> +    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
+>> +
+>> +    rmc->board_rev = 0x900092;
+> 
+> shouldn't it be
+> 920092	Zero	1.2	512MB	Embest
+> or
+> 920093  Zero	1.3	512MB	Embest
 
-Would be new command useful tough? What we end up is broken guest
-(if I read commit message right) and a user who has no idea if=20
-device_add was successful or not.
-So what user should do in this case
-  - wait till it explodes?
-  - can user remove it or it would be stuck there forever?
-  - poll slot before hotplug, manually?
+I took the value from the "New-style revision codes"
+table listed in hw/arm/raspi.c before the REV_CODE
+register definitions:
 
-(if this is the case then failing device_add cleanly doesn't sound bad,
-it looks similar to another error we have "/* Check if hot-plug is disabled=
- on the slot */"
-in pcie_cap_slot_pre_plug_cb)
+https://www.raspberrypi.org/documentation/hardware/raspberrypi/revision-codes/README.md
 
-CCing libvirt, as it concerns not only QEMU.
+90009x's manufacturer is "Sony UK", 92009x is "Embest".
+I guess we don't care much the manufacturer :)
 
->=20
-> > The above will at least mimic the mechanics of the pyhs=C3=83=E2=80=9A=
-=C3=82=C2=A0world.=C3=83=E2=80=9A=C3=82=C2=A0 The operator
-> > looks at the indicator,
-> > the management software checks if adding the device is allowed.
-> > Since it is a corner case I would prefer the device_add to fail rather =
-than
-> > introducing a new interface,
-> > but that's just me.
-> >=20
-> > Thanks,
-> > Marcel
-> >  =20
->=20
-> I think we want QEMU management interface to be reasonably
-> abstract and agnostic if possible. Pushing knowledge of hardware
-> detail to management will just lead to pain IMHO.
-> We supported device_add which practically never fails for years,
+The Revision 1.3 exposed the MIPI camera interface.
+As we don't model it, I prefer to use the 1.2 revision
+which matches better.
 
-For CPUs and RAM, device_add can fail so maybe management is also
-prepared to handle errors on PCI hotplug path.
+I'll add this information in the commit description.
 
-> at this point it's easier to keep supporting it than
-> change all users ...
->=20
->=20
-> >=20
-> >     --
-> >     David Gibson <dgibson@redhat.com>
-> >     Principal Software Engineer, Virtualization, Red Hat
-> >  =20
->=20
->=20
+Thanks for reviewing!
 
+> 
+>> +    raspi_machine_class_common_init(mc, rmc->board_rev);
+>> +};
+>> +
+>>   static void raspi1ap_machine_class_init(ObjectClass *oc, void *data)
+>>   {
+>>       MachineClass *mc = MACHINE_CLASS(oc);
+>> @@ -352,6 +361,10 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
+>>   
+>>   static const TypeInfo raspi_machine_types[] = {
+>>       {
+>> +        .name           = MACHINE_TYPE_NAME("raspi0"),
+>> +        .parent         = TYPE_RASPI_MACHINE,
+>> +        .class_init     = raspi0_machine_class_init,
+>> +    }, {
+>>           .name           = MACHINE_TYPE_NAME("raspi1ap"),
+>>           .parent         = TYPE_RASPI_MACHINE,
+>>           .class_init     = raspi1ap_machine_class_init,
+> 
+> 
 
