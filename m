@@ -2,99 +2,95 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77D41C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:35:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7E1AC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A0CF4208C3
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:35:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E21E7208C3
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="rza2IUJL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A0CF4208C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K1/Iys18"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E21E7208C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34296 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW02L-00050Q-FX
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:35:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37420)
+	id 1kW040-0006d7-Qb
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40332)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzFz-00032F-6w; Fri, 23 Oct 2020 11:45:32 -0400
-Received: from esa6.hgst.iphmx.com ([216.71.154.45]:6193)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVzFu-0003ka-1n; Fri, 23 Oct 2020 11:45:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603467926; x=1635003926;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=jda6uFyOihTzKaAVgRYuX/hf6RU8mxfJGD/+tT4Ywhs=;
- b=rza2IUJLWd7pRBQyH7EtDkHBEOZLmZyqavSOcLoLAVEanu4rae7MOBF0
- vBVfBE7Dci2TjFk8ewQmEAwT8849S5Kr3U19tanWU3urP97C8FpceEjO9
- cbg6xoPZ7tIlYh6M/KfjJc4fW8FcvPOIGLNDl8J0FUcmWfAPC8zPppSfO
- /vmUBPshuoYnkDYrgI3JwK4EXY2xF7YTbgIfPLEJIAnE/WCIn1EaRsTYv
- 2cpmqpjFu6YdsXo6RBoiwUXtH89k8xB9qBRmFpzwbnpg90wZrznQ8h2GZ
- ilc1LYvwq5neiV0DqEdrFOW1FrNxn3gD3xpVO8WRg3AodcBBrApdFdgaG Q==;
-IronPort-SDR: gzy9iNYFddtqeyYnTOAIqiUQ9WCu3nYP9qv3DZSz+PyEpjOtI9OpmsFCOpuM0sMntXTReflH15
- DdoGs1aFtsoNIvFo7lpQhhwsXUaM/6b9hwnDfL/X7ErZVG8AtMmyBt/ykwsTpRMP7Y4Z2VOgGC
- +EP/55XM9Y3PfebuVkiJNa8p98Z5Fzl0QdvHjerzfHBMERdYS3CaR+aeYGiBY1Y5lWltFoKifg
- JKq1DY4zF3DtHlaPXXztgfZfXizB3Wq8lSEEnjH4zB3R/AgpfTS2MhTHDQzAZrYPmAhbHPoM4e
- E8c=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="151960182"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:45:18 +0800
-IronPort-SDR: izfu8yR+CLTCf0+zAqdC9ltaSufhP6UBPEw9F/ECVp8ivsxNZca8AN7o91ebhrorAWNHDa2dMB
- /7Tt/tt9+eiE76+MJjFgrFmSlkMNa7RpRDCEfl0LK/LMJ5jqVfpV5rTEBuFrRR7F2z+PoadfYq
- bGbGI8GVKP+teMtyTB1oG//VOOYS3Qou2U56v71bU1TDUZ18ty2WR6xA2srFLVyw3QOHc94Fax
- /OUMXSUhcAHiW+R/pWkO0SjkfziuCVQg8WrdZZKszimK8C6irmiBOHz2qbWzqD3hX7/UEoiSry
- SqMmBMUnDgfTOKaPX601eRyo
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:31:40 -0700
-IronPort-SDR: XzTyfU6IdPRk8is2Opukr4FD1ubWonGCfqPowhLY67Hq5q8wb+BRjZvC06hJ0d4QobB3/xNV2j
- 6RM6SFbx7dmxFZorA/N5juzmKolh35xgLfEDNghR8AXfB3C6SF5SohL3Z8J37YBwTHAltcc9vw
- XfiYeCmpb1vyqC9We7W1U87vNPCqKvLriuHg8LJCIdsF3dmkyqr7Q35hRUv1xEoMs93fcTAOYx
- kb9Yjc2N0nEcpVKP6kKb+lwe8DaK90VU5dlfqUFmp71+u15/CPnfpWq18aK17OpRKConLiznLG
- xA4=
-WDCIronportException: Internal
-Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.46])
- by uls-op-cesaip01.wdc.com with ESMTP; 23 Oct 2020 08:45:17 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 16/16] target/riscv: Consolidate *statush registers
-Date: Fri, 23 Oct 2020 08:33:56 -0700
-Message-Id: <ce9e33fdd36df39878df6657ecdc10e42c629b85.1603467169.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603467169.git.alistair.francis@wdc.com>
-References: <cover.1603467169.git.alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVzPv-0000Oz-Ty
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:55:47 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59765)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kVzPt-0005Hl-L0
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:55:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603468544;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iU3NOfsLIQJOHGM/gs3B5H2Cpk1ngy9rHda9it1TQCo=;
+ b=K1/Iys181H//Jq28iXyYzC1TkTgQYGKxF0hLlZeAn98pDJttZXSpxWuS8gQOaru5yh08Yk
+ wYhk3wXZzLkhAH+cR826fPAdtnFUdApvZ4hXPHM9bOj50Tj6MfNiJF8MeoHL05pzovGgNn
+ ZfaxyVlnsj5v77/j+McivadjcMQjtdo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-438-8oZyZG29O6SuBh5uSlmo2Q-1; Fri, 23 Oct 2020 11:55:43 -0400
+X-MC-Unique: 8oZyZG29O6SuBh5uSlmo2Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4246AA6B07;
+ Fri, 23 Oct 2020 15:55:09 +0000 (UTC)
+Received: from redhat.com (ovpn-113-117.ams2.redhat.com [10.36.113.117])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 55D3A756C5;
+ Fri, 23 Oct 2020 15:54:44 +0000 (UTC)
+Date: Fri, 23 Oct 2020 11:54:40 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
+Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
+ not ready
+Message-ID: <20201023115029-mutt-send-email-mst@kernel.org>
+References: <20201022080354-mutt-send-email-mst@kernel.org>
+ <20201022235632.7f69ddc9@yekko.fritz.box>
+ <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
+ <20201022100028-mutt-send-email-mst@kernel.org>
+ <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
+ <20201022102857-mutt-send-email-mst@kernel.org>
+ <CAC_L=vX0+H-SfQHneVPd-Mc3wFxHBSbkKHt3SpNOBOY_JsYDUA@mail.gmail.com>
+ <20201022110016-mutt-send-email-mst@kernel.org>
+ <20201023144901.5bd908a1@yekko.fritz.box>
+ <CAC_L=vUh8LU5c8c00OhnbEiW7EzZFWKU61vOdub7c11wDMXeRg@mail.gmail.com>
 MIME-Version: 1.0
+In-Reply-To: <CAC_L=vUh8LU5c8c00OhnbEiW7EzZFWKU61vOdub7c11wDMXeRg@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.45;
- envelope-from=prvs=558518344=alistair.francis@wdc.com;
- helo=esa6.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:44:34
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,298 +103,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, bmeng.cn@gmail.com, palmer@dabbelt.com,
- alistair23@gmail.com
+Cc: David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu.h        | 24 ++++++++++++++---------
- target/riscv/cpu_bits.h   | 14 ++-----------
- target/riscv/cpu.c        |  7 ++-----
- target/riscv/cpu_helper.c | 41 ++++++++++-----------------------------
- target/riscv/csr.c        | 15 ++++++++------
- target/riscv/op_helper.c  | 11 ++++-------
- 6 files changed, 42 insertions(+), 70 deletions(-)
+On Fri, Oct 23, 2020 at 09:47:14AM +0300, Marcel Apfelbaum wrote:
+> Hi David,
+> 
+> On Fri, Oct 23, 2020 at 6:49 AM David Gibson <dgibson@redhat.com> wrote:
+> 
+>     On Thu, 22 Oct 2020 11:01:04 -0400
+>     "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+>     > On Thu, Oct 22, 2020 at 05:50:51PM +0300, Marcel Apfelbaum wrote:
+>     >  [...] 
+>     >
+>     > Right. After detecting just failing unconditionally it a bit too
+>     > simplistic IMHO.
+> 
+>     There's also another factor here, which I thought I'd mentioned
+>     already, but looks like I didn't: I think we're still missing some
+>     details in what's going on.
+> 
+>     The premise for this patch is that plugging while the indicator is in
+>     transition state is allowed to fail in any way on the guest side.  I
+>     don't think that's a reasonable interpretation, because it's unworkable
+>     for physical hotplug.  If the indicator starts blinking while you're in
+>     the middle of shoving a card in, you'd be in trouble.
+> 
+>     So, what I'm assuming here is that while "don't plug while blinking" is
+>     the instruction for the operator to obey as best they can, on the guest
+>     side the rule has to be "start blinking, wait a while and by the time
+>     you leave blinking state again, you can be confident any plugs or
+>     unplugs have completed".  Obviously still racy in the strict computer
+>     science sense, but about the best you can do with slow humans in the
+>     mix.
+> 
+>     So, qemu should of course endeavour to follow that rule as though it
+>     was a human operator on a physical machine and not plug when the
+>     indicator is blinking.  *But* the qemu plug will in practice be fast
+>     enough that if we're hitting real problems here, it suggests the guest
+>     is still doing something wrong.
+> 
+> 
+> I personally think there is a little bit of over-engineering here.
+> Let's start with the spec:
+> 
+>     Power Indicator Blinking
+>     A blinking Power Indicator indicates that the slot is powering up or
+> powering down and that
+>     insertion or removal of the adapter is not permitted.
+> 
+> What exactly is an interpretation here?
+> As you stated, the races are theoretical, the whole point of the indicator
+> is to let the operator know he can't plug the device just yet.
+> 
+> I understand it would be more user friendly if the QEMU would wait internally
+> for the
+> blinking to end, but the whole point of the indicator is to let the operator 
+> (human or machine)
+> know they can't plug the device at a specific time.
+> Should QEMU take the responsibility of the operator? Is it even correct?
+> 
+> Even if we would want such a feature, how is it related to this patch?
+> The patch simply refuses to start a hotplug operation when it knows it will not
+> succeed. 
+>  
+> Another way that would make sense to me would be  is a new QEMU interface other
+> than
+> "add_device", let's say "adding_device_allowed", that would return true if the
+> hotplug is allowed
+> at this point of time. (I am aware of the theoretical races) 
 
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 8bde15544d..de864a947b 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -150,9 +150,11 @@ struct CPURISCVState {
-     target_ulong resetvec;
- 
-     target_ulong mhartid;
--    target_ulong mstatus;
--    /* This is RV32 only */
--    target_ulong mstatush;
-+    /*
-+     * For RV32 this is 32-bit mstatus and 32-bit mstatush.
-+     * For RV64 this is a 64-bit mstatus.
-+     */
-+    uint64_t mstatus;
- 
-     target_ulong mip;
- 
-@@ -187,15 +189,17 @@ struct CPURISCVState {
-     uint64_t htimedelta;
- 
-     /* Virtual CSRs */
--    target_ulong vsstatus;
-     target_ulong vstvec;
-     target_ulong vsscratch;
-     target_ulong vsepc;
-     target_ulong vscause;
-     target_ulong vstval;
-     target_ulong vsatp;
--    /* This is RV32 only */
--    target_ulong vsstatush;
-+    /*
-+     * For RV32 this is 32-bit mstatus and 32-bit mstatush.
-+     * For RV64 this is a 64-bit mstatus.
-+     */
-+    uint64_t vsstatus;
- 
-     target_ulong mtval2;
-     target_ulong mtinst;
-@@ -207,9 +211,11 @@ struct CPURISCVState {
-     target_ulong scause_hs;
-     target_ulong stval_hs;
-     target_ulong satp_hs;
--    target_ulong mstatus_hs;
--    /* This is RV32 only */
--    target_ulong mstatush_hs;
-+    /*
-+     * For RV32 this is 32-bit mstatus and 32-bit mstatush.
-+     * For RV64 this is a 64-bit mstatus.
-+     */
-+    uint64_t mstatus_hs;
- 
-     target_ulong scounteren;
-     target_ulong mcounteren;
-diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
-index db46739b1c..4b75d2766e 100644
---- a/target/riscv/cpu_bits.h
-+++ b/target/riscv/cpu_bits.h
-@@ -381,19 +381,9 @@
- #define MSTATUS_TVM         0x00100000 /* since: priv-1.10 */
- #define MSTATUS_TW          0x20000000 /* since: priv-1.10 */
- #define MSTATUS_TSR         0x40000000 /* since: priv-1.10 */
--#if defined(TARGET_RISCV64)
--#define MSTATUS_GVA         0x4000000000ULL
--#define MSTATUS_MPV         0x8000000000ULL
--#elif defined(TARGET_RISCV32)
--#define MSTATUS_GVA         0x00000040
--#define MSTATUS_MPV         0x00000080
--#endif
- 
--#ifdef TARGET_RISCV32
--# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatush, MSTATUS_MPV)
--#else
--# define MSTATUS_MPV_ISSET(env)  get_field(env->mstatus, MSTATUS_MPV)
--#endif
-+#define MSTATUS_GVA      0x4000000000ULL
-+#define MSTATUS_MPV      0x8000000000ULL
- 
- #define MSTATUS64_UXL       0x0000000300000000ULL
- #define MSTATUS64_SXL       0x0000000C00000000ULL
-diff --git a/target/riscv/cpu.c b/target/riscv/cpu.c
-index c77687ccb2..74c5ac5777 100644
---- a/target/riscv/cpu.c
-+++ b/target/riscv/cpu.c
-@@ -245,13 +245,10 @@ static void riscv_cpu_dump_state(CPUState *cs, FILE *f, int flags)
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "pc      ", env->pc);
- #ifndef CONFIG_USER_ONLY
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mhartid ", env->mhartid);
--    qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatus ", env->mstatus);
--    if (riscv_cpu_is_32bit(env)) {
--        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mstatush ", env->mstatush);
--    }
-+    qemu_fprintf(f, " %s %016lx\n", "mstatus ", env->mstatus);
-     if (riscv_has_ext(env, RVH)) {
-         qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "hstatus ", env->hstatus);
--        qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "vsstatus ", env->vsstatus);
-+        qemu_fprintf(f, " %s %016lx\n", "vsstatus ", env->vsstatus);
-     }
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mip     ", env->mip);
-     qemu_fprintf(f, " %s " TARGET_FMT_lx "\n", "mie     ", env->mie);
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 62aed24feb..b109529ace 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -110,27 +110,19 @@ bool riscv_cpu_fp_enabled(CPURISCVState *env)
- 
- void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
- {
--    target_ulong mstatus_mask = MSTATUS_MXR | MSTATUS_SUM | MSTATUS_FS |
--                                MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE;
-+    uint64_t mstatus_mask = MSTATUS_MXR | MSTATUS_SUM | MSTATUS_FS |
-+                            MSTATUS_SPP | MSTATUS_SPIE | MSTATUS_SIE |
-+                            MSTATUS64_UXL;
-     bool current_virt = riscv_cpu_virt_enabled(env);
- 
-     g_assert(riscv_has_ext(env, RVH));
- 
--#if defined(TARGET_RISCV64)
--    mstatus_mask |= MSTATUS64_UXL;
--#endif
--
-     if (current_virt) {
-         /* Current V=1 and we are about to change to V=0 */
-         env->vsstatus = env->mstatus & mstatus_mask;
-         env->mstatus &= ~mstatus_mask;
-         env->mstatus |= env->mstatus_hs;
- 
--        if (riscv_cpu_is_32bit(env)) {
--            env->vsstatush = env->mstatush;
--            env->mstatush |= env->mstatush_hs;
--        }
--
-         env->vstvec = env->stvec;
-         env->stvec = env->stvec_hs;
- 
-@@ -154,11 +146,6 @@ void riscv_cpu_swap_hypervisor_regs(CPURISCVState *env)
-         env->mstatus &= ~mstatus_mask;
-         env->mstatus |= env->vsstatus;
- 
--        if (riscv_cpu_is_32bit(env)) {
--            env->mstatush_hs = env->mstatush;
--            env->mstatush |= env->vsstatush;
--        }
--
-         env->stvec_hs = env->stvec;
-         env->stvec = env->vstvec;
- 
-@@ -729,7 +716,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-         access_type != MMU_INST_FETCH &&
-         get_field(env->mstatus, MSTATUS_MPRV) &&
--        MSTATUS_MPV_ISSET(env)) {
-+        get_field(env->mstatus, MSTATUS_MPV)) {
-         riscv_cpu_set_two_stage_lookup(env, true);
-     }
- 
-@@ -801,7 +788,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
-     if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
-         access_type != MMU_INST_FETCH &&
-         get_field(env->mstatus, MSTATUS_MPRV) &&
--        MSTATUS_MPV_ISSET(env)) {
-+        get_field(env->mstatus, MSTATUS_MPV)) {
-         riscv_cpu_set_two_stage_lookup(env, false);
-     }
- 
-@@ -864,7 +851,7 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-     RISCVCPU *cpu = RISCV_CPU(cs);
-     CPURISCVState *env = &cpu->env;
-     bool force_hs_execp = riscv_cpu_force_hs_excep_enabled(env);
--    target_ulong s;
-+    uint64_t s;
- 
-     /* cs->exception is 32-bits wide unlike mcause which is XLEN-bits wide
-      * so we mask off the MSB and separate into trap type and cause.
-@@ -997,18 +984,10 @@ void riscv_cpu_do_interrupt(CPUState *cs)
-             if (riscv_cpu_virt_enabled(env)) {
-                 riscv_cpu_swap_hypervisor_regs(env);
-             }
--            if (riscv_cpu_is_32bit(env)) {
--                env->mstatush = set_field(env->mstatush, MSTATUS_MPV,
--                                           riscv_cpu_virt_enabled(env));
--                if (riscv_cpu_virt_enabled(env) && tval) {
--                    env->mstatush = set_field(env->mstatush, MSTATUS_GVA, 1);
--                }
--            } else {
--                env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
--                                          riscv_cpu_virt_enabled(env));
--                if (riscv_cpu_virt_enabled(env) && tval) {
--                    env->mstatus = set_field(env->mstatus, MSTATUS_GVA, 1);
--                }
-+            env->mstatus = set_field(env->mstatus, MSTATUS_MPV,
-+                                     riscv_cpu_virt_enabled(env));
-+            if (riscv_cpu_virt_enabled(env) && tval) {
-+                env->mstatus = set_field(env->mstatus, MSTATUS_GVA, 1);
-             }
- 
-             mtval2 = env->guest_phys_fault_addr;
-diff --git a/target/riscv/csr.c b/target/riscv/csr.c
-index b153cdfec3..7132a9bcd0 100644
---- a/target/riscv/csr.c
-+++ b/target/riscv/csr.c
-@@ -473,8 +473,8 @@ static int validate_vm(CPURISCVState *env, target_ulong vm)
- 
- static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
- {
--    target_ulong mstatus = env->mstatus;
--    target_ulong mask = 0;
-+    uint64_t mstatus = env->mstatus;
-+    uint64_t mask = 0;
-     int dirty;
- 
-     /* flush tlb on mstatus fields that affect VM */
-@@ -507,19 +507,22 @@ static int write_mstatus(CPURISCVState *env, int csrno, target_ulong val)
- 
- static int read_mstatush(CPURISCVState *env, int csrno, target_ulong *val)
- {
--    *val = env->mstatush;
-+    *val = env->mstatus >> 32;
-     return 0;
- }
- 
- static int write_mstatush(CPURISCVState *env, int csrno, target_ulong val)
- {
--    if ((val ^ env->mstatush) & (MSTATUS_MPV)) {
-+    uint64_t val64 = (uint64_t) val << 32;
-+
-+    if ((val64 ^ env->mstatus) & (MSTATUS_MPV)) {
-         tlb_flush(env_cpu(env));
-     }
- 
--    val &= MSTATUS_MPV | MSTATUS_GVA;
-+    val64 &= MSTATUS_MPV | MSTATUS_GVA;
- 
--    env->mstatush = val;
-+    env->mstatus &= 0xFFFFFFFF;
-+    env->mstatus |= val64;
- 
-     return 0;
- }
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 4ce73575a7..f9361e3af8 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -78,7 +78,8 @@ target_ulong helper_csrrc(CPURISCVState *env, target_ulong src,
- 
- target_ulong helper_sret(CPURISCVState *env, target_ulong cpu_pc_deb)
- {
--    target_ulong prev_priv, prev_virt, mstatus;
-+    target_ulong prev_priv, prev_virt;
-+    uint64_t mstatus;
- 
-     if (!(env->priv >= PRV_S)) {
-         riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
-@@ -147,18 +148,14 @@ target_ulong helper_mret(CPURISCVState *env, target_ulong cpu_pc_deb)
-         riscv_raise_exception(env, RISCV_EXCP_INST_ADDR_MIS, GETPC());
-     }
- 
--    target_ulong mstatus = env->mstatus;
-+    uint64_t mstatus = env->mstatus;
-     target_ulong prev_priv = get_field(mstatus, MSTATUS_MPP);
--    target_ulong prev_virt = MSTATUS_MPV_ISSET(env);
-+    target_ulong prev_virt = !!get_field(env->mstatus, MSTATUS_MPV);
-     mstatus = set_field(mstatus, MSTATUS_MIE,
-                         get_field(mstatus, MSTATUS_MPIE));
-     mstatus = set_field(mstatus, MSTATUS_MPIE, 1);
-     mstatus = set_field(mstatus, MSTATUS_MPP, PRV_U);
--#ifdef TARGET_RISCV32
--    env->mstatush = set_field(env->mstatush, MSTATUS_MPV, 0);
--#else
-     mstatus = set_field(mstatus, MSTATUS_MPV, 0);
--#endif
-     env->mstatus = mstatus;
-     riscv_cpu_set_mode(env, prev_priv);
- 
--- 
-2.28.0
+Rather than adding_device_allowed, something like "query slot"
+might be helpful for debugging. That would help user figure out
+e.g. why isn't device visible without any races.
+
+
+> The above will at least mimic the mechanics of the pyhs world.  The operator
+> looks at the indicator,
+> the management software checks if adding the device is allowed.
+> Since it is a corner case I would prefer the device_add to fail rather than
+> introducing a new interface,
+> but that's just me.
+> 
+> Thanks,
+> Marcel
+> 
+
+I think we want QEMU management interface to be reasonably
+abstract and agnostic if possible. Pushing knowledge of hardware
+detail to management will just lead to pain IMHO.
+We supported device_add which practically never fails for years,
+at this point it's easier to keep supporting it than
+change all users ...
+
+
+> 
+>     --
+>     David Gibson <dgibson@redhat.com>
+>     Principal Software Engineer, Virtualization, Red Hat
+> 
 
 
