@@ -2,75 +2,98 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C796FC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:11:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63764C55178
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:14:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 095872192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:11:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 095872192A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id B6A8A2192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:14:15 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="paDgt8MQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A8A2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57432 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVuyd-0005sy-SW
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:11:19 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49422)
+	id 1kVv1S-0007XP-Md
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:14:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVuxa-0005OL-OC
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:10:14 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:42821)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVuxY-0005nT-8n
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:10:14 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.235])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id BC7EA6E7DAE6;
- Fri, 23 Oct 2020 13:10:08 +0200 (CEST)
-Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Fri, 23 Oct
- 2020 13:10:08 +0200
-Authentication-Results: garm.ovh; auth=pass
- (GARM-103G005aa0a12af-fb00-4f49-abf4-8f1f6f3837f3,
- C0BA1F4BE5C42AD64430581CA289E8EEBB8A5892) smtp.auth=groug@kaod.org
-Date: Fri, 23 Oct 2020 13:10:06 +0200
-From: Greg Kurz <groug@kaod.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Subject: Re: [PATCH] vhost: Don't special case vq->used_phys in
- vhost_get_log_size()
-Message-ID: <20201023131006.3bdb98bf@bahia.lan>
-In-Reply-To: <30e455d0-ac84-0be4-f1bb-5b7a98b1b66b@redhat.com>
-References: <160208823418.29027.15172801181796272300.stgit@bahia.lan>
- <30e455d0-ac84-0be4-f1bb-5b7a98b1b66b@redhat.com>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kVv0e-0006Te-G4; Fri, 23 Oct 2020 07:13:24 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:38893)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kVv0b-0006ye-Gd; Fri, 23 Oct 2020 07:13:22 -0400
+Received: by mail-wr1-x442.google.com with SMTP id n18so1359434wrs.5;
+ Fri, 23 Oct 2020 04:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=G9j2r8zy0UQ13szWxG3DfBiItx6wWb/uDGbW1g2pxS8=;
+ b=paDgt8MQCO3MjH+AJ1QUsJ5wszb+1wlX49wV+uv55U0hp0OhSR5ZfXJOJvDfFjMVUv
+ Xh58ErLeIEX7ymb01hqB2ZMDFbiIWDA6U2s7fXmvCe+i2HMD+8FNqBz+29IxuGV/h4uy
+ ZxtrWvk19DfJQri0D+4UM/5S4X7f6L9DxwsB4mK55FLYd9+xzUdxrkB/J7yzJNMk02kT
+ OG067TxA5O4t9uuKPWZM/l4gq9dtVGeY+nR4EV08AmlOyZtTYqzdnyRyr6Gqi+Z7G08L
+ uKyAcs87EgH8oM4pX8GsPsW7qIfOwWtHxkX+aB4PMu9EyvdWz+vwOf8HWUEnxMisqy6U
+ 0s0g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=G9j2r8zy0UQ13szWxG3DfBiItx6wWb/uDGbW1g2pxS8=;
+ b=IPdLAJ9ux00WZk2hy3lFiBt3RXDwdDErCFRSK8g1SI1oo6lJ+nCTGXipYoGT8uamuI
+ ugTJfZddHfYDrXNl1J8GgAK66tC9hDmAABRHg7yQbnR9SH2mK/LGT5uQHbh4//w+IyZh
+ xg2mARZw5teuSUA060Ob2f8V5Zws6OSCbvSPzApEiSamwvDhPxUO35wXkMYWUiW3B5cH
+ YFZ9rNEzEkIHCQOVYNEQT1t0Iosdte9jIjBkLYqGnYstTXmNKrYb4Jq7eb+5jrhBzhEF
+ 2Vxcx/sdTmQgVJeeRqKWVjNUvGZhaJqsbZMJruin17zg3TNrJ0meGGBT+oyXTMngnryB
+ zIqQ==
+X-Gm-Message-State: AOAM531qP+SmSz85aW5wzT6/TioKIpWg063yzrnGjukI79pFuiaDneqr
+ 0rjV79s3ridIa5phcUmEdFe7tWqBnss=
+X-Google-Smtp-Source: ABdhPJwZ4JEaJNWbKiC/VeR/JeyM6zOMIiy9iJS/iko0ZZis2/NNo6X0uLFCOZVeFjRJh5vybM3ATw==
+X-Received: by 2002:a5d:640d:: with SMTP id z13mr1997573wru.28.1603451599000; 
+ Fri, 23 Oct 2020 04:13:19 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id w83sm2677129wmg.48.2020.10.23.04.13.17
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 23 Oct 2020 04:13:18 -0700 (PDT)
+Subject: Re: [PATCH v3 00/15] raspi: add the bcm2835 cprman clock manager
+To: Guenter Roeck <linux@roeck-us.net>, Luc Michel <luc@lmichel.fr>,
+ qemu-devel@nongnu.org
+References: <20201010135759.437903-1-luc@lmichel.fr>
+ <f6c1ad96-ce36-e229-2a9d-d71070b82d82@amsat.org>
+ <9a858d15-5335-9036-058c-d752c2689219@roeck-us.net>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d90cc6f9-992d-dad8-d1cc-bc26d9a874bb@amsat.org>
+Date: Fri, 23 Oct 2020 13:13:17 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.103]
-X-ClientProxiedBy: DAG5EX2.mxp5.local (172.16.2.42) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: 4f1cc0ca-b5b6-4410-a47a-3f51a09c9337
-X-Ovh-Tracer-Id: 13407216093533936035
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrkedtgdefiecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnheptefffedttefggfekvdduvdfgudelvefghfduueegjeefgedtvdetheeufeetjeeinecuffhomhgrihhnpehrvgguhhgrthdrtghomhdpohiilhgrsghsrdhorhhgnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehlrghurhgvnhhtsehvihhvihgvrhdrvghu
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 06:57:22
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
+In-Reply-To: <9a858d15-5335-9036-058c-d752c2689219@roeck-us.net>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -15
+X-Spam_score: -1.6
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.108,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,76 +106,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, David Gibson <david@gibson.dropbear.id.au>
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Havard Skinnemoen <hskinnemoen@google.com>,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>,
+ Paul Zimmerman <pauldzim@gmail.com>,
+ Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, 10 Oct 2020 11:30:28 +0800
-Jason Wang <jasowang@redhat.com> wrote:
+On 10/23/20 5:55 AM, Guenter Roeck wrote:
+> On 10/22/20 3:06 PM, Philippe Mathieu-Daudé wrote:
+>> Cc'ing Guenter who had a similar patch and might be interested
+>> to test :)
+>>
+> I applied the series on top of qemu mainline and ran all my test with it
+> (raspi2 with qemu-system-arm as well as qemu-system-aarch64, and raspi3
+> in both big endian and little endian mode with qemu-system-aarch64.
+> All tests passed without error or kernel warning.
 
->=20
-> On 2020/10/8 =E4=B8=8A=E5=8D=8812:30, Greg Kurz wrote:
-> > The first loop in vhost_get_log_size() computes the size of the dirty l=
-og
-> > bitmap so that it allows to track changes in the entire guest memory, in
-> > terms of GPA.
-> >
-> > When not using a vIOMMU, the address of the vring's used structure,
-> > vq->used_phys, is a GPA. It is thus already covered by the first loop.
-> >
-> > When using a vIOMMU, vq->used_phys is a GIOVA that will be translated
-> > to an HVA when the vhost backend needs to update the used structure. It
-> > will log the corresponding GPAs into the bitmap but it certainly won't
-> > log the GIOVA.
-> >
-> > So in any case, vq->used_phys shouldn't be explicitly used to size the
-> > bitmap. Drop the second loop.
-> >
-> > This fixes a crash of the source when migrating a guest using in-kernel
-> > vhost-net and iommu_platform=3Don on POWER, because DMA regions are put
-> > over 0x800000000000000ULL. The resulting insanely huge log size causes
-> > g_malloc0() to abort.
-> >
-> > BugLink: https://bugzilla.redhat.com/show_bug.cgi?id=3D1879349
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> > ---
-> >
-> > This supersedes "vhost: Ignore vrings in dirty log when using a vIOMMU"
-> >
-> > http://patchwork.ozlabs.org/project/qemu-devel/patch/160105498386.68108=
-.2145229309875282336.stgit@bahia.lan/
-> > ---
-> >   hw/virtio/vhost.c |   10 ----------
-> >   1 file changed, 10 deletions(-)
-> >
-> > diff --git a/hw/virtio/vhost.c b/hw/virtio/vhost.c
-> > index 011951625442..c02b658b597f 100644
-> > --- a/hw/virtio/vhost.c
-> > +++ b/hw/virtio/vhost.c
-> > @@ -172,16 +172,6 @@ static uint64_t vhost_get_log_size(struct vhost_de=
-v *dev)
-> >                                          reg->memory_size);
-> >           log_size =3D MAX(log_size, last / VHOST_LOG_CHUNK + 1);
-> >       }
-> > -    for (i =3D 0; i < dev->nvqs; ++i) {
-> > -        struct vhost_virtqueue *vq =3D dev->vqs + i;
-> > -
-> > -        if (!vq->used_phys && !vq->used_size) {
-> > -            continue;
-> > -        }
-> > -
-> > -        uint64_t last =3D vq->used_phys + vq->used_size - 1;
-> > -        log_size =3D MAX(log_size, last / VHOST_LOG_CHUNK + 1);
-> > -    }
-> >       return log_size;
-> >   }
-> >  =20
->=20
->=20
-> Acked-by: Jason Wang <jasowang@redhat.com>
->=20
+Awesome :) I'm glad we finally get this complex part implemented.
 
-Ping ?
+Regards,
+
+Phil.
+
+> 
+> For the series:
+> 
+> Tested-by: Guenter Roeck <linux@roeck-us.net>
+> 
+> Guenter
 
