@@ -2,73 +2,77 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6225CC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:12:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05EC8C55178
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:12:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B395420878
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:12:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4BFAE20878
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 07:12:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbRuMAxG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B395420878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QtYisxdx"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4BFAE20878
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVrFd-0002nP-Dv
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:12:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60140)
+	id 1kVrFi-00030U-8v
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 03:12:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60036)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDm-000131-6h
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54200)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDi-0000vR-Jo
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30741)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDi-0003e5-2a
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:41 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kVrDg-0003c2-2R
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 03:10:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603437037;
+ s=mimecast20190719; t=1603437034;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=d/oAIn3nkyhrnG3V7Kj8kK6d6f9GUUSepLt603/6FAI=;
- b=bbRuMAxGb4Ibk5jSc6iklRwhy0WrysCqMe7wEKTR+H/dOp/Z3QAWHagJ0CaVRC2Sr7RV+P
- vNOgpHy72JORYXt82SxheiXf3qnWErXHQYK1bhy4A+tzaNPu/OZcsfQLnZ7itzv9ZCdD8n
- gyjYPfrM4kfc4HfyFMCj7/jK2qjwk+E=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+9HKCEY7PeyytYMMAkm21tXDmuRxndkLeIX+HeKhYCk=;
+ b=QtYisxdxT9ubncR8Y9jxv+qw+AzfsiB2T8QcilC72wmxvhs3kKfjLP2X12PdakX6TVJ3yc
+ /6wujbP6/lN6BNGjc4y6eFZtpj/pC7OVoF7P4PxjKt2N1b/4jeKC3k6GFjN1/0/pRRfckT
+ 0k68xyYSfbWD6t1cAXbV8wDZMvVHljE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-170-_zzv-H9pMwGmD-alitzdhw-1; Fri, 23 Oct 2020 03:10:33 -0400
-X-MC-Unique: _zzv-H9pMwGmD-alitzdhw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-160-4KCx7HXAOFerXJuNFZfFfg-1; Fri, 23 Oct 2020 03:10:33 -0400
+X-MC-Unique: 4KCx7HXAOFerXJuNFZfFfg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1EE7F5F9D5;
- Fri, 23 Oct 2020 07:10:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 889AA107B471;
+ Fri, 23 Oct 2020 07:10:31 +0000 (UTC)
 Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
  [10.36.114.66])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04BB05B4A1;
- Fri, 23 Oct 2020 07:10:23 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F38EF5D9CC;
+ Fri, 23 Oct 2020 07:10:22 +0000 (UTC)
 Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
- id 1D5F816E31; Fri, 23 Oct 2020 09:10:22 +0200 (CEST)
+ id 2C7631FCE5; Fri, 23 Oct 2020 09:10:22 +0200 (CEST)
 From: Gerd Hoffmann <kraxel@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 0/8] arm/virt: add usb support
-Date: Fri, 23 Oct 2020 09:10:14 +0200
-Message-Id: <20201023071022.24916-1-kraxel@redhat.com>
+Subject: [PATCH 2/8] tests/acpi: add empty tests/data/acpi/virt/DSDT.usb file
+Date: Fri, 23 Oct 2020 09:10:16 +0200
+Message-Id: <20201023071022.24916-3-kraxel@redhat.com>
+In-Reply-To: <20201023071022.24916-1-kraxel@redhat.com>
+References: <20201023071022.24916-1-kraxel@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
@@ -79,7 +83,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,32 +108,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Bring new microvm goodies to arm virt too.  Wire up=0D
--machine usb=3Don, add sysbus-xhci in case it is enabled.=0D
-=0D
-Gerd Hoffmann (8):=0D
-  tests/acpi: allow updates for expected data files=0D
-  tests/acpi: add empty tests/data/acpi/virt/DSDT.usb file=0D
-  arm/virt: add support for -machine usb=3Don=0D
-  arm/virt: add device tree node for xhci=0D
-  arm/virt: add acpi dsdt entry for xhci=0D
-  tests/acpi: add usb testcase for virt=0D
-  tests/acpi: update expected data files=0D
-  tests/acpi: disallow updates for expected data files=0D
-=0D
- include/hw/arm/virt.h            |   1 +=0D
- hw/arm/virt-acpi-build.c         |   6 ++++++=0D
- hw/arm/virt.c                    |  36 +++++++++++++++++++++++++++++++=0D
- hw/usb/hcd-xhci-sysbus.c         |   2 ++=0D
- tests/qtest/bios-tables-test.c   |  18 ++++++++++++++++=0D
- hw/arm/Kconfig                   |   1 +=0D
- tests/data/acpi/microvm/DSDT.usb | Bin 414 -> 426 bytes=0D
- tests/data/acpi/virt/DSDT.usb    | Bin 0 -> 5257 bytes=0D
- 8 files changed, 64 insertions(+)=0D
- create mode 100644 tests/data/acpi/virt/DSDT.usb=0D
-=0D
---=20=0D
-2.27.0=0D
-=0D
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ tests/data/acpi/virt/DSDT.usb | 0
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 tests/data/acpi/virt/DSDT.usb
+
+diff --git a/tests/data/acpi/virt/DSDT.usb b/tests/data/acpi/virt/DSDT.usb
+new file mode 100644
+index 000000000000..e69de29bb2d1
+-- 
+2.27.0
 
 
