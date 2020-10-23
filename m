@@ -7,47 +7,47 @@ X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 76416C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B57AC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:22:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D92B207BB
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:22:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E6E8F20874
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 11:22:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="Ev0UVW8Q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D92B207BB
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="mBR7YYd2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6E8F20874
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52526 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVv9F-0000r1-JI
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:22:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50674)
+	id 1kVv9b-0001dq-V3
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 07:22:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVv2p-0001YT-5u
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:15:39 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:8494)
+ id 1kVv1w-0008SW-HW
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:14:44 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:2718)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVv2n-0007iJ-4P
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:15:38 -0400
+ id 1kVv1u-0007Q6-1X
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 07:14:44 -0400
 Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f92bb4b0001>; Fri, 23 Oct 2020 04:15:23 -0700
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f92bac20001>; Fri, 23 Oct 2020 04:13:06 -0700
 Received: from HQMAIL109.nvidia.com (172.20.187.15) by HQMAIL107.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
- 2020 11:15:29 +0000
+ 2020 11:14:30 +0000
 Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
  (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Fri, 23 Oct 2020 11:15:20 +0000
+ Transport; Fri, 23 Oct 2020 11:14:21 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v28 14/17] vfio: Dirty page tracking when vIOMMU is enabled
-Date: Fri, 23 Oct 2020 16:10:40 +0530
-Message-ID: <1603449643-12851-15-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v28 08/17] vfio: Add save state functions to SaveVMHandlers
+Date: Fri, 23 Oct 2020 16:10:34 +0530
+Message-ID: <1603449643-12851-9-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
 References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
@@ -55,18 +55,18 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603451723; bh=6b/JrRWyqRq9qKQBnhSsvaPpUxUtXRJh5/ZhIWT6eG4=;
+ t=1603451586; bh=EJTSYQdlK7KYpw+MNotnoHfcb9df7EJ4bt4Y7WFh2qE=;
  h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
  References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=Ev0UVW8Qy7ag/4nWOjZPBhLYeFDuKz+jteT3e5X36AHksC6fxQKKlOsJHRlbwuNEF
- 9GhjKLznUCQg5kjl+x3dDXdTDAIiZDsTpGv84tAxg+KPVePW25jlFGqx1AkCH87jhC
- K/3fzT3C5Kf89Bddu/XYvl2bcdXbeZwKDy/Lh/lvikRo/8oUL8skSqH7OPpCIqwHPt
- 4abUfS9SWVSbLV8JDno63mPT+rBPh4a6RcVQDoRW+lPVAJL+fs0GKj9NVjTaPYWa1d
- B+v9WmnDnw8riyNKwrebJhljHEsxPYbV734dL7XIqiN8hrnCJG+LmGDgp2V82kCrYu
- v78uFJ0+ah8WA==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 07:14:11
+ b=mBR7YYd2CMf85X3AXMoUfWxRgYwLPJD262W0ck/voSCCHoAw0EAnCRnW17YLV9xKt
+ IcwHsnDFKK3G7sAp4T8xL3w0KW1oce88s2kRjoM1+7FQc44fqF9vavmINr2/nqGrlH
+ xSik+EJneQF4cru/MAF27yYxSJzMyBxRX7kjnqDEp6m7jgHx9tMcCShPdJKt9QERLV
+ vDU30VXaSuoazTog1Bf4f8kpfZ04hz8bCiyfZk87lCHMhzU52rQoh0uL9jEYArvV27
+ zVXWRuP/6/Fa9LMrVAmor3IDpDfP8ysGodtyKxpVTPLfoP1Mptm/Nw4eY9Iz46aBOz
+ ikixNnRJOHVFw==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:59:19
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -70
 X-Spam_score: -7.1
@@ -101,158 +101,376 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When vIOMMU is enabled, add MAP notifier from log_sync when all
-devices in container are in stop and copy phase of migration. Call replay
-and then from notifier callback, get dirty pages.
+Added .save_live_pending, .save_live_iterate and .save_live_complete_precopy
+functions. These functions handles pre-copy and stop-and-copy phase.
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+In _SAVING|_RUNNING device state or pre-copy phase:
+- read pending_bytes. If pending_bytes > 0, go through below steps.
+- read data_offset - indicates kernel driver to write data to staging
+  buffer.
+- read data_size - amount of data in bytes written by vendor driver in
+  migration region.
+- read data_size bytes of data from data_offset in the migration region.
+- Write data packet to file stream as below:
+{VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data,
+VFIO_MIG_FLAG_END_OF_STATE }
+
+In _SAVING device state or stop-and-copy phase
+a. read config space of device and save to migration file stream. This
+   doesn't need to be from vendor driver. Any other special config state
+   from driver can be saved as data in following iteration.
+b. read pending_bytes. If pending_bytes > 0, go through below steps.
+c. read data_offset - indicates kernel driver to write data to staging
+   buffer.
+d. read data_size - amount of data in bytes written by vendor driver in
+   migration region.
+e. read data_size bytes of data from data_offset in the migration region.
+f. Write data packet as below:
+   {VFIO_MIG_FLAG_DEV_DATA_STATE, data_size, actual data}
+g. iterate through steps b to f while (pending_bytes > 0)
+h. Write {VFIO_MIG_FLAG_END_OF_STATE}
+
+When data region is mapped, its user's responsibility to read data from
+data_offset of data_size before moving to next steps.
+
+Added fix suggested by Artem Polyakov to reset pending_bytes in
+vfio_save_iterate().
+Added fix suggested by Zhi Wang to add 0 as data size in migration stream and
+add END_OF_STATE delimiter to indicate phase complete.
+
+Suggested-by: Artem Polyakov <artemp@nvidia.com>
+Suggested-by: Zhi Wang <zhi.wang.linux@gmail.com>
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
 ---
- hw/vfio/common.c     | 88 ++++++++++++++++++++++++++++++++++++++++++++++++----
- hw/vfio/trace-events |  1 +
- 2 files changed, 83 insertions(+), 6 deletions(-)
+ hw/vfio/migration.c           | 276 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |   6 +
+ include/hw/vfio/vfio-common.h |   1 +
+ 3 files changed, 283 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 2634387df948..c0b5b6245a47 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -442,8 +442,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index 94d2bdae5c54..be9e4aba541d 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -148,6 +148,151 @@ static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
+     return 0;
  }
  
- /* Called with rcu_read_lock held.  */
--static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
--                           bool *read_only)
-+static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
-+                               ram_addr_t *ram_addr, bool *read_only)
- {
-     MemoryRegion *mr;
-     hwaddr xlat;
-@@ -474,8 +474,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
-         return false;
-     }
- 
--    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
--    *read_only = !writable || mr->readonly;
-+    if (vaddr) {
-+        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
-+    }
-+
-+    if (ram_addr) {
-+        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
-+    }
-+
-+    if (read_only) {
-+        *read_only = !writable || mr->readonly;
-+    }
- 
-     return true;
- }
-@@ -485,7 +494,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
-     VFIOContainer *container = giommu->container;
-     hwaddr iova = iotlb->iova + giommu->iommu_offset;
--    bool read_only;
-     void *vaddr;
-     int ret;
- 
-@@ -501,7 +509,9 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-     rcu_read_lock();
- 
-     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
--        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
-+        bool read_only;
-+
-+        if (!vfio_get_xlat_addr(iotlb, &vaddr, NULL, &read_only)) {
-             goto out;
-         }
-         /*
-@@ -899,11 +909,77 @@ err_out:
-     return ret;
- }
- 
-+typedef struct {
-+    IOMMUNotifier n;
-+    VFIOGuestIOMMU *giommu;
-+} vfio_giommu_dirty_notifier;
-+
-+static void vfio_iommu_map_dirty_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
++static void *get_data_section_size(VFIORegion *region, uint64_t data_offset,
++                                   uint64_t data_size, uint64_t *size)
 +{
-+    vfio_giommu_dirty_notifier *gdn = container_of(n,
-+                                                vfio_giommu_dirty_notifier, n);
-+    VFIOGuestIOMMU *giommu = gdn->giommu;
-+    VFIOContainer *container = giommu->container;
-+    hwaddr iova = iotlb->iova + giommu->iommu_offset;
-+    ram_addr_t translated_addr;
++    void *ptr = NULL;
++    uint64_t limit = 0;
++    int i;
 +
-+    trace_vfio_iommu_map_dirty_notify(iova, iova + iotlb->addr_mask);
++    if (!region->mmaps) {
++        if (size) {
++            *size = MIN(data_size, region->size - data_offset);
++        }
++        return ptr;
++    }
 +
-+    if (iotlb->target_as != &address_space_memory) {
-+        error_report("Wrong target AS \"%s\", only system memory is allowed",
-+                     iotlb->target_as->name ? iotlb->target_as->name : "none");
++    for (i = 0; i < region->nr_mmaps; i++) {
++        VFIOMmap *map = region->mmaps + i;
++
++        if ((data_offset >= map->offset) &&
++            (data_offset < map->offset + map->size)) {
++
++            /* check if data_offset is within sparse mmap areas */
++            ptr = map->mmap + data_offset - map->offset;
++            if (size) {
++                *size = MIN(data_size, map->offset + map->size - data_offset);
++            }
++            break;
++        } else if ((data_offset < map->offset) &&
++                   (!limit || limit > map->offset)) {
++            /*
++             * data_offset is not within sparse mmap areas, find size of
++             * non-mapped area. Check through all list since region->mmaps list
++             * is not sorted.
++             */
++            limit = map->offset;
++        }
++    }
++
++    if (!ptr && size) {
++        *size = limit ? MIN(data_size, limit - data_offset) : data_size;
++    }
++    return ptr;
++}
++
++static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region;
++    uint64_t data_offset = 0, data_size = 0, sz;
++    int ret;
++
++    ret = vfio_mig_read(vbasedev, &data_offset, sizeof(data_offset),
++                      region->fd_offset + VFIO_MIG_STRUCT_OFFSET(data_offset));
++    if (ret < 0) {
++        return ret;
++    }
++
++    ret = vfio_mig_read(vbasedev, &data_size, sizeof(data_size),
++                        region->fd_offset + VFIO_MIG_STRUCT_OFFSET(data_size));
++    if (ret < 0) {
++        return ret;
++    }
++
++    trace_vfio_save_buffer(vbasedev->name, data_offset, data_size,
++                           migration->pending_bytes);
++
++    qemu_put_be64(f, data_size);
++    sz = data_size;
++
++    while (sz) {
++        void *buf;
++        uint64_t sec_size;
++        bool buf_allocated = false;
++
++        buf = get_data_section_size(region, data_offset, sz, &sec_size);
++
++        if (!buf) {
++            buf = g_try_malloc(sec_size);
++            if (!buf) {
++                error_report("%s: Error allocating buffer ", __func__);
++                return -ENOMEM;
++            }
++            buf_allocated = true;
++
++            ret = vfio_mig_read(vbasedev, buf, sec_size,
++                                region->fd_offset + data_offset);
++            if (ret < 0) {
++                g_free(buf);
++                return ret;
++            }
++        }
++
++        qemu_put_buffer(f, buf, sec_size);
++
++        if (buf_allocated) {
++            g_free(buf);
++        }
++        sz -= sec_size;
++        data_offset += sec_size;
++    }
++
++    ret = qemu_file_get_error(f);
++
++    if (!ret && size) {
++        *size = data_size;
++    }
++
++    return ret;
++}
++
++static int vfio_update_pending(VFIODevice *vbasedev)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region;
++    uint64_t pending_bytes = 0;
++    int ret;
++
++    ret = vfio_mig_read(vbasedev, &pending_bytes, sizeof(pending_bytes),
++                    region->fd_offset + VFIO_MIG_STRUCT_OFFSET(pending_bytes));
++    if (ret < 0) {
++        migration->pending_bytes = 0;
++        return ret;
++    }
++
++    migration->pending_bytes = pending_bytes;
++    trace_vfio_update_pending(vbasedev->name, pending_bytes);
++    return 0;
++}
++
++static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_CONFIG_STATE);
++
++    if (vbasedev->ops && vbasedev->ops->vfio_save_config) {
++        vbasedev->ops->vfio_save_config(vbasedev, f);
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    trace_vfio_save_device_config_state(vbasedev->name);
++
++    return qemu_file_get_error(f);
++}
++
+ static void vfio_migration_cleanup(VFIODevice *vbasedev)
+ {
+     VFIOMigration *migration = vbasedev->migration;
+@@ -210,9 +355,140 @@ static void vfio_save_cleanup(void *opaque)
+     trace_vfio_save_cleanup(vbasedev->name);
+ }
+ 
++static void vfio_save_pending(QEMUFile *f, void *opaque,
++                              uint64_t threshold_size,
++                              uint64_t *res_precopy_only,
++                              uint64_t *res_compatible,
++                              uint64_t *res_postcopy_only)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    int ret;
++
++    ret = vfio_update_pending(vbasedev);
++    if (ret) {
 +        return;
 +    }
 +
-+    rcu_read_lock();
-+    if (vfio_get_xlat_addr(iotlb, NULL, &translated_addr, NULL)) {
-+        int ret;
++    *res_precopy_only += migration->pending_bytes;
 +
-+        ret = vfio_get_dirty_bitmap(container, iova, iotlb->addr_mask + 1,
-+                                    translated_addr);
-+        if (ret) {
-+            error_report("vfio_iommu_map_dirty_notify(%p, 0x%"HWADDR_PRIx", "
-+                         "0x%"HWADDR_PRIx") = %d (%m)",
-+                         container, iova,
-+                         iotlb->addr_mask + 1, ret);
-+        }
-+    }
-+    rcu_read_unlock();
++    trace_vfio_save_pending(vbasedev->name, *res_precopy_only,
++                            *res_postcopy_only, *res_compatible);
 +}
 +
- static int vfio_sync_dirty_bitmap(VFIOContainer *container,
-                                   MemoryRegionSection *section)
- {
-     ram_addr_t ram_addr;
- 
-+    if (memory_region_is_iommu(section->mr)) {
-+        VFIOGuestIOMMU *giommu;
++static int vfio_save_iterate(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    uint64_t data_size;
++    int ret;
 +
-+        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
-+            if (MEMORY_REGION(giommu->iommu) == section->mr &&
-+                giommu->n.start == section->offset_within_region) {
-+                Int128 llend;
-+                vfio_giommu_dirty_notifier gdn = { .giommu = giommu };
-+                int idx = memory_region_iommu_attrs_to_index(giommu->iommu,
-+                                                       MEMTXATTRS_UNSPECIFIED);
++    qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
 +
-+                llend = int128_add(int128_make64(section->offset_within_region),
-+                                   section->size);
-+                llend = int128_sub(llend, int128_one());
-+
-+                iommu_notifier_init(&gdn.n,
-+                                    vfio_iommu_map_dirty_notify,
-+                                    IOMMU_NOTIFIER_MAP,
-+                                    section->offset_within_region,
-+                                    int128_get64(llend),
-+                                    idx);
-+                memory_region_iommu_replay(giommu->iommu, &gdn.n);
-+                break;
-+            }
++    if (migration->pending_bytes == 0) {
++        ret = vfio_update_pending(vbasedev);
++        if (ret) {
++            return ret;
 +        }
-+        return 0;
++
++        if (migration->pending_bytes == 0) {
++            qemu_put_be64(f, 0);
++            qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++            /* indicates data finished, goto complete phase */
++            return 1;
++        }
 +    }
 +
-     ram_addr = memory_region_get_ram_addr(section->mr) +
-                section->offset_within_region;
++    ret = vfio_save_buffer(f, vbasedev, &data_size);
++    if (ret) {
++        error_report("%s: vfio_save_buffer failed %s", vbasedev->name,
++                     strerror(errno));
++        return ret;
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        return ret;
++    }
++
++    /*
++     * Reset pending_bytes as .save_live_pending is not called during savevm or
++     * snapshot case, in such case vfio_update_pending() at the start of this
++     * function updates pending_bytes.
++     */
++    migration->pending_bytes = 0;
++    trace_vfio_save_iterate(vbasedev->name, data_size);
++    return 0;
++}
++
++static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    uint64_t data_size;
++    int ret;
++
++    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_RUNNING,
++                                   VFIO_DEVICE_STATE_SAVING);
++    if (ret) {
++        error_report("%s: Failed to set state STOP and SAVING",
++                     vbasedev->name);
++        return ret;
++    }
++
++    ret = vfio_save_device_config_state(f, opaque);
++    if (ret) {
++        return ret;
++    }
++
++    ret = vfio_update_pending(vbasedev);
++    if (ret) {
++        return ret;
++    }
++
++    while (migration->pending_bytes > 0) {
++        qemu_put_be64(f, VFIO_MIG_FLAG_DEV_DATA_STATE);
++        ret = vfio_save_buffer(f, vbasedev, &data_size);
++        if (ret < 0) {
++            error_report("%s: Failed to save buffer", vbasedev->name);
++            return ret;
++        }
++
++        if (data_size == 0) {
++            break;
++        }
++
++        ret = vfio_update_pending(vbasedev);
++        if (ret) {
++            return ret;
++        }
++    }
++
++    qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++
++    ret = qemu_file_get_error(f);
++    if (ret) {
++        return ret;
++    }
++
++    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_SAVING, 0);
++    if (ret) {
++        error_report("%s: Failed to set state STOPPED", vbasedev->name);
++        return ret;
++    }
++
++    trace_vfio_save_complete_precopy(vbasedev->name);
++    return ret;
++}
++
+ static SaveVMHandlers savevm_vfio_handlers = {
+     .save_setup = vfio_save_setup,
+     .save_cleanup = vfio_save_cleanup,
++    .save_live_pending = vfio_save_pending,
++    .save_live_iterate = vfio_save_iterate,
++    .save_live_complete_precopy = vfio_save_complete_precopy,
+ };
  
+ /* ---------------------------------------------------------------------- */
 diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index dd991bd8f265..c0e75f24b76d 100644
+index f148b5e828c1..9f5712dab1ea 100644
 --- a/hw/vfio/trace-events
 +++ b/hw/vfio/trace-events
-@@ -164,3 +164,4 @@ vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
- vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
- vfio_load_cleanup(const char *name) " (%s)"
- vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
-+vfio_iommu_map_dirty_notify(uint64_t iova_start, uint64_t iova_end) "iommu dirty @ 0x%"PRIx64" - 0x%"PRIx64
+@@ -153,3 +153,9 @@ vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t
+ vfio_migration_state_notifier(const char *name, const char *state) " (%s) state %s"
+ vfio_save_setup(const char *name) " (%s)"
+ vfio_save_cleanup(const char *name) " (%s)"
++vfio_save_buffer(const char *name, uint64_t data_offset, uint64_t data_size, uint64_t pending) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64" pending 0x%"PRIx64
++vfio_update_pending(const char *name, uint64_t pending) " (%s) pending 0x%"PRIx64
++vfio_save_device_config_state(const char *name) " (%s)"
++vfio_save_pending(const char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible 0x%"PRIx64
++vfio_save_iterate(const char *name, int data_size) " (%s) data_size %d"
++vfio_save_complete_precopy(const char *name) " (%s)"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 2bd593ba38bb..f4ebdae013ad 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -65,6 +65,7 @@ typedef struct VFIOMigration {
+     uint32_t device_state;
+     int vm_running;
+     Notifier migration_state;
++    uint64_t pending_bytes;
+ } VFIOMigration;
+ 
+ typedef struct VFIOAddressSpace {
 -- 
 2.7.0
 
