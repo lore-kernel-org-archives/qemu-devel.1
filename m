@@ -2,85 +2,81 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34EFBC55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D596DC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:14:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE882168B
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2B3B8208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 10:14:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="jcmf8W0f"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE882168B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="egEprZDM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2B3B8208B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58812 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVtsG-0002Zj-BB
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:00:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34444)
+	id 1kVu5H-00074N-UA
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 06:14:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37618)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVtr1-00026b-Ry
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:59:23 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:12831)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kVtqz-0004tP-E8
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:59:23 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f92a9180000>; Fri, 23 Oct 2020 02:57:44 -0700
-Received: from [10.40.101.194] (10.124.1.5) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Fri, 23 Oct
- 2020 09:59:05 +0000
-Subject: Re: [PATCH v27 09/17] vfio: Add load state functions to SaveVMHandlers
-To: Alex Williamson <alex.williamson@redhat.com>
-References: <1603365127-14202-1-git-send-email-kwankhede@nvidia.com>
- <1603365127-14202-10-git-send-email-kwankhede@nvidia.com>
- <20201022135015.7e4e2742@w520.home>
-X-Nvconfidentiality: public
-From: Kirti Wankhede <kwankhede@nvidia.com>
-Message-ID: <4b97e667-e880-1cca-95b5-b0e9104d26ca@nvidia.com>
-Date: Fri, 23 Oct 2020 15:29:01 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.12.1
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVu4C-0005Pr-CW
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:13:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47926)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVu4A-0001bI-00
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 06:13:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603447976;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=gSp78aYnfBQazXAWBJcm69s0Ji1f69fThU0FHl/a+8Y=;
+ b=egEprZDMH90d6gpptN3jxLxsCQ7QitO2htc7Q1pntgAYOJlkjRTQXhSfFWjEcoWhSBV+6J
+ Fc0Jzq1czFEXWv0UiAxhtEudupOcQ6MTYh3r375SP691QYHXztzlGXUtmwxqFtMOyRgZ8z
+ EAbvFEL4+j9Evcqb/wwj2hFEi/3ebfo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-418-IdF_BeBAN4-QqyoUMZ5YIA-1; Fri, 23 Oct 2020 06:12:54 -0400
+X-MC-Unique: IdF_BeBAN4-QqyoUMZ5YIA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5D4E3805F05;
+ Fri, 23 Oct 2020 10:12:53 +0000 (UTC)
+Received: from merkur.redhat.com (ovpn-113-206.ams2.redhat.com [10.36.113.206])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DEC786EF65;
+ Fri, 23 Oct 2020 10:12:48 +0000 (UTC)
+From: Kevin Wolf <kwolf@redhat.com>
+To: qemu-block@nongnu.org
+Subject: [PATCH 0/6] qemu-storage-daemon: QAPIfy --chardev
+Date: Fri, 23 Oct 2020 12:12:16 +0200
+Message-Id: <20201023101222.250147-1-kwolf@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201022135015.7e4e2742@w520.home>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.124.1.5]
-X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
- HQMAIL107.nvidia.com (172.20.187.13)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603447064; bh=O79gclL7Afh6kS2IiewX5WhNx3CMvv1lpg+31bVEQeQ=;
- h=Subject:To:CC:References:X-Nvconfidentiality:From:Message-ID:Date:
- User-Agent:MIME-Version:In-Reply-To:Content-Type:Content-Language:
- Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
- b=jcmf8W0fbKpEXyBc1Uwd8YPRAdJJ4UFgRayJZp5tFq5WzwZtcFeNTOSDY8CXRxIX7
- Sdn/bYLZdxNcKaIVyIXibdqWSgEF8wzqhHWgWEtIUVmQbGgsYDTU4I3foG4RFzvB6y
- AJ8mpJZEHl+H7EEt8cXtwFEk5/9s3K6zrvNax+Y9+escZN6vDGHIT2o8pXrucxEKzC
- N/jYeEaJKsAG0aSPwO4EAIcELU1EpUvw3DTC1f/besBnRjhKWkGHaVRwJWlChtbm6a
- RHSlQ/3MfVLDch/4xnQUus9QqzWMXwN7920Hvmxc1Sppgee21QUza21lbu8uSlFTsw
- Xb+uKJqrzO4Iw==
-Received-SPF: pass client-ip=216.228.121.143;
- envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:59:19
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -71
-X-Spam_score: -7.2
-X-Spam_bar: -------
-X-Spam_report: (-7.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,298 +89,107 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
+Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
+ marcandre.lureau@redhat.com, pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+While the qemu-storage-daemon command line is still considered unstable,
+let's change --chardev from the old QemuOpts-based parser to QAPI, so
+that it becomes a simple mapping of chardev-add to the command line and
+will fit in a future fully QAPIfied command line without later
+incompatible changes or additional compatibility glue.
 
+Kevin Wolf (6):
+  char/stdio: Fix QMP default for 'signal'
+  char: Factor out qemu_chr_print_types()
+  qapi: Remove wrapper struct for simple unions
+  qapi: Optionally parse simple unions as flat
+  tests/qapi-schema: Flat representation of simple unions
+  qemu-storage-daemon: Use qmp_chardev_add() for --chardev
 
-On 10/23/2020 1:20 AM, Alex Williamson wrote:
-> On Thu, 22 Oct 2020 16:41:59 +0530
-> Kirti Wankhede <kwankhede@nvidia.com> wrote:
-> 
->> Sequence  during _RESUMING device state:
->> While data for this device is available, repeat below steps:
->> a. read data_offset from where user application should write data.
->> b. write data of data_size to migration region from data_offset.
->> c. write data_size which indicates vendor driver that data is written in
->>     staging buffer.
->>
->> For user, data is opaque. User should write data in the same order as
->> received.
->>
->> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
->> Reviewed-by: Neo Jia <cjia@nvidia.com>
->> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->> ---
->>   hw/vfio/migration.c  | 192 +++++++++++++++++++++++++++++++++++++++++++++++++++
->>   hw/vfio/trace-events |   3 +
->>   2 files changed, 195 insertions(+)
->>
->> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
->> index 5506cef15d88..46d05d230e2a 100644
->> --- a/hw/vfio/migration.c
->> +++ b/hw/vfio/migration.c
->> @@ -257,6 +257,77 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
->>       return ret;
->>   }
->>   
->> +static int vfio_load_buffer(QEMUFile *f, VFIODevice *vbasedev,
->> +                            uint64_t data_size)
->> +{
->> +    VFIORegion *region = &vbasedev->migration->region;
->> +    uint64_t data_offset = 0, size, report_size;
->> +    int ret;
->> +
->> +    do {
->> +        ret = vfio_mig_read(vbasedev, &data_offset, sizeof(data_offset),
->> +                      region->fd_offset + VFIO_MIG_STRUCT_OFFSET(data_offset));
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->> +
->> +        if (data_offset + data_size > region->size) {
->> +            /*
->> +             * If data_size is greater than the data section of migration region
->> +             * then iterate the write buffer operation. This case can occur if
->> +             * size of migration region at destination is smaller than size of
->> +             * migration region at source.
->> +             */
->> +            report_size = size = region->size - data_offset;
->> +            data_size -= size;
->> +        } else {
->> +            report_size = size = data_size;
->> +            data_size = 0;
->> +        }
->> +
->> +        trace_vfio_load_state_device_data(vbasedev->name, data_offset, size);
->> +
->> +        while (size) {
->> +            void *buf;
->> +            uint64_t sec_size;
->> +            bool buf_alloc = false;
->> +
->> +            buf = get_data_section_size(region, data_offset, size, &sec_size);
->> +
->> +            if (!buf) {
->> +                buf = g_try_malloc(sec_size);
->> +                if (!buf) {
->> +                    error_report("%s: Error allocating buffer ", __func__);
->> +                    return -ENOMEM;
->> +                }
->> +                buf_alloc = true;
->> +            }
->> +
->> +            qemu_get_buffer(f, buf, sec_size);
->> +
->> +            if (buf_alloc) {
->> +                ret = vfio_mig_write(vbasedev, buf, sec_size,
->> +                        region->fd_offset + data_offset);
->> +                g_free(buf);
->> +
->> +                if (ret < 0) {
->> +                    return ret;
->> +                }
->> +            }
->> +            size -= sec_size;
->> +            data_offset += sec_size;
->> +        }
->> +
->> +        ret = vfio_mig_write(vbasedev, &report_size, sizeof(report_size),
->> +                        region->fd_offset + VFIO_MIG_STRUCT_OFFSET(data_size));
->> +        if (ret < 0) {
->> +            return ret;
->> +        }
->> +    } while (data_size);
->> +
->> +    return 0;
->> +}
->> +
->>   static int vfio_update_pending(VFIODevice *vbasedev)
->>   {
->>       VFIOMigration *migration = vbasedev->migration;
->> @@ -293,6 +364,33 @@ static int vfio_save_device_config_state(QEMUFile *f, void *opaque)
->>       return qemu_file_get_error(f);
->>   }
->>   
->> +static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
->> +{
->> +    VFIODevice *vbasedev = opaque;
->> +    uint64_t data;
->> +
->> +    if (vbasedev->ops && vbasedev->ops->vfio_load_config) {
->> +        int ret;
->> +
->> +        ret = vbasedev->ops->vfio_load_config(vbasedev, f);
->> +        if (ret) {
->> +            error_report("%s: Failed to load device config space",
->> +                         vbasedev->name);
->> +            return ret;
->> +        }
->> +    }
->> +
->> +    data = qemu_get_be64(f);
->> +    if (data != VFIO_MIG_FLAG_END_OF_STATE) {
->> +        error_report("%s: Failed loading device config space, "
->> +                     "end flag incorrect 0x%"PRIx64, vbasedev->name, data);
->> +        return -EINVAL;
->> +    }
->> +
->> +    trace_vfio_load_device_config_state(vbasedev->name);
->> +    return qemu_file_get_error(f);
->> +}
->> +
->>   /* ---------------------------------------------------------------------- */
->>   
->>   static int vfio_save_setup(QEMUFile *f, void *opaque)
->> @@ -477,12 +575,106 @@ static int vfio_save_complete_precopy(QEMUFile *f, void *opaque)
->>       return ret;
->>   }
->>   
->> +static int vfio_load_setup(QEMUFile *f, void *opaque)
->> +{
->> +    VFIODevice *vbasedev = opaque;
->> +    VFIOMigration *migration = vbasedev->migration;
->> +    int ret = 0;
->> +
->> +    if (migration->region.mmaps) {
->> +        ret = vfio_region_mmap(&migration->region);
-> 
-> 
-> Checking, are we in the right thread context not to require locking the
-> iothread as we did in vfio_save_setup()?
-> 
-> 
+ qapi/char.json                                |  6 +-
+ docs/devel/qapi-code-gen.txt                  | 43 +++++++---
+ include/chardev/char.h                        |  1 +
+ include/qapi/visitor-impl.h                   |  3 +
+ include/qapi/visitor.h                        | 10 +++
+ backends/tpm/tpm_emulator.c                   |  3 +-
+ backends/tpm/tpm_passthrough.c                |  4 +-
+ block/crypto.c                                |  3 +-
+ block/qcow2.c                                 |  9 +-
+ block/vmdk.c                                  | 14 ++--
+ blockdev.c                                    | 36 ++++----
+ chardev/char-file.c                           |  5 +-
+ chardev/char-mux.c                            |  5 +-
+ chardev/char-parallel.c                       |  5 +-
+ chardev/char-pipe.c                           |  7 +-
+ chardev/char-ringbuf.c                        |  5 +-
+ chardev/char-serial.c                         |  5 +-
+ chardev/char-socket.c                         | 13 ++-
+ chardev/char-stdio.c                          |  9 +-
+ chardev/char-udp.c                            | 11 +--
+ chardev/char.c                                | 27 +++---
+ chardev/msmouse.c                             |  4 +-
+ chardev/wctablet.c                            |  4 +-
+ hw/core/numa.c                                |  6 +-
+ hw/display/xenfb.c                            |  8 +-
+ hw/input/hid.c                                |  8 +-
+ hw/input/ps2.c                                |  6 +-
+ hw/input/virtio-input-hid.c                   |  8 +-
+ hw/mem/pc-dimm.c                              | 18 ++--
+ hw/virtio/virtio-mem-pci.c                    |  3 +-
+ hw/virtio/virtio-pmem-pci.c                   |  3 +-
+ monitor/hmp-cmds.c                            | 14 ++--
+ qapi/qapi-visit-core.c                        | 10 +++
+ qemu-keymap.c                                 |  2 +-
+ replay/replay-input.c                         | 46 +++++-----
+ storage-daemon/qemu-storage-daemon.c          | 47 +++++++++--
+ tests/test-char.c                             | 12 ++-
+ tests/test-clone-visitor.c                    | 14 ++--
+ tests/test-qmp-cmds.c                         |  2 +-
+ tests/test-qobject-input-visitor.c            | 24 +++---
+ tests/test-qobject-output-visitor.c           | 24 +++---
+ ui/console.c                                  |  5 +-
+ ui/input-keymap.c                             | 12 +--
+ ui/input-legacy.c                             | 12 +--
+ ui/input.c                                    | 43 +++++-----
+ util/qemu-sockets.c                           |  8 +-
+ scripts/qapi/expr.py                          |  7 +-
+ scripts/qapi/introspect.py                    |  7 +-
+ scripts/qapi/schema.py                        | 63 +++++++++++---
+ scripts/qapi/visit.py                         | 36 ++++++++
+ tests/qapi-schema/doc-good.out                |  8 +-
+ tests/qapi-schema/flat-union-allow-flat.err   |  2 +
+ tests/qapi-schema/flat-union-allow-flat.json  | 10 +++
+ tests/qapi-schema/flat-union-allow-flat.out   |  0
+ tests/qapi-schema/meson.build                 |  4 +
+ tests/qapi-schema/qapi-schema-test.json       | 10 +++
+ tests/qapi-schema/qapi-schema-test.out        | 84 +++++++------------
+ tests/qapi-schema/union-allow-flat-bad.err    |  2 +
+ tests/qapi-schema/union-allow-flat-bad.json   |  5 ++
+ tests/qapi-schema/union-allow-flat-bad.out    |  0
+ .../union-allow-flat-builtin-type.err         |  2 +
+ .../union-allow-flat-builtin-type.json        |  5 ++
+ .../union-allow-flat-builtin-type.out         |  0
+ tests/qapi-schema/union-clash-member.err      |  2 +
+ tests/qapi-schema/union-clash-member.json     |  6 ++
+ tests/qapi-schema/union-clash-member.out      |  0
+ 66 files changed, 484 insertions(+), 336 deletions(-)
+ create mode 100644 tests/qapi-schema/flat-union-allow-flat.err
+ create mode 100644 tests/qapi-schema/flat-union-allow-flat.json
+ create mode 100644 tests/qapi-schema/flat-union-allow-flat.out
+ create mode 100644 tests/qapi-schema/union-allow-flat-bad.err
+ create mode 100644 tests/qapi-schema/union-allow-flat-bad.json
+ create mode 100644 tests/qapi-schema/union-allow-flat-bad.out
+ create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.err
+ create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.json
+ create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.out
+ create mode 100644 tests/qapi-schema/union-clash-member.err
+ create mode 100644 tests/qapi-schema/union-clash-member.json
+ create mode 100644 tests/qapi-schema/union-clash-member.out
 
-iothread lock is held when calling load_setup.
+-- 
+2.28.0
 
->> +        if (ret) {
->> +            error_report("%s: Failed to mmap VFIO migration region %d: %s",
->> +                         vbasedev->name, migration->region.nr,
->> +                         strerror(-ret));
->> +            error_report("%s: Falling back to slow path", vbasedev->name);
->> +        }
->> +    }
->> +
->> +    ret = vfio_migration_set_state(vbasedev, ~VFIO_DEVICE_STATE_MASK,
->> +                                   VFIO_DEVICE_STATE_RESUMING);
->> +    if (ret) {
->> +        error_report("%s: Failed to set state RESUMING", vbasedev->name);
->> +        if (migration->region.mmaps) {
->> +            vfio_region_unmap(&migration->region);
->> +        }
->> +    }
->> +    return ret;
->> +}
->> +
->> +static int vfio_load_cleanup(void *opaque)
->> +{
->> +    vfio_save_cleanup(opaque);
-> 
-> 
-> The tracing in there is going to be rather confusing.  Thanks,
-> 
-
-Updating patch 7 and this to separate tracing.
-
-Thanks,
-Kirti
-
-> Alex
-> 
-> 
->> +    return 0;
->> +}
->> +
->> +static int vfio_load_state(QEMUFile *f, void *opaque, int version_id)
->> +{
->> +    VFIODevice *vbasedev = opaque;
->> +    int ret = 0;
->> +    uint64_t data;
->> +
->> +    data = qemu_get_be64(f);
->> +    while (data != VFIO_MIG_FLAG_END_OF_STATE) {
->> +
->> +        trace_vfio_load_state(vbasedev->name, data);
->> +
->> +        switch (data) {
->> +        case VFIO_MIG_FLAG_DEV_CONFIG_STATE:
->> +        {
->> +            ret = vfio_load_device_config_state(f, opaque);
->> +            if (ret) {
->> +                return ret;
->> +            }
->> +            break;
->> +        }
->> +        case VFIO_MIG_FLAG_DEV_SETUP_STATE:
->> +        {
->> +            data = qemu_get_be64(f);
->> +            if (data == VFIO_MIG_FLAG_END_OF_STATE) {
->> +                return ret;
->> +            } else {
->> +                error_report("%s: SETUP STATE: EOS not found 0x%"PRIx64,
->> +                             vbasedev->name, data);
->> +                return -EINVAL;
->> +            }
->> +            break;
->> +        }
->> +        case VFIO_MIG_FLAG_DEV_DATA_STATE:
->> +        {
->> +            uint64_t data_size = qemu_get_be64(f);
->> +
->> +            if (data_size) {
->> +                ret = vfio_load_buffer(f, vbasedev, data_size);
->> +                if (ret < 0) {
->> +                    return ret;
->> +                }
->> +            }
->> +            break;
->> +        }
->> +        default:
->> +            error_report("%s: Unknown tag 0x%"PRIx64, vbasedev->name, data);
->> +            return -EINVAL;
->> +        }
->> +
->> +        data = qemu_get_be64(f);
->> +        ret = qemu_file_get_error(f);
->> +        if (ret) {
->> +            return ret;
->> +        }
->> +    }
->> +    return ret;
->> +}
->> +
->>   static SaveVMHandlers savevm_vfio_handlers = {
->>       .save_setup = vfio_save_setup,
->>       .save_cleanup = vfio_save_cleanup,
->>       .save_live_pending = vfio_save_pending,
->>       .save_live_iterate = vfio_save_iterate,
->>       .save_live_complete_precopy = vfio_save_complete_precopy,
->> +    .load_setup = vfio_load_setup,
->> +    .load_cleanup = vfio_load_cleanup,
->> +    .load_state = vfio_load_state,
->>   };
->>   
->>   /* ---------------------------------------------------------------------- */
->> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
->> index 9f5712dab1ea..4804cc266d44 100644
->> --- a/hw/vfio/trace-events
->> +++ b/hw/vfio/trace-events
->> @@ -159,3 +159,6 @@ vfio_save_device_config_state(const char *name) " (%s)"
->>   vfio_save_pending(const char *name, uint64_t precopy, uint64_t postcopy, uint64_t compatible) " (%s) precopy 0x%"PRIx64" postcopy 0x%"PRIx64" compatible 0x%"PRIx64
->>   vfio_save_iterate(const char *name, int data_size) " (%s) data_size %d"
->>   vfio_save_complete_precopy(const char *name) " (%s)"
->> +vfio_load_device_config_state(const char *name) " (%s)"
->> +vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
->> +vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
-> 
 
