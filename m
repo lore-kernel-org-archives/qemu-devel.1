@@ -2,90 +2,94 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07C4AC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:34:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31861C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 21:08:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 253A221D6C
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 20:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 64807208E4
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 21:08:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HnXnIySz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 253A221D6C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=google.com header.i=@google.com header.b="ZrDZ7Hev"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64807208E4
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48036 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW3lQ-0000OO-SA
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 16:34:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42652)
+	id 1kW4I4-0002Fx-6f
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 17:08:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW3kr-0008JY-JB
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:33:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45306)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kW3kp-0006a7-8e
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 16:33:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603485217;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=JjlIW9wQg1A4Y9WMEdL7IeCk1Hfj4WtDNTvL/XPZr+0=;
- b=HnXnIySzrDfvRcFn2YXXrMk2Aa6Fgwnw6D8d2OX9FHo46B7BPWG7WZKciaOxnj0qFmsClw
- fOLe1mVa0G+uHhBCVQ4CmLgSTNANxoBQfg44V622+tS+Tyyq2A7w60ImQMZlQwuSgFnjOz
- njs3MAgsUE3GTpHC4yzowQLC8t0I2Bo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-452-rxo7Ola9P6SJUhBPI2EL-Q-1; Fri, 23 Oct 2020 16:33:34 -0400
-X-MC-Unique: rxo7Ola9P6SJUhBPI2EL-Q-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id ED6401868400;
- Fri, 23 Oct 2020 20:33:32 +0000 (UTC)
-Received: from [10.3.113.7] (ovpn-113-7.phx2.redhat.com [10.3.113.7])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 650D71002388;
- Fri, 23 Oct 2020 20:33:32 +0000 (UTC)
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
-From: Eric Blake <eblake@redhat.com>
-Organization: Red Hat, Inc.
-Subject: Re: [PATCH v2 0/6] Add support for Control-Flow Integrity
-Message-ID: <947e698f-a582-956d-5b42-1dee6442f15d@redhat.com>
-Date: Fri, 23 Oct 2020 15:33:31 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ (Exim 4.90_1) (envelope-from
+ <34kWTXwsKCr0kvnlqqhprhqjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--hskinnemoen.bounces.google.com>)
+ id 1kW4Gu-0000Wh-4Z
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 17:06:49 -0400
+Received: from mail-pf1-x44a.google.com ([2607:f8b0:4864:20::44a]:36609)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from
+ <34kWTXwsKCr0kvnlqqhprhqjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--hskinnemoen.bounces.google.com>)
+ id 1kW4Gq-0002Cb-DO
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 17:06:47 -0400
+Received: by mail-pf1-x44a.google.com with SMTP id 62so2373063pfv.3
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 14:06:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=google.com; s=20161025;
+ h=sender:date:in-reply-to:message-id:mime-version:references:subject
+ :from:to:cc; bh=g9hLwZzvASQ+W2Fqi0Pfbug+e02F0q9JvSB2utWnBOo=;
+ b=ZrDZ7HevVhqan1iJdkUepw5QvbbNkYPiaGjfKRTjAA2C/ax1CgWLRE7euds9gQFu7m
+ hKDb/J/MLg8vnvhQ+zKri+N0GGj+sTibayQC6A+QkV+EDtX4I4mt1cBO7SMxgXJGlWdV
+ ZF9XA24Xj37dI4IsE/f2/gtVQ5Mgl/jiinvNp2xFO6sCfcx3Rt3/usc9cXHE1Vkjwswa
+ 4FyuafB2iwzEBCuhDECiT8fHPaNBLZsuiOVhfjMrJsjj+zFifpI2y+/7AGTwlf/FOmp1
+ NaEa9Wkb40cyxFRvqjBOw9feGCycoh3c+hLsqkjC8GXTI/g/pXXMiPD/FcNpMV6P+yYH
+ jxUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+ :references:subject:from:to:cc;
+ bh=g9hLwZzvASQ+W2Fqi0Pfbug+e02F0q9JvSB2utWnBOo=;
+ b=mUD8uZCIdquWiF5lQQ/p7AkrgpR2hum1UWR0cTeXJORtMuMjJJJeDc/LWa4/U/v5Sw
+ 2F+JRL2SGFeeGW58S1WCnERKqPjWUig1yG3/3GPTLNCaXqav8PxGWpOA5zJV2G2dP52J
+ 9tKDtKzPWFGJj2elvIouCIUMoRk+/qmGp6Ii6HLQwl9t25aUggngvSGdkaMf3zD4Dcg2
+ L/Mu5UkmskY9gMak+rVMitnkXDPJFgpIdoMAZDDpIZ16UbLPoqX8qnLW1Mkym83y7BfM
+ I+GzEQqjyL1K9wqbWjvQz05FbijyhZZgw4t7/wBH3HgnqHplWwN4cfl6XVlqg00IKMiG
+ ssHA==
+X-Gm-Message-State: AOAM53172AylTsApreaUp2V0VhiWV6vSIv+uO21AI0DKrUZAXeow9ZLf
+ xrROUeUD4u4DtFIHrOt0ZBmIbw47hGF2WMQcFQ==
+X-Google-Smtp-Source: ABdhPJw6VZtiQ3ErLIO4P1hOZIUdPTwyZoP030d2yIHPG0ZLLSmDGsc308egLa4m5h0m5ZyjzwEJo7e0Lbt3jFfwTw==
+X-Received: from skybert.c.googlers.com ([fda3:e722:ac3:10:24:72f4:c0a8:3107])
+ (user=hskinnemoen job=sendgmr) by 2002:a17:90a:6ba7:: with SMTP id
+ w36mr4562011pjj.12.1603487202838;
+ Fri, 23 Oct 2020 14:06:42 -0700 (PDT)
+Date: Fri, 23 Oct 2020 14:06:32 -0700
+In-Reply-To: <20201023210637.351238-1-hskinnemoen@google.com>
+Message-Id: <20201023210637.351238-2-hskinnemoen@google.com>
+Mime-Version: 1.0
+References: <20201023210637.351238-1-hskinnemoen@google.com>
+X-Mailer: git-send-email 2.29.0.rc1.297.gfa9743e501-goog
+Subject: [PATCH v3 1/6] tests/qtest: Make npcm7xx_timer-test conditional on
+ CONFIG_NPCM7XX
+To: peter.maydell@linaro.org
+Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, Avi.Fishman@nuvoton.com, 
+ kfting@nuvoton.com, venture@google.com, wuhaotsh@google.com, thuth@redhat.com, 
+ Havard Skinnemoen <hskinnemoen@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::44a;
+ envelope-from=34kWTXwsKCr0kvnlqqhprhqjrrjoh.frpthpx-ghyhoqrqjqx.ruj@flex--hskinnemoen.bounces.google.com;
+ helo=mail-pf1-x44a.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -95
+X-Spam_score: -9.6
+X-Spam_bar: ---------
+X-Spam_report: (-9.6 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_MED=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001, SPF_PASS=-0.001,
+ USER_IN_DEF_DKIM_WL=-7.5 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,63 +102,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Alexander Bulekov <alxndr@bu.edu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Havard Skinnemoen <hskinnemoen@google.com>
+From: Havard Skinnemoen via <qemu-devel@nongnu.org>
 
-On 10/23/20 3:06 PM, Daniele Buono wrote:
-> v2: Several months (and structural changes in QEMU) have passed since v1.
-> While the spirit of the patch is similar, the implementation is changed
-> in multiple points, and should address most if not all the comments
-> received in v1.
+This test won't work if qemu was compiled without CONFIG_NPCM7XX, as
+pointed out by Thomas Huth on a different patch.
 
-> 5) Most of the logic to enable CFI goes in the configure, since it's
-> just a matter of checking for dependencies and incompatible options.
-> However, I had to disable CFI checks for a few TCG functions.
-> This can only be done through a blacklist file. I added a file in the
-> root of QEMU, called cfi-blacklist.txt for such purpose. I am open to
-> suggestions on where the file should go, and I am willing to become the
-> maintainer of it, if deemed necessary.
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+---
+ tests/qtest/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-In the meantime, we have commits like:
-
-commit b199c682f1f0aaee22b2170a5fb885250057eec2
-Author: Philippe Mathieu-Daudé <philmd@redhat.com>
-Date:   Thu Sep 10 09:01:31 2020 +0200
-
-    target/i386/kvm: Rename host_tsx_blacklisted() as host_tsx_broken()
-
-    In order to use inclusive terminology, rename host_tsx_blacklisted()
-    as host_tsx_broken().
-
-which may help you in coming up with a more appropriate name for the new
-file.
-
-> 
->  MAINTAINERS                   |   5 +
->  accel/tcg/cpu-exec.c          |   9 ++
->  configure                     | 214 ++++++++++++++++++++++++++++++++++
->  include/qemu/sanitizers.h     |  22 ++++
->  meson.build                   |   3 +
->  plugins/core.c                |  25 ++++
->  plugins/loader.c              |   5 +
->  tcg/tci.c                     |   5 +
->  tests/check-block.sh          |  18 +--
->  tests/qtest/fuzz/fork_fuzz.ld |  12 +-
->  util/main-loop.c              |   9 ++
->  util/oslib-posix.c            |   9 ++
->  12 files changed, 328 insertions(+), 8 deletions(-)
->  create mode 100644 include/qemu/sanitizers.h
-
-although I don't see a new file by that name here, so perhaps the v1
-overview is now stale?
-
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 28d4068718..7e0ecaa2c5 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -133,12 +133,13 @@ qtests_sparc64 = \
+   (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+   ['prom-env-test', 'boot-serial-test']
+ 
++qtests_npcm7xx = ['npcm7xx_timer-test']
+ qtests_arm = \
+   (config_all_devices.has_key('CONFIG_PFLASH_CFI02') ? ['pflash-cfi02-test'] : []) +         \
++  (config_all_devices.has_key('CONFIG_NPCM7XX') ? qtests_npcm7xx : []) + \
+   ['arm-cpu-features',
+    'microbit-test',
+    'm25p80-test',
+-   'npcm7xx_timer-test',
+    'test-arm-mptimer',
+    'boot-serial-test',
+    'hexloader-test']
 -- 
-Eric Blake, Principal Software Engineer
-Red Hat, Inc.           +1-919-301-3226
-Virtualization:  qemu.org | libvirt.org
+2.29.0.rc1.297.gfa9743e501-goog
 
 
