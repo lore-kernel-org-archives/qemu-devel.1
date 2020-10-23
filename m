@@ -2,100 +2,89 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MIME_BASE64_TEXT,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26609C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:49:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00C18C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:49:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D74120878
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:49:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6C6C420878
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:49:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Zqt6IuwK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D74120878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ViNW3hER"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C6C420878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50250 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzJa-0006zy-BI
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:49:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60538)
+	id 1kVzJe-0007Av-C8
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:49:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVyzJ-0004Sz-E0
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:17 -0400
-Received: from esa4.hgst.iphmx.com ([216.71.154.42]:26168)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVyzH-0001Xq-Ab
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:28:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603466895; x=1635002895;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=QxxpnjE6UQxURuz1kdJyV9BtXyZ2wTvZTkGBbbGNMKY=;
- b=Zqt6IuwKojPMZPl3pvwgJ3l4CyTDq2N7HATvMVTSBZcurYPAzsGBfsB3
- L1v3KSKST06/LgyNxSWC9aT5Weqfs1CbqIfQ2ubVUrG1EaI6Wt8ZHP4AQ
- 0Q+LcToHzyMMUp/DJFpN9Zh2DiWuJOPvB3wb4W3RBebb+rDoX42qOK8HF
- QGtbcyOQX6T1As/nL5EiRjuo288Pd4EsUHUwFHW4YjliyD/qAUhzEjjkX
- 3GDfeplLKoeEE6iZ3QfXK5P9n9muFNwusWmEg1ts4RSWfOy5FWvlOuxrZ
- dAxkvKIvI8d2OwLSIWWsLvnmdUgI2HOf61u6/3XSO/A2akKH3YCR/XDw8 Q==;
-IronPort-SDR: oa1M1JXn57Qf4HpNXCaJGM3rgraeZbgc9PZXQ34JLQpRZQZh7FrVztlxPwBF80deuNymc/kesi
- ivKiErKHpMYHuHA8KNP4PWLxlA+IsnGcgY2oZm6QE6zoZ7FdPeUnfanD60uqltwPufhMErAa0E
- Nas+HxtqQ1pXmc3W0V2mbZr5HEBUg4ORYlTg5JIuggiEqagJVAezFkykWBNc/GKz2FAyQF8CH8
- a0BSuwv0fjf0wpPkboQVPCc1pl+vjnOgVTkhbEiZfTwxYjyFPo61a0lpxOEURar8qiWyN7Xlrs
- VoE=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="150652330"
-Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
- ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:27:45 +0800
-IronPort-SDR: Fa/cjtGHo43eFfNiqYEic6UAiaeeEOdb1rhWqYhqLjYH/NL9ELsigTl7sso5iiX+5IC1QRhbPZ
- jYFnHXCTRUsOg4WUVKe2ghN5qNQ1/yJ1GS1R1L2aA0vlGi1pBMhqLZ+GeZwWeOGp8jqAcSjfen
- bCZ9jn+AF0poRiWuRdkqiRVcpK3Y380ZrzYffiDuQ7uhZ8uAWmMEp2vRJ6nLIVIHcInmQXOQAi
- X9FeeIKfaQycFPpb1w/CNkKCzsWbB5+TeevTPcq86BZ/3pnSQP0NoZR+q25ojt7nAp8z3MTQyi
- co2yEyCBoHi6E9QQO+A5TnPG
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:13:01 -0700
-IronPort-SDR: LgBbZms+w/jj63DzoKDHz6v4NK21A9CVFshITOAe/hN4co52YZk3PW6sHM2HhgP+Bs2wZ/25ki
- wF4rqjK+s0G8Nj5iuor8cJjaqwYunyrpYhcH55HR0Kn1x2CU7deVAG1hpAT/9uLaGbJlxaq61B
- kYFzQB8pPsxjuddX4SDuRNNV70JqCyfwBEZgI0O84s1dKjlG72uTm7mKuH8FEXFX0Bl/Q4zRP/
- QRkHVDfCHYENcOUo6ZeyhN3nCyoUVtOJJRiEKQ6ysLuy+D+efz3HCamdLifqDU5/CiWOEZfaX4
- p/0=
-WDCIronportException: Internal
-Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:27:45 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVyvT-0007lz-QU
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:24:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45268)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kVyvP-0000zx-Ne
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:24:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603466654;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=ghFFnLOFkfjPoQsbyc4rZOBW07tC/ZmnO//U6wIqPqo=;
+ b=ViNW3hER5LcHjfjouneMy2uq2THsA+hXTH4gWuOFZhWX9Yg+Izuwywu+UJzvaRwc6sxfWZ
+ ZNS/b1TvdV1zPIhr7C8Weu/ehsh5zoX4g+9Apdo9fDshFOIbWAkyP37x0SGgRg18DSeq24
+ SPBxl6ZLBJNn+Etwm+JofQyo3AnTfac=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-596-a2lZ7z02NN26NzZD1fbTKA-1; Fri, 23 Oct 2020 11:24:11 -0400
+X-MC-Unique: a2lZ7z02NN26NzZD1fbTKA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 51949805F14;
+ Fri, 23 Oct 2020 15:23:40 +0000 (UTC)
+Received: from localhost (ovpn-114-178.ams2.redhat.com [10.36.114.178])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E8D2E5C1CF;
+ Fri, 23 Oct 2020 15:23:39 +0000 (UTC)
+From: Stefan Hajnoczi <stefanha@redhat.com>
 To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 12/12] hw/misc/sifive_u_otp: Add backend drive support
-Date: Fri, 23 Oct 2020 08:16:19 -0700
-Message-Id: <20201023151619.3175155-13-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201023151619.3175155-1-alistair.francis@wdc.com>
-References: <20201023151619.3175155-1-alistair.francis@wdc.com>
+	Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL v3 19/28] util/vhost-user-server: use static library in
+ meson.build
+Date: Fri, 23 Oct 2020 16:21:38 +0100
+Message-Id: <20201023152147.1016281-20-stefanha@redhat.com>
+In-Reply-To: <20201023152147.1016281-1-stefanha@redhat.com>
+References: <20201023152147.1016281-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.154.42;
- envelope-from=prvs=558518344=alistair.francis@wdc.com;
- helo=esa4.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:27:42
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -3
+X-Spam_score: -0.4
+X-Spam_bar: /
+X-Spam_report: (-0.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MIME_BASE64_TEXT=1.741, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,175 +98,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>, Green Wan <green.wan@sifive.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, Coiby Xu <Coiby.Xu@gmail.com>,
+ Markus Armbruster <armbru@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Green Wan <green.wan@sifive.com>
-
-Add '-drive' support to OTP device. Allow users to assign a raw file
-as OTP image.
-
-test commands for 16k otp.img filled with zero:
-
-$ dd if=/dev/zero of=./otp.img bs=1k count=16
-$ ./qemu-system-riscv64 -M sifive_u -m 256M -nographic -bios none \
--kernel ../opensbi/build/platform/sifive/fu540/firmware/fw_payload.elf \
--d guest_errors -drive if=none,format=raw,file=otp.img
-
-Signed-off-by: Green Wan <green.wan@sifive.com>
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Tested-by: Bin Meng <bin.meng@windriver.com>
-Acked-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 20201020033732.12921-3-green.wan@sifive.com
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- include/hw/misc/sifive_u_otp.h |  2 ++
- hw/misc/sifive_u_otp.c         | 65 ++++++++++++++++++++++++++++++++++
- 2 files changed, 67 insertions(+)
-
-diff --git a/include/hw/misc/sifive_u_otp.h b/include/hw/misc/sifive_u_otp.h
-index ebffbc1fa5..5d0d7df455 100644
---- a/include/hw/misc/sifive_u_otp.h
-+++ b/include/hw/misc/sifive_u_otp.h
-@@ -46,6 +46,7 @@
- 
- #define SIFIVE_U_OTP_PA_MASK        0xfff
- #define SIFIVE_U_OTP_NUM_FUSES      0x1000
-+#define SIFIVE_U_OTP_FUSE_WORD      4
- #define SIFIVE_U_OTP_SERIAL_ADDR    0xfc
- 
- #define SIFIVE_U_OTP_REG_SIZE       0x1000
-@@ -80,6 +81,7 @@ struct SiFiveUOTPState {
-     uint32_t fuse_wo[SIFIVE_U_OTP_NUM_FUSES];
-     /* config */
-     uint32_t serial;
-+    BlockBackend *blk;
- };
- 
- #endif /* HW_SIFIVE_U_OTP_H */
-diff --git a/hw/misc/sifive_u_otp.c b/hw/misc/sifive_u_otp.c
-index b9238d64cb..60066375ab 100644
---- a/hw/misc/sifive_u_otp.c
-+++ b/hw/misc/sifive_u_otp.c
-@@ -19,11 +19,14 @@
-  */
- 
- #include "qemu/osdep.h"
-+#include "qapi/error.h"
- #include "hw/qdev-properties.h"
- #include "hw/sysbus.h"
- #include "qemu/log.h"
- #include "qemu/module.h"
- #include "hw/misc/sifive_u_otp.h"
-+#include "sysemu/blockdev.h"
-+#include "sysemu/block-backend.h"
- 
- #define WRITTEN_BIT_ON 0x1
- 
-@@ -54,6 +57,16 @@ static uint64_t sifive_u_otp_read(void *opaque, hwaddr addr, unsigned int size)
-         if ((s->pce & SIFIVE_U_OTP_PCE_EN) &&
-             (s->pdstb & SIFIVE_U_OTP_PDSTB_EN) &&
-             (s->ptrim & SIFIVE_U_OTP_PTRIM_EN)) {
-+
-+            /* read from backend */
-+            if (s->blk) {
-+                int32_t buf;
-+
-+                blk_pread(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD, &buf,
-+                          SIFIVE_U_OTP_FUSE_WORD);
-+                return buf;
-+            }
-+
-             return s->fuse[s->pa & SIFIVE_U_OTP_PA_MASK];
-         } else {
-             return 0xff;
-@@ -145,6 +158,12 @@ static void sifive_u_otp_write(void *opaque, hwaddr addr,
-             /* write bit data */
-             SET_FUSEARRAY_BIT(s->fuse, s->pa, s->paio, s->pdin);
- 
-+            /* write to backend */
-+            if (s->blk) {
-+                blk_pwrite(s->blk, s->pa * SIFIVE_U_OTP_FUSE_WORD,
-+                           &s->fuse[s->pa], SIFIVE_U_OTP_FUSE_WORD, 0);
-+            }
-+
-             /* update written bit */
-             SET_FUSEARRAY_BIT(s->fuse_wo, s->pa, s->paio, WRITTEN_BIT_ON);
-         }
-@@ -168,16 +187,48 @@ static const MemoryRegionOps sifive_u_otp_ops = {
- 
- static Property sifive_u_otp_properties[] = {
-     DEFINE_PROP_UINT32("serial", SiFiveUOTPState, serial, 0),
-+    DEFINE_PROP_DRIVE("drive", SiFiveUOTPState, blk),
-     DEFINE_PROP_END_OF_LIST(),
- };
- 
- static void sifive_u_otp_realize(DeviceState *dev, Error **errp)
- {
-     SiFiveUOTPState *s = SIFIVE_U_OTP(dev);
-+    DriveInfo *dinfo;
- 
-     memory_region_init_io(&s->mmio, OBJECT(dev), &sifive_u_otp_ops, s,
-                           TYPE_SIFIVE_U_OTP, SIFIVE_U_OTP_REG_SIZE);
-     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mmio);
-+
-+    dinfo = drive_get_next(IF_NONE);
-+    if (dinfo) {
-+        int ret;
-+        uint64_t perm;
-+        int filesize;
-+        BlockBackend *blk;
-+
-+        blk = blk_by_legacy_dinfo(dinfo);
-+        filesize = SIFIVE_U_OTP_NUM_FUSES * SIFIVE_U_OTP_FUSE_WORD;
-+        if (blk_getlength(blk) < filesize) {
-+            error_setg(errp, "OTP drive size < 16K");
-+            return;
-+        }
-+
-+        qdev_prop_set_drive_err(dev, "drive", blk, errp);
-+
-+        if (s->blk) {
-+            perm = BLK_PERM_CONSISTENT_READ |
-+                   (blk_is_read_only(s->blk) ? 0 : BLK_PERM_WRITE);
-+            ret = blk_set_perm(s->blk, perm, BLK_PERM_ALL, errp);
-+            if (ret < 0) {
-+                return;
-+            }
-+
-+            if (blk_pread(s->blk, 0, s->fuse, filesize) != filesize) {
-+                error_setg(errp, "failed to read the initial flash content");
-+            }
-+        }
-+    }
- }
- 
- static void sifive_u_otp_reset(DeviceState *dev)
-@@ -191,6 +242,20 @@ static void sifive_u_otp_reset(DeviceState *dev)
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR] = s->serial;
-     s->fuse[SIFIVE_U_OTP_SERIAL_ADDR + 1] = ~(s->serial);
- 
-+    if (s->blk) {
-+        /* Put serial number to backend as well*/
-+        uint32_t serial_data;
-+        int index = SIFIVE_U_OTP_SERIAL_ADDR;
-+
-+        serial_data = s->serial;
-+        blk_pwrite(s->blk, index * SIFIVE_U_OTP_FUSE_WORD,
-+                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-+
-+        serial_data = ~(s->serial);
-+        blk_pwrite(s->blk, (index + 1) * SIFIVE_U_OTP_FUSE_WORD,
-+                   &serial_data, SIFIVE_U_OTP_FUSE_WORD, 0);
-+    }
-+
-     /* Initialize write-once map */
-     memset(s->fuse_wo, 0x00, sizeof(s->fuse_wo));
- }
--- 
-2.28.0
+RG9uJ3QgY29tcGlsZSBjb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jIGFnYWlu
+LiBJbnN0ZWFkIGJ1aWxkCnRoZSBzdGF0aWMgbGlicmFyeSBvbmNlIGFuZCB0aGVuIHJldXNlIGl0
+IHRocm91Z2hvdXQgUUVNVS4KCkFsc28gc3dpdGNoIGZyb20gQ09ORklHX0xJTlVYIHRvIENPTkZJ
+R19WSE9TVF9VU0VSLCB3aGljaCBpcyB3aGF0IHRoZQp2aG9zdC11c2VyIHRvb2xzICh2aG9zdC11
+c2VyLWdwdSwgZXRjKSBkby4KClNpZ25lZC1vZmYtYnk6IFN0ZWZhbiBIYWpub2N6aSA8c3RlZmFu
+aGFAcmVkaGF0LmNvbT4KTWVzc2FnZS1pZDogMjAyMDA5MjQxNTE1NDkuOTEzNzM3LTE0LXN0ZWZh
+bmhhQHJlZGhhdC5jb20KW0FkZGVkIENPTkZJR19MSU5VWCBhZ2FpbiBiZWNhdXNlIGxpYnZob3N0
+LXVzZXIgZG9lc24ndCBidWlsZCBvbiBtYWNPUy4KLS1TdGVmYW5dClNpZ25lZC1vZmYtYnk6IFN0
+ZWZhbiBIYWpub2N6aSA8c3RlZmFuaGFAcmVkaGF0LmNvbT4KLS0tCiBibG9jay9leHBvcnQvZXhw
+b3J0LmMgICAgICAgICAgICAgfCA4ICsrKystLS0tCiBibG9jay9leHBvcnQvbWVzb24uYnVpbGQg
+ICAgICAgICAgfCAyICstCiBjb250cmliL2xpYnZob3N0LXVzZXIvbWVzb24uYnVpbGQgfCAxICsK
+IG1lc29uLmJ1aWxkICAgICAgICAgICAgICAgICAgICAgICB8IDYgKysrKystCiB1dGlsL21lc29u
+LmJ1aWxkICAgICAgICAgICAgICAgICAgfCA0ICsrKy0KIDUgZmlsZXMgY2hhbmdlZCwgMTQgaW5z
+ZXJ0aW9ucygrKSwgNyBkZWxldGlvbnMoLSkKCmRpZmYgLS1naXQgYS9ibG9jay9leHBvcnQvZXhw
+b3J0LmMgYi9ibG9jay9leHBvcnQvZXhwb3J0LmMKaW5kZXggYmQ3Y2FjMjQxZi4uYTI0ZmFkY2Zi
+NSAxMDA2NDQKLS0tIGEvYmxvY2svZXhwb3J0L2V4cG9ydC5jCisrKyBiL2Jsb2NrL2V4cG9ydC9l
+eHBvcnQuYwpAQCAtMTcsMTcgKzE3LDE3IEBACiAjaW5jbHVkZSAic3lzZW11L2Jsb2NrLWJhY2tl
+bmQuaCIKICNpbmNsdWRlICJibG9jay9leHBvcnQuaCIKICNpbmNsdWRlICJibG9jay9uYmQuaCIK
+LSNpZiBDT05GSUdfTElOVVgKLSNpbmNsdWRlICJibG9jay9leHBvcnQvdmhvc3QtdXNlci1ibGst
+c2VydmVyLmgiCi0jZW5kaWYKICNpbmNsdWRlICJxYXBpL2Vycm9yLmgiCiAjaW5jbHVkZSAicWFw
+aS9xYXBpLWNvbW1hbmRzLWJsb2NrLWV4cG9ydC5oIgogI2luY2x1ZGUgInFhcGkvcWFwaS1ldmVu
+dHMtYmxvY2stZXhwb3J0LmgiCiAjaW5jbHVkZSAicWVtdS9pZC5oIgorI2lmIGRlZmluZWQoQ09O
+RklHX0xJTlVYKSAmJiBkZWZpbmVkKENPTkZJR19WSE9TVF9VU0VSKQorI2luY2x1ZGUgInZob3N0
+LXVzZXItYmxrLXNlcnZlci5oIgorI2VuZGlmCiAKIHN0YXRpYyBjb25zdCBCbG9ja0V4cG9ydERy
+aXZlciAqYmxrX2V4cF9kcml2ZXJzW10gPSB7CiAgICAgJmJsa19leHBfbmJkLAotI2lmIENPTkZJ
+R19MSU5VWAorI2lmIGRlZmluZWQoQ09ORklHX0xJTlVYKSAmJiBkZWZpbmVkKENPTkZJR19WSE9T
+VF9VU0VSKQogICAgICZibGtfZXhwX3Zob3N0X3VzZXJfYmxrLAogI2VuZGlmCiB9OwpkaWZmIC0t
+Z2l0IGEvYmxvY2svZXhwb3J0L21lc29uLmJ1aWxkIGIvYmxvY2svZXhwb3J0L21lc29uLmJ1aWxk
+CmluZGV4IGVmM2E5NTc2ZjcuLmZmZmU2YjA5ZTggMTAwNjQ0Ci0tLSBhL2Jsb2NrL2V4cG9ydC9t
+ZXNvbi5idWlsZAorKysgYi9ibG9jay9leHBvcnQvbWVzb24uYnVpbGQKQEAgLTEsMiArMSwyIEBA
+CiBibG9ja19zcy5hZGQoZmlsZXMoJ2V4cG9ydC5jJykpCi1ibG9ja19zcy5hZGQod2hlbjogJ0NP
+TkZJR19MSU5VWCcsIGlmX3RydWU6IGZpbGVzKCd2aG9zdC11c2VyLWJsay1zZXJ2ZXIuYycsICcu
+Li8uLi9jb250cmliL2xpYnZob3N0LXVzZXIvbGlidmhvc3QtdXNlci5jJykpCitibG9ja19zcy5h
+ZGQod2hlbjogWydDT05GSUdfTElOVVgnLCAnQ09ORklHX1ZIT1NUX1VTRVInXSwgaWZfdHJ1ZTog
+ZmlsZXMoJ3Zob3N0LXVzZXItYmxrLXNlcnZlci5jJykpCmRpZmYgLS1naXQgYS9jb250cmliL2xp
+YnZob3N0LXVzZXIvbWVzb24uYnVpbGQgYi9jb250cmliL2xpYnZob3N0LXVzZXIvbWVzb24uYnVp
+bGQKaW5kZXggZTY4ZGQxYTU4MS4uYTI2MWU3NjY1ZiAxMDA2NDQKLS0tIGEvY29udHJpYi9saWJ2
+aG9zdC11c2VyL21lc29uLmJ1aWxkCisrKyBiL2NvbnRyaWIvbGlidmhvc3QtdXNlci9tZXNvbi5i
+dWlsZApAQCAtMSwzICsxLDQgQEAKIGxpYnZob3N0X3VzZXIgPSBzdGF0aWNfbGlicmFyeSgndmhv
+c3QtdXNlcicsCiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZXMoJ2xpYnZob3N0
+LXVzZXIuYycsICdsaWJ2aG9zdC11c2VyLWdsaWIuYycpLAogICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgIGJ1aWxkX2J5X2RlZmF1bHQ6IGZhbHNlKQordmhvc3RfdXNlciA9IGRlY2xhcmVf
+ZGVwZW5kZW5jeShsaW5rX3dpdGg6IGxpYnZob3N0X3VzZXIpCmRpZmYgLS1naXQgYS9tZXNvbi5i
+dWlsZCBiL21lc29uLmJ1aWxkCmluZGV4IDc2MjdhMGFlNDYuLjJlYzRmMTE0Y2UgMTAwNjQ0Ci0t
+LSBhL21lc29uLmJ1aWxkCisrKyBiL21lc29uLmJ1aWxkCkBAIC0xMzk4LDYgKzEzOTgsMTEgQEAg
+dHJhY2VfZXZlbnRzX3N1YmRpcnMgKz0gWwogICAndXRpbCcsCiBdCiAKK3Zob3N0X3VzZXIgPSBu
+b3RfZm91bmQKK2lmICdDT05GSUdfVkhPU1RfVVNFUicgaW4gY29uZmlnX2hvc3QKKyAgc3ViZGly
+KCdjb250cmliL2xpYnZob3N0LXVzZXInKQorZW5kaWYKKwogc3ViZGlyKCdxYXBpJykKIHN1YmRp
+cigncW9iamVjdCcpCiBzdWJkaXIoJ3N0dWJzJykKQEAgLTE4MzAsNyArMTgzNSw2IEBAIGlmIGhh
+dmVfdG9vbHMKICAgICAgICAgICAgICBpbnN0YWxsOiB0cnVlKQogCiAgIGlmICdDT05GSUdfVkhP
+U1RfVVNFUicgaW4gY29uZmlnX2hvc3QKLSAgICBzdWJkaXIoJ2NvbnRyaWIvbGlidmhvc3QtdXNl
+cicpCiAgICAgc3ViZGlyKCdjb250cmliL3Zob3N0LXVzZXItYmxrJykKICAgICBzdWJkaXIoJ2Nv
+bnRyaWIvdmhvc3QtdXNlci1ncHUnKQogICAgIHN1YmRpcignY29udHJpYi92aG9zdC11c2VyLWlu
+cHV0JykKZGlmZiAtLWdpdCBhL3V0aWwvbWVzb24uYnVpbGQgYi91dGlsL21lc29uLmJ1aWxkCmlu
+ZGV4IDIyOTZlODFiMzQuLmM1MTU5YWQ3OWQgMTAwNjQ0Ci0tLSBhL3V0aWwvbWVzb24uYnVpbGQK
+KysrIGIvdXRpbC9tZXNvbi5idWlsZApAQCAtNjYsNyArNjYsOSBAQCBpZiBoYXZlX2Jsb2NrCiAg
+IHV0aWxfc3MuYWRkKGZpbGVzKCdtYWluLWxvb3AuYycpKQogICB1dGlsX3NzLmFkZChmaWxlcygn
+bnZkaW1tLXV0aWxzLmMnKSkKICAgdXRpbF9zcy5hZGQoZmlsZXMoJ3FlbXUtY29yb3V0aW5lLmMn
+LCAncWVtdS1jb3JvdXRpbmUtbG9jay5jJywgJ3FlbXUtY29yb3V0aW5lLWlvLmMnKSkKLSAgdXRp
+bF9zcy5hZGQod2hlbjogJ0NPTkZJR19MSU5VWCcsIGlmX3RydWU6IGZpbGVzKCd2aG9zdC11c2Vy
+LXNlcnZlci5jJykpCisgIHV0aWxfc3MuYWRkKHdoZW46IFsnQ09ORklHX0xJTlVYJywgJ0NPTkZJ
+R19WSE9TVF9VU0VSJ10sIGlmX3RydWU6IFsKKyAgICBmaWxlcygndmhvc3QtdXNlci1zZXJ2ZXIu
+YycpLCB2aG9zdF91c2VyCisgIF0pCiAgIHV0aWxfc3MuYWRkKGZpbGVzKCdibG9jay1oZWxwZXJz
+LmMnKSkKICAgdXRpbF9zcy5hZGQoZmlsZXMoJ3FlbXUtY29yb3V0aW5lLXNsZWVwLmMnKSkKICAg
+dXRpbF9zcy5hZGQoZmlsZXMoJ3FlbXUtY28tc2hhcmVkLXJlc291cmNlLmMnKSkKLS0gCjIuMjYu
+MgoK
 
 
