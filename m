@@ -2,100 +2,88 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAD6CC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:18:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F3A2BC4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:18:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 211A82192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:18:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 534282192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:18:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="GmXd243U"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 211A82192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UvtBLtUS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 534282192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzlU-0004r5-3z
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:18:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35176)
+	id 1kVzmG-0005xM-8i
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:18:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVz8E-0000DB-QA; Fri, 23 Oct 2020 11:37:32 -0400
-Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38929)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
- id 1kVz8B-0002qB-91; Fri, 23 Oct 2020 11:37:30 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603467447; x=1635003447;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=fVH3yJDP92d88/TMEtwm9Tro9Lrx+BKom1+AbX5QU0M=;
- b=GmXd243UmzX0hqNbE7AZ5Ck7GW9c5fRoUXZToNuMW+9TSgYcO9JODPJ9
- L/il8n9JS8jTBfNzpzj4J36gLepLnLjt/xtvKqkIZvPHVvAEHz3atGjwF
- ilIH21pZWoA99YIrv3iysZ68dZ8NmWthVksn3NC7vPsdznxzjBvWQQZ57
- 3mr76bUFUm2NCQWhcIgzPv6vSMKr/GGEZAzr81OjVsl172U7QqPgQnkcg
- wzcJmF0r19Oikbexsq2qE8IZqK0/BsPdH2Ipz2+uJkwMh6+RBxP48gvFg
- GNEMPZEseKv1FO9eCo2L9+0vE/laT4eCjgJl3VqJe2Npzs9F5TZkpzMNl A==;
-IronPort-SDR: TsuN3FRp4U5yUqhODmYsdpOPJjEyrBOFF60GFeC/M6hx9F/Tdj3pi58UReFrbRkkAi+1NPzpjr
- duVwVKQntBVj1b7Xaxe12uGleyuFOjt+8cGyz83hUVJx9UIYOaF1ad5yH0bkkhxTotBY7Tsyyp
- P+0Q+dlEaytKSSD6aEtLuqLFwgxlQzSnse96XD33zeFqoBhIU9VJC+mRG3uCzl5FiZwIg0BYYI
- 6KFvuQ+C9ni3EnUZWyFXOLTMXQ+1c7s5Q19nTV1mpeCNrf4uoX4Aszkz45HdKwx8FVV1saQyXh
- S7E=
-X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="260636267"
-Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:37:25 +0800
-IronPort-SDR: O2TJtcsEFgMqe2MiGM483JCJAJdmbJiuXwYvEuDQLMJBfsQ/KOwDEaOK41ciAvcW78eem3ofwD
- nLvfda7++X4haHYKnuDuP9ZPdtMO6tezoU3aVakQ0grhfAnmgepWVZ7CNt+x00H8Negd0evJsr
- pa0rkgrX0FLT4as5+jBWo18uHmkiPOC20ktpU+MosSNIP6d9nc4GkrMkV55N9yq953kU0FBEIE
- b2Y2+htCDZbZp9W3DByclV3o7Q6QN2Pi7XShF4nIlMO6KDcE5imbr4Al6yb7dLumSdwEOv6YoU
- 345u4NkSd8qxDP3TQgFdYZMp
-Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 23 Oct 2020 08:23:47 -0700
-IronPort-SDR: cpqGxKW/3+r2CxmWPPe3kYRJA3cr/k29NtTTmNApX1pRwOxHaz55Ooo++LRGO3eFozc1qHUr1Q
- ziP+AWSq7PA8/JKFs38+5Jz+fYxbNSkW3lkUkCedkPWsJUg7uHP3MTM+C25a2Dk4bwXYQwgT/G
- DsE5BZyL5DTfOvPVZS99qy7qI7IqDqiMxwNqYko1VJUWHE9Fim3AzFU1eIPjivgoKzdlNvgbaH
- L3Wd2Qm6GouAT9rHexAtjB6AVBKGiVxIC+Cpj9SHOBYEqdAIkB+oVWL0ObPI0ck31rdiXjF3it
- Ro0=
-WDCIronportException: Internal
-Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.46])
- by uls-op-cesaip02.wdc.com with ESMTP; 23 Oct 2020 08:37:25 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	qemu-riscv@nongnu.org
-Subject: [PATCH v1 2/5] target/riscv: Set the virtualised MMU mode when doing
- hyp accesses
-Date: Fri, 23 Oct 2020 08:26:04 -0700
-Message-Id: <0231a2792b6653c9399d91a6605874b001641a02.1603466725.git.alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603466725.git.alistair.francis@wdc.com>
-References: <cover.1603466725.git.alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kVzQs-00027F-FX
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:56:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:27000)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kVzQq-0005OP-Ix
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:56:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603468604;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=fUpIiA80kzCQG3WyAunrf71WbEpFTyhfJoK4ohi5mgw=;
+ b=UvtBLtUSykln/af3QmwK43VjuWjq7WTewliH8CL0JqlG/stnCgR9vZie0h3h6E1jp4GyRv
+ xyekBiHrw94kI3FhnML+w4uhFlpFO74y5/cIuGEIiAZxead5DscEJ/LhLGil6Gy5hAvKC2
+ 7qvvxZilzMCe2NbCXDkdEOzUi3XfLx0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-435-S_xAAfnnMjiYZsHdI4Pg-w-1; Fri, 23 Oct 2020 11:56:40 -0400
+X-MC-Unique: S_xAAfnnMjiYZsHdI4Pg-w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 25F8C805729;
+ Fri, 23 Oct 2020 15:55:59 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3B3BB60DA0;
+ Fri, 23 Oct 2020 15:55:56 +0000 (UTC)
+Date: Fri, 23 Oct 2020 17:55:55 +0200
+From: Igor Mammedov <imammedo@redhat.com>
+To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>
+Subject: Re: [PATCH v3 7/9] hw/arm/raspi: Add the Raspberry Pi A+ machine
+Message-ID: <20201023175555.669c415b@redhat.com>
+In-Reply-To: <20201018203358.1530378-8-f4bug@amsat.org>
+References: <20201018203358.1530378-1-f4bug@amsat.org>
+ <20201018203358.1530378-8-f4bug@amsat.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=68.232.141.245;
- envelope-from=prvs=558518344=alistair.francis@wdc.com;
- helo=esa1.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:37:20
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,113 +96,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
- palmer@dabbelt.com, alistair23@gmail.com
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-arm@nongnu.org,
+ Luc Michel <luc@lmichel.fr>, qemu-devel@nongnu.org,
+ Andrew Baumann <Andrew.Baumann@microsoft.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When performing the hypervisor load/store operations set the MMU mode to
-indicate that we are virtualised.
+On Sun, 18 Oct 2020 22:33:56 +0200
+Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote:
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/op_helper.c | 30 +++++++++++++++++-------------
- 1 file changed, 17 insertions(+), 13 deletions(-)
+> The Pi A is almost the first machine released.
+> It uses a BCM2835 SoC which includes a ARMv6Z core.
+>=20
+> Example booting the machine using content from [*]
+> (we use the device tree from the B model):
+>=20
+>   $ qemu-system-arm -M raspi1ap -serial stdio \
+>       -kernel raspberrypi/firmware/boot/kernel.img \
+>       -dtb raspberrypi/firmware/boot/bcm2708-rpi-b-plus.dtb \
+>       -append 'earlycon=3Dpl011,0x20201000 console=3DttyAMA0'
+>   [    0.000000] Booting Linux on physical CPU 0x0
+>   [    0.000000] Linux version 4.19.118+ (dom@buildbot) (gcc version 4.9.=
+3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1311 Mon Apr 27 14:16:15=
+ BST 2020
+>   [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision 7 (A=
+RMv7), cr=3D00c5387d
+>   [    0.000000] CPU: VIPT aliasing data cache, unknown instruction cache
+>   [    0.000000] OF: fdt: Machine model: Raspberry Pi Model B+
+>   ...
+>=20
+> [*] http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmwar=
+e/raspberrypi-kernel_1.20200512-2_armhf.deb
+>=20
+> Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
 
-diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
-index 4ce73575a7..bc6df6c8c9 100644
---- a/target/riscv/op_helper.c
-+++ b/target/riscv/op_helper.c
-@@ -238,30 +238,31 @@ target_ulong helper_hyp_load(CPURISCVState *env, target_ulong address,
-         (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
-             get_field(env->hstatus, HSTATUS_HU))) {
-         target_ulong pte;
-+        int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
- 
-         riscv_cpu_set_two_stage_lookup(env, true);
- 
-         switch (memop) {
-         case MO_SB:
--            pte = cpu_ldsb_data_ra(env, address, GETPC());
-+            pte = cpu_ldsb_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_UB:
--            pte = cpu_ldub_data_ra(env, address, GETPC());
-+            pte = cpu_ldub_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TESW:
--            pte = cpu_ldsw_data_ra(env, address, GETPC());
-+            pte = cpu_ldsw_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TEUW:
--            pte = cpu_lduw_data_ra(env, address, GETPC());
-+            pte = cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TESL:
--            pte = cpu_ldl_data_ra(env, address, GETPC());
-+            pte = cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TEUL:
--            pte = cpu_ldl_data_ra(env, address, GETPC());
-+            pte = cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TEQ:
--            pte = cpu_ldq_data_ra(env, address, GETPC());
-+            pte = cpu_ldq_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         default:
-             g_assert_not_reached();
-@@ -287,23 +288,25 @@ void helper_hyp_store(CPURISCVState *env, target_ulong address,
-         (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
-         (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
-             get_field(env->hstatus, HSTATUS_HU))) {
-+        int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
-+
-         riscv_cpu_set_two_stage_lookup(env, true);
- 
-         switch (memop) {
-         case MO_SB:
-         case MO_UB:
--            cpu_stb_data_ra(env, address, val, GETPC());
-+            cpu_stb_mmuidx_ra(env, address, val, mmu_idx, GETPC());
-             break;
-         case MO_TESW:
-         case MO_TEUW:
--            cpu_stw_data_ra(env, address, val, GETPC());
-+            cpu_stw_mmuidx_ra(env, address, val, mmu_idx, GETPC());
-             break;
-         case MO_TESL:
-         case MO_TEUL:
--            cpu_stl_data_ra(env, address, val, GETPC());
-+            cpu_stl_mmuidx_ra(env, address, val, mmu_idx, GETPC());
-             break;
-         case MO_TEQ:
--            cpu_stq_data_ra(env, address, val, GETPC());
-+            cpu_stq_mmuidx_ra(env, address, val, mmu_idx, GETPC());
-             break;
-         default:
-             g_assert_not_reached();
-@@ -329,15 +332,16 @@ target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
-         (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
-             get_field(env->hstatus, HSTATUS_HU))) {
-         target_ulong pte;
-+        int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
- 
-         riscv_cpu_set_two_stage_lookup(env, true);
- 
-         switch (memop) {
-         case MO_TEUW:
--            pte = cpu_lduw_data_ra(env, address, GETPC());
-+            pte = cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         case MO_TEUL:
--            pte = cpu_ldl_data_ra(env, address, GETPC());
-+            pte = cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
-             break;
-         default:
-             g_assert_not_reached();
--- 
-2.28.0
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> ---
+>  hw/arm/raspi.c | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
+>=20
+> diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
+> index 30fafa59ecb..91a59d1d489 100644
+> --- a/hw/arm/raspi.c
+> +++ b/hw/arm/raspi.c
+> @@ -319,6 +319,15 @@ static void raspi_machine_class_common_init(MachineC=
+lass *mc,
+>      mc->default_ram_id =3D "ram";
+>  };
+> =20
+> +static void raspi1ap_machine_class_init(ObjectClass *oc, void *data)
+> +{
+> +    MachineClass *mc =3D MACHINE_CLASS(oc);
+> +    RaspiMachineClass *rmc =3D RASPI_MACHINE_CLASS(oc);
+> +
+> +    rmc->board_rev =3D 0x900021;
+> +    raspi_machine_class_common_init(mc, rmc->board_rev);
+> +};
+> +
+>  static void raspi2b_machine_class_init(ObjectClass *oc, void *data)
+>  {
+>      MachineClass *mc =3D MACHINE_CLASS(oc);
+> @@ -343,6 +352,10 @@ static void raspi3b_machine_class_init(ObjectClass *=
+oc, void *data)
+> =20
+>  static const TypeInfo raspi_machine_types[] =3D {
+>      {
+> +        .name           =3D MACHINE_TYPE_NAME("raspi1ap"),
+> +        .parent         =3D TYPE_RASPI_MACHINE,
+> +        .class_init     =3D raspi1ap_machine_class_init,
+> +    }, {
+>          .name           =3D MACHINE_TYPE_NAME("raspi2b"),
+>          .parent         =3D TYPE_RASPI_MACHINE,
+>          .class_init     =3D raspi2b_machine_class_init,
 
 
