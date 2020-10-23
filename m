@@ -2,85 +2,89 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A52C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:39:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3D88C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:39:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E10CF206B5
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:39:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3C541206B5
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:39:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvJKPu54"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E10CF206B5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPXWEqqw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3C541206B5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW06H-0002AQ-So
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:39:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45244)
+	id 1kW06e-0002ss-7z
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:39:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVzhQ-0008HM-5p
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:13:52 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36049)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <kwolf@redhat.com>) id 1kVzhL-0007kU-0K
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:13:51 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603469624;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7IW7p6laPaR5hSZGxFp2gRPwVk8lAybNgDWwcbm1580=;
- b=JvJKPu54ugPMP/5N0uNGHr8mgcNna0iyekF+uYanVr8xhSufAYAnxzIssL/PQa+ucVmhJT
- gv3zY4v20A9dfGjE0XVB5cazRZmx7+TKLzpqsAksrKLstAw5WwpSSNvU96bTjU6mlDHREo
- QCKCfoQ3GM6u5PX/YODIkjrOB3fLKRM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-436-vgbF0J-pNGuviXh7R7ETQQ-1; Fri, 23 Oct 2020 12:13:42 -0400
-X-MC-Unique: vgbF0J-pNGuviXh7R7ETQQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 26631EC502;
- Fri, 23 Oct 2020 16:13:39 +0000 (UTC)
-Received: from merkur.redhat.com (ovpn-113-206.ams2.redhat.com [10.36.113.206])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AF0E35C1D0;
- Fri, 23 Oct 2020 16:13:37 +0000 (UTC)
-From: Kevin Wolf <kwolf@redhat.com>
-To: qemu-block@nongnu.org
-Subject: [PATCH v2 5/6] tests/qapi-schema: Flat representation of simple unions
-Date: Fri, 23 Oct 2020 18:13:11 +0200
-Message-Id: <20201023161312.460406-6-kwolf@redhat.com>
-In-Reply-To: <20201023161312.460406-1-kwolf@redhat.com>
-References: <20201023161312.460406-1-kwolf@redhat.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kVzHy-0004ys-3K; Fri, 23 Oct 2020 11:47:34 -0400
+Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:37529)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kVzHv-0004Az-UZ; Fri, 23 Oct 2020 11:47:33 -0400
+Received: by mail-io1-xd42.google.com with SMTP id q25so2323382ioh.4;
+ Fri, 23 Oct 2020 08:47:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Q0zhBuJwVfaqWFxVDvRV6NmbWfYwQwjqyLOvb6HnaOo=;
+ b=BPXWEqqwSKCrYmOPf2dmlb/NdjOA+3/T1KBwcxXbKvrezDVt/U6Rwey1JIg0LSqFPR
+ fiELqCyuIvHWp8z9qz0laUB7UvsodIWIq3d4Rmnzr2INwP6UdgQqFMjtgwnAmK3pviLc
+ 2rBl5H3jo1+8Rh9biHM3QFTPRN3P3bsWti1hMu3lhgCnYKHXJqa8h0btcOe0oJb6Rkop
+ fQdUqMAZoSmNBX/tq5/sv15i63ZkkafBycmEYnxP+hj6R6axV1qMpT6rLDuBA4mD+P3k
+ W2hiT4eDMMs/ZrKqdeq5QNee3BgnaMUjVr1S9tykskJQka7LYYx08cL22QJuXMqz9cDd
+ 4GUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Q0zhBuJwVfaqWFxVDvRV6NmbWfYwQwjqyLOvb6HnaOo=;
+ b=R1MVDbiFuAiIxpF68vOLjEdCbKF+zwVdmCqisDapXWCsQRGvieU4JKpCkgMefAsrGC
+ HpAE8Tg0VoKFIaLPw2UzTkgRT0viAs39z25zAPPQEUthHu7Oe7+cN41IEUn4QKx6axsN
+ vMjmWmU2muQ9giWNNI3Exq7YY6SqxZXVqj5Jc73n5yCWF6nOd3bD06TUzNSwG+B+WccK
+ sIhORNX/XFdckMyrKgAIijju5qtx4kJlwMWf3bQX9o/YAcPcHE33bRdJDaN8EmVx2Pgv
+ VaTBIWUL226tkAF3gIfftzH4QSwg5m5qyT8jRIWjxvcBStKKUeo5mDIyFpJQ84ianP6d
+ Z4gA==
+X-Gm-Message-State: AOAM533EGbw6ta3bsP18fM3CZBg1TTPamsjdS/0+/s5C+nNXI3afMl7A
+ UdgR4lt9ybv8+Pv+cdO/FA3lRF3LAC4JpDlUa8k=
+X-Google-Smtp-Source: ABdhPJw3usEvnAShsrwsaSGjnr7oHPjh0r00VfbjESsA//+BSur0QqlIQyc1UMWcLOwlejxXM1TufgcvT11xjQ21BuE=
+X-Received: by 2002:a05:6638:1696:: with SMTP id
+ f22mr2586337jat.8.1603468050333; 
+ Fri, 23 Oct 2020 08:47:30 -0700 (PDT)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kwolf@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=kwolf@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <20201021170842.25762-1-alex.bennee@linaro.org>
+ <20201021170842.25762-3-alex.bennee@linaro.org>
+In-Reply-To: <20201021170842.25762-3-alex.bennee@linaro.org>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 23 Oct 2020 08:35:43 -0700
+Message-ID: <CAKmqyKNdUQ4cEOzm4Ldd9nyPkiALktz-m0YKAo+vtkn4t8QcOg@mail.gmail.com>
+Subject: Re: [PATCH v1 2/4] hw/riscv: migrate fdt field to generic MachineState
+To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,245 +97,113 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, qemu-devel@nongnu.org, armbru@redhat.com,
- marcandre.lureau@redhat.com, pbonzini@redhat.com
+Cc: julien@xen.org, Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Masami Hiramatsu <masami.hiramatsu@linaro.org>, andre.przywara@arm.com,
+ stefano.stabellini@linaro.org,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Takahiro Akashi <takahiro.akashi@linaro.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ Alistair Francis <Alistair.Francis@wdc.com>, stefano.stabellini@xilinx.com,
+ "open list:RISC-V TCG CPUs" <qemu-riscv@nongnu.org>,
+ stratos-dev@op-lists.linaro.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This adds some test cases related to flat representation of simple
-unions and the 'allow-flat' option for union branches.
+On Wed, Oct 21, 2020 at 10:13 AM Alex Benn=C3=A9e <alex.bennee@linaro.org> =
+wrote:
+>
+> This is a mechanical change to make the fdt available through
+> MachineState.
+>
+> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
----
- tests/qapi-schema/flat-union-allow-flat.err        |  2 ++
- tests/qapi-schema/flat-union-allow-flat.json       | 10 ++++++++++
- tests/qapi-schema/flat-union-allow-flat.out        |  0
- tests/qapi-schema/meson.build                      |  5 +++++
- tests/qapi-schema/qapi-schema-test.json            | 10 ++++++++++
- tests/qapi-schema/qapi-schema-test.out             | 14 ++++++++++++++
- tests/qapi-schema/union-allow-flat-bad.err         |  2 ++
- tests/qapi-schema/union-allow-flat-bad.json        |  5 +++++
- tests/qapi-schema/union-allow-flat-bad.out         |  0
- .../qapi-schema/union-allow-flat-builtin-type.err  |  2 ++
- .../qapi-schema/union-allow-flat-builtin-type.json |  5 +++++
- .../qapi-schema/union-allow-flat-builtin-type.out  |  0
- tests/qapi-schema/union-clash-member-data.err      |  2 ++
- tests/qapi-schema/union-clash-member-data.json     |  6 ++++++
- tests/qapi-schema/union-clash-member-data.out      |  0
- tests/qapi-schema/union-clash-member-type.err      |  2 ++
- tests/qapi-schema/union-clash-member-type.json     |  6 ++++++
- tests/qapi-schema/union-clash-member-type.out      |  0
- 18 files changed, 71 insertions(+)
- create mode 100644 tests/qapi-schema/flat-union-allow-flat.err
- create mode 100644 tests/qapi-schema/flat-union-allow-flat.json
- create mode 100644 tests/qapi-schema/flat-union-allow-flat.out
- create mode 100644 tests/qapi-schema/union-allow-flat-bad.err
- create mode 100644 tests/qapi-schema/union-allow-flat-bad.json
- create mode 100644 tests/qapi-schema/union-allow-flat-bad.out
- create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.err
- create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.json
- create mode 100644 tests/qapi-schema/union-allow-flat-builtin-type.out
- create mode 100644 tests/qapi-schema/union-clash-member-data.err
- create mode 100644 tests/qapi-schema/union-clash-member-data.json
- create mode 100644 tests/qapi-schema/union-clash-member-data.out
- create mode 100644 tests/qapi-schema/union-clash-member-type.err
- create mode 100644 tests/qapi-schema/union-clash-member-type.json
- create mode 100644 tests/qapi-schema/union-clash-member-type.out
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-diff --git a/tests/qapi-schema/flat-union-allow-flat.err b/tests/qapi-schema/flat-union-allow-flat.err
-new file mode 100644
-index 0000000000..f3f3d2384b
---- /dev/null
-+++ b/tests/qapi-schema/flat-union-allow-flat.err
-@@ -0,0 +1,2 @@
-+flat-union-allow-flat.json: In union 'MyUnion':
-+flat-union-allow-flat.json:6: 'allow-flat' requires simple union
-diff --git a/tests/qapi-schema/flat-union-allow-flat.json b/tests/qapi-schema/flat-union-allow-flat.json
-new file mode 100644
-index 0000000000..114acaad86
---- /dev/null
-+++ b/tests/qapi-schema/flat-union-allow-flat.json
-@@ -0,0 +1,10 @@
-+# Flat unions must not use allow-flat
-+{ 'enum': 'Enum', 'data': [ 'one', 'two' ] }
-+{ 'struct': 'Base',
-+  'data': { 'switch': 'Enum' } }
-+{ 'struct': 'Branch', 'data': { 'name': 'str' } }
-+{ 'union': 'MyUnion',
-+  'base': 'Base',
-+  'discriminator': 'switch',
-+  'data': { 'one': { 'type': 'Branch', 'allow-flat': true },
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/flat-union-allow-flat.out b/tests/qapi-schema/flat-union-allow-flat.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/meson.build b/tests/qapi-schema/meson.build
-index 304ef939bd..a5138d0c0f 100644
---- a/tests/qapi-schema/meson.build
-+++ b/tests/qapi-schema/meson.build
-@@ -103,6 +103,7 @@ schemas = [
-   'features-name-bad-type.json',
-   'features-no-list.json',
-   'features-unknown-key.json',
-+  'flat-union-allow-flat.json',
-   'flat-union-array-branch.json',
-   'flat-union-bad-base.json',
-   'flat-union-bad-discriminator.json',
-@@ -184,12 +185,16 @@ schemas = [
-   'unclosed-list.json',
-   'unclosed-object.json',
-   'unclosed-string.json',
-+  'union-allow-flat-bad.json',
-+  'union-allow-flat-builtin-type.json',
-   'union-base-empty.json',
-   'union-base-no-discriminator.json',
-   'union-branch-case.json',
-   'union-branch-if-invalid.json',
-   'union-branch-invalid-dict.json',
-   'union-clash-branches.json',
-+  'union-clash-member-data.json',
-+  'union-clash-member-type.json',
-   'union-empty.json',
-   'union-invalid-base.json',
-   'union-optional-branch.json',
-diff --git a/tests/qapi-schema/qapi-schema-test.json b/tests/qapi-schema/qapi-schema-test.json
-index 63f92adf68..1c29576ae9 100644
---- a/tests/qapi-schema/qapi-schema-test.json
-+++ b/tests/qapi-schema/qapi-schema-test.json
-@@ -110,6 +110,16 @@
- { 'struct': 'UserDefC',
-   'data': { 'string1': 'str', 'string2': 'str' } }
- 
-+{ 'struct': 'UserDefD',
-+  'data': { 'type': 'str' } }
-+
-+{ 'union': 'UserDefSimpleUnion',
-+  'data': { 'value1' : {'type': 'UserDefA'},
-+            'value2' : 'UserDefB',
-+            'value3' : 'UserDefB',
-+            'value4' : { 'type': 'UserDefD', 'allow-flat': false }
-+  } }
-+
- # for testing use of 'number' within alternates
- { 'alternate': 'AltEnumBool', 'data': { 'e': 'EnumOne', 'b': 'bool' } }
- { 'alternate': 'AltEnumNum', 'data': { 'e': 'EnumOne', 'n': 'number' } }
-diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
-index a4e4051c61..7521e86e9f 100644
---- a/tests/qapi-schema/qapi-schema-test.out
-+++ b/tests/qapi-schema/qapi-schema-test.out
-@@ -105,6 +105,20 @@ alternate UserDefAlternate
- object UserDefC
-     member string1: str optional=False
-     member string2: str optional=False
-+object UserDefD
-+    member type: str optional=False
-+enum UserDefSimpleUnionKind
-+    member value1
-+    member value2
-+    member value3
-+    member value4
-+object UserDefSimpleUnion
-+    member type: UserDefSimpleUnionKind optional=False
-+    tag type
-+    case value1: UserDefA
-+    case value2: UserDefB
-+    case value3: UserDefB
-+    case value4: UserDefD
- alternate AltEnumBool
-     tag type
-     case e: EnumOne
-diff --git a/tests/qapi-schema/union-allow-flat-bad.err b/tests/qapi-schema/union-allow-flat-bad.err
-new file mode 100644
-index 0000000000..561fd338e1
---- /dev/null
-+++ b/tests/qapi-schema/union-allow-flat-bad.err
-@@ -0,0 +1,2 @@
-+union-allow-flat-bad.json: In union 'MyUnion':
-+union-allow-flat-bad.json:3: 'allow-flat' must be a boolean
-diff --git a/tests/qapi-schema/union-allow-flat-bad.json b/tests/qapi-schema/union-allow-flat-bad.json
-new file mode 100644
-index 0000000000..6e02e8312b
---- /dev/null
-+++ b/tests/qapi-schema/union-allow-flat-bad.json
-@@ -0,0 +1,5 @@
-+# allow-flat must be a boolean
-+{ 'struct': 'Branch', 'data': { 'name': 'str' } }
-+{ 'union': 'MyUnion',
-+  'data': { 'one': { 'type': 'Branch', 'allow-flat': 'maybe' },
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/union-allow-flat-bad.out b/tests/qapi-schema/union-allow-flat-bad.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/union-allow-flat-builtin-type.err b/tests/qapi-schema/union-allow-flat-builtin-type.err
-new file mode 100644
-index 0000000000..4163d2426e
---- /dev/null
-+++ b/tests/qapi-schema/union-allow-flat-builtin-type.err
-@@ -0,0 +1,2 @@
-+union-allow-flat-builtin-type.json: In union 'MyUnion':
-+union-allow-flat-builtin-type.json:3: branch 'one' cannot use built-in type 'int'
-diff --git a/tests/qapi-schema/union-allow-flat-builtin-type.json b/tests/qapi-schema/union-allow-flat-builtin-type.json
-new file mode 100644
-index 0000000000..21eb25c48a
---- /dev/null
-+++ b/tests/qapi-schema/union-allow-flat-builtin-type.json
-@@ -0,0 +1,5 @@
-+# Can't use built-in types for branches with 'allow-flat': true
-+{ 'struct': 'Branch', 'data': { 'name': 'str' } }
-+{ 'union': 'MyUnion',
-+  'data': { 'one': { 'type': 'int', 'allow-flat': true },
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/union-allow-flat-builtin-type.out b/tests/qapi-schema/union-allow-flat-builtin-type.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/union-clash-member-data.err b/tests/qapi-schema/union-clash-member-data.err
-new file mode 100644
-index 0000000000..316003e1b8
---- /dev/null
-+++ b/tests/qapi-schema/union-clash-member-data.err
-@@ -0,0 +1,2 @@
-+union-clash-member-data.json: In union 'MyUnion':
-+union-clash-member-data.json:4: member 'data' of type 'Branch' collides with flat representation of branch 'one'
-diff --git a/tests/qapi-schema/union-clash-member-data.json b/tests/qapi-schema/union-clash-member-data.json
-new file mode 100644
-index 0000000000..b908d44372
---- /dev/null
-+++ b/tests/qapi-schema/union-clash-member-data.json
-@@ -0,0 +1,6 @@
-+# For simple union branches, a 'data' member would prevent conversion
-+# to flat representation, so we don't want to allow it
-+{ 'struct': 'Branch', 'data': { 'data': 'str' } }
-+{ 'union': 'MyUnion',
-+  'data': { 'one': 'Branch',
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/union-clash-member-data.out b/tests/qapi-schema/union-clash-member-data.out
-new file mode 100644
-index 0000000000..e69de29bb2
-diff --git a/tests/qapi-schema/union-clash-member-type.err b/tests/qapi-schema/union-clash-member-type.err
-new file mode 100644
-index 0000000000..34e4b135ec
---- /dev/null
-+++ b/tests/qapi-schema/union-clash-member-type.err
-@@ -0,0 +1,2 @@
-+union-clash-member-type.json: In union 'MyUnion':
-+union-clash-member-type.json:4: member 'type' of type 'Branch' collides with member 'type'
-diff --git a/tests/qapi-schema/union-clash-member-type.json b/tests/qapi-schema/union-clash-member-type.json
-new file mode 100644
-index 0000000000..cb09cd7d89
---- /dev/null
-+++ b/tests/qapi-schema/union-clash-member-type.json
-@@ -0,0 +1,6 @@
-+# 'type' is in the implicit base type and clashes with a 'type' member
-+# in branches if flat representation is not disabled
-+{ 'struct': 'Branch', 'data': { 'type': 'str' } }
-+{ 'union': 'MyUnion',
-+  'data': { 'one': 'Branch',
-+            'two': 'Branch' } }
-diff --git a/tests/qapi-schema/union-clash-member-type.out b/tests/qapi-schema/union-clash-member-type.out
-new file mode 100644
-index 0000000000..e69de29bb2
--- 
-2.28.0
+Alistair
 
+> ---
+>  include/hw/riscv/virt.h |  1 -
+>  hw/riscv/virt.c         | 18 +++++++++---------
+>  2 files changed, 9 insertions(+), 10 deletions(-)
+>
+> diff --git a/include/hw/riscv/virt.h b/include/hw/riscv/virt.h
+> index b4ed9a32eb..6505ae8d23 100644
+> --- a/include/hw/riscv/virt.h
+> +++ b/include/hw/riscv/virt.h
+> @@ -41,7 +41,6 @@ struct RISCVVirtState {
+>      DeviceState *plic[VIRT_SOCKETS_MAX];
+>      PFlashCFI01 *flash[2];
+>
+> -    void *fdt;
+>      int fdt_size;
+>  };
+>
+> diff --git a/hw/riscv/virt.c b/hw/riscv/virt.c
+> index 41bd2f38ba..17c0706156 100644
+> --- a/hw/riscv/virt.c
+> +++ b/hw/riscv/virt.c
+> @@ -194,7 +194,7 @@ static void create_fdt(RISCVVirtState *s, const struc=
+t MemmapEntry *memmap,
+>      hwaddr flashsize =3D virt_memmap[VIRT_FLASH].size / 2;
+>      hwaddr flashbase =3D virt_memmap[VIRT_FLASH].base;
+>
+> -    fdt =3D s->fdt =3D create_device_tree(&s->fdt_size);
+> +    fdt =3D mc->fdt =3D create_device_tree(&s->fdt_size);
+>      if (!fdt) {
+>          error_report("create_device_tree() failed");
+>          exit(1);
+> @@ -434,12 +434,12 @@ static void create_fdt(RISCVVirtState *s, const str=
+uct MemmapEntry *memmap,
+>      g_free(name);
+>
+>      name =3D g_strdup_printf("/soc/flash@%" PRIx64, flashbase);
+> -    qemu_fdt_add_subnode(s->fdt, name);
+> -    qemu_fdt_setprop_string(s->fdt, name, "compatible", "cfi-flash");
+> -    qemu_fdt_setprop_sized_cells(s->fdt, name, "reg",
+> +    qemu_fdt_add_subnode(mc->fdt, name);
+> +    qemu_fdt_setprop_string(mc->fdt, name, "compatible", "cfi-flash");
+> +    qemu_fdt_setprop_sized_cells(mc->fdt, name, "reg",
+>                                   2, flashbase, 2, flashsize,
+>                                   2, flashbase + flashsize, 2, flashsize)=
+;
+> -    qemu_fdt_setprop_cell(s->fdt, name, "bank-width", 4);
+> +    qemu_fdt_setprop_cell(mc->fdt, name, "bank-width", 4);
+>      g_free(name);
+>  }
+>
+> @@ -613,9 +613,9 @@ static void virt_machine_init(MachineState *machine)
+>              hwaddr end =3D riscv_load_initrd(machine->initrd_filename,
+>                                             machine->ram_size, kernel_ent=
+ry,
+>                                             &start);
+> -            qemu_fdt_setprop_cell(s->fdt, "/chosen",
+> +            qemu_fdt_setprop_cell(machine->fdt, "/chosen",
+>                                    "linux,initrd-start", start);
+> -            qemu_fdt_setprop_cell(s->fdt, "/chosen", "linux,initrd-end",
+> +            qemu_fdt_setprop_cell(machine->fdt, "/chosen", "linux,initrd=
+-end",
+>                                    end);
+>          }
+>      } else {
+> @@ -636,11 +636,11 @@ static void virt_machine_init(MachineState *machine=
+)
+>
+>      /* Compute the fdt load address in dram */
+>      fdt_load_addr =3D riscv_load_fdt(memmap[VIRT_DRAM].base,
+> -                                   machine->ram_size, s->fdt);
+> +                                   machine->ram_size, machine->fdt);
+>      /* load the reset vector */
+>      riscv_setup_rom_reset_vec(start_addr, virt_memmap[VIRT_MROM].base,
+>                                virt_memmap[VIRT_MROM].size, kernel_entry,
+> -                              fdt_load_addr, s->fdt);
+> +                              fdt_load_addr, machine->fdt);
+>
+>      /* SiFive Test MMIO device */
+>      sifive_test_create(memmap[VIRT_TEST].base);
+> --
+> 2.20.1
+>
+>
 
