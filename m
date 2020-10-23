@@ -2,68 +2,90 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0EEBC4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:04:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22096C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:07:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 159E1208B6
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:04:31 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 159E1208B6
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id 87804208B6
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 15:07:38 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bS3lQWem"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 87804208B6
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59804 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35338 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVycI-0000cV-Rp
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:04:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51696)
+	id 1kVyfJ-0002WU-7t
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 11:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52730)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVyZH-00075j-Rp
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:01:23 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:47924)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVyci-00012f-Vn
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:04:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43715)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kVyZG-0006IQ-1U
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:01:23 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kVycb-0006bv-96
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 11:04:56 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603465484;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=909Gfe4u8PCGeTj+SdqtzMct+iP9Q+E+HPx6e5qbeNM=;
+ b=bS3lQWemiSF8UuHH5vIpqadtuE8Rabx8c/a75J3lW38VsI+TgUpB8cp5+TW3TLuUmVuZvc
+ j+jNFKGFvx0UhreiRPzajxpQD2xJ6u938l17OMjogef7CZkGBYUGM2bftrO1XNXFh3wPFr
+ 6BD2zAaoPqQXRBAdaFBgvbOsz7B9YkE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-334-stF4zQsjMuqYGaftO4Z7XQ-1; Fri, 23 Oct 2020 11:01:17 -0400
-X-MC-Unique: stF4zQsjMuqYGaftO4Z7XQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-225-oyiyJGtsMJOt93BF7xH5Zw-1; Fri, 23 Oct 2020 11:04:43 -0400
+X-MC-Unique: oyiyJGtsMJOt93BF7xH5Zw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 30A3A83DC21;
- Fri, 23 Oct 2020 15:01:15 +0000 (UTC)
-Received: from bahia.lan (ovpn-115-53.ams2.redhat.com [10.36.115.53])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 04A555C1CF;
- Fri, 23 Oct 2020 15:01:10 +0000 (UTC)
-Subject: [PATCH v2] block: End quiescent sections when a BDS is deleted
-From: Greg Kurz <groug@kaod.org>
-To: qemu-devel@nongnu.org
-Date: Fri, 23 Oct 2020 17:01:10 +0200
-Message-ID: <160346526998.272601.9045392804399803158.stgit@bahia.lan>
-User-Agent: StGit/0.21
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 241CE804B71
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 15:04:42 +0000 (UTC)
+Received: from work-vm (ovpn-113-212.ams2.redhat.com [10.36.113.212])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id BE19E1002C03;
+ Fri, 23 Oct 2020 15:04:31 +0000 (UTC)
+Date: Fri, 23 Oct 2020 16:04:29 +0100
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Vivek Goyal <vgoyal@redhat.com>
+Subject: Re: [PATCH v3 2/5] tools/virtiofsd: xattr name mappings: Map client
+ xattr names
+Message-ID: <20201023150429.GF3038@work-vm>
+References: <20201014180209.49299-1-dgilbert@redhat.com>
+ <20201014180209.49299-3-dgilbert@redhat.com>
+ <20201022152853.GC512900@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201022152853.GC512900@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: kaod.org
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
- helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:01:19
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 01:44:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -11
-X-Spam_score: -1.2
-X-Spam_bar: -
-X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- SPF_HELO_NONE=0.001, SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -76,131 +98,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>
+Cc: dinechin@redhat.com, virtio-fs@redhat.com, qemu-devel@nongnu.org,
+ stefanha@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a BDS gets deleted during blk_drain_all(), it might miss a
-call to bdrv_do_drained_end(). This means missing a call to
-aio_enable_external() and the AIO context remains disabled for
-ever. This can cause a device to become irresponsive and to
-disrupt the guest execution, ie. hang, loop forever or worse.
+* Vivek Goyal (vgoyal@redhat.com) wrote:
+> On Wed, Oct 14, 2020 at 07:02:06PM +0100, Dr. David Alan Gilbert (git) wrote:
+> > From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+> > 
+> > Map xattr names originating at the client; from get/set/remove xattr.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> > ---
+> >  tools/virtiofsd/passthrough_ll.c | 101 ++++++++++++++++++++++++++++++-
+> >  1 file changed, 98 insertions(+), 3 deletions(-)
+> > 
+> > diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> > index f5a33014f9..57ebe17ed6 100644
+> > --- a/tools/virtiofsd/passthrough_ll.c
+> > +++ b/tools/virtiofsd/passthrough_ll.c
+> > @@ -2183,20 +2183,80 @@ static XattrMapEntry *parse_xattrmap(struct lo_data *lo)
+> >      return res;
+> >  }
+> >  
+> > -static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
+> > +/*
+> > + * For use with getxattr/setxattr/removexattr, where the client
+> > + * gives us a name and we may need to choose a different one.
+> > + * Allocates a buffer for the result placing it in *out_name.
+> > + *   If there's no change then *out_name is not set.
+> > + * Returns 0 on success
+> > + * Can return -EPERM to indicate we block a given attribute
+> > + *   (in which case out_name is not allocated)
+> > + * Can return -ENOMEM to indicate out_name couldn't be allocated.
+> > + */
+> > +static int xattr_map_client(const struct lo_data *lo, const char *client_name,
+> > +                            char **out_name)
+> > +{
+> > +    const XattrMapEntry *cur_entry;
+> > +
+> > +    for (cur_entry = lo->xattr_map_list; ; cur_entry++) {
+> > +        if ((cur_entry->flags & XATTR_MAP_FLAG_CLIENT) &&
+> > +            (strstart(client_name, cur_entry->key, NULL))) {
+> > +            if (cur_entry->flags & XATTR_MAP_FLAG_END_BAD) {
+> > +                return -EPERM;
+> > +            }
+> > +            if (cur_entry->flags & XATTR_MAP_FLAG_END_OK) {
+> > +                /* Unmodified name */
+> > +                return 0;
+> > +            }
+> > +            if (cur_entry->flags & XATTR_MAP_FLAG_PREFIX) {
+> 
+> I am wondering why do have "END" substring in BAD and OK flags while
+> we don't have one in PREFIX flag. IOW, why not simply call these
+> flags as XATTR_MAP_FLAG_OK and XATTR_MAP_FLAG_BAD respectively.
 
-This scenario is quite easy to encounter with virtio-scsi
-on POWER when punching multiple blockdev-create QMP commands
-while the guest is booting and it is still running the SLOF
-firmware. This happens because SLOF disables/re-enables PCI
-devices multiple times via IO/MEM/MASTER bits of PCI_COMMAND
-register after the initial probe/feature negotiation, as it
-tends to work with a single device at a time at various stages
-like probing and running block/network bootloaders without
-doing a full reset in-between. This naturally generates many
-dataplane stops and starts, and thus many drain sections that
-can race with blockdev_create_run(). In the end, SLOF bails
-out.
+OK, the END_'s have gone.
 
-It is somehow reproducible on x86 but it requires to generate
-articial dataplane start/stop activity with stop/cont QMP
-commands. In this case, seabios ends up looping for ever,
-waiting for the virtio-scsi device to send a response to
-a command it never received.
+> > +                *out_name = g_try_malloc(strlen(client_name) +
+> > +                                         strlen(cur_entry->prepend) + 1);
+> 
+> Should we check for cur_entry->prepend to be NULL before we try to
+> allocate out_name. One could say.
+> 
+> "prefix:client:trusted.::". In that case we are not supposed to prefix
+> anything?
 
-Add a helper that pairs all previously called bdrv_do_drained_begin()
-with a bdrv_do_drained_end() and call it from bdrv_close().
-While at it, update the "/bdrv-drain/graph-change/drain_all"
-test in test-bdrv-drain so that it can catch the issue.
+We shouldn't need to do the NULL check; cur_entry->prepend should = ""
+in that case, not NULL.
 
-BugId: https://bugzilla.redhat.com/show_bug.cgi?id=3D1874441
-Signed-off-by: Greg Kurz <groug@kaod.org>
----
-v2: - use g_assert() in core code (checkpatch)
-    - rename helper to bdrv_drain_all_end_quiesce() (Kevin)
----
- block.c                 |    9 +++++++++
- block/io.c              |   13 +++++++++++++
- include/block/block.h   |    6 ++++++
- tests/test-bdrv-drain.c |    1 +
- 4 files changed, 29 insertions(+)
+Dave
 
-diff --git a/block.c b/block.c
-index 430edf79bb10..ee5b28a9798d 100644
---- a/block.c
-+++ b/block.c
-@@ -4458,6 +4458,15 @@ static void bdrv_close(BlockDriverState *bs)
-     }
-     QLIST_INIT(&bs->aio_notifiers);
-     bdrv_drained_end(bs);
-+
-+    /*
-+     * If we're still inside some bdrv_drain_all_begin()/end() sections, e=
-nd
-+     * them now since this BDS won't exist anymore when bdrv_drain_all_end=
-()
-+     * gets called.
-+     */
-+    if (bs->quiesce_counter) {
-+        bdrv_drain_all_end_quiesce(bs);
-+    }
- }
-=20
- void bdrv_close_all(void)
-diff --git a/block/io.c b/block/io.c
-index 54f0968aee27..c3a345a911e6 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -633,6 +633,19 @@ void bdrv_drain_all_begin(void)
-     }
- }
-=20
-+void bdrv_drain_all_end_quiesce(BlockDriverState *bs)
-+{
-+    int drained_end_counter =3D 0;
-+
-+    g_assert(bs->quiesce_counter > 0);
-+    g_assert(!bs->refcnt);
-+
-+    while (bs->quiesce_counter) {
-+        bdrv_do_drained_end(bs, false, NULL, true, &drained_end_counter);
-+    }
-+    BDRV_POLL_WHILE(bs, qatomic_read(&drained_end_counter) > 0);
-+}
-+
- void bdrv_drain_all_end(void)
- {
-     BlockDriverState *bs =3D NULL;
-diff --git a/include/block/block.h b/include/block/block.h
-index d16c401cb44e..809987017631 100644
---- a/include/block/block.h
-+++ b/include/block/block.h
-@@ -779,6 +779,12 @@ void bdrv_drained_end(BlockDriverState *bs);
-  */
- void bdrv_drained_end_no_poll(BlockDriverState *bs, int *drained_end_count=
-er);
-=20
-+/**
-+ * End all quiescent sections started by bdrv_drain_all_begin(). This is
-+ * only needed when deleting a BDS before bdrv_drain_all_end() is called.
-+ */
-+void bdrv_drain_all_end_quiesce(BlockDriverState *bs);
-+
- /**
-  * End a quiescent section started by bdrv_subtree_drained_begin().
-  */
-diff --git a/tests/test-bdrv-drain.c b/tests/test-bdrv-drain.c
-index 1595bbc92e9e..8a29e33e004a 100644
---- a/tests/test-bdrv-drain.c
-+++ b/tests/test-bdrv-drain.c
-@@ -594,6 +594,7 @@ static void test_graph_change_drain_all(void)
-=20
-     g_assert_cmpint(bs_b->quiesce_counter, =3D=3D, 0);
-     g_assert_cmpint(b_s->drain_count, =3D=3D, 0);
-+    g_assert_cmpint(qemu_get_aio_context()->external_disable_cnt, =3D=3D, =
-0);
-=20
-     bdrv_unref(bs_b);
-     blk_unref(blk_b);
 
+> > +                if (!*out_name) {
+> > +                    return -ENOMEM;
+> > +                }
+> > +                sprintf(*out_name, "%s%s", cur_entry->prepend, client_name);
+> > +                return 0;
+> > +            }
+> > +        }
+> > +    }
+> > +
+> > +    /* Shouldn't get here - rules should have an END_* */
+> > +    abort();
+> > +}
+> 
+> Thanks
+> Vivek
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
