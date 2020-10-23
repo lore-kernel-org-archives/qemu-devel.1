@@ -2,103 +2,95 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A6C6C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F80C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:35:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 96AC12192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:24:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1955E2192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:35:23 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JZk/xoY2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 96AC12192A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c8XkE+DJ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1955E2192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38712 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVtJH-00083G-EN
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:24:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56452)
+	id 1kVtTm-00026m-DI
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:35:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58386)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVtIE-0007Pf-KC; Fri, 23 Oct 2020 05:23:26 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:39555)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVtSe-0001bC-Pj
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:34:12 -0400
+Received: from mail-wm1-x32e.google.com ([2a00:1450:4864:20::32e]:35964)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kVtIC-0008Gd-Rz; Fri, 23 Oct 2020 05:23:26 -0400
-Received: by mail-wr1-x444.google.com with SMTP id y12so1005143wrp.6;
- Fri, 23 Oct 2020 02:23:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=6WcAI9LqJXniaPU6wS68WgkQq4afR52p4cXzIvB+4bY=;
- b=JZk/xoY2lAtCzpCM/W6AqoeoBOknlnn1ePqygyIhbmTUs8AUhOWGxiQGDAbcvp/0PH
- x9We/ITPaCMiziJX0RtsqyirB1fjJnHqN2PnBmKesRjv9jyaLIXwBV3rv7N35xABHmCc
- vu+r9Ab1gVKDwynBYkMN3dkqaMlD1BDZKq21XQmof8FEgfD+ijpM4XwfzD9bcOLOg7Nn
- 7wHN8KNd7WnbtLIsfa8dXhOLJ6yIYVmpVITRGu+71RJOsir5iXmEdQ7h8tOvX0HBWeu5
- mbNQYtwKB6EPiuy2h5mLyeskd/7NLnYs2GKMyGxmS3bYeT7ce0D7wqR+XdFwCq8ffZQ5
- QW0w==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kVtSc-0003Z1-Ng
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:34:12 -0400
+Received: by mail-wm1-x32e.google.com with SMTP id e2so782974wme.1
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 02:34:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=H2iRsKVL6EY6l0LBosnmoseFejYzzjApIoYOrRbruAw=;
+ b=c8XkE+DJg6F4FPpNendbCZHBEUvxKY3bE4MI8sLOc3NwZlToeblcnB2ubko0knuvTH
+ t81PR/oQMo5wBIG1F4k4b1La0nFEHENx7c2U0g5W6wWFg0RBFqMm/zN+dujZU4K5D9bT
+ 1c9lI7f4Cc0HvAxvsLznzFsHLv6KKoTTRSvXSFl4tVEVKBAB45xgfR66TJnoBm1nS6pi
+ Z1bHCRxpPYhZeE3yD6RIRCsutrT+Qi6DyFLahE3ZKhmucOFjWfSYxC37hplj9AdXi5pg
+ Yfz7zZcPYMJE/44CGOLbeFbZW6HVcHoyuM5kWbfoXIYRZ/fLdM5fQ9dneYZnohu491Ze
+ 1HlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=6WcAI9LqJXniaPU6wS68WgkQq4afR52p4cXzIvB+4bY=;
- b=lcsrGzRXJHTSZJfbsKaSbz7aab08EECyz3NCXW+yCBxDXs/+ag50DDddGLlCQ1hpx5
- bYNtR6ePjIvoRG2J5jG0mi4zFolQR+HjAVQLTQEEwjAyH22acAEY1KnMVrhXLOhyX/N1
- zHELnYyVQux1VVCdh+GMJ6gAEE7Hx5uIX7GwT2eD6GF8KfQXggV8NmMiAXe7fRGGm6es
- aUlIbRSk8g4yka0Bo4/XSaeYzoBY8fvn4l2jlZqeUs13X4nevh5X405IkiC5vBRqUC++
- Kj0vbjSFi1Kb3+KEDuRis3kQRmItxk7N5vQyDzIn/85GnUOUS3/kOSfYN5oiGUxFP5FQ
- V0ZA==
-X-Gm-Message-State: AOAM531xTnpuzLslTzz4LrGk1kScsmO0xgwCzAdBFqj8WRFsqW7CGeld
- 6GJkqtqsiWHzJUY0pj3otcK3QAx6WC0=
-X-Google-Smtp-Source: ABdhPJyEmadX2JC0m/tI0eaujivh+MZUaQqmPxBA7CPHeH5qAuXn2EFJFM80UKBUJMMal4yJjgSreg==
-X-Received: by 2002:adf:91a4:: with SMTP id 33mr1689539wri.170.1603445002235; 
- Fri, 23 Oct 2020 02:23:22 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id l8sm2060367wrn.28.2020.10.23.02.23.20
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Oct 2020 02:23:21 -0700 (PDT)
-Subject: Re: [PULL 22/23] hw/sd: Fix incorrect populated function switch
- status data structure
-To: Bin Meng <bmeng.cn@gmail.com>, Niek Linnenbank <nieklinnenbank@gmail.com>
-References: <20200821172916.1260954-1-f4bug@amsat.org>
- <20200821172916.1260954-23-f4bug@amsat.org>
- <e378932a-1de3-83c1-834f-ae6526604cb7@amsat.org>
- <CAEUhbmVFZ8aWdv48D8acdfFRp6WMYL6n=ENeo4hBZfmqE9TrDA@mail.gmail.com>
- <a0ac3805-ec48-2a0e-6511-b142bfc6f214@amsat.org>
- <CAEUhbmVLFJWND=KHexD12mrCMJSO3mcE6k7_tRE+v8pNZjhN_A@mail.gmail.com>
- <CAPan3Wqx-psi6zgz3NyM1Hu_PHaGq4Nn3_RJf_zueqwXFNKuWg@mail.gmail.com>
- <CAEUhbmXGbNNXkJYt8-sX_+nT_ReXoyerYaf+KROxx55-89wbHA@mail.gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <db561779-005b-c358-3e72-e1169ef49faf@amsat.org>
-Date: Fri, 23 Oct 2020 11:23:20 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=H2iRsKVL6EY6l0LBosnmoseFejYzzjApIoYOrRbruAw=;
+ b=T5K6xub9ErfAqEa3izjIA+A7GjGlv7Tvicb8T0q5HyC9ObRIZORk/AijxL6wlpYE+n
+ +rUMsaYb0kaOH3obU+2adWkXukB3SGsJX8Mmi624vHZ2klkCtBfzxarJ5Rtv2kKAaop2
+ /OKrFLBrRiCQZ/BfWSpc9wdFt/UllklMiv2PbL1LV7J/qf4AcRNetz7MrFA+BQMdbM4F
+ 0/f9Nk4CxixJ7zlg+lZle9Zr6dMeRJIPEt5+asY8Br91G0dkGiKDckVSoGfpmgK7Iini
+ mbrS5TqMudGC7UdlbbXS+Z83rp0Mx8vXI9ZhxTx40+r0x4DcN4pNresuwsAGb/jJUtus
+ AgbA==
+X-Gm-Message-State: AOAM530oje52AZSFCIDkOQHuirWMgB4cYAKPB9tptF6fq7lZrxPXDWhd
+ SrwJ/WtVDPU30cc1NT88aerBgw==
+X-Google-Smtp-Source: ABdhPJxdwrejujsZesd3qo4d9ytaAwax+qR8L9XHxi+e9uNQ3OeXHVYxMJm7ZbRjHslTofJULWJ68A==
+X-Received: by 2002:a7b:c453:: with SMTP id l19mr1368077wmi.50.1603445648679; 
+ Fri, 23 Oct 2020 02:34:08 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id e15sm2026330wro.13.2020.10.23.02.34.07
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Oct 2020 02:34:07 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 214BE1FF7E;
+ Fri, 23 Oct 2020 10:34:07 +0100 (BST)
+References: <87o8kttj2e.fsf@linaro.org>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: Tips for debugging GPU acceleration.
+In-reply-to: <87o8kttj2e.fsf@linaro.org>
+Date: Fri, 23 Oct 2020 10:34:07 +0100
+Message-ID: <87imb1thf4.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <CAEUhbmXGbNNXkJYt8-sX_+nT_ReXoyerYaf+KROxx55-89wbHA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::32e;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x32e.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -15
-X-Spam_score: -1.6
-X-Spam_bar: -
-X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.107,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,70 +103,137 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-block@nongnu.org,
- Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Bin Meng <bin.meng@windriver.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Beniamino Galvani <b.galvani@gmail.com>, Michael Walle <michael@walle.cc>,
- qemu-arm <qemu-arm@nongnu.org>
+Cc: qemu-devel@nongnu.org, agl-dev-community@lists.automotivelinux.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/23/20 4:02 AM, Bin Meng wrote:
-> Hi Niek,
-> 
-> On Thu, Oct 22, 2020 at 11:20 PM Niek Linnenbank
-> <nieklinnenbank@gmail.com> wrote:
->>
->> Hi Bin, Philippe,
->>
->> If im correct the acceptance tests for orange pi need to be run with a flag ARMBIAN_ARTIFACTS_CACHED set that explicitly allows them to be run using the armbian mirror. So if you pass that flag on the same command that Philippe gave, the rests should run.
-> 
-> Thank you for the hints. Actually I noticed the environment variable
-> ARMBIAN_ARTIFACTS_CACHED when looking at the test codes, but after I
-> turned on the flag it still could not download the test asset from the
-> apt.armbian.com website.
 
-This patch could help you, but it use a different image [*]:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg737760.html
-(I haven't tested the image yet but I assume the same bug is present).
+Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
 
-> 
->> I have a follow up question and Im interested to hear your opinion on that Philippe. Should we perhaps update the orange pi tests (and maybe others) so they use a reliable mirror that we can control, for example a github repo? I would be happy to create a repo for that, at least for the orange pi tests. But maybe there is already something planned as a more general solution for artifacts of other machines as well?
+(fix the qemu-devel address)
 
-This is a technical debt between the Avocado and QEMU communities
-(or a misunderstanding?).
+> Hi Gerd,
+>
+> I'm currently trying to get accelerated graphics working on an AArch64
+> AGL distribution (both in KVM and TCG builds). As far as I can tell the
+> device is being correctly created and I do get a working DRI based
+> display. However the Weston based compositor falls back to the softpipe
+> rendering:
+>
+>   Date: 2020-10-22 UTC
+>   [19:37:22.296] Using config file '/etc/xdg/weston/weston.ini'.
+>   [19:37:22.297] Output repaint window is 7 ms maximum.
+>   [19:37:22.298] Loading module '/usr/lib/libweston-8/drm-backend.so'
+>   [19:37:22.318] initializing drm backend
+>   [19:37:22.323] logind: not running in a systemd session
+>   [19:37:22.323] logind: cannot setup systemd-logind helper (-61), using =
+legacy fallback
+>   [19:37:22.370] using /dev/dri/card0
+>   [19:37:22.370] DRM: supports universal planes
+>   [19:37:22.370] DRM: supports atomic modesetting
+>   [19:37:22.370] DRM: supports picture aspect ratio
+>   [19:37:22.373] Loading module '/usr/lib/libweston-8/gl-renderer.so'
+>   [19:37:22.540] EGL client extensions: EGL_EXT_client_extensions
+>                  EGL_EXT_device_base EGL_EXT_device_enumeration
+>                  EGL_EXT_device_query EGL_EXT_platform_base
+>                  EGL_KHR_client_get_all_proc_addresses EGL_KHR_debug
+>                  EGL_EXT_platform_wayland EGL_MESA_platform_gbm
+>                  EGL_MESA_platform_surfaceless EGL_EXT_platform_device
+>   [19:37:22.542] EGL version: 1.4
+>   [19:37:22.542] EGL vendor: Mesa Project
+>   [19:37:22.542] EGL client APIs: OpenGL OpenGL_ES=20
+>   [19:37:22.542] EGL extensions: EGL_ANDROID_blob_cache EGL_EXT_buffer_age
+>                  EGL_EXT_image_dma_buf_import EGL_KHR_cl_event2
+>                  EGL_KHR_config_attribs EGL_KHR_create_context
+>                  EGL_KHR_create_context_no_error EGL_KHR_fence_sync
+>                  EGL_KHR_get_all_proc_addresses EGL_KHR_gl_colorspace
+>                  EGL_KHR_gl_renderbuffer_image EGL_KHR_gl_texture_2D_image
+>                  EGL_KHR_gl_texture_3D_image EGL_KHR_gl_texture_cubemap_i=
+mage
+>                  EGL_KHR_image EGL_KHR_image_base EGL_KHR_image_pixmap
+>                  EGL_KHR_no_config_context EGL_KHR_reusable_sync
+>                  EGL_KHR_surfaceless_context EGL_EXT_pixel_format_float
+>                  EGL_KHR_wait_sync EGL_MESA_configless_context
+>                  EGL_MESA_image_dma_buf_export EGL_MESA_query_driver
+>   [19:37:22.542] warning: Disabling render GPU timeline and explicit sync=
+hronization due to missing EGL_ANDROID_native_fence_sync extension
+>   [19:37:22.542] EGL_KHR_surfaceless_context available
+>   [19:37:22.819] GL version: OpenGL ES 3.1 Mesa 20.0.2
+>   [19:37:22.819] GLSL version: OpenGL ES GLSL ES 3.10
+>   [19:37:22.819] GL vendor: VMware, Inc.
+>   [19:37:22.819] GL renderer: softpipe
+>   [19:37:22.819] GL extensions: GL_EXT_blend_minmax GL_EXT_multi_draw_arr=
+ays
+>
+> I know the kernel has the right bits enabled (VIRTIO_DRM_GPU) but the
+> kernel seems to think the host needs something else to support it:
+>
+>   [    2.743035] virtio-pci 0000:00:04.0: enabling device (0000 -> 0003)
+>   [    2.746441] virtio-pci 0000:00:05.0: enabling device (0000 -> 0002)
+>   [    2.778843] random: fast init done
+>   [    2.780024] random: crng init done
+>   [    2.781054] bochs-drm 0000:00:02.0: remove_conflicting_pci_framebuff=
+ers: bar 0: 0x10000000 -> 0x10ffffff
+>   [    2.781597] bochs-drm 0000:00:02.0: remove_conflicting_pci_framebuff=
+ers: bar 2: 0x11014000 -> 0x11014fff
+>   [    2.786609] bochs-drm 0000:00:02.0: enabling device (0000 -> 0002)
+>   [    2.789259] [drm] Found bochs VGA, ID 0xb0c5.
+>   [    2.789639] [drm] Framebuffer size 16384 kB @ 0x10000000, mmio @ 0x1=
+1014000.
+>   [    2.791527] [TTM] Zone  kernel: Available graphics memory: 2015562 K=
+iB
+>   [    2.792300] [TTM] Initializing pool allocator
+>   [    2.793275] [TTM] Initializing DMA pool allocator
+>   [    2.801629] [drm] Found EDID data blob.
+>   [    2.809735] [drm] Initialized bochs-drm 1.0.0 20130925 for 0000:00:0=
+2.0 on minor 0
+>   [    2.903431] Console: switching to colour frame buffer device 128x48
+>   [    2.928141] bochs-drm 0000:00:02.0: fb0: bochs-drmdrmfb frame buffer=
+ device
+>   [    2.929844] [drm] pci: virtio-gpu-pci detected at 0000:00:05.0
+>   [    2.930300] [drm] virgl 3d acceleration not supported by host
+>   [    2.930484] [drm] EDID support available.
+>   [    2.931193] [drm] number of scanouts: 1
+>   [    2.931318] [drm] number of cap sets: 0
+>   [    2.935329] [drm] Initialized virtio_gpu 0.1.0 0 for virtio4 on mino=
+r 1
+>   [    3.058526] virtio_gpu virtio4: fb1: virtio_gpudrmfb frame buffer de=
+vice
+>
+> I'm invoking QEMU on both systems with:
+>
+>   -device virtio-gpu-pci,virgl=3Dtrue
+>
+> The full TCG command line is:
+>
+>   ./aarch64-softmmu/qemu-system-aarch64 -cpu cortex-a57 \
+>     -machine type=3Dvirt,virtualization=3Don,gic-version=3D3 \
+>     -serial mon:stdio \
+>     -netdev user,id=3Dunet,hostfwd=3Dtcp::2222-:22 \
+>     -device virtio-net-device,netdev=3Dunet,id=3Dvirt-net \
+>     -drive id=3Ddisk0,file=3D$HOME/images/agl/agl-demo-platform-crosssdk-=
+qemuarm64.ext4,if=3Dnone,format=3Draw \
+>     -device virtio-blk-device,drive=3Ddisk0 \
+>     -soundhw hda \
+>     -device qemu-xhci \
+>     -device usb-tablet \
+>     -device usb-kbd \
+>     -object rng-random,filename=3D/dev/urandom,id=3Drng0 \
+>     -device virtio-rng-pci,rng=3Drng0 \
+>     -device virtio-serial-device \
+>     -chardev null,id=3Dvirtcon \
+>     -device virtconsole,chardev=3Dvirtcon \
+>     -m 4096 \
+>     -kernel ~/images/agl/Image \
+>     -append "console=3DttyAMA0 root=3D/dev/vda" \
+>     -display gtk,show-cursor=3Don \
+>     -smp 4 \
+>     -device virtio-gpu-pci,virgl=3Dtrue
+>
+> Any tips on how to track down where things are going wrong?
 
-QEMU community understood the Avocado caching would be an helpful
-feature, but it ended being more of a problem.
 
-
-I.e. here Niek, Michael Roth and myself still have the image cached,
-so we can keep running the tests committed to the repository. You
-Bin can not, as the armbian mirror is not stable and remove the old
-image.
-
-The old image (Armbian_19.11.3_Orangepipc_bionic_current_5.3.9.img)
-has been manually tested by Niek and myself, I enabled tracing and
-look at the SD packets for some time, was happy how the model worked
-and decided we should keep running a test with this particular image.
-
-Armbian released new images, in particular the one Cleber sent in [*]:
-Armbian_20.08.1_Orangepipc_bionic_current_5.8.5.img.xz. While it might
-work similarly, I haven't tested it, and don't have time to do again
-the same audit.
- From my experience with the Raspberry Pi, these images never work the
-same way, as the Linux kernel evolves quickly with these kinda recent
-embedded boards. The QEMU raspi models have to emulate new devices
-(or complete current ones) every years, because Linux started to use
-a device differently, or started to use a part of the SoC that was not
-used before. Either the kernel doesn't boot, or there are side-effect
-later when userspace program is executed. PITA to debug TBH. For this
-reason I disagree with updating test images to the latest releases.
-
-It would be nice to know QEMU works with the latest Armbian, but
-nobody popped up on the mailing list asking for it. I am personally
-happy enough using the 19.11 release for now.
+--=20
+Alex Benn=C3=A9e
 
