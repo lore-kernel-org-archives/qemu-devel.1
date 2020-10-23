@@ -2,88 +2,111 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46E49C388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:08:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA296C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:08:36 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B6A52208FE
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46F7D208FE
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:08:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YN/9D6wy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B6A52208FE
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MMOFR3UF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F7D208FE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44264 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46558 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0Xv-0002CG-LP
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:08:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58130)
+	id 1kW0YN-00038y-90
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:08:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW0Wm-0000kj-R8
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:06:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52255)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kW0XB-0001cA-N5
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:07:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22551)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kW0Wk-0006Id-3G
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:06:56 -0400
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kW0X9-0006LU-TV
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 13:07:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603472811;
+ s=mimecast20190719; t=1603472838;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=fpCAKh1qFEsDfC8aXXPIYzwiPvsP8lHIWiE82QJ/Hgg=;
- b=YN/9D6wyUZn8LrCRZ9Fbtx833ybdwQvr1MZUkzFPq2r5eGybhxIr1PdysWEWOL51mRdSg4
- f9VNeUu8Yd6tx+fGz/wNJKjBfYOGZjwD8uanykBGHruNA85GAU0IxWulsFkJgqryi09X/J
- pgbQAa0wAmHjeBFYS9s8u1Mog1rON+k=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-390-Ex83D_faOOWEUt9QCshquQ-1; Fri, 23 Oct 2020 13:06:47 -0400
-X-MC-Unique: Ex83D_faOOWEUt9QCshquQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 83B438797E2;
- Fri, 23 Oct 2020 17:06:46 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E6EDC55795;
- Fri, 23 Oct 2020 17:06:44 +0000 (UTC)
-Date: Fri, 23 Oct 2020 19:06:43 +0200
-From: Igor Mammedov <imammedo@redhat.com>
-To: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-Subject: Re: [PATCH] cpus: verify that number of created cpus do not exceed
- smp params
-Message-ID: <20201023190643.06db22f7@redhat.com>
-In-Reply-To: <160343848141.8350.10469322440262034340.stgit@pasha-ThinkPad-X280>
-References: <160343848141.8350.10469322440262034340.stgit@pasha-ThinkPad-X280>
+ bh=uv348hOlmwnXCqW0YKJPMk8st5yikMTDxnAgbpXKkIw=;
+ b=MMOFR3UFXsc0p/+qYFKXvA5bW09cHU6Za47X7ykO/X6Zp8HZ0N6Saaitve8HeKfbqGkiVh
+ pmbnd5QrinMNzgyAERe+Nx+ymjwD4TQoIk2ahs/4r26Gzitgl1tl+IfqytpL9tVrn2d66N
+ SkH3dIHeSIk6XPSqnB4NDPeo/qcOgD0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-522-QabkRt8iPsiAgGLx7bqSlg-1; Fri, 23 Oct 2020 13:07:17 -0400
+X-MC-Unique: QabkRt8iPsiAgGLx7bqSlg-1
+Received: by mail-wr1-f69.google.com with SMTP id i6so807101wrx.11
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 10:07:16 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=uv348hOlmwnXCqW0YKJPMk8st5yikMTDxnAgbpXKkIw=;
+ b=c593BzMA+oKnzdsWcVJ3gQapFeTdG5FDfV8NYiryegt/DQjs2Ogde+KzNSU1hV58+r
+ dNd2Tjtq6GlLZXs0mCMIvgVYfimZ7nLm2kbrqQW+8tVSrqPioshhOnsHU8uKysziqOfp
+ z+UCBZPvp/o+nRqqfLL7tEWEBuO2nDd0Y2+JY0DWNrnJmUXsiSvpg2B3Zdc3cZsqCfbi
+ /4ndpQ9wCpPSErOfjizKGtyXJT03b1DRHbwLTfP8TBlpsaGZmJwwH/V+VsfgwQQ+YiOn
+ ikDX0lCsWfnVZUk131tBJ+hMztThnkHBabjEJa4AVnRw2gyEC7fLCf+a41WTHdqI82sH
+ U+8g==
+X-Gm-Message-State: AOAM5324mdJtDx4CwuFyclku4TNMoXmz5bOROI/aR9W4xrBzo6sXBMIG
+ Besy3QmWtrYRcLFHPJMYjFuAz66zS1E2UffWdjgu0RYNXVIJidXlp8TbH/bqBBpneZO6puhRFW4
+ hRYd5InhsF2BjdYg=
+X-Received: by 2002:a1c:2601:: with SMTP id m1mr3134483wmm.12.1603472832774;
+ Fri, 23 Oct 2020 10:07:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwtrU3Q52WqZZY7bvliRrgwoDopMnzV1GRRrPLoh1IEas0fcCOEs/AdqtoiVDD2HH0BTsjUeQ==
+X-Received: by 2002:a1c:2601:: with SMTP id m1mr3134475wmm.12.1603472832591;
+ Fri, 23 Oct 2020 10:07:12 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id a199sm4847229wmd.8.2020.10.23.10.07.11
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Fri, 23 Oct 2020 10:07:11 -0700 (PDT)
+Subject: Re: [qemu-web PATCH 6/7] Add link to "edit this page" for all pages
+To: =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>
+References: <20201023152957.488974-1-berrange@redhat.com>
+ <20201023152957.488974-7-berrange@redhat.com>
+ <d61c100e-fb49-6f13-77e0-2262cb06946d@redhat.com>
+ <20201023161912.GB463062@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Message-ID: <d50d8fe4-c980-2765-7a37-feffff5bfb9a@redhat.com>
+Date: Fri, 23 Oct 2020 19:07:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <20201023161912.GB463062@redhat.com>
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 02:46:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -21
+X-Spam_score: -2.2
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,47 +119,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: pbonzini@redhat.com, David Gibson <dgibson@redhat.com>,
- qemu-devel@nongnu.org, rth@twiddle.net
+Cc: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, 23 Oct 2020 10:34:41 +0300
-Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru> wrote:
+On 23/10/20 18:19, Daniel P. Berrangé wrote:
+>> I think this is a good idea *if* we switch to merge requests for website
+>> edits---which isn't something I'm opposed to.
+> Note if you disable merge requests, then the page we link to doesn't
+> show a live editor. It merely shows the read-only source. Not as
+> useful, at least the user can see which source file they need to
+> touch in their fork, which is still a step forwards I think.
+> 
 
-> Machine definitions may miss some vCPU-related parameters.
-> E.g., xlnx-versal-virt missed min_cpus and it was set to 1 by default.
-> This allowed using -smp 1 command line argument. But the machine
-> still created 2 vCPUs and passed all checks.
-> This patch adds one more check that does not allow creating
-> extra cpus that exceed the values specified in machine/smp.
-> 
-> Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
-> ---
->  0 files changed
-> 
-> diff --git a/softmmu/cpus.c b/softmmu/cpus.c
-> index 47cceddd80..da74794e09 100644
-> --- a/softmmu/cpus.c
-> +++ b/softmmu/cpus.c
-> @@ -603,6 +603,11 @@ void qemu_init_vcpu(CPUState *cpu)
->  {
->      MachineState *ms = MACHINE(qdev_get_machine());
->  
-> +    if (cpu->cpu_index >= ms->smp.cpus) {
-looks like for such machines we need MachineClass:min_cpus + setting it in affected machines
-and corresponding check in smp_parse(), instead of terminating from qemu_init_vcpu();
+I agree, so I think if you change it to "View source" it's okay.
 
-
-> +        fprintf(stderr, "Machine definition error: trying to create too many CPUs\n");
-> +        exit(1);
-> +    }
-> +
->      cpu->nr_cores = ms->smp.cores;
->      cpu->nr_threads =  ms->smp.threads;
->      cpu->stopped = true;
-> 
-> 
+Paolo
 
 
