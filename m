@@ -2,129 +2,98 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8565C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77AC6C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:20:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8FED621D47
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BC0262192A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 16:20:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="pO55zZ+i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8FED621D47
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="WEHqscrI"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BC0262192A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34768 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39644 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVzmO-0006Iz-Ge
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:19:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33338)
+	id 1kVznS-0008Tq-Jx
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 12:20:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVz33-0001K8-3n; Fri, 23 Oct 2020 11:32:09 -0400
-Received: from mail-eopbgr70095.outbound.protection.outlook.com
- ([40.107.7.95]:25942 helo=EUR04-HE1-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVz8I-0000Dt-9X; Fri, 23 Oct 2020 11:37:34 -0400
+Received: from esa1.hgst.iphmx.com ([68.232.141.245]:38922)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kVz2z-00025m-37; Fri, 23 Oct 2020 11:32:07 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BOHxIviZViEUcpZETc9ZFL/qDi4evZVimnsIu4QqeP3v+QNCn4z2p3bVi0olu41q/6Hu3o+1wcbJLf9lspgPXpNkaBoprhz01skhR8mr8+xzX7yJRv5Ez8mHSK9XLUVR/K6kl9tvHJj1m+udSFLm96nsYTolIP9pE9LU0hp2f1EMyo/fXxUn1m/Cavn8yh0XoyVmCVzKUwiuJRF+jkCZjdatjH59ZPWnB0Juqv/hgThChTdBToFaXkgOQD3VeQ0v9H7hj9nTDcveJYp3oz3/tjSBaMOnbmrTUaEANuvwIdDoWO0+SZTJvoBdQQ+eZ2h8b+oYphQg4pUBQfUpY6En5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s2k8lsFqu1NIJgX1u3xZfhrPhgL6UIq2prCEy3k9a+w=;
- b=UAZHwxF1pCDCaTxinj8IQakLDV+D4gg2cDBdUH7yaGwKhmd4e4SYjNjYl2wI5fcSJ+5v8rRBwil6kXZJ8EmbZ6Pkf1Q4NpJW/TgPRecQ49tGiWnWH1HOJ16z+YOKVg2VdGfY5MZCZvKT+rTLpSbrDZpOW0Ayq68C6Vlp8b61Q54ME6dn35Try8ejA8vHrzHxjLJN52CcstEsXs08JKnTfnNZbrc1f4HnBfaoN/TBQmJI042HlZ3XcouCpjItcHODxwehcDzFTCqBp7HDM9FHGBXoGWFs6Vj9+aASNZSD/1+QvvWOgyVb6fCOdPMBbbZofcDXQLkD6rgNSgSSRfKdSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=s2k8lsFqu1NIJgX1u3xZfhrPhgL6UIq2prCEy3k9a+w=;
- b=pO55zZ+i5/2zH/zHIYP579KVQ+vtBIssC92o5ppvDfS4pIOyJy0hT31vvtLMSq+SbX/fm63z5tZUoxNlWMEIlSJlkIS2R4QqCYv0PU2ZdAPQdvxu3yklrb8MJrfAxsRsboXkj//LHErgdE+n2Rzn9vzu7TWkxAV2KzZxlP1Viw8=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR08MB2650.eurprd08.prod.outlook.com (2603:10a6:7:2d::26) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.21; Fri, 23 Oct
- 2020 15:31:58 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.028; Fri, 23 Oct 2020
- 15:31:57 +0000
-Subject: Re: [PATCH v12 06/14] copy-on-read: pass bottom node name to COR
- driver
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- eblake@redhat.com, den@openvz.org
-References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1603390423-980205-7-git-send-email-andrey.shinkevich@virtuozzo.com>
- <5cb6baa3-3035-9b50-3e45-a2a48bc8fdd6@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <96d5d3b8-8334-3900-7085-6fd7aeb8190b@virtuozzo.com>
-Date: Fri, 23 Oct 2020 18:31:54 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <5cb6baa3-3035-9b50-3e45-a2a48bc8fdd6@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [109.252.114.22]
-X-ClientProxiedBy: FR2P281CA0021.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:14::8) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1)
+ (envelope-from <prvs=558518344=alistair.francis@wdc.com>)
+ id 1kVz8D-0002ph-Jf; Fri, 23 Oct 2020 11:37:33 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
+ t=1603467449; x=1635003449;
+ h=from:to:cc:subject:date:message-id:in-reply-to:
+ references:mime-version:content-transfer-encoding;
+ bh=4Z/7dayRDSa2KKP8y8Jqwgf1XxejSmUnh8RAME+YzaE=;
+ b=WEHqscrIrGwmnbS5lgc26uEWNo7vJaA7E1oHR8wbVvpE7xO+rsF4xBvC
+ fqh1LglRkLH7aoseD0ouodQqsllTKgxkCgLkKljRu6hXws4bPCzHo7Y/u
+ MhRhUrwjpgiZe3dqOqHtq7S7NIaNam9HK4zogQROeqmFW8m8kbrgjqtPR
+ 8PPaiJ4c048ldbE0SNkB79co1e9RxPiKZipRHeKRbrM7Hypmwk9s/Pt9n
+ trsunqMKq2qrRD2k6eSeIOpdUoh2zu0Mc3qyTYCOp8Yc2YlagchcQqUK+
+ yzanhOT5FgnCXB/tZrhb1/UV96toiMZGQsKd6BwlOp7NqIx71JtRuVdpz Q==;
+IronPort-SDR: bPoVdAJ6Ficw2ABBlbYj80HXHSYgOT/ZahxKEAnZFBueoUIb1VsCxF6ZKFHYZD+Z3cVh+XpRb9
+ 3NouTmH8u8yo+w+eC2mUrBar7IHB3wd79V4puM6ymcSAfl7L3LazgxRqkMU07zcfYIc3JTPZse
+ CVdl5WlkybrFUoOEMLfuTcZBjUSNlZqSnYjmJFWiaPKKorrZGCACB1IjEEWQrvBT2japvspIrI
+ fOm0F8GXPDdq9iZ5RkbPxlzCOLOcSL7qA5RBqptFUaMhx1TcFZ/RqsQzbFi1N2XlpzVKRhVqjg
+ CSg=
+X-IronPort-AV: E=Sophos;i="5.77,408,1596470400"; d="scan'208";a="260636274"
+Received: from h199-255-45-14.hgst.com (HELO uls-op-cesaep01.wdc.com)
+ ([199.255.45.14])
+ by ob1.hgst.iphmx.com with ESMTP; 23 Oct 2020 23:37:28 +0800
+IronPort-SDR: 0LZ1nLrgc2gWUJZNE/uSRtRyczwY8YC7u4lc+1Fol2hWqfRq4VB6KdlYegujD+FBSK98HuzHku
+ JpoSAyznQYDTPaNdzE2FUEAsLfu/ZrIACBXGiIOT3B4WNSgyEsffGq9RWCalRBQ4bCbt9PisfH
+ IhMzZIGF8G/r0izgAyDlTyaCREV4wwsOHjSXSXwiOXsEQD+gyqcOf7BckwuTIgf2Ojx2vjVlJq
+ G0YkV+eonj3CjP9r0MC5MsRtGVLoarCRWzLy/Eku7YaJmHf1CsnOOop/lCpNiQfSyAKx93oyZr
+ uHikAC2wfKT/PXqJKCa3ZhXF
+Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 23 Oct 2020 08:23:50 -0700
+IronPort-SDR: IJb84/xbLn02tNeuAD0U1/fpjcVLzHLu7lHQxDQW2vI9NauOfedxxvABXbSnS6duhCeYWaNlrB
+ 8D6Ax7SK/BqHJycTfV11PRv/F/PliPIQV1QMkxeXB6pKX/cJ6ebqkFh0B8B6H4tPrk60cSWC4g
+ 3S1XVkf8DGas61rUotD/MfelX6BamLQ/3ZTAcoAHPTi/Aw7UbmWe4zohuNToO411CO5tLGJegy
+ OtzPYCWTHMwjoLy31v9kA/6gJIhjAysegzNd89tHKIS0q3eauKbCcpdOPl93yHxajtVKHBGaTr
+ DGo=
+WDCIronportException: Internal
+Received: from cnf006900.ad.shared (HELO risc6-mainframe.hgst.com)
+ ([10.86.60.46])
+ by uls-op-cesaip01.wdc.com with ESMTP; 23 Oct 2020 08:37:27 -0700
+From: Alistair Francis <alistair.francis@wdc.com>
+To: qemu-devel@nongnu.org,
+	qemu-riscv@nongnu.org
+Subject: [PATCH v1 3/5] target/riscv: Remove the HS_TWO_STAGE flag
+Date: Fri, 23 Oct 2020 08:26:07 -0700
+Message-Id: <48ac80cb949569fa0de6379cb8229f588817eb30.1603466725.git.alistair.francis@wdc.com>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <cover.1603466725.git.alistair.francis@wdc.com>
+References: <cover.1603466725.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- FR2P281CA0021.DEUP281.PROD.OUTLOOK.COM (2603:10a6:d10:14::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.7 via Frontend Transport; Fri, 23 Oct 2020 15:31:56 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 03a46ae5-59ec-4932-9ff2-08d87768c73b
-X-MS-TrafficTypeDiagnostic: HE1PR08MB2650:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR08MB2650DBD3AD4DFF7C62312769F41A0@HE1PR08MB2650.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:10000;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: kAFtnL8MKkDATazQZhQbh5xgKNwhLDs/SiXD4o8WNpP5x764Y1XzUhTua16tDr03ZWm7LSslUuVfeTmVh3JBIex46jctQPUAIIWyQStYFhjeLGRyHYrH/NQAPzZeqIy7sy35DNkWtc0c06jkSAAZMqTwgc7cc42v7Rgk0YVzFSrP9dFfoLxZwCoFfqWY3HWBHo3LedoEqhOOb6pVi2eR0BMtbYmBL03V1QIzsbuW6JvxyIixfsb8+NmgcfnTyVovxyZWqOTOJrwlkZ5VKtxrYmi5n8x3NTpAFEQy/SjucB40FRDLvSPZka2BwrWGer9a4bqn9+cErqx7wMVReTerJ5eDmE30MlZ76TxTVl6ko981/NLBJ5BdXBDQGqiC9Bzi
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(39840400004)(396003)(366004)(346002)(136003)(376002)(186003)(16526019)(6506007)(53546011)(478600001)(5660300002)(6486002)(52116002)(83380400001)(2906002)(4326008)(107886003)(8936002)(36756003)(6512007)(26005)(31686004)(66946007)(66476007)(66556008)(44832011)(8676002)(86362001)(31696002)(2616005)(956004)(316002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: B+96EQTM1QrMCLh5JCdvNT7/1+uSu6PpPfGF/cnEQj/OVwNk+HupnRziE2dS1ojI/yI4RaEzkOJJg4+StjKA4ylhCvX2FFPitJlHt0pOHR09ajCFYrZVlv5CvFw+iJ7Ah5ixMTTV2cAZ+BDmndxejmlBde4V3XvZSFVQG6/J7be5Mq9htEMOKkOy587RukIWBHAZHfujp/r12qUJRfesLNsa+2U5g9CPflNqKsocoTDokoclPNjS2+n/TsP9ObOy6/czYNQEql7++hEoWIooisrJjqyRFt6gOSOrhkkFb1xEM4XaG1u2/k6UGAnC1dahfBckQSbCM0GK3c8BsEz+zVwucjrbAYnNFOQVylHTEf65q0TGE9WX24eybG88AseiG1ksvUDNot7pXMehBEzg3JpO3f6IGssLTpuksxWttTb1J/00dxGdV8lI6aaEVtGNTSrINnWJMxZ7Hi74UAPYtr2U6HuSjrCdiMpU0gjosoe6lUqzFU4fLJI6MN7Bu/Ay92G//2qm4JIS2matCqA+uVSFV6cW7RGXvoBdhUF+vHAW/XkZ1VamElSvPQBFg3NjSkxMhdWGU5ih1+yKjXjZCZkqKV3UU8viQYydoDrzt9LvR4mOolDRO9LiKhm1NV7qXOWXCS2t6WjNeBY56+ltew==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03a46ae5-59ec-4932-9ff2-08d87768c73b
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2020 15:31:57.7771 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dmjarV9nfieVyg74t6vP8MLJn6vym4Gc1PegbXpid8P6Rj80jL2yD8EQxwHDyT4Mn183mOGY7DAYNAW6NAwmKdalsckZHnqwXRrWaEAu1/s=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR08MB2650
-Received-SPF: pass client-ip=40.107.7.95;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR04-HE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:32:01
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -28
-X-Spam_score: -2.9
-X-Spam_bar: --
-X-Spam_report: (-2.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=68.232.141.245;
+ envelope-from=prvs=558518344=alistair.francis@wdc.com;
+ helo=esa1.hgst.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 11:37:20
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -138,88 +107,258 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: alistair.francis@wdc.com, richard.henderson@linaro.org, bmeng.cn@gmail.com,
+ palmer@dabbelt.com, alistair23@gmail.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+The HS_TWO_STAGE flag is no longer required as the MMU index contains
+the information if we are performing a two stage access.
 
-On 23.10.2020 17:45, Vladimir Sementsov-Ogievskiy wrote:
-> 22.10.2020 21:13, Andrey Shinkevich wrote:
->> We are going to use the COR-filter for a block-stream job.
->> To limit COR operations by the base node in the backing chain during
->> stream job, pass the bottom node name, that is the first non-filter
->> overlay of the base, to the copy-on-read driver as the base node itself
->> may change due to possible concurrent jobs.
->> The rest of the functionality will be implemented in the patch that
->> follows.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   block/copy-on-read.c | 16 ++++++++++++++++
->>   1 file changed, 16 insertions(+)
->>
->> diff --git a/block/copy-on-read.c b/block/copy-on-read.c
->> index 618c4c4..3d8e4db 100644
->> --- a/block/copy-on-read.c
->> +++ b/block/copy-on-read.c
->> @@ -24,18 +24,24 @@
->>   #include "block/block_int.h"
->>   #include "qemu/module.h"
->>   #include "qapi/error.h"
->> +#include "qapi/qmp/qerror.h"
->> +#include "qapi/qmp/qdict.h"
->>   #include "block/copy-on-read.h"
->>   typedef struct BDRVStateCOR {
->>       bool active;
->> +    BlockDriverState *bottom_bs;
->>   } BDRVStateCOR;
->>   static int cor_open(BlockDriverState *bs, QDict *options, int flags,
->>                       Error **errp)
->>   {
->> +    BlockDriverState *bottom_bs = NULL;
->>       BDRVStateCOR *state = bs->opaque;
->> +    /* Find a bottom node name, if any */
->> +    const char *bottom_node = qdict_get_try_str(options, "bottom");
->>       bs->file = bdrv_open_child(NULL, options, "file", bs, 
->> &child_of_bds,
->>                                  BDRV_CHILD_FILTERED | 
->> BDRV_CHILD_PRIMARY,
->> @@ -51,7 +57,17 @@ static int cor_open(BlockDriverState *bs, QDict 
->> *options, int flags,
->>           ((BDRV_REQ_FUA | BDRV_REQ_MAY_UNMAP | BDRV_REQ_NO_FALLBACK) &
->>               bs->file->bs->supported_zero_flags);
->> +    if (bottom_node) {
->> +        bottom_bs = bdrv_lookup_bs(NULL, bottom_node, errp);
->> +        if (!bottom_bs) {
->> +            error_setg(errp, QERR_BASE_NOT_FOUND, bottom_node);
-> 
-> QERR_BASE_NOT_FOUND is unrelated here. Also, I see a comment in qerror.h 
-> that such macros should not be used in new code. And don't forget to 
-> drop qerror.h include line.
-> 
+Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/cpu.h        |  3 +-
+ target/riscv/cpu_bits.h   |  1 -
+ target/riscv/cpu_helper.c | 61 ++++++++++++++++-----------------------
+ target/riscv/op_helper.c  | 12 --------
+ 4 files changed, 26 insertions(+), 51 deletions(-)
 
-I have been surprized because I don't have it in my branch and instead I do:
-error_setg(errp, "Bottom node '%s' not found", bottom_node);
+diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
+index 8ac01f3a64..694f51ebd4 100644
+--- a/target/riscv/cpu.h
++++ b/target/riscv/cpu.h
+@@ -325,8 +325,7 @@ bool riscv_cpu_virt_enabled(CPURISCVState *env);
+ void riscv_cpu_set_virt_enabled(CPURISCVState *env, bool enable);
+ bool riscv_cpu_force_hs_excep_enabled(CPURISCVState *env);
+ void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable);
+-bool riscv_cpu_two_stage_lookup(CPURISCVState *env);
+-void riscv_cpu_set_two_stage_lookup(CPURISCVState *env, bool enable);
++bool riscv_cpu_two_stage_lookup(int mmu_idx);
+ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch);
+ hwaddr riscv_cpu_get_phys_page_debug(CPUState *cpu, vaddr addr);
+ void  riscv_cpu_do_unaligned_access(CPUState *cs, vaddr addr,
+diff --git a/target/riscv/cpu_bits.h b/target/riscv/cpu_bits.h
+index bd36062877..20b6ec4ec5 100644
+--- a/target/riscv/cpu_bits.h
++++ b/target/riscv/cpu_bits.h
+@@ -480,7 +480,6 @@
+  * page table fault.
+  */
+ #define FORCE_HS_EXCEP      2
+-#define HS_TWO_STAGE        4
+ 
+ /* RV32 satp CSR field masks */
+ #define SATP32_MODE         0x80000000
+diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
+index 46b62a0f37..a1f94ea518 100644
+--- a/target/riscv/cpu_helper.c
++++ b/target/riscv/cpu_helper.c
+@@ -224,22 +224,9 @@ void riscv_cpu_set_force_hs_excep(CPURISCVState *env, bool enable)
+     env->virt = set_field(env->virt, FORCE_HS_EXCEP, enable);
+ }
+ 
+-bool riscv_cpu_two_stage_lookup(CPURISCVState *env)
++bool riscv_cpu_two_stage_lookup(int mmu_idx)
+ {
+-    if (!riscv_has_ext(env, RVH)) {
+-        return false;
+-    }
+-
+-    return get_field(env->virt, HS_TWO_STAGE);
+-}
+-
+-void riscv_cpu_set_two_stage_lookup(CPURISCVState *env, bool enable)
+-{
+-    if (!riscv_has_ext(env, RVH)) {
+-        return;
+-    }
+-
+-    env->virt = set_field(env->virt, HS_TWO_STAGE, enable);
++    return mmu_idx & TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+ }
+ 
+ int riscv_cpu_claim_interrupts(RISCVCPU *cpu, uint32_t interrupts)
+@@ -350,7 +337,8 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
+      * was called. Background registers will be used if the guest has
+      * forced a two stage translation to be on (in HS or M mode).
+      */
+-    if (riscv_cpu_two_stage_lookup(env) && access_type != MMU_INST_FETCH) {
++    if ((!riscv_cpu_virt_enabled(env) && riscv_cpu_two_stage_lookup(mmu_idx))
++        && access_type != MMU_INST_FETCH) {
+         use_background = true;
+     }
+ 
+@@ -589,7 +577,7 @@ restart:
+ 
+ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+                                 MMUAccessType access_type, bool pmp_violation,
+-                                bool first_stage)
++                                bool first_stage, bool two_stage)
+ {
+     CPUState *cs = env_cpu(env);
+     int page_fault_exceptions;
+@@ -612,8 +600,7 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+         }
+         break;
+     case MMU_DATA_LOAD:
+-        if ((riscv_cpu_virt_enabled(env) || riscv_cpu_two_stage_lookup(env)) &&
+-            !first_stage) {
++        if (two_stage && !first_stage) {
+             cs->exception_index = RISCV_EXCP_LOAD_GUEST_ACCESS_FAULT;
+         } else {
+             cs->exception_index = page_fault_exceptions ?
+@@ -621,8 +608,7 @@ static void raise_mmu_exception(CPURISCVState *env, target_ulong address,
+         }
+         break;
+     case MMU_DATA_STORE:
+-        if ((riscv_cpu_virt_enabled(env) || riscv_cpu_two_stage_lookup(env)) &&
+-            !first_stage) {
++        if (two_stage && !first_stage) {
+             cs->exception_index = RISCV_EXCP_STORE_GUEST_AMO_ACCESS_FAULT;
+         } else {
+             cs->exception_index = page_fault_exceptions ?
+@@ -713,6 +699,7 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     int prot, prot2;
+     bool pmp_violation = false;
+     bool first_stage_error = true;
++    bool two_stage_lookup = false;
+     int ret = TRANSLATE_FAIL;
+     int mode = mmu_idx;
+     target_ulong tlb_size = 0;
+@@ -732,11 +719,12 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+         access_type != MMU_INST_FETCH &&
+         get_field(env->mstatus, MSTATUS_MPRV) &&
+         MSTATUS_MPV_ISSET(env)) {
+-        riscv_cpu_set_two_stage_lookup(env, true);
++        two_stage_lookup = true;
+     }
+ 
+     if (riscv_cpu_virt_enabled(env) ||
+-        (riscv_cpu_two_stage_lookup(env) && access_type != MMU_INST_FETCH)) {
++        ((riscv_cpu_two_stage_lookup(mmu_idx) || two_stage_lookup) &&
++         access_type != MMU_INST_FETCH)) {
+         /* Two stage lookup */
+         ret = get_physical_address(env, &pa, &prot, address,
+                                    &env->guest_phys_fault_addr, access_type,
+@@ -799,14 +787,6 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+                       __func__, address, ret, pa, prot);
+     }
+ 
+-    /* We did the two stage lookup based on MPRV, unset the lookup */
+-    if (riscv_has_ext(env, RVH) && env->priv == PRV_M &&
+-        access_type != MMU_INST_FETCH &&
+-        get_field(env->mstatus, MSTATUS_MPRV) &&
+-        MSTATUS_MPV_ISSET(env)) {
+-        riscv_cpu_set_two_stage_lookup(env, false);
+-    }
+-
+     if (riscv_feature(env, RISCV_FEATURE_PMP) &&
+         (ret == TRANSLATE_SUCCESS) &&
+         !pmp_hart_has_privs(env, pa, size, 1 << access_type, mode)) {
+@@ -828,7 +808,10 @@ bool riscv_cpu_tlb_fill(CPUState *cs, vaddr address, int size,
+     } else if (probe) {
+         return false;
+     } else {
+-        raise_mmu_exception(env, address, access_type, pmp_violation, first_stage_error);
++        raise_mmu_exception(env, address, access_type, pmp_violation,
++                            first_stage_error,
++                            riscv_cpu_virt_enabled(env) ||
++                                riscv_cpu_two_stage_lookup(mmu_idx));
+         riscv_raise_exception(env, cs->exception_index, retaddr);
+     }
+ 
+@@ -932,9 +915,16 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+         /* handle the trap in S-mode */
+         if (riscv_has_ext(env, RVH)) {
+             target_ulong hdeleg = async ? env->hideleg : env->hedeleg;
++            bool two_stage_lookup = false;
++
++            if (env->priv == PRV_M ||
++                (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
++                (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
++                    get_field(env->hstatus, HSTATUS_HU))) {
++                    two_stage_lookup = true;
++            }
+ 
+-            if ((riscv_cpu_virt_enabled(env) ||
+-                 riscv_cpu_two_stage_lookup(env)) && write_tval) {
++            if ((riscv_cpu_virt_enabled(env) || two_stage_lookup) && write_tval) {
+                 /*
+                  * If we are writing a guest virtual address to stval, set
+                  * this to 1. If we are trapping to VS we will set this to 0
+@@ -972,11 +962,10 @@ void riscv_cpu_do_interrupt(CPUState *cs)
+                 riscv_cpu_set_force_hs_excep(env, 0);
+             } else {
+                 /* Trap into HS mode */
+-                if (!riscv_cpu_two_stage_lookup(env)) {
++                if (!two_stage_lookup) {
+                     env->hstatus = set_field(env->hstatus, HSTATUS_SPV,
+                                              riscv_cpu_virt_enabled(env));
+                 }
+-                riscv_cpu_set_two_stage_lookup(env, false);
+                 htval = env->guest_phys_fault_addr;
+             }
+         }
+diff --git a/target/riscv/op_helper.c b/target/riscv/op_helper.c
+index bc6df6c8c9..556a23f031 100644
+--- a/target/riscv/op_helper.c
++++ b/target/riscv/op_helper.c
+@@ -240,8 +240,6 @@ target_ulong helper_hyp_load(CPURISCVState *env, target_ulong address,
+         target_ulong pte;
+         int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+ 
+-        riscv_cpu_set_two_stage_lookup(env, true);
+-
+         switch (memop) {
+         case MO_SB:
+             pte = cpu_ldsb_mmuidx_ra(env, address, mmu_idx, GETPC());
+@@ -268,8 +266,6 @@ target_ulong helper_hyp_load(CPURISCVState *env, target_ulong address,
+             g_assert_not_reached();
+         }
+ 
+-        riscv_cpu_set_two_stage_lookup(env, false);
+-
+         return pte;
+     }
+ 
+@@ -290,8 +286,6 @@ void helper_hyp_store(CPURISCVState *env, target_ulong address,
+             get_field(env->hstatus, HSTATUS_HU))) {
+         int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+ 
+-        riscv_cpu_set_two_stage_lookup(env, true);
+-
+         switch (memop) {
+         case MO_SB:
+         case MO_UB:
+@@ -312,8 +306,6 @@ void helper_hyp_store(CPURISCVState *env, target_ulong address,
+             g_assert_not_reached();
+         }
+ 
+-        riscv_cpu_set_two_stage_lookup(env, false);
+-
+         return;
+     }
+ 
+@@ -334,8 +326,6 @@ target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
+         target_ulong pte;
+         int mmu_idx = cpu_mmu_index(env, false) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+ 
+-        riscv_cpu_set_two_stage_lookup(env, true);
+-
+         switch (memop) {
+         case MO_TEUW:
+             pte = cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
+@@ -347,8 +337,6 @@ target_ulong helper_hyp_x_load(CPURISCVState *env, target_ulong address,
+             g_assert_not_reached();
+         }
+ 
+-        riscv_cpu_set_two_stage_lookup(env, false);
+-
+         return pte;
+     }
+ 
+-- 
+2.28.0
 
->> +            qdict_del(options, "bottom");
-> 
-> this may be moved above "bottom_bs = ..", to not call it after "if" in 
-> separate.
-> 
-
-Please, see the "Re: [PATCH v11 04/13] copy-on-read: pass overlay base 
-node name to COR driver".
-
->> +            return -EINVAL;
->> +        }
->> +        qdict_del(options, "bottom");
->> +    }
->>       state->active = true;
->> +    state->bottom_bs = bottom_bs;
->>       /*
->>        * We don't need to call bdrv_child_refresh_perms() now as the 
->> permissions
->>
-> 
-> 
 
