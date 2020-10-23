@@ -2,137 +2,75 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFFABC388F9
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:40:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 445F3C388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:42:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3E7B72192A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:40:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=xilinx.onmicrosoft.com header.i=@xilinx.onmicrosoft.com header.b="RsavJHp0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3E7B72192A
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=xilinx.com
+	by mail.kernel.org (Postfix) with ESMTPS id 772C324182
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:42:10 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 772C324182
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53764 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVtYs-0006Fn-Vl
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:40:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59408)
+	id 1kVtaL-0007Co-FS
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:42:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59644)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kVtY5-0005bu-DI
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:39:49 -0400
-Received: from mail-dm6nam10on2070.outbound.protection.outlook.com
- ([40.107.93.70]:40833 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kVtZa-0006mI-BB; Fri, 23 Oct 2020 05:41:22 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:2945 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <edgar@xilinx.com>) id 1kVtY2-0005bX-Tu
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 05:39:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QMoPuPwy4ouiG2W2sE1GgySlnOePQYwss8TF3Zi3jYyGADygHDvywXOFeKm4uqaJ+mdXXTAzHfq6RhxvJoctDD63s0klIK9zjsLo5JIx5qMqNsaGeI9p9EBCh63NuSZOeIDJ+3+LqBYF7bp2igLJ3MoDjzJb8RKt9a8FTGn72hcFxijH/djzipE4EAtfk0hZLpmmKslpQ6EHS782wuVfefFz8cTyuGPLjpYVxJiRUmzvIiIQ2DZ75iwHdz59SE3eARILw2IfY4fhLHnFRmnWtJxuaHCK8b2nxCH+L/ktGgN3qxFLwsZubzo0Un+KZ163nnA8j/LY6knx2qm9UNYJiQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Odi3NI1+kMTTUsjVQha67cCDo2sOQK4+WmLSIqPVPKE=;
- b=JuvUydt7NFDq+gu/TLP/IqOekSdRS5ElbgW2I4hKabgkF9tmjmn+MCLDUrbZlGqvYCnPYD78tPjjnzIHc+WlqOBbYOd38kqJCOdJFe3Bw+I1EB2fzabISSYxdliqhXJMNhSuJLWYwdNzy5YikZfRSOY9oTsNS+9AIOw83m7J5C9CpkESTanFzWIxrazR/asERWfJmeGSNv+hUOmX+LGnXROS8b3yjADJYMLTuy5fklozq1pbM8crxJTWUqXilzqdBgHFJQHqP+wRuAlhO6xfeZsBlMiz2vTP9CAGXJXbQ/xgk0lymSFT1+GM+M1Vu4fMQkQaajfXTZpHvQqij9qaXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 149.199.60.83) smtp.rcpttodomain=gmail.com smtp.mailfrom=xilinx.com;
- dmarc=bestguesspass action=none header.from=xilinx.com; dkim=none (message
- not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=xilinx.onmicrosoft.com; s=selector2-xilinx-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Odi3NI1+kMTTUsjVQha67cCDo2sOQK4+WmLSIqPVPKE=;
- b=RsavJHp08ACv4eTh4oOxaylNNOEkZy1H8Kdj/vZWh85fDzWf0dScdQ5JV++GN5e4slB9maXzEPFcUp7rtWzqxBWYeojE6ef3S7niXHDavWscBsWSQ8cV081iPxneT2bn21pnzJV6cNG6R/2KwanJZ2xI85QOfNLf1OGd31niBxM=
-Received: from CY4PR19CA0046.namprd19.prod.outlook.com (2603:10b6:903:103::32)
- by DM5PR02MB2236.namprd02.prod.outlook.com (2603:10b6:3:51::8) with
- Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3477.27; Fri, 23 Oct 2020 09:24:41 +0000
-Received: from CY1NAM02FT006.eop-nam02.prod.protection.outlook.com
- (2603:10b6:903:103:cafe::57) by CY4PR19CA0046.outlook.office365.com
- (2603:10b6:903:103::32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.19 via Frontend
- Transport; Fri, 23 Oct 2020 09:24:41 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 149.199.60.83)
- smtp.mailfrom=xilinx.com; gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=bestguesspass action=none
- header.from=xilinx.com;
-Received-SPF: Pass (protection.outlook.com: domain of xilinx.com designates
- 149.199.60.83 as permitted sender) receiver=protection.outlook.com;
- client-ip=149.199.60.83; helo=xsj-pvapsmtpgw01;
-Received: from xsj-pvapsmtpgw01 (149.199.60.83) by
- CY1NAM02FT006.mail.protection.outlook.com (10.152.74.104) with Microsoft SMTP
- Server id 15.20.3499.20 via Frontend Transport; Fri, 23 Oct 2020 09:24:41
- +0000
-Received: from [149.199.38.66] (port=49763 helo=smtp.xilinx.com)
- by xsj-pvapsmtpgw01 with esmtp (Exim 4.90)
- (envelope-from <edgar@xilinx.com>)
- id 1kVtIT-0005dG-So; Fri, 23 Oct 2020 02:23:41 -0700
-Received: from [127.0.0.1] (helo=localhost)
- by smtp.xilinx.com with smtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kVtJR-0005v3-9A; Fri, 23 Oct 2020 02:24:41 -0700
-Received: from xsj-pvapsmtp01 (mail.xilinx.com [149.199.38.66])
- by xsj-smtp-dlp1.xlnx.xilinx.com (8.13.8/8.13.1) with ESMTP id 09N9OVY6010284; 
- Fri, 23 Oct 2020 02:24:31 -0700
-Received: from [10.71.116.235] (helo=localhost)
- by xsj-pvapsmtp01 with esmtp (Exim 4.63)
- (envelope-from <edgar@xilinx.com>)
- id 1kVtJH-0005to-AF; Fri, 23 Oct 2020 02:24:31 -0700
-Date: Fri, 23 Oct 2020 11:27:18 +0200
-From: "Edgar E. Iglesias" <edgar.iglesias@xilinx.com>
-To: Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>
-Subject: Re: [PATCH v12 0/3] Add Versal usb model
-Message-ID: <20201023092718.GN18995@toto>
-References: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kVtZX-0006Dk-HT; Fri, 23 Oct 2020 05:41:21 -0400
+Received: from DGGEMM405-HUB.china.huawei.com (unknown [172.30.72.57])
+ by Forcepoint Email with ESMTP id 26E749EBEFB06B6A1720;
+ Fri, 23 Oct 2020 17:41:09 +0800 (CST)
+Received: from dggemm754-chm.china.huawei.com (10.1.198.60) by
+ DGGEMM405-HUB.china.huawei.com (10.3.20.213) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Fri, 23 Oct 2020 17:41:08 +0800
+Received: from dggpemm000001.china.huawei.com (7.185.36.245) by
+ dggemm754-chm.china.huawei.com (10.1.198.60) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.1913.5; Fri, 23 Oct 2020 17:41:08 +0800
+Received: from dggpemm000001.china.huawei.com ([7.185.36.245]) by
+ dggpemm000001.china.huawei.com ([7.185.36.245]) with mapi id 15.01.1913.007;
+ Fri, 23 Oct 2020 17:41:08 +0800
+From: Jiangyifei <jiangyifei@huawei.com>
+To: "Alistair.Francis@wdc.com" <Alistair.Francis@wdc.com>
+Subject: RE: [PATCH V3 1/6] target/riscv: Merge m/vsstatus and m/vsstatush
+ into one uint64_t unit
+Thread-Topic: [PATCH V3 1/6] target/riscv: Merge m/vsstatus and m/vsstatush
+ into one uint64_t unit
+Thread-Index: AQHWqRys4dCH1TwnVkqlZ+p9iNToy6mk7YzQ
+Date: Fri, 23 Oct 2020 09:41:08 +0000
+Message-ID: <6b5533929fa74311b3e5264b126a1d18@huawei.com>
+References: <20201023091225.224-1-jiangyifei@huawei.com>
+ <20201023091225.224-2-jiangyifei@huawei.com>
+In-Reply-To: <20201023091225.224-2-jiangyifei@huawei.com>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.186.209]
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1603369056-4168-1-git-send-email-sai.pavan.boddu@xilinx.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-RCIS-Action: ALLOW
-X-TM-AS-Product-Ver: IMSS-7.1.0.1224-8.2.0.1013-23620.005
-X-TM-AS-User-Approved-Sender: Yes;Yes
-X-EOPAttributedMessage: 0
-X-MS-Office365-Filtering-HT: Tenant
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 3d02030c-830b-4913-d034-08d8773578ba
-X-MS-TrafficTypeDiagnostic: DM5PR02MB2236:
-X-Microsoft-Antispam-PRVS: <DM5PR02MB223693F6C59E8E2FBCD676C7C21A0@DM5PR02MB2236.namprd02.prod.outlook.com>
-X-Auto-Response-Suppress: DR, RN, NRN, OOF, AutoReply
-X-MS-Oob-TLC-OOBClassifiers: OLM:3044;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: z/7+HBlJ/Aeamak4EoMUJgIwNyTt/iebhG0NN64HpYNhSlt7dunwXQqXBKLNnC/x7aY1gyLcSZXyHbJC7/pbSmB2NlweDxTIrV8JM4yKcCFzPrcddFMMB0GK+ZTUlGekxrgf/Q9zigyampJ078M1NIabNUT4M8T9QzzftbZgtd6XHQVOloIUEGJ4PAHUdDqwp4VSC3+s0Vik7KknnI7pQ61OVeqzbDXYqX5WzlXTm/3F4id5nHXK4soQyeHc3FKw4ThAofVjzx7FcLo7q+QcJ3uHUFfdR2hmctYrU4bO0EtPjiM1/S9uJCQnKHewcD4Sacnv5Hb90gi4fTcHjxOYkqceNyM7ORWFFjAUSybxso9KyBuyjHAI+ILfQevB9sch9iFazRHhISoi3eCmLhvZlA==
-X-Forefront-Antispam-Report: CIP:149.199.60.83; CTRY:US; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:xsj-pvapsmtpgw01; PTR:unknown-60-83.xilinx.com; CAT:NONE;
- SFS:(4636009)(7916004)(39860400002)(136003)(396003)(346002)(376002)(46966005)(426003)(107886003)(336012)(6666004)(9686003)(26005)(7416002)(316002)(54906003)(186003)(81166007)(2906002)(33656002)(1076003)(70586007)(8936002)(70206006)(9786002)(82310400003)(83380400001)(5660300002)(33716001)(356005)(4326008)(82740400003)(6862004)(47076004)(8676002)(478600001)(6636002);
- DIR:OUT; SFP:1101; 
-X-OriginatorOrg: xilinx.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Oct 2020 09:24:41.5246 (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3d02030c-830b-4913-d034-08d8773578ba
-X-MS-Exchange-CrossTenant-Id: 657af505-d5df-48d0-8300-c31994686c5c
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=657af505-d5df-48d0-8300-c31994686c5c; Ip=[149.199.60.83];
- Helo=[xsj-pvapsmtpgw01]
-X-MS-Exchange-CrossTenant-AuthSource: CY1NAM02FT006.eop-nam02.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM5PR02MB2236
-Received-SPF: pass client-ip=40.107.93.70; envelope-from=edgar@xilinx.com;
- helo=NAM10-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:39:44
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.187;
+ envelope-from=jiangyifei@huawei.com; helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:41:09
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -146,94 +84,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Francisco Eduardo Iglesias <figlesia@xilinx.com>,
- Peter Maydell <peter.maydell@linaro.org>,
- Eduardo Habkost <ehabkost@redhat.com>, Vikram Garhwal <fnuv@xilinx.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- Sai Pavan Boddu <saipava@xilinx.com>, Edgar Iglesias <edgari@xilinx.com>,
- Alistair Francis <alistair.francis@wdc.com>, Gerd Hoffmann <kraxel@redhat.com>,
- =?iso-8859-1?Q?'Marc-Andr=E9?= Lureau' <marcandre.lureau@redhat.com>,
- Ying Fang <fangying1@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- 'Philippe =?iso-8859-1?Q?Mathieu-Daud=E9'?= <philmd@redhat.com>
+Cc: "qemu-riscv@nongnu.org" <qemu-riscv@nongnu.org>,
+ Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "sagark@eecs.berkeley.edu" <sagark@eecs.berkeley.edu>,
+ "kbastian@mail.uni-paderborn.de" <kbastian@mail.uni-paderborn.de>,
+ "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
+ "richard.henderson@linaro.org" <richard.henderson@linaro.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ "palmer@dabbelt.com" <palmer@dabbelt.com>, yinyipeng <yinyipeng1@huawei.com>,
+ "Wubin \(H\)" <wu.wubin@huawei.com>, "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Oct 22, 2020 at 05:47:33PM +0530, Sai Pavan Boddu wrote:
-> This patch series attempts to make 'hcd-xhci' an independent model so it can be used by both pci and system-bus interface.
 
+> -----Original Message-----
+> From: Jiangyifei
+> Sent: Friday, October 23, 2020 5:12 PM
+> To: qemu-devel@nongnu.org; qemu-riscv@nongnu.org
+> Cc: palmer@dabbelt.com; Alistair.Francis@wdc.com;
+> sagark@eecs.berkeley.edu; kbastian@mail.uni-paderborn.de;
+> richard.henderson@linaro.org; Zhangxiaofeng (F)
+> <victor.zhangxiaofeng@huawei.com>; Wubin (H) <wu.wubin@huawei.com>;
+> Zhanghailiang <zhang.zhanghailiang@huawei.com>; dengkai (A)
+> <dengkai1@huawei.com>; yinyipeng <yinyipeng1@huawei.com>; Jiangyifei
+> <jiangyifei@huawei.com>
+> Subject: [PATCH V3 1/6] target/riscv: Merge m/vsstatus and m/vsstatush in=
+to
+> one uint64_t unit
+>=20
+> mstatus/mstatush and vsstatus/vsstatush are two halved for RISCV32.
+> This patch expands mstatus and vsstatus to uint64_t instead of target_ulo=
+ng
+> so that it can be saved as one unit and reduce some ifdefs in the code.
+>=20
+> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+> ---
+......
+>  static int write_mstatush(CPURISCVState *env, int csrno, target_ulong va=
+l)
+> {
+> -    if ((val ^ env->mstatush) & (MSTATUS_MPV)) {
+> +    uint64_t valh =3D (uint64_t)val << 32;
+> +    uint64_t mask =3D MSTATUS_MPV | MSTATUS_GVA;
+> +
+> +    if ((valh ^ env->mstatus) & (MSTATUS_MPV)) {
+>          tlb_flush(env_cpu(env));
+>      }
+>=20
+> -    val &=3D MSTATUS_MPV | MSTATUS_GVA;
+> -
+> -    env->mstatush =3D val;
+> +    env->mstatus =3D (env->mstatus & ~mask) | (valh & mask);
+>=20
+>      return 0;
+>  }
 
-On the series:
+Hi Alistair,
 
-Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+It's a little different here.
 
+Previously, except for MPV and GVA, other bits were cleared.
+Now, except for MPV and GVA, other bits are reserved.
+Refer to write_mstatus () and specification, I think it's better now.
+How does it sound?
 
+Yifei
 
-> 
-> Changes for V2:
->     Make XHCIState non-qom
->     Use container_of functions for retriving pci device instance
->     Initialize the AddressSpace pointer in PATCH 1/3 itself Changes for V3:
->     Convert XHCIState to TYPE_DEVICE and register as a child of XHCIPciState.
-> Changes for V4:
->     Add DWC3 usb controller
->     Add versal, usb2-reg module
->     Connect sysbus xhci to versal virt board Changes for V5:
->     Add extra info about dwc3 and usb2_regs devices in commit messages
->     Use only one irq for versal usb controller
->     Mark the unimplemented registers in dwc3 controller
->     Rebase the patches over master.
->     Move few mispalced contents from patch 2/7 to 3/7.
->     Fix the author names in the header.
->     Move the inclusion of "sysemu/dma.h" from patch 1/7 to 3/7 Changes for V6:
->     Fixed style issue in patch 7/7
->     Renamed usb2_reg model to VersalUsb2CtrlReg
->     Fixed author in headers
-> Changes for V7:
->     Create a usb structure to keep things clean
->     Remove the repeated patch in the series i.e 5/7 Changes for V8:
->     Fix vmstate sturcts to support cross version migration.
-> Changes for V9:
->     Added recommended changes to fix vmstate migration.
->     Fixed commit message on 3/7.
-> Changes for V10:
->     use vmstate_post_load avaialble in VMStateDescription
->     tested vmstate cross migration.
-> Changes for V11:
->     Removed the patches which got accepted
->     Changed object name "USB2Reg" -> "ctrl"
->     Updated Subject line on cover letter.
-> Changes for V12:
->     Use reset class for usb2-ctrl-regs module
->     Move the few register update to realize
->     Marked registers which are unimplemented in regapi model
-> 
-> 
-> Sai Pavan Boddu (1):
->   misc: Add versal-usb2-ctrl-regs module
-> 
-> Vikram Garhwal (2):
->   usb: Add DWC3 model
->   Versal: Connect DWC3 controller with virt-versal
-> 
->  hw/arm/xlnx-versal-virt.c                    |  58 +++
->  hw/arm/xlnx-versal.c                         |  34 ++
->  hw/misc/meson.build                          |   1 +
->  hw/misc/xlnx-versal-usb2-ctrl-regs.c         | 229 +++++++++
->  hw/usb/Kconfig                               |   6 +
->  hw/usb/hcd-dwc3.c                            | 666 +++++++++++++++++++++++++++
->  hw/usb/meson.build                           |   1 +
->  include/hw/arm/xlnx-versal.h                 |  14 +
->  include/hw/misc/xlnx-versal-usb2-ctrl-regs.h |  45 ++
->  include/hw/usb/hcd-dwc3.h                    |  55 +++
->  10 files changed, 1109 insertions(+)
->  create mode 100644 hw/misc/xlnx-versal-usb2-ctrl-regs.c
->  create mode 100644 hw/usb/hcd-dwc3.c
->  create mode 100644 include/hw/misc/xlnx-versal-usb2-ctrl-regs.h
->  create mode 100644 include/hw/usb/hcd-dwc3.h
-> 
-> -- 
-> 2.7.4
-> 
 
