@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC21EC55178
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:17:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32FCEC388F9
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:19:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 558AE2225F
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:17:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 558AE2225F
+	by mail.kernel.org (Postfix) with ESMTPS id 9941424182
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 09:19:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9941424182
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51300 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kVtCT-0001KE-Ap
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:17:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54460)
+	id 1kVtEc-0003x1-JX
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 05:19:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kVt88-0004a6-4C; Fri, 23 Oct 2020 05:13:00 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:5207 helo=huawei.com)
+ id 1kVt89-0004cR-CK; Fri, 23 Oct 2020 05:13:01 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:46606 helo=huawei.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
- id 1kVt85-0004kg-LV; Fri, 23 Oct 2020 05:12:59 -0400
+ id 1kVt86-0004mP-SW; Fri, 23 Oct 2020 05:13:01 -0400
 Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.58])
- by Forcepoint Email with ESMTP id 48C1243186EAF3CA9A72;
- Fri, 23 Oct 2020 17:12:51 +0800 (CST)
+ by Forcepoint Email with ESMTP id 53652F5524677535EE1F;
+ Fri, 23 Oct 2020 17:12:56 +0800 (CST)
 Received: from huawei.com (10.174.186.209) by DGGEMS406-HUB.china.huawei.com
  (10.3.19.206) with Microsoft SMTP Server id 14.3.487.0; Fri, 23 Oct 2020
- 17:12:44 +0800
+ 17:12:45 +0800
 From: Yifei Jiang <jiangyifei@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
-Subject: [PATCH V3 4/6] target/riscv: Add H extension state description
-Date: Fri, 23 Oct 2020 17:12:23 +0800
-Message-ID: <20201023091225.224-5-jiangyifei@huawei.com>
+Subject: [PATCH V3 5/6] target/riscv: Add V extension state description
+Date: Fri, 23 Oct 2020 17:12:24 +0800
+Message-ID: <20201023091225.224-6-jiangyifei@huawei.com>
 X-Mailer: git-send-email 2.26.2.windows.1
 In-Reply-To: <20201023091225.224-1-jiangyifei@huawei.com>
 References: <20201023091225.224-1-jiangyifei@huawei.com>
@@ -49,9 +49,9 @@ Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 X-Originating-IP: [10.174.186.209]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190;
- envelope-from=jiangyifei@huawei.com; helo=huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:12:52
+Received-SPF: pass client-ip=45.249.212.35; envelope-from=jiangyifei@huawei.com;
+ helo=huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 05:12:47
 X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -80,77 +80,56 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-In the case of supporting H extension, add H extension description
+In the case of supporting V extension, add V extension description
 to vmstate_riscv_cpu.
 
 Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
 Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/riscv/machine.c | 47 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 47 insertions(+)
+ target/riscv/machine.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
 diff --git a/target/riscv/machine.c b/target/riscv/machine.c
-index fc1461d88e..ae60050898 100644
+index ae60050898..44d4015bd6 100644
 --- a/target/riscv/machine.c
 +++ b/target/riscv/machine.c
-@@ -68,6 +68,52 @@ static const VMStateDescription vmstate_pmp = {
-     }
- };
+@@ -76,6 +76,30 @@ static bool hyper_needed(void *opaque)
+     return riscv_has_ext(env, RVH);
+ }
  
-+static bool hyper_needed(void *opaque)
++static bool vector_needed(void *opaque)
 +{
 +    RISCVCPU *cpu = opaque;
 +    CPURISCVState *env = &cpu->env;
 +
-+    return riscv_has_ext(env, RVH);
++    return riscv_has_ext(env, RVV);
 +}
 +
-+static const VMStateDescription vmstate_hyper = {
-+    .name = "cpu/hyper",
++static const VMStateDescription vmstate_vector = {
++    .name = "cpu/vector",
 +    .version_id = 1,
 +    .minimum_version_id = 1,
-+    .needed = hyper_needed,
++    .needed = vector_needed,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINTTL(env.hstatus, RISCVCPU),
-+        VMSTATE_UINTTL(env.hedeleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.hideleg, RISCVCPU),
-+        VMSTATE_UINTTL(env.hcounteren, RISCVCPU),
-+        VMSTATE_UINTTL(env.htval, RISCVCPU),
-+        VMSTATE_UINTTL(env.htinst, RISCVCPU),
-+        VMSTATE_UINTTL(env.hgatp, RISCVCPU),
-+        VMSTATE_UINT64(env.htimedelta, RISCVCPU),
-+
-+        VMSTATE_UINT64(env.vsstatus, RISCVCPU),
-+        VMSTATE_UINTTL(env.vstvec, RISCVCPU),
-+        VMSTATE_UINTTL(env.vsscratch, RISCVCPU),
-+        VMSTATE_UINTTL(env.vsepc, RISCVCPU),
-+        VMSTATE_UINTTL(env.vscause, RISCVCPU),
-+        VMSTATE_UINTTL(env.vstval, RISCVCPU),
-+        VMSTATE_UINTTL(env.vsatp, RISCVCPU),
-+
-+        VMSTATE_UINTTL(env.mtval2, RISCVCPU),
-+        VMSTATE_UINTTL(env.mtinst, RISCVCPU),
-+
-+        VMSTATE_UINTTL(env.stvec_hs, RISCVCPU),
-+        VMSTATE_UINTTL(env.sscratch_hs, RISCVCPU),
-+        VMSTATE_UINTTL(env.sepc_hs, RISCVCPU),
-+        VMSTATE_UINTTL(env.scause_hs, RISCVCPU),
-+        VMSTATE_UINTTL(env.stval_hs, RISCVCPU),
-+        VMSTATE_UINTTL(env.satp_hs, RISCVCPU),
-+        VMSTATE_UINT64(env.mstatus_hs, RISCVCPU),
-+
-+        VMSTATE_END_OF_LIST()
-+    }
++            VMSTATE_UINT64_ARRAY(env.vreg, RISCVCPU, 32 * RV_VLEN_MAX / 64),
++            VMSTATE_UINTTL(env.vxrm, RISCVCPU),
++            VMSTATE_UINTTL(env.vxsat, RISCVCPU),
++            VMSTATE_UINTTL(env.vl, RISCVCPU),
++            VMSTATE_UINTTL(env.vstart, RISCVCPU),
++            VMSTATE_UINTTL(env.vtype, RISCVCPU),
++            VMSTATE_END_OF_LIST()
++        }
 +};
 +
- const VMStateDescription vmstate_riscv_cpu = {
-     .name = "cpu",
+ static const VMStateDescription vmstate_hyper = {
+     .name = "cpu/hyper",
      .version_id = 1,
-@@ -119,6 +165,7 @@ const VMStateDescription vmstate_riscv_cpu = {
-     },
+@@ -166,6 +190,7 @@ const VMStateDescription vmstate_riscv_cpu = {
      .subsections = (const VMStateDescription * []) {
          &vmstate_pmp,
-+        &vmstate_hyper,
+         &vmstate_hyper,
++        &vmstate_vector,
          NULL
      }
  };
