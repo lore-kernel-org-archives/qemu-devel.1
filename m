@@ -2,89 +2,89 @@ Return-Path: <SRS0=OdKR=D6=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC5E1C4363A
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:14:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91354C4363A
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:16:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2A86F20E65
-	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:14:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B30D120E65
+	for <qemu-devel@archiver.kernel.org>; Fri, 23 Oct 2020 17:15:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z6knIjnf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A86F20E65
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XVPGvgS0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30D120E65
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59666 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34438 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW0e5-0000Cy-4m
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:14:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50498)
+	id 1kW0fU-0001a8-Id
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 13:15:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53828)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kW036-0006H7-8l
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:36:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30842)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kW0GT-0007ns-Ai
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:50:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24750)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kW034-0002Dz-NP
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:36:15 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kW0GR-0003vT-2l
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 12:50:04 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603470973;
+ s=mimecast20190719; t=1603471802;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wgSM33K/lHKUrdkZ1FgzRnNuhfYt5gPmJS4shbZ90R0=;
- b=Z6knIjnfybDoRaLNX7DnVPX1F4Gw2gFQP/ZrCkUZA4wlKXzAK5qFjItExjxQW25M9KoWeG
- 1QNILr6Mh8GgTxEua5rQ6VPxoAzuxhTqNzWiNux4mjcRhNx/2fyndNCmaLBKixBzXu3RTx
- SSos9/cL2pssqmKyQqRbvlBlon6L7TU=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-553-hy2m64wwMUeeeeeB0K3zWQ-1; Fri, 23 Oct 2020 12:36:11 -0400
-X-MC-Unique: hy2m64wwMUeeeeeB0K3zWQ-1
-Received: by mail-wm1-f70.google.com with SMTP id u5so477588wme.3
- for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 09:36:11 -0700 (PDT)
+ bh=YxgP9AD59gDL6aQ96qyDjbhP4x8bXG3rp795fp2AuMk=;
+ b=XVPGvgS0eQUd6j1SVqZ5iFfe+o9YMOWCVpm3bI9+s++CWTtPO9Yiqpyn4e5MMdUY4o7hK5
+ D3rPzkDNkHZBvPAV95/dbDHcjPDnExiTekVND27194ZT8+DxC8jzx51rdT928I+eCrKSDv
+ 7QJKP+pVUhrUM4xGGVYGArO1hEnQcYs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-193-3cUbEoCaMmmFBxFMXJFg_A-1; Fri, 23 Oct 2020 12:49:58 -0400
+X-MC-Unique: 3cUbEoCaMmmFBxFMXJFg_A-1
+Received: by mail-wm1-f69.google.com with SMTP id u5so490887wme.3
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 09:49:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=wgSM33K/lHKUrdkZ1FgzRnNuhfYt5gPmJS4shbZ90R0=;
- b=pXgILS/bM2i6/CtVY3j91RUhddnNCJ6dmC/qKdsm18iP0lwH6rp3g+ZknVd9ytnoAL
- GoKA5vQsjZi1d8n3o+8ylm+VmOgJcfhD1JYGRoqFpFd+rg4UzWgNP6JSDFTIr2nSTYdP
- 9IEqap9asGYpZADaqpnNj5PAQn3G0QzgL799jcnwDgt76x7pXONBf24K5r6SB4WjRcwZ
- e+nEK2Z3K4O5B+cNnPCe7rb/6Y6VUCQpkWFSAd1XTC88nchRxPxdDCDJY29cc14ynj3P
- xO2C5AOZ5zhgFoMF567qQMe6xV5ezn3mO3Kj2aNEdt8JEOZNEFaiZ7iemyAFWLYKGs9i
- 9q3A==
-X-Gm-Message-State: AOAM531BV1boViGKRUme/RKsAqrnG3uBosYo+tR/FBOz4H26Y7WouXKq
- YUSxZRIEYZVdQO9Z1s6jZbP43ffvkqt14Np3y6tdRiYZJd/YreP5Gk6dS4fTCJ6Xhey11aS3QQ4
- mP+L3BwdAkSKssPU=
-X-Received: by 2002:adf:c045:: with SMTP id c5mr3515165wrf.405.1603470970225; 
- Fri, 23 Oct 2020 09:36:10 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyntZBB6uobIG1xds1qP+wWp24HNFAl/U7vYZteWy0MIOHKLN1C6CXcf9iiXRL8NUDRmVtFIA==
-X-Received: by 2002:adf:c045:: with SMTP id c5mr3515142wrf.405.1603470970051; 
- Fri, 23 Oct 2020 09:36:10 -0700 (PDT)
+ bh=YxgP9AD59gDL6aQ96qyDjbhP4x8bXG3rp795fp2AuMk=;
+ b=klL+1F1PahIE3aCbJ4pYFqN0XQ5kGdNddWt6wmHL1MDuTB6bXzUNhlMQYp2KYlQufk
+ fRNy1MJRMuiKpRtbODE9smLYZzSpNWH6emRdaFNNQOH3/TV0qhce6y24roncPV/RuBtu
+ ZfrxLMgIxykvGpNbjJ4E2UrObAMpjMVEHqhrzIRlvmQxWsvH+m74ahqZE+iD8HWQOs3v
+ 7lKID0kZyWgZ0Hjfckw2fTlsmXrcU+9BaH7w3YKkIVcmZvoSZ7Wd3YoTTIQkgTgCFNYg
+ DiyAxp25wb6n4F0UzPWiZm2lYv2BiHbYq2nmQib+iz+vUTWya/d4+xMyFJxyRmfAWcGR
+ 9cJg==
+X-Gm-Message-State: AOAM531KU0+wE0j4tInIz6/N6rfNCofGcAa4UgPI8aFpC1UMe+hRJtJ8
+ 7N+/pqyUGftBN6/BqLaUZ5XylZ6r3+Bcg3vPzkkBF5SgVg8E0GHKCeT8K4L2YxFl9B29PCWdgVk
+ PUofBLmDwXtZwsM0=
+X-Received: by 2002:adf:cc82:: with SMTP id p2mr3626428wrj.177.1603471797830; 
+ Fri, 23 Oct 2020 09:49:57 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzkr3eqW7sw1wTTVpSijgs3WYWDGhDgTQBppLIM6jUIWc9lZvadTMCq5pflQHG6yOGsUf723g==
+X-Received: by 2002:adf:cc82:: with SMTP id p2mr3626376wrj.177.1603471797574; 
+ Fri, 23 Oct 2020 09:49:57 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id o140sm4675866wme.43.2020.10.23.09.36.08
+ by smtp.gmail.com with ESMTPSA id q8sm4397533wro.32.2020.10.23.09.49.55
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Fri, 23 Oct 2020 09:36:09 -0700 (PDT)
-Subject: Re: [PATCH v11 05/19] multi-process: add qio channel function to
- transmit
+ Fri, 23 Oct 2020 09:49:56 -0700 (PDT)
+Subject: Re: [PATCH v11 02/19] multi-process: Add config option for
+ multi-process QEMU
 To: Jagannathan Raman <jag.raman@oracle.com>, qemu-devel@nongnu.org
 References: <cover.1602784930.git.jag.raman@oracle.com>
- <599c6eb3f07b3ef16f29ad8fda005ddecc038566.1602784930.git.jag.raman@oracle.com>
+ <acf32d0e54e0aec669723f2f1b64f87788b2c8b4.1602784930.git.jag.raman@oracle.com>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <51fa6f71-b01b-d700-8c7d-7aa7e9634554@redhat.com>
-Date: Fri, 23 Oct 2020 18:36:07 +0200
+Message-ID: <071dc8d8-ecbd-a1ad-f503-bc278efce038@redhat.com>
+Date: Fri, 23 Oct 2020 18:49:55 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <599c6eb3f07b3ef16f29ad8fda005ddecc038566.1602784930.git.jag.raman@oracle.com>
+In-Reply-To: <acf32d0e54e0aec669723f2f1b64f87788b2c8b4.1602784930.git.jag.raman@oracle.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -129,22 +129,49 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/15/20 8:04 PM, Jagannathan Raman wrote:
-> From: Elena Ufimtseva <elena.ufimtseva@oracle.com>
+> Add a configuration option to separate multi-process code
 > 
-> The entire array of the memory regions and file handlers.
-
-I don't understand the description... Did you forgot the
-verb?
-
-> Will be used in the next patch.
-> 
-> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 > Signed-off-by: John G Johnson <john.g.johnson@oracle.com>
 > Signed-off-by: Jagannathan Raman <jag.raman@oracle.com>
+> Signed-off-by: Elena Ufimtseva <elena.ufimtseva@oracle.com>
 > Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 > ---
->   include/io/channel.h | 24 ++++++++++++++++++++++++
->   io/channel.c         | 45 +++++++++++++++++++++++++++++++++++++++++++++
->   2 files changed, 69 insertions(+)
+>   configure   | 10 ++++++++++
+>   meson.build |  1 +
+>   2 files changed, 11 insertions(+)
+> 
+> diff --git a/configure b/configure
+> index f839c2a..2025e89 100755
+> --- a/configure
+> +++ b/configure
+> @@ -447,6 +447,7 @@ meson=""
+>   ninja=""
+>   skip_meson=no
+>   gettext=""
+> +mpqemu="no"
+>   
+>   bogus_os="no"
+>   malloc_trim="auto"
+> @@ -1520,6 +1521,10 @@ for opt do
+>     ;;
+>     --disable-libdaxctl) libdaxctl=no
+>     ;;
+> +  --enable-mpqemu) mpqemu=yes
+> +  ;;
+> +  --disable-mpqemu) mpqemu=no
+> +  ;;
+>     *)
+>         echo "ERROR: unknown option $opt"
+>         echo "Try '$0 --help' for more information"
+> @@ -1838,6 +1843,8 @@ disabled with --disable-FEATURE, default is enabled if available:
+>     xkbcommon       xkbcommon support
+>     rng-none        dummy RNG, avoid using /dev/(u)random and getrandom()
+>     libdaxctl       libdaxctl support
+> +  mpqemu          multi-process QEMU support
+
+When I first heard about this, I was expecting something
+else. It could be better named as "remote-device emulation"
+or maybe "manifold (device) emulation" :) Anyway too late
+I presume.
 
 
