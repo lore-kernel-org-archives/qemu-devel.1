@@ -4,105 +4,95 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DCFF1C4363A
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 20:02:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1962C4363A
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 20:08:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7436022276
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 20:02:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2084E22276
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 20:08:20 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g7aBYU/C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7436022276
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fQ0s4GJv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2084E22276
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54912 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWPkc-0000oO-EN
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 16:02:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59360)
+	id 1kWPpr-0003Le-59
+	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 16:08:19 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60318)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kWPih-00081z-3e
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 16:00:55 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39059)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kWPie-0000dw-Rx
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 16:00:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603569651;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=mS1kqen4g4ncPjAoNVeoHCFrFTqazFEml0O/GZ69RDY=;
- b=g7aBYU/C8L+LpBio7BDrjRWr0JgE1tSKyqZyO0Ja3/vBIYjpZoe56dR4FlOKjn4WclUIBD
- VPb4NVHCa3a7K5YTdqWz7dfeV4CKxdUWEIWbVgmIdo2krciA04nPYMLaWiaOEKTdi6GHHG
- IEgiUFvCdDGXALAyU8gCOhSnjijJ52U=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-221-G9ILHB77PRizjrY05q7FCw-1; Sat, 24 Oct 2020 16:00:49 -0400
-X-MC-Unique: G9ILHB77PRizjrY05q7FCw-1
-Received: by mail-wr1-f71.google.com with SMTP id b6so3715350wrn.17
- for <qemu-devel@nongnu.org>; Sat, 24 Oct 2020 13:00:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kWPo0-0002Wc-1Y; Sat, 24 Oct 2020 16:06:24 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:53535)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kWPnw-0001LD-GR; Sat, 24 Oct 2020 16:06:22 -0400
+Received: by mail-wm1-x342.google.com with SMTP id d78so6196745wmd.3;
+ Sat, 24 Oct 2020 13:06:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=gaGUXfj+4igL3ksAUaalL4a3tFJLwZ5Dv/u334hoUA4=;
+ b=fQ0s4GJvOZZYxfcqio/UMXm346/PHeAnB8ODO2g/IjQopXWm/m8aTIPaZHwGw2sxiC
+ PdW0JyaDEF+QgO0gtqKvWxJWb39Rd6kovsLp5eu3lIhKdZeXlZh5qkMNs5fgBRgFcUxg
+ Zuh+jnBrjbTKjiw90sLPaXwAcF3zcDesHhyYBm6V17+o97DGcWWLw3ga18fx99RpSqpa
+ IMB0IGVLrpJTga+3xWoWEPSZr6+oyn20lywZPmy4pz4Yjwcv4UJN6pc+6dSXY9U/t3xK
+ 6AHlFls3SzNNcn0+76EM/QD/Z9MiSPc4U02HxlzDgWky4utph8LklIckC/K8XQJfkVPf
+ kOEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=mS1kqen4g4ncPjAoNVeoHCFrFTqazFEml0O/GZ69RDY=;
- b=JO/hzLR/YU3UMA9rwnI1hhgBuc6BeB8vMZ8CMX/U8crzNSiNQcrI78LuDoDBdlwVH8
- l8ndDs83o7ZnvDh+81FkJIZHCnsRdY9dfVOjgkuU2nc183tgcM7EDDNRf/8L45JstGnV
- paWtguxIo2Nf8Ro6+PyQeTSILYqea08MEVViEAMwjX+LlkdxX/p2Vqk0wtrCK4wcKaNf
- pNW+2f+aCktUtNvTuSRNVtqr6qmOuvjAPoFea1q9RqETHJoUhMAUVMzqx8+PS983vP4g
- Z7SxMoGOkUhdEJe2RqYs08dMqfnp5QlkhLdz+HIIMNdyWoMeInWeOg8dQXdjb0/sh90h
- kn2A==
-X-Gm-Message-State: AOAM533aUmuUFpLjlbfCqiG3RAU78jQhh1jDRJ5dXYL8ss+zlrXUU3sN
- zrAU+crdMStpqFv6nDhQu+UVvAShiu746/rEEBoWP9MJABZbbpqx9K4WPuGW6a0lzrkTPK+6Rj3
- 9P4qoF4zFpWmc4l4=
-X-Received: by 2002:adf:de89:: with SMTP id w9mr9103696wrl.212.1603569647733; 
- Sat, 24 Oct 2020 13:00:47 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxVm+kbY92WmKzDnxnZGKAKQ3SHTRT+QD6yCW2eENfZNXsz8xDYFl4GkPes4W6tE3OTUgC60Q==
-X-Received: by 2002:adf:de89:: with SMTP id w9mr9103680wrl.212.1603569647546; 
- Sat, 24 Oct 2020 13:00:47 -0700 (PDT)
+ bh=gaGUXfj+4igL3ksAUaalL4a3tFJLwZ5Dv/u334hoUA4=;
+ b=CUCzUaNUigP46FEVsaj/O0VKQRLaecmcAoX7siPeoQXRVDWb9oyGBycM3zW+oU57sb
+ KmpzwVnksy4xy79SDj1wLTGRO+D0lvlqMfU8GHUzgNHNOYe13P6iZd1ZtDz3c4Xg2Co4
+ 2af+EwmqTGT5kCjdQg3WvXy8n00B+sGrATNrkQ528vQyGy/EmEfbpANPH3eTX0fEE8v+
+ ZtnclrE3F/s0gEC4kOJ81q9jw7/b4phBSKgg1kNp3+NrgEeiXW8G9H8WKhxvDlGtrUj/
+ gky6Ov2QrXiqIkkDv0xtJ+Qc+vW6xZYKFWcBa9xLYTQqXHDyXNpIBQ/q/+adwtwHdZlM
+ nzmg==
+X-Gm-Message-State: AOAM533tPKO8lEd7S+afhsxyJwqt94C6JVOPVdRXqLWykCqAyzfrj18R
+ EnilbH8cRWjejnnBwfN5z+c=
+X-Google-Smtp-Source: ABdhPJwLJq9/w7TpkRoVS5dMicWsxcsx+43GmZdQv8EGXXhAIdIAhPHCjIvtUyqnJa92vipUDL8Jtw==
+X-Received: by 2002:a1c:495:: with SMTP id 143mr7896466wme.63.1603569976205;
+ Sat, 24 Oct 2020 13:06:16 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id a199sm13501278wmd.8.2020.10.24.13.00.46
+ by smtp.gmail.com with ESMTPSA id f14sm13484321wrr.80.2020.10.24.13.06.14
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 24 Oct 2020 13:00:46 -0700 (PDT)
-Subject: Re: [PATCH 02/15] python/qmp: add qom script entry points
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20201021185208.1611145-1-jsnow@redhat.com>
- <20201021185208.1611145-3-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <f33e1170-739c-73b3-9ec0-0613584db4ff@redhat.com>
-Date: Sat, 24 Oct 2020 22:00:45 +0200
+ Sat, 24 Oct 2020 13:06:15 -0700 (PDT)
+Subject: Re: [PATCH 1/3] hw/timer/sh_timer: Coding style clean-up
+To: Thomas Huth <thuth@redhat.com>,
+ Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20201020153935.54315-1-thuth@redhat.com>
+ <20201020153935.54315-2-thuth@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <3059881f-08f6-cc9f-9bbb-0e179b1d4002@amsat.org>
+Date: Sat, 24 Oct 2020 22:06:14 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201021185208.1611145-3-jsnow@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
+In-Reply-To: <20201020153935.54315-2-thuth@redhat.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 15:52:22
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -21
-X-Spam_score: -2.2
-X-Spam_bar: --
-X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x342.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -15
+X-Spam_score: -1.6
+X-Spam_bar: -
+X-Spam_report: (-1.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.107,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -115,22 +105,22 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cleber Rosa <crosa@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>
+Cc: qemu-trivial@nongnu.org, Magnus Damm <magnus.damm@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/21/20 8:51 PM, John Snow wrote:
-> Add the 'qom', 'qom-set', 'qom-get', 'qom-list', and 'qom-tree' scripts
-> to the qemu.qmp package. When you install this package, these scripts
-> will become available on your command line.
+On 10/20/20 5:39 PM, Thomas Huth wrote:
+> Replace TAB characters with spaces, put code after case-statement on
+> separate lines and add some curly braces in related lines to keep
+> checkpatch.pl happy.
 > 
-> Signed-off-by: John Snow <jsnow@redhat.com>
+> Signed-off-by: Thomas Huth <thuth@redhat.com>
 > ---
->   python/setup.cfg | 8 ++++++++
->   1 file changed, 8 insertions(+)
+>   hw/timer/sh_timer.c | 89 +++++++++++++++++++++++++++++----------------
+>   1 file changed, 57 insertions(+), 32 deletions(-)
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Easily reviewed with 'git-diff --color-words'.
 
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
