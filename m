@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A47CC4363A
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 11:55:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47BA8C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 11:59:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1023922210
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 11:55:54 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1023922210
+	by mail.kernel.org (Postfix) with ESMTPS id B125A2225F
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 11:59:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B125A2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58002 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWI9J-0008GL-UY
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 07:55:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41586)
+	id 1kWICK-0000tL-T3
+	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 07:59:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41854)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kWI8h-0007lF-9v
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 07:55:15 -0400
-Received: from mga05.intel.com ([192.55.52.43]:2554)
+ id 1kWIB8-0000Pa-Ce
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 07:57:46 -0400
+Received: from mga03.intel.com ([134.134.136.65]:56822)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kWI8c-0004J7-GC
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 07:55:14 -0400
-IronPort-SDR: MJRPF7Q4UzjcdJGXsnid1bD7ComBCLjDQ/CY88e14UgEeQe/amvDu/lmw+9cNSQ94i5uiWSbot
- ive6JYBb+l/Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9783"; a="252467601"
-X-IronPort-AV: E=Sophos;i="5.77,412,1596524400"; d="scan'208";a="252467601"
+ id 1kWIB5-0004dc-Uu
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 07:57:46 -0400
+IronPort-SDR: e+PI1Dg1WaYnT7ZuZK6CzzYoXw/AjZgPvY0yDoPKXjlx/uMEO6GAdJUuqw3IZjbLVLoT5JdYxu
+ wgBS9Qmkzt4Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9783"; a="167864457"
+X-IronPort-AV: E=Sophos;i="5.77,412,1596524400"; d="scan'208";a="167864457"
 X-Amp-Result: SKIPPED(no attachment in message)
 X-Amp-File-Uploaded: False
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
- by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2020 04:55:04 -0700
-IronPort-SDR: GFfw87G4uL9n7Xzsz5g67uLecaXZ8RAuzSCpb/+agxDf+CaEnkL1ayR+ApRdVQ90KTIaYQDwh/
- NXHbysriECpw==
-X-IronPort-AV: E=Sophos;i="5.77,412,1596524400"; d="scan'208";a="467375278"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2020 04:57:39 -0700
+IronPort-SDR: TZlrOAaMvjmoY/xw2eFBq5NHV0BkRPchzeJb/GPTuha1E2qsK+xujHMilId34nIqbssr/YU5Z9
+ dgVvm9KbovtA==
+X-IronPort-AV: E=Sophos;i="5.77,412,1596524400"; d="scan'208";a="534740770"
 Received: from joy-optiplex-7040.sh.intel.com (HELO yzhao56-desk)
  ([10.239.13.16])
- by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2020 04:54:57 -0700
-Date: Sat, 24 Oct 2020 19:53:39 +0800
+ by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2020 04:57:32 -0700
+Date: Sat, 24 Oct 2020 19:56:13 +0800
 From: Yan Zhao <yan.y.zhao@intel.com>
 To: Kirti Wankhede <kwankhede@nvidia.com>
-Subject: Re: [PATCH v28 03/17] vfio: Add save and load functions for VFIO PCI
- devices
-Message-ID: <20201024115327.GA11667@yzhao56-desk>
+Subject: Re: [PATCH v28 14/17] vfio: Dirty page tracking when vIOMMU is enabled
+Message-ID: <20201024115613.GA11827@yzhao56-desk>
 References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
- <1603449643-12851-4-git-send-email-kwankhede@nvidia.com>
+ <1603449643-12851-15-git-send-email-kwankhede@nvidia.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1603449643-12851-4-git-send-email-kwankhede@nvidia.com>
+In-Reply-To: <1603449643-12851-15-git-send-email-kwankhede@nvidia.com>
 User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=192.55.52.43; envelope-from=yan.y.zhao@intel.com;
- helo=mga05.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 07:55:04
+Received-SPF: pass client-ip=134.134.136.65; envelope-from=yan.y.zhao@intel.com;
+ helo=mga03.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 07:57:41
 X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -96,178 +95,161 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-hi
-when I migrating VFs, the PCI_COMMAND is not properly saved. and the
-target side would meet below bug
-root@tester:~# [  189.360671] ++++++++++>> reset starts here: iavf_reset_task !!!
-[  199.360798] iavf 0000:00:04.0: Reset never finished (0)
-[  199.380504] kernel BUG at drivers/pci/msi.c:352!
-[  199.382957] invalid opcode: 0000 [#1] SMP PTI
-[  199.384855] CPU: 1 PID: 419 Comm: kworker/1:2 Tainted: G           OE     5.0.0-13-generic #14-Ubuntu
-[  199.388204] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-[  199.392401] Workqueue: events iavf_reset_task [iavf]
-[  199.393586] RIP: 0010:free_msi_irqs+0x17b/0x1b0
-[  199.394659] Code: 84 e1 fe ff ff 45 31 f6 eb 11 41 83 c6 01 44 39 73 14 0f 86 ce fe ff ff 8b 7b 10 44 01 f7 e8 3c 7a ba ff 48 83 78 70 00 74 e0 <0f> 0b 49 8d b5 b0 00 00 00 e8 07 27 bb ff e9 cf fe ff ff 48 8b 78
-[  199.399056] RSP: 0018:ffffabd1006cfdb8 EFLAGS: 00010282
-[  199.400302] RAX: ffff9e336d8a2800 RBX: ffff9e3333b006c0 RCX: 0000000000000000
-[  199.402000] RDX: 0000000000000000 RSI: 0000000000000019 RDI: ffffffffbaa68100
-[  199.403168] RBP: ffffabd1006cfde8 R08: ffff9e3375000248 R09: ffff9e3375000338
-[  199.404343] R10: 0000000000000000 R11: ffffffffbaa68108 R12: ffff9e3374ef12c0
-[  199.405526] R13: ffff9e3374ef1000 R14: 0000000000000000 R15: ffff9e3371f2d018
-[  199.406702] FS:  0000000000000000(0000) GS:ffff9e3375b00000(0000) knlGS:0000000000000000
-[  199.408027] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  199.408987] CR2: 00000000ffffffff CR3: 0000000033266000 CR4: 00000000000006e0
-[  199.410155] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[  199.411321] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[  199.412437] Call Trace:
-[  199.412750]  pci_disable_msix+0xf3/0x120
-[  199.413227]  iavf_reset_interrupt_capability.part.40+0x19/0x40 [iavf]
-[  199.413998]  iavf_reset_task+0x4b3/0x9d0 [iavf]
-[  199.414544]  process_one_work+0x20f/0x410
-[  199.415026]  worker_thread+0x34/0x400
-[  199.415486]  kthread+0x120/0x140
-[  199.415876]  ? process_one_work+0x410/0x410
-[  199.416380]  ? __kthread_parkme+0x70/0x70
-[  199.416864]  ret_from_fork+0x35/0x40
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 
-I fixed it with below patch.
-
-
-commit ad3efa0eeea7edb352294bfce35b904b8d3c759c
-Author: Yan Zhao <yan.y.zhao@intel.com>
-Date:   Sat Oct 24 19:45:01 2020 +0800
-
-    msix fix.
-    
-    Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index f63f15b553..92f71bf933 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2423,8 +2423,14 @@ const VMStateDescription vmstate_vfio_pci_config = {
- static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
- {
-     VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+    PCIDevice *pdev = &vdev->pdev;
-+    uint16_t pci_cmd;
-+
-+    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-+    qemu_put_be16(f, pci_cmd);
- 
-     vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
-+
- }
- 
- static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-@@ -2432,6 +2438,10 @@ static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-     VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-     PCIDevice *pdev = &vdev->pdev;
-     int ret;
-+    uint16_t pci_cmd;
-+
-+    pci_cmd = qemu_get_be16(f);
-+    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
- 
-     ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
-     if (ret) {
-
-
-On Fri, Oct 23, 2020 at 04:10:29PM +0530, Kirti Wankhede wrote:
-> Added functions to save and restore PCI device specific data,
-> specifically config space of PCI device.
+On Fri, Oct 23, 2020 at 04:10:40PM +0530, Kirti Wankhede wrote:
+> When vIOMMU is enabled, add MAP notifier from log_sync when all
+> devices in container are in stop and copy phase of migration. Call replay
+> and then from notifier callback, get dirty pages.
 > 
+> Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> Reviewed-by: Neo Jia <cjia@nvidia.com>
 > ---
->  hw/vfio/pci.c                 | 48 +++++++++++++++++++++++++++++++++++++++++++
->  include/hw/vfio/vfio-common.h |  2 ++
->  2 files changed, 50 insertions(+)
+>  hw/vfio/common.c     | 88 ++++++++++++++++++++++++++++++++++++++++++++++++----
+>  hw/vfio/trace-events |  1 +
+>  2 files changed, 83 insertions(+), 6 deletions(-)
 > 
-> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> index bffd5bfe3b78..92cc25a5489f 100644
-> --- a/hw/vfio/pci.c
-> +++ b/hw/vfio/pci.c
-> @@ -41,6 +41,7 @@
->  #include "trace.h"
->  #include "qapi/error.h"
->  #include "migration/blocker.h"
-> +#include "migration/qemu-file.h"
->  
->  #define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
->  
-> @@ -2401,11 +2402,58 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
->      return OBJECT(vdev);
+> diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+> index 2634387df948..c0b5b6245a47 100644
+> --- a/hw/vfio/common.c
+> +++ b/hw/vfio/common.c
+> @@ -442,8 +442,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
 >  }
 >  
-> +static bool vfio_msix_present(void *opaque, int version_id)
-> +{
-> +    PCIDevice *pdev = opaque;
-> +
-> +    return msix_present(pdev);
-> +}
-> +
-> +const VMStateDescription vmstate_vfio_pci_config = {
-> +    .name = "VFIOPCIDevice",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +        VMSTATE_PCI_DEVICE(pdev, VFIOPCIDevice),
-> +        VMSTATE_MSIX_TEST(pdev, VFIOPCIDevice, vfio_msix_present),
-> +        VMSTATE_END_OF_LIST()
-> +    }
-> +};
-> +
-> +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> +{
-> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> +
-> +    vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
-> +}
-> +
-> +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> +{
-> +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> +    PCIDevice *pdev = &vdev->pdev;
-> +    int ret;
-> +
-> +    ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
-> +    if (ret) {
-> +        return ret;
-> +    }
-> +
-> +    if (msi_enabled(pdev)) {
-> +        vfio_msi_enable(vdev);
-> +    } else if (msix_enabled(pdev)) {
-> +        vfio_msix_enable(vdev);
-> +    }
-> +
-> +    return ret;
-> +}
-> +
->  static VFIODeviceOps vfio_pci_ops = {
->      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
->      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
->      .vfio_eoi = vfio_intx_eoi,
->      .vfio_get_object = vfio_pci_get_object,
-> +    .vfio_save_config = vfio_pci_save_config,
-> +    .vfio_load_config = vfio_pci_load_config,
->  };
+>  /* Called with rcu_read_lock held.  */
+> -static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+> -                           bool *read_only)
+> +static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
+> +                               ram_addr_t *ram_addr, bool *read_only)
+>  {
+>      MemoryRegion *mr;
+>      hwaddr xlat;
+> @@ -474,8 +474,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+>          return false;
+>      }
 >  
->  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-> diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> index fe99c36a693a..ba6169cd926e 100644
-> --- a/include/hw/vfio/vfio-common.h
-> +++ b/include/hw/vfio/vfio-common.h
-> @@ -120,6 +120,8 @@ struct VFIODeviceOps {
->      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
->      void (*vfio_eoi)(VFIODevice *vdev);
->      Object *(*vfio_get_object)(VFIODevice *vdev);
-> +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
-> +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
->  };
+> -    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> -    *read_only = !writable || mr->readonly;
+> +    if (vaddr) {
+> +        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+> +    }
+> +
+> +    if (ram_addr) {
+> +        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
+> +    }
+> +
+> +    if (read_only) {
+> +        *read_only = !writable || mr->readonly;
+> +    }
 >  
->  typedef struct VFIOGroup {
+>      return true;
+>  }
+> @@ -485,7 +494,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+>      VFIOContainer *container = giommu->container;
+>      hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> -    bool read_only;
+>      void *vaddr;
+>      int ret;
+>  
+> @@ -501,7 +509,9 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+>      rcu_read_lock();
+>  
+>      if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+> -        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
+> +        bool read_only;
+> +
+> +        if (!vfio_get_xlat_addr(iotlb, &vaddr, NULL, &read_only)) {
+>              goto out;
+>          }
+>          /*
+> @@ -899,11 +909,77 @@ err_out:
+>      return ret;
+>  }
+>  
+> +typedef struct {
+> +    IOMMUNotifier n;
+> +    VFIOGuestIOMMU *giommu;
+> +} vfio_giommu_dirty_notifier;
+> +
+> +static void vfio_iommu_map_dirty_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+> +{
+> +    vfio_giommu_dirty_notifier *gdn = container_of(n,
+> +                                                vfio_giommu_dirty_notifier, n);
+> +    VFIOGuestIOMMU *giommu = gdn->giommu;
+> +    VFIOContainer *container = giommu->container;
+> +    hwaddr iova = iotlb->iova + giommu->iommu_offset;
+> +    ram_addr_t translated_addr;
+> +
+> +    trace_vfio_iommu_map_dirty_notify(iova, iova + iotlb->addr_mask);
+> +
+> +    if (iotlb->target_as != &address_space_memory) {
+> +        error_report("Wrong target AS \"%s\", only system memory is allowed",
+> +                     iotlb->target_as->name ? iotlb->target_as->name : "none");
+> +        return;
+> +    }
+> +
+> +    rcu_read_lock();
+> +    if (vfio_get_xlat_addr(iotlb, NULL, &translated_addr, NULL)) {
+> +        int ret;
+> +
+> +        ret = vfio_get_dirty_bitmap(container, iova, iotlb->addr_mask + 1,
+> +                                    translated_addr);
+> +        if (ret) {
+> +            error_report("vfio_iommu_map_dirty_notify(%p, 0x%"HWADDR_PRIx", "
+> +                         "0x%"HWADDR_PRIx") = %d (%m)",
+> +                         container, iova,
+> +                         iotlb->addr_mask + 1, ret);
+> +        }
+> +    }
+> +    rcu_read_unlock();
+> +}
+> +
+>  static int vfio_sync_dirty_bitmap(VFIOContainer *container,
+>                                    MemoryRegionSection *section)
+>  {
+>      ram_addr_t ram_addr;
+>  
+> +    if (memory_region_is_iommu(section->mr)) {
+> +        VFIOGuestIOMMU *giommu;
+> +
+> +        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
+> +            if (MEMORY_REGION(giommu->iommu) == section->mr &&
+> +                giommu->n.start == section->offset_within_region) {
+> +                Int128 llend;
+> +                vfio_giommu_dirty_notifier gdn = { .giommu = giommu };
+> +                int idx = memory_region_iommu_attrs_to_index(giommu->iommu,
+> +                                                       MEMTXATTRS_UNSPECIFIED);
+> +
+> +                llend = int128_add(int128_make64(section->offset_within_region),
+> +                                   section->size);
+> +                llend = int128_sub(llend, int128_one());
+> +
+> +                iommu_notifier_init(&gdn.n,
+> +                                    vfio_iommu_map_dirty_notify,
+> +                                    IOMMU_NOTIFIER_MAP,
+> +                                    section->offset_within_region,
+> +                                    int128_get64(llend),
+> +                                    idx);
+> +                memory_region_iommu_replay(giommu->iommu, &gdn.n);
+> +                break;
+> +            }
+> +        }
+> +        return 0;
+> +    }
+> +
+>      ram_addr = memory_region_get_ram_addr(section->mr) +
+>                 section->offset_within_region;
+>  
+> diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+> index dd991bd8f265..c0e75f24b76d 100644
+> --- a/hw/vfio/trace-events
+> +++ b/hw/vfio/trace-events
+> @@ -164,3 +164,4 @@ vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
+>  vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+>  vfio_load_cleanup(const char *name) " (%s)"
+>  vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
+> +vfio_iommu_map_dirty_notify(uint64_t iova_start, uint64_t iova_end) "iommu dirty @ 0x%"PRIx64" - 0x%"PRIx64
 > -- 
 > 2.7.0
 > 
