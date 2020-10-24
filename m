@@ -2,87 +2,88 @@ Return-Path: <SRS0=SOuJ=D7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E08C388F9
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC363C5517A
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:16:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 20C762225E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8A99722273
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:16:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="N6eWqYJa";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="N6eWqYJa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C762225E
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ttdfs8FK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8A99722273
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57280 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60284 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW7Dr-0008Kl-63
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:15:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
+	id 1kW7EY-0001HP-Ks
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:16:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54978)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>) id 1kW7BO-00062W-L1
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:13:18 -0400
-Received: from home.keithp.com ([63.227.221.253]:42952 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>) id 1kW7BK-0007Ra-B2
- for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:13:18 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 6EB7A3F2DD13;
- Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603498390; bh=6z3XBZyJXageL+uutf/KQ30suIRAyWPctZDuf1unqrI=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=N6eWqYJaOaZ0DpAwqyadD2tu3g5fFNf7mD1yGAgj6cprQxM+x/Ap5O0l3LX5NPpk7
- LqQghoYCXyp43ldhXPWhlEooliWuETmkEEfLbHUeIUrmJdWgA9d/S9cGeTgW0cB8hY
- X5HyXe/q1EOeuAMnfZdTWqkwbeF0hJcRlvtXcBm7WAS1Pgf140pb0Vj4d9LA5OQSmP
- 4r4IevkyrA5+j0Uq4UllXWtzHGeWR4xEJMaUREcjQSSe5XItjqEjmuTiUGJjhZ9hNY
- oBibWCZfNcVQ+wMyok0At+FbGZ39kY7ELyDDj8U9vuVlJAQSFh5g0qAYiAgRYL14Rn
- N2IObnRndNHXg==
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id BYsshI_7z7II; Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 2ACC03F2DD0B;
- Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603498390; bh=6z3XBZyJXageL+uutf/KQ30suIRAyWPctZDuf1unqrI=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=N6eWqYJaOaZ0DpAwqyadD2tu3g5fFNf7mD1yGAgj6cprQxM+x/Ap5O0l3LX5NPpk7
- LqQghoYCXyp43ldhXPWhlEooliWuETmkEEfLbHUeIUrmJdWgA9d/S9cGeTgW0cB8hY
- X5HyXe/q1EOeuAMnfZdTWqkwbeF0hJcRlvtXcBm7WAS1Pgf140pb0Vj4d9LA5OQSmP
- 4r4IevkyrA5+j0Uq4UllXWtzHGeWR4xEJMaUREcjQSSe5XItjqEjmuTiUGJjhZ9hNY
- oBibWCZfNcVQ+wMyok0At+FbGZ39kY7ELyDDj8U9vuVlJAQSFh5g0qAYiAgRYL14Rn
- N2IObnRndNHXg==
-Received: by keithp.com (Postfix, from userid 1000)
- id 06EF715821A3; Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
-To: Alistair Francis <alistair23@gmail.com>
-Cc: "qemu-devel\@nongnu.org Developers" <qemu-devel@nongnu.org>
-Subject: Re: [PATCH 1/2] riscv: Add sifive test device to sifive_e target
-In-Reply-To: <CAKmqyKN20Fg_cKXmh2-vUaY4gPkE=PtPome5vwoTW9rM1gBTog@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kW7DD-0008Eh-Ep
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:15:11 -0400
+Received: from mail-il1-x143.google.com ([2607:f8b0:4864:20::143]:39757)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kW7DB-0007cX-OY
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:15:11 -0400
+Received: by mail-il1-x143.google.com with SMTP id q1so3056796ilt.6
+ for <qemu-devel@nongnu.org>; Fri, 23 Oct 2020 17:15:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=1hR0jtMiVqyiqcatMA5nKnLgP+1fQyAcDDOeu9vbn7Y=;
+ b=ttdfs8FKscIgC66xsh4xr+ncXj8t0/3kSIHO68H4klRKzjvVCgTB2qPfnLX/vxvqbj
+ dr399l+x3xYqrol8T0RRlNDtJ779g+dt+ASBITO518Tr/Ab71rb8HZ3K2GGwjEPhxgod
+ rHTZEg0VqU3u6M2xdzN+Zpd0VkfVX2Rt+DsBcBqtBrUc0J2QUhkfdU6E61pdxkhey6m1
+ dhoVF5S2AJ9s21F9lG7T/9mnwYnV7MCFiSShy4LbWJqpXD3Ws8rJiMnq1kudNI41Ofn2
+ xSIYc7RH1N7IKgi5XDduOkjtWtoGazfGVCNxlHFaqnJEicXaKp7Nmml+VQEPiRl3jEpC
+ DLZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=1hR0jtMiVqyiqcatMA5nKnLgP+1fQyAcDDOeu9vbn7Y=;
+ b=tg571FwoUqpjif799jg+zmmJmwf1NUK7pAoC0oLiqeARl3Yq0Wp41KSOPaP7wB+PZY
+ YSE1u7UN6YTZxAIWLJcw5qKWzk+CJ1/YrvuUMK9L+ITE0Dq7MIllbdKuYrjUdoQgP06A
+ 2SNiryA7B7N6ds2xtaoENM3nde2ByPEpZe8teC7iQc33QFLQLlwpWXo/bG2BvDZe0Nmo
+ G+QHzfTfIdYpMYJuIC0FQ4sieC7vJzuRtixyAYfGWnzz/gB3SJc1xVtGRhQzi/j8a9y7
+ elnMqjCP8wfRPFgUEmczXRIsbZWTKLo3cEU5k3I56tgsox1eI8Ib5lpYTkSoZgmMljpT
+ c6Kg==
+X-Gm-Message-State: AOAM532n9I856RtP8oNW56WVWMT8TM49+zYULaNuNedSgzy2KW9/uErG
+ +s+u6y4gGqO2vu5JPBWORERxT11+vFAGb3hiuM0=
+X-Google-Smtp-Source: ABdhPJxnGEuGbUgSZuc1M9sOV2uiGkmqwYNpSChSu1i5070OguO422x6PIKPnUm+SaeWLCDWYk+x2/vK7ZgmNAiDds8=
+X-Received: by 2002:a92:5eda:: with SMTP id f87mr3914341ilg.131.1603498508594; 
+ Fri, 23 Oct 2020 17:15:08 -0700 (PDT)
+MIME-Version: 1.0
 References: <20201023214506.917601-1-keithp@keithp.com>
  <20201023214506.917601-2-keithp@keithp.com>
  <CAKmqyKN20Fg_cKXmh2-vUaY4gPkE=PtPome5vwoTW9rM1gBTog@mail.gmail.com>
-Date: Fri, 23 Oct 2020 17:13:09 -0700
-Message-ID: <87eelo7a7e.fsf@keithp.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
- helo=elaine.keithp.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 20:13:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ <87eelo7a7e.fsf@keithp.com>
+In-Reply-To: <87eelo7a7e.fsf@keithp.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Fri, 23 Oct 2020 17:03:21 -0700
+Message-ID: <CAKmqyKNKAwtE6M6zSiP1mneo3GhMzz--GOjW6Yh+kaBLB=zp=g@mail.gmail.com>
+Subject: Re: [PATCH 1/2] riscv: Add sifive test device to sifive_e target
+To: Keith Packard <keithp@keithp.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::143;
+ envelope-from=alistair23@gmail.com; helo=mail-il1-x143.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,48 +97,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: "Keith Packard" <keithp@keithp.com>
-From: "Keith Packard" via <qemu-devel@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Fri, Oct 23, 2020 at 5:13 PM Keith Packard <keithp@keithp.com> wrote:
+>
+> Alistair Francis <alistair23@gmail.com> writes:
+>
+> > I don't see this mentioned in the FE310 data sheet. Is it included in
+> > the hardware?
+>
+> This is strictly a virtual device used to support 'power off' when
+> running under QEMU. We need either this or semihosting support for doing
 
-Alistair Francis <alistair23@gmail.com> writes:
+The sifive_u and sifive_e model real hardware (the names are confusing
+I agree) so I would rather not add a virtual device.
 
-> I don't see this mentioned in the FE310 data sheet. Is it included in
-> the hardware?
+> automated testing. Our tests currently use this device, but I'd be happy
+> to switch them over to using semihosting instead, if you'd be interested
+> in getting that merged...
 
-This is strictly a virtual device used to support 'power off' when
-running under QEMU. We need either this or semihosting support for doing
-automated testing. Our tests currently use this device, but I'd be happy
-to switch them over to using semihosting instead, if you'd be interested
-in getting that merged...
+Looking at it now.
 
-=2D-=20
-=2Dkeith
+Alistair
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+TcZUACgkQ2yIaaQAA
-ABEw0BAAjV0NpUIl4SVvVGOpYrYgFGK7C2AuDVLhL/bnGEXm8zrAxNJuxfu8J9AW
-MF6Vto5jGM+zDwbydwYq86/sBciK924EWUGOO1aABI5saMKy2kwwj77i2x4OJtlS
-PsHCRjnGUCLjv67ieMRdWN6nPun/0RA1Ewmy5LZlC4LiCuLnwYbm5r4gDjfDZjlQ
-X+rtIX1iSAnOyLSuovPKhC4EJOOxORqEQxIh8Vqiw1JMX9lM2FGzUUgfKCBpZ8Ot
-UFI4Px9P4LuznVibDQQTaqzlz0bMseuGpM6o0/UX95qSgZbIoDy8J/KDICbHxdh/
-V7drhH4nl2fRYWIWndLIQrKUDhCvTRObhQYK0J9G5bHhAy/Wuf43RqMTAof6yr6x
-IJdf0uf7AqsVFUjOVwBmtvir/4zCaa6AN3XrSErAlQL9qmTmMubweBkuGEHZI3I5
-n2dejj666TNXI9tFMo981IRZoecx+DzkkgEf3fyYl7Q4gdjIBwqdXxusyS+gcnZB
-vs/I3gQCg4F65hmhNJYoDxTV8ZCbvufrxq3sWdfYaYS3lqEbPEqCBbfhAeuPFv4s
-sp9+9G4tvmECT9Kd+ZLIx7Pe5dBcD/9Qtyr1BQJZS/HwEcMYg8Jby9VvA6amvqG8
-0SK8g7Ahufldn6zGYJB6+0wlO33JpXIjD7EAF5Lcitos30ZEtvY=
-=b4DV
------END PGP SIGNATURE-----
---=-=-=--
+>
+> --
+> -keith
 
