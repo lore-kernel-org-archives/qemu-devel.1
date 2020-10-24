@@ -2,85 +2,87 @@ Return-Path: <SRS0=SOuJ=D7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 904C3C388F9
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4E08C388F9
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 12A032225E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 20C762225E
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 00:15:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dym3INMz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 12A032225E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="N6eWqYJa";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="N6eWqYJa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 20C762225E
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56054 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57280 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW7D5-0007iX-NS
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:15:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54724)
+	id 1kW7Dr-0008Kl-63
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 20:15:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54602)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kW7C1-0006ah-Li; Fri, 23 Oct 2020 20:13:58 -0400
-Received: from mail-io1-xd42.google.com ([2607:f8b0:4864:20::d42]:41040)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kW7By-0007Vs-Ok; Fri, 23 Oct 2020 20:13:57 -0400
-Received: by mail-io1-xd42.google.com with SMTP id u62so4008365iod.8;
- Fri, 23 Oct 2020 17:13:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=g6d8kNhVYrSQks0nOXxK/SSqiv+CYxWCaBG1rmfqCzg=;
- b=Dym3INMzzAVRImV8MCW8GPkhG7IWRc8KKC+z7LQdcvP22cSXcqKeIyywbHZ3u/38Gg
- 4Lc5tXJOlZ5x+D1Rcik45gkQeg/q44Sg630aPvh4f/IhAc4rgMjPKIT8c269KLwxWLOp
- uUl4oNv7vRvzpZUzHgtpMXzS+NUnRK77j6jWJKtk7jReksqDdKjNbH1JaMToTAVx9Mbn
- aPjbcaWohrqUodHliCbgXHiI0lFKcfFzTB+BWntYAmSD9FRRPaFOju9W0BhU5zF3O3pb
- DFuLL6E3LdQwYPqJtms8sZfyxsK2uVn5XnBSzxPArKiulZAN09Kpuo+XqLGcpMjm31B4
- Mu5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=g6d8kNhVYrSQks0nOXxK/SSqiv+CYxWCaBG1rmfqCzg=;
- b=M+ZXqeGuseNCk7Gw56wAFkfua1on14xmWwcDQzoR7dZEkiztT8AwnLpzJxY6mBsJub
- Xm3zRwqiPXIg9mykLT/6ZPwQ+az+2MggPGQj+v3ttFoZ0kl7WMSQUqDuSSdB9aUXo8S4
- +urHZk1B721nfm+SXvL76Jg8VynU0iI7EddB/him0pdFJw/shYJar+wsy7Ld8J50xRiB
- aRIacO0F0XfFP+LCdfJsmSzXSzS+ef9ufhUgvUQVtc0l2hAn+wL2kkErCstfkzdsxRNo
- 1g1hSJMRdavFP9h4PQns0KWdNLb613FvnVbv0WI1PkRTklJb5FEO0pmbIOQaOD5J+fqK
- p7pQ==
-X-Gm-Message-State: AOAM531vLfqooOQcKgGrvEQy456nRmUCx7Yg+CYvsGMF7ZDsDWUdmeBa
- 72GlDERGz2N2K2qIYg9GOK/q/9O+/iYenfX3rvw=
-X-Google-Smtp-Source: ABdhPJwwMRoOrSrCvDBz2gZQ6qH+Adl81wDen70h0g0+NbtTNFuqHNbYazTJia3gXnmSCgnDItfrPJ/TSJVze2+mcbY=
-X-Received: by 2002:a5d:9a8d:: with SMTP id c13mr3621582iom.176.1603498433500; 
- Fri, 23 Oct 2020 17:13:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>) id 1kW7BO-00062W-L1
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:13:18 -0400
+Received: from home.keithp.com ([63.227.221.253]:42952 helo=elaine.keithp.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>) id 1kW7BK-0007Ra-B2
+ for qemu-devel@nongnu.org; Fri, 23 Oct 2020 20:13:18 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by elaine.keithp.com (Postfix) with ESMTP id 6EB7A3F2DD13;
+ Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+ t=1603498390; bh=6z3XBZyJXageL+uutf/KQ30suIRAyWPctZDuf1unqrI=;
+ h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+ b=N6eWqYJaOaZ0DpAwqyadD2tu3g5fFNf7mD1yGAgj6cprQxM+x/Ap5O0l3LX5NPpk7
+ LqQghoYCXyp43ldhXPWhlEooliWuETmkEEfLbHUeIUrmJdWgA9d/S9cGeTgW0cB8hY
+ X5HyXe/q1EOeuAMnfZdTWqkwbeF0hJcRlvtXcBm7WAS1Pgf140pb0Vj4d9LA5OQSmP
+ 4r4IevkyrA5+j0Uq4UllXWtzHGeWR4xEJMaUREcjQSSe5XItjqEjmuTiUGJjhZ9hNY
+ oBibWCZfNcVQ+wMyok0At+FbGZ39kY7ELyDDj8U9vuVlJAQSFh5g0qAYiAgRYL14Rn
+ N2IObnRndNHXg==
+X-Virus-Scanned: Debian amavisd-new at keithp.com
+Received: from elaine.keithp.com ([127.0.0.1])
+ by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
+ with LMTP id BYsshI_7z7II; Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
+Received: from keithp.com (koto.keithp.com [10.0.0.2])
+ by elaine.keithp.com (Postfix) with ESMTPSA id 2ACC03F2DD0B;
+ Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+ t=1603498390; bh=6z3XBZyJXageL+uutf/KQ30suIRAyWPctZDuf1unqrI=;
+ h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+ b=N6eWqYJaOaZ0DpAwqyadD2tu3g5fFNf7mD1yGAgj6cprQxM+x/Ap5O0l3LX5NPpk7
+ LqQghoYCXyp43ldhXPWhlEooliWuETmkEEfLbHUeIUrmJdWgA9d/S9cGeTgW0cB8hY
+ X5HyXe/q1EOeuAMnfZdTWqkwbeF0hJcRlvtXcBm7WAS1Pgf140pb0Vj4d9LA5OQSmP
+ 4r4IevkyrA5+j0Uq4UllXWtzHGeWR4xEJMaUREcjQSSe5XItjqEjmuTiUGJjhZ9hNY
+ oBibWCZfNcVQ+wMyok0At+FbGZ39kY7ELyDDj8U9vuVlJAQSFh5g0qAYiAgRYL14Rn
+ N2IObnRndNHXg==
+Received: by keithp.com (Postfix, from userid 1000)
+ id 06EF715821A3; Fri, 23 Oct 2020 17:13:10 -0700 (PDT)
+To: Alistair Francis <alistair23@gmail.com>
+Cc: "qemu-devel\@nongnu.org Developers" <qemu-devel@nongnu.org>
+Subject: Re: [PATCH 1/2] riscv: Add sifive test device to sifive_e target
+In-Reply-To: <CAKmqyKN20Fg_cKXmh2-vUaY4gPkE=PtPome5vwoTW9rM1gBTog@mail.gmail.com>
+References: <20201023214506.917601-1-keithp@keithp.com>
+ <20201023214506.917601-2-keithp@keithp.com>
+ <CAKmqyKN20Fg_cKXmh2-vUaY4gPkE=PtPome5vwoTW9rM1gBTog@mail.gmail.com>
+Date: Fri, 23 Oct 2020 17:13:09 -0700
+Message-ID: <87eelo7a7e.fsf@keithp.com>
 MIME-Version: 1.0
-References: <20201023091225.224-1-jiangyifei@huawei.com>
- <20201023091225.224-7-jiangyifei@huawei.com>
-In-Reply-To: <20201023091225.224-7-jiangyifei@huawei.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Fri, 23 Oct 2020 17:02:06 -0700
-Message-ID: <CAKmqyKNg5__hB+tMm3z0S9EH7FG9fMLpvFmwz5BoBKZ0Ag_Ruw@mail.gmail.com>
-Subject: Re: [PATCH V3 6/6] target/riscv: Add sifive_plic vmstate
-To: Yifei Jiang <jiangyifei@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d42;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd42.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
+ helo=elaine.keithp.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/23 20:13:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,114 +96,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- "Zhangxiaofeng \(F\)" <victor.zhangxiaofeng@huawei.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Alistair Francis <Alistair.Francis@wdc.com>, yinyipeng <yinyipeng1@huawei.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, "Wubin \(H\)" <wu.wubin@huawei.com>,
- "dengkai \(A\)" <dengkai1@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: "Keith Packard" <keithp@keithp.com>
+From: "Keith Packard" via <qemu-devel@nongnu.org>
 
-On Fri, Oct 23, 2020 at 2:13 AM Yifei Jiang <jiangyifei@huawei.com> wrote:
->
-> Add sifive_plic vmstate for supporting sifive_plic migration.
-> Current vmstate framework only supports one structure parameter
-> as num field to describe variable length arrays, so introduce
-> num_enables.
->
-> Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
-> Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+Alistair Francis <alistair23@gmail.com> writes:
 
-Alistair
+> I don't see this mentioned in the FE310 data sheet. Is it included in
+> the hardware?
 
-> ---
->  hw/intc/sifive_plic.c | 26 +++++++++++++++++++++++++-
->  hw/intc/sifive_plic.h |  1 +
->  2 files changed, 26 insertions(+), 1 deletion(-)
->
-> diff --git a/hw/intc/sifive_plic.c b/hw/intc/sifive_plic.c
-> index f42fd695d8..97a1a27a9a 100644
-> --- a/hw/intc/sifive_plic.c
-> +++ b/hw/intc/sifive_plic.c
-> @@ -30,6 +30,7 @@
->  #include "hw/intc/sifive_plic.h"
->  #include "target/riscv/cpu.h"
->  #include "sysemu/sysemu.h"
-> +#include "migration/vmstate.h"
->
->  #define RISCV_DEBUG_PLIC 0
->
-> @@ -448,11 +449,12 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
->                            TYPE_SIFIVE_PLIC, plic->aperture_size);
->      parse_hart_config(plic);
->      plic->bitfield_words = (plic->num_sources + 31) >> 5;
-> +    plic->num_enables = plic->bitfield_words * plic->num_addrs;
->      plic->source_priority = g_new0(uint32_t, plic->num_sources);
->      plic->target_priority = g_new(uint32_t, plic->num_addrs);
->      plic->pending = g_new0(uint32_t, plic->bitfield_words);
->      plic->claimed = g_new0(uint32_t, plic->bitfield_words);
-> -    plic->enable = g_new0(uint32_t, plic->bitfield_words * plic->num_addrs);
-> +    plic->enable = g_new0(uint32_t, plic->num_enables);
->      sysbus_init_mmio(SYS_BUS_DEVICE(dev), &plic->mmio);
->      qdev_init_gpio_in(dev, sifive_plic_irq_request, plic->num_sources);
->
-> @@ -472,12 +474,34 @@ static void sifive_plic_realize(DeviceState *dev, Error **errp)
->      msi_nonbroken = true;
->  }
->
-> +static const VMStateDescription vmstate_sifive_plic = {
-> +    .name = "riscv_sifive_plic",
-> +    .version_id = 1,
-> +    .minimum_version_id = 1,
-> +    .fields = (VMStateField[]) {
-> +            VMSTATE_VARRAY_UINT32(source_priority, SiFivePLICState,
-> +                                  num_sources, 0,
-> +                                  vmstate_info_uint32, uint32_t),
-> +            VMSTATE_VARRAY_UINT32(target_priority, SiFivePLICState,
-> +                                  num_addrs, 0,
-> +                                  vmstate_info_uint32, uint32_t),
-> +            VMSTATE_VARRAY_UINT32(pending, SiFivePLICState, bitfield_words, 0,
-> +                                  vmstate_info_uint32, uint32_t),
-> +            VMSTATE_VARRAY_UINT32(claimed, SiFivePLICState, bitfield_words, 0,
-> +                                  vmstate_info_uint32, uint32_t),
-> +            VMSTATE_VARRAY_UINT32(enable, SiFivePLICState, num_enables, 0,
-> +                                  vmstate_info_uint32, uint32_t),
-> +            VMSTATE_END_OF_LIST()
-> +        }
-> +};
-> +
->  static void sifive_plic_class_init(ObjectClass *klass, void *data)
->  {
->      DeviceClass *dc = DEVICE_CLASS(klass);
->
->      device_class_set_props(dc, sifive_plic_properties);
->      dc->realize = sifive_plic_realize;
-> +    dc->vmsd = &vmstate_sifive_plic;
->  }
->
->  static const TypeInfo sifive_plic_info = {
-> diff --git a/hw/intc/sifive_plic.h b/hw/intc/sifive_plic.h
-> index b75b1f145d..1e451a270c 100644
-> --- a/hw/intc/sifive_plic.h
-> +++ b/hw/intc/sifive_plic.h
-> @@ -52,6 +52,7 @@ struct SiFivePLICState {
->      uint32_t num_addrs;
->      uint32_t num_harts;
->      uint32_t bitfield_words;
-> +    uint32_t num_enables;
->      PLICAddr *addr_config;
->      uint32_t *source_priority;
->      uint32_t *target_priority;
-> --
-> 2.19.1
->
->
+This is strictly a virtual device used to support 'power off' when
+running under QEMU. We need either this or semihosting support for doing
+automated testing. Our tests currently use this device, but I'd be happy
+to switch them over to using semihosting instead, if you'd be interested
+in getting that merged...
+
+=2D-=20
+=2Dkeith
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+TcZUACgkQ2yIaaQAA
+ABEw0BAAjV0NpUIl4SVvVGOpYrYgFGK7C2AuDVLhL/bnGEXm8zrAxNJuxfu8J9AW
+MF6Vto5jGM+zDwbydwYq86/sBciK924EWUGOO1aABI5saMKy2kwwj77i2x4OJtlS
+PsHCRjnGUCLjv67ieMRdWN6nPun/0RA1Ewmy5LZlC4LiCuLnwYbm5r4gDjfDZjlQ
+X+rtIX1iSAnOyLSuovPKhC4EJOOxORqEQxIh8Vqiw1JMX9lM2FGzUUgfKCBpZ8Ot
+UFI4Px9P4LuznVibDQQTaqzlz0bMseuGpM6o0/UX95qSgZbIoDy8J/KDICbHxdh/
+V7drhH4nl2fRYWIWndLIQrKUDhCvTRObhQYK0J9G5bHhAy/Wuf43RqMTAof6yr6x
+IJdf0uf7AqsVFUjOVwBmtvir/4zCaa6AN3XrSErAlQL9qmTmMubweBkuGEHZI3I5
+n2dejj666TNXI9tFMo981IRZoecx+DzkkgEf3fyYl7Q4gdjIBwqdXxusyS+gcnZB
+vs/I3gQCg4F65hmhNJYoDxTV8ZCbvufrxq3sWdfYaYS3lqEbPEqCBbfhAeuPFv4s
+sp9+9G4tvmECT9Kd+ZLIx7Pe5dBcD/9Qtyr1BQJZS/HwEcMYg8Jby9VvA6amvqG8
+0SK8g7Ahufldn6zGYJB6+0wlO33JpXIjD7EAF5Lcitos30ZEtvY=
+=b4DV
+-----END PGP SIGNATURE-----
+--=-=-=--
 
