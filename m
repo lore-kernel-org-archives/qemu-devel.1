@@ -2,88 +2,88 @@ Return-Path: <SRS0=SOuJ=D7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-8.4 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D29AC55179
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 21:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67C43C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 21:42:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3A382225E
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 21:39:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ACB96208B3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 21:42:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fVLXXPd7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3A382225E
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mQItRiAU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB96208B3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWRFk-0002xc-Q4
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 17:39:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44974)
+	id 1kWRIV-0004FR-M4
+	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 17:41:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWREE-0001lL-SH
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 17:37:34 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:34681)
+ id 1kWRHa-0003jk-Mx
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 17:41:02 -0400
+Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:46150)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWREB-0002yA-Io
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 17:37:34 -0400
-Received: by mail-wr1-x444.google.com with SMTP id i1so7229445wro.1
- for <qemu-devel@nongnu.org>; Sat, 24 Oct 2020 14:37:31 -0700 (PDT)
+ id 1kWRHV-0003RB-Nq
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 17:41:02 -0400
+Received: by mail-wr1-x432.google.com with SMTP id n6so7216401wrm.13
+ for <qemu-devel@nongnu.org>; Sat, 24 Oct 2020 14:40:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:references:cc:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=zLi19lChuv1CdQ1QVntCQgAfFV439ngq7ChuXFlLYsc=;
- b=fVLXXPd75OT4jeTN+qvfOyCZT7UltjuQY+JrGUegPYPPEvXGfCFicqOpin0wFNk51F
- vXANme+mo/tiPJFh4X2hF6o88TomDYm4RKLI+jWQiE8rv96hCOKFHd/f8E38vnjo0NRi
- /WTRphqB0DalJfR/2ABLK2m5d1A2fvQlQN7OuyYNkjY+5943/I13LZKIZ0Zxw70MWYvs
- /M+W4McJ+MBMuHIQmSoReP7MTqpZyKaaTpYP4jpBWUm9r/Q2g6oOCVyJvze3jMhs15UQ
- RZzzBkXcS0yvnm2NgQXyAgtoT+H2gkrnxz0pJ4AFESLGDmz+4uj3PIyAnupJVra+Lm0w
- J5tw==
+ bh=HkmKbVJYjp4DqsnsVNLE4OHrPDXjSoeWLNO4q0fJTxU=;
+ b=mQItRiAU+p3Omxq34DEVCtOgyFPgjuEgx43m1kmONJOUZL32lF+N30Gxeh8o7aaHSH
+ FpMPpe9HdEZaStljqp3VGKjjq69l4QXIqfprChcPPiZY0vtajIvhzOprwqAb+CU5IX8P
+ FK5hthFh3QTF7B4LhJ3IBnYtobXBqRnDz/mlvU/lM26deO6mwUS5+V5PQi/ogOj6HPYf
+ 0ORFh4yAh6DhpDiHwEEq1dpWZXClzHV+cay4P49jedhlbeKtwXblnTL9gNZ/PKMEYpwL
+ ew4AzZT/OshzDk9/V4uAh3S1yE13+CxtxsjjmX9/8qPSuOly0uFfD70xR7SQLupDOgv3
+ D4+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:references:cc:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=zLi19lChuv1CdQ1QVntCQgAfFV439ngq7ChuXFlLYsc=;
- b=fxVWYn7oTgZhTiTFhT6B0DmwkyJLNgvzKnkTQb5pwNJrukYKJEkgLm634bEzM5TSD1
- +vwsvhiY3A/FYO29qRD5097y2xLZn5Im/qDmf9k0dfrqtsOSIuJw6JR9yAs0I9ynZ3K3
- 5WpDw86VuUmP5DOk3JPZHRYP0PYBoxL/nt+EjZoXT+q0E0HokKmJcJ3IMk3EhyME9LSv
- srmbcXmQpVuJVyVy40Iau6VYRuOcGqxTtDTHobsIB9jekoMi18YHvVRGwFn41ePdqhUQ
- zXFP43RxmX/kP4lTNI0GOiauS9eKX1Zix5vbdOSzoqNX3AsXcK1PIu/GUTs2cdiixpJQ
- IljA==
-X-Gm-Message-State: AOAM530pQ8MIQLG1DhAhkgOSWQryAKTkt/YncnRd70aAIS1b6hyWr60a
- SApaPqlCrMh3UCzXJqM0cwA=
-X-Google-Smtp-Source: ABdhPJw5F3LFYEI6eJ4+Td97DMMe3PG1kBPEYRKU9bdYvhcCrcuFbHP+YDjIZB+rsKrA3llJGgxoZg==
-X-Received: by 2002:adf:fc83:: with SMTP id g3mr9456561wrr.200.1603575449945; 
- Sat, 24 Oct 2020 14:37:29 -0700 (PDT)
+ bh=HkmKbVJYjp4DqsnsVNLE4OHrPDXjSoeWLNO4q0fJTxU=;
+ b=OHNi39C6WMNIg6HKEkYOvQPwiiclxy++neSZx1uIQXtizocfWoXeI3gLkFInqbAcjb
+ RguUKZIm67wq4Kqs3wlNLQp6fl5yyMPFhjJuUGzUxPb4Co97DsPvRlqcEpvDYfKOrwHI
+ g0pNCX0g1HZ/z9ykkbCknAUK+F9pxFrbXVaOG4ZbcGPwZ58IbKsa8JzC8KySWajbUFzc
+ qTtFrONEs2/VWZE4Wl0n6ioYrIAfKGPEFALvFG9B5Igp3SDvMYZdnQe+vupgqumk0GKX
+ 6fNdWNochmxDeSW7nj61kVHy8cN/iuC0hiXi84eLXxCZaBwFP0INmNO+A6sLb+LR+ZD8
+ o1sA==
+X-Gm-Message-State: AOAM530V0siLY0sKH8R4zSR3x7J8uQto2wpdtLW1VeDWj3ofkqF5ZR8I
+ vQFnOJIdAL/8Vt5XGBvFvHs=
+X-Google-Smtp-Source: ABdhPJzBfenovwvDeWkAAUQh65jco8YpOM+8S/W01Ub45ieDym3aZbCEtrmXkvUgLm4muyvPUch33w==
+X-Received: by 2002:a5d:43c6:: with SMTP id v6mr9444947wrr.20.1603575655802;
+ Sat, 24 Oct 2020 14:40:55 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id q2sm13365696wrw.40.2020.10.24.14.37.28
+ by smtp.gmail.com with ESMTPSA id c14sm12994121wrv.12.2020.10.24.14.40.54
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 24 Oct 2020 14:37:28 -0700 (PDT)
-Subject: Re: [PATCH 16/20] hw/net: Add Renesas On-chip Ethernet MAC
+ Sat, 24 Oct 2020 14:40:55 -0700 (PDT)
+Subject: Re: [PATCH 11/20] hw/char: Renesas SCI module.
 To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
 References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
- <20200827123859.81793-17-ysato@users.sourceforge.jp>
+ <20200827123859.81793-12-ysato@users.sourceforge.jp>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <73fcda19-912a-a012-c6ff-38090428b74b@amsat.org>
-Date: Sat, 24 Oct 2020 23:37:28 +0200
+Message-ID: <efd40890-10fb-27ec-cb9e-ee7e553e5bbc@amsat.org>
+Date: Sat, 24 Oct 2020 23:40:54 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20200827123859.81793-17-ysato@users.sourceforge.jp>
+In-Reply-To: <20200827123859.81793-12-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::432;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x432.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -15
@@ -106,992 +106,1397 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Jason Wang <jasowang@redhat.com>
+Cc: =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc'ing Jason Wang, maintainer of network devices.
+Cc'ing Marc-André, maintainer of character devices.
 
 On 8/27/20 2:38 PM, Yoshinori Sato wrote:
+> This module supported SCI / SCIa / SCIF.
+> 
+> Hardware manual.
+> SCI / SCIF
+> https://www.renesas.com/us/en/doc/products/mpumcu/001/r01uh0457ej0401_sh7751.pdf
+> SCIa
+> https://www.renesas.com/us/en/doc/products/mpumcu/doc/rx_family/r01uh0033ej0140_rx62n.pdf
+> 
 > Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->   include/hw/net/renesas_eth.h |  57 +++
->   hw/net/renesas_eth.c         | 875 +++++++++++++++++++++++++++++++++++
->   hw/net/Kconfig               |   5 +
->   hw/net/meson.build           |   1 +
->   4 files changed, 938 insertions(+)
->   create mode 100644 include/hw/net/renesas_eth.h
->   create mode 100644 hw/net/renesas_eth.c
+>   include/hw/char/renesas_sci.h |  129 +++-
+>   hw/char/renesas_sci.c         | 1040 +++++++++++++++++++++++++++------
+>   2 files changed, 967 insertions(+), 202 deletions(-)
 > 
-> diff --git a/include/hw/net/renesas_eth.h b/include/hw/net/renesas_eth.h
-> new file mode 100644
-> index 0000000000..e0026c6434
-> --- /dev/null
-> +++ b/include/hw/net/renesas_eth.h
-> @@ -0,0 +1,57 @@
-> +/*
-> + *  Renesas ETHERC / EDMAC
+> diff --git a/include/hw/char/renesas_sci.h b/include/hw/char/renesas_sci.h
+> index efdebc620a..07140e8aad 100644
+> --- a/include/hw/char/renesas_sci.h
+> +++ b/include/hw/char/renesas_sci.h
+> @@ -1,51 +1,138 @@
+>   /*
+>    * Renesas Serial Communication Interface
+>    *
+> - * Copyright (c) 2018 Yoshinori Sato
+> + * Copyright (c) 2020 Yoshinori Sato
 > + *
-> + *  Copyright 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; under version 2 of the License.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License along
-> + *  with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + *  Contributions after 2012-01-13 are licensed under the terms of the
-> + *  GNU GPL, version 2 or (at your option) any later version.
-> + */
-> +
-> +#include "hw/sysbus.h"
-> +#include "net/net.h"
-> +#include "hw/net/mdio.h"
-> +#include "hw/register.h"
+> + * This code is licensed under the GPL version 2 or later.
+>    *
+> - * SPDX-License-Identifier: GPL-2.0-or-later
+>    */
+>   
+> -#ifndef HW_CHAR_RENESAS_SCI_H
+> -#define HW_CHAR_RENESAS_SCI_H
+> -
+>   #include "chardev/char-fe.h"
+> +#include "qemu/timer.h"
+> +#include "qemu/fifo8.h"
+>   #include "hw/sysbus.h"
 > +#include "hw/clock.h"
+>   
+> +#define TYPE_RENESAS_SCI_COMMON "renesas-sci-common"
+> +#define RSCICommon(obj) OBJECT_CHECK(RSCICommonState, (obj), \
+> +                                     TYPE_RENESAS_SCI_COMMON)
+>   #define TYPE_RENESAS_SCI "renesas-sci"
+>   #define RSCI(obj) OBJECT_CHECK(RSCIState, (obj), TYPE_RENESAS_SCI)
+> +#define TYPE_RENESAS_SCIA "renesas-scia"
+> +#define RSCIA(obj) OBJECT_CHECK(RSCIAState, (obj), TYPE_RENESAS_SCIA)
+> +#define TYPE_RENESAS_SCIF "renesas-scif"
+> +#define RSCIF(obj) OBJECT_CHECK(RSCIFState, (obj), TYPE_RENESAS_SCIF)
 > +
-> +#define TYPE_RENESAS_ETH "renesas_eth"
-> +#define RenesasEth(obj) OBJECT_CHECK(RenesasEthState, (obj), TYPE_RENESAS_ETH)
-> +
-> +#define RENESAS_ETHERC_R_MAX (0x100 / 4)
-> +#define RENESAS_EDMAC_R_MAX  (0x100 / 4)
-> +
-> +typedef struct RenesasEthState {
+> +#define SCI_GET_CLASS(obj) \
+> +    OBJECT_GET_CLASS(RenesasSCICommonClass, obj, TYPE_RENESAS_SCI_COMMON)
+> +#define SCI_COMMON_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(RenesasSCICommonClass, klass, TYPE_RENESAS_SCI_COMMON)
+> +#define SCI_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(RenesasSCIClass, klass, TYPE_RENESAS_SCI)
+> +#define SCIA_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(RenesasSCIAClass, klass, TYPE_RENESAS_SCIA)
+> +#define SCIF_CLASS(klass) \
+> +    OBJECT_CLASS_CHECK(RenesasSCIFClass, klass, TYPE_RENESAS_SCIF)
+>   
+>   enum {
+>       ERI = 0,
+>       RXI = 1,
+>       TXI = 2,
+> -    TEI = 3,
+> -    SCI_NR_IRQ = 4
+> +    BRI_TEI = 3,
+> +    SCI_NR_IRQ = 4,
+>   };
+>   
+> -typedef struct {
+> -    /*< private >*/
+> -    SysBusDevice parent_obj;
+> -    /*< public >*/
+> +enum {
+> +    RXTOUT,
+> +    RXNEXT,
+> +    TXEMPTY,
+> +    TXEND,
+> +    NR_SCI_EVENT,
+> +};
+>   
+> +typedef struct RSCICommonState {
 > +    SysBusDevice parent_obj;
+>       MemoryRegion memory;
+> -    QEMUTimer timer;
+> -    CharBackend chr;
+> -    qemu_irq irq[SCI_NR_IRQ];
+> +    MemoryRegion memory_p4;
+> +    MemoryRegion memory_a7;
+>   
+> +    /* SCI register */
+>       uint8_t smr;
+>       uint8_t brr;
+>       uint8_t scr;
+>       uint8_t tdr;
+> -    uint8_t ssr;
+> -    uint8_t rdr;
+> -    uint8_t scmr;
+> -    uint8_t semr;
+> +    uint16_t Xsr;
+>   
+> -    uint8_t read_ssr;
+> +    /* internal use */
+> +    uint16_t read_Xsr;
+> +    int64_t etu;
+>       int64_t trtime;
+> -    int64_t rx_next;
+> +    int64_t tx_start_time;
+> +    struct {
+> +        int64_t time;
+> +        int64_t (*handler)(struct RSCICommonState *sci);
+> +    } event[NR_SCI_EVENT];
+> +    QEMUTimer *event_timer;
+> +    CharBackend chr;
+>       uint64_t input_freq;
+> +    qemu_irq irq[SCI_NR_IRQ];
+> +    Fifo8 rxfifo;
+> +    int regshift;
+> +    uint32_t unit;
+> +    Clock *pck;
+> +} RSCICommonState;
 > +
-> +    NICState *nic;
-> +    NICConf conf;
-> +    MemoryRegion etherc_mem;
-> +    MemoryRegion edmac_mem;
-> +    qemu_irq irq;
+> +typedef struct {
+> +    RSCICommonState parent_obj;
 > +
-> +    /* ETHERC registers */
-> +    RegisterInfo etherc_regs_info[RENESAS_ETHERC_R_MAX];
-> +    uint32_t etherc_regs[RENESAS_ETHERC_R_MAX];
+> +    /* SCI specific register */
+> +    uint8_t sptr;
+>   } RSCIState;
+>   
+> -#endif
+> +typedef struct {
+> +    RSCICommonState parent_obj;
 > +
-> +    /* EDMAC register */
-> +    RegisterInfo edmac_regs_info[RENESAS_EDMAC_R_MAX];
-> +    uint32_t edmac_regs[RENESAS_EDMAC_R_MAX];
+> +    /* SCIa specific register */
+> +    uint8_t scmr;
+> +    uint8_t semr;
+> +} RSCIAState;
 > +
-> +    int descsize;
-> +    int rcv_bcast;
-> +    uint8_t macadr[6];
-> +    int link_sta;
-> +    MDIOState *mdiodev;
-> +    Clock *ick;
-> +} RenesasEthState;
-> diff --git a/hw/net/renesas_eth.c b/hw/net/renesas_eth.c
-> new file mode 100644
-> index 0000000000..d5fc2bb30c
-> --- /dev/null
-> +++ b/hw/net/renesas_eth.c
-> @@ -0,0 +1,875 @@
-> +/*
-> + *  Renesas ETHERC / EDMAC
-> + *
-> + *  Copyright 2019 Yoshinori Sato <ysato@users.sourceforge.jp>
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; under version 2 of the License.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + *  You should have received a copy of the GNU General Public License along
-> + *  with this program; if not, see <http://www.gnu.org/licenses/>.
-> + *
-> + *  Contributions after 2012-01-13 are licensed under the terms of the
-> + *  GNU GPL, version 2 or (at your option) any later version.
-> + */
+> +typedef struct {
+> +    RSCICommonState parent_obj;
 > +
-> +#include "qemu/osdep.h"
+> +    /* SCIF specific register */
+> +    uint16_t fcr;
+> +    uint16_t sptr;
+> +    uint16_t lsr;
 > +
+> +    /* internal use */
+> +    uint16_t read_lsr;
+> +    int tdcnt;
+> +} RSCIFState;
+> +
+> +typedef struct RenesasSCICommonClass {
+> +    SysBusDeviceClass parent;
+> +
+> +    const struct MemoryRegionOps *ops;
+> +    void (*irq_fn)(RSCICommonState *sci, int request);
+> +    int (*divrate)(RSCICommonState *sci);
+> +} RenesasSCICommonClass;
+> +
+> +typedef struct RenesasSCIClass {
+> +    RenesasSCICommonClass parent;
+> +
+> +    void (*p_irq_fn)(RSCICommonState *sci, int request);
+> +} RenesasSCIClass;
+> +
+> +typedef struct RenesasSCIAClass {
+> +    RenesasSCICommonClass parent;
+> +
+> +    void (*p_irq_fn)(RSCICommonState *sci, int request);
+> +    int (*p_divrate)(RSCICommonState *sci);
+> +} RenesasSCIAClass;
+> +
+> +typedef struct RenesasSCIFClass {
+> +    RenesasSCICommonClass parent;
+> +
+> +    void (*p_irq_fn)(RSCICommonState *sci, int request);
+> +} RenesasSCIFClass;
+> diff --git a/hw/char/renesas_sci.c b/hw/char/renesas_sci.c
+> index 5d7c6e6523..24c23709ee 100644
+> --- a/hw/char/renesas_sci.c
+> +++ b/hw/char/renesas_sci.c
+> @@ -1,12 +1,12 @@
+>   /*
+> - * Renesas Serial Communication Interface
+> + * Renesas Serial Communication Interface (SCI / SCIa / SCIF)
+>    *
+>    * Datasheet: RX62N Group, RX621 Group User's Manual: Hardware
+> - *            (Rev.1.40 R01UH0033EJ0140)
+> + * (Rev.1.40 R01UH0033EJ0140)
+> + * And SH7751 Group, SH7751R Group User's Manual: Hardware
+> + * (Rev.4.01 R01UH0457EJ0401)
+>    *
+> - * Copyright (c) 2019 Yoshinori Sato
+> - *
+> - * SPDX-License-Identifier: GPL-2.0-or-later
+> + * Copyright (c) 2020 Yoshinori Sato
+>    *
+>    * This program is free software; you can redistribute it and/or modify it
+>    * under the terms and conditions of the GNU General Public License,
+> @@ -23,14 +23,25 @@
+>   
+>   #include "qemu/osdep.h"
+>   #include "qemu/log.h"
+> +#include "qapi/error.h"
+> +#include "qemu-common.h"
 > +#include "hw/hw.h"
-> +#include "sysemu/dma.h"
-> +#include "qemu/log.h"
-> +#include "hw/qdev-properties.h"
+>   #include "hw/irq.h"
+> +#include "hw/sysbus.h"
+>   #include "hw/registerfields.h"
+>   #include "hw/qdev-properties.h"
 > +#include "hw/qdev-clock.h"
-> +#include "net/net.h"
-> +#include "sysemu/sysemu.h"
-> +#include "hw/irq.h"
-> +#include "hw/net/renesas_eth.h"
+>   #include "hw/char/renesas_sci.h"
+>   #include "migration/vmstate.h"
+> +#include "qemu/error-report.h"
+>   
+> -/* SCI register map */
+> -REG8(SMR, 0)
+> +/*
+> + * SCI register map
+> + * SCI(a) register size all 8bit.
+> + * SCIF regsister size 8bit and 16bit.
+> + * Allocate 16bit to match the larger one.
+> + */
+> +REG16(SMR, 0) /* 8bit */
+>     FIELD(SMR, CKS,  0, 2)
+>     FIELD(SMR, MP,   2, 1)
+>     FIELD(SMR, STOP, 3, 1)
+> @@ -38,263 +49,839 @@ REG8(SMR, 0)
+>     FIELD(SMR, PE,   5, 1)
+>     FIELD(SMR, CHR,  6, 1)
+>     FIELD(SMR, CM,   7, 1)
+> -REG8(BRR, 1)
+> -REG8(SCR, 2)
+> -  FIELD(SCR, CKE,  0, 2)
+> +REG16(BRR, 2) /* 8bit */
+> +REG16(SCR, 4)
+> +  FIELD(SCR, CKE, 0, 2)
+>     FIELD(SCR, TEIE, 2, 1)
+>     FIELD(SCR, MPIE, 3, 1)
+> +  FIELD(SCR, REIE, 3, 1)
+>     FIELD(SCR, RE,   4, 1)
+>     FIELD(SCR, TE,   5, 1)
+>     FIELD(SCR, RIE,  6, 1)
+>     FIELD(SCR, TIE,  7, 1)
+> -REG8(TDR, 3)
+> -REG8(SSR, 4)
+> +REG16(TDR, 6) /* 8bit */
+> +REG16(SSR, 8) /* 8bit */
+>     FIELD(SSR, MPBT, 0, 1)
+>     FIELD(SSR, MPB,  1, 1)
+>     FIELD(SSR, TEND, 2, 1)
+> -  FIELD(SSR, ERR,  3, 3)
+> +  FIELD(SSR, ERR, 3, 3)
+>       FIELD(SSR, PER,  3, 1)
+>       FIELD(SSR, FER,  4, 1)
+>       FIELD(SSR, ORER, 5, 1)
+>     FIELD(SSR, RDRF, 6, 1)
+>     FIELD(SSR, TDRE, 7, 1)
+> -REG8(RDR, 5)
+> -REG8(SCMR, 6)
+> +REG16(FSR, 8)
+> +  FIELD(FSR, DR, 0, 1)
+> +  FIELD(FSR, RDF, 1, 1)
+> +  FIELD(FSR, RDF_DR, 0, 2)
+> +  FIELD(FSR, PER, 2, 1)
+> +  FIELD(FSR, FER, 3, 1)
+> +  FIELD(FSR, BRK, 4, 1)
+> +  FIELD(FSR, TDFE, 5, 1)
+> +  FIELD(FSR, TEND, 6, 1)
+> +  FIELD(FSR, ER, 7, 1)
+> +  FIELD(FSR, FERn, 8, 4)
+> +  FIELD(FSR, PERn, 12, 4)
+> +REG16(RDR, 10) /* 8bit */
+> +REG16(SCMR, 12) /* 8bit */
+>     FIELD(SCMR, SMIF, 0, 1)
+>     FIELD(SCMR, SINV, 2, 1)
+>     FIELD(SCMR, SDIR, 3, 1)
+>     FIELD(SCMR, BCP2, 7, 1)
+> -REG8(SEMR, 7)
+> +REG16(FCR, 12)
+> +  FIELD(FCR, LOOP, 0, 1)
+> +  FIELD(FCR, RFRST, 1, 1)
+> +  FIELD(FCR, TFRST, 2, 1)
+> +  FIELD(FCR, MCE, 3, 1)
+> +  FIELD(FCR, TTRG, 4, 2)
+> +  FIELD(FCR, RTRG, 6, 2)
+> +  FIELD(FCR, RSTRG, 8, 3)
+> +REG16(SEMR, 14) /* 8bit */
+>     FIELD(SEMR, ACS0, 0, 1)
+>     FIELD(SEMR, ABCS, 4, 1)
+> +REG16(FDR, 14)
+> +  FIELD(FDR, Rn, 0, 4)
+> +  FIELD(FDR, Tn, 8, 4)
+> +REG16(SPTR, 16)
+> +  FIELD(SPTR, SPB2DT, 0, 1)
+> +  FIELD(SPTR, SPB2IO, 1, 1)
+> +  FIELD(SPTR, SCKDT, 2, 1)
+> +  FIELD(SPTR, SCKIO, 3, 1)
+> +  FIELD(SPTR, CTSDT, 4, 1)
+> +  FIELD(SPTR, CTSIO, 5, 1)
+> +  FIELD(SPTR, RTSDT, 6, 1)
+> +  FIELD(SPTR, RTSIO, 7, 1)
+> +  FIELD(SPTR, EIO, 7, 1)
+> +REG16(LSR, 18)
+> +  FIELD(LSR, ORER, 0, 1)
 > +
-> +/* ETHERC Registers */
-> +REG32(ECMR, 0x00)
-> +  FIELD(ECMR, PRM, 0, 1)
-> +  FIELD(ECMR, DM, 1, 1)
-> +  FIELD(ECMR, RTM, 2, 1)
-> +  FIELD(ECMR, ILB, 3, 1)
-> +  FIELD(ECMR, TE, 5, 1)
-> +  FIELD(ECMR, RE, 6, 1)
-> +  FIELD(ECMR, MPDE, 9, 1)
-> +  FIELD(ECMR, PRCREF, 12, 1)
-> +  FIELD(ECMR, TXF, 16, 1)
-> +  FIELD(ECMR, RXF, 17, 1)
-> +  FIELD(ECMR, PFR, 18, 1)
-> +  FIELD(ECMR, ZPF, 19, 1)
-> +  FIELD(ECMR, TPC, 20, 1)
-> +REG32(RFLR, 0x08)
-> +  FIELD(RFLR, RFL, 0, 12)
-> +REG32(ECSR, 0x10)
-> +  FIELD(ECSR, ICD, 0, 1)
-> +  FIELD(ECSR, MPD, 1, 1)
-> +  FIELD(ECSR, LCHNG, 2, 1)
-> +  FIELD(ECSR, PSRTO, 4, 1)
-> +  FIELD(ECSR, BFR, 5, 1)
-> +REG32(ECSIPR, 0x18)
-> +  FIELD(ECSIPR, ICDIP, 0, 1)
-> +  FIELD(ECSIPR, MPDIP, 1, 1)
-> +  FIELD(ECSIPR, LCHNGIP, 2, 1)
-> +  FIELD(ECSIPR, PSRTOIP, 4, 1)
-> +  FIELD(ECSIPR, BFSIPR, 5, 1)
-> +REG32(PIR, 0x20)
-> +  FIELD(PIR, MDC, 0, 1)
-> +  FIELD(PIR, MMD, 1, 1)
-> +  FIELD(PIR, MDO, 2, 1)
-> +  FIELD(PIR, MDI, 3, 1)
-> +REG32(PSR, 0x28)
-> +  FIELD(PSR, LMON, 0, 1)
-> +REG32(RDMLR, 0x40)
-> +  FIELD(RDMLR, RMD, 0, 20)
-> +REG32(IPGR, 0x50)
-> +  FIELD(IPGR, IPG, 0, 5)
-> +REG32(APR, 0x54)
-> +  FIELD(APR, AP, 0, 16)
-> +REG32(MPR, 0x58)
-> +  FIELD(MPR, MP, 0, 16)
-> +REG32(RFCF, 0x60)
-> +  FIELD(RFCF, RPAUSE, 0, 8)
-> +REG32(TPAUSER, 0x64)
-> +REG32(TPAUSECR, 0x68)
-> +  FIELD(TPAUSECR, TXP, 0, 8)
-> +  FIELD(TPAUSER, TPAUSE, 0, 16)
-> +REG32(BCFRR, 0x6c)
-> +  FIELD(BCFRR, BCF, 0, 16)
-> +REG32(MAHR, 0xc0)
-> +  FIELD(MAHR, MA, 0, 32)
-> +REG32(MALR, 0xc8)
-> +  FIELD(MALR, MA, 0, 16)
-> +REG32(TROCR, 0xd0)
-> +REG32(CDCR, 0xd4)
-> +REG32(LCCR, 0xd8)
-> +REG32(CNDCR, 0xdc)
-> +REG32(CEFCR, 0xe4)
-> +REG32(FRECR, 0xe8)
-> +REG32(TSFRCR, 0xec)
-> +REG32(TLFRCR, 0xf0)
-> +REG32(RFCR, 0xf4)
-> +REG32(MAFCR, 0xf8)
+> +#define SCIF_FIFO_DEPTH 16
 > +
-> +/* EDMAC register */
-> +REG32(EDMR, 0x00)
-> +  FIELD(EDMR, SWR, 0, 1)
-> +  FIELD(EDMR, DL, 4, 2)
-> +  FIELD(EDMR, DE, 6, 1)
-> +REG32(EDTRR, 0x08)
-> +  FIELD(EDTRR, TR, 0, 1)
-> +REG32(EDRRR, 0x10)
-> +  FIELD(EDRRR, RR, 0, 1)
-> +REG32(TDLAR, 0x18)
-> +REG32(RDLAR, 0x20)
-> +REG32(EESR, 0x28)
-> +  FIELD(EESR, CERF, 0, 1)
-> +  FIELD(EESR, PRE,  1, 1)
-> +  FIELD(EESR, RTSF, 2, 1)
-> +  FIELD(EESR, RTLF, 3, 1)
-> +  FIELD(EESR, RRF,  4, 1)
-> +  FIELD(EESR, RMAF, 7, 1)
-> +  FIELD(EESR, TRO,  8, 1)
-> +  FIELD(EESR, CD,   9, 1)
-> +  FIELD(EESR, RDESC, 0, 10)
-> +  FIELD(EESR, DLC,  10, 1)
-> +  FIELD(EESR, CND,  11, 1)
-> +  FIELD(EESR, RDOF, 16, 1)
-> +  FIELD(EESR, RDE,  17, 1)
-> +  FIELD(EESR, FR,   18, 1)
-> +  FIELD(EESR, TFUF, 19, 1)
-> +  FIELD(EESR, TDE,  20, 1)
-> +  FIELD(EESR, TC,   21, 1)
-> +  FIELD(EESR, ECI,  22, 1)
-> +  FIELD(EESR, ADE,  23, 1)
-> +  FIELD(EESR, RFCOF, 24, 1)
-> +  FIELD(EESR, RABT, 25, 1)
-> +  FIELD(EESR, TABT, 26, 1)
-> +  FIELD(EESR, TWB,  30, 1)
-> +REG32(EESIPR, 0x30)
-> +  FIELD(EESIPR, CERFIP, 0, 1)
-> +  FIELD(EESIPR, PREIP,  1, 1)
-> +  FIELD(EESIPR, RTSFIP, 2, 1)
-> +  FIELD(EESIPR, RTLFIP, 3, 1)
-> +  FIELD(EESIPR, RRFIP,  4, 1)
-> +  FIELD(EESIPR, RMAFIP, 7, 1)
-> +  FIELD(EESIPR, TROIP,  8, 1)
-> +  FIELD(EESIPR, CDIP,   9, 1)
-> +  FIELD(EESIPR, DLCIP,  10, 1)
-> +  FIELD(EESIPR, CNDIP,  11, 1)
-> +  FIELD(EESIPR, RDOFIP, 16, 1)
-> +  FIELD(EESIPR, RDEIP,  17, 1)
-> +  FIELD(EESIPR, FRIP,   18, 1)
-> +  FIELD(EESIPR, TFUFIP, 19, 1)
-> +  FIELD(EESIPR, TDEIP,  20, 1)
-> +  FIELD(EESIPR, TCIP,   21, 1)
-> +  FIELD(EESIPR, ECIIP,  22, 1)
-> +  FIELD(EESIPR, ADEIP,  23, 1)
-> +  FIELD(EESIPR, RFCOFIP, 24, 1)
-> +  FIELD(EESIPR, RABTIP, 25, 1)
-> +  FIELD(EESIPR, TABTIP, 26, 1)
-> +  FIELD(EESIPR, TWBIP,  30, 1)
-> +REG32(TRSCER, 0x38)
-> +  FIELD(TRSCER, RRFCE, 4, 1)
-> +  FIELD(TRSCER, RMAFCE, 7, 1)
-> +REG32(RMFCR, 0x40)
-> +  FIELD(RMFCR, MFC, 0, 16)
-> +REG32(TFTR, 0x48)
-> +  FIELD(TFTR, TFT, 0, 11)
-> +REG32(FDR, 0x50)
-> +  FIELD(FDR, RFD, 0, 5)
-> +  FIELD(FDR, TFD, 8, 5)
-> +REG32(RMCR, 0x58)
-> +  FIELD(RMCR, RNR, 0, 1)
-> +  FIELD(RMCR, RNC, 1, 1)
-> +REG32(TFUCR, 0x64)
-> +  FIELD(TFUCR, UNDER, 0, 16)
-> +REG32(RFOCR, 0x68)
-> +  FIELD(RFOCR, OVER, 0, 16)
-> +REG32(IOSR, 0x6c)
-> +  FIELD(IOSR, ELB, 0, 1);
-> +REG32(FCFTR, 0x70)
-> +  FIELD(FCFTR, RFDO, 0, 3)
-> +  FIELD(FCFTR, RFFO, 16, 3)
-> +REG32(RPADIR, 0x78)
-> +  FIELD(RPADIR, PADR, 0, 6)
-> +  FIELD(RPADIR, PADS, 16, 2)
-> +REG32(TRIMD, 0x7c)
-> +  FIELD(TRIMD, TIS, 0, 1)
-> +  FIELD(TRIMD, TIM, 4, 1)
-> +REG32(RBWAR, 0xc8)
-> +REG32(RDFAR, 0xcc)
-> +REG32(TBRAR, 0xd4)
-> +REG32(TDFAR, 0xd8)
-> +
-> +/* Transmit Descriptor */
-> +REG32(TD0, 0x0000)
-> +  FIELD(TD0, TFS0, 0, 1)
-> +  FIELD(TD0, TFS1, 1, 1)
-> +  FIELD(TD0, TFS2, 2, 1)
-> +  FIELD(TD0, TFS3, 3, 1)
-> +  FIELD(TD0, TFS8, 8, 1)
-> +  FIELD(TD0, TWBI, 26, 1)
-> +  FIELD(TD0, TFE,  27, 1)
-> +  FIELD(TD0, TFP,  28, 2)
-> +  FIELD(TD0, TDLE, 30, 1)
-> +  FIELD(TD0, TACT, 31, 1)
-> +REG32(TD1, 0x0004)
-> +  FIELD(TD1, TBL, 16, 16)
-> +REG32(TD2, 0x0008)
-> +  FIELD(TD2, TBA, 0, 32)
-> +
-> +/* Receive Descriptor */
-> +REG32(RD0, 0x0000)
-> +  FIELD(RD0, RFS,  0, 10)
-> +    FIELD(RD0, RFS0, 0, 1)
-> +    FIELD(RD0, RFS1, 1, 1)
-> +    FIELD(RD0, RFS2, 2, 1)
-> +    FIELD(RD0, RFS3, 3, 1)
-> +    FIELD(RD0, RFS4, 4, 1)
-> +    FIELD(RD0, RFS7, 7, 1)
-> +    FIELD(RD0, RFS8, 8, 1)
-> +    FIELD(RD0, RFS9, 9, 1)
-> +  FIELD(RD0, RFE,  27, 1)
-> +  FIELD(RD0, RFP,  28, 2)
-> +  FIELD(RD0, RFP0, 28, 1)
-> +  FIELD(RD0, RDLE, 30, 1)
-> +  FIELD(RD0, RACT, 31, 1)
-> +REG32(RD1, 0x0004)
-> +  FIELD(RD1, RFL, 0, 16)
-> +  FIELD(RD1, RBL, 16, 16)
-> +REG32(RD2, 0x0008)
-> +  FIELD(RD2, RBA, 0, 32)
-> +
-> +static void renesas_eth_set_irq(RenesasEthState *s)
-> +{
-> +    if (s->edmac_regs[R_EESR] & s->edmac_regs[R_EESIPR]) {
-> +        qemu_set_irq(s->irq, 1);
-> +    } else {
-> +        qemu_set_irq(s->irq, 0);
+> +static const int sci_rtrg[] = {1, 4, 8, 14};
+>   
+> -static int can_receive(void *opaque)
+> +static void update_event_time(RSCICommonState *sci, int evt, int64_t t)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> -    if (sci->rx_next > qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL)) {
+> -        return 0;
+> +    if (t > 0) {
+> +        t +=  qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +        sci->event[evt].time = t;
+> +        if (timer_expire_time_ns(sci->event_timer) > t) {
+> +            timer_mod(sci->event_timer, t);
+> +        }
+>       } else {
+> -        return FIELD_EX8(sci->scr, SCR, RE);
+> +        sci->event[evt].time = 0;
 > +    }
 > +}
 > +
-> +static bool renesas_eth_can_receive(NetClientState *nc)
+> +static void sci_irq(RSCICommonState *sci_common, int req)
 > +{
-> +    RenesasEthState *s = RenesasEth(qemu_get_nic_opaque(nc));
+> +    int irq = 0;
+> +    int rie;
+> +    int tie;
+> +    RSCIState *sci = RSCI(sci_common);
 > +
-> +    return FIELD_EX32(s->edmac_regs[R_EDRRR], EDRRR, RR);
-> +}
+> +    rie = FIELD_EX16(sci_common->scr, SCR, RIE);
+> +    tie = FIELD_EX16(sci_common->scr, SCR, TIE);
+> +    switch (req) {
+> +    case ERI:
+> +        irq = rie && (FIELD_EX16(sci_common->Xsr, SSR, ERR) != 0);
+> +        break;
+> +    case RXI:
+> +        irq = FIELD_EX16(sci_common->Xsr, SSR, RDRF) && rie  &&
+> +            !FIELD_EX16(sci->sptr, SPTR, EIO);
+> +        break;
+> +    case TXI:
+> +        irq = FIELD_EX16(sci_common->Xsr, SSR, TDRE) && tie;
+> +        break;
+> +    case BRI_TEI:
+> +        irq = FIELD_EX16(sci_common->Xsr, SSR, TEND) &&
+> +            FIELD_EX16(sci_common->scr, SCR, TEIE);
+> +        break;
+>       }
+> +    qemu_set_irq(sci_common->irq[req], irq);
+>   }
+>   
+> -static void receive(void *opaque, const uint8_t *buf, int size)
+> +static void scia_irq(RSCICommonState *sci, int req)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> -    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime;
+> -    if (FIELD_EX8(sci->ssr, SSR, RDRF) || size > 1) {
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, ORER, 1);
+> -        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> -            qemu_set_irq(sci->irq[ERI], 1);
+> +    int irq = 0;
+> +    int rie;
+> +    int tie;
 > +
-> +static void set_ecsr(RenesasEthState *s, int bit)
-> +{
-> +    s->etherc_regs[R_ECSR] = deposit32(s->etherc_regs[R_ECSR], bit, 1, 1);
-> +    if (s->etherc_regs[R_ECSR] & s->etherc_regs[R_ECSIPR]) {
-> +        s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                           EESR, ECI, 1);
+> +    rie = FIELD_EX16(sci->scr, SCR, RIE);
+> +    tie = FIELD_EX16(sci->scr, SCR, TIE);
+> +    switch (req) {
+> +    case ERI:
+> +        irq = (FIELD_EX16(sci->Xsr, SSR, ERR) != 0) && rie;
+> +        qemu_set_irq(sci->irq[req], irq);
+> +        break;
+> +    case RXI:
+> +        if (FIELD_EX16(sci->Xsr, SSR, RDRF) && rie) {
+> +            qemu_irq_pulse(sci->irq[req]);
+>           }
+> -    } else {
+> -        sci->rdr = buf[0];
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 1);
+> -        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> -            qemu_irq_pulse(sci->irq[RXI]);
+> +        break;
+> +    case TXI:
+> +        if (FIELD_EX16(sci->Xsr, SSR, TDRE) && tie) {
+> +            qemu_irq_pulse(sci->irq[req]);
+>           }
+> +        break;
+> +    case BRI_TEI:
+> +        irq = FIELD_EX16(sci->Xsr, SSR, TEND) &&
+> +            FIELD_EX16(sci->scr, SCR, TEIE);
+> +        qemu_set_irq(sci->irq[req], irq);
+> +        break;
 > +    }
-> +    renesas_eth_set_irq(s);
 > +}
 > +
-> +static void renesas_eth_set_link_status(NetClientState *nc)
+> +static void scif_irq(RSCICommonState *sci, int req)
 > +{
-> +    RenesasEthState *s = RenesasEth(qemu_get_nic_opaque(nc));
-> +    int old_lmon, new_lmon;
-> +    if (s->mdiodev) {
-> +        old_lmon = mdio_phy_linksta(mdio_get_phy(s->mdiodev));
-> +        mdio_phy_set_link(mdio_get_phy(s->mdiodev), !nc->link_down);
-> +        new_lmon = mdio_phy_linksta(mdio_get_phy(s->mdiodev));
-> +        if (old_lmon ^ new_lmon) {
-> +            set_ecsr(s, R_ECSR_LCHNG_SHIFT);
+> +    int irq = 0;
+> +    int rie;
+> +    int reie;
+> +    int tie;
+> +
+> +    rie = FIELD_EX16(sci->scr, SCR, RIE);
+> +    reie = FIELD_EX16(sci->scr, SCR, REIE);
+> +    tie = FIELD_EX16(sci->scr, SCR, TIE);
+> +    switch (req) {
+> +    case ERI:
+> +        irq = (rie || reie) && FIELD_EX16(sci->Xsr, FSR, ER);
+> +        break;
+> +    case RXI:
+> +        irq = (FIELD_EX16(sci->Xsr, FSR, RDF_DR) != 0) && rie;
+> +        break;
+> +    case TXI:
+> +        irq = FIELD_EX16(sci->Xsr, FSR, TDFE) & tie;
+> +        break;
+> +    case BRI_TEI:
+> +        irq = (rie || reie) && FIELD_EX16(sci->Xsr, FSR, BRK);
+> +        break;
+>       }
+> +    qemu_set_irq(sci->irq[req], irq);
+>   }
+>   
+> -static void send_byte(RSCIState *sci)
+> +static int sci_can_receive(void *opaque)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    int fifo_free = 0;
+> +    if (clock_is_enabled(sci->pck) && FIELD_EX16(sci->scr, SCR, RE)) {
+> +        /* Receiver enabled */
+> +        fifo_free = fifo8_num_free(&sci->rxfifo);
+> +    }
+> +    return fifo_free;
+> +}
+> +
+> +static void sci_receive(void *opaque, const uint8_t *buf, int size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    fifo8_push_all(&sci->rxfifo, buf, size);
+> +    if (sci->event[RXNEXT].time == 0) {
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 1);
+> +        update_event_time(sci, RXNEXT, sci->trtime);
+> +        rc->irq_fn(sci, RXI);
+> +    }
+> +}
+> +
+> +static int scif_can_receive(void *opaque)
+> +{
+> +    RSCIFState *scif = RSCIF(opaque);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    int fifo_free = 0;
+> +    if (clock_is_enabled(sci->pck) && FIELD_EX16(sci->scr, SCR, RE)) {
+> +        /* Receiver enabled */
+> +        fifo_free = fifo8_num_free(&sci->rxfifo);
+> +        if (fifo_free == 0) {
+> +            /* FIFO overrun */
+> +            scif->lsr = FIELD_DP16(scif->lsr, LSR, ORER, 1);
+> +            scif_irq(sci, ERI);
 > +        }
 > +    }
+> +    return fifo_free;
 > +}
 > +
-> +static void edmac_write(RenesasEthState *s, const uint8_t *buf,
-> +                        size_t size, int pad)
+> +static void scif_receive(void *opaque, const uint8_t *buf, int size)
 > +{
-> +    uint32_t rdesc[3];
-> +    uint32_t eesr;
-> +    int state = 0;
+> +    RSCIFState *scif = RSCIF(opaque);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    int rtrg;
 > +
-> +    while (size > 0) {
-> +        size_t wsize;
-> +        /* RDESC read */
-> +        dma_memory_read(&address_space_memory,
-> +                        s->edmac_regs[R_RDFAR], rdesc, sizeof(rdesc));
-> +        if (FIELD_EX32(rdesc[0], RD0, RACT)) {
-> +            if (state == 0) {
-> +                /* Fist block */
-> +                rdesc[0] = FIELD_DP32(rdesc[0], RD0, RFP, 2);
-> +            }
-> +            state++;
-> +            s->edmac_regs[R_RBWAR] = rdesc[2];
-> +            wsize = MIN(FIELD_EX32(rdesc[1], RD1, RBL), size);
-> +            /* Write receive data */
-> +            dma_memory_write(&address_space_memory,
-> +                             s->edmac_regs[R_RBWAR], buf, wsize);
-> +            buf += wsize;
-> +            size -= wsize;
-> +            rdesc[1] = FIELD_DP32(rdesc[1], RD1, RFL, wsize);
-> +            if (size == 0) {
-> +                /* Last descriptor */
-> +                rdesc[0] = FIELD_DP32(rdesc[0], RD0, RFP0, 1);
-> +                if (FIELD_EX32(s->edmac_regs[R_RMCR], RMCR, RNR) == 0) {
-> +                    s->edmac_regs[R_EDRRR] = FIELD_DP32(s->edmac_regs[R_EDRRR],
-> +                                                  EDRRR, RR, 0);
-> +                }
-> +                s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                                   EESR, FR, 1);
-> +                renesas_eth_set_irq(s);
-> +            }
-> +            eesr = FIELD_EX32(s->edmac_regs[R_EESR], EESR, RDESC);
-> +            rdesc[0] = FIELD_DP32(rdesc[0], RD0, RFS,
-> +                                  eesr & ~(s->edmac_regs[R_TRSCER]));
-> +            rdesc[0] = FIELD_DP32(rdesc[0], RD0, RFE, eesr != 0);
-> +            rdesc[0] = FIELD_DP32(rdesc[0], RD0, RACT, 0);
-> +            /* RDESC write back */
-> +            dma_memory_write(&address_space_memory,
-> +                             s->edmac_regs[R_RDFAR], rdesc, sizeof(rdesc));
-> +            if (FIELD_EX32(rdesc[0], RD0, RDLE)) {
-> +                s->edmac_regs[R_RDFAR] = s->edmac_regs[R_RDLAR];
-> +            } else {
-> +                s->edmac_regs[R_RDFAR] += s->descsize;
-> +            }
-> +            s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                               EESR, FR, 1);
+> +    fifo8_push_all(&sci->rxfifo, buf, size);
+> +    if (sci->event[RXNEXT].time == 0) {
+> +        rtrg = sci_rtrg[FIELD_EX16(scif->fcr, FCR, RTRG)];
+> +        if (fifo8_num_used(&sci->rxfifo) >= rtrg) {
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, RDF, 1);
 > +        } else {
-> +            /* no active RDESC */
-> +            if (FIELD_EX32(s->edmac_regs[R_RMCR], RMCR, RNC) == 0) {
-> +                s->edmac_regs[R_EDRRR] = FIELD_DP32(s->edmac_regs[R_EDRRR],
-> +                                                    EDRRR, RR, 0);
-> +            }
-> +            s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                               EESR, RDE, 1);
-> +            break;
+> +            update_event_time(sci, RXTOUT, 15 * sci->etu);
 > +        }
-> +    }
-> +    renesas_eth_set_irq(s);
-> +}
-> +
-> +static inline void update_count(uint32_t *cnt)
-> +{
-> +    if (*cnt < UINT32_MAX) {
-> +        /* Satulate on 32bit value */
-> +        (*cnt)++;
+> +        scif_irq(sci, RXI);
 > +    }
 > +}
 > +
-> +#define MIN_BUF_SIZE 60
-> +static ssize_t renesas_eth_receive(NetClientState *nc,
-> +                            const uint8_t *buf, size_t size)
-> +{
-> +    RenesasEthState *s = RenesasEth(qemu_get_nic_opaque(nc));
-> +    static const uint8_t bcast_addr[] = {
-> +        0xff, 0xff, 0xff, 0xff, 0xff, 0xff
-> +    };
-> +    static const uint8_t pad[3] = { 0 };
-> +    uint8_t buf1[MIN_BUF_SIZE];
-> +    bool receive = false;
-> +    size_t pads;
-> +    uint32_t rflr;
+> +static void sci_send_byte(RSCICommonState *sci)
+>   {
+>       if (qemu_chr_fe_backend_connected(&sci->chr)) {
+>           qemu_chr_fe_write_all(&sci->chr, &sci->tdr, 1);
+>       }
+> -    timer_mod(&sci->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + sci->trtime);
+> -    sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 0);
+> -    sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
+> -    qemu_set_irq(sci->irq[TEI], 0);
+> -    if (FIELD_EX8(sci->scr, SCR, TIE)) {
+> -        qemu_irq_pulse(sci->irq[TXI]);
+> +    sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 0);
+> +    sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 1);
+> +}
 > +
-> +    if (size >= 6) {
-> +        if (memcmp(buf, bcast_addr, sizeof(bcast_addr)) == 0) {
-> +            /* broadcast */
-> +            if (s->etherc_regs[R_BCFRR] == 0 ||
-> +                s->etherc_regs[R_BCFRR] < s->rcv_bcast) {
-> +                s->rcv_bcast++;
-> +                receive = true;
-> +            }
-> +        } else if (buf[0] & 0x1) {
-> +            /* multicast */
-> +            receive = true;
-> +            s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                               EESR, RMAF, 1);
-> +            update_count(&s->edmac_regs[R_MAFCR]);
-> +        } else if (FIELD_EX32(s->edmac_regs[R_ECMR], ECMR, PRM)) {
-> +            /* promiscas */
-> +            receive = true;
-> +        } else if (memcmp(buf, s->macadr, sizeof(s->macadr)) == 0) {
-> +            /* normal */
-> +            receive = true;
+> +static int transmit_byte(RSCIFState *scif)
+> +{
+> +    RSCICommonState *sci = RSCICommon(scif);
+> +    int64_t elapsed;
+> +    int byte = 0;
+> +    if (sci->tx_start_time > 0) {
+> +        elapsed = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) - sci->tx_start_time;
+> +        byte = elapsed / sci->trtime;
+> +        if (byte > scif->tdcnt) {
+> +            byte = scif->tdcnt;
 > +        }
-> +    }
-> +    if (!receive) {
-> +        return size;
-> +    }
-> +    /* if too small buffer, then expand it */
-> +    if (size < MIN_BUF_SIZE) {
-> +        memcpy(buf1, buf, size);
-> +        memset(buf1 + size, 0, MIN_BUF_SIZE - size);
-> +        buf = buf1;
-> +        size = MIN_BUF_SIZE;
-> +    }
-> +
-> +    rflr = FIELD_EX32(s->etherc_regs[R_RFLR], RFLR, RFL);
-> +    rflr = MAX(rflr, 1518);
-> +    if (size > rflr) {
-> +        update_count(&s->etherc_regs[R_TLFRCR]);
-> +        s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                           EESR, RTLF, 1);
-> +    }
-> +    pads = FIELD_EX32(s->edmac_regs[R_RPADIR], RPADIR, PADS);
-> +    if (pads > 0) {
-> +        int pos = FIELD_EX32(s->edmac_regs[R_RPADIR], RPADIR, PADR);
-> +        uint8_t *padbuf = g_new(uint8_t, size + pads);
-> +        if (size > pos) {
-> +            if (pos > 0) {
-> +                memcpy(padbuf, buf, pos);
-> +            }
-> +            memcpy(padbuf + pos, pad, pads);
-> +            memcpy(padbuf + pos + pads, buf + pos, size - pos);
-> +        } else {
-> +            pads = 0;
-> +        }
-> +        edmac_write(s, padbuf, size + pads, pads);
-> +        g_free(padbuf);
-> +    } else {
-> +        edmac_write(s, buf, size, 0);
-> +    }
-> +    return size;
-> +}
-> +
-> +static size_t edmac_read(RenesasEthState *s, uint8_t **buf)
-> +{
-> +    uint32_t tdesc[3];
-> +    uint32_t size = 0;
-> +
-> +    *buf = NULL;
-> +    for (;;) {
-> +        size_t rsize;
-> +        dma_memory_read(&address_space_memory,
-> +                        s->edmac_regs[R_TDFAR], tdesc, sizeof(tdesc));
-> +        if (FIELD_EX32(tdesc[0], TD0, TACT)) {
-> +            s->edmac_regs[R_TBRAR] = tdesc[2];
-> +            rsize = FIELD_EX32(tdesc[1], TD1, TBL);
-> +            *buf = g_realloc(*buf, size + rsize);
-> +            dma_memory_read(&address_space_memory,
-> +                            s->edmac_regs[R_TBRAR], *buf + size, rsize);
-> +            tdesc[0] = FIELD_DP32(tdesc[0], TD0, TACT, 0);
-> +            dma_memory_write(&address_space_memory,
-> +                            s->edmac_regs[R_TDFAR], tdesc, sizeof(tdesc));
-> +            size += rsize;
-> +            if (FIELD_EX32(tdesc[0], TD0, TDLE)) {
-> +                s->edmac_regs[R_TDFAR] = s->edmac_regs[R_TDLAR];
-> +            } else {
-> +                s->edmac_regs[R_TDFAR] += s->descsize;
-> +            }
-> +            if (FIELD_EX32(tdesc[0], TD0, TFP) & 1) {
-> +                break;
-> +            }
-> +        } else {
-> +            s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                               EESR, TDE, 1);
-> +            renesas_eth_set_irq(s);
-> +            break;
-> +        }
-> +    }
-> +    return size;
-> +}
-> +
-> +static void renesas_eth_start_xmit(RenesasEthState *s)
-> +{
-> +    uint8_t *txbuf;
-> +    size_t size;
-> +
-> +    size = edmac_read(s, &txbuf);
-> +    qemu_send_packet(qemu_get_queue(s->nic), txbuf, size);
-> +    g_free(txbuf);
-> +    s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR], EESR, TWB, 1);
-> +    s->edmac_regs[R_EDTRR] = FIELD_DP32(s->edmac_regs[R_EDTRR], EDTRR, TR, 0);
-> +    renesas_eth_set_irq(s);
-> +}
-> +
-> +static void renesas_eth_reset(RenesasEthState *s)
-> +{
-> +    int i;
-> +
-> +    for (i = 0; i < RENESAS_ETHERC_R_MAX; i++) {
-> +        register_reset(&s->etherc_regs_info[i]);
-> +    }
-> +    for (i = 0; i < RENESAS_EDMAC_R_MAX; i++) {
-> +        register_reset(&s->edmac_regs_info[i]);
-> +    }
-> +}
-> +
-> +static uint64_t ecsr_pre_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    uint32_t old_val = s->etherc_regs[R_ECSR];
-> +
-> +    val ^= old_val;
-> +    val &= old_val;
-> +    return val;
-> +}
-> +
-> +static void ecsr_post_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +
-> +    if (s->etherc_regs[R_ECSR] & s->etherc_regs[R_ECSIPR]) {
-> +        s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                           EESR, ECI, 1);
-> +    } else {
-> +        s->edmac_regs[R_EESR] = FIELD_DP32(s->edmac_regs[R_EESR],
-> +                                           EESR, ECI, 0);
-> +    }
-> +    renesas_eth_set_irq(s);
-> +}
-> +
-> +static void pir_post_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    if (s->mdiodev) {
-> +        mdio_set_mdc_pin(s->mdiodev, FIELD_EX32(val, PIR, MDC));
-> +        if (FIELD_EX32(val, PIR, MMD)) {
-> +            mdio_set_mdo_pin(s->mdiodev, FIELD_EX32(val, PIR, MDO));
-> +        }
-> +    }
-> +}
-> +
-> +static uint64_t pir_post_read(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    if (s->mdiodev) {
-> +        val = FIELD_DP64(val, PIR, MDI, mdio_read_mdi_pin(s->mdiodev));
-> +    }
-> +    return val;
-> +}
-> +
-> +static uint64_t mar_pre_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    if (FIELD_EX32(s->edmac_regs[R_EDTRR], EDTRR, TR) ||
-> +        FIELD_EX32(s->edmac_regs[R_EDRRR], EDRRR, RR)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "renesas_eth: Tx/Rx enabled in MAR write.\n");
-> +    }
-> +    return val;
-> +}
-> +
-> +static void mar_post_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    int i;
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    for (i = 0; i < 4; i++) {
-> +        s->macadr[i] = extract32(s->etherc_regs[R_MAHR], 8 * (3 - i), 8);
-> +    }
-> +    for (i = 0; i < 2; i++) {
-> +        s->macadr[i + 4] = extract32(s->etherc_regs[R_MALR], 8 * (1 - i), 8);
-> +    }
-> +}
-> +
-> +static uint64_t etherc_counter_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    /* Counter register clear in any write operation */
+>       }
+> +    return byte;
+>   }
+>   
+> -static void txend(void *opaque)
+> +static int64_t scif_rx_timeout(RSCICommonState *sci)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> -    if (!FIELD_EX8(sci->ssr, SSR, TDRE)) {
+> -        send_byte(sci);
+> +    sci->Xsr = FIELD_DP16(sci->Xsr, FSR, DR, 1);
+> +    scif_irq(sci, RXI);
 > +    return 0;
 > +}
 > +
-> +static void edmr_post_write(RegisterInfo *reg, uint64_t val)
+> +static int64_t sci_rx_next(RSCICommonState *sci)
 > +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    uint32_t TDLAR, RMFCR, TFUCR, RFOCR;
-> +    int dl;
-> +
-> +    if (FIELD_EX32(val, EDMR, SWR)) {
-> +        /* Following register keep for SWR */
-> +        TDLAR = s->edmac_regs[R_TDLAR];
-> +        RMFCR = s->edmac_regs[R_RMFCR];
-> +        TFUCR = s->edmac_regs[R_TFUCR];
-> +        RFOCR = s->edmac_regs[R_RFOCR];
-> +        renesas_eth_reset(s);
-> +        s->edmac_regs[R_TDLAR] = TDLAR;
-> +        s->edmac_regs[R_RMFCR] = RMFCR;
-> +        s->edmac_regs[R_TFUCR] = TFUCR;
-> +        s->edmac_regs[R_RFOCR] = RFOCR;
+> +    int64_t next_event = 0;
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    if (!fifo8_is_empty(&sci->rxfifo)) {
+> +        if (FIELD_EX16(sci->Xsr, SSR, RDRF)) {
+> +            /* Receiver overrun */
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, ORER, 1);
+> +            rc->irq_fn(sci, ERI);
+> +        } else {
+> +            /* Trigger next event */
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 1);
+> +            rc->irq_fn(sci, RXI);
+> +            next_event = sci->trtime;
+> +        }
 > +    }
-> +    dl = FIELD_EX32(val, EDMR, DL) % 3;
-> +    s->descsize = 16 << dl;
+> +    return next_event;
 > +}
 > +
-> +static void edtrr_post_write(RegisterInfo *reg, uint64_t val)
+> +static int64_t sci_tx_empty(RSCICommonState *sci)
 > +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    if (FIELD_EX32(val, EDTRR, TR)) {
-> +        renesas_eth_start_xmit(s);
+> +    int64_t ret = 0;
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    if (!FIELD_EX16(sci->Xsr, SSR, TDRE)) {
+> +        sci_send_byte(sci);
+> +        ret = sci->trtime;
+> +        rc->irq_fn(sci, TXI);
+>       } else {
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
+> -        if (FIELD_EX8(sci->scr, SCR, TEIE)) {
+> -            qemu_set_irq(sci->irq[TEI], 1);
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 1);
+> +        rc->irq_fn(sci, BRI_TEI);
 > +    }
+> +    return ret;
 > +}
 > +
-> +static uint64_t eesr_pre_write(RegisterInfo *reg, uint64_t val)
+> +static int64_t scif_tx_empty(RSCICommonState *sci)
 > +{
-> +    uint32_t eesr;
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    /* flag clear for write 1 */
-> +    eesr = s->edmac_regs[R_EESR];
-> +    val = FIELD_DP64(val, EESR, ECI, 0); /* Keep ECI value */
-> +    eesr &= ~val;
-> +    return eesr;
+> +    RSCIFState *scif = RSCIF(sci);
+> +    scif->tdcnt -= transmit_byte(scif);
+> +    sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 1);
+> +    scif_irq(sci, TXI);
+> +    return 0;
 > +}
 > +
-> +static void eesr_post_write(RegisterInfo *reg, uint64_t val)
+> +static int64_t scif_tx_end(RSCICommonState *sci)
 > +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    renesas_eth_set_irq(s);
+> +    RSCIFState *scif = RSCIF(sci);
+> +    scif->tdcnt = 0;
+> +    sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 1);
+> +    return 0;
 > +}
 > +
-> +static void tdlar_post_write(RegisterInfo *reg, uint64_t val)
+> +static void sci_timer_event(void *opaque)
 > +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    s->edmac_regs[R_TDFAR] = s->edmac_regs[R_TDLAR];
-> +}
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    int64_t now, next, t;
+> +    int i;
 > +
-> +static void rdlar_post_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    s->edmac_regs[R_RDFAR] = s->edmac_regs[R_RDLAR];
-> +}
-> +
-> +static uint64_t fdr_pre_write(RegisterInfo *reg, uint64_t val)
-> +{
-> +    RenesasEthState *s = RenesasEth(reg->opaque);
-> +    if (FIELD_EX32(val, FDR, TFD) != 7 || FIELD_EX32(val, FDR, RFD) != 7) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "renesas_eth: invalid FDR setting %"
-> +                      HWADDR_PRIX ".\n", val);
-> +    }
-> +    if (FIELD_EX32(s->edmac_regs[R_EDTRR], EDTRR, TR) ||
-> +        FIELD_EX32(s->edmac_regs[R_EDRRR], EDRRR, RR)) {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "renesas_eth: Tx/Rx enabled in FDR write.\n");
-> +    }
-> +    return val;
-> +}
-> +
-> +static uint64_t edmac_reg_read(void *opaque, hwaddr addr, unsigned int size)
-> +{
-> +    RegisterInfoArray *ra = opaque;
-> +    RenesasEthState *s = RenesasEth(ra->r[0]->opaque);
-> +    if (clock_is_enabled(s->ick)) {
-> +        return register_read_memory(ra, addr, size);
+> +    now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    next = INT64_MAX;
+> +    for (i = 0; i < NR_SCI_EVENT; i++) {
+> +        if (sci->event[i].time > 0 && sci->event[i].time <= now) {
+> +            t = sci->event[i].handler(sci);
+> +            sci->event[i].time = (t > 0) ? now + t : 0;
+> +        }
+> +        if (sci->event[i].time > 0) {
+> +            next = MIN(next, sci->event[i].time);
+>           }
+>       }
+> +    if (next < INT64_MAX) {
+> +        timer_mod(sci->event_timer, next);
 > +    } else {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "renesas_eth: EDMAC module stopped.\n");
-> +        return UINT64_MAX;
+> +        timer_del(sci->event_timer);
+> +    }
+>   }
+>   
+> -static void update_trtime(RSCIState *sci)
+> +static int static_divrate(RSCICommonState *sci)
+>   {
+> -    /* char per bits */
+> -    sci->trtime = 8 - FIELD_EX8(sci->smr, SMR, CHR);
+> -    sci->trtime += FIELD_EX8(sci->smr, SMR, PE);
+> -    sci->trtime += FIELD_EX8(sci->smr, SMR, STOP) + 1;
+> -    /* x bit transmit time (32 * divrate * brr) / base freq */
+> -    sci->trtime *= 32 * sci->brr;
+> -    sci->trtime *= 1 << (2 * FIELD_EX8(sci->smr, SMR, CKS));
+> -    sci->trtime *= NANOSECONDS_PER_SECOND;
+> -    sci->trtime /= sci->input_freq;
+> +    /* SCI / SCIF have static divide rate */
+> +    return 32;
+>   }
+>   
+> -static bool sci_is_tr_enabled(RSCIState *sci)
+> +static int scia_divrate(RSCICommonState *sci)
+>   {
+> -    return FIELD_EX8(sci->scr, SCR, TE) || FIELD_EX8(sci->scr, SCR, RE);
+> +    /*
+> +     * SEMR.ABCS = 0 -> 32
+> +     * SEMR.ABCS = 1 -> 16
+> +     */
+> +    RSCIAState *scia = RSCIA(sci);
+> +    return 16 * (2 - FIELD_EX8(scia->semr, SEMR, ABCS));
+>   }
+>   
+> -static void sci_write(void *opaque, hwaddr offset, uint64_t val, unsigned size)
+> +static void update_trtime(RSCICommonState *sci)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    int cks = 1 << (2 * FIELD_EX16(sci->smr, SMR, CKS));
+> +    if (sci->input_freq > 0) {
+> +        /* x bit transmit time (divrate * brr) / base freq */
+> +        sci->etu = rc->divrate(sci) * cks;
+> +        sci->etu *= sci->brr + 1;
+> +        sci->etu *= NANOSECONDS_PER_SECOND;
+> +        sci->etu /= sci->input_freq;
+>   
+> -    switch (offset) {
+> -    case A_SMR:
+> -        if (!sci_is_tr_enabled(sci)) {
+> -            sci->smr = val;
+> -            update_trtime(sci);
+> +        /* char per bits */
+> +        sci->trtime = 8 - FIELD_EX16(sci->smr, SMR, CHR);
+> +        sci->trtime += FIELD_EX16(sci->smr, SMR, PE);
+> +        sci->trtime += FIELD_EX16(sci->smr, SMR, STOP) + 1 + 1;
+> +        sci->trtime *= sci->etu;
 > +    }
 > +}
 > +
-> +static void edmac_reg_write(void *opaque, hwaddr addr,
-> +                        uint64_t value, unsigned int size)
+> +static void sci_pck_update(void *opaque)
 > +{
-> +    RegisterInfoArray *ra = opaque;
-> +    RenesasEthState *s = RenesasEth(ra->r[0]->opaque);
-> +    if (clock_is_enabled(s->ick)) {
-> +        register_write_memory(ra, addr, value, size);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +
+> +    sci->input_freq = clock_get_hz(sci->pck);
+> +    update_trtime(sci);
+> +}
+> +
+> +#define IS_TR_ENABLED(scr) \
+> +    (FIELD_EX16(scr, SCR, TE) || FIELD_EX16(scr, SCR, RE))
+> +
+> +static hwaddr map_address(RSCICommonState *sci, hwaddr addr)
+> +{
+> +    return (addr << 1) >> sci->regshift;
+> +}
+> +
+> +static void sci_common_write(void *opaque, hwaddr addr,
+> +                             uint64_t val, unsigned size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(opaque);
+> +    switch (addr) {
+> +    case A_SCR:
+> +        sci->scr = val;
+> +        if (FIELD_EX16(sci->scr, SCR, TE)) {
+> +            /* Transmitter enable */
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 1);
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TEND, 1);
+> +            rc->irq_fn(sci, TXI);
+> +            rc->irq_fn(sci, BRI_TEI);
+> +        } else {
+> +            /* Transmitter disable  */
+> +            update_event_time(sci, TXEND, 0);
+> +            update_event_time(sci, TXEMPTY, 0);
+>           }
+>           break;
+> +    case A_SMR:
+> +        sci->smr = val;
+> +        update_trtime(sci);
+> +        break;
+>       case A_BRR:
+> -        if (!sci_is_tr_enabled(sci)) {
+> -            sci->brr = val;
+> -            update_trtime(sci);
+> -        }
+> +        sci->brr = val;
+> +        update_trtime(sci);
+>           break;
+> -    case A_SCR:
+> -        sci->scr = val;
+> -        if (FIELD_EX8(sci->scr, SCR, TE)) {
+> -            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 1);
+> -            sci->ssr = FIELD_DP8(sci->ssr, SSR, TEND, 1);
+> -            if (FIELD_EX8(sci->scr, SCR, TIE)) {
+> -                qemu_irq_pulse(sci->irq[TXI]);
+> -            }
+> +    default:
+> +        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
+> +                      " not implemented\n", addr);
+> +    }
+> +}
+> +
+> +static void sci_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    bool tx_start;
+> +
+> +    if (!clock_is_enabled(sci->pck)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCI %d is stopped.\n",
+> +                      sci->unit);
+> +        return ;
+> +    }
+> +    addr = map_address(sci, addr);
+> +    switch (addr) {
+> +    case A_TDR:
+> +        sci->tdr = val;
+> +        break;
+> +    case A_SSR:
+> +        /* Mask for read only bits */
+> +        sci->Xsr = FIELD_DP16(RSCICommon(sci)->Xsr, SSR, MPBT,
+> +                              FIELD_EX16(val, SSR, MPBT));
+> +        sci->Xsr &= (val | 0x07);
+> +        /* Clear ERI */
+> +        rc->irq_fn(sci, ERI);
+> +        tx_start = FIELD_EX16(sci->read_Xsr, SSR, TDRE) &&
+> +            !FIELD_EX16(sci->Xsr, SSR, TDRE) &&
+> +            (FIELD_EX16(sci->Xsr, SSR, ERR) == 0);
+> +        if (tx_start) {
+> +            sci_send_byte(sci);
+> +            update_event_time(sci, TXEMPTY, sci->trtime);
+> +            rc->irq_fn(sci, TXI);
+>           }
+> -        if (!FIELD_EX8(sci->scr, SCR, TEIE)) {
+> -            qemu_set_irq(sci->irq[TEI], 0);
+> +        break;
+> +    case A_SPTR:
+> +        RSCI(sci)->sptr = val;
+> +        break;
+> +    default:
+> +        sci_common_write(sci, addr, val, size);
+> +    }
+> +}
+> +
+> +static void scia_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RSCIAState *scia = RSCIA(opaque);
+> +
+> +    if (!clock_is_enabled(sci->pck)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCIa %d is stopped.\n",
+> +                      sci->unit);
+> +        return ;
+> +    }
+> +    addr = map_address(sci, addr);
+> +    switch (addr) {
+> +    case A_SMR:
+> +        if (IS_TR_ENABLED(sci->scr)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "reneas_sci: SMR write protected.\n");
+> +        } else {
+> +            sci_common_write(sci, addr, val, size);
+>           }
+> -        if (!FIELD_EX8(sci->scr, SCR, RIE)) {
+> -            qemu_set_irq(sci->irq[ERI], 0);
+> +        break;
+> +    case A_BRR:
+> +        if (IS_TR_ENABLED(sci->scr)) {
+> +            qemu_log_mask(LOG_GUEST_ERROR,
+> +                          "reneas_sci: BRR write protected.\n");
+> +            break;
+> +        } else {
+> +            sci_common_write(sci, addr, val, size);
+>           }
+>           break;
+>       case A_TDR:
+>           sci->tdr = val;
+> -        if (FIELD_EX8(sci->ssr, SSR, TEND)) {
+> -            send_byte(sci);
+> +        if (FIELD_EX16(sci->Xsr, SSR, TEND)) {
+> +            update_event_time(sci, TXEMPTY, sci->trtime);
+> +            sci_send_byte(sci);
+>           } else {
+> -            sci->ssr = FIELD_DP8(sci->ssr, SSR, TDRE, 0);
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, TDRE, 0);
+>           }
+> +        scia_irq(sci, TXI);
+> +        scia_irq(sci, BRI_TEI);
+>           break;
+>       case A_SSR:
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, MPBT,
+> -                             FIELD_EX8(val, SSR, MPBT));
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, ERR,
+> -                             FIELD_EX8(val, SSR, ERR) & 0x07);
+> -        if (FIELD_EX8(sci->read_ssr, SSR, ERR) &&
+> -            FIELD_EX8(sci->ssr, SSR, ERR) == 0) {
+> -            qemu_set_irq(sci->irq[ERI], 0);
+> -        }
+> -        break;
+> -    case A_RDR:
+> -        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: RDR is read only.\n");
+> +        /* Mask for read only bits */
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, MPBT,
+> +                              FIELD_EX16(val, SSR, MPBT));
+> +        sci->Xsr &= (val | 0xc7);
+> +        /* Clear ERI */
+> +        scia_irq(sci, ERI);
+>           break;
+>       case A_SCMR:
+> -        sci->scmr = val; break;
+> -    case A_SEMR: /* SEMR */
+> -        sci->semr = val; break;
+> +        scia->scmr = val;
+> +        break;
+> +    case A_SEMR:
+> +        scia->semr = val;
+> +        break;
+>       default:
+> -        qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX " "
+> -                                 "not implemented\n",
+> -                      offset);
+> +        sci_common_write(sci, addr, val, size);
+> +        break;
+>       }
+>   }
+>   
+> -static uint64_t sci_read(void *opaque, hwaddr offset, unsigned size)
+> +static void scif_write(void *opaque, hwaddr addr, uint64_t val, unsigned size)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RSCIFState *scif = RSCIF(opaque);
+> +    int txtrg;
+> +    int rxtrg;
+> +    uint16_t ssr_mask;
+> +    uint8_t txd;
+> +
+> +    if (!clock_is_enabled(sci->pck)) {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCIF %d is stopped.\n",
+> +                      sci->unit);
+> +        return ;
+> +    }
+> +    txtrg = 1 << (3 - FIELD_EX16(scif->fcr, FCR, TTRG));
+> +    addr = map_address(sci, addr);
+> +    switch (addr) {
+> +    case A_SCR:
+> +        sci->scr = val;
+> +        if (FIELD_EX16(sci->scr, SCR, TE)) {
+> +            /* Transmitter enable */
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 1);
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 1);
+> +            sci->tx_start_time = 0;
+> +            scif_irq(sci, TXI);
+> +        } else {
+> +            /* Transmitter disable  */
+> +            update_event_time(sci, TXEND, 0);
+> +            update_event_time(sci, TXEMPTY, 0);
+> +        }
+> +        break;
+> +    case A_TDR:
+> +        if (sci->tx_start_time > 0) {
+> +            scif->tdcnt -= transmit_byte(scif);
+> +        } else {
+> +            sci->tx_start_time = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +        }
+> +        if (scif->tdcnt >= SCIF_FIFO_DEPTH) {
+> +            break;
+> +        }
+> +        txd = val;
+> +        if (qemu_chr_fe_backend_connected(&sci->chr)) {
+> +            qemu_chr_fe_write_all(&sci->chr, &txd, 1);
+> +        }
+> +        if (FIELD_EX16(scif->fcr, FCR, LOOP) && scif_can_receive(sci) > 0) {
+> +            /* Loopback mode */
+> +            scif_receive(sci, &txd, 1);
+> +        }
+> +        scif->tdcnt++;
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TEND, 0);
+> +        update_event_time(sci, TXEND, scif->tdcnt);
+> +        if (scif->tdcnt > txtrg) {
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, FSR, TDFE, 0);
+> +            update_event_time(sci, TXEMPTY, scif->tdcnt - txtrg + 1);
+> +            scif_irq(sci, TXI);
+> +        }
+> +        break;
+> +    case A_FSR:
+> +        rxtrg = sci_rtrg[FIELD_EX16(scif->fcr, FCR, RTRG)];
+> +        ssr_mask = ~(sci->read_Xsr & 0xf3);
+> +        scif->tdcnt -= transmit_byte(scif);
+> +        if (scif->tdcnt < txtrg) {
+> +            ssr_mask = FIELD_DP16(ssr_mask, FSR, TDFE, 1);
+> +        }
+> +        if (fifo8_num_used(&sci->rxfifo) >= rxtrg) {
+> +            ssr_mask = FIELD_DP16(ssr_mask, FSR, RDF, 1);
+> +        }
+> +        sci->Xsr &= (val | ssr_mask);
+> +        scif_irq(sci, ERI);
+> +        scif_irq(sci, RXI);
+> +        scif_irq(sci, TXI);
+> +        break;
+> +    case A_FCR:
+> +        scif->fcr = val;
+> +        if (FIELD_EX16(scif->fcr, FCR, RFRST)) {
+> +            fifo8_reset(&sci->rxfifo);
+> +            update_event_time(sci, RXTOUT, 0);
+> +            update_event_time(sci, RXNEXT, 0);
+> +        }
+> +        if (FIELD_EX16(scif->fcr, FCR, TFRST)) {
+> +            scif->tdcnt = 0;
+> +        }
+> +        break;
+> +    case A_FDR:
+> +        qemu_log_mask(LOG_GUEST_ERROR, "reneas_sci: FDR is read only.\n");
+> +        break;
+> +    case A_SPTR:
+> +        scif->sptr = val;
+> +        break;
+> +    case A_LSR:
+> +        if (FIELD_EX16(scif->read_lsr, LSR, ORER) != 1) {
+> +            val = FIELD_DP16(val, LSR, ORER, 1);
+> +        }
+> +        scif->lsr &= val;
+> +        scif_irq(sci, ERI);
+> +        break;
+> +    default:
+> +        sci_common_write(sci, addr, val, size);
+> +        break;
+> +    }
+> +}
+>   
+> -    switch (offset) {
+> +static uint64_t sci_common_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    switch (addr) {
+>       case A_SMR:
+>           return sci->smr;
+>       case A_BRR:
+>           return sci->brr;
+>       case A_SCR:
+>           return sci->scr;
+> -    case A_TDR:
+> -        return sci->tdr;
+> -    case A_SSR:
+> -        sci->read_ssr = sci->ssr;
+> -        return sci->ssr;
+> +    case A_FSR: /* A_SSR */
+> +        sci->read_Xsr = sci->Xsr;
+> +        return sci->Xsr;
+>       case A_RDR:
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, RDRF, 0);
+> -        return sci->rdr;
+> -    case A_SCMR:
+> -        return sci->scmr;
+> -    case A_SEMR:
+> -        return sci->semr;
+> +        return fifo8_pop(&sci->rxfifo);
+>       default:
+>           qemu_log_mask(LOG_UNIMP, "renesas_sci: Register 0x%" HWADDR_PRIX
+> -                      " not implemented.\n", offset);
+> +                      " not implemented.\n", addr);
+>       }
+>       return UINT64_MAX;
+>   }
+>   
+> -static const MemoryRegionOps sci_ops = {
+> -    .write = sci_write,
+> -    .read  = sci_read,
+> -    .endianness = DEVICE_NATIVE_ENDIAN,
+> -    .impl.max_access_size = 1,
+> -    .valid.max_access_size = 1,
+> -};
+> +static uint64_t sci_read(void *opaque, hwaddr addr, unsigned size)
+> +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    addr = map_address(sci, addr);
+> +
+> +    if (clock_is_enabled(sci->pck)) {
+> +        switch (addr) {
+> +        case A_TDR:
+> +            return sci->tdr;
+> +        case A_SPTR:
+> +            return RSCI(sci)->sptr;
+> +        default:
+> +            return sci_common_read(sci, addr, size);
+> +        }
 > +    } else {
-> +        qemu_log_mask(LOG_GUEST_ERROR,
-> +                      "renesas_eth: EDMAC module stopped.\n");
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCI %d is stopped.\n",
+> +                      sci->unit);
 > +    }
+> +    return UINT64_MAX;
+> +}
+>   
+> -static void rsci_reset(DeviceState *dev)
+> +static uint64_t scia_read(void *opaque, hwaddr addr, unsigned size)
+>   {
+> -    RSCIState *sci = RSCI(dev);
+> -    sci->smr = sci->scr = 0x00;
+> -    sci->brr = 0xff;
+> -    sci->tdr = 0xff;
+> -    sci->rdr = 0x00;
+> -    sci->ssr = 0x84;
+> -    sci->scmr = 0x00;
+> -    sci->semr = 0x00;
+> -    sci->rx_next = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RSCIAState *scia = RSCIA(opaque);
+> +    uint64_t ret;
+> +
+> +    if (clock_is_enabled(sci->pck)) {
+> +        addr = map_address(sci, addr);
+> +        switch (addr) {
+> +        case A_TDR:
+> +            return sci->tdr;
+> +        case A_RDR:
+> +            ret = fifo8_pop(&sci->rxfifo);
+> +            sci->Xsr = FIELD_DP16(sci->Xsr, SSR, RDRF, 0);
+> +            return ret;
+> +        case A_SCMR:
+> +            return scia->scmr;
+> +        default:
+> +            return sci_common_read(sci, addr, size);
+> +        }
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCIa %d is stopped.\n",
+> +                      sci->unit);
+> +    }
+> +    return UINT64_MAX;
 > +}
 > +
-> +static const MemoryRegionOps renesas_etherc_ops = {
-> +    .read = register_read_memory,
-> +    .write = register_write_memory,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static const MemoryRegionOps renesas_edmac_ops = {
-> +    .read = edmac_reg_read,
-> +    .write = edmac_reg_write,
-> +    .endianness = DEVICE_NATIVE_ENDIAN,
-> +    .impl = {
-> +        .min_access_size = 4,
-> +        .max_access_size = 4,
-> +    },
-> +};
-> +
-> +static NetClientInfo net_renesas_eth_info = {
-> +    .type = NET_CLIENT_DRIVER_NIC,
-> +    .size = sizeof(NICState),
-> +    .can_receive = renesas_eth_can_receive,
-> +    .receive = renesas_eth_receive,
-> +    .link_status_changed = renesas_eth_set_link_status,
-> +};
-> +
-> +static const RegisterAccessInfo renesas_etherc_regs_info[] = {
-> +    { .name = "ECMR", .addr = A_ECMR,
-> +      .rsvd = 0xffe0ed90, },
-> +    { .name = "RFLR", .addr = A_RFLR,
-> +      .rsvd = 0xfffff000, },
-> +    { .name = "ECSR", .addr = A_ECSR,
-> +      .rsvd = 0xffffffc8,
-> +      .pre_write = ecsr_pre_write,
-> +      .post_write = ecsr_post_write, },
-> +    { .name = "ECSIPR", .addr = A_ECSIPR,
-> +      .rsvd = 0xffffffc8,
-> +      .post_write = ecsr_post_write, },
-> +    { .name = "PIR", .addr = A_PIR,
-> +      .rsvd = 0xfffffff0,
-> +      .post_write = pir_post_write,
-> +      .post_read = pir_post_read, },
-> +    { .name = "PSR", .addr = A_PSR,
-> +      .rsvd = 0xfffffffe, },
-> +    { .name = "RDMLR", .addr = A_RDMLR,
-> +      .rsvd = 0xfff00000, },
-> +    { .name = "IPGR", .addr = A_IPGR,
-> +      .rsvd = 0xffffffe0, .reset = 0x00000014, },
-> +    { .name = "APR", .addr = A_APR,
-> +      .rsvd = 0xffff0000, },
-> +    { .name = "MPR", .addr = A_MPR,
-> +      .rsvd = 0xffff0000, },
-> +    { .name = "RFCF", .addr = A_RFCF,
-> +      .rsvd = 0xffffff00, },
-> +    { .name = "TPAUSER", .addr = A_TPAUSER,
-> +      .rsvd = 0xffff0000, },
-> +    { .name = "TPAUSECR", .addr = A_TPAUSECR,
-> +      .rsvd = 0xffffff00, },
-> +    { .name = "BCFRR", .addr = A_BCFRR,
-> +      .rsvd = 0xffff0000, },
-> +    { .name = "MAHR", .addr = A_MAHR,
-> +      .pre_write = mar_pre_write,
-> +      .post_write = mar_post_write, },
-> +    { .name = "MALR", .addr = A_MALR,
-> +      .rsvd = 0xffff0000,
-> +      .pre_write = mar_pre_write,
-> +      .post_write = mar_post_write, },
-> +    { .name = "TROCR", .addr = A_TROCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "CDCR", .addr = A_CDCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "LCCR", .addr = A_LCCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "CNDCR", .addr = A_CNDCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "CEFCR", .addr = A_CEFCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "FRECR", .addr = A_FRECR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "TSFRCR", .addr = A_TSFRCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "TLFRCR", .addr = A_TLFRCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "RFCR", .addr = A_RFCR,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "MAFCR", .addr = A_MAFCR,
-> +      .pre_write = etherc_counter_write, },
-> +};
-> +
-> +static const RegisterAccessInfo renesas_edmac_regs_info[] = {
-> +    { .name = "EDMR", .addr = A_EDMR,
-> +      .rsvd = 0xfffffff8e,
-> +      .post_write = edmr_post_write, },
-> +    { .name = "EDTRR", .addr = A_EDTRR,
-> +      .rsvd = 0xffffffffe,
-> +      .post_write = edtrr_post_write, },
-> +    { .name = "EDRRR", .addr = A_EDRRR,
-> +      .rsvd = 0xffffffffe, },
-> +    { .name = "TDLAR", .addr = A_TDLAR,
-> +      .post_write = tdlar_post_write, },
-> +    { .name = "RDLAR", .addr = A_RDLAR,
-> +      .post_write = rdlar_post_write, },
-> +    { .name = "EESR", .addr = A_EESR,
-> +      .rsvd = 0xb800f0c0, .ro = 0x00400000,
-> +      .pre_write = eesr_pre_write,
-> +      .post_write = eesr_post_write, },
-> +    { .name = "EESIPR", .addr = A_EESIPR,
-> +      .rsvd = 0xb800f060,
-> +      .post_write = eesr_post_write, },
-> +    { .name = "TRSCER", .addr = A_TRSCER,
-> +      .rsvd = 0xfffffd6f, },
-> +    { .name = "RMFCR", .addr = A_RMFCR,
-> +      .rsvd = 0xffff0000, },
-> +    { .name = "TFTR", .addr = A_TFTR,
-> +      .rsvd = 0xfffff800, },
-> +    { .name = "FDR", .addr = A_FDR,
-> +      .rsvd = 0xffffe0e0,
-> +      .pre_write = fdr_pre_write, },
-> +    { .name = "RMCR", .addr = A_RMCR,
-> +      .rsvd = 0xfffffffc, },
-> +    { .name = "TFUCR", .addr = A_TFUCR,
-> +      .rsvd = 0xffff0000,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "RFOCR", .addr = A_RFOCR,
-> +      .rsvd = 0xffff0000,
-> +      .pre_write = etherc_counter_write, },
-> +    { .name = "RBWAR", .addr = A_RBWAR,
-> +      .ro = 0xffffffff, .rsvd = 0xffff0000, },
-> +    { .name = "RDFAR", .addr = A_RDFAR,
-> +      .ro = 0xffffffff, .rsvd = 0xffff0000, },
-> +    { .name = "TBRAR", .addr = A_TBRAR,
-> +      .ro = 0xffffffff, .rsvd = 0xffff0000, },
-> +    { .name = "TDFAR", .addr = A_TDFAR,
-> +      .ro = 0xffffffff, .rsvd = 0xffff0000, },
-> +    { .name = "FCFTR", .addr = A_FCFTR,
-> +      .rsvd = 0xfff8fff8, },
-> +    { .name = "RPADIR", .addr = A_RPADIR,
-> +      .rsvd = 0xfffcffc0, },
-> +    { .name = "TRIMD", .addr = A_TRIMD,
-> +      .rsvd = 0xffffffee, },
-> +    { .name = "IOSR", .addr = A_IOSR,
-> +      .rsvd = 0xfffffffe, },
-> +};
-> +
-> +static void renesas_eth_realize(DeviceState *dev, Error **errp)
+> +static uint64_t scif_read(void *opaque, hwaddr addr, unsigned size)
 > +{
-> +    RenesasEthState *s = RenesasEth(dev);
+> +    RSCIFState *scif = RSCIF(opaque);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    uint64_t ret;
 > +
-> +    s->nic = qemu_new_nic(&net_renesas_eth_info, &s->conf,
-> +                          object_get_typename(OBJECT(s)), dev->id, s);
-> +
-> +    renesas_eth_reset(s);
-> +    if (s->mdiodev) {
-> +        mdio_phy_set_link(mdio_get_phy(s->mdiodev),
-> +                          !qemu_get_queue(s->nic)->link_down);
+> +    if (clock_is_enabled(sci->pck)) {
+> +        addr = map_address(sci, addr);
+> +        switch (addr) {
+> +        case A_FCR:
+> +            return scif->fcr & 0x7ff;
+> +        case A_FDR:
+> +            ret = 0;
+> +            ret = FIELD_DP16(ret, FDR, Rn, fifo8_num_used(&sci->rxfifo));
+> +            ret = FIELD_DP16(ret, FDR, Tn, scif->tdcnt - transmit_byte(scif));
+> +            return ret;
+> +        case A_SPTR:
+> +            return scif->sptr;
+> +        case A_LSR:
+> +            scif->read_lsr = scif->lsr;
+> +            return scif->lsr;
+> +        default:
+> +            return sci_common_read(sci, addr, size);
+> +        }
+> +    } else {
+> +        qemu_log_mask(LOG_GUEST_ERROR, "renesas_sci: SCIF %d is stopped.\n",
+> +                      sci->unit);
 > +    }
+> +    return UINT64_MAX;
 > +}
 > +
-> +static Property renesas_eth_properties[] = {
-> +    DEFINE_NIC_PROPERTIES(RenesasEthState, conf),
-> +    DEFINE_PROP_LINK("mdio", RenesasEthState, mdiodev, TYPE_ETHER_MDIO_BB,
-> +                     MDIOState *),
-> +    DEFINE_PROP_END_OF_LIST(),
-> +};
-> +
-> +static void renesas_eth_init(Object *obj)
+> +static void rsci_common_init(Object *obj)
 > +{
+> +    RSCICommonState *sci = RSCICommon(obj);
 > +    SysBusDevice *d = SYS_BUS_DEVICE(obj);
-> +    RenesasEthState *s = RenesasEth(obj);
-> +    RegisterInfoArray *ra_etherc;
-> +    RegisterInfoArray *ra_edmac;
+> +    int i;
 > +
-> +    memory_region_init(&s->etherc_mem, obj, "renesas-etherc", 0x100);
-> +    ra_etherc = register_init_block32(DEVICE(d), renesas_etherc_regs_info,
-> +                                      ARRAY_SIZE(renesas_etherc_regs_info),
-> +                                      s->etherc_regs_info, s->etherc_regs,
-> +                                      &renesas_etherc_ops,
-> +                                      false, 0x100);
-> +    memory_region_add_subregion(&s->etherc_mem, 0x00, &ra_etherc->mem);
-> +    sysbus_init_mmio(d, &s->etherc_mem);
-> +
-> +    memory_region_init(&s->edmac_mem, obj, "renesas-edmac", 0x100);
-> +    ra_edmac = register_init_block32(DEVICE(d), renesas_edmac_regs_info,
-> +                                     ARRAY_SIZE(renesas_edmac_regs_info),
-> +                                     s->edmac_regs_info, s->edmac_regs,
-> +                                     &renesas_edmac_ops,
-> +                                     false, 0x100);
-> +    memory_region_add_subregion(&s->edmac_mem, 0x00, &ra_edmac->mem);
-> +    sysbus_init_mmio(d, &s->edmac_mem);
-> +
-> +    sysbus_init_irq(d, &s->irq);
-> +    s->ick =  qdev_init_clock_in(DEVICE(d), "ick", NULL, NULL);
+> +    for (i = 0; i < SCI_NR_IRQ; i++) {
+> +        sysbus_init_irq(d, &sci->irq[i]);
+> +    }
+> +    fifo8_create(&sci->rxfifo, SCIF_FIFO_DEPTH);
+> +    sci->event_timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, sci_timer_event, sci);
+> +    sci->pck = qdev_init_clock_in(DEVICE(d), "pck",
+> +                                  sci_pck_update, sci);
+>   }
+>   
+>   static void sci_event(void *opaque, QEMUChrEvent event)
+>   {
+> -    RSCIState *sci = RSCI(opaque);
+> +    RSCICommonState *sci = RSCICommon(opaque);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+> +    if (clock_is_enabled(sci->pck) && event == CHR_EVENT_BREAK) {
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, SSR, FER, 1);
+> +        rc->irq_fn(sci, BRI_TEI);
+> +    }
 > +}
 > +
-> +static void renesas_eth_class_init(ObjectClass *klass, void *data)
+> +static void scif_event(void *opaque, QEMUChrEvent event)
 > +{
+> +    RSCICommonState *sci = RSCICommon(opaque);
+>       if (event == CHR_EVENT_BREAK) {
+> -        sci->ssr = FIELD_DP8(sci->ssr, SSR, FER, 1);
+> -        if (FIELD_EX8(sci->scr, SCR, RIE)) {
+> -            qemu_set_irq(sci->irq[ERI], 1);
+> -        }
+> +        sci->Xsr = FIELD_DP16(sci->Xsr, FSR, BRK, 1);
+> +        scif_irq(sci, BRI_TEI);
+>       }
+>   }
+>   
+> -static void rsci_realize(DeviceState *dev, Error **errp)
+> +static void rsci_common_realize(DeviceState *dev, Error **errp)
+>   {
+> -    RSCIState *sci = RSCI(dev);
+> +    RSCICommonState *sci = RSCICommon(dev);
+>   
+> -    if (sci->input_freq == 0) {
+> +    if (sci->regshift != 8 && sci->regshift != 16 && sci->regshift != 32) {
+>           qemu_log_mask(LOG_GUEST_ERROR,
+> -                      "renesas_sci: input-freq property must be set.");
+> +                      "renesas_sci: Invalid register size.");
+>           return;
+>       }
+> -    qemu_chr_fe_set_handlers(&sci->chr, can_receive, receive,
+> -                             sci_event, NULL, sci, NULL, true);
+> +
+> +    sci->regshift = sci->regshift / 8 - 1;
+> +    sci->smr = sci->scr = 0x00;
+> +    sci->brr = 0xff;
+> +    sci->tdr = 0xff;
+> +    sci->Xsr = 0x84;
+> +    update_trtime(sci);
+> +
+>   }
+>   
+> -static void rsci_init(Object *obj)
+> +static void register_mmio(RSCICommonState *sci, int size)
+>   {
+> -    SysBusDevice *d = SYS_BUS_DEVICE(obj);
+> -    RSCIState *sci = RSCI(obj);
+> -    int i;
+> +    SysBusDevice *d = SYS_BUS_DEVICE(sci);
+> +    RenesasSCICommonClass *rc = SCI_GET_CLASS(sci);
+>   
+> -    memory_region_init_io(&sci->memory, OBJECT(sci), &sci_ops,
+> -                          sci, "renesas-sci", 0x8);
+> +    memory_region_init_io(&sci->memory, OBJECT(sci), rc->ops,
+> +                          sci, "renesas-sci", size);
+>       sysbus_init_mmio(d, &sci->memory);
+> +    memory_region_init_alias(&sci->memory_p4, NULL, "renesas-sci-p4",
+> +                             &sci->memory, 0, size);
+> +    sysbus_init_mmio(d, &sci->memory_p4);
+> +    memory_region_init_alias(&sci->memory_a7, NULL, "renesas-sci-a7",
+> +                             &sci->memory, 0, size);
+> +    sysbus_init_mmio(d, &sci->memory_a7);
+> +}
+>   
+> -    for (i = 0; i < SCI_NR_IRQ; i++) {
+> -        sysbus_init_irq(d, &sci->irq[i]);
+> -    }
+> -    timer_init_ns(&sci->timer, QEMU_CLOCK_VIRTUAL, txend, sci);
+> +static void rsci_realize(DeviceState *dev, Error **errp)
+> +{
+> +    RSCIState *sci = RSCI(dev);
+> +    RSCICommonState *common = RSCICommon(dev);
+> +
+> +    rsci_common_realize(dev, errp);
+> +
+> +    register_mmio(common, 8 * (1 << common->regshift));
+> +    qemu_chr_fe_set_handlers(&common->chr, sci_can_receive, sci_receive,
+> +                             sci_event, NULL, sci, NULL, true);
+> +
+> +    sci->sptr = 0x00;
+> +}
+> +
+> +static void rscia_realize(DeviceState *dev, Error **errp)
+> +{
+> +    RSCIAState *sci = RSCIA(dev);
+> +    RSCICommonState *common = RSCICommon(dev);
+> +
+> +    rsci_common_realize(dev, errp);
+> +
+> +    register_mmio(common, 8 * (1 << common->regshift));
+> +    qemu_chr_fe_set_handlers(&common->chr, sci_can_receive, sci_receive,
+> +                             sci_event, NULL, sci, NULL, true);
+> +
+> +    sci->scmr = 0x00;
+> +    sci->semr = 0x00;
+> +}
+> +
+> +static void rscif_realize(DeviceState *dev, Error **errp)
+> +{
+> +    RSCIFState *sci = RSCIF(dev);
+> +    RSCICommonState *common = RSCICommon(sci);
+> +
+> +    rsci_common_realize(dev, errp);
+> +
+> +    register_mmio(common, 10 * (1 << common->regshift));
+> +    qemu_chr_fe_set_handlers(&common->chr, scif_can_receive, scif_receive,
+> +                             scif_event, NULL, sci, NULL, true);
+> +    common->Xsr = 0x0060;
+> +    sci->fcr = 0x0000;
+> +    sci->sptr = 0x0000;
+> +    sci->lsr = 0x0000;
+>   }
+>   
+>   static const VMStateDescription vmstate_rsci = {
+> @@ -302,49 +889,140 @@ static const VMStateDescription vmstate_rsci = {
+>       .version_id = 1,
+>       .minimum_version_id = 1,
+>       .fields = (VMStateField[]) {
+> -        VMSTATE_INT64(trtime, RSCIState),
+> -        VMSTATE_INT64(rx_next, RSCIState),
+> -        VMSTATE_UINT8(smr, RSCIState),
+> -        VMSTATE_UINT8(brr, RSCIState),
+> -        VMSTATE_UINT8(scr, RSCIState),
+> -        VMSTATE_UINT8(tdr, RSCIState),
+> -        VMSTATE_UINT8(ssr, RSCIState),
+> -        VMSTATE_UINT8(rdr, RSCIState),
+> -        VMSTATE_UINT8(scmr, RSCIState),
+> -        VMSTATE_UINT8(semr, RSCIState),
+> -        VMSTATE_UINT8(read_ssr, RSCIState),
+> -        VMSTATE_TIMER(timer, RSCIState),
+>           VMSTATE_END_OF_LIST()
+>       }
+>   };
+>   
+>   static Property rsci_properties[] = {
+> -    DEFINE_PROP_UINT64("input-freq", RSCIState, input_freq, 0),
+> -    DEFINE_PROP_CHR("chardev", RSCIState, chr),
+> +    DEFINE_PROP_INT32("register-size", RSCICommonState, regshift, 8),
+> +    DEFINE_PROP_UINT32("unit", RSCICommonState, unit, 0),
+> +    DEFINE_PROP_CHR("chardev", RSCICommonState, chr),
+>       DEFINE_PROP_END_OF_LIST(),
+>   };
+>   
+> -static void rsci_class_init(ObjectClass *klass, void *data)
+> +static void rsci_init(Object *obj)
+>   {
+> +    RSCICommonState *sci = RSCICommon(obj);
+> +    sci->event[RXNEXT].handler = sci_rx_next;
+> +    sci->event[TXEMPTY].handler = sci_tx_empty;
+> +}
+> +
+> +static void rscif_init(Object *obj)
+> +{
+> +    RSCICommonState *sci = RSCICommon(obj);
+> +    sci->event[RXTOUT].handler = scif_rx_timeout;
+> +    sci->event[TXEMPTY].handler = scif_tx_empty;
+> +    sci->event[TXEND].handler = scif_tx_end;
+> +}
+> +
+> +static void rsci_common_class_init(ObjectClass *klass, void *data)
+> +{
+> +    RenesasSCICommonClass *rc = SCI_COMMON_CLASS(klass);
+>       DeviceClass *dc = DEVICE_CLASS(klass);
+>   
+> -    dc->realize = rsci_realize;
+>       dc->vmsd = &vmstate_rsci;
+> -    dc->reset = rsci_reset;
+>       device_class_set_props(dc, rsci_properties);
+> +    rc->divrate = static_divrate;
+>   }
+>   
+> -static const TypeInfo rsci_info = {
+> -    .name = TYPE_RENESAS_SCI,
+> -    .parent = TYPE_SYS_BUS_DEVICE,
+> -    .instance_size = sizeof(RSCIState),
+> -    .instance_init = rsci_init,
+> -    .class_init = rsci_class_init,
+> +static const MemoryRegionOps sci_ops = {
+> +    .read = sci_read,
+> +    .write = sci_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4,
+> +    },
+>   };
+>   
+> -static void rsci_register_types(void)
+> +static void rsci_class_init(ObjectClass *klass, void *data)
+>   {
+> -    type_register_static(&rsci_info);
+> +    RenesasSCICommonClass *comm_rc = SCI_COMMON_CLASS(klass);
 > +    DeviceClass *dc = DEVICE_CLASS(klass);
 > +
-> +    set_bit(DEVICE_CATEGORY_NETWORK, dc->categories);
-> +    device_class_set_props(dc, renesas_eth_properties);
-> +    dc->realize = renesas_eth_realize;
-> +}
-> +
-> +static const TypeInfo renesas_eth_info = {
-> +    .name          = TYPE_RENESAS_ETH,
-> +    .parent        = TYPE_SYS_BUS_DEVICE,
-> +    .instance_size = sizeof(RenesasEthState),
-> +    .instance_init = renesas_eth_init,
-> +    .class_init    = renesas_eth_class_init,
+> +    comm_rc->ops = &sci_ops;
+> +    comm_rc->irq_fn = sci_irq;
+> +    dc->realize = rsci_realize;
+>   }
+>   
+> -type_init(rsci_register_types)
+> +static const MemoryRegionOps scia_ops = {
+> +    .read = scia_read,
+> +    .write = scia_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4,
+> +    },
 > +};
 > +
-> +static void renesas_eth_register_types(void)
+> +static void rscia_class_init(ObjectClass *klass, void *data)
 > +{
-> +    type_register_static(&renesas_eth_info);
+> +    RenesasSCICommonClass *comm_rc = SCI_COMMON_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    comm_rc->ops = &scia_ops;
+> +    comm_rc->irq_fn = scia_irq;
+> +    comm_rc->divrate = scia_divrate;
+> +
+> +    dc->realize = rscia_realize;
 > +}
 > +
-> +type_init(renesas_eth_register_types)
-> diff --git a/hw/net/Kconfig b/hw/net/Kconfig
-> index e6a32a2ab0..7cb3aeadeb 100644
-> --- a/hw/net/Kconfig
-> +++ b/hw/net/Kconfig
-> @@ -146,3 +146,8 @@ config CAN_SJA1000
->   
->   config MDIO_PHY
->       bool
+> +static const MemoryRegionOps scif_ops = {
+> +    .read = scif_read,
+> +    .write = scif_write,
+> +    .endianness = DEVICE_NATIVE_ENDIAN,
+> +    .valid = {
+> +        .min_access_size = 1,
+> +        .max_access_size = 4,
+> +    },
+> +};
 > +
-> +config RENESAS_ETH
-> +    bool
-> +    select MDIO_PHY
-> +    select REGISTER
-> diff --git a/hw/net/meson.build b/hw/net/meson.build
-> index faa4e3d2c0..0f64af7b8f 100644
-> --- a/hw/net/meson.build
-> +++ b/hw/net/meson.build
-> @@ -65,5 +65,6 @@ softmmu_ss.add(when: 'CONFIG_ROCKER', if_true: files(
->   softmmu_ss.add(when: 'CONFIG_ALL', if_true: files('rocker/qmp-norocker.c'))
->   
->   softmmu_ss.add(when: 'CONFIG_MDIO_PHY', if_true: files('mdio.c'))
-> +softmmu_ss.add(when: 'CONFIG_RENESAS_ETH', if_true: files('renesas_eth.c'))
->   
->   subdir('can')
+> +static void rscif_class_init(ObjectClass *klass, void *data)
+> +{
+> +    RenesasSCICommonClass *comm_rc = SCI_COMMON_CLASS(klass);
+> +    DeviceClass *dc = DEVICE_CLASS(klass);
+> +
+> +    comm_rc->ops = &scif_ops;
+> +    comm_rc->irq_fn = scif_irq;
+> +
+> +    dc->realize = rscif_realize;
+> +}
+> +
+> +static const TypeInfo renesas_sci_info[] = {
+> +    {
+> +        .name       = TYPE_RENESAS_SCI_COMMON,
+> +        .parent     = TYPE_SYS_BUS_DEVICE,
+> +        .instance_size = sizeof(RSCICommonState),
+> +        .instance_init = rsci_common_init,
+> +        .class_init = rsci_common_class_init,
+> +        .class_size = sizeof(RenesasSCICommonClass),
+> +        .abstract = true,
+> +    },
+> +    {
+> +        .name       = TYPE_RENESAS_SCI,
+> +        .parent     = TYPE_RENESAS_SCI_COMMON,
+> +        .instance_size = sizeof(RSCIState),
+> +        .instance_init = rsci_init,
+> +        .class_init = rsci_class_init,
+> +        .class_size = sizeof(RenesasSCIClass),
+> +    },
+> +    {
+> +        .name       = TYPE_RENESAS_SCIA,
+> +        .parent     = TYPE_RENESAS_SCI_COMMON,
+> +        .instance_size = sizeof(RSCIAState),
+> +        /* Initializer same of SCI */
+> +        .instance_init = rsci_init,
+> +        .class_init = rscia_class_init,
+> +        .class_size = sizeof(RenesasSCIAClass),
+> +    },
+> +    {
+> +        .name       = TYPE_RENESAS_SCIF,
+> +        .parent     = TYPE_RENESAS_SCI_COMMON,
+> +        .instance_size = sizeof(RSCIFState),
+> +        .instance_init = rscif_init,
+> +        .class_init = rscif_class_init,
+> +        .class_size = sizeof(RenesasSCIFClass),
+> +    },
+> +};
+> +
+> +DEFINE_TYPES(renesas_sci_info)
 > 
 
 
