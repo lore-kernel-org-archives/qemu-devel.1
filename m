@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B7EC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 06:26:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B869C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 06:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6F8B62225F
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 06:26:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D4E5A2225F
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 06:33:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S5AtSqtx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6F8B62225F
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apfX+T1U"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D4E5A2225F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33868 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWD0c-0008L0-C8
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 02:26:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46430)
+	id 1kWD74-00020u-Mo
+	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 02:33:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47256)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWCz2-0007mU-Ea
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 02:24:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27022)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWD5Q-0001WH-2a
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 02:31:32 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:46738)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWCyy-0000rU-SZ
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 02:24:55 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWD5N-00038x-RQ
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 02:31:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603520690;
+ s=mimecast20190719; t=1603521088;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=cuCzqMLQY5FgIU6IKRm2Gjven7isvDb6JDTaYGkpJUg=;
- b=S5AtSqtx+YlXaa77SovIO8epmSiLdtHCupe4lp50nv3Gfh0HCboz1Z6368Ph476SSLmDrP
- O9NM0+FWSd/KVcJGYh5ETzXInzKfab40HJbdAW0YItQn9lpITTcs6eizb0/c3qY4mg7aBI
- Wxptb5fGqKV9RCIlKFdOZGQ7t/SjXIY=
+ bh=oku5hHS1Dd49Sed+OcI2cIDgPveMO88HoToaMBKLAFw=;
+ b=apfX+T1U3/Vcy5/RI3LuzVD1nBiuTnV9NkjRp635llkBrL24Fp+o8Ub7P2Ke6Inxci78NZ
+ Oe63TUJUSOFSaLZF3RjxMvJpL+Xs9+HAOoosfzchxAbup38C3YsrVgLpg7Ix6BgHQ81NVG
+ GyXHKrDNmKsbjbaL281a1MZXVX86Xi4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-386-OdP9xHHkP1W2Cso0g6kL2Q-1; Sat, 24 Oct 2020 02:24:46 -0400
-X-MC-Unique: OdP9xHHkP1W2Cso0g6kL2Q-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-119-XHj59xzBPPaHU6AarT9Phw-1; Sat, 24 Oct 2020 02:31:26 -0400
+X-MC-Unique: XHj59xzBPPaHU6AarT9Phw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA9E0107B46F;
- Sat, 24 Oct 2020 06:24:44 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 32973107B46F;
+ Sat, 24 Oct 2020 06:31:25 +0000 (UTC)
 Received: from thuth.remote.csb (ovpn-112-13.ams2.redhat.com [10.36.112.13])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8F74D60BFA;
- Sat, 24 Oct 2020 06:24:36 +0000 (UTC)
-Subject: Re: [PATCH 2/6] tests/acceptance: Use .ppm extention for Portable
- PixMap files
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 955905B4BC;
+ Sat, 24 Oct 2020 06:31:18 +0000 (UTC)
+Subject: Re: [PATCH 3/6] tests/acceptance: Extract tesseract_available()
+ helper in new namespace
 To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
  qemu-devel@nongnu.org
 References: <20201021105035.2477784-1-f4bug@amsat.org>
- <20201021105035.2477784-3-f4bug@amsat.org>
+ <20201021105035.2477784-4-f4bug@amsat.org>
 From: Thomas Huth <thuth@redhat.com>
-Message-ID: <8807d86a-0adf-09c1-c4a9-814d72a1f425@redhat.com>
-Date: Sat, 24 Oct 2020 08:24:35 +0200
+Message-ID: <19e256cd-285e-966a-cf3e-bf9d48ba2607@redhat.com>
+Date: Sat, 24 Oct 2020 08:31:16 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.6.0
 MIME-Version: 1.0
-In-Reply-To: <20201021105035.2477784-3-f4bug@amsat.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+In-Reply-To: <20201021105035.2477784-4-f4bug@amsat.org>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -76,16 +76,16 @@ X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 01:26:25
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 01:17:57
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -21
 X-Spam_score: -2.2
 X-Spam_bar: --
 X-Spam_report: (-2.2 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ NICE_REPLY_A=-0.108, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -113,14 +113,17 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 21/10/2020 12.50, Philippe Mathieu-Daudé wrote:
-> The HMP 'screendump' command generates Portable PixMap files.
-> Make it obvious by using the .ppm file extention.
+> We are going to reuse tesseract_available(). Extract it to
+> a new 'tesseract_utils' namespace.
 > 
 > Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 > ---
->  tests/acceptance/machine_m68k_nextcube.py | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
+>  tests/acceptance/machine_m68k_nextcube.py | 25 +++-----------------
+>  tests/acceptance/tesseract_utils.py       | 28 +++++++++++++++++++++++
+>  2 files changed, 31 insertions(+), 22 deletions(-)
+>  create mode 100644 tests/acceptance/tesseract_utils.py
 
 Reviewed-by: Thomas Huth <thuth@redhat.com>
+
 
 
