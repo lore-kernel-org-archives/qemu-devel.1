@@ -2,79 +2,83 @@ Return-Path: <SRS0=SOuJ=D7=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72E48C4363A
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 01:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF30EC4363A
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 01:51:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BF21720791
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 01:07:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DB80522272
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 01:51:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D+Hnnfk+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BF21720791
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CrkpUm+Y"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB80522272
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53456 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kW826-0006gQ-IG
-	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 21:07:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34842)
+	id 1kW8i6-0004XP-VW
+	for qemu-devel@archiver.kernel.org; Fri, 23 Oct 2020 21:51:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41646)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kW80l-00067J-9V; Fri, 23 Oct 2020 21:06:23 -0400
-Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:45518)
+ id 1kW8hK-0003yS-36; Fri, 23 Oct 2020 21:50:22 -0400
+Received: from mail-pf1-x441.google.com ([2607:f8b0:4864:20::441]:45854)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kW80h-0004rN-FM; Fri, 23 Oct 2020 21:06:22 -0400
-Received: by mail-yb1-xb42.google.com with SMTP id s89so2669832ybi.12;
- Fri, 23 Oct 2020 18:06:18 -0700 (PDT)
+ id 1kW8hI-00017J-IE; Fri, 23 Oct 2020 21:50:21 -0400
+Received: by mail-pf1-x441.google.com with SMTP id e7so2820623pfn.12;
+ Fri, 23 Oct 2020 18:50:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=6iONO9iXi9R844aMpHyATWzUGqnrLaKueG1qSFM63H0=;
- b=D+Hnnfk+AMPtVdAgQJOv/bQ99jYjV1uIHyo5hWFnVENAYtVGGr5bR54ondz2Qi8nI6
- xfbOcfRfPnJR/uJNxS/1NrmpaK64aqvLJajYQirKmDxqjFUCW6hv7HxtLTFoOzIB7uY8
- MUu/uCYwziHvON9Qz1eAGacDIBlpsZ1uV6uvHzw/pDRFvbJOMWJwbGzxIqfSMbVV+USd
- PYjvecx6RB1Ka7wAJ8ySfq62VlbZcyFivVt3BSiX2NESW1RwatXLpU40NIf+Q6m6PNmy
- L7Lfo9fhm1Q6YM2+zH3B4ef5f/ib4b+kxIJ2ux2P0VVg17w1muk0iNy5woSMU+sLS1x2
- m56Q==
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KUa8ua5YuGfWsHWpW7218Ha7emqQTAdJ1paNsVxfgSI=;
+ b=CrkpUm+YwLHtPvOvvPfhsgXm57tE5K7hAGJ1RN0CENTu4xVMa12jvIqIv9KLvAdxoh
+ gtkHKvnruhmx70fxIRFQLxVlqmDoUCw8w4zeR+2souH6huXOiz6oAhQQXnaU6rxyofxz
+ MDCwnoU7vl+bSbFh6h0BWpxQDDypbOQH2Z1OSJDYbtrsYxjyoOVkWK9F2+3F07DWdAPp
+ kPRHmPUy57yi8b+ljMonEAls5+7wgtxRnaE2PpHxfuS8hrt5d/IGYB95EAMQ41o0AOH5
+ oaQ/wlIRz9eg/DieWIGWClTI004ywsDOIGcoBuWQWf8WMQGF/7ly51GekqUqVaALzPz7
+ 63GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=6iONO9iXi9R844aMpHyATWzUGqnrLaKueG1qSFM63H0=;
- b=FLo4M8kUTJihyLwbIeTJcCkrcfJKTca79R44C+1Wx4wgJTk8+Cb2dUi9TtuVP/grX2
- ilkZWbSQfxKCacVWNeJH7aT4nNWtT747pfEsbPtnBMDtr/gk6H1XXRGkRZb+kao8xpe3
- hRv1scH5dTuRUY9z32Meg02ST+XbNfDAbzlOHXTuXVDhA5Os4Kk3F+3l5xYfF2FmqSfH
- r66rojg6r+P7mjIISK/gZx8NuEL7yUzJRk2op5COaiYad3NKF/pgXRw84GbFDHSexZQt
- ZQy9zJQpYTR5DLIFuThL8ZLaDHSXYnzIyw/6WrFXX6ZOsh+JcQ0nel9TiNgc7e/Wvbuj
- tJIQ==
-X-Gm-Message-State: AOAM532GWMaPWm/7RW7eVvsT5V4mT/I4kC5JgLFDIP9nIDx1S4j1qAn8
- yjuk2O/uLERRRBSL0rXTE0OWstXu44wo6yqtaPw=
-X-Google-Smtp-Source: ABdhPJxc8LZJrbqiYg7otDIWF+oF4TQDJx70J/bMz88oL7v4YGG4pxDo6rClHId9sm/iAbnXb8cy7YliBwxDoCmHz9k=
-X-Received: by 2002:a25:328a:: with SMTP id y132mr6978879yby.306.1603501577953; 
- Fri, 23 Oct 2020 18:06:17 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201023131808.3198005-1-f4bug@amsat.org>
- <CAEUhbmWJQHJgdvgjXRy3jzJLQC9w3cCdft40ium0TbjEq=9pQw@mail.gmail.com>
- <e2863605-d90e-5e97-0a9b-35d7c2b15e34@amsat.org>
-In-Reply-To: <e2863605-d90e-5e97-0a9b-35d7c2b15e34@amsat.org>
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=KUa8ua5YuGfWsHWpW7218Ha7emqQTAdJ1paNsVxfgSI=;
+ b=PY3bz7yWp/UZNmJU0aQY8pH1e7JAE8GK+CCsNsr6+JNxIUS6ind5gItkgi5XVZbrcY
+ TPi8EuHtB0CwjxpwTg21miM+5RZyEbvA2fPnsJiEjmgGmame6kBEJB0+PxYQpeW/oC44
+ o0ZyueyRI3zmF4JfEi/HLiUn1AU/XFpGxjAn/NxPuhOLEusypXhKxGlMf9ycHhQ+OyAy
+ z7knnHHThiiwW8d3nVknO4NaULCkIHPkIZUXG5sCdvHHI62kG9MRb8ZfP7gYtCHOys2V
+ pS9dSseAfzV/dF04JJVXae7Lim2YM8ewxHFdFZf8ncsxSi6ML/JrP8/kwkkJ9TPnH5c4
+ cxOQ==
+X-Gm-Message-State: AOAM533ig1FbzO1qbkQGkjYpMdHH13QpY9TRSPsXfIkKWVRrx9rSK2xR
+ 7iPkhy409iZul9fLSz5iL4k=
+X-Google-Smtp-Source: ABdhPJygImpEKZbLAHqEKbMPNY8iZXx0slFSMVy63FJ/wd9yKqBcYi3exEtpNBxiM3zTfKabFkN2Mg==
+X-Received: by 2002:aa7:9424:0:b029:15d:5340:83b0 with SMTP id
+ y4-20020aa794240000b029015d534083b0mr1890449pfo.73.1603504218737; 
+ Fri, 23 Oct 2020 18:50:18 -0700 (PDT)
+Received: from Intel.localdomain (144.168.56.201.16clouds.com.
+ [144.168.56.201])
+ by smtp.gmail.com with ESMTPSA id q13sm3515900pfg.3.2020.10.23.18.50.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Fri, 23 Oct 2020 18:50:18 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Sat, 24 Oct 2020 09:06:06 +0800
-Message-ID: <CAEUhbmXX9RH12_EuUd-HmipOFMWH1_2gvCjL_RRqXiOqvzzU=Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/4] tests/acceptance: Test U-Boot/Linux from Armbian
- 20.08 on Orange Pi PC
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org
+Subject: [PATCH] hw/sd: Zero out function selection fields before being
+ populated
+Date: Sat, 24 Oct 2020 09:49:54 +0800
+Message-Id: <20201024014954.21330-1-bmeng.cn@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::441;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pf1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -96,79 +100,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
- Bin Meng <bin.meng@windriver.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Cc: Bin Meng <bin.meng@windriver.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+From: Bin Meng <bin.meng@windriver.com>
 
-On Sat, Oct 24, 2020 at 1:56 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
-g> wrote:
->
-> On 10/23/20 7:42 PM, Bin Meng wrote:
-> > Hi Philippe,
-> >
-> > On Fri, Oct 23, 2020 at 9:18 PM Philippe Mathieu-Daud=C3=A9 <f4bug@amsa=
-t.org> wrote:
-> >>
-> >> Series meant to help Bin Meng to debug the SD card issue
-> >> reported by Michael Roth.
-> >
-> > Thank you for the patches.
-> >
-> >>
-> >> Philippe Mathieu-Daud=C3=A9 (4):
-> >>    Revert "hw/sd: Fix incorrect populated function switch status data
-> >>      structure"
-> >>    tests/acceptance: Allow running Orange Pi test using cached artifac=
-ts
-> >>    tests/acceptance: Extract do_test_arm_orangepi_armbian_uboot() meth=
-od
-> >>    tests/acceptance: Test U-Boot/Linux from Armbian 20.08 on Orange Pi=
- PC
-> >>
-> >>   hw/sd/sd.c                             |  3 +-
-> >>   tests/acceptance/boot_linux_console.py | 68 +++++++++++++++++++-----=
---
-> >>   2 files changed, 50 insertions(+), 21 deletions(-)
-> >
-> > With this series, I used:
-> >
-> > $ ARMBIAN_ARTIFACTS_CACHED=3D1 AVOCADO_ALLOW_LARGE_STORAGE=3D1 make che=
-ck-acceptance
-> >
-> > It looks that the failure still exists? Log below:
-> >
-> > 13-tests_acceptance_boot_linux_console.py_BootLinuxConsole.test_arm_ora=
-ngepi_bionic_20_08/debug.log:
-> >
-> > 01:11:27 DEBUG| =3D> boot
-> > 01:11:27 DEBUG| unable to select a mode
-> > 01:11:27 DEBUG| Device 0: unknown device
-> > 01:11:27 DEBUG| BOOTP broadcast 1
-> > 01:11:27 DEBUG| DHCP client bound to address 10.0.2.15 (1 ms)
-> > 01:11:27 DEBUG| *** Warning: no boot file name; using '0A00020F.img'
-> > 01:11:27 DEBUG| Using ethernet@1c30000 device
-> > 01:11:27 DEBUG| TFTP from server 10.0.2.2; our IP address is 10.0.2.15
-> > 01:11:27 DEBUG| Filename '0A00020F.img'.
-> > 01:11:27 DEBUG| Load address: 0x42000000
-> > 01:11:27 DEBUG| Loading: *^H
-> > 01:11:27 DEBUG| TFTP error: 'Access violation' (2)
-> > 01:11:27 DEBUG| Not retrying...
->
-> Have you rebuilt qemu-system-arm with the reverted patch included?
+The function selection fields (399:376) should be zeroed out to
+prevent leftover from being or'ed into the switch function status
+data structure.
 
-Oops, I took it for granted that the `make check-acceptance` will
-automatically rebuild the QEMU binary, which is not the case. Should
-we enforce the rebuild before testing in Makefiles?
+This fixes the boot failure as seen in the acceptance testing on
+the orangepi target.
 
-Regards,
-Bin
+Fixes: b638627c723a ("hw/sd: Fix incorrect populated function switch status data structure")
+Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+Signed-off-by: Bin Meng <bin.meng@windriver.com>
+---
+
+ hw/sd/sd.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+index c3febed243..bd10ec8fc4 100644
+--- a/hw/sd/sd.c
++++ b/hw/sd/sd.c
+@@ -824,6 +824,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+     sd->data[12] = 0x80;	/* Supported group 1 functions */
+     sd->data[13] = 0x03;
+ 
++    memset(&sd->data[14], 0, 3);
+     for (i = 0; i < 6; i ++) {
+         new_func = (arg >> (i * 4)) & 0x0f;
+         if (mode && new_func != 0x0f)
+-- 
+2.25.1
+
 
