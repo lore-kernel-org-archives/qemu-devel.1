@@ -4,86 +4,89 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA6E4C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 17:34:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81598C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 17:41:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4213421D81
-	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 17:34:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E0F2822254
+	for <qemu-devel@archiver.kernel.org>; Sat, 24 Oct 2020 17:41:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBfzClM2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4213421D81
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u8VHIjqo"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0F2822254
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35680 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWNQs-0000GE-CM
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 13:34:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37992)
+	id 1kWNXs-00038q-Pg
+	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 13:41:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39100)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWNQI-0008GJ-DD; Sat, 24 Oct 2020 13:33:46 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:45913)
+ id 1kWNWT-0002X3-H1
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 13:40:09 -0400
+Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:42832)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWNQG-0000i8-OI; Sat, 24 Oct 2020 13:33:46 -0400
-Received: by mail-wr1-x444.google.com with SMTP id e17so6497976wru.12;
- Sat, 24 Oct 2020 10:33:44 -0700 (PDT)
+ id 1kWNWR-0001JT-Ru
+ for qemu-devel@nongnu.org; Sat, 24 Oct 2020 13:40:09 -0400
+Received: by mail-wr1-x441.google.com with SMTP id j7so6517429wrt.9
+ for <qemu-devel@nongnu.org>; Sat, 24 Oct 2020 10:40:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=LvGGTFWsyQjDX5+PrYR7huE/ykamm8i7tc7sFW0RZts=;
- b=JBfzClM2DhuZjra0NgovW3TFh5NqTTpjAJpgeHst4jfovebI3doZJnA94/0HrFFzRq
- W6jwOuHkoqmNgXbWr5DchSCqBBAAlQvE3Ra0hhxHowc6bba6ymiwXWXyiiyRK1JG34hV
- RH8U/VJAM4dXKo0U7K+qN12LBt+im/KrBlxDi/2I/6NMlLDOD7wHh9hOiyXjll+SO8Yp
- 3mzbjxmuXI/q8pUyCg8S/weZ7zT4dDNKHa5T5RgZKBPeYh6CnrZradBa83RVbbmKaZUb
- W3FLDwyj0tPIe1vPYk/Sf4zu0b8GDZb5zKBJStT6DwbBR37KqVTVLQjOH75n46uFv/FS
- jZvQ==
+ bh=Ooqbihq6iHUmi3zjx1nDHhAOsxRSOmn+FbPGa60W5aA=;
+ b=u8VHIjqoe+IwvN7ir5g3wnvwCwVczIGRN5ncqmWidezvrdEQgW72VIuxmnX1KPn8yb
+ 87GdNY722s7hvKhbUpErsr5dC4NgF5wKg2NOBD41Q1waPctizUHuXeg3A+KMjx7fvyRn
+ m72HeizXWRYRMxegYZoaiJur0YCUetFa7jckgaLbV4tgKHtC6CwrqMslJuNUWVWQyucR
+ xb531PGCUwQg14aKRvttMq4735aXd/2xkEOxnWjAc0UyOO1Cl8WuddtVmbOUwegcAIRZ
+ 8nCQNGAc+BD3Z6Vcrf3nTRDkvqw0L8kJVrtX6Ctxj/7XzqxGnoDMTZKNqYTWZpas2AYO
+ mKJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=LvGGTFWsyQjDX5+PrYR7huE/ykamm8i7tc7sFW0RZts=;
- b=BAQ1irsbNdOEffl3PCRVTJcWZzTSME949Yjjw75EFoz3Y/ubo0PM5BBLLzoptFTePs
- q1VFt3plP+cvEtkazozwJvNRFJfDmQReIa9GJu+4jBUtzszX8eCvqczb6wNo/36jSTpv
- WqLXS7EJqcPCGj3G/jhNxgC4pG2raD+uQIlvOS4/SP93QhNI1ZBfG8sNUCA/yXGT8z2k
- E2KbrwuD8zzIpNuHAozkXlyjiuYo5ZnHIzxT03HqGxMIFG8/bp/fGfuP7tAdC2FMPmbb
- fRCJ/8miX4uAI/W01zkhPWU8lxdQYIUQeV27t88eHCMe34ku6IHXv4F5j5dV4mz1ucR7
- nO8Q==
-X-Gm-Message-State: AOAM531PuxC609CUZi1cg4PnBP9q0+D4BBap8T3AdCLtYCXJ0bQxuH90
- owvX2xeMLqC4ZAZJQolPVI4seDmRwiA=
-X-Google-Smtp-Source: ABdhPJzthD8/zHsKTi9K90+mZgpVH3pSBu6uWFyulQgz4Lg19Hf/Hofgkb0dNsA4A9y5/OlhNYrnZg==
-X-Received: by 2002:adf:e881:: with SMTP id d1mr8649457wrm.395.1603560821927; 
- Sat, 24 Oct 2020 10:33:41 -0700 (PDT)
+ bh=Ooqbihq6iHUmi3zjx1nDHhAOsxRSOmn+FbPGa60W5aA=;
+ b=Cbt6jD0xVqTeGZa2t5dnZSIPXGqOU8P/85OsO9TbpjNsaITomLAPtoO89XzzhzHr8o
+ 7c5zVPIYyTmZlCKSOe6Fh4ngkmiiP5C8rce94AwHj6WBioUhb+MV+aUMDQtta+5zvHPO
+ zjBgaRPdetRwgXtFxfk9MZjMbsj4wSoOedeH0gQCUy9cDwldBZ1uSmb5R0km7WhMLdll
+ os+yrM4BbFWBQRu/h488dGOiOUhLaiykW6lokv2VimLHr1cyN0m2yArKSB0wIJF1DaKJ
+ xhkqA61Gk/BwNvPq7jGVVMJw80n63tVrLgE8nJe5X/6jp8q4Hh4yPjRrIkp4cXcK2c1f
+ FiiA==
+X-Gm-Message-State: AOAM533svauHmph+cQdhS7u1Zr6m2iiKtnJslz4LD9nNYFOFMgRRX1Gm
+ fzuLo7T6h88itD+b5T2bJd0=
+X-Google-Smtp-Source: ABdhPJx+X6MgiVP3O+YTL5AZRSX/qwtRDiAGT+6LifEBmqwPmgPfLDM3iQ3x8c4n4JwwqLarHOoqTA==
+X-Received: by 2002:adf:97da:: with SMTP id t26mr8599729wrb.321.1603561204788; 
+ Sat, 24 Oct 2020 10:40:04 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id e20sm11104149wme.35.2020.10.24.10.33.40
+ by smtp.gmail.com with ESMTPSA id q10sm11924670wrp.83.2020.10.24.10.40.03
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sat, 24 Oct 2020 10:33:41 -0700 (PDT)
-Subject: Re: [PATCH v2 1/2] hw/misc: add an EMC141{3,4} device model
-To: =?UTF-8?Q?C=c3=a9dric_Le_Goater?= <clg@kaod.org>,
- John Wang <wangzhiqiang.bj@bytedance.com>, xuxiaohan@bytednace.com,
- yulei.sh@bytedance.com, joel@jms.id.au
-References: <20201008090244.3770-1-wangzhiqiang.bj@bytedance.com>
- <19801c31-77e3-f51f-24ce-124ae65cd698@kaod.org>
+ Sat, 24 Oct 2020 10:40:04 -0700 (PDT)
+Subject: Re: [PATCH 4/6] tests/acceptance: Introduce tesseract_ocr() helper
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201021105035.2477784-1-f4bug@amsat.org>
+ <20201021105035.2477784-5-f4bug@amsat.org>
+ <0b31c367-f054-ce03-c1f8-d6fb6cbffc28@redhat.com>
+ <3cd8bd76-2115-1317-f852-fb1ffdde544a@redhat.com>
+ <87b084e3-8e6e-359d-784d-2f1353522f98@amsat.org>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <ef53dba9-431e-bd9e-df92-cedb6a75e4c6@amsat.org>
-Date: Sat, 24 Oct 2020 19:33:40 +0200
+Message-ID: <82f65042-abd3-36e0-b384-99dd87298163@amsat.org>
+Date: Sat, 24 Oct 2020 19:40:02 +0200
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <19801c31-77e3-f51f-24ce-124ae65cd698@kaod.org>
+In-Reply-To: <87b084e3-8e6e-359d-784d-2f1353522f98@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::441;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -15
@@ -106,43 +109,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+Cc: Huacai Chen <zltjiangshi@gmail.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Cleber Rosa <crosa@redhat.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/8/20 7:19 PM, Cédric Le Goater wrote:
-> On 10/8/20 11:02 AM, John Wang wrote:
->> Largely inspired by the TMP421 temperature sensor, here is a model for
->> the EMC1413 temperature sensors.
+On 10/24/20 9:37 AM, Philippe Mathieu-Daudé wrote:
+> On 10/24/20 8:40 AM, Thomas Huth wrote:
+>> On 24/10/2020 08.35, Thomas Huth wrote:
+>>> On 21/10/2020 12.50, Philippe Mathieu-Daudé wrote:
+>>>> We are going to reuse the tesseract OCR code.
+>>>> Create a new tesseract_ocr() helper and use it.
+>>>>
+>>>> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+>>>> ---
+>>>>   tests/acceptance/machine_m68k_nextcube.py | 21 +++++----------------
+>>>>   tests/acceptance/tesseract_utils.py       | 18 ++++++++++++++++++
+>>>>   2 files changed, 23 insertions(+), 16 deletions(-)
+...
+
+>>>
+>>> Would it make sense to completely hide the tesseract version handling in
+>>> this new tesseract_utils.py file now, so that the tests themselves do 
+>>> not
+>>> have to worry about this anymore
+
+The problem is the recognized strings differ between versions,
+see in tests/acceptance/machine_m68k_nextcube.py:
+
+         lines = tesseract_ocr(screenshot_path, tesseract_version=3)
+         text = '\n'.join(lines)
+         self.assertIn('Backplane', text)
+         self.assertIn('Ethernet address', text)
+
+and:
+
+         lines = tesseract_ocr(screenshot_path, tesseract_version=4)
+         text = '\n'.join(lines)
+         self.assertIn('Testing the FPU, SCC', text)
+         self.assertIn('System test failed. Error code', text)
+         self.assertIn('Boot command', text)
+         self.assertIn('Next>', text)
+
+> 
+> Yes, good idea.
+> 
+>> (i.e. would it be possible to merge
+>>> test_bootrom_framebuffer_ocr_with_tesseract_v3 and
+>>> test_bootrom_framebuffer_ocr_with_tesseract_v4 into one single test 
+>>> that way?)
 >>
->> Specs can be found here :
->>    https://pdf1.alldatasheet.com/datasheet-pdf/view/533713/SMSC/EMC1413.html
+>> If I've got that right, there is also now a proper release 4 of 
+>> Tesseract,
+>> so maybe we can simply scratch the testing with version 3 now?
+> 
+> Good to know, I'll have a look. Thanks!
+> 
 >>
->> Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
+>>   Thomas
+>>
 > 
-> Reviewed-by: Cédric Le Goater <clg@kaod.org>
-> 
->> ---
->> v2:
->>    - Remove DeviceInfo
-> 
-> I will look at doing the same in TMP421. All the temperature devices
-> have a lot in common.
-> 
-> Philippe,
-> 
-> Did you have a patchset introducing a common framework ?
 
-Yes, based on this (but probably using QOM path instead of ID):
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg697031.html
-
-I plan to respin once the 5.2 is released.
-
-> 
-> Thanks,
-> 
-> C.
 
