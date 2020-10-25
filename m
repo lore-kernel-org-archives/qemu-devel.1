@@ -2,88 +2,88 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-5.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD215C388F7
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 12:13:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAFCC388F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 12:24:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 13DAA222E8
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 12:13:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B8856223AE
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 12:24:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsgUJt9h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 13DAA222E8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yuks+cAY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8856223AE
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46450 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWetg-0003cN-30
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 08:13:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32882)
+	id 1kWf43-0005b2-Mf
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 08:23:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33822)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWesT-00033F-Df; Sun, 25 Oct 2020 08:12:01 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:40467)
+ id 1kWf2m-00055f-OK
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 08:22:41 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:35853)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWesR-0004cZ-Np; Sun, 25 Oct 2020 08:12:01 -0400
-Received: by mail-wr1-x443.google.com with SMTP id h5so9364596wrv.7;
- Sun, 25 Oct 2020 05:11:58 -0700 (PDT)
+ id 1kWf2k-0005SM-Rt
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 08:22:40 -0400
+Received: by mail-wr1-x444.google.com with SMTP id x7so9417442wrl.3
+ for <qemu-devel@nongnu.org>; Sun, 25 Oct 2020 05:22:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:from:to:cc:references:message-id:date:user-agent
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=8HeZ9OLUzJALMf3SRUnPIM3RgxdtwqEFyk8bGSySriM=;
- b=bsgUJt9hr/9KEfUTqjNYVod3kTFDDrhYAxBoC2Sfgh/5tpxrpChWuWDKr+9w7TLK9B
- 2C9SsuvJKo1WWTQ3O64Avb3Wgj4qxnLRPslut3R/h4os4k9urH+PulREN7UTUKs5VOAa
- xf784K5nRip9pioHC+4JX4+4u+iXXVDs3OblO1qaJRiWk+zNIfX3MYJ2nk5AjmuCGxcP
- dTdjH1AZcEBiw1joFGCNNojnVBSRRXmWUOhNDCMrzLw3CyCLcJ6Va1A2vhaQmpnW5AKk
- XHy2iAEu57wr7pRcEmrkAagvC+kiOnNJuaEN83znBAfSfI8aLYDtPIAH8cuHGfuieONK
- 2pxA==
+ bh=xbDFpkldMCQMjOuYmPHkQCEwhVMi1pfU+Fnv+neJ5qU=;
+ b=Yuks+cAYToOkcwlrfFPj2E9mo3QbP9wCNEfsePcDnHG7im7ZByMK56279x/0kwrsBZ
+ v6GM0/Bx7/OKoCJsFsms+5FVR/LgmNbO8l+ZfT2A+banwOC5dAIwCPtZhd09uFuOizb/
+ CU1ncxBhLLbmp23s/a4bHShHR+dEvCoO9VdTNez1Zc8mKnyiGhhOzb8B+IiXQvZ9bMWg
+ PcAMUXoU3p/9pVspmhKvrc9FPW6n70JnXmIUk6q4tBBRad79YO0qXXJ1hE0FVN6MWOgw
+ rtPauQ8jeqUxTEtIquehkENGCW/WcpZodCuY47JJoakDKyDFQuRLLMq2jDe/LvR7EYSE
+ vHZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:from:to:cc:references:message-id
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=8HeZ9OLUzJALMf3SRUnPIM3RgxdtwqEFyk8bGSySriM=;
- b=kXr0PRR/+N91syKbmTqPyTQoswwvDaZFPZElQECqsBTchtbkAQUgY9JsAdvzv60C8W
- JXOlS87/Ig2mMpeS63Vd9OKWxh4AzWdWeOQ6xZzX8BUCyXU9p9hJh+R9Fvf41SEP0x5E
- +0jC5TAbB1fEFeB/W4yjdAyhQmDSAgqXxdgPThIQx+ti/W/QGUtrUw/O/TccSO/YQOE2
- JEE/3j9p5tm998Z7djBK7yv1g1pgi5kkbDDDenfpW8kRh+f/6XmtKl3gm0byJnRkdfCE
- 43ql1lNKM4PdogJ2becgVbKJx2v7W7sSN4SGQnGy+SglyGI7GQnlxg9/PDjfDf4z2JG0
- 7SmQ==
-X-Gm-Message-State: AOAM531sDuDwVX1GDVQczv09s3mNmUBovkQOgZ+77U/6rAkjdXaTY8uw
- Zkyv8J9xRmBlLtcK51FpY6xXM3XTUNg=
-X-Google-Smtp-Source: ABdhPJwQOiCVFXa4OxwLY3i5l13ELvDIIfp1FWMcymAqjHzWvw3xuoox03iUjtDq7pBedmDF62s4BA==
-X-Received: by 2002:adf:f103:: with SMTP id r3mr13494344wro.153.1603627917479; 
- Sun, 25 Oct 2020 05:11:57 -0700 (PDT)
+ bh=xbDFpkldMCQMjOuYmPHkQCEwhVMi1pfU+Fnv+neJ5qU=;
+ b=kUGF5rusPI0JjzEfq90lvy7XuUJ+nwFEGrm878MmEJHFRyyBVfwLCMaGCLj39/aPjP
+ 8qiyxJJe6azgx8x/qKgv4mHRTZhX0lmh69THHMeLCmASBb+gcopXvIF56wDVb4RAsnv3
+ 35h0aC3VvEwA1MMwBA3HXSRfxj2IBMXYdkrkenNkwuDaACgimMYR19X8OvNGVhmfd5Gr
+ DPCWLSzUULTg81oZdXhrFFXk1RVcqKgmRJtooj3AKmTtBNZKQc/0cBJIz6XcIhIOussi
+ P0zwQKYjy7N2umkK9D+bAgYf/4WWAt2GrEnQ494uKZS3NBsFxCi1ERvuMUeNa9kj39VZ
+ hpaA==
+X-Gm-Message-State: AOAM533lunW7yb7G39xLRQAVu/TNhsvTFhwutvtpcAxiivDaztdwCVqi
+ /1UR9Ku0M+LDMVss1uNzoxQ=
+X-Google-Smtp-Source: ABdhPJwW3YhtF2aqNAzUckEOffQMc+YXDPNKFMwd4RPjuSJyHjxKL3H1ZNCjmlhi11z2D/95INmjPQ==
+X-Received: by 2002:a5d:5748:: with SMTP id q8mr12559095wrw.299.1603628556821; 
+ Sun, 25 Oct 2020 05:22:36 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id b5sm16505796wrs.97.2020.10.25.05.11.55
+ by smtp.gmail.com with ESMTPSA id q8sm16977560wro.32.2020.10.25.05.22.35
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 25 Oct 2020 05:11:56 -0700 (PDT)
-Subject: Re: [PATCH] tests/acceptance: expand Orange Pi PC SD images for
- NetBSD, Armbian above nearest power of two
+ Sun, 25 Oct 2020 05:22:35 -0700 (PDT)
+Subject: Re: [PATCH 0/6] tests/acceptance: Test the Fuloong 2E machine
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, qemu-devel@nongnu.org
+References: <20201021105035.2477784-1-f4bug@amsat.org>
+ <54a947e4-929c-aaa4-52b0-339827a010b8@ilande.co.uk>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-To: Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-devel@nongnu.org,
- Bin Meng <bin.meng@windriver.com>
-References: <20201024215200.494209-1-nieklinnenbank@gmail.com>
- <fd949ad0-f7fd-561e-33d8-57133a9afd31@amsat.org>
-Message-ID: <3bb92403-f955-d887-a301-1ff38259b49f@amsat.org>
-Date: Sun, 25 Oct 2020 13:11:55 +0100
+Message-ID: <d2851fba-040c-9f39-ccf7-2d22b862ec2b@amsat.org>
+Date: Sun, 25 Oct 2020 13:22:34 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <fd949ad0-f7fd-561e-33d8-57133a9afd31@amsat.org>
+In-Reply-To: <54a947e4-929c-aaa4-52b0-339827a010b8@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -106,83 +106,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, qemu-arm@nongnu.org
+Cc: Huacai Chen <zltjiangshi@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Cleber Rosa <crosa@redhat.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/25/20 2:31 AM, Philippe Mathieu-Daudé wrote:
-> Hi Niek,
+On 10/25/20 12:18 PM, Mark Cave-Ayland wrote:
+> On 21/10/2020 11:50, Philippe Mathieu-Daudé wrote:
 > 
-> On 10/24/20 11:52 PM, Niek Linnenbank wrote:
->> The acceptance tests for the Orange Pi PC need to expand the SD card 
->> images
->> to a size which is a power of two. As Qemu uses the size of the SD 
->> image file
->> as well for the size of the emulated SD card, this can sometimes give 
->> problems
->> for guests that assume a certain minimum size of the SD card.
+>> This series add tests for the MIPS Fuloong 2E machine.
 >>
->> This commit resolves the following acceptance test error for the 
->> NetBSD 9.0 test
->> of the Orange Pi PC by increasing the size of the expanded SD card 
->> image to two times
->> the nearest power of two:
+>> I have been using these tests for over 1 year now.
+>> After recent discussions with Huacai and Mark regarding
+>> how to contribute tests for machines using private blob,
+>> I think it is time to publish this series, to see how
+>> the final part will be discussed, as it tests a blob
+>> which Lemote company doesn't publish the sources. The
+>> binary is know to work and has been used for various
+>> years on real hardware. Its MD5 is also know (I am not
+>> using SHA-1 because it has been published with MD5).
 >>
->>     (5/5) 
->> tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9: 
->> |console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
->>    console: DRAM: 1024 MiB
->>    console: Failed to set core voltage! Can't set CPU frequency
->>    /console: Trying to boot from MMC1
->>    console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) 
->> Allwinner Technology
->>    ...
->>    console: Starting kernel ...
->>    console: [   1.0000000] NetBSD/evbarm (fdt) booting ...
->>    ...
->>    console: [   1.3300167] sdmmc0: SD card status: 4-bit, C0
->>    console: [   1.3300167] ld0 at sdmmc0: 
->> <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
-> 
-> The test has this comment:
-> 
->     # This test download a 304MB compressed image and expand it to 2GB
-> 
-> Once uncompressed the image is ~1.2GB before rounding to 2GB.
-> 
->>    console: [   1.3430678] ld0: 1024 MB, 1040 cyl, 32 head, 63 sec, 
->> 512 bytes/sect x 2097152 sectors
-> 
-> Why the card appears as 1GB??     ^^^^^^^
-> 
-> Can you try reverting commit 6d2d4069c47?
-> ("sd: Correct the maximum size of a Standard Capacity SD Memory Card")
-
-Now I remember, I hit the similar problem 2 years ago :S
-
-See the description of the C_SIZE field in CSD register:
-
-   "To indicate 2 GByte card, BLOCK_LEN shall be 1024 bytes."
-
-This model uses a fixed BLOCK_LEN = 512 bytes.
-
-> 
->>    console: [   1.4102580] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
->>    console: [   2.0674392] WARNING: 4 errors while detecting hardware; 
->> check system log.
->>    console: [   2.0674392] boot device: ld0
->>    console: [   2.0775401] root on ld0a dumps on ld0b
->>    console: [   2.0977679] vfs_mountroot: can't open root device
->>    console: [   2.0977679] cannot mount root, error = 6
->>    INTERRUPTED: Test interrupted by SIGTERM\nRunner error occurred: 
->> Timeout reached.
+>> The idea is to be able to share tests without infringing
+>> licenses issues.
 >>
->> Signed-off-by: Niek Linnenbank <nieklinnenbank@gmail.com>
->> Based-on: ("[RFC PATCH 0/4] tests/acceptance: Test U-Boot/Linux from 
->> Armbian 20.08 on Orange Pi PC")
->> ---
->>   tests/acceptance/boot_linux_console.py | 10 +++++-----
->>   1 file changed, 5 insertions(+), 5 deletions(-)
+>> Please comment :)
+>>
+>> Phil.
+>>
+>> Philippe Mathieu-Daudé (6):
+>>    tests/acceptance: Remove unused import
+>>    tests/acceptance: Use .ppm extention for Portable PixMap files
+>>    tests/acceptance: Extract tesseract_available() helper in new
+>>      namespace
+>>    tests/acceptance: Introduce tesseract_ocr() helper
+>>    tests/acceptance: Test Linux on the Fuloong 2E machine
+>>    tests/acceptance: Test PMON on the Fuloong 2E machine
+>>
+>>   MAINTAINERS                                |   1 +
+>>   tests/acceptance/machine_m68k_nextcube.py  |  51 ++---------
+>>   tests/acceptance/machine_mips_fuloong2e.py | 101 +++++++++++++++++++++
+>>   tests/acceptance/tesseract_utils.py        |  46 ++++++++++
+>>   4 files changed, 158 insertions(+), 41 deletions(-)
+>>   create mode 100644 tests/acceptance/machine_mips_fuloong2e.py
+>>   create mode 100644 tests/acceptance/tesseract_utils.py
 > 
+> In general this looks good: certainly I don't see any reason why the 
+> tesseract_ocr helper changes shouldn't be merged, since I expect that 
+> this is something that will be used more in future.
+> 
+> Looking at the fuloong test it seems that it stops fairly early in the 
+> kernel boot: one of the problems that Zoltan's VIA southbridge patches 
+> were trying to solve earlier in the year was because of problems with 
+> PCI IRQ routing, so it would be nice to include a small OS image that 
+> can be used to boot to userspace to ensure that such problems can be 
+> detected in future.
+
+The Linux tests (ab)use of the rescue image prepared for the Yeeloong
+machine which we don't model (Loongson 2F CPU, 1GB of DRAM). The kernel
+triggers DATA ABORT while accessing >256MB because we do not model
+mapping more than 256MB :/ (The Fuloong comes with 512MB extensible to 
+1GB). I have a branch adding that but had the idea nobody was interested
+in the Fuloong 2E so I didn't insist (I have more interest in embedded
+32-bit CPUs). I might try to post it after the release, as it makes this
+test complete.
+
+Thanks for giving it a try!
+
+Phil.
 
