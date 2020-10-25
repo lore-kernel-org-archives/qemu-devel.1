@@ -2,59 +2,59 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEA75C388F7
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:10:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1B6C388F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:12:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 075EB223BD
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:10:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 075EB223BD
+	by mail.kernel.org (Postfix) with ESMTPS id 35362222E8
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:12:57 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35362222E8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47822 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWdvB-0005Bf-1Y
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 07:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52940)
+	id 1kWdxI-0006Ad-Ab
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 07:12:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdtn-0004SU-Do
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:09:23 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46010
+ id 1kWdw4-0005fW-DR
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:11:40 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46028
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdti-0006gp-3G
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:09:17 -0400
+ id 1kWdw2-000735-5u
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:11:40 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdtj-0001hC-J3; Sun, 25 Oct 2020 11:09:20 +0000
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- qemu-devel@nongnu.org
-References: <20201024203900.3619498-1-f4bug@amsat.org>
+ id 1kWdw6-0001hs-6D; Sun, 25 Oct 2020 11:11:45 +0000
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-ID: <b28c4399-dcb2-15b8-4d4b-f02234a3e549@ilande.co.uk>
-Date: Sun, 25 Oct 2020 11:09:06 +0000
+To: qemu-devel@nongnu.org, f4bug@amsat.org
+References: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
+Message-ID: <24f4d006-f8b4-4eac-5319-67ad14b182b5@ilande.co.uk>
+Date: Sun, 25 Oct 2020 11:11:33 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201024203900.3619498-1-f4bug@amsat.org>
+In-Reply-To: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH v2 0/2] pci: assert that irqnum is between 0 and
- bus->nirqs in pci_change_irq_level()
+Subject: Re: [PATCH] sabre: use object_initialize_child() for iommu child
+ object
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,33 +79,100 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Igor Mammedov <imammedo@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/10/2020 21:38, Philippe Mathieu-Daudé wrote:
+On 21/10/2020 12:43, Mark Cave-Ayland wrote:
 
-> Respin of Mark's patch:
-> https://www.mail-archive.com/qemu-devel@nongnu.org/msg749459.html
+> Store the child object directly within the sabre object rather than using
+> link properties.
 > 
-> Supersedes: <20201011082022.3016-1-mark.cave-ayland@ilande.co.uk>
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>   hw/pci-host/sabre.c         | 10 ++++------
+>   hw/sparc64/sun4u.c          |  8 +-------
+>   include/hw/pci-host/sabre.h |  2 +-
+>   3 files changed, 6 insertions(+), 14 deletions(-)
 > 
-> Mark Cave-Ayland (1):
->    pci: Assert irqnum is between 0 and bus->nirqs in
->      pci_bus_change_irq_level
-> 
-> Philippe Mathieu-Daudé (1):
->    hw/pci: Extract pci_bus_change_irq_level() from pci_change_irq_level()
-> 
->   hw/pci/pci.c | 11 +++++++++--
->   1 file changed, 9 insertions(+), 2 deletions(-)
+> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
+> index f41a0cc301..aaa93acd6e 100644
+> --- a/hw/pci-host/sabre.c
+> +++ b/hw/pci-host/sabre.c
+> @@ -383,9 +383,10 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+>       pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
+>   
+>       /* IOMMU */
+> +    sysbus_realize(SYS_BUS_DEVICE(&s->iommu), &error_fatal);
+>       memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
+> -                    sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
+> -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
+> +                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->iommu), 0), 1);
+> +    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, &s->iommu);
+>   
+>       /* APB secondary busses */
+>       pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
+> @@ -422,10 +423,7 @@ static void sabre_init(Object *obj)
+>       s->pci_irq_in = 0ULL;
+>   
+>       /* IOMMU */
+> -    object_property_add_link(obj, "iommu", TYPE_SUN4U_IOMMU,
+> -                             (Object **) &s->iommu,
+> -                             qdev_prop_allow_set_link_before_realize,
+> -                             0);
+> +    object_initialize_child(obj, "iommu", &s->iommu, TYPE_SUN4U_IOMMU);
+>   
+>       /* sabre_config */
+>       memory_region_init_io(&s->sabre_config, OBJECT(s), &sabre_config_ops, s,
+> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+> index 2f8fc670cf..a33f1eccfd 100644
+> --- a/hw/sparc64/sun4u.c
+> +++ b/hw/sparc64/sun4u.c
+> @@ -562,7 +562,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>       PCIBus *pci_bus, *pci_busA, *pci_busB;
+>       PCIDevice *ebus, *pci_dev;
+>       SysBusDevice *s;
+> -    DeviceState *iommu, *dev;
+> +    DeviceState *dev;
+>       FWCfgState *fw_cfg;
+>       NICInfo *nd;
+>       MACAddr macaddr;
+> @@ -571,10 +571,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>       /* init CPUs */
+>       cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
+>   
+> -    /* IOMMU */
+> -    iommu = qdev_new(TYPE_SUN4U_IOMMU);
+> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(iommu), &error_fatal);
+> -
+>       /* set up devices */
+>       ram_init(0, machine->ram_size);
+>   
+> @@ -584,8 +580,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>       sabre = SABRE(qdev_new(TYPE_SABRE));
+>       qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
+>       qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
+> -    object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
+> -                             &error_abort);
+>       sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
+>   
+>       /* sabre_config */
+> diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
+> index 01190241bb..05bf741cde 100644
+> --- a/include/hw/pci-host/sabre.h
+> +++ b/include/hw/pci-host/sabre.h
+> @@ -34,7 +34,7 @@ struct SabreState {
+>       MemoryRegion pci_mmio;
+>       MemoryRegion pci_ioport;
+>       uint64_t pci_irq_in;
+> -    IOMMUState *iommu;
+> +    IOMMUState iommu;
+>       PCIBridge *bridgeA;
+>       PCIBridge *bridgeB;
+>       uint32_t pci_control[16];
 
-This version LGTM - I think it's just waiting on review from the PCI folks to see 
-whether they agree with the change.
-
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+No further comments (and I'm happier that this is a better solution than having an 
+"optional" link property) so I've applied this to my qemu-sparc branch.
 
 
 ATB,
