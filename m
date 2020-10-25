@@ -2,70 +2,77 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 895A0C4363A
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 02:31:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92150C4363A
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 04:28:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0C8622246
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 02:31:10 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0C8622246
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id D7EC822202
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 04:28:22 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7EC822202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWVoL-0005NY-GB
-	for qemu-devel@archiver.kernel.org; Sat, 24 Oct 2020 22:31:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48746)
+	id 1kWXdl-0008Aj-NX
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 00:28:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kWVnK-0004ro-L4
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 22:30:06 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:2420 helo=dggsg03-dlp)
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1kWXdC-0007m3-OK
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 00:27:46 -0400
+Received: from mga02.intel.com ([134.134.136.20]:22074)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
- id 1kWVnI-0006zL-5k
- for qemu-devel@nongnu.org; Sat, 24 Oct 2020 22:30:06 -0400
-Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.60])
- by dggsg03-dlp (SkyGuard) with ESMTP id 4CJhkq4PD5zLnCR;
- Sun, 25 Oct 2020 10:29:55 +0800 (CST)
-Received: from [10.174.186.51] (10.174.186.51) by
- DGGEMS402-HUB.china.huawei.com (10.3.19.202) with Microsoft SMTP Server id
- 14.3.487.0; Sun, 25 Oct 2020 10:29:40 +0800
-Subject: Re: [PATCH v3 00/18] Support Multifd for RDMA migration
-To: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-References: <1602908748-43335-1-git-send-email-zhengchuan@huawei.com>
- <2ea09ca2cc8c494390b506877f6e5e2c@huawei.com>
- <d9a87b5a-f524-fd79-6e11-f95430a4c29f@huawei.com>
- <20201023190214.GR3038@work-vm>
-From: Zheng Chuan <zhengchuan@huawei.com>
-Message-ID: <64f2dcf4-8ccd-e8d3-f279-7170b1fadf92@huawei.com>
-Date: Sun, 25 Oct 2020 10:29:40 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
+ id 1kWXd9-0004eg-KA
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 00:27:46 -0400
+IronPort-SDR: S3Vo1dP9y7npgTN3NiK85P0T929Xe5tF315w4UOLOVl3A2GaCxNPyY3zz9xn748UEis2zSromb
+ 66vY6fDBx0Ig==
+X-IronPort-AV: E=McAfee;i="6000,8403,9784"; a="154774122"
+X-IronPort-AV: E=Sophos;i="5.77,414,1596524400"; d="scan'208";a="154774122"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+ by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2020 21:27:36 -0700
+IronPort-SDR: 5McXZTnwkCzgxbiTj9UkGLPSe1tw6ljgIqZ6cEU9jP9XKUd6i0ASSpnLoX6pDkeYtP8iI02ksy
+ Qdt4X2ypPvZg==
+X-IronPort-AV: E=Sophos;i="5.77,414,1596524400"; d="scan'208";a="534927004"
+Received: from joy-optiplex-7040.sh.intel.com (HELO yzhao56-desk)
+ ([10.239.13.16])
+ by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 24 Oct 2020 21:27:30 -0700
+Date: Sun, 25 Oct 2020 12:26:11 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Subject: Re: [PATCH v28 03/17] vfio: Add save and load functions for VFIO PCI
+ devices
+Message-ID: <20201025042611.GE11827@yzhao56-desk>
+References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
+ <1603449643-12851-4-git-send-email-kwankhede@nvidia.com>
+ <20201024115327.GA11667@yzhao56-desk>
+ <20201024081630.29d3a2bf@x1.home>
 MIME-Version: 1.0
-In-Reply-To: <20201023190214.GR3038@work-vm>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.186.51]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.191;
- envelope-from=zhengchuan@huawei.com; helo=dggsg03-dlp
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/24 22:29:50
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -4
-X-Spam_score: -0.5
-X-Spam_bar: /
-X-Spam_report: (-0.5 / 5.0 requ) BAYES_00=-1.9, FSL_HELO_NON_FQDN_1=0.001,
- HELO_NO_DOMAIN=0.485, NICE_REPLY_A=-0.107, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, RCVD_IN_SBL_CSS=3.335,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201024081630.29d3a2bf@x1.home>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+Received-SPF: pass client-ip=134.134.136.20; envelope-from=yan.y.zhao@intel.com;
+ helo=mga02.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 00:27:37
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -78,146 +85,216 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yubihong <yubihong@huawei.com>,
- Zhanghailiang <zhang.zhanghailiang@huawei.com>,
- "quintela@redhat.com" <quintela@redhat.com>,
- "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
- Xiexiangyou <xiexiangyou@huawei.com>,
- "Chenzhendong \(alex\)" <alex.chen@huawei.com>,
- "wanghao \(O\)" <wanghao232@huawei.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
+ eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
+ pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-
-
-On 2020/10/24 3:02, Dr. David Alan Gilbert wrote:
-> * Zheng Chuan (zhengchuan@huawei.com) wrote:
->>
->>
->> On 2020/10/21 17:25, Zhanghailiang wrote:
->>> Hi zhengchuan,
->>>
->>>> -----Original Message-----
->>>> From: zhengchuan
->>>> Sent: Saturday, October 17, 2020 12:26 PM
->>>> To: quintela@redhat.com; dgilbert@redhat.com
->>>> Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>; Chenzhendong (alex)
->>>> <alex.chen@huawei.com>; Xiexiangyou <xiexiangyou@huawei.com>; wanghao
->>>> (O) <wanghao232@huawei.com>; yubihong <yubihong@huawei.com>;
->>>> fengzhimin1@huawei.com; qemu-devel@nongnu.org
->>>> Subject: [PATCH v3 00/18] Support Multifd for RDMA migration
->>>>
->>>> Now I continue to support multifd for RDMA migration based on my colleague
->>>> zhiming's work:)
->>>>
->>>> The previous RFC patches is listed below:
->>>> v1:
->>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg669455.html
->>>> v2:
->>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg679188.html
->>>>
->>>> As descried in previous RFC, the RDMA bandwidth is not fully utilized for over
->>>> 25Gigabit NIC because of single channel for RDMA migration.
->>>> This patch series is going to support multifd for RDMA migration based on multifd
->>>> framework.
->>>>
->>>> Comparsion is between origion and multifd RDMA migration is re-tested for v3.
->>>> The VM specifications for migration are as follows:
->>>> - VM use 4k page;
->>>> - the number of VCPU is 4;
->>>> - the total memory is 16Gigabit;
->>>> - use 'mempress' tool to pressurize VM(mempress 8000 500);
->>>> - use 25Gigabit network card to migrate;
->>>>
->>>> For origin RDMA and MultiRDMA migration, the total migration times of VM are
->>>> as follows:
->>>> +++++++++++++++++++++++++++++++++++++++++++++++++
->>>> |             | NOT rdma-pin-all | rdma-pin-all |
->>>> +++++++++++++++++++++++++++++++++++++++++++++++++
->>>> | origin RDMA |       26 s       |     29 s     |
->>>> -------------------------------------------------
->>>> |  MultiRDMA  |       16 s       |     17 s     |
->>>> +++++++++++++++++++++++++++++++++++++++++++++++++
->>>>
->>>> Test the multifd RDMA migration like this:
->>>> virsh migrate --live --multiFd --migrateuri
->>>
->>> There is no option '--multiFd' for virsh commands, It seems that, we added this private option for internal usage.
->>> It's better to provide testing method by using qemu commands.
->>>
->>>
->> Hi, Hailiang
->> Yes, it should be, will update in V4.
->>
->> Also, Ping.
->>
->> Dave, Juan.
->>
->> Any suggestion and comment about this series? Hope this feature could catch up with qemu 5.2.
+On Sat, Oct 24, 2020 at 08:16:30AM -0600, Alex Williamson wrote:
+> On Sat, 24 Oct 2020 19:53:39 +0800
+> Yan Zhao <yan.y.zhao@intel.com> wrote:
 > 
-> It's a bit close; I'm not sure if I'll have time to review it on Monday
-> before the pull.
+> > hi
+> > when I migrating VFs, the PCI_COMMAND is not properly saved. and the
+> > target side would meet below bug
+> > root@tester:~# [  189.360671] ++++++++++>> reset starts here: iavf_reset_task !!!
+> > [  199.360798] iavf 0000:00:04.0: Reset never finished (0)
+> > [  199.380504] kernel BUG at drivers/pci/msi.c:352!
+> > [  199.382957] invalid opcode: 0000 [#1] SMP PTI
+> > [  199.384855] CPU: 1 PID: 419 Comm: kworker/1:2 Tainted: G           OE     5.0.0-13-generic #14-Ubuntu
+> > [  199.388204] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
+> > [  199.392401] Workqueue: events iavf_reset_task [iavf]
+> > [  199.393586] RIP: 0010:free_msi_irqs+0x17b/0x1b0
+> > [  199.394659] Code: 84 e1 fe ff ff 45 31 f6 eb 11 41 83 c6 01 44 39 73 14 0f 86 ce fe ff ff 8b 7b 10 44 01 f7 e8 3c 7a ba ff 48 83 78 70 00 74 e0 <0f> 0b 49 8d b5 b0 00 00 00 e8 07 27 bb ff e9 cf fe ff ff 48 8b 78
+> > [  199.399056] RSP: 0018:ffffabd1006cfdb8 EFLAGS: 00010282
+> > [  199.400302] RAX: ffff9e336d8a2800 RBX: ffff9e3333b006c0 RCX: 0000000000000000
+> > [  199.402000] RDX: 0000000000000000 RSI: 0000000000000019 RDI: ffffffffbaa68100
+> > [  199.403168] RBP: ffffabd1006cfde8 R08: ffff9e3375000248 R09: ffff9e3375000338
+> > [  199.404343] R10: 0000000000000000 R11: ffffffffbaa68108 R12: ffff9e3374ef12c0
+> > [  199.405526] R13: ffff9e3374ef1000 R14: 0000000000000000 R15: ffff9e3371f2d018
+> > [  199.406702] FS:  0000000000000000(0000) GS:ffff9e3375b00000(0000) knlGS:0000000000000000
+> > [  199.408027] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > [  199.408987] CR2: 00000000ffffffff CR3: 0000000033266000 CR4: 00000000000006e0
+> > [  199.410155] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > [  199.411321] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > [  199.412437] Call Trace:
+> > [  199.412750]  pci_disable_msix+0xf3/0x120
+> > [  199.413227]  iavf_reset_interrupt_capability.part.40+0x19/0x40 [iavf]
+> > [  199.413998]  iavf_reset_task+0x4b3/0x9d0 [iavf]
+> > [  199.414544]  process_one_work+0x20f/0x410
+> > [  199.415026]  worker_thread+0x34/0x400
+> > [  199.415486]  kthread+0x120/0x140
+> > [  199.415876]  ? process_one_work+0x410/0x410
+> > [  199.416380]  ? __kthread_parkme+0x70/0x70
+> > [  199.416864]  ret_from_fork+0x35/0x40
+> > 
+> > I fixed it with below patch.
+> > 
+> > 
+> > commit ad3efa0eeea7edb352294bfce35b904b8d3c759c
+> > Author: Yan Zhao <yan.y.zhao@intel.com>
+> > Date:   Sat Oct 24 19:45:01 2020 +0800
+> > 
+> >     msix fix.
+> >     
+> >     Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> > 
+> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > index f63f15b553..92f71bf933 100644
+> > --- a/hw/vfio/pci.c
+> > +++ b/hw/vfio/pci.c
+> > @@ -2423,8 +2423,14 @@ const VMStateDescription vmstate_vfio_pci_config = {
+> >  static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> >  {
+> >      VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> > +    PCIDevice *pdev = &vdev->pdev;
+> > +    uint16_t pci_cmd;
+> > +
+> > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
+> > +    qemu_put_be16(f, pci_cmd);
+> >  
+> >      vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
+> > +
+> >  }
+> >  
+> >  static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> > @@ -2432,6 +2438,10 @@ static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> >      VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> >      PCIDevice *pdev = &vdev->pdev;
+> >      int ret;
+> > +    uint16_t pci_cmd;
+> > +
+> > +    pci_cmd = qemu_get_be16(f);
+> > +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
+> >  
+> >      ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
+> >      if (ret) {
+> > 
 > 
-> Dave
 > 
-Yes, it is.
-Then we may wait for next merge window after fully review:)
+> We need to avoid this sort of ad-hoc stuffing random fields into the
+> config stream.  The command register is already migrated in vconfig, it
+> only needs to be written through vfio:
+> 
+> vfio_pci_write_config(pdev, PCI_COMMAND,
+> 		      pci_get_word(pdev->config, PCI_COMMAND), 2);
+> 
+yes, it should work. previously we just rely on qemu to save and load
+the common fields.
 
->>> Thanks.
->>>
->>>> rdma://192.168.1.100 [VM] --listen-address 0.0.0.0
->>>> qemu+tcp://192.168.1.100/system --verbose
->>>>
->>>> v2 -> v3:
->>>>     create multifd ops for both tcp and rdma
->>>>     do not export rdma to avoid multifd code in mess
->>>>     fix build issue for non-rdma
->>>>     fix some codestyle and buggy code
->>>>
->>>> Chuan Zheng (18):
->>>>   migration/rdma: add the 'migrate_use_rdma_pin_all' function
->>>>   migration/rdma: judge whether or not the RDMA is used for migration
->>>>   migration/rdma: create multifd_setup_ops for Tx/Rx thread
->>>>   migration/rdma: add multifd_setup_ops for rdma
->>>>   migration/rdma: do not need sync main for rdma
->>>>   migration/rdma: export MultiFDSendParams/MultiFDRecvParams
->>>>   migration/rdma: add rdma field into multifd send/recv param
->>>>   migration/rdma: export getQIOChannel to get QIOchannel in rdma
->>>>   migration/rdma: add multifd_rdma_load_setup() to setup multifd rdma
->>>>   migration/rdma: Create the multifd recv channels for RDMA
->>>>   migration/rdma: record host_port for multifd RDMA
->>>>   migration/rdma: Create the multifd send channels for RDMA
->>>>   migration/rdma: Add the function for dynamic page registration
->>>>   migration/rdma: register memory for multifd RDMA channels
->>>>   migration/rdma: only register the memory for multifd channels
->>>>   migration/rdma: add rdma_channel into Migrationstate field
->>>>   migration/rdma: send data for both rdma-pin-all and NOT rdma-pin-all
->>>>     mode
->>>>   migration/rdma: RDMA cleanup for multifd migration
->>>>
->>>>  migration/migration.c |  24 +++
->>>>  migration/migration.h |  11 ++
->>>>  migration/multifd.c   |  97 +++++++++-
->>>>  migration/multifd.h   |  24 +++
->>>>  migration/qemu-file.c |   5 +
->>>>  migration/qemu-file.h |   1 +
->>>>  migration/rdma.c      | 503
->>>> +++++++++++++++++++++++++++++++++++++++++++++++++-
->>>>  7 files changed, 653 insertions(+), 12 deletions(-)
->>>>
->>>> --
->>>> 1.8.3.1
->>>
->>> .
->>>
->>
->> -- 
->> Regards.
->> Chuan
->>
+Thanks
+Yan
 
--- 
-Regards.
-Chuan
+> 
+> 
+> > On Fri, Oct 23, 2020 at 04:10:29PM +0530, Kirti Wankhede wrote:
+> > > Added functions to save and restore PCI device specific data,
+> > > specifically config space of PCI device.
+> > > 
+> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
+> > > ---
+> > >  hw/vfio/pci.c                 | 48 +++++++++++++++++++++++++++++++++++++++++++
+> > >  include/hw/vfio/vfio-common.h |  2 ++
+> > >  2 files changed, 50 insertions(+)
+> > > 
+> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> > > index bffd5bfe3b78..92cc25a5489f 100644
+> > > --- a/hw/vfio/pci.c
+> > > +++ b/hw/vfio/pci.c
+> > > @@ -41,6 +41,7 @@
+> > >  #include "trace.h"
+> > >  #include "qapi/error.h"
+> > >  #include "migration/blocker.h"
+> > > +#include "migration/qemu-file.h"
+> > >  
+> > >  #define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+> > >  
+> > > @@ -2401,11 +2402,58 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
+> > >      return OBJECT(vdev);
+> > >  }
+> > >  
+> > > +static bool vfio_msix_present(void *opaque, int version_id)
+> > > +{
+> > > +    PCIDevice *pdev = opaque;
+> > > +
+> > > +    return msix_present(pdev);
+> > > +}
+> > > +
+> > > +const VMStateDescription vmstate_vfio_pci_config = {
+> > > +    .name = "VFIOPCIDevice",
+> > > +    .version_id = 1,
+> > > +    .minimum_version_id = 1,
+> > > +    .fields = (VMStateField[]) {
+> > > +        VMSTATE_PCI_DEVICE(pdev, VFIOPCIDevice),
+> > > +        VMSTATE_MSIX_TEST(pdev, VFIOPCIDevice, vfio_msix_present),
+> > > +        VMSTATE_END_OF_LIST()
+> > > +    }
+> > > +};
+> > > +
+> > > +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
+> > > +{
+> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> > > +
+> > > +    vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
+> > > +}
+> > > +
+> > > +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
+> > > +{
+> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
+> > > +    PCIDevice *pdev = &vdev->pdev;
+> > > +    int ret;
+> > > +
+> > > +    ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
+> > > +    if (ret) {
+> > > +        return ret;
+> > > +    }
+> > > +
+> > > +    if (msi_enabled(pdev)) {
+> > > +        vfio_msi_enable(vdev);
+> > > +    } else if (msix_enabled(pdev)) {
+> > > +        vfio_msix_enable(vdev);
+> > > +    }
+> > > +
+> > > +    return ret;
+> > > +}
+> > > +
+> > >  static VFIODeviceOps vfio_pci_ops = {
+> > >      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
+> > >      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
+> > >      .vfio_eoi = vfio_intx_eoi,
+> > >      .vfio_get_object = vfio_pci_get_object,
+> > > +    .vfio_save_config = vfio_pci_save_config,
+> > > +    .vfio_load_config = vfio_pci_load_config,
+> > >  };
+> > >  
+> > >  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+> > > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+> > > index fe99c36a693a..ba6169cd926e 100644
+> > > --- a/include/hw/vfio/vfio-common.h
+> > > +++ b/include/hw/vfio/vfio-common.h
+> > > @@ -120,6 +120,8 @@ struct VFIODeviceOps {
+> > >      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
+> > >      void (*vfio_eoi)(VFIODevice *vdev);
+> > >      Object *(*vfio_get_object)(VFIODevice *vdev);
+> > > +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
+> > > +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
+> > >  };
+> > >  
+> > >  typedef struct VFIOGroup {
+> > > -- 
+> > > 2.7.0
+> > >   
+> > 
+> 
 
