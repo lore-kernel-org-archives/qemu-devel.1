@@ -2,96 +2,75 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45C56C388F7
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 21:09:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5D0C4363A
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 21:33:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 76738222C3
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 21:08:59 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IX5yhQLY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 76738222C3
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 6DB902225B
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 21:33:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6DB902225B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58212 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWnG6-0002KK-6z
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 17:08:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54286)
+	id 1kWne7-0000lj-Dw
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 17:33:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60052)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWnFQ-0001n0-32; Sun, 25 Oct 2020 17:08:16 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:37296)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWnFN-00013v-Tz; Sun, 25 Oct 2020 17:08:15 -0400
-Received: by mail-wr1-x441.google.com with SMTP id h7so10266227wre.4;
- Sun, 25 Oct 2020 14:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=XjWdsZH+f+a88qGHQj2wNal+Pi03yGxVzAUMhQ9x7rk=;
- b=IX5yhQLYjQhP38WpN8eqKy2+cAggioav2MjExsYa7Ku5B5Fa4CYBWvlbYySVYxV75x
- dPzufYuAxg71Qref+4t1hnpEtsVYrA27CmnaC/KVFzH3lQN08XKSeunnKmg/3b/s0NS+
- Y5Sai+eaXocLQidF3VLqQhLqbM3qfUKE+BiuVcnDjPZhYF+uNsTUEJS6YyQ1fsNmrJMl
- xla3cTiTiRl+reezm+BKp9OlE6+Le5r5IcZUYCPSvkqIeGFBdRZZh2T3gKodhwHjodIv
- VT4vHQB1zLIecRrCjyXgRV7a3J5lDYm1s/xuR+I+/YVz0W9bvRQBVU++UnJRLUAC2+Oz
- sg/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=XjWdsZH+f+a88qGHQj2wNal+Pi03yGxVzAUMhQ9x7rk=;
- b=OpvT8IBw368MjP+/4j+HNsBbdjFB00yePnHBOLmwfpaiSC2sPdJRtVcSKhoaEtt9OY
- IjzD/FDcta9yncgkMShVfHTR71J9g84fGnbZEU/sJDk9UircWzb+CE9D9dr08M4qGZES
- 5dS8twRdCXZLyPVNRHPXwVuZHUq8Nqbrab5EPajgyi62AtYjAAQLxQz+vossEUZAOzdO
- yervB8b3rQ9z2tOlTFcY0Y67LpcDIsGrF9BQcasEhQ30ByX9AQa4HpWzxFKACgqXkM5/
- jgesIJyB9cgWg9M2jJG3FFAPXt2AcT81p+xjHKy3Jv87aYPpXZzwb/MVkQKsIrpa/ViP
- oFuw==
-X-Gm-Message-State: AOAM532r++493rNyMwmg2/KrsLZNUu+ZF07jZCfPtvFuaLY2WHP95b6G
- zd5FcV3Oc2FrYoJFBHu0hWsW50XdZTk=
-X-Google-Smtp-Source: ABdhPJy+SGJoMTzm9qI4uYCEyxDfDs21j08QSdM+926hg5exTC7zuG063sIY44de5BbrlZmn+m61kA==
-X-Received: by 2002:a5d:5743:: with SMTP id q3mr14101936wrw.167.1603660091692; 
- Sun, 25 Oct 2020 14:08:11 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id o186sm18111807wmb.12.2020.10.25.14.08.10
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Sun, 25 Oct 2020 14:08:10 -0700 (PDT)
-Subject: Re: [PATCH v3 1/2] hw/misc: add an EMC141{3,4} device model
-To: John Wang <wangzhiqiang.bj@bytedance.com>, clg@kaod.org,
- xuxiaohan@bytedance.com, yulei.sh@bytedance.com, joel@jms.id.au
-References: <20201025131435.144-1-wangzhiqiang.bj@bytedance.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <6793bb35-985c-be0f-bfb1-76017dafdd02@amsat.org>
-Date: Sun, 25 Oct 2020 22:08:09 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kWncL-0008HI-V3
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 17:31:57 -0400
+Received: from 10.mo52.mail-out.ovh.net ([87.98.187.244]:50227)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kWncJ-0004YC-O6
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 17:31:57 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.138.194])
+ by mo52.mail-out.ovh.net (Postfix) with ESMTPS id 789971FF1B7;
+ Sun, 25 Oct 2020 22:31:50 +0100 (CET)
+Received: from kaod.org (37.59.142.96) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Sun, 25 Oct
+ 2020 22:31:49 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-96R001b2d30bea-7591-48cb-8f1c-3457a5ffd96b,
+ 5F9C93A9F3AD2D257DE4C2DCE7DBF4E7A6D9743C) smtp.auth=groug@kaod.org
+Date: Sun, 25 Oct 2020 22:31:48 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 1/5] pc-dimm: Drop @errp argument of pc_dimm_plug()
+Message-ID: <20201025223148.2822fcf9@bahia.lan>
+In-Reply-To: <20201023211919.77377cb9@redhat.com>
+References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
+ <160309728447.2739814.12831204841251148202.stgit@bahia.lan>
+ <20201023211919.77377cb9@redhat.com>
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <20201025131435.144-1-wangzhiqiang.bj@bytedance.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset="US-ASCII"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+X-Originating-IP: [37.59.142.96]
+X-ClientProxiedBy: DAG8EX2.mxp5.local (172.16.2.72) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: b828ecb5-1de6-40e7-ac94-febefb3b8004
+X-Ovh-Tracer-Id: 17205439427372751352
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrkeeggdduhedvucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeefuddtieejjeevheekieeltefgleetkeetheettdeifeffvefhffelffdtfeeljeenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddrleeinecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegurghvihgusehgihgsshhonhdrughrohhpsggvrghrrdhiugdrrghu
+Received-SPF: pass client-ip=87.98.187.244; envelope-from=groug@kaod.org;
+ helo=10.mo52.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 17:31:52
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,214 +84,149 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Peter Maydell <peter.maydell@linaro.org>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- "open list:All patches CC here" <qemu-devel@nongnu.org>
+ Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
+ "Daniel P. Berrange" <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
+ qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/25/20 2:14 PM, John Wang wrote:
-> Largely inspired by the TMP421 temperature sensor, here is a model for
-> the EMC1413/EMC1414 temperature sensors.
+On Fri, 23 Oct 2020 21:19:19 +0200
+Igor Mammedov <imammedo@redhat.com> wrote:
+
+> On Mon, 19 Oct 2020 10:48:04 +0200
+> Greg Kurz <groug@kaod.org> wrote:
 > 
-> Specs can be found here :
->    http://ww1.microchip.com/downloads/en/DeviceDoc/20005274A.pdf
+> > pc_dimm_plug() doesn't use it. It only aborts on error.
+> > 
+> > Drop @errp and adapt the callers accordingly.
+> > 
+> > Signed-off-by: Greg Kurz <groug@kaod.org>
+> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
 > 
-> Signed-off-by: John Wang <wangzhiqiang.bj@bytedance.com>
-> ---
-> v3:
->    - update the link to the spec
->    - Rename emc1413.c to emc141x.c
->    - Add sensors_count in EMC141XClass
->    - Make emc1413_read/write easier to review :)
-
-Thanks for the update.
-
-> v2:
->    - Remove DeviceInfo
->    - commit message: TMP423 -> TMP421
-> ---
->   hw/arm/Kconfig      |   1 +
->   hw/misc/Kconfig     |   4 +
->   hw/misc/emc141x.c   | 347 ++++++++++++++++++++++++++++++++++++++++++++
->   hw/misc/meson.build |   1 +
->   4 files changed, 353 insertions(+)
->   create mode 100644 hw/misc/emc141x.c
+> arguably the same should be done in spapr.
 > 
-> diff --git a/hw/arm/Kconfig b/hw/arm/Kconfig
-> index 7d040827af..3dd651a236 100644
-> --- a/hw/arm/Kconfig
-> +++ b/hw/arm/Kconfig
-> @@ -403,6 +403,7 @@ config ASPEED_SOC
->       select SSI_M25P80
->       select TMP105
->       select TMP421
-> +    select EMC141X
->       select UNIMP
->   
->   config MPS2
-> diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-> index 3185456110..169d087d3d 100644
-> --- a/hw/misc/Kconfig
-> +++ b/hw/misc/Kconfig
-> @@ -13,6 +13,10 @@ config TMP421
->       bool
->       depends on I2C
->   
-> +config EMC141X
-> +    bool
-> +    depends on I2C
-> +
->   config ISA_DEBUG
->       bool
->       depends on ISA_BUS
-> diff --git a/hw/misc/emc141x.c b/hw/misc/emc141x.c
-> new file mode 100644
-> index 0000000000..a2bce74719
-> --- /dev/null
-> +++ b/hw/misc/emc141x.c
-> @@ -0,0 +1,347 @@
-> +/*
-> + * SMSC EMC141X temperature sensor.
-> + *
-> + * Copyright (c) 2020 Bytedance Corporation
-> + * Written by John Wang <wangzhiqiang.bj@bytedance.com>
-> + *
-> + * This program is free software; you can redistribute it and/or
-> + * modify it under the terms of the GNU General Public License as
-> + * published by the Free Software Foundation; either version 2 or
-> + * (at your option) version 3 of the License.
-> + *
-> + * This program is distributed in the hope that it will be useful,
-> + * but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + * GNU General Public License for more details.
-> + *
-> + * You should have received a copy of the GNU General Public License along
-> + * with this program; if not, see <http://www.gnu.org/licenses/>.
-> + */
-> +
-> +#include "qemu/osdep.h"
-> +#include "hw/i2c/i2c.h"
-> +#include "migration/vmstate.h"
-> +#include "qapi/error.h"
-> +#include "qapi/visitor.h"
-> +#include "qemu/module.h"
-> +#include "qom/object.h"
-> +
-> +#define EMC1413_DEVICE_ID                0x21
-> +#define EMC1414_DEVICE_ID                0x25
-> +#define MANUFACTURER_ID                  0x5d
-> +#define REVISION                         0x04
-> +
-> +#define SENSORS_COUNT_MAX    4
-> +
-> +struct EMC141XState {
-> +    I2CSlave i2c;
 
-The QOM style name is 'parent_obj':
+As explained in another mail, we have to keep spapr_drc_attach()
+at plug time and this can legitimately fail if an unplug operation
+is pending for the device. We certainly prefer to report this as
+an error rather than aborting.
 
-        I2CSlave parent_obj;
+> > ---
+> >  hw/arm/virt.c            |    9 +--------
+> >  hw/i386/pc.c             |    8 +-------
+> >  hw/mem/pc-dimm.c         |    2 +-
+> >  hw/ppc/spapr.c           |    5 +----
+> >  include/hw/mem/pc-dimm.h |    2 +-
+> >  5 files changed, 5 insertions(+), 21 deletions(-)
+> > 
+> > diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+> > index e465a988d683..27dbeb549ef1 100644
+> > --- a/hw/arm/virt.c
+> > +++ b/hw/arm/virt.c
+> > @@ -2261,12 +2261,8 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> >      VirtMachineState *vms = VIRT_MACHINE(hotplug_dev);
+> >      MachineState *ms = MACHINE(hotplug_dev);
+> >      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> > -    Error *local_err = NULL;
+> >  
+> > -    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms), &local_err);
+> > -    if (local_err) {
+> > -        goto out;
+> > -    }
+> > +    pc_dimm_plug(PC_DIMM(dev), MACHINE(vms));
+> >  
+> >      if (is_nvdimm) {
+> >          nvdimm_plug(ms->nvdimms_state);
+> > @@ -2274,9 +2270,6 @@ static void virt_memory_plug(HotplugHandler *hotplug_dev,
+> >  
+> >      hotplug_handler_plug(HOTPLUG_HANDLER(vms->acpi_dev),
+> >                           dev, &error_abort);
+> > -
+> > -out:
+> > -    error_propagate(errp, local_err);
+> >  }
+> >  
+> >  static void virt_machine_device_pre_plug_cb(HotplugHandler *hotplug_dev,
+> > diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+> > index e87be5d29a01..38b1be78e707 100644
+> > --- a/hw/i386/pc.c
+> > +++ b/hw/i386/pc.c
+> > @@ -1265,24 +1265,18 @@ static void pc_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >  static void pc_memory_plug(HotplugHandler *hotplug_dev,
+> >                             DeviceState *dev, Error **errp)
+> >  {
+> > -    Error *local_err = NULL;
+> >      PCMachineState *pcms = PC_MACHINE(hotplug_dev);
+> >      X86MachineState *x86ms = X86_MACHINE(hotplug_dev);
+> >      MachineState *ms = MACHINE(hotplug_dev);
+> >      bool is_nvdimm = object_dynamic_cast(OBJECT(dev), TYPE_NVDIMM);
+> >  
+> > -    pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms), &local_err);
+> > -    if (local_err) {
+> > -        goto out;
+> > -    }
+> > +    pc_dimm_plug(PC_DIMM(dev), MACHINE(pcms));
+> >  
+> >      if (is_nvdimm) {
+> >          nvdimm_plug(ms->nvdimms_state);
+> >      }
+> >  
+> >      hotplug_handler_plug(x86ms->acpi_dev, dev, &error_abort);
+> > -out:
+> > -    error_propagate(errp, local_err);
+> >  }
+> >  
+> >  static void pc_memory_unplug_request(HotplugHandler *hotplug_dev,
+> > diff --git a/hw/mem/pc-dimm.c b/hw/mem/pc-dimm.c
+> > index c30351070bb8..2ffc986734df 100644
+> > --- a/hw/mem/pc-dimm.c
+> > +++ b/hw/mem/pc-dimm.c
+> > @@ -64,7 +64,7 @@ void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
+> >                             errp);
+> >  }
+> >  
+> > -void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp)
+> > +void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine)
+> >  {
+> >      PCDIMMDeviceClass *ddc = PC_DIMM_GET_CLASS(dimm);
+> >      MemoryRegion *vmstate_mr = ddc->get_vmstate_memory_region(dimm,
+> > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> > index ee716a12af73..4edd31b86915 100644
+> > --- a/hw/ppc/spapr.c
+> > +++ b/hw/ppc/spapr.c
+> > @@ -3438,10 +3438,7 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
+> >  
+> >      size = memory_device_get_region_size(MEMORY_DEVICE(dev), &error_abort);
+> >  
+> > -    pc_dimm_plug(dimm, MACHINE(ms), &local_err);
+> > -    if (local_err) {
+> > -        goto out;
+> > -    }
+> > +    pc_dimm_plug(dimm, MACHINE(ms));
+> >  
+> >      if (!is_nvdimm) {
+> >          addr = object_property_get_uint(OBJECT(dimm),
+> > diff --git a/include/hw/mem/pc-dimm.h b/include/hw/mem/pc-dimm.h
+> > index aec9527fdd96..3d3db82641f8 100644
+> > --- a/include/hw/mem/pc-dimm.h
+> > +++ b/include/hw/mem/pc-dimm.h
+> > @@ -72,6 +72,6 @@ struct PCDIMMDeviceClass {
+> >  
+> >  void pc_dimm_pre_plug(PCDIMMDevice *dimm, MachineState *machine,
+> >                        const uint64_t *legacy_align, Error **errp);
+> > -void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine, Error **errp);
+> > +void pc_dimm_plug(PCDIMMDevice *dimm, MachineState *machine);
+> >  void pc_dimm_unplug(PCDIMMDevice *dimm, MachineState *machine);
+> >  #endif
+> > 
+> > 
+> > 
+> 
+> 
 
-> +    uint8_t temperature[SENSORS_COUNT_MAX];
-
-What is the unit?
-
-> +    uint8_t min[SENSORS_COUNT_MAX];
-> +    uint8_t max[SENSORS_COUNT_MAX];
-
-min/max what? Temperature?
-
-What about (if the unit is milli Celsius):
-
-        struct {
-            uint8_t temp_min_mC;
-            uint8_t temp_current_mC;
-            uint8_t temp_max_mC;
-        } sensor[SENSORS_COUNT_MAX];
-
-Looking at the datasheet chapter 6.8 "Temperature Measurement
-Results  and  Data", it isn't in milli Celsius. See below in
-emc141x_get_temperature().
-
-So maybe:
-
-        struct {
-            uint8_t raw_temp_min;
-            uint8_t raw_temp_current;
-            uint8_t raw_temp_max;
-        } sensor[SENSORS_COUNT_MAX];
-
-> +    uint8_t len;
-> +    uint8_t data;
-> +    uint8_t pointer;
-> +};
-> +
-> +struct EMC141XClass {
-> +    I2CSlaveClass parent_class;
-> +    uint8_t model;
-> +    unsigned sensors_count;
-> +};
-> +
-> +#define TYPE_EMC141X "emc141x"
-> +OBJECT_DECLARE_TYPE(EMC141XState, EMC141XClass, EMC141X)
-> +
-> +
-> +/* the EMC141X registers */
-> +#define EMC141X_TEMP_HIGH0               0x00
-> +#define EMC141X_TEMP_HIGH1               0x01
-> +#define EMC141X_TEMP_HIGH2               0x23
-> +#define EMC141X_TEMP_HIGH3               0x2a
-> +#define EMC141X_TEMP_MAX_HIGH0           0x05
-> +#define EMC141X_TEMP_MIN_HIGH0           0x06
-> +#define EMC141X_TEMP_MAX_HIGH1           0x07
-> +#define EMC141X_TEMP_MIN_HIGH1           0x08
-> +#define EMC141X_TEMP_MAX_HIGH2           0x15
-> +#define EMC141X_TEMP_MIN_HIGH2           0x16
-> +#define EMC141X_TEMP_MAX_HIGH3           0x2c
-> +#define EMC141X_TEMP_MIN_HIGH3           0x2d
-> +#define EMC141X_DEVICE_ID                0xfd
-> +#define EMC141X_MANUFACTURER_ID          0xfe
-> +#define EMC141X_REVISION                 0xff
-> +
-> +static void emc141x_get_temperature(Object *obj, Visitor *v, const char *name,
-> +                                   void *opaque, Error **errp)
-
-Nitpicking, align is off ;)
-
-> +{
-> +    EMC141XState *s = EMC141X(obj);
-> +    EMC141XClass *sc = EMC141X_GET_CLASS(s);
-> +    int64_t value;
-> +    int tempid;
-
-Shouldn't it be unsigned?
-
-> +
-> +    if (sscanf(name, "temperature%d", &tempid) != 1) {
-
-Format doesn't match. Using 'unsigned' is probably easier (%u).
-
-> +        error_setg(errp, "error reading %s: %s", name, g_strerror(errno));
-> +        return;
-> +    }
-> +
-> +    if (tempid >= sc->sensors_count || tempid < 0) {
-> +        error_setg(errp, "error reading %s", name);
-> +        return;
-> +    }
-> +
-> +    value = s->temperature[tempid] * 1000;
-
-This is not what is described in "Table 6.2: Temperature Data Format",
-there is an offset and a step multiplier. Which makes me wonder how
-are you testing this?
-We have very simple tests for the TMP105, see tests/qtest/tmp105-test.c,
-please add a similar test.
-
-> +
-> +    visit_type_int(v, name, &value, errp);
-> +}
-> +
-...
 
