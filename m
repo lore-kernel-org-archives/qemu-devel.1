@@ -2,59 +2,58 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD1B6C388F7
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:12:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC618C388F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:21:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 35362222E8
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:12:57 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 35362222E8
+	by mail.kernel.org (Postfix) with ESMTPS id D6C75222E8
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 11:21:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D6C75222E8
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47822 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWdxI-0006Ad-Ab
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 07:12:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53300)
+	id 1kWe5i-0007xG-0T
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 07:21:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdw4-0005fW-DR
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:11:40 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46028
+ id 1kWe3L-00073n-O3
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:19:11 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46054
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdw2-000735-5u
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:11:40 -0400
+ id 1kWe3K-0007fD-47
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 07:19:11 -0400
 Received: from host86-148-246-80.range86-148.btcentralplus.com
  ([86.148.246.80] helo=[192.168.1.65])
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWdw6-0001hs-6D; Sun, 25 Oct 2020 11:11:45 +0000
+ id 1kWe3C-0001jt-9U; Sun, 25 Oct 2020 11:19:06 +0000
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201021105035.2477784-1-f4bug@amsat.org>
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org, f4bug@amsat.org
-References: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
-Message-ID: <24f4d006-f8b4-4eac-5319-67ad14b182b5@ilande.co.uk>
-Date: Sun, 25 Oct 2020 11:11:33 +0000
+Message-ID: <54a947e4-929c-aaa4-52b0-339827a010b8@ilande.co.uk>
+Date: Sun, 25 Oct 2020 11:18:52 +0000
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
+In-Reply-To: <20201021105035.2477784-1-f4bug@amsat.org>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.246.80
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: Re: [PATCH] sabre: use object_initialize_child() for iommu child
- object
+Subject: Re: [PATCH 0/6] tests/acceptance: Test the Fuloong 2E machine
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -79,100 +78,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Huacai Chen <zltjiangshi@gmail.com>, Thomas Huth <thuth@redhat.com>,
+ "Daniel P . Berrange" <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Cleber Rosa <crosa@redhat.com>,
+ Huacai Chen <chenhc@lemote.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 21/10/2020 12:43, Mark Cave-Ayland wrote:
+On 21/10/2020 11:50, Philippe Mathieu-Daudé wrote:
 
-> Store the child object directly within the sabre object rather than using
-> link properties.
+> This series add tests for the MIPS Fuloong 2E machine.
 > 
-> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> ---
->   hw/pci-host/sabre.c         | 10 ++++------
->   hw/sparc64/sun4u.c          |  8 +-------
->   include/hw/pci-host/sabre.h |  2 +-
->   3 files changed, 6 insertions(+), 14 deletions(-)
+> I have been using these tests for over 1 year now.
+> After recent discussions with Huacai and Mark regarding
+> how to contribute tests for machines using private blob,
+> I think it is time to publish this series, to see how
+> the final part will be discussed, as it tests a blob
+> which Lemote company doesn't publish the sources. The
+> binary is know to work and has been used for various
+> years on real hardware. Its MD5 is also know (I am not
+> using SHA-1 because it has been published with MD5).
 > 
-> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-> index f41a0cc301..aaa93acd6e 100644
-> --- a/hw/pci-host/sabre.c
-> +++ b/hw/pci-host/sabre.c
-> @@ -383,9 +383,10 @@ static void sabre_realize(DeviceState *dev, Error **errp)
->       pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
->   
->       /* IOMMU */
-> +    sysbus_realize(SYS_BUS_DEVICE(&s->iommu), &error_fatal);
->       memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
-> -                    sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
-> -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
-> +                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->iommu), 0), 1);
-> +    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, &s->iommu);
->   
->       /* APB secondary busses */
->       pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
-> @@ -422,10 +423,7 @@ static void sabre_init(Object *obj)
->       s->pci_irq_in = 0ULL;
->   
->       /* IOMMU */
-> -    object_property_add_link(obj, "iommu", TYPE_SUN4U_IOMMU,
-> -                             (Object **) &s->iommu,
-> -                             qdev_prop_allow_set_link_before_realize,
-> -                             0);
-> +    object_initialize_child(obj, "iommu", &s->iommu, TYPE_SUN4U_IOMMU);
->   
->       /* sabre_config */
->       memory_region_init_io(&s->sabre_config, OBJECT(s), &sabre_config_ops, s,
-> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-> index 2f8fc670cf..a33f1eccfd 100644
-> --- a/hw/sparc64/sun4u.c
-> +++ b/hw/sparc64/sun4u.c
-> @@ -562,7 +562,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->       PCIBus *pci_bus, *pci_busA, *pci_busB;
->       PCIDevice *ebus, *pci_dev;
->       SysBusDevice *s;
-> -    DeviceState *iommu, *dev;
-> +    DeviceState *dev;
->       FWCfgState *fw_cfg;
->       NICInfo *nd;
->       MACAddr macaddr;
-> @@ -571,10 +571,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->       /* init CPUs */
->       cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
->   
-> -    /* IOMMU */
-> -    iommu = qdev_new(TYPE_SUN4U_IOMMU);
-> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(iommu), &error_fatal);
-> -
->       /* set up devices */
->       ram_init(0, machine->ram_size);
->   
-> @@ -584,8 +580,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
->       sabre = SABRE(qdev_new(TYPE_SABRE));
->       qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
->       qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
-> -    object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
-> -                             &error_abort);
->       sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
->   
->       /* sabre_config */
-> diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
-> index 01190241bb..05bf741cde 100644
-> --- a/include/hw/pci-host/sabre.h
-> +++ b/include/hw/pci-host/sabre.h
-> @@ -34,7 +34,7 @@ struct SabreState {
->       MemoryRegion pci_mmio;
->       MemoryRegion pci_ioport;
->       uint64_t pci_irq_in;
-> -    IOMMUState *iommu;
-> +    IOMMUState iommu;
->       PCIBridge *bridgeA;
->       PCIBridge *bridgeB;
->       uint32_t pci_control[16];
+> The idea is to be able to share tests without infringing
+> licenses issues.
+> 
+> Please comment :)
+> 
+> Phil.
+> 
+> Philippe Mathieu-Daudé (6):
+>    tests/acceptance: Remove unused import
+>    tests/acceptance: Use .ppm extention for Portable PixMap files
+>    tests/acceptance: Extract tesseract_available() helper in new
+>      namespace
+>    tests/acceptance: Introduce tesseract_ocr() helper
+>    tests/acceptance: Test Linux on the Fuloong 2E machine
+>    tests/acceptance: Test PMON on the Fuloong 2E machine
+> 
+>   MAINTAINERS                                |   1 +
+>   tests/acceptance/machine_m68k_nextcube.py  |  51 ++---------
+>   tests/acceptance/machine_mips_fuloong2e.py | 101 +++++++++++++++++++++
+>   tests/acceptance/tesseract_utils.py        |  46 ++++++++++
+>   4 files changed, 158 insertions(+), 41 deletions(-)
+>   create mode 100644 tests/acceptance/machine_mips_fuloong2e.py
+>   create mode 100644 tests/acceptance/tesseract_utils.py
 
-No further comments (and I'm happier that this is a better solution than having an 
-"optional" link property) so I've applied this to my qemu-sparc branch.
+In general this looks good: certainly I don't see any reason why the tesseract_ocr 
+helper changes shouldn't be merged, since I expect that this is something that will 
+be used more in future.
+
+Looking at the fuloong test it seems that it stops fairly early in the kernel boot: 
+one of the problems that Zoltan's VIA southbridge patches were trying to solve 
+earlier in the year was because of problems with PCI IRQ routing, so it would be nice 
+to include a small OS image that can be used to boot to userspace to ensure that such 
+problems can be detected in future.
 
 
 ATB,
