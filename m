@@ -2,73 +2,72 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FD8C388F7
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 10:15:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D75E6C388F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 10:57:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05BB220936
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 10:15:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05BB220936
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id DB9B220723
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 10:57:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DB9B220723
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50336 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWd3k-0000LT-VD
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 06:15:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44652)
+	id 1kWdiH-0007pA-GV
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 06:57:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50776)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kWd2D-0008AE-Al; Sun, 25 Oct 2020 06:13:57 -0400
-Received: from smtpout1.mo804.mail-out.ovh.net ([79.137.123.220]:59065)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kWdgn-0007MI-5q
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 06:55:53 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:45972
+ helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>)
- id 1kWd2A-00050n-RZ; Sun, 25 Oct 2020 06:13:57 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.109.156.136])
- by mo804.mail-out.ovh.net (Postfix) with ESMTPS id 8E3E96EC7C21;
- Sun, 25 Oct 2020 11:13:43 +0100 (CET)
-Received: from kaod.org (37.59.142.104) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Sun, 25 Oct
- 2020 11:13:42 +0100
-Authentication-Results: garm.ovh; auth=pass
- (GARM-104R0057ec7792b-6544-4a9e-b9c0-81726e8c62c4,
- 5F9C93A9F3AD2D257DE4C2DCE7DBF4E7A6D9743C) smtp.auth=groug@kaod.org
-Date: Sun, 25 Oct 2020 11:13:40 +0100
-From: Greg Kurz <groug@kaod.org>
-To: David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH 0/5] spapr: Error handling fixes and cleanups (round 3)
-Message-ID: <20201025111340.48e2a40c@bahia.lan>
-In-Reply-To: <20201022041142.GG1821515@yekko.fritz.box>
-References: <160309727218.2739814.14722724927730985344.stgit@bahia.lan>
- <20201022041142.GG1821515@yekko.fritz.box>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kWdgf-0002Uu-FD
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 06:55:52 -0400
+Received: from host86-148-246-80.range86-148.btcentralplus.com
+ ([86.148.246.80] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kWdga-0001cC-4h; Sun, 25 Oct 2020 10:55:45 +0000
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201024205100.3623006-1-f4bug@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <8744a7c0-4fb8-65ce-cecf-0013468eeb10@ilande.co.uk>
+Date: Sun, 25 Oct 2020 10:55:30 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/hJGAiGihyLNCxdRq6Cc.Cso";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Originating-IP: [37.59.142.104]
-X-ClientProxiedBy: DAG8EX1.mxp5.local (172.16.2.71) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: ec4d4d28-11b7-400c-b27d-a5be8fb11b55
-X-Ovh-Tracer-Id: 5752785578270890488
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrkeeggddugecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtghisehgtderreertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuieeujeehheeuiefhleetueeiudevgfdutdejveeifffffeegtdekheehledtvdenucffohhmrghinhepghhnuhdrohhrghenucfkpheptddrtddrtddrtddpfeejrdehledrudegvddruddtgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhhouggvpehsmhhtphdqohhuthdphhgvlhhopehmgihplhgrnhehrdhmrghilhdrohhvhhdrnhgvthdpihhnvghtpedtrddtrddtrddtpdhmrghilhhfrhhomhepghhrohhugheskhgrohgurdhorhhgpdhrtghpthhtohepqhgvmhhuqdhpphgtsehnohhnghhnuhdrohhrgh
-Received-SPF: pass client-ip=79.137.123.220; envelope-from=groug@kaod.org;
- helo=smtpout1.mo804.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 06:13:44
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+In-Reply-To: <20201024205100.3623006-1-f4bug@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.148.246.80
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH v3] hw/display/tcx: Allow 64-bit accesses to framebuffer
+ stippler and blitter
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -18
 X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -81,121 +80,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Vladimir
- Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "Daniel P. Berrange" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org,
- qemu-ppc@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Igor Mammedov <imammedo@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Michael Lorenz <macallan@NetBSD.org>,
+ "Michael S . Tsirkin" <mst@redhat.com>, Andreas Gustafsson <gson@gson.org>,
+ 1892540@bugs.launchpad.net, Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>, Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---Sig_/hJGAiGihyLNCxdRq6Cc.Cso
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 24/10/2020 21:51, Philippe Mathieu-Daudé wrote:
 
-On Thu, 22 Oct 2020 15:11:42 +1100
-David Gibson <david@gibson.dropbear.id.au> wrote:
+> The S24/TCX datasheet is listed as "Unable to locate" on [1].
+> 
+> However the NetBSD revision 1.32 of the driver introduced
+> 64-bit accesses to the stippler and blitter [2]. It is safe
+> to assume these memory regions are 64-bit accessible.
+> QEMU implementation is 32-bit, so fill the 'impl' fields.
+> 
+> Michael Lorenz (author of the NetBSD code [2]) provided us with more
+> information in [3]:
+> 
+>> IIRC the real hardware *requires* 64bit accesses for stipple and
+>> blitter operations to work. For stipples you write a 64bit word into
+>> STIP space, the address defines where in the framebuffer you want to
+>> draw, the data contain a 32bit bitmask, foreground colour and a ROP.
+>> BLIT space works similarly, the 64bit word contains an offset were to
+>> read pixels from, and how many you want to copy.
+>>
+>> One more thing since there seems to be some confusion - 64bit accesses
+>> on the framebuffer are fine as well. TCX/S24 is *not* an SBus device,
+>> even though its node says it is.
+>> S24 is a card that plugs into a special slot on the SS5 mainboard,
+>> which is shared with an SBus slot and looks a lot like a horizontal
+>> UPA slot. Both S24 and TCX are accessed through the Micro/TurboSPARC's
+>> AFX bus which is 64bit wide and intended for graphics.
+>> Early FFB docs even mentioned connecting to both AFX and UPA,
+>> no idea if that was ever realized in hardware though.
+> 
+> [1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/FOSSdocs/Home
+> [2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=1.31&r2=1.32
+> [3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg734928.html
+> 
+> Reported-by: Andreas Gustafsson <gson@gson.org>
+> Buglink: https://bugs.launchpad.net/bugs/1892540
+> Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
+> Tested-by: Michael S. Tsirkin <mst@redhat.com>
+> Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+> Tested-by: Andreas Gustafsson <gson@gson.org>
+> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+> ---
+> Since v2:
+> - added Michael's memories
+> - added R-b/T-b tags
+> 
+> Since v1:
+> - added missing uncommitted staged changes... (tcx_blit_ops)
+> ---
+>   hw/display/tcx.c | 18 +++++++++++++++---
+>   1 file changed, 15 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/display/tcx.c b/hw/display/tcx.c
+> index c9d5e45cd1f..878ecc8c506 100644
+> --- a/hw/display/tcx.c
+> +++ b/hw/display/tcx.c
+> @@ -549,20 +549,28 @@ static const MemoryRegionOps tcx_stip_ops = {
+>       .read = tcx_stip_readl,
+>       .write = tcx_stip_writel,
+>       .endianness = DEVICE_NATIVE_ENDIAN,
+> -    .valid = {
+> +    .impl = {
+>           .min_access_size = 4,
+>           .max_access_size = 4,
+>       },
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 8,
+> +    },
+>   };
+>   
+>   static const MemoryRegionOps tcx_rstip_ops = {
+>       .read = tcx_stip_readl,
+>       .write = tcx_rstip_writel,
+>       .endianness = DEVICE_NATIVE_ENDIAN,
+> -    .valid = {
+> +    .impl = {
+>           .min_access_size = 4,
+>           .max_access_size = 4,
+>       },
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 8,
+> +    },
+>   };
+>   
+>   static uint64_t tcx_blit_readl(void *opaque, hwaddr addr,
+> @@ -651,10 +659,14 @@ static const MemoryRegionOps tcx_rblit_ops = {
+>       .read = tcx_blit_readl,
+>       .write = tcx_rblit_writel,
+>       .endianness = DEVICE_NATIVE_ENDIAN,
+> -    .valid = {
+> +    .impl = {
+>           .min_access_size = 4,
+>           .max_access_size = 4,
+>       },
+> +    .valid = {
+> +        .min_access_size = 4,
+> +        .max_access_size = 8,
+> +    },
+>   };
+>   
+>   static void tcx_invalidate_cursor_position(TCXState *s)
 
-> On Mon, Oct 19, 2020 at 10:47:52AM +0200, Greg Kurz wrote:
-> > Hi,
-> >=20
-> > This is a followup to a previous cleanup for the sPAPR code:
-> >=20
-> > https://lists.gnu.org/archive/html/qemu-devel/2020-09/msg04860.html
-> >=20
-> > The last two patches had to be dropped because they were wrongly assumi=
-ng
-> > that object_property_get_uint() returning zero meant failure. This led =
-to
-> > a discussion in which arose a consensus that most of the time (not to s=
-ay
-> > always) object property getters should never fail actually, ie. failure
-> > is very likely the result of a programming error and QEMU should abort.
-> >=20
-> > This series aims at demonstrating a revelant case I've found while audi=
-ting
-> > object property getters (this is patch 4 that I've isolated from a huge
-> > 50-patch series I haven't dared to post yet). The sPAPR memory hotplug =
-code
-> > is tailored to support either regular PC DIMMs or NVDIMMs, which inherit
-> > from PC DIMMs. They expect to get some properties from the DIMM object,
-> > which happens to be set by default at the PC DIMM class level. It thus
-> > doesn't make sense to pass an error object and propagate it when getting
-> > them since this would lure the user into thinking they did something wr=
-ong.
-> >=20
-> > Some preliminary cleanup is done on the way, especially dropping an unu=
-sed
-> > @errp argument of pc_dimm_plug(). This affects several platforms other =
-than
-> > sPAPR but I guess the patch is trivial enough to go through David's tree
-> > if it gets acks from the relevant maintainers.
->=20
-> Since this series mostly affects ppc, I've applied it to ppc-for-5.2.
->=20
-> It would be nice to have an acked-by from Igor or Michael for the
-> first patch, though.
->=20
-
-David,
-
-Igor sent a R-b for patches 1 and 4. He also suggested to call
-spapr_drc_attach() at pre-plug time. I'll look into this, so maybe
-you can drop patch 5 from ppc-for-5.2 (or the entire series at
-your convenience).
-
-Cheers,
-
---
-Greg
-
-> >=20
-> > ---
-> >=20
-> > Greg Kurz (5):
-> >       pc-dimm: Drop @errp argument of pc_dimm_plug()
-> >       spapr: Use appropriate getter for PC_DIMM_ADDR_PROP
-> >       spapr: Use appropriate getter for PC_DIMM_SLOT_PROP
-> >       spapr: Pass &error_abort when getting some PC DIMM properties
-> >       spapr: Simplify error handling in spapr_memory_plug()
-> >=20
-> >=20
-> >  hw/arm/virt.c                 |    9 +-------
-> >  hw/i386/pc.c                  |    8 +------
-> >  hw/mem/pc-dimm.c              |    2 +-
-> >  hw/ppc/spapr.c                |   48 +++++++++++++++------------------=
---------
-> >  hw/ppc/spapr_nvdimm.c         |    5 +++-
-> >  include/hw/mem/pc-dimm.h      |    2 +-
-> >  include/hw/ppc/spapr_nvdimm.h |    2 +-
-> >  7 files changed, 25 insertions(+), 51 deletions(-)
-> >=20
->=20
+I'd already queued v2 of this patch (see my earlier email) with the intent to send a 
+PR today, however I'll replace it with this v3 instead.
 
 
---Sig_/hJGAiGihyLNCxdRq6Cc.Cso
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+ATB,
 
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEtIKLr5QxQM7yo0kQcdTV5YIvc9YFAl+VT9UACgkQcdTV5YIv
-c9Yd8A/+JLmBLZJ+6vTgkuguSc2hW21KYilCmaTiU+4LKh2z+PwP7MMkR0r/3+5s
-nrKJbw5WCo/NfSnz4dMf0nR69fO/UvLdd/4jaJN/aMo0mcA0wlTTah8grzBUawdl
-mQkBT2qF0Y7Vi9gGFMO1jIF7kHCdl8qX469po6gcfbo01aGj3wkp2kSediImUBqk
-YfCwfI0lL5hjUdJeOEmvS53QwS7gvinbMcvWCRiPxtG/y5pVOlHbzjzA6Pd5ntlI
-3o5327w+py3IdPmS4+RJW4n5ON5F5lsajX1ODNQELDa1V13qBcUYo15HOSt5aVO3
-dUIRSHtpQGXzrYROG65KULSHsUcjZqJJb01FGj5MW8sLSXQHz2+tcbKrS9igX37X
-+xyViPccFCyPukf0ZiTCb/hTH2qiotWjecrkt1zLmb8jE+eOQz3YNAfVW7eGQ4gi
-sFsj8gA9bMn/c8JDPJjtEGLfuHfK7hPTKJfNmdHvSfWH+ZyTg13BtE3xAiGQ3gEd
-g/gOVVvJvcBis2CFwuWXIGXt9ePdck5oEPtilFykeap7rtN0xb4zXZRKtmO/6sRn
-voG7vDBK+KJ/n6EwvVOaynQuX8VAnjQJ6Rlun7qm5LhEZhLIRFu4WRcetO8mR69d
-9Gkmz2CKX+n9y9Yz/lrCkD6ZLvM1R/D77n1uxfYdMcWo33Vmdro=
-=VgW+
------END PGP SIGNATURE-----
-
---Sig_/hJGAiGihyLNCxdRq6Cc.Cso--
+Mark.
 
