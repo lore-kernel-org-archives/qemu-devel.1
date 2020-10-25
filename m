@@ -2,77 +2,89 @@ Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92150C4363A
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 04:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C176C388F7
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 09:18:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D7EC822202
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 04:28:22 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D7EC822202
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 64B0E22259
+	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 09:18:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hIR0XvfW"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 64B0E22259
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51718 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWXdl-0008Aj-NX
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 00:28:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35334)
+	id 1kWcA7-0001rd-Ft
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 05:18:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kWXdC-0007m3-OK
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 00:27:46 -0400
-Received: from mga02.intel.com ([134.134.136.20]:22074)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <yan.y.zhao@intel.com>)
- id 1kWXd9-0004eg-KA
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 00:27:46 -0400
-IronPort-SDR: S3Vo1dP9y7npgTN3NiK85P0T929Xe5tF315w4UOLOVl3A2GaCxNPyY3zz9xn748UEis2zSromb
- 66vY6fDBx0Ig==
-X-IronPort-AV: E=McAfee;i="6000,8403,9784"; a="154774122"
-X-IronPort-AV: E=Sophos;i="5.77,414,1596524400"; d="scan'208";a="154774122"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
- by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2020 21:27:36 -0700
-IronPort-SDR: 5McXZTnwkCzgxbiTj9UkGLPSe1tw6ljgIqZ6cEU9jP9XKUd6i0ASSpnLoX6pDkeYtP8iI02ksy
- Qdt4X2ypPvZg==
-X-IronPort-AV: E=Sophos;i="5.77,414,1596524400"; d="scan'208";a="534927004"
-Received: from joy-optiplex-7040.sh.intel.com (HELO yzhao56-desk)
- ([10.239.13.16])
- by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 24 Oct 2020 21:27:30 -0700
-Date: Sun, 25 Oct 2020 12:26:11 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Subject: Re: [PATCH v28 03/17] vfio: Add save and load functions for VFIO PCI
- devices
-Message-ID: <20201025042611.GE11827@yzhao56-desk>
-References: <1603449643-12851-1-git-send-email-kwankhede@nvidia.com>
- <1603449643-12851-4-git-send-email-kwankhede@nvidia.com>
- <20201024115327.GA11667@yzhao56-desk>
- <20201024081630.29d3a2bf@x1.home>
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWc9A-0001M3-FT
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 05:17:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34166)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWc94-0002Br-BD
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 05:17:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603617417;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=AHJOPc1oXIKQbA2I+y1s2Qxk3I8wntDRBUafqa9RwQ4=;
+ b=hIR0XvfWJM7cJ9+p0Xksz6si1Oz8JLiFPNcmMRhoJz7s8mEOfmEDzqYZmx67a9RmQvNlk7
+ i+8f9OnfYliAeOK91GfVEa1NmmhsR3V43rZh8RHiOXJz4N35cGT7S+1nokcJs58y2EEqdv
+ uMX/WfqYthxwCKEr16IltwZLl0b17rY=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-325-5vvY5I1qN5K-T6sXV360Dg-1; Sun, 25 Oct 2020 05:16:47 -0400
+X-MC-Unique: 5vvY5I1qN5K-T6sXV360Dg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A3F648030C1;
+ Sun, 25 Oct 2020 09:16:46 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1E80650B44;
+ Sun, 25 Oct 2020 09:16:43 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id 7ECFB113865F; Sun, 25 Oct 2020 10:16:41 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Subject: Re: [PATCH v2 3/6] qapi: Remove wrapper struct for simple unions
+References: <20201023161312.460406-1-kwolf@redhat.com>
+ <20201023161312.460406-4-kwolf@redhat.com>
+Date: Sun, 25 Oct 2020 10:16:41 +0100
+In-Reply-To: <20201023161312.460406-4-kwolf@redhat.com> (Kevin Wolf's message
+ of "Fri, 23 Oct 2020 18:13:09 +0200")
+Message-ID: <87d016fyx2.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201024081630.29d3a2bf@x1.home>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-Received-SPF: pass client-ip=134.134.136.20; envelope-from=yan.y.zhao@intel.com;
- helo=mga02.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 00:27:37
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 05:16:55
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -85,216 +97,965 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, artemp@nvidia.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, dgilbert@redhat.com, changpeng.liu@intel.com,
- eskultet@redhat.com, Ken.Xue@amd.com, jonathan.davies@nutanix.com,
- pbonzini@redhat.com, dnigam@nvidia.com
+Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sat, Oct 24, 2020 at 08:16:30AM -0600, Alex Williamson wrote:
-> On Sat, 24 Oct 2020 19:53:39 +0800
-> Yan Zhao <yan.y.zhao@intel.com> wrote:
-> 
-> > hi
-> > when I migrating VFs, the PCI_COMMAND is not properly saved. and the
-> > target side would meet below bug
-> > root@tester:~# [  189.360671] ++++++++++>> reset starts here: iavf_reset_task !!!
-> > [  199.360798] iavf 0000:00:04.0: Reset never finished (0)
-> > [  199.380504] kernel BUG at drivers/pci/msi.c:352!
-> > [  199.382957] invalid opcode: 0000 [#1] SMP PTI
-> > [  199.384855] CPU: 1 PID: 419 Comm: kworker/1:2 Tainted: G           OE     5.0.0-13-generic #14-Ubuntu
-> > [  199.388204] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.14.0-0-g155821a1990b-prebuilt.qemu.org 04/01/2014
-> > [  199.392401] Workqueue: events iavf_reset_task [iavf]
-> > [  199.393586] RIP: 0010:free_msi_irqs+0x17b/0x1b0
-> > [  199.394659] Code: 84 e1 fe ff ff 45 31 f6 eb 11 41 83 c6 01 44 39 73 14 0f 86 ce fe ff ff 8b 7b 10 44 01 f7 e8 3c 7a ba ff 48 83 78 70 00 74 e0 <0f> 0b 49 8d b5 b0 00 00 00 e8 07 27 bb ff e9 cf fe ff ff 48 8b 78
-> > [  199.399056] RSP: 0018:ffffabd1006cfdb8 EFLAGS: 00010282
-> > [  199.400302] RAX: ffff9e336d8a2800 RBX: ffff9e3333b006c0 RCX: 0000000000000000
-> > [  199.402000] RDX: 0000000000000000 RSI: 0000000000000019 RDI: ffffffffbaa68100
-> > [  199.403168] RBP: ffffabd1006cfde8 R08: ffff9e3375000248 R09: ffff9e3375000338
-> > [  199.404343] R10: 0000000000000000 R11: ffffffffbaa68108 R12: ffff9e3374ef12c0
-> > [  199.405526] R13: ffff9e3374ef1000 R14: 0000000000000000 R15: ffff9e3371f2d018
-> > [  199.406702] FS:  0000000000000000(0000) GS:ffff9e3375b00000(0000) knlGS:0000000000000000
-> > [  199.408027] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [  199.408987] CR2: 00000000ffffffff CR3: 0000000033266000 CR4: 00000000000006e0
-> > [  199.410155] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [  199.411321] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [  199.412437] Call Trace:
-> > [  199.412750]  pci_disable_msix+0xf3/0x120
-> > [  199.413227]  iavf_reset_interrupt_capability.part.40+0x19/0x40 [iavf]
-> > [  199.413998]  iavf_reset_task+0x4b3/0x9d0 [iavf]
-> > [  199.414544]  process_one_work+0x20f/0x410
-> > [  199.415026]  worker_thread+0x34/0x400
-> > [  199.415486]  kthread+0x120/0x140
-> > [  199.415876]  ? process_one_work+0x410/0x410
-> > [  199.416380]  ? __kthread_parkme+0x70/0x70
-> > [  199.416864]  ret_from_fork+0x35/0x40
-> > 
-> > I fixed it with below patch.
-> > 
-> > 
-> > commit ad3efa0eeea7edb352294bfce35b904b8d3c759c
-> > Author: Yan Zhao <yan.y.zhao@intel.com>
-> > Date:   Sat Oct 24 19:45:01 2020 +0800
-> > 
-> >     msix fix.
-> >     
-> >     Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> > 
-> > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > index f63f15b553..92f71bf933 100644
-> > --- a/hw/vfio/pci.c
-> > +++ b/hw/vfio/pci.c
-> > @@ -2423,8 +2423,14 @@ const VMStateDescription vmstate_vfio_pci_config = {
-> >  static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> >  {
-> >      VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> > +    PCIDevice *pdev = &vdev->pdev;
-> > +    uint16_t pci_cmd;
-> > +
-> > +    pci_cmd = pci_default_read_config(pdev, PCI_COMMAND, 2);
-> > +    qemu_put_be16(f, pci_cmd);
-> >  
-> >      vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
-> > +
-> >  }
-> >  
-> >  static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> > @@ -2432,6 +2438,10 @@ static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> >      VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> >      PCIDevice *pdev = &vdev->pdev;
-> >      int ret;
-> > +    uint16_t pci_cmd;
-> > +
-> > +    pci_cmd = qemu_get_be16(f);
-> > +    vfio_pci_write_config(pdev, PCI_COMMAND, pci_cmd, 2);
-> >  
-> >      ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
-> >      if (ret) {
-> > 
-> 
-> 
-> We need to avoid this sort of ad-hoc stuffing random fields into the
-> config stream.  The command register is already migrated in vconfig, it
-> only needs to be written through vfio:
-> 
-> vfio_pci_write_config(pdev, PCI_COMMAND,
-> 		      pci_get_word(pdev->config, PCI_COMMAND), 2);
-> 
-yes, it should work. previously we just rely on qemu to save and load
-the common fields.
+I apologize for writing so much.  It's the only way I know to figure out
+how things work.
 
-Thanks
-Yan
+This may feel like I'm trying to shoot down your patch.  I'm not!  I'm
+merely trying to understand and maybe improve it.  I'd love to get rid
+of implicit wrapper objects, actually.  They complicate things in
+places.  More on that below.
 
-> 
-> 
-> > On Fri, Oct 23, 2020 at 04:10:29PM +0530, Kirti Wankhede wrote:
-> > > Added functions to save and restore PCI device specific data,
-> > > specifically config space of PCI device.
-> > > 
-> > > Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-> > > Reviewed-by: Neo Jia <cjia@nvidia.com>
-> > > ---
-> > >  hw/vfio/pci.c                 | 48 +++++++++++++++++++++++++++++++++++++++++++
-> > >  include/hw/vfio/vfio-common.h |  2 ++
-> > >  2 files changed, 50 insertions(+)
-> > > 
-> > > diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-> > > index bffd5bfe3b78..92cc25a5489f 100644
-> > > --- a/hw/vfio/pci.c
-> > > +++ b/hw/vfio/pci.c
-> > > @@ -41,6 +41,7 @@
-> > >  #include "trace.h"
-> > >  #include "qapi/error.h"
-> > >  #include "migration/blocker.h"
-> > > +#include "migration/qemu-file.h"
-> > >  
-> > >  #define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
-> > >  
-> > > @@ -2401,11 +2402,58 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
-> > >      return OBJECT(vdev);
-> > >  }
-> > >  
-> > > +static bool vfio_msix_present(void *opaque, int version_id)
-> > > +{
-> > > +    PCIDevice *pdev = opaque;
-> > > +
-> > > +    return msix_present(pdev);
-> > > +}
-> > > +
-> > > +const VMStateDescription vmstate_vfio_pci_config = {
-> > > +    .name = "VFIOPCIDevice",
-> > > +    .version_id = 1,
-> > > +    .minimum_version_id = 1,
-> > > +    .fields = (VMStateField[]) {
-> > > +        VMSTATE_PCI_DEVICE(pdev, VFIOPCIDevice),
-> > > +        VMSTATE_MSIX_TEST(pdev, VFIOPCIDevice, vfio_msix_present),
-> > > +        VMSTATE_END_OF_LIST()
-> > > +    }
-> > > +};
-> > > +
-> > > +static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
-> > > +{
-> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> > > +
-> > > +    vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
-> > > +}
-> > > +
-> > > +static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
-> > > +{
-> > > +    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-> > > +    PCIDevice *pdev = &vdev->pdev;
-> > > +    int ret;
-> > > +
-> > > +    ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
-> > > +    if (ret) {
-> > > +        return ret;
-> > > +    }
-> > > +
-> > > +    if (msi_enabled(pdev)) {
-> > > +        vfio_msi_enable(vdev);
-> > > +    } else if (msix_enabled(pdev)) {
-> > > +        vfio_msix_enable(vdev);
-> > > +    }
-> > > +
-> > > +    return ret;
-> > > +}
-> > > +
-> > >  static VFIODeviceOps vfio_pci_ops = {
-> > >      .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-> > >      .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-> > >      .vfio_eoi = vfio_intx_eoi,
-> > >      .vfio_get_object = vfio_pci_get_object,
-> > > +    .vfio_save_config = vfio_pci_save_config,
-> > > +    .vfio_load_config = vfio_pci_load_config,
-> > >  };
-> > >  
-> > >  int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-> > > diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-> > > index fe99c36a693a..ba6169cd926e 100644
-> > > --- a/include/hw/vfio/vfio-common.h
-> > > +++ b/include/hw/vfio/vfio-common.h
-> > > @@ -120,6 +120,8 @@ struct VFIODeviceOps {
-> > >      int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-> > >      void (*vfio_eoi)(VFIODevice *vdev);
-> > >      Object *(*vfio_get_object)(VFIODevice *vdev);
-> > > +    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
-> > > +    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
-> > >  };
-> > >  
-> > >  typedef struct VFIOGroup {
-> > > -- 
-> > > 2.7.0
-> > >   
-> > 
-> 
+Kevin Wolf <kwolf@redhat.com> writes:
+
+> Variants of simple unions are always contained in a wrapper object
+> called 'data' that serves no real use.
+
+Not quite.
+
+Two aspects: on the wire, and in C.  Which aspect this patch is about is
+not clear to me at this point.
+
+1. One the wire
+
+qapi-code-gen.txt documents:
+
+    A simple union can always be re-written as a flat union where the base
+    class has a single member named 'type', and where each branch of the
+    union has a struct with a single member named 'data'.  That is,
+
+     { 'union': 'Simple', 'data': { 'one': 'str', 'two': 'int' } }
+
+    is identical on the wire to:
+
+     { 'enum': 'Enum', 'data': ['one', 'two'] }
+     { 'struct': 'Branch1', 'data': { 'data': 'str' } }
+     { 'struct': 'Branch2', 'data': { 'data': 'int' } }
+     { 'union': 'Flat', 'base': { 'type': 'Enum' }, 'discriminator': 'type',
+       'data': { 'one': 'Branch1', 'two': 'Branch2' } }
+
+Actual wire format:
+
+    { "type": "one", "data": "some-string" }
+    { "type": "two", "data": 1 }
+
+"data" does serve a use here.
+
+If we change the second branch from 'int' to some complex type, say
+
+    { 'struct': 'Object', 'data': { 'x': 'int', 'y': 'int' } }
+    { 'union': 'Simple', 'data': { 'one': 'str', 'two': 'Object' } }
+
+    { 'struct': 'Branch2', 'data': { 'data': 'Object' } }
+
+we get
+
+    { "type": "one", "data": "some-string" }
+    { "type": "two", "data": { "x": 1, "y": 2 } }
+
+where the "data" wrapper is indeed pointless for branch "two".  We can
+get rid of it by replacing the equivalent flat union by
+
+    { 'union': 'Flatter', 'base': { 'type': 'Enum' }, 'discriminator': 'type',
+      'data': { 'one': 'Branch1', 'two': 'Object' } }
+
+to get
+
+    { "type": "one", "data": "some-string" }
+    { "type": "two", "x": 1, "y": 2 }
+
+2. In C
+
+The C types generated for the simple union and its corresponding flat
+union are structurally equivalent (qapi-code-gen.txt doesn't document
+this, maybe it should):
+
+    typedef enum SimpleKind {
+        SIMPLE_KIND_ONE,
+        SIMPLE_KIND_TWO,
+        SIMPLE_KIND__MAX,
+    } SimpleKind;
+
+    struct q_obj_str_wrapper {
+        char *data;
+    };
+
+    struct q_obj_Object_wrapper {
+        Object *data;
+    };
+
+    struct Simple {
+        SimpleKind type;
+        union { /* union tag is @type */
+            q_obj_str_wrapper one;
+            q_obj_Object_wrapper two;
+        } u;
+    };
+
+and
+
+    typedef enum Enum {
+        ENUM_ONE,
+        ENUM_TWO,
+        ENUM__MAX,
+    } Enum;
+
+    struct Branch1 {
+        char *data;
+    };
+
+    struct Branch2 {
+        Object *data;
+    };
+
+    struct Flat {
+        Enum type;
+        union { /* union tag is @type */
+            Branch1 one;
+            Branch2 two;
+        } u;
+    };
+
+Here, the wrapper is pointless for both branches.
+
+For the "flatter" flat union, we get
+
+    struct Flatter {
+        Enum type;
+        union { /* union tag is @type */
+            Branch1 one;
+            Object two;
+        } u;
+    };
+
+One of two pointless wrappers are gone.
+
+>                                        When mapping a QAPI object to the
+> command line, this becomes very visible to users because they have to
+> add one or more useless 'data.' to many option names.
+
+It's useless in QMP, too.
+
+> As a first step towards avoiding this painful CLI experience,
+
+It's painful in CLI when you use dotted keys syntax, because that syntax
+makes nesting painful.
+
+I dislike pointless nesting even when the syntax makes it almost not
+painful, like in QMP.
+
+>                                                               this gets
+> rid of the 'data' indirection internally: The QAPI parser doesn't use a
+> wrapper object as the variant type any more, so the indirection is
+> removed from the generated C types. As a result, the C type looks the
+> same for flat and simple unions now.
+
+Really?
+
+For the simple union we now generate
+
+    struct Simple {
+        SimpleKind type;
+        union { /* union tag is @type */
+            char *one;
+            Object two;
+        } u;
+    };
+
+Same as what flat union?
+
+Certainly not 'Flatter', which has branch 'one' wrapped in a struct.
+
+The naive attempt to not wrap it
+
+    { 'union': 'Flattest',
+      'base': { 'type': 'Enum' }, 'discriminator': 'type',
+      'data': { 'one': 'str', 'two': 'Object' } }
+
+is invalid, because "All flat union branches must be of struct type"
+(qapi-code-gen.txt).  qapi-gen.py duly rejects it with "branch 'one'
+cannot use built-in type 'str'".  Remember, flat unions "splice in" the
+variant members on the wire.  There have to be members for that.
+
+>                                      A large part of this patch is
+> mechanical conversion of C code to remove the 'data' indirection.
+
+How did you do the conversion?  Coccinelle?  Regexps?  Manual until
+compiler is happy?
+
+> Conceptually, the important change is that variants can now have flat
+> and wrapped representations. For a transitioning period, we'll allow
+> variants to support both representations in a later patch.
+
+Alright, now I'm confused.
+
+What exactly is a "flat representation", and when is it used?
+
+What's a "wrapped representation", and when is it used?
+
+Are you talking about the internal representation,
+i.e. QAPISchemaVariant?
+
+>                                                            Eventually,
+> the plan is to deprecate and remove wrapped representations entirely,
+> unifying simple and flat unions.
+>
+> The externally visible interfaces stay unchanged: Visitors still expect
+> the 'data' wrappers, and introspection still shows it.
+
+Visitors are externally visible only indirectly: the QObject visitors
+determine the wire format.  But that's detail.  Perhaps:
+
+    The wire format remains the same.  The 'data' wrappers are still
+    there, and introspection and documentation still show them.  This
+    necessitates new special cases in visit.py, introspect.py, and
+    qapidoc.py.
+
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> ---
+>  docs/devel/qapi-code-gen.txt           | 32 ++++++++----
+>  docs/sphinx/qapidoc.py                 | 14 +++---
+>  backends/tpm/tpm_emulator.c            |  3 +-
+>  backends/tpm/tpm_passthrough.c         |  4 +-
+>  block/crypto.c                         |  3 +-
+>  block/qcow2.c                          |  9 ++--
+>  block/vmdk.c                           | 14 ++----
+>  blockdev.c                             | 36 ++++++-------
+>  chardev/char-file.c                    |  5 +-
+>  chardev/char-mux.c                     |  5 +-
+>  chardev/char-parallel.c                |  5 +-
+>  chardev/char-pipe.c                    |  7 ++-
+>  chardev/char-ringbuf.c                 |  5 +-
+>  chardev/char-serial.c                  |  5 +-
+>  chardev/char-socket.c                  | 13 ++---
+>  chardev/char-stdio.c                   |  5 +-
+>  chardev/char-udp.c                     | 11 ++--
+>  chardev/char.c                         | 10 ++--
+>  chardev/msmouse.c                      |  4 +-
+>  chardev/spice.c                        | 10 ++--
+>  chardev/wctablet.c                     |  4 +-
+>  hw/core/numa.c                         |  6 +--
+>  hw/display/xenfb.c                     |  8 +--
+>  hw/input/hid.c                         |  8 +--
+>  hw/input/ps2.c                         |  6 +--
+>  hw/input/virtio-input-hid.c            |  8 +--
+>  hw/mem/pc-dimm.c                       | 18 +++----
+>  hw/virtio/virtio-mem-pci.c             |  3 +-
+>  hw/virtio/virtio-pmem-pci.c            |  3 +-
+>  monitor/hmp-cmds.c                     | 14 +++---
+>  qemu-keymap.c                          |  2 +-
+>  replay/replay-input.c                  | 46 +++++++----------
+>  tests/test-char.c                      | 12 ++---
+>  tests/test-clone-visitor.c             | 14 +++---
+>  tests/test-qmp-cmds.c                  |  2 +-
+>  tests/test-qobject-input-visitor.c     | 24 ++++-----
+>  tests/test-qobject-output-visitor.c    | 24 ++++-----
+>  ui/console.c                           |  5 +-
+>  ui/input-keymap.c                      | 12 ++---
+>  ui/input-legacy.c                      | 12 ++---
+>  ui/input.c                             | 43 ++++++++--------
+>  ui/spice-app.c                         |  5 +-
+>  util/qemu-sockets.c                    |  8 +--
+>  scripts/qapi/introspect.py             |  7 ++-
+>  scripts/qapi/schema.py                 | 48 ++++++++++++++----
+>  scripts/qapi/visit.py                  | 28 +++++++++++
+>  tests/qapi-schema/doc-good.out         |  8 +--
+>  tests/qapi-schema/qapi-schema-test.out | 70 +++++++-------------------
+>  48 files changed, 322 insertions(+), 326 deletions(-)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index c6438c6aa9..9722c1a204 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -310,7 +310,20 @@ The BRANCH's STRING name is the branch name.
+>  The BRANCH's value defines the branch's properties, in particular its
+>  type.  The form TYPE-REF is shorthand for { 'type': TYPE-REF }.
+>  
+> -A simple union type defines a mapping from automatic discriminator
+> +Each branch can have flat or wrapped representation in the Client JSON
+> +Protocol.
+> +
+> +Wrapped representation of a branch means that it is represented by a
+> +'data' member that is of the specified data type corresponding to the
+> +discriminator value.
+> +
+> +Flat representation means that the union forms a single object that
+> +contains both common members (from the base type) and the selected
+> +branch's members, without any additional nesting.  The two sets of
+> +member names must be disjoint.
+
+You talk about representation of branches before saying anything about
+representation of unions.  But let's focus on the contents now.  How to
+best present it can wait.
+
+> +
+> +A simple union type automatically contains the 'type' member as a
+> +discriminator and defines a mapping from automatic discriminator
+>  values to data types like in this example:
+>  
+>   { 'struct': 'BlockdevOptionsFile', 'data': { 'filename': 'str' } }
+> @@ -321,10 +334,8 @@ values to data types like in this example:
+>     'data': { 'file': 'BlockdevOptionsFile',
+>               'qcow2': 'BlockdevOptionsQcow2' } }
+>  
+> -In the Client JSON Protocol, a simple union is represented by an
+> -object that contains the 'type' member as a discriminator, and a
+> -'data' member that is of the specified data type corresponding to the
+> -discriminator value, as in these examples:
+> +In the Client JSON Protocol, all simple union branches have wrapped
+> +representation, as in these examples:
+>  
+>   { "type": "file", "data": { "filename": "/some/place/my-image" } }
+>   { "type": "qcow2", "data": { "backing": "/some/place/my-image",
+> @@ -344,13 +355,12 @@ object, it defines common members just like a struct type's 'data'
+>  member defines struct type members.  If it is a STRING, it names a
+>  struct type whose members are the common members.
+>  
+> -All flat union branches must be of struct type.
+> +Member 'discriminator' must name a non-optional enum-typed member of
+> +the base struct and defines the option that should server as the
+> +discrimiator.
+
+s/server as the discrimiator/serve as discriminator/
+
+>  
+> -In the Client JSON Protocol, a flat union is represented by an object
+> -with the common members (from the base type) and the selected branch's
+> -members.  The two sets of member names must be disjoint.  Member
+> -'discriminator' must name a non-optional enum-typed member of the base
+> -struct.
+> +All flat union branches must be of struct type.  They have always flat
+> +representation.
+
+So, simple unions use wrapped representation, flat unions use flat
+representation, but I have to read the whole section at least twice to
+figure that out :)  Let's not worry about that now.
+
+>  
+>  The following example enhances the above simple union example by
+>  adding an optional common member 'read-only', renaming the
+> diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
+> index e03abcbb95..75f6721e29 100644
+> --- a/docs/sphinx/qapidoc.py
+> +++ b/docs/sphinx/qapidoc.py
+
+Best to review the changes to the QAPI generator from frontend to
+backends: schema.py first, then come back here.
+
+> @@ -183,12 +183,14 @@ class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
+>  
+>          if variants:
+>              for v in variants.variants:
+> -                if v.type.is_implicit():
+> -                    assert not v.type.base and not v.type.variants
+> -                    for m in v.type.local_members:
+> -                        term = self._nodes_for_one_member(m)
+> -                        term.extend(self._nodes_for_variant_when(variants, v))
+> -                        dlnode += self._make_dlitem(term, None)
+> +                if v.wrapped:
+> +                    term = [nodes.literal('', 'data'),
+> +                            nodes.Text(': '),
+> +                            nodes.literal('', v.type.doc_type())]
+> +                    term.extend(self._nodes_for_variant_when(variants, v))
+> +                    dlnode += self._make_dlitem(term, None)
+> +                elif v.type.is_implicit():
+> +                    assert v.type.name == 'q_empty'
+>                  else:
+>                      term = [nodes.Text('The members of '),
+>                              nodes.literal('', v.type.doc_type())]
+[...]
+> diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+> index fafec94e02..1c4e3407a3 100644
+> --- a/scripts/qapi/introspect.py
+> +++ b/scripts/qapi/introspect.py
+> @@ -188,7 +188,12 @@ const QLitObject %(c_name)s = %(c_string)s;
+>                  'variants': [self._gen_variant(v) for v in variants]}
+>  
+>      def _gen_variant(self, variant):
+> -        obj = {'case': variant.name, 'type': self._use_type(variant.type)}
+> +        if variant.wrapped:
+> +            obj = {'case': variant.name,
+> +                   'type': self._use_type(variant.wrapper_type)}
+> +        else:
+> +            obj = {'case': variant.name,
+> +                   'type': self._use_type(variant.type)}
+>          return _make_tree(obj, variant.ifcond, None)
+>  
+>      def visit_builtin_type(self, name, info, json_type):
+> diff --git a/scripts/qapi/schema.py b/scripts/qapi/schema.py
+> index 720449feee..17525b4216 100644
+> --- a/scripts/qapi/schema.py
+> +++ b/scripts/qapi/schema.py
+> @@ -216,6 +216,11 @@ class QAPISchemaBuiltinType(QAPISchemaType):
+>          self._json_type_name = json_type
+>          self._c_type_name = c_type
+>  
+> +    def check(self, schema):
+> +        # Don't check twice, it would fail an assertion
+> +        if not self._checked:
+> +            super().check(schema)
+> +
+
+How can this get called twice?
+
+I'm asking because I remember the last time I cleaned up .check()
+recursion (commit f9d1743b9b0).  Just glancing at its commit message
+brings back the headache.
+
+>      def c_name(self):
+>          return self.name
+>  
+
+Further down in QAPISchemaObjectType:
+
+       @property
+       def ifcond(self):
+           assert self._checked
+           if isinstance(self._ifcond, QAPISchemaType):
+               # Simple union wrapper type inherits from wrapped type;
+               # see _make_implicit_object_type()
+               return self._ifcond.ifcond
+           return self._ifcond
+
+Is isinstance(self._ifcond, QAPISchemaType) still possible?  See
+_make_implicit_object_type() below.
+
+> @@ -593,18 +598,21 @@ class QAPISchemaVariants:
+           if self._tag_name:    # flat union
+               # branches that are not explicitly covered get an empty type
+               cases = {v.name for v in self.variants}
+               for m in self.tag_member.type.members:
+                   if m.name not in cases:
+                       v = QAPISchemaVariant(m.name, self.info,
+                                             'q_empty', m.ifcond)
+
+Note for later: the code to create a default empty variant stays the
+same.
+
+                       v.set_defined_in(self.tag_member.defined_in)
+                       self.variants.append(v)
+           [...]
+           for v in self.variants:
+               v.check(schema)
+               # Union names must match enum values; alternate names are
+               # checked separately. Use 'seen' to tell the two apart.
+               if seen:
+                   if v.name not in self.tag_member.type.member_names():
+                       raise QAPISemError(
+                           self.info,
+>                          "branch '%s' is not a value of %s"
+>                          % (v.name, self.tag_member.type.describe()))
+>                  if (not isinstance(v.type, QAPISchemaObjectType)
+> -                        or v.type.variants):
+> +                        or v.type.variants) and v.flat:
+>                      raise QAPISemError(
+>                          self.info,
+>                          "%s cannot use %s"
+>                          % (v.describe(self.info), v.type.describe()))
+
+Before the patch: check branch type is an object without variants.  For
+flat unions, this is documented in qapi-code-gen.txt: "All flat union
+branches must be of struct type".  For simple unions, the wrapper types
+spliced in by the desugaring ensure this can't fail.
+
+What the hunk does: permit arbitrary branch types when not v.flat.  To
+make sense of it, we need to understand the meaning of v.flat.  See
+below.
+
+> -                v.type.check(schema)
+> +                if isinstance(v.type, QAPISchemaObjectType):
+> +                    v.type.check(schema)
+
+Since we want to recurse only for object types (see commit f9d1743b9b0),
+and other types are now possible when not v.flat, the recursion now
+needs to be guarded.  Okay.
+
+>  
+>      def check_clash(self, info, seen):
+>          for v in self.variants:
+>              # Reset seen map for each variant, since qapi names from one
+> -            # branch do not affect another branch
+> -            v.type.check_clash(info, dict(seen))
+> +            # branch do not affect another branch.  Variants that are
+> +            # never flat don't even conflict with the base.
+
+What do you mean by "never flat"?  Could a variant be sometimes flat?
+
+> +            if isinstance(v.type, QAPISchemaObjectType):
+> +                v.type.check_clash(info, dict(seen) if v.flat else {})
+
+The guard is necessary because v.type has method .check_clash() only if
+it's an object type.
+
+.check() ensures that v.type is an object type without variants when
+v.flat.
+
+So:
+
+* If v.flat, no change.
+
+* If not v.flat and v.type is an object type (possibly with variants),
+  we run its .check_clash() with an empty seen.  What does this
+  accomplish?
+
+* If not v.flat and v.type is not an object type, we do nothing.
+
+>  
+>  
+>  class QAPISchemaMember:
+> @@ -705,9 +713,22 @@ class QAPISchemaObjectTypeMember(QAPISchemaMember):
+>  class QAPISchemaVariant(QAPISchemaObjectTypeMember):
+>      role = 'branch'
+>  
+> -    def __init__(self, name, info, typ, ifcond=None):
+> +    def __init__(self, name, info, typ, ifcond=None, flat=True,
+> +                 wrapper_type=None):
+>          super().__init__(name, info, typ, False, ifcond)
+>  
+> +        self.flat = flat
+> +        self.wrapped = bool(wrapper_type)
+> +        self.wrapper_type = wrapper_type
+> +
+> +        # For now, unions are either flat or wrapped, never both
+> +        assert self.flat or self.wrapped
+> +        assert not (self.flat and self.wrapped)
+
+The comment makes me expect
+
+           assert self.flat == not self.wrapped
+
+Moreover, .flat and .wrapped seem to be redundant with .wrapper_type.
+
+Hmm, I see the next patch will change this again.  I'm therefore
+reserving judgement until the end of the series.
+
+The constructor is called in three places:
+
+* QAPISchema._make_variant(), call unchanged (see below), therefore flat
+
+* QAPISchema._make_simple_variant(), now passes flat=False, see below
+  for details
+
+* QAPISchemaVariants.check(), call unchanged (see below), therefore flat
+
+> +
+> +    def check(self, schema):
+> +        super().check(schema)
+> +        if self.wrapped:
+> +            self.wrapper_type.check(schema)
+
+Commit f9d1743b9b0: "An entity's .check() recurses into another entity's
+.check() only if the C struct generated for the former contains the C
+struct generated for the latter (pointers don't count).  This is used to
+detect "object contains itself".
+
+Can you explain why we want to recurse here?
+
+>  
+
+pycodestyle-3 complains:
+
+    scripts/qapi/schema.py:733:1: E302 expected 2 blank lines, found 1
+
+>  class QAPISchemaCommand(QAPISchemaEntity):
+>      meta = 'command'
+> @@ -1017,14 +1038,19 @@ class QAPISchema:
+
+Not changed:
+
+       def _make_implicit_object_type(self, name, info, ifcond, role, members):
+           if not members:
+               return None
+           # See also QAPISchemaObjectTypeMember.describe()
+           name = 'q_obj_%s-%s' % (name, role)
+           typ = self.lookup_entity(name, QAPISchemaObjectType)
+           if typ:
+               # The implicit object type has multiple users.  This can
+               # happen only for simple unions' implicit wrapper types.
+               # Its ifcond should be the disjunction of its user's
+               # ifconds.  Not implemented.  Instead, we always pass the
+               # wrapped type's ifcond, which is trivially the same for all
+               # users.  It's also necessary for the wrapper to compile.
+               # But it's not tight: the disjunction need not imply it.  We
+               # may end up compiling useless wrapper types.
+               # TODO kill simple unions or implement the disjunction
+
+               # pylint: disable=protected-access
+               assert (ifcond or []) == typ._ifcond
+           else:
+               self._def_entity(QAPISchemaObjectType(
+                   name, info, None, ifcond, None, None, members, None))
+           return name
+
+Can typ still be non-None?
+
+[...]
+>      def _make_variant(self, case, typ, ifcond, info):
+>          return QAPISchemaVariant(case, info, typ, ifcond)
+>  
+> -    def _make_simple_variant(self, case, typ, ifcond, info):
+> +    def _make_simple_variant(self, union_name, case, typ, ifcond, info):
+>          if isinstance(typ, list):
+>              assert len(typ) == 1
+>              typ = self._make_array_type(typ[0], info)
+> -        typ = self._make_implicit_object_type(
+> -            typ, info, self.lookup_type(typ),
+> -            'wrapper', [self._make_member('data', typ, None, None, info)])
+> -        return QAPISchemaVariant(case, info, typ, ifcond)
+> +
+> +        # The wrapper type is only used for introspection compatibility.
+> +        # Don't add it to the entity list of the schema.
+> +        wrapper_name = 'q_obj_%s-%s-wrapper' % (union_name, case)
+> +        wrapper_member = self._make_member('data', typ, None, None, info)
+> +        wrapper_type = QAPISchemaObjectType(wrapper_name, info, None, ifcond,
+> +                                            None, None, [wrapper_member], None)
+
+This adds another place where we create implicit object types.  Comments
+need to be updated, e.g. in QAPISchemaObjectType.is_implicit().
+
+> +        return QAPISchemaVariant(case, info, typ, ifcond, flat=False,
+> +                                 wrapper_type=wrapper_type)
+
+This changes argument @typ from wrapper to wrapped type.  The wrapper is
+passed as @wrapped_type instead.
+
+It's not the same wrapper, though.
+
+Before the patch, we have a common q_obj_<wrapped-type>-wrapper.
+_make_implicit_object_type() creates it unless it exists already.
+
+After the patch, we have q_obj_<union-type>-<branch-name>-wrapper.  The
+wrapper de-duplication is gone.  _make_implicit_object_type() is
+bypassed.
+
+But is this bypass necessary?  I suspect it's to not "add it to the
+entity list of the schema".  Why not?
+
+If the loss of de-duplication is intentional, the commit message should
+mention it.
+
+>  
+>      def _def_union_type(self, expr, info, doc):
+>          name = expr['union']
+> @@ -1044,7 +1070,7 @@ class QAPISchema:
+>                          for (key, value) in data.items()]
+>              members = []
+>          else:
+> -            variants = [self._make_simple_variant(key, value['type'],
+> +            variants = [self._make_simple_variant(name, key, value['type'],
+>                                                    value.get('if'), info)
+>                          for (key, value) in data.items()]
+>              enum = [{'name': v.name, 'if': v.ifcond} for v in variants]
+> diff --git a/scripts/qapi/visit.py b/scripts/qapi/visit.py
+> index 339f152152..f72567cbcc 100644
+> --- a/scripts/qapi/visit.py
+> +++ b/scripts/qapi/visit.py
+> @@ -118,6 +118,34 @@ bool visit_type_%(c_name)s_members(Visitor *v, %(c_name)s *obj, Error **errp)
+           for var in variants.variants:
+               case_str = c_enum_const(tag_member.type.name, var.name,
+                                       tag_member.type.prefix)
+               ret += gen_if(var.ifcond)
+
+Before the patch, special case 'q_empty' (which has no visitor), general
+case object type.
+
+The patch adds two more cases.
+
+
+This is special case 'q_empty':
+
+               if var.type.name == 'q_empty':
+                   # valid variant and nothing to do
+                   ret += mcgen('''
+       case %(case)s:
+>          break;
+>  ''',
+>                               case=case_str)
+
+
+New case "not an object type":
+
+> +            elif not isinstance(var.type, QAPISchemaObjectType):
+> +                assert not var.flat
+> +                ret += mcgen('''
+> +    case %(case)s:
+> +        return visit_type_%(c_type)s(v, "data", &obj->u.%(c_name)s, errp);
+> +''',
+> +                             case=case_str,
+> +                             c_type=var.type.c_name(), c_name=c_name(var.name))
+
+Before the patch, we visit the implicit wrapper, using the general case
+below, i.e.
+
+           return visit_type_q_obj_T_wrapper_members(v, &obj->u.BRANCH, errp);
+
+visit_type_q_obj_T_members() looks like this:
+
+       bool visit_type_q_obj_T_wrapper_members(Visitor *v, q_obj_T_wrapper *obj, Error **errp)
+       {
+           if (!visit_type_T(v, "data", &obj->data, errp)) {
+               return false;
+           }
+           return true;
+       }
+
+The new code calls visit_type_T() directly.  The only change (I think /
+hope) is from &obj->u.BASE->data to &obj->u.BASE, which is what we want.
+
+
+New case "wrapped object type":
+
+> +            elif var.wrapped:
+> +                ret += mcgen('''
+> +    case %(case)s:
+> +    {
+> +        bool ok;
+> +
+> +        if (!visit_start_struct(v, "data", NULL, 0, errp)) {
+> +            return false;
+> +        }
+> +        ok = visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, errp);
+> +        if (ok) {
+> +            ok = visit_check_struct(v, errp);
+> +        }
+> +        visit_end_struct(v, NULL);
+> +        return ok;
+> +    }
+> +''',
+> +                             case=case_str,
+> +                             c_type=var.type.c_name(), c_name=c_name(var.name))
+> +
+>              else:
+>                  ret += mcgen('''
+
+To compensate for the implicit wrapper type's removal from the C type,
+we splice in a virtual struct visit.
+
+Before the patch, we visit the implicit wrapper, using the general case
+below, i.e.
+
+           return visit_type_q_obj_T_wrapper_members(v, &obj->u.BRANCH, errp);
+
+visit_type_q_obj_T_members() looks like this:
+
+       bool visit_type_q_obj_T_wrapper_members(Visitor *v, q_obj_T_wrapper *obj, Error **errp)
+       {
+           if (!visit_type_T(v, "data", &obj->data, errp)) {
+               return false;
+           }
+           return true;
+       }
+
+When T is an object type, visit_type_T() looks like this:
+
+       bool visit_type_T(Visitor *v, const char *name,
+                        T **obj, Error **errp)
+       {
+           bool ok = false;
+
+           if (!visit_start_struct(v, name, (void **)obj, sizeof(T), errp)) {
+               return false;
+           }
+           if (!*obj) {
+               /* incomplete */
+               assert(visit_is_dealloc(v));
+               ok = true;
+               goto out_obj;
+           }
+           if (!visit_type_T_members(v, *obj, errp)) {
+               goto out_obj;
+           }
+           ok = visit_check_struct(v, errp);
+       out_obj:
+           visit_end_struct(v, (void **)obj);
+           if (!ok && visit_is_input(v)) {
+               qapi_free_T(*obj);
+               *obj = NULL;
+           }
+           return ok;
+       }
+
+Compare to the new code:
+
+1. The new code passes NULL to visit_start_struct() and
+   visit_end_struct(), i.e. the visit of "data" becomes virtual.
+
+2. The new code passes &obj->u.BRANCH instead of &obj->u.BRANCH->data.
+
+3. The new code doesn't have the /* incomplete */ conditional.
+
+4. The new code doesn't have the conditional qapi_free_T().
+
+The first two compensate for the wrapper type's removal from the C type.
+
+Why are the last two not needed?
+
+
+Case "unwrapped object type" (same as old general case):
+
+>      case %(case)s:
+           return visit_type_%(c_type)s_members(v, &obj->u.%(c_name)s, errp);
+   ''',
+                                case=case_str,
+                                c_type=var.type.c_name(), c_name=c_name(var.name))
+
+               ret += gen_endif(var.ifcond)
+           ret += mcgen('''
+       default:
+           abort();
+       }
+   ''')
+
+Now I should go back to qapidoc.py and introspect.py.  But I think we
+have enough to discuss about this patch already, so I'm postponing their
+review, and move on the the next patch.
+
+> diff --git a/tests/qapi-schema/doc-good.out b/tests/qapi-schema/doc-good.out
+> index 419284dae2..bcbcbd2fce 100644
+> --- a/tests/qapi-schema/doc-good.out
+> +++ b/tests/qapi-schema/doc-good.out
+> @@ -31,10 +31,6 @@ object Object
+>      case two: Variant2
+>          if ['IFTWO']
+>      feature union-feat1
+> -object q_obj_Variant1-wrapper
+> -    member data: Variant1 optional=False
+> -object q_obj_Variant2-wrapper
+> -    member data: Variant2 optional=False
+>  enum SugaredUnionKind
+>      member one
+>      member two
+> @@ -42,8 +38,8 @@ enum SugaredUnionKind
+>  object SugaredUnion
+>      member type: SugaredUnionKind optional=False
+>      tag type
+> -    case one: q_obj_Variant1-wrapper
+> -    case two: q_obj_Variant2-wrapper
+> +    case one: Variant1
+> +    case two: Variant2
+>          if ['IFTWO']
+>      feature union-feat2
+>  alternate Alternate
+> diff --git a/tests/qapi-schema/qapi-schema-test.out b/tests/qapi-schema/qapi-schema-test.out
+> index 8868ca0dca..a4e4051c61 100644
+> --- a/tests/qapi-schema/qapi-schema-test.out
+> +++ b/tests/qapi-schema/qapi-schema-test.out
+> @@ -125,36 +125,6 @@ alternate AltStrObj
+>      tag type
+>      case s: str
+>      case o: TestStruct
+> -object q_obj_intList-wrapper
+> -    member data: intList optional=False
+> -object q_obj_int8List-wrapper
+> -    member data: int8List optional=False
+> -object q_obj_int16List-wrapper
+> -    member data: int16List optional=False
+> -object q_obj_int32List-wrapper
+> -    member data: int32List optional=False
+> -object q_obj_int64List-wrapper
+> -    member data: int64List optional=False
+> -object q_obj_uint8List-wrapper
+> -    member data: uint8List optional=False
+> -object q_obj_uint16List-wrapper
+> -    member data: uint16List optional=False
+> -object q_obj_uint32List-wrapper
+> -    member data: uint32List optional=False
+> -object q_obj_uint64List-wrapper
+> -    member data: uint64List optional=False
+> -object q_obj_numberList-wrapper
+> -    member data: numberList optional=False
+> -object q_obj_boolList-wrapper
+> -    member data: boolList optional=False
+> -object q_obj_strList-wrapper
+> -    member data: strList optional=False
+> -object q_obj_sizeList-wrapper
+> -    member data: sizeList optional=False
+> -object q_obj_anyList-wrapper
+> -    member data: anyList optional=False
+> -object q_obj_StatusList-wrapper
+> -    member data: StatusList optional=False
+>  enum UserDefListUnionKind
+>      member integer
+>      member s8
+> @@ -174,21 +144,21 @@ enum UserDefListUnionKind
+>  object UserDefListUnion
+>      member type: UserDefListUnionKind optional=False
+>      tag type
+> -    case integer: q_obj_intList-wrapper
+> -    case s8: q_obj_int8List-wrapper
+> -    case s16: q_obj_int16List-wrapper
+> -    case s32: q_obj_int32List-wrapper
+> -    case s64: q_obj_int64List-wrapper
+> -    case u8: q_obj_uint8List-wrapper
+> -    case u16: q_obj_uint16List-wrapper
+> -    case u32: q_obj_uint32List-wrapper
+> -    case u64: q_obj_uint64List-wrapper
+> -    case number: q_obj_numberList-wrapper
+> -    case boolean: q_obj_boolList-wrapper
+> -    case string: q_obj_strList-wrapper
+> -    case sizes: q_obj_sizeList-wrapper
+> -    case any: q_obj_anyList-wrapper
+> -    case user: q_obj_StatusList-wrapper
+> +    case integer: intList
+> +    case s8: int8List
+> +    case s16: int16List
+> +    case s32: int32List
+> +    case s64: int64List
+> +    case u8: uint8List
+> +    case u16: uint16List
+> +    case u32: uint32List
+> +    case u64: uint64List
+> +    case number: numberList
+> +    case boolean: boolList
+> +    case string: strList
+> +    case sizes: sizeList
+> +    case any: anyList
+> +    case user: StatusList
+>  include include/sub-module.json
+>  command user_def_cmd None -> None
+>      gen=True success_response=True boxed=False oob=False preconfig=False
+> @@ -263,14 +233,12 @@ object __org.qemu_x-Struct
+>      base __org.qemu_x-Base
+>      member __org.qemu_x-member2: str optional=False
+>      member wchar-t: int optional=True
+> -object q_obj_str-wrapper
+> -    member data: str optional=False
+>  enum __org.qemu_x-Union1Kind
+>      member __org.qemu_x-branch
+>  object __org.qemu_x-Union1
+>      member type: __org.qemu_x-Union1Kind optional=False
+>      tag type
+> -    case __org.qemu_x-branch: q_obj_str-wrapper
+> +    case __org.qemu_x-branch: str
+>  alternate __org.qemu_x-Alt1
+>      tag type
+>      case __org.qemu_x-branch: str
+> @@ -305,8 +273,6 @@ enum TestIfEnum
+>      member bar
+>          if ['defined(TEST_IF_ENUM_BAR)']
+>      if ['defined(TEST_IF_ENUM)']
+> -object q_obj_TestStruct-wrapper
+> -    member data: TestStruct optional=False
+>  enum TestIfUnionKind
+>      member foo
+>      member union_bar
+> @@ -315,8 +281,8 @@ enum TestIfUnionKind
+>  object TestIfUnion
+>      member type: TestIfUnionKind optional=False
+>      tag type
+> -    case foo: q_obj_TestStruct-wrapper
+> -    case union_bar: q_obj_str-wrapper
+> +    case foo: TestStruct
+> +    case union_bar: str
+>          if ['defined(TEST_IF_UNION_BAR)']
+>      if ['defined(TEST_IF_UNION) && defined(TEST_IF_STRUCT)']
+>  object q_obj_TestIfUnionCmd-arg
+
+Match what I'd expect.
+
 
