@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E3B8C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:40:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 865B0C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C90FA22242
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:40:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DF16922265
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="FvuD3d7b"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C90FA22242
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="WL4/npjA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF16922265
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40864 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6TS-0000IB-0e
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:40:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49456)
+	id 1kX6X2-0003iH-VG
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:43:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49568)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX68s-0007WN-3r; Mon, 26 Oct 2020 13:18:46 -0400
-Received: from mail-eopbgr60108.outbound.protection.outlook.com
- ([40.107.6.108]:26030 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ id 1kX692-0007oN-Ra; Mon, 26 Oct 2020 13:18:56 -0400
+Received: from mail-eopbgr60093.outbound.protection.outlook.com
+ ([40.107.6.93]:39555 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX68p-0008Ma-W3; Mon, 26 Oct 2020 13:18:45 -0400
+ id 1kX690-0008NC-Mq; Mon, 26 Oct 2020 13:18:56 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=MXwa0y4QPcyo8IAswtTKH+RYn+LyRdoZe9d+zPWxqCAVAHKTTld2i2tFO+vMCIAYTXzHlYHuLyDkuAdvwsxXsGa843doHVq+l9HaKDvmd3+0v2Qfd+9QUSPRllYEy2cyalbRiQn/JctwqNEXWB2RfmkQk8NtFow65fmUr5pBMkvRzBuw2mGY1eDMwmBMrOemI0NGzVcbhgyOCuIsq6zLadO++U1mjANEntO+doubmqRP6WIkXTiuqGUCR3rtfDWdG3epTpxHEnFT2CyxxIXiWsgApJWMkVt+R7cNX4C+sA0UghJUyzZnf3hVmRnNqSxbi7ex2qCr4J/p8GKzEpiesQ==
+ b=FanJNA5KpY2TTffPQz/0fyfrf4JjeN7qHvrBwsHHwM3InKlItcPn3f+Gtp8zIgPmlZzjwunWO1GbZ6lGd8rNJqhZGj066SPLCxxBnUP4Yh36q8eEPyUjNSQHqh4Ohr6taLwqAZFnBJ8vhwpMqCqprUNSHcoKZSe1mQJYm60ZtyDjiYTP41qnKkyeJn0RAw87KZtl6Cl/njQ8c+ZKFsqGrhiLdCa269b5oQLIzUwK163JEzXh28uzt2OPE4wAfvUnHF7LloUxh21RsSZNk93Ip+6QpWyP3oMIWL1Mdd1zxZTLSg4hXxkeF2jwilgqA3X1rP4lhoZkIx36GY+hcFitsA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MAr7Nve6ddL6t2DWtKipHvOZSMXnELBA6nhnqL+MIKY=;
- b=KRqthOxrhG9y1qcNd8I/52UBrGRqJgTxA3VBzxBMDuqM/86NfF1jZVxZ35EF+6MUs9tbHBwAvGPNApJ1gXQZiv85+KM+ReMpU79eQ6tXrjmj8lmBNMzC7z3irBfr8i1A6SA3sTq0u979yrWxXcCxyLMZR5hyJrGhjISHZoiwmn/Z6Nv8BEvG4NAfJibwTfFumgGx+WEH4uX3F5npHrE1dQAM78ETtVGsep/CbWtqqpQLvYGgpAxRfXNMgVu+tcVXqmW26rgmUNWB9lRGtoy/vXLEmO/+j7uDkIpMmAbk2nYSrpPm2pVZbU+cnaLDiqCybEewuh0o5Nw/Gr/bUZn+DA==
+ bh=eF2VTnE/lfj8+MzIcBBEP3DczQsTl5DvM4MCEpKPhFU=;
+ b=XVWK56wmu/MGCDwgl10Nx0gmOHNt3EMVuftM8iAFfiR1cuUznF1e9SR854gHcZUHJnejho4V2vbMqY584IieG9OIvCsM++zrfof6+4UWUgxbngcnnkELM9xZEmin63jsZ7KJbCIdy0fUg98nL1Cps+DAd6WGHJNLVCfxQoEzc5U/E1OXfsS9AJkQ8engqXV/+34qGja/zfzyavh4A7OAw594xBLmPDZ7no1Ho9hOa6f0AnmBv18BAgU57ubQMnBGJXRLFu8LrcQkLnITc4sPKSl6lcz6TNjsglHUReCSwSn+XkgEyxn/Y+AYQfanCmsXsWkB7KZwG9KChzIb+jmCtw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MAr7Nve6ddL6t2DWtKipHvOZSMXnELBA6nhnqL+MIKY=;
- b=FvuD3d7bFJzxn8p4ArhRQotamaAnuYg6e0o/BeIXr1dmNiwGe88TtAzVLVxiJdSm+f46KJoFTSnrraJHKJYagT3/p34NSYzQA05OCp1ZokCoBEU4YnL9fjT6E4OscXF6z8PeH2w9nPKu9I67++TGYbv2mcb4UgEgc8Vbv/IV694=
+ bh=eF2VTnE/lfj8+MzIcBBEP3DczQsTl5DvM4MCEpKPhFU=;
+ b=WL4/npjAY6Zff126617xj6gz4NzgXCS+H7WnA/VwhMhz0uMS9Nu6iaLzRv6MctHfQRAX1lPpzWD5P0BhL+sQpPENwlaJfU7MhfQZcgvh0bXfF1dq6pAkzeVIKtFrzODwuXwa7FGA+nQRgb1v3J/Ebl2IyqyIe+iui7BnZUFVNsA=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB5031.eurprd08.prod.outlook.com (2603:10a6:20b:ed::12)
+ by AM6PR08MB3032.eurprd08.prod.outlook.com (2603:10a6:209:43::31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 26 Oct
- 2020 17:18:33 +0000
+ 2020 17:18:42 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Mon, 26 Oct 2020
- 17:18:33 +0000
+ 17:18:42 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, eblake@redhat.com,
  armbru@redhat.com, xiechanglong.d@gmail.com, wencongyang2@huawei.com,
  jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Subject: [PATCH v3 04/25] block/block-copy: implement block_copy_async
-Date: Mon, 26 Oct 2020 20:17:54 +0300
-Message-Id: <20201026171815.13233-5-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 14/25] iotests: 185: prepare for backup over block-copy
+Date: Mon, 26 Oct 2020 20:18:04 +0300
+Message-Id: <20201026171815.13233-15-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201026171815.13233-1-vsementsov@virtuozzo.com>
 References: <20201026171815.13233-1-vsementsov@virtuozzo.com>
@@ -82,43 +82,44 @@ Received: from kvm.sw.ru (185.215.60.99) by
  AM0PR02CA0101.eurprd02.prod.outlook.com (2603:10a6:208:154::42) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Mon, 26 Oct 2020 17:18:32 +0000
+ Transport; Mon, 26 Oct 2020 17:18:41 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 2efa9a13-b780-4a3b-e597-08d879d32a8f
-X-MS-TrafficTypeDiagnostic: AM6PR08MB5031:
+X-MS-Office365-Filtering-Correlation-Id: 2d4fb9b3-e0dd-4d0b-30d0-08d879d32fe7
+X-MS-TrafficTypeDiagnostic: AM6PR08MB3032:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB5031E8B2F61A65A723827746C1190@AM6PR08MB5031.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:50;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB30329C6158CAE43C71A4912EC1190@AM6PR08MB3032.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:3631;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XwmjUyQajTRmIbun3YHZsQyuNgBNzbT2RV4apoJM4SJzKZX3EikCW81ujeKyMK3ifRQOF7mjxSkIsvHb4WeoaEkSdJrc92ZZx3DjggMXndgsEC+YO60hFn6rEn9+jnRclx/HZ+kNGvmmtL5I7ncU3u0fm4TBH+zaKnj4f7kfbwnA6VkUyKswMyXC4HxEd3cmoWkwpLAH3eQYvUJJa2wUCEg+wNzmW2yJzxgpn2mpwAp+9YdZ460RBq1E2uoAUF+/N/nEGYlJ5vYhW+qGTk3g9kUXfhxLd9gqNhOFoYOm9xjXlcTiuAAtjD0OEm7ZzBwaU2aeYpQF2O38TU8rqGNNQg==
+X-Microsoft-Antispam-Message-Info: QvBZNZBN5Pw0GgbKwIgt2c64CS2+4RUMYj2B6qnr+VYQCM55xDL4+IUMtwRxsLSO1i2JYbwkP4ULWBlLxwnLy5o3qeKDodMmeu1Co90NNRsNy1G3dJfju6rjM1bvUPuWVrSqvqVqw00HNXpwfw4jU6E4VSdTu0oWfx7D6IfZcBlTHp11JPh+V0t0tRIMLB4Ibzm2je1upzR46CoTUUeInfoWAj4f0hc8FMHN+kCUFFokNCBut7WBE8qtSOU02tamaGS+EG4B8gFG2YdAZRd8pcxuH5FM4+va0i6VxCjJpoqDXI2iq+MRGEx7zyrLhmul0bzmw+jKG2cQJIJOHRI2fQ==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(366004)(39840400004)(346002)(376002)(396003)(83380400001)(5660300002)(1076003)(316002)(2616005)(478600001)(6506007)(4326008)(6666004)(66946007)(26005)(66556008)(956004)(36756003)(6486002)(6512007)(186003)(66476007)(8936002)(52116002)(2906002)(16526019)(107886003)(8676002)(6916009)(86362001);
+ SFS:(4636009)(136003)(366004)(376002)(346002)(396003)(39840400004)(66476007)(8936002)(5660300002)(316002)(6506007)(6512007)(2616005)(66946007)(956004)(66556008)(6666004)(26005)(4326008)(36756003)(478600001)(52116002)(1076003)(16526019)(83380400001)(2906002)(186003)(6916009)(8676002)(107886003)(86362001)(6486002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: aH2H+5vi1xuTa6nIhaVL2Ts90omd6ZwmmD/VWqePCHKKYGDyTw0p3vhTmSXKA/Sp833KjcnScR3rfL/hRVkTuDv4+IMhsvDpBH7WMTknVgKZSlyBZSkdGzH4GZ5magUJeeKgl8+pPyB2DMb43sBG5+ZKbrXAxjGdduDRJXt0fxoOJtqTyBG8keHyXLvTtfq9SX4xPjMl3gO61zPoMUVx4NsYlp3HtQtrjIrk8vr9IjkIFyrTcUgDazt8vvIzx956I2zzp23AhWI/DH7OScwWyjIrburCeXWPe6JgA8YeYUG6RXPV51GDoAWWQRv4H1pQA5yJYREoCB7y2EySYOw8QOnRoY3P6WjxaWgurreFkkh5og4vyu6PQOzOaPfGdOb7aF1JRx4A5pTREQbZiZawOqaMptEDSVSVoKxNnMXDmelY5XbBzHxWnSLfqvJHdcfoKxvdviJE23CdnW6f3XmPKyrSvgBnfgx6/8bXAPjExZgJqk7Yk5YhFuR3kTgASWWQ1gQjHKmrjflEiKNjgJx2+HL2cYO6g11zxPF7kUYtikmXWa/RhomlHVOS4qpFaMJee1WPmue0oLqxyzbckd636ciyJyhfsCwQS3uugiG3TbBtwSIHd4PzjMtBqk84zVUSBJa9KUY7xCMhO12AbBb2uw==
+X-MS-Exchange-AntiSpam-MessageData: tlWi6+GrvdTXrDf1f/XJY7xe1WX0PvJY+7Dcg/1oQ1mNR8Dn2Ih0KEXdCubN0qvqPt5bcOTTO2xBFNg2tlgNalRehkiEBgFBSD5UNNyXZ/5EvRfmh5320FHExWUrzILZK+MJ7ABhxP0NjzU+fSIB66uSH+JTFuVG+/fbY5GKKDvb9CI+dZYJovD7L3r58HeYd5rAX/Zmp7TLO5qiU0pj4PPLpwem1AiPLQkV12Shn1gR0efd8LKG0iFgGUreJSQdg0/dTD3MK3EXrJ80cHndqlMg4zgKqRBhoeiO/a3xzkG5vxqnWsErPgbBuSmB7VcZjv98r+Qb/GfKRCZNDXqUK4cBGQdffxKJ2z6wAVzhGgzY5y0kdqYHqCTshkDk9u2cMTn1Cep0gQu+J7WrHoEvtmWZWOFm824jIdCWhKBgzY/DzxkXK0h5f1wTp+w3Rkng6j77PJSip0469k0SyE6/lYszExm5APt+KEnr/okp22/g5JURkJ8h1QIhCm7LewZFPBZOSfTRP+yb0RQO9jG6FOPkWjBSyH1TlszFqE1iiHQBoAMEz8WeFn197cU9aFPXXSUri88mhGZSQy+0OrS7QvRAyk97zcr8Gh6zEE4O40VvWVOkehlsNxnvXrev9YZPF3UoB0zYZWnrzYBv2b1zTw==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2efa9a13-b780-4a3b-e597-08d879d32a8f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2d4fb9b3-e0dd-4d0b-30d0-08d879d32fe7
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2020 17:18:33.3432 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2020 17:18:42.2870 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iPYYghx2s97FEovIhRQmvYU3hoCdVE0DsE5spe/sAxExhLiFUeJZ+FojuytiHEb4jkbPVoX1HQTrC8ZdkyMLLSjJEZ37gYWhQCcQaVebgqI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB5031
-Received-SPF: pass client-ip=40.107.6.108;
+X-MS-Exchange-CrossTenant-UserPrincipalName: k3RAwhDcBSkbiMF4dsX5evXFkFmjYi9/2gDiwHJB2eOWrRtVcorFtdkkhSqRaAAenVf4M4VGPii73qEFl4aJHm36owv2oeJX1qWCivAOztg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3032
+Received-SPF: pass client-ip=40.107.6.93;
  envelope-from=vsementsov@virtuozzo.com;
  helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:18:30
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:18:35
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -135,177 +136,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We'll need async block-copy invocation to use in backup directly.
+The further change of moving backup to be a one block-copy call will
+make copying chunk-size and cluster-size two separate things. So, even
+with 64k cluster sized qcow2 image, default chunk would be 1M.
+185 test however assumes, that with speed limited to 64K, one iteration
+would result in offset=64K. It will change, as first iteration would
+result in offset=1M independently of speed.
+
+So, let's explicitly specify, what test wants: set max-chunk to 64K, so
+that one iteration is 64K. Note, that we don't need to limit
+max-workers, as block-copy rate limiter will handle the situation and
+wouldn't start new workers when speed limit is obviously reached.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Reviewed-by: Max Reitz <mreitz@redhat.com>
 ---
- include/block/block-copy.h | 26 ++++++++++++
- block/block-copy.c         | 81 ++++++++++++++++++++++++++++++++++++--
- 2 files changed, 103 insertions(+), 4 deletions(-)
+ tests/qemu-iotests/185     | 3 ++-
+ tests/qemu-iotests/185.out | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 6397505f30..3566827599 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -19,7 +19,9 @@
- #include "qemu/co-shared-resource.h"
+diff --git a/tests/qemu-iotests/185 b/tests/qemu-iotests/185
+index fd5e6ebe11..0efadcbf62 100755
+--- a/tests/qemu-iotests/185
++++ b/tests/qemu-iotests/185
+@@ -182,7 +182,8 @@ _send_qemu_cmd $h \
+                       'target': '$TEST_IMG.copy',
+                       'format': '$IMGFMT',
+                       'sync': 'full',
+-                      'speed': 65536 } }" \
++                      'speed': 65536,
++                      'x-perf': {'max-chunk': 65536} } }" \
+     "return"
  
- typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
-+typedef void (*BlockCopyAsyncCallbackFunc)(void *opaque);
- typedef struct BlockCopyState BlockCopyState;
-+typedef struct BlockCopyCallState BlockCopyCallState;
+ # If we don't sleep here 'quit' command races with disk I/O
+diff --git a/tests/qemu-iotests/185.out b/tests/qemu-iotests/185.out
+index 339438ac68..dd31d69cea 100644
+--- a/tests/qemu-iotests/185.out
++++ b/tests/qemu-iotests/185.out
+@@ -61,7 +61,7 @@ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 cluster_size=65536 extended_l2=off
  
- BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-                                      int64_t cluster_size, bool use_copy_range,
-@@ -41,6 +43,30 @@ int64_t block_copy_reset_unallocated(BlockCopyState *s,
- int coroutine_fn block_copy(BlockCopyState *s, int64_t offset, int64_t bytes,
-                             bool *error_is_read);
- 
-+/*
-+ * Run block-copy in a coroutine, create corresponding BlockCopyCallState
-+ * object and return pointer to it. Never returns NULL.
-+ *
-+ * Caller is responsible to call block_copy_call_free() to free
-+ * BlockCopyCallState object.
-+ */
-+BlockCopyCallState *block_copy_async(BlockCopyState *s,
-+                                     int64_t offset, int64_t bytes,
-+                                     BlockCopyAsyncCallbackFunc cb,
-+                                     void *cb_opaque);
-+
-+/*
-+ * Free finished BlockCopyCallState. Trying to free running
-+ * block-copy will crash.
-+ */
-+void block_copy_call_free(BlockCopyCallState *call_state);
-+
-+/* Note, that block-copy call is marked finished prior to calling the callback. */
-+bool block_copy_call_finished(BlockCopyCallState *call_state);
-+bool block_copy_call_succeeded(BlockCopyCallState *call_state);
-+bool block_copy_call_failed(BlockCopyCallState *call_state);
-+int block_copy_call_status(BlockCopyCallState *call_state, bool *error_is_read);
-+
- BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s);
- void block_copy_set_skip_unallocated(BlockCopyState *s, bool skip);
- 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 6ea55f1f9a..74655b86f8 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -30,13 +30,19 @@
- static coroutine_fn int block_copy_task_entry(AioTask *task);
- 
- typedef struct BlockCopyCallState {
--    /* IN parameters */
-+    /* IN parameters. Initialized in block_copy_async() and never changed. */
-     BlockCopyState *s;
-     int64_t offset;
-     int64_t bytes;
-+    BlockCopyAsyncCallbackFunc cb;
-+    void *cb_opaque;
-+
-+    /* Coroutine where async block-copy is running */
-+    Coroutine *co;
- 
-     /* State */
--    bool failed;
-+    int ret;
-+    bool finished;
- 
-     /* OUT parameters */
-     bool error_is_read;
-@@ -428,8 +434,8 @@ static coroutine_fn int block_copy_task_entry(AioTask *task)
- 
-     ret = block_copy_do_copy(t->s, t->offset, t->bytes, t->zeroes,
-                              &error_is_read);
--    if (ret < 0 && !t->call_state->failed) {
--        t->call_state->failed = true;
-+    if (ret < 0 && !t->call_state->ret) {
-+        t->call_state->ret = ret;
-         t->call_state->error_is_read = error_is_read;
-     } else {
-         progress_work_done(t->s->progress, t->bytes);
-@@ -679,6 +685,12 @@ static int coroutine_fn block_copy_common(BlockCopyCallState *call_state)
-          */
-     } while (ret > 0);
- 
-+    call_state->finished = true;
-+
-+    if (call_state->cb) {
-+        call_state->cb(call_state->cb_opaque);
-+    }
-+
-     return ret;
- }
- 
-@@ -700,6 +712,67 @@ int coroutine_fn block_copy(BlockCopyState *s, int64_t start, int64_t bytes,
-     return ret;
- }
- 
-+static void coroutine_fn block_copy_async_co_entry(void *opaque)
-+{
-+    block_copy_common(opaque);
-+}
-+
-+BlockCopyCallState *block_copy_async(BlockCopyState *s,
-+                                     int64_t offset, int64_t bytes,
-+                                     BlockCopyAsyncCallbackFunc cb,
-+                                     void *cb_opaque)
-+{
-+    BlockCopyCallState *call_state = g_new(BlockCopyCallState, 1);
-+
-+    *call_state = (BlockCopyCallState) {
-+        .s = s,
-+        .offset = offset,
-+        .bytes = bytes,
-+        .cb = cb,
-+        .cb_opaque = cb_opaque,
-+
-+        .co = qemu_coroutine_create(block_copy_async_co_entry, call_state),
-+    };
-+
-+    qemu_coroutine_enter(call_state->co);
-+
-+    return call_state;
-+}
-+
-+void block_copy_call_free(BlockCopyCallState *call_state)
-+{
-+    if (!call_state) {
-+        return;
-+    }
-+
-+    assert(call_state->finished);
-+    g_free(call_state);
-+}
-+
-+bool block_copy_call_finished(BlockCopyCallState *call_state)
-+{
-+    return call_state->finished;
-+}
-+
-+bool block_copy_call_succeeded(BlockCopyCallState *call_state)
-+{
-+    return call_state->finished && call_state->ret == 0;
-+}
-+
-+bool block_copy_call_failed(BlockCopyCallState *call_state)
-+{
-+    return call_state->finished && call_state->ret < 0;
-+}
-+
-+int block_copy_call_status(BlockCopyCallState *call_state, bool *error_is_read)
-+{
-+    assert(call_state->finished);
-+    if (error_is_read) {
-+        *error_is_read = call_state->error_is_read;
-+    }
-+    return call_state->ret;
-+}
-+
- BdrvDirtyBitmap *block_copy_dirty_bitmap(BlockCopyState *s)
- {
-     return s->copy_bitmap;
+ { 'execute': 'qmp_capabilities' }
+ {"return": {}}
+-{ 'execute': 'drive-backup', 'arguments': { 'device': 'disk', 'target': 'TEST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536 } }
++{ 'execute': 'drive-backup', 'arguments': { 'device': 'disk', 'target': 'TEST_DIR/t.IMGFMT.copy', 'format': 'IMGFMT', 'sync': 'full', 'speed': 65536, 'x-perf': {'max-chunk': 65536} } }
+ Formatting 'TEST_DIR/t.qcow2.copy', fmt=qcow2 cluster_size=65536 extended_l2=off compression_type=zlib size=67108864 lazy_refcounts=off refcount_bits=16
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "disk"}}
+ {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "disk"}}
 -- 
 2.21.3
 
