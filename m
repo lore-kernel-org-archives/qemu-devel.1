@@ -2,89 +2,74 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1DAC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:22:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2C3AC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:26:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F23C820795
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:22:22 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="G7AofQgO";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="G7AofQgO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23C820795
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	by mail.kernel.org (Postfix) with ESMTPS id 57516207F7
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:26:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 57516207F7
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37182 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42870 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX9wb-0002WB-MI
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 17:22:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56988)
+	id 1kXA0c-0005EH-D1
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 17:26:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58344)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kX9vH-0001HU-RL; Mon, 26 Oct 2020 17:20:59 -0400
-Received: from home.keithp.com ([63.227.221.253]:57048 helo=elaine.keithp.com)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX9zy-0004la-Hg
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 17:25:50 -0400
+Received: from smtpout1.mo529.mail-out.ovh.net ([178.32.125.2]:57295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kX9vE-0007ru-Qm; Mon, 26 Oct 2020 17:20:59 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 8CB7D3F2DD61;
- Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603747253; bh=IQUHrFXKJLaQlnApe4q47g7/mOk6S1Ckw1cgJjvGIf8=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=G7AofQgODUbr6d7gEj8ghXTsZTmKSzSu5cymCUOvBVU4vDbZtSe5B9DAy2E3yiWRO
- 79uuvcmFBNAP+06L0kcfw+sVCnu3NnHrXGhYfR0J9eFuza30Oa1VhjVp2zamzLKfvj
- p3teCUCY5OMhKK35E4PqZ6Huwv0P01SiUv7Q4K1M8i3OqUujEvQkfRhMQOeR76WoJG
- CZHt+5pmV0bLQ9RSlkYhA5oFdMOJQNMCpE/P5qITQeb6xJdsx9USy1S0DNURLj+mqV
- jRi60A6hrawLPl+Y+YMKbsSPrjGM/Ba4TXhvzJ+J7dTbtG5yrU62sl7xtz003SpE1k
- VUO5FGid6nBFQ==
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id ep3decOYF6mE; Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 247673F2DD60;
- Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603747253; bh=IQUHrFXKJLaQlnApe4q47g7/mOk6S1Ckw1cgJjvGIf8=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=G7AofQgODUbr6d7gEj8ghXTsZTmKSzSu5cymCUOvBVU4vDbZtSe5B9DAy2E3yiWRO
- 79uuvcmFBNAP+06L0kcfw+sVCnu3NnHrXGhYfR0J9eFuza30Oa1VhjVp2zamzLKfvj
- p3teCUCY5OMhKK35E4PqZ6Huwv0P01SiUv7Q4K1M8i3OqUujEvQkfRhMQOeR76WoJG
- CZHt+5pmV0bLQ9RSlkYhA5oFdMOJQNMCpE/P5qITQeb6xJdsx9USy1S0DNURLj+mqV
- jRi60A6hrawLPl+Y+YMKbsSPrjGM/Ba4TXhvzJ+J7dTbtG5yrU62sl7xtz003SpE1k
- VUO5FGid6nBFQ==
-Received: by keithp.com (Postfix, from userid 1000)
- id E16411582210; Mon, 26 Oct 2020 14:20:52 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
-Cc: Laurent Vivier <laurent@vivier.eu>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar
- <sagark@eecs.berkeley.edu>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>, qemu-riscv@nongnu.org
-Subject: Re: [PATCH] riscv: Add semihosting support [v8]
-In-Reply-To: <4faf9e1f-45bd-9f47-8a5f-be7b6fcdf540@linaro.org>
-References: <20201023214940.917885-1-keithp@keithp.com>
- <4faf9e1f-45bd-9f47-8a5f-be7b6fcdf540@linaro.org>
-Date: Mon, 26 Oct 2020 14:20:52 -0700
-Message-ID: <87zh48fzuz.fsf@keithp.com>
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX9zv-0000Ge-VJ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 17:25:50 -0400
+Received: from mxplan5.mail.ovh.net (unknown [10.109.156.124])
+ by mo529.mail-out.ovh.net (Postfix) with ESMTPS id 8A1B368A906B;
+ Mon, 26 Oct 2020 22:25:42 +0100 (CET)
+Received: from kaod.org (37.59.142.103) by DAG8EX1.mxp5.local (172.16.2.71)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 26 Oct
+ 2020 22:25:40 +0100
+Authentication-Results: garm.ovh; auth=pass
+ (GARM-103G0058e442a16-c708-4190-9b4c-7fb81bcb8628,
+ D69A261E470FD7A087455D2B3B9CC66C186A091D) smtp.auth=groug@kaod.org
+Date: Mon, 26 Oct 2020 22:25:37 +0100
+From: Greg Kurz <groug@kaod.org>
+To: Christian Schoenebeck <qemu_oss@crudebyte.com>
+Subject: Re: [PULL 00/13] 9p queue 2020-10-23
+Message-ID: <20201026222537.61ac2ad8@bahia.lan>
+In-Reply-To: <2016477.jJ6Bm08OSA@silver>
+References: <cover.1603452058.git.qemu_oss@crudebyte.com>
+ <CAFEAcA_Pd2PQd097tSHABR=jFK-Rq6odkZXEC2V2DBHrh8pSXg@mail.gmail.com>
+ <2016477.jJ6Bm08OSA@silver>
+X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
- helo=elaine.keithp.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 17:06:21
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [37.59.142.103]
+X-ClientProxiedBy: DAG9EX2.mxp5.local (172.16.2.82) To DAG8EX1.mxp5.local
+ (172.16.2.71)
+X-Ovh-Tracer-GUID: 130f1873-cbaa-4846-b0a9-5165bf5444f3
+X-Ovh-Tracer-Id: 4527806477524965856
+X-VR-SPAMSTATE: OK
+X-VR-SPAMSCORE: -100
+X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrkeejgdduudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuqfggjfdpvefjgfevmfevgfenuceurghilhhouhhtmecuhedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvffukfgjfhfogggtgfhisehtjeertdertddvnecuhfhrohhmpefirhgvghcumfhurhiiuceoghhrohhugheskhgrohgurdhorhhgqeenucggtffrrghtthgvrhhnpeeuffetueffkeevfffhffeujeekiedtgfejvddtlefgtedtfffgffeiieejffdtveenucffohhmrghinhepghhithhhuhgsrdgtohhmnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutdefnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopegughhilhgsvghrthesrhgvughhrghtrdgtohhm
+Received-SPF: pass client-ip=178.32.125.2; envelope-from=groug@kaod.org;
+ helo=smtpout1.mo529.mail-out.ovh.net
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 17:25:45
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -98,76 +83,121 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org, "Dr.
+ David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: "Keith Packard" <keithp@keithp.com>
-From: "Keith Packard" via <qemu-devel@nongnu.org>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Mon, 26 Oct 2020 13:48:37 +0100
+Christian Schoenebeck <qemu_oss@crudebyte.com> wrote:
 
-Richard Henderson <richard.henderson@linaro.org> writes:
+> On Montag, 26. Oktober 2020 11:33:42 CET Peter Maydell wrote:
+> > On Fri, 23 Oct 2020 at 12:46, Christian Schoenebeck
+> > 
+> > <qemu_oss@crudebyte.com> wrote:
+> > > The following changes since commit 4c5b97bfd0dd54dc27717ae8d1cd10e14eef1430:
+> > >   Merge remote-tracking branch
+> > >   'remotes/kraxel/tags/modules-20201022-pull-request' into staging
+> > >   (2020-10-22 12:33:21 +0100)> 
+> > > are available in the Git repository at:
+> > >   https://github.com/cschoenebeck/qemu.git tags/pull-9p-20201023
+> > > 
+> > > for you to fetch changes up to ee01926a11b1f9bffcd6cdec0961dd9d1882da71:
+> > >   tests/9pfs: add local Tunlinkat hard link test (2020-10-22 20:26:33
+> > >   +0200)
+> > > 
+> > > ----------------------------------------------------------------
+> > > 9pfs: more tests using local fs driver
+> > > 
+> > > Only 9pfs test case changes this time:
+> > > 
+> > > * Refactor: Rename functions to make top-level test functions fs_*()
+> > > 
+> > >   easily distinguishable from utility test functions do_*().
+> > > 
+> > > * Refactor: Drop unnecessary function arguments in utility test
+> > > 
+> > >   functions.
+> > > 
+> > > * More test cases using the 9pfs 'local' filesystem driver backend,
+> > > 
+> > >   namely for the following 9p requests: Tunlinkat, Tlcreate, Tsymlink
+> > >   and Tlink.
+> > > 
+> > > ----------------------------------------------------------------
+> > 
+> > I get a 'make check' failure on x86-64 Linux host:
+> > 
+> > PASS 54 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/config PASS 55 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/create_dir PASS 56 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/unlinkat_dir PASS 57 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/create_file PASS 58 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/unlinkat_file PASS 59 qtest-x86_64: qos-test
+> > /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-
+> > 9p-tests/local/symlink_file Received response 7 (RLERROR) instead of 73
+> > (RMKDIR)
+> > Rlerror has errno 2 (No such file or directory)
+> > **
+> > ERROR:../../tests/qtest/virtio-9p-test.c:300:v9fs_req_recv: assertion
+> > failed (hdr.id == id): (7 == 73)
 
-> On 10/23/20 2:49 PM, Keith Packard via wrote:
->>  static bool trans_ebreak(DisasContext *ctx, arg_ebreak *a)
->>  {
->> -    generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
->> +    uint32_t pre    =3D opcode_at(&ctx->base, ctx->base.pc_next - 4);
->> +    uint32_t ebreak =3D opcode_at(&ctx->base, ctx->base.pc_next);
->> +    uint32_t post   =3D opcode_at(&ctx->base, ctx->base.pc_next + 4);
->
-> Alistair asked if this approach is ok.  I think it is.  There are other p=
-laces
-> in which we scan forward (usually only forward, not backward, but this is=
- a
-> special nop, so it doesn't matter).
->
-> However:
->
-> (1) No need to re-read the current ebreak insn.  That is how we arrived h=
-ere,
-> after all.
+Not sure this is related to this PR actually. Dave Gilbert reported on irc that
+he encountered a similar issue with 'make -j check', likely without these patches.
 
-The semihosting spec requires that we land here using a 32-bit ebreak
-instruction, not the compressed version, so I think we still need to
-check for this.
+> > ERROR qtest-x86_64: qos-test - Bail out!
+> > ERROR:../../tests/qtest/virtio-9ptest.c:300:v9fs_req_recv: assertion
+> > failed (hdr.id == id): (7 == 73)
+> > Makefile.mtest:3953: recipe for target 'run-test-492' failed
+> > 
+> > 
+> > thanks
+> > -- PMM
+> 
+> So the 9p server is already failing to create the test case directory
+> "./qtest-9p-local/05/" relative to your current working directory.
+> 
+> I would appreciate to get more info when you have some free cycles, as I'm
+> unable to reproduce this on any system unfortunately. But no hurry as
+> these tests only become relevant actually for QEMU 6.
+> 
+> What puzzles me is that the previous test cases succeeded there, which all
+> create their own test directory in the same way:
+> 
+> 	./qtest-9p-local/01/
+> 	./qtest-9p-local/02/  (<-- dir vanishes after that test completed)
+> 	./qtest-9p-local/03/
+> 	./qtest-9p-local/04/
+> 	...
+> 
+> How does the "./qtest-9p-local/" directory look like after that
+> "local/symlink_file" test failed there? You can use this shortcut:
+> 
+> export QTEST_QEMU_BINARY=x86_64-softmmu/qemu-system-x86_64
+> cd build
+> tests/qtest/qos-test --verbose
+> ls -l qtest-9p-local
+> 
+> That latter qos-test run will also output the assembled qemu command
+> line the 9p local tests would run with, which might also be helpful,
+> e.g. the relevant output would be something like this:
+> 
+> GTest: run: /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-9p-tests/local/config
+> (MSG: starting QEMU: exec x86_64-softmmu/qemu-system-x86_64 -qtest unix:/tmp/qtest-7428.sock -qtest-log /dev/null -chardev socket,path=/tmp/qtest-7428.qmp,id=char0 -mon chardev=char0,mode=control -display none -M pc  -fsdev local,id=fsdev0,path='/home/me/git/qemu/build/qtest-9p-local',security_model=mapped-xattr -device virtio-9p-pci,fsdev=fsdev0,addr=04.0,mount_tag=qtest -accel qtest)
+> 
+> Would probably the test succeed if run alone?
+> 
+> tests/qtest/qos-test -p /x86_64/pc/i440FX-pcihost/pci-bus-pc/pci-bus/virtio-9p-pci/virtio-9p/virtio-9p-tests/local/symlink_file
+> 
+> Best regards,
+> Christian Schoenebeck
+> 
+> 
 
-> (2) You need to check for page boundaries before reading pre and post.
-> Otherwise you could wind up with SIGSEGV (or the equivalent internal qemu
-> exception) when you shouldn't.
-
-Right, in that case the ebreak instruction should just raise a regular
-break point exception. I've added a check to make sure the address of
-the three functions match when and-ed with TARGET_PAGE_MASK.
-
-I've finished re-working this patch into a series which first modifies
-the ARM semihosting support to be architecture-independent, then adds
-the changes necessary to support RISC-V. Expect to see that series on
-the list shortly.
-
-=2D-=20
-=2Dkeith
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+XPbQACgkQ2yIaaQAA
-ABHB0w//TcQubFd20vRnOTuVj4h8vOPLJJfy0/6Z7804eCGrlefBrjp3DkmofgHs
-V0d8+E+ZXguxTKJi3xyeMhl2GAP8E8ulOtNYblTjQ3NH9+hx3oUZsf23MouAfKyh
-2WLKelFOM32SiX52Ll7BR5Wb+jWztd4sUfg9Kq6MIL3FujWVXZrZ+OIWvDTaJtBl
-YSUgKIX6C988za4qMzNCmjizlkqo4JxEt8aYzid3xLdX/4fJz7Yn4qF9gTD0G5/7
-6Ny3V4x0vmWoqz4hqoXmndpgV4LJV7KGvf1vJbS7dZ5Xh0KW+vu+to0Xr3su53pG
-jN9zOl7HVuFOWcsD1PMZAGdBvNuYdaIEtvncFTtDD1wgKS5s3oYXOrWNIt5te8RT
-wuXBYUMCscnV7oTdt9yeJOyUSInMNrC8K5vt0khQr/KGe2hMs1URr164Wu4yNWuo
-eRICAZRmJCYzql8EAcKxFwBmid657BtmhMBXgrZBuIc5AtRit1grP/puars70VZ5
-jGlEmPRU9XcbihtIPDM7Y4L1xNbgBqTC9g64P5K24rryyYMFjGOXHGZqli+IYZm8
-bftEmh3IBIAdbepfkkx4F9LgZ8EnksnCBt566bO3T36wnscuIaT13bcM5xaoKNFx
-vS6zzlLNfcbLsO8ZUpm0xJ9CrS4//hBtEjiVKI4XbE9SabN0v7I=
-=Cbg1
------END PGP SIGNATURE-----
---=-=-=--
 
