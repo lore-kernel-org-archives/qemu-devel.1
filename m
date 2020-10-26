@@ -2,88 +2,91 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19D97C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23E40C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7ED642242A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:08:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7D47E2242A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:09:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xrk6F+Ol"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7ED642242A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d4LCpKM/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7D47E2242A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX3B9-0000Cb-Ho
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:08:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39652)
+	id 1kX3C5-0001sW-Ei
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42330)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX2uq-0005ni-FO
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:52:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57433)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX35i-0002oy-0S
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:03:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44909)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX2uf-0001la-L1
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:52:03 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX35e-0003bf-AH
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:03:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603720301;
+ s=mimecast20190719; t=1603720991;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=GACWTAeoHeWNXn2WHSonbmBKUVFTaChEeiPHVvJ9DJY=;
- b=Xrk6F+Old3KHfKzlX/IHvgWbkGBcHYV6s/aVDepeUeXnp/xZD52Y+LOcDTEz5UgDb4mq6g
- Ep99+jRljc2kjQV1tPUetjkuUdUYWY+zWxJ/kpAhAW8yZYpzBeB8e+EiJ1H/MSsNxb1lV6
- Rs0aPf0XSTw+/d7RVq7hARYwsFdmiOM=
+ bh=IIwPRN4YsTd2zXRwDH/Bxh7PumdUnSzyScM22M6b85U=;
+ b=d4LCpKM/92xoxoRN3r/l4SZgJJM2I3y1BilOSwIdfUQ6aO3hMra6N80SvGnrzHzmgq00oi
+ rQTfg/TppSXeLKg8e/ewgr4znYWHVY2hq+KU6YhrjNgZdaM3utDxN2OLQsalZT8OSYu2jX
+ VZkragykTO2sRV/9JfxTo97CL4+2ITY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-329-e2vyhjgnPOCxHV0Exx_Xzw-1; Mon, 26 Oct 2020 09:51:39 -0400
-X-MC-Unique: e2vyhjgnPOCxHV0Exx_Xzw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-582-IHRB3MBKNjqY7JoEPwPAkA-1; Mon, 26 Oct 2020 10:03:08 -0400
+X-MC-Unique: IHRB3MBKNjqY7JoEPwPAkA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 777C11060B73
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:51:38 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 45B191002C09
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:51:38 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 15/17] machine: remove deprecated -machine
- enforce-config-section option
-Date: Mon, 26 Oct 2020 09:51:29 -0400
-Message-Id: <20201026135131.3006712-16-pbonzini@redhat.com>
-In-Reply-To: <20201026135131.3006712-1-pbonzini@redhat.com>
-References: <20201026135131.3006712-1-pbonzini@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 82DDA1019638;
+ Mon, 26 Oct 2020 14:03:03 +0000 (UTC)
+Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4DAC25B4A4;
+ Mon, 26 Oct 2020 14:02:58 +0000 (UTC)
+Date: Mon, 26 Oct 2020 08:02:57 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v29 05/17] vfio: Add VM state change handler to know
+ state of VM
+Message-ID: <20201026080257.2f9d3506@w520.home>
+In-Reply-To: <ce6c6864-a8a3-269e-a9c2-3fe4d2b265b8@nvidia.com>
+References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
+ <1603704987-20977-6-git-send-email-kwankhede@nvidia.com>
+ <20201026070056.42bb04de@w520.home>
+ <ce6c6864-a8a3-269e-a9c2-3fe4d2b265b8@nvidia.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,161 +100,104 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Deprecated since 3.1 and complicates the initialization sequence,
-remove it.
+On Mon, 26 Oct 2020 19:18:51 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- docs/system/deprecated.rst | 12 ++++++------
- hw/core/machine.c          | 23 -----------------------
- include/hw/boards.h        |  1 -
- migration/migration.c      | 10 ----------
- qemu-options.hx            |  8 --------
- 5 files changed, 6 insertions(+), 48 deletions(-)
+> On 10/26/2020 6:30 PM, Alex Williamson wrote:
+> > On Mon, 26 Oct 2020 15:06:15 +0530
+> > Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> >   
+> >> VM state change handler is called on change in VM's state. Based on
+> >> VM state, VFIO device state should be changed.
+> >> Added read/write helper functions for migration region.
+> >> Added function to set device_state.
+> >>
+> >> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> >> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> >> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> >> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+> >> ---
+> >>   hw/vfio/migration.c           | 158 ++++++++++++++++++++++++++++++++++++++++++
+> >>   hw/vfio/trace-events          |   2 +
+> >>   include/hw/vfio/vfio-common.h |   4 ++
+> >>   3 files changed, 164 insertions(+)
+> >>
+> >> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+> >> index fd7faf423cdc..65ce735d667b 100644
+> >> --- a/hw/vfio/migration.c
+> >> +++ b/hw/vfio/migration.c  
+> > [snip]  
+> >> @@ -64,6 +216,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+> >>           ret = -EINVAL;
+> >>           goto err;
+> >>       }
+> >> +
+> >> +    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> >> +                                                           vbasedev);
+> >>       return 0;
+> >>   
+> >>   err:  
+> > 
+> > Fails to build, @migration is not defined.  We could use
+> > vbasedev->migration or pull defining and setting @migration from patch
+> > 06.  Thanks,
+> >   
+> 
+> Pulling and setting migration from patch 06 seems better option.
+> Should I resend patch 5 & 6 only?
 
-diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-index 895433c356..0ebce37a19 100644
---- a/docs/system/deprecated.rst
-+++ b/docs/system/deprecated.rst
-@@ -21,12 +21,6 @@ deprecated.
- System emulator command line arguments
- --------------------------------------
- 
--``-machine enforce-config-section=on|off`` (since 3.1)
--''''''''''''''''''''''''''''''''''''''''''''''''''''''
--
--The ``enforce-config-section`` parameter is replaced by the
--``-global migration.send-configuration={on|off}`` option.
--
- ``-usbdevice`` (since 2.10.0)
- '''''''''''''''''''''''''''''
- 
-@@ -689,6 +683,12 @@ Support for invalid topologies is removed, the user must ensure
- topologies described with -smp include all possible cpus, i.e.
- *sockets* * *cores* * *threads* = *maxcpus*.
- 
-+``-machine enforce-config-section=on|off`` (removed 5.2)
-+''''''''''''''''''''''''''''''''''''''''''''''''''''''''
-+
-+The ``enforce-config-section`` property was replaced by the
-+``-global migration.send-configuration={on|off}`` option.
-+
- Block devices
- -------------
- 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index d740a7e963..7a0b263cda 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -411,24 +411,6 @@ static bool machine_get_suppress_vmdesc(Object *obj, Error **errp)
-     return ms->suppress_vmdesc;
- }
- 
--static void machine_set_enforce_config_section(Object *obj, bool value,
--                                             Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
--
--    warn_report("enforce-config-section is deprecated, please use "
--                "-global migration.send-configuration=on|off instead");
--
--    ms->enforce_config_section = value;
--}
--
--static bool machine_get_enforce_config_section(Object *obj, Error **errp)
--{
--    MachineState *ms = MACHINE(obj);
--
--    return ms->enforce_config_section;
--}
--
- static char *machine_get_memory_encryption(Object *obj, Error **errp)
+I've resolved this locally as patch 05:
+
+@@ -38,6 +190,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
  {
-     MachineState *ms = MACHINE(obj);
-@@ -857,11 +839,6 @@ static void machine_class_init(ObjectClass *oc, void *data)
-     object_class_property_set_description(oc, "suppress-vmdesc",
-         "Set on to disable self-describing migration");
+     int ret;
+     Object *obj;
++    VFIOMigration *migration;
  
--    object_class_property_add_bool(oc, "enforce-config-section",
--        machine_get_enforce_config_section, machine_set_enforce_config_section);
--    object_class_property_set_description(oc, "enforce-config-section",
--        "Set on to enforce configuration section migration");
--
-     object_class_property_add_str(oc, "memory-encryption",
-         machine_get_memory_encryption, machine_set_memory_encryption);
-     object_class_property_set_description(oc, "memory-encryption",
-diff --git a/include/hw/boards.h b/include/hw/boards.h
-index bf53e8a16e..a49e3a6b44 100644
---- a/include/hw/boards.h
-+++ b/include/hw/boards.h
-@@ -268,7 +268,6 @@ struct MachineState {
-     char *firmware;
-     bool iommu;
-     bool suppress_vmdesc;
--    bool enforce_config_section;
-     bool enable_graphics;
-     char *memory_encryption;
-     char *ram_memdev_id;
-diff --git a/migration/migration.c b/migration/migration.c
-index 0575ecb379..deb6005b8d 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -145,7 +145,6 @@ static void migrate_fd_cancel(MigrationState *s);
- 
- void migration_object_init(void)
- {
--    MachineState *ms = MACHINE(qdev_get_machine());
-     Error *err = NULL;
- 
-     /* This can only be called once. */
-@@ -170,15 +169,6 @@ void migration_object_init(void)
-         error_report_err(err);
-         exit(1);
+     if (!vbasedev->ops->vfio_get_object) {
+         return -EINVAL;
+@@ -64,6 +217,10 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+         ret = -EINVAL;
+         goto err;
      }
--
--    /*
--     * We cannot really do this in migration_instance_init() since at
--     * that time global properties are not yet applied, then this
--     * value will be definitely replaced by something else.
--     */
--    if (ms->enforce_config_section) {
--        current_migration->send_configuration = true;
--    }
- }
++
++    migration = vbasedev->migration;
++    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
++                                                           vbasedev);
+     return 0;
  
- void migration_shutdown(void)
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 9e1ace04f7..2c83390504 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -34,7 +34,6 @@ DEF("machine", HAS_ARG, QEMU_OPTION_machine, \
-     "                dea-key-wrap=on|off controls support for DEA key wrapping (default=on)\n"
-     "                suppress-vmdesc=on|off disables self-describing migration (default=off)\n"
-     "                nvdimm=on|off controls NVDIMM support (default=off)\n"
--    "                enforce-config-section=on|off enforce configuration section migration (default=off)\n"
-     "                memory-encryption=@var{} memory encryption object to use (default=none)\n"
-     "                hmat=on|off controls ACPI HMAT support (default=off)\n",
-     QEMU_ARCH_ALL)
-@@ -91,13 +90,6 @@ SRST
-     ``nvdimm=on|off``
-         Enables or disables NVDIMM support. The default is off.
- 
--    ``enforce-config-section=on|off``
--        If ``enforce-config-section`` is set to on, force migration code
--        to send configuration section even if the machine-type sets the
--        ``migration.send-configuration`` property to off. NOTE: this
--        parameter is deprecated. Please use ``-global``
--        ``migration.send-configuration``\ =on\|off instead.
--
-     ``memory-encryption=``
-         Memory encryption object to use. The default is none.
- 
--- 
-2.26.2
+ err:
 
+patch 06:
+
+@@ -219,8 +243,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+     }
+ 
+     migration = vbasedev->migration;
++    migration->vbasedev = vbasedev;
+     migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+                                                            vbasedev);
++    migration->migration_state.notify = vfio_migration_state_notifier;
++    add_migration_state_change_notifier(&migration->migration_state);
+     return 0;
+ 
+ err:
+
+If you're satisfied with that, no need to resend.  Thanks,
+
+Alex
 
 
