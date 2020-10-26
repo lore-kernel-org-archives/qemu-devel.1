@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 462F9C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:38:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B9A5C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:38:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B5B2E22242
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:38:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F41FB22242
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:38:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="OCp0LLaW"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B5B2E22242
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="uwer6+Mc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F41FB22242
 Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59774 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6Rl-0007qk-Rz
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:38:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49726)
+	id 1kX6SG-0008Ab-4D
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:38:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49548)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX69N-00080V-Q3; Mon, 26 Oct 2020 13:19:19 -0400
-Received: from mail-eopbgr60093.outbound.protection.outlook.com
- ([40.107.6.93]:39555 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
+ id 1kX691-0007lS-DG; Mon, 26 Oct 2020 13:18:55 -0400
+Received: from mail-vi1eur05on2123.outbound.protection.outlook.com
+ ([40.107.21.123]:17409 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX69A-0008NC-3R; Mon, 26 Oct 2020 13:19:14 -0400
+ id 1kX68z-0008Ou-LU; Mon, 26 Oct 2020 13:18:55 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=WUHOOoKIehEgyMEioVb+nxn6QpMHbpm/bqLE2JGPpshSaPLP1K5zNp7pGqIyBv9U3WYNPhUK9OJGIEHwRn/7Er1h6Ewiv0m+SSXMoIm9EdFCiScKvTGw+5A97f8BC9rAl+0S8XtdX3s77Vu8EtJOAvlubzu4/xi+wrsO5HrubIcyBymYXdkCPHfGe0Qa/pPbEf6GX4ykVaeRmQA8mBQlNSZVXR+df13LKEREC64ikH21x9WcGeMcBSXQRnirNGuLAAFZBp3/0I9D3PMao2NVNpZoyNF1N9A8HXTkzbGa3lMaPu4OE54MfAKF4YL7uMEtl/yY4+vgnOx7ZMcsp8xACQ==
+ b=TxWSzvp/GiKmOgUf3yD1wrIhhGriZYBOVCtL00sVKYwtITVKVve+a9S06nxSFUlcA1SmzcdahxgeBhsersrndycOEMloNfiuJABJ2fNv9m9O5nFLYf3jlG4aJkqWJcmoeVQt3xLGsJ4uWpu3UJxliHGhb5gp9xKFNmqCEOxWVjMlX6fhQEMwm/EXkJrwutCgkHlFTAjd1EQX4jxWWJ3gVIocxIneTtFuz16a+yn5VYBwiycZwQKiksiTOsBSGhRq5z4xAdJ/M0swqh7KTy4kQ6GLJpz7FEqfxoeCPhLE73DtVqQDkPOeTvJ2/F3SJYa/I6tyDmW1ZJrU8EnjHp8MgA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7blNLfYfmsle4Ppu6DqQyUTOJ5oaBW+g3DdYSYApssA=;
- b=MBYflykjZXU11OI6/5tYEVsY3M/8IxRaCqeWuY3HVbIAQ6ULFEEC4xU6/OEb3VQAayGiQj6ctl30A1YYUEP9f8PUqUrLbKdJsYsRASPukXfAMnUeAjJAH8AVTqkJh/NlDFmheUFDNJ9WYyVDgQys9D3N58j0v7CSO64lh4+q+X0PHm4/i7oVxFpLgLKS+hi5RTKKGy3X5fwYuytPWICawRlRv6yZsBvGE+b9jmXH/FcbnLe9zadMqn1FxO1wu72dE5wk6fP9fOXcbeGGucPGvzoT3R3jLIpqGe60h79Cf0LC+GK9KGjbz8DJaeusT+7jc873Rkb0gGQntbC6ktmoXg==
+ bh=URZwoNWNyx4nEg3ZYnTOvQwp3HpRk9+C2ZYXmFxOgbg=;
+ b=G7FMcFIDoYcwlUh1D7j85WBl7z9P6BNYp2WbWv7HImKZNpcVPnnp0gSmsLtIFVwq4atACngfzEWythf0f6dz29rHbXHIDmyZ5Wt/6b+BrgxQoJA5bpKa3Faw+7/Uym/ZTSbNGVJCB1YK75c7/cUQ9e2sJhbvy63rwObCL2BbkXp/i7C/Ocs7EewPfJRq8+MTxx2z4NcBJd7JQuTmHbdfjKSIoHPg+YSDKRqTXI34cQS9sdEa3lq3lQH3ZSzg1EK4ErFcxx8SNWepaWMfci6LwCTLL3XDmnZXnL0hS2se3yhg35m6o/pEBALwKYRLomFmWGLYjbWm3DITUj+lL+DO1Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
  header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7blNLfYfmsle4Ppu6DqQyUTOJ5oaBW+g3DdYSYApssA=;
- b=OCp0LLaW7vu3hqlgedJbF+ntSbutLPaE6NatzjujTr3kpzZeBbphb6ERcLybUTr10YT5coM8adP88u8X9krOVEKn4fouFv9LxQtXFeFDvSw2KmYzIb0JChQa2bTDRQmbRRqcc4aZmFh0Iq/IBs7uNXKV5ZiI/aZh9obQRVBJ6LA=
+ bh=URZwoNWNyx4nEg3ZYnTOvQwp3HpRk9+C2ZYXmFxOgbg=;
+ b=uwer6+Mctj95WWjFfJ/hrVe60f4D190zaSoRxOpWp9IFP0nZCq0zPE6NTXZBZAsHmobia650GwZKy+fsr01Ci6ebRDtRli6jNPJHd/UqPFqqaLuioy3XnqeOjLt1emq65PoAOduXfuGBEBBU39LbWmCJz8bQBVIedxm0OzSwV+8=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
  by AM6PR08MB3032.eurprd08.prod.outlook.com (2603:10a6:209:43::31)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 26 Oct
- 2020 17:18:48 +0000
+ 2020 17:18:40 +0000
 Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
  ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Mon, 26 Oct 2020
- 17:18:48 +0000
+ 17:18:40 +0000
 From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 To: qemu-block@nongnu.org
 Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, eblake@redhat.com,
  armbru@redhat.com, xiechanglong.d@gmail.com, wencongyang2@huawei.com,
  jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Subject: [PATCH v3 21/25] block/block-copy: drop unused
- block_copy_set_progress_callback()
-Date: Mon, 26 Oct 2020 20:18:11 +0300
-Message-Id: <20201026171815.13233-22-vsementsov@virtuozzo.com>
+Subject: [PATCH v3 12/25] iotests: 56: prepare for backup over block-copy
+Date: Mon, 26 Oct 2020 20:18:02 +0300
+Message-Id: <20201026171815.13233-13-vsementsov@virtuozzo.com>
 X-Mailer: git-send-email 2.21.3
 In-Reply-To: <20201026171815.13233-1-vsementsov@virtuozzo.com>
 References: <20201026171815.13233-1-vsementsov@virtuozzo.com>
@@ -83,44 +82,43 @@ Received: from kvm.sw.ru (185.215.60.99) by
  AM0PR02CA0101.eurprd02.prod.outlook.com (2603:10a6:208:154::42) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Mon, 26 Oct 2020 17:18:47 +0000
+ Transport; Mon, 26 Oct 2020 17:18:39 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: a3e7cc94-b870-4196-c762-08d879d333ae
+X-MS-Office365-Filtering-Correlation-Id: 983bfe6c-4455-4338-292c-08d879d32ecc
 X-MS-TrafficTypeDiagnostic: AM6PR08MB3032:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB3032DFB9A01A0E4BB88D0BF5C1190@AM6PR08MB3032.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:52;
+X-Microsoft-Antispam-PRVS: <AM6PR08MB303269877E015BD4CC64C1DEC1190@AM6PR08MB3032.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: XShwB12DL7JOIJ5F/GPizucIMvTew0bSals62B9ZHhGv0+HwiS37AE21IF6rKd9i7m6yRnVJNImxK8ZTNv/zu5EbxNWsnPh/Ywcw9QINZKKyFrpEqwETUaguaewGxc+31NfqHOXXcqFGuUHTocef/xJkXBNB7f1Rqh9kf1QYG5n3XQ/94r8WEmjz27ArpAlrpq936o0KbrtC5k4IaaAztEqlRZuFoN4Yx9pP+w+4xziZWuSf+fpCDiqmQjHPU+SfRdP80wWkzDp33ChWHnqjDhGlgk6yfmijJZ5yj8bpjsI1KzmxT/dYNSDXZkpIrjIKGE9T6bdA1+5DQZKNwx0U+g==
+X-Microsoft-Antispam-Message-Info: 2qGkHLDIDHgefUO3CHImalouuE6Ok4Zvd62K055tOaUGYL2LLtF+BbeuYrMTJxvT4pk8pZJEKqaxHmvKtCOgV/5xHrExpnU8QTaNE58qe9BtECgw+Hbx84WNA7DmTHooWwmnspW3+yzRtxQrOArEHymbgfEsvHNAqHNhBqVS0emr/vodO2bDwI18qJBOHR2hbIHQ5pugPMP476BGAhVdtiqsYXWh/XYUTKJj5fOfkAv2KQVWZzgYkrh7Z9An/OEbkZE1i7M2NCGwanF6RwNCpAtbqiH2DDmnha0rOKYCYBrdCJHmMObXM0kHYMC4p1nB
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(366004)(39850400004)(376002)(346002)(396003)(66476007)(8936002)(5660300002)(316002)(6506007)(6512007)(2616005)(66946007)(956004)(66556008)(6666004)(26005)(4326008)(36756003)(478600001)(52116002)(1076003)(16526019)(83380400001)(2906002)(186003)(6916009)(8676002)(107886003)(86362001)(6486002);
+ SFS:(4636009)(136003)(366004)(376002)(346002)(396003)(39840400004)(66476007)(8936002)(5660300002)(316002)(6506007)(6512007)(2616005)(66946007)(956004)(66556008)(6666004)(26005)(4326008)(36756003)(478600001)(52116002)(1076003)(16526019)(83380400001)(2906002)(186003)(6916009)(8676002)(107886003)(86362001)(6486002);
  DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: pOxxpAiL7t/5mu4ssrHYgwnlaihiJTJSrHY8jyr8c4RASF7mPzDuHXhjKlzGYjgDSPSMKSgdZBD5ZW5Pnr3p26aM5Vs0Hj+bcRB6i8OptPYhnJA3x57YKt0zOojiQaGVS040QMdShbvJyCmKxb7g1ejKeH8TsLycNB4kW7mph2QjDJF0Nczks14sAcjd8gXC5lARn4KFw4b0/s+JzJi0ZhdE3JYYExV97O1QgMrA6vrTAKWi9yRtbVQd5Gvr21hW0UitJjFIj0CkbQkGTq/YvcW2NY2i4CsCDiwB6qSQmXEVsGHBKyjx0UIpimJnPP0SlaXaz80wBVGI5Nb/EAi6mYsUjoUrWIKD2FpIxOtpjqqQxaf2HckJ2EcieeKdA2bBWjP6VD3G40TV98/L+TdOwDF9PRbWBiJfrlMgZtDJiz7/GZPBaPjpHT6LbpNqWlpV9Y7/w+ZC3/PJZcC7kwkxAwzO97Obgejqr6J8vXvFdeXMx0NUKNF4B5JjLf2aNGk3VR6C2SYop/mmyA0DCOFNGOKNylt8uU0qS+PiDjbxdsrK7Fcosg9Gs6D930+d8sQ+RU6skt97bfVSOncvDtXuCQrqfiaPWlSI7yKiJtybZucneRtEwkbAkwYRAUVEUteJBJcHLSQILv30+q55tM+QdQ==
+X-MS-Exchange-AntiSpam-MessageData: tG9MyDzKK83RnK784rQ/b9sAXIZhzbd/UlxGqauaT/IBcJzb+SAEopey6/QYpveL7IXzwv8jY2rjc98zfredH1gfOGOE7Jiel3QPEDeiLAVkcHUQFJnox0gtVs8RbgX3Izp5uJrEI+IXldFuoPpmGBu0tdGHdHIE9bADbyq4/W/RFyN4fctvINPPL9IjygcXixBXh++OhUZHkFTkbdUpBtiRMsrvdpLRo83BTSSa7PlPmymIX/aKxAzaLH/CLBeckhLXVFxm3LSRKC2SkJsobVLKSpt7V5gqb9I07dOPW0FtOJ4gy/zJO2QVABvRKm1zQFgcNFmIHvaiDAWGeRkxPX4fhqIPv9JpQR1yblb62g5fxZoaKphAyPq8lTH/Z27xL4sVtsNX+qFQWhAteWD2TjV5ZrABx+1Mhmb7iPzXhi85XKLWTvjJRHPmrQTUyudBJ2VLbuFDXC5fM+rAijKb1DKOmPlbtx9ddQy3b4PTkdbDYuCzA+CrMU+r4atKP0rdykOXn3cMaxrMiXvF/i0FohELBFvLye35osEeEUvUL6Yvg4V0ym1JBGp6+M4i2N/midy992YkoSZGxTPexxULrEy4BklNGZYov/LBFpVQfPoelOuMmF33J8Ae5rq7MKOcl7H+GE8vNJeXGj76UwbCmQ==
 X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a3e7cc94-b870-4196-c762-08d879d333ae
+X-MS-Exchange-CrossTenant-Network-Message-Id: 983bfe6c-4455-4338-292c-08d879d32ecc
 X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2020 17:18:48.6441 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2020 17:18:40.4690 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dhk52LXDAxTZTpk3qE74G1E40N0trVZuuuExLo03+9r8Dq5XDV7XrGkv1YBHvqamOtUuUCzCsm6hatq0cwHHdbWygDE9nnBZlo/sG0gHWO8=
+X-MS-Exchange-CrossTenant-UserPrincipalName: njovuEjzrSl2UJ4SUFKYeyphS8EazqD/VYcbSRWeI0yvJz2lqWWFpZY2LxNLS9RY3SwS4Uk9vh6cMG5daqOQ8PkLn597ZnTOlSAFoznbYE0=
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3032
-Received-SPF: pass client-ip=40.107.6.93;
+Received-SPF: pass client-ip=40.107.21.123;
  envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:18:35
+ helo=EUR05-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:18:43
 X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+X-Spam_score_int: -27
+X-Spam_score: -2.8
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -137,78 +135,36 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Drop unused code.
+After introducing parallel async copy requests instead of plain
+cluster-by-cluster copying loop, we'll have to wait for paused status,
+as we need to wait for several parallel request. So, let's gently wait
+instead of just asserting that job already paused.
 
 Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- include/block/block-copy.h |  6 ------
- block/block-copy.c         | 15 ---------------
- 2 files changed, 21 deletions(-)
+ tests/qemu-iotests/056 | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-diff --git a/include/block/block-copy.h b/include/block/block-copy.h
-index 8f5013d0aa..7b77abf70b 100644
---- a/include/block/block-copy.h
-+++ b/include/block/block-copy.h
-@@ -18,7 +18,6 @@
- #include "block/block.h"
- #include "qemu/co-shared-resource.h"
- 
--typedef void (*ProgressBytesCallbackFunc)(int64_t bytes, void *opaque);
- typedef void (*BlockCopyAsyncCallbackFunc)(void *opaque);
- typedef struct BlockCopyState BlockCopyState;
- typedef struct BlockCopyCallState BlockCopyCallState;
-@@ -28,11 +27,6 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-                                      BdrvRequestFlags write_flags,
-                                      Error **errp);
- 
--void block_copy_set_progress_callback(
--        BlockCopyState *s,
--        ProgressBytesCallbackFunc progress_bytes_callback,
--        void *progress_opaque);
--
- void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm);
- 
- void block_copy_state_free(BlockCopyState *s);
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 61d82d9a1c..2ea8b28684 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -110,9 +110,6 @@ typedef struct BlockCopyState {
-     bool skip_unallocated;
- 
-     ProgressMeter *progress;
--    /* progress_bytes_callback: called when some copying progress is done. */
--    ProgressBytesCallbackFunc progress_bytes_callback;
--    void *progress_opaque;
- 
-     SharedResource *mem;
- 
-@@ -298,15 +295,6 @@ BlockCopyState *block_copy_state_new(BdrvChild *source, BdrvChild *target,
-     return s;
- }
- 
--void block_copy_set_progress_callback(
--        BlockCopyState *s,
--        ProgressBytesCallbackFunc progress_bytes_callback,
--        void *progress_opaque)
--{
--    s->progress_bytes_callback = progress_bytes_callback;
--    s->progress_opaque = progress_opaque;
--}
--
- void block_copy_set_progress_meter(BlockCopyState *s, ProgressMeter *pm)
- {
-     s->progress = pm;
-@@ -454,9 +442,6 @@ static coroutine_fn int block_copy_task_entry(AioTask *task)
-         t->call_state->error_is_read = error_is_read;
-     } else {
-         progress_work_done(t->s->progress, t->bytes);
--        if (t->s->progress_bytes_callback) {
--            t->s->progress_bytes_callback(t->bytes, t->s->progress_opaque);
--        }
-     }
-     co_put_to_shres(t->s->mem, t->bytes);
-     block_copy_task_end(t, ret);
+diff --git a/tests/qemu-iotests/056 b/tests/qemu-iotests/056
+index 052456aa00..e2978ba019 100755
+--- a/tests/qemu-iotests/056
++++ b/tests/qemu-iotests/056
+@@ -307,8 +307,13 @@ class BackupTest(iotests.QMPTestCase):
+         event = self.vm.event_wait(name="BLOCK_JOB_ERROR",
+                                    match={'data': {'device': 'drive0'}})
+         self.assertNotEqual(event, None)
+-        # OK, job should be wedged
+-        res = self.vm.qmp('query-block-jobs')
++        # OK, job should pause, but it can't do it immediately, as it can't
++        # cancel other parallel requests (which didn't fail)
++        with iotests.Timeout(60, "Timeout waiting for backup actually paused"):
++            while True:
++                res = self.vm.qmp('query-block-jobs')
++                if res['return'][0]['status'] == 'paused':
++                    break
+         self.assert_qmp(res, 'return[0]/status', 'paused')
+         res = self.vm.qmp('block-job-dismiss', id='drive0')
+         self.assert_qmp(res, 'error/desc',
 -- 
 2.21.3
 
