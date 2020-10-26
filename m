@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C20C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:46:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CF10C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:49:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6D4CD20732
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:46:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B23912085B
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:49:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JG4KLGBE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6D4CD20732
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XLDRlaE9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B23912085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54218 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33444 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7Vg-0003t4-9c
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:46:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45678)
+	id 1kX7Yq-00075h-L7
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:49:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45744)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7TC-0001kQ-HA
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:50 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60889)
+ id 1kX7TI-0001s5-8h
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43305)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7TA-0003Xh-7N
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:49 -0400
+ id 1kX7TF-0003Za-Vg
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603737826;
+ s=mimecast20190719; t=1603737833;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gtsmfijWgyLNkgM0CrneJMzbSakeS+8oBqn1UodAYBA=;
- b=JG4KLGBEoj+vRWrZFbk/pI4GmPM9C4k8o1sDOgelNMBcO5JrHWcqz7cedbaH6Ar5WqoUxq
- R+68cQiVNTwPmgnt3rNz/hqPRrFxCvKhUfN5QomnirmndrmU+BsQ1FYP0LeRYJYI/G1oih
- N9NFsgYbaHMf5cX0Gkrb4ArfIrAHKBY=
+ bh=Sv1Qo7+CsFfaWKxUVr6u+y/lgrQ3vfxM4FjjEsXHMcc=;
+ b=XLDRlaE9mdy3V93mhRoLbjgj6MbR/wmSWa5PSL2Le64o/csQhZFr2lBsA3ErC6LekNxnmU
+ 3KJZJIOdRDp8I3AwAnhz0Tfvfaumst/NWg5Pp9s3UXPfUNHuMmHelR0C5bX8faCzpqtrB1
+ H7GgCz81MPRQpIwW7nwUnHANZv0PlrM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-186-PJIhcSMbPVKR02_jDegxQg-1; Mon, 26 Oct 2020 14:43:44 -0400
-X-MC-Unique: PJIhcSMbPVKR02_jDegxQg-1
+ us-mta-581-bpvbcnEKPnCD66Iyn3wFUw-1; Mon, 26 Oct 2020 14:43:49 -0400
+X-MC-Unique: bpvbcnEKPnCD66Iyn3wFUw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 388B3100854F;
- Mon, 26 Oct 2020 18:43:43 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5BCBA1074649;
+ Mon, 26 Oct 2020 18:43:48 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D20B85D9CA;
- Mon, 26 Oct 2020 18:43:41 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F25DD5D9CA;
+ Mon, 26 Oct 2020 18:43:46 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com,
  misono.tomohiro@jp.fujitsu.com
-Subject: [PULL 01/16] configure: add option for virtiofsd
-Date: Mon, 26 Oct 2020 18:43:16 +0000
-Message-Id: <20201026184331.272953-2-dgilbert@redhat.com>
+Subject: [PULL 04/16] tools/virtiofsd: xattr name mappings: Add option
+Date: Mon, 26 Oct 2020 18:43:19 +0000
+Message-Id: <20201026184331.272953-5-dgilbert@redhat.com>
 In-Reply-To: <20201026184331.272953-1-dgilbert@redhat.com>
 References: <20201026184331.272953-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -74,16 +74,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,132 +102,368 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Currently it is unknown whether virtiofsd will be built at
-configuration time. It will be automatically built when dependency
-is met. Also, required libraries are not clear.
+Add an option to define mappings of xattr names so that
+the client and server filesystems see different views.
+This can be used to have different SELinux mappings as
+seen by the guest, to run the virtiofsd with less privileges
+(e.g. in a case where it can't set trusted/system/security
+xattrs but you want the guest to be able to), or to isolate
+multiple users of the same name; e.g. trusted attributes
+used by stacking overlayfs.
 
-To make this clear, add configure option --{enable,disable}-virtiofsd.
-The default is the same as current (enabled if available) like many
-other options. When --enable-virtiofsd is given and dependency is not
-met, we get:
+A mapping engine is used with 3 simple rules; the rules can
+be combined to allow most useful mapping scenarios.
+The ruleset is defined by -o xattrmap='rules...'.
 
-  ERROR: Problem encountered: virtiofsd requires libcap-ng-devel and seccomp-devel
-or
-  ERROR: Problem encountered: virtiofsd needs tools and vhost-user support
+This patch doesn't use the rule maps yet.
 
-In addition, configuration summary now includes virtiofsd entry:
-
-  build virtiofs daemon: YES/NO
-
-Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
-Message-Id: <20201008103133.2722903-1-misono.tomohiro@jp.fujitsu.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-  Manual merge
+Message-Id: <20201023165812.36028-2-dgilbert@redhat.com>
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- configure         |  8 +++++++-
- meson.build       |  1 +
- meson_options.txt |  2 ++
- tools/meson.build | 17 +++++++++++++++--
- 4 files changed, 25 insertions(+), 3 deletions(-)
+ docs/tools/virtiofsd.rst         |  92 ++++++++++++++++
+ tools/virtiofsd/passthrough_ll.c | 173 +++++++++++++++++++++++++++++++
+ 2 files changed, 265 insertions(+)
 
-diff --git a/configure b/configure
-index 55e07c82dd..83610b0db8 100755
---- a/configure
-+++ b/configure
-@@ -302,6 +302,7 @@ fdt="auto"
- netmap="no"
- sdl="auto"
- sdl_image="auto"
-+virtiofsd="auto"
- virtfs=""
- libudev="auto"
- mpath="auto"
-@@ -999,6 +1000,10 @@ for opt do
-   ;;
-   --enable-libudev) libudev="enabled"
-   ;;
-+  --disable-virtiofsd) virtiofsd="disabled"
-+  ;;
-+  --enable-virtiofsd) virtiofsd="enabled"
-+  ;;
-   --disable-mpath) mpath="disabled"
-   ;;
-   --enable-mpath) mpath="enabled"
-@@ -1758,6 +1763,7 @@ disabled with --disable-FEATURE, default is enabled if available:
-   vnc-png         PNG compression for VNC server
-   cocoa           Cocoa UI (Mac OS X only)
-   virtfs          VirtFS
-+  virtiofsd       build virtiofs daemon (virtiofsd)
-   libudev         Use libudev to enumerate host devices
-   mpath           Multipath persistent reservation passthrough
-   xen             xen backend driver support
-@@ -6972,7 +6978,7 @@ NINJA=$ninja $meson setup \
-         -Dxen=$xen -Dxen_pci_passthrough=$xen_pci_passthrough -Dtcg=$tcg \
-         -Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
-         -Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
--        -Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
-+        -Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f -Dvirtiofsd=$virtiofsd \
-         -Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
-         -Diconv=$iconv -Dcurses=$curses -Dlibudev=$libudev\
-         -Ddocs=$docs -Dsphinx_build=$sphinx_build -Dinstall_blobs=$blobs \
-diff --git a/meson.build b/meson.build
-index 835424999d..47e32e1fcb 100644
---- a/meson.build
-+++ b/meson.build
-@@ -2045,6 +2045,7 @@ summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
- summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
- summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
- summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
-+summary_info += {'build virtiofs daemon': have_virtiofsd}
- summary_info += {'Multipath support': mpathpersist.found()}
- summary_info += {'VNC support':       vnc.found()}
- if vnc.found()
-diff --git a/meson_options.txt b/meson_options.txt
-index 48ab4ce7d0..b4f1801875 100644
---- a/meson_options.txt
-+++ b/meson_options.txt
-@@ -62,6 +62,8 @@ option('vnc_sasl', type : 'feature', value : 'auto',
-        description: 'SASL authentication for VNC server')
- option('xkbcommon', type : 'feature', value : 'auto',
-        description: 'xkbcommon support')
-+option('virtiofsd', type: 'feature', value: 'auto',
-+       description: 'build virtiofs daemon (virtiofsd)')
+diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+index 65f8e76569..67c16f9df0 100644
+--- a/docs/tools/virtiofsd.rst
++++ b/docs/tools/virtiofsd.rst
+@@ -127,6 +127,98 @@ Options
+   timeout.  ``always`` sets a long cache lifetime at the expense of coherency.
+   The default is ``auto``.
  
- option('capstone', type: 'combo', value: 'auto',
-        choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
-diff --git a/tools/meson.build b/tools/meson.build
-index 513bd2ff4f..76bf84df52 100644
---- a/tools/meson.build
-+++ b/tools/meson.build
-@@ -1,10 +1,23 @@
--have_virtiofsd = (have_system and
-+have_virtiofsd = (targetos == 'linux' and
-     have_tools and
--    'CONFIG_LINUX' in config_host and 
-     'CONFIG_SECCOMP' in config_host and
-     'CONFIG_LIBCAP_NG' in config_host and
-     'CONFIG_VHOST_USER' in config_host)
- 
-+if get_option('virtiofsd').enabled()
-+  if not have_virtiofsd
-+    if targetos != 'linux'
-+      error('virtiofsd requires Linux')
-+    elif 'CONFIG_SECCOMP' not in config_host or 'CONFIG_LIBCAP_NG' not in config_host
-+      error('virtiofsd requires libcap-ng-devel and seccomp-devel')
-+    elif not have_tools or 'CONFIG_VHOST_USER' not in config_host
-+      error('virtiofsd needs tools and vhost-user support')
-+    endif
-+  endif
-+elif get_option('virtiofsd').disabled() or not have_system
-+  have_virtiofsd = false
-+endif
++xattr-mapping
++-------------
 +
- if have_virtiofsd
-   subdir('virtiofsd')
- endif
++By default the name of xattr's used by the client are passed through to the server
++file system.  This can be a problem where either those xattr names are used
++by something on the server (e.g. selinux client/server confusion) or if the
++virtiofsd is running in a container with restricted privileges where it cannot
++access some attributes.
++
++A mapping of xattr names can be made using -o xattrmap=mapping where the ``mapping``
++string consists of a series of rules.
++
++The first matching rule terminates the mapping.
++The set of rules must include a terminating rule to match any remaining attributes
++at the end.
++
++Each rule consists of a number of fields separated with a separator that is the
++first non-white space character in the rule.  This separator must then be used
++for the whole rule.
++White space may be added before and after each rule.
++Using ':' as the separator a rule is of the form:
++
++``:type:scope:key:prepend:``
++
++**scope** is:
++
++- 'client' - match 'key' against a xattr name from the client for
++             setxattr/getxattr/removexattr
++- 'server' - match 'prepend' against a xattr name from the server
++             for listxattr
++- 'all' - can be used to make a single rule where both the server
++          and client matches are triggered.
++
++**type** is one of:
++
++- 'prefix' - is designed to prepend and strip a prefix;  the modified
++  attributes then being passed on to the client/server.
++
++- 'ok' - Causes the rule set to be terminated when a match is found
++  while allowing matching xattr's through unchanged.
++  It is intended both as a way of explicitly terminating
++  the list of rules, and to allow some xattr's to skip following rules.
++
++- 'bad' - If a client tries to use a name matching 'key' it's
++  denied using EPERM; when the server passes an attribute
++  name matching 'prepend' it's hidden.  In many ways it's use is very like
++  'ok' as either an explict terminator or for special handling of certain
++  patterns.
++
++**key** is a string tested as a prefix on an attribute name originating
++on the client.  It maybe empty in which case a 'client' rule
++will always match on client names.
++
++**prepend** is a string tested as a prefix on an attribute name originating
++on the server, and used as a new prefix.  It may be empty
++in which case a 'server' rule will always match on all names from
++the server.
++
++e.g.:
++
++  ``:prefix:client:trusted.:user.virtiofs.:``
++
++  will match 'trusted.' attributes in client calls and prefix them before
++  passing them to the server.
++
++  ``:prefix:server::user.virtiofs.:``
++
++  will strip 'user.virtiofs.' from all server replies.
++
++  ``:prefix:all:trusted.:user.virtiofs.:``
++
++  combines the previous two cases into a single rule.
++
++  ``:ok:client:user.::``
++
++  will allow get/set xattr for 'user.' xattr's and ignore
++  following rules.
++
++  ``:ok:server::security.:``
++
++  will pass 'securty.' xattr's in listxattr from the server
++  and ignore following rules.
++
++  ``:ok:all:::``
++
++  will terminate the rule search passing any remaining attributes
++  in both directions.
++
++  ``:bad:server::security.:``
++
++  would hide 'security.' xattr's in listxattr from the server.
++
+ Examples
+ --------
+ 
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index f03b1f9a69..cb24af27f5 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -64,6 +64,7 @@
+ #include <syslog.h>
+ #include <unistd.h>
+ 
++#include "qemu/cutils.h"
+ #include "passthrough_helpers.h"
+ #include "passthrough_seccomp.h"
+ 
+@@ -142,6 +143,12 @@ enum {
+     SANDBOX_CHROOT,
+ };
+ 
++typedef struct xattr_map_entry {
++    char *key;
++    char *prepend;
++    unsigned int flags;
++} XattrMapEntry;
++
+ struct lo_data {
+     pthread_mutex_t mutex;
+     int sandbox;
+@@ -150,6 +157,7 @@ struct lo_data {
+     int flock;
+     int posix_lock;
+     int xattr;
++    char *xattrmap;
+     char *source;
+     char *modcaps;
+     double timeout;
+@@ -163,6 +171,8 @@ struct lo_data {
+     struct lo_map ino_map; /* protected by lo->mutex */
+     struct lo_map dirp_map; /* protected by lo->mutex */
+     struct lo_map fd_map; /* protected by lo->mutex */
++    XattrMapEntry *xattr_map_list;
++    size_t xattr_map_nentries;
+ 
+     /* An O_PATH file descriptor to /proc/self/fd/ */
+     int proc_self_fd;
+@@ -184,6 +194,7 @@ static const struct fuse_opt lo_opts[] = {
+     { "no_posix_lock", offsetof(struct lo_data, posix_lock), 0 },
+     { "xattr", offsetof(struct lo_data, xattr), 1 },
+     { "no_xattr", offsetof(struct lo_data, xattr), 0 },
++    { "xattrmap=%s", offsetof(struct lo_data, xattrmap), 0 },
+     { "modcaps=%s", offsetof(struct lo_data, modcaps), 0 },
+     { "timeout=%lf", offsetof(struct lo_data, timeout), 0 },
+     { "timeout=", offsetof(struct lo_data, timeout_set), 1 },
+@@ -2022,6 +2033,161 @@ static void lo_flock(fuse_req_t req, fuse_ino_t ino, struct fuse_file_info *fi,
+     fuse_reply_err(req, res == -1 ? errno : 0);
+ }
+ 
++/* types */
++/*
++ * Exit; process attribute unmodified if matched.
++ * An empty key applies to all.
++ */
++#define XATTR_MAP_FLAG_OK      (1 <<  0)
++/*
++ * The attribute is unwanted;
++ * EPERM on write, hidden on read.
++ */
++#define XATTR_MAP_FLAG_BAD     (1 <<  1)
++/*
++ * For attr that start with 'key' prepend 'prepend'
++ * 'key' may be empty to prepend for all attrs
++ * key is defined from set/remove point of view.
++ * Automatically reversed on read
++ */
++#define XATTR_MAP_FLAG_PREFIX  (1 <<  2)
++
++/* scopes */
++/* Apply rule to get/set/remove */
++#define XATTR_MAP_FLAG_CLIENT  (1 << 16)
++/* Apply rule to list */
++#define XATTR_MAP_FLAG_SERVER  (1 << 17)
++/* Apply rule to all */
++#define XATTR_MAP_FLAG_ALL   (XATTR_MAP_FLAG_SERVER | XATTR_MAP_FLAG_CLIENT)
++
++static void add_xattrmap_entry(struct lo_data *lo,
++                               const XattrMapEntry *new_entry)
++{
++    XattrMapEntry *res = g_realloc_n(lo->xattr_map_list,
++                                     lo->xattr_map_nentries + 1,
++                                     sizeof(XattrMapEntry));
++    res[lo->xattr_map_nentries++] = *new_entry;
++
++    lo->xattr_map_list = res;
++}
++
++static void free_xattrmap(struct lo_data *lo)
++{
++    XattrMapEntry *map = lo->xattr_map_list;
++    size_t i;
++
++    if (!map) {
++        return;
++    }
++
++    for (i = 0; i < lo->xattr_map_nentries; i++) {
++        g_free(map[i].key);
++        g_free(map[i].prepend);
++    };
++
++    g_free(map);
++    lo->xattr_map_list = NULL;
++    lo->xattr_map_nentries = -1;
++}
++
++static void parse_xattrmap(struct lo_data *lo)
++{
++    const char *map = lo->xattrmap;
++    const char *tmp;
++
++    lo->xattr_map_nentries = 0;
++    while (*map) {
++        XattrMapEntry tmp_entry;
++        char sep;
++
++        if (isspace(*map)) {
++            map++;
++            continue;
++        }
++        /* The separator is the first non-space of the rule */
++        sep = *map++;
++        if (!sep) {
++            break;
++        }
++
++        tmp_entry.flags = 0;
++        /* Start of 'type' */
++        if (strstart(map, "prefix", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_PREFIX;
++        } else if (strstart(map, "ok", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_OK;
++        } else if (strstart(map, "bad", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_BAD;
++        } else {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Unexpected type;"
++                     "Expecting 'prefix', 'ok', or 'bad' in rule %zu\n",
++                     __func__, lo->xattr_map_nentries);
++            exit(1);
++        }
++
++        if (*map++ != sep) {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Missing '%c' at end of type field of rule %zu\n",
++                     __func__, sep, lo->xattr_map_nentries);
++            exit(1);
++        }
++
++        /* Start of 'scope' */
++        if (strstart(map, "client", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_CLIENT;
++        } else if (strstart(map, "server", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_SERVER;
++        } else if (strstart(map, "all", &map)) {
++            tmp_entry.flags |= XATTR_MAP_FLAG_ALL;
++        } else {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Unexpected scope;"
++                     " Expecting 'client', 'server', or 'all', in rule %zu\n",
++                     __func__, lo->xattr_map_nentries);
++            exit(1);
++        }
++
++        if (*map++ != sep) {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Expecting '%c' found '%c'"
++                     " after scope in rule %zu\n",
++                     __func__, sep, *map, lo->xattr_map_nentries);
++            exit(1);
++        }
++
++        /* At start of 'key' field */
++        tmp = strchr(map, sep);
++        if (!tmp) {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Missing '%c' at end of key field of rule %zu",
++                     __func__, sep, lo->xattr_map_nentries);
++            exit(1);
++        }
++        tmp_entry.key = g_strndup(map, tmp - map);
++        map = tmp + 1;
++
++        /* At start of 'prepend' field */
++        tmp = strchr(map, sep);
++        if (!tmp) {
++            fuse_log(FUSE_LOG_ERR,
++                     "%s: Missing '%c' at end of prepend field of rule %zu",
++                     __func__, sep, lo->xattr_map_nentries);
++            exit(1);
++        }
++        tmp_entry.prepend = g_strndup(map, tmp - map);
++        map = tmp + 1;
++
++        add_xattrmap_entry(lo, &tmp_entry);
++        /* End of rule - go around again for another rule */
++    }
++
++    if (!lo->xattr_map_nentries) {
++        fuse_log(FUSE_LOG_ERR, "Empty xattr map\n");
++        exit(1);
++    }
++}
++
+ static void lo_getxattr(fuse_req_t req, fuse_ino_t ino, const char *name,
+                         size_t size)
+ {
+@@ -2858,6 +3024,8 @@ static void fuse_lo_data_cleanup(struct lo_data *lo)
+         close(lo->root.fd);
+     }
+ 
++    free(lo->xattrmap);
++    free_xattrmap(lo);
+     free(lo->source);
+ }
+ 
+@@ -2958,6 +3126,11 @@ int main(int argc, char *argv[])
+     } else {
+         lo.source = strdup("/");
+     }
++
++    if (lo.xattrmap) {
++        parse_xattrmap(&lo);
++    }
++
+     if (!lo.timeout_set) {
+         switch (lo.cache) {
+         case CACHE_NONE:
 -- 
 2.28.0
 
