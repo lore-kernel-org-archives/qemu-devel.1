@@ -2,89 +2,79 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 50430C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:40:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C3E02C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:42:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9589422265
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:40:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xFGbjG+W"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9589422265
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id C0779206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:42:24 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C0779206F4
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34286 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37068 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX0rB-0004HW-OI
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:40:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35396)
+	id 1kX0tL-0005b1-T7
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:42:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX0pw-0003aE-JC
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:38:52 -0400
-Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:40213)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kX0rt-0004ot-Ud
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:40:53 -0400
+Received: from indium.canonical.com ([91.189.90.7]:45038)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX0pu-0006ol-0H
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:38:52 -0400
-Received: by mail-ed1-x541.google.com with SMTP id p13so8900809edi.7
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 04:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8S2JinLb9lWGKscLwifjdAqWcMxstZyUBqU3LCeJXGo=;
- b=xFGbjG+WRzcNSnTy97NSIELrWn6WK7B10cNarI3kCpnT+oqrIMJvoz4S2tgUuhlfiI
- WVww3NDiX9aJiF0fhbTaf4l6fAvJQacIhnC7ec4NTMMx7qZClwT01YMmO3XZ22w8J+6M
- rwDu+n+0gYg3a3xWaS33VHtle7E/cEmgxh4f36zuDCRmP2rSMtL71qRue3P4X4Nibz4e
- oXy0dTnCvvu9Ier6WdB9A48xRsWH9fHhfzE98hqwGvb8MvM1LUj72XsZBj3fTdQxon+U
- Zwn7r2RNbU2pW8+JNH8+nsWcBY6M6Wj0aZAJAm7D+Mr/P4hDcDxO8R4TAt8kjaZcy4ZJ
- 5vEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=8S2JinLb9lWGKscLwifjdAqWcMxstZyUBqU3LCeJXGo=;
- b=oY284JaCYImmJ/ZYpaDDFnJLYxxmmyxpyQOHmhSWRiwWD8zhCZBgKXWTBYYL6YmsFB
- U5+ojwZt+c4MieTO6lfXp48qGs6B63ZMSbPGwqEUbdkNm9LL7ukrX+8/gm/QkRQ6CiGO
- xzOlYxnpNt4PBD6Nf5s9CHQWfWJjyTByQbnXtXjgr/0vqG0uPrTKB1pATSoxNEd7rRWl
- J3nY0Loqu/ui4d/XedQkxE7kDSfgYYH39N7Pk/WjVYl1GRlxJvHIwS3c72mOreGXKAX6
- ioZ3li2qvOKwqVOAeponJ6dzZjdJ+Faa875sEnuPtRuA3z3hCxyuTHvo0NKCwnI/Nfzn
- 1JXQ==
-X-Gm-Message-State: AOAM533Wc+jMH0IvalOmPJHQbP+3ElbPkamqjWxPoeQFRapTVZ/4fmpD
- T8Z+Btc2D42TUM7avBPRrOJrkO2VRGPC3SDAsZ8kkA==
-X-Google-Smtp-Source: ABdhPJwT723/U1O5ibpoIsKlla9tQ1SeiFoAQ3JiLRDP22LIewM89+sVCw1OwOxCLhNZWOnkRTTuB63gCq6omIyW808=
-X-Received: by 2002:aa7:c683:: with SMTP id n3mr15018685edq.146.1603712328549; 
- Mon, 26 Oct 2020 04:38:48 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kX0rr-0007Ep-QJ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:40:53 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kX0rq-0005W3-1h
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 11:40:50 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 0215C2E812F
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 11:40:50 +0000 (UTC)
 MIME-Version: 1.0
-References: <20201020105938.23209-1-thuth@redhat.com>
-In-Reply-To: <20201020105938.23209-1-thuth@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Oct 2020 11:38:37 +0000
-Message-ID: <CAFEAcA8hxhVgpBdTd24opRKtnYa_73NSuU67Y17F_Rpbup2cFg@mail.gmail.com>
-Subject: Re: [PATCH] hw/arm/highbank: Silence warnings about missing
- fallthrough statements
-To: Thomas Huth <thuth@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::541;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Oct 2020 11:32:58 -0000
+From: "Cheol-Woo,Myung" <1901532@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: cwmyung
+X-Launchpad-Bug-Reporter: Cheol-Woo,Myung (cwmyung)
+X-Launchpad-Bug-Modifier: Cheol-Woo,Myung (cwmyung)
+Message-Id: <160371197903.29636.2526014342409272320.malonedeb@chaenomeles.canonical.com>
+Subject: [Bug 1901532] [NEW] Assertion failure `mr != NULL' failed through
+ usb-ehci
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
+X-Launchpad-Hash: 926139494c467a5f472bba827ed10fcde97f60ce
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 04:15:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -65
+X-Spam_score: -6.6
+X-Spam_bar: ------
+X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -93,26 +83,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>, Rob Herring <robh@kernel.org>,
- qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: Bug 1901532 <1901532@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 20 Oct 2020 at 11:59, Thomas Huth <thuth@redhat.com> wrote:
->
-> When compiling with -Werror=implicit-fallthrough, gcc complains about
-> missing fallthrough annotations in this file. Looking at the code,
-> the fallthrough is very likely intended here, so add some comments
-> to silence the compiler warnings.
->
-> Signed-off-by: Thomas Huth <thuth@redhat.com>
-> ---
->  hw/arm/highbank.c | 2 ++
->  1 file changed, 2 insertions(+)
+Public bug reported:
+
+Hello,
+
+Using hypervisor fuzzer, hyfuzz, I found an assertion failure through
+usb-ehci.
+
+This was found in version 5.0.1 (stable-5.0).
+
+--------
+
+qemu-system-i386: src/qemu-repro/exec.c:3581: address_space_unmap: Assertio=
+n `mr !=3D NULL' failed.
+[1]    14721 abort      src/qemu-repro/build/i386-softmmu/qemu-system-i386
 
 
-Applied to target-arm.next, thanks.
+To reproduce the assertion failure, please run the QEMU with following comm=
+and line.
 
--- PMM
+```
+$ qemu-system-i386 -drive file=3D./hyfuzz.img,index=3D0,media=3Ddisk,format=
+=3Draw -m 512 -drive if=3Dnone,id=3Dstick,file=3D./usbdisk.img -device usb-=
+ehci,id=3Dehci -device usb-storage,bus=3Dehci.0,drive=3Dstick
+```
+
+** Affects: qemu
+     Importance: Undecided
+         Status: New
+
+** Attachment added: "attachment.zip"
+   https://bugs.launchpad.net/bugs/1901532/+attachment/5427245/+files/attac=
+hment.zip
+
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1901532
+
+Title:
+  Assertion failure `mr !=3D NULL' failed through usb-ehci
+
+Status in QEMU:
+  New
+
+Bug description:
+  Hello,
+
+  Using hypervisor fuzzer, hyfuzz, I found an assertion failure through
+  usb-ehci.
+
+  This was found in version 5.0.1 (stable-5.0).
+
+  --------
+
+  qemu-system-i386: src/qemu-repro/exec.c:3581: address_space_unmap: Assert=
+ion `mr !=3D NULL' failed.
+  [1]    14721 abort      src/qemu-repro/build/i386-softmmu/qemu-system-i386
+
+  =
+
+  To reproduce the assertion failure, please run the QEMU with following co=
+mmand line.
+
+  ```
+  $ qemu-system-i386 -drive file=3D./hyfuzz.img,index=3D0,media=3Ddisk,form=
+at=3Draw -m 512 -drive if=3Dnone,id=3Dstick,file=3D./usbdisk.img -device us=
+b-ehci,id=3Dehci -device usb-storage,bus=3Dehci.0,drive=3Dstick
+  ```
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1901532/+subscriptions
 
