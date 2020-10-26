@@ -1,65 +1,87 @@
-Return-Path: <SRS0=AG+E=EA=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
+Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.kernel.org@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,HK_RANDOM_FROM,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7373AC4363A
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 23:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABE77C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 01:41:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B777D208B3
-	for <qemu-devel@archiver.kernel.org>; Sun, 25 Oct 2020 23:44:51 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B777D208B3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bu.edu
+	by mail.kernel.org (Postfix) with ESMTPS id D25A42225E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 01:41:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cD4aoGVC"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D25A42225E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55258 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWpgw-0007qe-Oc
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 19:44:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54280)
+	id 1kWrWH-0007oE-Od
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 21:41:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kWpfy-0007NK-VE
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 19:43:50 -0400
-Received: from relay64.bu.edu ([128.197.228.104]:50009)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alxndr@bu.edu>) id 1kWpfw-0004rG-KX
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 19:43:50 -0400
-X-Envelope-From: alxndr@bu.edu
-X-BU-AUTH: mozz.bu.edu [128.197.127.33]
-Received: from BU-AUTH (localhost.localdomain [127.0.0.1]) (authenticated
- bits=0)
- by relay64.bu.edu (8.14.3/8.14.3) with ESMTP id 09PNh4rl011208
- (version=TLSv1/SSLv3 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
- Sun, 25 Oct 2020 19:43:10 -0400
-Date: Sun, 25 Oct 2020 19:43:04 -0400
-From: Alexander Bulekov <alxndr@bu.edu>
-To: Joelle van Dyne <j@getutm.app>
-Subject: Re: [PATCH v2 6/9] tcg: implement mirror mapped JIT for iOS
-Message-ID: <20201025234304.v3sclooubjsdvqga@mozz.bu.edu>
-References: <20201019013928.72770-1-j@getutm.app>
- <20201019013928.72770-7-j@getutm.app>
- <aa4c227-c33-72dc-92c6-75792f60b58e@eik.bme.hu>
- <CA+E+eSAYV50ACGaAvd_e-eR3FoSiBq6EXqDVRH7vJZyYHvhA8w@mail.gmail.com>
- <b1a9e0c9-4327-6950-bc58-8c79dbe8b8a0@linaro.org>
- <CA+E+eSBh7fQnn+PapM_hnuo=jeKih6Q+Vmbjyz3ci2Y_c-okZw@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kWrVc-0007JX-Qd; Sun, 25 Oct 2020 21:41:16 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:40346)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kWrVX-0002YE-RT; Sun, 25 Oct 2020 21:41:16 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id n142so6346421ybf.7;
+ Sun, 25 Oct 2020 18:41:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc:content-transfer-encoding;
+ bh=Q3cPl29zKnqybr70jkv6rl7R1OTzhpJ8x1NVQwDLhD8=;
+ b=cD4aoGVCKSSxU0UZLAZzpFoMIb0dFYBRkM1oDfqrp/x0DqHM+2lGtJydWlZM+Ecf2v
+ x3Vkzd79Tlo615n6cZpGWcBDZ5rui45QCCuSVvnkUHm5QDvgxOe7QRdjuntXmdWvvWw7
+ udQ5NWxABayALqRF5SIQAOuMQHZVHok4KBz6s4tHkDYKi0DUmHZDxjZu9McM9G+awwSS
+ qrPQgcejMB1rzG8rod+Tsl8Aen2ihDUXX8zLR8I05Wf688YTdKckZkloRGxNSDWKTpFw
+ t69tFL1HL/vVDJTsiyLA32fZ2mceXwxn5NIEAG2LBReUuVXBuspR5NEeuk+fmOb3e+B6
+ bY3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=Q3cPl29zKnqybr70jkv6rl7R1OTzhpJ8x1NVQwDLhD8=;
+ b=M0Um3KV2q7dH/9Ls38psXK5uO3tfGRHNpRPxpHYnYlQjWREjb5Mgji5iaeTEcmAEf6
+ 40YFrxi6FVrOIuyklxMcnbG1dSgMRCLKjbaTVR8/TlkD8K8al1KyW0HtreU/wZeLGLdF
+ RAJshBrcXDfnofAlkJ+wlecqId0GDfXcEojXyJsqc8T0OcoSCIfDm3B394D+dDObpFhm
+ yS+Z0biNs48saTz+wBnzCzba2pw6AnZ+7mRK4FZAb2qPGXFRPBdibJaxTe03Cpj60uu2
+ jUbJoOF5TTBG2BQLb4kiXMtaatf+3yGtelHg74lerN6vqOrLvD9qcpu93JC6ZUBglyDL
+ zRZA==
+X-Gm-Message-State: AOAM533vx0bDw580juWD3gV1b4qTq0TeDv02dYMGeJoSBAxXYAtWK1A6
+ 5P0i0ze8FlEnK81i4GEs6Qh1vxIjOw2arRGjNBQ=
+X-Google-Smtp-Source: ABdhPJyP2vZ3t4Pe7K0FmpGu8dt9cBMtWDyCKyBAW4xR79NB4nl7oiJwbawT7QK+4hBQoSw+X5eb4+EI3MtXREXC0wY=
+X-Received: by 2002:a25:4113:: with SMTP id o19mr17395486yba.314.1603676470494; 
+ Sun, 25 Oct 2020 18:41:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CA+E+eSBh7fQnn+PapM_hnuo=jeKih6Q+Vmbjyz3ci2Y_c-okZw@mail.gmail.com>
-Received-SPF: pass client-ip=128.197.228.104; envelope-from=alxndr@bu.edu;
- helo=relay64.bu.edu
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 19:43:46
-X-ACL-Warn: Detected OS   = Linux 2.6.x
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+References: <20201025152357.11865-1-bmeng.cn@gmail.com>
+ <10ba2a1c-4e8d-a860-2e8d-99dd32e61c9e@amsat.org>
+In-Reply-To: <10ba2a1c-4e8d-a860-2e8d-99dd32e61c9e@amsat.org>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 26 Oct 2020 09:40:59 +0800
+Message-ID: <CAEUhbmUSYd4gz0Egs8zSCUhk9Y0CqP4c6cBePmT08zfYxxQ_DA@mail.gmail.com>
+Subject: Re: [PATCH] hw/sd: Fix 2 GiB card CSD register values
+To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, HK_RANDOM_ENVFROM=0.001,
- HK_RANDOM_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -73,110 +95,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Niek Linnenbank <nieklinnenbank@gmail.com>,
+ Bin Meng <bin.meng@windriver.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Qemu-block <qemu-block@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 201025 1351, Joelle van Dyne wrote:
-> > Finally, I'd like to have this implemented on Linux as well, or I'm afraid the
-> > feature will bit-rot.  This can be trivially done by either (1)
-> > MREMAP_DONTUNMAP or (2) mapping from posix shared memory instead of MAP_ANON so
-> > that you can map the same memory twice.  Thus virtually all of the ifdefs
-> > should go away.
-> Just spent an hour trying to implement this for Linux and running into issues.
-> 
-> 1) Doesn't work because MREMAP_DONTUNMAP does in fact remove the entry
-> from the page table. According to the man pages "After completion, any
-> access to the range specified by old_address and old_size will result
-> in a page fault." Seems like the feature is designed around memory
-> locking, not mirror mapping.
-> 
-> 2) I tried doing shm_open() and mmap() but you can't PROT_EXEC on shm
-> (see https://stackoverflow.com/questions/25275777/shared-executable-memory
-> )
-> 
-> I think it may be possible to map a file on an executable partition,
-> but I can foresee countless issues there including some security
-> issues. Anyone have any other ideas?
+Hi Philippe,
 
-Maybe memfd_create(2) + mmap? It doesn't require a tmpfs mount, so it should
-be affected by noexec.
--Alex
+On Mon, Oct 26, 2020 at 2:56 AM Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.or=
+g> wrote:
+>
+> On 10/25/20 4:23 PM, Bin Meng wrote:
+> > From: Bin Meng <bin.meng@windriver.com>
+> >
+> > Per the SD spec, to indicate a 2 GiB card, BLOCK_LEN shall be 1024
+> > bytes, hence the READ_BL_LEN field in the CSD register shall be 10
+> > instead of 9.
+> >
+> > This fixes the acceptance test error for the NetBSD 9.0 test of the
+> > Orange Pi PC that has an expanded SD card image of 2 GiB size.
+> >
+> > Fixes: 6d2d4069c47e ("hw/sd: Correct the maximum size of a Standard Cap=
+acity SD Memory Card")
+> > Reported-by: Niek Linnenbank <nieklinnenbank@gmail.com>
+> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
+> > ---
+> >
+> >   hw/sd/sd.c | 15 +++++++++++----
+> >   1 file changed, 11 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> > index bd10ec8fc4..732fcb5ff0 100644
+> > --- a/hw/sd/sd.c
+> > +++ b/hw/sd/sd.c
+> > @@ -386,10 +386,17 @@ static const uint8_t sd_csd_rw_mask[16] =3D {
+> >
+> >   static void sd_set_csd(SDState *sd, uint64_t size)
+> >   {
+> > -    uint32_t csize =3D (size >> (CMULT_SHIFT + HWBLOCK_SHIFT)) - 1;
+> > +    int hwblock_shift =3D HWBLOCK_SHIFT;
+> > +    uint32_t csize;
+> >       uint32_t sectsize =3D (1 << (SECTOR_SHIFT + 1)) - 1;
+> >       uint32_t wpsize =3D (1 << (WPGROUP_SHIFT + 1)) - 1;
+> >
+> > +    /* To indicate 2 GiB card, BLOCK_LEN shall be 1024 bytes */
+> > +    if (size =3D=3D SDSC_MAX_CAPACITY) {
+> > +        hwblock_shift +=3D 1;
+>
+> This is going in the good direction, however now we have an huge
+> security hole, as SDState::data[] is 512 bytes, and you announce the
+> guest it can use 1024 bytes. See sd_blk_read() and sd_blk_write().
 
-> 
-> -j
-> 
-> On Mon, Oct 19, 2020 at 5:20 PM Richard Henderson
-> <richard.henderson@linaro.org> wrote:
-> >
-> > On 10/19/20 3:39 PM, Joelle van Dyne wrote:
-> > >> Explicit cast may not be needed here so this could be a macro if caling it
-> > >> differently helps or why don't you just use tcg_mirror_prr_rw directly
-> > >> everywhere?
-> > >
-> > > There are quite a bit of code that depends on tcg_insn_unit * type such as
-> > >
-> > > *tcg_code_ptr_rw(s, code_ptr) = insn;
-> > >
-> > > and
-> > >
-> > > (tcg_code_ptr_rw(s, p))[i] = NOP;
-> > >
-> > > I think it's cleaner to not have to manually cast in every one of 30+
-> > > instances of this. In v1, I used a macro but was told to use an inline
-> > > function instead.
-> >
-> > Yep.
-> >
-> > >> Is that !defined or are you missing an implementation and #else here?
-> > > No, `flush_dcache_range` is only needed when mirror mapped (after
-> > > writing to the RW mirror). Now there is no iOS compatible compiler for
-> > > any other arch than x86 and ARM. However, in the slim chance that
-> > > Apple decides to change arch again in the future and moves to RISC-V
-> > > or something, then we get a nice compiler error.
-> >
-> > *shrug* As opposed to the nice compiler error you get for a missing function
-> > declaration?
-> >
-> > That said, I think __builtin___clear_cache() may be the target-independent
-> > runtime function that you need.  Both GCC and LLVM support this, and I'd be
-> > surprised if that doesn't carry through to iOS.
-> >
-> > >> Maybe this patch could be split up some more, making the RW offset
-> > >> handling and cache management separate patches even if they don't work
-> > >> separately just to make it easier to review.
-> > >
-> > > I can probably do that for v3 but imo most of the LOC here is because
-> > > the same change has to be done to every TCG target. No matter how you
-> > > split up the patches, it will look like a lot of changes.
-> >
-> > It occurs to me that the majority of the code changes in patches 5 and 6 are
-> > due to your choice that code_gen_buffer points to the RX copy and not the RW copy.
-> >
-> > Swap the two, and instead have an inline function that produces the executable
-> > pointer from the rw pointer, and suddenly there are very much fewer changes
-> > required.
-> >
-> > For the most part, tcg/$cpu/ generates pc-relative code, so it need not
-> > consider the absolute address.  There are a few exceptions including,
-> > obviously, 32-bit x86.  But the number of places that occurs is small.
-> >
-> > There's the assignment to tb->tc.ptr of course, and
-> > tcg_ctx.code_gen_prologue/epilogue.
-> >
-> > In any case, each of these changes (generic, per tcg backend) can occur before
-> > you finally add a non-zero displacement that actually separates the RX and RW
-> > mappings.
-> >
-> > Finally, I'd like to have this implemented on Linux as well, or I'm afraid the
-> > feature will bit-rot.  This can be trivially done by either (1)
-> > MREMAP_DONTUNMAP or (2) mapping from posix shared memory instead of MAP_ANON so
-> > that you can map the same memory twice.  Thus virtually all of the ifdefs
-> > should go away.
-> >
-> >
-> > r~
-> 
+Currently sd_normal_command() ensures that the maximum block length is
+512 bytes as the response to cmd 16.
+
+The spec also says in chapter4.3.2 2 GByte Card:
+
+"However, the Block Length, set by CMD16, shall be up to 512 bytes to
+keep consistency with 512 bytes Maximum Block Length cards (Less than
+or equal 2GBytes cards).
+
+I don't see any issue here. Am I missing anything?
+
+>
+> Now SDState::data[] is migrated, so this isn't an easy field to
+> modify without breaking compatibility again :(
+>
+> I've been working on a more robust approach today, doing some cleanup
+> first. I'll send it during the next days hopefully.
+
+Regards,
+Bin
 
