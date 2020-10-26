@@ -2,78 +2,87 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D866BC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:54:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65E37C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:55:48 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4946622265
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:54:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 11EA320791
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:55:48 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jKPyYDx6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4946622265
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Jmc36PC/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 11EA320791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49308 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6hO-0000jc-D2
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:54:26 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49754)
+	id 1kX6ih-0002kb-1W
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:55:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX69Q-00081P-2v
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:19:21 -0400
-Received: from mail-ej1-x633.google.com ([2a00:1450:4864:20::633]:42677)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kX6JP-0006UD-Jt
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:29:39 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41643)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX69E-0008SI-7z
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:19:18 -0400
-Received: by mail-ej1-x633.google.com with SMTP id h24so14733616ejg.9
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:19:06 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kX6JN-0001XB-Ko
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:29:38 -0400
+Received: by mail-wr1-x442.google.com with SMTP id s9so13569972wro.8
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:29:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=u1X3uBwS2qZ8jbsivQ/HRseVrRa5gN7qWeMUp5zhAtE=;
- b=jKPyYDx6oflaz+c0xYN26agkuW28XDtf1RJoKjToNNokIVP2AAh+9A0nWBPakD0FB/
- KoyAn65hBHqccghQ/+ZeMnAkk0BWKmWpnYUR37VNLgznp4SvewGsGA69G2rxX7JhIjGW
- UldZcNRG7vBsqZFuGHc+4UgBBDVhq7NoUWbM5J9Y0wTtdT9edhxbdysDickOsQAlfjeG
- ydd9wejRyQMKtXesstYInaV1Rn+r6vd9tl9y3DlhdxO3Z2qMSMLONlWNYkaK6uwcgt1w
- +Lwr5LFoY0F1BsisvMo0YwKpIsw8vDIVy30RhD6rW0hQ/EfcAz0i1Q3aYePQn9Y5mTDG
- rHPw==
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=6R2VxZTPiaSahfUTK2ht+7VHLStg8UB6v4HCMT3qZRQ=;
+ b=Jmc36PC/r/b6jP9OjLlg86KmtyrtkwTl0/xdemebAibZO6yXOp2uXA8muINv1Pbh1P
+ K/kkIwI6nXenldAvblU/eI6VoXYCiwyWevgonM3m+cOjnEItMwSmBBHOnHFwM8w4VlaI
+ 5e5SyaWEr+sVGQAAMBV85DxUZL84VIn1yAX/mzZ01KpQds+en3RgGuF7MIjCXjTO7pW2
+ 76+Iou0PI2RsoPQGMgjWZA7Pdu56ef1zLHE96qCHtx6M982Ya6IkTDeQL0oxAZ++C9Nc
+ 5uwzyS1OiEokA5qo9pXXDf+rFyDbOD2dImi82e0B0tPCVEli1+w+vcoPvVVZ5oneIJRy
+ iQ6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=u1X3uBwS2qZ8jbsivQ/HRseVrRa5gN7qWeMUp5zhAtE=;
- b=deLCN+qkag38ZZFmjwrtseRNn+64+CHXHUiODzbSzaVTYTT8WJC0+Jt/BUCsF8fXxp
- dlUgHYDQLrm6iJgnYAH+FJhS1XJkqWKPyHmKXYWDH99lhja6yK/s6Gpm+UkYlH+OtXA+
- 1LCCLbtXqhNih29RzNpI8eu50vA805cGhkJsFqk/4Avoha0VtCVMWe1YzaBCLNzEVKef
- OV3bJXwie0w4cxOHoZ6o6cZfM34tD1mPIC16hLrGG1I3nggjTYhO+XPPpamfRr53U7p5
- tiJUQksIKOHc2qCNjw7vE2QfiG5Fb/NRFnMI5Ju0mhmLqUFWSY/VgDjG3uXsQeCJ10XK
- wFlQ==
-X-Gm-Message-State: AOAM533pm+OFoK6bOOJiXtL+8boUAQdRX3iAiZdZsO5+GmA9pwDcfBWT
- blWgJcu6RKX3I9wJXPWugMCL/2mYHrbZ8ARMUBU7ew==
-X-Google-Smtp-Source: ABdhPJwDmZBopxxzARlOzuchzojUZbN3rJh80I8wRK/vZ1VX55Ixkkc32hN8i5hTEPTimSCU4f4JYlz6NKa1Br5Ou/Q=
-X-Received: by 2002:a17:906:c7d9:: with SMTP id
- dc25mr16613621ejb.482.1603732745498; 
- Mon, 26 Oct 2020 10:19:05 -0700 (PDT)
-MIME-Version: 1.0
-References: <20201026135131.3006712-1-pbonzini@redhat.com>
-In-Reply-To: <20201026135131.3006712-1-pbonzini@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Oct 2020 17:18:54 +0000
-Message-ID: <CAFEAcA-WscaYcpooMQ0F2Etc+Rzf5M=Bb-b9Dw7pGsaaO8Od=g@mail.gmail.com>
-Subject: Re: [PULL 00/17] Build system changes and misc fixes for QEMU 5.2
- soft freeze
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=6R2VxZTPiaSahfUTK2ht+7VHLStg8UB6v4HCMT3qZRQ=;
+ b=QCjxyghGbDQz1Hhab5xp24x9FuEvC5J+irYnpTZRxY9eZM/Lrf4rxWcRGjtzb0ghaZ
+ kgoF0XOi8OVpB5wMWvQ1KED6SDuZ+LJJWEjfuWl6ikUt4bUnuhhOLjaRHE22k+SwYEx/
+ R+XctKv4annokKD8cdcuipLgAcv0wP0qXwhK8Qb7yBvY7UpuYVAh+sgN55ZS5C2eITEt
+ NgHndj+xO+NIMz0B12K5srBZqiFIVvakfyRPqVGvv/q9HdMGp944uTBQ9+3TbQLF+PEw
+ YuzqtTzTiiGI/lF5eTGZqZtMJYGDGaeF5WqiuSjRCgw8AB96Kcvarc+a2u3HvprCEyAr
+ WfLQ==
+X-Gm-Message-State: AOAM532nAVW+SUB1FNVPtM94wdl7pTyVjxowTDPEFvDc9IDqfxI6/HQB
+ 7V4jmXkAdI14c8z5B+LYZ0CpfRG6ME7OhA==
+X-Google-Smtp-Source: ABdhPJz7wuAv/zYq60ESVqr+Js6H+8gIwL9x3qo/B8Mi54bUC/SBLz0ZCKClQGyYj65Hxlo1XbGsUw==
+X-Received: by 2002:adf:cd8d:: with SMTP id q13mr18864757wrj.268.1603733375300; 
+ Mon, 26 Oct 2020 10:29:35 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id c14sm23039292wrv.12.2020.10.26.10.29.33
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 26 Oct 2020 10:29:33 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 3880F1FF7E;
+ Mon, 26 Oct 2020 17:29:33 +0000 (GMT)
+References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ <20201026143028.3034018-13-pbonzini@redhat.com>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::633;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x633.google.com
+Subject: Re: [PATCH 12/15] s390: remove bios_name
+In-reply-to: <20201026143028.3034018-13-pbonzini@redhat.com>
+Date: Mon, 26 Oct 2020 17:29:33 +0000
+Message-ID: <87imawgaki.fsf@linaro.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -82,7 +91,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,41 +104,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Thomas Huth <thuth@redhat.com>, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 at 14:04, Paolo Bonzini <pbonzini@redhat.com> wrote:
->
-> The following changes since commit 4c5b97bfd0dd54dc27717ae8d1cd10e14eef1430:
->
->   Merge remote-tracking branch 'remotes/kraxel/tags/modules-20201022-pull-request' into staging (2020-10-22 12:33:21 +0100)
->
-> are available in the Git repository at:
->
->   https://gitlab.com/bonzini/qemu.git tags/for-upstream
->
-> for you to fetch changes up to 8b0e484c8bf82e07bb0439bff04e248c63cdc86a:
->
->   machine: move SMP initialization from vl.c (2020-10-26 07:08:40 -0400)
->
-> ----------------------------------------------------------------
-> * fix --disable-tcg builds (Claudio)
-> * Fixes for macOS --enable-modules build and OpenBSD curses/iconv detection (myself)
-> * Start preparing for meson 0.56 (myself)
-> * Move directory configuration to meson (myself)
-> * Start untangling qemu_init (myself)
-> * Windows fixes (Sunil)
-> * Remove -no-kbm (Thomas)
->
-> ----------------------------------------------------------------
 
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Applied, thanks.
+Might be worth mentioning the trixy path from qdev_prop_set_string to
+end up in ipl->firmware because it's not obvious just from the diff.
+Anyway:
 
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
--- PMM
+--=20
+Alex Benn=C3=A9e
 
