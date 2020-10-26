@@ -2,94 +2,92 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 790E8C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 02:07:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B57A1C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 02:45:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AC7AB20760
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 02:07:47 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AC7AB20760
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=invisiblethingslab.com
+	by mail.kernel.org (Postfix) with ESMTPS id 056DC2087C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 02:44:59 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="c/c0zKOf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 056DC2087C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42292 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWrvG-0003Zw-7L
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 22:07:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46206)
+	id 1kWsVH-0008Bu-26
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 22:44:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50474)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marmarek@invisiblethingslab.com>)
- id 1kWruC-00036z-1f
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 22:06:40 -0400
-Received: from out1-smtp.messagingengine.com ([66.111.4.25]:37351)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <marmarek@invisiblethingslab.com>)
- id 1kWruA-0005N6-GX
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 22:06:39 -0400
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
- by mailout.nyi.internal (Postfix) with ESMTP id 49C145C00AF;
- Sun, 25 Oct 2020 22:06:36 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute3.internal (MEProxy); Sun, 25 Oct 2020 22:06:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:message-id:mime-version:subject:to:x-me-proxy
- :x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=tBzRPD
- fx2arn5aR+mtf9eeYDogdV1jhAZLJysLcYba4=; b=dCbXL+VAnhQ2KNRnZW2200
- 0L24I9S4pMWLzt4XadxZpe/xUpq9c/Pkq68L/OQDp/CgpSdOR0hlUmZrcG11JE54
- SwK5lmpCy1HiGOLh1cUht4Kqag1Qi1YdVP3CGq9nlkRITejxOPadCdRvPUSaKZT9
- RQph7pTa7Pd/J/X74LaXncQVYAiiAA/6wj8xbrs8p9ZmF3qSOL2UxD4yBSxW5FFg
- FRFgr6kTZI4SoM0LhxhFbuhY/cwRb9J67QOcr3JTzJFtjf8nI3iOPb8stoSFL+Hn
- x40lORl403MZZs2YHgBEfEC65cOpn0snpTt9v2QDKUDFAqDNK7L7RtgWO//tU02A
- ==
-X-ME-Sender: <xms:LC-WX9R73loR-CnerLTLd2WVPUwFhZa0Kmkg50EWHdIYprouFUu2Qw>
- <xme:LC-WX2xNYdvz_hXRJWCV_f5S5wDAi675gdnbcNQQ3hvolbbmPQxNgZwQknWFQCaXP
- eNXxZ6nUGYSjw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrkeehgdeggecutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffogggtohfgsehtkeertd
- ertdejnecuhfhrohhmpeforghrvghkucforghrtgiihihkohifshhkihdqifpkrhgvtghk
- ihcuoehmrghrmhgrrhgvkhesihhnvhhishhisghlvghthhhinhhgshhlrggsrdgtohhmqe
- enucggtffrrghtthgvrhhnpeetgeetkeeukeffhfejueeludehtedtkeeuiedtgffgtdfh
- veefueeiiefhudehgeenucfkphepledurdeigedrudejtddrkeelnecuvehluhhsthgvrh
- fuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhmrghrvghksehinhhv
- ihhsihgslhgvthhhihhnghhslhgrsgdrtghomh
-X-ME-Proxy: <xmx:LC-WXy1X7dLTbNFHbvY2QRUE7OFymlhd501jAgsM7IvD3Tj3fUGPhw>
- <xmx:LC-WX1D4v7OU7PG9UruzEezniZhmdzf-kWp9xy1zuowPWVbpDGPH4A>
- <xmx:LC-WX2he2Icdmm-SoH_VUzcOuuTBYVw4zUhvjWV4nadsiMVnXnLd0g>
- <xmx:LC-WXxsNiwO5hdr8NpPbe8hhOp9juu5ZC2iZRG_rN3tkttPuE-X8rw>
-Received: from localhost.localdomain (unknown [91.64.170.89])
- by mail.messagingengine.com (Postfix) with ESMTPA id A1C553280064;
- Sun, 25 Oct 2020 22:06:35 -0400 (EDT)
-From: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] i386/kvm: fix setting up nested_state for SVM
-Date: Mon, 26 Oct 2020 03:06:22 +0100
-Message-Id: <20201026020622.2890096-1-marmarek@invisiblethingslab.com>
-X-Mailer: git-send-email 2.25.4
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kWsUJ-0007bX-Jp
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 22:43:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20168)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
+ id 1kWsUH-00033H-6W
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 22:43:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603680234;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FPTzTStjPaA+AYyhsC/bs+Z+f9lM8Kwj4nN2KUBWUCY=;
+ b=c/c0zKOf3xOSNmO4uNBgghZNxCDk3Tb9X91egkchKQ96mKaE/xsDGP+XJeMpyXzYdnrmW1
+ lWuHVVx3DCpVQGC+9nvKJzfwR8ZfheKXvycIVZjDozqBol2X4TMLSYZfOhlVz5cPMTRo9M
+ noLGb8d+p5CT5RS0Yc3OHW9wBKic478=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-466-N4CwpJOOMpqfGNGA75o9og-1; Sun, 25 Oct 2020 22:43:52 -0400
+X-MC-Unique: N4CwpJOOMpqfGNGA75o9og-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A9F01186DD26;
+ Mon, 26 Oct 2020 02:43:51 +0000 (UTC)
+Received: from [10.72.13.201] (ovpn-13-201.pek2.redhat.com [10.72.13.201])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EC4125C1A3;
+ Mon, 26 Oct 2020 02:43:46 +0000 (UTC)
+Subject: Re: [PATCH v2] virtio-net: Add check for mac address while peer is
+ vdpa
+To: Cindy Lu <lulu@redhat.com>, mst@redhat.com, qemu-devel@nongnu.org
+References: <20201023091559.4858-1-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Message-ID: <462e6df3-8a34-9cfb-0696-49481aba4d46@redhat.com>
+Date: Mon, 26 Oct 2020 10:43:45 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.10.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Organization: Invisible Things Lab
+In-Reply-To: <20201023091559.4858-1-lulu@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Received-SPF: none client-ip=66.111.4.25;
- envelope-from=marmarek@invisiblethingslab.com;
- helo=out1-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 22:06:36
+Content-Language: en-US
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
-X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_PASS=-0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,54 +100,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Marek=20Marczykowski-G=C3=B3recki?=
- <marmarek@invisiblethingslab.com>
+Cc: qemu-stable@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-nested_state->format needs to ne set appropriately for VMX/SVM,
-otherwise KVM_SET_NESTED_STATE ioctl will fail.
 
-Signed-off-by: Marek Marczykowski-Górecki <marmarek@invisiblethingslab.com>
----
- target/i386/kvm.c | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+On 2020/10/23 下午5:15, Cindy Lu wrote:
+> Sometime vdpa get an all 0 mac address from the hardware, this will cause the traffic down
+> So we add the check for this part.
+> if we get an 0 mac address we will use the default mac address instead
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>   hw/net/virtio-net.c | 7 ++++++-
+>   1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> index 9179013ac4..f1648fc47d 100644
+> --- a/hw/net/virtio-net.c
+> +++ b/hw/net/virtio-net.c
+> @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
+>       VirtIONet *n = VIRTIO_NET(vdev);
+>       struct virtio_net_config netcfg;
+>       NetClientState *nc = qemu_get_queue(n->nic);
+> +    static const MACAddr zero = { .a = { 0, 0, 0, 0, 0, 0 } };
+>   
+>       int ret = 0;
+>       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
+> @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice *vdev, uint8_t *config)
+>           ret = vhost_net_get_config(get_vhost_net(nc->peer), (uint8_t *)&netcfg,
+>                                      n->config_size);
+>           if (ret != -1) {
+> -            memcpy(config, &netcfg, n->config_size);
+> +            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) != 0) {
+> +                memcpy(config, &netcfg, n->config_size);
+> +        } else {
+> +                error_report("Get an all zero mac address from hardware");
+> +            }
+>           }
+>       }
+>   }
 
-diff --git a/target/i386/kvm.c b/target/i386/kvm.c
-index cf46259534..a002f0b4f1 100644
---- a/target/i386/kvm.c
-+++ b/target/i386/kvm.c
-@@ -1816,16 +1816,22 @@ int kvm_arch_init_vcpu(CPUState *cs)
-         assert(max_nested_state_len >= offsetof(struct kvm_nested_state, data));
- 
-         if (cpu_has_vmx(env) || cpu_has_svm(env)) {
--            struct kvm_vmx_nested_state_hdr *vmx_hdr;
--
-             env->nested_state = g_malloc0(max_nested_state_len);
-             env->nested_state->size = max_nested_state_len;
--            env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
- 
-             if (cpu_has_vmx(env)) {
--                    vmx_hdr = &env->nested_state->hdr.vmx;
--                    vmx_hdr->vmxon_pa = -1ull;
--                    vmx_hdr->vmcs12_pa = -1ull;
-+                struct kvm_vmx_nested_state_hdr *vmx_hdr =
-+                    &env->nested_state->hdr.vmx;
-+
-+                vmx_hdr->vmxon_pa = -1ull;
-+                vmx_hdr->vmcs12_pa = -1ull;
-+                env->nested_state->format = KVM_STATE_NESTED_FORMAT_VMX;
-+            } else {
-+                struct kvm_svm_nested_state_hdr *svm_hdr =
-+                    &env->nested_state->hdr.svm;
-+
-+                svm_hdr->vmcb_pa = -1ull;
-+                env->nested_state->format = KVM_STATE_NESTED_FORMAT_SVM;
-             }
-         }
-     }
--- 
-2.25.4
+
+Applied.
+
+Thanks
 
 
