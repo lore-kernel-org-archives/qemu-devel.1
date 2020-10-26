@@ -2,97 +2,82 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C4CC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EDF2C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:04:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6310E206D4
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:03:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A7423206D4
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:04:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MPLlDywQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6310E206D4
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Um5b2W/w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A7423206D4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44998 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5tq-0006Hy-GG
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:03:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43214)
+	id 1kX5vI-0007e4-Ej
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:04:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX5qN-0002zV-Ku
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:59:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:55098)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kX5uF-0006s8-DD
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:03:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37596)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX5qK-0005cL-RI
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:59:39 -0400
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kX5uD-0006Db-Rv
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:03:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603731576;
+ s=mimecast20190719; t=1603731817;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Z+kXbEM/Nq2H+uTRufx+cyFwcq6wPhqZXTX3wXf2zjs=;
- b=MPLlDywQ+Pi7BtsZ1cNDJFwAA/RaqVFNVbuRDCkxZczyqpCQSEal/T816CGB0CYQO6vJP6
- 8GIabJrBbCh9VenCB/KF2Yyg/4FwW4uKmpm/RpeJBLw0iIE1xk+qjAzoEDsRVr00yTTQ88
- V63XBkPrYSH0G7dI8Kg3E1BpX6yipPA=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-235-IM_plVwVOYmUJrOoRiPTLQ-1; Mon, 26 Oct 2020 12:59:34 -0400
-X-MC-Unique: IM_plVwVOYmUJrOoRiPTLQ-1
-Received: by mail-ed1-f72.google.com with SMTP id n16so4808274edw.19
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 09:59:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Z+kXbEM/Nq2H+uTRufx+cyFwcq6wPhqZXTX3wXf2zjs=;
- b=PUpO0o1hFM3gVMPRW6d/KdCNkobQ3cLFDXX1aS/cgLPp3AXBhecbT6eJw3FkCDDDp/
- /QR3oT6Y7oNbyZLzPeNE53Z1f0VaMJSESdm9Avga7mh3e9SNztDu+AESVmQ83CUCPd9+
- z1LFqrEXm9tAreeNwznTL8Vtbu+ELVloxuSJZssqa5juu5G4QliREC9EEiHcIlhq2s7G
- MULuTLGGY/TAvCEooF+c6laGii1iKg7S7brdLuU7w7ONp4bybiP83Ch16kPwt+axTU4r
- 6gHjC/aO5DNliogAhB8yJcfSipMxRvWZ3BDzzG/1PXJOmUByoizsIwtth2UwvRuW4Gvt
- eQTA==
-X-Gm-Message-State: AOAM530WcvBzpgzVen1wLoNTDdm016JeQkg8X0VlygChRN0qbkgDlToy
- lezq1IVZAV9X2WQsy8sxFSa7dfFMUA1Eewmkb+Dqf94sc0TbF5wCLjN+/P9lKQAf7NNmeVBLso9
- 48ZY2qtpKrj10cUs=
-X-Received: by 2002:a50:ef12:: with SMTP id m18mr16766497eds.313.1603731573344; 
- Mon, 26 Oct 2020 09:59:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJytsbxFDVdtD9YDXVszXYc4Jt9K/gQWwtFwfn+1YINBANu444FwFPBndRVGWZVT5uW0Ici2Tg==
-X-Received: by 2002:a50:ef12:: with SMTP id m18mr16766407eds.313.1603731571617; 
- Mon, 26 Oct 2020 09:59:31 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id e17sm6308135ejh.64.2020.10.26.09.59.30
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 09:59:30 -0700 (PDT)
-Subject: Re: [PULL v2 0/2] Tracing patches
-To: Stefan Hajnoczi <stefanha@redhat.com>, qemu-devel@nongnu.org
-References: <20201026160221.62704-1-stefanha@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <d620c1d4-d3c2-47dc-5bc7-78c01944a1eb@redhat.com>
-Date: Mon, 26 Oct 2020 17:59:29 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=N7sZbkqlV2qLM4L4n5gB6iixRF31pMjYTmnSrlXB7BM=;
+ b=Um5b2W/wU0InQpDFIibdAUfWxthOMqAXgrFFXgI68U5jErO3gxsHo1Z/HRsLJtW7z3mMuo
+ +taOO2MepfHBlbJuiA+CZMQezPMn5OYQj4EzKtUi276z0M34KMAo3T8PI5X2RGdfnP2m11
+ QPDJo4aY3ulTLaDZd9q+YsZxG5xGEkg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-135-zxx_lJ8sPmaTTlQoQskiPA-1; Mon, 26 Oct 2020 13:03:35 -0400
+X-MC-Unique: zxx_lJ8sPmaTTlQoQskiPA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AA2C6A0CC9;
+ Mon, 26 Oct 2020 17:03:33 +0000 (UTC)
+Received: from [10.36.112.194] (ovpn-112-194.ams2.redhat.com [10.36.112.194])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 511B775141;
+ Mon, 26 Oct 2020 17:03:31 +0000 (UTC)
+Subject: Re: [PATCH] [RFC] hw/arm/smmuv3: Set the restoration priority of the
+ vSMMUv3 explicitly
+To: Zenghui Yu <yuzenghui@huawei.com>, peter.maydell@linaro.org
+References: <20201019091508.197-1-yuzenghui@huawei.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <8afdbde3-5b5f-0237-d311-32974cf58a14@redhat.com>
+Date: Mon, 26 Oct 2020 18:03:30 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
 MIME-Version: 1.0
-In-Reply-To: <20201026160221.62704-1-stefanha@redhat.com>
+In-Reply-To: <20201019091508.197-1-yuzenghui@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -42
@@ -115,45 +100,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>
+Cc: wanghaibin.wang@huawei.com, qemu-arm@nongnu.org, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Stefan,
+Hi Zenghui,
 
-On 10/26/20 5:02 PM, Stefan Hajnoczi wrote:
-> The following changes since commit 4c5b97bfd0dd54dc27717ae8d1cd10e14eef1430:
-> 
->    Merge remote-tracking branch 'remotes/kraxel/tags/modules-20201022-pull-request' into staging (2020-10-22 12:33:21 +0100)
-> 
-> are available in the Git repository at:
-> 
->    https://gitlab.com/stefanha/qemu.git tags/tracing-pull-request
-> 
-> for you to fetch changes up to 1e8ebf1116a7023b4dd1919d31af8b4e17321da4:
-> 
->    Add execute bit back to scripts/tracetool.py (2020-10-26 13:22:36 +0000)
-> 
-> ----------------------------------------------------------------
-> Pull request
-> 
-> ----------------------------------------------------------------
-> 
-> Anthony PERARD via (1):
->    Add execute bit back to scripts/tracetool.py
+On 10/19/20 11:15 AM, Zenghui Yu wrote:
+> Ensure the vSMMUv3 will be restored before all PCIe devices so that DMA
+> translation can work properly during migration.
 
-Author email is incorrect: Anthony PERARD via <qemu-devel@nongnu.org>
+Sorry I missed this patch. good catch!
+
+Acked-by: Eric Auger <eric.auger@redhat.com>
+
+Thanks
+
+Eric
 
 > 
-> Josh DuBois (1):
->    trace/simple: Enable tracing on startup only if the user specifies a
->      trace option
+> Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+> ---
 > 
->   trace/control.c      | 6 +++++-
->   scripts/tracetool.py | 0
->   2 files changed, 5 insertions(+), 1 deletion(-)
->   mode change 100644 => 100755 scripts/tracetool.py
+> not sure if anything would actually go wrong...
+> 
+>  hw/arm/smmuv3.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+> index 0122700e72..2017ba7a5a 100644
+> --- a/hw/arm/smmuv3.c
+> +++ b/hw/arm/smmuv3.c
+> @@ -1440,6 +1440,7 @@ static const VMStateDescription vmstate_smmuv3 = {
+>      .name = "smmuv3",
+>      .version_id = 1,
+>      .minimum_version_id = 1,
+> +    .priority = MIG_PRI_IOMMU,
+>      .fields = (VMStateField[]) {
+>          VMSTATE_UINT32(features, SMMUv3State),
+>          VMSTATE_UINT8(sid_size, SMMUv3State),
 > 
 
 
