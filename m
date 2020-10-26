@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 48A06C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:04:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 62783C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:04:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6E3422284
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D34DE22281
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:04:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VG/GBrqa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6E3422284
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XuM5tAEm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D34DE22281
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38618 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39056 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX1Eh-0002St-Kp
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 08:04:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40866)
+	id 1kX1En-0002er-JE
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 08:04:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40852)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX1DG-0000zg-GB
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX1DG-0000zE-GX
  for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:02:58 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29839)
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45508)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX1DD-0001pg-9p
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX1DD-0001ph-7r
  for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:02:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1603713773;
@@ -38,29 +38,29 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=oLyUB6LTT/nJ6eZrsjXCp9HkJxFs8bbUSiSmYcKKUBw=;
- b=VG/GBrqaEUhLgD0hFs6d4TCgC5nq81A6wktJaoZ00Zw9fHHoHGLooLFyW0o4z3CAxBY9/T
- IIPPnPX1dx4P99QV5Iuaqt6FetdW9aLAzhHW9bCC42DoyruKNw6O79thpm4t9R79UpTKQb
- H/RfZNYI2xZwcz8cYaCAd0hALpN5WIM=
+ bh=h8uXnxFwQZA0rxBmJzPi9mlR83+QQb3SlPu4A2ChkrY=;
+ b=XuM5tAEmrIuneJO3g3LyZ1jpC5dVHJfoAiGXWZQcTlZzH2Gg9+kITXFkKRap6GMR4UVMfH
+ sJ+rUOIXNViXXllo3fyVQhj8o1ayhcaFz9nMVGA968E/zgr6cFxMUIOhxmpdFKG6GNTjzt
+ hnNbSNUAXOy2LUiKl0h9xw4d198PxUY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-76-8PQ4iARhPX6c8I-OShLMkA-1; Mon, 26 Oct 2020 08:02:51 -0400
-X-MC-Unique: 8PQ4iARhPX6c8I-OShLMkA-1
+ us-mta-80-KOIufmW0Ms26IGCMt-u0VQ-1; Mon, 26 Oct 2020 08:02:51 -0400
+X-MC-Unique: KOIufmW0Ms26IGCMt-u0VQ-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B15FAA0BE8;
- Mon, 26 Oct 2020 12:02:49 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-145.phx2.redhat.com [10.3.112.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D485310013D9;
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2FC4106BC77;
  Mon, 26 Oct 2020 12:02:48 +0000 (UTC)
+Received: from blue.redhat.com (ovpn-112-145.phx2.redhat.com [10.3.112.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9600D10013D9;
+ Mon, 26 Oct 2020 12:02:47 +0000 (UTC)
 From: Eric Blake <eblake@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/2] migration/block-dirty-bitmap: fix uninitialized variable
- warning
-Date: Mon, 26 Oct 2020 07:02:45 -0500
-Message-Id: <20201026120245.25024-3-eblake@redhat.com>
+Subject: [PULL 1/2] migration/block-dirty-bitmap: fix larger granularity
+ bitmaps
+Date: Mon, 26 Oct 2020 07:02:44 -0500
+Message-Id: <20201026120245.25024-2-eblake@redhat.com>
 In-Reply-To: <20201026120245.25024-1-eblake@redhat.com>
 References: <20201026120245.25024-1-eblake@redhat.com>
 MIME-Version: 1.0
@@ -69,8 +69,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=eblake@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
@@ -97,67 +97,48 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>,
  Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
  "open list:Dirty Bitmaps" <qemu-block@nongnu.org>,
- Juan Quintela <quintela@redhat.com>,
+ Juan Quintela <quintela@redhat.com>, Stefan Reiter <s.reiter@proxmox.com>,
  "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, Euler Robot <euler.robot@huawei.com>,
- Chen Qun <kuhn.chenqun@huawei.com>, John Snow <jsnow@redhat.com>
+ Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Chen Qun <kuhn.chenqun@huawei.com>
+From: Stefan Reiter <s.reiter@proxmox.com>
 
-A default value is provided for the variable 'bitmap_name' to avoid
-a compiler warning.
+sectors_per_chunk is a 64 bit integer, but the calculation is done in 32
+bits, leading to an overflow for coarse bitmap granularities.
 
-The compiler showed the warning:
-migration/block-dirty-bitmap.c:1090:13: warning: ‘bitmap_name’
-may be used uninitialized in this function [-Wmaybe-uninitialized]
-       g_strlcpy(s->bitmap_name, bitmap_name, sizeof(s->bitmap_name));
-       ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+If that results in the value 0, it leads to a hang where no progress is
+made but send_bitmap_bits is constantly called with nr_sectors being 0.
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-Message-Id: <20201014114430.1898684-1-kuhn.chenqun@huawei.com>
+Signed-off-by: Stefan Reiter <s.reiter@proxmox.com>
+Message-Id: <20201021144456.1072-1-s.reiter@proxmox.com>
+Fixes: b35ebdf07 migration: add postcopy migration of dirty bitmaps
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-[eblake: commit message grammar tweaks]
+Reviewed-by: Eric Blake <eblake@redhat.com>
+[eblake: Use correct type for 8ULL, use () to avoid overflow]
 Signed-off-by: Eric Blake <eblake@redhat.com>
 ---
- migration/block-dirty-bitmap.c | 21 +++++++++------------
- 1 file changed, 9 insertions(+), 12 deletions(-)
+ migration/block-dirty-bitmap.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/migration/block-dirty-bitmap.c b/migration/block-dirty-bitmap.c
-index 98921db77271..c61d382be87c 100644
+index 5bef793ac0eb..98921db77271 100644
 --- a/migration/block-dirty-bitmap.c
 +++ b/migration/block-dirty-bitmap.c
-@@ -1072,18 +1072,15 @@ static int dirty_bitmap_load_header(QEMUFile *f, DBMLoadState *s,
-             return -EINVAL;
+@@ -562,8 +562,9 @@ static int add_bitmaps_to_list(DBMSaveState *s, BlockDriverState *bs,
+         dbms->bitmap_alias = g_strdup(bitmap_alias);
+         dbms->bitmap = bitmap;
+         dbms->total_sectors = bdrv_nb_sectors(bs);
+-        dbms->sectors_per_chunk = CHUNK_SIZE * 8 *
+-            bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS;
++        dbms->sectors_per_chunk = CHUNK_SIZE * 8LLU *
++            (bdrv_dirty_bitmap_granularity(bitmap) >> BDRV_SECTOR_BITS);
++        assert(dbms->sectors_per_chunk != 0);
+         if (bdrv_dirty_bitmap_enabled(bitmap)) {
+             dbms->flags |= DIRTY_BITMAP_MIG_START_FLAG_ENABLED;
          }
-
--        if (!s->cancelled) {
--            if (bitmap_alias_map) {
--                bitmap_name = g_hash_table_lookup(bitmap_alias_map,
--                                                  s->bitmap_alias);
--                if (!bitmap_name) {
--                    error_report("Error: Unknown bitmap alias '%s' on node "
--                                 "'%s' (alias '%s')", s->bitmap_alias,
--                                 s->bs->node_name, s->node_alias);
--                    cancel_incoming_locked(s);
--                }
--            } else {
--                bitmap_name = s->bitmap_alias;
-+        bitmap_name = s->bitmap_alias;
-+        if (!s->cancelled && bitmap_alias_map) {
-+            bitmap_name = g_hash_table_lookup(bitmap_alias_map,
-+                                              s->bitmap_alias);
-+            if (!bitmap_name) {
-+                error_report("Error: Unknown bitmap alias '%s' on node "
-+                             "'%s' (alias '%s')", s->bitmap_alias,
-+                             s->bs->node_name, s->node_alias);
-+                cancel_incoming_locked(s);
-             }
-         }
-
 -- 
 2.29.0
 
