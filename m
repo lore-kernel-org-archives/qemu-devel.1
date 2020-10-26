@@ -2,98 +2,120 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E00AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:16:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81309C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:16:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7CF962224E
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E1F8C2222C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:16:50 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LWT6fGYa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7CF962224E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m7q5jypX"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E1F8C2222C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52344 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52802 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX72y-00031E-AH
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:16:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36056)
+	id 1kX733-0003Cj-Qp
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:16:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:55228)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX6xd-0005tv-O5
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:11:13 -0400
-Received: from mail-ej1-x641.google.com ([2a00:1450:4864:20::641]:33954)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX6xX-00079e-Mt
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:11:13 -0400
-Received: by mail-ej1-x641.google.com with SMTP id gs25so15044372ejb.1
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 11:11:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=PZrXk6W7mQs4ElV2C5DAdWPjGnR8Jcr+ipn/INYEJI4=;
- b=LWT6fGYa9l/a+rIM0FaxT4Xbdh/KQoBdTB3EpKnlNa1d8QW2HTgeEIy8La4GQKR9Zt
- X9xJHa7Yuh1vuMv3xaPfJ1IzNc6L0C75gDQbyktoA9a25yuHmxrbtibPHCQcI8xYh3RY
- jmlORsINEsnBFNs8F5t906wsDR7yVSRakxEXX40Oq1lNPdWn1jiSytUIZuZ1bZmorn/w
- F+UsFG5dX2FiowxfIlp2L/ghBOW2FHoiGxQr7d0fjwr52iLFOuzLb8/dNvOgchOsfuSM
- 3jaLFGhIj1kUyW8yRa2Aqw5OoFpWoRAXnmKOTEFpgJlXUk93RMJXxtW1PR6oL9sX+KM1
- BKMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=PZrXk6W7mQs4ElV2C5DAdWPjGnR8Jcr+ipn/INYEJI4=;
- b=AtaVMgDEpI6gEDBJMqpZFuvhVWb0LIA0MW89c8dcDvBmpOQ26VcIqZVVSGEzQIZwvR
- MjjnqjmUEmqAJfmN0s7rwxLkcEvQx+Rrhoe9ZYZ5GSzxmweyLPfOIqkHSnfi70dXDK9e
- fbqoQBYyObeuNDx//CEUB8yg2wB18EqOgLFK/HJ/pifKfSQMNBHY1Zz25sIgnwKn1yUh
- Qjo7CNhxldejKyKlmnJStzAvMiMgOVlfWgF2HmkVb002wN8NDENyFfRV4OVeluNbX0/z
- t5f4KIzz9G1DGzMkyXIi7eraKEQVZJjx8prMpFrxRKf4qppbVJNFqxCiK6ADIDkbA2g0
- OWJQ==
-X-Gm-Message-State: AOAM532NNcTK5pW56Ee37dKityhHy3MsO/1V5GjSmnTd/p7CZgpFTTHk
- IYXM6Z0IdvytZfTV5wZAykY=
-X-Google-Smtp-Source: ABdhPJzHwYNW2gsA17pMNyejBfj9IhEWVZ/9+Q/b6MTuhQDto9UQJYNmc2iaaWEx2v9ZGJnS28LJCw==
-X-Received: by 2002:a17:906:2b44:: with SMTP id
- b4mr12253392ejg.73.1603735864203; 
- Mon, 26 Oct 2020 11:11:04 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id ld2sm1051786ejb.94.2020.10.26.11.11.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 11:11:03 -0700 (PDT)
-Subject: Re: [PATCH 01/15] alpha: remove bios_name
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20201026143028.3034018-1-pbonzini@redhat.com>
- <20201026143028.3034018-2-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <5b95222d-a335-2589-375a-7b0f0621d5eb@amsat.org>
-Date: Mon, 26 Oct 2020 19:11:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kX6U9-0001fK-Hw; Mon, 26 Oct 2020 13:40:49 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:62462)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
+ id 1kX6U6-0002xu-Gx; Mon, 26 Oct 2020 13:40:45 -0400
+Received: from pps.filterd (m0098421.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09QHWItv074816; Mon, 26 Oct 2020 13:40:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=subject : to : cc :
+ references : from : message-id : date : mime-version : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=N8x87jjoTsSE/CXSSyEMfSvl2TFRL8kektPyYonN0kQ=;
+ b=m7q5jypXsgEcpA9sODfiRlQP2X+DtS6lP3/0DehppPMwd2fmSVnAFTGmFm2fzqvQvx/a
+ lLY7KcijCq8p9Euko0brGPw68k0ZKG4B0Yw3DTkB2kQKVg7zX+AnLJZWuos7e2IAv8hZ
+ QGsg9nzF2lBHpD8D9tsP4attFVclLLcbRaZfSkfj/hhSNOJqDTmtndmE1DnBIyRH0+Z/
+ fB8mGQlu5upfMJ+S6zJrFXu50wDWhge1WuYmoeLoFa+7/0LUCu2zYVXhy0tIw2fbR9f0
+ AzZUZlB+z64qvpisqtC9k2ukSZskHV+3DA0CfR5drkERAEZ+lJWmyWSpqotlEpy479AA Nw== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34dq9fn5p5-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 26 Oct 2020 13:40:40 -0400
+Received: from m0098421.ppops.net (m0098421.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09QHWJNx074931;
+ Mon, 26 Oct 2020 13:40:40 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34dq9fn5nx-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 26 Oct 2020 13:40:40 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09QHcJxr017804;
+ Mon, 26 Oct 2020 17:40:39 GMT
+Received: from b03cxnp08025.gho.boulder.ibm.com
+ (b03cxnp08025.gho.boulder.ibm.com [9.17.130.17])
+ by ppma03dal.us.ibm.com with ESMTP id 34cbw8wsre-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Mon, 26 Oct 2020 17:40:39 +0000
+Received: from b03ledav005.gho.boulder.ibm.com
+ (b03ledav005.gho.boulder.ibm.com [9.17.130.236])
+ by b03cxnp08025.gho.boulder.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09QHeWKW63963536
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Mon, 26 Oct 2020 17:40:32 GMT
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id E45A5BE056;
+ Mon, 26 Oct 2020 17:40:37 +0000 (GMT)
+Received: from b03ledav005.gho.boulder.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 85D00BE05A;
+ Mon, 26 Oct 2020 17:40:36 +0000 (GMT)
+Received: from oc4221205838.ibm.com (unknown [9.163.49.29])
+ by b03ledav005.gho.boulder.ibm.com (Postfix) with ESMTP;
+ Mon, 26 Oct 2020 17:40:36 +0000 (GMT)
+Subject: Re: [PATCH 02/13] linux-headers: update against 5.10-rc1
+To: Alex Williamson <alex.williamson@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>
+References: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
+ <1603726481-31824-3-git-send-email-mjrosato@linux.ibm.com>
+ <20201026113716.2c67aec6@w520.home>
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+Message-ID: <5ef1a7c9-66a1-8e88-7f29-1109d41e2bd0@linux.ibm.com>
+Date: Mon, 26 Oct 2020 13:40:35 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.0
 MIME-Version: 1.0
-In-Reply-To: <20201026143028.3034018-2-pbonzini@redhat.com>
+In-Reply-To: <20201026113716.2c67aec6@w520.home>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::641;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
+ definitions=2020-10-26_08:2020-10-26,
+ 2020-10-26 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ phishscore=0 bulkscore=0
+ adultscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ spamscore=0 impostorscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010260115
+Received-SPF: pass client-ip=148.163.158.5;
+ envelope-from=mjrosato@linux.ibm.com; helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:40:41
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,17 +129,115 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Richard Henderson <richard.henderson@linaro.org>
+Cc: thuth@redhat.com, kvm@vger.kernel.org, pmorel@linux.ibm.com,
+ david@redhat.com, cohuck@redhat.com, schnelle@linux.ibm.com,
+ qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
+ qemu-s390x@nongnu.org, mst@redhat.com, pbonzini@redhat.com, philmd@redhat.com,
+ rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/26/20 3:30 PM, Paolo Bonzini wrote:
-> Cc: Richard Henderson <richard.henderson@linaro.org>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->   hw/alpha/dp264.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+On 10/26/20 1:37 PM, Alex Williamson wrote:
+> On Mon, 26 Oct 2020 11:34:30 -0400
+> Matthew Rosato <mjrosato@linux.ibm.com> wrote:
+> 
+>> commit 3650b228f83adda7e5ee532e2b90429c03f7b9ec
+>>
+>> Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+>> ---
+>>   .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h | 14 ++--
+>>   .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h        |  2 +-
+>>   include/standard-headers/linux/ethtool.h           |  2 +
+>>   include/standard-headers/linux/fuse.h              | 50 +++++++++++++-
+>>   include/standard-headers/linux/input-event-codes.h |  4 ++
+>>   include/standard-headers/linux/pci_regs.h          |  6 +-
+>>   include/standard-headers/linux/virtio_fs.h         |  3 +
+>>   include/standard-headers/linux/virtio_gpu.h        | 19 ++++++
+>>   include/standard-headers/linux/virtio_mmio.h       | 11 +++
+>>   include/standard-headers/linux/virtio_pci.h        | 11 ++-
+>>   linux-headers/asm-arm64/kvm.h                      | 25 +++++++
+>>   linux-headers/asm-arm64/mman.h                     |  1 +
+>>   linux-headers/asm-generic/hugetlb_encode.h         |  1 +
+>>   linux-headers/asm-generic/unistd.h                 | 18 ++---
+>>   linux-headers/asm-mips/unistd_n32.h                |  1 +
+>>   linux-headers/asm-mips/unistd_n64.h                |  1 +
+>>   linux-headers/asm-mips/unistd_o32.h                |  1 +
+>>   linux-headers/asm-powerpc/unistd_32.h              |  1 +
+>>   linux-headers/asm-powerpc/unistd_64.h              |  1 +
+>>   linux-headers/asm-s390/unistd_32.h                 |  1 +
+>>   linux-headers/asm-s390/unistd_64.h                 |  1 +
+>>   linux-headers/asm-x86/kvm.h                        | 20 ++++++
+>>   linux-headers/asm-x86/unistd_32.h                  |  1 +
+>>   linux-headers/asm-x86/unistd_64.h                  |  1 +
+>>   linux-headers/asm-x86/unistd_x32.h                 |  1 +
+>>   linux-headers/linux/kvm.h                          | 19 ++++++
+>>   linux-headers/linux/mman.h                         |  1 +
+>>   linux-headers/linux/vfio.h                         | 29 +++++++-
+>>   linux-headers/linux/vfio_zdev.h                    | 78 ++++++++++++++++++++++
+>>   29 files changed, 301 insertions(+), 23 deletions(-)
+>>   create mode 100644 linux-headers/linux/vfio_zdev.h
+>>
+>> diff --git a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> index 7b4062a..acd4c83 100644
+>> --- a/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> +++ b/include/standard-headers/drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h
+>> @@ -68,7 +68,7 @@ static inline int pvrdma_idx_valid(uint32_t idx, uint32_t max_elems)
+>>   
+>>   static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
+>>   {
+>> -	const unsigned int idx = qatomic_read(var);
+>> +	const unsigned int idx = atomic_read(var);
+>>   
+>>   	if (pvrdma_idx_valid(idx, max_elems))
+>>   		return idx & (max_elems - 1);
+>> @@ -77,17 +77,17 @@ static inline int32_t pvrdma_idx(int *var, uint32_t max_elems)
+>>   
+>>   static inline void pvrdma_idx_ring_inc(int *var, uint32_t max_elems)
+>>   {
+>> -	uint32_t idx = qatomic_read(var) + 1;	/* Increment. */
+>> +	uint32_t idx = atomic_read(var) + 1;	/* Increment. */
+>>   
+>>   	idx &= (max_elems << 1) - 1;		/* Modulo size, flip gen. */
+>> -	qatomic_set(var, idx);
+>> +	atomic_set(var, idx);
+>>   }
+>>   
+>>   static inline int32_t pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
+>>   					      uint32_t max_elems, uint32_t *out_tail)
+>>   {
+>> -	const uint32_t tail = qatomic_read(&r->prod_tail);
+>> -	const uint32_t head = qatomic_read(&r->cons_head);
+>> +	const uint32_t tail = atomic_read(&r->prod_tail);
+>> +	const uint32_t head = atomic_read(&r->cons_head);
+>>   
+>>   	if (pvrdma_idx_valid(tail, max_elems) &&
+>>   	    pvrdma_idx_valid(head, max_elems)) {
+>> @@ -100,8 +100,8 @@ static inline int32_t pvrdma_idx_ring_has_space(const struct pvrdma_ring *r,
+>>   static inline int32_t pvrdma_idx_ring_has_data(const struct pvrdma_ring *r,
+>>   					     uint32_t max_elems, uint32_t *out_head)
+>>   {
+>> -	const uint32_t tail = qatomic_read(&r->prod_tail);
+>> -	const uint32_t head = qatomic_read(&r->cons_head);
+>> +	const uint32_t tail = atomic_read(&r->prod_tail);
+>> +	const uint32_t head = atomic_read(&r->cons_head);
+>>   
+>>   	if (pvrdma_idx_valid(tail, max_elems) &&
+>>   	    pvrdma_idx_valid(head, max_elems)) {
+> 
+> 
+> The above is clearly just going to revert Stefan's changes to this file
+> via:
+> 
+> d73415a31547 )"qemu/atomic.h: rename atomic_ to qatomic_")
+> 
+> For now I'm just going to drop these changes (with comment) to avoid
+> that.  I'll leave it to others to fix the header update script to either
+> reimplement the s/atomic_/qatomic_/ conversion or remove these code
+> blocks altogether.  Sound ok?  Thanks,
+> 
+> Alex
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Yes, this makes sense to me.
+
 
