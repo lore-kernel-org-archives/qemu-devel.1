@@ -2,92 +2,83 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ECE3C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:19:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44848C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:19:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D9A522223C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:18:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CE8D82223C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:19:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kjc/4RFE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D9A522223C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DKynrHQL"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CE8D82223C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45200 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX0Wg-0001BS-Rw
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:18:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54190)
+	id 1kX0Wm-0001Od-Nt
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:19:04 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57092)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX0He-0008G6-65; Mon, 26 Oct 2020 07:03:26 -0400
-Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:36722)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX0Hc-0002d8-Lk; Mon, 26 Oct 2020 07:03:25 -0400
-Received: by mail-wr1-x429.google.com with SMTP id x7so11935707wrl.3;
- Mon, 26 Oct 2020 04:03:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding;
- bh=yrIfSe6YicHcmNa56yOajmgv3h3ly3b3aUGVmAig4lI=;
- b=kjc/4RFE5iK3HHoKlDbqjcnlyim9wIhQpf5LzbcLMfBew2cg/MEkszynKYCplZMMdv
- BiDNzy8oZbG3x72qf4q30ypL9xM81FvkUt7GdIBBHbTUjppYGBF6d2pCRdtMYO46yNCq
- HEOSAfbyaElweX2waulKR1jQ/BhIXv6gcw70mdaI/YDnz0UMxobvebs9O1fnM7aLdDMe
- bdvz2+qxuSVuK3h96seYoo7hxSj0p8bkTsqiqZgcE4MB3z5dMeAH6syRcrdrSp50E86h
- TOu6xmhVtsmnq1RqB8jV6NsJWSiPrndylItjmatwh41r48DbsM26tW4Bq6S49Ri4Igfl
- nRGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=yrIfSe6YicHcmNa56yOajmgv3h3ly3b3aUGVmAig4lI=;
- b=tfWpSG6tqXJARUmOqQssYrYRQRBoawxOPu777pkyZiVmpjLGhVaojgWPKXxA/Qj8Us
- v40M/4w66+X4rlyIZvOd9wgi/3FQEuasGCXPd805i9QmR+XzBAT+86jBVr2PUuXNpDcl
- v+40oHpoulGpOikCq/XU6bEor7xNLI3uIJt29gavv/vaP/+E8GtH34eMPGQ6RaFiNdrR
- 4HETthl4gshpA3ZOKwlSL2liuG8O5vUGLdZOpVVItAJPuhtE8gbPQKtwBvXMmaEiE/Y5
- +/C2/yqMCG9eISOt2CnyleBePHqru2pgrgpOdnpQNEhkWmaH81tjQ/qmfdpJx0vHitLa
- fxKw==
-X-Gm-Message-State: AOAM5313pDgLeFbAVquj60plTX5SLjPaA07T92Swk/uM3OTKQCc4JsMr
- ji/1XoRjP6cwJjeJ26CYmkStCqHoDF4=
-X-Google-Smtp-Source: ABdhPJzCxwyFqVQw/x5Cl5hWncgMKCklk4TYvbavJ3Vxcq64FiMZgKkzI7R5qC1Rs8NKZbXH+2YLqQ==
-X-Received: by 2002:adf:f44d:: with SMTP id f13mr16484159wrp.385.1603710202607; 
- Mon, 26 Oct 2020 04:03:22 -0700 (PDT)
-Received: from localhost.localdomain (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id x64sm19263766wmg.33.2020.10.26.04.03.21
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 04:03:21 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 1/5] hw/sd/sdcard: Update the SDState documentation
-Date: Mon, 26 Oct 2020 12:03:11 +0100
-Message-Id: <20201026110315.4026183-2-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201026110315.4026183-1-f4bug@amsat.org>
-References: <20201026110315.4026183-1-f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kX0Rx-0005KM-TT
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:14:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:54457)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kX0Rt-0006PU-M0
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:14:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603710839;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=NfvrFXDOPoyYpWQFWokubuaOdtoQEY26kZaIqeONIIY=;
+ b=DKynrHQLnVdjki0NpE1pSqT9NJeLeg/X7BcZD9xq9yMDEVvYohQC1EVB2es2g0i1h8RPMb
+ Su8583SxNoGVeE7eOAspr+iHHYbM3GJ1/RL3bT/uruKZVUDCA6hZY0GfFg0qyL80ep9qHh
+ 1YE0adXQmUWi6JvivU/GKSQ13zQ15VU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-584-sle9MGwSN7-lKpd1DsLj_A-1; Mon, 26 Oct 2020 07:13:55 -0400
+X-MC-Unique: sle9MGwSN7-lKpd1DsLj_A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 88F0F846360;
+ Mon, 26 Oct 2020 11:13:54 +0000 (UTC)
+Received: from gondolin.redhat.com (ovpn-113-108.ams2.redhat.com
+ [10.36.113.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 74C2C60BF3;
+ Mon, 26 Oct 2020 11:13:53 +0000 (UTC)
+From: Cornelia Huck <cohuck@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: [PULL 0/3] s390x updates
+Date: Mon, 26 Oct 2020 12:13:44 +0100
+Message-Id: <20201026111347.252015-1-cohuck@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::429;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wr1-x429.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -100,46 +91,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- Alistair Francis <alistair.francis@wdc.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-block@nongnu.org
+Cc: qemu-s390x@nongnu.org, Cornelia Huck <cohuck@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add more descriptive comments to keep a clear separation
-between static property vs runtime changeable.
+The following changes since commit 4c5b97bfd0dd54dc27717ae8d1cd10e14eef1430:
 
-Suggested-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-Id: <20200630133912.9428-12-f4bug@amsat.org>
----
- hw/sd/sd.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+  Merge remote-tracking branch 'remotes/kraxel/tags/modules-20201022-pull-request' into staging (2020-10-22 12:33:21 +0100)
 
-diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-index c3febed2434..9b53053527e 100644
---- a/hw/sd/sd.c
-+++ b/hw/sd/sd.c
-@@ -102,11 +102,14 @@ struct SDState {
-     uint32_t card_status;
-     uint8_t sd_status[64];
- 
--    /* Configurable properties */
-+    /* Static properties */
-+
-     uint8_t spec_version;
-     BlockBackend *blk;
-     bool spi;
- 
-+    /* Runtime changeables */
-+
-     uint32_t mode;    /* current card mode, one of SDCardModes */
-     int32_t state;    /* current card state, one of SDCardStates */
-     uint32_t vhs;
+are available in the Git repository at:
+
+  https://github.com/cohuck/qemu tags/s390x-20201026
+
+for you to fetch changes up to 3ded270a2697852a71961b45291519ae044f25e3:
+
+  s390x: pv: Fix diag318 PV fencing (2020-10-22 15:47:27 +0200)
+
+----------------------------------------------------------------
+some s390x fixes
+
+----------------------------------------------------------------
+
+Janosch Frank (2):
+  s390x: pv: Remove sclp boundary checks
+  s390x: pv: Fix diag318 PV fencing
+
+Matthew Rosato (1):
+  s390x/s390-virtio-ccw: Reset PCI devices during subsystem reset
+
+ hw/s390x/s390-virtio-ccw.c  | 1 +
+ hw/s390x/sclp.c             | 5 -----
+ target/s390x/cpu_features.c | 5 +++++
+ target/s390x/cpu_features.h | 4 ++++
+ target/s390x/cpu_models.c   | 4 ++++
+ target/s390x/kvm.c          | 3 +--
+ 6 files changed, 15 insertions(+), 7 deletions(-)
+
 -- 
 2.26.2
 
