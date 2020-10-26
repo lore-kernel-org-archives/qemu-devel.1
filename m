@@ -2,99 +2,99 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDD7C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D487C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:02:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DCBEF2085B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:00:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EC3F920720
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:02:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dUoMZu90"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCBEF2085B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvOwJWFi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EC3F920720
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37802 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41406 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7jj-00040V-ML
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:00:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47996)
+	id 1kX7lf-0005bl-SD
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:02:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kX7aU-0001NU-Uf
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:51:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:57429)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kX7aR-0004h5-3q
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:51:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603738278;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7/Lh4jTkutGtglW4BtG+vAxEysiPodyDNiL9ZMmiGHk=;
- b=dUoMZu90TkqEhYewB5faQhPX5fNNOKQVK1eN0Udas5pMmg3V9e9aiBmkRoEwnIsYntcm7v
- FwLmUI5DCgiVd3AGGFp8+WGUY33q84uHShxOAtKwUteliYQ2+evaCVsXKHxEEyPQxvR8mT
- 2ep2P9mW56fwOPdwyMIhKPrXmwMBBTY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-52-_F7AQczCOQK562HlGefVUg-1; Mon, 26 Oct 2020 14:51:15 -0400
-X-MC-Unique: _F7AQczCOQK562HlGefVUg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0DFE64080;
- Mon, 26 Oct 2020 18:51:14 +0000 (UTC)
-Received: from thuth.remote.csb (ovpn-112-104.ams2.redhat.com [10.36.112.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0A66760C13;
- Mon, 26 Oct 2020 18:51:13 +0000 (UTC)
-Subject: Re: [PATCH v2 2/9] configure: cross-compiling without cross_prefix
-To: Paolo Bonzini <pbonzini@redhat.com>, Joelle van Dyne <j@getutm.app>
-References: <20201019013928.72770-1-j@getutm.app>
- <20201019013928.72770-3-j@getutm.app>
- <9a68e856-cb97-bf44-eef6-52d7cbca9884@redhat.com>
- <ec63904c-f0d2-b37b-9f9f-8f2109f1335a@redhat.com>
- <1f92b68-6d6c-d125-c034-7cbe414b198e@eik.bme.hu>
- <CA+E+eSCjkYf-6GYbJUQ=gpmQHH2zAH3g1JN+-2kjy2rUnwk3fA@mail.gmail.com>
- <d27c852c-b982-9b58-fbff-1bfc3d075e94@redhat.com>
- <0a7b6404-55db-ec3f-2b56-1d695f840475@redhat.com>
- <CA+E+eSBgVCsfOC0Huo3wJuyBOyCvU+97usH_YFdUAEQsbe-S3Q@mail.gmail.com>
- <77ef9338-de8c-82a8-7ca0-f8d708f8d1da@redhat.com>
- <CA+E+eSBedWZL2hw_RKCSLn2bxomhdbTvYd9YSatX5RnGB5r-KQ@mail.gmail.com>
- <1bf42269-3373-1f7b-1741-d1357d426af4@redhat.com>
-From: Thomas Huth <thuth@redhat.com>
-Message-ID: <7bf6b1d7-413e-e992-cc55-c04cbcb31ec7@redhat.com>
-Date: Mon, 26 Oct 2020 19:51:12 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kX7jk-0004P2-UG
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:00:57 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:34641)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kX7jj-00063x-3Z
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:00:56 -0400
+Received: by mail-ed1-x541.google.com with SMTP id x1so10594154eds.1
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:00:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=e0etMofaW9SaMB1wnsg0x/G5RNjt5vIKJ7MJQXxwx3M=;
+ b=bvOwJWFi664MCi6AIGRffX7BN7VJ4zo08SfvSQeC31S8W3A3cAU/vILdF9X4mMWxIc
+ bFhBm/DGRlqaMovQpDAcrsEeqZetMdbh0EcZT+lPH8qprr53ZUbVTrTyf/KcrKnN+uuv
+ nfyxswVevnQOSPDPC9v2htkFzFJk3cm0FeqJEWhVwbhtN4DlW+blUC3zQ1OQpK9JFVuC
+ 5+f69hVbIEy5+f6Seos4vwlFFeHtBEsdrG2A1cDcErnt68O4qEMhQk68kwbFJs2dKXy9
+ 4lqRFQ/nhgAU6xFPJcs7IweH4st5KlxVRRZ59SFUS20m5n1wHFaUDsF/JVoQGppQh7Q+
+ q7ew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=e0etMofaW9SaMB1wnsg0x/G5RNjt5vIKJ7MJQXxwx3M=;
+ b=hW+LeSgXxx3YAaOSr/RjHRiVl486PSf7guR3JyxQXu01lFPpkiUNrQCS+pD+/teLKR
+ +J9ZTlYdLL5HaGOt77BHTPUt5pTwz22QVgjnBMULYUBpbe4lPeMdVQpGwD/D53qtQSwW
+ Uac7kPGIrZ3xICeW86gvjbkf+mX7LBMaRtRWYqUW9Od0iaor8HAdi/vp25uZ33kuPhE4
+ P21B9osb+x4910nW6oHAvrjME7e0NErcr0t6o5B0wnJvEJYarxHehkRjhKr0Nm0i6E/o
+ RL2bi9J0FWe7HkNPXRfo4wKrp3ToRGO9QgRj7SLx0WCElld5EnVZKiN4sxsbbVU0ZGdC
+ J21Q==
+X-Gm-Message-State: AOAM530ve+WVal3IL3Qr707u8Qix27LLzZXHya+moIVfb3OHUcJIs/DG
+ FnT7/CT+3kjdwdLe8nc5t/oFbsy1DUg=
+X-Google-Smtp-Source: ABdhPJyOvKqK5PmXho1UCcjMkj69ZTnhKL5r95fA/QkcWuMIGfh/RIJeybs3lRfqCMWE3sFkfwC7FA==
+X-Received: by 2002:a50:9ea6:: with SMTP id a35mr17617624edf.52.1603738850669; 
+ Mon, 26 Oct 2020 12:00:50 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id u2sm5725592edr.70.2020.10.26.12.00.49
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 26 Oct 2020 12:00:49 -0700 (PDT)
+Subject: Re: [PATCH 11/15] rx: move BIOS load from MCU to board
+To: Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Alex_Benn=c3=a9e?=
+ <alex.bennee@linaro.org>
+References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ <20201026143028.3034018-12-pbonzini@redhat.com> <87lffsgas5.fsf@linaro.org>
+ <53ddb690-db6d-cfce-ee9e-c274b18bfaa0@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <d76b93ed-0abf-9b77-7b46-66161d57c75f@amsat.org>
+Date: Mon, 26 Oct 2020 20:00:48 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <1bf42269-3373-1f7b-1741-d1357d426af4@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <53ddb690-db6d-cfce-ee9e-c274b18bfaa0@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -108,24 +108,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 26/10/2020 17.15, Paolo Bonzini wrote:
-> On 26/10/20 16:33, Joelle van Dyne wrote:
->> Just to be clear, you're in favor of removing the
->> --enable-cross-compile option? I can do that if others agree but I'm
->> not sure what the downside of adding this extra option is?
+On 10/26/20 6:34 PM, Paolo Bonzini wrote:
+> On 26/10/20 18:24, Alex Bennée wrote:
+>>
+>> Paolo Bonzini <pbonzini@redhat.com> writes:
+>>
+>>> The ROM loader state is global and not part of the MCU, and the
+>>> BIOS is in machine->firmware.  So just like the kernel case,
+>>> load it in the board.
+>>>
+>>> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+>>> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>   hw/rx/rx-gdbsim.c | 7 +++++++
+>>>   hw/rx/rx62n.c     | 9 ---------
+>>>   2 files changed, 7 insertions(+), 9 deletions(-)
+>>>
+>>> diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
+>>> index 417ec0564b..040006c1c5 100644
+>>> --- a/hw/rx/rx-gdbsim.c
+>>> +++ b/hw/rx/rx-gdbsim.c
+>>> @@ -142,6 +142,13 @@ static void rx_gdbsim_init(MachineState *machine)
+>>>               /* Set dtb address to R1 */
+>>>               RX_CPU(first_cpu)->env.regs[1] = SDRAM_BASE + dtb_offset;
+>>>           }
+>>> +    } else {
+>>> +        if (machine->firmware) {
+>>> +            rom_add_file_fixed(machine->firmware, RX62N_CFLASH_BASE, 0);
+>>> +        } else if (!qtest_enabled()) {
+>>> +            error_report("No bios or kernel specified");
+>>> +            exit(1);
+>>> +        }
+>>>       }
+>>>   }
+>>>   
+>>> diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
+>>> index 6eb4eea700..17ec73fc7b 100644
+>>> --- a/hw/rx/rx62n.c
+>>> +++ b/hw/rx/rx62n.c
+>>> @@ -245,15 +245,6 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
+>>>                              rxc->rom_flash_size, &error_abort);
+>>>       memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
+>>>   
+>>> -    if (!s->kernel) {
+>>> -        if (bios_name) {
+>>> -            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
+
+The acceptance test fails. There is some odd reset order problem,
+eventually related to this discussion "CPU reset handler priority":
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg686362.html
+
+>>> -        }  else if (!qtest_enabled()) {
+>>> -            error_report("No bios or kernel specified");
+>>> -            exit(1);
+>>> -        }
+>>> -    }
+>>> -
+>>
+>> I'm confused because on the face of it these are two different models.
+>> I'll defer to the domain expert on this one.
+
+Yoshinori started to clean that here:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg734135.html
+
 > 
-> For me the downside is that it's not clear that --cross-prefix=foo-
-> implies --enable-cross-compile.
-
-I agree with Paolo ... two options sound rather confusing to me than just
-having one option. And the amount of options of the configure script is too
-big already anyway, so I'd recommend to drop --enable-cross-compile.
-
- Thomas
+> rx62n is the SoC, rx-gdbsim.c instead includes the rx62n7 and rx62n8
+> machines.
+> 
+> Paolo
+> 
 
 
