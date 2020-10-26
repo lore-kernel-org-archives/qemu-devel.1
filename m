@@ -7,82 +7,82 @@ X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B823BC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:26:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21082C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:32:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E787B20B1F
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:26:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84B34206F4
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:32:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="u856KuGF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E787B20B1F
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hZyV926C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84B34206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39242 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49094 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXAwz-0006L2-RE
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:26:49 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41742)
+	id 1kXB2W-0002r3-Lz
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:32:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42810)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXAky-0002f2-NG; Mon, 26 Oct 2020 18:14:24 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:36881)
+ id 1kXApI-0008UV-Rh
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:18:52 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:41448)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXAkw-0006px-UJ; Mon, 26 Oct 2020 18:14:24 -0400
-Received: by mail-ej1-x642.google.com with SMTP id p9so16132069eji.4;
- Mon, 26 Oct 2020 15:14:22 -0700 (PDT)
+ id 1kXApH-0007QD-24
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:18:52 -0400
+Received: by mail-ed1-x541.google.com with SMTP id l24so11329829edj.8
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 15:18:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ h=sender:subject:to:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=IqZdFuxZIgRYJvizMKfIjMdKNCayeP/lE7qlR7OAGGM=;
- b=u856KuGF2eMWOyTgaIw/+CAmbSxpECpBnJpfCBqbVIBV9yoALMh65SpJHE4nw5+RJR
- GE87hX2cjrzVj+lQQ+Dc7hgqIBC3Udkn2upyCMlOGe3Fe103/zquTawGHUa+0+bydyq2
- jEXbOsQZF/wB7pzkBnB2dVmVrbsjYDg8Ngvo9vaLwyNnOG8sZLg3+dZhqHFyDWzxldCc
- 68nbc6xDOEySShrE+AeUpd16B2PPZtNgnSZGVgBZ+cq5aE1uaGP/hN6KrWwDFQLGfOpG
- KxyZ/dCLZ2pmBWkSSsYtimHTQwysZWvvSSX6nNZ/YrO1Riz5Qz9rP6+y3T9nM9S5viAU
- CGMw==
+ bh=2LlLySCA6Qbm1gB6rd8wGTNDIdS0m+sDATuCX6JpgHs=;
+ b=hZyV926CCdDRhkAz/YCoXPn104eDte/hRYi1u3mBUfHVqz25bqXiuXG0HQQspP7IYS
+ Jb1hTviFKtcXKDPtb4DtYxW4g+dDv2AP5AbrERYiLTjAIVwW+07uVDsIKkeD9rIcn1k1
+ 41N8dXFTRYboRsSfYNAwfnQtwNA3mM7frFLtTjKNheDJOGlPTXY4KepMTC8vkOugd3iP
+ Eh329ww9E2lxQnsleIJ65U+Bi5TvoQQR0hYV0Q8PO5/3HXusgVgxyrQunwFTD23NBdbR
+ U1jCQ0eix8wCTz4603Wq5BugIflPU32dbF3BVyiyXFKY9W3aN35PqNDCV6EyJe/V6cLt
+ Lc2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ h=x-gm-message-state:sender:subject:to:references:from:message-id
  :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=IqZdFuxZIgRYJvizMKfIjMdKNCayeP/lE7qlR7OAGGM=;
- b=sIWxJg05oawZRr6x4DQbkCYG6PPVWBoV+MxE6L1+fcR/KhyZfMpsjG9L9dWZTko4+D
- wKQ2fAsZTwTTsNKERgIG91PeJB2wUTCUNRoctW1YofUzipVqplzntKdcbbHyjMziK7um
- CNu4La1fPuNhC0W+vgoEl91Ji8Ln5neEP6jhDQ25U4i6WBWd1Rkun4hYpHGPH1SnoWnC
- aAhzJdcT1/zUEVz3PV4MnxVvmqG9zp6ZLcstbGnx2xNfTNoFZYkkZLVo5b+Stjnxhe83
- zPSmBSPm1nO8sZDl/Fip2MOpkIQ8EnAB9RrwAJtRLkc9BGCHfbr3j0xitbgwClIR5/4w
- RpAQ==
-X-Gm-Message-State: AOAM5308NOx4WkQx7c2Fpi63vAqJ2VqZWOvTmDbiX5fYvPRpchGQC6D4
- PfLVpMjZGwy70OS2arAGzIdiK+O2Znw=
-X-Google-Smtp-Source: ABdhPJzaX/PvxR/HxCo7701bBUJW2BNtqB/PvzDJQOxMmkhQ+cOhI8A4DXu9qYFyA2tyToiy+ETKxQ==
-X-Received: by 2002:a17:907:118c:: with SMTP id
- uz12mr18127479ejb.98.1603750458776; 
- Mon, 26 Oct 2020 15:14:18 -0700 (PDT)
+ bh=2LlLySCA6Qbm1gB6rd8wGTNDIdS0m+sDATuCX6JpgHs=;
+ b=LTgPUY41VHTH4OJatzILTGI1XxFA8SuFibxc/r2JVp1S5SS6YHeY+N0ntlDelwLxDv
+ 9kAWiLkf4Te58lbA84Ndwg7NN/R35Ror400n7uFp3X4uwY7GEGz/QEGsQdq+ls0pLB1r
+ WZ6ZdvCxi3wORQOeGhyd9AJXchZyXg5mHIafq7Ybvf7xwAwtB2oal8a5kDGdbRAh8xW7
+ mup/EH4Nza03WqDffAaStf0sYwWWPPfh2v3ga9auOwJT4PooCZpTny6ijVbD91AFCZT5
+ YOfaD4oulelg2m34nZmQTcBOMqa5p/hNwGuaicanqfV+KZRYPmE6BhBWOlPQAXXFXmUn
+ FQ/w==
+X-Gm-Message-State: AOAM531ciARs1a5+o0IgKf4rgMxJ2I6AetppD5vTJd+px9o6NjwREY/L
+ h8sqpKHbvrx7pOjRtX7ZMN65C5yGgRA=
+X-Google-Smtp-Source: ABdhPJxbxFdaIk/YEjHnyhLoHCDUa1rGf7Fb7A/2PLJ43CcXU2sw550XMUGck4eMh1JdNgWicKqeEA==
+X-Received: by 2002:aa7:dcc2:: with SMTP id w2mr18081096edu.121.1603750729325; 
+ Mon, 26 Oct 2020 15:18:49 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id op24sm6576255ejb.56.2020.10.26.15.14.17
+ by smtp.gmail.com with ESMTPSA id rl1sm6609674ejb.36.2020.10.26.15.18.47
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 15:14:18 -0700 (PDT)
-Subject: Re: [PATCH V2 04/14] rx/: fix some comment spelling errors
-To: zhaolichang <zhaolichang@huawei.com>, qemu-trivial@nongnu.org
-References: <20201009064449.2336-1-zhaolichang@huawei.com>
- <20201009064449.2336-5-zhaolichang@huawei.com>
+ Mon, 26 Oct 2020 15:18:48 -0700 (PDT)
+Subject: Re: [PATCH 1/1] include/elf.h: Add EM_RX.
+To: Yoshinori Sato <ysato@users.sourceforge.jp>, qemu-devel@nongnu.org
+References: <20200814131438.28406-1-ysato@users.sourceforge.jp>
 From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <bb1673cc-4edf-9ec3-b7e6-b179fad29f41@amsat.org>
-Date: Mon, 26 Oct 2020 23:14:16 +0100
+Message-ID: <1a217ab5-4ced-b694-b218-c3554c7bc1a3@amsat.org>
+Date: Mon, 26 Oct 2020 23:18:46 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201009064449.2336-5-zhaolichang@huawei.com>
+In-Reply-To: <20200814131438.28406-1-ysato@users.sourceforge.jp>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x541.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -36
@@ -105,22 +105,18 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Edmondson <david.edmondson@oracle.com>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/9/20 8:44 AM, zhaolichang wrote:
-> I found that there are many spelling errors in the comments of qemu/target/rx.
-> I used spellcheck to check the spelling errors and found some errors in the folder.
+On 8/14/20 3:14 PM, Yoshinori Sato wrote:
+> RX's ELF machine not defined elf.h.
+> Added it.
 > 
-> Signed-off-by: zhaolichang <zhaolichang@huawei.com>
-> Reviewed-by: David Edmondson <david.edmondson@oracle.com>
-> Reviewed-by: Philippe Mathieu-Daude<f4bug@amsat.org>
+> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 > ---
->   target/rx/op_helper.c | 2 +-
->   target/rx/translate.c | 2 +-
->   2 files changed, 2 insertions(+), 2 deletions(-)
+>   include/elf.h | 2 ++
+>   1 file changed, 2 insertions(+)
 
 Thanks, applied to renesas-next.
 
