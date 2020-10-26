@@ -2,102 +2,98 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3287CC388F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CBB5C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:15:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CDE12080A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:13:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 75A5E2080A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:15:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPXY+JN3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CDE12080A
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVvEhSWl"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 75A5E2080A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36650 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39034 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7wK-0007KT-KF
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:13:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52368)
+	id 1kX7yE-0008NQ-DF
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:15:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52728)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qX-0002RP-NG
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:57 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59708)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qV-0006rh-I1
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:57 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603739274;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pwT4moo83BHvNKvdSJN7HO0ctYsohM97736gAr9OGRw=;
- b=GPXY+JN3tybvWrvl0rRwEm+6hVyQbXN8HUGngyWcAgfE+1iuJpiz+b0Two0RAw+qeoDBNU
- cTrMzQZpXEA11GXkTZiwZg7k7SKAy2bFtI0SILwFA8zNuDWDJc/YHoivYjWi4a8JHbH2xP
- I1K62jR1jbF/e8+V/N0QPd3Cm+oTGiU=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-8-DzbVV4x2PLu78VMnlzJyEQ-1; Mon, 26 Oct 2020 15:07:51 -0400
-X-MC-Unique: DzbVV4x2PLu78VMnlzJyEQ-1
-Received: by mail-ej1-f72.google.com with SMTP id z25so5885817ejd.2
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:07:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kX7sF-00043T-Rt
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:09:43 -0400
+Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:36831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kX7sE-0007BV-3V
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:09:43 -0400
+Received: by mail-ed1-x543.google.com with SMTP id l16so10651759eds.3
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:09:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=u6MiLiQX0pj3lh5bhUYLDut1DBwIn+mRUsrxaUTHu5I=;
+ b=gVvEhSWlRQwATuai0jsyzRXPbmEL82p0WXFQ6cNIuGYlSSqS0u7tk1686uPFipK386
+ VMhHXTpAWw0rHCfLQ9BHM+jxf8lPJ4+pUEeW+pwgh+z67/v8SdzKriTYvELUCI8X0jxR
+ y/H0i7E2ZhEh2vYUKd9FVpp0tJG8Rpil5xMaohbf9JT6gRL6ujcmUtjhH8czJRSUxUev
+ 8OQezWdKdTHb8l3XsGPDNEZ+UiD7FS9Esp+GA+SZ68J6etPph9zmbo7deearRDvnYwmG
+ HLIJ/v0IDGaxCyrtqwtH59fsMqNxb8ZTdk3zRAHN/eOpf0PgkFwKebrZS70GtrG4vKbK
+ o+FA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=pwT4moo83BHvNKvdSJN7HO0ctYsohM97736gAr9OGRw=;
- b=jnXD+6jM0ok3Wb0smBpCvPuDGQR6EQ8G8LXCsZNwk9KrBVlg92ozZNf99eGsrlK9US
- LXEJcyeobA48CvUZNRbQODuuSyEEcb/WVLx/4GmPcU1SZr+O4MFkYu/yarBsNjrk71o2
- u+HstK0OsOKl1PO7Ir3aKly51DQYZGA7JzkxQbw6cHmNfPl/VUtu6i6s78RK04yhFyhS
- vH+fTiyjqEtUcrQDef3WyBMlvOXrdMZ3si87wSdrpRv1+vJDwf9PN0ZyWZBVtq09/4ko
- oDtWkRIrUgDxVoGmLPWqV4d696lvpIA6sU9WeebcN9JSkMhHIQRz9B8gQuEXOIPnGa49
- q7/g==
-X-Gm-Message-State: AOAM532n/WtZaesUJ7ybsqVbDuwFFxQGv+GhZiX0+l/Lf4AN1ByW76f5
- wxKnPcyu3Q5vl+S3zkK5hJL5/IVCx7N8hEJj0rGtH1BpPEKi6Pi3KGt33b80sL8uQcOJbqT13Ep
- WyFv9wewNP6Y/YSk=
-X-Received: by 2002:aa7:d7ca:: with SMTP id e10mr17057869eds.269.1603739270138; 
- Mon, 26 Oct 2020 12:07:50 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJx/JgiqEbPPvQcO3+q+o0DOJwGqSkY8f/3/bRJ0Cxbh7gO45z7dybiWrS6hXpXuUli5S2dvTw==
-X-Received: by 2002:aa7:d7ca:: with SMTP id e10mr17057743eds.269.1603739268834; 
- Mon, 26 Oct 2020 12:07:48 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ h=x-gm-message-state:sender:subject:to:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=u6MiLiQX0pj3lh5bhUYLDut1DBwIn+mRUsrxaUTHu5I=;
+ b=E/CsKwG1j0h5bCtZv24fgNEHZPyRm5IaTMgE3adyaFdfjdB+6A8dZHQg65y0k85BWu
+ nNSrL0E2yvOTPbBJ7nv0zlr62e2QyQVMp4QD1SthKEIVKkLEUt6KmSeWos+0QJBlLsa6
+ J0YflWsqNhiFmUyt1jZY7mDjHv1mPCSw07sQAu8D8p+jj7WqsbFFyGJBHmGByydrdIb8
+ EF+t4StUh9eD4Zns3wgV3QYyuNlbDsXORi2RfQ6wh8XdHO5jDpr/yCVRjapju7ZAMAlr
+ Jwwb4BFSNhRRmzDQjqBWmxzSrXEw6blh6PM+ayYG/ZHx/q/GtknVSqka9QiDJbqIwLjk
+ JRgw==
+X-Gm-Message-State: AOAM532PpQ3ukkn8HoEU8hbV67GtpqMuH9MmuqWMiR82r+SUkT7kuwPU
+ buOkBqNSqgitRVEuC5RdWcZ/BmjT+Rs=
+X-Google-Smtp-Source: ABdhPJyFb2NzGkGL2hhwTmVEUzYsBEqi6PtDuFd/7Ve0FwM7H96ioX/im0Svtr4cNDCOY6HbYe0j3w==
+X-Received: by 2002:a05:6402:1b1e:: with SMTP id
+ by30mr7619387edb.369.1603739380160; 
+ Mon, 26 Oct 2020 12:09:40 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id gy6sm6349930ejb.7.2020.10.26.12.07.47
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 12:07:48 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 4/4] docs/devel/testing.rst: Update outdated Avocado URLs
-Date: Mon, 26 Oct 2020 20:07:26 +0100
-Message-Id: <20201026190726.19515-5-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201026190726.19515-1-philmd@redhat.com>
-References: <20201026190726.19515-1-philmd@redhat.com>
+ by smtp.gmail.com with ESMTPSA id k22sm5700951edr.12.2020.10.26.12.09.39
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Mon, 26 Oct 2020 12:09:39 -0700 (PDT)
+Subject: Re: [PATCH v2] rx: move BIOS load from MCU to board
+To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+References: <20201026190540.3106013-1-pbonzini@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <f6e5e6d0-ad35-d698-2560-10d91d069030@amsat.org>
+Date: Mon, 26 Oct 2020 20:09:38 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <20201026190540.3106013-1-pbonzini@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::543;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -110,46 +106,26 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avocado documentation referred returns 404 error.
-Update the broken links.
+On 10/26/20 8:05 PM, Paolo Bonzini wrote:
+> The ROM loader state is global and not part of the MCU, and the
+> BIOS is in machine->firmware.  So just like the kernel case,
+> load it in the board.
+> 
+> Due to the ordering between CPU reset and ROM reset, the ROM
+> has to be registered before the CPU is realized, otherwise
+> the reset vector is loaded before the ROM is there.
+> 
+> Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>   hw/rx/rx-gdbsim.c | 10 ++++++++++
+>   hw/rx/rx62n.c     |  9 ---------
+>   2 files changed, 10 insertions(+), 9 deletions(-)
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Cleber Rosa <crosa@redhat.com>
-Message-Id: <20201010080741.2932406-1-philmd@redhat.com>
----
- docs/devel/testing.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/docs/devel/testing.rst b/docs/devel/testing.rst
-index 0c3e79d31cd..0aa7a13bbad 100644
---- a/docs/devel/testing.rst
-+++ b/docs/devel/testing.rst
-@@ -654,7 +654,7 @@ To manually install Avocado and its dependencies, run:
- 
- Alternatively, follow the instructions on this link:
- 
--  http://avocado-framework.readthedocs.io/en/latest/GetStartedGuide.html#installing-avocado
-+  https://avocado-framework.readthedocs.io/en/latest/guides/user/chapters/installing.html
- 
- Overview
- --------
-@@ -837,7 +837,7 @@ Parameter reference
- To understand how Avocado parameters are accessed by tests, and how
- they can be passed to tests, please refer to::
- 
--  http://avocado-framework.readthedocs.io/en/latest/WritingTests.html#accessing-test-parameters
-+  https://avocado-framework.readthedocs.io/en/latest/guides/writer/chapters/writing.html#accessing-test-parameters
- 
- Parameter values can be easily seen in the log files, and will look
- like the following:
--- 
-2.26.2
-
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
