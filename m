@@ -2,88 +2,80 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B1FC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E6C7C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0257820791
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E3F020791
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:38 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="McIw5P/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0257820791
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="dUieituw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E3F020791
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48996 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51598 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzw1-0004qe-0Y
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:41:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40252)
+	id 1kWzwX-0005wg-Hf
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:41:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSQ-0007wh-Un
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26271)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSB-0007xo-Vu
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603707014;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=6lDjz0L9jKbvxmxDp9dqjfdZRnV9hR4KKUUQp5CJEAY=;
- b=McIw5P/nsjkNOkwfOKRm6MmQ4Gj0uTcejtta5OSBHDw6/X63ncFksyNeOveNpbRSIIsDKs
- /7tjjnlP7rsm3khUcyySXIgSUJZmHrscGkZOiCWPI/yzspiPfzkecwWOHW1OsfGrmX+hJG
- LpWH76Z30OoweFGIj/yOknmIfk9rmZI=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-181-QDN2wVncNiiPkXmMtP3StQ-1; Mon, 26 Oct 2020 06:10:12 -0400
-X-MC-Unique: QDN2wVncNiiPkXmMtP3StQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 030C610E2190;
- Mon, 26 Oct 2020 10:10:11 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4ADF05B4C1;
- Mon, 26 Oct 2020 10:10:07 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id CB1931132D67; Mon, 26 Oct 2020 11:10:05 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 4/4] qemu-storage-daemon: QAPIfy --chardev
-Date: Mon, 26 Oct 2020 11:10:05 +0100
-Message-Id: <20201026101005.2940615-5-armbru@redhat.com>
-In-Reply-To: <20201026101005.2940615-1-armbru@redhat.com>
-References: <20201026101005.2940615-1-armbru@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kWzTT-0001GM-Vm
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:11:36 -0400
+Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:17995)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kWzTR-00007W-VB
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:11:35 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f96a0bf0001>; Mon, 26 Oct 2020 03:11:11 -0700
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL101.nvidia.com
+ (172.20.187.10) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
+ 2020 10:11:24 +0000
+Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
+ Transport; Mon, 26 Oct 2020 10:11:16 +0000
+From: Kirti Wankhede <kwankhede@nvidia.com>
+To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
+Subject: [PATCH v29 10/17] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU is
+ enabled
+Date: Mon, 26 Oct 2020 15:06:20 +0530
+Message-ID: <1603704987-20977-11-git-send-email-kwankhede@nvidia.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
+References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
+X-NVConfidentiality: public
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603707071; bh=r92JoZBQOTsCCf8yYCdZx/5GwBTWs4tNGrSyapeSUes=;
+ h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
+ References:X-NVConfidentiality:MIME-Version:Content-Type;
+ b=dUieituwY7abVotzoWQ4yAbBoCb0LpJZamXl/Gg743FaF/sYmQ6QUgqz+gms3Dtx+
+ 41oHEAYzQj82QC6GI2J+FEm7mBs8ca65Ip+iarfeana3lXn60nv3xiy3jB6TiO/8ww
+ 5im1C4x9Erq9amG+J96Zui6YbmKoBgzG/FQ/D5DlmiSFvVJt4MF68bm6/df4JoZqmd
+ KdV8KCHo+Ymdbj/8VcGxq5ERGowHXPNPwi1QNgGMMuAx8vHO8eT9mSlIOavnjM7+Pl
+ etLMpN5bUK5/WFyGfbSYDv640I1yifjZTST3k2aY/PwgE8lc4cit/FPAxv5TOeRfqx
+ +4ZI9UNkyQYfw==
+Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate26.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 06:10:16
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,156 +88,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
- pbonzini@redhat.com
+Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com,
+ Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kevin Wolf <kwolf@redhat.com>
+mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
+wasn't set correctly due to which memory listener's log_sync doesn't
+get called.
+This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
+IOMMU is enabled.
 
-This removes the dependency on QemuOpts from the --chardev option of
-the storage daemon.
-
-Help on option parameters is still wrong.  Marked FIXME.
-
-There are quite a few differences between qemu-system-FOO -chardev,
-QMP chardev-add, and qemu-storage-daemon --chardev:
-
-* QMP chardev-add wraps arguments other than "id" in a "backend"
-  object.  Parameters other than "type" are further wrapped in a
-  "data" object.  Example:
-
-        {"execute": "chardev-add",
-         "arguments": {
-             "id":"sock0",
-             "backend": {
-                 "type": "socket",
-                 "data": {
-                     "addr": {
-                         "type": "inet",
-			 ...
-        }}}}}
-
-  qemu-system-FOO -chardev does not wrap.  Neither does
-  qemu-storage-daemon --chardev.
-
-* qemu-system-FOO -chardev parameter "backend" corresponds to QMP
-  chardev-add "backend" member "type".  qemu-storage-daemon names it
-  "backend".
-
-* qemu-system-FOO -chardev parameter "backend" recognizes a few
-  additional aliases for compatibility.  QMP chardev-add does not.
-  Neither does qemu-storage-daemon --chardev.
-
-* qemu-system-FOO -chardev' with types "serial", "parallel" and "pipe"
-  parameter "path" corresponds to QMP chardev-add member "device".
-  qemu-storage-daemon --chardev follows QMP.
-
-* Backend type "socket":
-
-  - Intentionally different defaults (documented as such):
-    qemu-system-FOO -chardev defaults to server=false and
-    wait=true (if server=true), but QMP chardev-add defaults to
-    server=true and wait=false.  qemu-storage-daemon --chardev follows
-    QMP.
-
-  - Accidentally different defaults: qemu-system-FOO -chardev defaults
-    to tight=true, QMP chardev-add defaults to tight=false in
-    QMP (this is a bug in commit 776b97d3).  qemu-storage-daemon
-    follows QMP.
-
-  - QMP chardev-add wraps socket address arguments "path", "host",
-    "port", etc in a "data" object.  qemu-system-FOO -chardev does not
-    wrap.  Neither does qemu-storage-daemon --chardev.
-
-  - qemu-system-FOO -chardev parameter "delay" corresponds to QMP
-    chardev-add member "nodelay" with the sense reversed.
-    qemu-storage-daemon --chardev follows QMP.
-
-* Backend type "udp":
-
-  - QMP chardev-add wraps remote and local address arguments in a
-    "remote" and a "local" object, respectively.  qemu-system-FOO
-    -chardev does not wrap, but prefixes the local address parameter
-    names with "local" instead.
-
-  - QMP chardev-add wraps socket address arguments in a "data" object.
-    qemu-system-FOO -chardev does not wrap.  Neither does
-    qemu-storage-daemon --chardev.  Same as for type "socket".
-
-* I'm not sure qemu-system-FOO -chardev supports everything QMP
-  chardev-add does.  I am sure qemu-storage-daemon --chardev does.
-
-Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 ---
- storage-daemon/qemu-storage-daemon.c | 37 +++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 9 deletions(-)
+ softmmu/memory.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-index e419ba9f19..f1f3bdc320 100644
---- a/storage-daemon/qemu-storage-daemon.c
-+++ b/storage-daemon/qemu-storage-daemon.c
-@@ -37,10 +37,13 @@
- #include "qapi/error.h"
- #include "qapi/qapi-visit-block-core.h"
- #include "qapi/qapi-visit-block-export.h"
-+#include "qapi/qapi-visit-char.h"
-+#include "qapi/qapi-visit-char.h"
- #include "qapi/qapi-visit-control.h"
- #include "qapi/qmp/qdict.h"
- #include "qapi/qmp/qstring.h"
- #include "qapi/qobject-input-visitor.h"
-+#include "qapi/qobject-output-visitor.h"
- 
- #include "qemu-common.h"
- #include "qemu-version.h"
-@@ -207,18 +210,34 @@ static void process_options(int argc, char *argv[])
-             }
-         case OPTION_CHARDEV:
-             {
--                /* TODO This interface is not stable until we QAPIfy it */
--                QemuOpts *opts = qemu_opts_parse_noisily(&qemu_chardev_opts,
--                                                         optarg, true);
--                if (opts == NULL) {
--                    exit(EXIT_FAILURE);
--                }
-+                QDict *args;
-+                Visitor *v;
-+                ChardevOptions *chr;
-+                q_obj_chardev_add_arg *arg;
-+                bool help;
- 
--                if (!qemu_chr_new_from_opts(opts, NULL, &error_fatal)) {
--                    /* No error, but NULL returned means help was printed */
-+                args = keyval_parse(optarg, "backend", &help, &error_fatal);
-+                if (help) {
-+                    if (qdict_haskey(args, "backend")) {
-+                        /* FIXME wrong where QAPI differs from QemuOpts */
-+                        qemu_opts_print_help(&qemu_chardev_opts, true);
-+                    } else {
-+                        qemu_chr_print_types();
-+                    }
-                     exit(EXIT_SUCCESS);
-                 }
--                qemu_opts_del(opts);
-+
-+                v = qobject_input_visitor_new_keyval(QOBJECT(args));
-+                visit_type_ChardevOptions(v, NULL, &chr, &error_fatal);
-+                visit_free(v);
-+
-+                arg = chardev_options_crumple(chr);
-+
-+                qmp_chardev_add(arg->id, arg->backend, &error_fatal);
-+                g_free(arg->id);
-+                qapi_free_ChardevBackend(arg->backend);
-+                qapi_free_ChardevOptions(chr);
-+                qobject_unref(args);
-                 break;
-             }
-         case OPTION_EXPORT:
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index 403ff3abc99b..94f606e9d9d9 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1792,7 +1792,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
+-    if (global_dirty_log && mr->ram_block) {
++    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
+         mask |= (1 << DIRTY_MEMORY_MIGRATION);
+     }
+     return mask;
 -- 
-2.26.2
+2.7.0
 
 
