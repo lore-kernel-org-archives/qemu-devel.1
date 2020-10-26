@@ -2,84 +2,100 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F0B7C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:08:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B097C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:09:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DA704207C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:07:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 673DF207C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:09:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="O95UQM8l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DA704207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KieXY1bQ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 673DF207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53052 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55378 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7qY-0002AM-LY
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:07:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51734)
+	id 1kX7rj-00039b-EB
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:09:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52234)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX7oV-0008LS-VD
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:05:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48811)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qB-00023L-Hr
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:35 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:43822)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX7oT-0006Xr-Hp
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:05:50 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7q9-0006pB-Ub
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:35 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603739147;
+ s=mimecast20190719; t=1603739253;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding;
- bh=DWNJgv6IDfd6jIm/7i4j4jkOeDgyzy1FGS1TsoQGhOo=;
- b=O95UQM8lE4t1aYdIrlrvpx4Ha6gnBWo7aO/IGQ3zOulFCjJKtd5OypdYNBlDOUR7NQXtrb
- agiUZMtfGVTx7tMJ5UWkacVn8QKVDWfFNH9O2qo3YoL1xqEX8zkgePl8Hm7X5e5Q63TmRC
- KLPYXYMt9OAaqbSJtDXJJBKVGBKuxrw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-288-h0OcpZbeMBa3MHkE_CViwA-1; Mon, 26 Oct 2020 15:05:42 -0400
-X-MC-Unique: h0OcpZbeMBa3MHkE_CViwA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B21E809DC0
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 19:05:41 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 42D6D5D9CA;
- Mon, 26 Oct 2020 19:05:41 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
+ bh=YUPimfd1+Il1ZXihEUp45s96llasmd5rajL//TC8sE0=;
+ b=KieXY1bQdglpqh9AGTafVU99yacSESWmqoNHDEcT+4DdF0j3z7jebk1eJ88qZqQZOsWfmJ
+ UXxNLffCUPsQDfevSbqCvtGYLSdmA3DeJ3Tm472j5v1dpzz64mXlS/BBdp7iPahYYU+A6C
+ V3oqZRqK34FTGfOdG151rfvWRPHSGiY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-419-1r5HgBFOPXm3UMuKkJfHTA-1; Mon, 26 Oct 2020 15:07:30 -0400
+X-MC-Unique: 1r5HgBFOPXm3UMuKkJfHTA-1
+Received: by mail-ej1-f69.google.com with SMTP id lf18so5863144ejb.13
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:07:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YUPimfd1+Il1ZXihEUp45s96llasmd5rajL//TC8sE0=;
+ b=f8AMTgOgbdLuKM6L6rl0u3a99DzjHa5+pS826XIKCTc7hoObdwfueuSWShDRxhJeHy
+ E9H1W++tcsgb3YnH50dav/oEZ8L0ZDyzO6/X22AxD5ARH6WqJYQCHZHOVwpRQvKcBVge
+ XTUGMQFZuC5NXomTwMhj6CLSJQ44SuttkCVzXBcdboEsxYz43zaau2WeHXbqIiIftUWE
+ i0gbclgVqn0zZ3reRS/FlxwYxMMVDprziabDmhLWxAHTGvKvSAhL3flE/TEZBNlBoeor
+ IpqWWqTvcQh6wE+efyhaWlF5Nfa5BVop3VV4tVhokkLRJLZ+oVfhiVOcv2tGL8qm4bVS
+ 1t0Q==
+X-Gm-Message-State: AOAM5302kHloRe+MOJRUuiO8stCnIuiXLwBJYXDPYaQLhqlOeXt0fkzO
+ +AJ7UAQ4Z9d1vlqqdtz+wPChTaaHep7DvxBNOtfwDNlTbcMWlAfwV6MFiH8eC2YgQv96MuvARdo
+ tASz1xiw4MX2mG+Q=
+X-Received: by 2002:a17:906:e10e:: with SMTP id
+ gj14mr17967982ejb.134.1603739248917; 
+ Mon, 26 Oct 2020 12:07:28 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxDB37LVSz3/BR2eMqOVm1PXW3y3HNZxNRGAxDhHliJNln+SGNv8M93TQ6Dp8NgJGwpAY1dzA==
+X-Received: by 2002:a17:906:e10e:: with SMTP id
+ gj14mr17967946ejb.134.1603739248561; 
+ Mon, 26 Oct 2020 12:07:28 -0700 (PDT)
+Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id bt16sm6377792ejb.89.2020.10.26.12.07.27
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 26 Oct 2020 12:07:27 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v2] rx: move BIOS load from MCU to board
-Date: Mon, 26 Oct 2020 15:05:40 -0400
-Message-Id: <20201026190540.3106013-1-pbonzini@redhat.com>
+Subject: [PULL 0/4] Acceptance testing patches for 2020-10-26
+Date: Mon, 26 Oct 2020 20:07:22 +0100
+Message-Id: <20201026190726.19515-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,68 +109,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: philmd@redhat.com
+Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The ROM loader state is global and not part of the MCU, and the
-BIOS is in machine->firmware.  So just like the kernel case,
-load it in the board.
-
-Due to the ordering between CPU reset and ROM reset, the ROM
-has to be registered before the CPU is realized, otherwise
-the reset vector is loaded before the ROM is there.
-
-Cc: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/rx/rx-gdbsim.c | 10 ++++++++++
- hw/rx/rx62n.c     |  9 ---------
- 2 files changed, 10 insertions(+), 9 deletions(-)
-
-diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
-index 417ec0564b..6bf4a620e1 100644
---- a/hw/rx/rx-gdbsim.c
-+++ b/hw/rx/rx-gdbsim.c
-@@ -106,6 +106,16 @@ static void rx_gdbsim_init(MachineState *machine)
-                              rxc->xtal_freq_hz, &error_abort);
-     object_property_set_bool(OBJECT(&s->mcu), "load-kernel",
-                              kernel_filename != NULL, &error_abort);
-+
-+    if (!kernel_filename) {
-+        if (machine->firmware) {
-+            rom_add_file_fixed(machine->firmware, RX62N_CFLASH_BASE, 0);
-+        } else if (!qtest_enabled()) {
-+            error_report("No bios or kernel specified");
-+            exit(1);
-+        }
-+    }
-+
-     qdev_realize(DEVICE(&s->mcu), NULL, &error_abort);
- 
-     /* Load kernel and dtb */
-diff --git a/hw/rx/rx62n.c b/hw/rx/rx62n.c
-index 6eb4eea700..17ec73fc7b 100644
---- a/hw/rx/rx62n.c
-+++ b/hw/rx/rx62n.c
-@@ -245,15 +245,6 @@ static void rx62n_realize(DeviceState *dev, Error **errp)
-                            rxc->rom_flash_size, &error_abort);
-     memory_region_add_subregion(s->sysmem, RX62N_CFLASH_BASE, &s->c_flash);
- 
--    if (!s->kernel) {
--        if (bios_name) {
--            rom_add_file_fixed(bios_name, RX62N_CFLASH_BASE, 0);
--        }  else if (!qtest_enabled()) {
--            error_report("No bios or kernel specified");
--            exit(1);
--        }
--    }
--
-     /* Initialize CPU */
-     object_initialize_child(OBJECT(s), "cpu", &s->cpu, TYPE_RX62N_CPU);
-     qdev_realize(DEVICE(&s->cpu), NULL, &error_abort);
--- 
-2.26.2
+The following changes since commit a46e72710566eea0f90f9c673a0f02da0064acce=
+:=0D
+=0D
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201026' into st=
+ag=3D=0D
+ing (2020-10-26 14:50:03 +0000)=0D
+=0D
+are available in the Git repository at:=0D
+=0D
+  https://gitlab.com/philmd/qemu.git tags/acceptance-testing-20201026=0D
+=0D
+for you to fetch changes up to 4c9ac67230d2d8c12bfc0f3447ae353e67b43f7f:=0D
+=0D
+  docs/devel/testing.rst: Update outdated Avocado URLs (2020-10-26 18:20:51=
+ +=3D=0D
+0100)=0D
+=0D
+----------------------------------------------------------------=0D
+Acceptance testing patches=0D
+=0D
+- More ARM tests=0D
+- Documentation update=0D
+=0D
+CI jobs results:=0D
+. https://cirrus-ci.com/build/5754555684093952=0D
+. https://gitlab.com/philmd/qemu/-/pipelines/207807648=0D
+----------------------------------------------------------------=0D
+=0D
+Philippe Mathieu-Daud=3DC3=3DA9 (4):=0D
+  tests/boot_linux_console: Boot Trusted Firmware-A on the Raspberry Pi=0D
+    3=0D
+  tests/acceptance: Add a 'virt_kvm' test using the GICv3=0D
+  tests/acceptance: Allow running Orange Pi test using cached artifacts=0D
+  docs/devel/testing.rst: Update outdated Avocado URLs=0D
+=0D
+ docs/devel/testing.rst                 |  4 ++--=0D
+ tests/acceptance/boot_linux.py         | 17 ++++++++++++++++-=0D
+ tests/acceptance/boot_linux_console.py | 24 ++++++++++++++++++++++++=0D
+ 3 files changed, 42 insertions(+), 3 deletions(-)=0D
+=0D
+--=3D20=0D
+2.26.2=0D
+=0D
 
 
