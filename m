@@ -2,73 +2,80 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17B9EC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:07:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8C4CC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:08:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 60E5321707
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7A6A221BE5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:08:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elSvWb5o"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 60E5321707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hoEt4432"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7A6A221BE5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59084 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60404 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8mJ-0007r8-CO
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:07:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33776)
+	id 1kX8ml-0008QO-Ga
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:08:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60418)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kX8Om-0006a2-MK
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:43:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50536)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8Hb-0005o5-52
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51858)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kX8Oh-00038K-K4
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:43:20 -0400
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8HZ-0002N6-6F
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:54 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603741394;
+ s=mimecast20190719; t=1603740952;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=NS7GuZOZomlBwMDkfqMsEGS70Im1nb/zmllpfmWqJaM=;
- b=elSvWb5ois9bXL/navVsIBcs0Ble/ZFNYYSCGStJw9jzJ9sqS/2X5WlhmAlcPFHd27bp2b
- pe1AD8da5Ex7WOZWwYGb2raf/AyX54FtdApb7+CpTsSub9kH7oja3YenSdD59pJCpoSGZX
- sRzLh+UcUUoaS5bN06YDDCEyHbTMRO4=
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TrW/iXAG2s9ENGArfq6oI14QfPgCFFI6F13qb4HLRMs=;
+ b=hoEt4432ldPPSg1o/YRCMTreo5fxkJfCqcyJytDSRMYRXFoBhv10uup0rSNf7dpXyUGZcn
+ pdEFPPEsJEg67P3D3QrlLDxmpvYLPF0FPfV2ioTQR5ix44Awdrv1WYc3C/hNoNfUh1lbd6
+ TSxkwQ9psDzVnihl77uZT7vOgMqUSEQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-kH3TNXVcPaybA14AuKXQ2Q-1; Mon, 26 Oct 2020 15:43:11 -0400
-X-MC-Unique: kH3TNXVcPaybA14AuKXQ2Q-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-47-8m6TCAxXPUK9kMoBa72NSA-1; Mon, 26 Oct 2020 15:35:49 -0400
+X-MC-Unique: 8m6TCAxXPUK9kMoBa72NSA-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B41C88C7AA
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 19:43:07 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A35605B4C9;
- Mon, 26 Oct 2020 19:42:52 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: qemu-devel@nongnu.org,
-	Markus Armbruster <armbru@redhat.com>
-Subject: [PATCH v2 00/11] qapi: static typing conversion, pt2
-Date: Mon, 26 Oct 2020 15:42:40 -0400
-Message-Id: <20201026194251.11075-1-jsnow@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4562580364D;
+ Mon, 26 Oct 2020 19:35:48 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id F222E55760;
+ Mon, 26 Oct 2020 19:35:45 +0000 (UTC)
+Subject: [PULL 23/32] s390x/pci: Add routine to get the vfio dma available
+ count
+From: Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 26 Oct 2020 13:35:45 -0600
+Message-ID: <160374094492.22414.1057050065406633805.stgit@gimli.home>
+In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -91,99 +98,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi, this series adds static type hints to the QAPI module.=0D
-This is part two, and covers introspect.py.=0D
-=0D
-Part 2: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt2=0D
-Everything: https://gitlab.com/jsnow/qemu/-/tree/python-qapi-cleanup-pt6=0D
-=0D
-- Requires Python 3.6+=0D
-- Requires mypy 0.770 or newer (for type analysis only)=0D
-- Requires pylint 2.6.0 or newer (for lint checking only)=0D
-=0D
-Type hints are added in patches that add *only* type hints and change no=0D
-other behavior. Any necessary changes to behavior to accommodate typing=0D
-are split out into their own tiny patches.=0D
-=0D
-Every commit should pass with:=0D
- - flake8 qapi/=0D
- - pylint --rcfile=3Dqapi/pylintrc qapi/=0D
- - mypy --config-file=3Dqapi/mypy.ini qapi/=0D
-=0D
-V2:=0D
- - Dropped all R-B from previous series; enough has changed.=0D
- - pt2 is now introspect.py, expr.py is pushed to pt3.=0D
- - Reworked again to have less confusing (?) type names=0D
- - Added an assertion to prevent future accidental breakage=0D
-=0D
-John Snow (11):=0D
-  [DO-NOT-MERGE] docs: replace single backtick (`) with double-backtick=0D
-    (``)=0D
-  [DO-NOT-MERGE] docs/sphinx: change default role to "any"=0D
-  [DO-NOT-MERGE] docs: enable sphinx-autodoc for scripts/qapi=0D
-  qapi/introspect.py: add assertions and casts=0D
-  qapi/introspect.py: add preliminary type hint annotations=0D
-  qapi/introspect.py: add _gen_features helper=0D
-  qapi/introspect.py: Unify return type of _make_tree()=0D
-  qapi/introspect.py: replace 'extra' dict with 'comment' argument=0D
-  qapi/introspect.py: create a typed 'Annotated' data strutcure=0D
-  qapi/introspect.py: improve readability of _tree_to_qlit=0D
-  qapi/introspect.py: Add docstring to _tree_to_qlit=0D
-=0D
- docs/conf.py                           |   6 +-=0D
- docs/devel/build-system.rst            | 120 +++++------=0D
- docs/devel/index.rst                   |   1 +=0D
- docs/devel/migration.rst               |  59 +++---=0D
- docs/devel/python/index.rst            |   7 +=0D
- docs/devel/python/qapi.commands.rst    |   7 +=0D
- docs/devel/python/qapi.common.rst      |   7 +=0D
- docs/devel/python/qapi.error.rst       |   7 +=0D
- docs/devel/python/qapi.events.rst      |   7 +=0D
- docs/devel/python/qapi.expr.rst        |   7 +=0D
- docs/devel/python/qapi.gen.rst         |   7 +=0D
- docs/devel/python/qapi.introspect.rst  |   7 +=0D
- docs/devel/python/qapi.main.rst        |   7 +=0D
- docs/devel/python/qapi.parser.rst      |   8 +=0D
- docs/devel/python/qapi.rst             |  26 +++=0D
- docs/devel/python/qapi.schema.rst      |   7 +=0D
- docs/devel/python/qapi.source.rst      |   7 +=0D
- docs/devel/python/qapi.types.rst       |   7 +=0D
- docs/devel/python/qapi.visit.rst       |   7 +=0D
- docs/devel/tcg-plugins.rst             |  14 +-=0D
- docs/devel/testing.rst                 |   2 +-=0D
- docs/interop/live-block-operations.rst |   4 +-=0D
- docs/system/arm/cpu-features.rst       | 110 +++++-----=0D
- docs/system/arm/nuvoton.rst            |   2 +-=0D
- docs/system/s390x/protvirt.rst         |  10 +-=0D
- qapi/block-core.json                   |   4 +-=0D
- scripts/qapi/introspect.py             | 277 +++++++++++++++++--------=0D
- scripts/qapi/mypy.ini                  |   5 -=0D
- scripts/qapi/schema.py                 |   2 +-=0D
- 29 files changed, 487 insertions(+), 254 deletions(-)=0D
- create mode 100644 docs/devel/python/index.rst=0D
- create mode 100644 docs/devel/python/qapi.commands.rst=0D
- create mode 100644 docs/devel/python/qapi.common.rst=0D
- create mode 100644 docs/devel/python/qapi.error.rst=0D
- create mode 100644 docs/devel/python/qapi.events.rst=0D
- create mode 100644 docs/devel/python/qapi.expr.rst=0D
- create mode 100644 docs/devel/python/qapi.gen.rst=0D
- create mode 100644 docs/devel/python/qapi.introspect.rst=0D
- create mode 100644 docs/devel/python/qapi.main.rst=0D
- create mode 100644 docs/devel/python/qapi.parser.rst=0D
- create mode 100644 docs/devel/python/qapi.rst=0D
- create mode 100644 docs/devel/python/qapi.schema.rst=0D
- create mode 100644 docs/devel/python/qapi.source.rst=0D
- create mode 100644 docs/devel/python/qapi.types.rst=0D
- create mode 100644 docs/devel/python/qapi.visit.rst=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+From: Matthew Rosato <mjrosato@linux.ibm.com>
+
+Create new files for separating out vfio-specific work for s390
+pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
+ioctl to collect the current dma available count.
+
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/s390x/meson.build             |    1 +
+ hw/s390x/s390-pci-vfio.c         |   54 ++++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/s390-pci-vfio.h |   17 ++++++++++++
+ 3 files changed, 72 insertions(+)
+ create mode 100644 hw/s390x/s390-pci-vfio.c
+ create mode 100644 include/hw/s390x/s390-pci-vfio.h
+
+diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+index 948ceae7a7b3..3ee4594760ac 100644
+--- a/hw/s390x/meson.build
++++ b/hw/s390x/meson.build
+@@ -10,6 +10,7 @@ s390x_ss.add(files(
+   's390-ccw.c',
+   's390-pci-bus.c',
+   's390-pci-inst.c',
++  's390-pci-vfio.c',
+   's390-skeys.c',
+   's390-stattrib.c',
+   's390-virtio-hcall.c',
+diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+new file mode 100644
+index 000000000000..cb3f4d98adf8
+--- /dev/null
++++ b/hw/s390x/s390-pci-vfio.c
+@@ -0,0 +1,54 @@
++/*
++ * s390 vfio-pci interfaces
++ *
++ * Copyright 2020 IBM Corp.
++ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include <sys/ioctl.h>
++
++#include "qemu/osdep.h"
++#include "hw/s390x/s390-pci-vfio.h"
++#include "hw/vfio/vfio-common.h"
++
++/*
++ * Get the current DMA available count from vfio.  Returns true if vfio is
++ * limiting DMA requests, false otherwise.  The current available count read
++ * from vfio is returned in avail.
++ */
++bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
++{
++    g_autofree struct vfio_iommu_type1_info *info;
++    uint32_t argsz;
++
++    assert(avail);
++
++    argsz = sizeof(struct vfio_iommu_type1_info);
++    info = g_malloc0(argsz);
++
++    /*
++     * If the specified argsz is not large enough to contain all capabilities
++     * it will be updated upon return from the ioctl.  Retry until we have
++     * a big enough buffer to hold the entire capability chain.
++     */
++retry:
++    info->argsz = argsz;
++
++    if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
++        return false;
++    }
++
++    if (info->argsz > argsz) {
++        argsz = info->argsz;
++        info = g_realloc(info, argsz);
++        goto retry;
++    }
++
++    /* If the capability exists, update with the current value */
++    return vfio_get_info_dma_avail(info, avail);
++}
++
+diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
+new file mode 100644
+index 000000000000..2a5a261cc9b1
+--- /dev/null
++++ b/include/hw/s390x/s390-pci-vfio.h
+@@ -0,0 +1,17 @@
++/*
++ * s390 vfio-pci interfaces
++ *
++ * Copyright 2020 IBM Corp.
++ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#ifndef HW_S390_PCI_VFIO_H
++#define HW_S390_PCI_VFIO_H
++
++bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
++
++#endif
 
 
