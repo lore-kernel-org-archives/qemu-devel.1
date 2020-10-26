@@ -2,72 +2,89 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1CF6C5517A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:53:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BADA8C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:54:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 581B520795
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:53:06 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 581B520795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5879520795
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:54:10 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Eoo02Sz2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5879520795
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45688 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8YD-0006nm-67
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:53:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33166)
+	id 1kX8ZF-0007zb-E2
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:54:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60550)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
- id 1kX8Lh-0003Bn-DA
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:40:09 -0400
-Received: from mga09.intel.com ([134.134.136.24]:62565)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
- id 1kX8Lf-0002kJ-GI
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:40:09 -0400
-IronPort-SDR: lx/+YXnimXKlQ35YPAtJL4PkYFgmZ0/c6UTTQ/HJXemvek90ekMzq0eflFS+1vdyJO3n3yybPe
- Bdx+Ti9rzTmA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9786"; a="168103249"
-X-IronPort-AV: E=Sophos;i="5.77,420,1596524400"; d="scan'208";a="168103249"
-X-Amp-Result: SKIPPED(no attachment in message)
-X-Amp-File-Uploaded: False
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
- by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Oct 2020 12:39:56 -0700
-IronPort-SDR: d/JXoVTLHd1Wd0oiGXdUxvd+QlFIiJnRLFyhmJpCix7EQ1av7knxiZc7M8m0Y8g98uGiSePL4b
- YzcJtMGaOB6g==
-X-IronPort-AV: E=Sophos;i="5.77,420,1596524400"; d="scan'208";a="334140300"
-Received: from alhertig-mobl1.amr.corp.intel.com (HELO bwidawsk-mobl5.local)
- ([10.252.135.229])
- by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 26 Oct 2020 12:39:56 -0700
-From: Ben Widawsky <ben.widawsky@intel.com>
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8I2-0006LN-8h
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:36:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57712)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8Hz-0002QZ-4L
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:36:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603740978;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6hLE+ft5dxG9Mkv1Oy8pLGor0YljIw2ZtPZFwzWF+RU=;
+ b=Eoo02Sz2KtN9kNsZeXW65iEIurSv1NxHziv0B2DUlQw565VINWCptuz+2LumBuANDkVRBi
+ jxEKzPbaYtj9LqxlpHv6h6RbVVNfNUbbYeakIenMPFzagXhnL0u2DJGfGym80FfVCmEEGS
+ H8Ll/qVBfAvgVTiOUKNatrQ7Sd9Y9NM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-BZZBVLVHPfeETM9xI20DDg-1; Mon, 26 Oct 2020 15:36:15 -0400
+X-MC-Unique: BZZBVLVHPfeETM9xI20DDg-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D7FF79CC0B;
+ Mon, 26 Oct 2020 19:36:14 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9361D5C1C5;
+ Mon, 26 Oct 2020 19:36:11 +0000 (UTC)
+Subject: [PULL 27/32] s390x/pci: clean up s390 PCI groups
+From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 2/2] acpi/crs: Support ranges > 32b for hosts
-Date: Mon, 26 Oct 2020 12:39:24 -0700
-Message-Id: <20201026193924.985014-2-ben.widawsky@intel.com>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201026193924.985014-1-ben.widawsky@intel.com>
-References: <20201026193924.985014-1-ben.widawsky@intel.com>
+Date: Mon, 26 Oct 2020 13:36:11 -0600
+Message-ID: <160374097104.22414.10111590915972508676.stgit@gimli.home>
+In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=134.134.136.24;
- envelope-from=ben.widawsky@intel.com; helo=mga09.intel.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 15:39:56
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -80,55 +97,52 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Ben Widawsky <ben.widawsky@intel.com>,
- Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-According to PCIe spec 5.0 Type 1 header space Base Address Registers
-are defined by 7.5.1.2.1 Base Address Registers (same as Type 0). The
-_CRS region should allow for the same range (up to 64b). Prior to this
-change, any host bridge utilizing more than 32b for the BAR would have
-the address truncated and likely lead to conflicts when the operating
-systems reads the _CRS object.
+From: Matthew Rosato <mjrosato@linux.ibm.com>
 
-Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
+Add a step to remove all stashed PCI groups to avoid stale data between
+machine resets.
 
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
-I don't think this effects any code currently in QEMU. You'd need to
-have a host bridge which has a BAR, and that BAR wants to be > 32b. I've
-hit this because I have a modified PXB device that does advertise a 64b
-BAR. Also, you'd need a platform that cares about ACPI, which, many do
-not.
----
- hw/i386/acpi-build.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ hw/s390x/s390-pci-bus.c |   12 ++++++++++++
+ 1 file changed, 12 insertions(+)
 
-diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-index df13abecf4..75604bdc74 100644
---- a/hw/i386/acpi-build.c
-+++ b/hw/i386/acpi-build.c
-@@ -789,8 +789,14 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
-                 crs_range_insert(temp_range_set.io_ranges,
-                                  range_base, range_limit);
-             } else { /* "memory" */
--                crs_range_insert(temp_range_set.mem_ranges,
--                                 range_base, range_limit);
-+                uint64_t length = range_limit - range_base + 1;
-+                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
-+                    crs_range_insert(temp_range_set.mem_ranges, range_base,
-+                                     range_limit);
-+                } else {
-+                    crs_range_insert(temp_range_set.mem_64bit_ranges,
-+                                     range_base, range_limit);
-+                }
-             }
-         }
+diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
+index 4c7f06d5cf95..036cf4635a7e 100644
+--- a/hw/s390x/s390-pci-bus.c
++++ b/hw/s390x/s390-pci-bus.c
+@@ -813,6 +813,17 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+                              S390_ADAPTER_SUPPRESSIBLE, errp);
+ }
  
--- 
-2.29.1
++static void s390_pcihost_unrealize(DeviceState *dev)
++{
++    S390PCIGroup *group;
++    S390pciState *s = S390_PCI_HOST_BRIDGE(dev);
++
++    while (!QTAILQ_EMPTY(&s->zpci_groups)) {
++        group = QTAILQ_FIRST(&s->zpci_groups);
++        QTAILQ_REMOVE(&s->zpci_groups, group, link);
++    }
++}
++
+ static int s390_pci_msix_init(S390PCIBusDevice *pbdev)
+ {
+     char *name;
+@@ -1171,6 +1182,7 @@ static void s390_pcihost_class_init(ObjectClass *klass, void *data)
+ 
+     dc->reset = s390_pcihost_reset;
+     dc->realize = s390_pcihost_realize;
++    dc->unrealize = s390_pcihost_unrealize;
+     hc->pre_plug = s390_pcihost_pre_plug;
+     hc->plug = s390_pcihost_plug;
+     hc->unplug_request = s390_pcihost_unplug_request;
 
 
