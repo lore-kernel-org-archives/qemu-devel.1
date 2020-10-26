@@ -2,61 +2,85 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADFB4C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:09:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79E4BC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:09:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1F491223AB
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:09:30 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1F491223AB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
+	by mail.kernel.org (Postfix) with ESMTPS id DF6A5223AB
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:09:46 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dj4Domk9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF6A5223AB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44662 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWyVN-0000ht-5J
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:09:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52706)
+	id 1kWyVd-0000xn-J9
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:09:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50624)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kWyRv-0004OE-Q6; Mon, 26 Oct 2020 05:05:55 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:2296)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
- id 1kWyRt-0000bM-L9; Mon, 26 Oct 2020 05:05:55 -0400
-Received: from DGGEMS410-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CKTTH1DVfzkZVg;
- Mon, 26 Oct 2020 17:05:55 +0800 (CST)
-Received: from [10.174.187.138] (10.174.187.138) by
- DGGEMS410-HUB.china.huawei.com (10.3.19.210) with Microsoft SMTP Server id
- 14.3.487.0; Mon, 26 Oct 2020 17:05:49 +0800
-Message-ID: <5F96916D.1020501@huawei.com>
-Date: Mon, 26 Oct 2020 17:05:49 +0800
-From: AlexChen <alex.chen@huawei.com>
-User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
- rv:17.0) Gecko/20130509 Thunderbird/17.0.6
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kWyIy-0002R6-A8; Mon, 26 Oct 2020 04:56:40 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:44687)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kWyIv-0005qF-V5; Mon, 26 Oct 2020 04:56:40 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id h6so6978445ybi.11;
+ Mon, 26 Oct 2020 01:56:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=mvExcYMn6d5AGLYRzy6Xnbw5G+UujgsZbLBTIOKD6Jw=;
+ b=dj4Domk9P2sgp31yeKXgqC8qGFsfUzjrgTyK/PZQ2AmXXywXeHr8dUfUohANUTOeeM
+ XTkOlIWYXGrCIOF00VdGgaLL9HfHHutKKdMpvQAf98uiN204WB5SLJecsAXPUQJjGvZV
+ SdSwlKIC5rvL76SvbcNoKkLx4dBRPqbKwsXFil8V+KXo06gJYBAnodYkuIcr/U9lYEff
+ mR4HrB/3Atsb+2Y34GX5lsIlo+Qa/MGLBtBEOP57S3Ysc8hkqd/0bV1g7AjNpWjM0Mfb
+ QzIuVyNLv2WRgprYjWXSA8YfGYjpl4dAHcm6Ch72zmRHmiRA7xihU9Mqfc2qvnPBHOzr
+ wrPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=mvExcYMn6d5AGLYRzy6Xnbw5G+UujgsZbLBTIOKD6Jw=;
+ b=tlrXu7uPyu5e3zdCA9AYyfDvuuoufJA5qqb7AYpV39CnKMkUn0pDjTzv41iwTWPeYF
+ npOripXBQuOCYQLfCBPAWjLUq9ETyyyIznFhjMOPL4QAAofHYvigvqp0k6Yn3i8CltGS
+ Er+V5bqBvY1S0OOGsNBubORoXP9/lnnYRxh8tZAZpcmtKgMI49BPpqzH3YtGOQIS3CeL
+ ddzrDiCQW+QaI37XcvtQp9SAvinjtH3N8yiSWJpBhxXtExWGqIw/9u58dCHlhnvNDmFr
+ uaAaFNQ6eo6f+otPjvfK5Xrm9IC6a1hbtkrlikw0RPMqEKh6Ns5N7RyazNLjSwKcBNIw
+ v9UA==
+X-Gm-Message-State: AOAM530SlLUx4YYJIgC9vy7405JxszhDwT4pWSj+jlQrgSovlZ7RU/vb
+ uPOtNPigYktqfcRHJGediE803tsjlAbosYo1tpcATA4g
+X-Google-Smtp-Source: ABdhPJxcLFwgUXhgqiDRi1m+3PvB7WQHDcNBinNfpnJ014LSQ1LhCSv5Rdkq9gmdcngYhI3jKUdzgeMjP3s1QiGogso=
+X-Received: by 2002:a25:328a:: with SMTP id
+ y132mr18123435yby.306.1603702595338; 
+ Mon, 26 Oct 2020 01:56:35 -0700 (PDT)
 MIME-Version: 1.0
-To: <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>
-Subject: [PATCH 4/4] qga: Switch and case should be at the same indent
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.174.187.138]
-X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.190; envelope-from=alex.chen@huawei.com;
- helo=szxga04-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 05:05:50
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -41
-X-Spam_score: -4.2
-X-Spam_bar: ----
-X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
- RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+References: <cover.1603467169.git.alistair.francis@wdc.com>
+ <0316e1e7b7d81d1e6265fc125983a1e2872c0fe1.1603467169.git.alistair.francis@wdc.com>
+In-Reply-To: <0316e1e7b7d81d1e6265fc125983a1e2872c0fe1.1603467169.git.alistair.francis@wdc.com>
+From: Bin Meng <bmeng.cn@gmail.com>
+Date: Mon, 26 Oct 2020 16:56:24 +0800
+Message-ID: <CAEUhbmVaAsj6w=q3+ry5Y3OaLbfV53Eq4Vw786wVnqd5K=f2Mw@mail.gmail.com>
+Subject: Re: [PATCH v1 14/16] target/riscv: cpu: Set XLEN independently from
+ target
+To: Alistair Francis <alistair.francis@wdc.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -70,88 +94,23 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, qemu-devel@nongnu.org
+Cc: Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Alistair Francis <alistair23@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Reported-by: Euler Robot <euler.robot@huawei.com>
-Signed-off-by: AlexChen <alex.chen@huawei.com>
----
- qga/main.c | 52 ++++++++++++++++++++++++++--------------------------
- 1 file changed, 26 insertions(+), 26 deletions(-)
+On Fri, Oct 23, 2020 at 11:45 PM Alistair Francis
+<alistair.francis@wdc.com> wrote:
+>
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  target/riscv/cpu.c | 25 ++++++++++++++++---------
+>  1 file changed, 16 insertions(+), 9 deletions(-)
+>
 
-diff --git a/qga/main.c b/qga/main.c
-index 69660d9abd..33e510ba19 100644
---- a/qga/main.c
-+++ b/qga/main.c
-@@ -280,20 +280,20 @@ QEMU_HELP_BOTTOM "\n"
- static const char *ga_log_level_str(GLogLevelFlags level)
- {
-     switch (level & G_LOG_LEVEL_MASK) {
--        case G_LOG_LEVEL_ERROR:
--            return "error";
--        case G_LOG_LEVEL_CRITICAL:
--            return "critical";
--        case G_LOG_LEVEL_WARNING:
--            return "warning";
--        case G_LOG_LEVEL_MESSAGE:
--            return "message";
--        case G_LOG_LEVEL_INFO:
--            return "info";
--        case G_LOG_LEVEL_DEBUG:
--            return "debug";
--        default:
--            return "user";
-+    case G_LOG_LEVEL_ERROR:
-+        return "error";
-+    case G_LOG_LEVEL_CRITICAL:
-+        return "critical";
-+    case G_LOG_LEVEL_WARNING:
-+        return "warning";
-+    case G_LOG_LEVEL_MESSAGE:
-+        return "message";
-+    case G_LOG_LEVEL_INFO:
-+        return "info";
-+    case G_LOG_LEVEL_DEBUG:
-+        return "debug";
-+    default:
-+        return "user";
-     }
- }
-
-@@ -695,19 +695,19 @@ DWORD WINAPI service_ctrl_handler(DWORD ctrl, DWORD type, LPVOID data,
-     GAService *service = &ga_state->service;
-
-     switch (ctrl) {
--        case SERVICE_CONTROL_STOP:
--        case SERVICE_CONTROL_SHUTDOWN:
--            quit_handler(SIGTERM);
--            SetEvent(ga_state->wakeup_event);
--            service->status.dwCurrentState = SERVICE_STOP_PENDING;
--            SetServiceStatus(service->status_handle, &service->status);
--            break;
--        case SERVICE_CONTROL_DEVICEEVENT:
--            handle_serial_device_events(type, data);
--            break;
-+    case SERVICE_CONTROL_STOP:
-+    case SERVICE_CONTROL_SHUTDOWN:
-+        quit_handler(SIGTERM);
-+        SetEvent(ga_state->wakeup_event);
-+        service->status.dwCurrentState = SERVICE_STOP_PENDING;
-+        SetServiceStatus(service->status_handle, &service->status);
-+        break;
-+    case SERVICE_CONTROL_DEVICEEVENT:
-+        handle_serial_device_events(type, data);
-+        break;
-
--        default:
--            ret = ERROR_CALL_NOT_IMPLEMENTED;
-+    default:
-+        ret = ERROR_CALL_NOT_IMPLEMENTED;
-     }
-     return ret;
- }
--- 
-2.19.1
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Tested-by: Bin Meng <bin.meng@windriver.com>
 
