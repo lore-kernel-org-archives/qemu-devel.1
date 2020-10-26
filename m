@@ -2,88 +2,88 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 943A0C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:46:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 851EAC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:46:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0CDA622263
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:46:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29C2122263
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:46:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dNcZxmy7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0CDA622263
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="kP4Kjtdw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C2122263
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:60040 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60258 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX3lb-0006AD-4Z
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:46:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50614)
+	id 1kX3le-0006FR-8B
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:46:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52254)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX3WE-0004GU-PT
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:30:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30242)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX3WC-00080T-Su
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:30:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603722639;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=ET+rXC0AcJAQhzp2Gghq1VFYQ/vRNne+hjXiB0oh9pg=;
- b=dNcZxmy7d771NCTOEIUIX+lfNG4skNQ2K/39m/0xEQ/HfObDgMAfWsho9T10XAYtMrgkVt
- JaSGAJK58YDf9XazevuSkUX+cU7z+JvtUHZpVUrpHJ4lwun46ZZE2hmj8B+bx12jCaFOOd
- GtH8GV7hTib5vmE97E3acy/zSjWthf8=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-22-OpBy43SxMxqlAgLo_ON9cQ-1; Mon, 26 Oct 2020 10:30:37 -0400
-X-MC-Unique: OpBy43SxMxqlAgLo_ON9cQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A8422EC134;
- Mon, 26 Oct 2020 14:30:36 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 26FBB5C1C2;
- Mon, 26 Oct 2020 14:30:36 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 14/15] sparc: remove bios_name
-Date: Mon, 26 Oct 2020 10:30:27 -0400
-Message-Id: <20201026143028.3034018-15-pbonzini@redhat.com>
-In-Reply-To: <20201026143028.3034018-1-pbonzini@redhat.com>
-References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kX3cr-0003H4-IM
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:37:34 -0400
+Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:18236)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
+ id 1kX3co-0000WD-RZ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:37:33 -0400
+Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
+ hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f96df300001>; Mon, 26 Oct 2020 07:37:36 -0700
+Received: from [10.40.102.184] (10.124.1.5) by HQMAIL107.nvidia.com
+ (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
+ 2020 14:37:10 +0000
+Subject: Re: [PATCH v29 05/17] vfio: Add VM state change handler to know state
+ of VM
+To: Alex Williamson <alex.williamson@redhat.com>
+References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
+ <1603704987-20977-6-git-send-email-kwankhede@nvidia.com>
+ <20201026070056.42bb04de@w520.home>
+ <ce6c6864-a8a3-269e-a9c2-3fe4d2b265b8@nvidia.com>
+ <20201026080257.2f9d3506@w520.home>
+X-Nvconfidentiality: public
+From: Kirti Wankhede <kwankhede@nvidia.com>
+Message-ID: <9c5e89fc-b247-5897-ef23-d198a97b48d3@nvidia.com>
+Date: Mon, 26 Oct 2020 20:07:07 +0530
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.12.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+In-Reply-To: <20201026080257.2f9d3506@w520.home>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.124.1.5]
+X-ClientProxiedBy: HQMAIL105.nvidia.com (172.20.187.12) To
+ HQMAIL107.nvidia.com (172.20.187.13)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
+ t=1603723056; bh=Yd2diF01NySxd8/iLB7TeOX93u7QRtrs5GfS8/5jMNI=;
+ h=Subject:To:CC:References:X-Nvconfidentiality:From:Message-ID:Date:
+ User-Agent:MIME-Version:In-Reply-To:Content-Type:Content-Language:
+ Content-Transfer-Encoding:X-Originating-IP:X-ClientProxiedBy;
+ b=kP4KjtdwlOu3x57Rk7jB7FQ3zHXomL3X03RQipaGpPH1Cgr8YvjIbiUjyB6B1xToX
+ ljyQsW7+zZP/aLQA4IR45s/6OIHnROLSh28puw0vvULjzmkTI8PWL2Ds8z/eaQ6cfx
+ XTNUhEDFEQJdLAlkhffrWgbBMMwOlg1Ty5JEDUZ3vABP3g4r2njtCHgiQ96uCP+1sw
+ R23Y8Q448mxjYEJcv9WTQW+fUEmpCp9A/V4+eq0sXs2v3Bx/N8UmVVVSDIuSfgZX7V
+ rp+2GV2R1o7qvHo6IYl7N0wKA0DU6UEzmQgZeD0P3I4slG8WW/64qsh/TZinUytJg5
+ xoz3sHWuiH05Q==
+Received-SPF: pass client-ip=216.228.121.143;
+ envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 10:37:29
+X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
+X-Spam_score_int: -92
+X-Spam_score: -9.3
+X-Spam_bar: ---------
+X-Spam_report: (-9.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,69 +96,111 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>, philmd@redhat.com
+Cc: cohuck@redhat.com, cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
+ jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- hw/sparc/leon3.c   | 4 +---
- hw/sparc/sun4m.c   | 2 +-
- hw/sparc64/sun4u.c | 2 +-
- 3 files changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/hw/sparc/leon3.c b/hw/sparc/leon3.c
-index d40b7891f6..1c50b02f81 100644
---- a/hw/sparc/leon3.c
-+++ b/hw/sparc/leon3.c
-@@ -185,6 +185,7 @@ static void leon3_set_pil_in(void *opaque, int n, int level)
- static void leon3_generic_hw_init(MachineState *machine)
- {
-     ram_addr_t ram_size = machine->ram_size;
-+    const char *bios_name = machine->firmware ?: LEON3_PROM_FILENAME;
-     const char *kernel_filename = machine->kernel_filename;
-     SPARCCPU *cpu;
-     CPUSPARCState   *env;
-@@ -259,9 +260,6 @@ static void leon3_generic_hw_init(MachineState *machine)
-     memory_region_add_subregion(address_space_mem, LEON3_PROM_OFFSET, prom);
- 
-     /* Load boot prom */
--    if (bios_name == NULL) {
--        bios_name = LEON3_PROM_FILENAME;
--    }
-     filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
- 
-     if (filename) {
-diff --git a/hw/sparc/sun4m.c b/hw/sparc/sun4m.c
-index 38d1e0fd12..81d4ae9385 100644
---- a/hw/sparc/sun4m.c
-+++ b/hw/sparc/sun4m.c
-@@ -878,7 +878,7 @@ static void sun4m_hw_init(const struct sun4m_hwdef *hwdef,
-                         hwdef->max_mem - machine->ram_size);
-     }
- 
--    prom_init(hwdef->slavio_base, bios_name);
-+    prom_init(hwdef->slavio_base, machine->firmware);
- 
-     slavio_intctl = slavio_intctl_init(hwdef->intctl_base,
-                                        hwdef->intctl_base + 0x10000ULL,
-diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
-index 05e659c8a4..50230d261a 100644
---- a/hw/sparc64/sun4u.c
-+++ b/hw/sparc64/sun4u.c
-@@ -578,7 +578,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
-     /* set up devices */
-     ram_init(0, machine->ram_size);
- 
--    prom_init(hwdef->prom_addr, bios_name);
-+    prom_init(hwdef->prom_addr, machine->firmware);
- 
-     /* Init sabre (PCI host bridge) */
-     sabre = SABRE(qdev_new(TYPE_SABRE));
--- 
-2.26.2
 
 
+On 10/26/2020 7:32 PM, Alex Williamson wrote:
+> On Mon, 26 Oct 2020 19:18:51 +0530
+> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+> 
+>> On 10/26/2020 6:30 PM, Alex Williamson wrote:
+>>> On Mon, 26 Oct 2020 15:06:15 +0530
+>>> Kirti Wankhede <kwankhede@nvidia.com> wrote:
+>>>    
+>>>> VM state change handler is called on change in VM's state. Based on
+>>>> VM state, VFIO device state should be changed.
+>>>> Added read/write helper functions for migration region.
+>>>> Added function to set device_state.
+>>>>
+>>>> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+>>>> Reviewed-by: Neo Jia <cjia@nvidia.com>
+>>>> Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+>>>> ---
+>>>>    hw/vfio/migration.c           | 158 ++++++++++++++++++++++++++++++++++++++++++
+>>>>    hw/vfio/trace-events          |   2 +
+>>>>    include/hw/vfio/vfio-common.h |   4 ++
+>>>>    3 files changed, 164 insertions(+)
+>>>>
+>>>> diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+>>>> index fd7faf423cdc..65ce735d667b 100644
+>>>> --- a/hw/vfio/migration.c
+>>>> +++ b/hw/vfio/migration.c
+>>> [snip]
+>>>> @@ -64,6 +216,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>>>>            ret = -EINVAL;
+>>>>            goto err;
+>>>>        }
+>>>> +
+>>>> +    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+>>>> +                                                           vbasedev);
+>>>>        return 0;
+>>>>    
+>>>>    err:
+>>>
+>>> Fails to build, @migration is not defined.  We could use
+>>> vbasedev->migration or pull defining and setting @migration from patch
+>>> 06.  Thanks,
+>>>    
+>>
+>> Pulling and setting migration from patch 06 seems better option.
+>> Should I resend patch 5 & 6 only?
+> 
+> I've resolved this locally as patch 05:
+> 
+> @@ -38,6 +190,7 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>   {
+>       int ret;
+>       Object *obj;
+> +    VFIOMigration *migration;
+>   
+>       if (!vbasedev->ops->vfio_get_object) {
+>           return -EINVAL;
+> @@ -64,6 +217,10 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>           ret = -EINVAL;
+>           goto err;
+>       }
+> +
+> +    migration = vbasedev->migration;
+> +    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+> +                                                           vbasedev);
+>       return 0;
+>   
+>   err:
+> 
+> patch 06:
+> 
+> @@ -219,8 +243,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+>       }
+>   
+>       migration = vbasedev->migration;
+> +    migration->vbasedev = vbasedev;
+>       migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
+>                                                              vbasedev);
+> +    migration->migration_state.notify = vfio_migration_state_notifier;
+> +    add_migration_state_change_notifier(&migration->migration_state);
+>       return 0;
+>   
+>   err:
+> 
+> If you're satisfied with that, no need to resend.  Thanks,
+> 
+
+Yes, this is exactly I was going to send.
+Thanks for fixing it.
+
+Thanks,
+Kirti
 
