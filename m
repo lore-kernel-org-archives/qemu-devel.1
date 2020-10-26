@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A80CC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D721AC55178
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 247272074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 83B22223B0
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ByJAZcc+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 247272074B
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H/FH0SXc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 83B22223B0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55270 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34012 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5Gf-0006U7-34
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:22:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60044)
+	id 1kX5II-0000vm-Ji
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60420)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5E9-00040Z-6V
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36981)
+ id 1kX5Ed-0004Xo-QA
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38334)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5E6-0008UF-QJ
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:08 -0400
+ id 1kX5Ea-0000Ey-SO
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603729205;
+ s=mimecast20190719; t=1603729236;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=c2Eb1cFXZIbsMpZlh/kHUpn3yS6L0BdQVRiW1HvPpl8=;
- b=ByJAZcc+XPzeH+odj4L4s6j/2MV2Z91rgsnHZ/HPfNPJZGUQubsnkWLkGxEHziuiAjV5S8
- 5ouzUEa35FI9+TnDqJvEQ9tjG/CTwh0ljoa8hoHK7uu8rMR9gLCTHZQehDDYE1G7gvsj9D
- vK6wIgEspGlU0ejaKNRywvg7evQ98EQ=
+ bh=HdZSo4zL5HxLrqA8KjdUTNdghcRyfN2rA70LPzDMvsM=;
+ b=H/FH0SXc1Pl6Hn4qRErI2MOfGadgToiT4/jHOD7E2BGnx4c2uesHxqW1V0tJOUp54qSO/7
+ va7mijo2zdrHyXMtIjXIJi/eXX9/MujhBxiJ4LxGESJiQBD+s7MGGsyWqJHHPhI2xJK2LG
+ AygHk3tL4x5BGJwUMjM+MvpUAkDFObw=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-141-7JCX_cV5Pz-cURps8JJxqQ-1; Mon, 26 Oct 2020 12:20:02 -0400
-X-MC-Unique: 7JCX_cV5Pz-cURps8JJxqQ-1
+ us-mta-339-BMBNScRpOFaAjgPmRAYcOw-1; Mon, 26 Oct 2020 12:20:33 -0400
+X-MC-Unique: BMBNScRpOFaAjgPmRAYcOw-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C19C86123B;
- Mon, 26 Oct 2020 16:20:01 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A6DBC18B9EF2;
+ Mon, 26 Oct 2020 16:20:32 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8AB025D9E8;
- Mon, 26 Oct 2020 16:20:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 93C125D9E4;
+ Mon, 26 Oct 2020 16:20:29 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, yubihong@huawei.com, peterx@redhat.com,
  peter.maydell@linaro.org
-Subject: [PULL 02/16] migration: Do not use C99 // comments
-Date: Mon, 26 Oct 2020 16:19:38 +0000
-Message-Id: <20201026161952.149188-3-dgilbert@redhat.com>
+Subject: [PULL 06/16] migration: Add braces {} for if statement
+Date: Mon, 26 Oct 2020 16:19:42 +0000
+Message-Id: <20201026161952.149188-7-dgilbert@redhat.com>
 In-Reply-To: <20201026161952.149188-1-dgilbert@redhat.com>
 References: <20201026161952.149188-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -107,40 +107,36 @@ From: Bihong Yu <yubihong@huawei.com>
 Signed-off-by: Bihong Yu <yubihong@huawei.com>
 Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Message-Id: <1603163448-27122-6-git-send-email-yubihong@huawei.com>
 Reviewed-by: Juan Quintela <quintela@redhat.com>
-Message-Id: <1603163448-27122-2-git-send-email-yubihong@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/block.c | 2 +-
- migration/rdma.c  | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ migration/ram.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/migration/block.c b/migration/block.c
-index 737b6499f9..4b8576b8d6 100644
---- a/migration/block.c
-+++ b/migration/block.c
-@@ -40,7 +40,7 @@
- #define MAX_IO_BUFFERS 512
- #define MAX_PARALLEL_IO 16
+diff --git a/migration/ram.c b/migration/ram.c
+index 0aea78f8a1..09178cc3a3 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -101,14 +101,16 @@ static struct {
  
--//#define DEBUG_BLK_MIGRATION
-+/* #define DEBUG_BLK_MIGRATION */
+ static void XBZRLE_cache_lock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_lock(&XBZRLE.lock);
++    }
+ }
  
- #ifdef DEBUG_BLK_MIGRATION
- #define DPRINTF(fmt, ...) \
-diff --git a/migration/rdma.c b/migration/rdma.c
-index 0340841fad..0eb42b74f0 100644
---- a/migration/rdma.c
-+++ b/migration/rdma.c
-@@ -1288,7 +1288,7 @@ const char *print_wrid(int wrid)
-  * workload information or LRU information is available, do not attempt to use
-  * this feature except for basic testing.
-  */
--//#define RDMA_UNREGISTRATION_EXAMPLE
-+/* #define RDMA_UNREGISTRATION_EXAMPLE */
+ static void XBZRLE_cache_unlock(void)
+ {
+-    if (migrate_use_xbzrle())
++    if (migrate_use_xbzrle()) {
+         qemu_mutex_unlock(&XBZRLE.lock);
++    }
+ }
  
- /*
-  * Perform a non-optimized memory unregistration after every transfer
+ /**
 -- 
 2.28.0
 
