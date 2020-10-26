@@ -2,84 +2,86 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6EB3C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:55:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DFEEC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:58:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1661E2224A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:55:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 00B2D223B0
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:58:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZRyjwoT/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1661E2224A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ki3oeEQm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 00B2D223B0
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52844 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58150 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5mA-0007G5-3q
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:55:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41728)
+	id 1kX5p7-000190-2X
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:58:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42496)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX5lA-0005vH-Ew
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:54:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:27047)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kX5no-0000P5-TP
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:57:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29636)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX5l8-0004wN-NB
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:54:16 -0400
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kX5nk-0005LN-Uj
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:57:00 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603731253;
+ s=mimecast20190719; t=1603731415;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=wLEKZXx53bC/AXofQXHwBHnCSy+NkKOX2yE9+4TERTk=;
- b=ZRyjwoT/yKFdi8aCeag/RAk3bUWlhwlHGAHe3/dp0Y4wMAtA1SmR1FzMyKVhgWL0qe+GMM
- 53iWLTYq5ZsIRkcdtQhhyVZi5Nt+Xbr4/iiqXrmoSgfX3OqLUMeHeL1VGEKCquHCs8R1kF
- 4e16T3lftZf0grUH8fKsmsHW05NU22k=
+ bh=cRSimjyOi/6kAM12mbBL/oZAz/eFJJ+/dnk1LRb53R4=;
+ b=Ki3oeEQmNP2y/jLNV0HHa19eNl58G7AA6/RJtdi/C4AuhuHlWrapwvl4bynSy/nBBvW/ug
+ MM1nEvmzp0wy9rkUp3bNMnYLwSM1sDKWUTjJF9JwydRzU5FDZM0bqxNCqIJsTcTvDJxneR
+ c+U9LoNRiQZyV34NkSVSLgF2cNwcsF8=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-312-6gZAGOtrPBiQoHan6C7dTA-1; Mon, 26 Oct 2020 12:54:11 -0400
-X-MC-Unique: 6gZAGOtrPBiQoHan6C7dTA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-541-n_gsNJ0_PGCZTnsa3w5r0w-1; Mon, 26 Oct 2020 12:56:52 -0400
+X-MC-Unique: n_gsNJ0_PGCZTnsa3w5r0w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CF78B1009E27;
- Mon, 26 Oct 2020 16:54:09 +0000 (UTC)
-Received: from w520.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id E01445D9E4;
- Mon, 26 Oct 2020 16:53:54 +0000 (UTC)
-Date: Mon, 26 Oct 2020 10:53:54 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [PATCH 00/13] s390x/pci: s390-pci updates for kernel 5.10-rc1
-Message-ID: <20201026105354.703fc480@w520.home>
-In-Reply-To: <20201026174124.1a662fa3.cohuck@redhat.com>
-References: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
- <20201026171947.0f302dcc.cohuck@redhat.com>
- <20201026174124.1a662fa3.cohuck@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1AFB2192C96E;
+ Mon, 26 Oct 2020 16:56:51 +0000 (UTC)
+Received: from work-vm (ovpn-112-208.ams2.redhat.com [10.36.112.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id F10C860C13;
+ Mon, 26 Oct 2020 16:56:46 +0000 (UTC)
+Date: Mon, 26 Oct 2020 16:56:44 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+Subject: Re: [PATCH v2] configure: add option for virtiofsd
+Message-ID: <20201026165644.GA152260@work-vm>
+References: <20201008103133.2722903-1-misono.tomohiro@jp.fujitsu.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=alex.williamson@redhat.com;
+In-Reply-To: <20201008103133.2722903-1-misono.tomohiro@jp.fujitsu.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -93,58 +95,145 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, Matthew Rosato <mjrosato@linux.ibm.com>,
- pmorel@linux.ibm.com, david@redhat.com, schnelle@linux.ibm.com,
- qemu-devel@nongnu.org, pasic@linux.ibm.com, borntraeger@de.ibm.com,
- qemu-s390x@nongnu.org, mst@redhat.com, kvm@vger.kernel.org,
- pbonzini@redhat.com, philmd@redhat.com, rth@twiddle.net
+Cc: virtio-fs@redhat.com, pbonzini@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 17:41:24 +0100
-Cornelia Huck <cohuck@redhat.com> wrote:
+* Misono Tomohiro (misono.tomohiro@jp.fujitsu.com) wrote:
+> Currently it is unknown whether virtiofsd will be built at
+> configuration time. It will be automatically built when dependency
+> is met. Also, required libraries are not clear.
+> 
+> To make this clear, add configure option --{enable,disable}-virtiofsd.
+> The default is the same as current (enabled if available) like many
+> other options. When --enable-virtiofsd is given and dependency is not
+> met, we get:
+> 
+>   ERROR: Problem encountered: virtiofsd requires libcap-ng-devel and seccomp-devel
+> or
+>   ERROR: Problem encountered: virtiofsd needs tools and vhost-user support
+> 
+> In addition, configuration summary now includes virtiofsd entry:
+> 
+>   build virtiofs daemon: YES/NO
+> 
+> Signed-off-by: Misono Tomohiro <misono.tomohiro@jp.fujitsu.com>
+> ---
+> This patch is based on current master branch
+> 
+> v1 ... https://lore.kernel.org/qemu-devel/20201007092913.1524199-1-misono.tomohiro@jp.fujitsu.com/
+> v1 -> v2: Update to follow the current meson build style
 
-> On Mon, 26 Oct 2020 17:19:47 +0100
-> Cornelia Huck <cohuck@redhat.com> wrote:
-> 
-> > On Mon, 26 Oct 2020 11:34:28 -0400
-> > Matthew Rosato <mjrosato@linux.ibm.com> wrote:
-> >   
-> > > Combined set of patches that exploit vfio/s390-pci features available in
-> > > kernel 5.10-rc1.  This patch set is a combination of 
-> > > 
-> > > [PATCH v4 0/5] s390x/pci: Accomodate vfio DMA limiting
-> > > 
-> > > and
-> > > 
-> > > [PATCH v3 00/10] Retrieve zPCI hardware information from VFIO
-> > > 
-> > > with duplicate patches removed and a single header sync.  All patches have
-> > > prior maintainer reviews except for:
-> > > 
-> > > - Patch 1 (update-linux-headers change to add new file)     
-> > 
-> > That one has ;)
-> >   
-> > > - Patch 2 (header sync against 5.10-rc1)    
-> > 
-> > I'm still unsure about the rdma/(q)atomic stuff -- had we reached any
-> > conclusion there?
-> >   
-> > > - Patch 13 - contains a functional (debug) change; I switched from using
-> > >   DPRINTFs to using trace events per Connie's request.  
-> 
-> Looks good.
-> 
-> I think that should go through the vfio tree, in case there are
-> collisions with the migration stuff?
-> 
-> (The s390x queue is currently empty.)
+Queued
 
-Patches appear to apply cleanly on top of the migration series, but I
-can take it if preferred.  Thanks,
-
-Alex
+> 
+>  configure         |  8 +++++++-
+>  meson.build       |  1 +
+>  meson_options.txt |  2 ++
+>  tools/meson.build | 17 +++++++++++++++--
+>  4 files changed, 25 insertions(+), 3 deletions(-)
+> 
+> diff --git a/configure b/configure
+> index 28df227db5..2bd8419b1f 100755
+> --- a/configure
+> +++ b/configure
+> @@ -302,6 +302,7 @@ netmap="no"
+>  sdl="auto"
+>  sdl_image="auto"
+>  virtfs=""
+> +virtiofsd="auto"
+>  mpath="auto"
+>  vnc="enabled"
+>  sparse="auto"
+> @@ -1004,6 +1005,10 @@ for opt do
+>    ;;
+>    --enable-virtfs) virtfs="yes"
+>    ;;
+> +  --disable-virtiofsd) virtiofsd="disabled"
+> +  ;;
+> +  --enable-virtiofsd) virtiofsd="enabled"
+> +  ;;
+>    --disable-mpath) mpath="disabled"
+>    ;;
+>    --enable-mpath) mpath="enabled"
+> @@ -1761,6 +1766,7 @@ disabled with --disable-FEATURE, default is enabled if available:
+>    vnc-png         PNG compression for VNC server
+>    cocoa           Cocoa UI (Mac OS X only)
+>    virtfs          VirtFS
+> +  virtiofsd       build virtiofs daemon (virtiofsd)
+>    mpath           Multipath persistent reservation passthrough
+>    xen             xen backend driver support
+>    xen-pci-passthrough    PCI passthrough support for Xen
+> @@ -7215,7 +7221,7 @@ NINJA=${ninja:-$PWD/ninjatool} $meson setup \
+>  	-Dxen=$xen -Dxen_pci_passthrough=$xen_pci_passthrough -Dtcg=$tcg \
+>  	-Dcocoa=$cocoa -Dmpath=$mpath -Dsdl=$sdl -Dsdl_image=$sdl_image \
+>  	-Dvnc=$vnc -Dvnc_sasl=$vnc_sasl -Dvnc_jpeg=$vnc_jpeg -Dvnc_png=$vnc_png \
+> -	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f \
+> +	-Dgettext=$gettext -Dxkbcommon=$xkbcommon -Du2f=$u2f -Dvirtiofsd=$virtiofsd \
+>  	-Dcapstone=$capstone -Dslirp=$slirp -Dfdt=$fdt \
+>          $cross_arg \
+>          "$PWD" "$source_path"
+> diff --git a/meson.build b/meson.build
+> index 17c89c87c6..a087239009 100644
+> --- a/meson.build
+> +++ b/meson.build
+> @@ -1843,6 +1843,7 @@ summary_info += {'Audio drivers':     config_host['CONFIG_AUDIO_DRIVERS']}
+>  summary_info += {'Block whitelist (rw)': config_host['CONFIG_BDRV_RW_WHITELIST']}
+>  summary_info += {'Block whitelist (ro)': config_host['CONFIG_BDRV_RO_WHITELIST']}
+>  summary_info += {'VirtFS support':    config_host.has_key('CONFIG_VIRTFS')}
+> +summary_info += {'build virtiofs daemon': have_virtiofsd}
+>  summary_info += {'Multipath support': mpathpersist.found()}
+>  summary_info += {'VNC support':       vnc.found()}
+>  if vnc.found()
+> diff --git a/meson_options.txt b/meson_options.txt
+> index 1d3c94840a..80637ada63 100644
+> --- a/meson_options.txt
+> +++ b/meson_options.txt
+> @@ -48,6 +48,8 @@ option('vnc_sasl', type : 'feature', value : 'auto',
+>         description: 'SASL authentication for VNC server')
+>  option('xkbcommon', type : 'feature', value : 'auto',
+>         description: 'xkbcommon support')
+> +option('virtiofsd', type: 'feature', value: 'auto',
+> +       description: 'build virtiofs daemon (virtiofsd)')
+>  
+>  option('capstone', type: 'combo', value: 'auto',
+>         choices: ['disabled', 'enabled', 'auto', 'system', 'internal'],
+> diff --git a/tools/meson.build b/tools/meson.build
+> index 513bd2ff4f..76bf84df52 100644
+> --- a/tools/meson.build
+> +++ b/tools/meson.build
+> @@ -1,10 +1,23 @@
+> -have_virtiofsd = (have_system and
+> +have_virtiofsd = (targetos == 'linux' and
+>      have_tools and
+> -    'CONFIG_LINUX' in config_host and 
+>      'CONFIG_SECCOMP' in config_host and
+>      'CONFIG_LIBCAP_NG' in config_host and
+>      'CONFIG_VHOST_USER' in config_host)
+>  
+> +if get_option('virtiofsd').enabled()
+> +  if not have_virtiofsd
+> +    if targetos != 'linux'
+> +      error('virtiofsd requires Linux')
+> +    elif 'CONFIG_SECCOMP' not in config_host or 'CONFIG_LIBCAP_NG' not in config_host
+> +      error('virtiofsd requires libcap-ng-devel and seccomp-devel')
+> +    elif not have_tools or 'CONFIG_VHOST_USER' not in config_host
+> +      error('virtiofsd needs tools and vhost-user support')
+> +    endif
+> +  endif
+> +elif get_option('virtiofsd').disabled() or not have_system
+> +  have_virtiofsd = false
+> +endif
+> +
+>  if have_virtiofsd
+>    subdir('virtiofsd')
+>  endif
+> -- 
+> 2.25.4
+> 
+> 
+-- 
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
