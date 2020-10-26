@@ -2,83 +2,82 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85217C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:10:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0632C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:10:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E0C21207C3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:10:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E2A94207C3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:10:57 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPXqDozQ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E0C21207C3
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CuwOtXxt"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2A94207C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57936 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59930 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7sa-0004CY-To
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:10:04 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52288)
+	id 1kX7tQ-00057K-PR
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:10:56 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52274)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qL-0002IN-Ar
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39443)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qH-0002C0-Cv
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:41 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:20753)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qJ-0006pw-IS
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:45 -0400
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kX7qF-0006pn-GO
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:07:41 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603739262;
+ s=mimecast20190719; t=1603739258;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=R4NQKTT0N4YaHyuFI7iWRatURDvw2djrZGhLWKYnYYw=;
- b=bPXqDozQu0dgEsA/SMNauTxDvgQYwkTAb/YGjD3SRLMG91kmKeDmvI8rWLu8KStnh5opG7
- Kr5sliPbl7A7QNdF29vrag+fte5uY4wEZlbUjQFK9KhMF4HILKDqQ/TG4ncyNOnvv1erxU
- QO2C4yLBoBvI6jMnmQt7OybyX77RLHo=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-71-qmuHN6VyNSO4MsiYrYLfEQ-1; Mon, 26 Oct 2020 15:07:40 -0400
-X-MC-Unique: qmuHN6VyNSO4MsiYrYLfEQ-1
-Received: by mail-ed1-f69.google.com with SMTP id dn20so5236945edb.14
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:07:40 -0700 (PDT)
+ bh=7CT9njDsFv7z3bPi4MElJcX4QFjJnLsmcrJhB+d6sQ0=;
+ b=CuwOtXxt2mQ8bnmEwHMssSFf+plkE2snaMZQFJlBs5mdJRoO/7tqJG0d9HArWq4V0BPEYa
+ rwtTv9RrmUNP+mTkxCrG5LV6jmk0dB4o1mLBO7MgR4DRmVcjcPaaz0mFymzDWvEAMvRGNa
+ 2AhB1J1UfjHt/S2p8anuPEHN3D13GTg=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-2d1KTYOzOqOggTCVgkQRbw-1; Mon, 26 Oct 2020 15:07:36 -0400
+X-MC-Unique: 2d1KTYOzOqOggTCVgkQRbw-1
+Received: by mail-ed1-f72.google.com with SMTP id a73so5205685edf.16
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 12:07:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=R4NQKTT0N4YaHyuFI7iWRatURDvw2djrZGhLWKYnYYw=;
- b=OOxg6l9wxl1sycLwY33K8MyPzjauAOC5ll2ztZ8+JPywQVnuCKycve5cCYUSBvOZWI
- vZqPauE46ZAg+kmhDw+tmrIKIi44DJ6Nf+OCHUfxAerZZKkhPshDs13WX2ermMHZbm0C
- gmUvk2RTH7XL4EEeEfMbaX4y0qOVLQEP6Ox6Oh4Kq5a0OvkkOBY4bkrskImlomPT/xnP
- ORAjjTjoAKjpyIgyzAa8qTqjy6LxOGT35f2V5+pk5JXN5hAttXMyo2YPC7vMW6Niuj0W
- UPqW1ewasHDDUQsu60KlhEQ66X66xH+ERlRs4AxkA4CJgZVeC3OvqoENOhsjiYy6kB8z
- ABMw==
-X-Gm-Message-State: AOAM531XagbMXVyGZcMn0VmmGN5U5nFWFgrqyknXVYzZaXYRYLYXgaI3
- EeTIQd+huR1l5+ljDYlzR4hpnO71npoGfRsnL0E0vbA1VKwYAE9QfExnoHd7+yC7Z8ZgtSooyA9
- eoZ6Yr+4+6kuPBPc=
-X-Received: by 2002:a17:906:a149:: with SMTP id
- bu9mr16616410ejb.115.1603739258899; 
- Mon, 26 Oct 2020 12:07:38 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJw7JInhPPkFsh1VFBN7oZdYwF/goz23poAPdQGOx0aYSMWpQrfSxWZ1o3lvMldRmSfp/wRE1A==
-X-Received: by 2002:a17:906:a149:: with SMTP id
- bu9mr16616392ejb.115.1603739258703; 
- Mon, 26 Oct 2020 12:07:38 -0700 (PDT)
+ bh=7CT9njDsFv7z3bPi4MElJcX4QFjJnLsmcrJhB+d6sQ0=;
+ b=PNXJFnLZW0xIlYBwK0fbB62Y5q5NeKjd8CmRddSXo/RBtU3BgtA8Zto9OWaJT0ghll
+ rLp5TJN+hbnRaEBkTM2e8cnHDGjilF2ji/se4G0qIB418jEdum3jtatgLA/urpbJBYhC
+ /Erry9XpnFeitJxzkOHabKmS5wuj7LNGF1sqL2OmApwi1g1tbE49saFJ2kaeZcESLbd0
+ kfvnr4HCpBwZmSRSFiPR47J3zyeWABT3i8/CdKL3PCJyDMdZjyAJIYFo5x/3NuiXYrDH
+ bQ3iwnS7qtOlmZnpmozHYstf1t8fHsrNZom+6jLEybXNv4INVnHQoiXg+O2qsKsD/dIZ
+ eSWw==
+X-Gm-Message-State: AOAM533yB5jCuXnlZMLqNRegGf/dZvc/BWz3ufWnQGvpG8UOuPysp8X/
+ 9v7aaZ54/La/4rYKuzXY7K5+C+ngUS4rEHrRB0yAmg8S6U5r1J5WnSqyEFXsTJsF/mTW6uGhVg4
+ E1xR2KnNUDi8JwHg=
+X-Received: by 2002:a50:d65c:: with SMTP id c28mr11611681edj.279.1603739254656; 
+ Mon, 26 Oct 2020 12:07:34 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJw7691Eoc3/823C/lNN/zwZ14iS85WxeCapR/EGFlLe2tsDoA89BHLhJrbKVwjxgADbbVqu2Q==
+X-Received: by 2002:a50:d65c:: with SMTP id c28mr11611597edj.279.1603739253712; 
+ Mon, 26 Oct 2020 12:07:33 -0700 (PDT)
 Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id h13sm5752787edz.43.2020.10.26.12.07.37
+ by smtp.gmail.com with ESMTPSA id e2sm6361275ejd.81.2020.10.26.12.07.32
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 12:07:38 -0700 (PDT)
+ Mon, 26 Oct 2020 12:07:33 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 2/4] tests/acceptance: Add a 'virt_kvm' test using the GICv3
-Date: Mon, 26 Oct 2020 20:07:24 +0100
-Message-Id: <20201026190726.19515-3-philmd@redhat.com>
+Subject: [PULL 1/4] tests/boot_linux_console: Boot Trusted Firmware-A on the
+ Raspberry Pi 3
+Date: Mon, 26 Oct 2020 20:07:23 +0100
+Message-Id: <20201026190726.19515-2-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201026190726.19515-1-philmd@redhat.com>
 References: <20201026190726.19515-1-philmd@redhat.com>
@@ -112,78 +111,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Willian Rampazzo <willianr@redhat.com>,
+Cc: Luc Michel <luc.michel@greensocs.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The current 'virt_kvm' test is restricted to GICv2, but can also
-work with a GICv3. Duplicate it but add a GICv3 test which can be
-tested on some hardware.
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Noticed while running:
+This test runs Trusted Firmware-A on the Raspberry Pi 3.
+We deliberately stop the boot process when the EDK2 UEFI version
+is displayed.
 
- $ avocado --show=app run -t machine:virt tests/acceptance/
- ...
- (2/6) tests/acceptance/boot_linux.py:BootLinuxAarch64.test_virt_kvm: ERROR: Unexpected empty reply from server (1.82 s)
+The binary is build on AppVeyor CI using Pete Batard repository [1].
+ATF v2.1 binary are used (see [2]).
 
-The job.log content is:
+It is very simple and fast:
 
-  L0351 DEBUG| Output: 'qemu-system-aarch64: host does not support in-kernel GICv2 emulation\n'
+  $ avocado --show=app,console run -t atf tests/acceptance
+  JOB ID     : 1e748d7c9e9011cf0af3250ddc8ebf2389d6204e
+  JOB LOG    : avocado/job-results/job-2020-02-16T18.08-1e748d7/job.log
+   (1/1) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_aarch64_raspi3_atf:
+  console: NOTICE:  Booting Trusted Firmware
+  console: NOTICE:  BL1: v2.1(release):v2.1
+  console: NOTICE:  BL1: Built : 15:26:06, May 13 2019
+  console: NOTICE:  rpi3: Detected: Raspberry Pi 3 Model B (1GB, Sony, UK) [0x00a02082]
+  console: NOTICE:  BL1: Booting BL2
+  console: ERROR:   rpi3_sdhost: timeout status 0x40
+  console: NOTICE:  BL2: v2.1(release):v2.1
+  console: NOTICE:  BL2: Built : 15:26:01, May 13 2019
+  console: NOTICE:  BL1: Booting BL31
+  console: NOTICE:  BL31: v2.1(release):v2.1
+  console: NOTICE:  BL31: Built : 15:26:04, May 13 2019
+  console: =UEFI firmware (version UEFI Firmware v1.15 built at 11:58:44 on Feb 14 2020)
+  PASS (1.54 s)
+  RESULTS    : PASS 1 | ERROR 0 | FAIL 0 | SKIP 0 | WARN 0 | INTERRUPT 0 | CANCEL 0
+  JOB TIME   : 1.88 s
 
-With this patch:
+[1] https://github.com/pbatard/RPi3#summary
+[2] https://github.com/ARM-software/arm-trusted-firmware/blob/v2.1/docs/plat/rpi3.rst
 
- $ avocado --show=app run -t device:gicv3 tests/acceptance/
- (1/1) tests/acceptance/boot_linux.py:BootLinuxAarch64.test_virt_kvm_gicv3: PASS (55.10 s)
-
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Message-Id: <20200217103442.30318-1-f4bug@amsat.org>
 Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Willian Rampazzo <willianr@redhat.com>
-Message-Id: <20200929224857.1225107-1-philmd@redhat.com>
 ---
- tests/acceptance/boot_linux.py | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ tests/acceptance/boot_linux_console.py | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/tests/acceptance/boot_linux.py b/tests/acceptance/boot_linux.py
-index 0055dc7cee7..c743e231f47 100644
---- a/tests/acceptance/boot_linux.py
-+++ b/tests/acceptance/boot_linux.py
-@@ -182,10 +182,11 @@ def test_virt_tcg(self):
-         self.add_common_args()
-         self.launch_and_wait()
+diff --git a/tests/acceptance/boot_linux_console.py b/tests/acceptance/boot_linux_console.py
+index 0118ed59156..415e32ef0d6 100644
+--- a/tests/acceptance/boot_linux_console.py
++++ b/tests/acceptance/boot_linux_console.py
+@@ -889,6 +889,28 @@ def test_arm_orangepi_uboot_netbsd9(self):
+         # Wait for user-space
+         wait_for_console_pattern(self, 'Starting root file system check')
  
--    def test_virt_kvm(self):
-+    def test_virt_kvm_gicv2(self):
-         """
-         :avocado: tags=accel:kvm
-         :avocado: tags=cpu:host
-+        :avocado: tags=device:gicv2
-         """
-         if not kvm_available(self.arch, self.qemu_bin):
-             self.cancel(KVM_NOT_AVAILABLE)
-@@ -195,6 +196,20 @@ def test_virt_kvm(self):
-         self.add_common_args()
-         self.launch_and_wait()
- 
-+    def test_virt_kvm_gicv3(self):
++    def test_aarch64_raspi3_atf(self):
 +        """
-+        :avocado: tags=accel:kvm
-+        :avocado: tags=cpu:host
-+        :avocado: tags=device:gicv3
++        :avocado: tags=arch:aarch64
++        :avocado: tags=machine:raspi3
++        :avocado: tags=cpu:cortex-a53
++        :avocado: tags=device:pl011
++        :avocado: tags=atf
 +        """
-+        if not kvm_available(self.arch, self.qemu_bin):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args("-accel", "kvm")
-+        self.vm.add_args("-cpu", "host")
-+        self.vm.add_args("-machine", "virt,gic-version=3")
-+        self.add_common_args()
-+        self.launch_and_wait()
++        zip_url = ('https://github.com/pbatard/RPi3/releases/download/'
++                   'v1.15/RPi3_UEFI_Firmware_v1.15.zip')
++        zip_hash = '74b3bd0de92683cadb14e008a7575e1d0c3cafb9'
++        zip_path = self.fetch_asset(zip_url, asset_hash=zip_hash)
 +
- 
- class BootLinuxPPC64(BootLinux):
-     """
++        archive.extract(zip_path, self.workdir)
++        efi_fd = os.path.join(self.workdir, 'RPI_EFI.fd')
++
++        self.vm.set_console(console_index=1)
++        self.vm.add_args('-nodefaults',
++                         '-device', 'loader,file=%s,force-raw=true' % efi_fd)
++        self.vm.launch()
++        self.wait_for_console_pattern('version UEFI Firmware v1.15')
++
+     def test_s390x_s390_ccw_virtio(self):
+         """
+         :avocado: tags=arch:s390x
 -- 
 2.26.2
 
