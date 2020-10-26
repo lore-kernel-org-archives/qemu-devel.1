@@ -2,94 +2,64 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78307C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:43:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3248AC55178
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:44:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E9C9C21BE5
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:43:51 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PdllR3nz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9C9C21BE5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	by mail.kernel.org (Postfix) with ESMTPS id 7BFD121BE5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:44:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7BFD121BE5
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40872 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45264 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX2ms-00044g-Ui
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:43:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37058)
+	id 1kX2nu-0005vN-Hv
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:44:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kX2kI-0001cH-CN
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:41:10 -0400
-Received: from mail-wr1-x441.google.com ([2a00:1450:4864:20::441]:36538)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kX2kC-00007N-9S
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:41:09 -0400
-Received: by mail-wr1-x441.google.com with SMTP id x7so12634367wrl.3
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 06:41:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=taR2hC8LHHB+RXm4WOny/v4myzxLN7EPkyO8nrr0e60=;
- b=PdllR3nzMgLmJegLJmvmNiq5kTbaJShUhzIsQ2NHsfT3mTJbvBbU4jkqEXswpWwj2D
- 5ENmPiTTHePK8F6ISo+lZ+bW1ba02XQUuoOwA+9yCvPl+ZxQJSxUylVO+LnJy9dIs883
- ElWJOm6N78+qFDvYnF1I9JNrguPx2bE9z6LjlHrj9KsOJiUbp81Z+rSluW9pZnZbq4Mm
- 77m0KKYi9jGR3Mv9hjdUmWDRWAW5NLlHkv9TgqEHaPuHY6i3bDJ5BzVcwrGDQh4kGtlu
- SbMp+wkPV/M42Oq3hzJGkcjF8uD55D9mT0g+wl0hveVQYokDvXNTsDiOw10uIst+u8/q
- N6fQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=taR2hC8LHHB+RXm4WOny/v4myzxLN7EPkyO8nrr0e60=;
- b=FYrXNrikwMTy+2YP4krpIpXcllFWnOyNjfOVqiY6fNlEAxpCDR9spu5nWFNrsikvBO
- Tp5NQ0gH38r/xQU58yUz5x+uqif2b98umyD/UbnGydcG3W1ncozObrlmtS0iFpiPHRPI
- O92wk7jfFIioPfGNI9edJqzrPq/jzf2YPKsnWXCH/LTn1TtID/jSId2RZvL+Ez960bKw
- 5tuP5h6pEyRtRdHHfRGcgVeJJNdnRanZhH5jEN4xjrV0XWX7dfsVvXEaem7OOLChudB1
- 5vhgWlAXgiGDVVlluCnYC6/QpLWk7Rg1YdU7ueNhP6zl7aetMzS+33+V3ug4lT5ecouA
- NbEg==
-X-Gm-Message-State: AOAM532gjqRKA0xCMfinUEyconCm7mSbbhv3LV5rjcPbvbKf05AQ3i/5
- XcohQAot8nfUKQoawgIUh7Slc08bhPOlJw==
-X-Google-Smtp-Source: ABdhPJx7M1/VrHe3cdMTGPIEr9r7F+6K6DaUEUa1HLNDH1Vq8AOpetWqCaaDgXcSZnnsoNv9HFt89g==
-X-Received: by 2002:adf:8462:: with SMTP id 89mr17873817wrf.389.1603719662312; 
- Mon, 26 Oct 2020 06:41:02 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id b63sm21916563wme.9.2020.10.26.06.41.01
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 06:41:01 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 692CA1FF7E;
- Mon, 26 Oct 2020 13:41:00 +0000 (GMT)
-References: <20201023073351.251332-1-thuth@redhat.com>
- <87mu09glre.fsf@linaro.org>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 0/4] Test more "check-acceptance" tests in the gitlab-CI
-In-reply-to: <87mu09glre.fsf@linaro.org>
-Date: Mon, 26 Oct 2020 13:41:00 +0000
-Message-ID: <87k0vdgl5f.fsf@linaro.org>
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kX2mN-00045n-6O
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:43:19 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2361)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <zhengchuan@huawei.com>)
+ id 1kX2mH-0000Jl-Lg
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:43:18 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.58])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CKbd232rgz15MRD;
+ Mon, 26 Oct 2020 21:43:02 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Mon, 26 Oct 2020
+ 21:42:50 +0800
+From: Chuan Zheng <zhengchuan@huawei.com>
+To: <quintela@redhat.com>, <dgilbert@redhat.com>
+Subject: [PATCH v1 3/4] migration/debug: add checkpoint for migration
+ consistency check
+Date: Mon, 26 Oct 2020 21:58:44 +0800
+Message-ID: <1603720725-81206-4-git-send-email-zhengchuan@huawei.com>
+X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1603720725-81206-1-git-send-email-zhengchuan@huawei.com>
+References: <1603720725-81206-1-git-send-email-zhengchuan@huawei.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::441;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x441.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=zhengchuan@huawei.com; helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 07:55:44
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -103,28 +73,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Wainer dos Santos
- Moschetta <wainersm@redhat.com>, qemu-ppc@nongnu.org,
- Cleber Rosa <crosa@redhat.com>,
- =?utf-8?Q?Herv=C3=A9?= Poussineau <hpoussin@reactos.org>,
- =?utf-8?Q?Phili?= =?utf-8?Q?ppe_Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: yubihong@huawei.com, zhang.zhanghailiang@huawei.com, qemu-devel@nongnu.org,
+ xiexiangyou@huawei.com, alex.chen@huawei.com, wanghao232@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Signed-off-by: Chuan Zheng <zhengchuan@huawei.com>
+---
+ migration/migration.c | 1 +
+ migration/savevm.c    | 7 +++++++
+ 2 files changed, 8 insertions(+)
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+diff --git a/migration/migration.c b/migration/migration.c
+index 0575ecb..f4434c4 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -1678,6 +1678,7 @@ static void migrate_fd_cleanup(MigrationState *s)
+         tmp = s->to_dst_file;
+         s->to_dst_file = NULL;
+         qemu_mutex_unlock(&s->qemu_file_lock);
++        MIGRATION_RAM_CONSISTENCY_CHECK();
+         /*
+          * Close the file handle without the lock to make sure the
+          * critical section won't block for long.
+diff --git a/migration/savevm.c b/migration/savevm.c
+index ff33e21..5f989a8 100644
+--- a/migration/savevm.c
++++ b/migration/savevm.c
+@@ -2636,6 +2636,13 @@ int qemu_loadvm_state(QEMUFile *f)
+     }
+ 
+     qemu_loadvm_state_cleanup();
++    /*
++     * cpu_synchronize_all_post_init->kvm_put_msrs will update the
++     * kvmclock share-mem.
++     * So this's the latest point at which the ram is the same as source
++     */
++    MIGRATION_RAM_CONSISTENCY_CHECK();
++
+     cpu_synchronize_all_post_init();
+ 
+     return ret;
+-- 
+1.8.3.1
 
-> Thomas Huth <thuth@redhat.com> writes:
->
->> These patches enable more "check-acceptance" tests in the gitlab-CI,
->> fixing a broken URL, setting AVOCADO_ALLOW_UNTRUSTED_CODE and adding
->> some missing packages to the containers.
->
-> Queued to pr/261020-testing-and-misc-1, thanks.
-
-Ahh I shall drop as your PR should be in first anyway.
-
---=20
-Alex Benn=C3=A9e
 
