@@ -7,48 +7,48 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 897BEC2D0A3
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA88DC4363A
 	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:37:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF26420770
+	by mail.kernel.org (Postfix) with ESMTPS id E9B9720791
 	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:37:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="JfpGrQUy"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF26420770
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="ZRC0uX7m"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9B9720791
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36754 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzsA-000843-OF
+	id 1kWzsA-00084z-Om
 	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:37:06 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40830)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40460)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzUG-0002RM-Po
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:12:26 -0400
-Received: from hqnvemgate24.nvidia.com ([216.228.121.143]:13368)
+ id 1kWzSk-00005E-KI
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:52 -0400
+Received: from hqnvemgate25.nvidia.com ([216.228.121.64]:14909)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzUA-0000MX-VH
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:12:23 -0400
+ id 1kWzSh-0008Jj-Oz
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:50 -0400
 Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate24.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f96a1080000>; Mon, 26 Oct 2020 03:12:24 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL107.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
- 2020 10:12:09 +0000
+ hqnvemgate25.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
+ id <B5f96a0ab0000>; Mon, 26 Oct 2020 03:10:51 -0700
+Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL105.nvidia.com
+ (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
+ 2020 10:10:37 +0000
 Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
  (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Oct 2020 10:12:01 +0000
+ Transport; Mon, 26 Oct 2020 10:10:29 +0000
 From: Kirti Wankhede <kwankhede@nvidia.com>
 To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v29 15/17] vfio: Add ioctl to get dirty pages bitmap during
- dma unmap
-Date: Mon, 26 Oct 2020 15:06:25 +0530
-Message-ID: <1603704987-20977-16-git-send-email-kwankhede@nvidia.com>
+Subject: [PATCH v29 05/17] vfio: Add VM state change handler to know state of
+ VM
+Date: Mon, 26 Oct 2020 15:06:15 +0530
+Message-ID: <1603704987-20977-6-git-send-email-kwankhede@nvidia.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
 References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
@@ -56,18 +56,18 @@ X-NVConfidentiality: public
 MIME-Version: 1.0
 Content-Type: text/plain
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603707145; bh=OhcAlMXoLAYBrlJlYzcqA0dhUVMvACU5pFKjEdoeB+A=;
+ t=1603707051; bh=On/tU9dDtQtmgArUaqREL5G3KpfJnalo7+eH9WUSc4s=;
  h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
  References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=JfpGrQUy+etypimOPQkVyLAH6du5SjPQVsjocaIIUYXhCfdhINwTe6horj9aWNj4D
- zlhVuncPLBFtt5NN4cav07MT1hOXXEilmD26X6iK5AZHGnsgmHwDPEUhgwjV75TRBp
- 8syghCjvfiQB1EgohJp4j00mRmYAihNhmGj/IVGXjFzcvie4lpdoje+LqiBNjtuNBN
- Si9WwfZq4I76NZyxIUOysKFS526FNey7oaXexC3t37RiClQIY/decGZApJ15xw+0UT
- hd3gZm0s6Z3uHt81GWtV6jxaBmq57yNcQ8Wl6AfgfIrefO3c9GohPagwdYPVB0ESV0
- 0VRMvPSJKbEQA==
-Received-SPF: pass client-ip=216.228.121.143;
- envelope-from=kwankhede@nvidia.com; helo=hqnvemgate24.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 06:10:03
+ b=ZRC0uX7mfi/IIIaqVl4DRVawUPIMlmgV1Ef5LazJwQKDSjFeUMiAxQe49JzS3wWta
+ HLNeuTKGFhZ2tynMBYJ/UXVgVbQzscA/+j6vXcVHkZs32lLkw5YhOJmEkD6KHEFNm2
+ dtmx+C8ez6TKGIEAKvVxUkRUZeUrmkY4r4WYCv9ufKR5+gtM96k16BENIR9LW2bet4
+ V4jwDMDvE0wYPQFj+jGjbABxD9PvHqVC15JGY1qQUTRo8LwzOgKguW9LAWIZnqWuG3
+ 4b2ltV4ZzPnHQEUN6+DWtXTCK50BCJnx1Rv2Suw++XO/GQr9DpFv2Ny/nrv1GMEhem
+ 9LpQCD9tWz7eQ==
+Received-SPF: pass client-ip=216.228.121.64; envelope-from=kwankhede@nvidia.com;
+ helo=hqnvemgate25.nvidia.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 06:10:10
 X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
 X-Spam_score_int: -70
 X-Spam_score: -7.1
@@ -102,157 +102,244 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-With vIOMMU, IO virtual address range can get unmapped while in pre-copy
-phase of migration. In that case, unmap ioctl should return pages pinned
-in that range and QEMU should find its correcponding guest physical
-addresses and report those dirty.
+VM state change handler is called on change in VM's state. Based on
+VM state, VFIO device state should be changed.
+Added read/write helper functions for migration region.
+Added function to set device_state.
 
-Suggested-by: Alex Williamson <alex.williamson@redhat.com>
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 ---
- hw/vfio/common.c | 96 +++++++++++++++++++++++++++++++++++++++++++++++++++++---
- 1 file changed, 92 insertions(+), 4 deletions(-)
+ hw/vfio/migration.c           | 158 ++++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |   2 +
+ include/hw/vfio/vfio-common.h |   4 ++
+ 3 files changed, 164 insertions(+)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index c0b5b6245a47..49c68a5253ae 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -321,11 +321,94 @@ static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
-     return true;
- }
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+index fd7faf423cdc..65ce735d667b 100644
+--- a/hw/vfio/migration.c
++++ b/hw/vfio/migration.c
+@@ -10,6 +10,7 @@
+ #include "qemu/osdep.h"
+ #include <linux/vfio.h>
  
-+static bool vfio_devices_all_running_and_saving(VFIOContainer *container)
++#include "sysemu/runstate.h"
+ #include "hw/vfio/vfio-common.h"
+ #include "cpu.h"
+ #include "migration/migration.h"
+@@ -22,6 +23,157 @@
+ #include "exec/ram_addr.h"
+ #include "pci.h"
+ #include "trace.h"
++#include "hw/hw.h"
++
++static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
++                                  off_t off, bool iswrite)
 +{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
-+    MigrationState *ms = migrate_get_current();
-+
-+    if (!migration_is_setup_or_active(ms->state)) {
-+        return false;
-+    }
-+
-+    QLIST_FOREACH(group, &container->group_list, container_next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            VFIOMigration *migration = vbasedev->migration;
-+
-+            if (!migration) {
-+                return false;
-+            }
-+
-+            if ((migration->device_state & VFIO_DEVICE_STATE_SAVING) &&
-+                (migration->device_state & VFIO_DEVICE_STATE_RUNNING)) {
-+                continue;
-+            } else {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
-+static int vfio_dma_unmap_bitmap(VFIOContainer *container,
-+                                 hwaddr iova, ram_addr_t size,
-+                                 IOMMUTLBEntry *iotlb)
-+{
-+    struct vfio_iommu_type1_dma_unmap *unmap;
-+    struct vfio_bitmap *bitmap;
-+    uint64_t pages = TARGET_PAGE_ALIGN(size) >> TARGET_PAGE_BITS;
 +    int ret;
 +
-+    unmap = g_malloc0(sizeof(*unmap) + sizeof(*bitmap));
-+
-+    unmap->argsz = sizeof(*unmap) + sizeof(*bitmap);
-+    unmap->iova = iova;
-+    unmap->size = size;
-+    unmap->flags |= VFIO_DMA_UNMAP_FLAG_GET_DIRTY_BITMAP;
-+    bitmap = (struct vfio_bitmap *)&unmap->data;
-+
-+    /*
-+     * cpu_physical_memory_set_dirty_lebitmap() expects pages in bitmap of
-+     * TARGET_PAGE_SIZE to mark those dirty. Hence set bitmap_pgsize to
-+     * TARGET_PAGE_SIZE.
-+     */
-+
-+    bitmap->pgsize = TARGET_PAGE_SIZE;
-+    bitmap->size = ROUND_UP(pages, sizeof(__u64) * BITS_PER_BYTE) /
-+                   BITS_PER_BYTE;
-+
-+    if (bitmap->size > container->max_dirty_bitmap_size) {
-+        error_report("UNMAP: Size of bitmap too big 0x%llx", bitmap->size);
-+        ret = -E2BIG;
-+        goto unmap_exit;
++    ret = iswrite ? pwrite(vbasedev->fd, val, count, off) :
++                    pread(vbasedev->fd, val, count, off);
++    if (ret < count) {
++        error_report("vfio_mig_%s %d byte %s: failed at offset 0x%lx, err: %s",
++                     iswrite ? "write" : "read", count,
++                     vbasedev->name, off, strerror(errno));
++        return (ret < 0) ? ret : -EINVAL;
 +    }
-+
-+    bitmap->data = g_try_malloc0(bitmap->size);
-+    if (!bitmap->data) {
-+        ret = -ENOMEM;
-+        goto unmap_exit;
-+    }
-+
-+    ret = ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, unmap);
-+    if (!ret) {
-+        cpu_physical_memory_set_dirty_lebitmap((uint64_t *)bitmap->data,
-+                iotlb->translated_addr, pages);
-+    } else {
-+        error_report("VFIO_UNMAP_DMA with DIRTY_BITMAP : %m");
-+    }
-+
-+    g_free(bitmap->data);
-+unmap_exit:
-+    g_free(unmap);
-+    return ret;
++    return 0;
 +}
 +
- /*
-  * DMA - Mapping and unmapping for the "type1" IOMMU interface used on x86
-  */
- static int vfio_dma_unmap(VFIOContainer *container,
--                          hwaddr iova, ram_addr_t size)
-+                          hwaddr iova, ram_addr_t size,
-+                          IOMMUTLBEntry *iotlb)
- {
-     struct vfio_iommu_type1_dma_unmap unmap = {
-         .argsz = sizeof(unmap),
-@@ -334,6 +417,11 @@ static int vfio_dma_unmap(VFIOContainer *container,
-         .size = size,
-     };
- 
-+    if (iotlb && container->dirty_pages_supported &&
-+        vfio_devices_all_running_and_saving(container)) {
-+        return vfio_dma_unmap_bitmap(container, iova, size, iotlb);
++static int vfio_mig_rw(VFIODevice *vbasedev, __u8 *buf, size_t count,
++                       off_t off, bool iswrite)
++{
++    int ret, done = 0;
++    __u8 *tbuf = buf;
++
++    while (count) {
++        int bytes = 0;
++
++        if (count >= 8 && !(off % 8)) {
++            bytes = 8;
++        } else if (count >= 4 && !(off % 4)) {
++            bytes = 4;
++        } else if (count >= 2 && !(off % 2)) {
++            bytes = 2;
++        } else {
++            bytes = 1;
++        }
++
++        ret = vfio_mig_access(vbasedev, tbuf, bytes, off, iswrite);
++        if (ret) {
++            return ret;
++        }
++
++        count -= bytes;
++        done += bytes;
++        off += bytes;
++        tbuf += bytes;
++    }
++    return done;
++}
++
++#define vfio_mig_read(f, v, c, o)       vfio_mig_rw(f, (__u8 *)v, c, o, false)
++#define vfio_mig_write(f, v, c, o)      vfio_mig_rw(f, (__u8 *)v, c, o, true)
++
++#define VFIO_MIG_STRUCT_OFFSET(f)       \
++                                 offsetof(struct vfio_device_migration_info, f)
++/*
++ * Change the device_state register for device @vbasedev. Bits set in @mask
++ * are preserved, bits set in @value are set, and bits not set in either @mask
++ * or @value are cleared in device_state. If the register cannot be accessed,
++ * the resulting state would be invalid, or the device enters an error state,
++ * an error is returned.
++ */
++
++static int vfio_migration_set_state(VFIODevice *vbasedev, uint32_t mask,
++                                    uint32_t value)
++{
++    VFIOMigration *migration = vbasedev->migration;
++    VFIORegion *region = &migration->region;
++    off_t dev_state_off = region->fd_offset +
++                          VFIO_MIG_STRUCT_OFFSET(device_state);
++    uint32_t device_state;
++    int ret;
++
++    ret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
++                        dev_state_off);
++    if (ret < 0) {
++        return ret;
 +    }
 +
-     while (ioctl(container->fd, VFIO_IOMMU_UNMAP_DMA, &unmap)) {
-         /*
-          * The type1 backend has an off-by-one bug in the kernel (71a7d3d78e3c
-@@ -381,7 +469,7 @@ static int vfio_dma_map(VFIOContainer *container, hwaddr iova,
-      * the VGA ROM space.
-      */
-     if (ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0 ||
--        (errno == EBUSY && vfio_dma_unmap(container, iova, size) == 0 &&
-+        (errno == EBUSY && vfio_dma_unmap(container, iova, size, NULL) == 0 &&
-          ioctl(container->fd, VFIO_IOMMU_MAP_DMA, &map) == 0)) {
-         return 0;
++    device_state = (device_state & mask) | value;
++
++    if (!VFIO_DEVICE_STATE_VALID(device_state)) {
++        return -EINVAL;
++    }
++
++    ret = vfio_mig_write(vbasedev, &device_state, sizeof(device_state),
++                         dev_state_off);
++    if (ret < 0) {
++        int rret;
++
++        rret = vfio_mig_read(vbasedev, &device_state, sizeof(device_state),
++                             dev_state_off);
++
++        if ((rret < 0) || (VFIO_DEVICE_STATE_IS_ERROR(device_state))) {
++            hw_error("%s: Device in error state 0x%x", vbasedev->name,
++                     device_state);
++            return rret ? rret : -EIO;
++        }
++        return ret;
++    }
++
++    migration->device_state = device_state;
++    trace_vfio_migration_set_state(vbasedev->name, device_state);
++    return 0;
++}
++
++static void vfio_vmstate_change(void *opaque, int running, RunState state)
++{
++    VFIODevice *vbasedev = opaque;
++    VFIOMigration *migration = vbasedev->migration;
++    uint32_t value, mask;
++    int ret;
++
++    if ((vbasedev->migration->vm_running == running)) {
++        return;
++    }
++
++    if (running) {
++        /*
++         * Here device state can have one of _SAVING, _RESUMING or _STOP bit.
++         * Transition from _SAVING to _RUNNING can happen if there is migration
++         * failure, in that case clear _SAVING bit.
++         * Transition from _RESUMING to _RUNNING occurs during resuming
++         * phase, in that case clear _RESUMING bit.
++         * In both the above cases, set _RUNNING bit.
++         */
++        mask = ~VFIO_DEVICE_STATE_MASK;
++        value = VFIO_DEVICE_STATE_RUNNING;
++    } else {
++        /*
++         * Here device state could be either _RUNNING or _SAVING|_RUNNING. Reset
++         * _RUNNING bit
++         */
++        mask = ~VFIO_DEVICE_STATE_RUNNING;
++        value = 0;
++    }
++
++    ret = vfio_migration_set_state(vbasedev, mask, value);
++    if (ret) {
++        /*
++         * Migration should be aborted in this case, but vm_state_notify()
++         * currently does not support reporting failures.
++         */
++        error_report("%s: Failed to set device state 0x%x", vbasedev->name,
++                     (migration->device_state & mask) | value);
++        qemu_file_set_error(migrate_get_current()->to_dst_file, ret);
++    }
++    vbasedev->migration->vm_running = running;
++    trace_vfio_vmstate_change(vbasedev->name, running, RunState_str(state),
++            (migration->device_state & mask) | value);
++}
+ 
+ static void vfio_migration_exit(VFIODevice *vbasedev)
+ {
+@@ -64,6 +216,9 @@ static int vfio_migration_init(VFIODevice *vbasedev,
+         ret = -EINVAL;
+         goto err;
      }
-@@ -531,7 +619,7 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
-                          iotlb->addr_mask + 1, vaddr, ret);
-         }
-     } else {
--        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1);
-+        ret = vfio_dma_unmap(container, iova, iotlb->addr_mask + 1, iotlb);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
-@@ -834,7 +922,7 @@ static void vfio_listener_region_del(MemoryListener *listener,
++
++    migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
++                                                           vbasedev);
+     return 0;
+ 
+ err:
+@@ -111,6 +266,9 @@ add_blocker:
+ void vfio_migration_finalize(VFIODevice *vbasedev)
+ {
+     if (vbasedev->migration) {
++        VFIOMigration *migration = vbasedev->migration;
++
++        qemu_del_vm_change_state_handler(migration->vm_state);
+         vfio_migration_exit(vbasedev);
      }
  
-     if (try_unmap) {
--        ret = vfio_dma_unmap(container, iova, int128_get64(llsize));
-+        ret = vfio_dma_unmap(container, iova, int128_get64(llsize), NULL);
-         if (ret) {
-             error_report("vfio_dma_unmap(%p, 0x%"HWADDR_PRIx", "
-                          "0x%"HWADDR_PRIx") = %d (%m)",
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index 9ced5ec6277c..41de81f12f60 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -148,3 +148,5 @@ vfio_display_edid_write_error(void) ""
+ 
+ # migration.c
+ vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
++vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
++vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index 8275c4c68f45..9a571f1fb552 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -29,6 +29,7 @@
+ #ifdef CONFIG_LINUX
+ #include <linux/vfio.h>
+ #endif
++#include "sysemu/sysemu.h"
+ 
+ #define VFIO_MSG_PREFIX "vfio %s: "
+ 
+@@ -58,7 +59,10 @@ typedef struct VFIORegion {
+ } VFIORegion;
+ 
+ typedef struct VFIOMigration {
++    VMChangeStateEntry *vm_state;
+     VFIORegion region;
++    uint32_t device_state;
++    int vm_running;
+ } VFIOMigration;
+ 
+ typedef struct VFIOAddressSpace {
 -- 
 2.7.0
 
