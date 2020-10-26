@@ -2,90 +2,93 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26491C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 15:37:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D48AC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 15:37:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 95B9220754
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 15:37:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F3F5F20754
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 15:37:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jEVzicKB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 95B9220754
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GNbTiuNN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3F5F20754
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57564 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57934 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX4Yy-0000s3-PP
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 11:37:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43066)
+	id 1kX4ZD-00011I-2D
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 11:37:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43166)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kX4WQ-0005nv-Ov; Mon, 26 Oct 2020 11:34:58 -0400
-Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:6012
+ id 1kX4Wf-0005we-3X; Mon, 26 Oct 2020 11:35:14 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:42354
  helo=mx0a-001b2d01.pphosted.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mjrosato@linux.ibm.com>)
- id 1kX4WM-0000oV-Kb; Mon, 26 Oct 2020 11:34:58 -0400
-Received: from pps.filterd (m0098419.ppops.net [127.0.0.1])
+ id 1kX4Wb-0000qJ-2u; Mon, 26 Oct 2020 11:35:12 -0400
+Received: from pps.filterd (m0098420.ppops.net [127.0.0.1])
  by mx0b-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
- 09QFXfOS159479; Mon, 26 Oct 2020 11:34:51 -0400
+ 09QFXmpa054528; Mon, 26 Oct 2020 11:35:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
  h=from : to : cc : subject
- : date : message-id : mime-version : content-type :
- content-transfer-encoding; s=pp1;
- bh=MPOOUrolEsOl3/XJNifqjJs1FTGO61oGzLzV+vkgnVI=;
- b=jEVzicKB4L2L0OhVktpVEPPBzejl/E0w/dpo6OsWI+ICw4C7cewr6CXhFR3xycyKdZxS
- P83ufex40y4L6vrZJMdZkZcO/xonWYOh51ad2M1zQtrn4Ijm8BmQuzvMOQZkKImmACP/
- wJWzVLEZfhGck17yLRvxYLj3iHf9Yqk3o6Hw0k6//NocMfseJdw2CyGdRlMyvQMqnsGb
- qvoTstGZKPeoeciV9tuO4dR8GzngX6sSjCfdG10Tcd+gLGqM/GKkQeCZy1US8EPI6dFM
- Le7CmsYDJcxVh37IF1XcgdS6zMMC8IaBtzFbIfWuuL/TeVD73WpvOrOgcwWgw03zgWHn 7w== 
+ : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=1gi5s1Tx693BWL7xgcm3etVQVG7BMtLGNWjUnVDwD3o=;
+ b=GNbTiuNNr/P38MrmRS7k1uw8Jq1/u3DHwD1YU3O4+mYlAEKZcNepEF0HbT9+dUqRr++1
+ hhCr2cJX1c/WFYlIcdOqCHky1qcFzKzazWGd/QaFe6rYNQuVnKHsIBDn6+UhjpfLkH4z
+ xzyLdXZpxb2GqejNO9QJcO7CxQnpSR8jcFJE0v0SH9i3HmDhmw/1EPr0M9c7cxAxSHca
+ Ml5thzndVyIVd9HNYHCtpxKsFgDOTjOTa8ca/yKAgkB+KWE9oN1nFwZTeGMLEBdQd7B+
+ +PztZPuwHJItXEiLMwvqpkosqPE9ckNHk8Pq8aphgAnWjww62tHctfZTMpMcUybzvw7P ig== 
 Received: from pps.reinject (localhost [127.0.0.1])
- by mx0b-001b2d01.pphosted.com with ESMTP id 34duwd2bw6-1
+ by mx0b-001b2d01.pphosted.com with ESMTP id 34dhc0qtjr-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 26 Oct 2020 11:34:51 -0400
-Received: from m0098419.ppops.net (m0098419.ppops.net [127.0.0.1])
- by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09QFXqBu159980;
- Mon, 26 Oct 2020 11:34:51 -0400
-Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com
- [169.53.41.122])
- by mx0b-001b2d01.pphosted.com with ESMTP id 34duwd2bvt-1
+ Mon, 26 Oct 2020 11:35:07 -0400
+Received: from m0098420.ppops.net (m0098420.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09QFYBqW056681;
+ Mon, 26 Oct 2020 11:35:06 -0400
+Received: from ppma04wdc.us.ibm.com (1a.90.2fa9.ip4.static.sl-reverse.com
+ [169.47.144.26])
+ by mx0b-001b2d01.pphosted.com with ESMTP id 34dhc0qthu-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 26 Oct 2020 11:34:51 -0400
-Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
- by ppma04dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09QFIEjA028487;
- Mon, 26 Oct 2020 15:34:50 GMT
-Received: from b01cxnp22036.gho.pok.ibm.com (b01cxnp22036.gho.pok.ibm.com
- [9.57.198.26]) by ppma04dal.us.ibm.com with ESMTP id 34cbw8vrn3-1
+ Mon, 26 Oct 2020 11:35:06 -0400
+Received: from pps.filterd (ppma04wdc.us.ibm.com [127.0.0.1])
+ by ppma04wdc.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09QFHaVF028424;
+ Mon, 26 Oct 2020 15:35:05 GMT
+Received: from b01cxnp23032.gho.pok.ibm.com (b01cxnp23032.gho.pok.ibm.com
+ [9.57.198.27]) by ppma04wdc.us.ibm.com with ESMTP id 34cbw90mft-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Mon, 26 Oct 2020 15:34:50 +0000
+ Mon, 26 Oct 2020 15:35:05 +0000
 Received: from b01ledav004.gho.pok.ibm.com (b01ledav004.gho.pok.ibm.com
  [9.57.199.109])
- by b01cxnp22036.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
- 09QFYn8L1704660
+ by b01cxnp23032.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09QFZ4Jh52953366
  (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Mon, 26 Oct 2020 15:34:49 GMT
+ Mon, 26 Oct 2020 15:35:04 GMT
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 92638112063;
- Mon, 26 Oct 2020 15:34:49 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id A7AEC112061;
+ Mon, 26 Oct 2020 15:35:04 +0000 (GMT)
 Received: from b01ledav004.gho.pok.ibm.com (unknown [127.0.0.1])
- by IMSVA (Postfix) with ESMTP id 7A5F7112061;
- Mon, 26 Oct 2020 15:34:45 +0000 (GMT)
+ by IMSVA (Postfix) with ESMTP id 49A4A112066;
+ Mon, 26 Oct 2020 15:35:02 +0000 (GMT)
 Received: from oc4221205838.ibm.com (unknown [9.163.49.29])
  by b01ledav004.gho.pok.ibm.com (Postfix) with ESMTP;
- Mon, 26 Oct 2020 15:34:45 +0000 (GMT)
+ Mon, 26 Oct 2020 15:35:02 +0000 (GMT)
 From: Matthew Rosato <mjrosato@linux.ibm.com>
 To: cohuck@redhat.com, thuth@redhat.com
-Subject: [PATCH 00/13] s390x/pci: s390-pci updates for kernel 5.10-rc1 
-Date: Mon, 26 Oct 2020 11:34:28 -0400
-Message-Id: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
+Subject: [PATCH 04/13] vfio: Create shared routine for scanning info
+ capabilities
+Date: Mon, 26 Oct 2020 11:34:32 -0400
+Message-Id: <1603726481-31824-5-git-send-email-mjrosato@linux.ibm.com>
 X-Mailer: git-send-email 1.8.3.1
+In-Reply-To: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
+References: <1603726481-31824-1-git-send-email-mjrosato@linux.ibm.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -94,11 +97,11 @@ X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.235, 18.0.737
  definitions=2020-10-26_08:2020-10-26,
  2020-10-26 signatures=0
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
- priorityscore=1501 mlxscore=0
- mlxlogscore=831 bulkscore=0 impostorscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 phishscore=0 adultscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2010260107
+ mlxscore=0 lowpriorityscore=0
+ spamscore=0 impostorscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ malwarescore=0 adultscore=0 phishscore=0 mlxlogscore=999 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
+ definitions=main-2010260107
 Received-SPF: pass client-ip=148.163.158.5;
  envelope-from=mjrosato@linux.ibm.com; helo=mx0a-001b2d01.pphosted.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 11:03:39
@@ -130,93 +133,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Combined set of patches that exploit vfio/s390-pci features available in
-kernel 5.10-rc1.  This patch set is a combination of 
+Rather than duplicating the same loop in multiple locations,
+create a static function to do the work.
 
-[PATCH v4 0/5] s390x/pci: Accomodate vfio DMA limiting
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+---
+ hw/vfio/common.c | 21 +++++++++++++--------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-and
-
-[PATCH v3 00/10] Retrieve zPCI hardware information from VFIO
-
-with duplicate patches removed and a single header sync.  All patches have
-prior maintainer reviews except for:
-
-- Patch 1 (update-linux-headers change to add new file) 
-- Patch 2 (header sync against 5.10-rc1)
-- Patch 13 - contains a functional (debug) change; I switched from using
-  DPRINTFs to using trace events per Connie's request.
-
-
-
-Matthew Rosato (10):
-  update-linux-headers: Add vfio_zdev.h
-  linux-headers: update against 5.10-rc1
-  s390x/pci: Move header files to include/hw/s390x
-  vfio: Create shared routine for scanning info capabilities
-  vfio: Find DMA available capability
-  s390x/pci: Add routine to get the vfio dma available count
-  s390x/pci: Honor DMA limits set by vfio
-  s390x/pci: clean up s390 PCI groups
-  vfio: Add routine for finding VFIO_DEVICE_GET_INFO capabilities
-  s390x/pci: get zPCI function info from host
-
-Pierre Morel (3):
-  s390x/pci: create a header dedicated to PCI CLP
-  s390x/pci: use a PCI Group structure
-  s390x/pci: use a PCI Function structure
-
- MAINTAINERS                                        |   1 +
- hw/s390x/meson.build                               |   1 +
- hw/s390x/s390-pci-bus.c                            |  91 ++++++-
- hw/s390x/s390-pci-inst.c                           |  78 ++++--
- hw/s390x/s390-pci-vfio.c                           | 276 +++++++++++++++++++++
- hw/s390x/s390-virtio-ccw.c                         |   2 +-
- hw/s390x/trace-events                              |   6 +
- hw/vfio/common.c                                   |  62 ++++-
- {hw => include/hw}/s390x/s390-pci-bus.h            |  22 ++
- .../hw/s390x/s390-pci-clp.h                        | 123 +--------
- include/hw/s390x/s390-pci-inst.h                   | 119 +++++++++
- include/hw/s390x/s390-pci-vfio.h                   |  23 ++
- include/hw/vfio/vfio-common.h                      |   4 +
- .../drivers/infiniband/hw/vmw_pvrdma/pvrdma_ring.h |  14 +-
- .../infiniband/hw/vmw_pvrdma/pvrdma_verbs.h        |   2 +-
- include/standard-headers/linux/ethtool.h           |   2 +
- include/standard-headers/linux/fuse.h              |  50 +++-
- include/standard-headers/linux/input-event-codes.h |   4 +
- include/standard-headers/linux/pci_regs.h          |   6 +-
- include/standard-headers/linux/virtio_fs.h         |   3 +
- include/standard-headers/linux/virtio_gpu.h        |  19 ++
- include/standard-headers/linux/virtio_mmio.h       |  11 +
- include/standard-headers/linux/virtio_pci.h        |  11 +-
- linux-headers/asm-arm64/kvm.h                      |  25 ++
- linux-headers/asm-arm64/mman.h                     |   1 +
- linux-headers/asm-generic/hugetlb_encode.h         |   1 +
- linux-headers/asm-generic/unistd.h                 |  18 +-
- linux-headers/asm-mips/unistd_n32.h                |   1 +
- linux-headers/asm-mips/unistd_n64.h                |   1 +
- linux-headers/asm-mips/unistd_o32.h                |   1 +
- linux-headers/asm-powerpc/unistd_32.h              |   1 +
- linux-headers/asm-powerpc/unistd_64.h              |   1 +
- linux-headers/asm-s390/unistd_32.h                 |   1 +
- linux-headers/asm-s390/unistd_64.h                 |   1 +
- linux-headers/asm-x86/kvm.h                        |  20 ++
- linux-headers/asm-x86/unistd_32.h                  |   1 +
- linux-headers/asm-x86/unistd_64.h                  |   1 +
- linux-headers/asm-x86/unistd_x32.h                 |   1 +
- linux-headers/linux/kvm.h                          |  19 ++
- linux-headers/linux/mman.h                         |   1 +
- linux-headers/linux/vfio.h                         |  29 ++-
- linux-headers/linux/vfio_zdev.h                    |  78 ++++++
- scripts/update-linux-headers.sh                    |   2 +-
- 43 files changed, 961 insertions(+), 173 deletions(-)
- create mode 100644 hw/s390x/s390-pci-vfio.c
- rename {hw => include/hw}/s390x/s390-pci-bus.h (94%)
- rename hw/s390x/s390-pci-inst.h => include/hw/s390x/s390-pci-clp.h (59%)
- create mode 100644 include/hw/s390x/s390-pci-inst.h
- create mode 100644 include/hw/s390x/s390-pci-vfio.h
- create mode 100644 linux-headers/linux/vfio_zdev.h
-
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 13471ae..e47a4d7 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -825,17 +825,12 @@ static void vfio_listener_release(VFIOContainer *container)
+     }
+ }
+ 
+-struct vfio_info_cap_header *
+-vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
++static struct vfio_info_cap_header *
++vfio_get_cap(void *ptr, uint32_t cap_offset, uint16_t id)
+ {
+     struct vfio_info_cap_header *hdr;
+-    void *ptr = info;
+-
+-    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
+-        return NULL;
+-    }
+ 
+-    for (hdr = ptr + info->cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
++    for (hdr = ptr + cap_offset; hdr != ptr; hdr = ptr + hdr->next) {
+         if (hdr->id == id) {
+             return hdr;
+         }
+@@ -844,6 +839,16 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
+     return NULL;
+ }
+ 
++struct vfio_info_cap_header *
++vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
++{
++    if (!(info->flags & VFIO_REGION_INFO_FLAG_CAPS)) {
++        return NULL;
++    }
++
++    return vfio_get_cap((void *)info, info->cap_offset, id);
++}
++
+ static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
+                                           struct vfio_region_info *info)
+ {
 -- 
 1.8.3.1
 
