@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0D0AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:57:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68311C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:57:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 877DD2084C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:57:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 106602084C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pn2G1EQ4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 877DD2084C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QasAFqa7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 106602084C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49000 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50674 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX30A-0002zX-CP
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:57:34 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39628)
+	id 1kX30S-0003ix-1a
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:57:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39542)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX2up-0005ld-JL
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:52:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28579)
+ id 1kX2ug-0005hQ-G4
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:51:56 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41315)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX2uf-0001mS-DT
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:52:03 -0400
+ id 1kX2uS-0001kt-Qx
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:51:53 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603720305;
+ s=mimecast20190719; t=1603720298;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=5LKvEkpPcLibyqkLS8s8WHoqonbFKyk3jZDn8Jd8wSQ=;
- b=Pn2G1EQ4rvDMpcDH5JWajoukbS6937Zpfk2Nyzex2lnAOQb1FGBhCUlvkVJ+jP25AYII4V
- b6a7nYYqqygNbWLUsjriCQN7vEmAaonCtQeO3BUm10jLyMRoDjy2K3YVFt42lG6fss9ta3
- 7yLKu7yN4P013uw0s8ZA4VncG65F2pY=
+ bh=q2/1xW3dbH1Lhr/F+FHDrEtNrsWDFmpxnRil/jGCbtM=;
+ b=QasAFqa7gJGxvdQYLIzdRGZiGaTfuFUAClscA40ZgLFQQYOvU8PLoXL9R/8DyrRwvW0SGr
+ HiUe/lGm5GYOmD+chca2fx8IinGd8giQ3kt2FnsiSHq2C/gUiNiUs8I6GCa5/UzQyylxQ0
+ tpi2FC58wabEiv3WPF0WQ9l5eG+Y588=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-91-We2Ts0oJP5epKsK1eGFYcQ-1; Mon, 26 Oct 2020 09:51:43 -0400
-X-MC-Unique: We2Ts0oJP5epKsK1eGFYcQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-313-kEk091TXOWCzPx1TR1rwIg-1; Mon, 26 Oct 2020 09:51:33 -0400
+X-MC-Unique: kEk091TXOWCzPx1TR1rwIg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A606C1099F65
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:51:41 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 9CBE7188C12F
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:51:32 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 045C21002C00;
- Mon, 26 Oct 2020 13:51:38 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 623016EF7B
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:51:32 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/17] machine: move SMP initialization from vl.c
-Date: Mon, 26 Oct 2020 09:51:31 -0400
-Message-Id: <20201026135131.3006712-18-pbonzini@redhat.com>
+Subject: [PULL 02/17] meson: rewrite curses/iconv test
+Date: Mon, 26 Oct 2020 09:51:16 -0400
+Message-Id: <20201026135131.3006712-3-pbonzini@redhat.com>
 In-Reply-To: <20201026135131.3006712-1-pbonzini@redhat.com>
 References: <20201026135131.3006712-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
@@ -96,58 +96,170 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Initialize the object's values from the class when the object is
-created, no need to have vl.c do it for us.
+Redo the curses test to do the same tests that the configure
+check used to do.  OpenBSD triggers the warning because
+it does not support NCURSES_WIDECHAR and thus the cc.links
+test fails.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- hw/core/machine.c | 7 +++++++
- softmmu/vl.c      | 7 -------
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ meson.build | 127 ++++++++++++++++++++++++++++++----------------------
+ 1 file changed, 73 insertions(+), 54 deletions(-)
 
-diff --git a/hw/core/machine.c b/hw/core/machine.c
-index 57463ad77a..c5e0e79e6d 100644
---- a/hw/core/machine.c
-+++ b/hw/core/machine.c
-@@ -907,6 +907,13 @@ static void machine_initfn(Object *obj)
-     /* Register notifier when init is done for sysbus sanity checks */
-     ms->sysbus_notifier.notify = machine_init_notify;
-     qemu_add_machine_init_done_notifier(&ms->sysbus_notifier);
+diff --git a/meson.build b/meson.build
+index 7627a0ae46..0edde14ad7 100644
+--- a/meson.build
++++ b/meson.build
+@@ -465,70 +465,89 @@ endif
+ iconv = not_found
+ curses = not_found
+ if have_system and not get_option('curses').disabled()
+-  if not get_option('iconv').disabled()
+-    libiconv = cc.find_library('iconv',
+-                               required: false,
+-                               static: enable_static)
+-    if cc.links('''
+-      #include <iconv.h>
+-      int main(void) {
+-        iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
+-        return conv != (iconv_t) -1;
+-      }''', dependencies: [libiconv])
+-      iconv = declare_dependency(dependencies: [libiconv])
++  curses_test = '''
++    #include <locale.h>
++    #include <curses.h>
++    #include <wchar.h>
++    int main(void) {
++      wchar_t wch = L'w';
++      setlocale(LC_ALL, "");
++      resize_term(0, 0);
++      addwstr(L"wide chars\n");
++      addnwstr(&wch, 1);
++      add_wch(WACS_DEGREE);
++      return 0;
++    }'''
 +
-+    /* default to mc->default_cpus */
-+    ms->smp.cpus = mc->default_cpus;
-+    ms->smp.max_cpus = mc->default_cpus;
-+    ms->smp.cores = 1;
-+    ms->smp.threads = 1;
-+    ms->smp.sockets = 1;
- }
- 
- static void machine_finalize(Object *obj)
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 9b67ea300e..b7d7f43c88 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -3970,13 +3970,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         exit(0);
-     }
- 
--    /* default to machine_class->default_cpus */
--    current_machine->smp.cpus = machine_class->default_cpus;
--    current_machine->smp.max_cpus = machine_class->default_cpus;
--    current_machine->smp.cores = 1;
--    current_machine->smp.threads = 1;
--    current_machine->smp.sockets = 1;
++  curses = dependency((targetos == 'windows' ? 'ncurses' : 'ncursesw'),
++                      required: false,
++                      method: 'pkg-config',
++                      static: enable_static)
++  msg = get_option('curses').enabled() ? 'curses library not found' : ''
++  if curses.found()
++    if cc.links(curses_test, dependencies: [curses])
++      curses = declare_dependency(compile_args: '-DNCURSES_WIDECHAR', dependencies: [curses])
++    else
++      msg = 'curses package not usable'
++      curses = not_found
+     endif
+   endif
+-  if get_option('iconv').enabled() and not iconv.found()
+-    error('Cannot detect iconv API')
+-  endif
+-  if iconv.found()
+-    curses_libname_list = ['ncursesw', 'ncurses', 'cursesw', 'pdcurses']
+-    curses_test = '''
+-      #include <locale.h>
+-      #include <curses.h>
+-      #include <wchar.h>
+-      int main(void) {
+-        wchar_t wch = L'w';
+-        setlocale(LC_ALL, "");
+-        resize_term(0, 0);
+-        addwstr(L"wide chars\n");
+-        addnwstr(&wch, 1);
+-        add_wch(WACS_DEGREE);
+-        return 0;
+-      }'''
+-    foreach curses_libname : curses_libname_list
+-      libcurses = dependency(curses_libname,
+-                             required: false,
+-                             method: 'pkg-config',
+-                             static: enable_static)
 -
-     machine_class->smp_parse(current_machine,
-         qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
- 
+-      if not libcurses.found()
+-        dirs = ['/usr/include/ncursesw']
+-        if targetos == 'windows'
+-          dirs = []
+-        endif
++  if not curses.found()
++    curses_compile_args = ['-DNCURSES_WIDECHAR']
++    has_curses_h = cc.has_header('curses.h', args: curses_compile_args)
++    if targetos != 'windows' and not has_curses_h
++      message('Trying with /usr/include/ncursesw')
++      curses_compile_args += ['-I/usr/include/ncursesw']
++      has_curses_h = cc.has_header('curses.h', args: curses_compile_args)
++    endif
++    if has_curses_h
++      curses_libname_list = (targetos == 'windows' ? ['pdcurses'] : ['ncursesw', 'cursesw'])
++      foreach curses_libname : curses_libname_list
+         libcurses = cc.find_library(curses_libname,
+                                     required: false,
+-                                    dirs: dirs,
+                                     static: enable_static)
+-      endif
+-      if libcurses.found()
+-        if cc.links(curses_test, dependencies: [libcurses])
+-          curses = declare_dependency(compile_args: '-DNCURSES_WIDECHAR', dependencies: [libcurses])
+-          break
++        if libcurses.found()
++          if cc.links(curses_test, args: curses_compile_args, dependencies: libcurses)
++            curses = declare_dependency(compile_args: curses_compile_args,
++                                        dependencies: [libcurses])
++            break
++          else
++            msg = 'curses library not usable'
++          endif
+         endif
++      endforeach
++    endif
++  endif
++  if not get_option('iconv').disabled()
++    foreach link_args : [ ['-liconv'], [] ]
++      # Programs will be linked with glib and this will bring in libiconv on FreeBSD.
++      # We need to use libiconv if available because mixing libiconv's headers with
++      # the system libc does not work.
++      # However, without adding glib to the dependencies -L/usr/local/lib will not be
++      # included in the command line and libiconv will not be found.
++      if cc.links('''
++        #include <iconv.h>
++        int main(void) {
++          iconv_t conv = iconv_open("WCHAR_T", "UCS-2");
++          return conv != (iconv_t) -1;
++        }''', args: config_host['GLIB_CFLAGS'].split() + config_host['GLIB_LIBS'].split() + link_args)
++        iconv = declare_dependency(link_args: link_args, dependencies: glib)
++        break
+       endif
+     endforeach
+   endif
+-  if not curses.found()
+-    if iconv.found()
+-      if get_option('curses').enabled()
+-        error('Cannot find curses')
+-      endif
+-    elif get_option('curses').enabled()
+-      error('iconv required for curses UI but not available')
++  if curses.found() and not iconv.found()
++    if get_option('iconv').enabled()
++      error('iconv not available')
++    endif
++    msg = 'iconv required for curses UI but not available'
++    curses = not_found
++  endif
++  if not curses.found() and msg != ''
++    if get_option('curses').enabled()
++      error(msg)
+     else
+-      warning('iconv required for curses UI but not available, disabling')
++      warning(msg + ', disabling')
+     endif
+   endif
+ endif
 -- 
 2.26.2
+
 
 
