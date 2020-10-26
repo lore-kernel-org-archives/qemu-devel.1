@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E70B2C5517A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:58:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4CF13C5517A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:58:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 543132085B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:58:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AA3DF207E8
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:58:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CnTu78Wr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 543132085B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bh9FkcDa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AA3DF207E8
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57594 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58320 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7h2-0000WC-AV
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:58:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45970)
+	id 1kX7hA-0000oN-LY
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:58:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45900)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7Td-0002jK-TY
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:26566)
+ id 1kX7TY-0002St-2Y
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:12 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23204)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7Ta-0003cY-FX
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:17 -0400
+ id 1kX7TV-0003bc-70
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:11 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603737853;
+ s=mimecast20190719; t=1603737848;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=mm6Tj7lkIwSgB7XZCF/5J0XlTgQktMlJMB87joXdMPs=;
- b=CnTu78WrcuuR47u1gi+XTfD/3GwKLsc4vNqetGUJMji8WXzeUvuQINisLlnHAvyD77krGR
- RYzLFlbUsuqfi8QJybMM6H3ydisviyOhHf0mP8VOrSHNdxo1UQatWC83oewVNpA6x/HghE
- hAbqsYznk7MKIP5+c9SloYlJ5XZA6uA=
+ bh=sbZxJE8lItiisgE6vCpdmaJoXtvJ0tNwXj0lOiC4PRk=;
+ b=Bh9FkcDa/1i6tQSxqzURRqHtPrQIQSrwkQ+cWi4OCkSbIKhgn1+K8ln9S/dTki3ClmrYeC
+ QsNvoJWqoS2vPQIU3eA6UqhrWR9JRwa+h1j6H6Et/jkQKNwysMApzWnRrpDOOVm4u069q/
+ 0pSH53sBKy+aF4T0KpSq6ken91ftwKU=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-340-sqbngvIgPfuoY1zs1vk2wg-1; Mon, 26 Oct 2020 14:44:09 -0400
-X-MC-Unique: sqbngvIgPfuoY1zs1vk2wg-1
+ us-mta-488-UlbZfj0oMmO8zs6tg2aRPA-1; Mon, 26 Oct 2020 14:44:06 -0400
+X-MC-Unique: UlbZfj0oMmO8zs6tg2aRPA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2AE2D1009E2D;
- Mon, 26 Oct 2020 18:44:08 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C7EF5809DC1;
+ Mon, 26 Oct 2020 18:44:04 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C4F305D9CA;
- Mon, 26 Oct 2020 18:44:06 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6E62B5D9E8;
+ Mon, 26 Oct 2020 18:44:03 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com,
  misono.tomohiro@jp.fujitsu.com
-Subject: [PULL 12/16] virtiofsd: Add fuse_reply_attr_with_flags()
-Date: Mon, 26 Oct 2020 18:43:27 +0000
-Message-Id: <20201026184331.272953-13-dgilbert@redhat.com>
+Subject: [PULL 10/16] virtiofsd: Announce FUSE_ATTR_FLAGS
+Date: Mon, 26 Oct 2020 18:43:25 +0000
+Message-Id: <20201026184331.272953-11-dgilbert@redhat.com>
 In-Reply-To: <20201026184331.272953-1-dgilbert@redhat.com>
 References: <20201026184331.272953-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -104,81 +104,70 @@ Sender: "Qemu-devel"
 
 From: Max Reitz <mreitz@redhat.com>
 
-The plain fuse_reply_attr() function does not allow setting
-fuse_attr.flags, so add this new function that does.
-
-Make fuse_reply_attr() a wrapper around it.
+The fuse_attr.flags field is currently just initialized to 0, which is
+valid.  Thus, there is no reason not to always announce FUSE_ATTR_FLAGS
+(when the kernel supports it).
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200909184028.262297-5-mreitz@redhat.com>
+Message-Id: <20200909184028.262297-3-mreitz@redhat.com>
 Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tools/virtiofsd/fuse_lowlevel.c | 14 ++++++++++++--
- tools/virtiofsd/fuse_lowlevel.h | 15 +++++++++++++++
- 2 files changed, 27 insertions(+), 2 deletions(-)
+ tools/virtiofsd/fuse_common.h   | 8 ++++++++
+ tools/virtiofsd/fuse_lowlevel.c | 7 +++++++
+ 2 files changed, 15 insertions(+)
 
-diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
-index 00da84432c..5198f627bc 100644
---- a/tools/virtiofsd/fuse_lowlevel.c
-+++ b/tools/virtiofsd/fuse_lowlevel.c
-@@ -426,8 +426,8 @@ int fuse_reply_create(fuse_req_t req, const struct fuse_entry_param *e,
-     return send_reply_ok(req, buf, entrysize + sizeof(struct fuse_open_out));
- }
- 
--int fuse_reply_attr(fuse_req_t req, const struct stat *attr,
--                    double attr_timeout)
-+int fuse_reply_attr_with_flags(fuse_req_t req, const struct stat *attr,
-+                               double attr_timeout, uint32_t attr_flags)
- {
-     struct fuse_attr_out arg;
-     size_t size = sizeof(arg);
-@@ -437,9 +437,19 @@ int fuse_reply_attr(fuse_req_t req, const struct stat *attr,
-     arg.attr_valid_nsec = calc_timeout_nsec(attr_timeout);
-     convert_stat(attr, &arg.attr);
- 
-+    if (req->se->conn.capable & FUSE_CAP_ATTR_FLAGS) {
-+        arg.attr.flags = attr_flags;
-+    }
-+
-     return send_reply_ok(req, &arg, size);
- }
- 
-+int fuse_reply_attr(fuse_req_t req, const struct stat *attr,
-+                    double attr_timeout)
-+{
-+    return fuse_reply_attr_with_flags(req, attr, attr_timeout, 0);
-+}
-+
- int fuse_reply_readlink(fuse_req_t req, const char *linkname)
- {
-     return send_reply_ok(req, linkname, strlen(linkname));
-diff --git a/tools/virtiofsd/fuse_lowlevel.h b/tools/virtiofsd/fuse_lowlevel.h
-index 9c06240f9e..1ff6ba1e4f 100644
---- a/tools/virtiofsd/fuse_lowlevel.h
-+++ b/tools/virtiofsd/fuse_lowlevel.h
-@@ -1313,6 +1313,21 @@ int fuse_reply_create(fuse_req_t req, const struct fuse_entry_param *e,
- int fuse_reply_attr(fuse_req_t req, const struct stat *attr,
-                     double attr_timeout);
+diff --git a/tools/virtiofsd/fuse_common.h b/tools/virtiofsd/fuse_common.h
+index 686c42c0a5..870544fe13 100644
+--- a/tools/virtiofsd/fuse_common.h
++++ b/tools/virtiofsd/fuse_common.h
+@@ -352,6 +352,14 @@ struct fuse_file_info {
+  */
+ #define FUSE_CAP_NO_OPENDIR_SUPPORT (1 << 24)
  
 +/**
-+ * Reply with attributes and set fuse_attr.flags
++ * Indicates that the client will provide fuse_attr.flags, and the kernel will
++ * interpret it.
 + *
-+ * Possible requests:
-+ *   getattr, setattr
-+ *
-+ * @param req request handle
-+ * @param attr the attributes
-+ * @param attr_timeout validity timeout (in seconds) for the attributes
-+ * @param attr_flags flags to put into fuse_attr.flags
-+ * @return zero for success, -errno for failure to send reply
++ * This feature is enabled by default when supported by the kernel.
 + */
-+int fuse_reply_attr_with_flags(fuse_req_t req, const struct stat *attr,
-+                               double attr_timeout, uint32_t attr_flags);
++#define FUSE_CAP_ATTR_FLAGS (1 << 27)
 +
  /**
-  * Reply with the contents of a symbolic link
+  * Ioctl flags
   *
+diff --git a/tools/virtiofsd/fuse_lowlevel.c b/tools/virtiofsd/fuse_lowlevel.c
+index 4d1ba2925d..8679594255 100644
+--- a/tools/virtiofsd/fuse_lowlevel.c
++++ b/tools/virtiofsd/fuse_lowlevel.c
+@@ -1988,6 +1988,9 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
+             bufsize = max_bufsize;
+         }
+     }
++    if (arg->flags & FUSE_ATTR_FLAGS) {
++        se->conn.capable |= FUSE_CAP_ATTR_FLAGS;
++    }
+ #ifdef HAVE_SPLICE
+ #ifdef HAVE_VMSPLICE
+     se->conn.capable |= FUSE_CAP_SPLICE_WRITE | FUSE_CAP_SPLICE_MOVE;
+@@ -2014,6 +2017,7 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
+     LL_SET_DEFAULT(1, FUSE_CAP_ASYNC_DIO);
+     LL_SET_DEFAULT(1, FUSE_CAP_IOCTL_DIR);
+     LL_SET_DEFAULT(1, FUSE_CAP_ATOMIC_O_TRUNC);
++    LL_SET_DEFAULT(1, FUSE_CAP_ATTR_FLAGS);
+     LL_SET_DEFAULT(se->op.write_buf, FUSE_CAP_SPLICE_READ);
+     LL_SET_DEFAULT(se->op.getlk && se->op.setlk, FUSE_CAP_POSIX_LOCKS);
+     LL_SET_DEFAULT(se->op.flock, FUSE_CAP_FLOCK_LOCKS);
+@@ -2103,6 +2107,9 @@ static void do_init(fuse_req_t req, fuse_ino_t nodeid,
+     if (se->conn.want & FUSE_CAP_POSIX_ACL) {
+         outarg.flags |= FUSE_POSIX_ACL;
+     }
++    if (se->conn.want & FUSE_CAP_ATTR_FLAGS) {
++        outarg.flags |= FUSE_ATTR_FLAGS;
++    }
+     outarg.max_readahead = se->conn.max_readahead;
+     outarg.max_write = se->conn.max_write;
+     if (se->conn.max_background >= (1 << 16)) {
 -- 
 2.28.0
 
