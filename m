@@ -2,110 +2,85 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AECFFC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:02:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5492C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:04:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 05DC420674
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:02:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2A98520723
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:04:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aE+d6J/n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 05DC420674
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PbKcEL0s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2A98520723
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47150 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzKu-0006cc-11
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:02:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36698)
+	id 1kWzMh-0000M1-W7
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:04:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36464)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWzJ2-0004rJ-Fd
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:00:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32052)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWzIz-0004Tb-HT
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:00:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603706443;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pOMCclc21vjUH40ISk/gsqpOXuo0RH/Du+IAJDGnYuo=;
- b=aE+d6J/n/MKF/a3FgoE6RZwS1K56hPEe8/xWCbbiTsrCPs8M2IWzxj9P+2EfFs/GKvjV1Q
- gyAN/XFvktEMDoFn/8GGdiS7SHkSjxRiQ644vIy5jD5/lidJ8tsjqxwWuHoacUwfvd1hs4
- SmGXkmDP6Im1EuuKJOFuj91t0UghMC8=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-112-U5hoxdtSP1OM913ThQ4L4w-1; Mon, 26 Oct 2020 06:00:41 -0400
-X-MC-Unique: U5hoxdtSP1OM913ThQ4L4w-1
-Received: by mail-wr1-f72.google.com with SMTP id 91so8103636wrk.20
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 03:00:41 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kWzIH-0004Mb-GR
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:00:01 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:34483)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kWzIF-00049l-NE
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:00:00 -0400
+Received: by mail-ed1-x542.google.com with SMTP id x1so8602226eds.1
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 02:59:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=yWPGiz+en+QDTJfj33gEX/zxs5gcfs8+iWAunjrTK/w=;
+ b=PbKcEL0sEWzazqlBjHie4HhK2seCPzukTHy/djIOVJirSYSammtIHuKVNLSVTSj42+
+ CR8yMnzNTSu4A8BPdwd8+CbHfN9zMcxnFcPytc3O7Z9LXwOK278MlW02SM5bwuK7h7Dz
+ SSOCaX9OqhW918g+ocLDymV3x16aTiWxEFlHW0LnbrOqukIznlB8q9z1dfkBkMlFR1BE
+ nUpY3S77kCLdjA0lsRfvQBiDACUvwZIaF+vAVJMcnelMj+wJgakWhnlFWQm/jyX8OOEB
+ WawlCgrRu99Tq24AnnxzAe4J3+7mAusuVWJquNS36TQ1u3JRiKYhMw+YUUx0kGi+LM9I
+ ZryA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:to:cc:references:from:subject:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=pOMCclc21vjUH40ISk/gsqpOXuo0RH/Du+IAJDGnYuo=;
- b=IF4Vtq0M/8G3Hv9UzpTJi+c1647w5MdkumGQRsi+RA6tEx/ZQ0Sc4dK+bSmnTjr5K3
- ff4Tszv3DGa4bFPJBCpL+k8Wny2gBTtGmwWqfiWNyNLBkKr8bnP2yaJeoLMqhpMc/p7v
- 8eqZerCSg8i8yer1KSDwRE8l2xLos19VPuvrq7jN+gpVSc7c2+ELXOCGSrsYPqrwZ4FJ
- cn4qtZ0dwjBG++vQbY5SrTb7Z1VfT+/cTD4T7/mne/fXTaGmNa2gipyqCtXFaTwbLGdw
- P2i6r1zcWOib0aPft8j4YrDGuqpuJKanYW7yNUUKUFentJq1xNXh6FTCkhhmVSULzZ0c
- kW6g==
-X-Gm-Message-State: AOAM533bROUpRu2F2uu3nhd0jk5fs62K5GmbkGq1Gqj2BnqPiktQBmCr
- 7i7x5sM3zVlzNBtlNbCiRuPL+KEp9GZlSgBX/Om3WWLpbZIw8eu78PSMNufrsVJZg1ZnheBSzha
- uj4wkrsl+1MBVEEs=
-X-Received: by 2002:a05:600c:2211:: with SMTP id
- z17mr15749006wml.92.1603706440462; 
- Mon, 26 Oct 2020 03:00:40 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzYB7Sg4VYvADZtF7lhxCjDELzR06PH86wnAVRf8yB5DZD3pW6URQk2U3nC5rFaMoPuJ7swOw==
-X-Received: by 2002:a05:600c:2211:: with SMTP id
- z17mr15748980wml.92.1603706440218; 
- Mon, 26 Oct 2020 03:00:40 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id t83sm21339927wmt.43.2020.10.26.03.00.39
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 03:00:39 -0700 (PDT)
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
- <20201023200645.1055-7-dbuono@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH v2 6/6] configure: add support for Control-Flow Integrity
-Message-ID: <7fef8ff2-9c15-e3a0-5af8-a50e6c49f37f@redhat.com>
-Date: Mon, 26 Oct 2020 11:00:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=yWPGiz+en+QDTJfj33gEX/zxs5gcfs8+iWAunjrTK/w=;
+ b=IIO8ldMjh+IjVCIumKYlKcfd5qx9LU2l78D6h4axFWRgFzCssWH6sq3iSoZ0W1Apyw
+ flniBjG44WXxDudE2+7mS+UdgAJ6+/lIJFnEBLiHOqk/yHAv4izn+OB4ZiDVwv14KbF6
+ i+dt1PI4g6uHxKwNiPHiSZDscVUSAf4dHaPTdHFK9/sQF/3lTkHFPgw3K/AFCSHoEUZ5
+ 2d20EwmZoeXs1T0fGZqvb6T2RzwZIqsydepURoW4jHAh1e0Ed7CXtD6Ex4eRR0w7gobQ
+ iNC9HPmDybMQELHBe+7Ke4RxwWgihE5ioSHF9Y/fpA6MZ0qf7BwQ22JHZpdRI8WuUbvU
+ R6WQ==
+X-Gm-Message-State: AOAM532kW4zDisR3rKVwxLjaYM+VGEUqsmnW340WcQZYTvy1WoUHFDvq
+ YU81pLwJKVOq0bHEOHe7tDolqHFivTq+c30iG0ynPw==
+X-Google-Smtp-Source: ABdhPJzHYsMk4ziERi+FgchpQik+FT18jGWyWW4AlkhNIyovv11UrBuwoLx9H+es2ynkY7Wy4DLSlh88d+PHFy4Dgbg=
+X-Received: by 2002:a50:9ea6:: with SMTP id a35mr15386619edf.52.1603706398205; 
+ Mon, 26 Oct 2020 02:59:58 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201023200645.1055-7-dbuono@linux.vnet.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+References: <20201021060550.1652896-1-ppandit@redhat.com>
+ <38575304-e5ff-c93e-c1e8-997d4148e579@redhat.com>
+ <nycvar.YSQ.7.78.906.2010211440290.1506567@xnncv>
+In-Reply-To: <nycvar.YSQ.7.78.906.2010211440290.1506567@xnncv>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Oct 2020 09:59:47 +0000
+Message-ID: <CAFEAcA-sSk+4v5XDUTapV8qKu-Lv2v87q7+_NUqtxoM50PQnAg@mail.gmail.com>
+Subject: Re: [PATCH v3] net: remove an assert call in eth_get_gso_type
+To: P J P <ppandit@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -119,63 +94,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Alexander Bulekov <alxndr@bu.edu>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, Gaoning Pan <pgn@zju.edu.cn>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/10/20 22:06, Daniele Buono wrote:
-> +
-> +if test "$cfi" = "yes"; then
-> +  # Compiler/Linker Flags that needs to be added for cfi:
-> +  # -fsanitize=cfi-icall to enable control-flow integrity checks on
-> +  #            indirect function calls.
-> +  # -fsanitize-cfi-icall-generalize-pointers to allow indirect function calls
-> +  #            with pointers of a different type (i.e. pass a void* to a
-> +  #            function that expects a char*). Used in some spots in QEMU,
-> +  #            with compile-time type checks done by macros
-> +  # -fno-sanitize-trap=cfi-icall, when debug is enabled, to display the
-> +  #            position in the code that triggered a CFI violation
-> +
-> +  # Make sure that LTO is enabled
-> +  if test "$lto" != "true"; then
-> +    error_exit "Control Flow Integrity requires Link-Time Optimization (LTO)"
-> +  fi
-> +
-> +  test_cflag="-fsanitize=cfi-icall -fsanitize-cfi-icall-generalize-pointers"
-> +  test_ldflag="-fsanitize=cfi-icall"
+On Wed, 21 Oct 2020 at 10:23, P J P <ppandit@redhat.com> wrote:
+>
+> +-- On Wed, 21 Oct 2020, Jason Wang wrote --+
+> | It should not be a guest error, since guest is allowed to send a packet
+> | other than IPV4(6).
+>
+> * Ah...sigh! :(
+>
+> * I very hesitantly used guest_error mask, since it was g_assert-ing before.
+>   To me both guest_error and log_unimp seem mismatching. Because no GSO is
+>   also valid IIUC. That's why in patch v2 I used plain qemu_log(). But plain
+>   qemu_log is also not good it seems.
 
-Can you pass both options to the linker for simplicity?
+Well, as I said last time round, the right function depends on what
+is going on here. If this is "the fallback code path is fine, it
+might just be a bit inefficient", then either no logging or use
+a tracepoint. If this is "the guest is allowed to send this packet
+but we're going to mishandle it" then use LOG_UNIMP.
 
-Unless you need to add the flag to CONFIGURE_CFLAGS/CONFIGURE_LDFLAGS,
-please do all the tests in meson instead, it's much simpler to do
-something like
-
-if get_option('cfi')
-  cfi_flags=['-fsanitize=cfi-icall',
-             '-fsanitize-cfi-icall-generalize-pointers']
-  if get_option('cfi_debug')
-    cfi_flags += 'fno-sanitize-trap=cfi-icall'
-  endif
-  if cc.get_supported_arguments(cfi_flags).length() != cfi_flags.length()
-    error('...')
-  endif
-  add_project_arguments(cfi_flags, native: false, language: ['c', 'cpp',
-'objc'])
-)
-  add_project_link_arguments(cfi_flags, native: false, language: ['c',
-'cpp', 'objc'])
-)
-endif
-
-> +  if test "$cfi_debug" = "yes"; then
-> +    error_exit "Cannot enable Control Flow Integrity debugging since CFI is not enabled"
-> +  fi
-> +fi
-
-Generally dependent options are ignored so you can remove this part.
-
-Paolo
-
+thanks
+-- PMM
 
