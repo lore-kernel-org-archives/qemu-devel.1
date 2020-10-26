@@ -2,89 +2,70 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19189C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1B50C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:49:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C9A72076D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:48:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VLgNe/vB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C9A72076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 65AFC2076D
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:49:23 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 65AFC2076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=intel.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36744 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37720 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8Tv-0002gd-Gg
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:48:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59510)
+	id 1kX8Uc-00037F-CJ
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:49:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33150)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8FL-00021i-64
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:33:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39478)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8FJ-0001vw-5O
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:33:34 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603740811;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=F7Z8Ab96QqAlGmJl+/S7ZqJyHT3n5wgDwb/EX4vdpos=;
- b=VLgNe/vBQAwL0jNPP0n9tyUxR5DhMqbl3rqqvq+65ZpJl2qKqfBUKrGFSVFVQ0zcZaHyqO
- EEGlK646fTEnfzLNV+NMGuBxHsaIIWCFjSxV7vjRoeXZrGpSOFFmeWquZL061gH8rAcUYt
- x6eJ21W11n13kKO9rw8aAQy5P+3cvyU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-146-vm1AdFuoOgSz8ZeJSO59pw-1; Mon, 26 Oct 2020 15:33:22 -0400
-X-MC-Unique: vm1AdFuoOgSz8ZeJSO59pw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D6C0364087;
- Mon, 26 Oct 2020 19:33:20 +0000 (UTC)
-Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6B58E5B4C8;
- Mon, 26 Oct 2020 19:33:16 +0000 (UTC)
-Subject: [PULL 06/32] vfio: Add migration state change notifier
-From: Alex Williamson <alex.williamson@redhat.com>
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kX8Lf-000371-9D
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:40:07 -0400
+Received: from mga09.intel.com ([134.134.136.24]:62565)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <ben.widawsky@intel.com>)
+ id 1kX8Lb-0002kJ-Is
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:40:06 -0400
+IronPort-SDR: BtJiAeXmN2CmX3limi6tXmCXoGVoFo1w5X/ZtnapfJF0Qf0lwe07vIMdsAM8S7xjapBvyLFU5J
+ 3vWkZxT9421g==
+X-IronPort-AV: E=McAfee;i="6000,8403,9786"; a="168103244"
+X-IronPort-AV: E=Sophos;i="5.77,420,1596524400"; d="scan'208";a="168103244"
+X-Amp-Result: SKIPPED(no attachment in message)
+X-Amp-File-Uploaded: False
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+ by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Oct 2020 12:39:56 -0700
+IronPort-SDR: ddc8LcyvM1RG4yDkNiBA2AND+wNCLGiBU/eQa6XE+6XsuamwIM8ncwm6nIlKispqiIx4g3giB7
+ 03DzGsdQWWzQ==
+X-IronPort-AV: E=Sophos;i="5.77,420,1596524400"; d="scan'208";a="334140296"
+Received: from alhertig-mobl1.amr.corp.intel.com (HELO bwidawsk-mobl5.local)
+ ([10.252.135.229])
+ by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
+ 26 Oct 2020 12:39:55 -0700
+From: Ben Widawsky <ben.widawsky@intel.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 26 Oct 2020 13:33:16 -0600
-Message-ID: <160374079605.22414.17724430939494295951.stgit@gimli.home>
-In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+Subject: [PATCH 1/2] acpi/crs: Prevent bad ranges for host bridges
+Date: Mon, 26 Oct 2020 12:39:23 -0700
+Message-Id: <20201026193924.985014-1-ben.widawsky@intel.com>
+X-Mailer: git-send-email 2.29.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=134.134.136.24;
+ envelope-from=ben.widawsky@intel.com; helo=mga09.intel.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 15:39:56
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,109 +78,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
- Neo Jia <cjia@nvidia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Ben Widawsky <ben.widawsky@intel.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kirti Wankhede <kwankhede@nvidia.com>
+Prevent _CRS resources being quietly chopped off and instead throw an
+assertion. _CRS is used by host bridges to declare regions of io and/or
+memory that they consume. On some (all?) platforms the host bridge
+doesn't have PCI header space and so they need some way to convey the
+information.
 
-Added migration state change notifier to get notification on migration state
-change. These states are translated to VFIO device state and conveyed to
-vendor driver.
+Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/migration.c           |   28 ++++++++++++++++++++++++++++
- hw/vfio/trace-events          |    1 +
- include/hw/vfio/vfio-common.h |    2 ++
- 3 files changed, 31 insertions(+)
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 1a3325ae8148..888a615d39ea 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -175,6 +175,30 @@ static void vfio_vmstate_change(void *opaque, int running, RunState state)
-             (migration->device_state & mask) | value);
- }
- 
-+static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-+{
-+    MigrationState *s = data;
-+    VFIOMigration *migration = container_of(notifier, VFIOMigration,
-+                                            migration_state);
-+    VFIODevice *vbasedev = migration->vbasedev;
-+    int ret;
-+
-+    trace_vfio_migration_state_notifier(vbasedev->name,
-+                                        MigrationStatus_str(s->state));
-+
-+    switch (s->state) {
-+    case MIGRATION_STATUS_CANCELLING:
-+    case MIGRATION_STATUS_CANCELLED:
-+    case MIGRATION_STATUS_FAILED:
-+        ret = vfio_migration_set_state(vbasedev,
-+                      ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
-+                      VFIO_DEVICE_STATE_RUNNING);
-+        if (ret) {
-+            error_report("%s: Failed to set state RUNNING", vbasedev->name);
-+        }
-+    }
-+}
-+
- static void vfio_migration_exit(VFIODevice *vbasedev)
- {
-     VFIOMigration *migration = vbasedev->migration;
-@@ -219,8 +243,11 @@ static int vfio_migration_init(VFIODevice *vbasedev,
-     }
- 
-     migration = vbasedev->migration;
-+    migration->vbasedev = vbasedev;
-     migration->vm_state = qemu_add_vm_change_state_handler(vfio_vmstate_change,
-                                                            vbasedev);
-+    migration->migration_state.notify = vfio_migration_state_notifier;
-+    add_migration_state_change_notifier(&migration->migration_state);
-     return 0;
- 
- err:
-@@ -270,6 +297,7 @@ void vfio_migration_finalize(VFIODevice *vbasedev)
-     if (vbasedev->migration) {
-         VFIOMigration *migration = vbasedev->migration;
- 
-+        remove_migration_state_change_notifier(&migration->migration_state);
-         qemu_del_vm_change_state_handler(migration->vm_state);
-         vfio_migration_exit(vbasedev);
-     }
-diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 41de81f12f60..78d7d83b5ef8 100644
---- a/hw/vfio/trace-events
-+++ b/hw/vfio/trace-events
-@@ -150,3 +150,4 @@ vfio_display_edid_write_error(void) ""
- vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
- vfio_migration_set_state(const char *name, uint32_t state) " (%s) state %d"
- vfio_vmstate_change(const char *name, int running, const char *reason, uint32_t dev_state) " (%s) running %d reason %s device state %d"
-+vfio_migration_state_notifier(const char *name, const char *state) " (%s) state %s"
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 9a571f1fb552..2bd593ba38bb 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -59,10 +59,12 @@ typedef struct VFIORegion {
- } VFIORegion;
- 
- typedef struct VFIOMigration {
-+    struct VFIODevice *vbasedev;
-     VMChangeStateEntry *vm_state;
-     VFIORegion region;
-     uint32_t device_state;
-     int vm_running;
-+    Notifier migration_state;
- } VFIOMigration;
- 
- typedef struct VFIOAddressSpace {
+1. I'm not aware of this being a real issue on platforms today as I think
+   many platforms that use ACPI and actually have regions, constrain to
+   32b to be complaint with legacy.
+2. Since host bridges aren't usually hot plugged, it can't be invoked by
+   a user, so assert() seems like the right way to handle this.
+---
+ hw/i386/acpi-build.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
+index eee7b57c37..df13abecf4 100644
+--- a/hw/i386/acpi-build.c
++++ b/hw/i386/acpi-build.c
+@@ -869,6 +869,8 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
+     crs_range_merge(temp_range_set.mem_ranges);
+     for (i = 0; i < temp_range_set.mem_ranges->len; i++) {
+         entry = g_ptr_array_index(temp_range_set.mem_ranges, i);
++        assert(entry->limit <= UINT32_MAX &&
++               (entry->limit - entry->base + 1) <= UINT32_MAX);
+         aml_append(crs,
+                    aml_dword_memory(AML_POS_DECODE, AML_MIN_FIXED,
+                                     AML_MAX_FIXED, AML_NON_CACHEABLE,
+-- 
+2.29.1
 
 
