@@ -2,87 +2,63 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B66C5C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:53:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE1EC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:57:39 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E7C9122263
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:53:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdMV0/gq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E7C9122263
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id E208C20738
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 11:57:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E208C20738
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46594 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX14V-0008JM-PT
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:53:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38298)
+	id 1kX186-0002Gb-1C
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 07:57:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX13m-0007sb-Ve
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:53:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:60522)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX13j-0000LH-UV
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 07:53:09 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603713186;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5tSv4kEUJRY33T+xl+WhUrpRtH4lGUKRADQMDZy82lI=;
- b=OdMV0/gqevlS/r7SrVyClTVgvw0HvL2/iSY8QbEYQDsN1NEL8RY1LgzXeBLZ/NuQ2IS9VM
- 9hfAfT4i29JtME03fbdMRz/BRP1JLzdGyJmo/dv4j7m6UkjKNTauHh8noYJU4I+N4P0QR4
- ZaDBmyd3OFbCCk2wC2hPdF0KryEc8lM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-448-X2T_fAElOFuH32J1jJSpvw-1; Mon, 26 Oct 2020 07:53:05 -0400
-X-MC-Unique: X2T_fAElOFuH32J1jJSpvw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0B1B780F054;
- Mon, 26 Oct 2020 11:53:04 +0000 (UTC)
-Received: from work-vm (ovpn-112-208.ams2.redhat.com [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 14BAD5B4B7;
- Mon, 26 Oct 2020 11:53:02 +0000 (UTC)
-Date: Mon, 26 Oct 2020 11:53:00 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PATCH] migration: Drop unused VMSTATE_FLOAT64 support
-Message-ID: <20201026115300.GE3277@work-vm>
-References: <20201022120830.5938-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kX16S-0000Z1-5g; Mon, 26 Oct 2020 07:55:56 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2360)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <jiangyifei@huawei.com>)
+ id 1kX16O-0000hq-Qk; Mon, 26 Oct 2020 07:55:55 -0400
+Received: from DGGEMS402-HUB.china.huawei.com (unknown [172.30.72.59])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CKYFP0Xrfz15MVn;
+ Mon, 26 Oct 2020 19:55:53 +0800 (CST)
+Received: from huawei.com (10.174.186.209) by DGGEMS402-HUB.china.huawei.com
+ (10.3.19.202) with Microsoft SMTP Server id 14.3.487.0; Mon, 26 Oct 2020
+ 19:55:38 +0800
+From: Yifei Jiang <jiangyifei@huawei.com>
+To: <qemu-devel@nongnu.org>, <qemu-riscv@nongnu.org>
+Subject: [PATCH V4 3/6] target/riscv: Add PMP state description
+Date: Mon, 26 Oct 2020 19:55:27 +0800
+Message-ID: <20201026115530.304-4-jiangyifei@huawei.com>
+X-Mailer: git-send-email 2.26.2.windows.1
+In-Reply-To: <20201026115530.304-1-jiangyifei@huawei.com>
+References: <20201026115530.304-1-jiangyifei@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <20201022120830.5938-1-peter.maydell@linaro.org>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Originating-IP: [10.174.186.209]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=jiangyifei@huawei.com; helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 07:55:44
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,120 +71,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, Juan Quintela <quintela@redhat.com>
+Cc: zhang.zhanghailiang@huawei.com, sagark@eecs.berkeley.edu,
+ kbastian@mail.uni-paderborn.de, victor.zhangxiaofeng@huawei.com,
+ richard.henderson@linaro.org, Yifei Jiang <jiangyifei@huawei.com>,
+ Alistair Francis <alistair.francis@wdc.com>, yinyipeng1@huawei.com,
+ palmer@dabbelt.com, wu.wubin@huawei.com, dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Peter Maydell (peter.maydell@linaro.org) wrote:
-> Commit ef96e3ae9698d6 in January 2019 removed the last user of the
-> VMSTATE_FLOAT64* macros. These were used by targets which defined
-> their floating point register file as an array of 'float64'.
-> 
-> We used to try to maintain a stricter distinction between
-> 'float64' (a type for holding an integer representing an IEEE float)
-> and 'uint64_t', including having a debug option for 'float64' being
-> a struct and supposedly mandatory macros for converting between
-> float64 and uint64_t. We no longer think that's a usefully
-> strong distinction to draw and we allow ourselves to freely
-> assume that float64 really is just a 64-bit integer type, so
-> for new targets we would simply recommend use of the uint64_t type
-> for a floating point register file. The float64 type remains
-> as a useful way of documenting in the type signature of helper
-> functions and the like that they expect to receive an IEEE float
-> from the TCG generated code rather than an arbitrary integer.
-> 
-> Since the VMSTATE_FLOAT64* macros have no remaining users and
-> we don't recommend new code uses them, delete them.
-> 
-> Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+In the case of supporting PMP feature, add PMP state description
+to vmstate_riscv_cpu.
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+'vmstate_pmp_addr' and 'num_rules' could be regenerated by
+pmp_update_rule(). But there exists the problem of updating
+num_rules repeatedly in pmp_update_rule(). So here extracts
+pmp_update_rule_addr() and pmp_update_rule_nums() to update
+'vmstate_pmp_addr' and 'num_rules' respectively.
 
-> ---
->  include/migration/vmstate.h | 13 -------------
->  migration/vmstate-types.c   | 26 --------------------------
->  2 files changed, 39 deletions(-)
-> 
-> diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-> index f68ed7db13c..4d71dc8fbaa 100644
-> --- a/include/migration/vmstate.h
-> +++ b/include/migration/vmstate.h
-> @@ -219,7 +219,6 @@ extern const VMStateInfo vmstate_info_uint64;
->  #define VMS_NULLPTR_MARKER (0x30U) /* '0' */
->  extern const VMStateInfo vmstate_info_nullptr;
->  
-> -extern const VMStateInfo vmstate_info_float64;
->  extern const VMStateInfo vmstate_info_cpudouble;
->  
->  extern const VMStateInfo vmstate_info_timer;
-> @@ -997,12 +996,6 @@ extern const VMStateInfo vmstate_info_qlist;
->      VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_uint64, uint64_t)
->  
->  
-> -#define VMSTATE_FLOAT64_V(_f, _s, _v)                                 \
-> -    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_float64, float64)
-> -
-> -#define VMSTATE_FLOAT64(_f, _s)                                       \
-> -    VMSTATE_FLOAT64_V(_f, _s, 0)
-> -
->  #define VMSTATE_TIMER_PTR_TEST(_f, _s, _test)                             \
->      VMSTATE_POINTER_TEST(_f, _s, _test, vmstate_info_timer, QEMUTimer *)
->  
-> @@ -1114,12 +1107,6 @@ extern const VMStateInfo vmstate_info_qlist;
->  #define VMSTATE_INT64_ARRAY(_f, _s, _n)                               \
->      VMSTATE_INT64_ARRAY_V(_f, _s, _n, 0)
->  
-> -#define VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, _v)                       \
-> -    VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_float64, float64)
-> -
-> -#define VMSTATE_FLOAT64_ARRAY(_f, _s, _n)                             \
-> -    VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, 0)
-> -
->  #define VMSTATE_CPUDOUBLE_ARRAY_V(_f, _s, _n, _v)                     \
->      VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_cpudouble, CPU_DoubleU)
->  
-> diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-> index 35e784c9d93..e22d41d73d6 100644
-> --- a/migration/vmstate-types.c
-> +++ b/migration/vmstate-types.c
-> @@ -420,32 +420,6 @@ const VMStateInfo vmstate_info_uint16_equal = {
->      .put  = put_uint16,
->  };
->  
-> -/* floating point */
-> -
-> -static int get_float64(QEMUFile *f, void *pv, size_t size,
-> -                       const VMStateField *field)
-> -{
-> -    float64 *v = pv;
-> -
-> -    *v = make_float64(qemu_get_be64(f));
-> -    return 0;
-> -}
-> -
-> -static int put_float64(QEMUFile *f, void *pv, size_t size,
-> -                       const VMStateField *field, QJSON *vmdesc)
-> -{
-> -    uint64_t *v = pv;
-> -
-> -    qemu_put_be64(f, float64_val(*v));
-> -    return 0;
-> -}
-> -
-> -const VMStateInfo vmstate_info_float64 = {
-> -    .name = "float64",
-> -    .get  = get_float64,
-> -    .put  = put_float64,
-> -};
-> -
->  /* CPU_DoubleU type */
->  
->  static int get_cpudouble(QEMUFile *f, void *pv, size_t size,
-> -- 
-> 2.20.1
-> 
+Signed-off-by: Yifei Jiang <jiangyifei@huawei.com>
+Signed-off-by: Yipeng Yin <yinyipeng1@huawei.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
+---
+ target/riscv/machine.c | 50 ++++++++++++++++++++++++++++++++++++++++++
+ target/riscv/pmp.c     | 29 ++++++++++++++----------
+ target/riscv/pmp.h     |  2 ++
+ 3 files changed, 70 insertions(+), 11 deletions(-)
+
+diff --git a/target/riscv/machine.c b/target/riscv/machine.c
+index 32edbcba7c..fc1461d88e 100644
+--- a/target/riscv/machine.c
++++ b/target/riscv/machine.c
+@@ -22,6 +22,52 @@
+ #include "sysemu/kvm.h"
+ #include "migration/cpu.h"
+ 
++static bool pmp_needed(void *opaque)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++
++    return riscv_feature(env, RISCV_FEATURE_PMP);
++}
++
++static int pmp_post_load(void *opaque, int version_id)
++{
++    RISCVCPU *cpu = opaque;
++    CPURISCVState *env = &cpu->env;
++    int i;
++
++    for (i = 0; i < MAX_RISCV_PMPS; i++) {
++        pmp_update_rule_addr(env, i);
++    }
++    pmp_update_rule_nums(env);
++
++    return 0;
++}
++
++static const VMStateDescription vmstate_pmp_entry = {
++    .name = "cpu/pmp/entry",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_UINTTL(addr_reg, pmp_entry_t),
++        VMSTATE_UINT8(cfg_reg, pmp_entry_t),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
++static const VMStateDescription vmstate_pmp = {
++    .name = "cpu/pmp",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .needed = pmp_needed,
++    .post_load = pmp_post_load,
++    .fields = (VMStateField[]) {
++        VMSTATE_STRUCT_ARRAY(env.pmp_state.pmp, RISCVCPU, MAX_RISCV_PMPS,
++                             0, vmstate_pmp_entry, pmp_entry_t),
++        VMSTATE_END_OF_LIST()
++    }
++};
++
+ const VMStateDescription vmstate_riscv_cpu = {
+     .name = "cpu",
+     .version_id = 1,
+@@ -70,5 +116,9 @@ const VMStateDescription vmstate_riscv_cpu = {
+         VMSTATE_UINT64(env.timecmp, RISCVCPU),
+ 
+         VMSTATE_END_OF_LIST()
++    },
++    .subsections = (const VMStateDescription * []) {
++        &vmstate_pmp,
++        NULL
+     }
+ };
+diff --git a/target/riscv/pmp.c b/target/riscv/pmp.c
+index c394e867f8..2eda8e1e2f 100644
+--- a/target/riscv/pmp.c
++++ b/target/riscv/pmp.c
+@@ -136,18 +136,8 @@ static void pmp_decode_napot(target_ulong a, target_ulong *sa, target_ulong *ea)
+     }
+ }
+ 
+-
+-/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
+- *   end address values.
+- *   This function is called relatively infrequently whereas the check that
+- *   an address is within a pmp rule is called often, so optimise that one
+- */
+-static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
++void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index)
+ {
+-    int i;
+-
+-    env->pmp_state.num_rules = 0;
+-
+     uint8_t this_cfg = env->pmp_state.pmp[pmp_index].cfg_reg;
+     target_ulong this_addr = env->pmp_state.pmp[pmp_index].addr_reg;
+     target_ulong prev_addr = 0u;
+@@ -186,7 +176,13 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+ 
+     env->pmp_state.addr[pmp_index].sa = sa;
+     env->pmp_state.addr[pmp_index].ea = ea;
++}
+ 
++void pmp_update_rule_nums(CPURISCVState *env)
++{
++    int i;
++
++    env->pmp_state.num_rules = 0;
+     for (i = 0; i < MAX_RISCV_PMPS; i++) {
+         const uint8_t a_field =
+             pmp_get_a_field(env->pmp_state.pmp[i].cfg_reg);
+@@ -196,6 +192,17 @@ static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
+     }
+ }
+ 
++/* Convert cfg/addr reg values here into simple 'sa' --> start address and 'ea'
++ *   end address values.
++ *   This function is called relatively infrequently whereas the check that
++ *   an address is within a pmp rule is called often, so optimise that one
++ */
++static void pmp_update_rule(CPURISCVState *env, uint32_t pmp_index)
++{
++    pmp_update_rule_addr(env, pmp_index);
++    pmp_update_rule_nums(env);
++}
++
+ static int pmp_is_in_range(CPURISCVState *env, int pmp_index, target_ulong addr)
+ {
+     int result = 0;
+diff --git a/target/riscv/pmp.h b/target/riscv/pmp.h
+index 6a8f072871..6c6b4c9bef 100644
+--- a/target/riscv/pmp.h
++++ b/target/riscv/pmp.h
+@@ -62,5 +62,7 @@ bool pmp_hart_has_privs(CPURISCVState *env, target_ulong addr,
+     target_ulong size, pmp_priv_t priv, target_ulong mode);
+ bool pmp_is_range_in_tlb(CPURISCVState *env, hwaddr tlb_sa,
+                          target_ulong *tlb_size);
++void pmp_update_rule_addr(CPURISCVState *env, uint32_t pmp_index);
++void pmp_update_rule_nums(CPURISCVState *env);
+ 
+ #endif
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+2.19.1
 
 
