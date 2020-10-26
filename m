@@ -2,73 +2,86 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 768BCC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:54:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43CECC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:56:05 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ED9C822263
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:54:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ED9C822263
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id B55D320773
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:56:04 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="FlfvNpwy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B55D320773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53108 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55454 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX3tf-0006Zt-2F
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:54:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56666)
+	id 1kX3ul-0007Vn-L1
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:56:03 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54650)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kX3r6-0003sr-Ih
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:52:16 -0400
-Resent-Date: Mon, 26 Oct 2020 10:52:16 -0400
-Resent-Message-Id: <E1kX3r6-0003sr-Ih@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21778)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kX3r3-0002dH-Lv
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:52:16 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603723919; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=j1VMkYu/26U+0gnBKJYqwIh8l1BkdjEu7pakMyYSWXg8fqWGf+biX/QfWtZTz0WFSrx1J+Wm6lMcunpPCtiAk97krmhJSpdgX2z5ADRXOX41qky9Rcj8MLrOT/Cn9SA0kHy2xHTideomBtlpHVKs4uK676FVso25Iyk/Ooli1H8=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603723919;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=aJDdpNE1x60EwICmKv4+YDArRmVKd9OnWBykPJUVEjY=; 
- b=edmXuG5beQZrhmFyBkWpV9J6DTai79ZLjy07jPDk4LNlLA/JoH+GQv0qxO0O0bCOR85aWsNWSAivAC9nXNASVEKY1+/qsT8uJTWwvzJ0TV+7ENZ82zVY+oNRJnE8NSS+SNhfq+1Y5vO87W7q7X0vs56ft/ojXvpvygfUyfH8zhI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 1603723918930126.1317073048881;
- Mon, 26 Oct 2020 07:51:58 -0700 (PDT)
-Subject: Re: [PATCH 00/15] remove bios_name variable
-Message-ID: <160372391769.1984.14999058410886180750@66eaa9a8a123>
-In-Reply-To: <20201026143028.3034018-1-pbonzini@redhat.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kX3kE-0004vo-Oe
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:45:10 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:45095)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kX3kB-0001dB-I6
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:45:10 -0400
+Received: by mail-ej1-x644.google.com with SMTP id dt13so13923166ejb.12
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 07:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=szdpdUzzaZ8jLqAZWjRW/SfAG1gnOzMA+My6CI7nSOE=;
+ b=FlfvNpwyi9rvJ6JfEyU9JmhGIYEKR4RX2NPzH3WhTK6sIdSVS4atFh0Pjb2i2JGrf3
+ AHnlEZAj/eK4idYm6uLeMo6il+H3lD1Pf+dTiwMZ2Kbg8Xog92LuQOgpBguPtmuV0Gh8
+ MHnZitnjKlPlyad7ZSfsSaeLELvThEqjRxXsl31y+DzFZj8v7WJ9tZZjXV9HkT1QEhS0
+ AYTDT08eLDn71bup1DWDwTGr2+Mkw5KFnn+chBHthXewqwLqHsktTlITQmU+2JDI7+Lw
+ HyDw5ENG03fdr2bD0ylFxJ6GZO+sCAnmAxsusyYVYkZDIK0Aa+T6rUiYBW7txtdAWm+l
+ CFUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=szdpdUzzaZ8jLqAZWjRW/SfAG1gnOzMA+My6CI7nSOE=;
+ b=AdaM3clk2bZOyjNRKDjRw1dA+HqZrb/aa9bAZuSWTzUINp95tdTP38INKGSnnxWzD1
+ RCHufwUNSYLeqz5VMaDJlJpcFIQDJScwvB8r0jISQsgmBtgEt4/XbzFK40IgOg6XEr2H
+ u+zce0jnXCjx2flk/Fbhvwmx9lcW8H3j9M45I3LNbE30CxTLeo+1k3T0Fo8mlhNLeV2S
+ qdyRQybTLIVwdYIv8zy2dJt+C70XAasOrBWGp+P5Za/zF3/xfEHMKhwjZlUzLlXzYbSD
+ X+APp62HBtU9Ch27rz40Y4XbQElgxK8eqg2psElxM1jOZU+aKPXvbPI+JtN+toWEl9ZN
+ +glA==
+X-Gm-Message-State: AOAM532XQQnWo5KxSdQ6GjjFlE42qER4cJaCJDr67tf0xa0O2ImCaMdP
+ tow7Tjqd3jXugc/sXfS0ehBfRfaFzjUxCO3NGGOvFQ==
+X-Google-Smtp-Source: ABdhPJwmgOQPJNArllW623MtnGtF+YvBSd2nDONIf/p+u4j0wVy0H5489dhTMmtHE8kkgDBNyWZWMssHpUBNPJhADSc=
+X-Received: by 2002:a17:906:7254:: with SMTP id
+ n20mr15382743ejk.382.1603723505151; 
+ Mon, 26 Oct 2020 07:45:05 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: pbonzini@redhat.com
-Date: Mon, 26 Oct 2020 07:51:58 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 10:52:04
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ <20201026143028.3034018-3-pbonzini@redhat.com>
+In-Reply-To: <20201026143028.3034018-3-pbonzini@redhat.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Oct 2020 14:44:54 +0000
+Message-ID: <CAFEAcA_VYpdo+KBxTkBfDzoOh7eCUrhFTxeh0VXpMB4Yv89NFA@mail.gmail.com>
+Subject: Re: [PATCH 02/15] digic: stash firmware into DigicState
+To: Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,100 +95,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: philmd@redhat.com, qemu-devel@nongnu.org
+Cc: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8yMDIwMTAyNjE0MzAyOC4zMDM0
-MDE4LTEtcGJvbnppbmlAcmVkaGF0LmNvbS8KCgoKSGksCgpUaGlzIHNlcmllcyBzZWVtcyB0byBo
-YXZlIHNvbWUgY29kaW5nIHN0eWxlIHByb2JsZW1zLiBTZWUgb3V0cHV0IGJlbG93IGZvcgptb3Jl
-IGluZm9ybWF0aW9uOgoKVHlwZTogc2VyaWVzCk1lc3NhZ2UtaWQ6IDIwMjAxMDI2MTQzMDI4LjMw
-MzQwMTgtMS1wYm9uemluaUByZWRoYXQuY29tClN1YmplY3Q6IFtQQVRDSCAwMC8xNV0gcmVtb3Zl
-IGJpb3NfbmFtZSB2YXJpYWJsZQoKPT09IFRFU1QgU0NSSVBUIEJFR0lOID09PQojIS9iaW4vYmFz
-aApnaXQgcmV2LXBhcnNlIGJhc2UgPiAvZGV2L251bGwgfHwgZXhpdCAwCmdpdCBjb25maWcgLS1s
-b2NhbCBkaWZmLnJlbmFtZWxpbWl0IDAKZ2l0IGNvbmZpZyAtLWxvY2FsIGRpZmYucmVuYW1lcyBU
-cnVlCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLmFsZ29yaXRobSBoaXN0b2dyYW0KLi9zY3JpcHRz
-L2NoZWNrcGF0Y2gucGwgLS1tYWlsYmFjayBiYXNlLi4KPT09IFRFU1QgU0NSSVBUIEVORCA9PT0K
-ClVwZGF0aW5nIDNjOGNmNWE5YzIxZmY4NzgyMTY0ZDFkZWY3ZjQ0YmQ4ODg3MTMzODQKRnJvbSBo
-dHRwczovL2dpdGh1Yi5jb20vcGF0Y2hldy1wcm9qZWN0L3FlbXUKICAgMjg4YTFjYy4uZTc1ZGU4
-MyAgbWFzdGVyICAgICAtPiBtYXN0ZXIKICogW25ldyB0YWddICAgICAgICAgcGF0Y2hldy8yMDIw
-MTAyNjE0MzAyOC4zMDM0MDE4LTEtcGJvbnppbmlAcmVkaGF0LmNvbSAtPiBwYXRjaGV3LzIwMjAx
-MDI2MTQzMDI4LjMwMzQwMTgtMS1wYm9uemluaUByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3
-IGJyYW5jaCAndGVzdCcKZTZhMzk3NSB2bDogcmVtb3ZlIGJpb3NfbmFtZQpmZjIzY2E4IHNwYXJj
-OiByZW1vdmUgYmlvc19uYW1lCjRiMDRlMzUgc2g0OiByZW1vdmUgYmlvc19uYW1lCjM1ZGU1NzMg
-czM5MDogcmVtb3ZlIGJpb3NfbmFtZQphMzUyMjIwIHJ4OiBtb3ZlIEJJT1MgbG9hZCBmcm9tIE1D
-VSB0byBib2FyZAo4M2MzMTczIHBwYzogcmVtb3ZlIGJpb3NfbmFtZQpjMDIwMjcyIG1veGllOiBy
-ZW1vdmUgYmlvc19uYW1lCjA5YmNkYmMgbWlwczogcmVtb3ZlIGJpb3NfbmFtZQpjNjE4YzllIG02
-OGs6IHJlbW92ZSBiaW9zX25hbWUKNGZmMTdmNyBsbTMyOiByZW1vdmUgYmlvc19uYW1lCmM2NjA5
-YmYgaTM4NjogcmVtb3ZlIGJpb3NfbmFtZQoyZjJkNzI0IGhwcGE6IHJlbW92ZSBiaW9zX25hbWUK
-ZGE2OGE1MSBhcm06IHJlbW92ZSBiaW9zX25hbWUKNTY4NzIzOSBkaWdpYzogc3Rhc2ggZmlybXdh
-cmUgaW50byBEaWdpY1N0YXRlCjJmYWU1MGUgYWxwaGE6IHJlbW92ZSBiaW9zX25hbWUKCj09PSBP
-VVRQVVQgQkVHSU4gPT09CjEvMTUgQ2hlY2tpbmcgY29tbWl0IDJmYWU1MGU2ZGVmYyAoYWxwaGE6
-IHJlbW92ZSBiaW9zX25hbWUpCjIvMTUgQ2hlY2tpbmcgY29tbWl0IDU2ODcyMzk1ODA5ZSAoZGln
-aWM6IHN0YXNoIGZpcm13YXJlIGludG8gRGlnaWNTdGF0ZSkKMy8xNSBDaGVja2luZyBjb21taXQg
-ZGE2OGE1MTZiODUzIChhcm06IHJlbW92ZSBiaW9zX25hbWUpCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiMzNzogRklMRTogaHcvYXJtL2hpZ2hiYW5rLmM6Mjk5OgorICAgICAgICBz
-eXNib290X2ZpbGVuYW1lID0gcWVtdV9maW5kX2ZpbGUoUUVNVV9GSUxFX1RZUEVfQklPUywgbWFj
-aGluZS0+ZmlybXdhcmUpOwoKdG90YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMDUgbGluZXMg
-Y2hlY2tlZAoKUGF0Y2ggMy8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuICBJ
-ZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0IHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo0LzE1IENoZWNr
-aW5nIGNvbW1pdCAyZjJkNzI0ZTJkMTIgKGhwcGE6IHJlbW92ZSBiaW9zX25hbWUpCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMyMTogRklMRTogaHcvaHBwYS9tYWNoaW5lLmM6MjE2
-OgorICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgbWFjaGluZS0+ZmlybXdh
-cmUgPzogImhwcGEtZmlybXdhcmUuaW1nIik7Cgp0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3Ms
-IDkgbGluZXMgY2hlY2tlZAoKUGF0Y2ggNC8xNSBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSBy
-ZXZpZXcuICBJZiBhbnkgb2YgdGhlc2UgZXJyb3JzCmFyZSBmYWxzZSBwb3NpdGl2ZXMgcmVwb3J0
-IHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZQpDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgo1
-LzE1IENoZWNraW5nIGNvbW1pdCBjNjYwOWJmNTlhMjUgKGkzODY6IHJlbW92ZSBiaW9zX25hbWUp
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiMzMzogRklMRTogaHcvaTM4Ni9taWNy
-b3ZtLmM6MjY2OgorICAgIHg4Nl9iaW9zX3JvbV9pbml0KE1BQ0hJTkUobW1zKSwgZGVmYXVsdF9m
-aXJtd2FyZSwgZ2V0X3N5c3RlbV9tZW1vcnkoKSwgdHJ1ZSk7Cgp0b3RhbDogMCBlcnJvcnMsIDEg
-d2FybmluZ3MsIDc1IGxpbmVzIGNoZWNrZWQKClBhdGNoIDUvMTUgaGFzIHN0eWxlIHByb2JsZW1z
-LCBwbGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRp
-dmVzIHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlO
-VEFJTkVSUy4KNi8xNSBDaGVja2luZyBjb21taXQgNGZmMTdmN2FmYTQ5IChsbTMyOiByZW1vdmUg
-Ymlvc19uYW1lKQpFUlJPUjogc3BhY2VzIHJlcXVpcmVkIGFyb3VuZCB0aGF0ICc6JyAoY3R4OlZ4
-RSkKIzE5OiBGSUxFOiBody9sbTMyL21pbGt5bWlzdC5jOjExMToKKyAgICBjb25zdCBjaGFyICpi
-aW9zX25hbWUgPSBtYWNoaW5lLT5maXJtd2FyZSA/IEJJT1NfRklMRU5BTUU6CiAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgXgoKdG90
-YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxNiBsaW5lcyBjaGVja2VkCgpQYXRjaCA2LzE1IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCgo3LzE1IENoZWNraW5nIGNvbW1pdCBjNjE4YzllYjY5
-ZDMgKG02OGs6IHJlbW92ZSBiaW9zX25hbWUpCjgvMTUgQ2hlY2tpbmcgY29tbWl0IDA5YmNkYmNj
-NzQ0ZSAobWlwczogcmVtb3ZlIGJpb3NfbmFtZSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJh
-Y3RlcnMKIzQ0OiBGSUxFOiBody9taXBzL2phenouYzoyMjE6CisgICAgZmlsZW5hbWUgPSBxZW11
-X2ZpbmRfZmlsZShRRU1VX0ZJTEVfVFlQRV9CSU9TLCBtYWNoaW5lLT5maXJtd2FyZSA/OiBCSU9T
-X0ZJTEVOQU1FKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3OTogRklMRTog
-aHcvbWlwcy9tYWx0YS5jOjEzNDY6CisgICAgICAgICAgICAgICAgZXJyb3JfcmVwb3J0KCJDb3Vs
-ZCBub3QgbG9hZCBNSVBTIGJpb3MgJyVzJyIsIG1hY2hpbmUtPmZpcm13YXJlKTsKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM5MjogRklMRTogaHcvbWlwcy9taXBzc2ltLmM6MTgw
-OgorICAgIGZpbGVuYW1lID0gcWVtdV9maW5kX2ZpbGUoUUVNVV9GSUxFX1RZUEVfQklPUywgbWFj
-aGluZS0+ZmlybXdhcmUgPzogQklPU19GSUxFTkFNRSk7Cgp0b3RhbDogMCBlcnJvcnMsIDMgd2Fy
-bmluZ3MsIDg5IGxpbmVzIGNoZWNrZWQKClBhdGNoIDgvMTUgaGFzIHN0eWxlIHByb2JsZW1zLCBw
-bGVhc2UgcmV2aWV3LiAgSWYgYW55IG9mIHRoZXNlIGVycm9ycwphcmUgZmFsc2UgcG9zaXRpdmVz
-IHJlcG9ydCB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBzZWUKQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJ
-TkVSUy4KOS8xNSBDaGVja2luZyBjb21taXQgYzAyMDI3MjVjNWJmIChtb3hpZTogcmVtb3ZlIGJp
-b3NfbmFtZSkKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzIyOiBGSUxFOiBody9t
-b3hpZS9tb3hpZXNpbS5jOjEzNzoKKyAgICAgICAgaWYgKGxvYWRfaW1hZ2VfdGFyZ3BoeXMobWFj
-aGluZS0+ZmlybXdhcmUsIEZJUk1XQVJFX0JBU0UsIEZJUk1XQVJFX1NJWkUpIDwgMCkgewoKdG90
-YWw6IDAgZXJyb3JzLCAxIHdhcm5pbmdzLCAxMiBsaW5lcyBjaGVja2VkCgpQYXRjaCA5LzE1IGhh
-cyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBvZiB0aGVzZSBlcnJvcnMK
-YXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFpbnRhaW5lciwgc2VlCkNI
-RUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCjEwLzE1IENoZWNraW5nIGNvbW1pdCA4M2MzMTczMGM5
-YmQgKHBwYzogcmVtb3ZlIGJpb3NfbmFtZSkKMTEvMTUgQ2hlY2tpbmcgY29tbWl0IGEzNTIyMjA0
-MjAwZSAocng6IG1vdmUgQklPUyBsb2FkIGZyb20gTUNVIHRvIGJvYXJkKQoxMi8xNSBDaGVja2lu
-ZyBjb21taXQgMzVkZTU3M2E5MzgyIChzMzkwOiByZW1vdmUgYmlvc19uYW1lKQoxMy8xNSBDaGVj
-a2luZyBjb21taXQgNGIwNGUzNWMxNjA1IChzaDQ6IHJlbW92ZSBiaW9zX25hbWUpCjE0LzE1IENo
-ZWNraW5nIGNvbW1pdCBmZjIzY2E4NjI2ODIgKHNwYXJjOiByZW1vdmUgYmlvc19uYW1lKQoxNS8x
-NSBDaGVja2luZyBjb21taXQgZTZhMzk3NTJhMzkzICh2bDogcmVtb3ZlIGJpb3NfbmFtZSkKPT09
-IE9VVFBVVCBFTkQgPT09CgpUZXN0IGNvbW1hbmQgZXhpdGVkIHdpdGggY29kZTogMQoKClRoZSBm
-dWxsIGxvZyBpcyBhdmFpbGFibGUgYXQKaHR0cDovL3BhdGNoZXcub3JnL2xvZ3MvMjAyMDEwMjYx
-NDMwMjguMzAzNDAxOC0xLXBib256aW5pQHJlZGhhdC5jb20vdGVzdGluZy5jaGVja3BhdGNoLz90
-eXBlPW1lc3NhZ2UuCi0tLQpFbWFpbCBnZW5lcmF0ZWQgYXV0b21hdGljYWxseSBieSBQYXRjaGV3
-IFtodHRwczovL3BhdGNoZXcub3JnL10uClBsZWFzZSBzZW5kIHlvdXIgZmVlZGJhY2sgdG8gcGF0
-Y2hldy1kZXZlbEByZWRoYXQuY29t
+On Mon, 26 Oct 2020 at 14:30, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> Prepare for removing bios_name.
+>
+> Cc: Peter Maydell <peter.maydell@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  hw/arm/digic_boards.c  | 5 +++--
+>  include/hw/arm/digic.h | 1 +
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/hw/arm/digic_boards.c b/hw/arm/digic_boards.c
+> index d5524d3e72..d320b54c44 100644
+> --- a/hw/arm/digic_boards.c
+> +++ b/hw/arm/digic_boards.c
+> @@ -55,6 +55,7 @@ static void digic4_board_init(MachineState *machine, DigicBoard *board)
+>      DigicState *s = DIGIC(object_new(TYPE_DIGIC));
+>      MachineClass *mc = MACHINE_GET_CLASS(machine);
+>
+> +    s->firmware = machine->firmware;
+>      if (machine->ram_size != mc->default_ram_size) {
+>          char *sz = size_to_str(mc->default_ram_size);
+>          error_report("Invalid RAM size, should be %s", sz);
+> @@ -91,8 +92,8 @@ static void digic_load_rom(DigicState *s, hwaddr addr,
+>          return;
+>      }
+>
+> -    if (bios_name) {
+> -        filename = bios_name;
+> +    if (s->firmware) {
+> +        filename = s->firmware;
+>      } else {
+>          filename = def_filename;
+>      }
+
+The existing code is a little odd, because if the user passes -bios
+then we use it in both the add_rom0 and add_rom1 callbacks;
+however this ends up not mattering for the moment because the
+only supported Digic board has just the rom1 and no rom0.
+
+Anyway, rather than stashing the firmware filename in the
+DigicState, you could lift the "decide whether to use
+machine->firmware or the def_filename" choice up to
+the callsites in digic4_board_init():
+
+    if (board->add_rom0) {
+        board->add_rom0(s, DIGIC4_ROM0_BASE,
+                        machine->firmware ?: board->rom0_def_filename);
+    }
+(and similarly for rom1).
+
+Then you can delete the
+    if (bios_name) {
+        filename = bios_name;
+    } else {
+        filename = def_filename;
+    }
+block from digic_load_rom() and rename the arguments of
+digic_load_rom() and digic4_add_k8p3215uqb_rom() to just
+"filename" rather than "def_filename".
+
+Doing it that way avoids passing things around that we don't
+need to, and makes it clear in the digic4_board_init() code
+that we're doing something a bit suspect in possibly using
+the machine->firmware file twice -- if we ever need to fix
+that bug then it'll be a simple change to the logic in that
+one function.
+
+thanks
+-- PMM
 
