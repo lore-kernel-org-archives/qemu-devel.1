@@ -2,101 +2,80 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A9FC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:10:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A6B0C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:16:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 779D9223AC
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:10:31 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDFQgq3/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779D9223AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id 1CC2520874
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:16:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC2520874
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43506 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45878 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWxaI-0003bI-Et
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:10:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
+	id 1kWxgI-0004vd-7G
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:16:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42352)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWxYt-0002bd-0U; Mon, 26 Oct 2020 04:09:03 -0400
-Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40920)
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kWxfL-0004So-OW
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:15:43 -0400
+Received: from indium.canonical.com ([91.189.90.7]:55588)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kWxYr-00059L-BN; Mon, 26 Oct 2020 04:09:02 -0400
-Received: by mail-wm1-x341.google.com with SMTP id k18so11450167wmj.5;
- Mon, 26 Oct 2020 01:09:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=y8jPhiGQvTCWXAv0hYVCIpQDQLplznWE1yrPbus25zk=;
- b=TDFQgq3/gVQZL9xCeohGD+rqBNkYzVRXA+Vw0RSeTdTH9xjRXhPfl9zmH28Xytb88y
- /R8gf5vWtVM3ayqNuHjMrZeG0TlF24cQQZ88CIaPaJaGdX3LSd7A7D7Iv7XucbsOPuY4
- 0H+RS+zWxw93t7tMVefh2EheN66uxzTfPLngNXYyGfyf6mDHopKIz8oZFtyBqvDcwgiB
- 5cmMZ1HPKartlM+zaDKTB13uCnMU65wzQSPtaJMtokKrmNiaqeucqpIqfE1cMaa3XP5D
- nS98HMH9ximqqBUuZVmRmGqXUmezUpqJIFx5JFvqF8lhcI6IIRRp1ISo/JNcs8sSMjJR
- RYkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=y8jPhiGQvTCWXAv0hYVCIpQDQLplznWE1yrPbus25zk=;
- b=T889DzNjGUTgGC2vdfARsPUZ2d7W8HyV1KkEXW4h1Gfz8V1lb0KTNkJk/g+MO26voM
- Fvy/y8SPAxKP3wTg8lwQxPH+CBhjehpEy+jAbM/JrAzGDhr2CqS8WFVfj3daTcebFbc+
- uwtNcsSrlAyS6jpjeNI84o0b0J2aRMe1S3UqNVV3VeCqPXkUtR+l8AGV/PNsMCcT9IIU
- 1GxZHmgwh3m8JK0mzMJKJFW2kQncxgduk/FQCoH5I0X7Ls2nh7rrpoyuMVF/CSEJE3Pz
- QtrbY5ODlxKU/9vWr/TUXyeBM3e6KpCEk3DpPxvwRBqcy+u/WoOZKQLDDnbZqn4NOWND
- Gtfw==
-X-Gm-Message-State: AOAM533KynIBj9yG99Dwv1mDv0P/Vyt8nPg0pzY8OBs65MVZLZPsM6mr
- 7Qp+NByIEAFPW5SD1mr4zXQ=
-X-Google-Smtp-Source: ABdhPJwVIa0NCf1SiJfXiVGL44t3W6d3z3SPpwCIqeciGIci4TANBjGaPn42pCVZXjS3rlXwwsDqpA==
-X-Received: by 2002:a1c:7f97:: with SMTP id
- a145mr15289672wmd.160.1603699739457; 
- Mon, 26 Oct 2020 01:08:59 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id 1sm23408199wre.61.2020.10.26.01.08.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 01:08:58 -0700 (PDT)
-Subject: Re: [PATCH] hw/sd: Zero out function selection fields before being
- populated
-To: Bin Meng <bmeng.cn@gmail.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
-References: <20201024014954.21330-1-bmeng.cn@gmail.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <1e4c44aa-7d2a-e773-fe8e-47b858137896@amsat.org>
-Date: Mon, 26 Oct 2020 09:08:57 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
+ id 1kWxfJ-0007e2-8k
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:15:43 -0400
+Received: from loganberry.canonical.com ([91.189.90.37])
+ by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
+ id 1kWxfG-0003dr-4m
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 08:15:38 +0000
+Received: from loganberry.canonical.com (localhost [127.0.0.1])
+ by loganberry.canonical.com (Postfix) with ESMTP id 18F152E812F
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 08:15:38 +0000 (UTC)
 MIME-Version: 1.0
-In-Reply-To: <20201024014954.21330-1-bmeng.cn@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::341;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Oct 2020 08:07:44 -0000
+From: Thomas Huth <1901440@bugs.launchpad.net>
+To: qemu-devel@nongnu.org
+X-Launchpad-Notification-Type: bug
+X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
+X-Launchpad-Bug-Information-Type: Public
+X-Launchpad-Bug-Private: no
+X-Launchpad-Bug-Security-Vulnerability: no
+X-Launchpad-Bug-Commenters: player-001 th-huth
+X-Launchpad-Bug-Reporter: Dave G (player-001)
+X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
+References: <160365777400.12451.12378376347775649238.malonedeb@soybean.canonical.com>
+Message-Id: <160369966421.31539.15046287947018495673.malone@gac.canonical.com>
+Subject: [Bug 1901440] Re: Instability in IVSHMEM after updating QEMU 4.2 ->
+ 5.0
+X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
+X-Launchpad-Message-For: qemu-devel-ml
+Precedence: bulk
+X-Generated-By: Launchpad (canonical.com);
+ Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
+X-Launchpad-Hash: d4ed41f352e7e8081ef22bb854149d761b4a895d
+Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
+ helo=indium.canonical.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 04:15:38
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -66
+X-Spam_score: -6.7
+X-Spam_bar: ------
+X-Spam_report: (-6.7 / 5.0 requ) BAYES_00=-1.9,
+ HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
+ RCVD_IN_MSPIKE_H3=-0.01, RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
-Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -105,42 +84,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
+Reply-To: Bug 1901440 <1901440@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/24/20 3:49 AM, Bin Meng wrote:
-> From: Bin Meng <bin.meng@windriver.com>
-> 
-> The function selection fields (399:376) should be zeroed out to
-> prevent leftover from being or'ed into the switch function status
-> data structure.
-> 
-> This fixes the boot failure as seen in the acceptance testing on
-> the orangepi target.
-> 
-> Fixes: b638627c723a ("hw/sd: Fix incorrect populated function switch status data structure")
-> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
-> Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> ---
-> 
->   hw/sd/sd.c | 1 +
->   1 file changed, 1 insertion(+)
-> 
-> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
-> index c3febed243..bd10ec8fc4 100644
-> --- a/hw/sd/sd.c
-> +++ b/hw/sd/sd.c
-> @@ -824,6 +824,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
->       sd->data[12] = 0x80;	/* Supported group 1 functions */
->       sd->data[13] = 0x03;
->   
-> +    memset(&sd->data[14], 0, 3);
->       for (i = 0; i < 6; i ++) {
->           new_func = (arg >> (i * 4)) & 0x0f;
->           if (mode && new_func != 0x0f)
-> 
+Can you reproduce this with the latest upstream QEMU release (v5.1)? Or
+did you only try with the versions that ship with Ubuntu?
 
-Thanks, series applied to sd-next tree.
+-- =
+
+You received this bug notification because you are a member of qemu-
+devel-ml, which is subscribed to QEMU.
+https://bugs.launchpad.net/bugs/1901440
+
+Title:
+  Instability in IVSHMEM after updating QEMU 4.2 -> 5.0
+
+Status in QEMU:
+  New
+
+Bug description:
+  Updating Ubuntu from 20.08 to 20.10 which updates QEMU from 4.2 to 5.0
+  results in the virtual machines freezing when the IVSHMEM interface is
+  active.  This workstation typically runs several windows 10 virtual
+  machines that are accessed locally:  two using the spice viewer and
+  one that uses an passthrough assigned GPU accessed through a viewer
+  called Looking Glass.  Looking Glass uses the IVSHMEM device interface
+  to pass captured frames from the windows virtual machine to the linux
+  host for display by a viewer application.
+
+  This workstation was 100% stable under Ubuntu 20.08 (QEMU 4.2).  It
+  handled a variety of heavy loads all day it never froze or crashed.
+  It became unstable under Ubuntu 20.10 (QEMU 5.0), seemingly triggered
+  by high levels of SHM activity.  I was able to reliably reproduce the
+  problem when playing a video in the looking-glass vm while playing
+  another video in a spice vm.  Other scenarios would also trigger this
+  problem less reliably, but this video playback scenario would trigger
+  it after 3-5 minutes of playback.
+
+  The result of this new instability would manifest itself by all
+  running vms on the host freezing but the host was not visibly
+  effected.  I could find no warnings or errors in any relevant system
+  or QEMU logs.  It wasn't just spice, when I accessed the gpu-passthru
+  vm via directly assigned devices it was frozen, still outputting video
+  of the last frame before the crash.  All vms would have to be force-
+  shutdown and the host rebooted to regain vm functionality.  Just
+  forcing shutdown and restarting a vm would result in showing 'running'
+  status but it would be frozen and inaccessible until system reboot.
+
+  I suspect this is a QEMU host / kernel error for several reasons:
+  Having to reboot the host, insensitivity to VM changes including
+  virtio-win version, etc.  I suspect it's related to IVSHMEM due to the
+  correlation of the freeze to the looking-glass related activity.
+
+  This might be kernel / PCIe / power management related in some way.
+  While experimenting to troubleshoot this issue I was able to trigger
+  the error more quickly by disabling PCIe power management in the BIOS.
+
+  The system was 100% stable under QEMU 5.0 when not running the
+  looking-glass vm, quite stable when the looking-glass vm was idle or
+  lightly used, but appeared increasingly unstable as SHM activity
+  increased.
+
+  Sorry if this is a bit anecdotal, this is my work machine and
+  unfortunately today I was forced to rollback restore to Ubuntu 20.08
+  (QEMU 4.2) from backup so I can work on Monday.  The system returned
+  to 100% stability after returning to 20.08.
+
+  If requested I can restore the Ubuntu 20.10 snapshot to reproduce &
+  gather information as directed.
+
+To manage notifications about this bug go to:
+https://bugs.launchpad.net/qemu/+bug/1901440/+subscriptions
 
