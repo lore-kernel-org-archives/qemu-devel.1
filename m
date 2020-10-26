@@ -2,85 +2,73 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B8A7C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:55:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0BAC388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:56:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1361520829
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:55:54 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NapQzM6u"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1361520829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3482A20829
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:56:08 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3482A20829
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38930 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX9Wz-0006Y0-Ul
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:55:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51178)
+	id 1kX9XE-0006uv-2u
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:56:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kX9Vl-0005hE-5u; Mon, 26 Oct 2020 16:54:37 -0400
-Received: from mail-lj1-x243.google.com ([2a00:1450:4864:20::243]:38478)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kX9Vj-0004IC-1A; Mon, 26 Oct 2020 16:54:36 -0400
-Received: by mail-lj1-x243.google.com with SMTP id m20so11896534ljj.5;
- Mon, 26 Oct 2020 13:54:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:reply-to:from:date:message-id
- :subject:to:cc;
- bh=d2fZGfjy06CNbNEUnBOTkyjn+PZKIVuRt+JPMo4bAqE=;
- b=NapQzM6unw8mkRIiDVKVTL8NP+T5ll+sWrSLTcSTMyvfwatrN/Dwkkx+njKpbj9ioB
- 23JehRmK0XiijxWoJmT2roEkAVp+knQC2zMWJGDmjx0b2GQyQo/wyNuJn+3W+9NiYFaj
- eKHSwYI5URvdzW/Q2EsRHLZTQ5CX3SC1BQyv4yK/cfe/frr2dUGXDLL2DQT+i/BWBM83
- ROV1kXbYs59dwmNjfJI91d7FAsGyN3V5SSlDwg0J7Lrcn/hliT+prh/vGulB46X5RN9W
- j9EOGKVo/DvM8qtE0v8Z0xfAICgPNw1TsGBH+Uvt5Dw0qCm6gitQwBwaer88b953GhRM
- bJzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:reply-to
- :from:date:message-id:subject:to:cc;
- bh=d2fZGfjy06CNbNEUnBOTkyjn+PZKIVuRt+JPMo4bAqE=;
- b=oWGT4PyizVBESD4LpgHXuEn40xDzZdcSPVFzV9b6qzhcWpVHyN6isE7bsfOFey5/8q
- B3g9PDMMva8UKXeQwRkFtA0JdVda+LToCkJfv+9MiCX6tJ2DaFsDjHcSDUuwbpThX9Kn
- vx+hVGQzt8LEtQZ2zUgzPCoFjz4cZkUUbW2RMZBcbwYhustx3F63up1WNAA2FWYzfGGR
- vlg/YTtv3nO6Pet+cem5DDjPAyvfkCvtuqB9PkpFyHntZclYaXeG+dwUXDnq0hDN9vWb
- 5Oc7YGofZyJifWfZcomOPG4vEksuR1FW7IanBRCelkNZzMxsYHWLqYUFQg9Bfp5uzBUT
- +qeg==
-X-Gm-Message-State: AOAM533fwJ7vlt4kRbw/3oBA4t0sMy4Q/LWfLrfPqQnoTfjSjQTzDl5r
- DLqPHTZzsegqR4mzW0ksCJVhNW07wOpadXMFbdc=
-X-Google-Smtp-Source: ABdhPJxvqPRPZIwCjAEK4szVvdGHGvipdB8fMqd+3k+rnD33Wa39Jk5fRt1MNk3A8vSRUBct9xBFXWkmyLuQsXPzVUc=
-X-Received: by 2002:a2e:8e32:: with SMTP id r18mr6975532ljk.171.1603745672785; 
- Mon, 26 Oct 2020 13:54:32 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kX9WA-00061L-JF
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:55:02 -0400
+Resent-Date: Mon, 26 Oct 2020 16:55:02 -0400
+Resent-Message-Id: <E1kX9WA-00061L-JF@lists.gnu.org>
+Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21793)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
+ id 1kX9W7-0004J6-KP
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:55:01 -0400
+ARC-Seal: i=1; a=rsa-sha256; t=1603745683; cv=none; 
+ d=zohomail.com; s=zohoarc; 
+ b=azy/nYM5p4q1EzZaaPD9MgtzSKmAii2YFQo6jBnWQz5JVwJCGQESmDCLFb2VxZ/H5/O7i/ZB+TERShniTsjZz8Hp+QXAH7VbASIH/OvU2p5sLvYJoEX2TXsSQD9i0fKzIAnkSX4mAe1CZvvMIgIbjdNVrQIZBOGZD6LZ+hl4Les=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
+ s=zohoarc; t=1603745683;
+ h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
+ bh=LpUScY+WBHzKaA0hQQHc17ku6ytUc85U4Vp8FzyC8vA=; 
+ b=DCU40vrugRZ3/6mVlVuCoEtNZhBKlQy736RebSe3qagJ8cFBF4C3hK4QEfmP+rjPAV4yi3wwbv7H8QdZmmhMQjyq2YKgCJARCMR2V+6zFU2MdfrXnlygpK33iXeOdVFmsHgdYitNvJYPLprkB1xK5k77rpavRrv9uSmeNvsUDcM=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+ spf=pass  smtp.mailfrom=no-reply@patchew.org;
+ dmarc=pass header.from=<no-reply@patchew.org>
+ header.from=<no-reply@patchew.org>
+Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
+ mx.zohomail.com with SMTPS id 160374568122564.98804397158221;
+ Mon, 26 Oct 2020 13:54:41 -0700 (PDT)
+Subject: Re: [PATCH 0/1] acpi: Implement ACPI ERST support for guests
+Message-ID: <160374567971.1984.17110999016759260017@66eaa9a8a123>
+In-Reply-To: <1603743573-9870-1-git-send-email-eric.devolder@oracle.com>
 MIME-Version: 1.0
-References: <20201015151829.14656-1-peter.maydell@linaro.org>
- <CAFEAcA8g-n4gqy0Az7cBsQJqcQpsc_vH2=VatqqdRt034YD5JQ@mail.gmail.com>
-In-Reply-To: <CAFEAcA8g-n4gqy0Az7cBsQJqcQpsc_vH2=VatqqdRt034YD5JQ@mail.gmail.com>
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 27 Oct 2020 04:54:21 +0800
-Message-ID: <CAE2XoE-dNO-guN8P6Btpzr_mB1C8kx4svoG=LioPYABF5HtBQQ@mail.gmail.com>
-Subject: Re: [PATCH 0/2] armv7m_systick: Rewrite to use ptimers
-To: Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="00000000000022f56405b2992360"
-Received-SPF: pass client-ip=2a00:1450:4864:20::243;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x243.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Resent-From: 
+From: no-reply@patchew.org
+To: eric.devolder@oracle.com
+Date: Mon, 26 Oct 2020 13:54:41 -0700 (PDT)
+X-ZohoMailClient: External
+Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
+ helo=sender4-of-o57.zoho.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 16:54:56
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -94,176 +82,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
-Cc: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Reply-To: qemu-devel@nongnu.org
+Cc: ehabkost@redhat.com, mst@redhat.com, konrad.wilk@oracle.com,
+ qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com,
+ boris.ostrovsky@oracle.com, rth@twiddle.net
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000022f56405b2992360
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Tue, Oct 27, 2020 at 4:44 AM Peter Maydell <peter.maydell@linaro.org>
-wrote:
->
-> Ping for review ?
->
-Maybe nobody can review this, anyway, is that possible add a test case for
-this?
-I found https://github.com/oxidecomputer/qemu-systick-bug are simple enough=
-.
-> thanks
-> -- PMM
->
-> On Thu, 15 Oct 2020 at 16:18, Peter Maydell <peter.maydell@linaro.org>
-wrote:
-> >
-> > This patch series rewrites our implementation of the armv7m systick
-> > timer to use ptimers.
-> >
-> > The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
-> > clear-on-write counter.  Our current implementation has various bugs
-> > and dubious workarounds in it (for instance see
-> > https://bugs.launchpad.net/qemu/+bug/1872237).
-> >
-> > We have an implementation of a simple decrementing counter and we put
-> > a lot of effort into making sure it handles the interesting corner
-> > cases (like "spend a cycle at 0 before reloading"), so rather than
-> > trying to fix these all over again in systick's hand-rolled countdown
-> > code it's much simpler to just rewrite it to use a ptimer.
-> >
-> > Unfortunately this is a migration compatibility break, which will
-> > affect all M-profile boards.
-> >
-> > Among other bugs, this fixes
-> > https://bugs.launchpad.net/qemu/+bug/1872237 : now writes to SYST_CVR
-> > when the timer is enabled correctly do nothing; when the timer is
-> > enabled via SYST_CSR.ENABLE, the ptimer code will (because of
-> > POLICY_NO_IMMEDIATE_RELOAD) arrange that after one timer tick the
-> > counter is reloaded from SYST_RVR and then counts down from there, as
-> > the architecture requires.
-> >
-> > Side note: the trace from the test program in LP1872237 won't look
-> > quite like it does on the hardware: under QEMU the "waiting for 1000
-> > ms" debug printing generally reports a SYST_CVR value of 0.  This is
-> > because QEMU's emulated CPU is comparatively fast and our systick has a
-> > hard-wired value of 1MHz for the frequency of the 'external reference
-> > clock', which means that execution of the guest code reaches "read
-> > SYST_CVR" before the first tick of the timer clock after enabling of
-> > the timer (which is where the reload of SYST_CVR from SYST_RVR is
-> > required).  The exception is the first iteration, where the time QEMU
-> > takes to translate the guest code is enough that the timer tick
-> > happens before the register read.  You can also get the timer tick to
-> > win the race by fiddling around with the -icount option (which
-> > effectively is slowing down the emulated CPU speed).
-> >
-> > Some day we should model both the 'system_clock_scale' (ie the CPU
-> > clock frequency) and the 'external reference clock' as QEMU clock
-> > source/sinks so that board code can specify the correct reference
-> > clock frequency.
-> >
-> > Patch 1 is a minor tweak to the ptimer code to suppress a spurious
-> > warning message for the "timer callback function disabled the ptimer"
-> > case, which the systick timer uses.  Patch 2 is the actual
-> > conversion.
-> >
-> > thanks
-> > -- PMM
-> >
-> >
-> > Peter Maydell (2):
-> >   hw/core/ptimer: Support ptimer being disabled by timer callback
-> >   hw/timer/armv7m_systick: Rewrite to use ptimers
-> >
-> >  include/hw/timer/armv7m_systick.h |   3 +-
-> >  hw/core/ptimer.c                  |   4 +
-> >  hw/timer/armv7m_systick.c         | 124 +++++++++++++-----------------
-> >  3 files changed, 58 insertions(+), 73 deletions(-)
-> >
-> > --
-> > 2.20.1
-> >
->
-
-
---
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
-
---00000000000022f56405b2992360
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><br><br>On Tue, Oct 27, 2020 at 4:44 AM Peter Maydell &lt;=
-<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@linaro.org</a>&gt=
-; wrote:<br>&gt;<br>&gt; Ping for review ?<br>&gt;<div>Maybe nobody can rev=
-iew this, anyway, is that possible add a test case for this?</div><div>I fo=
-und=C2=A0<a href=3D"https://github.com/oxidecomputer/qemu-systick-bug">http=
-s://github.com/oxidecomputer/qemu-systick-bug</a> are simple enough.<br>&gt=
-; thanks<br>&gt; -- PMM<br>&gt;<br>&gt; On Thu, 15 Oct 2020 at 16:18, Peter=
- Maydell &lt;<a href=3D"mailto:peter.maydell@linaro.org">peter.maydell@lina=
-ro.org</a>&gt; wrote:<br>&gt; &gt;<br>&gt; &gt; This patch series rewrites =
-our implementation of the armv7m systick<br>&gt; &gt; timer to use ptimers.=
-<br>&gt; &gt;<br>&gt; &gt; The armv7m systick timer is a 24-bit decrementin=
-g, wrap-on-zero,<br>&gt; &gt; clear-on-write counter.=C2=A0 Our current imp=
-lementation has various bugs<br>&gt; &gt; and dubious workarounds in it (fo=
-r instance see<br>&gt; &gt; <a href=3D"https://bugs.launchpad.net/qemu/+bug=
-/1872237">https://bugs.launchpad.net/qemu/+bug/1872237</a>).<br>&gt; &gt;<b=
-r>&gt; &gt; We have an implementation of a simple decrementing counter and =
-we put<br>&gt; &gt; a lot of effort into making sure it handles the interes=
-ting corner<br>&gt; &gt; cases (like &quot;spend a cycle at 0 before reload=
-ing&quot;), so rather than<br>&gt; &gt; trying to fix these all over again =
-in systick&#39;s hand-rolled countdown<br>&gt; &gt; code it&#39;s much simp=
-ler to just rewrite it to use a ptimer.<br>&gt; &gt;<br>&gt; &gt; Unfortuna=
-tely this is a migration compatibility break, which will<br>&gt; &gt; affec=
-t all M-profile boards.<br>&gt; &gt;<br>&gt; &gt; Among other bugs, this fi=
-xes<br>&gt; &gt; <a href=3D"https://bugs.launchpad.net/qemu/+bug/1872237">h=
-ttps://bugs.launchpad.net/qemu/+bug/1872237</a> : now writes to SYST_CVR<br=
->&gt; &gt; when the timer is enabled correctly do nothing; when the timer i=
-s<br>&gt; &gt; enabled via SYST_CSR.ENABLE, the ptimer code will (because o=
-f<br>&gt; &gt; POLICY_NO_IMMEDIATE_RELOAD) arrange that after one timer tic=
-k the<br>&gt; &gt; counter is reloaded from SYST_RVR and then counts down f=
-rom there, as<br>&gt; &gt; the architecture requires.<br>&gt; &gt;<br>&gt; =
-&gt; Side note: the trace from the test program in LP1872237 won&#39;t look=
-<br>&gt; &gt; quite like it does on the hardware: under QEMU the &quot;wait=
-ing for 1000<br>&gt; &gt; ms&quot; debug printing generally reports a SYST_=
-CVR value of 0.=C2=A0 This is<br>&gt; &gt; because QEMU&#39;s emulated CPU =
-is comparatively fast and our systick has a<br>&gt; &gt; hard-wired value o=
-f 1MHz for the frequency of the &#39;external reference<br>&gt; &gt; clock&=
-#39;, which means that execution of the guest code reaches &quot;read<br>&g=
-t; &gt; SYST_CVR&quot; before the first tick of the timer clock after enabl=
-ing of<br>&gt; &gt; the timer (which is where the reload of SYST_CVR from S=
-YST_RVR is<br>&gt; &gt; required).=C2=A0 The exception is the first iterati=
-on, where the time QEMU<br>&gt; &gt; takes to translate the guest code is e=
-nough that the timer tick<br>&gt; &gt; happens before the register read.=C2=
-=A0 You can also get the timer tick to<br>&gt; &gt; win the race by fiddlin=
-g around with the -icount option (which<br>&gt; &gt; effectively is slowing=
- down the emulated CPU speed).<br>&gt; &gt;<br>&gt; &gt; Some day we should=
- model both the &#39;system_clock_scale&#39; (ie the CPU<br>&gt; &gt; clock=
- frequency) and the &#39;external reference clock&#39; as QEMU clock<br>&gt=
-; &gt; source/sinks so that board code can specify the correct reference<br=
->&gt; &gt; clock frequency.<br>&gt; &gt;<br>&gt; &gt; Patch 1 is a minor tw=
-eak to the ptimer code to suppress a spurious<br>&gt; &gt; warning message =
-for the &quot;timer callback function disabled the ptimer&quot;<br>&gt; &gt=
-; case, which the systick timer uses.=C2=A0 Patch 2 is the actual<br>&gt; &=
-gt; conversion.<br>&gt; &gt;<br>&gt; &gt; thanks<br>&gt; &gt; -- PMM<br>&gt=
-; &gt;<br>&gt; &gt;<br>&gt; &gt; Peter Maydell (2):<br>&gt; &gt; =C2=A0 hw/=
-core/ptimer: Support ptimer being disabled by timer callback<br>&gt; &gt; =
-=C2=A0 hw/timer/armv7m_systick: Rewrite to use ptimers<br>&gt; &gt;<br>&gt;=
- &gt; =C2=A0include/hw/timer/armv7m_systick.h | =C2=A0 3 +-<br>&gt; &gt; =
-=C2=A0hw/core/ptimer.c =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
-=A0 =C2=A0| =C2=A0 4 +<br>&gt; &gt; =C2=A0hw/timer/armv7m_systick.c =C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 | 124 +++++++++++++-----------------<br>&gt; &gt; =C2=
-=A03 files changed, 58 insertions(+), 73 deletions(-)<br>&gt; &gt;<br>&gt; =
-&gt; --<br>&gt; &gt; 2.20.1<br>&gt; &gt;<br>&gt;<br><br><br>--<br>=C2=A0 =
-=C2=A0 =C2=A0 =C2=A0 =C2=A0=E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=
-=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo</div><=
-/div>
-
---00000000000022f56405b2992360--
+UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAzNzQzNTczLTk4NzAtMS1n
+aXQtc2VuZC1lbWFpbC1lcmljLmRldm9sZGVyQG9yYWNsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
+ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
+ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNjAz
+NzQzNTczLTk4NzAtMS1naXQtc2VuZC1lbWFpbC1lcmljLmRldm9sZGVyQG9yYWNsZS5jb20KU3Vi
+amVjdDogW1BBVENIIDAvMV0gYWNwaTogSW1wbGVtZW50IEFDUEkgRVJTVCBzdXBwb3J0IGZvciBn
+dWVzdHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
+ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
+bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
+IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
+IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
+ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
+Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTYw
+Mzc0MzU3My05ODcwLTEtZ2l0LXNlbmQtZW1haWwtZXJpYy5kZXZvbGRlckBvcmFjbGUuY29tIC0+
+IHBhdGNoZXcvMTYwMzc0MzU3My05ODcwLTEtZ2l0LXNlbmQtZW1haWwtZXJpYy5kZXZvbGRlckBv
+cmFjbGUuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDEwMjYxMDU1MDQuNDAy
+MzYyMC0xLXBoaWxtZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDEwMjYxMDU1MDQuNDAyMzYy
+MC0xLXBoaWxtZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTRj
+MjVhYyBhY3BpOiBJbXBsZW1lbnQgQUNQSSBFUlNUIHN1cHBvcnQgZm9yIGd1ZXN0cwoKPT09IE9V
+VFBVVCBCRUdJTiA9PT0KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
+ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDg6IApuZXcgZmlsZSBtb2RlIDEwMDY0
+NAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzczNjogRklMRTogaHcvYWNwaS9l
+cnN0LmM6Njg0OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVF
+LCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUg
+b3ZlciA4MCBjaGFyYWN0ZXJzCiM3Mzk6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY4NzoKKyAgICAg
+ICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NS
+X0FDVElPTiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
+cwojNzQyOiBGSUxFOiBody9hY3BpL2Vyc3QuYzo2OTA6CisgICAgICAgICAgICBpbnNucyArPSBC
+RUEoV1JJVEVfUkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwg
+TUFTSzgpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc0NTogRklMRTogaHcv
+YWNwaS9lcnN0LmM6NjkzOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVS
+X1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6
+IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3NDg6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY5NjoK
+KyAgICAgICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUiAgICAgICwgMCwgMzIsIEVS
+U1RfQ1NSX1ZBTFVFICwgMCwgTUFTSzMyKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
+ZXJzCiM3NDk6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY5NzoKKyAgICAgICAgICAgIGluc25zICs9
+IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NSX0FDVElPTiwgYWN0aW9u
+LCBNQVNLOCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzc1MjogRklMRTogaHcv
+YWNwaS9lcnN0LmM6NzAwOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVS
+X1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfVkFMVUUgLCBFUlNUX0VYRUNVVEVfT1BFUkFUSU9OX01B
+R0lDLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzUzOiBGSUxF
+OiBody9hY3BpL2Vyc3QuYzo3MDE6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoV1JJVEVfUkVH
+SVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwgTUFTSzgpOwoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc1NjogRklMRTogaHcvYWNwaS9lcnN0LmM6
+NzA0OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAz
+MiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3NTc6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcwNToKKyAgICAgICAgICAg
+IGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSX1ZBTFVFICwgMCwgMzIsIEVSU1RfQ1NSX1ZBTFVF
+LCAweDAxLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzYwOiBG
+SUxFOiBody9hY3BpL2Vyc3QuYzo3MDg6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoV1JJVEVf
+UkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwgTUFTSzgpOwoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2NDogRklMRTogaHcvYWNwaS9lcnN0
+LmM6NzEyOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAw
+LCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM3NjU6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcxMzoKKyAgICAgICAg
+ICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwgMCwgNjQsIEVSU1RfQ1NSX1ZB
+TFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2ODog
+RklMRTogaHcvYWNwaS9lcnN0LmM6NzE2OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRF
+X1JFR0lTVEVSICAgICAgLCAwLCA2NCwgRVJTVF9DU1JfVkFMVUUgLCAwLCBNQVNLNjQpOwoKV0FS
+TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2OTogRklMRTogaHcvYWNwaS9lcnN0LmM6
+NzE3OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAz
+MiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
+MCBjaGFyYWN0ZXJzCiM3NzI6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcyMDoKKyAgICAgICAgICAg
+IGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NSX0FDVElP
+TiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzcz
+OiBGSUxFOiBody9hY3BpL2Vyc3QuYzo3MjE6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoUkVB
+RF9SRUdJU1RFUiAgICAgICAsIDAsIDMyLCBFUlNUX0NTUl9WQUxVRSwgMCwgTUFTSzMyKTsKCldB
+Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3NzY6IEZJTEU6IGh3L2FjcGkvZXJzdC5j
+OjcyNDoKKyAgICAgICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwg
+MzIsIEVSU1RfQ1NSX0FDVElPTiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIg
+ODAgY2hhcmFjdGVycwojNzc5OiBGSUxFOiBody9hY3BpL2Vyc3QuYzo3Mjc6CisgICAgICAgICAg
+ICBpbnNucyArPSBCRUEoV1JJVEVfUkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJ
+T04sIGFjdGlvbiwgTUFTSzgpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc4
+MjogRklMRTogaHcvYWNwaS9lcnN0LmM6NzMwOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdS
+SVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4
+KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3ODM6IEZJTEU6IGh3L2FjcGkv
+ZXJzdC5jOjczMToKKyAgICAgICAgICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAg
+ICwgMCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVy
+IDgwIGNoYXJhY3RlcnMKIzc4NjogRklMRTogaHcvYWNwaS9lcnN0LmM6NzM0OgorICAgICAgICAg
+ICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNU
+SU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3
+ODc6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjczNToKKyAgICAgICAgICAgIGluc25zICs9IEJFQShS
+RUFEX1JFR0lTVEVSICAgICAgICwgMCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLMzIpOwoK
+V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc5MDogRklMRTogaHcvYWNwaS9lcnN0
+LmM6NzM4OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAw
+LCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3Zl
+ciA4MCBjaGFyYWN0ZXJzCiM3OTE6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjczOToKKyAgICAgICAg
+ICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwgMCwgMzIsIEVSU1RfQ1NSX1ZB
+TFVFLCAwLCBNQVNLMzIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc5NDog
+RklMRTogaHcvYWNwaS9lcnN0LmM6NzQyOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRF
+X1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsK
+CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3OTU6IEZJTEU6IGh3L2FjcGkvZXJz
+dC5jOjc0MzoKKyAgICAgICAgICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwg
+MCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVyIDgw
+IGNoYXJhY3RlcnMKIzEwMDc6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9lcnN0Lmg6NjoKKyAqIFNl
+ZSBBQ1BJIHNwZWNpZmljYXRpb24sICJBQ1BJIFBsYXRmb3JtIEVycm9yIEludGVyZmFjZXMiIDog
+IkVycm9yIFNlcmlhbGl6YXRpb24iCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
+MTA2ODogRklMRTogaW5jbHVkZS9ody9hY3BpL2Vyc3QuaDo2NzoKKyNkZWZpbmUgQUNQSV9FUlNU
+X01BWF9BQ1RJT05TIChBQ1BJX0VSU1RfQUNUSU9OX0dFVF9FWEVDVVRFX09QRVJBVElPTl9USU1J
+TkdTICsgMSkKCnRvdGFsOiAxIGVycm9ycywgMjkgd2FybmluZ3MsIDEwMjkgbGluZXMgY2hlY2tl
+ZAoKQ29tbWl0IDk0YzI1YWNkYzBmMSAoYWNwaTogSW1wbGVtZW50IEFDUEkgRVJTVCBzdXBwb3J0
+IGZvciBndWVzdHMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
+ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
+bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09
+PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
+aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE2MDM3NDM1NzMtOTg3MC0xLWdpdC1z
+ZW5kLWVtYWlsLWVyaWMuZGV2b2xkZXJAb3JhY2xlLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
+cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
+W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
+aGV3LWRldmVsQHJlZGhhdC5jb20=
 
