@@ -2,109 +2,97 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0435C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 07:58:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37A9FC2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:10:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0C520223AC
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 07:58:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 779D9223AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:10:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P7z2KhiK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0C520223AC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TDFQgq3/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 779D9223AC
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43506 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWxOe-0000h4-Vv
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 03:58:29 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39410)
+	id 1kWxaI-0003bI-Et
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:10:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41148)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWxNx-0000E0-Eq
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 03:57:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:21810)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWxNv-0001IN-Mk
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 03:57:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603699062;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=EgyA620ZbDwDcM1+E0O5qURI9RWQuJVzwYvDSBgh7dw=;
- b=P7z2KhiKjwQVpNPbnkHLfoWQnOUY3k44GSbXmk+AzsWcRXpFiM1DMerz1Plj3xzQO9TgL3
- vkU2Dj7EFI4Egs170sIMThYFDuKhzqMvIKNncpSBD1OcFESHO0cNeQX532FgHp5cGnh7c8
- CgMplMr2uc3jjZtdAgeac2x+77pFqTE=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-260-FI__EcOQMEeBdxYGXzXdMw-1; Mon, 26 Oct 2020 03:57:40 -0400
-X-MC-Unique: FI__EcOQMEeBdxYGXzXdMw-1
-Received: by mail-wr1-f69.google.com with SMTP id q15so7997999wrw.8
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 00:57:40 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kWxYt-0002bd-0U; Mon, 26 Oct 2020 04:09:03 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:40920)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kWxYr-00059L-BN; Mon, 26 Oct 2020 04:09:02 -0400
+Received: by mail-wm1-x341.google.com with SMTP id k18so11450167wmj.5;
+ Mon, 26 Oct 2020 01:09:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=y8jPhiGQvTCWXAv0hYVCIpQDQLplznWE1yrPbus25zk=;
+ b=TDFQgq3/gVQZL9xCeohGD+rqBNkYzVRXA+Vw0RSeTdTH9xjRXhPfl9zmH28Xytb88y
+ /R8gf5vWtVM3ayqNuHjMrZeG0TlF24cQQZ88CIaPaJaGdX3LSd7A7D7Iv7XucbsOPuY4
+ 0H+RS+zWxw93t7tMVefh2EheN66uxzTfPLngNXYyGfyf6mDHopKIz8oZFtyBqvDcwgiB
+ 5cmMZ1HPKartlM+zaDKTB13uCnMU65wzQSPtaJMtokKrmNiaqeucqpIqfE1cMaa3XP5D
+ nS98HMH9ximqqBUuZVmRmGqXUmezUpqJIFx5JFvqF8lhcI6IIRRp1ISo/JNcs8sSMjJR
+ RYkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=EgyA620ZbDwDcM1+E0O5qURI9RWQuJVzwYvDSBgh7dw=;
- b=iakPsiMXUBqG7ZO7xta2KTpK9ZS8bETeZlct4rlBYTnXXM3EC9DIrWTNBPwTf0GcGa
- rEVGxzy9bRLRiC/nJtgkl05iCxJ+NG1uvrkxp/5EVihQH+0yCpn7Js7Cks4N/1baBNS0
- 2KjtW75MUTHhELtlTM8w65SeagFZRPnWAcytw0IGGheX6nVOYut94ytvR+cjcuASvQJC
- Mp25jZ0tioBMkC0FHkPxwI6xwap6XjWQTFgWr8I2Mfk8yA9pp1Zb+4Acc0Lhgvuw+CXY
- ypi9tsSouKEJrAPGrwvg4HV2eDRdy3+AXjCZnyPJZmIOZgAVf2WUQ+hxrO8EfZYqKuOT
- o2DA==
-X-Gm-Message-State: AOAM532HefH6C8KPCfd1GLiyAZlemKmXfitGkE9FVCp4tKnW/QTbNVbb
- AVlZiL1tz73O5rNwwzqrPME0cwzXPshPLhU52hk+POqMRsLJVBLfIWmTjBthA75Jl6rTT1uPFXm
- bcGSqSVm59qmcFGE=
-X-Received: by 2002:a1c:a90e:: with SMTP id s14mr15109006wme.46.1603699059423; 
- Mon, 26 Oct 2020 00:57:39 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwnn+xIjWbd/fBlNzm3FtnOBMA9jjSzHeeJVVrs6blCpU+V7Eg/vL0Agyj21WD4/0YLGXQKhQ==
-X-Received: by 2002:a1c:a90e:: with SMTP id s14mr15108996wme.46.1603699059195; 
- Mon, 26 Oct 2020 00:57:39 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id y4sm18554358wmj.2.2020.10.26.00.57.38
+ bh=y8jPhiGQvTCWXAv0hYVCIpQDQLplznWE1yrPbus25zk=;
+ b=T889DzNjGUTgGC2vdfARsPUZ2d7W8HyV1KkEXW4h1Gfz8V1lb0KTNkJk/g+MO26voM
+ Fvy/y8SPAxKP3wTg8lwQxPH+CBhjehpEy+jAbM/JrAzGDhr2CqS8WFVfj3daTcebFbc+
+ uwtNcsSrlAyS6jpjeNI84o0b0J2aRMe1S3UqNVV3VeCqPXkUtR+l8AGV/PNsMCcT9IIU
+ 1GxZHmgwh3m8JK0mzMJKJFW2kQncxgduk/FQCoH5I0X7Ls2nh7rrpoyuMVF/CSEJE3Pz
+ QtrbY5ODlxKU/9vWr/TUXyeBM3e6KpCEk3DpPxvwRBqcy+u/WoOZKQLDDnbZqn4NOWND
+ Gtfw==
+X-Gm-Message-State: AOAM533KynIBj9yG99Dwv1mDv0P/Vyt8nPg0pzY8OBs65MVZLZPsM6mr
+ 7Qp+NByIEAFPW5SD1mr4zXQ=
+X-Google-Smtp-Source: ABdhPJwVIa0NCf1SiJfXiVGL44t3W6d3z3SPpwCIqeciGIci4TANBjGaPn42pCVZXjS3rlXwwsDqpA==
+X-Received: by 2002:a1c:7f97:: with SMTP id
+ a145mr15289672wmd.160.1603699739457; 
+ Mon, 26 Oct 2020 01:08:59 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id 1sm23408199wre.61.2020.10.26.01.08.57
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 00:57:38 -0700 (PDT)
-Subject: Re: [PATCH] win32: boot broken when bind & data dir are the same
-To: Sunil Muthuswamy <sunilmut@microsoft.com>,
- Markus Armbruster <armbru@redhat.com>
-References: <SN4PR2101MB08802BF242C429A15DDB32ACC01B0@SN4PR2101MB0880.namprd21.prod.outlook.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <9a206344-aa59-fbba-938d-9def34b18c31@redhat.com>
-Date: Mon, 26 Oct 2020 08:57:37 +0100
+ Mon, 26 Oct 2020 01:08:58 -0700 (PDT)
+Subject: Re: [PATCH] hw/sd: Zero out function selection fields before being
+ populated
+To: Bin Meng <bmeng.cn@gmail.com>, qemu-block@nongnu.org, qemu-devel@nongnu.org
+References: <20201024014954.21330-1-bmeng.cn@gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <1e4c44aa-7d2a-e773-fe8e-47b858137896@amsat.org>
+Date: Mon, 26 Oct 2020 09:08:57 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <SN4PR2101MB08802BF242C429A15DDB32ACC01B0@SN4PR2101MB0880.namprd21.prod.outlook.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <20201024014954.21330-1-bmeng.cn@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-wm1-x341.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -14
+X-Spam_score: -1.5
+X-Spam_bar: -
+X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.249,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25, NICE_REPLY_A=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,42 +105,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
+Cc: Bin Meng <bin.meng@windriver.com>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 24/10/20 11:14, Sunil Muthuswamy wrote:
-> With upstream commit#ea1edcd7da1a "vl: relocate paths to data
-> directories", the data dir logic was unified between POSIX &
-> Win32. That patch moved to using 'get_relocated_path()', to
-> find the data dir. There is a latent bug in get_relocated_path
-> which can cause it to spin indefinitely, when the bind dir is
-> the same as the passed in dir (in this case, it was the data
-> dir).
+On 10/24/20 3:49 AM, Bin Meng wrote:
+> From: Bin Meng <bin.meng@windriver.com>
 > 
-> Signed-off-by: Sunil Muthuswamy <sunilmut@microsoft.com>
+> The function selection fields (399:376) should be zeroed out to
+> prevent leftover from being or'ed into the switch function status
+> data structure.
+> 
+> This fixes the boot failure as seen in the acceptance testing on
+> the orangepi target.
+> 
+> Fixes: b638627c723a ("hw/sd: Fix incorrect populated function switch status data structure")
+> Reported-by: Michael Roth <mdroth@linux.vnet.ibm.com>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 > ---
->  util/cutils.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/util/cutils.c b/util/cutils.c
-> index be4e43a9ef..c395974fab 100644
-> --- a/util/cutils.c
-> +++ b/util/cutils.c
-> @@ -949,7 +949,7 @@ char *get_relocated_path(const char *dir)
->          bindir += len_bindir;
->          dir = next_component(dir, &len_dir);
->          bindir = next_component(bindir, &len_bindir);
-> -    } while (len_dir == len_bindir && !memcmp(dir, bindir, len_dir));
-> +    } while (len_dir && len_dir == len_bindir && !memcmp(dir, bindir, len_dir));
->  
->      /* Ascend from bindir to the common prefix with dir.  */
->      while (len_bindir) {
+>   hw/sd/sd.c | 1 +
+>   1 file changed, 1 insertion(+)
+> 
+> diff --git a/hw/sd/sd.c b/hw/sd/sd.c
+> index c3febed243..bd10ec8fc4 100644
+> --- a/hw/sd/sd.c
+> +++ b/hw/sd/sd.c
+> @@ -824,6 +824,7 @@ static void sd_function_switch(SDState *sd, uint32_t arg)
+>       sd->data[12] = 0x80;	/* Supported group 1 functions */
+>       sd->data[13] = 0x03;
+>   
+> +    memset(&sd->data[14], 0, 3);
+>       for (i = 0; i < 6; i ++) {
+>           new_func = (arg >> (i * 4)) & 0x0f;
+>           if (mode && new_func != 0x0f)
 > 
 
-Queued, thanks.
-
-Paolo
-
+Thanks, series applied to sd-next tree.
 
