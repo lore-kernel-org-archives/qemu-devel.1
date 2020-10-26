@@ -7,57 +7,57 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAB6C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50CF6C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:11:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D0D3520874
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D3520874
+	by mail.kernel.org (Postfix) with ESMTPS id DCD3520874
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:11:00 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DCD3520874
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56362 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXAhR-0005iz-Rk
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:10:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39260)
+	id 1kXAhe-0006BV-7R
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:10:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39246)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAam-0005hq-L9
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:52 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:53981)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAal-0005gO-Ls
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:51 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:36631)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAak-0005Gb-S0
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:52 -0400
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAaj-0005GF-Ud
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:51 -0400
 Received: from localhost.localdomain ([82.252.139.38]) by
  mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1M9FX5-1kQr4P2Dzj-006SYc; Mon, 26 Oct 2020 23:03:46 +0100
+ id 1N3suW-1kOTNT0bom-00zk6H; Mon, 26 Oct 2020 23:03:47 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 7/8] linux-user: correct errno returned from accept4() syscall
-Date: Mon, 26 Oct 2020 23:03:38 +0100
-Message-Id: <20201026220339.195790-8-laurent@vivier.eu>
+Subject: [PULL 8/8] target/xtensa: enable all coprocessors for linux-user
+Date: Mon, 26 Oct 2020 23:03:39 +0100
+Message-Id: <20201026220339.195790-9-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201026220339.195790-1-laurent@vivier.eu>
 References: <20201026220339.195790-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:fR27cjAFa6FuWbM/QS2BYXrlqXPE0ozWyGxPSvR3AN4R/ga+vcB
- bDefKmDIG5T88l1vF2m2t5008k0FryLxhqNAmwF6mMTYjtcKTHINWcRD6CWydmUge8IuVrK
- p8estLXp8w+N/utyzFXroJt44VSfOL117R3h4RfjtvHTaGasF9XEgU5zOAxai02bFqUXgZe
- n6RBWjv5ZdeQgGbDfmBUg==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:2NqcNlh0/Hw=:1TcqeMrfQRKwNga7b482Tf
- JziB9mJ80hlu8LwAankCLO/Hh/oYmHz84DOVy46QAOJkZP3ARohizPcnKp8lNt2OpHqLQLusV
- gc/sOA6+oSJCXIpv2EbIxyZ8hMEkDAFpqjbabb6hBR7RNGRuQR1KSC24BwAET2jieYSSQnC2r
- cy+B4r03bGv13/L5tBnj0ePsPMIYyn11gA3DWebLQJ0BPo3zzbMmLXMPcsLiPD67AxooVNWpX
- fmczzIUUBL5MVrmqcmwv8vOJXO/P/SZYwgBjYyDJi/tKEwl4iYk7tOHSvFkk5zWCaq4WfjXyq
- dxSD3xielxD84+rZLYOq6RVTVNiYw0+SGceeRjOwlM89U72xHw5dxvm2pC/3aNf+2esqbE4nh
- P8D9SPGNY8vco0izAF+ui8zzQqQXWNau8XBOE9K3K8ml0MeeIIj9gw6BIcmDJwIAeWUoSU7Ia
- ps1lSWz6bQ==
-Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:OAzESyHoUVSYsGs9sf3S2LXlWzkpaRhJnhG9hVEGdi9FPX3khEQ
+ 3lAOAHIlwxOpOwq5cDgec5QWk34hQyu/eGGlfxWGHMgVBAKFNcXGk67ZzIWQ1y+gUnkT2rS
+ hDLxnpun7VfY2ce/Rmuq3MVSbkdxAxatPQj3OrLft4wh0ZHtoed4DKiys3ZanAUOB8V1l8r
+ 2LgUQApeHee0sYO9YrpXA==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:+VTo9Y2U3jA=:zU8dMITeVOZuYVN9WQJuRV
+ m/M+oOEYWkwNySJekQdS8CCZiXTkFMc6UysGJrscHy1QRlHsPgB0E4UhzyVosXo7yLFjYPjOj
+ PPmm2wnGxKPtTMDi9SJ7a8XkeaYM1oJTABsZQ6Vv6XnGfMXk0mfZ6MgDmQTkvf6ltG4byPKNU
+ ffWpHgRH2Csb64wIVHhyQMs1Zeww0Hc3t3KQKwaS+EBu5fuConotTYYZJZwqw+dGVrUn97UGA
+ TaGFDiTYsIyxjdgiSHtw6GZzW4C6GrC0XvRebJkmEqLmgzYaHXSfq7AGmbNOM5/eTDPdvMIol
+ JtsIkgbP+BypPcqwISj276sVLm0CQ6v72LceRksP7rIuUuCv9ai1RRsgNVzhBilxr0LSSw99S
+ 9SM1GewT16t7rds+oq0LnGixHe4NpTBN5diAM+Q0DTvNLf+CO3G+a5wm6BG5gg20YvaZnOrmD
+ CJek24AFPw==
+Received-SPF: none client-ip=212.227.126.133; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 18:03:46
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 18:03:41
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -77,47 +77,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <laurent@vivier.eu>, Matus Kysel <mkysel@tachyum.com>
+Cc: Max Filippov <jcmvbkbc@gmail.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Laurent Vivier <laurent@vivier.eu>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Matus Kysel <mkysel@tachyum.com>
+From: Max Filippov <jcmvbkbc@gmail.com>
 
-accept4() returned wrong errno, that did not match current linux
+Linux userspace always sees coprocessors as enabled. CPENABLE register
+and coprocessor exceptions are used internally by the kernel to manage
+lazy coprocessor context switch. None of it is needed for linux-user.
+Always enable all coprocessors for user emulation.
 
-Signed-off-by: Matus Kysel <mkysel@tachyum.com>
-Reviewed-by: Laurent Vivier <laurent@vivier.eu>
-Message-Id: <20200930151616.3588165-1-mkysel@tachyum.com>
+Signed-off-by: Max Filippov <jcmvbkbc@gmail.com>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20200829104758.22337-1-jcmvbkbc@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- linux-user/syscall.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ target/xtensa/cpu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/linux-user/syscall.c b/linux-user/syscall.c
-index f0df6aecef80..6fef8181e738 100644
---- a/linux-user/syscall.c
-+++ b/linux-user/syscall.c
-@@ -3491,16 +3491,16 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
-         return get_errno(safe_accept4(fd, NULL, NULL, host_flags));
+diff --git a/target/xtensa/cpu.c b/target/xtensa/cpu.c
+index 6a033e778c95..88a32268a18b 100644
+--- a/target/xtensa/cpu.c
++++ b/target/xtensa/cpu.c
+@@ -93,6 +93,7 @@ static void xtensa_cpu_reset(DeviceState *dev)
+         !xtensa_abi_call0()) {
+         env->sregs[PS] |= PS_WOE;
      }
- 
--    /* linux returns EINVAL if addrlen pointer is invalid */
-+    /* linux returns EFAULT if addrlen pointer is invalid */
-     if (get_user_u32(addrlen, target_addrlen_addr))
--        return -TARGET_EINVAL;
-+        return -TARGET_EFAULT;
- 
-     if ((int)addrlen < 0) {
-         return -TARGET_EINVAL;
-     }
- 
-     if (!access_ok(VERIFY_WRITE, target_addr, addrlen))
--        return -TARGET_EINVAL;
-+        return -TARGET_EFAULT;
- 
-     addr = alloca(addrlen);
- 
++    env->sregs[CPENABLE] = 0xff;
+ #endif
+     env->sregs[VECBASE] = env->config->vecbase;
+     env->sregs[IBREAKENABLE] = 0;
 -- 
 2.26.2
 
