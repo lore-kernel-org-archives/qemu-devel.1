@@ -7,61 +7,61 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC03AC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E0EBC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:45:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 683DC207F7
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:43:33 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 683DC207F7
+	by mail.kernel.org (Postfix) with ESMTPS id F0093207F7
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 12:45:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F0093207F7
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40338 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44992 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX1qW-0001Mq-H4
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 08:43:32 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49670)
+	id 1kX1s6-0003NJ-Ta
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 08:45:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49440)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX1ob-00086C-9A
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:41:34 -0400
-Received: from us-smtp-delivery-44.mimecast.com ([207.211.30.44]:44866)
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX1o2-0007bC-Ry
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:40:59 -0400
+Received: from us-smtp-delivery-44.mimecast.com ([205.139.111.44]:43030)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX1oX-0007YX-Ua
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:41:32 -0400
+ (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX1nz-0007Sb-2p
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 08:40:58 -0400
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-101-yMjQvGxEOQaQ_CLlSGR1mg-1; Mon, 26 Oct 2020 08:41:21 -0400
-X-MC-Unique: yMjQvGxEOQaQ_CLlSGR1mg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-172-RpLFQiOWOyuxOy1thYqQ_g-1; Mon, 26 Oct 2020 08:40:50 -0400
+X-MC-Unique: RpLFQiOWOyuxOy1thYqQ_g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7ECFCA0BEB;
- Mon, 26 Oct 2020 12:40:56 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 750D05AED2;
+ Mon, 26 Oct 2020 12:40:49 +0000 (UTC)
 Received: from bahia.lan (ovpn-112-70.ams2.redhat.com [10.36.112.70])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9EEEE28545;
- Mon, 26 Oct 2020 12:40:55 +0000 (UTC)
-Subject: [PATCH 4/4] spapr: Improve spapr_reallocate_hpt() error reporting
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2F4185DC1B;
+ Mon, 26 Oct 2020 12:40:47 +0000 (UTC)
+Subject: [PATCH 3/4] target/ppc: Fix kvmppc_load_htab_chunk() error reporting
 From: Greg Kurz <groug@kaod.org>
 To: David Gibson <david@gibson.dropbear.id.au>
-Date: Mon, 26 Oct 2020 13:40:54 +0100
-Message-ID: <160371605460.305923.5890143959901241157.stgit@bahia.lan>
+Date: Mon, 26 Oct 2020 13:40:47 +0100
+Message-ID: <160371604713.305923.5264900354159029580.stgit@bahia.lan>
 In-Reply-To: <160371602625.305923.7832478283946753271.stgit@bahia.lan>
 References: <160371602625.305923.7832478283946753271.stgit@bahia.lan>
 User-Agent: StGit/0.21
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=groug@kaod.org
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: kaod.org
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: softfail client-ip=207.211.30.44; envelope-from=groug@kaod.org;
+Received-SPF: softfail client-ip=205.139.111.44; envelope-from=groug@kaod.org;
  helo=us-smtp-delivery-44.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 08:40:32
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 08:40:37
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -11
 X-Spam_score: -1.2
@@ -85,120 +85,107 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-spapr_reallocate_hpt() has three users, two of which pass &error_fatal
-and the third one, htab_load(), passes &local_err, uses it to detect
-failures and simply propagates -EINVAL up to vmstate_load(), which will
-cause QEMU to exit. It is thus confusing that spapr_reallocate_hpt()
-doesn't return right away when an error is detected in some cases. Also,
-the comment suggesting that the caller is welcome to try to carry on
-seems like a remnant in this respect.
+If kvmppc_load_htab_chunk() fails, its return value is propagated up
+to vmstate_load(). It should thus be a negative errno, not -1 (which
+maps to EPERM and would lure the user into thinking that the problem
+is necessarily related to a lack of privilege).
 
-This can be improved:
-- change spapr_reallocate_hpt() to always report a negative errno on
-  failure, either as reported by KVM or -ENOSPC if the HPT is smaller
-  than what was asked,
-- use that to detect failures in htab_load() which is preferred over
-  checking &local_err,
-- propagate this negative errno to vmstate_load() because it is more
-  accurate than propagating -EINVAL for all possible errors.
+Return the error reported by KVM or ENOSPC in case of short write.
+While here, propagate the error message through an @errp argument
+and have the caller to print it with error_report_err() instead
+of relying on fprintf().
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
 ---
- hw/ppc/spapr.c         |   18 ++++++++++--------
- include/hw/ppc/spapr.h |    3 +--
- 2 files changed, 11 insertions(+), 10 deletions(-)
+ hw/ppc/spapr.c       |    4 +++-
+ target/ppc/kvm.c     |   11 +++++------
+ target/ppc/kvm_ppc.h |    5 +++--
+ 3 files changed, 11 insertions(+), 9 deletions(-)
 
 diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index ff7de7da2875..12a012d9dd09 100644
+index f51b663f7dcb..ff7de7da2875 100644
 --- a/hw/ppc/spapr.c
 +++ b/hw/ppc/spapr.c
-@@ -1483,8 +1483,7 @@ void spapr_free_hpt(SpaprMachineState *spapr)
-     close_htab_fd(spapr);
- }
+@@ -2341,8 +2341,10 @@ static int htab_load(QEMUFile *f, void *opaque, int =
+version_id)
 =20
--void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
--                          Error **errp)
-+int spapr_reallocate_hpt(SpaprMachineState *spapr, int shift, Error **errp=
-)
- {
-     ERRP_GUARD();
-     long rc;
-@@ -1496,7 +1495,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
-nt shift,
+             assert(fd >=3D 0);
 =20
-     if (rc =3D=3D -EOPNOTSUPP) {
-         error_setg(errp, "HPT not supported in nested guests");
--        return;
-+        return -EOPNOTSUPP;
-     }
-=20
-     if (rc < 0) {
-@@ -1504,8 +1503,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
-nt shift,
-         error_setg_errno(errp, errno, "Failed to allocate KVM HPT of order=
- %d",
-                          shift);
-         error_append_hint(errp, "Try smaller maxmem?\n");
--        /* This is almost certainly fatal, but if the caller really
--         * wants to carry on with shift =3D=3D 0, it's welcome to try */
-+        return -errno;
-     } else if (rc > 0) {
-         /* kernel-side HPT allocated */
-         if (rc !=3D shift) {
-@@ -1513,6 +1511,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
-nt shift,
-                        "Requested order %d HPT, but kernel allocated order=
- %ld",
-                        shift, rc);
-             error_append_hint(errp, "Try smaller maxmem?\n");
-+            return -ENOSPC;
-         }
-=20
-         spapr->htab_shift =3D shift;
-@@ -1533,6 +1532,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr, i=
-nt shift,
-     /* We're setting up a hash table, so that means we're not radix */
-     spapr->patb_entry =3D 0;
-     spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
-+    return 0;
- }
-=20
- void spapr_setup_hpt(SpaprMachineState *spapr)
-@@ -2286,11 +2286,13 @@ static int htab_load(QEMUFile *f, void *opaque, int=
- version_id)
-     }
-=20
-     if (section_hdr) {
-+        int ret;
-+
-         /* First section gives the htab size */
--        spapr_reallocate_hpt(spapr, section_hdr, &local_err);
--        if (local_err) {
-+        ret =3D spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-+        if (ret < 0) {
-             error_report_err(local_err);
--            return -EINVAL;
-+            return ret;
-         }
-         return 0;
-     }
-diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-index bb47896f173b..2e89e36cfbdc 100644
---- a/include/hw/ppc/spapr.h
-+++ b/include/hw/ppc/spapr.h
-@@ -846,8 +846,7 @@ void spapr_hotplug_req_add_by_count_indexed(SpaprDrcTyp=
-e drc_type,
- void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
-                                                uint32_t count, uint32_t in=
-dex);
- int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
--void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
--                          Error **errp);
-+int spapr_reallocate_hpt(SpaprMachineState *spapr, int shift, Error **errp=
+-            rc =3D kvmppc_load_htab_chunk(f, fd, index, n_valid, n_invalid=
 );
- void spapr_clear_pending_events(SpaprMachineState *spapr);
- void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr);
- int spapr_max_server_number(SpaprMachineState *spapr);
++            rc =3D kvmppc_load_htab_chunk(f, fd, index, n_valid, n_invalid=
+,
++                                        &local_err);
+             if (rc < 0) {
++                error_report_err(local_err);
+                 return rc;
+             }
+         }
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index d85ba8ffe00b..0223b93ea561 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -2683,7 +2683,7 @@ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufs=
+ize, int64_t max_ns)
+ }
+=20
+ int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+-                           uint16_t n_valid, uint16_t n_invalid)
++                           uint16_t n_valid, uint16_t n_invalid, Error **e=
+rrp)
+ {
+     struct kvm_get_htab_header *buf;
+     size_t chunksize =3D sizeof(*buf) + n_valid * HASH_PTE_SIZE_64;
+@@ -2698,14 +2698,13 @@ int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uin=
+t32_t index,
+=20
+     rc =3D write(fd, buf, chunksize);
+     if (rc < 0) {
+-        fprintf(stderr, "Error writing KVM hash table: %s\n",
+-                strerror(errno));
+-        return rc;
++        error_setg_errno(errp, errno, "Error writing the KVM hash table");
++        return -errno;
+     }
+     if (rc !=3D chunksize) {
+         /* We should never get a short write on a single chunk */
+-        fprintf(stderr, "Short write, restoring KVM hash table\n");
+-        return -1;
++        error_setg(errp, "Short write while restoring the KVM hash table")=
+;
++        return -ENOSPC;
+     }
+     return 0;
+ }
+diff --git a/target/ppc/kvm_ppc.h b/target/ppc/kvm_ppc.h
+index 72e05f1cd2fc..73ce2bc95114 100644
+--- a/target/ppc/kvm_ppc.h
++++ b/target/ppc/kvm_ppc.h
+@@ -56,7 +56,7 @@ int kvmppc_define_rtas_kernel_token(uint32_t token, const=
+ char *function);
+ int kvmppc_get_htab_fd(bool write, uint64_t index, Error **errp);
+ int kvmppc_save_htab(QEMUFile *f, int fd, size_t bufsize, int64_t max_ns);
+ int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t index,
+-                           uint16_t n_valid, uint16_t n_invalid);
++                           uint16_t n_valid, uint16_t n_invalid, Error **e=
+rrp);
+ void kvmppc_read_hptes(ppc_hash_pte64_t *hptes, hwaddr ptex, int n);
+ void kvmppc_write_hpte(hwaddr ptex, uint64_t pte0, uint64_t pte1);
+ bool kvmppc_has_cap_fixup_hcalls(void);
+@@ -316,7 +316,8 @@ static inline int kvmppc_save_htab(QEMUFile *f, int fd,=
+ size_t bufsize,
+ }
+=20
+ static inline int kvmppc_load_htab_chunk(QEMUFile *f, int fd, uint32_t ind=
+ex,
+-                                         uint16_t n_valid, uint16_t n_inva=
+lid)
++                                         uint16_t n_valid, uint16_t n_inva=
+lid,
++                                         Error **errp)
+ {
+     abort();
+ }
 
 
 
