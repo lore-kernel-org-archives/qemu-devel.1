@@ -2,79 +2,78 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60789C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:34:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 794F6C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:35:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B416F205ED
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:34:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1FAE2205ED
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:35:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ey1jqs7d"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B416F205ED
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WDmGph4D"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FAE2205ED
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39514 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42914 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5S0-0006UN-Ov
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:34:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60610)
+	id 1kX5T9-0007sY-8K
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:35:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33380)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5Eq-00053v-L6
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34940)
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kX5IB-0001L2-9H
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:24:19 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39179)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5Eo-0000Kv-HM
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:52 -0400
+ (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kX5I9-0000tE-Ir
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:24:18 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603729249;
+ s=mimecast20190719; t=1603729456;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y02Z/CC8OZHxarIgsqkohNKx5yggt0q6ZHCms91H9aM=;
- b=ey1jqs7dWWfmE0ReJsY/bZ3G+yi3SmOuXlRtHavFyYsSaQ7yUZy46z+S40pCE8JCc8hw7I
- VOxd8lpWZTBWvf17smLj9GeiPBGcqLDT0KiW9iOuGiu+Mbdm+c46rQdNcDE+cZYhU7KwIm
- VP/W1hVftX0/H/UcbtOtt6lFD7DcVD0=
+ bh=qlPyrBzjf0GWK4BZ19lZ/OgTeZYhHxiaxiUxad17xG8=;
+ b=WDmGph4D1hEZ5agKNrr1WHvkdem2+2vXlo25SkmJj4Rbr0O6OmMbqSmuQxb0KBMIpNze5n
+ CeY+tqyavkrGJtNyljckivmPLabFmqVqZg4WpUj0oduNkLO78Y8rmttB/6P304lwQFmMXv
+ JxBQnF+1nyOtiXkGV4ICEtKCLIcjUyI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-78-GKjkGkJTOf2Hhft2b1_Z3w-1; Mon, 26 Oct 2020 12:20:46 -0400
-X-MC-Unique: GKjkGkJTOf2Hhft2b1_Z3w-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-344-vf2RaRnQM2ueqa78mOClww-1; Mon, 26 Oct 2020 12:24:12 -0400
+X-MC-Unique: vf2RaRnQM2ueqa78mOClww-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F3598EC502;
- Mon, 26 Oct 2020 16:20:44 +0000 (UTC)
-Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
- [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B68FB5D9E4;
- Mon, 26 Oct 2020 16:20:43 +0000 (UTC)
-From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org, yubihong@huawei.com, peterx@redhat.com,
- peter.maydell@linaro.org
-Subject: [PULL 12/16] migration: Introduce migrate_send_rp_message_req_pages()
-Date: Mon, 26 Oct 2020 16:19:48 +0000
-Message-Id: <20201026161952.149188-13-dgilbert@redhat.com>
-In-Reply-To: <20201026161952.149188-1-dgilbert@redhat.com>
-References: <20201026161952.149188-1-dgilbert@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE8EE18A072B;
+ Mon, 26 Oct 2020 16:24:09 +0000 (UTC)
+Received: from gondolin (ovpn-113-108.ams2.redhat.com [10.36.113.108])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E24EB6EF46;
+ Mon, 26 Oct 2020 16:23:54 +0000 (UTC)
+Date: Mon, 26 Oct 2020 17:23:52 +0100
+From: Cornelia Huck <cohuck@redhat.com>
+To: Kirti Wankhede <kwankhede@nvidia.com>
+Subject: Re: [PATCH v29 04/17] vfio: Add migration region initialization and
+ finalize function
+Message-ID: <20201026172352.4536493f.cohuck@redhat.com>
+In-Reply-To: <1603704987-20977-5-git-send-email-kwankhede@nvidia.com>
+References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
+ <1603704987-20977-5-git-send-email-kwankhede@nvidia.com>
+Organization: Red Hat GmbH
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -97,68 +96,39 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: quintela@redhat.com
+Cc: cjia@nvidia.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
+ Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
+ qemu-devel@nongnu.org, peterx@redhat.com, eauger@redhat.com, artemp@nvidia.com,
+ yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
+ armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
+ felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
+ kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
+ alex.williamson@redhat.com, changpeng.liu@intel.com, eskultet@redhat.com,
+ Ken.Xue@amd.com, jonathan.davies@nutanix.com, pbonzini@redhat.com,
+ dnigam@nvidia.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+On Mon, 26 Oct 2020 15:06:14 +0530
+Kirti Wankhede <kwankhede@nvidia.com> wrote:
 
-This is another layer wrapper for sending a page request to the source VM.  The
-new migrate_send_rp_message_req_pages() will be used elsewhere in coming
-patches.
+> Whether the VFIO device supports migration or not is decided based of
+> migration region query. If migration region query is successful and migration
+> region initialization is successful then migration is supported else
+> migration is blocked.
+> 
+> Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+> Reviewed-by: Neo Jia <cjia@nvidia.com>
+> Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+> ---
+>  hw/vfio/meson.build           |   1 +
+>  hw/vfio/migration.c           | 122 ++++++++++++++++++++++++++++++++++++++++++
+>  hw/vfio/trace-events          |   3 ++
+>  include/hw/vfio/vfio-common.h |   9 ++++
+>  4 files changed, 135 insertions(+)
+>  create mode 100644 hw/vfio/migration.c
 
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20201021212721.440373-3-peterx@redhat.com>
-Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.c | 10 ++++++++--
- migration/migration.h |  2 ++
- 2 files changed, 10 insertions(+), 2 deletions(-)
-
-diff --git a/migration/migration.c b/migration/migration.c
-index e050f5726b..ed122ff8d9 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -316,8 +316,8 @@ error:
-  *   Start: Address offset within the RB
-  *   Len: Length in bytes required - must be a multiple of pagesize
-  */
--int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
--                              ram_addr_t start)
-+int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
-+                                      RAMBlock *rb, ram_addr_t start)
- {
-     uint8_t bufc[12 + 1 + 255]; /* start (8), len (4), rbname up to 256 */
-     size_t msglen = 12; /* start + len */
-@@ -353,6 +353,12 @@ int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
-     return migrate_send_rp_message(mis, msg_type, msglen, bufc);
- }
- 
-+int migrate_send_rp_req_pages(MigrationIncomingState *mis,
-+                              RAMBlock *rb, ram_addr_t start)
-+{
-+    return migrate_send_rp_message_req_pages(mis, rb, start);
-+}
-+
- static bool migration_colo_enabled;
- bool migration_incoming_colo_enabled(void)
- {
-diff --git a/migration/migration.h b/migration/migration.h
-index 99784b44bd..9c1cba98d6 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -332,6 +332,8 @@ void migrate_send_rp_pong(MigrationIncomingState *mis,
-                           uint32_t value);
- int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
-                               ram_addr_t start);
-+int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
-+                                      RAMBlock *rb, ram_addr_t start);
- void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
-                                  char *block_name);
- void migrate_send_rp_resume_ack(MigrationIncomingState *mis, uint32_t value);
--- 
-2.28.0
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 
 
