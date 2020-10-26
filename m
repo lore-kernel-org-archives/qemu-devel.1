@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BBDEEC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 23:31:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D206C56201
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 23:31:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46671207F7
+	by mail.kernel.org (Postfix) with ESMTPS id ACB6E20872
 	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 23:31:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YjyO25H7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46671207F7
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVYUIsqd"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ACB6E20872
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55146 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54968 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXBxy-00054y-0j
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 19:31:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59020)
+	id 1kXBxv-00050O-IZ
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 19:31:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXBw5-00037D-D9
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 19:29:58 -0400
-Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:40491)
+ id 1kXBvu-00034B-Dh
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 19:29:46 -0400
+Received: from mail-ed1-x535.google.com ([2a00:1450:4864:20::535]:40494)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXBw3-0000Go-UZ
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 19:29:57 -0400
-Received: by mail-ed1-x531.google.com with SMTP id p93so1163742edd.7
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 16:29:55 -0700 (PDT)
+ id 1kXBvs-0000G4-Uj
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 19:29:46 -0400
+Received: by mail-ed1-x535.google.com with SMTP id p93so1163116edd.7
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 16:29:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=sender:from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=IPy8xSDiS043tJ1qMib/hHCsnldOT9q1j5PDtKMfWf4=;
- b=YjyO25H7f/AlgxZ5zvDpiKR2vl+Tonxb/fesN+Lhox3oU9iYqtExyvrDPb6UElb54C
- uB59d+9aximzMS544QjdpUTAE64RGtjMpV/NYUueabxJIAoMZxqpzdooiOewpcnOOPXZ
- EX9tNd7sBh8BbwVXO+JhAkwqO+n8AraQcnCblpA1NpAYrZTYTv23j0YBXcpYJWmPgI8v
- S2sS/oNWJYWhpBj6hrZ/uapW95jxDblqkBJeNrHmus9kRmQ9htoBsup/srj9mtmgywko
- w3hmwR2VymCvtLLMDE5eTlvwxHpXI4COkuLUQ8CHzYH5foaZ4faBHwtmJa/Y7t44lBuy
- 1eXw==
+ bh=urFZaeBJKljDRkArj0HwcSmE633p30vmh0ol15kKy9E=;
+ b=mVYUIsqdMcm4JDdnKtYSmnLzcAatosaK79SgzMhDRVgep3RogvqG66cjf7Di22kUx7
+ 3AUNiiBuOydJFnaw+x5n1VQiTGJ32VVvPisI33ZIcYpe7X+wq31hDkq1vy085SjkNcfR
+ YZv11qr0l7v6cy92OQIXnMb1djFD9FdBTio0TK5HXRGQZSYyQ2M8yoJOp8vf8lNtTVgl
+ ChQD/cxtkMsfABLbpos/mjLJPcrqUTPi9ZlRHdgNdEKGVj+aL7WMZmHfoq6KK8IbU3mN
+ FkSj0mgirpXChqywlclbK0v2kHq5qsWsgEHqMWW25pP6HFaqUlZ2vxPK9SdosdvHqt42
+ jHXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
  :in-reply-to:references:mime-version:content-transfer-encoding;
- bh=IPy8xSDiS043tJ1qMib/hHCsnldOT9q1j5PDtKMfWf4=;
- b=arZmaLlXXMRxDr1cTPO0reSIQG1OqCLzRozyr+y6dA6+YXN0W4W7/zmphfpGzt6WH6
- smdq+TWdHipYhznzjSP4ZJOxMjk4g0gLXAY+JuY0ulICWJu+U6DVo1w7EO6ZDE6T1WiH
- UUhtH1SNrJIPOo/K/t3cKTje4Gds/nxV9EBUCd0t9eOXoX0O5RnkYftKLKqNEOktQSX/
- 4G8DLtm96NEAWCZ0CBDHObqVN/KrQhpqCdQ3/F4qL9igjhmk6Hj7xAtcot5DMMrXPoNO
- 1rTI+YeELcIDVPCYH/DtZ/xItvytGDnwZdtWh1zuvRgMbhF/WUEM14nfXPC442QnMiUA
- LO+Q==
-X-Gm-Message-State: AOAM530rjZvr+PVLWelKrRUZD6vmJuRwgNKsZuRYvt1Pif4pM1jgO3Zh
- nS4on6scw+NtV8ZpbRwH0v1aXSWtAH0=
-X-Google-Smtp-Source: ABdhPJy8qozl7+BUfvRi4eLSqZDBe8zDdIX521ymCx58GbHStOofoFONEal03BDnOO4StkVlSAGnGQ==
-X-Received: by 2002:aa7:c5c4:: with SMTP id h4mr18733480eds.379.1603754994405; 
- Mon, 26 Oct 2020 16:29:54 -0700 (PDT)
+ bh=urFZaeBJKljDRkArj0HwcSmE633p30vmh0ol15kKy9E=;
+ b=DIysfLqItitLIqFf5+badZoaZU73j5MAwSNr/JVXDxevX/J6EtH/BTxURvXXb6SQH2
+ +bf+7ulajs8kCPdWZQNA+FzLIOzinOGaTmXB4pFllfcZkEKIp6l82hMhiK3us70yucI9
+ GR4BsGk1eePrnLn17LJOMH4a8quV+lRqz9ROeE0KwU2n/KxrmEEWmaA32lEhKrUqItBy
+ 0kyZyYFoIJz1q9D3f0mtovepoHRDSm4npp6tP6gLBsOJsRxlLOze+4GfF9wlgJxsetxd
+ lobK1NcwLRSTw4ym/9toXjlX4EebaG/RoTSDNrwxh7pr29XUD2FcdKwZQn0fM+fP7iuN
+ XuKg==
+X-Gm-Message-State: AOAM532cN6mFDD4oR2SXICf7+BwfomVC8Ml6aq9LrKc6b6G3Da+H0Jcy
+ O9Xm9r4KFVDKQRvmPTqQ5CG/6AMWlLY=
+X-Google-Smtp-Source: ABdhPJyW6/eo7p9K54Vvl072fTYA7gHXy/vs5BzmhhMbmYP+49xJ2JAnHIR8KWBBcHl58hCCZDKbHg==
+X-Received: by 2002:a05:6402:a45:: with SMTP id
+ bt5mr2669162edb.101.1603754983034; 
+ Mon, 26 Oct 2020 16:29:43 -0700 (PDT)
 Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id c5sm6003342edx.58.2020.10.26.16.29.52
+ by smtp.gmail.com with ESMTPSA id q9sm6642658ejr.115.2020.10.26.16.29.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 16:29:53 -0700 (PDT)
+ Mon, 26 Oct 2020 16:29:42 -0700 (PDT)
 From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 3/8] hw/timer/sh_timer: Silence warnings about missing
- fallthrough statements
-Date: Tue, 27 Oct 2020 00:29:30 +0100
-Message-Id: <20201026232935.92777-4-f4bug@amsat.org>
+Subject: [PULL 1/8] elf: Add EM_RX definition
+Date: Tue, 27 Oct 2020 00:29:28 +0100
+Message-Id: <20201026232935.92777-2-f4bug@amsat.org>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201026232935.92777-1-f4bug@amsat.org>
 References: <20201026232935.92777-1-f4bug@amsat.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::531;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x531.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::535;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x535.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -14
@@ -104,66 +104,39 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Richard Henderson <richard.henderson@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Magnus Damm <magnus.damm@gmail.com>,
+ Magnus Damm <magnus.damm@gmail.com>,
  =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Yoshinori Sato <ysato@users.sourceforge.jp>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Thomas Huth <thuth@redhat.com>
+From: Yoshinori Sato <ysato@users.sourceforge.jp>
 
-When compiling with -Werror=implicit-fallthrough, gcc complains about
-missing fallthrough annotations in this file. Looking at the code,
-the fallthrough is very likely intended here, so add some comments
-to silence the compiler warnings.
+RX's ELF machine is not defined in "elf.h".
+Added it.
 
-Fixes: cd1a3f6840e ("Stand-alone TMU emulation code")
-Signed-off-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
 Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Message-Id: <20201020153935.54315-3-thuth@redhat.com>
+Message-Id: <20200814131438.28406-1-ysato@users.sourceforge.jp>
 Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 ---
- hw/timer/sh_timer.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ include/elf.h | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/hw/timer/sh_timer.c b/hw/timer/sh_timer.c
-index b09e30f9388..934daaa7dcc 100644
---- a/hw/timer/sh_timer.c
-+++ b/hw/timer/sh_timer.c
-@@ -122,6 +122,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_EXTCLK) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved TPSC value\n");
-             break;
-@@ -135,6 +136,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_EXTCLK) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved CKEG value\n");
-             break;
-@@ -147,6 +149,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             if (s->feat & TIMER_FEAT_CAPT) {
-                 break;
-             }
-+            /* fallthrough */
-         default:
-             hw_error("sh_timer_write: Reserved ICPE value\n");
-             break;
-@@ -180,6 +183,7 @@ static void sh_timer_write(void *opaque, hwaddr offset,
-             s->tcpr = value;
-             break;
-         }
-+        /* fallthrough */
-     default:
-         hw_error("sh_timer_write: Bad offset %x\n", (int)offset);
-     }
+diff --git a/include/elf.h b/include/elf.h
+index c117a4d1ab0..d9bf4a95d86 100644
+--- a/include/elf.h
++++ b/include/elf.h
+@@ -172,6 +172,8 @@ typedef struct mips_elf_abiflags_v0 {
+ 
+ #define EM_UNICORE32    110     /* UniCore32 */
+ 
++#define EM_RX           173     /* Renesas RX family */
++
+ #define EM_RISCV        243     /* RISC-V */
+ 
+ #define EM_NANOMIPS     249     /* Wave Computing nanoMIPS */
 -- 
 2.26.2
 
