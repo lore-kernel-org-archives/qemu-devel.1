@@ -2,79 +2,88 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9800CC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:30:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD941C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:30:12 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0530A2076D
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:30:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 027B22076D
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:30:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="LkVXQIat"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0530A2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q7V6xsHu"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 027B22076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47488 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzlL-0000AD-KZ
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:30:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40226)
+	id 1kWzlS-0000OZ-Qi
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:30:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40268)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzSP-0007uT-2f
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:29 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:17900)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzSF-00080f-Fi
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:28 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f96a0730000>; Mon, 26 Oct 2020 03:09:55 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL105.nvidia.com
- (172.20.187.12) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
- 2020 10:10:10 +0000
-Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Oct 2020 10:10:02 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v29 02/17] vfio: Add vfio_get_object callback to VFIODeviceOps
-Date: Mon, 26 Oct 2020 15:06:12 +0530
-Message-ID: <1603704987-20977-3-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
-References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSR-0007yT-Fv
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:31 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31123)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSF-0007xD-DP
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603707013;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=9Zbrf/7MIKoxLr6GRVvazu/PJkW22ZqrIAHcrpYs15I=;
+ b=Q7V6xsHu2SATIbaHFzvhUGdNLoHt+ePDYsntsh7BwCTYdOthAiQRiW/FggBnxD3tOrZPSE
+ 5QVDJbVVuNoEh/SqjblON7+zIes8jKpkV1Xt21mVV1Y9oh3zEjLBEvMAhKpLZlxf63pktQ
+ Jb0qP05yI31QaaDKOSBzgZcZapw9QKk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-8-pO-bLKsXOou7oaYQtG7HJQ-1; Mon, 26 Oct 2020 06:10:11 -0400
+X-MC-Unique: pO-bLKsXOou7oaYQtG7HJQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FDA3188C136;
+ Mon, 26 Oct 2020 10:10:10 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 493815C1DC;
+ Mon, 26 Oct 2020 10:10:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id C41181138468; Mon, 26 Oct 2020 11:10:05 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] char: Factor out qemu_chr_print_types()
+Date: Mon, 26 Oct 2020 11:10:03 +0100
+Message-Id: <20201026101005.2940615-3-armbru@redhat.com>
+In-Reply-To: <20201026101005.2940615-1-armbru@redhat.com>
+References: <20201026101005.2940615-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603706995; bh=mU8d8K+D3qa+ZRgdEnJg1v/fWKHItlS0NCXLsW8dowA=;
- h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
- References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=LkVXQIattpYAfMMfKzfw7YWJXP+K0q4Ue+NbriduhnUgmBk8ruRrV5qdhG6elB+iI
- 1FI6OXaNVJ5qYB9nHm5yRx1MGBBb2Zh9I+aeKDr//CnEhY9QTSd7zysN/PBx+zNzP9
- qG9LOPkBNdwlIvDHlU3jOhfWcPQfrgdmaBqjtYPILah7Y/VwtlCUTkO5nmdUEYFw7h
- sW2zKwKgd1AqVUGgcd7cWlQxE7lBIZFBGRsy/yvYLDjX6NaIMUUYIbmUZg6GpndMty
- EwPFlG96262fsj2plzr7eOMNX9kIL9/Z6nnbCnpp4uDvtJOOWExDuWxPkKWGfK4aQT
- nBCqhSxRVjysQ==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 06:10:16
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -87,67 +96,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, artemp@nvidia.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
+Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hook vfio_get_object callback for PCI devices.
+From: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+We'll want to call the same from a non-QemuOpts code path.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Message-Id: <20201023161312.460406-3-kwolf@redhat.com>
 ---
- hw/vfio/pci.c                 | 8 ++++++++
- include/hw/vfio/vfio-common.h | 1 +
- 2 files changed, 9 insertions(+)
+ include/chardev/char.h |  1 +
+ chardev/char.c         | 16 ++++++++++------
+ 2 files changed, 11 insertions(+), 6 deletions(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 0d83eb0e47bb..bffd5bfe3b78 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2394,10 +2394,18 @@ static void vfio_pci_compute_needs_reset(VFIODevice *vbasedev)
-     }
+diff --git a/include/chardev/char.h b/include/chardev/char.h
+index db42f0a8c6..3b91645081 100644
+--- a/include/chardev/char.h
++++ b/include/chardev/char.h
+@@ -212,6 +212,7 @@ void qemu_chr_be_update_read_handlers(Chardev *s,
+  */
+ void qemu_chr_be_event(Chardev *s, QEMUChrEvent event);
+ 
++void qemu_chr_print_types(void);
+ int qemu_chr_add_client(Chardev *s, int fd);
+ Chardev *qemu_chr_find(const char *name);
+ 
+diff --git a/chardev/char.c b/chardev/char.c
+index 78553125d3..4d188bfa6f 100644
+--- a/chardev/char.c
++++ b/chardev/char.c
+@@ -633,6 +633,15 @@ ChardevBackend *qemu_chr_parse_opts(QemuOpts *opts, Error **errp)
+     return backend;
  }
  
-+static Object *vfio_pci_get_object(VFIODevice *vbasedev)
++void qemu_chr_print_types(void)
 +{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++    g_autoptr(GString) str = g_string_new("");
 +
-+    return OBJECT(vdev);
++    chardev_name_foreach(help_string_append, str);
++
++    qemu_printf("Available chardev backend types: %s\n", str->str);
 +}
 +
- static VFIODeviceOps vfio_pci_ops = {
-     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-     .vfio_eoi = vfio_intx_eoi,
-+    .vfio_get_object = vfio_pci_get_object,
- };
+ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMainContext *context,
+                                 Error **errp)
+ {
+@@ -644,12 +653,7 @@ Chardev *qemu_chr_new_from_opts(QemuOpts *opts, GMainContext *context,
+     char *bid = NULL;
  
- int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index dc95f527b583..fe99c36a693a 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -119,6 +119,7 @@ struct VFIODeviceOps {
-     void (*vfio_compute_needs_reset)(VFIODevice *vdev);
-     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-     void (*vfio_eoi)(VFIODevice *vdev);
-+    Object *(*vfio_get_object)(VFIODevice *vdev);
- };
+     if (name && is_help_option(name)) {
+-        GString *str = g_string_new("");
+-
+-        chardev_name_foreach(help_string_append, str);
+-
+-        qemu_printf("Available chardev backend types: %s\n", str->str);
+-        g_string_free(str, true);
++        qemu_chr_print_types();
+         return NULL;
+     }
  
- typedef struct VFIOGroup {
 -- 
-2.7.0
+2.26.2
 
 
