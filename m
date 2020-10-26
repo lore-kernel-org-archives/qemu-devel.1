@@ -2,75 +2,76 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E94BCC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:57:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A52C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:57:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 55C0D20795
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:57:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 706B520706
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:57:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IJlTb3+i"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 55C0D20795
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PanpVx+s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 706B520706
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38548 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39702 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWyJf-0002uC-42
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:57:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50280)
+	id 1kWyK8-0003Q6-9Y
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:57:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50354)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIF-0001W4-Tt; Mon, 26 Oct 2020 04:55:55 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:33822)
+ id 1kWyIR-0001ji-4k; Mon, 26 Oct 2020 04:56:07 -0400
+Received: from mail-yb1-xb43.google.com ([2607:f8b0:4864:20::b43]:42868)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIE-0005XW-7t; Mon, 26 Oct 2020 04:55:55 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id o70so7011579ybc.1;
- Mon, 26 Oct 2020 01:55:53 -0700 (PDT)
+ id 1kWyIO-0005en-Kf; Mon, 26 Oct 2020 04:56:06 -0400
+Received: by mail-yb1-xb43.google.com with SMTP id a12so6990020ybg.9;
+ Mon, 26 Oct 2020 01:56:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=PqD5rL0+SXSsSU1Qx2tFHM/n3e5AcxAZZyLeFT/9anc=;
- b=IJlTb3+iGhFHmNJjrHCNW8jS516atKPMHKsaKOeyDSLqW3+VAGihx4TC7G+jG0X7Xf
- to+4y3beAl0CLbqoveBu2m13FtvZCOUDQZfks8zop8a+uL5QLOKOD+RiCF3b2EmMeQOn
- Nf03VubI0I1DSfC0ob8nFMqOUwjamEHl8kkN2y4jvYWnpp2gTEFcY14V2UyicsMxydHq
- Su7d3mSWDsIG2xN+TK45xwM8JyLGwyvg4Zu3B4EnWdYHsfrWhteDlJlCr2yrmTm7aYp8
- bQt5P7MNgFmkE5gwKoNRACHFt4WqAaN23ZyXdEwU4B+aC+pidvAwfHHVg2+ImJU21c5R
- /dfg==
+ :cc; bh=MKEMOv9vqXWKtvkIigSj+6rFSvUIpO/mtMVTTbCV1z4=;
+ b=PanpVx+sxPdQUBx6XnvtwrP4kemSti18wi31NZZUSbM68IpRKOaVhhCNKh0jxyWNzx
+ CVr1iZrg6Ha7m/Mg73NjtYp59zKmPbPokPBvq10BJVE4ghnLD8cWAhiR0VtTVzzLjrJ/
+ fTFdffmPtrFBLTvRfOgU0lePOzCjL97CvsHSdm9/BA6AI2xGMRM2KWKXi4UrqQ5fEj9G
+ 0c9ocayN14XVIkVauw0ADo8V7agTkQkAj90A4jE73itL3tVryIX9LL8JfBqazw0mcwLR
+ a2x9zwxOSBOjgE//vn++DcelWZFd/g5K1fQ3gFV2Lvz9WfEmzNn0stCSOVvchDIJsnJU
+ aqzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=PqD5rL0+SXSsSU1Qx2tFHM/n3e5AcxAZZyLeFT/9anc=;
- b=sjeZCw5VRiO2z+RWHpnqGsdmgQHvpuXl1qB2Tfz86JjhN/lcxJl8TKrjw2Icvlabab
- LhbAlx0xhkNoOX/zu4DeJrH344CRCKSK5yoD5kZ8IjNtcmeGnpZnAuQrFLOgp5vUAWU1
- alPwNUyMN+Fzl08cFLHjxBOp73jNZ10Ypx3QJXpTVmUDskp4gHtEaiEwxeI0xLtZc3BK
- y+JXuPbGPdbGAI0McWdTYWsAOFfnhNAQ3FzDTWIpfflKDiLo1YklEAVPOwh/mIqyMcKY
- ZofLBhuBfwZ5L162oyFSLrZsS1nRVTW6RZPqJFbHLV5tZ6FjCWK/toZJHznIfwO+azyD
- O3+Q==
-X-Gm-Message-State: AOAM532SUpQB5vSckGU/Z2T57lcq8BrOXx/Yv49BErNpPYsBT6w2XHa2
- wip/zkllDS7ZE2LTwfeOkl4wObauAdq4oaItl2s=
-X-Google-Smtp-Source: ABdhPJz9pSu06JbU4/MQcRj1hNjeE9Ozn4j3Gnu/dhs5r1Yv8L1mbhlkPexvrjp4WJWy75fDXKxT2jVtN4H5XNqDM2Q=
-X-Received: by 2002:a25:328a:: with SMTP id
- y132mr18121224yby.306.1603702552683; 
- Mon, 26 Oct 2020 01:55:52 -0700 (PDT)
+ bh=MKEMOv9vqXWKtvkIigSj+6rFSvUIpO/mtMVTTbCV1z4=;
+ b=NEpdfyyCWvHvr6AE5YU77LoZQiBEC2voxHUL+DNSujzMYf/IlU9dKo+fIvx45Y2EzO
+ D/dKmG/giQrppDTAxe/VzIgUk8GyGC+rHdahAL5dRsaElRIzavMRJ5WAS5JR+c+TtoR4
+ 0Mggfjwu/fcRuucK7xzY/IobwlcDCmXSJlcTnbY+OHoHLWhzlmQj9giE3xqrz8GUk7gH
+ ca0Tt2XU3PaYhZFnmNjlf8zZF1hEVfk95VdKP281r7dzgLRx1YIVG4cWtkAk5hbIf/Uv
+ 7VNq3qFiHnfvT0tFYqfv5jaW1dPFM01+1dVbmttTfbkr0IbzvInTWQ1J1dtZEriYKHvo
+ lxeQ==
+X-Gm-Message-State: AOAM5323mCUhmS84ArWXP8h4jh4zrqMr5fH6M4VZn6Fh/o+6Qtz48qFu
+ 1cQJSZBL+wpWsa2A8Y2tZWH8Wm7dwZwdd++Z7To=
+X-Google-Smtp-Source: ABdhPJzs3AAj2QJ2iTwDt4fRY5NqX+NSvXVlrHuEBasunOSIlBtt2zGHvJ9NHbk5t+7mdBtLn/89hB4odGgLrk3eA0I=
+X-Received: by 2002:a25:c1c1:: with SMTP id
+ r184mr17069517ybf.517.1603702562902; 
+ Mon, 26 Oct 2020 01:56:02 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1603467169.git.alistair.francis@wdc.com>
-In-Reply-To: <cover.1603467169.git.alistair.francis@wdc.com>
+ <9710f7917b7a1fcffce2d926005efc3bb84c0152.1603467169.git.alistair.francis@wdc.com>
+In-Reply-To: <9710f7917b7a1fcffce2d926005efc3bb84c0152.1603467169.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 26 Oct 2020 16:55:41 +0800
-Message-ID: <CAEUhbmUYkst2AL6cfiffJSr1T23VJyJsaqFBZe+UzDHreCqNpQ@mail.gmail.com>
-Subject: Re: [PATCH v1 00/16] RISC-V: Start to remove xlen preprocess
+Date: Mon, 26 Oct 2020 16:55:51 +0800
+Message-ID: <CAEUhbmUvBBGAy9hOann+7VGMDv0FiPXztAm-8zM9d95h2gCMJA@mail.gmail.com>
+Subject: Re: [PATCH v1 03/16] riscv: virt: Remove target macro conditionals
 To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b43;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb43.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,59 +101,16 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
-
 On Fri, Oct 23, 2020 at 11:44 PM Alistair Francis
 <alistair.francis@wdc.com> wrote:
 >
-> The RISC-V QEMU port currently has lot of preprocessor directives that
-> check if we are targetting a 32-bit or 64-bit CPU. This means that the
-> 64-bit RISC-V target can not run 32-bit CPUs. This is different to most
-> other QEMU architectures and doesn't allow us to mix xlens (such as when
-> running Hypervisors with different xlen guests).
+> Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+> ---
+>  include/hw/riscv/virt.h | 6 ------
+>  hw/riscv/virt.c         | 2 +-
+>  2 files changed, 1 insertion(+), 7 deletions(-)
 >
-> This series is a step toward removing some of those to allow us to use
-> 32-bit CPUs on 64-bit RISC-V targets.
->
-> Alistair Francis (16):
->   target/riscv: Add a TYPE_RISCV_CPU_BASE CPU
->   riscv: spike: Remove target macro conditionals
->   riscv: virt: Remove target macro conditionals
->   hw/riscv: boot: Remove compile time XLEN checks
->   hw/riscv: virt: Remove compile time XLEN checks
->   hw/riscv: spike: Remove compile time XLEN checks
->   hw/riscv: sifive_u: Remove compile time XLEN checks
->   target/riscv: fpu_helper: Match function defs in HELPER macros
->   target/riscv: Add a riscv_cpu_is_32bit() helper function
->   target/riscv: Specify the XLEN for CPUs
->   target/riscv: cpu: Remove compile time XLEN checks
->   target/riscv: cpu_helper: Remove compile time XLEN checks
->   target/riscv: csr: Remove compile time XLEN checks
->   target/riscv: cpu: Set XLEN independently from target
->   target/riscv: Convert the get/set_field() to support 64-bit values
->   target/riscv: Consolidate *statush registers
->
->  include/hw/riscv/boot.h   |   8 +-
->  include/hw/riscv/spike.h  |   6 --
->  include/hw/riscv/virt.h   |   6 --
->  target/riscv/cpu.h        |  36 ++++---
->  target/riscv/cpu_bits.h   |  24 ++---
->  hw/riscv/boot.c           |  55 ++++++-----
->  hw/riscv/sifive_u.c       |  59 ++++++------
->  hw/riscv/spike.c          |  50 +++++-----
->  hw/riscv/virt.c           |  36 +++----
->  target/riscv/cpu.c        |  83 ++++++++++------
->  target/riscv/cpu_helper.c |  47 +++------
->  target/riscv/csr.c        | 197 ++++++++++++++++++++------------------
->  target/riscv/fpu_helper.c |  16 ++--
->  target/riscv/op_helper.c  |  11 +--
->  14 files changed, 328 insertions(+), 306 deletions(-)
 
-Test result:
-
-64-bit virt & sifive_u, boots OpenSBI and kernel.
-32-bit virt boots OpenSBI and kernel. 32-bit sifive_u does not boot OpenSBI.
-
-Regards,
-Bin
+Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Tested-by: Bin Meng <bin.meng@windriver.com>
 
