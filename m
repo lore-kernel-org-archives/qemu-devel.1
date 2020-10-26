@@ -7,44 +7,44 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A3BBC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:36:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DC02C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:36:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id ECD0D223B0
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:36:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ECD0D223B0
+	by mail.kernel.org (Postfix) with ESMTPS id 6B1D4223B0
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 08:36:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6B1D4223B0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34318 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWxzN-00051F-Sw
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:36:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46000)
+	id 1kWxzQ-00057K-AQ
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 04:36:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46028)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWxxZ-0003El-V8
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:34:33 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46950
+ id 1kWxxh-0003IJ-3q
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:34:41 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:46964
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWxxY-0005xn-9j
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:34:33 -0400
+ id 1kWxxb-0005ys-PC
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 04:34:39 -0400
 Received: from host86-148-103-79.range86-148.btcentralplus.com
  ([86.148.103.79] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kWxxc-00082O-WA; Mon, 26 Oct 2020 08:34:40 +0000
+ id 1kWxxi-00082O-57; Mon, 26 Oct 2020 08:34:43 +0000
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: qemu-devel@nongnu.org,
 	kraxel@redhat.com,
 	samuel.thibault@ens-lyon.org
-Date: Mon, 26 Oct 2020 08:33:54 +0000
-Message-Id: <20201026083401.13231-3-mark.cave-ayland@ilande.co.uk>
+Date: Mon, 26 Oct 2020 08:33:56 +0000
+Message-Id: <20201026083401.13231-5-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
 References: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
@@ -52,8 +52,8 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 86.148.103.79
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH 2/9] dev-serial: use USB_SERIAL QOM macro for USBSerialState
- assignments
+Subject: [PATCH 4/9] dev-serial: add trace-events for baud rate and data
+ parameters
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -84,40 +84,41 @@ Sender: "Qemu-devel"
 
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/usb/dev-serial.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/usb/dev-serial.c | 3 +++
+ hw/usb/trace-events | 2 ++
+ 2 files changed, 5 insertions(+)
 
 diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
-index 7a5fa3770e..77ce89d38b 100644
+index abc316c7bf..badf8785db 100644
 --- a/hw/usb/dev-serial.c
 +++ b/hw/usb/dev-serial.c
-@@ -204,7 +204,7 @@ static void usb_serial_reset(USBSerialState *s)
+@@ -307,6 +307,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         }
  
- static void usb_serial_handle_reset(USBDevice *dev)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
+         s->params.speed = (48000000 / 2) / (8 * divisor + subdivisor8);
++        trace_usb_serial_set_baud(bus->busnr, dev->addr, s->params.speed);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         break;
+     }
+@@ -340,6 +341,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+             goto fail;
+         }
  
-     DPRINTF("Reset\n");
- 
-@@ -243,7 +243,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
-                                       int request, int value, int index,
-                                       int length, uint8_t *data)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
-     int ret;
- 
-     DPRINTF("got control %x, value %x\n", request, value);
-@@ -430,7 +430,7 @@ static void usb_serial_token_in(USBSerialState *s, USBPacket *p)
- 
- static void usb_serial_handle_data(USBDevice *dev, USBPacket *p)
- {
--    USBSerialState *s = (USBSerialState *)dev;
-+    USBSerialState *s = USB_SERIAL(dev);
-     uint8_t devep = p->ep->nr;
-     struct iovec *iov;
-     int i;
++        trace_usb_serial_set_data(bus->busnr, dev->addr, s->params.parity,
++                                  s->params.data_bits, s->params.stop_bits);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         /* TODO: TX ON/OFF */
+         break;
+diff --git a/hw/usb/trace-events b/hw/usb/trace-events
+index e5871cbbbc..9e984b2e0c 100644
+--- a/hw/usb/trace-events
++++ b/hw/usb/trace-events
+@@ -328,3 +328,5 @@ usb_serial_unsupported_parity(int bus, int addr, int value) "dev %d:%d unsupport
+ usb_serial_unsupported_stopbits(int bus, int addr, int value) "dev %d:%d unsupported stop bits %d"
+ usb_serial_unsupported_control(int bus, int addr, int request, int value) "dev %d:%d got unsupported/bogus control 0x%x, value 0x%x"
+ usb_serial_bad_token(int bus, int addr) "dev %d:%d bad token"
++usb_serial_set_baud(int bus, int addr, int baud) "dev %d:%d baud rate %d"
++usb_serial_set_data(int bus, int addr, int parity, int data, int stop) "dev %d:%d parity %c, data bits %d, stop bits %d"
 -- 
 2.20.1
 
