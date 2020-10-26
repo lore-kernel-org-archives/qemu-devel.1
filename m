@@ -2,90 +2,96 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1501FC55178
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:35:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0514AC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:38:15 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E44E206DD
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:35:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 875B521BE5
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:38:14 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MVd+x7Ti"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E44E206DD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="efJSqn7q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875B521BE5
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX2eK-0006ie-CB
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:35:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35242)
+	id 1kX2hR-0007yh-90
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:38:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36180)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kX2d6-0005fI-Lf
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:33:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47675)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kX2gN-0007S4-4K
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:37:07 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36521)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kX2d4-0007LF-EL
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:33:43 -0400
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kX2gL-0007wB-NE
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:37:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603719221;
+ s=mimecast20190719; t=1603719424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=/sH0t7iqbKyVeHOQaisfus6iZfjvBhWUWuPltEdmoMI=;
- b=MVd+x7TiZyUCACmi6sObqqgOjSgrXYR9MimxVz3aDCRZgmoEGeLiqpekF8zSeOoyBB8fEV
- HomaYVvq5RDoG+Op1iIwLZP2GQqpvDvf58zNfC8b0vG3xgby+de12X8Nfu2/+FZH0Fun3o
- Y30hfj7yySAXXvPGriS5D0k/FqagBNQ=
+ bh=7C2ayH26KYGWGb2OWxpQkjx9rYlDwqJAqkRUBSCv78I=;
+ b=efJSqn7qDqGdK/2tItBnwXaACbBv70g9pnOLLFyA75SghFIdvgyyMYBHT+k8+fKpGTFU2S
+ qjKbpiDUQGtijDRldb5H+NTFCqF84uFyMeTkX9wjVMGUxSxwzhsxwP5+3zWfQvdQUkQEk0
+ rf5zaFmmgadgKk2hi6xTYSCvvCmfWu0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-204-oy1A_uPQMaOmRsmj0S9fLA-1; Mon, 26 Oct 2020 09:33:39 -0400
-X-MC-Unique: oy1A_uPQMaOmRsmj0S9fLA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-171-9vAuFOZqOYCFM1klvw0xew-1; Mon, 26 Oct 2020 09:37:02 -0400
+X-MC-Unique: 9vAuFOZqOYCFM1klvw0xew-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 52A13875110;
- Mon, 26 Oct 2020 13:33:38 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id C78B55D9F1;
- Mon, 26 Oct 2020 13:33:34 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 14C50113865F; Mon, 26 Oct 2020 14:33:33 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: Kevin Wolf <kwolf@redhat.com>
-Subject: Re: [PATCH 6/6] qemu-storage-daemon: Use qmp_chardev_add() for
- --chardev
-References: <20201023101222.250147-1-kwolf@redhat.com>
- <20201023101222.250147-7-kwolf@redhat.com>
-Date: Mon, 26 Oct 2020 14:33:32 +0100
-In-Reply-To: <20201023101222.250147-7-kwolf@redhat.com> (Kevin Wolf's message
- of "Fri, 23 Oct 2020 12:12:22 +0200")
-Message-ID: <87wnzdnmc2.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 837EB1882FB3;
+ Mon, 26 Oct 2020 13:37:01 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.18])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB9026EF66;
+ Mon, 26 Oct 2020 13:36:59 +0000 (UTC)
+Date: Mon, 26 Oct 2020 14:36:57 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 25/33] tests/acceptance: Add a test for the N800 and N810
+ arm machines
+Message-ID: <20201026143657.68147517@redhat.com>
+In-Reply-To: <CAFEAcA_wP1t1+o_PnCOotHvs54qSxJQSyuhtbSCSg4oewD43ng@mail.gmail.com>
+References: <20200228163840.23585-1-peter.maydell@linaro.org>
+ <20200228163840.23585-26-peter.maydell@linaro.org>
+ <a049110f-b7cb-52bd-de77-6e1193b5b6de@amsat.org>
+ <6ce6a790-c68e-e3ed-962e-ba6f49244315@redhat.com>
+ <f02d74fb-af6e-6e04-7ce7-48ab09a20e4f@amsat.org>
+ <f2f276a9-a6ad-a2f8-2fbc-f1aca5423f79@amsat.org>
+ <20201023174351.31838a86@redhat.com>
+ <c80350d2-3591-6541-abf3-960b69cedf7d@amsat.org>
+ <20201023210445.2fa72562@redhat.com>
+ <CAFEAcA_wP1t1+o_PnCOotHvs54qSxJQSyuhtbSCSg4oewD43ng@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,140 +104,42 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- pbonzini@redhat.com
+Cc: Thomas Huth <thuth@redhat.com>,
+ Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin Wolf <kwolf@redhat.com> writes:
+On Sun, 25 Oct 2020 17:03:43 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-> While this makes the code quite a bit longer and arguably isn't very
-> elegant, it removes the dependency on QemuOpts from the --chardev option
-> of the storage daemon.
->
-> Going through qmp_chardev_add() already now ensures that semantics and
-> accessible features won't change incompatibly once we QAPIfy it fully.
->
-> Note that there are a few differences between the command line option
-> -chardev in the system emulator and chardev-add in QMP. The --chardev
-> option of qemu-storage-daemon will follow QMP in these respects:
->
-> * All chardev types using ChardevHostdev accept a "path" option on the
->   command line, but QMP renamed it to "device"
->
-> * ChardevSocket:
->
->   - Intentionally different defaults (documented as such): server=false
->     and wait=true (if server=true) on the command line, but server=true
->     and wait=false in QMP.
->
->   - Accidentally different defaults: tight=true on the command line, but
->     tight=false in QMP (this is a bug in commit 776b97d3).
->
->   - QMP has a nested SocketAddressLegacy field, whereas the command line
->     accepts "path"/"host"/"port"/"fd"/etc. on the top level.
->
->   - The command line has a "delay" option, but QMP has "nodelay"
->
-> * ChardevUdp has two SocketAddressLegacy fields, the command line has
->   "host"/"port"/"localaddr"/"localport" on the top level with defaults
->   for values that are mandatory in SocketAddressLegacy
+> On Fri, 23 Oct 2020 at 20:04, Igor Mammedov <imammedo@redhat.com> wrote:
+> >
+> > On Fri, 23 Oct 2020 19:39:16 +0200
+> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote: =20
+> > > Are you saying arm_boot_info should hold a pointer to MachineState*
+> > > instead of duplicating? =20
+> >
+> > yep, some parts of it (fdt related) already use MachineState* so it's
+> > complete rewrite. The same probably applies to the fields you've just
+> > quoted. =20
+>=20
+> Hmm, maybe, maybe not. The original design idea here was that
+> the boot loader code took a structure defining only the things
+> that the bootloader needed to know. It doesn't really need to
+> know about all the stuff that's in MachineState, which is
+> the state structure for the machine.
 
-I found a few more differences when I picked this patch into my "[PATCH
-0/4] qemu-storage-daemon: QAPIfy --chardev the stupid way" series.  I
-worked them into the commit message there.  Please have a look and steal
-the parts that are good.
+Yep It doesn't need all data the MachineState contains, but then we end up
+with this kind of bugs which could be avoided if duplication were not there=
+.
+And some of the fields in  MachineState are pure bootloader data.
 
-> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
-> ---
->  storage-daemon/qemu-storage-daemon.c | 47 ++++++++++++++++++++++------
->  1 file changed, 38 insertions(+), 9 deletions(-)
->
-> diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
-> index e419ba9f19..b543c30951 100644
-> --- a/storage-daemon/qemu-storage-daemon.c
-> +++ b/storage-daemon/qemu-storage-daemon.c
-> @@ -37,6 +37,7 @@
->  #include "qapi/error.h"
->  #include "qapi/qapi-visit-block-core.h"
->  #include "qapi/qapi-visit-block-export.h"
-> +#include "qapi/qapi-visit-char.h"
->  #include "qapi/qapi-visit-control.h"
->  #include "qapi/qmp/qdict.h"
->  #include "qapi/qmp/qstring.h"
-> @@ -207,18 +208,46 @@ static void process_options(int argc, char *argv[])
->              }
->          case OPTION_CHARDEV:
->              {
-> -                /* TODO This interface is not stable until we QAPIfy it */
-> -                QemuOpts *opts = qemu_opts_parse_noisily(&qemu_chardev_opts,
-> -                                                         optarg, true);
-> -                if (opts == NULL) {
-> -                    exit(EXIT_FAILURE);
-> -                }
-> +                QDict *args;
-> +                Visitor *v;
-> +                ChardevBackend *chr_options;
-> +                char *id;
-> +                bool help;
->  
-> -                if (!qemu_chr_new_from_opts(opts, NULL, &error_fatal)) {
-> -                    /* No error, but NULL returned means help was printed */
-> +                args = keyval_parse(optarg, "type", &help, &error_fatal);
-> +                if (help) {
-> +                    if (qdict_haskey(args, "type")) {
-> +                        /* TODO Print help based on the QAPI schema */
-
-I phrased this as
-
-                           /* FIXME wrong where QAPI differs from QemuOpts */
-
-I think that's more accurate.
-
-I plan to work on generating bare-bones help for use with keyval_parse()
-from the QAPI schema.
-
-> +                        qemu_opts_print_help(&qemu_chardev_opts, true);
-> +                    } else {
-> +                        qemu_chr_print_types();
-> +                    }
->                      exit(EXIT_SUCCESS);
->                  }
-> -                qemu_opts_del(opts);
-> +
-> +                /*
-> +                 * TODO Flattened version of chardev-add in the QAPI schema
-> +                 *
-> +                 * While it's not there, parse 'id' manually from the QDict
-> +                 * and treat everything else as the 'backend' option for
-> +                 * chardev-add.
-> +                 */
-
-This is basically a manual flattening of chardev-add's implicit
-arguments type.  Okay.
-
-> +                id = g_strdup(qdict_get_try_str(args, "id"));
-> +                if (!id) {
-> +                    error_report("Parameter 'id' is missing");
-> +                    exit(EXIT_FAILURE);
-> +                }
-> +                qdict_del(args, "id");
-> +
-> +                v = qobject_input_visitor_new_keyval(QOBJECT(args));
-> +                visit_set_flat_simple_unions(v, true);
-> +                visit_type_ChardevBackend(v, NULL, &chr_options, &error_fatal);
-> +                visit_free(v);
-> +
-> +                qmp_chardev_add(id, chr_options, &error_fatal);
-> +                qapi_free_ChardevBackend(chr_options);
-> +                g_free(id);
-> +                qobject_unref(args);
->                  break;
->              }
->          case OPTION_EXPORT:
-
-Preferably with the commit message improved:
-Reviewed-by: Markus Armbruster <armbru@redhat.com>
+>=20
+> thanks
+> -- PMM
+>=20
 
 
