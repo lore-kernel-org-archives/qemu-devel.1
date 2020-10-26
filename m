@@ -2,88 +2,86 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 885EBC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:00:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E1079C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:00:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CBAAC20795
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:00:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 44A7420795
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:00:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SlvlIzXF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CBAAC20795
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hAtnWDSS"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 44A7420795
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42486 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43348 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8fT-0000YA-Ic
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:00:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60122)
+	id 1kX8fk-0000vk-2d
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:00:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33990)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8Gp-0004UW-GL
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:35568)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kX8P5-000760-Da
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:43:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51832)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8Gn-00028d-I8
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:07 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kX8P3-0003Bl-2t
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:43:39 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603740904;
+ s=mimecast20190719; t=1603741416;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ABsplA+Ew9WzGRC2xafZ01qCbJNCojq91P0Gi6x9HyA=;
- b=SlvlIzXFzQbNffZ5WVP0azcYhomSwGYPvzrr17Fe49Qjl7R4tm/ymJ8NyvhZBN2LEvB2Hf
- ZRPCbuR3VOnMNc2M9VgVDKwUmpUuVkLG8iRydUuMIDmKYJu3SNQotmsOag8n7iNyKdNEGg
- SE/KKolIq6r1G35W+x/BlMgiBDTCtCE=
+ bh=92mglJF7EP28EAbroH+YcEyPHAhA2QfdRodb5cb2HGU=;
+ b=hAtnWDSSqU6PpSi75o8umSWl3w9G2ogIR9DF7q9yPJdJl3zCl1Clok0Xbce766xZGCRYz+
+ /Q6MZaulr12+Nrtv0ntozaiQ89qqth0duwwH+c5BMQuEXgzPd9kDHDfu5ij6p5HTR6bUod
+ IWMNw/4ajVaLMHS6DDE/F/q4GeTOo3A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-437-lJMsw3PxP6Cd9tP2LLlnIw-1; Mon, 26 Oct 2020 15:35:00 -0400
-X-MC-Unique: lJMsw3PxP6Cd9tP2LLlnIw-1
+ us-mta-594-yR8N5U-pM6Cpvwhf3cQGnQ-1; Mon, 26 Oct 2020 15:43:29 -0400
+X-MC-Unique: yR8N5U-pM6Cpvwhf3cQGnQ-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E8420101962A;
- Mon, 26 Oct 2020 19:34:59 +0000 (UTC)
-Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5855B76640;
- Mon, 26 Oct 2020 19:34:59 +0000 (UTC)
-Subject: [PULL 17/32] qapi: Add VFIO devices migration stats in Migration stats
-From: Alex Williamson <alex.williamson@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 26 Oct 2020 13:34:59 -0600
-Message-ID: <160374089897.22414.17432741319879877719.stgit@gimli.home>
-In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8EF4FAE572
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 19:43:16 +0000 (UTC)
+Received: from scv.redhat.com (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id CAC545B4AE;
+ Mon, 26 Oct 2020 19:43:15 +0000 (UTC)
+From: John Snow <jsnow@redhat.com>
+To: qemu-devel@nongnu.org,
+	Markus Armbruster <armbru@redhat.com>
+Subject: [PATCH v2 09/11] qapi/introspect.py: create a typed 'Annotated' data
+ strutcure
+Date: Mon, 26 Oct 2020 15:42:49 -0400
+Message-Id: <20201026194251.11075-10-jsnow@redhat.com>
+In-Reply-To: <20201026194251.11075-1-jsnow@redhat.com>
+References: <20201026194251.11075-1-jsnow@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,219 +95,219 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: John Snow <jsnow@redhat.com>, Eduardo Habkost <ehabkost@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Kirti Wankhede <kwankhede@nvidia.com>
+This replaces _make_tree with Annotated(). By creating it as a generic
+container, we can more accurately describe the exact nature of this
+particular value. i.e., each Annotated object is actually an
+Annotated<T>, describing its contained value.
 
-Added amount of bytes transferred to the VM at destination by all VFIO
-devices
+This adds stricter typing to Annotated nodes and extra annotated
+information. It also replaces a check of "isinstance tuple" with the
+much more explicit "isinstance Annotated" which is guaranteed not to
+break if a tuple is accidentally introduced into the type tree. (Perhaps
+as a result of a bad conversion from a list.)
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: John Snow <jsnow@redhat.com>
 ---
- hw/vfio/common.c              |   19 +++++++++++++++++++
- hw/vfio/migration.c           |    9 +++++++++
- include/hw/vfio/vfio-common.h |    3 +++
- migration/migration.c         |   17 +++++++++++++++++
- monitor/hmp-cmds.c            |    6 ++++++
- qapi/migration.json           |   17 +++++++++++++++++
- 6 files changed, 71 insertions(+)
+ scripts/qapi/introspect.py | 97 +++++++++++++++++++-------------------
+ 1 file changed, 48 insertions(+), 49 deletions(-)
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 49c68a5253ae..56f6fee66a55 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -292,6 +292,25 @@ const MemoryRegionOps vfio_region_ops = {
-  * Device state interfaces
-  */
+diff --git a/scripts/qapi/introspect.py b/scripts/qapi/introspect.py
+index a0978cb3adb..a261e402d69 100644
+--- a/scripts/qapi/introspect.py
++++ b/scripts/qapi/introspect.py
+@@ -13,12 +13,13 @@
+ from typing import (
+     Any,
+     Dict,
++    Generic,
++    Iterable,
+     List,
+     Optional,
+     Sequence,
+-    Tuple,
++    TypeVar,
+     Union,
+-    cast,
+ )
  
-+bool vfio_mig_active(void)
-+{
-+    VFIOGroup *group;
-+    VFIODevice *vbasedev;
-+
-+    if (QLIST_EMPTY(&vfio_group_list)) {
-+        return false;
-+    }
-+
-+    QLIST_FOREACH(group, &vfio_group_list, next) {
-+        QLIST_FOREACH(vbasedev, &group->device_list, next) {
-+            if (vbasedev->migration_blocker) {
-+                return false;
-+            }
-+        }
-+    }
-+    return true;
-+}
-+
- static bool vfio_devices_all_stopped_and_saving(VFIOContainer *container)
- {
-     VFIOGroup *group;
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index ffedbcca179d..2d657289c68e 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -45,6 +45,8 @@
- #define VFIO_MIG_FLAG_DEV_SETUP_STATE   (0xffffffffef100003ULL)
- #define VFIO_MIG_FLAG_DEV_DATA_STATE    (0xffffffffef100004ULL)
+ from .common import (
+@@ -63,50 +64,48 @@
+ _scalar = Union[str, bool, None]
+ _nonscalar = Union[Dict[str, _stub], List[_stub]]
+ _value = Union[_scalar, _nonscalar]
+-TreeValue = Union[_value, 'Annotated']
++TreeValue = Union[_value, 'Annotated[_value]']
  
-+static int64_t bytes_transferred;
-+
- static inline int vfio_mig_access(VFIODevice *vbasedev, void *val, int count,
-                                   off_t off, bool iswrite)
- {
-@@ -255,6 +257,7 @@ static int vfio_save_buffer(QEMUFile *f, VFIODevice *vbasedev, uint64_t *size)
-         *size = data_size;
-     }
+ # This is just an alias for an object in the structure described above:
+ _DObject = Dict[str, object]
  
-+    bytes_transferred += data_size;
-     return ret;
- }
+-# Represents the annotations themselves:
+-Annotations = Dict[str, object]
  
-@@ -785,6 +788,7 @@ static void vfio_migration_state_notifier(Notifier *notifier, void *data)
-     case MIGRATION_STATUS_CANCELLING:
-     case MIGRATION_STATUS_CANCELLED:
-     case MIGRATION_STATUS_FAILED:
-+        bytes_transferred = 0;
-         ret = vfio_migration_set_state(vbasedev,
-                       ~(VFIO_DEVICE_STATE_SAVING | VFIO_DEVICE_STATE_RESUMING),
-                       VFIO_DEVICE_STATE_RUNNING);
-@@ -866,6 +870,11 @@ err:
+-# Represents an annotated node (of some kind).
+-Annotated = Tuple[_value, Annotations]
++_AnnoType = TypeVar('_AnnoType', bound=TreeValue)
  
- /* ---------------------------------------------------------------------- */
  
-+int64_t vfio_mig_bytes_transferred(void)
-+{
-+    return bytes_transferred;
-+}
-+
- int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
- {
-     VFIOContainer *container = vbasedev->group->container;
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index b1c1b18fd228..24e299d97425 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -203,6 +203,9 @@ extern const MemoryRegionOps vfio_region_ops;
- typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
- extern VFIOGroupList vfio_group_list;
+-def _make_tree(obj: Union[_DObject, str], ifcond: List[str],
+-               comment: Optional[str] = None) -> Annotated:
+-    extra: Annotations = {
+-        'if': ifcond,
+-        'comment': comment,
+-    }
+-    return (obj, extra)
++class Annotated(Generic[_AnnoType]):
++    """
++    Annotated generally contains a SchemaInfo-like type (as a dict),
++    But it also used to wrap comments/ifconds around scalar leaf values,
++    for the benefit of features and enums.
++    """
++    # Remove after 3.7 adds @dataclass:
++    # pylint: disable=too-few-public-methods
++    def __init__(self, value: _AnnoType, ifcond: Iterable[str],
++                 comment: Optional[str] = None):
++        self.value = value
++        self.comment: Optional[str] = comment
++        self.ifcond: Sequence[str] = tuple(ifcond)
  
-+bool vfio_mig_active(void);
-+int64_t vfio_mig_bytes_transferred(void);
-+
- #ifdef CONFIG_LINUX
- int vfio_get_region_info(VFIODevice *vbasedev, int index,
-                          struct vfio_region_info **info);
-diff --git a/migration/migration.c b/migration/migration.c
-index 0575ecb37953..995ccd96a774 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -57,6 +57,10 @@
- #include "qemu/queue.h"
- #include "multifd.h"
  
-+#ifdef CONFIG_VFIO
-+#include "hw/vfio/vfio-common.h"
-+#endif
-+
- #define MAX_THROTTLE  (128 << 20)      /* Migration transfer speed throttling */
+-def _tree_to_qlit(obj: TreeValue,
+-                  level: int = 0,
++def _tree_to_qlit(obj: TreeValue, level: int = 0,
+                   suppress_first_indent: bool = False) -> str:
  
- /* Amount of time to allocate to each "chunk" of bandwidth-throttled
-@@ -1002,6 +1006,17 @@ static void populate_disk_info(MigrationInfo *info)
-     }
- }
+     def indent(level: int) -> str:
+         return level * 4 * ' '
  
-+static void populate_vfio_info(MigrationInfo *info)
-+{
-+#ifdef CONFIG_VFIO
-+    if (vfio_mig_active()) {
-+        info->has_vfio = true;
-+        info->vfio = g_malloc0(sizeof(*info->vfio));
-+        info->vfio->transferred = vfio_mig_bytes_transferred();
-+    }
-+#endif
-+}
-+
- static void fill_source_migration_info(MigrationInfo *info)
- {
-     MigrationState *s = migrate_get_current();
-@@ -1026,6 +1041,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-         populate_disk_info(info);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_COLO:
-         info->has_status = true;
-@@ -1034,6 +1050,7 @@ static void fill_source_migration_info(MigrationInfo *info)
-     case MIGRATION_STATUS_COMPLETED:
-         populate_time_info(info, s);
-         populate_ram_info(info, s);
-+        populate_vfio_info(info);
-         break;
-     case MIGRATION_STATUS_FAILED:
-         info->has_status = true;
-diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
-index 9789f4277f50..56e9bad33d94 100644
---- a/monitor/hmp-cmds.c
-+++ b/monitor/hmp-cmds.c
-@@ -357,6 +357,12 @@ void hmp_info_migrate(Monitor *mon, const QDict *qdict)
+-    if isinstance(obj, tuple):
+-        ifobj, extra = obj
+-        ifcond = cast(Optional[Sequence[str]], extra.get('if'))
+-        comment = extra.get('comment')
+-
++    if isinstance(obj, Annotated):
+         msg = "Comments and Conditionals not implemented for dict values"
+-        assert not (suppress_first_indent and (ifcond or comment)), msg
++        assert not (suppress_first_indent and (obj.comment or obj.ifcond)), msg
+ 
+         ret = ''
+-        if comment:
+-            ret += indent(level) + '/* %s */\n' % comment
+-        if ifcond:
+-            ret += gen_if(ifcond)
+-        ret += _tree_to_qlit(ifobj, level, suppress_first_indent)
+-        if ifcond:
+-            ret += '\n' + gen_endif(ifcond)
++        if obj.comment:
++            ret += indent(level) + '/* %s */\n' % obj.comment
++        if obj.ifcond:
++            ret += gen_if(obj.ifcond)
++        ret += _tree_to_qlit(obj.value, level, suppress_first_indent)
++        if obj.ifcond:
++            ret += '\n' + gen_endif(obj.ifcond)
+         return ret
+ 
+     ret = ''
+@@ -153,7 +152,7 @@ def __init__(self, prefix: str, unmask: bool):
+             ' * QAPI/QMP schema introspection', __doc__)
+         self._unmask = unmask
+         self._schema: Optional[QAPISchema] = None
+-        self._trees: List[Annotated] = []
++        self._trees: List[Annotated[_DObject]] = []
+         self._used_types: List[QAPISchemaType] = []
+         self._name_map: Dict[str, str] = {}
+         self._genc.add(mcgen('''
+@@ -219,10 +218,9 @@ def _use_type(self, typ: QAPISchemaType) -> str:
+         return self._name(typ.name)
+ 
+     @classmethod
+-    def _gen_features(cls,
+-                      features: List[QAPISchemaFeature]
+-                      ) -> List[Annotated]:
+-        return [_make_tree(f.name, f.ifcond) for f in features]
++    def _gen_features(
++            cls, features: List[QAPISchemaFeature]) -> List[Annotated[str]]:
++        return [Annotated(f.name, f.ifcond) for f in features]
+ 
+     def _gen_tree(self, name: str, mtype: str, obj: _DObject,
+                   ifcond: List[str],
+@@ -238,10 +236,10 @@ def _gen_tree(self, name: str, mtype: str, obj: _DObject,
+         obj['meta-type'] = mtype
+         if features:
+             obj['features'] = self._gen_features(features)
+-        self._trees.append(_make_tree(obj, ifcond, comment))
++        self._trees.append(Annotated(obj, ifcond, comment))
+ 
+     def _gen_member(self,
+-                    member: QAPISchemaObjectTypeMember) -> Annotated:
++                    member: QAPISchemaObjectTypeMember) -> Annotated[_DObject]:
+         obj: _DObject = {
+             'name': member.name,
+             'type': self._use_type(member.type)
+@@ -250,19 +248,19 @@ def _gen_member(self,
+             obj['default'] = None
+         if member.features:
+             obj['features'] = self._gen_features(member.features)
+-        return _make_tree(obj, member.ifcond)
++        return Annotated(obj, member.ifcond)
+ 
+     def _gen_variants(self, tag_name: str,
+                       variants: List[QAPISchemaVariant]) -> _DObject:
+         return {'tag': tag_name,
+                 'variants': [self._gen_variant(v) for v in variants]}
+ 
+-    def _gen_variant(self, variant: QAPISchemaVariant) -> Annotated:
++    def _gen_variant(self, variant: QAPISchemaVariant) -> Annotated[_DObject]:
+         obj: _DObject = {
+             'case': variant.name,
+             'type': self._use_type(variant.type)
          }
-         monitor_printf(mon, "]\n");
-     }
-+
-+    if (info->has_vfio) {
-+        monitor_printf(mon, "vfio device transferred: %" PRIu64 " kbytes\n",
-+                       info->vfio->transferred >> 10);
-+    }
-+
-     qapi_free_MigrationInfo(info);
- }
+-        return _make_tree(obj, variant.ifcond)
++        return Annotated(obj, variant.ifcond)
  
-diff --git a/qapi/migration.json b/qapi/migration.json
-index a5da513c9e05..3c7582052725 100644
---- a/qapi/migration.json
-+++ b/qapi/migration.json
-@@ -147,6 +147,18 @@
-             'active', 'postcopy-active', 'postcopy-paused',
-             'postcopy-recover', 'completed', 'failed', 'colo',
-             'pre-switchover', 'device', 'wait-unplug' ] }
-+##
-+# @VfioStats:
-+#
-+# Detailed VFIO devices migration statistics
-+#
-+# @transferred: amount of bytes transferred to the target VM by VFIO devices
-+#
-+# Since: 5.2
-+#
-+##
-+{ 'struct': 'VfioStats',
-+  'data': {'transferred': 'int' } }
+     def visit_builtin_type(self, name: str, info: Optional[QAPISourceInfo],
+                            json_type: str) -> None:
+@@ -272,10 +270,11 @@ def visit_enum_type(self, name: str, info: QAPISourceInfo,
+                         ifcond: List[str], features: List[QAPISchemaFeature],
+                         members: List[QAPISchemaEnumMember],
+                         prefix: Optional[str]) -> None:
+-        self._gen_tree(name, 'enum',
+-                       {'values': [_make_tree(m.name, m.ifcond, None)
+-                                   for m in members]},
+-                       ifcond, features)
++        self._gen_tree(
++            name, 'enum',
++            {'values': [Annotated(m.name, m.ifcond) for m in members]},
++            ifcond, features
++        )
  
- ##
- # @MigrationInfo:
-@@ -208,11 +220,16 @@
- #
- # @socket-address: Only used for tcp, to know what the real port is (Since 4.0)
- #
-+# @vfio: @VfioStats containing detailed VFIO devices migration statistics,
-+#        only returned if VFIO device is present, migration is supported by all
-+#        VFIO devices and status is 'active' or 'completed' (since 5.2)
-+#
- # Since: 0.14.0
- ##
- { 'struct': 'MigrationInfo',
-   'data': {'*status': 'MigrationStatus', '*ram': 'MigrationStats',
-            '*disk': 'MigrationStats',
-+           '*vfio': 'VfioStats',
-            '*xbzrle-cache': 'XBZRLECacheStats',
-            '*total-time': 'int',
-            '*expected-downtime': 'int',
+     def visit_array_type(self, name: str, info: Optional[QAPISourceInfo],
+                          ifcond: List[str],
+@@ -300,12 +299,12 @@ def visit_alternate_type(self, name: str, info: QAPISourceInfo,
+                              ifcond: List[str],
+                              features: List[QAPISchemaFeature],
+                              variants: QAPISchemaVariants) -> None:
+-        self._gen_tree(name, 'alternate',
+-                       {'members': [
+-                           _make_tree({'type': self._use_type(m.type)},
+-                                      m.ifcond, None)
+-                           for m in variants.variants]},
+-                       ifcond, features)
++        self._gen_tree(
++            name, 'alternate',
++            {'members': [Annotated({'type': self._use_type(m.type)}, m.ifcond)
++                         for m in variants.variants]},
++            ifcond, features
++        )
+ 
+     def visit_command(self, name: str, info: QAPISourceInfo, ifcond: List[str],
+                       features: List[QAPISchemaFeature],
+-- 
+2.26.2
 
 
