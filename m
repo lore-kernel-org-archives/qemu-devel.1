@@ -2,118 +2,100 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17459C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:46:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD4A8C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 04:43:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7156F20795
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:46:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7156F20795
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
+	by mail.kernel.org (Postfix) with ESMTPS id 56D6720885
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 04:43:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U50AIHdG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56D6720885
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34322 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWtT3-0000ai-53
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 23:46:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57368)
+	id 1kWuLZ-0001Xi-93
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 00:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37954)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <d0u9.su@outlook.com>)
- id 1kWtRt-0008UH-37
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:45:33 -0400
-Received: from mail-dm6nam10olkn2015.outbound.protection.outlook.com
- ([40.92.41.15]:56192 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <d0u9.su@outlook.com>)
- id 1kWtRo-0000g8-Tb
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:45:32 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DN8ruHKU/7relBp6R5TPVy/DKusD/Jk1AdHG24YzlkaUYV7RvbA7h7vZs0lY4yzuiNr5M/7CrECFND8mh58JW/gR5Bz0PcLHDpQM2qzi23NCK5kRROfhlxQoEHN4lys0Y4j/dYvYKp3LLWfjRy875OdKz+vLG2APsYb03k/PfweofZ8e5UGQHzwbM3KsLpPsxGEAADDyQEAbqChuOB5HOmq/cIgsphHmTE+GOgXg9Bue+k98dwLwUi1XVM+Kh/SgCFKdBqF/mUz1mcSgjSAaZg8iOLlfjK//Anu3Q7Be8CLEvbty4wE+Sn13K0erMdW5wpXf1HNtNeI4JHwcaF8CGg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I11XJRBM86SYETDCRXEURUOFdbi5mffgxzLHsLX7MwA=;
- b=Qyu6X1tsWmr8IUrqq09JfWm/DQszJMD/Fhf2wSgW8WYoWFu3U57l7IvovVuCWiNZnpQpD4msetFdfrXHOaAqmxqRePeHB7xI08hY5JQSLCnFTYR4V2FtOwbIz1SMaeVVGWYyBkdp8e/NiomxIT20q6NOYSD5JxgKxUY11CwLTs+N7mqCLtBTntTYH+HTyuzZb3FtfeuIVzE6FVzka7a6hAq5m/r7YtrEMTpPmXvb4R/XKfkrw7+9uF62dcobfNnhPVkGJ5dV3TVD4OM8/QmvvGhRtk/PT5RO1SRy84mYHLURMRY1lG1Kgik+TAP+8DH4Gobg0gAHhl8pchaIMa7nFw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=I11XJRBM86SYETDCRXEURUOFdbi5mffgxzLHsLX7MwA=;
- b=QhQdofmL9VZrWFaaIydI5xFgk3Rr+k2ldNDFGxlutKL5g66iqq9yq4oKB+fI4Z7cJaKfDMfrwSCTPXXWrVFalkbPYAPrnbZHBHonkJJ+TGPeG3LtKkr2axreykBORhMhjv4rj2c87UxRLyaM3815OYDiGcXGbDSodst1VXMawVJr/x3VTZFeBl1upfNgIryB/Zg5KJfqs8iNkZwEO2fioZlD3K4KqQ455olhFnOxKrQVtF3DOtdN+LW7vlbxwDvnHM8sI94IMArriR6xW6mLBA4U6rGmXFocPgJ/vHy9Ad6+9mZXB2UAe/Utf1hgufutOtXoFpQ2chmv8JY+O8n6XQ==
-Received: from BN7NAM10FT050.eop-nam10.prod.protection.outlook.com
- (2a01:111:e400:7e8f::4a) by
- BN7NAM10HT063.eop-nam10.prod.protection.outlook.com (2a01:111:e400:7e8f::314)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 26 Oct
- 2020 03:30:22 +0000
-Received: from BYAPR11MB2664.namprd11.prod.outlook.com
- (2a01:111:e400:7e8f::4e) by BN7NAM10FT050.mail.protection.outlook.com
- (2a01:111:e400:7e8f::284) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Mon, 26 Oct 2020 03:30:22 +0000
-Received: from BYAPR11MB2664.namprd11.prod.outlook.com
- ([fe80::2164:d6ba:9ca3:3090]) by BYAPR11MB2664.namprd11.prod.outlook.com
- ([fe80::2164:d6ba:9ca3:3090%4]) with mapi id 15.20.3477.028; Mon, 26 Oct 2020
- 03:30:22 +0000
-From: Douglas Su <d0u9.su@outlook.com>
-To: QEMU Developers <qemu-devel@nongnu.org>
-CC: QEMU Developers <qemu-devel@nongnu.org>
-Subject: Re: Enable MSI-X support in PCIe device.
-Thread-Topic: Enable MSI-X support in PCIe device.
-Thread-Index: AQHWqOtsbiQu9ZKUjUCwfcsDfQs236mpPo8u
-Date: Mon, 26 Oct 2020 03:30:21 +0000
-Message-ID: <BYAPR11MB266438F1968B1180660D2868EC190@BYAPR11MB2664.namprd11.prod.outlook.com>
-References: <BYAPR11MB26641AF7375C0C2A2652D8C8EC1A0@BYAPR11MB2664.namprd11.prod.outlook.com>
-In-Reply-To: <BYAPR11MB26641AF7375C0C2A2652D8C8EC1A0@BYAPR11MB2664.namprd11.prod.outlook.com>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-incomingtopheadermarker: OriginalChecksum:86C5DB9150A5F5847024742410CA7BDD6D95FB35F6DF4A96AEFD67E37D515182;
- UpperCasedChecksum:1317F7200F152DF3DD4B6CEB96AAD00103CBD30EEC5F0358B33EA122D8872FAC;
- SizeAsReceived:6886; Count:45
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn: [RUxP1MQrXWe7OtaBMaXg0P+USl7I6+tp]
-x-ms-publictraffictype: Email
-x-incomingheadercount: 45
-x-eopattributedmessage: 0
-x-ms-office365-filtering-correlation-id: 1613f60b-922a-49d8-f12e-08d8795f7858
-x-ms-traffictypediagnostic: BN7NAM10HT063:
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: +qnET0GbJgYnnUKjLdVkAQTJxnloqh4i6hub/7sJLP2VhzgC0t2CVjVTut4XL0WHFE3POo2IY1mttV6loZVwti840ElswHN8K2FuTLYz/YEDGdCLQAkch8viaEXEUn+FntG6moadXsv9iJPTR9bMJbe5o7wvszB5bx8h5oCUJ4wfgr7+RtCmQUT3HA1C1AkJgJRrlk5VewE/twXyF9RoVg==
-x-ms-exchange-antispam-messagedata: 8AKNZ//fwgHSyJrMx7mxPk6gItNrdqPSjJ+HNVUUOGSbBzrxXefUswQdxBGzMQskys4E2cHjiXvX7KxUUsa0JQiS9UKKt1tyAQ37C0kSrOxAh06fy57ZPvpfz23miTstf5suTQTQ6zAqwm7BATYqBA==
-x-ms-exchange-transport-forked: True
-Content-Type: multipart/alternative;
- boundary="_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_"
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kWuKV-0000y5-F7
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 00:41:59 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46929)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <lulu@redhat.com>) id 1kWuKS-0004qG-Um
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 00:41:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603687313;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=WjVX+3Jur5SctexiqjWEpCCtsSwjXyWYrcdnTbu4uig=;
+ b=U50AIHdGwRP0nR+Gy9jqdcNICLzY97jKDEyS269PVrc12I/SrTsxmvKHntGPpoKmnZ0sNo
+ /bARloqc/AsayMWUqRs/+04vpvY5p/Vzm+NCffaY0BpmqbAOavvdOY2owUmY8LZLsHNneN
+ 3H7A5EXK7NtPZonKQTJd+4ZnSb3lxEk=
+Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
+ [209.85.210.198]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-212-Y_yaC-DXMyWHnUXYV3Pvlg-1; Mon, 26 Oct 2020 00:41:43 -0400
+X-MC-Unique: Y_yaC-DXMyWHnUXYV3Pvlg-1
+Received: by mail-pf1-f198.google.com with SMTP id f15so4949995pfj.19
+ for <qemu-devel@nongnu.org>; Sun, 25 Oct 2020 21:41:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=WjVX+3Jur5SctexiqjWEpCCtsSwjXyWYrcdnTbu4uig=;
+ b=VS5Xda96Nax3wsCbNj4OrSvneeiafoXXwJwJwXYmRT+SbOEXohw0Iwtaycg7GY+tdm
+ 1xq7Tvt7i5vI97YpC7tzSMK3Uyr3au8GApiUGFXnQ5FBybrVeRMHUnknVN/w4P9bDMFh
+ YSZH2xGhR50LR6fQovmuszrC7Wt5IvzVc/WF6Ahy7kMRHw77QRXDGb2qFE44q0k7Amxb
+ 1I9Wq7Kp1AJEfVkt6uvbIt/tuD5NcXim0ylrtTh7eIv77iP+pLOnfyTzDryRtBOFloEV
+ OEBGRzEyp1cCSNNJ1il4L9XH6JHGAexhROzin8GoKFSOH6f2T6iddQvo5Jsc1CHc4MW7
+ HIGQ==
+X-Gm-Message-State: AOAM530oKsv8tJ+slaoUCwsc9xLsnCie/CVSW2HWzEOYmcahQ8cARu3e
+ sE1RyVWNTjcsLNRW+tni5o6jRIJ08U0woFug2a+28TUM2lW8fHVqiRMEpA7yZ0Q2G+4OWFf7/Oo
+ ATriuWhkTuBaKAEuyRBJZ3XYKlHFMGfc=
+X-Received: by 2002:a17:90b:807:: with SMTP id
+ bk7mr14236187pjb.166.1603687302207; 
+ Sun, 25 Oct 2020 21:41:42 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJxZgnLHRXemzvDGWJD6xZvslhxPBv0pZ91r1wzUpre0Wx7AldDu1YDkmbTI8D0QrEM3eGFK+oyw7lVIuSd4gCE=
+X-Received: by 2002:a17:90b:807:: with SMTP id
+ bk7mr14236168pjb.166.1603687301921; 
+ Sun, 25 Oct 2020 21:41:41 -0700 (PDT)
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-AuthSource: BN7NAM10FT050.eop-nam10.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1613f60b-922a-49d8-f12e-08d8795f7858
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Oct 2020 03:30:21.9994 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Internet
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7NAM10HT063
-Received-SPF: pass client-ip=40.92.41.15; envelope-from=d0u9.su@outlook.com;
- helo=NAM10-DM6-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 23:45:26
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <20201023091559.4858-1-lulu@redhat.com>
+ <462e6df3-8a34-9cfb-0696-49481aba4d46@redhat.com>
+ <1bd85488-7186-d869-9bc2-2536d23c1e78@redhat.com>
+In-Reply-To: <1bd85488-7186-d869-9bc2-2536d23c1e78@redhat.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Mon, 26 Oct 2020 12:41:30 +0800
+Message-ID: <CACLfguVsAtAe_KrKFH2wH+w62BbLahtRXU6nV53jFODPF6XxXw@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio-net: Add check for mac address while peer is
+ vdpa
+To: Jason Wang <jasowang@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=lulu@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000f653b505b28b8b3a"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=lulu@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -30
+X-Spam_score: -3.1
+X-Spam_bar: ---
+X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
+ RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -126,143 +108,207 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: qemu-stable@nongnu.org, QEMU Developers <qemu-devel@nongnu.org>,
+ Michael Tsirkin <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_
-Content-Type: text/plain; charset="iso-8859-1"
+--000000000000f653b505b28b8b3a
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-I have tried to use msi only, but failed again. Is there and documentation =
-details this?
-
-________________________________
-From: Qemu-devel <qemu-devel-bounces+d0u9.su=3Doutlook.com@nongnu.org> on b=
-ehalf of Douglas Su <d0u9.su@outlook.com>
-Sent: Thursday, October 22, 2020 20:32
-To: QEMU Developers <qemu-devel@nongnu.org>
-Subject: Enable MSI-X support in PCIe device.
-
-To use MSI-X interrupt in my PCIe device, In realize() function I make a MS=
-IX initialization like this:
-
-#define MYDEV_MSIX_VEC_NUM 5
-
-void realize() {
-    memory_region_init(&mydev->msix, OBJECT(edu), "mydev-msix",
-                       MYDEV_MSIX_SIZE);
-    pci_register_bar(pdev, MYDEV_MSIX_IDX,
-                     PCI_BASE_ADDRESS_SPACE_MEMORY, &mydev->msix);
-
-    rv =3D msix_init(pdev, MYDEV_MSIX_VEC_NUM,
-                   &edu->msix, MYDEV_MSIX_IDX, MYDEV_MSIX_TABLE,
-                   &edu->msix, MYDEV_MSIX_IDX, MYDEV_MSIX_PBA,
-                   0, errp);
-}
-
-After this, a simple logic is added  to trigger interrupt by writing comman=
-d to a specific BAR0 address.
-
-void trigger() {
-    msix_notify(pdev, 1);         // send vector 1 to msix
-}
-
-In the OS driver, MSIX is enabled via `pci_alloc_irq_vectors()`, which is d=
-etailed in Linux Kernel's documentation `Documentation/PCI/msi-howto.rst` (=
-I use kernel 5.7).
-
-It is correct to obtain the number of vector from that function but failed =
-to receive interrupt from device. The IRQ, which is returned from `pci_irq_=
-vector`, is registered via `request_irq()` in the deriver.
-
-Can anyone give a clue?
+Hi jason
 
 
---_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_
-Content-Type: text/html; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+On Mon, Oct 26, 2020 at 11:20 AM Jason Wang <jasowang@redhat.com> wrote:
 
-<html>
-<head>
-<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
-1">
-<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
-ttom:0;} </style>
-</head>
-<body dir=3D"ltr">
-<div style=3D"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt;=
- color: rgb(0, 0, 0);">
-I have tried to use msi only, but failed again. Is there and documentation =
-details this?</div>
-<div>
-<div id=3D"appendonsend"></div>
-<div style=3D"font-family:Calibri,Helvetica,sans-serif; font-size:12pt; col=
-or:rgb(0,0,0)">
-<br>
-</div>
-<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
-<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" co=
-lor=3D"#000000" style=3D"font-size:11pt"><b>From:</b> Qemu-devel &lt;qemu-d=
-evel-bounces+d0u9.su=3Doutlook.com@nongnu.org&gt; on behalf of Douglas Su &=
-lt;d0u9.su@outlook.com&gt;<br>
-<b>Sent:</b> Thursday, October 22, 2020 20:32<br>
-<b>To:</b> QEMU Developers &lt;qemu-devel@nongnu.org&gt;<br>
-<b>Subject:</b> Enable MSI-X support in PCIe device.</font>
-<div>&nbsp;</div>
-</div>
-<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
 >
-<div class=3D"PlainText">To use MSI-X interrupt in my PCIe device, In reali=
-ze() function I make a MSIX initialization like this:<br>
-<br>
-#define MYDEV_MSIX_VEC_NUM 5<br>
-<br>
-void realize() {<br>
-&nbsp;&nbsp;&nbsp; memory_region_init(&amp;mydev-&gt;msix, OBJECT(edu), &qu=
-ot;mydev-msix&quot;,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MYDEV_MSIX_SIZE);=
-<br>
-&nbsp;&nbsp;&nbsp; pci_register_bar(pdev, MYDEV_MSIX_IDX,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PCI_BASE_ADDRESS_SPACE_MEMORY=
-, &amp;mydev-&gt;msix);<br>
-<br>
-&nbsp;&nbsp;&nbsp; rv =3D msix_init(pdev, MYDEV_MSIX_VEC_NUM,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;edu-&gt;msix, MYDEV_MSIX_IDX, MYDEV_=
-MSIX_TABLE,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;edu-&gt;msix, MYDEV_MSIX_IDX, MYDEV_=
-MSIX_PBA,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
-sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0, errp);<br>
-}<br>
-<br>
-After this, a simple logic is added&nbsp; to trigger interrupt by writing c=
-ommand to a specific BAR0 address.<br>
-<br>
-void trigger() {<br>
-&nbsp;&nbsp;&nbsp; msix_notify(pdev, 1);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
-;&nbsp;&nbsp; // send vector 1 to msix<br>
-}<br>
-<br>
-In the OS driver, MSIX is enabled via `pci_alloc_irq_vectors()`, which is d=
-etailed in Linux Kernel's documentation `Documentation/PCI/msi-howto.rst` (=
-I use kernel 5.7).<br>
-<br>
-It is correct to obtain the number of vector from that function but failed =
-to receive interrupt from device. The IRQ, which is returned from `pci_irq_=
-vector`, is registered via `request_irq()` in the deriver.<br>
-<br>
-Can anyone give a clue?<br>
-<br>
-</div>
-</span></font></div>
-</div>
-</body>
-</html>
+> On 2020/10/26 =E4=B8=8A=E5=8D=8810:43, Jason Wang wrote:
+> >
+> > On 2020/10/23 =E4=B8=8B=E5=8D=885:15, Cindy Lu wrote:
+> >> Sometime vdpa get an all 0 mac address from the hardware, this will
+> >> cause the traffic down
+> >> So we add the check for this part.
+> >> if we get an 0 mac address we will use the default mac address instead
+> >>
+> >> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> >> ---
+> >>   hw/net/virtio-net.c | 7 ++++++-
+> >>   1 file changed, 6 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c
+> >> index 9179013ac4..f1648fc47d 100644
+> >> --- a/hw/net/virtio-net.c
+> >> +++ b/hw/net/virtio-net.c
+> >> @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice
+> >> *vdev, uint8_t *config)
+> >>       VirtIONet *n =3D VIRTIO_NET(vdev);
+> >>       struct virtio_net_config netcfg;
+> >>       NetClientState *nc =3D qemu_get_queue(n->nic);
+> >> +    static const MACAddr zero =3D { .a =3D { 0, 0, 0, 0, 0, 0 } };
+> >>         int ret =3D 0;
+> >>       memset(&netcfg, 0 , sizeof(struct virtio_net_config));
+> >> @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevice
+> >> *vdev, uint8_t *config)
+> >>           ret =3D vhost_net_get_config(get_vhost_net(nc->peer),
+> >> (uint8_t *)&netcfg,
+> >>                                      n->config_size);
+> >>           if (ret !=3D -1) {
+> >> -            memcpy(config, &netcfg, n->config_size);
+> >> +            if (memcmp(&netcfg.mac, &zero, sizeof(zero)) !=3D 0) {
+> >> +                memcpy(config, &netcfg, n->config_size);
+> >> +        } else {
+> >> +                error_report("Get an all zero mac address from
+> >> hardware");
+> >> +            }
+> >>           }
+> >>       }
+> >>   }
+> >
+> >
+> > Applied.
+> >
+> > Thanks
+> >
+> >
+>
+> Speak too fast. Some questions:
+>
+> 1) Any reason that you do such check or get_config() instead of doing it
+> once in device initalization
+>
+get_config()  was called before the device realized.  If we check in the
+device initalization, the mac address is already overwritten to 0 and
+we lost the default mac address
+Also for my understanding. the mac address read from hardware should never
+been 0, so we need to check it every time we got it, Just in case it will
+change to 0 and overwrite the mac address while the qemu running or some
+other case
 
---_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_--
+> 2) the indentation looks wrong
+>
+sure will fix this
+
+> 3) There's no need for an error here since we can workaround it
+
+sure, I will change it to log
+
+>
+>
+
+
+> Thanks
+>
+>
+
+--000000000000f653b505b28b8b3a
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"ltr"><div dir=3D"ltr">Hi jason=C2=A0<div><br></div></div><br><d=
+iv class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">On Mon, Oct =
+26, 2020 at 11:20 AM Jason Wang &lt;<a href=3D"mailto:jasowang@redhat.com">=
+jasowang@redhat.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quot=
+e" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204)=
+;padding-left:1ex"><br>
+On 2020/10/26 =E4=B8=8A=E5=8D=8810:43, Jason Wang wrote:<br>
+&gt;<br>
+&gt; On 2020/10/23 =E4=B8=8B=E5=8D=885:15, Cindy Lu wrote:<br>
+&gt;&gt; Sometime vdpa get an all 0 mac address from the hardware, this wil=
+l <br>
+&gt;&gt; cause the traffic down<br>
+&gt;&gt; So we add the check for this part.<br>
+&gt;&gt; if we get an 0 mac address we will use the default mac address ins=
+tead<br>
+&gt;&gt;<br>
+&gt;&gt; Signed-off-by: Cindy Lu &lt;<a href=3D"mailto:lulu@redhat.com" tar=
+get=3D"_blank">lulu@redhat.com</a>&gt;<br>
+&gt;&gt; ---<br>
+&gt;&gt; =C2=A0 hw/net/virtio-net.c | 7 ++++++-<br>
+&gt;&gt; =C2=A0 1 file changed, 6 insertions(+), 1 deletion(-)<br>
+&gt;&gt;<br>
+&gt;&gt; diff --git a/hw/net/virtio-net.c b/hw/net/virtio-net.c<br>
+&gt;&gt; index 9179013ac4..f1648fc47d 100644<br>
+&gt;&gt; --- a/hw/net/virtio-net.c<br>
+&gt;&gt; +++ b/hw/net/virtio-net.c<br>
+&gt;&gt; @@ -126,6 +126,7 @@ static void virtio_net_get_config(VirtIODevice=
+ <br>
+&gt;&gt; *vdev, uint8_t *config)<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 VirtIONet *n =3D VIRTIO_NET(vdev);<=
+br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 struct virtio_net_config netcfg;<br=
+>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 NetClientState *nc =3D qemu_get_que=
+ue(n-&gt;nic);<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0 static const MACAddr zero =3D { .a =3D { 0, 0,=
+ 0, 0, 0, 0 } };<br>
+&gt;&gt; =C2=A0 =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 int ret =3D 0;<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 memset(&amp;netcfg, 0 , sizeof(stru=
+ct virtio_net_config));<br>
+&gt;&gt; @@ -151,7 +152,11 @@ static void virtio_net_get_config(VirtIODevic=
+e <br>
+&gt;&gt; *vdev, uint8_t *config)<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ret =3D vho=
+st_net_get_config(get_vhost_net(nc-&gt;peer), <br>
+&gt;&gt; (uint8_t *)&amp;netcfg,<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ n-&gt;config_size);<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (ret !=
+=3D -1) {<br>
+&gt;&gt; -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 memcpy(config, &amp;netcfg, n-&gt;config_size);<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 if (memcmp(&amp;netcfg.mac, &amp;zero, sizeof(zero)) !=3D 0) {<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 memcpy(config, &amp;netcfg, n-&gt;config_size);=
+<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 } else {<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 error_report(&quot;Get an all zero mac address =
+from <br>
+&gt;&gt; hardware&quot;);<br>
+&gt;&gt; +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 }<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
+&gt;&gt; =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 }<br>
+&gt;&gt; =C2=A0 }<br>
+&gt;<br>
+&gt;<br>
+&gt; Applied.<br>
+&gt;<br>
+&gt; Thanks<br>
+&gt;<br>
+&gt;<br>
+<br>
+Speak too fast. Some questions:<br>
+<br>
+1) Any reason that you do such check or get_config() instead of doing it <b=
+r>
+once in device initalization<br></blockquote><div>get_config()=C2=A0 was ca=
+lled before the device realized.=C2=A0 If we check in the  device initaliza=
+tion, the mac address is already overwritten=C2=A0to 0 and we=C2=A0lost the=
+ default mac address</div><div>Also for my understanding. the mac address r=
+ead from hardware should=C2=A0never been 0, so we need to check it every ti=
+me we got it, Just in case it will change to 0 and overwrite the mac addres=
+s while the qemu running or some other case=C2=A0=C2=A0</div><blockquote cl=
+ass=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid=
+ rgb(204,204,204);padding-left:1ex">
+2) the indentation looks wrong<br></blockquote><div>sure will fix this=C2=
+=A0=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0p=
+x 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
+3) There&#39;s no need for an error here since we can workaround it</blockq=
+uote><div>sure, I will change it to log</div><blockquote class=3D"gmail_quo=
+te" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204=
+);padding-left:1ex">=C2=A0<br></blockquote><div>=C2=A0</div><blockquote cla=
+ss=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid =
+rgb(204,204,204);padding-left:1ex">
+Thanks<br>
+<br>
+</blockquote></div></div>
+
+--000000000000f653b505b28b8b3a--
+
 
