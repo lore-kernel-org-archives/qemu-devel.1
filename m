@@ -6,79 +6,73 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D92C5C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:07:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC1DAC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:22:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2DA0520732
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:07:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F23C820795
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 21:22:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="YzyqzFtp";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="LIbtVclu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2DA0520732
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="G7AofQgO";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="G7AofQgO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F23C820795
 Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53714 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37182 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX9ib-0004j0-8u
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 17:07:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53772)
+	id 1kX9wb-0002WB-MI
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 17:22:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56988)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kX9hI-0003jL-7n; Mon, 26 Oct 2020 17:06:32 -0400
-Received: from home.keithp.com ([63.227.221.253]:56978 helo=elaine.keithp.com)
+ id 1kX9vH-0001HU-RL; Mon, 26 Oct 2020 17:20:59 -0400
+Received: from home.keithp.com ([63.227.221.253]:57048 helo=elaine.keithp.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kX9hC-0005ws-Ab; Mon, 26 Oct 2020 17:06:31 -0400
+ id 1kX9vE-0007ru-Qm; Mon, 26 Oct 2020 17:20:59 -0400
 Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 1DE053F2DD61;
- Mon, 26 Oct 2020 14:06:21 -0700 (PDT)
+ by elaine.keithp.com (Postfix) with ESMTP id 8CB7D3F2DD61;
+ Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603746381; bh=qCwCp5pS1/Te/2+yBMnqnmlqH7FAnO3igmcgeMGvmSU=;
+ t=1603747253; bh=IQUHrFXKJLaQlnApe4q47g7/mOk6S1Ckw1cgJjvGIf8=;
  h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=YzyqzFtpPvcANA1bIsOLw4qhy0r4FpVJ4gOTAKHTtDo6buOabtLzu1xR+ymPHVi3n
- gwWooYIS247BdsbziggYiQbtYpJ2uiZqqzUFBd2ZmRrT4x5UiHpX9OFcHeDbcK0CrX
- z/u8i29UvrkTPZy0Qpg+L0i8m2nRAvROX8Re22p4W7j1L25JPUFE2HwgO5CXd6ip87
- STFnoca1WCSRiKthbbd7+wMurZDX8Iw58nmX0Cb0694AfS0I1VIoitHa7O3vnkCyan
- Xo5ibkjxKFsYEgKFVc0j1nT0GuWaTYLQJElTqHR5Y38KW1PT0WRon6h75rXJKKtzH4
- kzl6LzOiaiqeA==
+ b=G7AofQgODUbr6d7gEj8ghXTsZTmKSzSu5cymCUOvBVU4vDbZtSe5B9DAy2E3yiWRO
+ 79uuvcmFBNAP+06L0kcfw+sVCnu3NnHrXGhYfR0J9eFuza30Oa1VhjVp2zamzLKfvj
+ p3teCUCY5OMhKK35E4PqZ6Huwv0P01SiUv7Q4K1M8i3OqUujEvQkfRhMQOeR76WoJG
+ CZHt+5pmV0bLQ9RSlkYhA5oFdMOJQNMCpE/P5qITQeb6xJdsx9USy1S0DNURLj+mqV
+ jRi60A6hrawLPl+Y+YMKbsSPrjGM/Ba4TXhvzJ+J7dTbtG5yrU62sl7xtz003SpE1k
+ VUO5FGid6nBFQ==
 X-Virus-Scanned: Debian amavisd-new at keithp.com
 Received: from elaine.keithp.com ([127.0.0.1])
  by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id y7pLJsBPWu4E; Mon, 26 Oct 2020 14:06:20 -0700 (PDT)
+ with LMTP id ep3decOYF6mE; Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
 Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id BC9ED3F2DD60;
- Mon, 26 Oct 2020 14:06:20 -0700 (PDT)
+ by elaine.keithp.com (Postfix) with ESMTPSA id 247673F2DD60;
+ Mon, 26 Oct 2020 14:20:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603746380; bh=qCwCp5pS1/Te/2+yBMnqnmlqH7FAnO3igmcgeMGvmSU=;
+ t=1603747253; bh=IQUHrFXKJLaQlnApe4q47g7/mOk6S1Ckw1cgJjvGIf8=;
  h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=LIbtVcluhqpPaOuu7n8rGTHH659LcogZLDu0NaJKbJcSUsmbatMx2Vb10DUXDEVIK
- 6ng85DU4V98T0nUZoIj4ZSFCENiQ6v5o55Og6k4V+NDGzno4UeT4JZxqwRNZ1pRHAI
- 2CuP//GjxHo7BpiWGxaqrYDrjqwtWUaeClXZQYREUhcPxgSPcpOp0PYTlp0cRAQ0jX
- veCzbVp92p18+SIP806U0rnU7GF1Lw2qmhq5BWt966+87Wpws++PrjRGUrN1VxFKSS
- 2W9jLRfGYOTKfG+GuAirm19y/mEunw+SrL8QVBewI+xl+j2t0XFatMRcNuJe0u39NS
- ILj6I7cmOvdGA==
+ b=G7AofQgODUbr6d7gEj8ghXTsZTmKSzSu5cymCUOvBVU4vDbZtSe5B9DAy2E3yiWRO
+ 79uuvcmFBNAP+06L0kcfw+sVCnu3NnHrXGhYfR0J9eFuza30Oa1VhjVp2zamzLKfvj
+ p3teCUCY5OMhKK35E4PqZ6Huwv0P01SiUv7Q4K1M8i3OqUujEvQkfRhMQOeR76WoJG
+ CZHt+5pmV0bLQ9RSlkYhA5oFdMOJQNMCpE/P5qITQeb6xJdsx9USy1S0DNURLj+mqV
+ jRi60A6hrawLPl+Y+YMKbsSPrjGM/Ba4TXhvzJ+J7dTbtG5yrU62sl7xtz003SpE1k
+ VUO5FGid6nBFQ==
 Received: by keithp.com (Postfix, from userid 1000)
- id 98DB01582210; Mon, 26 Oct 2020 14:06:20 -0700 (PDT)
-To: Richard Henderson <richard.henderson@linaro.org>, Alistair Francis
- <alistair23@gmail.com>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>, Laurent
- Vivier <laurent@vivier.eu>, Palmer Dabbelt <palmer@dabbelt.com>, Alistair
- Francis <Alistair.Francis@wdc.com>, Sagar Karandikar
+ id E16411582210; Mon, 26 Oct 2020 14:20:52 -0700 (PDT)
+To: Richard Henderson <richard.henderson@linaro.org>, qemu-devel@nongnu.org
+Cc: Laurent Vivier <laurent@vivier.eu>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>, Sagar Karandikar
  <sagark@eecs.berkeley.edu>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>, "open list:RISC-V"
- <qemu-riscv@nongnu.org>
+ <kbastian@mail.uni-paderborn.de>, qemu-riscv@nongnu.org
 Subject: Re: [PATCH] riscv: Add semihosting support [v8]
-In-Reply-To: <32eb3f3a-1256-ac68-c2ad-e887269ee796@linaro.org>
+In-Reply-To: <4faf9e1f-45bd-9f47-8a5f-be7b6fcdf540@linaro.org>
 References: <20201023214940.917885-1-keithp@keithp.com>
- <CAKmqyKMzHARF7C9Lo8SYFBbPNa_=ibbWBNnedwFbe8AY=DdXVA@mail.gmail.com>
- <8736246ub3.fsf@keithp.com>
- <CAKmqyKP6CE1YpkfKo6=zghAbdN58oQvYNoafq70dvmR6OHyhtg@mail.gmail.com>
- <32eb3f3a-1256-ac68-c2ad-e887269ee796@linaro.org>
-Date: Mon, 26 Oct 2020 14:06:20 -0700
-Message-ID: <87a6w8hf3n.fsf@keithp.com>
+ <4faf9e1f-45bd-9f47-8a5f-be7b6fcdf540@linaro.org>
+Date: Mon, 26 Oct 2020 14:20:52 -0700
+Message-ID: <87zh48fzuz.fsf@keithp.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; boundary="=-=-=";
  micalg=pgp-sha256; protocol="application/pgp-signature"
@@ -116,13 +110,42 @@ Content-Transfer-Encoding: quoted-printable
 
 Richard Henderson <richard.henderson@linaro.org> writes:
 
-> This is no different to EXCP_DEBUG, really, which is also internal to qem=
-u but
-> user-visible in the same way.  Just adjust the logging in riscv_cpu_do_in=
-terrupt.
+> On 10/23/20 2:49 PM, Keith Packard via wrote:
+>>  static bool trans_ebreak(DisasContext *ctx, arg_ebreak *a)
+>>  {
+>> -    generate_exception(ctx, RISCV_EXCP_BREAKPOINT);
+>> +    uint32_t pre    =3D opcode_at(&ctx->base, ctx->base.pc_next - 4);
+>> +    uint32_t ebreak =3D opcode_at(&ctx->base, ctx->base.pc_next);
+>> +    uint32_t post   =3D opcode_at(&ctx->base, ctx->base.pc_next + 4);
+>
+> Alistair asked if this approach is ok.  I think it is.  There are other p=
+laces
+> in which we scan forward (usually only forward, not backward, but this is=
+ a
+> special nop, so it doesn't matter).
+>
+> However:
+>
+> (1) No need to re-read the current ebreak insn.  That is how we arrived h=
+ere,
+> after all.
 
-I think that's already handled by the early return in
-riscv_cpu_do_interrupt after handling the RISCV_EXCP_SEMIHOST case.
+The semihosting spec requires that we land here using a 32-bit ebreak
+instruction, not the compressed version, so I think we still need to
+check for this.
+
+> (2) You need to check for page boundaries before reading pre and post.
+> Otherwise you could wind up with SIGSEGV (or the equivalent internal qemu
+> exception) when you shouldn't.
+
+Right, in that case the ebreak instruction should just raise a regular
+break point exception. I've added a check to make sure the address of
+the three functions match when and-ed with TARGET_PAGE_MASK.
+
+I've finished re-working this patch into a series which first modifies
+the ARM semihosting support to be architecture-independent, then adds
+the changes necessary to support RISC-V. Expect to see that series on
+the list shortly.
 
 =2D-=20
 =2Dkeith
@@ -132,19 +155,19 @@ Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+XOkwACgkQ2yIaaQAA
-ABFzEw//dNk30jK+07f3ZviNo7lvIUDRnhyNDtH7cTBE1YLjvhsPAoe9CkAF2Xhz
-7iyYsU/gRyWCIwAuCauyDeuGyPrbQKtCurq9QVUqZaebDj9KYT9ViAQSdPvclXEd
-xPL6kuOUWQcApdsuLFVi1MT4d+C9TLKorD14dzGU0sS8d8/1wvxnhy6kr8rpMcV+
-RUNPobXniJpdhzdUwTykHvzmTdCgpWI0Cunghzq3mLdFUT7FzAxQBHbcjdJB7/zJ
-bBmQ78aWQtbItb8yXzyxj9qPOdU6fBM3SvAv8D5s4eXfMsTpF3m6QNsMyGnzxv+Z
-S3U0/YqeC9r786FPVJD1zXvn/JcrCfj4Cto9rlzauMxbpr5lK5TE9d7NfwW++MME
-4qBx39AsaegJbmIYllZdxWh7Q4gej2k1bWL7XinqvNpbUvn751P8wKvl/Vg/YAoS
-p2CqQsR5QnyUEb0OQgcERrZSe18HbiUo5YPQYiQ5eyH1vFSpjHGoS6ghHbJowMTT
-Ch/NRO1lci5Zdg9DdZTtuM5G1BtGFb8DEF6VsxUx74mXyHQG5k+OC8EIAlg9hL2G
-j8mUdlm9oph9zb/U6+Xc7UAF0G7d278V5MfOJj1y5wp4+J797EOUzUSixMUf3hTz
-KHkJ1M8L4VnTS07UL6mqo7uwUc19i2xJR6pwfEH5vgZgGNUQyG0=
-=AiRe
+iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+XPbQACgkQ2yIaaQAA
+ABHB0w//TcQubFd20vRnOTuVj4h8vOPLJJfy0/6Z7804eCGrlefBrjp3DkmofgHs
+V0d8+E+ZXguxTKJi3xyeMhl2GAP8E8ulOtNYblTjQ3NH9+hx3oUZsf23MouAfKyh
+2WLKelFOM32SiX52Ll7BR5Wb+jWztd4sUfg9Kq6MIL3FujWVXZrZ+OIWvDTaJtBl
+YSUgKIX6C988za4qMzNCmjizlkqo4JxEt8aYzid3xLdX/4fJz7Yn4qF9gTD0G5/7
+6Ny3V4x0vmWoqz4hqoXmndpgV4LJV7KGvf1vJbS7dZ5Xh0KW+vu+to0Xr3su53pG
+jN9zOl7HVuFOWcsD1PMZAGdBvNuYdaIEtvncFTtDD1wgKS5s3oYXOrWNIt5te8RT
+wuXBYUMCscnV7oTdt9yeJOyUSInMNrC8K5vt0khQr/KGe2hMs1URr164Wu4yNWuo
+eRICAZRmJCYzql8EAcKxFwBmid657BtmhMBXgrZBuIc5AtRit1grP/puars70VZ5
+jGlEmPRU9XcbihtIPDM7Y4L1xNbgBqTC9g64P5K24rryyYMFjGOXHGZqli+IYZm8
+bftEmh3IBIAdbepfkkx4F9LgZ8EnksnCBt566bO3T36wnscuIaT13bcM5xaoKNFx
+vS6zzlLNfcbLsO8ZUpm0xJ9CrS4//hBtEjiVKI4XbE9SabN0v7I=
+=Cbg1
 -----END PGP SIGNATURE-----
 --=-=-=--
 
