@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29360C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:43:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF3ABC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:44:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CE232087C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 219822087C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 19:44:26 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TaKrA+a4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CE232087C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSGC6m/I"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 219822087C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52540 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8OR-0005Q8-Hf
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:42:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58958)
+	id 1kX8Pp-0007Dt-05
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 15:44:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59146)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8EM-0001GD-VI
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:32:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50358)
+ id 1kX8Ev-0001S8-V2
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:33:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:48051)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8EK-0001o6-MI
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:32:34 -0400
+ id 1kX8Er-0001qJ-GQ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:33:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603740751;
+ s=mimecast20190719; t=1603740784;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=gRBv8gtvtb+BxoGYfOE4XPwq2UrnEob7q3biKmwLgeM=;
- b=TaKrA+a4HuFbZPRcQMCLQyEGQ0k7WP8gkJO/pS0wo4NzCKO/HoQgPKdTGVHh3DihCxoOIF
- Ulpp2GGhoEQLOidoOHMgYprcpfVSDr0ZvB9nWysVG4sLsIY43RBUKM3Ynwno9oHtfm/4O7
- Syzp3UNf+hPzZaozloK4mJc7GUL9siw=
+ bh=XE94pqoB7OjJCfXtMpOC8+9XOfDVwobB9fXwYDWxpQo=;
+ b=HSGC6m/I3NRpl/ZcIxIieHLxyFtsJXh5C0ZRnKv869ODuMYb8PtCuSXKjP9EVbBAFeIrTe
+ wrw8+SoQTQjOYmh2XesCO/XWhC/4voxesZYRas3F/ejltpiIY6cpjK7TeD/L0Nyqg1bMzQ
+ +D+tmNIakdiFXbXTA13Y/vy1ZU0scQI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-I3ij_1qQN6OXVPIVFfgPBg-1; Mon, 26 Oct 2020 15:32:28 -0400
-X-MC-Unique: I3ij_1qQN6OXVPIVFfgPBg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-530-quNhUC-oNB29of0HM0mF6g-1; Mon, 26 Oct 2020 15:33:00 -0400
+X-MC-Unique: quNhUC-oNB29of0HM0mF6g-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B74E61074649;
- Mon, 26 Oct 2020 19:32:27 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2933364089;
+ Mon, 26 Oct 2020 19:32:59 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5913C6EF46;
- Mon, 26 Oct 2020 19:32:23 +0000 (UTC)
-Subject: [PULL 01/32] vfio: Add function to unmap VFIO region
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 207225D9F3;
+ Mon, 26 Oct 2020 19:32:51 +0000 (UTC)
+Subject: [PULL 04/32] vfio: Add migration region initialization and finalize
+ function
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Mon, 26 Oct 2020 13:32:23 -0600
-Message-ID: <160374074345.22414.4431652222183906358.stgit@gimli.home>
+Date: Mon, 26 Oct 2020 13:32:50 -0600
+Message-ID: <160374077075.22414.15518947290986840570.stgit@gimli.home>
 In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
 References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,107 +99,213 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: Kirti Wankhede <kwankhede@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
- Neo Jia <cjia@nvidia.com>
+ Neo Jia <cjia@nvidia.com>, "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Kirti Wankhede <kwankhede@nvidia.com>
 
-This function will be used for migration region.
-Migration region is mmaped when migration starts and will be unmapped when
-migration is complete.
+Whether the VFIO device supports migration or not is decided based of
+migration region query. If migration region query is successful and migration
+region initialization is successful then migration is supported else
+migration is blocked.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
 Reviewed-by: Neo Jia <cjia@nvidia.com>
+Acked-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Reviewed-by: Cornelia Huck <cohuck@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/common.c              |   32 ++++++++++++++++++++++++++++----
- hw/vfio/trace-events          |    1 +
- include/hw/vfio/vfio-common.h |    1 +
- 3 files changed, 30 insertions(+), 4 deletions(-)
+ hw/vfio/meson.build           |    1 
+ hw/vfio/migration.c           |  122 +++++++++++++++++++++++++++++++++++++++++
+ hw/vfio/trace-events          |    3 +
+ include/hw/vfio/vfio-common.h |    9 +++
+ 4 files changed, 135 insertions(+)
+ create mode 100644 hw/vfio/migration.c
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 13471ae29436..c6e98b8d61be 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -924,6 +924,18 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-     return 0;
- }
- 
-+static void vfio_subregion_unmap(VFIORegion *region, int index)
+diff --git a/hw/vfio/meson.build b/hw/vfio/meson.build
+index 37efa74018bc..da9af297a0c5 100644
+--- a/hw/vfio/meson.build
++++ b/hw/vfio/meson.build
+@@ -2,6 +2,7 @@ vfio_ss = ss.source_set()
+ vfio_ss.add(files(
+   'common.c',
+   'spapr.c',
++  'migration.c',
+ ))
+ vfio_ss.add(when: 'CONFIG_VFIO_PCI', if_true: files(
+   'display.c',
+diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
+new file mode 100644
+index 000000000000..fd7faf423cdc
+--- /dev/null
++++ b/hw/vfio/migration.c
+@@ -0,0 +1,122 @@
++/*
++ * Migration support for VFIO devices
++ *
++ * Copyright NVIDIA, Inc. 2020
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2. See
++ * the COPYING file in the top-level directory.
++ */
++
++#include "qemu/osdep.h"
++#include <linux/vfio.h>
++
++#include "hw/vfio/vfio-common.h"
++#include "cpu.h"
++#include "migration/migration.h"
++#include "migration/qemu-file.h"
++#include "migration/register.h"
++#include "migration/blocker.h"
++#include "migration/misc.h"
++#include "qapi/error.h"
++#include "exec/ramlist.h"
++#include "exec/ram_addr.h"
++#include "pci.h"
++#include "trace.h"
++
++static void vfio_migration_exit(VFIODevice *vbasedev)
 +{
-+    trace_vfio_region_unmap(memory_region_name(&region->mmaps[index].mem),
-+                            region->mmaps[index].offset,
-+                            region->mmaps[index].offset +
-+                            region->mmaps[index].size - 1);
-+    memory_region_del_subregion(region->mem, &region->mmaps[index].mem);
-+    munmap(region->mmaps[index].mmap, region->mmaps[index].size);
-+    object_unparent(OBJECT(&region->mmaps[index].mem));
-+    region->mmaps[index].mmap = NULL;
++    VFIOMigration *migration = vbasedev->migration;
++
++    vfio_region_exit(&migration->region);
++    vfio_region_finalize(&migration->region);
++    g_free(vbasedev->migration);
++    vbasedev->migration = NULL;
 +}
 +
- int vfio_region_mmap(VFIORegion *region)
- {
-     int i, prot = 0;
-@@ -954,10 +966,7 @@ int vfio_region_mmap(VFIORegion *region)
-             region->mmaps[i].mmap = NULL;
- 
-             for (i--; i >= 0; i--) {
--                memory_region_del_subregion(region->mem, &region->mmaps[i].mem);
--                munmap(region->mmaps[i].mmap, region->mmaps[i].size);
--                object_unparent(OBJECT(&region->mmaps[i].mem));
--                region->mmaps[i].mmap = NULL;
-+                vfio_subregion_unmap(region, i);
-             }
- 
-             return ret;
-@@ -982,6 +991,21 @@ int vfio_region_mmap(VFIORegion *region)
-     return 0;
- }
- 
-+void vfio_region_unmap(VFIORegion *region)
++static int vfio_migration_init(VFIODevice *vbasedev,
++                               struct vfio_region_info *info)
 +{
-+    int i;
++    int ret;
++    Object *obj;
 +
-+    if (!region->mem) {
-+        return;
++    if (!vbasedev->ops->vfio_get_object) {
++        return -EINVAL;
 +    }
 +
-+    for (i = 0; i < region->nr_mmaps; i++) {
-+        if (region->mmaps[i].mmap) {
-+            vfio_subregion_unmap(region, i);
-+        }
++    obj = vbasedev->ops->vfio_get_object(vbasedev);
++    if (!obj) {
++        return -EINVAL;
 +    }
++
++    vbasedev->migration = g_new0(VFIOMigration, 1);
++
++    ret = vfio_region_setup(obj, vbasedev, &vbasedev->migration->region,
++                            info->index, "migration");
++    if (ret) {
++        error_report("%s: Failed to setup VFIO migration region %d: %s",
++                     vbasedev->name, info->index, strerror(-ret));
++        goto err;
++    }
++
++    if (!vbasedev->migration->region.size) {
++        error_report("%s: Invalid zero-sized VFIO migration region %d",
++                     vbasedev->name, info->index);
++        ret = -EINVAL;
++        goto err;
++    }
++    return 0;
++
++err:
++    vfio_migration_exit(vbasedev);
++    return ret;
 +}
 +
- void vfio_region_exit(VFIORegion *region)
- {
-     int i;
++/* ---------------------------------------------------------------------- */
++
++int vfio_migration_probe(VFIODevice *vbasedev, Error **errp)
++{
++    struct vfio_region_info *info = NULL;
++    Error *local_err = NULL;
++    int ret;
++
++    ret = vfio_get_dev_region_info(vbasedev, VFIO_REGION_TYPE_MIGRATION,
++                                   VFIO_REGION_SUBTYPE_MIGRATION, &info);
++    if (ret) {
++        goto add_blocker;
++    }
++
++    ret = vfio_migration_init(vbasedev, info);
++    if (ret) {
++        goto add_blocker;
++    }
++
++    g_free(info);
++    trace_vfio_migration_probe(vbasedev->name, info->index);
++    return 0;
++
++add_blocker:
++    error_setg(&vbasedev->migration_blocker,
++               "VFIO device doesn't support migration");
++    g_free(info);
++
++    ret = migrate_add_blocker(vbasedev->migration_blocker, &local_err);
++    if (local_err) {
++        error_propagate(errp, local_err);
++        error_free(vbasedev->migration_blocker);
++        vbasedev->migration_blocker = NULL;
++    }
++    return ret;
++}
++
++void vfio_migration_finalize(VFIODevice *vbasedev)
++{
++    if (vbasedev->migration) {
++        vfio_migration_exit(vbasedev);
++    }
++
++    if (vbasedev->migration_blocker) {
++        migrate_del_blocker(vbasedev->migration_blocker);
++        error_free(vbasedev->migration_blocker);
++        vbasedev->migration_blocker = NULL;
++    }
++}
 diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
-index 93a0bc2522f8..a0c7b49a2ebc 100644
+index a0c7b49a2ebc..9ced5ec6277c 100644
 --- a/hw/vfio/trace-events
 +++ b/hw/vfio/trace-events
-@@ -113,6 +113,7 @@ vfio_region_mmap(const char *name, unsigned long offset, unsigned long end) "Reg
- vfio_region_exit(const char *name, int index) "Device %s, region %d"
- vfio_region_finalize(const char *name, int index) "Device %s, region %d"
- vfio_region_mmaps_set_enabled(const char *name, bool enabled) "Region %s mmaps enabled: %d"
-+vfio_region_unmap(const char *name, unsigned long offset, unsigned long end) "Region %s unmap [0x%lx - 0x%lx]"
- vfio_region_sparse_mmap_header(const char *name, int index, int nr_areas) "Device %s region %d: %d sparse mmap entries"
- vfio_region_sparse_mmap_entry(int i, unsigned long start, unsigned long end) "sparse entry %d [0x%lx - 0x%lx]"
- vfio_get_dev_region(const char *name, int index, uint32_t type, uint32_t subtype) "%s index %d, %08x/%0x8"
+@@ -145,3 +145,6 @@ vfio_display_edid_link_up(void) ""
+ vfio_display_edid_link_down(void) ""
+ vfio_display_edid_update(uint32_t prefx, uint32_t prefy) "%ux%u"
+ vfio_display_edid_write_error(void) ""
++
++# migration.c
++vfio_migration_probe(const char *name, uint32_t index) " (%s) Region %d"
 diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index c78f3ff5593c..dc95f527b583 100644
+index ba6169cd926e..8275c4c68f45 100644
 --- a/include/hw/vfio/vfio-common.h
 +++ b/include/hw/vfio/vfio-common.h
-@@ -171,6 +171,7 @@ int vfio_region_setup(Object *obj, VFIODevice *vbasedev, VFIORegion *region,
-                       int index, const char *name);
- int vfio_region_mmap(VFIORegion *region);
- void vfio_region_mmaps_set_enabled(VFIORegion *region, bool enabled);
-+void vfio_region_unmap(VFIORegion *region);
- void vfio_region_exit(VFIORegion *region);
- void vfio_region_finalize(VFIORegion *region);
- void vfio_reset_handler(void *opaque);
+@@ -57,6 +57,10 @@ typedef struct VFIORegion {
+     uint8_t nr; /* cache the region number for debug */
+ } VFIORegion;
+ 
++typedef struct VFIOMigration {
++    VFIORegion region;
++} VFIOMigration;
++
+ typedef struct VFIOAddressSpace {
+     AddressSpace *as;
+     QLIST_HEAD(, VFIOContainer) containers;
+@@ -113,6 +117,8 @@ typedef struct VFIODevice {
+     unsigned int num_irqs;
+     unsigned int num_regions;
+     unsigned int flags;
++    VFIOMigration *migration;
++    Error *migration_blocker;
+ } VFIODevice;
+ 
+ struct VFIODeviceOps {
+@@ -204,4 +210,7 @@ int vfio_spapr_create_window(VFIOContainer *container,
+ int vfio_spapr_remove_window(VFIOContainer *container,
+                              hwaddr offset_within_address_space);
+ 
++int vfio_migration_probe(VFIODevice *vbasedev, Error **errp);
++void vfio_migration_finalize(VFIODevice *vbasedev);
++
+ #endif /* HW_VFIO_VFIO_COMMON_H */
 
 
