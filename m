@@ -2,90 +2,73 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99DF0C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:42:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D719C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:42:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19621223EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:42:13 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Tfa4I9mk"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19621223EA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id A596F2075B
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:42:40 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A596F2075B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34016 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWz12-00042z-4E
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:42:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60190)
+	id 1kWz1T-000528-Gf
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:42:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kWyzG-0002bb-KL
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:40:22 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53146)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kWyzD-00054s-Ih
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:40:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603705216;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=oLmsJ99OS0U995klmvtVy0dW5YqlaC5YIIAYkHyV9pA=;
- b=Tfa4I9mkf4hzfDOz7p1wPm0ejdPmSK/X8a4660uvO/iRU0MyJOWhNQEXv46tbFHFz2mYH/
- PJTw5Fu8vATyny1+d38ms//n9R7e+UYM6gLIFDImj8RQmpT3RM+NnV44xfScLZV3aR/vy1
- q7DVb3xWOQKXZMw8KE2+ncml2D1OLvE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-48-EOTBlP2NNRKZ_HjKtXWNYA-1; Mon, 26 Oct 2020 05:40:14 -0400
-X-MC-Unique: EOTBlP2NNRKZ_HjKtXWNYA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 072501009E30;
- Mon, 26 Oct 2020 09:40:13 +0000 (UTC)
-Received: from work-vm (ovpn-112-208.ams2.redhat.com [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id F3FAD1043270;
- Mon, 26 Oct 2020 09:40:07 +0000 (UTC)
-Date: Mon, 26 Oct 2020 09:40:05 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH] ACPI: Avoid infinite recursion when dump-vmstate
-Message-ID: <20201026094005.GC3277@work-vm>
-References: <20201019093156.2993284-1-liangpeng10@huawei.com>
- <20201023180933.2fe23875@redhat.com>
- <20201023185441.GP3038@work-vm>
- <20201023212346.79e54986@redhat.com>
+ (Exim 4.90_1) (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWz0T-0003lm-L5
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:41:37 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:55986)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWz0R-0005pX-RQ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:41:37 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by hera.aquilenet.fr (Postfix) with ESMTP id 5FEBBB8;
+ Mon, 26 Oct 2020 10:41:34 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
+Received: from hera.aquilenet.fr ([127.0.0.1])
+ by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id wWMiCo2B_gHJ; Mon, 26 Oct 2020 10:41:33 +0100 (CET)
+Received: from function (lfbn-bor-1-56-204.w90-50.abo.wanadoo.fr
+ [90.50.148.204])
+ by hera.aquilenet.fr (Postfix) with ESMTPSA id 773829D;
+ Mon, 26 Oct 2020 10:41:33 +0100 (CET)
+Received: from samy by function with local (Exim 4.94)
+ (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWz0O-006i2p-Qg; Mon, 26 Oct 2020 10:41:32 +0100
+Date: Mon, 26 Oct 2020 10:41:32 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Subject: Re: [PATCH 5/9] dev-serial: replace DeviceOutVendor/DeviceInVendor
+ with equivalent macros from usb.h
+Message-ID: <20201026094132.65noafdyxe6ssxi7@function>
+References: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
+ <20201026083401.13231-6-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20201023212346.79e54986@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201026083401.13231-6-mark.cave-ayland@ilande.co.uk>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
+Received-SPF: softfail client-ip=2a0c:e300::1;
+ envelope-from=samuel.thibault@gnu.org; helo=hera.aquilenet.fr
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,110 +81,114 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peng Liang <liangpeng10@huawei.com>, mst@redhat.com, qemu-devel@nongnu.org,
- xiexiangyou@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Igor Mammedov (imammedo@redhat.com) wrote:
-> On Fri, 23 Oct 2020 19:54:41 +0100
-> "Dr. David Alan Gilbert" <dgilbert@redhat.com> wrote:
+Mark Cave-Ayland, le lun. 26 oct. 2020 08:33:57 +0000, a ecrit:
+> The DeviceOutVendor and DeviceInVendor macros can be replaced with their
+> equivalent VendorDeviceOutRequest and VendorDeviceRequest macros from usb.h.
 > 
-> > * Igor Mammedov (imammedo@redhat.com) wrote:
-> > > On Mon, 19 Oct 2020 17:31:56 +0800
-> > > Peng Liang <liangpeng10@huawei.com> wrote:
-> > >   
-> > > > There is a field with vmstate_ghes_state as vmsd in vmstate_ghes_state,
-> > > > which will lead to infinite recursion in dump_vmstate_vmsd.
-> > > > 
-> > > > Fixes: a08a64627b ("ACPI: Record the Generic Error Status Block address")
-> > > > Reported-by: Euler Robot <euler.robot@huawei.com>
-> > > > Signed-off-by: Peng Liang <liangpeng10@huawei.com>
-> > > > ---
-> > > >  hw/acpi/generic_event_device.c | 3 +--
-> > > >  1 file changed, 1 insertion(+), 2 deletions(-)
-> > > > 
-> > > > diff --git a/hw/acpi/generic_event_device.c b/hw/acpi/generic_event_device.c
-> > > > index 6df400e1ee16..4b6867300a55 100644
-> > > > --- a/hw/acpi/generic_event_device.c
-> > > > +++ b/hw/acpi/generic_event_device.c
-> > > > @@ -334,8 +334,7 @@ static const VMStateDescription vmstate_ghes_state = {
-> > > >      .minimum_version_id = 1,
-> > > >      .needed = ghes_needed,
-> > > >      .fields      = (VMStateField[]) {
-> > > > -        VMSTATE_STRUCT(ghes_state, AcpiGedState, 1,
-> > > > -                       vmstate_ghes_state, AcpiGhesState),
-> > > > +        VMSTATE_UINT64(ghes_state.ghes_addr_le, AcpiGedState),  
-> > > 
-> > > not sure its' ok handle it this way,
-> > > 
-> > > see how it is done with another structure:
-> > > 
-> > > static const VMStateDescription vmstate_ged_state = {                            
-> > >     .name = "acpi-ged-state",                                                    
-> > >     .version_id = 1,                                                             
-> > >     .minimum_version_id = 1,                                                     
-> > >     .fields      = (VMStateField[]) {                                            
-> > >         VMSTATE_UINT32(sel, GEDState),                                           
-> > >         VMSTATE_END_OF_LIST()                                                    
-> > >     }                                                                            
-> > > }; 
-> > > 
-> > > ...
-> > > 
-> > > VMSTATE_STRUCT(ged_state, AcpiGedState, 1, vmstate_ged_state, GEDState),
-> > > 
-> > > i.e. it looks like we are missing structure definition for AcpiGhesState
-> > > 
-> > > CCing David,
-> > >  to help with migration magic in case I'm wrong or missed something  
-> > 
-> > Yeh that's confusing :-)
-> > 
-> > Given a:
-> > 
-> >   VMSTATE_STRUCT(a, B, 1, vmstate_c, C)
-> > 
-> > We're saying there's a field 'a' in type B, and field 'a'
-> > should be of type C and be serialised using vmstate_c.
-> > 
-> > That also means that in any vmstate_c, we're expecting it
-> > to be passed a type C generally.
-> > 
-> > Having said that; you don't need a struct - you can get away
-> > with that VMSTATE_UINT64, there's two problems:
-> > 
-> >   a) That assumes that your ghes always stays that simple.
-> >   b) If you wanted to store a Ghes from a number of different
-> > parent structures then you're stuck because your vmstate_ghes_state
-> > is bound to being a strict field of AcpiGedState.
-> > 
-> > So yes, it's neatest to do it using a VMSD for AcpiGhesState
-> > 
-> > And congratulations on finding a loop; I don't think we've ever had one
-> > before :-)
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+
+> ---
+>  hw/usb/dev-serial.c | 25 ++++++++++---------------
+>  1 file changed, 10 insertions(+), 15 deletions(-)
 > 
-> can we make compilation fail in case VMSTATE_STRUCT is used but
-> is not actually provided like it was in this case?
-
-There's some type checking by the vmstate_offset_value macro; which I
-think would have verified that the 'ghes_state' field in AcpiGedState
-really is of type AcpiGhesState; but what we don't have is a type
-associated with a given VMStateDescription to know what type of state
-it's supposed to be called on.
-
-Dave
-
-> > 
-> > Dave
-> > 
-> > > >          VMSTATE_END_OF_LIST()
-> > > >      }
-> > > >  };  
-> > >   
+> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+> index badf8785db..92c35615eb 100644
+> --- a/hw/usb/dev-serial.c
+> +++ b/hw/usb/dev-serial.c
+> @@ -37,11 +37,6 @@
+>  #define FTDI_SET_LATENCY       9
+>  #define FTDI_GET_LATENCY       10
+>  
+> -#define DeviceOutVendor \
+> -           ((USB_DIR_OUT | USB_TYPE_VENDOR | USB_RECIP_DEVICE) << 8)
+> -#define DeviceInVendor \
+> -           ((USB_DIR_IN | USB_TYPE_VENDOR | USB_RECIP_DEVICE) << 8)
+> -
+>  /* RESET */
+>  
+>  #define FTDI_RESET_SIO 0
+> @@ -253,7 +248,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>          break;
+>  
+>      /* Class specific requests.  */
+> -    case DeviceOutVendor | FTDI_RESET:
+> +    case VendorDeviceOutRequest | FTDI_RESET:
+>          switch (value) {
+>          case FTDI_RESET_SIO:
+>              usb_serial_reset(s);
+> @@ -268,7 +263,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>              break;
+>          }
+>          break;
+> -    case DeviceOutVendor | FTDI_SET_MDM_CTRL:
+> +    case VendorDeviceOutRequest | FTDI_SET_MDM_CTRL:
+>      {
+>          static int flags;
+>          qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_GET_TIOCM, &flags);
+> @@ -289,10 +284,10 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>          qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_TIOCM, &flags);
+>          break;
+>      }
+> -    case DeviceOutVendor | FTDI_SET_FLOW_CTRL:
+> +    case VendorDeviceOutRequest | FTDI_SET_FLOW_CTRL:
+>          /* TODO: ioctl */
+>          break;
+> -    case DeviceOutVendor | FTDI_SET_BAUD: {
+> +    case VendorDeviceOutRequest | FTDI_SET_BAUD: {
+>          static const int subdivisors8[8] = { 0, 4, 2, 1, 3, 5, 6, 7 };
+>          int subdivisor8 = subdivisors8[((value & 0xc000) >> 14)
+>                                       | ((index & 1) << 2)];
+> @@ -311,7 +306,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>          qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+>          break;
+>      }
+> -    case DeviceOutVendor | FTDI_SET_DATA:
+> +    case VendorDeviceOutRequest | FTDI_SET_DATA:
+>          switch (value & FTDI_PARITY) {
+>          case 0:
+>              s->params.parity = 'N';
+> @@ -346,23 +341,23 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>          qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+>          /* TODO: TX ON/OFF */
+>          break;
+> -    case DeviceInVendor | FTDI_GET_MDM_ST:
+> +    case VendorDeviceRequest | FTDI_GET_MDM_ST:
+>          data[0] = usb_get_modem_lines(s) | 1;
+>          data[1] = FTDI_THRE | FTDI_TEMT;
+>          p->actual_length = 2;
+>          break;
+> -    case DeviceOutVendor | FTDI_SET_EVENT_CHR:
+> +    case VendorDeviceOutRequest | FTDI_SET_EVENT_CHR:
+>          /* TODO: handle it */
+>          s->event_chr = value;
+>          break;
+> -    case DeviceOutVendor | FTDI_SET_ERROR_CHR:
+> +    case VendorDeviceOutRequest | FTDI_SET_ERROR_CHR:
+>          /* TODO: handle it */
+>          s->error_chr = value;
+>          break;
+> -    case DeviceOutVendor | FTDI_SET_LATENCY:
+> +    case VendorDeviceOutRequest | FTDI_SET_LATENCY:
+>          s->latency = value;
+>          break;
+> -    case DeviceInVendor | FTDI_GET_LATENCY:
+> +    case VendorDeviceRequest | FTDI_GET_LATENCY:
+>          data[0] = s->latency;
+>          p->actual_length = 1;
+>          break;
+> -- 
+> 2.20.1
 > 
+
 -- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
-
+Samuel
+How do I type "for i in *.dvi do xdvi i done" in a GUI?
+(Discussion in comp.os.linux.misc on the intuitiveness of interfaces.)
 
