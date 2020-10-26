@@ -2,81 +2,94 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F6FCC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28EDBC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:04:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 718A220790
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:03:00 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 718A220790
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 890EA20790
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:04:58 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RpUwrpVM"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 890EA20790
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56786 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX29L-0001ay-9Z
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54224)
+	id 1kX2BF-0003CW-Hd
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:04:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54244)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kX27U-0000o7-0S
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kX27V-0000o9-0x
  for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:01:05 -0400
-Received: from indium.canonical.com ([91.189.90.7]:58158)
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:45387)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kX27P-0002NV-Lj
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:01:03 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kX27N-0005mR-Jf
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:00:57 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 89C252E8134
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:00:57 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <jandryuk@gmail.com>)
+ id 1kX27P-0002NS-JA
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:01:04 -0400
+Received: by mail-lj1-x242.google.com with SMTP id a4so9901272lji.12
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 06:00:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=RpfeeoDviQV6DXLvvMEhJ2UVvtRanZGrvRd5j475GgA=;
+ b=RpUwrpVMpErJqzGO45RZ5MI+XY73/NgzQvBqkPHfwsrSi9D7uhiD7SDmEfNDJyJRFF
+ lgbz+CubmxMKMVmALIkxVtk+UIaNTK6D4Q6f5iXqoB1xTkA9Agls9TreuutCu4OsWTyI
+ y8PPn9D54vlU1ZC8mwrEJ7AKxk1JHG6AR7HQIh5tHd2+U85JplJz3mBKKew54m0aJWjp
+ ZbTZT9HPMLqtikWAU11oAJSj2T6aRJ6zF2HgkziBqXokhZiKAnmJbkSPW/UhUZr0TX3U
+ 1Gkm93iQDfUf9ZXI6UklYyXyYheNi3EoXv2QIUY7SeoVE20t7ICY73OQxAfYq7utbPeq
+ Tv5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=RpfeeoDviQV6DXLvvMEhJ2UVvtRanZGrvRd5j475GgA=;
+ b=GCM9VIEbs5PfEzPt8xnrrqBqu/r6N4wFP0pDF5y3OivCyux2byWZ5sZjymw8TS1o/1
+ 3+K7fulNJINoq1DH0XkhPP6v/GTm7Qy/+Z7oRfn3WK4eRvcQnUVWwU0UHRAkvH21i9bv
+ K2o/mOuYGOG6uinRMgi2SQUuxikXyxENVRkspvMRQ7kkH72z3PQS3T/1PqXL42EjFfrl
+ GruBwxgUYLc3Bqd1m8Jz/md5aG9IK3/SAR/nutldv+jShAWb3GbX6nK1y/j+lEFYjyxc
+ 84I91QECeV8qaVn9z2Hy06jrNOytiy/7ucIoehJFwXDiUhGV/scshmUHnMrY2S/+dOCv
+ WFaQ==
+X-Gm-Message-State: AOAM530PPoLbqCGykaC9USOo1IX67LeEwcTucFI5SYeE1n4LobxAxIBV
+ pnMG18Gp0VphsZHR+USIZRagC9c1smR4lm7zS+Q=
+X-Google-Smtp-Source: ABdhPJzomO6ix0sJipLbvhfDdoxWduW3+QfaS11GnPcVvCH7txj+jTpg6jTHfO/BcNkKSaGTcF45qHhCb3cc3UZFjBU=
+X-Received: by 2002:a2e:b0c7:: with SMTP id g7mr5431540ljl.433.1603717256254; 
+ Mon, 26 Oct 2020 06:00:56 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Mon, 26 Oct 2020 12:45:57 -0000
-From: Thomas Huth <1901440@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: distribution=ubuntu; sourcepackage=qemu; component=main;
- status=New; importance=Undecided; assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: player-001 th-huth
-X-Launchpad-Bug-Reporter: Dave G (player-001)
-X-Launchpad-Bug-Modifier: Thomas Huth (th-huth)
-References: <160365777400.12451.12378376347775649238.malonedeb@soybean.canonical.com>
-Message-Id: <160371635750.30384.277782006879559371.malone@gac.canonical.com>
-Subject: [Bug 1901440] Re: Instability in IVSHMEM after updating QEMU 4.2 ->
- 5.0
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="bc5a16cfdc4ba776ecdf84a052201ef8fb1f3321"; Instance="production"
-X-Launchpad-Hash: e9f61fdaea9d824e6f069a976b98e7dbfaf61d1f
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 04:15:38
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+References: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
+ <20201026083401.13231-9-mark.cave-ayland@ilande.co.uk>
+ <20201026095450.ko6snc4dusk3pvnw@function>
+ <547c0ea5-dad4-d246-1de8-844a2e9a9507@ilande.co.uk>
+ <20201026111406.jvpexlkh53g4fxff@function>
+In-Reply-To: <20201026111406.jvpexlkh53g4fxff@function>
+From: Jason Andryuk <jandryuk@gmail.com>
+Date: Mon, 26 Oct 2020 09:00:44 -0400
+Message-ID: <CAKf6xpvcnmEs+v3+Tm1srQfo=m37EAGRPynJDJy4HkMuCmD6NQ@mail.gmail.com>
+Subject: Re: [PATCH 8/9] dev-serial: fix FTDI_GET_MDM_ST response
+To: Samuel Thibault <samuel.thibault@gnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=jandryuk@gmail.com; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,78 +98,81 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1901440 <1901440@bugs.launchpad.net>
+Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ QEMU <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ok, so I'm moving this to the Ubuntu bug tracker.
+On Mon, Oct 26, 2020 at 7:21 AM Samuel Thibault <samuel.thibault@gnu.org> wrote:
+>
+> Mark Cave-Ayland, le lun. 26 oct. 2020 10:58:43 +0000, a ecrit:
+> > On 26/10/2020 09:54, Samuel Thibault wrote:
+> > > Mark Cave-Ayland, le lun. 26 oct. 2020 08:34:00 +0000, a ecrit:
+> > > > The FTDI_GET_MDM_ST response should only return a single byte indicating the
+> > > > modem status with bit 0 cleared (as documented in the Linux ftdi_sio.h header
+> > > > file).
+> > > >
+> > > > Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> > > > ---
+> > > >   hw/usb/dev-serial.c | 5 ++---
+> > > >   1 file changed, 2 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+> > > > index 4c374d0790..fa734bcf54 100644
+> > > > --- a/hw/usb/dev-serial.c
+> > > > +++ b/hw/usb/dev-serial.c
+> > > > @@ -360,9 +360,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+> > > >           /* TODO: TX ON/OFF */
+> > > >           break;
+> > > >       case VendorDeviceRequest | FTDI_GET_MDM_ST:
+> > > > -        data[0] = usb_get_modem_lines(s) | 1;
+> > > > -        data[1] = FTDI_THRE | FTDI_TEMT;
+> > > > -        p->actual_length = 2;
+> > > > +        data[0] = usb_get_modem_lines(s);
+> > > > +        p->actual_length = 1;
+> > >
+> [...]
+> > A quick test shows my Chipi-X returns 0x1 0x60 with nothing attached in
+> > response to FTDI_SIO_GET_MODEM_STATUS_REQUEST: assuming the reply length
+> > should be 2 bytes, the comment about B0-B3 being zero and the response from
+> > my Chip-X above suggests that the "| 1" should still be dropped from the
+> > response.
+>
+> Aurelien, you introduced the "| 1" in
+>
+> commit abb8a13918ecc1e8160aa78582de9d5224ea70df
+> Author: Aurelien Jarno <aurelien@aurel32.net>
+> Date:   Wed Aug 13 04:23:17 2008 +0000
+>
+>     usb-serial: add support for modem lines
+>
+> [...]
+> @@ -357,9 +393,9 @@ static int usb_serial_handle_control(USBDevice *dev, int request, int value,
+>          /* TODO: TX ON/OFF */
+>          break;
+>      case DeviceInVendor | FTDI_GET_MDM_ST:
+> -        /* TODO: return modem status */
+> -        data[0] = 0;
+> -        ret = 1;
+> +        data[0] = usb_get_modem_lines(s) | 1;
+> +        data[1] = 0;
+> +        ret = 2;
+>          break;
+>
+> do you know exactly what it is for?
 
-** Project changed: qemu =3D> qemu (Ubuntu)
+Hi,
 
--- =
+I'm not particularly familiar with the FTDI USB serial devices.  I
+found setting FTDI_THRE | FTDI_TEMT by comparing with real hardware.
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1901440
+A little searching found this:
+https://elixir.bootlin.com/linux/latest/source/drivers/usb/serial/ftdi_sio.h#L541
 
-Title:
-  Instability in IVSHMEM after updating QEMU 4.2 -> 5.0
+That shows "B0   Reserved - must be 1", so maybe that is why "| 1" was added?
 
-Status in qemu package in Ubuntu:
-  New
-
-Bug description:
-  Updating Ubuntu from 20.08 to 20.10 which updates QEMU from 4.2 to 5.0
-  results in the virtual machines freezing when the IVSHMEM interface is
-  active.  This workstation typically runs several windows 10 virtual
-  machines that are accessed locally:  two using the spice viewer and
-  one that uses an passthrough assigned GPU accessed through a viewer
-  called Looking Glass.  Looking Glass uses the IVSHMEM device interface
-  to pass captured frames from the windows virtual machine to the linux
-  host for display by a viewer application.
-
-  This workstation was 100% stable under Ubuntu 20.08 (QEMU 4.2).  It
-  handled a variety of heavy loads all day it never froze or crashed.
-  It became unstable under Ubuntu 20.10 (QEMU 5.0), seemingly triggered
-  by high levels of SHM activity.  I was able to reliably reproduce the
-  problem when playing a video in the looking-glass vm while playing
-  another video in a spice vm.  Other scenarios would also trigger this
-  problem less reliably, but this video playback scenario would trigger
-  it after 3-5 minutes of playback.
-
-  The result of this new instability would manifest itself by all
-  running vms on the host freezing but the host was not visibly
-  effected.  I could find no warnings or errors in any relevant system
-  or QEMU logs.  It wasn't just spice, when I accessed the gpu-passthru
-  vm via directly assigned devices it was frozen, still outputting video
-  of the last frame before the crash.  All vms would have to be force-
-  shutdown and the host rebooted to regain vm functionality.  Just
-  forcing shutdown and restarting a vm would result in showing 'running'
-  status but it would be frozen and inaccessible until system reboot.
-
-  I suspect this is a QEMU host / kernel error for several reasons:
-  Having to reboot the host, insensitivity to VM changes including
-  virtio-win version, etc.  I suspect it's related to IVSHMEM due to the
-  correlation of the freeze to the looking-glass related activity.
-
-  This might be kernel / PCIe / power management related in some way.
-  While experimenting to troubleshoot this issue I was able to trigger
-  the error more quickly by disabling PCIe power management in the BIOS.
-
-  The system was 100% stable under QEMU 5.0 when not running the
-  looking-glass vm, quite stable when the looking-glass vm was idle or
-  lightly used, but appeared increasingly unstable as SHM activity
-  increased.
-
-  Sorry if this is a bit anecdotal, this is my work machine and
-  unfortunately today I was forced to rollback restore to Ubuntu 20.08
-  (QEMU 4.2) from backup so I can work on Monday.  The system returned
-  to 100% stability after returning to 20.08.
-
-  If requested I can restore the Ubuntu 20.10 snapshot to reproduce &
-  gather information as directed.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/ubuntu/+source/qemu/+bug/1901440/+subscriptions
+Regards,
+Jason
 
