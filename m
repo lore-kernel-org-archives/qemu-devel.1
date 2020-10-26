@@ -2,86 +2,60 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7B2AC55178
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:01:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02F32C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:05:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DE6E20706
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:01:56 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VulL4z0h"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE6E20706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 952E722460
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:05:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 952E722460
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=arm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34012 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42198 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX4wV-0001ul-5X
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:01:55 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51050)
+	id 1kX4zi-0005Oj-OA
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:05:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52520)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kX4pP-0002ko-Nv
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 11:54:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60482)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kX4pO-0004U9-5n
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 11:54:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603727672;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=hF5PTBLVjy2CuSHHEyxICX0prM5nf+mUDdhBFkn2ZIA=;
- b=VulL4z0hU8gytIudAcEQ+WqKAbKKHIW54UuAC2trs/6K+aQl5z00LOpQIxwDEdjwzT/hX1
- 4OltTUFhjkM1XdthP2C8N7CMXZVLcFCiYpIKYfsRVUxvmL5MIThcB2S5dGikDt8hQZVQbu
- uDWvbDMmArw114gx+nesKIyWAmaNhvQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-265-dZwwczYUN96L_ELKK5SAig-1; Mon, 26 Oct 2020 11:54:29 -0400
-X-MC-Unique: dZwwczYUN96L_ELKK5SAig-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D5DF6809DC9
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 15:54:28 +0000 (UTC)
-Received: from localhost (ovpn-114-214.ams2.redhat.com [10.36.114.214])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 76A3319D6C;
- Mon, 26 Oct 2020 15:54:28 +0000 (UTC)
-Date: Mon, 26 Oct 2020 15:54:27 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
-Subject: Re: [PATCH v4 4/5] tools/virtiofsd: xattr name mapping examples
-Message-ID: <20201026155427.GF52035@stefanha-x1.localdomain>
-References: <20201023165812.36028-1-dgilbert@redhat.com>
- <20201023165812.36028-5-dgilbert@redhat.com>
+ (Exim 4.90_1) (envelope-from <steven.price@arm.com>)
+ id 1kX4sY-0006Kk-Cw
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 11:57:50 -0400
+Received: from foss.arm.com ([217.140.110.172]:35908)
+ by eggs.gnu.org with esmtp (Exim 4.90_1)
+ (envelope-from <steven.price@arm.com>) id 1kX4sV-0005D5-KQ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 11:57:49 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+ by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E3F8E11FB;
+ Mon, 26 Oct 2020 08:57:45 -0700 (PDT)
+Received: from e112269-lin.arm.com (unknown [172.31.20.19])
+ by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 589CC3F719;
+ Mon, 26 Oct 2020 08:57:43 -0700 (PDT)
+From: Steven Price <steven.price@arm.com>
+To: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>
+Subject: [PATCH v4 2/2] arm64: kvm: Introduce MTE VCPU feature
+Date: Mon, 26 Oct 2020 15:57:27 +0000
+Message-Id: <20201026155727.36685-3-steven.price@arm.com>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201026155727.36685-1-steven.price@arm.com>
+References: <20201026155727.36685-1-steven.price@arm.com>
 MIME-Version: 1.0
-In-Reply-To: <20201023165812.36028-5-dgilbert@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="yRA+Bmk8aPhU85Qt"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=217.140.110.172;
+ envelope-from=steven.price@arm.com; helo=foss.arm.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 11:57:40
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,37 +69,161 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: dinechin@redhat.com, virtio-fs@redhat.com, qemu-devel@nongnu.org,
- vgoyal@redhat.com
+Cc: Mark Rutland <mark.rutland@arm.com>,
+ Peter Maydell <peter.maydell@linaro.org>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Andrew Jones <drjones@redhat.com>, Haibo Xu <Haibo.Xu@arm.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, qemu-devel@nongnu.org,
+ Dave Martin <Dave.Martin@arm.com>, Juan Quintela <quintela@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>, linux-kernel@vger.kernel.org,
+ Steven Price <steven.price@arm.com>, James Morse <james.morse@arm.com>,
+ Julien Thierry <julien.thierry.kdev@gmail.com>,
+ Thomas Gleixner <tglx@linutronix.de>, kvmarm@lists.cs.columbia.edu,
+ linux-arm-kernel@lists.infradead.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---yRA+Bmk8aPhU85Qt
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Add a new VM feature 'KVM_ARM_CAP_MTE' which enables memory tagging
+for a VM. This exposes the feature to the guest and automatically tags
+memory pages touched by the VM as PG_mte_tagged (and clears the tags
+storage) to ensure that the guest cannot see stale tags, and so that the
+tags are correctly saved/restored across swap.
 
-On Fri, Oct 23, 2020 at 05:58:11PM +0100, Dr. David Alan Gilbert (git) wrote:
-> +The third rule stops a guest from explicitly setting
-> +the 'user.viritofs.' path directly.
+Signed-off-by: Steven Price <steven.price@arm.com>
+Reviewed-by: Andrew Jones <drjones@redhat.com>
+---
+ arch/arm64/include/asm/kvm_emulate.h |  3 +++
+ arch/arm64/include/asm/kvm_host.h    |  3 +++
+ arch/arm64/kvm/arm.c                 |  9 +++++++++
+ arch/arm64/kvm/mmu.c                 | 20 ++++++++++++++++++++
+ arch/arm64/kvm/sys_regs.c            |  6 +++++-
+ include/uapi/linux/kvm.h             |  1 +
+ 6 files changed, 41 insertions(+), 1 deletion(-)
 
-s/virito/virtio/
-
---yRA+Bmk8aPhU85Qt
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+W8TMACgkQnKSrs4Gr
-c8h1eQf+MPFHU/Gm6bGNu/Zh4G5Kz6VB0R1y+4LIx/MR2FIx2MviyLJYCsB/jaFE
-OfoFofaKp0sqkDs+Oc5i7zTAAq6//oFp8mthREL+JgGcb/mCHcC6nyfun5+p3DWc
-KOqwcDikQgBwm1342R0YhdJHSY90reyD/0WsPoqJ6ezLDAnqdoyxHyqWPxLYy/+c
-Z1DFaDUmsfVTrLw0H6KIjIQgEyS1++MINjpaJDVZP5Z4zE5w4AsHnJJNE6oDV+1W
-Sr8/l+G47vKhSqVGVTdh+QyxeknyyOVJbDcNrRepvjSq0DMGHnrEx23gXfm6DyyM
-mtRrh1rRmxriEOnv1n6CSLGs9h222Q==
-=wL1+
------END PGP SIGNATURE-----
-
---yRA+Bmk8aPhU85Qt--
+diff --git a/arch/arm64/include/asm/kvm_emulate.h b/arch/arm64/include/asm/kvm_emulate.h
+index 5ef2669ccd6c..66c0d9e7c2b4 100644
+--- a/arch/arm64/include/asm/kvm_emulate.h
++++ b/arch/arm64/include/asm/kvm_emulate.h
+@@ -79,6 +79,9 @@ static inline void vcpu_reset_hcr(struct kvm_vcpu *vcpu)
+ 	if (cpus_have_const_cap(ARM64_MISMATCHED_CACHE_TYPE) ||
+ 	    vcpu_el1_is_32bit(vcpu))
+ 		vcpu->arch.hcr_el2 |= HCR_TID2;
++
++	if (vcpu->kvm->arch.mte_enabled)
++		vcpu->arch.hcr_el2 |= HCR_ATA;
+ }
+ 
+ static inline unsigned long *vcpu_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 95ab7345dcc8..cd993aec0440 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -118,6 +118,9 @@ struct kvm_arch {
+ 	 */
+ 	unsigned long *pmu_filter;
+ 	unsigned int pmuver;
++
++	/* Memory Tagging Extension enabled for the guest */
++	bool mte_enabled;
+ };
+ 
+ struct kvm_vcpu_fault_info {
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index f56122eedffc..7ee93bcac017 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -89,6 +89,12 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		r = 0;
+ 		kvm->arch.return_nisv_io_abort_to_user = true;
+ 		break;
++	case KVM_CAP_ARM_MTE:
++		if (!system_supports_mte() || kvm->created_vcpus)
++			return -EINVAL;
++		r = 0;
++		kvm->arch.mte_enabled = true;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+@@ -210,6 +216,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 		 */
+ 		r = 1;
+ 		break;
++	case KVM_CAP_ARM_MTE:
++		r = system_supports_mte();
++		break;
+ 	case KVM_CAP_STEAL_TIME:
+ 		r = kvm_arm_pvtime_supported();
+ 		break;
+diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
+index 19aacc7d64de..38fe25310ca1 100644
+--- a/arch/arm64/kvm/mmu.c
++++ b/arch/arm64/kvm/mmu.c
+@@ -862,6 +862,26 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
+ 	if (vma_pagesize == PAGE_SIZE && !force_pte)
+ 		vma_pagesize = transparent_hugepage_adjust(memslot, hva,
+ 							   &pfn, &fault_ipa);
++
++	/*
++	 * The otherwise redundant test for system_supports_mte() allows the
++	 * code to be compiled out when CONFIG_ARM64_MTE is not present.
++	 */
++	if (system_supports_mte() && kvm->arch.mte_enabled && pfn_valid(pfn)) {
++		/*
++		 * VM will be able to see the page's tags, so we must ensure
++		 * they have been initialised.
++		 */
++		struct page *page = pfn_to_page(pfn);
++		long i, nr_pages = compound_nr(page);
++
++		/* if PG_mte_tagged is set, tags have already been initialised */
++		for (i = 0; i < nr_pages; i++, page++) {
++			if (!test_and_set_bit(PG_mte_tagged, &page->flags))
++				mte_clear_page_tags(page_address(page));
++		}
++	}
++
+ 	if (writable) {
+ 		prot |= KVM_PGTABLE_PROT_W;
+ 		kvm_set_pfn_dirty(pfn);
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 430e36e1a13d..35a3dc448231 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -1132,7 +1132,8 @@ static u64 read_id_reg(const struct kvm_vcpu *vcpu,
+ 		    arm64_get_spectre_v2_state() == SPECTRE_UNAFFECTED)
+ 			val |= (1UL << ID_AA64PFR0_CSV2_SHIFT);
+ 	} else if (id == SYS_ID_AA64PFR1_EL1) {
+-		val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
++		if (!vcpu->kvm->arch.mte_enabled)
++			val &= ~(0xfUL << ID_AA64PFR1_MTE_SHIFT);
+ 	} else if (id == SYS_ID_AA64ISAR1_EL1 && !vcpu_has_ptrauth(vcpu)) {
+ 		val &= ~((0xfUL << ID_AA64ISAR1_APA_SHIFT) |
+ 			 (0xfUL << ID_AA64ISAR1_API_SHIFT) |
+@@ -1394,6 +1395,9 @@ static bool access_mte_regs(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
+ static unsigned int mte_visibility(const struct kvm_vcpu *vcpu,
+ 				   const struct sys_reg_desc *rd)
+ {
++	if (vcpu->kvm->arch.mte_enabled)
++		return 0;
++
+ 	return REG_HIDDEN_USER | REG_HIDDEN_GUEST;
+ }
+ 
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index ca41220b40b8..3e6fb5b580a9 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -1053,6 +1053,7 @@ struct kvm_ppc_resize_hpt {
+ #define KVM_CAP_X86_USER_SPACE_MSR 188
+ #define KVM_CAP_X86_MSR_FILTER 189
+ #define KVM_CAP_ENFORCE_PV_FEATURE_CPUID 190
++#define KVM_CAP_ARM_MTE 191
+ 
+ #ifdef KVM_CAP_IRQ_ROUTING
+ 
+-- 
+2.20.1
 
 
