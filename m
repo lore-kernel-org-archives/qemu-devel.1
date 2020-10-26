@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C93CC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:29:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 79B60C5517A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:29:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9D703223B0
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:29:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B4C932224A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:29:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AHWyyhSs"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D703223B0
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bDh3J0wz"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4C932224A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53984 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5Ml-0008TS-9e
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:29:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60628)
+	id 1kX5N8-0000in-Ok
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:29:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5Eu-00054O-PJ
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:56 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53955)
+ id 1kX5Eo-00050L-Sz
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:59123)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5Ep-0000LD-0N
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:56 -0400
+ id 1kX5Em-0000Ix-L5
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603729249;
+ s=mimecast20190719; t=1603729247;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=pMVPm4N20zoZqJs3+Rp51dp3qfJtgNHPjVQ/fCkrb5U=;
- b=AHWyyhSsy7hcn5kCsfV7dhia3ditvfJhYDjqsO05NUnuTD+nLSo61p7MsMn9KaWRCpitMR
- uhEjLt3fMLKOco0M9qeNzP/sV8xCaiYW9zQtvJMyw+kj2SWHa6ykt8qDmBkNzKKY6KV8uh
- 6l7hMZDi2U+HzzcV4pSwnEp5aUo6hmo=
+ bh=5w2aARphuD1Jpzw5dWT2tcLGrPMUzElMQdKQtFeEtx4=;
+ b=bDh3J0wzZ+sEgl8W7u3Q5CQWLnu9P5NVxpL2yvQs8nmUBqK4b3C5pRfAEqwbCu8tKXDC31
+ cAiqiqqbhQkFlGjv8g24wzsQ75qOI7OlOWyzJGkevt2Va4ZyHPoEUj92wdGuJqqFEm6lOD
+ RUrq8mlncSVHuUM2sov0GYsdWBJ70xQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-408-CLZAgdR5O_KN-XFWGfaTHw-1; Mon, 26 Oct 2020 12:20:47 -0400
-X-MC-Unique: CLZAgdR5O_KN-XFWGfaTHw-1
+ us-mta-246-m-fQ5T5aM3-NSygg_9o-9Q-1; Mon, 26 Oct 2020 12:20:43 -0400
+X-MC-Unique: m-fQ5T5aM3-NSygg_9o-9Q-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8754B809DC3;
- Mon, 26 Oct 2020 16:20:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DF14B18B9F42;
+ Mon, 26 Oct 2020 16:20:41 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4D4E15D9E4;
- Mon, 26 Oct 2020 16:20:45 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id C7CEE5D9E4;
+ Mon, 26 Oct 2020 16:20:37 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, yubihong@huawei.com, peterx@redhat.com,
  peter.maydell@linaro.org
-Subject: [PULL 13/16] migration: Maintain postcopy faulted addresses
-Date: Mon, 26 Oct 2020 16:19:49 +0000
-Message-Id: <20201026161952.149188-14-dgilbert@redhat.com>
+Subject: [PULL 10/16] migration: using trace_ to replace DPRINTF
+Date: Mon, 26 Oct 2020 16:19:46 +0000
+Message-Id: <20201026161952.149188-11-dgilbert@redhat.com>
 In-Reply-To: <20201026161952.149188-1-dgilbert@redhat.com>
 References: <20201026161952.149188-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -72,8 +72,8 @@ Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
@@ -102,223 +102,188 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Xu <peterx@redhat.com>
+From: Bihong Yu <yubihong@huawei.com>
 
-Maintain a list of faulted addresses on the destination host for which we're
-waiting on.  This is implemented using a GTree rather than a real list to make
-sure even there're plenty of vCPUs/threads that are faulting, the lookup will
-still be fast with O(log(N)) (because we'll do that after placing each page).
-It should bring a slight overhead, but ideally that shouldn't be a big problem
-simply because in most cases the requested page list will be short.
-
-Actually we did similar things for postcopy blocktime measurements.  This patch
-didn't use that simply because:
-
-  (1) blocktime measurement is towards vcpu threads only, but here we need to
-      record all faulted addresses, including main thread and external
-      thread (like, DPDK via vhost-user).
-
-  (2) blocktime measurement will require UFFD_FEATURE_THREAD_ID, but here we
-      don't want to add that extra dependency on the kernel version since not
-      necessary.  E.g., we don't need to know which thread faulted on which
-      page, we also don't care about multiple threads faulting on the same
-      page.  But we only care about what addresses are faulted so waiting for a
-      page copying from src.
-
-  (3) blocktime measurement is not enabled by default.  However we need this by
-      default especially for postcopy recover.
-
-Another thing to mention is that this patch introduced a new mutex to serialize
-the receivedmap and the page_requested tree, however that serialization does
-not cover other procedures like UFFDIO_COPY.
-
-Signed-off-by: Peter Xu <peterx@redhat.com>
-Message-Id: <20201021212721.440373-4-peterx@redhat.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
+Message-Id: <1603179176-5360-1-git-send-email-yubihong@huawei.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- migration/migration.c    | 41 +++++++++++++++++++++++++++++++++++++++-
- migration/migration.h    | 19 ++++++++++++++++++-
- migration/postcopy-ram.c | 17 ++++++++++++++---
- migration/trace-events   |  2 ++
- 4 files changed, 74 insertions(+), 5 deletions(-)
+ migration/block.c      | 36 ++++++++++++++++++------------------
+ migration/page_cache.c | 13 +++----------
+ migration/trace-events | 13 +++++++++++++
+ 3 files changed, 34 insertions(+), 28 deletions(-)
 
-diff --git a/migration/migration.c b/migration/migration.c
-index ed122ff8d9..5421042d4a 100644
---- a/migration/migration.c
-+++ b/migration/migration.c
-@@ -143,6 +143,13 @@ static int migration_maybe_pause(MigrationState *s,
-                                  int new_state);
- static void migrate_fd_cancel(MigrationState *s);
+diff --git a/migration/block.c b/migration/block.c
+index 273392be78..a950977855 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -26,6 +26,7 @@
+ #include "qemu-file.h"
+ #include "migration/vmstate.h"
+ #include "sysemu/block-backend.h"
++#include "trace.h"
  
-+static gint page_request_addr_cmp(gconstpointer ap, gconstpointer bp)
-+{
-+    uintptr_t a = (uintptr_t) ap, b = (uintptr_t) bp;
-+
-+    return (a > b) - (a < b);
-+}
-+
- void migration_object_init(void)
- {
-     MachineState *ms = MACHINE(qdev_get_machine());
-@@ -165,6 +172,8 @@ void migration_object_init(void)
-     qemu_event_init(&current_incoming->main_thread_load_event, false);
-     qemu_sem_init(&current_incoming->postcopy_pause_sem_dst, 0);
-     qemu_sem_init(&current_incoming->postcopy_pause_sem_fault, 0);
-+    qemu_mutex_init(&current_incoming->page_request_mutex);
-+    current_incoming->page_requested = g_tree_new(page_request_addr_cmp);
+ #define BLK_MIG_BLOCK_SIZE           (1 << 20)
+ #define BDRV_SECTORS_PER_DIRTY_CHUNK (BLK_MIG_BLOCK_SIZE >> BDRV_SECTOR_BITS)
+@@ -434,10 +435,9 @@ static int init_blk_migration(QEMUFile *f)
+         block_mig_state.total_sector_sum += sectors;
  
-     if (!migration_object_check(current_migration, &err)) {
-         error_report_err(err);
-@@ -240,6 +249,11 @@ void migration_incoming_state_destroy(void)
+         if (bmds->shared_base) {
+-            DPRINTF("Start migration for %s with shared base image\n",
+-                    bdrv_get_device_name(bs));
++            trace_migration_block_init_shared(bdrv_get_device_name(bs));
+         } else {
+-            DPRINTF("Start full migration for %s\n", bdrv_get_device_name(bs));
++            trace_migration_block_init_full(bdrv_get_device_name(bs));
+         }
  
-     qemu_event_reset(&mis->main_thread_load_event);
+         QSIMPLEQ_INSERT_TAIL(&block_mig_state.bmds_list, bmds, entry);
+@@ -592,7 +592,7 @@ static int mig_save_device_dirty(QEMUFile *f, BlkMigDevState *bmds,
+     return (bmds->cur_dirty >= bmds->total_sectors);
  
-+    if (mis->page_requested) {
-+        g_tree_destroy(mis->page_requested);
-+        mis->page_requested = NULL;
-+    }
-+
-     if (mis->socket_address_list) {
-         qapi_free_SocketAddressList(mis->socket_address_list);
-         mis->socket_address_list = NULL;
-@@ -354,8 +368,33 @@ int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
- }
+ error:
+-    DPRINTF("Error reading sector %" PRId64 "\n", sector);
++    trace_migration_block_save_device_dirty(sector);
+     g_free(blk->buf);
+     g_free(blk);
+     return ret;
+@@ -628,9 +628,9 @@ static int flush_blks(QEMUFile *f)
+     BlkMigBlock *blk;
+     int ret = 0;
  
- int migrate_send_rp_req_pages(MigrationIncomingState *mis,
--                              RAMBlock *rb, ram_addr_t start)
-+                              RAMBlock *rb, ram_addr_t start, uint64_t haddr)
- {
-+    void *aligned = (void *)(uintptr_t)(haddr & (-qemu_ram_pagesize(rb)));
-+    bool received;
-+
-+    WITH_QEMU_LOCK_GUARD(&mis->page_request_mutex) {
-+        received = ramblock_recv_bitmap_test_byte_offset(rb, start);
-+        if (!received && !g_tree_lookup(mis->page_requested, aligned)) {
-+            /*
-+             * The page has not been received, and it's not yet in the page
-+             * request list.  Queue it.  Set the value of element to 1, so that
-+             * things like g_tree_lookup() will return TRUE (1) when found.
-+             */
-+            g_tree_insert(mis->page_requested, aligned, (gpointer)1);
-+            mis->page_requested_count++;
-+            trace_postcopy_page_req_add(aligned, mis->page_requested_count);
-+        }
-+    }
-+
-+    /*
-+     * If the page is there, skip sending the message.  We don't even need the
-+     * lock because as long as the page arrived, it'll be there forever.
-+     */
-+    if (received) {
-+        return 0;
-+    }
-+
-     return migrate_send_rp_message_req_pages(mis, rb, start);
- }
+-    DPRINTF("%s Enter submitted %d read_done %d transferred %d\n",
+-            __func__, block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_migration_block_flush_blks("Enter", block_mig_state.submitted,
++                                     block_mig_state.read_done,
++                                     block_mig_state.transferred);
  
-diff --git a/migration/migration.h b/migration/migration.h
-index 9c1cba98d6..d096b77f74 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -104,6 +104,23 @@ struct MigrationIncomingState {
- 
-     /* List of listening socket addresses  */
-     SocketAddressList *socket_address_list;
-+
-+    /* A tree of pages that we requested to the source VM */
-+    GTree *page_requested;
-+    /* For debugging purpose only, but would be nice to keep */
-+    int page_requested_count;
-+    /*
-+     * The mutex helps to maintain the requested pages that we sent to the
-+     * source, IOW, to guarantee coherent between the page_requests tree and
-+     * the per-ramblock receivedmap.  Note! This does not guarantee consistency
-+     * of the real page copy procedures (using UFFDIO_[ZERO]COPY).  E.g., even
-+     * if one bit in receivedmap is cleared, UFFDIO_COPY could have happened
-+     * for that page already.  This is intended so that the mutex won't
-+     * serialize and blocked by slow operations like UFFDIO_* ioctls.  However
-+     * this should be enough to make sure the page_requested tree always
-+     * contains valid information.
-+     */
-+    QemuMutex page_request_mutex;
- };
- 
- MigrationIncomingState *migration_incoming_get_current(void);
-@@ -331,7 +348,7 @@ void migrate_send_rp_shut(MigrationIncomingState *mis,
- void migrate_send_rp_pong(MigrationIncomingState *mis,
-                           uint32_t value);
- int migrate_send_rp_req_pages(MigrationIncomingState *mis, RAMBlock *rb,
--                              ram_addr_t start);
-+                              ram_addr_t start, uint64_t haddr);
- int migrate_send_rp_message_req_pages(MigrationIncomingState *mis,
-                                       RAMBlock *rb, ram_addr_t start);
- void migrate_send_rp_recv_bitmap(MigrationIncomingState *mis,
-diff --git a/migration/postcopy-ram.c b/migration/postcopy-ram.c
-index aed4cdaa38..d3bb3a744b 100644
---- a/migration/postcopy-ram.c
-+++ b/migration/postcopy-ram.c
-@@ -684,7 +684,7 @@ int postcopy_request_shared_page(struct PostCopyFD *pcfd, RAMBlock *rb,
-                                         qemu_ram_get_idstr(rb), rb_offset);
-         return postcopy_wake_shared(pcfd, client_addr, rb);
+     blk_mig_lock();
+     while ((blk = QSIMPLEQ_FIRST(&block_mig_state.blk_list)) != NULL) {
+@@ -656,9 +656,9 @@ static int flush_blks(QEMUFile *f)
      }
--    migrate_send_rp_req_pages(mis, rb, aligned_rbo);
-+    migrate_send_rp_req_pages(mis, rb, aligned_rbo, client_addr);
-     return 0;
- }
+     blk_mig_unlock();
  
-@@ -979,7 +979,8 @@ retry:
-              * Send the request to the source - we want to request one
-              * of our host page sizes (which is >= TPS)
-              */
--            ret = migrate_send_rp_req_pages(mis, rb, rb_offset);
-+            ret = migrate_send_rp_req_pages(mis, rb, rb_offset,
-+                                            msg.arg.pagefault.address);
-             if (ret) {
-                 /* May be network failure, try to wait for recovery */
-                 if (ret == -EIO && postcopy_pause_fault_thread(mis)) {
-@@ -1149,10 +1150,20 @@ static int qemu_ufd_copy_ioctl(MigrationIncomingState *mis, void *host_addr,
-         ret = ioctl(userfault_fd, UFFDIO_ZEROPAGE, &zero_struct);
-     }
-     if (!ret) {
-+        qemu_mutex_lock(&mis->page_request_mutex);
-         ramblock_recv_bitmap_set_range(rb, host_addr,
-                                        pagesize / qemu_target_page_size());
-+        /*
-+         * If this page resolves a page fault for a previous recorded faulted
-+         * address, take a special note to maintain the requested page list.
-+         */
-+        if (g_tree_lookup(mis->page_requested, host_addr)) {
-+            g_tree_remove(mis->page_requested, host_addr);
-+            mis->page_requested_count--;
-+            trace_postcopy_page_req_del(host_addr, mis->page_requested_count);
-+        }
-+        qemu_mutex_unlock(&mis->page_request_mutex);
-         mark_postcopy_blocktime_end((uintptr_t)host_addr);
--
-     }
+-    DPRINTF("%s Exit submitted %d read_done %d transferred %d\n", __func__,
+-            block_mig_state.submitted, block_mig_state.read_done,
+-            block_mig_state.transferred);
++    trace_migration_block_flush_blks("Exit", block_mig_state.submitted,
++                                     block_mig_state.read_done,
++                                     block_mig_state.transferred);
      return ret;
  }
+ 
+@@ -727,8 +727,8 @@ static int block_save_setup(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live setup submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("setup", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     qemu_mutex_lock_iothread();
+     ret = init_blk_migration(f);
+@@ -759,8 +759,8 @@ static int block_save_iterate(QEMUFile *f, void *opaque)
+     int64_t last_ftell = qemu_ftell(f);
+     int64_t delta_ftell;
+ 
+-    DPRINTF("Enter save live iterate submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("iterate", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -825,8 +825,8 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+ {
+     int ret;
+ 
+-    DPRINTF("Enter save live complete submitted %d transferred %d\n",
+-            block_mig_state.submitted, block_mig_state.transferred);
++    trace_migration_block_save("complete", block_mig_state.submitted,
++                               block_mig_state.transferred);
+ 
+     ret = flush_blks(f);
+     if (ret) {
+@@ -851,7 +851,7 @@ static int block_save_complete(QEMUFile *f, void *opaque)
+     /* report completion */
+     qemu_put_be64(f, (100 << BDRV_SECTOR_BITS) | BLK_MIG_FLAG_PROGRESS);
+ 
+-    DPRINTF("Block migration completed\n");
++    trace_migration_block_save_complete();
+ 
+     qemu_put_be64(f, BLK_MIG_FLAG_EOS);
+ 
+@@ -884,7 +884,7 @@ static void block_save_pending(QEMUFile *f, void *opaque, uint64_t max_size,
+         pending = max_size + BLK_MIG_BLOCK_SIZE;
+     }
+ 
+-    DPRINTF("Enter save live pending  %" PRIu64 "\n", pending);
++    trace_migration_block_save_pending(pending);
+     /* We don't do postcopy */
+     *res_precopy_only += pending;
+ }
+diff --git a/migration/page_cache.c b/migration/page_cache.c
+index 775582f453..098b436223 100644
+--- a/migration/page_cache.c
++++ b/migration/page_cache.c
+@@ -18,14 +18,7 @@
+ #include "qapi/error.h"
+ #include "qemu/host-utils.h"
+ #include "page_cache.h"
+-
+-#ifdef DEBUG_CACHE
+-#define DPRINTF(fmt, ...) \
+-    do { fprintf(stdout, "cache: " fmt, ## __VA_ARGS__); } while (0)
+-#else
+-#define DPRINTF(fmt, ...) \
+-    do { } while (0)
+-#endif
++#include "trace.h"
+ 
+ /* the page in cache will not be replaced in two cycles */
+ #define CACHED_PAGE_LIFETIME 2
+@@ -75,7 +68,7 @@ PageCache *cache_init(int64_t new_size, size_t page_size, Error **errp)
+     cache->num_items = 0;
+     cache->max_num_items = num_pages;
+ 
+-    DPRINTF("Setting cache buckets to %" PRId64 "\n", cache->max_num_items);
++    trace_migration_pagecache_init(cache->max_num_items);
+ 
+     /* We prefer not to abort if there is no memory */
+     cache->page_cache = g_try_malloc((cache->max_num_items) *
+@@ -169,7 +162,7 @@ int cache_insert(PageCache *cache, uint64_t addr, const uint8_t *pdata,
+     if (!it->it_data) {
+         it->it_data = g_try_malloc(cache->page_size);
+         if (!it->it_data) {
+-            DPRINTF("Error allocating page\n");
++            trace_migration_pagecache_insert();
+             return -1;
+         }
+         cache->num_items++;
 diff --git a/migration/trace-events b/migration/trace-events
-index c7755116b8..5f0001f808 100644
+index 338f38b3dd..c7755116b8 100644
 --- a/migration/trace-events
 +++ b/migration/trace-events
-@@ -162,6 +162,7 @@ postcopy_pause_return_path(void) ""
- postcopy_pause_return_path_continued(void) ""
- postcopy_pause_continued(void) ""
- postcopy_start_set_run(void) ""
-+postcopy_page_req_add(void *addr, int count) "new page req %p total %d"
- source_return_path_thread_bad_end(void) ""
- source_return_path_thread_end(void) ""
- source_return_path_thread_entry(void) ""
-@@ -272,6 +273,7 @@ postcopy_ram_incoming_cleanup_blocktime(uint64_t total) "total blocktime %" PRIu
- postcopy_request_shared_page(const char *sharer, const char *rb, uint64_t rb_offset) "for %s in %s offset 0x%"PRIx64
- postcopy_request_shared_page_present(const char *sharer, const char *rb, uint64_t rb_offset) "%s already %s offset 0x%"PRIx64
- postcopy_wake_shared(uint64_t client_addr, const char *rb) "at 0x%"PRIx64" in %s"
-+postcopy_page_req_del(void *addr, int count) "resolved page req %p total %d"
- 
- get_mem_fault_cpu_index(int cpu, uint32_t pid) "cpu: %d, pid: %u"
- 
+@@ -325,3 +325,16 @@ get_ramblock_vfn_hash(const char *idstr, uint64_t vfn, uint32_t crc) "ramblock n
+ calc_page_dirty_rate(const char *idstr, uint32_t new_crc, uint32_t old_crc) "ramblock name: %s, new crc: %" PRIu32 ", old crc: %" PRIu32
+ skip_sample_ramblock(const char *idstr, uint64_t ramblock_size) "ramblock name: %s, ramblock size: %" PRIu64
+ find_page_matched(const char *idstr) "ramblock %s addr or size changed"
++
++# block.c
++migration_block_init_shared(const char *blk_device_name) "Start migration for %s with shared base image"
++migration_block_init_full(const char *blk_device_name) "Start full migration for %s"
++migration_block_save_device_dirty(int64_t sector) "Error reading sector %" PRId64
++migration_block_flush_blks(const char *action, int submitted, int read_done, int transferred) "%s submitted %d read_done %d transferred %d"
++migration_block_save(const char *mig_stage, int submitted, int transferred) "Enter save live %s submitted %d transferred %d"
++migration_block_save_complete(void) "Block migration completed"
++migration_block_save_pending(uint64_t pending) "Enter save live pending  %" PRIu64
++
++# page_cache.c
++migration_pagecache_init(int64_t max_num_items) "Setting cache buckets to %" PRId64
++migration_pagecache_insert(void) "Error allocating page"
 -- 
 2.28.0
 
