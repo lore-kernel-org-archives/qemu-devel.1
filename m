@@ -2,75 +2,93 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00ECCC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:52:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A41DC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:52:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8807E20773
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:52:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8807E20773
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=kaod.org
+	by mail.kernel.org (Postfix) with ESMTPS id C7A6320773
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:52:45 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HMfFLB7P"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7A6320773
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46254 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX3rE-0003jk-Gi
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:52:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55216)
+	id 1kX3rX-00043y-42
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:52:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52718)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX3mZ-0007NW-7l
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:47:35 -0400
-Received: from 7.mo52.mail-out.ovh.net ([188.165.59.253]:41585)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <groug@kaod.org>) id 1kX3mX-00020H-11
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:47:34 -0400
-Received: from mxplan5.mail.ovh.net (unknown [10.108.20.68])
- by mo52.mail-out.ovh.net (Postfix) with ESMTPS id E06A61FFD66;
- Mon, 26 Oct 2020 15:47:28 +0100 (CET)
-Received: from kaod.org (37.59.142.100) by DAG8EX1.mxp5.local (172.16.2.71)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2044.4; Mon, 26 Oct
- 2020 15:47:28 +0100
-Authentication-Results: garm.ovh; auth=pass
- (GARM-100R003c3b2a2d3-5704-487b-aa99-9f8972f0b8ca,
- D69A261E470FD7A087455D2B3B9CC66C186A091D) smtp.auth=groug@kaod.org
-Date: Mon, 26 Oct 2020 15:47:22 +0100
-From: Greg Kurz <groug@kaod.org>
-To: Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>
-Subject: Re: [PATCH 4/4] spapr: Improve spapr_reallocate_hpt() error reporting
-Message-ID: <20201026154722.3b573be7@bahia.lan>
-In-Reply-To: <b67330f6-797c-f088-b6fa-7e81075e2245@redhat.com>
-References: <160371602625.305923.7832478283946753271.stgit@bahia.lan>
- <160371605460.305923.5890143959901241157.stgit@bahia.lan>
- <b67330f6-797c-f088-b6fa-7e81075e2245@redhat.com>
-X-Mailer: Claws Mail 3.17.7 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX3eQ-0005ww-Cr
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:39:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42075)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kX3eO-0000kN-Re
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:39:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603723147;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=FC7uDYskSiwdeFskvuhQ0Nr3GuPsiFmlPOIpHooM2Aw=;
+ b=HMfFLB7Pm/J24+j2QGNy8YAVJkk5HoW1GdBySLq5tODBvmeWoPpNMPHhjiSkGZPtdqFjwR
+ jNUnUsgsZ5q+8os56kGfAw5VS0sds2Tbqk2G/TwNo/OZ8CcycMHVZTIY9ryo6CSjOsqFNR
+ hJeaVXmc9p7R1bqg+xoWMWY48vHzN8g=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-539-I9MFUL_kMY-SM6HcwJBrPA-1; Mon, 26 Oct 2020 10:39:03 -0400
+X-MC-Unique: I9MFUL_kMY-SM6HcwJBrPA-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E0DBE188C136;
+ Mon, 26 Oct 2020 14:39:01 +0000 (UTC)
+Received: from [10.3.112.145] (ovpn-112-145.phx2.redhat.com [10.3.112.145])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 1F87310021AA;
+ Mon, 26 Oct 2020 14:38:58 +0000 (UTC)
+Subject: Re: [PATCH v5 02/12] qapi: Make QAPI_LIST_ADD() public
+From: Eric Blake <eblake@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+References: <20201023183652.478921-1-eblake@redhat.com>
+ <20201023183652.478921-3-eblake@redhat.com>
+ <87v9ex3vzl.fsf@dusky.pond.sub.org>
+ <19e7105e-534e-7e4e-702f-3227a5f714e7@redhat.com>
+Organization: Red Hat, Inc.
+Message-ID: <c6259b99-a7db-0afd-d7c8-facf80097e86@redhat.com>
+Date: Mon, 26 Oct 2020 09:38:57 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Originating-IP: [37.59.142.100]
-X-ClientProxiedBy: DAG4EX1.mxp5.local (172.16.2.31) To DAG8EX1.mxp5.local
- (172.16.2.71)
-X-Ovh-Tracer-GUID: d7dde868-e3a4-4be8-ba91-7c37d7606c7c
-X-Ovh-Tracer-Id: 16248987459836221920
-X-VR-SPAMSTATE: OK
-X-VR-SPAMSCORE: -100
-X-VR-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedujedrkeejgdefvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfqggfjpdevjffgvefmvefgnecuuegrihhlohhuthemucehtddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvuffkjghfofggtgfgihesthhqredtredtjeenucfhrhhomhepifhrvghgucfmuhhriicuoehgrhhouhhgsehkrghougdrohhrgheqnecuggftrfgrthhtvghrnhepveelhfdtudffhfeiveehhfelgeellefgteffteekudegheejfffghefhfeeuudffnecukfhppedtrddtrddtrddtpdefjedrheelrddugedvrddutddtnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmohguvgepshhmthhpqdhouhhtpdhhvghlohepmhigphhlrghnhedrmhgrihhlrdhovhhhrdhnvghtpdhinhgvtheptddrtddrtddrtddpmhgrihhlfhhrohhmpehgrhhouhhgsehkrghougdrohhrghdprhgtphhtthhopehqvghmuhdquggvvhgvlhesnhhonhhgnhhurdhorhhg
-Received-SPF: pass client-ip=188.165.59.253; envelope-from=groug@kaod.org;
- helo=7.mo52.mail-out.ovh.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 10:47:30
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <19e7105e-534e-7e4e-702f-3227a5f714e7@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -83,121 +101,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com,
+ Michael Roth <mdroth@linux.vnet.ibm.com>, qemu-block@nongnu.org,
+ rjones@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 14:49:34 +0100
-Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com> wrote:
+On 10/26/20 9:37 AM, Eric Blake wrote:
 
-> On 10/26/20 1:40 PM, Greg Kurz wrote:
-> > spapr_reallocate_hpt() has three users, two of which pass &error_fatal
-> > and the third one, htab_load(), passes &local_err, uses it to detect
-> > failures and simply propagates -EINVAL up to vmstate_load(), which will
-> > cause QEMU to exit. It is thus confusing that spapr_reallocate_hpt()
-> > doesn't return right away when an error is detected in some cases. Also,
-> > the comment suggesting that the caller is welcome to try to carry on
-> > seems like a remnant in this respect.
-> >=20
-> > This can be improved:
-> > - change spapr_reallocate_hpt() to always report a negative errno on
-> >    failure, either as reported by KVM or -ENOSPC if the HPT is smaller
-> >    than what was asked,
-> > - use that to detect failures in htab_load() which is preferred over
-> >    checking &local_err,
-> > - propagate this negative errno to vmstate_load() because it is more
-> >    accurate than propagating -EINVAL for all possible errors.
-> >=20
-> > Signed-off-by: Greg Kurz <groug@kaod.org>
-> ...
->=20
-> > -void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
-> > -                          Error **errp)
-> > +int spapr_reallocate_hpt(SpaprMachineState *spapr, int shift, Error **=
-errp)
-> >   {
-> >       ERRP_GUARD();
-> >       long rc;
-> > @@ -1496,7 +1495,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spap=
-r, int shift,
-> >  =20
-> >       if (rc =3D=3D -EOPNOTSUPP) {
-> >           error_setg(errp, "HPT not supported in nested guests");
-> > -        return;
-> > +        return -EOPNOTSUPP;
-> >       }
-> >  =20
-> >       if (rc < 0) {
-> > @@ -1504,8 +1503,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spap=
-r, int shift,
-> >           error_setg_errno(errp, errno, "Failed to allocate KVM HPT of =
-order %d",
-> >                            shift);
-> >           error_append_hint(errp, "Try smaller maxmem?\n");
-> > -        /* This is almost certainly fatal, but if the caller really
-> > -         * wants to carry on with shift =3D=3D 0, it's welcome to try =
-*/
-> > +        return -errno;
->=20
-> Maybe returning here should be in a previous patch.
-> Otherwise patch looks good.
->=20
+>> PATCH 12 has more.  I wonder whether PATCH 12 should be squashed into
+>> this one.  You decide.
+> 
+> Patch 12 has a LOT more.  And we're really close to soft freeze.  I kept
+> them separate to minimize the risk of landing my QAPI changes (4/12)
 
-It could have been indeed...
+Correction - the QAPI change was 6/12 of v5 (whereas it moves earlier in
+the series in my upcoming v6 posting)
 
-> >       } else if (rc > 0) {
-> >           /* kernel-side HPT allocated */
-> >           if (rc !=3D shift) {
-> > @@ -1513,6 +1511,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spap=
-r, int shift,
-> >                          "Requested order %d HPT, but kernel allocated =
-order %ld",
-> >                          shift, rc);
-> >               error_append_hint(errp, "Try smaller maxmem?\n");
-> > +            return -ENOSPC;
-
-... along with this one.
-
-I didn't go this way because it doesn't really affect the final behavior si=
-nce
-QEMU exits in all cases. It's mostly about propagating an appropriate errno=
- up
-to VMState in the case of htab_load(). But if you find it clearer and I need
-to post a v2, I can certainly do that.
-
-> >           }
-> >  =20
-> >           spapr->htab_shift =3D shift;
-> > @@ -1533,6 +1532,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spap=
-r, int shift,
-> >       /* We're setting up a hash table, so that means we're not radix */
-> >       spapr->patb_entry =3D 0;
-> >       spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
-> > +    return 0;
-> >   }
-> >  =20
-> >   void spapr_setup_hpt(SpaprMachineState *spapr)
-> > @@ -2286,11 +2286,13 @@ static int htab_load(QEMUFile *f, void *opaque,=
- int version_id)
-> >       }
-> >  =20
-> >       if (section_hdr) {
-> > +        int ret;
-> > +
-> >           /* First section gives the htab size */
-> > -        spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-> > -        if (local_err) {
-> > +        ret =3D spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-> > +        if (ret < 0) {
-> >               error_report_err(local_err);
-> > -            return -EINVAL;
-> > +            return ret;
-> >           }
-> >           return 0;
-> >       }
-> ...
->=20
+> before 5.2 (that MUST happen, or we've locked in a problematic API with
+> block-export-add), vs. cleanup changes that may require review from a
+> lot more areas in the tree.
+-- 
+Eric Blake, Principal Software Engineer
+Red Hat, Inc.           +1-919-301-3226
+Virtualization:  qemu.org | libvirt.org
 
 
