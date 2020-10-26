@@ -2,76 +2,78 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3783C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D66DC56201
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0677C22242
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B0BA2223FD
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:46 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0XCi7/5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0677C22242
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JBq5ASy/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B0BA2223FD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59366 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWyRT-0003Og-0X
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:05:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50580)
+	id 1kWyRl-0003ox-Mw
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:05:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50446)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIo-0002Ls-KQ; Mon, 26 Oct 2020 04:56:30 -0400
-Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:35821)
+ id 1kWyId-0002AN-Nr; Mon, 26 Oct 2020 04:56:19 -0400
+Received: from mail-yb1-xb42.google.com ([2607:f8b0:4864:20::b42]:36672)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIk-0005nV-OF; Mon, 26 Oct 2020 04:56:30 -0400
-Received: by mail-yb1-xb41.google.com with SMTP id m188so2002302ybf.2;
- Mon, 26 Oct 2020 01:56:24 -0700 (PDT)
+ id 1kWyIb-0005kM-RR; Mon, 26 Oct 2020 04:56:19 -0400
+Received: by mail-yb1-xb42.google.com with SMTP id f140so7015721ybg.3;
+ Mon, 26 Oct 2020 01:56:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=8Ngt2yFRuvWjSs8QJgqJkXW0Co7OHWxTNYBAs1hNods=;
- b=b0XCi7/5jnv8wq/TPjlHtveUdrhn4LmreayX1dFCv5OozYjnMs2DDChmXaTba6cBDS
- RI36Wp4msJfh+RXnjL4AMq96Novsh1Z1A3e3A3ffcVFhskLKMuq0A4d2xq8F0P+7Th0G
- fUpGulITT/e+5myG2Gt8acJnD5xJeZfgiV/6XyuHEI9i9dJsy5feD5ibTpuq0XuiRqFF
- NFLvwZBvxIY3839XABaCRXxV4MmB4MeojYHDqPryJf20Kkns5E9mYjIcjbnJAxpZfut5
- CiFgaVA/ytwYD/XR5foAmhjL9o1/iOeKxZNPq7pzDXlkBuka+MAeWMYdk9NlTowLOHpT
- kMww==
+ :cc; bh=s536AZZpRLlIXesgwxri1axUHJ6DRlZIVLg8B0woC+c=;
+ b=JBq5ASy/JZzDDNzgVxtjlvOdhFM1DodP3xFze2S7dJPcr3KVNZh83120YZdwhY4PzO
+ C4tDxkZeXbwPJQFv85vzR2SZKf8g97NEbV2jeP43Yf7C4TP1/JDnt0/eh4XtybPts58C
+ ivxQTh9WUcF4bt5LBB0NXhKlAFPSG944OgjeJaxtaR7zXEtbN9quIFUhk054LYe23ITg
+ Y369vJ/y3ehMAYfOx0jyup0GiYPJR038/SM+2EdLlh0uz1WZpSI46qGkInrUh9VpE4YX
+ XAxkSpcWDuHeLw7btu+I0RQ+psxLBckz//t/aPUQbwa45CFg7IrZRfzkxPnZYePHHVwV
+ Bclg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=8Ngt2yFRuvWjSs8QJgqJkXW0Co7OHWxTNYBAs1hNods=;
- b=iiepajJwDueHWMsP78ROXKKTSLUG+uuGTK7XI3D0MBCvS8LTss6Z9UHA7i6Fqli8Ey
- TQlRO3bjSaCQ4ohvlPGnZN3nw9fxaZG7/Mjq5TaWsIujwnJ7LRJLck0/ki7xkJxJ2lbG
- DrVgIV+b8Voc9NLHyia3HKXZqcE7a78Ws/hSw+FoWDzM4+C7YMdjC/a4Tkv1TcGxdB0C
- r5aQWoWf9kSNoJIIPf1SasBtpO46O6vtKuLROw89kjBK5Zf/rp10LtHwsyLtZUpxEAt2
- 665kkJEYu3SO1JoxgKQyf9VbkYnP4R174x30TXovvYPMrrEEtqQwp/SfLSqmBZKAZJMX
- 5mSQ==
-X-Gm-Message-State: AOAM533wuu5icc8FgfzMVM+OdXKEMnzDISCWWFgN28Zl1C7T003L4Hw4
- e06yizwKcs8RpVlFoIMIent9cfrFtx31znqVgfk=
-X-Google-Smtp-Source: ABdhPJxKe4xwG4o3jhCpw/HNdqifsDeMVYY3RfGl8Z2yEQTwmQZRhBDiMiRh9xhnuXiOyB2okADnetFsN0YJMYtgNrU=
-X-Received: by 2002:a25:c1c1:: with SMTP id
- r184mr17070500ybf.517.1603702584070; 
- Mon, 26 Oct 2020 01:56:24 -0700 (PDT)
+ bh=s536AZZpRLlIXesgwxri1axUHJ6DRlZIVLg8B0woC+c=;
+ b=BeIE3wxHFhcyK4BFuezRudRkAEzaQNWMrPW3fzLdj5cZBqFk6J4yvDAhNu2BUmmxGr
+ LlywZgbjcJaGmI2rNBfVu+zy87rbD/RS8mXxLyvQr8L9RSyvxDR6oh74OOArhYm4+yJQ
+ BIYIhOENc7FiF5fXWrUVYvPy+OXwuBBDt1Gsyb5AXswMMPVpTdmJk+kERK21lS+vmkVU
+ 5HI80+wNEWfX7C5gys2IAwMquTR6lk2ZMpZ9r44hS41aBpBLMK+/GdaNg0rnVDNiOEC8
+ DzTK4WsaGQugZRr2VjWGq62Djg7XKYGqY/8czRMYeagOoGtGNWkO921Bj8CeCQOpCCKm
+ WzlA==
+X-Gm-Message-State: AOAM530/XuQ9n/Mev4VdRLk/9IJJWvUFgy5ooJYpH1KR9yu+RzaTLJ9q
+ SW7kZOXLNgIfoT2OO0RBXu4oPTuf2vbPhyjvMlA=
+X-Google-Smtp-Source: ABdhPJz9oUQsjCn/iWcp+HUHOlhuqi1pcOk8jgSgIMl9w3tsO5yiacfnIpovAwA0k+uOLiGkb5D4wsR4G29pAXpUFaQ=
+X-Received: by 2002:a25:328a:: with SMTP id
+ y132mr18122426yby.306.1603702576560; 
+ Mon, 26 Oct 2020 01:56:16 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1603467169.git.alistair.francis@wdc.com>
- <b586d3c656319962c5cd4d73bd17e6d03bdd1301.1603467169.git.alistair.francis@wdc.com>
-In-Reply-To: <b586d3c656319962c5cd4d73bd17e6d03bdd1301.1603467169.git.alistair.francis@wdc.com>
+ <7ce5ff70057b2fad2d455887d048c419a7e42746.1603467169.git.alistair.francis@wdc.com>
+In-Reply-To: <7ce5ff70057b2fad2d455887d048c419a7e42746.1603467169.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 26 Oct 2020 16:56:13 +0800
-Message-ID: <CAEUhbmUGNOB_bA03gmbK_Rf9B4rvYBXRdgZ4Vc_8B1+B0zgd3Q@mail.gmail.com>
-Subject: Re: [PATCH v1 10/16] target/riscv: Specify the XLEN for CPUs
+Date: Mon, 26 Oct 2020 16:56:04 +0800
+Message-ID: <CAEUhbmXVDj0AJ9-0WC3G_Gk4jA6B78hQoFz6KX0SGdCPPCsVTQ@mail.gmail.com>
+Subject: Re: [PATCH v1 07/16] hw/riscv: sifive_u: Remove compile time XLEN
+ checks
 To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b42;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb42.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -101,15 +103,142 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 11:45 PM Alistair Francis
+On Fri, Oct 23, 2020 at 11:44 PM Alistair Francis
 <alistair.francis@wdc.com> wrote:
 >
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  target/riscv/cpu.c | 33 +++++++++++++++++++++++----------
->  1 file changed, 23 insertions(+), 10 deletions(-)
+>  hw/riscv/sifive_u.c | 57 ++++++++++++++++++++++++---------------------
+>  1 file changed, 31 insertions(+), 26 deletions(-)
 >
+> diff --git a/hw/riscv/sifive_u.c b/hw/riscv/sifive_u.c
+> index 978cfedd24..3bc32c9225 100644
+> --- a/hw/riscv/sifive_u.c
+> +++ b/hw/riscv/sifive_u.c
+> @@ -60,12 +60,6 @@
+>
+>  #include <libfdt.h>
+>
+> -#if defined(TARGET_RISCV32)
+> -# define BIOS_FILENAME "opensbi-riscv32-generic-fw_dynamic.bin"
+> -#else
+> -# define BIOS_FILENAME "opensbi-riscv64-generic-fw_dynamic.bin"
+> -#endif
+> -
+>  static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+> @@ -93,7 +87,7 @@ static const struct MemmapEntry {
+>  #define GEM_REVISION        0x10070109
+>
+>  static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+> -    uint64_t mem_size, const char *cmdline)
+> +                       uint64_t mem_size, const char *cmdline, bool is_32_bit)
+>  {
+>      MachineState *ms = MACHINE(qdev_get_machine());
+>      void *fdt;
+> @@ -167,11 +161,11 @@ static void create_fdt(SiFiveUState *s, const struct MemmapEntry *memmap,
+>          qemu_fdt_add_subnode(fdt, nodename);
+>          /* cpu 0 is the management hart that does not have mmu */
+>          if (cpu != 0) {
+> -#if defined(TARGET_RISCV32)
+> -            qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
+> -#else
+> -            qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+> -#endif
+> +            if (is_32_bit) {
+> +                qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv32");
+> +            } else {
+> +                qemu_fdt_setprop_string(fdt, nodename, "mmu-type", "riscv,sv48");
+> +            }
+>              isa = riscv_isa_string(&s->soc.u_cpus.harts[cpu - 1]);
+>          } else {
+>              isa = riscv_isa_string(&s->soc.e_cpus.harts[0]);
+> @@ -414,7 +408,7 @@ static void sifive_u_machine_init(MachineState *machine)
+>      MemoryRegion *system_memory = get_system_memory();
+>      MemoryRegion *main_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *flash0 = g_new(MemoryRegion, 1);
+> -    target_ulong start_addr = memmap[SIFIVE_U_DEV_DRAM].base;
+> +    uint64_t start_addr = memmap[SIFIVE_U_DEV_DRAM].base;
 
-Reviewed-by: Bin Meng <bin.meng@windriver.com>
-Tested-by: Bin Meng <bin.meng@windriver.com>
+Why is this change necessary? If yes, should we do the same change to virt.c?
+
+>      target_ulong firmware_end_addr, kernel_start_addr;
+>      uint32_t start_addr_hi32 = 0x00000000;
+>      int i;
+> @@ -446,7 +440,8 @@ static void sifive_u_machine_init(MachineState *machine)
+>                            qemu_allocate_irq(sifive_u_machine_reset, NULL, 0));
+>
+>      /* create device tree */
+> -    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline);
+> +    create_fdt(s, memmap, machine->ram_size, machine->kernel_cmdline,
+> +               riscv_is_32_bit(machine));
+>
+>      if (s->start_in_flash) {
+>          /*
+> @@ -475,8 +470,15 @@ static void sifive_u_machine_init(MachineState *machine)
+>          break;
+>      }
+>
+> -    firmware_end_addr = riscv_find_and_load_firmware(machine, BIOS_FILENAME,
+> -                                                     start_addr, NULL);
+> +    if (riscv_is_32_bit(machine)) {
+> +        firmware_end_addr = riscv_find_and_load_firmware(machine,
+> +                                    "opensbi-riscv32-generic-fw_dynamic.bin",
+> +                                    start_addr, NULL);
+> +    } else {
+> +        firmware_end_addr = riscv_find_and_load_firmware(machine,
+> +                                    "opensbi-riscv64-generic-fw_dynamic.bin",
+> +                                    start_addr, NULL);
+> +    }
+>
+>      if (machine->kernel_filename) {
+>          kernel_start_addr = riscv_calc_kernel_start_addr(machine,
+> @@ -506,9 +508,9 @@ static void sifive_u_machine_init(MachineState *machine)
+>      /* Compute the fdt load address in dram */
+>      fdt_load_addr = riscv_load_fdt(memmap[SIFIVE_U_DEV_DRAM].base,
+>                                     machine->ram_size, s->fdt);
+> -    #if defined(TARGET_RISCV64)
+> -    start_addr_hi32 = start_addr >> 32;
+> -    #endif
+> +    if (!riscv_is_32_bit(machine)) {
+> +        start_addr_hi32 = start_addr >> 32;
+> +    }
+>
+>      /* reset vector */
+>      uint32_t reset_vec[11] = {
+> @@ -516,13 +518,8 @@ static void sifive_u_machine_init(MachineState *machine)
+>          0x00000297,                    /* 1:  auipc  t0, %pcrel_hi(fw_dyn) */
+>          0x02828613,                    /*     addi   a2, t0, %pcrel_lo(1b) */
+>          0xf1402573,                    /*     csrr   a0, mhartid  */
+> -#if defined(TARGET_RISCV32)
+> -        0x0202a583,                    /*     lw     a1, 32(t0) */
+> -        0x0182a283,                    /*     lw     t0, 24(t0) */
+> -#elif defined(TARGET_RISCV64)
+> -        0x0202b583,                    /*     ld     a1, 32(t0) */
+> -        0x0182b283,                    /*     ld     t0, 24(t0) */
+> -#endif
+> +        0,
+> +        0,
+>          0x00028067,                    /*     jr     t0 */
+>          start_addr,                    /* start: .dword */
+>          start_addr_hi32,
+> @@ -530,6 +527,14 @@ static void sifive_u_machine_init(MachineState *machine)
+>          0x00000000,
+>                                         /* fw_dyn: */
+>      };
+> +    if (riscv_is_32_bit(machine)) {
+> +        reset_vec[4] = 0x0202a583;     /*     lw     a1, 32(t0) */
+> +        reset_vec[5] = 0x0182a283;     /*     lw     t0, 24(t0) */
+> +    } else {
+> +        reset_vec[4] = 0x0202b583;     /*     ld     a1, 32(t0) */
+> +        reset_vec[5] = 0x0182b283;     /*     ld     t0, 24(t0) */
+> +    }
+> +
+>
+>      /* copy in the reset vector in little_endian byte order */
+>      for (i = 0; i < ARRAY_SIZE(reset_vec); i++) {
+
+Regards,
+Bin
 
