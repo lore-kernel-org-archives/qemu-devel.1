@@ -2,95 +2,74 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0514AC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:38:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1C1EC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:41:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 875B521BE5
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:38:14 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="efJSqn7q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 875B521BE5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3BAEB22284
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 13:41:01 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3BAEB22284
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58826 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX2hR-0007yh-90
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:38:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36180)
+	id 1kX2k8-0001G4-7Y
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 09:41:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36762)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kX2gN-0007S4-4K
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:37:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36521)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
- id 1kX2gL-0007wB-NE
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:37:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603719424;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=7C2ayH26KYGWGb2OWxpQkjx9rYlDwqJAqkRUBSCv78I=;
- b=efJSqn7qDqGdK/2tItBnwXaACbBv70g9pnOLLFyA75SghFIdvgyyMYBHT+k8+fKpGTFU2S
- qjKbpiDUQGtijDRldb5H+NTFCqF84uFyMeTkX9wjVMGUxSxwzhsxwP5+3zWfQvdQUkQEk0
- rf5zaFmmgadgKk2hi6xTYSCvvCmfWu0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-171-9vAuFOZqOYCFM1klvw0xew-1; Mon, 26 Oct 2020 09:37:02 -0400
-X-MC-Unique: 9vAuFOZqOYCFM1klvw0xew-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 837EB1882FB3;
- Mon, 26 Oct 2020 13:37:01 +0000 (UTC)
-Received: from localhost (unknown [10.40.208.18])
- by smtp.corp.redhat.com (Postfix) with ESMTP id BB9026EF66;
- Mon, 26 Oct 2020 13:36:59 +0000 (UTC)
-Date: Mon, 26 Oct 2020 14:36:57 +0100
-From: Igor Mammedov <imammedo@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>
-Subject: Re: [PULL 25/33] tests/acceptance: Add a test for the N800 and N810
- arm machines
-Message-ID: <20201026143657.68147517@redhat.com>
-In-Reply-To: <CAFEAcA_wP1t1+o_PnCOotHvs54qSxJQSyuhtbSCSg4oewD43ng@mail.gmail.com>
-References: <20200228163840.23585-1-peter.maydell@linaro.org>
- <20200228163840.23585-26-peter.maydell@linaro.org>
- <a049110f-b7cb-52bd-de77-6e1193b5b6de@amsat.org>
- <6ce6a790-c68e-e3ed-962e-ba6f49244315@redhat.com>
- <f02d74fb-af6e-6e04-7ce7-48ab09a20e4f@amsat.org>
- <f2f276a9-a6ad-a2f8-2fbc-f1aca5423f79@amsat.org>
- <20201023174351.31838a86@redhat.com>
- <c80350d2-3591-6541-abf3-960b69cedf7d@amsat.org>
- <20201023210445.2fa72562@redhat.com>
- <CAFEAcA_wP1t1+o_PnCOotHvs54qSxJQSyuhtbSCSg4oewD43ng@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kX2jT-0000f8-86
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 09:40:19 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:47648
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kX2jQ-0008FL-FN; Mon, 26 Oct 2020 09:40:18 -0400
+Received: from host86-148-103-79.range86-148.btcentralplus.com
+ ([86.148.103.79] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kX2jP-0001Vu-1t; Mon, 26 Oct 2020 13:40:20 +0000
+To: Jason Andryuk <jandryuk@gmail.com>,
+ Samuel Thibault <samuel.thibault@gnu.org>
+References: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
+ <20201026083401.13231-9-mark.cave-ayland@ilande.co.uk>
+ <20201026095450.ko6snc4dusk3pvnw@function>
+ <547c0ea5-dad4-d246-1de8-844a2e9a9507@ilande.co.uk>
+ <20201026111406.jvpexlkh53g4fxff@function>
+ <CAKf6xpvcnmEs+v3+Tm1srQfo=m37EAGRPynJDJy4HkMuCmD6NQ@mail.gmail.com>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <38110b4a-34b1-3e97-5a7f-4fad1bfff080@ilande.co.uk>
+Date: Mon, 26 Oct 2020 13:40:05 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=imammedo@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <CAKf6xpvcnmEs+v3+Tm1srQfo=m37EAGRPynJDJy4HkMuCmD6NQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-SA-Exim-Connect-IP: 86.148.103.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH 8/9] dev-serial: fix FTDI_GET_MDM_ST response
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.167,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -104,42 +83,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- Alex =?UTF-8?B?QmVubsOpZQ==?= <alex.bennee@linaro.org>,
- Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Aurelien Jarno <aurelien@aurel32.net>,
+ Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, 25 Oct 2020 17:03:43 +0000
-Peter Maydell <peter.maydell@linaro.org> wrote:
+On 26/10/2020 13:00, Jason Andryuk wrote:
 
-> On Fri, 23 Oct 2020 at 20:04, Igor Mammedov <imammedo@redhat.com> wrote:
-> >
-> > On Fri, 23 Oct 2020 19:39:16 +0200
-> > Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org> wrote: =20
-> > > Are you saying arm_boot_info should hold a pointer to MachineState*
-> > > instead of duplicating? =20
-> >
-> > yep, some parts of it (fdt related) already use MachineState* so it's
-> > complete rewrite. The same probably applies to the fields you've just
-> > quoted. =20
->=20
-> Hmm, maybe, maybe not. The original design idea here was that
-> the boot loader code took a structure defining only the things
-> that the bootloader needed to know. It doesn't really need to
-> know about all the stuff that's in MachineState, which is
-> the state structure for the machine.
+> On Mon, Oct 26, 2020 at 7:21 AM Samuel Thibault <samuel.thibault@gnu.org> wrote:
+>>
+>> Mark Cave-Ayland, le lun. 26 oct. 2020 10:58:43 +0000, a ecrit:
+>>> On 26/10/2020 09:54, Samuel Thibault wrote:
+>>>> Mark Cave-Ayland, le lun. 26 oct. 2020 08:34:00 +0000, a ecrit:
+>>>>> The FTDI_GET_MDM_ST response should only return a single byte indicating the
+>>>>> modem status with bit 0 cleared (as documented in the Linux ftdi_sio.h header
+>>>>> file).
+>>>>>
+>>>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>>>> ---
+>>>>>    hw/usb/dev-serial.c | 5 ++---
+>>>>>    1 file changed, 2 insertions(+), 3 deletions(-)
+>>>>>
+>>>>> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+>>>>> index 4c374d0790..fa734bcf54 100644
+>>>>> --- a/hw/usb/dev-serial.c
+>>>>> +++ b/hw/usb/dev-serial.c
+>>>>> @@ -360,9 +360,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>>>>>            /* TODO: TX ON/OFF */
+>>>>>            break;
+>>>>>        case VendorDeviceRequest | FTDI_GET_MDM_ST:
+>>>>> -        data[0] = usb_get_modem_lines(s) | 1;
+>>>>> -        data[1] = FTDI_THRE | FTDI_TEMT;
+>>>>> -        p->actual_length = 2;
+>>>>> +        data[0] = usb_get_modem_lines(s);
+>>>>> +        p->actual_length = 1;
+>>>>
+>> [...]
+>>> A quick test shows my Chipi-X returns 0x1 0x60 with nothing attached in
+>>> response to FTDI_SIO_GET_MODEM_STATUS_REQUEST: assuming the reply length
+>>> should be 2 bytes, the comment about B0-B3 being zero and the response from
+>>> my Chip-X above suggests that the "| 1" should still be dropped from the
+>>> response.
+>>
+>> Aurelien, you introduced the "| 1" in
+>>
+>> commit abb8a13918ecc1e8160aa78582de9d5224ea70df
+>> Author: Aurelien Jarno <aurelien@aurel32.net>
+>> Date:   Wed Aug 13 04:23:17 2008 +0000
+>>
+>>      usb-serial: add support for modem lines
+>>
+>> [...]
+>> @@ -357,9 +393,9 @@ static int usb_serial_handle_control(USBDevice *dev, int request, int value,
+>>           /* TODO: TX ON/OFF */
+>>           break;
+>>       case DeviceInVendor | FTDI_GET_MDM_ST:
+>> -        /* TODO: return modem status */
+>> -        data[0] = 0;
+>> -        ret = 1;
+>> +        data[0] = usb_get_modem_lines(s) | 1;
+>> +        data[1] = 0;
+>> +        ret = 2;
+>>           break;
+>>
+>> do you know exactly what it is for?
+> 
+> Hi,
+> 
+> I'm not particularly familiar with the FTDI USB serial devices.  I
+> found setting FTDI_THRE | FTDI_TEMT by comparing with real hardware.
+> 
+> A little searching found this:
+> https://elixir.bootlin.com/linux/latest/source/drivers/usb/serial/ftdi_sio.h#L541
+> 
+> That shows "B0   Reserved - must be 1", so maybe that is why "| 1" was added?
 
-Yep It doesn't need all data the MachineState contains, but then we end up
-with this kind of bugs which could be avoided if duplication were not there=
-.
-And some of the fields in  MachineState are pure bootloader data.
+Right - that's for the modem status returned as part of the first 2 status bytes for 
+incoming data which is slightly different from modem status returned directly from 
+FTDI_SIO_GET_MODEM_STATUS: 
+https://elixir.bootlin.com/linux/latest/source/drivers/usb/serial/ftdi_sio.h#L423.
 
->=20
-> thanks
-> -- PMM
->=20
+It is the latter which this patch changes and appears to match what I see on my 
+Chipi-X hardware here.
 
+
+ATB,
+
+Mark.
 
