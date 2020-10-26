@@ -2,89 +2,75 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83A05C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:04:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB6C9C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:06:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EEC0C21707
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:04:47 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ORGvfQPg"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEC0C21707
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 1CC3F21707
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:06:45 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1CC3F21707
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52198 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8jW-0004sB-Mg
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:04:46 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60404)
+	id 1kX8lP-0006du-SD
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:06:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8HT-0005UD-0h
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:47 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51904)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kX8HQ-0002Ib-8B
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:35:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603740943;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=hIJ0esh5DZW0RDKwxqS764eXBUHQIMgYJbBbhoudoIk=;
- b=ORGvfQPg1XSksJQrMIQ4L7nGOgjc5C+SGLkAapLGenqDZuGbOWc93XkgmZdIYPdhySg51y
- 83tzPJeQUZHq+pACozsRc47ag5oLOnrKB8tB2YPXkurpEzjLgfnuhqH0ov6Rs8mKJTzzwR
- VU2/zLsjH9UxLMGVBYpHi0t759y/zmk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-162-G3IjU9XyOhqh31UOqOjEpw-1; Mon, 26 Oct 2020 15:35:40 -0400
-X-MC-Unique: G3IjU9XyOhqh31UOqOjEpw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE895108E1A1;
- Mon, 26 Oct 2020 19:35:39 +0000 (UTC)
-Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8809910013C0;
- Mon, 26 Oct 2020 19:35:36 +0000 (UTC)
-Subject: [PULL 22/32] vfio: Find DMA available capability
-From: Alex Williamson <alex.williamson@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Mon, 26 Oct 2020 13:35:36 -0600
-Message-ID: <160374093618.22414.9317873776645408846.stgit@gimli.home>
-In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kX8GI-0003Wx-6p; Mon, 26 Oct 2020 15:34:34 -0400
+Received: from mout.kundenserver.de ([217.72.192.75]:41305)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
+ id 1kX8GG-00025N-D3; Mon, 26 Oct 2020 15:34:33 -0400
+Received: from [192.168.100.1] ([82.252.139.38]) by mrelayeu.kundenserver.de
+ (mreue107 [213.165.67.119]) with ESMTPSA (Nemesis) id
+ 1N8X9L-1kJqc70gLp-014PPu; Mon, 26 Oct 2020 20:34:26 +0100
+Subject: Re: [PATCH 1/4] qdev: Fix two typos
+To: Thomas Huth <thuth@redhat.com>, Maxim Levitsky <mlevitsk@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201019163702.471239-1-mlevitsk@redhat.com>
+ <20201019163702.471239-2-mlevitsk@redhat.com>
+ <ce809c9e-c6ad-2d4b-a186-d32ab79213ef@redhat.com>
+From: Laurent Vivier <laurent@vivier.eu>
+Message-ID: <03a9894b-c6c3-8d1b-ff60-10bb17bf2dfc@vivier.eu>
+Date: Mon, 26 Oct 2020 20:34:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+In-Reply-To: <ce809c9e-c6ad-2d4b-a186-d32ab79213ef@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: fr
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:dZ/zpS+44wCAZ782kZblDXIYj9sLMDZRDFoO7X/4P7iLeABrfP/
+ ynEX3P5vQGaKNc4O+Z/2RYlOiAekwxDV0JieBw66QYq+OxQhvZepp1IvHLRdw9p2EO9SviH
+ j499VyoG6njJg/B3zacisyi8s3QcZhweO12Tk6dHRVs0Cg3BUzV4hQrJq0qJ2k7scyOj9zE
+ 0MaVc3nchfZogn7/ubxoQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:bz7q21iirus=:8Ugv2UsJfpJvlpjS6LUz3N
+ M7/GP/1v9PQJ4NQhUQxI2YrggMcboWX+ZDojNlm/E1V7wTzumO68TfZx//PYzj/d6XkVCej7B
+ CjQf/fP1WxrN1F+8AmET+S3GO1zKnrV23sSnglX5uEq1fE9O+EK2Vt0pILQQkq1trzkKfOW+w
+ 31cPnDw4aVMsdivrR8Cfr4oTx6BR0XWWFwzZmmsJ++v3C2eVbmjXEKwg3pQvejnmHXS2XZUmH
+ 3ViU9SrnOiQm7ZlFNE1AHDzIOcQIEaKcBVeXR1J80EoVkconQ5GCwxaAMuI2i5O0JxOeksG30
+ K9g054qLDlIHQiHUFJMofISbw9qgPLXA5HHuBe/V0BPGSuGPnFcLXZRR9r8DrJmD/ol0fWCjy
+ zn4inzyQgF3huNsj+gwlpnqrkr2kn1lnKKthuEOx9UMDNZc/sGbuC17xKLC0U2MHfAT+R1dcH
+ 6gbc+/n42g==
+Received-SPF: none client-ip=217.72.192.75; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 15:34:30
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,80 +83,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ QEMU Trivial <qemu-trivial@nongnu.org>, Max Reitz <mreitz@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Matthew Rosato <mjrosato@linux.ibm.com>
+Le 24/10/2020 à 07:34, Thomas Huth a écrit :
+> On 19/10/2020 18.36, Maxim Levitsky wrote:
+>> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+>> ---
+>>  include/hw/qdev-core.h | 4 ++--
+>>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+>> index 868973319e..3761186804 100644
+>> --- a/include/hw/qdev-core.h
+>> +++ b/include/hw/qdev-core.h
+>> @@ -163,8 +163,8 @@ struct NamedClockList {
+>>  /**
+>>   * DeviceState:
+>>   * @realized: Indicates whether the device has been fully constructed.
+>> - *            When accessed outsize big qemu lock, must be accessed with
+>> - *            atomic_load_acquire()
+>> + *            When accessed outside big qemu lock, must be accessed with
+>> + *            qatomic_load_acquire()
+>>   * @reset: ResettableState for the device; handled by Resettable interface.
+>>   *
+>>   * This structure should not be accessed directly.  We declare it here
+>>
+> 
+> Reviewed-by: Thomas Huth <thuth@redhat.com>
+> 
+> 
+Applied to my trivial-patches branch.
 
-The underlying host may be limiting the number of outstanding DMA
-requests for type 1 IOMMU.  Add helper functions to check for the
-DMA available capability and retrieve the current number of DMA
-mappings allowed.
-
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c              |   31 +++++++++++++++++++++++++++++++
- include/hw/vfio/vfio-common.h |    2 ++
- 2 files changed, 33 insertions(+)
-
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 3714f8bcb84e..246adcdcaefa 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -1148,6 +1148,37 @@ vfio_get_region_info_cap(struct vfio_region_info *info, uint16_t id)
-     return vfio_get_cap((void *)info, info->cap_offset, id);
- }
- 
-+static struct vfio_info_cap_header *
-+vfio_get_iommu_type1_info_cap(struct vfio_iommu_type1_info *info, uint16_t id)
-+{
-+    if (!(info->flags & VFIO_IOMMU_INFO_CAPS)) {
-+        return NULL;
-+    }
-+
-+    return vfio_get_cap((void *)info, info->cap_offset, id);
-+}
-+
-+bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
-+                             unsigned int *avail)
-+{
-+    struct vfio_info_cap_header *hdr;
-+    struct vfio_iommu_type1_info_dma_avail *cap;
-+
-+    /* If the capability cannot be found, assume no DMA limiting */
-+    hdr = vfio_get_iommu_type1_info_cap(info,
-+                                        VFIO_IOMMU_TYPE1_INFO_DMA_AVAIL);
-+    if (hdr == NULL) {
-+        return false;
-+    }
-+
-+    if (avail != NULL) {
-+        cap = (void *) hdr;
-+        *avail = cap->avail;
-+    }
-+
-+    return true;
-+}
-+
- static int vfio_setup_region_sparse_mmaps(VFIORegion *region,
-                                           struct vfio_region_info *info)
- {
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index 24e299d97425..8336f2e7ac19 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -198,6 +198,8 @@ VFIOGroup *vfio_get_group(int groupid, AddressSpace *as, Error **errp);
- void vfio_put_group(VFIOGroup *group);
- int vfio_get_device(VFIOGroup *group, const char *name,
-                     VFIODevice *vbasedev, Error **errp);
-+bool vfio_get_info_dma_avail(struct vfio_iommu_type1_info *info,
-+                             unsigned int *avail);
- 
- extern const MemoryRegionOps vfio_region_ops;
- typedef QLIST_HEAD(VFIOGroupList, VFIOGroup) VFIOGroupList;
+Thanks,
+Laurent
 
 
