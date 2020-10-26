@@ -2,125 +2,80 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8001DC2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:50:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C36E1C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 06F0222265
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:50:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="UKzd7t0t"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 06F0222265
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	by mail.kernel.org (Postfix) with ESMTPS id 5E8AF2225C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8AF2225C
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58706 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6dN-00030l-4B
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:50:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49606)
+	id 1kX6eT-0004Kh-CP
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:51:25 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51754)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX695-0007ty-4g; Mon, 26 Oct 2020 13:18:59 -0400
-Received: from mail-eopbgr60093.outbound.protection.outlook.com
- ([40.107.6.93]:39555 helo=EUR04-DB3-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kX693-0008NC-Da; Mon, 26 Oct 2020 13:18:58 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=C4sdZuekWta/lIUUuRoEvcvuAnCcfMeTiAKYEnJfbdk0wTy+F2jbvL4ZQDP2S2BLOAzJsiIsuKnDn0lYosxNj9UDwuHiNfJYXzRlaxWuaGgahZ7VQjWORRK9RjRl/RS+WN/oSeOw4EguI4gLRgbV61RUET8dl+PwR/kZisfZjB5ut1p4mbER+CVTprL3bvgWPobT2iamww+uvASTYTqzvwos9qF00R7KLhIhaaShqE8PhW7i5hRcEI2+6c4Kklr46jIH6FmkoFYAEUcAkCqGGu+5q6IQO5d0WsoHOaxR3TkM3Ad3NZqUQRCpZfY99WM9LjnbIlZfbCKHRBikMxPOWA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GRTUWwh5iv3XC+ROEm0xJHcdtTc/PceILJOmjAS2b9g=;
- b=i+NbQqXtZ9tfGjWd24JTGlM7G31Mj5GCfzqDEwDcJwewIrWLU9Yw31xtmRxhrsncAbU5LaOoRGr+3NDxkLJeMXrp/sE6drRg081BmtV7u3aJqUIGNoSFHExRVD6DJaDF0zjNb5fdBDPy+05onwUsqZcmQNGd7W8+d4j+eYP6KMqOUqDb73dHljygPjQlP9+G2CGNxyt5QDZZIkcBeKQbo7ks1UmLi4+vsGimHsqV4lUkpY5s1jVymXBTIyOPoGULRXfLlLY0UN17oUnj6SklyRg97uH6shvIULJbQ8e/lM6+7zTeKJ6HfQ88r74gy1NgjxSxH4bJWqkPhhtO+kjTeQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GRTUWwh5iv3XC+ROEm0xJHcdtTc/PceILJOmjAS2b9g=;
- b=UKzd7t0taK3yEuSO9Ewk+rnZEMqB/jrkth3DPoITsRMuNoQh0FV5T04KkramJ6pMhj4DQZpArz7jUuvSZuLhwL5TNWNwaqOOwBzguY6Bt25tvA2/W2+b8DlxbH+9e2NU3XCl7ThMOHG9JfIDs053FU5K740VqK3jlXtsvz6mu6k=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com (2603:10a6:20b:dc::15)
- by AM6PR08MB3032.eurprd08.prod.outlook.com (2603:10a6:209:43::31)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 26 Oct
- 2020 17:18:45 +0000
-Received: from AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243]) by AM7PR08MB5494.eurprd08.prod.outlook.com
- ([fe80::fd02:1330:f620:1243%9]) with mapi id 15.20.3499.018; Mon, 26 Oct 2020
- 17:18:45 +0000
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-To: qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, vsementsov@virtuozzo.com, eblake@redhat.com,
- armbru@redhat.com, xiechanglong.d@gmail.com, wencongyang2@huawei.com,
- jsnow@redhat.com, mreitz@redhat.com, kwolf@redhat.com, den@openvz.org
-Subject: [PATCH v3 17/25] block/block-copy: make progress_bytes_callback
- optional
-Date: Mon, 26 Oct 2020 20:18:07 +0300
-Message-Id: <20201026171815.13233-18-vsementsov@virtuozzo.com>
-X-Mailer: git-send-email 2.21.3
-In-Reply-To: <20201026171815.13233-1-vsementsov@virtuozzo.com>
-References: <20201026171815.13233-1-vsementsov@virtuozzo.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [185.215.60.99]
-X-ClientProxiedBy: AM0PR02CA0101.eurprd02.prod.outlook.com
- (2603:10a6:208:154::42) To AM7PR08MB5494.eurprd08.prod.outlook.com
- (2603:10a6:20b:dc::15)
+ (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
+ id 1kX6Ff-0000Pe-Av
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:25:48 -0400
+Received: from mail-pl1-f196.google.com ([209.85.214.196]:34427)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
+ id 1kX6Fb-0001AB-6f
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:25:46 -0400
+Received: by mail-pl1-f196.google.com with SMTP id r3so5006191plo.1
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:25:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=Yh/zwd8J3NXD+r3FYcs6OA7kJm9yhTuQacKIilSY6OQ=;
+ b=aco5hUo3DJ0ipr62ZXPEwhS5oivUNerc4awRfsXgDREyBiY1oA1/AGkD4OQ6fsEXiK
+ Hl3AAbT/zKHsZRIFfJ/G+arXmTIFukRRGn7Q5nYSmHY2Cr7tdcturqFaiBzpNMOHzbaX
+ 8zyjkku1uBgUgOVh1kzD3D2arpP7/8t/BbgvSKNcJEw4k4zRQq7z7UlUlS8K5HjWv29j
+ A2aQfzLGg4yYP6h4dWrIUPdKRRe27jJIDMk0Ts8WOQVfmAupk+sYqH/+US/roUFD+VeO
+ TaU9jlGWE0d8wW9BdHPIFcxVP5IBF7PPA4y+UhcCsCRkNegRWU9VjutS+8Mi/2KNla8z
+ oevQ==
+X-Gm-Message-State: AOAM532zML/OKuper6+LxNkhaLul/heRpC4zmFe5vsx6XkrBKxVpSv28
+ b9JtrcQNqA0emebBW+2jJqm+clpIvwI=
+X-Google-Smtp-Source: ABdhPJxP1DtfrJROiDeksc831VUW/iizv8+/ygf9fe+W3n9bm/AorLW8ZlhXdPCp37TQxkMCr2wcww==
+X-Received: by 2002:a17:90a:c901:: with SMTP id
+ v1mr17583259pjt.103.1603733141556; 
+ Mon, 26 Oct 2020 10:25:41 -0700 (PDT)
+Received: from localhost.localdomain ([73.93.154.188])
+ by smtp.gmail.com with ESMTPSA id j20sm12723075pfd.40.2020.10.26.10.25.40
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Mon, 26 Oct 2020 10:25:41 -0700 (PDT)
+From: Joelle van Dyne <j@getutm.app>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 2/4] tcg: implement mirror mapped JIT for Linux
+Date: Mon, 26 Oct 2020 10:25:33 -0700
+Message-Id: <20201026172535.10419-3-j@getutm.app>
+X-Mailer: git-send-email 2.28.0
+In-Reply-To: <20201026172535.10419-1-j@getutm.app>
+References: <20201026172535.10419-1-j@getutm.app>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from kvm.sw.ru (185.215.60.99) by
- AM0PR02CA0101.eurprd02.prod.outlook.com (2603:10a6:208:154::42) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Mon, 26 Oct 2020 17:18:44 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 11e363c8-0dcb-490b-d624-08d879d3318d
-X-MS-TrafficTypeDiagnostic: AM6PR08MB3032:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM6PR08MB30329B2E41117C8F5A6CDB42C1190@AM6PR08MB3032.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:89;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 65MDH1gHEeNxSTXVrnMVmYXt/HG2XWM3T1MhGe5/sK0kfAQsx57cT7pNkzrx1+9nFqB8Bu4RF/etHUBrJEEu9+clopC6yzbQTQewTUAyiEzAOX/W0rkytNxFepdVXjd41ju9gPiFAdxrxVD11fGr/O93mZY4puMS6qq1i9HuxAxRbLmKhYlZOzS59TS85da5N7LlUadN4Y3AaA5vlGtnyzKz6qSRysam5cSEHoPGhSYeAN2PUtoDEjcW8mFoEOdMBhjQ+pvfYxVrY1qpDFwq6bsVBP6fb8hXWWHeOnhKFgvaAQjYjT5qzGBW7A3PSelkymy9Ur210rc0J4wIFjCMRw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM7PR08MB5494.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(136003)(366004)(39850400004)(376002)(346002)(396003)(66476007)(8936002)(5660300002)(316002)(6506007)(6512007)(2616005)(66946007)(956004)(66556008)(6666004)(26005)(4326008)(36756003)(478600001)(52116002)(1076003)(16526019)(83380400001)(2906002)(186003)(6916009)(8676002)(107886003)(86362001)(6486002)(4744005);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: hzlGO+69xcr4uWzqb6wi34+7BjtBHrO9jPWOeNC0JvPzgFttFZQk59deCPMB34hUjVCQ3IBjllUIAAqfdIqsxhhrTV868hjjVBYg0CXwbKEw7G84tuG9pouWDuAoEiP/6XVlF0eQcxtsJe3NQ+ifIgBP43Dc2bYSMtiX7v89OafkACymhoTsCUL7qC75XHN8RjC076kJFZ3YXvnCUnimUUZkEZK860cubkNr61QIZt5e5/OyVou6U0UMiamKdzutKroPD1hjXzRGjbvE6VvZ4dDgGtV6l221i9LjMl26DF6xWf4+2O6WTpECSjLjy873BszBZOMHMfo6tCw0AYzYgNrJZoUE+Rfob2QapWGMAyQe5BxyiwVQvk9h5UKNc5YqaroEAvcxYZUmvo1Q6IUTTD6o2vyBZ/VkE2UyJnzdbyIybHBIpS57ylHJBmhsPbPlB2ZdoQ2HVvYbD9K2VOPpBFWtOiJURS72PbWbeylS4MAigDNy7cGgkW7WVBHiRAdIswhEEtvE/xeagf7e8LSpr0vYcnKaKyHAFxxmCoVpfnDjYgveEsegy4/cjmx0+wOnpMmaXOtV5p3BE67ya3x/ia74h0AQ7Qz7ulC+UO5CuqcfapHxrHUvUcjxAAPDm6I7iWaatn/Q/ow6mAjltRYE6g==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11e363c8-0dcb-490b-d624-08d879d3318d
-X-MS-Exchange-CrossTenant-AuthSource: AM7PR08MB5494.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Oct 2020 17:18:45.0748 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dDAQLUvUCmSpxfl/durnvKuO/IpLpo4LwzXvQ6YHGNLIhXNM92GwjDHZwTpPezpMML2++7wm78VaZUE7axys1Y9B9PW0FORmIaDqKo8z+qA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM6PR08MB3032
-Received-SPF: pass client-ip=40.107.6.93;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR04-DB3-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:18:35
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=209.85.214.196;
+ envelope-from=osy86github@gmail.com; helo=mail-pl1-f196.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:25:42
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -133,35 +88,281 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-We are going to stop use of this callback in the following commit.
-Still the callback handling code will be dropped in a separate commit.
-So, for now let's make it optional.
+When configured with --enable-debug-tcg on Linux, we enable JIT mirror map
+which separates the JIT allocation into a RX-only address and a RW-only
+address. The backing is a memfd_create() object.
 
-Signed-off-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This allows us to catch bugs where we unintentionally write to the JIT
+region. However, the main use case will be for other platforms that require
+strict W^X separation to run.
+
+Signed-off-by: Joelle van Dyne <j@getutm.app>
 ---
- block/block-copy.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ configure                 | 13 ++++++++
+ meson.build               |  1 +
+ include/exec/exec-all.h   |  8 +++++
+ include/tcg/tcg.h         | 18 ++++++++++
+ accel/tcg/cpu-exec.c      |  7 +++-
+ accel/tcg/translate-all.c | 69 +++++++++++++++++++++++++++++++++++----
+ 6 files changed, 108 insertions(+), 8 deletions(-)
 
-diff --git a/block/block-copy.c b/block/block-copy.c
-index 82cf945693..61d82d9a1c 100644
---- a/block/block-copy.c
-+++ b/block/block-copy.c
-@@ -454,7 +454,9 @@ static coroutine_fn int block_copy_task_entry(AioTask *task)
-         t->call_state->error_is_read = error_is_read;
+diff --git a/configure b/configure
+index e6754c1e87..9a632821c4 100755
+--- a/configure
++++ b/configure
+@@ -448,6 +448,7 @@ meson=""
+ ninja=""
+ skip_meson=no
+ gettext=""
++mirror_jit="no"
+ 
+ bogus_os="no"
+ malloc_trim="auto"
+@@ -5725,6 +5726,14 @@ if test "$mingw32" = "yes" ; then
+     done
+ fi
+ 
++# Enable mirror mapping if debug_tcg on supported platform
++
++if test "$debug_tcg" = "yes"; then
++  if test "$linux" = "yes"; then
++    mirror_jit=yes
++  fi
++fi
++
+ qemu_confdir="$sysconfdir/$qemu_suffix"
+ qemu_moddir="$libdir/$qemu_suffix"
+ qemu_datadir="$datadir/$qemu_suffix"
+@@ -6843,6 +6852,10 @@ if test "$safe_stack" = "yes"; then
+   echo "CONFIG_SAFESTACK=y" >> $config_host_mak
+ fi
+ 
++if test "$mirror_jit" = "yes"; then
++  echo "CONFIG_MIRROR_JIT=y" >> $config_host_mak
++fi
++
+ # If we're using a separate build tree, set it up now.
+ # DIRS are directories which we simply mkdir in the build tree;
+ # LINKS are things to symlink back into the source tree
+diff --git a/meson.build b/meson.build
+index 7627a0ae46..9630edff9f 100644
+--- a/meson.build
++++ b/meson.build
+@@ -2114,6 +2114,7 @@ endif
+ summary_info += {'thread sanitizer':  config_host.has_key('CONFIG_TSAN')}
+ summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
+ summary_info += {'Linux keyring':     config_host.has_key('CONFIG_SECRET_KEYRING')}
++summary_info += {'mirror JIT':        config_host.has_key('CONFIG_MIRROR_JIT')}
+ summary(summary_info, bool_yn: true)
+ 
+ if not supported_cpus.contains(cpu)
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 4707ac140c..921767a51b 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -519,6 +519,14 @@ struct TranslationBlock {
+     uintptr_t jmp_list_head;
+     uintptr_t jmp_list_next[2];
+     uintptr_t jmp_dest[2];
++
++#if defined(CONFIG_MIRROR_JIT)
++    /*
++     * Store difference to writable mirror
++     * We need this when patching the jump instructions
++     */
++    ptrdiff_t code_rw_mirror_diff;
++#endif
+ };
+ 
+ extern bool parallel_cpus;
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index 79c5ff8dab..a76c259d1b 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -627,6 +627,10 @@ struct TCGContext {
+     size_t code_gen_buffer_size;
+     void *code_gen_ptr;
+     void *data_gen_ptr;
++#if defined(CONFIG_MIRROR_JIT)
++    int code_gen_buffer_fd;
++    ptrdiff_t code_rw_mirror_diff;
++#endif
+ 
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
+@@ -677,6 +681,20 @@ struct TCGContext {
+     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
+ };
+ 
++static inline void *tcg_mirror_ptr_rw(TCGContext *s, const void *rx)
++{
++#if defined(CONFIG_MIRROR_JIT)
++    return (void *)rx + s->code_rw_mirror_diff;
++#else
++    return (void *)rx;
++#endif
++}
++
++static inline tcg_insn_unit *tcg_code_ptr_rw(TCGContext *s, const void *rx)
++{
++    return (tcg_insn_unit *)tcg_mirror_ptr_rw(s, rx);
++}
++
+ extern TCGContext tcg_init_ctx;
+ extern __thread TCGContext *tcg_ctx;
+ extern TCGv_env cpu_env;
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index 58aea605d8..f7eb6fcd77 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -354,7 +354,12 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
+     if (TCG_TARGET_HAS_direct_jump) {
+         uintptr_t offset = tb->jmp_target_arg[n];
+         uintptr_t tc_ptr = (uintptr_t)tb->tc.ptr;
+-        tb_target_set_jmp_target(tc_ptr, tc_ptr + offset, addr);
++#if defined(CONFIG_MIRROR_JIT)
++        uintptr_t wr_addr = tc_ptr + offset + tb->code_rw_mirror_diff;
++#else
++        uintptr_t wr_addr = tc_ptr + offset;
++#endif
++        tb_target_set_jmp_target(tc_ptr, tc_ptr + offset, addr, wr_addr);
      } else {
-         progress_work_done(t->s->progress, t->bytes);
--        t->s->progress_bytes_callback(t->bytes, t->s->progress_opaque);
-+        if (t->s->progress_bytes_callback) {
-+            t->s->progress_bytes_callback(t->bytes, t->s->progress_opaque);
-+        }
+         tb->jmp_target_arg[n] = addr;
      }
-     co_put_to_shres(t->s->mem, t->bytes);
-     block_copy_task_end(t, ret);
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index d76097296d..bfb856ac1a 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -59,6 +59,7 @@
+ #include "sysemu/cpus.h"
+ #include "sysemu/cpu-timers.h"
+ #include "sysemu/tcg.h"
++#include "qemu/memfd.h"
+ 
+ /* #define DEBUG_TB_INVALIDATE */
+ /* #define DEBUG_TB_FLUSH */
+@@ -302,10 +303,12 @@ static target_long decode_sleb128(uint8_t **pp)
+ 
+ static int encode_search(TranslationBlock *tb, uint8_t *block)
+ {
+-    uint8_t *highwater = tcg_ctx->code_gen_highwater;
+-    uint8_t *p = block;
++    const uint8_t *highwater, *start;
++    uint8_t *p;
+     int i, j, n;
+ 
++    highwater = tcg_mirror_ptr_rw(tcg_ctx, tcg_ctx->code_gen_highwater);
++    start = p = tcg_mirror_ptr_rw(tcg_ctx, block);
+     for (i = 0, n = tb->icount; i < n; ++i) {
+         target_ulong prev;
+ 
+@@ -329,7 +332,7 @@ static int encode_search(TranslationBlock *tb, uint8_t *block)
+         }
+     }
+ 
+-    return p - block;
++    return p - start;
+ }
+ 
+ /* The cpu state corresponding to 'searched_pc' is restored.
+@@ -1067,12 +1070,29 @@ static inline void *alloc_code_gen_buffer(void)
+ #else
+ static inline void *alloc_code_gen_buffer(void)
+ {
+-    int prot = PROT_WRITE | PROT_READ | PROT_EXEC;
+-    int flags = MAP_PRIVATE | MAP_ANONYMOUS;
++    int prot = PROT_READ | PROT_EXEC;
++    int flags = 0;
+     size_t size = tcg_ctx->code_gen_buffer_size;
++    int fd = -1;
+     void *buf;
+ 
+-    buf = mmap(NULL, size, prot, flags, -1, 0);
++#if defined(CONFIG_MIRROR_JIT)
++#if defined(CONFIG_LINUX)
++    fd = qemu_memfd_create("tcg-jit", size, false, 0, 0, NULL);
++    if (fd < 0) {
++        return NULL;
++    }
++    tcg_ctx->code_gen_buffer_fd = fd;
++    flags |= MAP_SHARED;
++#else /* defined(CONFIG_LINUX) */
++#error "Mirror JIT unimplemented for this platform."
++#endif /* defined(CONFIG_LINUX) */
++#else /* defined(CONFIG_MIRROR_JIT) */
++    prot |= PROT_WRITE;
++    flags |= MAP_ANONYMOUS | MAP_PRIVATE;
++#endif /* defined(CONFIG_MIRROR_JIT) */
++
++    buf = mmap(NULL, size, prot, flags, fd, 0);
+     if (buf == MAP_FAILED) {
+         return NULL;
+     }
+@@ -1118,7 +1138,28 @@ static inline void *alloc_code_gen_buffer(void)
+ }
+ #endif /* USE_STATIC_CODE_GEN_BUFFER, WIN32, POSIX */
+ 
+-static inline void code_gen_alloc(size_t tb_size)
++#if defined(CONFIG_MIRROR_JIT)
++#if defined(CONFIG_LINUX)
++static inline void *alloc_jit_rw_mirror(void)
++{
++    int fd = tcg_ctx->code_gen_buffer_fd;
++    size_t size = tcg_ctx->code_gen_buffer_size;
++    void *buf;
++
++    assert(fd >= 0);
++    buf = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
++    if (buf == MAP_FAILED) {
++        return NULL;
++    }
++
++    return buf;
++}
++#else
++#error "Mirror JIT unimplemented for this platform."
++#endif /* CONFIG_IOS */
++#endif /* CONFIG_MIRROR_JIT */
++
++static inline void code_gen_alloc(size_t tb_size, bool mirror_jit)
+ {
+     tcg_ctx->code_gen_buffer_size = size_code_gen_buffer(tb_size);
+     tcg_ctx->code_gen_buffer = alloc_code_gen_buffer();
+@@ -1126,6 +1167,17 @@ static inline void code_gen_alloc(size_t tb_size)
+         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
+         exit(1);
+     }
++#if defined(CONFIG_MIRROR_JIT)
++    void *mirror;
++
++    /* For platforms that need a mirror mapping for code execution */
++    mirror = alloc_jit_rw_mirror();
++    if (mirror == NULL) {
++        fprintf(stderr, "Could not remap code buffer mirror\n");
++        exit(1);
++    }
++    tcg_ctx->code_rw_mirror_diff = mirror - tcg_ctx->code_gen_buffer;
++#endif /* CONFIG_MIRROR_JIT */
+ }
+ 
+ static bool tb_cmp(const void *ap, const void *bp)
+@@ -1721,6 +1773,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
+         cpu_loop_exit(cpu);
+     }
+ 
++#if defined(CONFIG_MIRROR_JIT)
++    tb->code_rw_mirror_diff = tcg_ctx->code_rw_mirror_diff;
++#endif
+     gen_code_buf = tcg_ctx->code_gen_ptr;
+     tb->tc.ptr = gen_code_buf;
+     tb->pc = pc;
 -- 
-2.21.3
+2.28.0
 
 
