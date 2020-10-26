@@ -7,82 +7,83 @@ X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39C35C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D7C8C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:23:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9CCE421D7B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:22:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9D66422263
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:23:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gqPtOVjF"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9CCE421D7B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Kg1qMtEp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9D66422263
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39350 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6Cs-00046B-MF
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:22:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48868)
+	id 1kX6DP-00050q-H0
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:23:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kX67O-0005qC-27
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:17:14 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:39774)
+ id 1kX666-0004Lh-HQ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:15:54 -0400
+Received: from mail-wm1-x342.google.com ([2a00:1450:4864:20::342]:56247)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kX67I-0008Bb-Qp
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:17:12 -0400
-Received: by mail-wr1-x443.google.com with SMTP id y12so13533639wrp.6
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:17:08 -0700 (PDT)
+ id 1kX664-000824-U8
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:15:54 -0400
+Received: by mail-wm1-x342.google.com with SMTP id a72so12457302wme.5
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:15:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=references:user-agent:from:to:cc:subject:in-reply-to:date
  :message-id:mime-version:content-transfer-encoding;
- bh=54gDcVuAT56XwNhs9nnw7oI93eoVaftg94YAOBBdE88=;
- b=gqPtOVjFS5UntBmWLOjJQoBN+zdoNMunXlL+HOlxILpbbJoEe9UzpwppwnUF17rulp
- AHRxoDfeu6y0EVF7SOmRjGasVMgFV8yRnk6d8lvD2OJpJFXmGYRMuVqQ8Ly20IpZQ0dT
- Hkf7h3zAy8c51LPzwunC83JOqx60fOhXZQvABS0NdNB6knW3JQBIjsFcPg95rpKk/Soy
- wrhQZAZaTQbZ8lRMP4uoFLsgJhG6gKQYNll3qYefd6NeyeWlKVDLs32DNatmefyaQVSh
- ypBGdN1s5Ac5IBO6EfXsLj9Asc+jiehoHt07Tnsnfyexs5LIWkyho0WmA3c7cGx0Zibv
- LidQ==
+ bh=1rGfK5KmDVjuMmXxy2nUSwHH6sMFKvTP3cU4+dNKII8=;
+ b=Kg1qMtEpRCVQVitELpZFu3wrwTX1cJE/7Ly6Su2bvTmBvD/BCm4ZGMhTtOSkxFUZGq
+ EBk4mwjW00CwpGhaUS0IbbUOJQpXBIryGoATdagHY92/hmy34iJgmrEQFKKXCKK3Xtjq
+ LmYI4ePVCwLo01Krbi0vvldgShtbLJLDLrbn7eW9rJyhckpLcQnSepp08Kdi7/06k4Hq
+ cdp2Vg+tntkdSkMLRYo0M1KzK24NVrqP9+y8adZPz8rH/QPz622mfhrK7UkuLFNSdcSk
+ vmmdLVBg9nvWID753NROCAH8gIxPPeR3fKKoA2KpyUwO4nPPmpPnO7u8XiRkOOD64hkr
+ M+gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:references:user-agent:from:to:cc:subject
  :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=54gDcVuAT56XwNhs9nnw7oI93eoVaftg94YAOBBdE88=;
- b=hvK2Xb+x+d3LtcKdi53Z2d3Dd7y4mf+Jswt1owZYpdehq7arZpk9nFf1BPElaMLeZk
- TyQMfQgVqJRAaxHasPrU3mro7M8o/jGTmGWBtBIVQPP/oG+RPcAf91MytPG2Bdcv/Xm/
- Nt0mAXXumYPhurCnXsIraB4qW5FNs8tCCNp+qAFGnTYuCKhKdlG3VusG7ojWhAXHXLrC
- 4glMb6tOL42I7QWarg51x6GRLYCvBWmKnqsvwWMoMgMmPIAJPjyZ2fy6cMvL4Uo/7841
- iW3Lp2Xc4GJZ3ALXlPftUed32CVVxhGUxShdZJuGKUfGz1/m5VVmHOhd+2si1WFzwF4c
- 3+SA==
-X-Gm-Message-State: AOAM531B0NM1sw4L8ExoxFmSWPA24hbDVRCNUdjkJcR53t8Tipb8H5A5
- 9Ke9bw9DTX0XYjusqWCb9FKuEkpwXC3Abg==
-X-Google-Smtp-Source: ABdhPJwk1yepklPDC0NnEc+kb+dbO0dO7Bif4BwX0Gf57usuZTFD7VTtAZRGh5HoIDsJ5NqY4U4e5g==
-X-Received: by 2002:a5d:654d:: with SMTP id z13mr19063481wrv.6.1603732626645; 
- Mon, 26 Oct 2020 10:17:06 -0700 (PDT)
+ bh=1rGfK5KmDVjuMmXxy2nUSwHH6sMFKvTP3cU4+dNKII8=;
+ b=lRCsH4pXZotcekO3rLWqjsB27euIWzJOqAtI7NGqrZupArZff+WEJjyOvnANiin+Rx
+ vIKnTvWCUgvAqhi9yqh9A3afo7rt0/HHLS8J8HM93TDfVIplJnlQ7gvZt+wp40qiIX0W
+ CW4gXvU2UpGHxcbpdTXH2leiN0AEvE+nkg/aygb9ht0Mhcv8W+pgF5dGJQYkC42STU4Y
+ bIy0cFe2tYlw2fGnQDkgiB1Kd9V5shWUtuTLfqLrqtJhZt+VbbmpLXJjV7NqW7iipnve
+ k57qXcQgGfy27B5Y3mA8jeu/KgaCvRTK7O7T9N7/aFG8xtFHAHauEXMMdnZWiJcodxw0
+ 4dSw==
+X-Gm-Message-State: AOAM531fDtmc6YoenMi2PS2B89zaj0OVVYyn6NoiidJgXndfu8rJI7mG
+ 3OsDoaAgRnx5VKHrvH8SVGSSSTMS4fCh9Q==
+X-Google-Smtp-Source: ABdhPJyew9HBOrOJiDrOS0jRWibgS7lxmgHtGkEPh+xZxZrYRJ7BeDlSlILlbjuI6lYl5Krsg+oJkQ==
+X-Received: by 2002:a05:600c:21d3:: with SMTP id
+ x19mr17059611wmj.170.1603732543715; 
+ Mon, 26 Oct 2020 10:15:43 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id v9sm21090610wmh.23.2020.10.26.10.17.05
+ by smtp.gmail.com with ESMTPSA id o186sm22091676wmb.12.2020.10.26.10.15.42
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 10:17:05 -0700 (PDT)
+ Mon, 26 Oct 2020 10:15:42 -0700 (PDT)
 Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9E61F1FF7E;
- Mon, 26 Oct 2020 17:17:04 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id BCAC61FF7E;
+ Mon, 26 Oct 2020 17:15:41 +0000 (GMT)
 References: <20201026143028.3034018-1-pbonzini@redhat.com>
- <20201026143028.3034018-8-pbonzini@redhat.com>
+ <20201026143028.3034018-7-pbonzini@redhat.com>
 User-agent: mu4e 1.5.6; emacs 28.0.50
 From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 07/15] m68k: remove bios_name
-In-reply-to: <20201026143028.3034018-8-pbonzini@redhat.com>
-Date: Mon, 26 Oct 2020 17:17:04 +0000
-Message-ID: <87wnzcgb5b.fsf@linaro.org>
+Subject: Re: [PATCH 06/15] lm32: remove bios_name
+In-reply-to: <20201026143028.3034018-7-pbonzini@redhat.com>
+Date: Mon, 26 Oct 2020 17:15:41 +0000
+Message-ID: <87zh48gb7m.fsf@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::342;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wm1-x342.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,8 +105,7 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Laurent Vivier <lvivier@redhat.com>, philmd@redhat.com,
- qemu-devel@nongnu.org
+Cc: Michael Walle <michael@walle.cc>, philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
@@ -113,7 +113,7 @@ Sender: "Qemu-devel"
 
 Paolo Bonzini <pbonzini@redhat.com> writes:
 
-> Cc: Laurent Vivier <lvivier@redhat.com>
+> Cc: Michael Walle <michael@walle.cc>
 > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
 Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
