@@ -2,73 +2,101 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-0.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B0BAC388F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:56:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89788C388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:59:24 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3482A20829
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:56:08 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3482A20829
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=patchew.org
+	by mail.kernel.org (Postfix) with ESMTPS id E2B9020829
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:59:23 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I3iMVtd0"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E2B9020829
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39854 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43708 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX9XE-0006uv-2u
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:56:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51252)
+	id 1kX9aM-00008H-VH
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:59:22 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kX9WA-00061L-JF
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:55:02 -0400
-Resent-Date: Mon, 26 Oct 2020 16:55:02 -0400
-Resent-Message-Id: <E1kX9WA-00061L-JF@lists.gnu.org>
-Received: from sender4-of-o57.zoho.com ([136.143.188.57]:21793)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <no-reply@patchew.org>)
- id 1kX9W7-0004J6-KP
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:55:01 -0400
-ARC-Seal: i=1; a=rsa-sha256; t=1603745683; cv=none; 
- d=zohomail.com; s=zohoarc; 
- b=azy/nYM5p4q1EzZaaPD9MgtzSKmAii2YFQo6jBnWQz5JVwJCGQESmDCLFb2VxZ/H5/O7i/ZB+TERShniTsjZz8Hp+QXAH7VbASIH/OvU2p5sLvYJoEX2TXsSQD9i0fKzIAnkSX4mAe1CZvvMIgIbjdNVrQIZBOGZD6LZ+hl4Les=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com;
- s=zohoarc; t=1603745683;
- h=Content-Type:Content-Transfer-Encoding:Cc:Date:From:In-Reply-To:MIME-Version:Message-ID:Reply-To:Subject:To;
- bh=LpUScY+WBHzKaA0hQQHc17ku6ytUc85U4Vp8FzyC8vA=; 
- b=DCU40vrugRZ3/6mVlVuCoEtNZhBKlQy736RebSe3qagJ8cFBF4C3hK4QEfmP+rjPAV4yi3wwbv7H8QdZmmhMQjyq2YKgCJARCMR2V+6zFU2MdfrXnlygpK33iXeOdVFmsHgdYitNvJYPLprkB1xK5k77rpavRrv9uSmeNvsUDcM=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
- spf=pass  smtp.mailfrom=no-reply@patchew.org;
- dmarc=pass header.from=<no-reply@patchew.org>
- header.from=<no-reply@patchew.org>
-Received: from [172.17.0.3] (23.253.156.214 [23.253.156.214]) by
- mx.zohomail.com with SMTPS id 160374568122564.98804397158221;
- Mon, 26 Oct 2020 13:54:41 -0700 (PDT)
-Subject: Re: [PATCH 0/1] acpi: Implement ACPI ERST support for guests
-Message-ID: <160374567971.1984.17110999016759260017@66eaa9a8a123>
-In-Reply-To: <1603743573-9870-1-git-send-email-eric.devolder@oracle.com>
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kX9ZZ-00088U-B0
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:58:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34307)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
+ id 1kX9ZW-0004ut-Q9
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:58:32 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603745909;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=MdTWRfv8wLzn4d1P/1zYoXavJgFY7KslRwtkwS0tzbw=;
+ b=I3iMVtd0pt8vgBnUFo1fGC/pLkqVepum27rPJxwAmfUFietjTDApUb4Ys3/3JpY2V3hp5S
+ 0/eoNM9nHBdCI6rHVYTgbBICYy/SMwD9P6Vqmi2hidzY5HBsNrx5nPiSE9N+tmE4c9B+0U
+ N862XmCyUOfkv2WfJQEGzvnQKPN5CbM=
+Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
+ [209.85.208.69]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-382-x2HyJm1XP2yjdUgIQ8WjFQ-1; Mon, 26 Oct 2020 16:58:24 -0400
+X-MC-Unique: x2HyJm1XP2yjdUgIQ8WjFQ-1
+Received: by mail-ed1-f69.google.com with SMTP id ay19so5563704edb.23
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:58:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=MdTWRfv8wLzn4d1P/1zYoXavJgFY7KslRwtkwS0tzbw=;
+ b=PeHB49CCUA5H0AiLBHARGNAHIhic02dQgljffl9catFWx8GwWoMkXIg1yfQxCklSEG
+ kliuROP1Rf2cWF7fyxj1If93aQK60aW5K1OWSksQ1KzdS6yOf4LwVntPAtyB7YOSL+N+
+ rLfX2bBgAwhzR7rHHpDRlpiyWUaHa7EvE9evON0K05a8wJ/AD2HWd40PzKRk75fOrbJR
+ /oVyOAN+lPvpAuWU8d4RsbXDo7Jt1E3KgeCgs6D+RpPz1pv1rp/T2vFP5GRrXIiX5tF+
+ vIM4MzXtRSxNQDeKt7ABEUlQDboJrhvV7ycsVC7rYMeIe5bjoFk99kdCplOguklH+h/3
+ lIKA==
+X-Gm-Message-State: AOAM530FPTNvs35ZR32nDKB+RGKxjHNJlQGBt4ddhCLVAmRbSvUesTT2
+ sTbE2tuWdIwX09XWt78YQkKwewlq1ZZbSQYlRF6eoYPVfNXh+cCYlw2S7Hpxh8UMxLSHdG50hro
+ nHkLn21ozbrRm2mbiXHRlOUAuEekSbyQ=
+X-Received: by 2002:a05:6402:b72:: with SMTP id
+ cb18mr17208258edb.129.1603745903356; 
+ Mon, 26 Oct 2020 13:58:23 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwW5fvXObkl/kX9kqiiWzS3i/9IHRRImcAsRTbLmGlfsYa7drEDFFqy5+CVj9ZB1J6vzBDQy/1IBQatQqqQrCI=
+X-Received: by 2002:a05:6402:b72:: with SMTP id
+ cb18mr17208249edb.129.1603745903177; 
+ Mon, 26 Oct 2020 13:58:23 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
-Resent-From: 
-From: no-reply@patchew.org
-To: eric.devolder@oracle.com
-Date: Mon, 26 Oct 2020 13:54:41 -0700 (PDT)
-X-ZohoMailClient: External
-Received-SPF: pass client-ip=136.143.188.57; envelope-from=no-reply@patchew.org;
- helo=sender4-of-o57.zoho.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 16:54:56
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201026135131.3006712-1-pbonzini@redhat.com>
+ <CAFEAcA-WscaYcpooMQ0F2Etc+Rzf5M=Bb-b9Dw7pGsaaO8Od=g@mail.gmail.com>
+ <CAE2XoE9AvG-G70Rm5S=q+Xz3C2_VVGdL6DHXme=ZFPU+OOwQng@mail.gmail.com>
+In-Reply-To: <CAE2XoE9AvG-G70Rm5S=q+Xz3C2_VVGdL6DHXme=ZFPU+OOwQng@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 26 Oct 2020 21:58:10 +0100
+Message-ID: <CABgObfaWBLrx6nsZktbDw7PC4_L5_HQKKUF+HGLSwVRMrK+_mQ@mail.gmail.com>
+Subject: Re: [PULL 00/17] Build system changes and misc fixes for QEMU 5.2
+ soft freeze
+To: Yonggang Luo <luoyonggang@gmail.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/alternative; boundary="000000000000de861105b29930ef"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -82,122 +110,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: qemu-devel@nongnu.org
-Cc: ehabkost@redhat.com, mst@redhat.com, konrad.wilk@oracle.com,
- qemu-devel@nongnu.org, imammedo@redhat.com, pbonzini@redhat.com,
- boris.ostrovsky@oracle.com, rth@twiddle.net
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-UGF0Y2hldyBVUkw6IGh0dHBzOi8vcGF0Y2hldy5vcmcvUUVNVS8xNjAzNzQzNTczLTk4NzAtMS1n
-aXQtc2VuZC1lbWFpbC1lcmljLmRldm9sZGVyQG9yYWNsZS5jb20vCgoKCkhpLAoKVGhpcyBzZXJp
-ZXMgc2VlbXMgdG8gaGF2ZSBzb21lIGNvZGluZyBzdHlsZSBwcm9ibGVtcy4gU2VlIG91dHB1dCBi
-ZWxvdyBmb3IKbW9yZSBpbmZvcm1hdGlvbjoKClR5cGU6IHNlcmllcwpNZXNzYWdlLWlkOiAxNjAz
-NzQzNTczLTk4NzAtMS1naXQtc2VuZC1lbWFpbC1lcmljLmRldm9sZGVyQG9yYWNsZS5jb20KU3Vi
-amVjdDogW1BBVENIIDAvMV0gYWNwaTogSW1wbGVtZW50IEFDUEkgRVJTVCBzdXBwb3J0IGZvciBn
-dWVzdHMKCj09PSBURVNUIFNDUklQVCBCRUdJTiA9PT0KIyEvYmluL2Jhc2gKZ2l0IHJldi1wYXJz
-ZSBiYXNlID4gL2Rldi9udWxsIHx8IGV4aXQgMApnaXQgY29uZmlnIC0tbG9jYWwgZGlmZi5yZW5h
-bWVsaW1pdCAwCmdpdCBjb25maWcgLS1sb2NhbCBkaWZmLnJlbmFtZXMgVHJ1ZQpnaXQgY29uZmln
-IC0tbG9jYWwgZGlmZi5hbGdvcml0aG0gaGlzdG9ncmFtCi4vc2NyaXB0cy9jaGVja3BhdGNoLnBs
-IC0tbWFpbGJhY2sgYmFzZS4uCj09PSBURVNUIFNDUklQVCBFTkQgPT09CgpVcGRhdGluZyAzYzhj
-ZjVhOWMyMWZmODc4MjE2NGQxZGVmN2Y0NGJkODg4NzEzMzg0CkZyb20gaHR0cHM6Ly9naXRodWIu
-Y29tL3BhdGNoZXctcHJvamVjdC9xZW11CiAqIFtuZXcgdGFnXSAgICAgICAgIHBhdGNoZXcvMTYw
-Mzc0MzU3My05ODcwLTEtZ2l0LXNlbmQtZW1haWwtZXJpYy5kZXZvbGRlckBvcmFjbGUuY29tIC0+
-IHBhdGNoZXcvMTYwMzc0MzU3My05ODcwLTEtZ2l0LXNlbmQtZW1haWwtZXJpYy5kZXZvbGRlckBv
-cmFjbGUuY29tCiAtIFt0YWcgdXBkYXRlXSAgICAgIHBhdGNoZXcvMjAyMDEwMjYxMDU1MDQuNDAy
-MzYyMC0xLXBoaWxtZEByZWRoYXQuY29tIC0+IHBhdGNoZXcvMjAyMDEwMjYxMDU1MDQuNDAyMzYy
-MC0xLXBoaWxtZEByZWRoYXQuY29tClN3aXRjaGVkIHRvIGEgbmV3IGJyYW5jaCAndGVzdCcKOTRj
-MjVhYyBhY3BpOiBJbXBsZW1lbnQgQUNQSSBFUlNUIHN1cHBvcnQgZm9yIGd1ZXN0cwoKPT09IE9V
-VFBVVCBCRUdJTiA9PT0KV0FSTklORzogYWRkZWQsIG1vdmVkIG9yIGRlbGV0ZWQgZmlsZShzKSwg
-ZG9lcyBNQUlOVEFJTkVSUyBuZWVkIHVwZGF0aW5nPwojNDg6IApuZXcgZmlsZSBtb2RlIDEwMDY0
-NAoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzczNjogRklMRTogaHcvYWNwaS9l
-cnN0LmM6Njg0OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVF
-LCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUg
-b3ZlciA4MCBjaGFyYWN0ZXJzCiM3Mzk6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY4NzoKKyAgICAg
-ICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NS
-X0FDVElPTiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVy
-cwojNzQyOiBGSUxFOiBody9hY3BpL2Vyc3QuYzo2OTA6CisgICAgICAgICAgICBpbnNucyArPSBC
-RUEoV1JJVEVfUkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwg
-TUFTSzgpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc0NTogRklMRTogaHcv
-YWNwaS9lcnN0LmM6NjkzOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVS
-X1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6
-IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3NDg6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY5NjoK
-KyAgICAgICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUiAgICAgICwgMCwgMzIsIEVS
-U1RfQ1NSX1ZBTFVFICwgMCwgTUFTSzMyKTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0
-ZXJzCiM3NDk6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjY5NzoKKyAgICAgICAgICAgIGluc25zICs9
-IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NSX0FDVElPTiwgYWN0aW9u
-LCBNQVNLOCk7CgpFUlJPUjogbGluZSBvdmVyIDkwIGNoYXJhY3RlcnMKIzc1MjogRklMRTogaHcv
-YWNwaS9lcnN0LmM6NzAwOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVS
-X1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfVkFMVUUgLCBFUlNUX0VYRUNVVEVfT1BFUkFUSU9OX01B
-R0lDLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzUzOiBGSUxF
-OiBody9hY3BpL2Vyc3QuYzo3MDE6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoV1JJVEVfUkVH
-SVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwgTUFTSzgpOwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc1NjogRklMRTogaHcvYWNwaS9lcnN0LmM6
-NzA0OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAz
-MiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM3NTc6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcwNToKKyAgICAgICAgICAg
-IGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSX1ZBTFVFICwgMCwgMzIsIEVSU1RfQ1NSX1ZBTFVF
-LCAweDAxLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzYwOiBG
-SUxFOiBody9hY3BpL2Vyc3QuYzo3MDg6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoV1JJVEVf
-UkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJT04sIGFjdGlvbiwgTUFTSzgpOwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2NDogRklMRTogaHcvYWNwaS9lcnN0
-LmM6NzEyOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAw
-LCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM3NjU6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcxMzoKKyAgICAgICAg
-ICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwgMCwgNjQsIEVSU1RfQ1NSX1ZB
-TFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2ODog
-RklMRTogaHcvYWNwaS9lcnN0LmM6NzE2OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRF
-X1JFR0lTVEVSICAgICAgLCAwLCA2NCwgRVJTVF9DU1JfVkFMVUUgLCAwLCBNQVNLNjQpOwoKV0FS
-TklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc2OTogRklMRTogaHcvYWNwaS9lcnN0LmM6
-NzE3OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAz
-MiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4
-MCBjaGFyYWN0ZXJzCiM3NzI6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjcyMDoKKyAgICAgICAgICAg
-IGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwgMzIsIEVSU1RfQ1NSX0FDVElP
-TiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwojNzcz
-OiBGSUxFOiBody9hY3BpL2Vyc3QuYzo3MjE6CisgICAgICAgICAgICBpbnNucyArPSBCRUEoUkVB
-RF9SRUdJU1RFUiAgICAgICAsIDAsIDMyLCBFUlNUX0NTUl9WQUxVRSwgMCwgTUFTSzMyKTsKCldB
-Uk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3NzY6IEZJTEU6IGh3L2FjcGkvZXJzdC5j
-OjcyNDoKKyAgICAgICAgICAgIGluc25zICs9IEJFQShXUklURV9SRUdJU1RFUl9WQUxVRSwgMCwg
-MzIsIEVSU1RfQ1NSX0FDVElPTiwgYWN0aW9uLCBNQVNLOCk7CgpXQVJOSU5HOiBsaW5lIG92ZXIg
-ODAgY2hhcmFjdGVycwojNzc5OiBGSUxFOiBody9hY3BpL2Vyc3QuYzo3Mjc6CisgICAgICAgICAg
-ICBpbnNucyArPSBCRUEoV1JJVEVfUkVHSVNURVJfVkFMVUUsIDAsIDMyLCBFUlNUX0NTUl9BQ1RJ
-T04sIGFjdGlvbiwgTUFTSzgpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc4
-MjogRklMRTogaHcvYWNwaS9lcnN0LmM6NzMwOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdS
-SVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4
-KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3ODM6IEZJTEU6IGh3L2FjcGkv
-ZXJzdC5jOjczMToKKyAgICAgICAgICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAg
-ICwgMCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVy
-IDgwIGNoYXJhY3RlcnMKIzc4NjogRklMRTogaHcvYWNwaS9lcnN0LmM6NzM0OgorICAgICAgICAg
-ICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNU
-SU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3
-ODc6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjczNToKKyAgICAgICAgICAgIGluc25zICs9IEJFQShS
-RUFEX1JFR0lTVEVSICAgICAgICwgMCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLMzIpOwoK
-V0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc5MDogRklMRTogaHcvYWNwaS9lcnN0
-LmM6NzM4OgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRFX1JFR0lTVEVSX1ZBTFVFLCAw
-LCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsKCldBUk5JTkc6IGxpbmUgb3Zl
-ciA4MCBjaGFyYWN0ZXJzCiM3OTE6IEZJTEU6IGh3L2FjcGkvZXJzdC5jOjczOToKKyAgICAgICAg
-ICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwgMCwgMzIsIEVSU1RfQ1NSX1ZB
-TFVFLCAwLCBNQVNLMzIpOwoKV0FSTklORzogbGluZSBvdmVyIDgwIGNoYXJhY3RlcnMKIzc5NDog
-RklMRTogaHcvYWNwaS9lcnN0LmM6NzQyOgorICAgICAgICAgICAgaW5zbnMgKz0gQkVBKFdSSVRF
-X1JFR0lTVEVSX1ZBTFVFLCAwLCAzMiwgRVJTVF9DU1JfQUNUSU9OLCBhY3Rpb24sIE1BU0s4KTsK
-CldBUk5JTkc6IGxpbmUgb3ZlciA4MCBjaGFyYWN0ZXJzCiM3OTU6IEZJTEU6IGh3L2FjcGkvZXJz
-dC5jOjc0MzoKKyAgICAgICAgICAgIGluc25zICs9IEJFQShSRUFEX1JFR0lTVEVSICAgICAgICwg
-MCwgNjQsIEVSU1RfQ1NSX1ZBTFVFLCAwLCBNQVNLNjQpOwoKV0FSTklORzogbGluZSBvdmVyIDgw
-IGNoYXJhY3RlcnMKIzEwMDc6IEZJTEU6IGluY2x1ZGUvaHcvYWNwaS9lcnN0Lmg6NjoKKyAqIFNl
-ZSBBQ1BJIHNwZWNpZmljYXRpb24sICJBQ1BJIFBsYXRmb3JtIEVycm9yIEludGVyZmFjZXMiIDog
-IkVycm9yIFNlcmlhbGl6YXRpb24iCgpXQVJOSU5HOiBsaW5lIG92ZXIgODAgY2hhcmFjdGVycwoj
-MTA2ODogRklMRTogaW5jbHVkZS9ody9hY3BpL2Vyc3QuaDo2NzoKKyNkZWZpbmUgQUNQSV9FUlNU
-X01BWF9BQ1RJT05TIChBQ1BJX0VSU1RfQUNUSU9OX0dFVF9FWEVDVVRFX09QRVJBVElPTl9USU1J
-TkdTICsgMSkKCnRvdGFsOiAxIGVycm9ycywgMjkgd2FybmluZ3MsIDEwMjkgbGluZXMgY2hlY2tl
-ZAoKQ29tbWl0IDk0YzI1YWNkYzBmMSAoYWNwaTogSW1wbGVtZW50IEFDUEkgRVJTVCBzdXBwb3J0
-IGZvciBndWVzdHMpIGhhcyBzdHlsZSBwcm9ibGVtcywgcGxlYXNlIHJldmlldy4gIElmIGFueSBv
-ZiB0aGVzZSBlcnJvcnMKYXJlIGZhbHNlIHBvc2l0aXZlcyByZXBvcnQgdGhlbSB0byB0aGUgbWFp
-bnRhaW5lciwgc2VlCkNIRUNLUEFUQ0ggaW4gTUFJTlRBSU5FUlMuCj09PSBPVVRQVVQgRU5EID09
-PQoKVGVzdCBjb21tYW5kIGV4aXRlZCB3aXRoIGNvZGU6IDEKCgpUaGUgZnVsbCBsb2cgaXMgYXZh
-aWxhYmxlIGF0Cmh0dHA6Ly9wYXRjaGV3Lm9yZy9sb2dzLzE2MDM3NDM1NzMtOTg3MC0xLWdpdC1z
-ZW5kLWVtYWlsLWVyaWMuZGV2b2xkZXJAb3JhY2xlLmNvbS90ZXN0aW5nLmNoZWNrcGF0Y2gvP3R5
-cGU9bWVzc2FnZS4KLS0tCkVtYWlsIGdlbmVyYXRlZCBhdXRvbWF0aWNhbGx5IGJ5IFBhdGNoZXcg
-W2h0dHBzOi8vcGF0Y2hldy5vcmcvXS4KUGxlYXNlIHNlbmQgeW91ciBmZWVkYmFjayB0byBwYXRj
-aGV3LWRldmVsQHJlZGhhdC5jb20=
+--000000000000de861105b29930ef
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Il lun 26 ott 2020, 19:59 =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyon=
+ggang@gmail.com> ha
+scritto:
+
+> This pull request confused me, the windows msys2 build time slow down fro=
+m
+> 40min to more than one hour.
+>
+
+Probably just the cache being rebuilt. Cirrus CI times seem to vary a lot
+but 40min and 1h5min seem to be the common cases before or after these
+changes:
+
+https://cirrus-ci.com/task/5531259461959680
+With this PR: 35+2 (build+test)
+
+https://cirrus-ci.com/task/4570682912669696
+With this PR: 10+4
+
+https://cirrus-ci.com/task/6662289128423424
+With this PR: 35+2, +20 to rebuild cirrus cache
+
+https://cirrus-ci.com/task/5383432727429120
+Without this PR: 30+2, +18 to rebuild cirrus cache
+
+Paolo
+
+>
+
+--000000000000de861105b29930ef
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+<div dir=3D"auto"><div><br><br><div class=3D"gmail_quote"><div dir=3D"ltr" =
+class=3D"gmail_attr">Il lun 26 ott 2020, 19:59 =E7=BD=97=E5=8B=87=E5=88=9A(=
+Yonggang Luo) &lt;<a href=3D"mailto:luoyonggang@gmail.com" target=3D"_blank=
+" rel=3D"noreferrer">luoyonggang@gmail.com</a>&gt; ha scritto:<br></div><bl=
+ockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;border-left:1px #=
+ccc solid;padding-left:1ex"><div dir=3D"ltr">This pull request confused me,=
+ the windows msys2 build time slow down from 40min to more than one hour.<b=
+r></div></blockquote></div></div><div dir=3D"auto"><br></div><div dir=3D"au=
+to"><div dir=3D"auto">Probably just the cache being rebuilt. Cirrus CI time=
+s seem to vary a lot but 40min and 1h5min seem to be the common cases befor=
+e or after these changes:</div><div dir=3D"auto"><br></div><div dir=3D"auto=
+"><a href=3D"https://cirrus-ci.com/task/5531259461959680">https://cirrus-ci=
+.com/task/5531259461959680</a></div><div dir=3D"auto">With this PR: 35+2 (b=
+uild+test)</div><div dir=3D"auto"><br></div><div dir=3D"auto"><a href=3D"ht=
+tps://cirrus-ci.com/task/4570682912669696">https://cirrus-ci.com/task/45706=
+82912669696</a></div><div dir=3D"auto">With this PR: 10+4</div><div dir=3D"=
+auto"><br></div><div dir=3D"auto"><a href=3D"https://cirrus-ci.com/task/666=
+2289128423424">https://cirrus-ci.com/task/6662289128423424</a></div><div di=
+r=3D"auto">With this PR: 35+2, +20 to rebuild cirrus cache</div><div dir=3D=
+"auto"><br></div><div dir=3D"auto"><a href=3D"https://cirrus-ci.com/task/53=
+83432727429120">https://cirrus-ci.com/task/5383432727429120</a></div><div d=
+ir=3D"auto">Without this PR: 30+2, +18 to rebuild cirrus cache</div><div di=
+r=3D"auto"><br></div><div dir=3D"auto">Paolo</div></div><div dir=3D"auto"><=
+div class=3D"gmail_quote"><blockquote class=3D"gmail_quote" style=3D"margin=
+:0 0 0 .8ex;border-left:1px #ccc solid;padding-left:1ex">
+</blockquote></div></div></div>
+
+--000000000000de861105b29930ef--
+
 
