@@ -2,79 +2,75 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07090C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:25:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF9FDC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:26:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 841D022284
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:25:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 594D722284
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:26:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DO+R9vSX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 841D022284
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P3tf9uga"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 594D722284
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35476 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42380 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5It-0001XV-HC
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:25:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60352)
+	id 1kX5KM-0004QN-AA
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:26:34 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60062)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5Ea-0004QU-R7
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56044)
+ id 1kX5E9-000412-6x
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:09 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21051)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5EX-0000EZ-EO
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:36 -0400
+ id 1kX5E7-0008UE-1k
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603729232;
+ s=mimecast20190719; t=1603729204;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=43e7h9zDqKhu4As2rtz/PEXJHWJMgs2H27vgB1zdqi0=;
- b=DO+R9vSXI72QZ3cILn++PT7sTNCkYE+GnWmhXcASHUqM2kJCfj4HJRyk5/SsNe7A+hcqGy
- H5/lCVvnFBEi92NB7a9rjlQdwG8cO9WCodLRd924RSHuDAtyo4V7tamvN+BI1+GIeDmKby
- VzhX5XmTkrsCjGsBDhE3aI8IGDQg7A8=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=L6auF/o22WyR3BrczqMYaKW2V/rRIVDhIZZKeALHLVI=;
+ b=P3tf9ugaYQU+Mj+RUBxc6g6ycqUI1T6qCwGWIeNI6PHIHwFyRQ2ViCZ5hobDsZbPH2rrX2
+ 7qSbj8c1Fi71Ol8hT9UXbksj6VEOYIPrSxns7EppBdHeKgSsKP0h1XFWZJJHnhoD+A6roz
+ s7x7utsltPYco9zxc7V1xrtxaz0udjk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-335-kPmHv1zFN0OKmDOndbuU2A-1; Mon, 26 Oct 2020 12:20:30 -0400
-X-MC-Unique: kPmHv1zFN0OKmDOndbuU2A-1
+ us-mta-291-pj8pG5XGPPWXPI9VTDPehg-1; Mon, 26 Oct 2020 12:20:00 -0400
+X-MC-Unique: pj8pG5XGPPWXPI9VTDPehg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 466CA1891EA7;
- Mon, 26 Oct 2020 16:20:29 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD38E8064B2;
+ Mon, 26 Oct 2020 16:19:58 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5A14A5D9E8;
- Mon, 26 Oct 2020 16:20:22 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A782A5D9E4;
+ Mon, 26 Oct 2020 16:19:54 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, yubihong@huawei.com, peterx@redhat.com,
  peter.maydell@linaro.org
-Subject: [PULL 05/16] migration: Open brace '{' following struct go on the
- same line
-Date: Mon, 26 Oct 2020 16:19:41 +0000
-Message-Id: <20201026161952.149188-6-dgilbert@redhat.com>
-In-Reply-To: <20201026161952.149188-1-dgilbert@redhat.com>
-References: <20201026161952.149188-1-dgilbert@redhat.com>
+Subject: [PULL 00/16] migration queue
+Date: Mon, 26 Oct 2020 16:19:36 +0000
+Message-Id: <20201026161952.149188-1-dgilbert@redhat.com>
 MIME-Version: 1.0
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
@@ -103,33 +99,65 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bihong Yu <yubihong@huawei.com>
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 
-Signed-off-by: Bihong Yu <yubihong@huawei.com>
-Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
-Message-Id: <1603163448-27122-5-git-send-email-yubihong@huawei.com>
-Reviewed-by: Juan Quintela <quintela@redhat.com>
+The following changes since commit a46e72710566eea0f90f9c673a0f02da0064acce:
+
+  Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201026' into staging (2020-10-26 14:50:03 +0000)
+
+are available in the Git repository at:
+
+  git://github.com/dagrh/qemu.git tags/pull-migration-20201026a
+
+for you to fetch changes up to a47295014de56e108f359ec859d5499b851f62b8:
+
+  migration-test: Only hide error if !QTEST_LOG (2020-10-26 16:15:04 +0000)
+
+----------------------------------------------------------------
+migration pull: 2020-10-26
+
+Another go at Peter's postcopy fixes
+
+Cleanups from Bihong Yu and Peter Maydell.
+
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
----
- migration/migration.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/migration/migration.h b/migration/migration.h
-index deb411aaad..99784b44bd 100644
---- a/migration/migration.h
-+++ b/migration/migration.h
-@@ -124,8 +124,7 @@ struct MigrationClass {
-     DeviceClass parent_class;
- };
- 
--struct MigrationState
--{
-+struct MigrationState {
-     /*< private >*/
-     DeviceState parent_obj;
- 
--- 
-2.28.0
+----------------------------------------------------------------
+Bihong Yu (9):
+      migration: Do not use C99 // comments
+      migration: Don't use '#' flag of printf format
+      migration: Add spaces around operator
+      migration: Open brace '{' following struct go on the same line
+      migration: Add braces {} for if statement
+      migration: Do not initialise statics and globals to 0 or NULL
+      migration: Open brace '{' following function declarations go on the next line
+      migration: Delete redundant spaces
+      migration: using trace_ to replace DPRINTF
+
+Peter Maydell (1):
+      migration: Drop unused VMSTATE_FLOAT64 support
+
+Peter Xu (6):
+      migration: Pass incoming state into qemu_ufd_copy_ioctl()
+      migration: Introduce migrate_send_rp_message_req_pages()
+      migration: Maintain postcopy faulted addresses
+      migration: Sync requested pages after postcopy recovery
+      migration/postcopy: Release fd before going into 'postcopy-pause'
+      migration-test: Only hide error if !QTEST_LOG
+
+ include/migration/vmstate.h  | 13 ----------
+ migration/block.c            | 40 ++++++++++++++---------------
+ migration/migration.c        | 59 +++++++++++++++++++++++++++++++++++++-----
+ migration/migration.h        | 24 ++++++++++++++---
+ migration/page_cache.c       | 13 +++-------
+ migration/postcopy-ram.c     | 27 +++++++++++++++-----
+ migration/ram.c              | 14 +++++-----
+ migration/rdma.c             |  7 ++---
+ migration/savevm.c           | 61 ++++++++++++++++++++++++++++++++++++++++++--
+ migration/trace-events       | 16 ++++++++++++
+ migration/vmstate-types.c    | 26 -------------------
+ migration/vmstate.c          | 10 ++++----
+ tests/qtest/migration-test.c |  6 ++++-
+ 13 files changed, 213 insertions(+), 103 deletions(-)
 
 
