@@ -2,93 +2,118 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BCEDC388F7
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17459C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:46:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E5C7420885
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:31:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OcOiUfCX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E5C7420885
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 7156F20795
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 03:46:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7156F20795
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=outlook.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50376 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52652 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWtEX-0006Xb-Mq
-	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 23:31:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55828)
+	id 1kWtT3-0000ai-53
+	for qemu-devel@archiver.kernel.org; Sun, 25 Oct 2020 23:46:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kWtDX-0005yB-9A
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:30:43 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33959)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kWtDT-0003dv-Js
- for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:30:42 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603683037;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=d+wHZTCJ/B5jjhOcbId3YbszfTR3EBDZdk+YOb/Z5dU=;
- b=OcOiUfCXzPFyc6lABhYq50I+5hjPxVOY24RR9KlVolts0xHaukaJM4lF125FwIac40DkZz
- eKGNmWbnK12cpmzaGs8U7Al2W62KBUrLl74oLS1PnvVVeT/nw2q9VGzc/LN4a70XMYhWO3
- lnDet061ky6BtcxhvKmn3mTakH+LZ3Y=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-585-fkHdW2t_Ol2JymUXyQes3Q-1; Sun, 25 Oct 2020 23:30:35 -0400
-X-MC-Unique: fkHdW2t_Ol2JymUXyQes3Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B5C1C1074655;
- Mon, 26 Oct 2020 03:30:33 +0000 (UTC)
-Received: from [10.72.13.201] (ovpn-13-201.pek2.redhat.com [10.72.13.201])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 6AFB255790;
- Mon, 26 Oct 2020 03:30:24 +0000 (UTC)
-Subject: Re: [PATCH v3] net: remove an assert call in eth_get_gso_type
-To: P J P <ppandit@redhat.com>
-References: <20201021060550.1652896-1-ppandit@redhat.com>
- <38575304-e5ff-c93e-c1e8-997d4148e579@redhat.com>
- <nycvar.YSQ.7.78.906.2010211440290.1506567@xnncv>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <012c023d-9351-1bfc-1c1b-77b47a54434e@redhat.com>
-Date: Mon, 26 Oct 2020 11:30:12 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
-MIME-Version: 1.0
-In-Reply-To: <nycvar.YSQ.7.78.906.2010211440290.1506567@xnncv>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ (Exim 4.90_1) (envelope-from <d0u9.su@outlook.com>)
+ id 1kWtRt-0008UH-37
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:45:33 -0400
+Received: from mail-dm6nam10olkn2015.outbound.protection.outlook.com
+ ([40.92.41.15]:56192 helo=NAM10-DM6-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <d0u9.su@outlook.com>)
+ id 1kWtRo-0000g8-Tb
+ for qemu-devel@nongnu.org; Sun, 25 Oct 2020 23:45:32 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DN8ruHKU/7relBp6R5TPVy/DKusD/Jk1AdHG24YzlkaUYV7RvbA7h7vZs0lY4yzuiNr5M/7CrECFND8mh58JW/gR5Bz0PcLHDpQM2qzi23NCK5kRROfhlxQoEHN4lys0Y4j/dYvYKp3LLWfjRy875OdKz+vLG2APsYb03k/PfweofZ8e5UGQHzwbM3KsLpPsxGEAADDyQEAbqChuOB5HOmq/cIgsphHmTE+GOgXg9Bue+k98dwLwUi1XVM+Kh/SgCFKdBqF/mUz1mcSgjSAaZg8iOLlfjK//Anu3Q7Be8CLEvbty4wE+Sn13K0erMdW5wpXf1HNtNeI4JHwcaF8CGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I11XJRBM86SYETDCRXEURUOFdbi5mffgxzLHsLX7MwA=;
+ b=Qyu6X1tsWmr8IUrqq09JfWm/DQszJMD/Fhf2wSgW8WYoWFu3U57l7IvovVuCWiNZnpQpD4msetFdfrXHOaAqmxqRePeHB7xI08hY5JQSLCnFTYR4V2FtOwbIz1SMaeVVGWYyBkdp8e/NiomxIT20q6NOYSD5JxgKxUY11CwLTs+N7mqCLtBTntTYH+HTyuzZb3FtfeuIVzE6FVzka7a6hAq5m/r7YtrEMTpPmXvb4R/XKfkrw7+9uF62dcobfNnhPVkGJ5dV3TVD4OM8/QmvvGhRtk/PT5RO1SRy84mYHLURMRY1lG1Kgik+TAP+8DH4Gobg0gAHhl8pchaIMa7nFw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=I11XJRBM86SYETDCRXEURUOFdbi5mffgxzLHsLX7MwA=;
+ b=QhQdofmL9VZrWFaaIydI5xFgk3Rr+k2ldNDFGxlutKL5g66iqq9yq4oKB+fI4Z7cJaKfDMfrwSCTPXXWrVFalkbPYAPrnbZHBHonkJJ+TGPeG3LtKkr2axreykBORhMhjv4rj2c87UxRLyaM3815OYDiGcXGbDSodst1VXMawVJr/x3VTZFeBl1upfNgIryB/Zg5KJfqs8iNkZwEO2fioZlD3K4KqQ455olhFnOxKrQVtF3DOtdN+LW7vlbxwDvnHM8sI94IMArriR6xW6mLBA4U6rGmXFocPgJ/vHy9Ad6+9mZXB2UAe/Utf1hgufutOtXoFpQ2chmv8JY+O8n6XQ==
+Received: from BN7NAM10FT050.eop-nam10.prod.protection.outlook.com
+ (2a01:111:e400:7e8f::4a) by
+ BN7NAM10HT063.eop-nam10.prod.protection.outlook.com (2a01:111:e400:7e8f::314)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18; Mon, 26 Oct
+ 2020 03:30:22 +0000
+Received: from BYAPR11MB2664.namprd11.prod.outlook.com
+ (2a01:111:e400:7e8f::4e) by BN7NAM10FT050.mail.protection.outlook.com
+ (2a01:111:e400:7e8f::284) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
+ Transport; Mon, 26 Oct 2020 03:30:22 +0000
+Received: from BYAPR11MB2664.namprd11.prod.outlook.com
+ ([fe80::2164:d6ba:9ca3:3090]) by BYAPR11MB2664.namprd11.prod.outlook.com
+ ([fe80::2164:d6ba:9ca3:3090%4]) with mapi id 15.20.3477.028; Mon, 26 Oct 2020
+ 03:30:22 +0000
+From: Douglas Su <d0u9.su@outlook.com>
+To: QEMU Developers <qemu-devel@nongnu.org>
+CC: QEMU Developers <qemu-devel@nongnu.org>
+Subject: Re: Enable MSI-X support in PCIe device.
+Thread-Topic: Enable MSI-X support in PCIe device.
+Thread-Index: AQHWqOtsbiQu9ZKUjUCwfcsDfQs236mpPo8u
+Date: Mon, 26 Oct 2020 03:30:21 +0000
+Message-ID: <BYAPR11MB266438F1968B1180660D2868EC190@BYAPR11MB2664.namprd11.prod.outlook.com>
+References: <BYAPR11MB26641AF7375C0C2A2652D8C8EC1A0@BYAPR11MB2664.namprd11.prod.outlook.com>
+In-Reply-To: <BYAPR11MB26641AF7375C0C2A2652D8C8EC1A0@BYAPR11MB2664.namprd11.prod.outlook.com>
+Accept-Language: en-US, zh-CN
 Content-Language: en-US
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 23:20:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-incomingtopheadermarker: OriginalChecksum:86C5DB9150A5F5847024742410CA7BDD6D95FB35F6DF4A96AEFD67E37D515182;
+ UpperCasedChecksum:1317F7200F152DF3DD4B6CEB96AAD00103CBD30EEC5F0358B33EA122D8872FAC;
+ SizeAsReceived:6886; Count:45
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn: [RUxP1MQrXWe7OtaBMaXg0P+USl7I6+tp]
+x-ms-publictraffictype: Email
+x-incomingheadercount: 45
+x-eopattributedmessage: 0
+x-ms-office365-filtering-correlation-id: 1613f60b-922a-49d8-f12e-08d8795f7858
+x-ms-traffictypediagnostic: BN7NAM10HT063:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: +qnET0GbJgYnnUKjLdVkAQTJxnloqh4i6hub/7sJLP2VhzgC0t2CVjVTut4XL0WHFE3POo2IY1mttV6loZVwti840ElswHN8K2FuTLYz/YEDGdCLQAkch8viaEXEUn+FntG6moadXsv9iJPTR9bMJbe5o7wvszB5bx8h5oCUJ4wfgr7+RtCmQUT3HA1C1AkJgJRrlk5VewE/twXyF9RoVg==
+x-ms-exchange-antispam-messagedata: 8AKNZ//fwgHSyJrMx7mxPk6gItNrdqPSjJ+HNVUUOGSbBzrxXefUswQdxBGzMQskys4E2cHjiXvX7KxUUsa0JQiS9UKKt1tyAQ37C0kSrOxAh06fy57ZPvpfz23miTstf5suTQTQ6zAqwm7BATYqBA==
+x-ms-exchange-transport-forked: True
+Content-Type: multipart/alternative;
+ boundary="_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_"
+MIME-Version: 1.0
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-AuthSource: BN7NAM10FT050.eop-nam10.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1613f60b-922a-49d8-f12e-08d8795f7858
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Oct 2020 03:30:21.9994 (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Internet
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN7NAM10HT063
+Received-SPF: pass client-ip=40.92.41.15; envelope-from=d0u9.su@outlook.com;
+ helo=NAM10-DM6-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 23:45:26
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,44 +126,143 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, Gaoning Pan <pgn@zju.edu.cn>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+--_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 
-On 2020/10/21 下午5:23, P J P wrote:
-> +-- On Wed, 21 Oct 2020, Jason Wang wrote --+
-> | It should not be a guest error, since guest is allowed to send a packet
-> | other than IPV4(6).
+I have tried to use msi only, but failed again. Is there and documentation =
+details this?
+
+________________________________
+From: Qemu-devel <qemu-devel-bounces+d0u9.su=3Doutlook.com@nongnu.org> on b=
+ehalf of Douglas Su <d0u9.su@outlook.com>
+Sent: Thursday, October 22, 2020 20:32
+To: QEMU Developers <qemu-devel@nongnu.org>
+Subject: Enable MSI-X support in PCIe device.
+
+To use MSI-X interrupt in my PCIe device, In realize() function I make a MS=
+IX initialization like this:
+
+#define MYDEV_MSIX_VEC_NUM 5
+
+void realize() {
+    memory_region_init(&mydev->msix, OBJECT(edu), "mydev-msix",
+                       MYDEV_MSIX_SIZE);
+    pci_register_bar(pdev, MYDEV_MSIX_IDX,
+                     PCI_BASE_ADDRESS_SPACE_MEMORY, &mydev->msix);
+
+    rv =3D msix_init(pdev, MYDEV_MSIX_VEC_NUM,
+                   &edu->msix, MYDEV_MSIX_IDX, MYDEV_MSIX_TABLE,
+                   &edu->msix, MYDEV_MSIX_IDX, MYDEV_MSIX_PBA,
+                   0, errp);
+}
+
+After this, a simple logic is added  to trigger interrupt by writing comman=
+d to a specific BAR0 address.
+
+void trigger() {
+    msix_notify(pdev, 1);         // send vector 1 to msix
+}
+
+In the OS driver, MSIX is enabled via `pci_alloc_irq_vectors()`, which is d=
+etailed in Linux Kernel's documentation `Documentation/PCI/msi-howto.rst` (=
+I use kernel 5.7).
+
+It is correct to obtain the number of vector from that function but failed =
+to receive interrupt from device. The IRQ, which is returned from `pci_irq_=
+vector`, is registered via `request_irq()` in the deriver.
+
+Can anyone give a clue?
+
+
+--_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_
+Content-Type: text/html; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
+
+<html>
+<head>
+<meta http-equiv=3D"Content-Type" content=3D"text/html; charset=3Diso-8859-=
+1">
+<style type=3D"text/css" style=3D"display:none;"> P {margin-top:0;margin-bo=
+ttom:0;} </style>
+</head>
+<body dir=3D"ltr">
+<div style=3D"font-family: Calibri, Helvetica, sans-serif; font-size: 12pt;=
+ color: rgb(0, 0, 0);">
+I have tried to use msi only, but failed again. Is there and documentation =
+details this?</div>
+<div>
+<div id=3D"appendonsend"></div>
+<div style=3D"font-family:Calibri,Helvetica,sans-serif; font-size:12pt; col=
+or:rgb(0,0,0)">
+<br>
+</div>
+<hr tabindex=3D"-1" style=3D"display:inline-block; width:98%">
+<div id=3D"divRplyFwdMsg" dir=3D"ltr"><font face=3D"Calibri, sans-serif" co=
+lor=3D"#000000" style=3D"font-size:11pt"><b>From:</b> Qemu-devel &lt;qemu-d=
+evel-bounces+d0u9.su=3Doutlook.com@nongnu.org&gt; on behalf of Douglas Su &=
+lt;d0u9.su@outlook.com&gt;<br>
+<b>Sent:</b> Thursday, October 22, 2020 20:32<br>
+<b>To:</b> QEMU Developers &lt;qemu-devel@nongnu.org&gt;<br>
+<b>Subject:</b> Enable MSI-X support in PCIe device.</font>
+<div>&nbsp;</div>
+</div>
+<div class=3D"BodyFragment"><font size=3D"2"><span style=3D"font-size:11pt"=
 >
-> * Ah...sigh! :(
->
-> * I very hesitantly used guest_error mask, since it was g_assert-ing before.
->    To me both guest_error and log_unimp seem mismatching. Because no GSO is
->    also valid IIUC. That's why in patch v2 I used plain qemu_log(). But plain
->    qemu_log is also not good it seems.
->
-> * I'm okay either way. Please let me know which one to use. OR I'm fine if you
->    fix it while merging upstream too.
+<div class=3D"PlainText">To use MSI-X interrupt in my PCIe device, In reali=
+ze() function I make a MSIX initialization like this:<br>
+<br>
+#define MYDEV_MSIX_VEC_NUM 5<br>
+<br>
+void realize() {<br>
+&nbsp;&nbsp;&nbsp; memory_region_init(&amp;mydev-&gt;msix, OBJECT(edu), &qu=
+ot;mydev-msix&quot;,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; MYDEV_MSIX_SIZE);=
+<br>
+&nbsp;&nbsp;&nbsp; pci_register_bar(pdev, MYDEV_MSIX_IDX,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; PCI_BASE_ADDRESS_SPACE_MEMORY=
+, &amp;mydev-&gt;msix);<br>
+<br>
+&nbsp;&nbsp;&nbsp; rv =3D msix_init(pdev, MYDEV_MSIX_VEC_NUM,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;edu-&gt;msix, MYDEV_MSIX_IDX, MYDEV_=
+MSIX_TABLE,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; &amp;edu-&gt;msix, MYDEV_MSIX_IDX, MYDEV_=
+MSIX_PBA,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nb=
+sp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 0, errp);<br>
+}<br>
+<br>
+After this, a simple logic is added&nbsp; to trigger interrupt by writing c=
+ommand to a specific BAR0 address.<br>
+<br>
+void trigger() {<br>
+&nbsp;&nbsp;&nbsp; msix_notify(pdev, 1);&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp=
+;&nbsp;&nbsp; // send vector 1 to msix<br>
+}<br>
+<br>
+In the OS driver, MSIX is enabled via `pci_alloc_irq_vectors()`, which is d=
+etailed in Linux Kernel's documentation `Documentation/PCI/msi-howto.rst` (=
+I use kernel 5.7).<br>
+<br>
+It is correct to obtain the number of vector from that function but failed =
+to receive interrupt from device. The IRQ, which is returned from `pci_irq_=
+vector`, is registered via `request_irq()` in the deriver.<br>
+<br>
+Can anyone give a clue?<br>
+<br>
+</div>
+</span></font></div>
+</div>
+</body>
+</html>
 
-
-I see.
-
-I applied the patch as is.
-
-Thanks
-
-
->
->
-> Thank you.
-> --
-> Prasad J Pandit / Red Hat Product Security Team
-> 8685 545E B54C 486B C6EB 271E E285 8B5A F050 DE8D
->
->
-
+--_000_BYAPR11MB266438F1968B1180660D2868EC190BYAPR11MB2664namp_--
 
