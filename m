@@ -2,85 +2,89 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C845FC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:20:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9158C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29FEC2074B
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:20:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 463D12074B
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:21:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ET11fNCd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29FEC2074B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dKaGTV1Q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 463D12074B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41638 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44718 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX8yR-0007do-5T
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:20:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40916)
+	id 1kX909-0000f4-66
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:21:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60714)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kX8tO-0001Os-Kz
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:14:59 -0400
-Received: from mail-lj1-x22a.google.com ([2a00:1450:4864:20::22a]:35352)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <luoyonggang@gmail.com>)
- id 1kX8tL-00072q-PK
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:14:58 -0400
-Received: by mail-lj1-x22a.google.com with SMTP id x16so11760751ljh.2
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:14:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:reply-to:from:date:message-id:subject:to;
- bh=G5X34XssD6eZocHMYjcZtyKh9SNU+IrvzYYI2iN1s2w=;
- b=ET11fNCdvg5j5cpTae7Y8qSpnFbmu1nQ9TIuewa6rHF8D7xB+3c+IIYtnDLOBz7wYz
- qv6x8Bv7nmEj5LOzaobB5735NlXGkips+pvJIwgFoj7sCgjKMHm8UdkLy1CZpvv2beA3
- SfAM6HcIUnFPAv+uUxHcYkzGagQ/3NCeAN4vy58mW/afnTgsL842wEJSwBBleV4vIpcN
- x8xZDBerPRtzdhwkptZD5PTsP7J5YnsSVCghwsSwbDkUAlHUKhaVsUE5yvors3yp2QA/
- 38VAUElwHzgPVV1egvz3zccybys6MexlOV7683i8OGt/rYNi6XDB32BVQaLD3gR8OH/2
- bMBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:reply-to:from:date:message-id
- :subject:to;
- bh=G5X34XssD6eZocHMYjcZtyKh9SNU+IrvzYYI2iN1s2w=;
- b=SxUN4gDtCCJKwOpW+E7v4LphjDTOEzKLVkhn+CF3cVJ25FWecH9ooaGzLZknpekk9p
- 2T46GkpUUHeczqKtJPtJGYIUuXwk1Qxv9wVcPOu2Kt8ggNyiD3OjOlMnZu11eEj/1xth
- bwTqxp/Um374uDsbhMOtJZsqlGJz10/n1BCdIUTYH+hkUJzc+Rs79KxT5wP/sBvrs+Ot
- FHjJaz7TGTTq2tGl9F0LsGLU4OE7gUiPVzLtLvXE3fHafR0jhgVJB21bclAxrW7DwJDE
- fA6Yq5mNPKVqO/k2mrY6Xlr1KFxaL1M7f3o72l3eEqV2lmFO5VtcvQNxzLXIDPokGPkQ
- K9vw==
-X-Gm-Message-State: AOAM530jL3xc8U/WwoocUbPEU29+MEpqn461t8OxXbqJzhvQyttrvPTu
- S0qmjsscluRBxrRuyo/q39U0/Xz/tLv6cpuN+XQ4K3wTlzE=
-X-Google-Smtp-Source: ABdhPJwDejLb+weNeXVWUt0uzsYujAJnhpF5Vb7oWffhaTqmspgHeHrg6/2YdVpYjo8WUzmo5MIncdhlDDolNcC54/M=
-X-Received: by 2002:a2e:87c9:: with SMTP id v9mr7195367ljj.368.1603743293112; 
- Mon, 26 Oct 2020 13:14:53 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8Ij-0006we-0k
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:37:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24301)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kX8Ib-0002TK-4s
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 15:37:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603741016;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=+rBwul389EePhtiA1BcUNknP1vMAArlrW8UMon7CiSA=;
+ b=dKaGTV1QW+fpjvmxjU/znlVZBR6qunTIlA2ErB5A52K6LchuFO04PzNUwD7jktj04EIurX
+ Q0Gd/pwyvtAs0zLelbLlUmRWUrseEiwKmO0FxEoUtSO88LDmR/jN9kZl9/kZhVxX/bGd3m
+ I3gpSI0AzqCW6rdSHZ6vvvcMdAFqVeM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-299-KGD_O2mUPHWkZGUhmO9fbA-1; Mon, 26 Oct 2020 15:36:53 -0400
+X-MC-Unique: KGD_O2mUPHWkZGUhmO9fbA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A49C8186841C;
+ Mon, 26 Oct 2020 19:36:52 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 6B7645C1BB;
+ Mon, 26 Oct 2020 19:36:52 +0000 (UTC)
+Subject: [PULL 32/32] vfio: fix incorrect print type
+From: Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Mon, 26 Oct 2020 13:36:52 -0600
+Message-ID: <160374101204.22414.5469893743685681968.stgit@gimli.home>
+In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-From: =?UTF-8?B?572X5YuH5YiaKFlvbmdnYW5nIEx1byk=?= <luoyonggang@gmail.com>
-Date: Tue, 27 Oct 2020 04:14:41 +0800
-Message-ID: <CAE2XoE-nwJRgoraR9HFoDpW-tgGER6CAaY0s5gyR8BGDH3aHxA@mail.gmail.com>
-Subject: How about using a bot to guard the pull request can be apply? like
- rust compiler does.
-To: qemu-level <qemu-devel@nongnu.org>, Paolo Bonzini <pbonzini@redhat.com>, 
- Peter Maydell <peter.maydell@linaro.org>
-Content-Type: multipart/alternative; boundary="0000000000004c08e805b29895d7"
-Received-SPF: pass client-ip=2a00:1450:4864:20::22a;
- envelope-from=luoyonggang@gmail.com; helo=mail-lj1-x22a.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -93,41 +97,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: luoyonggang@gmail.com
+Cc: Zhengui li <lizhengui@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---0000000000004c08e805b29895d7
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: Zhengui li <lizhengui@huawei.com>
 
-Peter can @bots try to apply pull request, if pull request apply and all ci
-tests passed, then the bot automatically merge the pull request and push to
-the mirrors.
-We even doesn't need gitlab or other things, only need the bot to monitor
-the instruction from Peter.
+The type of input variable is unsigned int
+while the printer type is int. So fix incorrect print type.
 
---=20
-         =E6=AD=A4=E8=87=B4
-=E7=A4=BC
-=E7=BD=97=E5=8B=87=E5=88=9A
-Yours
-    sincerely,
-Yonggang Luo
+Signed-off-by: Zhengui li <lizhengui@huawei.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/vfio/common.c |    4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
---0000000000004c08e805b29895d7
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 5b369e15b381..99bd91ece405 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -205,7 +205,7 @@ void vfio_region_write(void *opaque, hwaddr addr,
+         buf.qword = cpu_to_le64(data);
+         break;
+     default:
+-        hw_error("vfio: unsupported write size, %d bytes", size);
++        hw_error("vfio: unsupported write size, %u bytes", size);
+         break;
+     }
+ 
+@@ -262,7 +262,7 @@ uint64_t vfio_region_read(void *opaque,
+         data = le64_to_cpu(buf.qword);
+         break;
+     default:
+-        hw_error("vfio: unsupported read size, %d bytes", size);
++        hw_error("vfio: unsupported read size, %u bytes", size);
+         break;
+     }
+ 
 
-<div dir=3D"ltr">Peter can @bots try to apply pull request, if pull request=
- apply and all ci tests passed, then the bot automatically merge the pull r=
-equest and push to the mirrors.<div>We even doesn&#39;t need gitlab or othe=
-r things, only need the bot to monitor the instruction from Peter.</div><di=
-v><div><br></div>-- <br><div dir=3D"ltr" class=3D"gmail_signature" data-sma=
-rtmail=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=A0 =E6=AD=A4=E8=
-=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours<br>=C2=A0 =C2=
-=A0 sincerely,<br>Yonggang Luo<br></div></div></div>
-
---0000000000004c08e805b29895d7--
 
