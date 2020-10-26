@@ -2,109 +2,73 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB0C1C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:56:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14DB9C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:56:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 465342087C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:56:23 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g2TXKPeC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 465342087C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8799522202
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:56:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8799522202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59862 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60820 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzEk-0008Ba-56
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:56:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:34950)
+	id 1kWzF9-0000CK-GI
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:56:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35296)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWzBI-0005AW-C6
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:52:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42678)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kWzBG-0001ai-Mr
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:52:48 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603705965;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=IaeP7KKKmxO8MibyEMUeiU7p6h6rT8EI48aWMgO/ECY=;
- b=g2TXKPeC3usgdZK60GbdC4YuA52Bi2uYNXYYDOb6kaG91dfXOdUyK8a3h04Mg2WSpJhqDX
- AUkrjVb8F1em4zBgYI9P5MNiH1oTmGVmlD3pgXU7MBvUnraDDpCaREB1bIyar/UxnZIHdy
- p/jhQvn3kmswxHc7L6gR81Q+LjkuOGU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-44-fjG__ouzPvm_qnorOwLdiw-1; Mon, 26 Oct 2020 05:52:43 -0400
-X-MC-Unique: fjG__ouzPvm_qnorOwLdiw-1
-Received: by mail-wr1-f69.google.com with SMTP id j15so771130wro.4
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 02:52:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=IaeP7KKKmxO8MibyEMUeiU7p6h6rT8EI48aWMgO/ECY=;
- b=I6FYWMT8jXJN3lPmJ9cPP6c4mc5BaIyPnLaRLG5/rqGl6XOl1GhSPsFsQ0eYzWR0PI
- jEsSsJFeG8r6U0qHzooIExUJ2XCbaRGc/cs8kz0T07ykS0B50ZaexbjWNrIFCrMXIGci
- S+DVfuccqMr0KvpduUskOUjfmJncF4dqPk6wGEA7xywx+jcYWN5/dxR1XN1qkBNjTS0B
- JUsEvbXqzNT8GL7aIF4dAZRzkvbm84r4Hl2/HxpcmldQb9rBWjV4TXM9C1+323fkisjX
- ZhVLGf+ZEC3p0WQZGqeslFoXNnFAaku8kgF3xV7XasiTD+ehtVPC4phhpPC5ALCOMxr9
- Qfxw==
-X-Gm-Message-State: AOAM530jOoIEDiIR2u5AHXT58GLqTzwXG46Kz2xO6ej+7wzR5blsVvN3
- /Jcv9PstQMZZu5nzKCXfq6TFMsbMdZDcQhg9hVQdj7J3DtD/LbRt/+eahemAWd8unqyc9p0ItQX
- KuyURpHayMrmw5X4=
-X-Received: by 2002:adf:f101:: with SMTP id r1mr17977313wro.392.1603705962500; 
- Mon, 26 Oct 2020 02:52:42 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxG6zNG5If7O48x59KIH8zZgAVLYRn8SVYMt7zDMiqYjE4H91Drfbp4By6isAKN7grdYGkm6g==
-X-Received: by 2002:adf:f101:: with SMTP id r1mr17977298wro.392.1603705962309; 
- Mon, 26 Oct 2020 02:52:42 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id s11sm21420109wrm.56.2020.10.26.02.52.41
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 02:52:41 -0700 (PDT)
-Subject: Re: [PATCH v2 4/6] cfi: Initial support for cfi-icall in QEMU
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>, qemu-devel@nongnu.org
-References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
- <20201023200645.1055-5-dbuono@linux.vnet.ibm.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <50a26676-722b-889a-b926-ad25e513d384@redhat.com>
-Date: Mon, 26 Oct 2020 10:52:41 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWzDP-0007D2-0Q
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:55:00 -0400
+Received: from hera.aquilenet.fr ([2a0c:e300::1]:56148)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWzDM-0002Oh-SH
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 05:54:58 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by hera.aquilenet.fr (Postfix) with ESMTP id C2C5C4D8;
+ Mon, 26 Oct 2020 10:54:52 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at aquilenet.fr
+Received: from hera.aquilenet.fr ([127.0.0.1])
+ by localhost (hera.aquilenet.fr [127.0.0.1]) (amavisd-new, port 10024)
+ with ESMTP id rPMM-2TPad2p; Mon, 26 Oct 2020 10:54:52 +0100 (CET)
+Received: from function (lfbn-bor-1-56-204.w90-50.abo.wanadoo.fr
+ [90.50.148.204])
+ by hera.aquilenet.fr (Postfix) with ESMTPSA id 0F7ABB8;
+ Mon, 26 Oct 2020 10:54:52 +0100 (CET)
+Received: from samy by function with local (Exim 4.94)
+ (envelope-from <samuel.thibault@gnu.org>)
+ id 1kWzDG-006iJc-W1; Mon, 26 Oct 2020 10:54:51 +0100
+Date: Mon, 26 Oct 2020 10:54:50 +0100
+From: Samuel Thibault <samuel.thibault@gnu.org>
+To: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ Aurelien Jarno <aurelien@aurel32.net>, Jason Andryuk <jandryuk@gmail.com>
+Subject: Re: [PATCH 8/9] dev-serial: fix FTDI_GET_MDM_ST response
+Message-ID: <20201026095450.ko6snc4dusk3pvnw@function>
+References: <20201026083401.13231-1-mark.cave-ayland@ilande.co.uk>
+ <20201026083401.13231-9-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-In-Reply-To: <20201023200645.1055-5-dbuono@linux.vnet.ibm.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1,
- RCVD_IN_MSPIKE_WL=-0.01, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20201026083401.13231-9-mark.cave-ayland@ilande.co.uk>
+Organization: I am not organized
+User-Agent: NeoMutt/20170609 (1.8.3)
+Received-SPF: softfail client-ip=2a0c:e300::1;
+ envelope-from=samuel.thibault@gnu.org; helo=hera.aquilenet.fr
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -11
+X-Spam_score: -1.2
+X-Spam_bar: -
+X-Spam_report: (-1.2 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_PASS=-0.001,
+ SPF_SOFTFAIL=0.665 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,34 +81,64 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Stefan Weil <sw@weilnetz.de>, Alexander Bulekov <alxndr@bu.edu>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org, kraxel@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 23/10/20 22:06, Daniele Buono wrote:
-> +
-> +#ifdef CONFIG_CFI
-> +/* If CFI is enabled, use an attribute to disable cfi-icall on the following
-> + * function */
-> +#define __disable_cfi__ __attribute__((no_sanitize("cfi-icall")))
-> +#else
-> +/* If CFI is not enabled, use an empty define to not change the behavior */
-> +#define __disable_cfi__
-> +#endif
-> +
-> diff --git a/plugins/core.c b/plugins/core.c
+Hello,
 
-__disable_cfi__ is a reserved identifier, since it starts with two
-underscores.  Please name it QEMU_DISABLE_CFI and put it in
-include/qemu/compiler.h.
+(Cc-ing Aurelien who introduced the support for modem control, and Jason
+who added the missing THRE and TEMT flags).
 
-Thanks,
+Mark Cave-Ayland, le lun. 26 oct. 2020 08:34:00 +0000, a ecrit:
+> The FTDI_GET_MDM_ST response should only return a single byte indicating the
+> modem status with bit 0 cleared (as documented in the Linux ftdi_sio.h header
+> file).
+> 
+> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> ---
+>  hw/usb/dev-serial.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+> index 4c374d0790..fa734bcf54 100644
+> --- a/hw/usb/dev-serial.c
+> +++ b/hw/usb/dev-serial.c
+> @@ -360,9 +360,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+>          /* TODO: TX ON/OFF */
+>          break;
+>      case VendorDeviceRequest | FTDI_GET_MDM_ST:
+> -        data[0] = usb_get_modem_lines(s) | 1;
+> -        data[1] = FTDI_THRE | FTDI_TEMT;
+> -        p->actual_length = 2;
+> +        data[0] = usb_get_modem_lines(s);
+> +        p->actual_length = 1;
 
-Paolo
+Err, but Linux' drivers/usb/serial/ftdi_sio.c:ftdi_process_packet()
+contradicts this: 
 
+	if (len < 2) {
+		dev_dbg(&port->dev, "malformed packet\n");
+		return 0;
+	}
+
+	status = buf[0] & FTDI_STATUS_B0_MASK;
+	if (status != priv->prev_status) {
+		char diff_status = status ^ priv->prev_status;
+
+		if (diff_status & FTDI_RS0_CTS)
+			port->icount.cts++;
+
+[...]
+
+	/* save if the transmitter is empty or not */
+	if (buf[1] & FTDI_RS_TEMT)
+		priv->transmit_empty = 1;
+	else
+		priv->transmit_empty = 0;
+
+Did you actually get an issue with seeing this packet contain two bytes?
+
+Samuel
 
