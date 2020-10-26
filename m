@@ -2,80 +2,88 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C36E1C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E05C5C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:49 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5E8AF2225C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:26 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E8AF2225C
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
+	by mail.kernel.org (Postfix) with ESMTPS id 6C9BF2225C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:51:49 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rf9v/k6f"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6C9BF2225C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33302 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34680 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX6eT-0004Kh-CP
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:51:25 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51754)
+	id 1kX6ep-0004tl-AH
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:51:47 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49896)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kX6Ff-0000Pe-Av
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:25:48 -0400
-Received: from mail-pl1-f196.google.com ([209.85.214.196]:34427)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kX6Fb-0001AB-6f
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:25:46 -0400
-Received: by mail-pl1-f196.google.com with SMTP id r3so5006191plo.1
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:25:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=Yh/zwd8J3NXD+r3FYcs6OA7kJm9yhTuQacKIilSY6OQ=;
- b=aco5hUo3DJ0ipr62ZXPEwhS5oivUNerc4awRfsXgDREyBiY1oA1/AGkD4OQ6fsEXiK
- Hl3AAbT/zKHsZRIFfJ/G+arXmTIFukRRGn7Q5nYSmHY2Cr7tdcturqFaiBzpNMOHzbaX
- 8zyjkku1uBgUgOVh1kzD3D2arpP7/8t/BbgvSKNcJEw4k4zRQq7z7UlUlS8K5HjWv29j
- A2aQfzLGg4yYP6h4dWrIUPdKRRe27jJIDMk0Ts8WOQVfmAupk+sYqH/+US/roUFD+VeO
- TaU9jlGWE0d8wW9BdHPIFcxVP5IBF7PPA4y+UhcCsCRkNegRWU9VjutS+8Mi/2KNla8z
- oevQ==
-X-Gm-Message-State: AOAM532zML/OKuper6+LxNkhaLul/heRpC4zmFe5vsx6XkrBKxVpSv28
- b9JtrcQNqA0emebBW+2jJqm+clpIvwI=
-X-Google-Smtp-Source: ABdhPJxP1DtfrJROiDeksc831VUW/iizv8+/ygf9fe+W3n9bm/AorLW8ZlhXdPCp37TQxkMCr2wcww==
-X-Received: by 2002:a17:90a:c901:: with SMTP id
- v1mr17583259pjt.103.1603733141556; 
- Mon, 26 Oct 2020 10:25:41 -0700 (PDT)
-Received: from localhost.localdomain ([73.93.154.188])
- by smtp.gmail.com with ESMTPSA id j20sm12723075pfd.40.2020.10.26.10.25.40
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Mon, 26 Oct 2020 10:25:41 -0700 (PDT)
-From: Joelle van Dyne <j@getutm.app>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 2/4] tcg: implement mirror mapped JIT for Linux
-Date: Mon, 26 Oct 2020 10:25:33 -0700
-Message-Id: <20201026172535.10419-3-j@getutm.app>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201026172535.10419-1-j@getutm.app>
-References: <20201026172535.10419-1-j@getutm.app>
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kX69v-0008U9-DJ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:19:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54983)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
+ id 1kX69s-00004z-MH
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:19:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603732786;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=6IjphdCbl2ztLD31nNhXkVzcvdiAleyKgNqPoOzy7wQ=;
+ b=Rf9v/k6fKwnDpLgWo9aN5Qco27xrM3bvVnC3Qk/0HQPNk/gKIz6ytbcQlMaY2EtVCk2UUa
+ n9KXtHaXVZmtUKTDPRmnwo07lXmLRcfRm0pdbroEkNyEZD5I+HQ17Li89szgzH//ILIaRe
+ nCyDa0NJoe7OjKCjJguagjUCKLfsK5A=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-169-nsLjjsWONhSc5UBhOt4VWw-1; Mon, 26 Oct 2020 13:19:44 -0400
+X-MC-Unique: nsLjjsWONhSc5UBhOt4VWw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4548B1891E84;
+ Mon, 26 Oct 2020 17:19:42 +0000 (UTC)
+Received: from work-vm (ovpn-112-208.ams2.redhat.com [10.36.112.208])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 379C655762;
+ Mon, 26 Oct 2020 17:19:32 +0000 (UTC)
+Date: Mon, 26 Oct 2020 17:19:29 +0000
+From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+To: Stefan Hajnoczi <stefanha@redhat.com>
+Subject: Re: [PATCH v3] virtiofsd: add container-friendly -o sandbox=chroot
+ option
+Message-ID: <20201026171929.GC152260@work-vm>
+References: <20201008085534.16070-1-stefanha@redhat.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.214.196;
- envelope-from=osy86github@gmail.com; helo=mail-pl1-f196.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 13:25:42
+In-Reply-To: <20201008085534.16070-1-stefanha@redhat.com>
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -13
-X-Spam_score: -1.4
-X-Spam_bar: -
-X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,281 +96,221 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Joelle van Dyne <j@getutm.app>,
- Richard Henderson <rth@twiddle.net>
+Cc: vromanso@redhat.com, Daniel Walsh <dwalsh@redhat.com>,
+ qemu-devel@nongnu.org, rmohr@redhat.com, virtio-fs@redhat.com,
+ Al Viro <viro@zeniv.linux.org.uk>, mpatel@redhat.com, vgoyal@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When configured with --enable-debug-tcg on Linux, we enable JIT mirror map
-which separates the JIT allocation into a RX-only address and a RW-only
-address. The backing is a memfd_create() object.
+* Stefan Hajnoczi (stefanha@redhat.com) wrote:
+> virtiofsd cannot run in a container because CAP_SYS_ADMIN is required to
+> create namespaces.
+> 
+> Introduce a weaker sandbox mode that is sufficient in container
+> environments because the container runtime already sets up namespaces.
+> Use chroot to restrict path traversal to the shared directory.
+> 
+> virtiofsd loses the following:
+> 
+> 1. Mount namespace. The process chroots to the shared directory but
+>    leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+>    syscalls.
+> 
+> 2. Pid namespace. This should be fine because virtiofsd is the only
+>    process running in the container.
+> 
+> 3. Network namespace. This should be fine because seccomp already
+>    rejects the connect(2) syscall, but an additional layer of security
+>    is lost. Container runtime-specific network security policies can be
+>    used drop network traffic (except for the vhost-user UNIX domain
+>    socket).
+> 
+> Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-This allows us to catch bugs where we unintentionally write to the JIT
-region. However, the main use case will be for other platforms that require
-strict W^X separation to run.
+Queued
 
-Signed-off-by: Joelle van Dyne <j@getutm.app>
----
- configure                 | 13 ++++++++
- meson.build               |  1 +
- include/exec/exec-all.h   |  8 +++++
- include/tcg/tcg.h         | 18 ++++++++++
- accel/tcg/cpu-exec.c      |  7 +++-
- accel/tcg/translate-all.c | 69 +++++++++++++++++++++++++++++++++++----
- 6 files changed, 108 insertions(+), 8 deletions(-)
-
-diff --git a/configure b/configure
-index e6754c1e87..9a632821c4 100755
---- a/configure
-+++ b/configure
-@@ -448,6 +448,7 @@ meson=""
- ninja=""
- skip_meson=no
- gettext=""
-+mirror_jit="no"
- 
- bogus_os="no"
- malloc_trim="auto"
-@@ -5725,6 +5726,14 @@ if test "$mingw32" = "yes" ; then
-     done
- fi
- 
-+# Enable mirror mapping if debug_tcg on supported platform
-+
-+if test "$debug_tcg" = "yes"; then
-+  if test "$linux" = "yes"; then
-+    mirror_jit=yes
-+  fi
-+fi
-+
- qemu_confdir="$sysconfdir/$qemu_suffix"
- qemu_moddir="$libdir/$qemu_suffix"
- qemu_datadir="$datadir/$qemu_suffix"
-@@ -6843,6 +6852,10 @@ if test "$safe_stack" = "yes"; then
-   echo "CONFIG_SAFESTACK=y" >> $config_host_mak
- fi
- 
-+if test "$mirror_jit" = "yes"; then
-+  echo "CONFIG_MIRROR_JIT=y" >> $config_host_mak
-+fi
-+
- # If we're using a separate build tree, set it up now.
- # DIRS are directories which we simply mkdir in the build tree;
- # LINKS are things to symlink back into the source tree
-diff --git a/meson.build b/meson.build
-index 7627a0ae46..9630edff9f 100644
---- a/meson.build
-+++ b/meson.build
-@@ -2114,6 +2114,7 @@ endif
- summary_info += {'thread sanitizer':  config_host.has_key('CONFIG_TSAN')}
- summary_info += {'rng-none':          config_host.has_key('CONFIG_RNG_NONE')}
- summary_info += {'Linux keyring':     config_host.has_key('CONFIG_SECRET_KEYRING')}
-+summary_info += {'mirror JIT':        config_host.has_key('CONFIG_MIRROR_JIT')}
- summary(summary_info, bool_yn: true)
- 
- if not supported_cpus.contains(cpu)
-diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
-index 4707ac140c..921767a51b 100644
---- a/include/exec/exec-all.h
-+++ b/include/exec/exec-all.h
-@@ -519,6 +519,14 @@ struct TranslationBlock {
-     uintptr_t jmp_list_head;
-     uintptr_t jmp_list_next[2];
-     uintptr_t jmp_dest[2];
-+
-+#if defined(CONFIG_MIRROR_JIT)
-+    /*
-+     * Store difference to writable mirror
-+     * We need this when patching the jump instructions
-+     */
-+    ptrdiff_t code_rw_mirror_diff;
-+#endif
- };
- 
- extern bool parallel_cpus;
-diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
-index 79c5ff8dab..a76c259d1b 100644
---- a/include/tcg/tcg.h
-+++ b/include/tcg/tcg.h
-@@ -627,6 +627,10 @@ struct TCGContext {
-     size_t code_gen_buffer_size;
-     void *code_gen_ptr;
-     void *data_gen_ptr;
-+#if defined(CONFIG_MIRROR_JIT)
-+    int code_gen_buffer_fd;
-+    ptrdiff_t code_rw_mirror_diff;
-+#endif
- 
-     /* Threshold to flush the translated code buffer.  */
-     void *code_gen_highwater;
-@@ -677,6 +681,20 @@ struct TCGContext {
-     target_ulong gen_insn_data[TCG_MAX_INSNS][TARGET_INSN_START_WORDS];
- };
- 
-+static inline void *tcg_mirror_ptr_rw(TCGContext *s, const void *rx)
-+{
-+#if defined(CONFIG_MIRROR_JIT)
-+    return (void *)rx + s->code_rw_mirror_diff;
-+#else
-+    return (void *)rx;
-+#endif
-+}
-+
-+static inline tcg_insn_unit *tcg_code_ptr_rw(TCGContext *s, const void *rx)
-+{
-+    return (tcg_insn_unit *)tcg_mirror_ptr_rw(s, rx);
-+}
-+
- extern TCGContext tcg_init_ctx;
- extern __thread TCGContext *tcg_ctx;
- extern TCGv_env cpu_env;
-diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
-index 58aea605d8..f7eb6fcd77 100644
---- a/accel/tcg/cpu-exec.c
-+++ b/accel/tcg/cpu-exec.c
-@@ -354,7 +354,12 @@ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr)
-     if (TCG_TARGET_HAS_direct_jump) {
-         uintptr_t offset = tb->jmp_target_arg[n];
-         uintptr_t tc_ptr = (uintptr_t)tb->tc.ptr;
--        tb_target_set_jmp_target(tc_ptr, tc_ptr + offset, addr);
-+#if defined(CONFIG_MIRROR_JIT)
-+        uintptr_t wr_addr = tc_ptr + offset + tb->code_rw_mirror_diff;
-+#else
-+        uintptr_t wr_addr = tc_ptr + offset;
-+#endif
-+        tb_target_set_jmp_target(tc_ptr, tc_ptr + offset, addr, wr_addr);
-     } else {
-         tb->jmp_target_arg[n] = addr;
-     }
-diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
-index d76097296d..bfb856ac1a 100644
---- a/accel/tcg/translate-all.c
-+++ b/accel/tcg/translate-all.c
-@@ -59,6 +59,7 @@
- #include "sysemu/cpus.h"
- #include "sysemu/cpu-timers.h"
- #include "sysemu/tcg.h"
-+#include "qemu/memfd.h"
- 
- /* #define DEBUG_TB_INVALIDATE */
- /* #define DEBUG_TB_FLUSH */
-@@ -302,10 +303,12 @@ static target_long decode_sleb128(uint8_t **pp)
- 
- static int encode_search(TranslationBlock *tb, uint8_t *block)
- {
--    uint8_t *highwater = tcg_ctx->code_gen_highwater;
--    uint8_t *p = block;
-+    const uint8_t *highwater, *start;
-+    uint8_t *p;
-     int i, j, n;
- 
-+    highwater = tcg_mirror_ptr_rw(tcg_ctx, tcg_ctx->code_gen_highwater);
-+    start = p = tcg_mirror_ptr_rw(tcg_ctx, block);
-     for (i = 0, n = tb->icount; i < n; ++i) {
-         target_ulong prev;
- 
-@@ -329,7 +332,7 @@ static int encode_search(TranslationBlock *tb, uint8_t *block)
-         }
-     }
- 
--    return p - block;
-+    return p - start;
- }
- 
- /* The cpu state corresponding to 'searched_pc' is restored.
-@@ -1067,12 +1070,29 @@ static inline void *alloc_code_gen_buffer(void)
- #else
- static inline void *alloc_code_gen_buffer(void)
- {
--    int prot = PROT_WRITE | PROT_READ | PROT_EXEC;
--    int flags = MAP_PRIVATE | MAP_ANONYMOUS;
-+    int prot = PROT_READ | PROT_EXEC;
-+    int flags = 0;
-     size_t size = tcg_ctx->code_gen_buffer_size;
-+    int fd = -1;
-     void *buf;
- 
--    buf = mmap(NULL, size, prot, flags, -1, 0);
-+#if defined(CONFIG_MIRROR_JIT)
-+#if defined(CONFIG_LINUX)
-+    fd = qemu_memfd_create("tcg-jit", size, false, 0, 0, NULL);
-+    if (fd < 0) {
-+        return NULL;
-+    }
-+    tcg_ctx->code_gen_buffer_fd = fd;
-+    flags |= MAP_SHARED;
-+#else /* defined(CONFIG_LINUX) */
-+#error "Mirror JIT unimplemented for this platform."
-+#endif /* defined(CONFIG_LINUX) */
-+#else /* defined(CONFIG_MIRROR_JIT) */
-+    prot |= PROT_WRITE;
-+    flags |= MAP_ANONYMOUS | MAP_PRIVATE;
-+#endif /* defined(CONFIG_MIRROR_JIT) */
-+
-+    buf = mmap(NULL, size, prot, flags, fd, 0);
-     if (buf == MAP_FAILED) {
-         return NULL;
-     }
-@@ -1118,7 +1138,28 @@ static inline void *alloc_code_gen_buffer(void)
- }
- #endif /* USE_STATIC_CODE_GEN_BUFFER, WIN32, POSIX */
- 
--static inline void code_gen_alloc(size_t tb_size)
-+#if defined(CONFIG_MIRROR_JIT)
-+#if defined(CONFIG_LINUX)
-+static inline void *alloc_jit_rw_mirror(void)
-+{
-+    int fd = tcg_ctx->code_gen_buffer_fd;
-+    size_t size = tcg_ctx->code_gen_buffer_size;
-+    void *buf;
-+
-+    assert(fd >= 0);
-+    buf = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-+    if (buf == MAP_FAILED) {
-+        return NULL;
-+    }
-+
-+    return buf;
-+}
-+#else
-+#error "Mirror JIT unimplemented for this platform."
-+#endif /* CONFIG_IOS */
-+#endif /* CONFIG_MIRROR_JIT */
-+
-+static inline void code_gen_alloc(size_t tb_size, bool mirror_jit)
- {
-     tcg_ctx->code_gen_buffer_size = size_code_gen_buffer(tb_size);
-     tcg_ctx->code_gen_buffer = alloc_code_gen_buffer();
-@@ -1126,6 +1167,17 @@ static inline void code_gen_alloc(size_t tb_size)
-         fprintf(stderr, "Could not allocate dynamic translator buffer\n");
-         exit(1);
-     }
-+#if defined(CONFIG_MIRROR_JIT)
-+    void *mirror;
-+
-+    /* For platforms that need a mirror mapping for code execution */
-+    mirror = alloc_jit_rw_mirror();
-+    if (mirror == NULL) {
-+        fprintf(stderr, "Could not remap code buffer mirror\n");
-+        exit(1);
-+    }
-+    tcg_ctx->code_rw_mirror_diff = mirror - tcg_ctx->code_gen_buffer;
-+#endif /* CONFIG_MIRROR_JIT */
- }
- 
- static bool tb_cmp(const void *ap, const void *bp)
-@@ -1721,6 +1773,9 @@ TranslationBlock *tb_gen_code(CPUState *cpu,
-         cpu_loop_exit(cpu);
-     }
- 
-+#if defined(CONFIG_MIRROR_JIT)
-+    tb->code_rw_mirror_diff = tcg_ctx->code_rw_mirror_diff;
-+#endif
-     gen_code_buf = tcg_ctx->code_gen_ptr;
-     tb->tc.ptr = gen_code_buf;
-     tb->pc = pc;
+> ---
+> v3:
+>  * Rebased onto David Gilbert's latest migration & virtiofsd pull
+>    request
+> 
+>  tools/virtiofsd/helper.c         |  8 +++++
+>  tools/virtiofsd/passthrough_ll.c | 57 ++++++++++++++++++++++++++++++--
+>  docs/tools/virtiofsd.rst         | 32 ++++++++++++++----
+>  3 files changed, 88 insertions(+), 9 deletions(-)
+> 
+> diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+> index 85770d63f1..2e181a49b5 100644
+> --- a/tools/virtiofsd/helper.c
+> +++ b/tools/virtiofsd/helper.c
+> @@ -166,6 +166,14 @@ void fuse_cmdline_help(void)
+>             "                               enable/disable readirplus\n"
+>             "                               default: readdirplus except with "
+>             "cache=none\n"
+> +           "    -o sandbox=namespace|chroot\n"
+> +           "                               sandboxing mode:\n"
+> +           "                               - namespace: mount, pid, and net\n"
+> +           "                                 namespaces with pivot_root(2)\n"
+> +           "                                 into shared directory\n"
+> +           "                               - chroot: chroot(2) into shared\n"
+> +           "                                 directory (use in containers)\n"
+> +           "                               default: namespace\n"
+>             "    -o timeout=<number>        I/O timeout (seconds)\n"
+>             "                               default: depends on cache= option.\n"
+>             "    -o writeback|no_writeback  enable/disable writeback cache\n"
+> diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+> index ff53df4451..5b9064278a 100644
+> --- a/tools/virtiofsd/passthrough_ll.c
+> +++ b/tools/virtiofsd/passthrough_ll.c
+> @@ -137,8 +137,14 @@ enum {
+>      CACHE_ALWAYS,
+>  };
+>  
+> +enum {
+> +    SANDBOX_NAMESPACE,
+> +    SANDBOX_CHROOT,
+> +};
+> +
+>  struct lo_data {
+>      pthread_mutex_t mutex;
+> +    int sandbox;
+>      int debug;
+>      int writeback;
+>      int flock;
+> @@ -163,6 +169,12 @@ struct lo_data {
+>  };
+>  
+>  static const struct fuse_opt lo_opts[] = {
+> +    { "sandbox=namespace",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_NAMESPACE },
+> +    { "sandbox=chroot",
+> +      offsetof(struct lo_data, sandbox),
+> +      SANDBOX_CHROOT },
+>      { "writeback", offsetof(struct lo_data, writeback), 1 },
+>      { "no_writeback", offsetof(struct lo_data, writeback), 0 },
+>      { "source=%s", offsetof(struct lo_data, source), 0 },
+> @@ -2660,6 +2672,41 @@ static void setup_capabilities(char *modcaps_in)
+>      pthread_mutex_unlock(&cap.mutex);
+>  }
+>  
+> +/*
+> + * Use chroot as a weaker sandbox for environments where the process is
+> + * launched without CAP_SYS_ADMIN.
+> + */
+> +static void setup_chroot(struct lo_data *lo)
+> +{
+> +    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
+> +    if (lo->proc_self_fd == -1) {
+> +        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
+> +        exit(1);
+> +    }
+> +
+> +    /*
+> +     * Make the shared directory the file system root so that FUSE_OPEN
+> +     * (lo_open()) cannot escape the shared directory by opening a symlink.
+> +     *
+> +     * The chroot(2) syscall is later disabled by seccomp and the
+> +     * CAP_SYS_CHROOT capability is dropped so that tampering with the chroot
+> +     * is not possible.
+> +     *
+> +     * However, it's still possible to escape the chroot via lo->proc_self_fd
+> +     * but that requires first gaining control of the process.
+> +     */
+> +    if (chroot(lo->source) != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chroot(\"%s\"): %m\n", lo->source);
+> +        exit(1);
+> +    }
+> +
+> +    /* Move into the chroot */
+> +    if (chdir("/") != 0) {
+> +        fuse_log(FUSE_LOG_ERR, "chdir(\"/\"): %m\n");
+> +        exit(1);
+> +    }
+> +}
+> +
+>  /*
+>   * Lock down this process to prevent access to other processes or files outside
+>   * source directory.  This reduces the impact of arbitrary code execution bugs.
+> @@ -2667,8 +2714,13 @@ static void setup_capabilities(char *modcaps_in)
+>  static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+>                            bool enable_syslog)
+>  {
+> -    setup_namespaces(lo, se);
+> -    setup_mounts(lo->source);
+> +    if (lo->sandbox == SANDBOX_NAMESPACE) {
+> +        setup_namespaces(lo, se);
+> +        setup_mounts(lo->source);
+> +    } else {
+> +        setup_chroot(lo);
+> +    }
+> +
+>      setup_seccomp(enable_syslog);
+>      setup_capabilities(g_strdup(lo->modcaps));
+>  }
+> @@ -2815,6 +2867,7 @@ int main(int argc, char *argv[])
+>      struct fuse_session *se;
+>      struct fuse_cmdline_opts opts;
+>      struct lo_data lo = {
+> +        .sandbox = SANDBOX_NAMESPACE,
+>          .debug = 0,
+>          .writeback = 0,
+>          .posix_lock = 0,
+> diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+> index 7ecee49834..65f8e76569 100644
+> --- a/docs/tools/virtiofsd.rst
+> +++ b/docs/tools/virtiofsd.rst
+> @@ -17,13 +17,24 @@ This program is designed to work with QEMU's ``--device vhost-user-fs-pci``
+>  but should work with any virtual machine monitor (VMM) that supports
+>  vhost-user.  See the Examples section below.
+>  
+> -This program must be run as the root user.  Upon startup the program will
+> -switch into a new file system namespace with the shared directory tree as its
+> -root.  This prevents "file system escapes" due to symlinks and other file
+> -system objects that might lead to files outside the shared directory.  The
+> -program also sandboxes itself using seccomp(2) to prevent ptrace(2) and other
+> -vectors that could allow an attacker to compromise the system after gaining
+> -control of the virtiofsd process.
+> +This program must be run as the root user.  The program drops privileges where
+> +possible during startup although it must be able to create and access files
+> +with any uid/gid:
+> +
+> +* The ability to invoke syscalls is limited using seccomp(2).
+> +* Linux capabilities(7) are dropped.
+> +
+> +In "namespace" sandbox mode the program switches into a new file system
+> +namespace and invokes pivot_root(2) to make the shared directory tree its root.
+> +A new pid and net namespace is also created to isolate the process.
+> +
+> +In "chroot" sandbox mode the program invokes chroot(2) to make the shared
+> +directory tree its root. This mode is intended for container environments where
+> +the container runtime has already set up the namespaces and the program does
+> +not have permission to create namespaces itself.
+> +
+> +Both sandbox modes prevent "file system escapes" due to symlinks and other file
+> +system objects that might lead to files outside the shared directory.
+>  
+>  Options
+>  -------
+> @@ -69,6 +80,13 @@ Options
+>    * readdirplus|no_readdirplus -
+>      Enable/disable readdirplus.  The default is ``readdirplus``.
+>  
+> +  * sandbox=namespace|chroot -
+> +    Sandbox mode:
+> +    - namespace: Create mount, pid, and net namespaces and pivot_root(2) into
+> +    the shared directory.
+> +    - chroot: chroot(2) into shared directory (use in containers).
+> +    The default is "namespace".
+> +
+>    * source=PATH -
+>      Share host directory tree located at PATH.  This option is required.
+>  
+> -- 
+> 2.26.2
+> 
 -- 
-2.28.0
+Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
 
 
