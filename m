@@ -2,91 +2,69 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D702DC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AAB6C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6129820874
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:11 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ry2ZwKE5"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6129820874
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	by mail.kernel.org (Postfix) with ESMTPS id D0D3520874
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 22:10:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D0D3520874
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54104 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55396 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXAgs-0005C4-HV
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:10:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39958)
+	id 1kXAhR-0005iz-Rk
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 18:10:45 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39260)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXAdP-0008R8-6m; Mon, 26 Oct 2020 18:06:36 -0400
-Received: from mail-ej1-x632.google.com ([2a00:1450:4864:20::632]:34726)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXAdL-0005l3-DO; Mon, 26 Oct 2020 18:06:33 -0400
-Received: by mail-ej1-x632.google.com with SMTP id gs25so16126230ejb.1;
- Mon, 26 Oct 2020 15:06:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=aL5quuceH2hv9yMMQO0Q69DZ/woSC+UgyYuLQtAgKFg=;
- b=ry2ZwKE5Si0UMOAXqImFephmZ5zHH94fFYpOsksXM1xm9qZSpWEshWQ52R+Fu0bSHs
- QvjjqVRA08RhmdbjwhzzHCPIOfEnVCy506eUoJSQOoPtKFlGIcF7WQSmR8t1HTAKTPIs
- zyG0g+mhcEh0W2RGs0kv/xA8KVw/pMtEwNkXqBi3q+MRn26JQZSyenw4amz/3vwG8jyf
- Ow2kbrTQjCMm8rLfu52nTbGix+Q1G01auRX3kgU/HrRCcBEc3Mn9Rb7lkwcp5neIUyZy
- ox0yMkIVh0ib0uZai26u6AGDZSM2iFYt0HQEunGcPDQKzu5jbI8mKGIILcaxDcGRYbCA
- RQUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=aL5quuceH2hv9yMMQO0Q69DZ/woSC+UgyYuLQtAgKFg=;
- b=GHMdnnK97qVy3xkXeRyLQbTuwjLy9KIOZWg9sorZWv8uEb7N1o/RsBscQDsBv5Mu1R
- B9bP1VoR1JSSfTM7+MBKtXx18LS97HaNXXspJaQ+eDWAKw/IlAedKRMXrpM58c1k4gsf
- 365XXe+JwHw5/vLufCyHcgYjdirk5ioh6et7TR0DfPeTS6voWD7WXifdFQTk9UTkverv
- BpqLBBBRZpjELAGKMJ0SrPA/kI5Jn5DIr/8uSGoinAAS0nlYixCV8WGuHOwbMDweSTia
- Ot4EVEyxQAwLvsznssKx7QOBGo71uhQLjI0tMtw7TTGAbVI8DPjv37sWz03UwdQ16j6l
- AboA==
-X-Gm-Message-State: AOAM532FoIzW/AE6vQrCW6v58966H4QdeO83LpohzDPO0ObWbYoheX8D
- ccvEwjC+L1XRfYRpM7LF+O7uyLP2IFA=
-X-Google-Smtp-Source: ABdhPJxglkxQM13a2FMTD32xCV2dfcSWRxWvNXY0kOT/I+YWrevNPJylD8kWv0/4zq9xNZ5Pju39RQ==
-X-Received: by 2002:a17:906:170f:: with SMTP id
- c15mr13931983eje.347.1603749987403; 
- Mon, 26 Oct 2020 15:06:27 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id f14sm39532edv.79.2020.10.26.15.06.25
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Mon, 26 Oct 2020 15:06:26 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAam-0005hq-L9
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:52 -0400
+Received: from mout.kundenserver.de ([212.227.126.135]:53981)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <laurent@vivier.eu>) id 1kXAak-0005Gb-S0
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 18:03:52 -0400
+Received: from localhost.localdomain ([82.252.139.38]) by
+ mrelayeu.kundenserver.de (mreue010 [212.227.15.167]) with ESMTPSA (Nemesis)
+ id 1M9FX5-1kQr4P2Dzj-006SYc; Mon, 26 Oct 2020 23:03:46 +0100
+From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 0/7] LED API patches for 2020-10-26
-Date: Mon, 26 Oct 2020 23:06:17 +0100
-Message-Id: <20201026220624.60878-1-f4bug@amsat.org>
+Subject: [PULL 7/8] linux-user: correct errno returned from accept4() syscall
+Date: Mon, 26 Oct 2020 23:03:38 +0100
+Message-Id: <20201026220339.195790-8-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20201026220339.195790-1-laurent@vivier.eu>
+References: <20201026220339.195790-1-laurent@vivier.eu>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::632;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x632.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
+Content-Transfer-Encoding: 8bit
+X-Provags-ID: V03:K1:fR27cjAFa6FuWbM/QS2BYXrlqXPE0ozWyGxPSvR3AN4R/ga+vcB
+ bDefKmDIG5T88l1vF2m2t5008k0FryLxhqNAmwF6mMTYjtcKTHINWcRD6CWydmUge8IuVrK
+ p8estLXp8w+N/utyzFXroJt44VSfOL117R3h4RfjtvHTaGasF9XEgU5zOAxai02bFqUXgZe
+ n6RBWjv5ZdeQgGbDfmBUg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:2NqcNlh0/Hw=:1TcqeMrfQRKwNga7b482Tf
+ JziB9mJ80hlu8LwAankCLO/Hh/oYmHz84DOVy46QAOJkZP3ARohizPcnKp8lNt2OpHqLQLusV
+ gc/sOA6+oSJCXIpv2EbIxyZ8hMEkDAFpqjbabb6hBR7RNGRuQR1KSC24BwAET2jieYSSQnC2r
+ cy+B4r03bGv13/L5tBnj0ePsPMIYyn11gA3DWebLQJ0BPo3zzbMmLXMPcsLiPD67AxooVNWpX
+ fmczzIUUBL5MVrmqcmwv8vOJXO/P/SZYwgBjYyDJi/tKEwl4iYk7tOHSvFkk5zWCaq4WfjXyq
+ dxSD3xielxD84+rZLYOq6RVTVNiYw0+SGceeRjOwlM89U72xHw5dxvm2pC/3aNf+2esqbE4nh
+ P8D9SPGNY8vco0izAF+ui8zzQqQXWNau8XBOE9K3K8ml0MeeIIj9gw6BIcmDJwIAeWUoSU7Ia
+ ps1lSWz6bQ==
+Received-SPF: none client-ip=212.227.126.135; envelope-from=laurent@vivier.eu;
+ helo=mout.kundenserver.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 18:03:46
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -18
+X-Spam_score: -1.9
 X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
+ SPF_NONE=0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,72 +77,48 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Andrew Jeffery <andrew@aj.id.au>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- qemu-arm@nongnu.org, Joel Stanley <joel@jms.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?q?C=C3=A9dric=20Le=20Goater?= <clg@kaod.org>
+Cc: Laurent Vivier <laurent@vivier.eu>, Matus Kysel <mkysel@tachyum.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a5fac424c76d6401ecde4ecb7d846e656d0d6e89=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/stefanha-gitlab/tags/block-pull-req=
-ue=3D=0D
-st' into staging (2020-10-26 10:33:59 +0000)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/philmd/qemu.git tags/led-api-20201026=0D
-=0D
-for you to fetch changes up to 06972067c48fc21a47445b5d706368f1129f216f:=0D
-=0D
-  hw/arm/tosa: Replace fprintf() calls by LED devices (2020-10-26 13:44:58 =
-+0=3D=0D
-100)=0D
-=0D
-----------------------------------------------------------------=0D
-API to model LED.=0D
-=0D
-CI jobs results:=0D
-. https://cirrus-ci.com/build/4879251751043072=0D
-. https://gitlab.com/philmd/qemu/-/pipelines/207661784=0D
-. https://travis-ci.org/github/philmd/qemu/builds/738958191=0D
-. https://app.shippable.com/github/philmd/qemu/runs/891/summary/console=0D
-----------------------------------------------------------------=0D
-=0D
-Philippe Mathieu-Daud=3DC3=3DA9 (7):=0D
-  hw/misc/led: Add a LED device=0D
-  hw/misc/led: Allow connecting from GPIO output=0D
-  hw/misc/led: Emit a trace event when LED intensity has changed=0D
-  hw/arm/aspeed: Add the 3 front LEDs drived by the PCA9552 #1=0D
-  hw/misc/mps2-fpgaio: Use the LED device=0D
-  hw/misc/mps2-scc: Use the LED device=0D
-  hw/arm/tosa: Replace fprintf() calls by LED devices=0D
-=0D
- include/hw/misc/led.h         |  97 ++++++++++++++++++++=0D
- include/hw/misc/mps2-fpgaio.h |   2 +=0D
- include/hw/misc/mps2-scc.h    |   2 +=0D
- include/hw/qdev-core.h        |  16 ++++=0D
- hw/arm/aspeed.c               |  20 +++++=0D
- hw/arm/tosa.c                 |  40 ++++-----=0D
- hw/misc/led.c                 | 161 ++++++++++++++++++++++++++++++++++=0D
- hw/misc/mps2-fpgaio.c         |  23 +++--=0D
- hw/misc/mps2-scc.c            |  27 +++---=0D
- MAINTAINERS                   |   6 ++=0D
- hw/arm/Kconfig                |   2 +=0D
- hw/misc/Kconfig               |   5 ++=0D
- hw/misc/meson.build           |   1 +=0D
- hw/misc/trace-events          |   6 +-=0D
- 14 files changed, 365 insertions(+), 43 deletions(-)=0D
- create mode 100644 include/hw/misc/led.h=0D
- create mode 100644 hw/misc/led.c=0D
-=0D
---=3D20=0D
-2.26.2=0D
-=0D
+From: Matus Kysel <mkysel@tachyum.com>
+
+accept4() returned wrong errno, that did not match current linux
+
+Signed-off-by: Matus Kysel <mkysel@tachyum.com>
+Reviewed-by: Laurent Vivier <laurent@vivier.eu>
+Message-Id: <20200930151616.3588165-1-mkysel@tachyum.com>
+Signed-off-by: Laurent Vivier <laurent@vivier.eu>
+---
+ linux-user/syscall.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/linux-user/syscall.c b/linux-user/syscall.c
+index f0df6aecef80..6fef8181e738 100644
+--- a/linux-user/syscall.c
++++ b/linux-user/syscall.c
+@@ -3491,16 +3491,16 @@ static abi_long do_accept4(int fd, abi_ulong target_addr,
+         return get_errno(safe_accept4(fd, NULL, NULL, host_flags));
+     }
+ 
+-    /* linux returns EINVAL if addrlen pointer is invalid */
++    /* linux returns EFAULT if addrlen pointer is invalid */
+     if (get_user_u32(addrlen, target_addrlen_addr))
+-        return -TARGET_EINVAL;
++        return -TARGET_EFAULT;
+ 
+     if ((int)addrlen < 0) {
+         return -TARGET_EINVAL;
+     }
+ 
+     if (!access_ok(VERIFY_WRITE, target_addr, addrlen))
+-        return -TARGET_EINVAL;
++        return -TARGET_EFAULT;
+ 
+     addr = alloca(addrlen);
+ 
+-- 
+2.26.2
+
 
