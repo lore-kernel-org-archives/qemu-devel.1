@@ -2,98 +2,85 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FBA8C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9142C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:44:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC9B320809
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:41:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E22DE2070E
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 20:44:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S74IotPw"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC9B320809
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PWzEIHvP"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E22DE2070E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55982 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX9Is-0008Lx-QK
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:41:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45356)
+	id 1kX9LW-0001CS-RE
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 16:44:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX999-00085n-Oz
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:31:16 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35689)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kX996-0001Fr-Tg
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:31:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603744271;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=5sLV2S/bDWEeRRkRpqHP93e9AMjdbRR3fIDEpnXsZD0=;
- b=S74IotPwLPibwJOPANyRXZ6Qumx6uAjrv1awebNtXAaZtgLfQjplGVXjGxiLdDb7n3l+8s
- yNlRJmaPmrkSwvtmYIjIY4rCDRFtNARXcB+mZ6Osk0dbJZWo6GGTboVyMVdwi2kH7dCevI
- Jt1jPA5mKXSkikda027YeQUJPM3Vy/g=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-182-mxRZjSfTNnGPpo_YDdIe4w-1; Mon, 26 Oct 2020 16:31:09 -0400
-X-MC-Unique: mxRZjSfTNnGPpo_YDdIe4w-1
-Received: by mail-ej1-f71.google.com with SMTP id d12so6122013ejr.19
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:31:08 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kX9KM-0000kA-MR
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:42:50 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37825)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kX9KJ-0002yX-DP
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 16:42:50 -0400
+Received: by mail-ej1-x642.google.com with SMTP id p9so15728387eji.4
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 13:42:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+ bh=iU+ZRCG+AFRiE68g8Pl07JSs3G5DgNs8ih7zug8A1HQ=;
+ b=PWzEIHvPW+VznJn19AVD7Bx+08i5IAOS2/6PE9JbTfLk6xl/cwYiX64tlup1eXpJF1
+ jirFSe4y4RBvPOT101PHq5wwsVROBTjiJ6dZR6z397LnMnhPlx7boOid2NNVJFbI0mki
+ n4Fo2lX3swyRIjT07qrxui8Xpln1JCdxpJqORpQp66ISL04KzeVITlDNEwDcdmwBVoUw
+ AgWpdXUcDl1EUGNVfZ7d7J/XsGNm/Q9VcS9SXvMPj7T7IAbELTESHuFw5ulQ54qIoOb6
+ 6kBlVO/foCIVb1cQVx++WO38bcZDlNG16Va3G0A0IrMilTjo7bUPfDT3N0F8k+H7d312
+ uR4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=5sLV2S/bDWEeRRkRpqHP93e9AMjdbRR3fIDEpnXsZD0=;
- b=ZWTIhUfl2/i3xt20vEHMtmywdXR8RvYaRLk2o7RbT3n2sessADcIWbDU15M/cw9d8W
- 9y+lcqQGFV2z7d84IKNBgCosG0KxBNh46h8p76hXlIDo3XAAUk5t+h1vZ1UxhwdxEIgN
- ufXupFSmZQWHBoHqB1pfjxcu3wflOFPo7eSyY17tmNvFti4lfxkHXHj4BCfBx232nv5E
- 523ShDf5jeku6hAw3uy9JCZeO5Q5GUV9kflb1PG0p85PebP7j2mjYICBIfJH/1MdJ9FV
- pCnlHfnOjmzeS6VujkXeVRtrh3C4+uqgwwaEYR2NC3I2IgbrdBoZryxji3OxWj8zZ8gL
- 4tNQ==
-X-Gm-Message-State: AOAM533BaD0EQqFI3Z4gIkG11HIJuqpP/d4bpC0YdTo3FUFcfo4o2RcT
- 8b+F9kBdo1FutSOOXMGvL0KlxLInqShmQ7dKhRRui9YMMN110c8rqy1nxZ9KZl/h0wilg+I+el0
- d5mCMaslp9naFHXfY7T2hNG4mqswYN/Y=
-X-Received: by 2002:a17:906:9483:: with SMTP id
- t3mr18336619ejx.390.1603744267791; 
- Mon, 26 Oct 2020 13:31:07 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyJeW1fe5CPGUtGatbzD37uiWmfNj8QyOTgvUJ2OWpPqTx+MlK5wgZKAUKQauwp44GMC9kp6VttaJFKEYJh6fE=
-X-Received: by 2002:a17:906:9483:: with SMTP id
- t3mr18336605ejx.390.1603744267593; 
- Mon, 26 Oct 2020 13:31:07 -0700 (PDT)
+ :message-id:subject:to;
+ bh=iU+ZRCG+AFRiE68g8Pl07JSs3G5DgNs8ih7zug8A1HQ=;
+ b=LCAGn0g96Q/SLfimmguyXSbAyM6rjFzxcrIRou9aRoKtmQMhDQjfknObIGyjAN+ovL
+ anTzGSj3C8zPJSkPAMqDf5uAUSTp2PxDPxZ6D+/lVH51NmnMDJZDVVLGiwofgwKQ8J4f
+ 2/3kMGGNqYUcoRyLCSC63tIys/AhUe2FpG9DplJEOjgYJdOQW9H0gCS/0TrJvC423av+
+ 87qzTIWIzPNL8QIOIInElzrH1kAs5g3puY05ge+VFU+eS0yLzoppuqvcSEFV1lBwW2wE
+ G680/OcjP5anmCOCmxxNyTrmZN2leJ5vu9yqtzjDUe2GNGFeNQ4WlSrS+KsD7d4Z6t3Q
+ KhgQ==
+X-Gm-Message-State: AOAM5323xq+15++tyLF0hkMsNYD8ZRrY+S5Pk49vtr2JKB2zhQDQciNk
+ VtId1kxwSxkLkxoDzpxypA0yNogrWKydrrPlLl0MZ2r35eM=
+X-Google-Smtp-Source: ABdhPJzzJInurkN+I5jFNa5W7sVXhw5ctJ/TP4zXCR8hieW2KkkrM7oBdsnBPAlLtdjxChmpXypLWGqasTbWWq+DrNI=
+X-Received: by 2002:a17:906:af8d:: with SMTP id
+ mj13mr17134664ejb.85.1603744965414; 
+ Mon, 26 Oct 2020 13:42:45 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAE2XoE-nwJRgoraR9HFoDpW-tgGER6CAaY0s5gyR8BGDH3aHxA@mail.gmail.com>
-In-Reply-To: <CAE2XoE-nwJRgoraR9HFoDpW-tgGER6CAaY0s5gyR8BGDH3aHxA@mail.gmail.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Mon, 26 Oct 2020 21:30:55 +0100
-Message-ID: <CABgObfYHei8Dp-5vrvaf27fwwwhzf=G+b7nhm9AzACYQX349WA@mail.gmail.com>
-Subject: Re: How about using a bot to guard the pull request can be apply?
- like rust compiler does.
-To: Yonggang Luo <luoyonggang@gmail.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/alternative; boundary="00000000000061924c05b298cfb9"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201015151829.14656-1-peter.maydell@linaro.org>
+In-Reply-To: <20201015151829.14656-1-peter.maydell@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Mon, 26 Oct 2020 20:42:34 +0000
+Message-ID: <CAFEAcA8g-n4gqy0Az7cBsQJqcQpsc_vH2=VatqqdRt034YD5JQ@mail.gmail.com>
+Subject: Re: [PATCH 0/2] armv7m_systick: Rewrite to use ptimers
+To: qemu-arm <qemu-arm@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,73 +94,80 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- qemu-level <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---00000000000061924c05b298cfb9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Ping for review ?
 
-We will certainly have a lot more flexibility in handling application of
-patches as soon as we get closer to a gating CI.
+thanks
+-- PMM
 
-We should first make sure that Gitlab CI (directly or through custom
-runners, Travis, or cirrus-build) can cover all the scenarios and tests
-that Peter has in his CI. The main missing ones are NetBSD and OpenBSD
-builds, and various additional tests for warnings during builds, though
-there may be more. Once we do that, imagination is the limit. :-)
-
-Paolo
-
-Il lun 26 ott 2020, 21:15 =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) <luoyon=
-ggang@gmail.com> ha
-scritto:
-
-> Peter can @bots try to apply pull request, if pull request apply and all
-> ci tests passed, then the bot automatically merge the pull request and pu=
-sh
-> to the mirrors.
-> We even doesn't need gitlab or other things, only need the bot to monitor
-> the instruction from Peter.
+On Thu, 15 Oct 2020 at 16:18, Peter Maydell <peter.maydell@linaro.org> wrote:
+>
+> This patch series rewrites our implementation of the armv7m systick
+> timer to use ptimers.
+>
+> The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
+> clear-on-write counter.  Our current implementation has various bugs
+> and dubious workarounds in it (for instance see
+> https://bugs.launchpad.net/qemu/+bug/1872237).
+>
+> We have an implementation of a simple decrementing counter and we put
+> a lot of effort into making sure it handles the interesting corner
+> cases (like "spend a cycle at 0 before reloading"), so rather than
+> trying to fix these all over again in systick's hand-rolled countdown
+> code it's much simpler to just rewrite it to use a ptimer.
+>
+> Unfortunately this is a migration compatibility break, which will
+> affect all M-profile boards.
+>
+> Among other bugs, this fixes
+> https://bugs.launchpad.net/qemu/+bug/1872237 : now writes to SYST_CVR
+> when the timer is enabled correctly do nothing; when the timer is
+> enabled via SYST_CSR.ENABLE, the ptimer code will (because of
+> POLICY_NO_IMMEDIATE_RELOAD) arrange that after one timer tick the
+> counter is reloaded from SYST_RVR and then counts down from there, as
+> the architecture requires.
+>
+> Side note: the trace from the test program in LP1872237 won't look
+> quite like it does on the hardware: under QEMU the "waiting for 1000
+> ms" debug printing generally reports a SYST_CVR value of 0.  This is
+> because QEMU's emulated CPU is comparatively fast and our systick has a
+> hard-wired value of 1MHz for the frequency of the 'external reference
+> clock', which means that execution of the guest code reaches "read
+> SYST_CVR" before the first tick of the timer clock after enabling of
+> the timer (which is where the reload of SYST_CVR from SYST_RVR is
+> required).  The exception is the first iteration, where the time QEMU
+> takes to translate the guest code is enough that the timer tick
+> happens before the register read.  You can also get the timer tick to
+> win the race by fiddling around with the -icount option (which
+> effectively is slowing down the emulated CPU speed).
+>
+> Some day we should model both the 'system_clock_scale' (ie the CPU
+> clock frequency) and the 'external reference clock' as QEMU clock
+> source/sinks so that board code can specify the correct reference
+> clock frequency.
+>
+> Patch 1 is a minor tweak to the ptimer code to suppress a spurious
+> warning message for the "timer callback function disabled the ptimer"
+> case, which the systick timer uses.  Patch 2 is the actual
+> conversion.
+>
+> thanks
+> -- PMM
+>
+>
+> Peter Maydell (2):
+>   hw/core/ptimer: Support ptimer being disabled by timer callback
+>   hw/timer/armv7m_systick: Rewrite to use ptimers
+>
+>  include/hw/timer/armv7m_systick.h |   3 +-
+>  hw/core/ptimer.c                  |   4 +
+>  hw/timer/armv7m_systick.c         | 124 +++++++++++++-----------------
+>  3 files changed, 58 insertions(+), 73 deletions(-)
 >
 > --
->          =E6=AD=A4=E8=87=B4
-> =E7=A4=BC
-> =E7=BD=97=E5=8B=87=E5=88=9A
-> Yours
->     sincerely,
-> Yonggang Luo
+> 2.20.1
 >
-
---00000000000061924c05b298cfb9
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"auto"><div>We will certainly have a lot more flexibility in han=
-dling application of patches as soon as we get closer to a gating CI.<div d=
-ir=3D"auto"><br></div><div dir=3D"auto">We should first make sure that Gitl=
-ab CI (directly or through custom runners, Travis, or cirrus-build) can cov=
-er all the scenarios and tests that Peter has in his CI. The main missing o=
-nes are NetBSD and OpenBSD builds, and various additional tests for warning=
-s during builds, though there may be more. Once we do that, imagination is =
-the limit. :-)</div><div dir=3D"auto"><br></div><div dir=3D"auto">Paolo</di=
-v><br><div class=3D"gmail_quote"><div dir=3D"ltr" class=3D"gmail_attr">Il l=
-un 26 ott 2020, 21:15 =E7=BD=97=E5=8B=87=E5=88=9A(Yonggang Luo) &lt;<a href=
-=3D"mailto:luoyonggang@gmail.com">luoyonggang@gmail.com</a>&gt; ha scritto:=
-<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0 0 0 .8ex;bord=
-er-left:1px #ccc solid;padding-left:1ex"><div dir=3D"ltr">Peter can @bots t=
-ry to apply pull request, if pull request apply and all ci tests passed, th=
-en the bot automatically merge the pull request and push to the mirrors.<di=
-v>We even doesn&#39;t need gitlab or other things, only need the bot to mon=
-itor the instruction from Peter.</div><div><div><br></div>-- <br><div dir=
-=3D"ltr" data-smartmail=3D"gmail_signature">=C2=A0 =C2=A0 =C2=A0 =C2=A0=C2=
-=A0 =E6=AD=A4=E8=87=B4<br>=E7=A4=BC<br>=E7=BD=97=E5=8B=87=E5=88=9A<br>Yours=
-<br>=C2=A0 =C2=A0 sincerely,<br>Yonggang Luo<br></div></div></div>
-</blockquote></div></div></div>
-
---00000000000061924c05b298cfb9--
-
 
