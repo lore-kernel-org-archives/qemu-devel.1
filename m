@@ -2,93 +2,94 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E4D0C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:12:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19AB9C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:13:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 93C6520706
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:12:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A90A820706
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="qGr20bG/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 93C6520706
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="D23ejDbD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A90A820706
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36856 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX62l-0007pn-LN
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:12:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45694)
+	id 1kX63Q-0000kF-Nn
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:13:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46546)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX5xN-0001F5-ST; Mon, 26 Oct 2020 13:06:53 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:47009)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kX60K-0005Ia-1k
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:09:57 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:42585)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kX5xM-0006hx-6a; Mon, 26 Oct 2020 13:06:53 -0400
-Received: by mail-ed1-x543.google.com with SMTP id 33so10166666edq.13;
- Mon, 26 Oct 2020 10:06:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=tIszaKGNqPIJV+sN1CBQl0wxddGCvwGIsfIqZ8Fa/m4=;
- b=qGr20bG/TSjViAUsd41E96HADy2RA3qz+0YtWTQw+NjlZB4iG4REj1/fqOsS2a1udB
- hfdk9qmHJUBWMIcDeqvqr09eGVOOr1aul5Dxse225fv1AeUvVFaJn42vnOBbtqMWQ2jd
- hebqxRKyewhgbrU+TGVlQteril8XxO997sS8xVEimo1Ze5K7ffft9a+8pv+duJLZ7gGr
- NYY7mw6XyotiNUaW104xl9pb4aBcsNL7Vu3Y0gYWSooRQp29+BHWiYOYeclIlPzw8RN/
- c6zsQMbPJzV90FOT7TdWDP0o7V6E9vvYbkNX5OlVXbatCXKEBYd030t3tSrIfwnOXcRg
- 7DiA==
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kX60G-000700-RZ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 13:09:55 -0400
+Received: by mail-wr1-x444.google.com with SMTP id j7so13491146wrt.9
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 10:09:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=A3cvVT79n3JsZfAXZXtD6kWKJfj8sCr2NWHDwhO+tks=;
+ b=D23ejDbDao6xMERec7njSeyeBo0HT1ZzRcQwEXKoxiFfJbaB8YCZkc/eXhGG8bpMAK
+ 17mrSGGoy8T/8mo9DDVEdo8FY6mK4tTxBFhqRbj+OxFHmVobBSTg5fNySYRzGkIFu8PF
+ /DMsfHjgNGD6VNdltmQSO3rpss909mIiRbsXR8Zaz/K3yY/iZ/ytNBkPCI7McjI2BC5+
+ bwP4S99W1VNMnmt9WhWm2qW392jRpSLnvEnTBroT/vV1z9QEm59a44IEWPnOJCL3LX/j
+ R7rGGPBsdaJ3Ziyo+d4DiA3/tthdbz+G73CnYr3HoMmF7V6LeIBs//aBYMJXrXcAHIRm
+ itDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=tIszaKGNqPIJV+sN1CBQl0wxddGCvwGIsfIqZ8Fa/m4=;
- b=LgCqrao73J1k6VReAFqQwQS9TCGGJvs2HbZAMYtJeewXm2xPmA24KHfo8HAwPVo8nh
- qAIg5z86Y1EO5Xp7Omf/OcfeiWR03oqkESvsD49l+TFjdxp7daVmOmjb0cX3pVCHSkFy
- kdQk6X75SDKRMbxjxELFgzIFjw9NWxZHKA39tANeASPPTqAIaRTGY4ShijpvxA1QiWnC
- CKEktCPnqcL8FxtE/E1Pct2L0idjv4GYGphBuJXF2eRj8K8iMxjmT0AOB6A5KUBGETXz
- GXGrOpFdY+9cZC8JJaQaC0AznJWZrfDW22SQvsPAp0yCQ3AmW01/tY7VLnNKkKxsEn3j
- A2AQ==
-X-Gm-Message-State: AOAM531Tx84QvZ4pzJsr0oCnBpvuL1WejY9DUTt7WcHZcODpZcDV5A1U
- TbZBJLEc9BhbEqXvY8IB3Wg=
-X-Google-Smtp-Source: ABdhPJzGpLanY7W/3/jo6V6CvgMvxrxB/JIpWsEuIL/nZJamhsCiyKE8jTXlJMNy8FGIuwFvuhSB5g==
-X-Received: by 2002:a50:d69e:: with SMTP id r30mr16303216edi.383.1603732010427; 
- Mon, 26 Oct 2020 10:06:50 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id b6sm5777172edu.21.2020.10.26.10.06.49
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Mon, 26 Oct 2020 10:06:49 -0700 (PDT)
-Subject: Re: [PATCH] docs/system: Deprecate raspi2/raspi3 machine aliases
-To: qemu-devel@nongnu.org
-References: <20201019082121.1544550-1-f4bug@amsat.org>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <490c9656-a7ee-6988-472f-e8e7d909d9e1@amsat.org>
-Date: Mon, 26 Oct 2020 18:06:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=A3cvVT79n3JsZfAXZXtD6kWKJfj8sCr2NWHDwhO+tks=;
+ b=jhJ1JH0oA/Jzd8E+zBaWvVdu6bnisYzDoL0X8w46CxVN6R+kjQkK2IhPYttNrdIGsR
+ /lwAOiQhxRnBqpiopxW3fCaaLJY7+0MeKXNWIPLKz3WPVelh/d2pqu2SO2PNuILHMKvz
+ SJHzhGth8oe8xAOe9VEtuhOkVquKNbeYFFGnBKmxNwqBbbg/jXmdS5DhmXVmlTgrqcME
+ wAFm6hRZrzwNWlo+SIfiXBDv3ZKK5iXjlAY/lpQTaqqD/AXVbrGY4OUpxeN46+UfgazP
+ q5Msd/Htn9sCnHyAcOpS1RQQYE/9xvC2obndEB/IORIkoV7nFsqTsIZWlc2jvFFMgeFV
+ GO4A==
+X-Gm-Message-State: AOAM530qBy5+USh5WPaSUKcIV1JMhGEpGT9Q+5WfIKVtdT1idnvew7K4
+ b5NDB/XCADSdssIjNfi/UMMcQg==
+X-Google-Smtp-Source: ABdhPJzSyZI/jFTPQ8kyaXSaUHMfY8iThTDIOsyV9JCIiwXmF/KqW5Mz0y/ij3bLhdWxvjMumj/f+g==
+X-Received: by 2002:adf:a50e:: with SMTP id i14mr19199835wrb.121.1603732190599; 
+ Mon, 26 Oct 2020 10:09:50 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id k16sm20444673wmi.5.2020.10.26.10.09.49
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Mon, 26 Oct 2020 10:09:49 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9B6B31FF7E;
+ Mon, 26 Oct 2020 17:09:48 +0000 (GMT)
+References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ <20201026143028.3034018-2-pbonzini@redhat.com>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/15] alpha: remove bios_name
+In-reply-to: <20201026143028.3034018-2-pbonzini@redhat.com>
+Date: Mon, 26 Oct 2020 17:09:48 +0000
+Message-ID: <87blgohq1v.fsf@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <20201019082121.1544550-1-f4bug@amsat.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -103,43 +104,20 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: libvir-list@redhat.com, qemu-arm@nongnu.org,
- Andrew Baumann <Andrew.Baumann@microsoft.com>
+Cc: philmd@redhat.com, Richard Henderson <richard.henderson@linaro.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Ping? (patch Acked).
 
-On 10/19/20 10:21 AM, Philippe Mathieu-Daudé wrote:
-> Since commit aa35ec2213b ("hw/arm/raspi: Use more
-> specific machine names") the raspi2/raspi3 machines
-> have been renamed as raspi2b/raspi3b.
-> 
-> As more Raspberry Pi 2/3 models are emulated, in order
-> to avoid confusion deprecate the raspi2/raspi3 machine
-> aliases.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-> ---
->   docs/system/deprecated.rst | 5 +++++
->   1 file changed, 5 insertions(+)
-> 
-> diff --git a/docs/system/deprecated.rst b/docs/system/deprecated.rst
-> index 905628f3a0c..f0c7aaeb2ff 100644
-> --- a/docs/system/deprecated.rst
-> +++ b/docs/system/deprecated.rst
-> @@ -355,6 +355,11 @@ This machine has been renamed ``fuloong2e``.
->   These machine types are very old and likely can not be used for live migration
->   from old QEMU versions anymore. A newer machine type should be used instead.
->   
-> +Raspberry Pi ``raspi2`` and ``raspi3`` machines (since 5.2)
-> +'''''''''''''''''''''''''''''''''''''
-> +
-> +These machines have been respectively renamed ``raspi2b`` and ``raspi3b``.
-> +
->   Device options
->   --------------
->   
-> 
+Paolo Bonzini <pbonzini@redhat.com> writes:
+
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
 
