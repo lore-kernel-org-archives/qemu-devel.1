@@ -2,87 +2,85 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E528C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:54:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3D470C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:55:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 94B5624641
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:54:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C25252224A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:55:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JCcEp3Fb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 94B5624641
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Lxa8Ne1J"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C25252224A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48664 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5l9-0005ZP-8w
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:54:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41402)
+	id 1kX5lu-0006tZ-Mn
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:55:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41638)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5jt-00056v-J9
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:52:59 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:39100)
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kX5km-0005bv-PZ
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:53:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53584)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5jp-0004fS-OG
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:52:56 -0400
+ (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
+ id 1kX5kk-0004v6-Bb
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:53:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603731170;
+ s=mimecast20190719; t=1603731229;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=aSAECN1rOh1RDoF+w42zxD8/cd0u5IeZdo7PG+SJk1E=;
- b=JCcEp3Fb7qksaDmY86Lyl3aqhFpiuHr82o0z1iFsVh3GSaAX8wYxAZWwxcOgxlGDTLlDSe
- vvvv+o09TCGnTG1y7/7i6NPhYy1l5YwRwT+1fxNtYoY4fbOpmswQn2w2pbGVkMJIuwgK/g
- ibdMdkhwtuJBIgs3bjMwUcEG2MGaPS8=
+ bh=w+WvarrL7aXAqkWTtfoAsVr15lmSCbTNkuuzYMTUwz8=;
+ b=Lxa8Ne1J5o9QDjPm9HuIavRpWNh+HK8AtXJJ5E2a9jcM70O2yT4QFwxWef2ARWkLWFi35s
+ 4toYqXb9eyuqAPcW3kcQOCnPcmQwzVi47HE71TZNCWVEKYcFlSSxyjiNrh1x+QgNC08xCC
+ koOvk2PzDCJIisluLC1lhydhhQ45/eI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-476-j1LepEjGNASnrHjkagncDA-1; Mon, 26 Oct 2020 12:52:46 -0400
-X-MC-Unique: j1LepEjGNASnrHjkagncDA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-435-mUn_LrreOJS2WE8bbn8cBw-1; Mon, 26 Oct 2020 12:53:44 -0400
+X-MC-Unique: mUn_LrreOJS2WE8bbn8cBw-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D47BA809DC0;
- Mon, 26 Oct 2020 16:52:44 +0000 (UTC)
-Received: from work-vm (ovpn-112-208.ams2.redhat.com [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 91E516EF50;
- Mon, 26 Oct 2020 16:52:40 +0000 (UTC)
-Date: Mon, 26 Oct 2020 16:52:37 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Re: [PULL 00/16] migration queue
-Message-ID: <20201026165237.GJ3277@work-vm>
-References: <20201026161952.149188-1-dgilbert@redhat.com>
- <160373038097.1984.565441285420567282@66eaa9a8a123>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5A4EA809DDC;
+ Mon, 26 Oct 2020 16:53:43 +0000 (UTC)
+Received: from localhost (ovpn-114-214.ams2.redhat.com [10.36.114.214])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EA7695C22E;
+ Mon, 26 Oct 2020 16:53:42 +0000 (UTC)
+Date: Mon, 26 Oct 2020 16:53:41 +0000
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Jiahui Cen <cenjiahui@huawei.com>
+Subject: Re: [PATCH v3 0/9] block-backend: Introduce I/O hang
+Message-ID: <20201026165341.GM52035@stefanha-x1.localdomain>
+References: <20201022130303.1092-1-cenjiahui@huawei.com>
 MIME-Version: 1.0
-In-Reply-To: <160373038097.1984.565441285420567282@66eaa9a8a123>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20201022130303.1092-1-cenjiahui@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="kunpHVz1op/+13PW"
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -96,99 +94,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: yubihong@huawei.com, peter.maydell@linaro.org, peterx@redhat.com,
- quintela@redhat.com
+Cc: kwolf@redhat.com, zhang.zhanghailiang@huawei.com, qemu-block@nongnu.org,
+ qemu-devel@nongnu.org, mreitz@redhat.com, fangying1@huawei.com,
+ jsnow@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* no-reply@patchew.org (no-reply@patchew.org) wrote:
-> Patchew URL: https://patchew.org/QEMU/20201026161952.149188-1-dgilbert@redhat.com/
-> 
-> 
-> 
-> Hi,
-> 
-> This series seems to have some coding style problems. See output below for
-> more information:
-> 
-> Type: series
-> Message-id: 20201026161952.149188-1-dgilbert@redhat.com
-> Subject: [PULL 00/16] migration queue
-> 
-> === TEST SCRIPT BEGIN ===
-> #!/bin/bash
-> git rev-parse base > /dev/null || exit 0
-> git config --local diff.renamelimit 0
-> git config --local diff.renames True
-> git config --local diff.algorithm histogram
-> ./scripts/checkpatch.pl --mailback base..
-> === TEST SCRIPT END ===
-> 
-> Updating 3c8cf5a9c21ff8782164d1def7f44bd888713384
-> From https://github.com/patchew-project/qemu
->  - [tag update]      patchew/1603704987-20977-1-git-send-email-kwankhede@nvidia.com -> patchew/1603704987-20977-1-git-send-email-kwankhede@nvidia.com
->  * [new tag]         patchew/20201026161952.149188-1-dgilbert@redhat.com -> patchew/20201026161952.149188-1-dgilbert@redhat.com
-> Switched to a new branch 'test'
-> eec7173 migration-test: Only hide error if !QTEST_LOG
-> 3cf5619 migration/postcopy: Release fd before going into 'postcopy-pause'
-> 05826d6 migration: Sync requested pages after postcopy recovery
-> e3ab9bd migration: Maintain postcopy faulted addresses
-> 94c47fd migration: Introduce migrate_send_rp_message_req_pages()
-> 37f5d13 migration: Pass incoming state into qemu_ufd_copy_ioctl()
-> d212778 migration: using trace_ to replace DPRINTF
-> 57fda59 migration: Delete redundant spaces
-> 5b093f1 migration: Open brace '{' following function declarations go on the next line
-> 0b60dca migration: Do not initialise statics and globals to 0 or NULL
-> 2f219b6 migration: Add braces {} for if statement
-> 3fdcabc migration: Open brace '{' following struct go on the same line
-> 63bb26e migration: Add spaces around operator
-> fadaa39 migration: Don't use '#' flag of printf format
-> e568828 migration: Do not use C99 // comments
-> e477d01 migration: Drop unused VMSTATE_FLOAT64 support
-> 
-> === OUTPUT BEGIN ===
-> 1/16 Checking commit e477d010bf93 (migration: Drop unused VMSTATE_FLOAT64 support)
-> 2/16 Checking commit e568828c0e63 (migration: Do not use C99 // comments)
-> 3/16 Checking commit fadaa39cfb42 (migration: Don't use '#' flag of printf format)
-> 4/16 Checking commit 63bb26e930c4 (migration: Add spaces around operator)
-> ERROR: spaces required around that '*' (ctx:WxV)
-> #65: FILE: migration/savevm.c:523:
-> +    .subsections = (const VMStateDescription *[]) {
->                                               ^
-> 
-> total: 1 errors, 0 warnings, 59 lines checked
+--kunpHVz1op/+13PW
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-We decided that was preferable
+On Thu, Oct 22, 2020 at 09:02:54PM +0800, Jiahui Cen wrote:
+> A VM in the cloud environment may use a virutal disk as the backend stora=
+ge,
+> and there are usually filesystems on the virtual block device. When backe=
+nd
+> storage is temporarily down, any I/O issued to the virtual block device w=
+ill
+> cause an error. For example, an error occurred in ext4 filesystem would m=
+ake
+> the filesystem readonly. However a cloud backend storage can be soon reco=
+vered.
+> For example, an IP-SAN may be down due to network failure and will be onl=
+ine
+> soon after network is recovered. The error in the filesystem may not be
+> recovered unless a device reattach or system restart. So an I/O rehandle =
+is
+> in need to implement a self-healing mechanism.
+>=20
+> This patch series propose a feature called I/O hang. It can rehandle AIOs
+> with EIO error without sending error back to guest. From guest's perspect=
+ive
+> of view it is just like an IO is hanging and not returned. Guest can get
+> back running smoothly when I/O is recovred with this feature enabled.
 
-> 
-> Patch 4/16 has style problems, please review.  If any of these errors
-> are false positives report them to the maintainer, see
-> CHECKPATCH in MAINTAINERS.
-> 
-> 5/16 Checking commit 3fdcabce2015 (migration: Open brace '{' following struct go on the same line)
-> 6/16 Checking commit 2f219b67cf64 (migration: Add braces {} for if statement)
-> 7/16 Checking commit 0b60dca56f19 (migration: Do not initialise statics and globals to 0 or NULL)
-> 8/16 Checking commit 5b093f15f482 (migration: Open brace '{' following function declarations go on the next line)
-> 9/16 Checking commit 57fda592d44b (migration: Delete redundant spaces)
-> 10/16 Checking commit d21277810b4a (migration: using trace_ to replace DPRINTF)
-> 11/16 Checking commit 37f5d13fa1bb (migration: Pass incoming state into qemu_ufd_copy_ioctl())
-> 12/16 Checking commit 94c47fdc32f4 (migration: Introduce migrate_send_rp_message_req_pages())
-> 13/16 Checking commit e3ab9bded382 (migration: Maintain postcopy faulted addresses)
-> 14/16 Checking commit 05826d6ec62a (migration: Sync requested pages after postcopy recovery)
-> 15/16 Checking commit 3cf5619e375b (migration/postcopy: Release fd before going into 'postcopy-pause')
-> 16/16 Checking commit eec7173d989d (migration-test: Only hide error if !QTEST_LOG)
-> === OUTPUT END ===
-> 
-> Test command exited with code: 1
-> 
-> 
-> The full log is available at
-> http://patchew.org/logs/20201026161952.149188-1-dgilbert@redhat.com/testing.checkpatch/?type=message.
-> ---
-> Email generated automatically by Patchew [https://patchew.org/].
-> Please send your feedback to patchew-devel@redhat.com
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Hi,
+This feature seems like an extension of the existing -drive
+rerror=3D/werror=3D parameters:
+
+  werror=3Daction,rerror=3Daction
+      Specify which action to take on write and read errors. Valid
+      actions are: "ignore" (ignore the error and try to continue),
+      "stop" (pause QEMU), "report" (report the error to the guest),
+      "enospc" (pause QEMU only if the host disk is full; report the
+      error to the guest otherwise).  The default setting is
+      werror=3Denospc and rerror=3Dreport.
+
+That mechanism already has a list of requests to retry and live
+migration integration. Using the werror=3D/rerror=3D mechanism would avoid
+code duplication between these features. You could add a
+werror/rerror=3Dretry error action for this feature.
+
+Does that sound good?
+
+Stefan
+
+--kunpHVz1op/+13PW
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+W/xUACgkQnKSrs4Gr
+c8hxFgf8CgOCj1dic0ybfLWvtP/Ijm75I7X9ZXBaEg+CiQIF+pwk0726/o7RyYV1
+Ri8wAXmENKK8dFnCDZnJLfXVdK4vKhlceSzN7vREh0YGhIYJCSDqXxV8MCgwMepW
+9noJRZ9E8HY6/lYHp053K6j1siAPeeIxEubldELgBFrehS5SYwOXv/5hMX+kSrTD
+Tl6xuiSnae6L/autdoavqKaMdZol1q89OaEFMFXfsMoU2sQjzmLHIzaI0dT6C6mi
+YJK2pPQQkiiQ8YwGO1F8zl6GEp9j2wFSbVtIJJmgTxnVuNducfdmUYu2nZMehos2
+EEpCD/8HJ1QkFSlZ8BqhSGGIkuLnGg==
+=KoV9
+-----END PGP SIGNATURE-----
+
+--kunpHVz1op/+13PW--
 
 
