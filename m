@@ -4,61 +4,62 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BC30C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:10:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CBE56C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:13:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E789A223EA
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:10:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 47BE2223AC
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:13:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hP+Rno7y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E789A223EA
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RVkzIAbY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 47BE2223AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41576 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49446 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzSc-0007k3-P4
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:10:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38790)
+	id 1kWzUy-0002lL-2i
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:13:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38704)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWzP1-0002bE-Sl
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:07:00 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46573)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWzOs-0002TL-C6
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:06:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:50038)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWzOx-0006f2-2x
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:06:59 -0400
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kWzOq-0006ch-N8
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:06:50 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603706813;
+ s=mimecast20190719; t=1603706808;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:content-type:content-type:in-reply-to:in-reply-to:
- references:references; bh=Q7utiPbMI+tm18kijyblHQxsmeyYZVDQzQn75XCpiJ8=;
- b=hP+Rno7y3GLZWok9uWektJI5cSGzUxulM/vcVCfCm5f+zOb//vE3WuOGTtnF5fQi0SGVFF
- GPAtuIAoQifGow9LlWggpcwECraZ+K0w2aOtRQpUbns6jzevUUr63aU7k7YJgg/xuuviNT
- e7wBbtKqxvfXCSnOZkHGK+zJ/1LJ5ho=
+ references:references; bh=q3npmmAYQgwjsXjr7HvTSfti3EGmRvKx+HzB3bP0fMU=;
+ b=RVkzIAbY+UBsSGiuXKjth56rRC5YLayos3ZUA6jreK5BpcToWa0WlMw3TgrWNKrN+UQUB/
+ 6DL9jTOSXFuFLygbdqJC9rcZcRASn4U9E4btTH/X9fpeDTAqPXHwdocfaLnIHhRqGMuWiI
+ emYr38MRDtfpueIIjy2lCnHDzm8fN+c=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-282-U-ydJKnnO6Oz4SIS7qtBKw-1; Mon, 26 Oct 2020 06:06:50 -0400
-X-MC-Unique: U-ydJKnnO6Oz4SIS7qtBKw-1
+ us-mta-433-PffQBB1kPv-dYq66yNKTjQ-1; Mon, 26 Oct 2020 06:06:45 -0400
+X-MC-Unique: PffQBB1kPv-dYq66yNKTjQ-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
  [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7A1CD10E2188;
- Mon, 26 Oct 2020 10:06:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 992716123A;
+ Mon, 26 Oct 2020 10:06:44 +0000 (UTC)
 Received: from thuth.com (ovpn-112-104.ams2.redhat.com [10.36.112.104])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 609EB8B849;
- Mon, 26 Oct 2020 10:06:48 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7E86E8B843;
+ Mon, 26 Oct 2020 10:06:43 +0000 (UTC)
 From: Thomas Huth <thuth@redhat.com>
 To: qemu-devel@nongnu.org,
 	Peter Maydell <peter.maydell@linaro.org>
-Subject: [PULL 09/31] memory: Add FlatView foreach function
-Date: Mon, 26 Oct 2020 11:06:10 +0100
-Message-Id: <20201026100632.212530-10-thuth@redhat.com>
+Subject: [PULL 06/31] tests/qtest: Make npcm7xx_timer-test conditional on
+ CONFIG_NPCM7XX
+Date: Mon, 26 Oct 2020 11:06:07 +0100
+Message-Id: <20201026100632.212530-7-thuth@redhat.com>
 In-Reply-To: <20201026100632.212530-1-thuth@redhat.com>
 References: <20201026100632.212530-1-thuth@redhat.com>
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
@@ -67,16 +68,16 @@ Authentication-Results: relay.mimecast.com;
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=thuth@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -30
-X-Spam_score: -3.1
-X-Spam_bar: ---
-X-Spam_report: (-3.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=-1, RCVD_IN_MSPIKE_WL=-0.01,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,58 +96,37 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Alexander Bulekov <alxndr@bu.edu>
+From: Havard Skinnemoen <hskinnemoen@google.com>
 
-Acked-by: Paolo Bonzini <pbonzini@redhat.com>
-Reviewed-by: Darren Kenny <darren.kenny@oracle.com>
-Signed-off-by: Alexander Bulekov <alxndr@bu.edu>
-Message-Id: <20201023150746.107063-2-alxndr@bu.edu>
+This test won't work if qemu was compiled without CONFIG_NPCM7XX, as
+pointed out by Thomas Huth on a different patch.
+
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+Message-Id: <20201023210637.351238-2-hskinnemoen@google.com>
 Signed-off-by: Thomas Huth <thuth@redhat.com>
 ---
- include/exec/memory.h |  5 +++++
- softmmu/memory.c      | 13 +++++++++++++
- 2 files changed, 18 insertions(+)
+ tests/qtest/meson.build | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/include/exec/memory.h b/include/exec/memory.h
-index 622207bde1..042918dd16 100644
---- a/include/exec/memory.h
-+++ b/include/exec/memory.h
-@@ -719,6 +719,11 @@ static inline FlatView *address_space_to_flatview(AddressSpace *as)
-     return qatomic_rcu_read(&as->current_map);
- }
+diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
+index 28d4068718..7e0ecaa2c5 100644
+--- a/tests/qtest/meson.build
++++ b/tests/qtest/meson.build
+@@ -133,12 +133,13 @@ qtests_sparc64 = \
+   (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
+   ['prom-env-test', 'boot-serial-test']
  
-+typedef int (*flatview_cb)(Int128 start,
-+                           Int128 len,
-+                           const MemoryRegion*, void*);
-+
-+void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque);
- 
- /**
-  * struct MemoryRegionSection: describes a fragment of a #MemoryRegion
-diff --git a/softmmu/memory.c b/softmmu/memory.c
-index 403ff3abc9..a5d1641820 100644
---- a/softmmu/memory.c
-+++ b/softmmu/memory.c
-@@ -656,6 +656,19 @@ static void render_memory_region(FlatView *view,
-     }
- }
- 
-+void flatview_for_each_range(FlatView *fv, flatview_cb cb , void *opaque)
-+{
-+    FlatRange *fr;
-+
-+    assert(fv);
-+    assert(cb);
-+
-+    FOR_EACH_FLAT_RANGE(fr, fv) {
-+        if (cb(fr->addr.start, fr->addr.size, fr->mr, opaque))
-+            break;
-+    }
-+}
-+
- static MemoryRegion *memory_region_get_flatview_root(MemoryRegion *mr)
- {
-     while (mr->enabled) {
++qtests_npcm7xx = ['npcm7xx_timer-test']
+ qtests_arm = \
+   (config_all_devices.has_key('CONFIG_PFLASH_CFI02') ? ['pflash-cfi02-test'] : []) +         \
++  (config_all_devices.has_key('CONFIG_NPCM7XX') ? qtests_npcm7xx : []) + \
+   ['arm-cpu-features',
+    'microbit-test',
+    'm25p80-test',
+-   'npcm7xx_timer-test',
+    'test-arm-mptimer',
+    'boot-serial-test',
+    'hexloader-test']
 -- 
 2.18.2
 
