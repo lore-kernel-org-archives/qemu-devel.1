@@ -4,66 +4,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 666E7C4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:21:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E770FC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:21:58 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EF5C32463C
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:21:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71DDD2463C
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 16:21:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fr74ZzCB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EF5C32463C
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MXKDy1oD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71DDD2463C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53752 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54340 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5Fm-0005sS-Pm
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:21:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60072)
+	id 1kX5Ft-000679-HI
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 12:21:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60286)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5E9-00041e-LA
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:09 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24188)
+ id 1kX5EO-0004Fn-Ne
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX5E7-0008UM-44
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:09 -0400
+ id 1kX5EL-00009O-FU
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 12:20:24 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603729205;
+ s=mimecast20190719; t=1603729217;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=l5xaHCq17iNYCwX5xwZ/x4WrzmZ7UADqx3uFxpQLlfc=;
- b=Fr74ZzCBgdRjQhOwBpZIyy47aB8jrNZejfXPpiry4pgD2kk6XWayLl0bk8Z2SLl042yfCb
- GkZpbRF3XQnBkFtZoGyv9E6zVOGczVeOJ2YqMtbrF6oMAugYRSTzs2D506Ukd9lBTSMBv6
- gCwnmNgqgCpmK7efbU02zKDWAvF7f+A=
+ bh=zVKc2e9k/V1lT7QNozwVCIpi+MpJJr6mZH0jhTcph6A=;
+ b=MXKDy1oDnPC2sDUm5qPFVTpjLtVX9w22MiTNjPtzcTS2ZDL14oozkZhjH+15pkcvpT1wy4
+ l3kCksx+0lBf5Jha7MLXGTJvPVIFteTPzbsNuwGn5XHET3toPAKY+IVTmNXEvAjEtGhhEc
+ cIhwpMeVorC1F6QoMIH/yg+Vc6XPTPM=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-7CDGDqMeOI-i5SmuwMfYtA-1; Mon, 26 Oct 2020 12:20:01 -0400
-X-MC-Unique: 7CDGDqMeOI-i5SmuwMfYtA-1
+ us-mta-221-10BFls6zODSOStrqmumSAA-1; Mon, 26 Oct 2020 12:20:13 -0400
+X-MC-Unique: 10BFls6zODSOStrqmumSAA-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3BB9080364B;
- Mon, 26 Oct 2020 16:20:00 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4FCEC1084CA0;
+ Mon, 26 Oct 2020 16:20:12 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0B08B5D9E8;
- Mon, 26 Oct 2020 16:19:58 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 1F54D5D9E8;
+ Mon, 26 Oct 2020 16:20:01 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, yubihong@huawei.com, peterx@redhat.com,
  peter.maydell@linaro.org
-Subject: [PULL 01/16] migration: Drop unused VMSTATE_FLOAT64 support
-Date: Mon, 26 Oct 2020 16:19:37 +0000
-Message-Id: <20201026161952.149188-2-dgilbert@redhat.com>
+Subject: [PULL 03/16] migration: Don't use '#' flag of printf format
+Date: Mon, 26 Oct 2020 16:19:39 +0000
+Message-Id: <20201026161952.149188-4-dgilbert@redhat.com>
 In-Reply-To: <20201026161952.149188-1-dgilbert@redhat.com>
 References: <20201026161952.149188-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -102,112 +102,54 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peter Maydell <peter.maydell@linaro.org>
+From: Bihong Yu <yubihong@huawei.com>
 
-Commit ef96e3ae9698d6 in January 2019 removed the last user of the
-VMSTATE_FLOAT64* macros. These were used by targets which defined
-their floating point register file as an array of 'float64'.
-
-We used to try to maintain a stricter distinction between
-'float64' (a type for holding an integer representing an IEEE float)
-and 'uint64_t', including having a debug option for 'float64' being
-a struct and supposedly mandatory macros for converting between
-float64 and uint64_t. We no longer think that's a usefully
-strong distinction to draw and we allow ourselves to freely
-assume that float64 really is just a 64-bit integer type, so
-for new targets we would simply recommend use of the uint64_t type
-for a floating point register file. The float64 type remains
-as a useful way of documenting in the type signature of helper
-functions and the like that they expect to receive an IEEE float
-from the TCG generated code rather than an arbitrary integer.
-
-Since the VMSTATE_FLOAT64* macros have no remaining users and
-we don't recommend new code uses them, delete them.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Message-Id: <20201022120830.5938-1-peter.maydell@linaro.org>
+Signed-off-by: Bihong Yu <yubihong@huawei.com>
+Reviewed-by: Chuan Zheng <zhengchuan@huawei.com>
 Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Juan Quintela <quintela@redhat.com>
+Message-Id: <1603163448-27122-3-git-send-email-yubihong@huawei.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- include/migration/vmstate.h | 13 -------------
- migration/vmstate-types.c   | 26 --------------------------
- 2 files changed, 39 deletions(-)
+ migration/block.c | 2 +-
+ migration/ram.c   | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/migration/vmstate.h b/include/migration/vmstate.h
-index f68ed7db13..4d71dc8fba 100644
---- a/include/migration/vmstate.h
-+++ b/include/migration/vmstate.h
-@@ -219,7 +219,6 @@ extern const VMStateInfo vmstate_info_uint64;
- #define VMS_NULLPTR_MARKER (0x30U) /* '0' */
- extern const VMStateInfo vmstate_info_nullptr;
- 
--extern const VMStateInfo vmstate_info_float64;
- extern const VMStateInfo vmstate_info_cpudouble;
- 
- extern const VMStateInfo vmstate_info_timer;
-@@ -997,12 +996,6 @@ extern const VMStateInfo vmstate_info_qlist;
-     VMSTATE_SINGLE_TEST(_f, _s, _t, 0, vmstate_info_uint64, uint64_t)
- 
- 
--#define VMSTATE_FLOAT64_V(_f, _s, _v)                                 \
--    VMSTATE_SINGLE(_f, _s, _v, vmstate_info_float64, float64)
--
--#define VMSTATE_FLOAT64(_f, _s)                                       \
--    VMSTATE_FLOAT64_V(_f, _s, 0)
--
- #define VMSTATE_TIMER_PTR_TEST(_f, _s, _test)                             \
-     VMSTATE_POINTER_TEST(_f, _s, _test, vmstate_info_timer, QEMUTimer *)
- 
-@@ -1114,12 +1107,6 @@ extern const VMStateInfo vmstate_info_qlist;
- #define VMSTATE_INT64_ARRAY(_f, _s, _n)                               \
-     VMSTATE_INT64_ARRAY_V(_f, _s, _n, 0)
- 
--#define VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, _v)                       \
--    VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_float64, float64)
--
--#define VMSTATE_FLOAT64_ARRAY(_f, _s, _n)                             \
--    VMSTATE_FLOAT64_ARRAY_V(_f, _s, _n, 0)
--
- #define VMSTATE_CPUDOUBLE_ARRAY_V(_f, _s, _n, _v)                     \
-     VMSTATE_ARRAY(_f, _s, _n, _v, vmstate_info_cpudouble, CPU_DoubleU)
- 
-diff --git a/migration/vmstate-types.c b/migration/vmstate-types.c
-index 35e784c9d9..e22d41d73d 100644
---- a/migration/vmstate-types.c
-+++ b/migration/vmstate-types.c
-@@ -420,32 +420,6 @@ const VMStateInfo vmstate_info_uint16_equal = {
-     .put  = put_uint16,
- };
- 
--/* floating point */
--
--static int get_float64(QEMUFile *f, void *pv, size_t size,
--                       const VMStateField *field)
--{
--    float64 *v = pv;
--
--    *v = make_float64(qemu_get_be64(f));
--    return 0;
--}
--
--static int put_float64(QEMUFile *f, void *pv, size_t size,
--                       const VMStateField *field, QJSON *vmdesc)
--{
--    uint64_t *v = pv;
--
--    qemu_put_be64(f, float64_val(*v));
--    return 0;
--}
--
--const VMStateInfo vmstate_info_float64 = {
--    .name = "float64",
--    .get  = get_float64,
--    .put  = put_float64,
--};
--
- /* CPU_DoubleU type */
- 
- static int get_cpudouble(QEMUFile *f, void *pv, size_t size,
+diff --git a/migration/block.c b/migration/block.c
+index 4b8576b8d6..273392be78 100644
+--- a/migration/block.c
++++ b/migration/block.c
+@@ -998,7 +998,7 @@ static int block_load(QEMUFile *f, void *opaque, int version_id)
+                    (addr == 100) ? '\n' : '\r');
+             fflush(stdout);
+         } else if (!(flags & BLK_MIG_FLAG_EOS)) {
+-            fprintf(stderr, "Unknown block migration flags: %#x\n", flags);
++            fprintf(stderr, "Unknown block migration flags: 0x%x\n", flags);
+             return -EINVAL;
+         }
+         ret = qemu_file_get_error(f);
+diff --git a/migration/ram.c b/migration/ram.c
+index 433489d633..6ed4f9e507 100644
+--- a/migration/ram.c
++++ b/migration/ram.c
+@@ -3298,7 +3298,7 @@ static int ram_load_postcopy(QEMUFile *f)
+             multifd_recv_sync_main();
+             break;
+         default:
+-            error_report("Unknown combination of migration flags: %#x"
++            error_report("Unknown combination of migration flags: 0x%x"
+                          " (postcopy mode)", flags);
+             ret = -EINVAL;
+             break;
+@@ -3576,7 +3576,7 @@ static int ram_load_precopy(QEMUFile *f)
+             if (flags & RAM_SAVE_FLAG_HOOK) {
+                 ram_control_load_hook(f, RAM_CONTROL_HOOK, NULL);
+             } else {
+-                error_report("Unknown combination of migration flags: %#x",
++                error_report("Unknown combination of migration flags: 0x%x",
+                              flags);
+                 ret = -EINVAL;
+             }
 -- 
 2.28.0
 
