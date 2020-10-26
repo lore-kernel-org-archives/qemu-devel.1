@@ -7,49 +7,49 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA7EC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:00:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B82BC388F9
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:00:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EFBD1238E6
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:00:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F1ACF223B0
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 17:00:12 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="iKYCE3v1"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EFBD1238E6
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="ki1Xc+q7"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F1ACF223B0
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35612 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35664 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX5qt-0003X2-0k
+	id 1kX5qt-0003YL-Rh
 	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 13:00:11 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43122)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43132)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kX5pt-0001vh-PF; Mon, 26 Oct 2020 12:59:09 -0400
-Received: from fanzine.igalia.com ([178.60.130.6]:49282)
+ id 1kX5pu-0001w0-BD; Mon, 26 Oct 2020 12:59:10 -0400
+Received: from fanzine.igalia.com ([178.60.130.6]:49284)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <berto@igalia.com>)
- id 1kX5pr-0005YB-HO; Mon, 26 Oct 2020 12:59:09 -0400
+ id 1kX5pr-0005YA-Hr; Mon, 26 Oct 2020 12:59:10 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
  s=20170329; 
  h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From;
- bh=U9wt3R+OsQZtKKQT9SwSzSD2L/6TuHPIm4Guch2dRSo=; 
- b=iKYCE3v1Ry0DovSh+Pasf3H83qmrY/s4awTDJNbMBvAloC54rH/HMuw+rpSCSwT8nfrJpLA5+KbrYgtK19qKnw6hP7QFIm9LN8rNS2PJ8GImlaF/55iQQiJ8WIzJ4WcPPB21oYB93h6HMKO4YHr6McPX8VyapByoFvSRulZJXXHQB/TxtUyZy4jc+IZfzEenT1jgzL3ij3aTNZAsymmDHRdcalObeT6MTdhMWX+UQ4jRPb/arwXH9nE5tqIr9D0pQsPnwY4lNXzawMdzG6dRTycJaI+8yvYSP6uPEl+df+tiiLZXTbO6TxcoFu30tsTnqnoXWJhkywkomlWx/gup/Q==;
+ bh=ftAwabZBpdcM44WAFgIFa71ZrUALlWSQ2ageGPq1EwE=; 
+ b=ki1Xc+q7wpHExm/ZI/94my58DIuA9lR4mHDMQ/xn9dMHiDURmu9GwB5ul5cR28L+itMk8exKbDstmaK3xuhwP9nE0FSupenTpgUU48U7QOXue34oFfj3eDmCeos+Upgn9YlGyUiOqiICGIPMALbXb6munEYd9Jk6Om6KgK1bMXl9ZSnSWSLA/mVZ9nMlkDNJxMsdbLktm4DXM5HFbC9MjDWOwm/UqtTna2yvTSsA79WCfY0YQm9ScGDAKsDnPZXq4joEOPcM0WtgKL0fQVs+PW8Yj6/4NpD43Rfxps9I+RPHy0WGUAp+67RrsWAsgs6RXRfUhdXfGEVZLB9VfNFdJg==;
 Received: from [81.0.38.168] (helo=perseus.local)
  by fanzine.igalia.com with esmtpsa 
  (Cipher TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim)
- id 1kX5pU-0006VY-L4; Mon, 26 Oct 2020 17:58:44 +0100
+ id 1kX5pU-0006VX-LQ; Mon, 26 Oct 2020 17:58:44 +0100
 Received: from berto by perseus.local with local (Exim 4.92)
  (envelope-from <berto@igalia.com>)
- id 1kX5pG-0004Pu-HE; Mon, 26 Oct 2020 17:58:30 +0100
+ id 1kX5pG-0004Pw-I7; Mon, 26 Oct 2020 17:58:30 +0100
 From: Alberto Garcia <berto@igalia.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v5 1/2] qcow2: Report BDRV_BLOCK_ZERO more accurately in
- bdrv_co_block_status()
-Date: Mon, 26 Oct 2020 17:58:26 +0100
-Message-Id: <66fa0914a0e2b727ab6d1b63ca773d7cd29a9a9e.1603731354.git.berto@igalia.com>
+Subject: [PATCH v5 2/2] qcow2: Skip copy-on-write when allocating a zero
+ cluster
+Date: Mon, 26 Oct 2020 17:58:27 +0100
+Message-Id: <6d77cab968c501c44d6e1089b9bc91b04170b49e.1603731354.git.berto@igalia.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <cover.1603731354.git.berto@igalia.com>
 References: <cover.1603731354.git.berto@igalia.com>
@@ -85,45 +85,144 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If a BlockDriverState supports backing files but has none then any
-unallocated area reads back as zeroes.
+Since commit c8bb23cbdbe32f5c326365e0a82e1b0e68cdcd8a when a write
+request results in a new allocation QEMU first tries to see if the
+rest of the cluster outside the written area contains only zeroes.
 
-bdrv_co_block_status() is only reporting this is if want_zero is true,
-but this is an inexpensive test and there is no reason not to do it in
-all cases.
+In that case, instead of doing a normal copy-on-write operation and
+writing explicit zero buffers to disk, the code zeroes the whole
+cluster efficiently using pwrite_zeroes() with BDRV_REQ_NO_FALLBACK.
 
-Suggested-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+This improves performance very significantly but it only happens when
+we are writing to an area that was completely unallocated before. Zero
+clusters (QCOW2_CLUSTER_ZERO_*) are treated like normal clusters and
+are therefore slower to allocate.
+
+This happens because the code uses bdrv_is_allocated_above() rather
+bdrv_block_status_above(). The former is not as accurate for this
+purpose but it is faster. However in the case of qcow2 the underlying
+call does already report zero clusters just fine so there is no reason
+why we cannot use that information.
+
+After testing 4KB writes on an image that only contains zero clusters
+this patch results in almost five times more IOPS.
+
 Signed-off-by: Alberto Garcia <berto@igalia.com>
 Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 ---
- block/io.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ include/block/block.h |  2 ++
+ block/io.c            | 27 +++++++++++++++++++++++++++
+ block/qcow2.c         | 35 +++++++++++++++++++----------------
+ 3 files changed, 48 insertions(+), 16 deletions(-)
 
+diff --git a/include/block/block.h b/include/block/block.h
+index d16c401cb4..c9d7c58765 100644
+--- a/include/block/block.h
++++ b/include/block/block.h
+@@ -508,6 +508,8 @@ int bdrv_is_allocated(BlockDriverState *bs, int64_t offset, int64_t bytes,
+ int bdrv_is_allocated_above(BlockDriverState *top, BlockDriverState *base,
+                             bool include_base, int64_t offset, int64_t bytes,
+                             int64_t *pnum);
++int coroutine_fn bdrv_co_is_zero_fast(BlockDriverState *bs, int64_t offset,
++                                      int64_t bytes);
+ 
+ bool bdrv_is_read_only(BlockDriverState *bs);
+ int bdrv_can_set_read_only(BlockDriverState *bs, bool read_only,
 diff --git a/block/io.c b/block/io.c
-index 02528b3823..6fe1b275b6 100644
+index 6fe1b275b6..c33cecd58d 100644
 --- a/block/io.c
 +++ b/block/io.c
-@@ -2282,17 +2282,17 @@ static int coroutine_fn bdrv_co_block_status(BlockDriverState *bs,
+@@ -2447,6 +2447,33 @@ int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
+                                    offset, bytes, pnum, map, file);
+ }
  
-     if (ret & (BDRV_BLOCK_DATA | BDRV_BLOCK_ZERO)) {
-         ret |= BDRV_BLOCK_ALLOCATED;
--    } else if (want_zero && bs->drv->supports_backing) {
-+    } else if (bs->drv->supports_backing) {
-         BlockDriverState *cow_bs = bdrv_cow_bs(bs);
++/*
++ * Check @bs (and its backing chain) to see if the range defined
++ * by @offset and @bytes is known to read as zeroes.
++ * Return 1 if that is the case, 0 otherwise and -errno on error.
++ * This test is meant to be fast rather than accurate so returning 0
++ * does not guarantee non-zero data.
++ */
++int coroutine_fn bdrv_co_is_zero_fast(BlockDriverState *bs, int64_t offset,
++                                      int64_t bytes)
++{
++    int ret;
++    int64_t pnum = bytes;
++
++    if (!bytes) {
++        return 1;
++    }
++
++    ret = bdrv_common_block_status_above(bs, NULL, false, false, offset,
++                                         bytes, &pnum, NULL, NULL);
++
++    if (ret < 0) {
++        return ret;
++    }
++
++    return (pnum == bytes) && (ret & BDRV_BLOCK_ZERO);
++}
++
+ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
+                                    int64_t bytes, int64_t *pnum)
+ {
+diff --git a/block/qcow2.c b/block/qcow2.c
+index b6cb4db8bb..4274806a2a 100644
+--- a/block/qcow2.c
++++ b/block/qcow2.c
+@@ -2387,26 +2387,26 @@ static bool merge_cow(uint64_t offset, unsigned bytes,
+     return false;
+ }
  
--        if (cow_bs) {
-+        if (!cow_bs) {
-+            ret |= BDRV_BLOCK_ZERO;
-+        } else if (want_zero) {
-             int64_t size2 = bdrv_getlength(cow_bs);
+-static bool is_unallocated(BlockDriverState *bs, int64_t offset, int64_t bytes)
+-{
+-    int64_t nr;
+-    return !bytes ||
+-        (!bdrv_is_allocated_above(bs, NULL, false, offset, bytes, &nr) &&
+-         nr == bytes);
+-}
+-
+-static bool is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
++/*
++ * Return 1 if the COW regions read as zeroes, 0 if not, < 0 on error.
++ * Note that returning 0 does not guarantee non-zero data.
++ */
++static int is_zero_cow(BlockDriverState *bs, QCowL2Meta *m)
+ {
+     /*
+      * This check is designed for optimization shortcut so it must be
+      * efficient.
+-     * Instead of is_zero(), use is_unallocated() as it is faster (but not
+-     * as accurate and can result in false negatives).
++     * Instead of is_zero(), use bdrv_co_is_zero_fast() as it is
++     * faster (but not as accurate and can result in false negatives).
+      */
+-    return is_unallocated(bs, m->offset + m->cow_start.offset,
+-                          m->cow_start.nb_bytes) &&
+-           is_unallocated(bs, m->offset + m->cow_end.offset,
+-                          m->cow_end.nb_bytes);
++    int ret = bdrv_co_is_zero_fast(bs, m->offset + m->cow_start.offset,
++                                   m->cow_start.nb_bytes);
++    if (ret <= 0) {
++        return ret;
++    }
++
++    return bdrv_co_is_zero_fast(bs, m->offset + m->cow_end.offset,
++                                m->cow_end.nb_bytes);
+ }
  
-             if (size2 >= 0 && offset >= size2) {
-                 ret |= BDRV_BLOCK_ZERO;
-             }
--        } else {
--            ret |= BDRV_BLOCK_ZERO;
+ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+@@ -2432,7 +2432,10 @@ static int handle_alloc_space(BlockDriverState *bs, QCowL2Meta *l2meta)
+             continue;
          }
-     }
+ 
+-        if (!is_zero_cow(bs, m)) {
++        ret = is_zero_cow(bs, m);
++        if (ret < 0) {
++            return ret;
++        } else if (ret == 0) {
+             continue;
+         }
  
 -- 
 2.20.1
