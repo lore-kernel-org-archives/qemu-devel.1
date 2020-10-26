@@ -4,66 +4,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AACC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:53:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F933C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:53:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC876207E8
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:53:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 19B1D2085B
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 18:53:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bF47kUPO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC876207E8
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qiab494s"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19B1D2085B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42700 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX7cD-0002e0-UK
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:53:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46144)
+	id 1kX7cP-0002nT-TL
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 14:53:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45716)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7U0-0002vW-La
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:42 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50173)
+ id 1kX7TE-0001mY-Ix
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:52 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49184)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kX7Tp-0003fi-M8
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:44:40 -0400
+ id 1kX7TC-0003Yq-NT
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 14:43:52 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603737868;
+ s=mimecast20190719; t=1603737830;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=SLY/dlgU9NWegTMDMCjripDSB6aIPuFY+GGEiKRwNXY=;
- b=bF47kUPOYFoNMNq4oi99n15L/fBFeTKmKnqJ/gBndoQnyvulHlIrQUlAW1vQ/UEx5KorRH
- WCBkBouy5BnrBr33rvgnaFHQ0sfE6SEWnZWHSiZHN14gklnc4U/XM5NfSnxsCKvygpkVV6
- FOMDuIDt5VNNo7bEZARN3tjoWaJ/XLM=
+ bh=xPCkua7gV4LrgXrFdgJVa7CS07YPMvArpaMM7Iipcmk=;
+ b=Qiab494s6Hiz/yfYPxMwa1615qav7EKCBpg8F4ex1bVCTMJiEUQOP2z8eakqO+Ab/djxwb
+ BM/ns9yxtgrcIezwwL8M+nc3xD7HZXi/vpbDDsNRM0QPp5KQp9z4N31+C8kP2ouBmbvHFc
+ SFxXIQrYwFSyGzT9Ne7ZlnbBjAaehpc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-518-0_V9Id99MCedEd-4ImcACQ-1; Mon, 26 Oct 2020 14:44:22 -0400
-X-MC-Unique: 0_V9Id99MCedEd-4ImcACQ-1
+ us-mta-517-7kq7t3RtOvaOek2xECjH0g-1; Mon, 26 Oct 2020 14:43:47 -0400
+X-MC-Unique: 7kq7t3RtOvaOek2xECjH0g-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
  [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8B5D51882FCB;
- Mon, 26 Oct 2020 18:44:21 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A20381009E30;
+ Mon, 26 Oct 2020 18:43:46 +0000 (UTC)
 Received: from dgilbert-t580.localhost (ovpn-112-208.ams2.redhat.com
  [10.36.112.208])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 729AF5D9E4;
- Mon, 26 Oct 2020 18:44:13 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3BE695D9CA;
+ Mon, 26 Oct 2020 18:43:45 +0000 (UTC)
 From: "Dr. David Alan Gilbert (git)" <dgilbert@redhat.com>
 To: qemu-devel@nongnu.org, stefanha@redhat.com, mreitz@redhat.com,
  misono.tomohiro@jp.fujitsu.com
-Subject: [PULL 16/16] tests/acceptance: Add virtiofs_submounts.py
-Date: Mon, 26 Oct 2020 18:43:31 +0000
-Message-Id: <20201026184331.272953-17-dgilbert@redhat.com>
+Subject: [PULL 03/16] virtiofsd: add container-friendly -o sandbox=chroot
+ option
+Date: Mon, 26 Oct 2020 18:43:18 +0000
+Message-Id: <20201026184331.272953-4-dgilbert@redhat.com>
 In-Reply-To: <20201026184331.272953-1-dgilbert@redhat.com>
 References: <20201026184331.272953-1-dgilbert@redhat.com>
 MIME-Version: 1.0
@@ -74,16 +75,16 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=dgilbert@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,709 +103,207 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Max Reitz <mreitz@redhat.com>
+From: Stefan Hajnoczi <stefanha@redhat.com>
 
-This test invokes several shell scripts to create a random directory
-tree full of submounts, and then check in the VM whether every submount
-has its own ID and the structure looks as expected.
+virtiofsd cannot run in a container because CAP_SYS_ADMIN is required to
+create namespaces.
 
-(Note that the test scripts must be non-executable, so Avocado will not
-try to execute them as if they were tests on their own, too.)
+Introduce a weaker sandbox mode that is sufficient in container
+environments because the container runtime already sets up namespaces.
+Use chroot to restrict path traversal to the shared directory.
 
-Because at this commit's date it is unlikely that the Linux kernel on
-the image provided by boot_linux.py supports submounts in virtio-fs, the
-test will be cancelled if no custom Linux binary is provided through the
-vmlinuz parameter.  (The on-image kernel can be used by providing an
-empty string via vmlinuz=.)
+virtiofsd loses the following:
 
-So, invoking the test can be done as follows:
-$ avocado run \
-    tests/acceptance/virtiofs_submounts.py \
-    -p vmlinuz=/path/to/linux/build/arch/x86/boot/bzImage
+1. Mount namespace. The process chroots to the shared directory but
+   leaves the mounts in place. Seccomp rejects mount(2)/umount(2)
+   syscalls.
 
-This test requires root privileges (through passwordless sudo -n),
-because at this point, virtiofsd requires them.  (If you have a
-timestamp_timeout period for sudoers (e.g. the default of 5 min), you
-can provide this by executing something like "sudo true" before invoking
-Avocado.)
+2. Pid namespace. This should be fine because virtiofsd is the only
+   process running in the container.
 
-Signed-off-by: Max Reitz <mreitz@redhat.com>
-Message-Id: <20200909184028.262297-9-mreitz@redhat.com>
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+3. Network namespace. This should be fine because seccomp already
+   rejects the connect(2) syscall, but an additional layer of security
+   is lost. Container runtime-specific network security policies can be
+   used drop network traffic (except for the vhost-user UNIX domain
+   socket).
+
+Signed-off-by: Stefan Hajnoczi <stefanha@redhat.com>
+Message-Id: <20201008085534.16070-1-stefanha@redhat.com>
+Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 Signed-off-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
 ---
- tests/acceptance/virtiofs_submounts.py        | 289 ++++++++++++++++++
- .../virtiofs_submounts.py.data/cleanup.sh     |  46 +++
- .../guest-cleanup.sh                          |  30 ++
- .../virtiofs_submounts.py.data/guest.sh       | 138 +++++++++
- .../virtiofs_submounts.py.data/host.sh        | 127 ++++++++
- 5 files changed, 630 insertions(+)
- create mode 100644 tests/acceptance/virtiofs_submounts.py
- create mode 100644 tests/acceptance/virtiofs_submounts.py.data/cleanup.sh
- create mode 100644 tests/acceptance/virtiofs_submounts.py.data/guest-cleanup.sh
- create mode 100644 tests/acceptance/virtiofs_submounts.py.data/guest.sh
- create mode 100644 tests/acceptance/virtiofs_submounts.py.data/host.sh
+ docs/tools/virtiofsd.rst         | 32 ++++++++++++++----
+ tools/virtiofsd/helper.c         |  8 +++++
+ tools/virtiofsd/passthrough_ll.c | 57 ++++++++++++++++++++++++++++++--
+ 3 files changed, 88 insertions(+), 9 deletions(-)
 
-diff --git a/tests/acceptance/virtiofs_submounts.py b/tests/acceptance/virtiofs_submounts.py
-new file mode 100644
-index 0000000000..8b207b3e57
---- /dev/null
-+++ b/tests/acceptance/virtiofs_submounts.py
-@@ -0,0 +1,289 @@
-+import logging
-+import re
-+import os
-+import subprocess
-+import time
-+
-+from avocado import skipUnless
-+from avocado_qemu import Test, BUILD_DIR
-+from avocado_qemu import wait_for_console_pattern
-+from avocado.utils import ssh
-+
-+from qemu.accel import kvm_available
-+
-+from boot_linux import BootLinux
-+
-+
-+def run_cmd(args):
-+    subp = subprocess.Popen(args,
-+                            stdout=subprocess.PIPE,
-+                            stderr=subprocess.PIPE,
-+                            universal_newlines=True)
-+    stdout, stderr = subp.communicate()
-+    ret = subp.returncode
-+
-+    return (stdout, stderr, ret)
-+
-+def has_passwordless_sudo():
-+    """
-+    This function is for use in a @avocado.skipUnless decorator, e.g.:
-+
-+        @skipUnless(*has_passwordless_sudo())
-+        def test_something_that_needs_sudo(self):
-+            ...
-+    """
-+
-+    _, stderr, exitcode = run_cmd(('sudo', '-n', 'true'))
-+    if exitcode != 0:
-+        return (False, f'Failed to use sudo -n: {stderr.strip()}')
-+    else:
-+        return (True, '')
-+
-+
-+class VirtiofsSubmountsTest(BootLinux):
-+    """
-+    :avocado: tags=arch:x86_64
-+    """
-+
-+    def get_portfwd(self):
-+        port = None
-+
-+        res = self.vm.command('human-monitor-command',
-+                              command_line='info usernet')
-+        for line in res.split('\r\n'):
-+            match = \
-+                re.search(r'TCP.HOST_FORWARD.*127\.0\.0\.1\s*(\d+)\s+10\.',
-+                          line)
-+            if match is not None:
-+                port = match[1]
-+                break
-+
-+        self.assertIsNotNone(port)
-+        self.log.debug('sshd listening on port: ' + port)
-+        return port
-+
-+    def ssh_connect(self, username, keyfile):
-+        self.ssh_logger = logging.getLogger('ssh')
-+        port = self.get_portfwd()
-+        self.ssh_session = ssh.Session('127.0.0.1', port=int(port),
-+                                       user=username, key=keyfile)
-+        for i in range(10):
-+            try:
-+                self.ssh_session.connect()
-+                return
-+            except:
-+                time.sleep(4)
-+                pass
-+        self.fail('sshd timeout')
-+
-+    def ssh_command(self, command):
-+        self.ssh_logger.info(command)
-+        result = self.ssh_session.cmd(command)
-+        stdout_lines = [line.rstrip() for line
-+                        in result.stdout_text.splitlines()]
-+        for line in stdout_lines:
-+            self.ssh_logger.info(line)
-+        stderr_lines = [line.rstrip() for line
-+                        in result.stderr_text.splitlines()]
-+        for line in stderr_lines:
-+            self.ssh_logger.warning(line)
-+
-+        self.assertEqual(result.exit_status, 0,
-+                         f'Guest command failed: {command}')
-+        return stdout_lines, stderr_lines
-+
-+    def run(self, args, ignore_error=False):
-+        stdout, stderr, ret = run_cmd(args)
-+
-+        if ret != 0:
-+            cmdline = ' '.join(args)
-+            if not ignore_error:
-+                self.fail(f'{cmdline}: Returned {ret}: {stderr}')
-+            else:
-+                self.log.warn(f'{cmdline}: Returned {ret}: {stderr}')
-+
-+        return (stdout, stderr, ret)
-+
-+    def set_up_shared_dir(self):
-+        atwd = os.getenv('AVOCADO_TEST_WORKDIR')
-+        self.shared_dir = os.path.join(atwd, 'virtiofs-shared')
-+
-+        os.mkdir(self.shared_dir)
-+
-+        self.run(('cp', self.get_data('guest.sh'),
-+                 os.path.join(self.shared_dir, 'check.sh')))
-+
-+        self.run(('cp', self.get_data('guest-cleanup.sh'),
-+                 os.path.join(self.shared_dir, 'cleanup.sh')))
-+
-+    def set_up_virtiofs(self):
-+        attmp = os.getenv('AVOCADO_TESTS_COMMON_TMPDIR')
-+        self.vfsdsock = os.path.join(attmp, 'vfsdsock')
-+
-+        self.run(('sudo', '-n', 'rm', '-f', self.vfsdsock), ignore_error=True)
-+
-+        self.virtiofsd = \
-+            subprocess.Popen(('sudo', '-n',
-+                              'tools/virtiofsd/virtiofsd',
-+                              f'--socket-path={self.vfsdsock}',
-+                              '-o', f'source={self.shared_dir}',
-+                              '-o', 'cache=always',
-+                              '-o', 'xattr',
-+                              '-o', 'announce_submounts',
-+                              '-f'),
-+                             stdout=subprocess.DEVNULL,
-+                             stderr=subprocess.PIPE,
-+                             universal_newlines=True)
-+
-+        while not os.path.exists(self.vfsdsock):
-+            if self.virtiofsd.poll() is not None:
-+                self.fail('virtiofsd exited prematurely: ' +
-+                          self.virtiofsd.communicate()[1])
-+            time.sleep(0.1)
-+
-+        self.run(('sudo', '-n', 'chmod', 'go+rw', self.vfsdsock))
-+
-+        self.vm.add_args('-chardev',
-+                         f'socket,id=vfsdsock,path={self.vfsdsock}',
-+                         '-device',
-+                         'vhost-user-fs-pci,queue-size=1024,chardev=vfsdsock' \
-+                             ',tag=host',
-+                         '-object',
-+                         'memory-backend-file,id=mem,size=1G,' \
-+                             'mem-path=/dev/shm,share=on',
-+                         '-numa',
-+                         'node,memdev=mem')
-+
-+    def launch_vm(self):
-+        self.launch_and_wait()
-+        self.ssh_connect('root', self.ssh_key)
-+
-+    def set_up_nested_mounts(self):
-+        scratch_dir = os.path.join(self.shared_dir, 'scratch')
-+        try:
-+            os.mkdir(scratch_dir)
-+        except FileExistsError:
-+            pass
-+
-+        args = ['bash', self.get_data('host.sh'), scratch_dir]
-+        if self.seed:
-+            args += [self.seed]
-+
-+        out, _, _ = self.run(args)
-+        seed = re.search(r'^Seed: \d+', out)
-+        self.log.info(seed[0])
-+
-+    def mount_in_guest(self):
-+        self.ssh_command('mkdir -p /mnt/host')
-+        self.ssh_command('mount -t virtiofs host /mnt/host')
-+
-+    def check_in_guest(self):
-+        self.ssh_command('bash /mnt/host/check.sh /mnt/host/scratch/share')
-+
-+    def live_cleanup(self):
-+        self.ssh_command('bash /mnt/host/cleanup.sh /mnt/host/scratch')
-+
-+        # It would be nice if the above was sufficient to make virtiofsd clear
-+        # all references to the mounted directories (so they can be unmounted
-+        # on the host), but unfortunately it is not.  To do so, we have to
-+        # resort to a remount.
-+        self.ssh_command('mount -o remount /mnt/host')
-+
-+        scratch_dir = os.path.join(self.shared_dir, 'scratch')
-+        self.run(('bash', self.get_data('cleanup.sh'), scratch_dir))
-+
-+    @skipUnless(*has_passwordless_sudo())
-+    def setUp(self):
-+        vmlinuz = self.params.get('vmlinuz')
-+        if vmlinuz is None:
-+            self.cancel('vmlinuz parameter not set; you must point it to a '
-+                        'Linux kernel binary to test (to run this test with ' \
-+                        'the on-image kernel, set it to an empty string)')
-+
-+        self.seed = self.params.get('seed')
-+
-+        atwd = os.getenv('AVOCADO_TEST_WORKDIR')
-+        self.ssh_key = os.path.join(atwd, 'id_ed25519')
-+
-+        self.run(('ssh-keygen', '-t', 'ed25519', '-f', self.ssh_key))
-+
-+        pubkey = open(self.ssh_key + '.pub').read()
-+
-+        super(VirtiofsSubmountsTest, self).setUp(pubkey)
-+
-+        if len(vmlinuz) > 0:
-+            self.vm.add_args('-kernel', vmlinuz,
-+                             '-append', 'console=ttyS0 root=/dev/sda1')
-+
-+        # Allow us to connect to SSH
-+        self.vm.add_args('-netdev', 'user,id=vnet,hostfwd=:127.0.0.1:0-:22',
-+                         '-device', 'e1000,netdev=vnet')
-+
-+        if not kvm_available(self.arch, self.qemu_bin):
-+            self.cancel(KVM_NOT_AVAILABLE)
-+        self.vm.add_args('-accel', 'kvm')
-+
-+    def tearDown(self):
-+        try:
-+            self.vm.shutdown()
-+        except:
-+            pass
-+
-+        scratch_dir = os.path.join(self.shared_dir, 'scratch')
-+        self.run(('bash', self.get_data('cleanup.sh'), scratch_dir),
-+                 ignore_error=True)
-+
-+    def test_pre_virtiofsd_set_up(self):
-+        self.set_up_shared_dir()
-+
-+        self.set_up_nested_mounts()
-+
-+        self.set_up_virtiofs()
-+        self.launch_vm()
-+        self.mount_in_guest()
-+        self.check_in_guest()
-+
-+    def test_pre_launch_set_up(self):
-+        self.set_up_shared_dir()
-+        self.set_up_virtiofs()
-+
-+        self.set_up_nested_mounts()
-+
-+        self.launch_vm()
-+        self.mount_in_guest()
-+        self.check_in_guest()
-+
-+    def test_post_launch_set_up(self):
-+        self.set_up_shared_dir()
-+        self.set_up_virtiofs()
-+        self.launch_vm()
-+
-+        self.set_up_nested_mounts()
-+
-+        self.mount_in_guest()
-+        self.check_in_guest()
-+
-+    def test_post_mount_set_up(self):
-+        self.set_up_shared_dir()
-+        self.set_up_virtiofs()
-+        self.launch_vm()
-+        self.mount_in_guest()
-+
-+        self.set_up_nested_mounts()
-+
-+        self.check_in_guest()
-+
-+    def test_two_runs(self):
-+        self.set_up_shared_dir()
-+
-+        self.set_up_nested_mounts()
-+
-+        self.set_up_virtiofs()
-+        self.launch_vm()
-+        self.mount_in_guest()
-+        self.check_in_guest()
-+
-+        self.live_cleanup()
-+        self.set_up_nested_mounts()
-+
-+        self.check_in_guest()
-diff --git a/tests/acceptance/virtiofs_submounts.py.data/cleanup.sh b/tests/acceptance/virtiofs_submounts.py.data/cleanup.sh
-new file mode 100644
-index 0000000000..2a6579a0fe
---- /dev/null
-+++ b/tests/acceptance/virtiofs_submounts.py.data/cleanup.sh
-@@ -0,0 +1,46 @@
-+#!/bin/bash
-+
-+function print_usage()
+diff --git a/docs/tools/virtiofsd.rst b/docs/tools/virtiofsd.rst
+index 7ecee49834..65f8e76569 100644
+--- a/docs/tools/virtiofsd.rst
++++ b/docs/tools/virtiofsd.rst
+@@ -17,13 +17,24 @@ This program is designed to work with QEMU's ``--device vhost-user-fs-pci``
+ but should work with any virtual machine monitor (VMM) that supports
+ vhost-user.  See the Examples section below.
+ 
+-This program must be run as the root user.  Upon startup the program will
+-switch into a new file system namespace with the shared directory tree as its
+-root.  This prevents "file system escapes" due to symlinks and other file
+-system objects that might lead to files outside the shared directory.  The
+-program also sandboxes itself using seccomp(2) to prevent ptrace(2) and other
+-vectors that could allow an attacker to compromise the system after gaining
+-control of the virtiofsd process.
++This program must be run as the root user.  The program drops privileges where
++possible during startup although it must be able to create and access files
++with any uid/gid:
++
++* The ability to invoke syscalls is limited using seccomp(2).
++* Linux capabilities(7) are dropped.
++
++In "namespace" sandbox mode the program switches into a new file system
++namespace and invokes pivot_root(2) to make the shared directory tree its root.
++A new pid and net namespace is also created to isolate the process.
++
++In "chroot" sandbox mode the program invokes chroot(2) to make the shared
++directory tree its root. This mode is intended for container environments where
++the container runtime has already set up the namespaces and the program does
++not have permission to create namespaces itself.
++
++Both sandbox modes prevent "file system escapes" due to symlinks and other file
++system objects that might lead to files outside the shared directory.
+ 
+ Options
+ -------
+@@ -69,6 +80,13 @@ Options
+   * readdirplus|no_readdirplus -
+     Enable/disable readdirplus.  The default is ``readdirplus``.
+ 
++  * sandbox=namespace|chroot -
++    Sandbox mode:
++    - namespace: Create mount, pid, and net namespaces and pivot_root(2) into
++    the shared directory.
++    - chroot: chroot(2) into shared directory (use in containers).
++    The default is "namespace".
++
+   * source=PATH -
+     Share host directory tree located at PATH.  This option is required.
+ 
+diff --git a/tools/virtiofsd/helper.c b/tools/virtiofsd/helper.c
+index 85770d63f1..2e181a49b5 100644
+--- a/tools/virtiofsd/helper.c
++++ b/tools/virtiofsd/helper.c
+@@ -166,6 +166,14 @@ void fuse_cmdline_help(void)
+            "                               enable/disable readirplus\n"
+            "                               default: readdirplus except with "
+            "cache=none\n"
++           "    -o sandbox=namespace|chroot\n"
++           "                               sandboxing mode:\n"
++           "                               - namespace: mount, pid, and net\n"
++           "                                 namespaces with pivot_root(2)\n"
++           "                                 into shared directory\n"
++           "                               - chroot: chroot(2) into shared\n"
++           "                                 directory (use in containers)\n"
++           "                               default: namespace\n"
+            "    -o timeout=<number>        I/O timeout (seconds)\n"
+            "                               default: depends on cache= option.\n"
+            "    -o writeback|no_writeback  enable/disable writeback cache\n"
+diff --git a/tools/virtiofsd/passthrough_ll.c b/tools/virtiofsd/passthrough_ll.c
+index 13fdb12367..f03b1f9a69 100644
+--- a/tools/virtiofsd/passthrough_ll.c
++++ b/tools/virtiofsd/passthrough_ll.c
+@@ -137,8 +137,14 @@ enum {
+     CACHE_ALWAYS,
+ };
+ 
++enum {
++    SANDBOX_NAMESPACE,
++    SANDBOX_CHROOT,
++};
++
+ struct lo_data {
+     pthread_mutex_t mutex;
++    int sandbox;
+     int debug;
+     int writeback;
+     int flock;
+@@ -163,6 +169,12 @@ struct lo_data {
+ };
+ 
+ static const struct fuse_opt lo_opts[] = {
++    { "sandbox=namespace",
++      offsetof(struct lo_data, sandbox),
++      SANDBOX_NAMESPACE },
++    { "sandbox=chroot",
++      offsetof(struct lo_data, sandbox),
++      SANDBOX_CHROOT },
+     { "writeback", offsetof(struct lo_data, writeback), 1 },
+     { "no_writeback", offsetof(struct lo_data, writeback), 0 },
+     { "source=%s", offsetof(struct lo_data, source), 0 },
+@@ -2660,6 +2672,41 @@ static void setup_capabilities(char *modcaps_in)
+     pthread_mutex_unlock(&cap.mutex);
+ }
+ 
++/*
++ * Use chroot as a weaker sandbox for environments where the process is
++ * launched without CAP_SYS_ADMIN.
++ */
++static void setup_chroot(struct lo_data *lo)
 +{
-+    if [ -n "$2" ]; then
-+        echo "Error: $2"
-+        echo
-+    fi
-+    echo "Usage: $1 <scratch dir>"
++    lo->proc_self_fd = open("/proc/self/fd", O_PATH);
++    if (lo->proc_self_fd == -1) {
++        fuse_log(FUSE_LOG_ERR, "open(\"/proc/self/fd\", O_PATH): %m\n");
++        exit(1);
++    }
++
++    /*
++     * Make the shared directory the file system root so that FUSE_OPEN
++     * (lo_open()) cannot escape the shared directory by opening a symlink.
++     *
++     * The chroot(2) syscall is later disabled by seccomp and the
++     * CAP_SYS_CHROOT capability is dropped so that tampering with the chroot
++     * is not possible.
++     *
++     * However, it's still possible to escape the chroot via lo->proc_self_fd
++     * but that requires first gaining control of the process.
++     */
++    if (chroot(lo->source) != 0) {
++        fuse_log(FUSE_LOG_ERR, "chroot(\"%s\"): %m\n", lo->source);
++        exit(1);
++    }
++
++    /* Move into the chroot */
++    if (chdir("/") != 0) {
++        fuse_log(FUSE_LOG_ERR, "chdir(\"/\"): %m\n");
++        exit(1);
++    }
 +}
 +
-+scratch_dir=$1
-+if [ -z "$scratch_dir" ]; then
-+    print_usage "$0" 'Scratch dir not given' >&2
-+    exit 1
-+fi
+ /*
+  * Lock down this process to prevent access to other processes or files outside
+  * source directory.  This reduces the impact of arbitrary code execution bugs.
+@@ -2667,8 +2714,13 @@ static void setup_capabilities(char *modcaps_in)
+ static void setup_sandbox(struct lo_data *lo, struct fuse_session *se,
+                           bool enable_syslog)
+ {
+-    setup_namespaces(lo, se);
+-    setup_mounts(lo->source);
++    if (lo->sandbox == SANDBOX_NAMESPACE) {
++        setup_namespaces(lo, se);
++        setup_mounts(lo->source);
++    } else {
++        setup_chroot(lo);
++    }
 +
-+cd "$scratch_dir/share" || exit 1
-+mps=(mnt*)
-+mp_i=0
-+for mp in "${mps[@]}"; do
-+    mp_i=$((mp_i + 1))
-+    printf "Unmounting %i/%i...\r" "$mp_i" "${#mps[@]}"
-+
-+    sudo umount -R "$mp"
-+    rm -rf "$mp"
-+done
-+echo
-+
-+rm some-file
-+cd ..
-+rmdir share
-+
-+imgs=(fs*.img)
-+img_i=0
-+for img in "${imgs[@]}"; do
-+    img_i=$((img_i + 1))
-+    printf "Detaching and deleting %i/%i...\r" "$img_i" "${#imgs[@]}"
-+
-+    dev=$(losetup -j "$img" | sed -e 's/:.*//')
-+    sudo losetup -d "$dev"
-+    rm -f "$img"
-+done
-+echo
-+
-+echo 'Done.'
-diff --git a/tests/acceptance/virtiofs_submounts.py.data/guest-cleanup.sh b/tests/acceptance/virtiofs_submounts.py.data/guest-cleanup.sh
-new file mode 100644
-index 0000000000..729cb2d1a5
---- /dev/null
-+++ b/tests/acceptance/virtiofs_submounts.py.data/guest-cleanup.sh
-@@ -0,0 +1,30 @@
-+#!/bin/bash
-+
-+function print_usage()
-+{
-+    if [ -n "$2" ]; then
-+        echo "Error: $2"
-+        echo
-+    fi
-+    echo "Usage: $1 <scratch dir>"
-+}
-+
-+scratch_dir=$1
-+if [ -z "$scratch_dir" ]; then
-+    print_usage "$0" 'Scratch dir not given' >&2
-+    exit 1
-+fi
-+
-+cd "$scratch_dir/share" || exit 1
-+
-+mps=(mnt*)
-+mp_i=0
-+for mp in "${mps[@]}"; do
-+    mp_i=$((mp_i + 1))
-+    printf "Unmounting %i/%i...\r" "$mp_i" "${#mps[@]}"
-+
-+    sudo umount -R "$mp"
-+done
-+echo
-+
-+echo 'Done.'
-diff --git a/tests/acceptance/virtiofs_submounts.py.data/guest.sh b/tests/acceptance/virtiofs_submounts.py.data/guest.sh
-new file mode 100644
-index 0000000000..59ba40fde1
---- /dev/null
-+++ b/tests/acceptance/virtiofs_submounts.py.data/guest.sh
-@@ -0,0 +1,138 @@
-+#!/bin/bash
-+
-+function print_usage()
-+{
-+    if [ -n "$2" ]; then
-+        echo "Error: $2"
-+        echo
-+    fi
-+    echo "Usage: $1 <shared dir>"
-+    echo '(The shared directory is the "share" directory in the scratch' \
-+         'directory)'
-+}
-+
-+shared_dir=$1
-+if [ -z "$shared_dir" ]; then
-+    print_usage "$0" 'Shared dir not given' >&2
-+    exit 1
-+fi
-+
-+cd "$shared_dir"
-+
-+# FIXME: This should not be necessary, but it is.  In order for all
-+# submounts to be proper mount points, we need to visit them.
-+# (Before we visit them, they will not be auto-mounted, and so just
-+# appear as normal directories, with the catch that their st_ino will
-+# be the st_ino of the filesystem they host, while the st_dev will
-+# still be the st_dev of the parent.)
-+# `find` does not work, because it will refuse to touch the mount
-+# points as long as they are not mounted; their st_dev being shared
-+# with the parent and st_ino just being the root node's inode ID
-+# will practically ensure that this node exists elsewhere on the
-+# filesystem, and `find` is required to recognize loops and not to
-+# follow them.
-+# Thus, we have to manually visit all nodes first.
-+
-+mnt_i=0
-+
-+function recursively_visit()
-+{
-+    pushd "$1" >/dev/null
-+    for entry in *; do
-+        if [[ "$entry" == mnt* ]]; then
-+            mnt_i=$((mnt_i + 1))
-+            printf "Triggering auto-mount $mnt_i...\r"
-+        fi
-+
-+        if [ -d "$entry" ]; then
-+            recursively_visit "$entry"
-+        fi
-+    done
-+    popd >/dev/null
-+}
-+
-+recursively_visit .
-+echo
-+
-+
-+if [ -n "$(find -name not-mounted)" ]; then
-+    echo "Error: not-mounted files visible on mount points:" >&2
-+    find -name not-mounted >&2
-+    exit 1
-+fi
-+
-+if [ ! -f some-file -o "$(cat some-file)" != 'root' ]; then
-+    echo "Error: Bad file in the share root" >&2
-+    exit 1
-+fi
-+
-+shopt -s nullglob
-+
-+function check_submounts()
-+{
-+    local base_path=$1
-+
-+    for mp in mnt*; do
-+        printf "Checking submount %i...\r" "$((${#devs[@]} + 1))"
-+
-+        mp_i=$(echo "$mp" | sed -e 's/mnt//')
-+        dev=$(stat -c '%D' "$mp")
-+
-+        if [ -n "${devs[mp_i]}" ]; then
-+            echo "Error: $mp encountered twice" >&2
-+            exit 1
-+        fi
-+        devs[mp_i]=$dev
-+
-+        pushd "$mp" >/dev/null
-+        path="$base_path$mp"
-+        while true; do
-+            expected_content="$(printf '%s\n%s\n' "$mp_i" "$path")"
-+            if [ ! -f some-file ]; then
-+                echo "Error: $PWD/some-file does not exist" >&2
-+                exit 1
-+            fi
-+
-+            if [ "$(cat some-file)" != "$expected_content" ]; then
-+                echo "Error: Bad content in $PWD/some-file:" >&2
-+                echo '--- found ---'
-+                cat some-file
-+                echo '--- expected ---'
-+                echo "$expected_content"
-+                exit 1
-+            fi
-+            if [ "$(stat -c '%D' some-file)" != "$dev" ]; then
-+                echo "Error: $PWD/some-file has the wrong device ID" >&2
-+                exit 1
-+            fi
-+
-+            if [ -d sub ]; then
-+                if [ "$(stat -c '%D' sub)" != "$dev" ]; then
-+                    echo "Error: $PWD/some-file has the wrong device ID" >&2
-+                    exit 1
-+                fi
-+                cd sub
-+                path="$path/sub"
-+            else
-+                if [ -n "$(echo mnt*)" ]; then
-+                    check_submounts "$path/"
-+                fi
-+                break
-+            fi
-+        done
-+        popd >/dev/null
-+    done
-+}
-+
-+root_dev=$(stat -c '%D' some-file)
-+devs=()
-+check_submounts ''
-+echo
-+
-+reused_devs=$(echo "$root_dev ${devs[@]}" | tr ' ' '\n' | sort | uniq -d)
-+if [ -n "$reused_devs" ]; then
-+    echo "Error: Reused device IDs: $reused_devs" >&2
-+    exit 1
-+fi
-+
-+echo "Test passed for ${#devs[@]} submounts."
-diff --git a/tests/acceptance/virtiofs_submounts.py.data/host.sh b/tests/acceptance/virtiofs_submounts.py.data/host.sh
-new file mode 100644
-index 0000000000..d8a9afebdb
---- /dev/null
-+++ b/tests/acceptance/virtiofs_submounts.py.data/host.sh
-@@ -0,0 +1,127 @@
-+#!/bin/bash
-+
-+mount_count=128
-+
-+function print_usage()
-+{
-+    if [ -n "$2" ]; then
-+        echo "Error: $2"
-+        echo
-+    fi
-+    echo "Usage: $1 <scratch dir> [seed]"
-+    echo "(If no seed is given, it will be randomly generated.)"
-+}
-+
-+scratch_dir=$1
-+if [ -z "$scratch_dir" ]; then
-+    print_usage "$0" 'No scratch dir given' >&2
-+    exit 1
-+fi
-+
-+if [ ! -d "$scratch_dir" ]; then
-+    print_usage "$0" "$scratch_dir is not a directory" >&2
-+    exit 1
-+fi
-+
-+seed=$2
-+if [ -z "$seed" ]; then
-+    seed=$RANDOM
-+fi
-+RANDOM=$seed
-+
-+echo "Seed: $seed"
-+
-+set -e
-+shopt -s nullglob
-+
-+cd "$scratch_dir"
-+if [ -d share ]; then
-+    echo 'Error: This directory seems to be in use already' >&2
-+    exit 1
-+fi
-+
-+for ((i = 0; i < $mount_count; i++)); do
-+    printf "Setting up fs %i/%i...\r" "$((i + 1))" "$mount_count"
-+
-+    rm -f fs$i.img
-+    truncate -s 512M fs$i.img
-+    mkfs.xfs -q fs$i.img
-+    devs[i]=$(sudo losetup -f --show fs$i.img)
-+done
-+echo
-+
-+top_level_mounts=$((RANDOM % mount_count + 1))
-+
-+mkdir -p share
-+echo 'root' > share/some-file
-+
-+for ((i = 0; i < $top_level_mounts; i++)); do
-+    printf "Mounting fs %i/%i...\r" "$((i + 1))" "$mount_count"
-+
-+    mkdir -p share/mnt$i
-+    touch share/mnt$i/not-mounted
-+    sudo mount "${devs[i]}" share/mnt$i
-+    sudo chown "$(id -u):$(id -g)" share/mnt$i
-+
-+    pushd share/mnt$i >/dev/null
-+    path=mnt$i
-+    nesting=$((RANDOM % 4))
-+    for ((j = 0; j < $nesting; j++)); do
-+        cat > some-file <<EOF
-+$i
-+$path
-+EOF
-+        mkdir sub
-+        cd sub
-+        path="$path/sub"
-+    done
-+cat > some-file <<EOF
-+$i
-+$path
-+EOF
-+    popd >/dev/null
-+done
-+
-+for ((; i < $mount_count; i++)); do
-+    printf "Mounting fs %i/%i...\r" "$((i + 1))" "$mount_count"
-+
-+    mp_i=$((i % top_level_mounts))
-+
-+    pushd share/mnt$mp_i >/dev/null
-+    path=mnt$mp_i
-+    while true; do
-+        sub_mp="$(echo mnt*)"
-+        if cd sub 2>/dev/null; then
-+            path="$path/sub"
-+        elif [ -n "$sub_mp" ] && cd "$sub_mp" 2>/dev/null; then
-+            path="$path/$sub_mp"
-+        else
-+            break
-+        fi
-+    done
-+    mkdir mnt$i
-+    touch mnt$i/not-mounted
-+    sudo mount "${devs[i]}" mnt$i
-+    sudo chown "$(id -u):$(id -g)" mnt$i
-+
-+    cd mnt$i
-+    path="$path/mnt$i"
-+    nesting=$((RANDOM % 4))
-+    for ((j = 0; j < $nesting; j++)); do
-+        cat > some-file <<EOF
-+$i
-+$path
-+EOF
-+        mkdir sub
-+        cd sub
-+        path="$path/sub"
-+    done
-+    cat > some-file <<EOF
-+$i
-+$path
-+EOF
-+    popd >/dev/null
-+done
-+echo
-+
-+echo 'Done.'
+     setup_seccomp(enable_syslog);
+     setup_capabilities(g_strdup(lo->modcaps));
+ }
+@@ -2815,6 +2867,7 @@ int main(int argc, char *argv[])
+     struct fuse_session *se;
+     struct fuse_cmdline_opts opts;
+     struct lo_data lo = {
++        .sandbox = SANDBOX_NAMESPACE,
+         .debug = 0,
+         .writeback = 0,
+         .posix_lock = 0,
 -- 
 2.28.0
 
