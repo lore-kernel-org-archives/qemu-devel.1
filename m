@@ -2,80 +2,88 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1262DC55178
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:39:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B1FC4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 640C4207C4
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:39:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0257820791
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 10:41:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nvidia.com header.i=@nvidia.com header.b="DXF0Nzwo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 640C4207C4
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nvidia.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="McIw5P/n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0257820791
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45364 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48996 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWzuc-0003CU-BK
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:39:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40668)
+	id 1kWzw1-0004qe-0Y
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 06:41:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40252)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzTm-0001yf-5d
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:11:54 -0400
-Received: from hqnvemgate26.nvidia.com ([216.228.121.65]:18025)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <kwankhede@nvidia.com>)
- id 1kWzTk-0000D4-89
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:11:53 -0400
-Received: from hqmail.nvidia.com (Not Verified[216.228.121.13]) by
- hqnvemgate26.nvidia.com (using TLS: TLSv1.2, AES256-SHA)
- id <B5f96a0d10000>; Mon, 26 Oct 2020 03:11:29 -0700
-Received: from HQMAIL107.nvidia.com (172.20.187.13) by HQMAIL109.nvidia.com
- (172.20.187.15) with Microsoft SMTP Server (TLS) id 15.0.1473.3; Mon, 26 Oct
- 2020 10:11:42 +0000
-Received: from kwankhede-dev.nvidia.com (172.20.13.39) by mail.nvidia.com
- (172.20.187.13) with Microsoft SMTP Server (TLS) id 15.0.1473.3 via Frontend
- Transport; Mon, 26 Oct 2020 10:11:34 +0000
-From: Kirti Wankhede <kwankhede@nvidia.com>
-To: <alex.williamson@redhat.com>, <cjia@nvidia.com>
-Subject: [PATCH v29 12/17] vfio: Add function to start and stop dirty pages
- tracking
-Date: Mon, 26 Oct 2020 15:06:22 +0530
-Message-ID: <1603704987-20977-13-git-send-email-kwankhede@nvidia.com>
-X-Mailer: git-send-email 2.7.0
-In-Reply-To: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
-References: <1603704987-20977-1-git-send-email-kwankhede@nvidia.com>
-X-NVConfidentiality: public
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSQ-0007wh-Un
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26271)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kWzSB-0007xo-Vu
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 06:10:29 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603707014;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=6lDjz0L9jKbvxmxDp9dqjfdZRnV9hR4KKUUQp5CJEAY=;
+ b=McIw5P/nsjkNOkwfOKRm6MmQ4Gj0uTcejtta5OSBHDw6/X63ncFksyNeOveNpbRSIIsDKs
+ /7tjjnlP7rsm3khUcyySXIgSUJZmHrscGkZOiCWPI/yzspiPfzkecwWOHW1OsfGrmX+hJG
+ LpWH76Z30OoweFGIj/yOknmIfk9rmZI=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-181-QDN2wVncNiiPkXmMtP3StQ-1; Mon, 26 Oct 2020 06:10:12 -0400
+X-MC-Unique: QDN2wVncNiiPkXmMtP3StQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 030C610E2190;
+ Mon, 26 Oct 2020 10:10:11 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 4ADF05B4C1;
+ Mon, 26 Oct 2020 10:10:07 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id CB1931132D67; Mon, 26 Oct 2020 11:10:05 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 4/4] qemu-storage-daemon: QAPIfy --chardev
+Date: Mon, 26 Oct 2020 11:10:05 +0100
+Message-Id: <20201026101005.2940615-5-armbru@redhat.com>
+In-Reply-To: <20201026101005.2940615-1-armbru@redhat.com>
+References: <20201026101005.2940615-1-armbru@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nvidia.com; s=n1;
- t=1603707089; bh=Csj1B4V7H2eMQDlJbneMmgk5oD0HxeP+HflVx2QVIIk=;
- h=From:To:CC:Subject:Date:Message-ID:X-Mailer:In-Reply-To:
- References:X-NVConfidentiality:MIME-Version:Content-Type;
- b=DXF0NzwoSCetAoeYRcOJObeCydTEv+TGQ6if/IiCnVElSmuUj5sxzprtaGfgaAp1E
- r8mzRGYPnmIt/IJdTdScdGSY58VFiA4lutZklPTi+bhHa80R/lzZVcRBst0jd2dO4i
- LrY4I3IjnFj/f3le0AryNyaM23IvUtklObmgXbdoq1StDhnyH+avgWzYXR6Vk1ehc7
- /UDZ4bv0dRLA0ePBb+e1fMdtKhwf6gpRQGDTh3vymJLIfFHCwOjJenGB9pbDeWcmTY
- 0HBLPCd7COlARHvT9NYCvSaqkEFgWB15sstg1kfoV3b4T49nfnNIrfOA6sFe7y5KA9
- uHEwuHIiYJ0gg==
-Received-SPF: pass client-ip=216.228.121.65; envelope-from=kwankhede@nvidia.com;
- helo=hqnvemgate26.nvidia.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 06:10:16
-X-ACL-Warn: Detected OS   = Windows 7 or 8 [fuzzy]
-X-Spam_score_int: -70
-X-Spam_score: -7.1
-X-Spam_bar: -------
-X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 02:39:09
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=-0.01, RCVD_IN_MSPIKE_WL=-0.01,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -88,95 +96,156 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: cohuck@redhat.com, zhi.wang.linux@gmail.com, aik@ozlabs.ru,
- Zhengxiao.zx@Alibaba-inc.com, shuangtai.tst@alibaba-inc.com,
- qemu-devel@nongnu.org, peterx@redhat.com,
- Kirti Wankhede <kwankhede@nvidia.com>, eauger@redhat.com, artemp@nvidia.com,
- yi.l.liu@intel.com, quintela@redhat.com, ziye.yang@intel.com,
- armbru@redhat.com, mlevitsk@redhat.com, pasic@linux.ibm.com,
- felipe@nutanix.com, zhi.a.wang@intel.com, mcrossley@nvidia.com,
- kevin.tian@intel.com, yan.y.zhao@intel.com, dgilbert@redhat.com,
- changpeng.liu@intel.com, eskultet@redhat.com, Ken.Xue@amd.com,
- jonathan.davies@nutanix.com, pbonzini@redhat.com, dnigam@nvidia.com
+Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
-for VFIO devices.
+From: Kevin Wolf <kwolf@redhat.com>
 
-Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+This removes the dependency on QemuOpts from the --chardev option of
+the storage daemon.
+
+Help on option parameters is still wrong.  Marked FIXME.
+
+There are quite a few differences between qemu-system-FOO -chardev,
+QMP chardev-add, and qemu-storage-daemon --chardev:
+
+* QMP chardev-add wraps arguments other than "id" in a "backend"
+  object.  Parameters other than "type" are further wrapped in a
+  "data" object.  Example:
+
+        {"execute": "chardev-add",
+         "arguments": {
+             "id":"sock0",
+             "backend": {
+                 "type": "socket",
+                 "data": {
+                     "addr": {
+                         "type": "inet",
+			 ...
+        }}}}}
+
+  qemu-system-FOO -chardev does not wrap.  Neither does
+  qemu-storage-daemon --chardev.
+
+* qemu-system-FOO -chardev parameter "backend" corresponds to QMP
+  chardev-add "backend" member "type".  qemu-storage-daemon names it
+  "backend".
+
+* qemu-system-FOO -chardev parameter "backend" recognizes a few
+  additional aliases for compatibility.  QMP chardev-add does not.
+  Neither does qemu-storage-daemon --chardev.
+
+* qemu-system-FOO -chardev' with types "serial", "parallel" and "pipe"
+  parameter "path" corresponds to QMP chardev-add member "device".
+  qemu-storage-daemon --chardev follows QMP.
+
+* Backend type "socket":
+
+  - Intentionally different defaults (documented as such):
+    qemu-system-FOO -chardev defaults to server=false and
+    wait=true (if server=true), but QMP chardev-add defaults to
+    server=true and wait=false.  qemu-storage-daemon --chardev follows
+    QMP.
+
+  - Accidentally different defaults: qemu-system-FOO -chardev defaults
+    to tight=true, QMP chardev-add defaults to tight=false in
+    QMP (this is a bug in commit 776b97d3).  qemu-storage-daemon
+    follows QMP.
+
+  - QMP chardev-add wraps socket address arguments "path", "host",
+    "port", etc in a "data" object.  qemu-system-FOO -chardev does not
+    wrap.  Neither does qemu-storage-daemon --chardev.
+
+  - qemu-system-FOO -chardev parameter "delay" corresponds to QMP
+    chardev-add member "nodelay" with the sense reversed.
+    qemu-storage-daemon --chardev follows QMP.
+
+* Backend type "udp":
+
+  - QMP chardev-add wraps remote and local address arguments in a
+    "remote" and a "local" object, respectively.  qemu-system-FOO
+    -chardev does not wrap, but prefixes the local address parameter
+    names with "local" instead.
+
+  - QMP chardev-add wraps socket address arguments in a "data" object.
+    qemu-system-FOO -chardev does not wrap.  Neither does
+    qemu-storage-daemon --chardev.  Same as for type "socket".
+
+* I'm not sure qemu-system-FOO -chardev supports everything QMP
+  chardev-add does.  I am sure qemu-storage-daemon --chardev does.
+
+Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+Signed-off-by: Markus Armbruster <armbru@redhat.com>
 ---
- hw/vfio/migration.c | 36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ storage-daemon/qemu-storage-daemon.c | 37 +++++++++++++++++++++-------
+ 1 file changed, 28 insertions(+), 9 deletions(-)
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 93f8fe7bd869..ffedbcca179d 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -11,6 +11,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/cutils.h"
- #include <linux/vfio.h>
-+#include <sys/ioctl.h>
+diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
+index e419ba9f19..f1f3bdc320 100644
+--- a/storage-daemon/qemu-storage-daemon.c
++++ b/storage-daemon/qemu-storage-daemon.c
+@@ -37,10 +37,13 @@
+ #include "qapi/error.h"
+ #include "qapi/qapi-visit-block-core.h"
+ #include "qapi/qapi-visit-block-export.h"
++#include "qapi/qapi-visit-char.h"
++#include "qapi/qapi-visit-char.h"
+ #include "qapi/qapi-visit-control.h"
+ #include "qapi/qmp/qdict.h"
+ #include "qapi/qmp/qstring.h"
+ #include "qapi/qobject-input-visitor.h"
++#include "qapi/qobject-output-visitor.h"
  
- #include "sysemu/runstate.h"
- #include "hw/vfio/vfio-common.h"
-@@ -391,10 +392,40 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-     return qemu_file_get_error(f);
- }
+ #include "qemu-common.h"
+ #include "qemu-version.h"
+@@ -207,18 +210,34 @@ static void process_options(int argc, char *argv[])
+             }
+         case OPTION_CHARDEV:
+             {
+-                /* TODO This interface is not stable until we QAPIfy it */
+-                QemuOpts *opts = qemu_opts_parse_noisily(&qemu_chardev_opts,
+-                                                         optarg, true);
+-                if (opts == NULL) {
+-                    exit(EXIT_FAILURE);
+-                }
++                QDict *args;
++                Visitor *v;
++                ChardevOptions *chr;
++                q_obj_chardev_add_arg *arg;
++                bool help;
  
-+static int vfio_set_dirty_page_tracking(VFIODevice *vbasedev, bool start)
-+{
-+    int ret;
-+    VFIOMigration *migration = vbasedev->migration;
-+    VFIOContainer *container = vbasedev->group->container;
-+    struct vfio_iommu_type1_dirty_bitmap dirty = {
-+        .argsz = sizeof(dirty),
-+    };
+-                if (!qemu_chr_new_from_opts(opts, NULL, &error_fatal)) {
+-                    /* No error, but NULL returned means help was printed */
++                args = keyval_parse(optarg, "backend", &help, &error_fatal);
++                if (help) {
++                    if (qdict_haskey(args, "backend")) {
++                        /* FIXME wrong where QAPI differs from QemuOpts */
++                        qemu_opts_print_help(&qemu_chardev_opts, true);
++                    } else {
++                        qemu_chr_print_types();
++                    }
+                     exit(EXIT_SUCCESS);
+                 }
+-                qemu_opts_del(opts);
 +
-+    if (start) {
-+        if (migration->device_state & VFIO_DEVICE_STATE_SAVING) {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_START;
-+        } else {
-+            return -EINVAL;
-+        }
-+    } else {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP;
-+    }
++                v = qobject_input_visitor_new_keyval(QOBJECT(args));
++                visit_type_ChardevOptions(v, NULL, &chr, &error_fatal);
++                visit_free(v);
 +
-+    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, &dirty);
-+    if (ret) {
-+        error_report("Failed to set dirty tracking flag 0x%x errno: %d",
-+                     dirty.flags, errno);
-+        return -errno;
-+    }
-+    return ret;
-+}
++                arg = chardev_options_crumple(chr);
 +
- static void vfio_migration_cleanup(VFIODevice *vbasedev)
- {
-     VFIOMigration *migration = vbasedev->migration;
- 
-+    vfio_set_dirty_page_tracking(vbasedev, false);
-+
-     if (migration->region.mmaps) {
-         vfio_region_unmap(&migration->region);
-     }
-@@ -435,6 +466,11 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
-         return ret;
-     }
- 
-+    ret = vfio_set_dirty_page_tracking(vbasedev, true);
-+    if (ret) {
-+        return ret;
-+    }
-+
-     qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
- 
-     ret = qemu_file_get_error(f);
++                qmp_chardev_add(arg->id, arg->backend, &error_fatal);
++                g_free(arg->id);
++                qapi_free_ChardevBackend(arg->backend);
++                qapi_free_ChardevOptions(chr);
++                qobject_unref(args);
+                 break;
+             }
+         case OPTION_EXPORT:
 -- 
-2.7.0
+2.26.2
 
 
