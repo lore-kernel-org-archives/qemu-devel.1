@@ -7,70 +7,71 @@ X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EDA1C388F9
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:03:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3783C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:28 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9755822242
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:03:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0677C22242
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 09:05:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LvnC2nZG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9755822242
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0XCi7/5"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0677C22242
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54190 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59366 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kWyP5-0001Cj-LM
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:02:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50398)
+	id 1kWyRT-0003Og-0X
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 05:05:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50580)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIX-0001wz-QH; Mon, 26 Oct 2020 04:56:13 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:33827)
+ id 1kWyIo-0002Ls-KQ; Mon, 26 Oct 2020 04:56:30 -0400
+Received: from mail-yb1-xb41.google.com ([2607:f8b0:4864:20::b41]:35821)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kWyIW-0005hw-4k; Mon, 26 Oct 2020 04:56:13 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id o70so7012247ybc.1;
- Mon, 26 Oct 2020 01:56:11 -0700 (PDT)
+ id 1kWyIk-0005nV-OF; Mon, 26 Oct 2020 04:56:30 -0400
+Received: by mail-yb1-xb41.google.com with SMTP id m188so2002302ybf.2;
+ Mon, 26 Oct 2020 01:56:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=9pybJr78bVvapfavYXfM6yf471TkTAdxCqgm+6wN/80=;
- b=LvnC2nZGZGTvDlqtsrCOm4NdTWEOC4UctlVXPbEf1QmW2EACmP6m5z1siRzZ+Uj6Fo
- YJXqy40ButO9ZycsYdI4PmGIji4XfycCB5duFYIwFU6W54xBUaUg7kJSwOH0dIiH3lBH
- 3H3fszMXmTGebtGseoc82jnNSEn7+XQK+XiogzWdZhJWt2yu36DDnaSF96TIyycubCdo
- NgbCz0H2cIPAKQsubGd0UKPHhkVpkvxXL69l8iZeXZATZr4H8MDdigpJ3pkeePG3ruhr
- mjq0WBbTq8HzN/ozrwuauVKmWABIaRMgkLAoArHG21p7ULhhgs/51ZUU6vlhIwolhxjK
- 2AeA==
+ :cc; bh=8Ngt2yFRuvWjSs8QJgqJkXW0Co7OHWxTNYBAs1hNods=;
+ b=b0XCi7/5jnv8wq/TPjlHtveUdrhn4LmreayX1dFCv5OozYjnMs2DDChmXaTba6cBDS
+ RI36Wp4msJfh+RXnjL4AMq96Novsh1Z1A3e3A3ffcVFhskLKMuq0A4d2xq8F0P+7Th0G
+ fUpGulITT/e+5myG2Gt8acJnD5xJeZfgiV/6XyuHEI9i9dJsy5feD5ibTpuq0XuiRqFF
+ NFLvwZBvxIY3839XABaCRXxV4MmB4MeojYHDqPryJf20Kkns5E9mYjIcjbnJAxpZfut5
+ CiFgaVA/ytwYD/XR5foAmhjL9o1/iOeKxZNPq7pzDXlkBuka+MAeWMYdk9NlTowLOHpT
+ kMww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=9pybJr78bVvapfavYXfM6yf471TkTAdxCqgm+6wN/80=;
- b=tIWu8DUDYktVFtfdhNFzjQDtjdj7ozOeey0PEy9HyezJNOCSpzrbBdZc5NmLcPyzHV
- +7T8HMB9FUZvJjHvj+cGWaaki70aFQJ8c/BQL4kISV9D5OcyOdRukyzWpetAT8d8ZJK8
- nfKxF8seJlFwqlixRu6g3pd3uLbp8JmxH0v1Rp96gV7gwPLayOgnEPrxFLSw583SvDGe
- oLl3SgO2nWoUzjR2S8RqWDK8/BHoaa6S0/Z6HEvfrBJOnmTT1i1QOXIawye5dTg/3k/C
- ZcuQxYmmXfP8JML1agFMXYRZRFOiCj9oMlWJt31UPrpICg7aW7L/3UvmmdcQ7JxYlS/0
- RPZw==
-X-Gm-Message-State: AOAM531KYyMZl7QV2lV9OqYj06e2DZr1kNXN8j7NKmMdLPh+lU4EaiKz
- KJJME9tDCBc7OwNAjF5hrSfxg4+Wu80sSPJsNq+d1FXx
-X-Google-Smtp-Source: ABdhPJx3WS+2nfhWKc6qL3BKttb2X0IMMC4ILLQGh/puFxOmYURXLnFfWK743bTrc6sFooaxPHU+Y9Lat7uNXuhywns=
-X-Received: by 2002:a25:386:: with SMTP id 128mr18346777ybd.122.1603702571032; 
- Mon, 26 Oct 2020 01:56:11 -0700 (PDT)
+ bh=8Ngt2yFRuvWjSs8QJgqJkXW0Co7OHWxTNYBAs1hNods=;
+ b=iiepajJwDueHWMsP78ROXKKTSLUG+uuGTK7XI3D0MBCvS8LTss6Z9UHA7i6Fqli8Ey
+ TQlRO3bjSaCQ4ohvlPGnZN3nw9fxaZG7/Mjq5TaWsIujwnJ7LRJLck0/ki7xkJxJ2lbG
+ DrVgIV+b8Voc9NLHyia3HKXZqcE7a78Ws/hSw+FoWDzM4+C7YMdjC/a4Tkv1TcGxdB0C
+ r5aQWoWf9kSNoJIIPf1SasBtpO46O6vtKuLROw89kjBK5Zf/rp10LtHwsyLtZUpxEAt2
+ 665kkJEYu3SO1JoxgKQyf9VbkYnP4R174x30TXovvYPMrrEEtqQwp/SfLSqmBZKAZJMX
+ 5mSQ==
+X-Gm-Message-State: AOAM533wuu5icc8FgfzMVM+OdXKEMnzDISCWWFgN28Zl1C7T003L4Hw4
+ e06yizwKcs8RpVlFoIMIent9cfrFtx31znqVgfk=
+X-Google-Smtp-Source: ABdhPJxKe4xwG4o3jhCpw/HNdqifsDeMVYY3RfGl8Z2yEQTwmQZRhBDiMiRh9xhnuXiOyB2okADnetFsN0YJMYtgNrU=
+X-Received: by 2002:a25:c1c1:: with SMTP id
+ r184mr17070500ybf.517.1603702584070; 
+ Mon, 26 Oct 2020 01:56:24 -0700 (PDT)
 MIME-Version: 1.0
 References: <cover.1603467169.git.alistair.francis@wdc.com>
- <82ea05de42d429e1bf572cc134d4571d87a4cfc7.1603467169.git.alistair.francis@wdc.com>
-In-Reply-To: <82ea05de42d429e1bf572cc134d4571d87a4cfc7.1603467169.git.alistair.francis@wdc.com>
+ <b586d3c656319962c5cd4d73bd17e6d03bdd1301.1603467169.git.alistair.francis@wdc.com>
+In-Reply-To: <b586d3c656319962c5cd4d73bd17e6d03bdd1301.1603467169.git.alistair.francis@wdc.com>
 From: Bin Meng <bmeng.cn@gmail.com>
-Date: Mon, 26 Oct 2020 16:55:59 +0800
-Message-ID: <CAEUhbmUvdh_oqhG2X2P0oKBEzjvWT-jsXVXPKNNg2CdGftuXjQ@mail.gmail.com>
-Subject: Re: [PATCH v1 06/16] hw/riscv: spike: Remove compile time XLEN checks
+Date: Mon, 26 Oct 2020 16:56:13 +0800
+Message-ID: <CAEUhbmUGNOB_bA03gmbK_Rf9B4rvYBXRdgZ4Vc_8B1+B0zgd3Q@mail.gmail.com>
+Subject: Re: [PATCH v1 10/16] target/riscv: Specify the XLEN for CPUs
 To: Alistair Francis <alistair.francis@wdc.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::b41;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb41.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -100,14 +101,15 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 11:44 PM Alistair Francis
+On Fri, Oct 23, 2020 at 11:45 PM Alistair Francis
 <alistair.francis@wdc.com> wrote:
 >
 > Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
 > ---
->  hw/riscv/spike.c | 45 ++++++++++++++++++++++++---------------------
->  1 file changed, 24 insertions(+), 21 deletions(-)
+>  target/riscv/cpu.c | 33 +++++++++++++++++++++++----------
+>  1 file changed, 23 insertions(+), 10 deletions(-)
 >
 
 Reviewed-by: Bin Meng <bin.meng@windriver.com>
+Tested-by: Bin Meng <bin.meng@windriver.com>
 
