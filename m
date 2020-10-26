@@ -2,95 +2,85 @@ Return-Path: <SRS0=ZyMj=EB=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B26DC4363A
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:28:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA4A5C4363A
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:29:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 70F1520878
-	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:28:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4490920878
+	for <qemu-devel@archiver.kernel.org>; Mon, 26 Oct 2020 14:29:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fSa7pqWX"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 70F1520878
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YL/3dt5p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4490920878
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37938 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42346 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kX3Tc-0001Nh-Jr
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:28:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49676)
+	id 1kX3VN-0003Gh-Ss
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 10:29:49 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX3T2-0000pg-0l
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:27:24 -0400
-Received: from mail-ed1-x530.google.com ([2a00:1450:4864:20::530]:38874)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kX3T0-0007OC-6z
- for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:27:23 -0400
-Received: by mail-ed1-x530.google.com with SMTP id bc23so9553177edb.5
- for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 07:27:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OvbtfY6lkD6VEoZogwJ9TbS0WlCK3sjxtuzPyp+H5ro=;
- b=fSa7pqWXWZ9sPFh4Gi++zbJSsM6GZaCpenk+9Kl8FSF1gotAJce7T3g3h4q4YTO2FP
- lSVEImggFasMynK0r6hyM8uc5ZSVnldoMpyFXQzIw8GfkeKE/QlK4mcFXAdkQ4/kT1DD
- GOVJ8B6PqYGAODBTmHJNsao3fX/7Fq8tq6n92lH6HBnqVAhhFHlWlbMz72b+IZs4JNDw
- GDhANuby7+lHGZBl/nZB83KcPDlfZ3lDgJWNfWUCUMvg1NjKdZJWU2S/PQDThV///Aik
- NJmNItmHf4MlETEzViZ4YmvDWKfFZ5iwkjCjGcj9+1nY5+TAPBjqFDhVWeKRXBWpYk5T
- 3rAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OvbtfY6lkD6VEoZogwJ9TbS0WlCK3sjxtuzPyp+H5ro=;
- b=sUU5bE4EbfxtHfcL6WEo4g7m/WTdtVNyBwRWnYpetki/DDlO5mqNAnthzT6cc1HSoe
- 2gacqx5euh01am/g7hgbfTyH+yk7H2C9JWP8PND+6hGCAAqjL7ds7q9oAT7FjkjoCHz4
- UyX4GVl8ueqDmNik/EIJyyKVTiTBZYcXI+ceUGP5KVvqmWA1eLI+p1dAb9462YR8sDQD
- lHMD4iRa8Y+Flh+P4+5Q0ufFx3mOLISU/lncg7i1FOhRZBUTNt2VMpj8/5uM5RALoKPO
- VUAlTFi0wioyQfrm1FursRsHjOYWC0wHV4ezovrBE/329GYCUhKa6TkjzpZ4eeutAU6h
- zRKQ==
-X-Gm-Message-State: AOAM533J+Ogw4LbcGwkLexMAcufJB4jFV2k0tWEzLkbB5te7F8Qp9bw9
- L61icXD/4L6ErEdNobxqwQHeMclBayY45pZskAd0NA==
-X-Google-Smtp-Source: ABdhPJzDcraFiXeGbaaeiglb1htFAj5QVZ4RDINBtUihUSWe7nIjzhJIvD/vi2pfz5SDES9UWWE3s6QGdo/0C1FzBiQ=
-X-Received: by 2002:aa7:c683:: with SMTP id n3mr15723476edq.146.1603722440357; 
- Mon, 26 Oct 2020 07:27:20 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kX3Uf-0002Lz-7l
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:29:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53404)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kX3Uc-0007dn-RT
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 10:29:04 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603722541;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=kj7AZndJJ18iktbCsEy3FROXPYqgmVC4RUU1x5JUT/Y=;
+ b=YL/3dt5p7GCjypIJVVRhWcUOl0kJsAfa6inugr2Au5FtFA9ec5/dmdBjlVhmU2M5T8D2qj
+ VmHixqZtzE3CaSqAo8VcPztKQkgZhQw1WKmFhBy5zSuXk2amYKJPSOyw+MpntXi33Kqc+v
+ Mfi6yoKckKqVzZaQZ7UWLctCWR2S0Ys=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-172-oZzWnJMUMDu1ouv0g00dJQ-1; Mon, 26 Oct 2020 10:28:59 -0400
+X-MC-Unique: oZzWnJMUMDu1ouv0g00dJQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7D4341016CE0
+ for <qemu-devel@nongnu.org>; Mon, 26 Oct 2020 14:28:58 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E811E5D9E4;
+ Mon, 26 Oct 2020 14:28:51 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 0CB9D11AB5; Mon, 26 Oct 2020 15:28:51 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] virtio-gpu: only compile virtio-gpu-3d.c for CONFIG_VIRGL=y
+Date: Mon, 26 Oct 2020 15:28:51 +0100
+Message-Id: <20201026142851.28735-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <20200228163840.23585-1-peter.maydell@linaro.org>
- <20200228163840.23585-26-peter.maydell@linaro.org>
- <a049110f-b7cb-52bd-de77-6e1193b5b6de@amsat.org>
- <6ce6a790-c68e-e3ed-962e-ba6f49244315@redhat.com>
- <f02d74fb-af6e-6e04-7ce7-48ab09a20e4f@amsat.org>
- <f2f276a9-a6ad-a2f8-2fbc-f1aca5423f79@amsat.org>
- <20201023174351.31838a86@redhat.com>
- <c80350d2-3591-6541-abf3-960b69cedf7d@amsat.org>
- <20201023210445.2fa72562@redhat.com>
- <CAFEAcA_wP1t1+o_PnCOotHvs54qSxJQSyuhtbSCSg4oewD43ng@mail.gmail.com>
- <20201026143657.68147517@redhat.com>
-In-Reply-To: <20201026143657.68147517@redhat.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Mon, 26 Oct 2020 14:26:59 +0000
-Message-ID: <CAFEAcA_=_x=xH5jHiS6WyUSjyZwH2sy6xsMxgm6c-c+rcRAPzA@mail.gmail.com>
-Subject: Re: [PULL 25/33] tests/acceptance: Add a test for the N800 and N810
- arm machines
-To: Igor Mammedov <imammedo@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::530;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x530.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/25 21:03:19
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -103,35 +93,57 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>,
- =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>,
- QEMU Developers <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 at 13:37, Igor Mammedov <imammedo@redhat.com> wrote:
-> Peter Maydell <peter.maydell@linaro.org> wrote:
-> > Hmm, maybe, maybe not. The original design idea here was that
-> > the boot loader code took a structure defining only the things
-> > that the bootloader needed to know. It doesn't really need to
-> > know about all the stuff that's in MachineState, which is
-> > the state structure for the machine.
->
-> Yep It doesn't need all data the MachineState contains, but then we end up
-> with this kind of bugs which could be avoided if duplication were not there.
-> And some of the fields in  MachineState are pure bootloader data.
+There is no actual code in the CONFIG_VIRGL=n case.  So building is
+(a) pointless and (b) makes macos ranlib complain.
 
-I notice we already have arm_load_kernel() take a MachineState*
-and fill in the info->kernel_filename etc from the MachineState
-fields. I suppose we could do the same for a few more fields.
-I'm not very fond of the way that function takes the MachineState*,
-though. I think it would be nicer if the MachineState had a
-separate sub-struct which was "this is the stuff that's just
-data for the bootloader" and passed that, rather than throwing
-the entire state struct pointer around.
+Reported-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ hw/display/virtio-gpu-3d.c | 4 ----
+ hw/display/meson.build     | 4 +++-
+ 2 files changed, 3 insertions(+), 5 deletions(-)
 
-thanks
--- PMM
+diff --git a/hw/display/virtio-gpu-3d.c b/hw/display/virtio-gpu-3d.c
+index 1bd33d7aedc6..0b0c11474dd3 100644
+--- a/hw/display/virtio-gpu-3d.c
++++ b/hw/display/virtio-gpu-3d.c
+@@ -17,8 +17,6 @@
+ #include "hw/virtio/virtio.h"
+ #include "hw/virtio/virtio-gpu.h"
+ 
+-#ifdef CONFIG_VIRGL
+-
+ #include <virglrenderer.h>
+ 
+ static struct virgl_renderer_callbacks virtio_gpu_3d_cbs;
+@@ -633,5 +631,3 @@ int virtio_gpu_virgl_get_num_capsets(VirtIOGPU *g)
+ 
+     return capset2_max_ver ? 2 : 1;
+ }
+-
+-#endif /* CONFIG_VIRGL */
+diff --git a/hw/display/meson.build b/hw/display/meson.build
+index 0d5ddecd6503..5906b96b830e 100644
+--- a/hw/display/meson.build
++++ b/hw/display/meson.build
+@@ -57,7 +57,9 @@ softmmu_ss.add(when: [pixman, 'CONFIG_ATI_VGA'], if_true: files('ati.c', 'ati_2d
+ if config_all_devices.has_key('CONFIG_VIRTIO_GPU')
+   virtio_gpu_ss = ss.source_set()
+   virtio_gpu_ss.add(when: 'CONFIG_VIRTIO_GPU',
+-                    if_true: [files('virtio-gpu-base.c', 'virtio-gpu.c', 'virtio-gpu-3d.c'), pixman, virgl])
++                    if_true: [files('virtio-gpu-base.c', 'virtio-gpu.c'), pixman, virgl])
++  virtio_gpu_ss.add(when: ['CONFIG_VIRTIO_GPU', 'CONFIG_VIRGL'],
++                    if_true: [files('virtio-gpu-3d.c'), pixman, virgl])
+   virtio_gpu_ss.add(when: 'CONFIG_VHOST_USER_GPU', if_true: files('vhost-user-gpu.c'))
+   hw_display_modules += {'virtio-gpu': virtio_gpu_ss}
+ endif
+-- 
+2.27.0
+
 
