@@ -2,89 +2,90 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3060C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:35:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6595C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:37:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5625E22263
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:35:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5625E22263
+	by mail.kernel.org (Postfix) with ESMTPS id 16A6922263
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:37:12 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 16A6922263
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57632 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60500 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNFy-0002xC-6f
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:35:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38672)
+	id 1kXNHr-0004Gl-Gv
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:37:11 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38864)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYS-0000H2-7C; Tue, 27 Oct 2020 06:50:16 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:46313)
+ id 1kXMYo-0000ib-AB; Tue, 27 Oct 2020 06:50:38 -0400
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:37393)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYQ-0002C9-4k; Tue, 27 Oct 2020 06:50:15 -0400
+ id 1kXMYk-0002Gc-7t; Tue, 27 Oct 2020 06:50:37 -0400
 Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 5975F5C017E;
- Tue, 27 Oct 2020 06:49:53 -0400 (EDT)
+ by mailout.nyi.internal (Postfix) with ESMTP id ED54B5C018E;
+ Tue, 27 Oct 2020 06:49:57 -0400 (EDT)
 Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 27 Oct 2020 06:49:53 -0400
+ by compute4.internal (MEProxy); Tue, 27 Oct 2020 06:49:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=im3qlV+LNt1Ng
- Idjc9WEWMRpAEkcgO2T5qaSzWFow9E=; b=a7MKLWDuAS6Yz4EGhpa6SY7RrBBn0
- D8gDj6uQFMmusbFykr6Ft2TdCo7TNFzIic8F/N/YtEAZOJIF09o1ZAvIK437xKqi
- 6BJDfn9SpZfB3GZtsP/JOtr5p661IjHtrIL9W+MzNemPBqhx2OMIemper7dC487o
- T+2ltTYz7b7ZxyoKmtP2b4YnLmZrSD+gGyIoiYSdSnvhlFs9JKCtjCP2G7+8SvUq
- GGwxEqKKpKByqo9tXnxgXwJOR8f3ml8JKzXRVwVE+EsVOTIY9M5X3ubfUekFllFt
- +NrtN6snO14dsG3DxOrDDjfXdMaUgzTRNTPeRExzVj6ZQ/MhJJoMhUfFA==
+ :mime-version:content-type:content-transfer-encoding; s=fm1; bh=
+ HcV5uo7S2D06lJn9dLCcjXK1Q9lRgxa3Gzu1P85A6S4=; b=qW3bGPSzkrg8efVl
+ tJa13yC7Rl6gAwxNwzHMOtHAT63ctAPhEyAzP522qKFTrap6zvoZ84Vn99tc+zlI
+ cDT6ENaoNWrGmKQTBFkXji6k8nE5dwBJ7QbZheAyKdfgwJd3A5pvnYb0NeqKhkGg
+ DhwRPAARCKywBahD7AezrdwAPNdrsCbnlMhz8J2/aeip8teVaeHIb1T0J2aQKZ5n
+ etDoEcpJAKKvrLdu5yNPEmwhkuXWZLlfl7jnvI2vBbDhfTlxY56kOqVR+EqOtN3r
+ fXkZHsJ66ums46i/B9uAquGTq1QmjgzuPBi91851yJe2ARpjQgc+NKpjP5FgPB5b
+ T4RdaQ==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=im3qlV+LNt1NgIdjc9WEWMRpAEkcgO2T5qaSzWFow9E=; b=maQP5BYQ
- et1pE+75bGhoKtShlnhuc8Yly/9vJSTT5ki4aJjbtFCGfnQWzHbb1vNTHMheQ+q/
- qKmuiBl8HYaSRTQRVNaxl109lGVSGo6cSarV1TuUIHxdM8Lw0Ve1b+LKTYuBUxOO
- W3J1MDE6P22fYGeRl+c3O+gSjg93VtYLU9zpyVimWlYb2zhmMA7jT8e+AoDjUK+Z
- pKaFsTxWr5EDExSWF1gjqUHlJI65t6g5GSCW6pqizD3jB6GiEd+2uJFUyrzS0boJ
- s5QmCcnuQu6RnrMCvJaQfeQ6bG1uGHZalzORmk5nbyogWACGXqIeZbW5hz6yQpn7
- xl/pi+F3o5pQeg==
-X-ME-Sender: <xms:UfuXX2ETfu0XRVldxZhKYRZgRZ-XSbod6qk3vx_JujMREiq6qksh6g>
- <xme:UfuXX3WCead8B1ck0K2KjhZRFzpuzX4ITRm1w9TNwXZDn3pUsUpXSuSdH5rKF8bg6
- 461awVTFFSguV-EfO4>
+ messagingengine.com; h=cc:content-transfer-encoding:content-type
+ :date:from:in-reply-to:message-id:mime-version:references
+ :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+ :x-sasl-enc; s=fm1; bh=HcV5uo7S2D06lJn9dLCcjXK1Q9lRgxa3Gzu1P85A6
+ S4=; b=G0EbNeW4eFKebAPi0ORC6/Uq0oozaVInFyUGwPX5x0jj6LNheTw2fo/gg
+ shgsaG/AYAABXpZbqNTIbTSvivHkkxO5xu3YGVbJ9ljhR3BIQ3jVoJxd706szfvQ
+ IJJPzMnzkQhLwggGcMvjyhCYJFmJb4K6C0qzqfXn7tWIowD1EKLZ6vjtSNNUvHe4
+ 5JhKhKbIHVveXOfZmt2d5bAdFtRvblJmcpqagWEwORn6orJJ6PjVE2fuKnQmA6Ha
+ Bdq8cPVJeRVVwOgoaINgiGSpWleE8+RUBtCqHvPo5czppBGkdaXqHASg5nv+r0m9
+ Fff7h/2bpE5lkxRT4vskvFhC1+kWg==
+X-ME-Sender: <xms:VfuXX9J4GTabDV7iB2vbpaTJiKgRgHj9P7dzHXs6HKpN222Usd-_Rg>
+ <xme:VfuXX5I587DOyByaqiy2xkOZUpfq1KCixqvFKjRQeOzuZUgeI52DHPUVOMOJW3BWr
+ 7WMbM123_I4ALLkMPc>
 X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrkeelgddvtdcutefuodetggdotefrodftvf
  curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
  uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepteffteduveekfedufffftddutdejfeeuhffhuefhgeekveeikeevteffgeekuedu
- necuffhomhgrihhnpehnvhhmvgigphhrvghsshdrohhrghdpihhnfhhrrgguvggrugdroh
- hrghenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpedt
- necurfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:UfuXXwICLiuQeh27__nG2bSbe0TardFYsoytOsbVV2Ezqdi9jyvJQQ>
- <xmx:UfuXXwETIJM0F5teqo5FjiJxr7shvihwILZrxu8IAWzu9idPEC9j5w>
- <xmx:UfuXX8XB6hS6T0goo76v-RWACLogWxSdio7ZeSMEWFufwhZtEZM0WA>
- <xmx:UfuXX2fkY5Lso9RUtV8-_OEPqRsnmXSU8gVKSBIhRd5aS-ULNX4iZQ>
+ fjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpefmlhgruhhs
+ ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
+ gvrhhnpeetveeuudegveeiheegieelueeftedvtdekteefleegheduhfejueelvdfhffdt
+ geenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpeeine
+ curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
+X-ME-Proxy: <xmx:VfuXX1sHQYMN0fSBHgL-bhEzTydOI2WMDvPeDS7cMZM9s2jFWzCELQ>
+ <xmx:VfuXX-ZPE0a3Zwbbv1rHxruFMo8t19ZaiXkJK5AIUPNZXx-LiZqiRQ>
+ <xmx:VfuXX0ZtTYgJ4McB3tsGustNqUz4s4xONrXsbKMQLnkmU4wAZbfQzA>
+ <xmx:VfuXX7XHVlFLxPaBSovW8xs1Gfhyv0PwL6w6ffrn7o5R5I_9QBhsmA>
 Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
  [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 1C85F3280066;
- Tue, 27 Oct 2020 06:49:52 -0400 (EDT)
+ by mail.messagingengine.com (Postfix) with ESMTPA id C64CA3280064;
+ Tue, 27 Oct 2020 06:49:56 -0400 (EDT)
 From: Klaus Jensen <its@irrelevant.dk>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Subject: [PULL 16/30] pci: allocate pci id for nvme
-Date: Tue, 27 Oct 2020 11:49:18 +0100
-Message-Id: <20201027104932.558087-17-its@irrelevant.dk>
+Subject: [PULL 20/30] hw/block/nvme: fix log page offset check
+Date: Tue, 27 Oct 2020 11:49:22 +0100
+Message-Id: <20201027104932.558087-21-its@irrelevant.dk>
 X-Mailer: git-send-email 2.29.1
 In-Reply-To: <20201027104932.558087-1-its@irrelevant.dk>
 References: <20201027104932.558087-1-its@irrelevant.dk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=66.111.4.26; envelope-from=its@irrelevant.dk;
  helo=out2-smtp.messagingengine.com
@@ -109,98 +110,89 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>,
- Maxim Levitsky <mlevitsk@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Gerd Hoffmann <kraxel@redhat.com>, Klaus Jensen <its@irrelevant.dk>
+Cc: Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+From: Keith Busch <kbusch@kernel.org>
 
-The emulated nvme device (hw/block/nvme.c) is currently using an
-internal Intel device id.
+Return error if the requested offset starts after the size of the log
+being returned. Also, move the check for earlier in the function so
+we're not doing unnecessary calculations.
 
-Prepare to change that by allocating a device id under the 1b36 (Red
-Hat, Inc.) vendor id.
-
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed- by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
+Signed-off-by: Keith Busch <kbusch@kernel.org>
 Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Acked-by: Gerd Hoffmann <kraxel@redhat.com>
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Reviewed-by: Keith Busch <kbusch@kernel.org>
 ---
- docs/specs/nvme.txt    | 23 +++++++++++++++++++++++
- docs/specs/pci-ids.txt |  1 +
- include/hw/pci/pci.h   |  1 +
- MAINTAINERS            |  1 +
- 4 files changed, 26 insertions(+)
- create mode 100644 docs/specs/nvme.txt
+ hw/block/nvme.c | 22 ++++++++++------------
+ 1 file changed, 10 insertions(+), 12 deletions(-)
 
-diff --git a/docs/specs/nvme.txt b/docs/specs/nvme.txt
-new file mode 100644
-index 000000000000..56d393884e7a
---- /dev/null
-+++ b/docs/specs/nvme.txt
-@@ -0,0 +1,23 @@
-+NVM Express Controller
-+======================
-+
-+The nvme device (-device nvme) emulates an NVM Express Controller.
-+
-+
-+Reference Specifications
-+------------------------
-+
-+The device currently implements most mandatory features of NVMe v1.3d, see
-+
-+  https://nvmexpress.org/resources/specifications/
-+
-+for the specification.
-+
-+
-+Known issues
-+------------
-+
-+* The accounting numbers in the SMART/Health are reset across power cycles
-+
-+* Interrupt Coalescing is not supported and is disabled by default in volation
-+  of the specification.
-diff --git a/docs/specs/pci-ids.txt b/docs/specs/pci-ids.txt
-index 4d53e5c7d9d5..abbdbca6be38 100644
---- a/docs/specs/pci-ids.txt
-+++ b/docs/specs/pci-ids.txt
-@@ -63,6 +63,7 @@ PCI devices (other than virtio):
- 1b36:000b  PCIe Expander Bridge (-device pxb-pcie)
- 1b36:000d  PCI xhci usb host adapter
- 1b36:000f  mdpy (mdev sample device), linux/samples/vfio-mdev/mdpy.c
-+1b36:0010  PCIe NVMe device (-device nvme)
+diff --git a/hw/block/nvme.c b/hw/block/nvme.c
+index a168f0bf4adb..aa725d1141b2 100644
+--- a/hw/block/nvme.c
++++ b/hw/block/nvme.c
+@@ -1179,6 +1179,10 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
  
- All these devices are documented in docs/specs.
++    if (off >= sizeof(smart)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
+     for (int i = 1; i <= n->num_namespaces; i++) {
+         NvmeNamespace *ns = nvme_ns(n, i);
+         if (!ns) {
+@@ -1193,10 +1197,6 @@ static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+         write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
+     }
  
-diff --git a/include/hw/pci/pci.h b/include/hw/pci/pci.h
-index f19ffe6b4fe8..72ce649eee36 100644
---- a/include/hw/pci/pci.h
-+++ b/include/hw/pci/pci.h
-@@ -106,6 +106,7 @@ extern bool pci_available;
- #define PCI_DEVICE_ID_REDHAT_XHCI        0x000d
- #define PCI_DEVICE_ID_REDHAT_PCIE_BRIDGE 0x000e
- #define PCI_DEVICE_ID_REDHAT_MDPY        0x000f
-+#define PCI_DEVICE_ID_REDHAT_NVME        0x0010
- #define PCI_DEVICE_ID_REDHAT_QXL         0x0100
+-    if (off > sizeof(smart)) {
+-        return NVME_INVALID_FIELD | NVME_DNR;
+-    }
+-
+     trans_len = MIN(sizeof(smart) - off, buf_len);
  
- #define FMT_PCIBUS                      PRIx64
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ef6f5c739984..9e215088ce8c 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1877,6 +1877,7 @@ L: qemu-block@nongnu.org
- S: Supported
- F: hw/block/nvme*
- F: tests/qtest/nvme-test.c
-+F: docs/specs/nvme.txt
- T: git git://git.infradead.org/qemu-nvme.git nvme-next
+     memset(&smart, 0x0, sizeof(smart));
+@@ -1234,12 +1234,11 @@ static uint16_t nvme_fw_log_info(NvmeCtrl *n, uint32_t buf_len, uint64_t off,
+         .afi = 0x1,
+     };
  
- megasas
+-    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
+-
+-    if (off > sizeof(fw_log)) {
++    if (off >= sizeof(fw_log)) {
+         return NVME_INVALID_FIELD | NVME_DNR;
+     }
+ 
++    strpadcpy((char *)&fw_log.frs1, sizeof(fw_log.frs1), "1.0", ' ');
+     trans_len = MIN(sizeof(fw_log) - off, buf_len);
+ 
+     return nvme_dma(n, (uint8_t *) &fw_log + off, trans_len,
+@@ -1252,16 +1251,15 @@ static uint16_t nvme_error_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
+     uint32_t trans_len;
+     NvmeErrorLog errlog;
+ 
++    if (off >= sizeof(errlog)) {
++        return NVME_INVALID_FIELD | NVME_DNR;
++    }
++
+     if (!rae) {
+         nvme_clear_events(n, NVME_AER_TYPE_ERROR);
+     }
+ 
+-    if (off > sizeof(errlog)) {
+-        return NVME_INVALID_FIELD | NVME_DNR;
+-    }
+-
+     memset(&errlog, 0x0, sizeof(errlog));
+-
+     trans_len = MIN(sizeof(errlog) - off, buf_len);
+ 
+     return nvme_dma(n, (uint8_t *)&errlog, trans_len,
 -- 
 2.29.1
 
