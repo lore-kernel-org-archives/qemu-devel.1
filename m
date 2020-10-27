@@ -7,104 +7,103 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D863C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 07:52:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17C61C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 07:52:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F3CD9206DC
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 07:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A940720738
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 07:52:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="IbveM5vK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F3CD9206DC
+	dkim=pass (1024-bit key) header.d=amdcloud.onmicrosoft.com header.i=@amdcloud.onmicrosoft.com header.b="fIlBlftB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A940720738
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=amd.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50738 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50774 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXJml-000860-QN
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 03:52:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57642)
+	id 1kXJmo-00086v-9G
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 03:52:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57698)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
- id 1kXHvh-0007Et-GB
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 01:53:57 -0400
+ id 1kXHvm-0007MV-EV
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 01:54:02 -0400
 Received: from mail-bn7nam10on2050.outbound.protection.outlook.com
  ([40.107.92.50]:55041 helo=NAM10-BN7-obe.outbound.protection.outlook.com)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <Michael.Roth@amd.com>)
- id 1kXHvf-000447-QQ
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 01:53:57 -0400
+ id 1kXHvk-000447-VN
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 01:54:02 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OwIj1aAbvAKpQVPVoFMqj8hFI04KQv6e8rPeEiC8zHBMY9hDKagn3WzmSlQM0xk066luNJI67sooA3NbZ6GcY8loF/dcPKRgNemCzV+403829QguQBU0FKCWfxC8Eh3OjXD5qvQ4IsUQhbynu/gunJCwDv9xU1O+MyKmkw5HORjdcVgRKJMiQJX9aDlWVgWAAnTZDqgiJcuTJwRr7DM7ApWnpa5u/JpgYZ0eY35TF1WuGJgenC1xslY5gLMe+J6wRgwm1/DSIo2b4YC64VRSIscuj67Vr7mpGpdMC6RzeZ9aeOT9VPF3OrlqVACO70zPykbq3Zp6z77gMQ6JOW2zCQ==
+ b=FgJ/uM9zksHwXuxMJM7AHs3K700SzyXS65c4/SZuxjEPCyQFsuevr4NEKPeMEMWLaKNBWoU7cy3dg982j4TdTuzrANDzlMJTh5+5+leJaiMXyHB7bmk+LI5Aalq0J8GkthQboLj0aUYslMKfb8D8h7EmQ8qGYfrl20qI4XjBrdvP+acOpKQ/4lvM9o9nsYiWhgFYv/0avbghxOQOF3uCyBHr9fGHOwunIxSygjs+pj1b2RnZ8IMWdvkQ/9cTrbK9vk8FnJaIhdHeiZGTO9W/6srDrD5iCkeAkbFQzvvW4fk+6HfRU6mQocMUoKU9TIuBDOi/ppWRPSzjbFjBo6laQQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1sIAs+TJldLQL+HX0R1AdIOP64eRzzVdoUrAbd0UWjo=;
- b=PUfjMX1iKDsM7ZCePmg+s3x5SxbP6F/fTp9cbFBMa4AhdlrynTIreJmXwg0YM+A4mUEpQISRw5CZba/R5B0JcdA4E13l7uOCADuePah6DIuCjFSf3gkLtwUtNyIvFFKD7cpFgXOSuhJCc00+HW99oGmYwcYRP37IBDtL5J1YhhsNJVudYJHFXyMBvdvNqjQ3Cefxo6z7zWNC+eVW74h2/w/3Y0PMRijOm9Nf+xzd/hDb8gFu2ZyWT3/LHZpBBhjQHlsOvrI1Nu0r8nsnajq2VfHSWkfiHkg2roamdMhLZt4dlNp2t8sI+jnhKqbZWoZTIzrrZRC9JPoxD3pw11cPsw==
+ bh=1gqDMia7c4BktleQtq4MXU98cKjxCSJ/JIUaGfLlL6E=;
+ b=XRa1EcYI3/ArhN/ptjqdHS/C9Ug6CAScseCTnA2eG+9DF2pHjnKb6Zy+qcXMVQwwTCe5Bq1lNT2oU8pwEd+HAhJSejlo2891+Spgz42IGqkPXxCz9h5AVX2JTpXBnJUfh4GUhoRF1UvmsAqkv/A9/YDQw1wjWwhuT1alpO5+Qd2xIir3mCWnXLDFmCqiBrvzStdjeu7oYKnjxqJtptYWs57fKFyoHe1lQ/MwDoks6p32JPep/U5g696tFqW/PNPVl22HjMR1K1Fq4JAdby/tXwBNFdJmIwxprkFzZQcqLABxIH8r3tKv9+HHvvkPA4+UhQv0GnwTs8XcTkXcXgs/Sw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
  header.d=amd.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=amdcloud.onmicrosoft.com; s=selector2-amdcloud-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1sIAs+TJldLQL+HX0R1AdIOP64eRzzVdoUrAbd0UWjo=;
- b=IbveM5vKrLShqiwCeNaJVpfshYpOZ+caCmQvXWnDijYX6CTZXspnklVDYX/Xmw8/wdCHUgLKwekMBZZ+povD26BhGZ//x6XlbTiT4nbill6KD1rN4Bg2SbOm2cMGRSkMxC/a2LCoVM454EUT7cYxF7OO+9LvsLrGuLq2nc1QG4Q=
+ bh=1gqDMia7c4BktleQtq4MXU98cKjxCSJ/JIUaGfLlL6E=;
+ b=fIlBlftBAQBW67aGcvlem+lWgXLCnsXim7uz0c8t1C+O6KvLQRfzgXmvrdZEbMdWWHBPwdKb85iFUCbgy/AHKTwSUJwJIzvRW/ZY0hm/11bXZYG/wHylFnvW4DSd7Fy8cvJXUC8n06spHgHUf47ekmhVPBCZ+vNAg88ad2vz4R4=
 Authentication-Results: nongnu.org; dkim=none (message not signed)
  header.d=none;nongnu.org; dmarc=none action=none header.from=amd.com;
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com (2603:10b6:610:7a::13)
  by CH2PR12MB5004.namprd12.prod.outlook.com (2603:10b6:610:62::16)
  with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 27 Oct
- 2020 05:53:43 +0000
+ 2020 05:53:47 +0000
 Received: from CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::f428:769b:3e9:8300]) by CH2PR12MB4133.namprd12.prod.outlook.com
  ([fe80::f428:769b:3e9:8300%5]) with mapi id 15.20.3499.018; Tue, 27 Oct 2020
- 05:53:43 +0000
+ 05:53:47 +0000
 From: Michael Roth <michael.roth@amd.com>
 To: qemu-devel@nongnu.org
-Subject: [PULL 01/12] qga: Rename guest-get-devices return member 'address' to
- 'id'
-Date: Tue, 27 Oct 2020 00:53:06 -0500
-Message-Id: <20201027055317.351868-2-michael.roth@amd.com>
+Subject: [PULL 04/12] qga: Flatten simple union GuestDeviceId
+Date: Tue, 27 Oct 2020 00:53:09 -0500
+Message-Id: <20201027055317.351868-5-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201027055317.351868-1-michael.roth@amd.com>
 References: <20201027055317.351868-1-michael.roth@amd.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [76.251.165.188]
-X-ClientProxiedBy: SN1PR12CA0103.namprd12.prod.outlook.com
- (2603:10b6:802:21::38) To CH2PR12MB4133.namprd12.prod.outlook.com
+X-ClientProxiedBy: SN1PR12CA0102.namprd12.prod.outlook.com
+ (2603:10b6:802:21::37) To CH2PR12MB4133.namprd12.prod.outlook.com
  (2603:10b6:610:7a::13)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 Received: from localhost (76.251.165.188) by
- SN1PR12CA0103.namprd12.prod.outlook.com (2603:10b6:802:21::38) with Microsoft
+ SN1PR12CA0102.namprd12.prod.outlook.com (2603:10b6:802:21::37) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.19 via Frontend Transport; Tue, 27 Oct 2020 05:53:43 +0000
+ 15.20.3499.19 via Frontend Transport; Tue, 27 Oct 2020 05:53:47 +0000
 X-MS-PublicTrafficType: Email
 X-MS-Office365-Filtering-HT: Tenant
-X-MS-Office365-Filtering-Correlation-Id: 25bb597c-0e92-4c4a-9651-08d87a3ca97a
+X-MS-Office365-Filtering-Correlation-Id: 74d81e74-9cd6-4429-4775-08d87a3cac0f
 X-MS-TrafficTypeDiagnostic: CH2PR12MB5004:
-X-Microsoft-Antispam-PRVS: <CH2PR12MB50045CB6E12C8E864561C3AA95160@CH2PR12MB5004.namprd12.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:419;
+X-Microsoft-Antispam-PRVS: <CH2PR12MB500415D310D18E49AEA2846495160@CH2PR12MB5004.namprd12.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:4941;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: gk/QIje3EgZnKcYoFX9gEEl+FwUn83LjnuiKjUUGFl7TKCBVBXiZNQ9NJgYnvTraI/vMLAB7q77d4HECXVpg0agzqeujTNXtVmkdd7NtAXkv9lt6sYf/vAMbumQ1sd8LEcUGPauby9qAA/GOu/+VL1zOoG78v7yL4MJT8AP9O45GvBd8pji8oni0MK7nKXzduPhhAhLnQ+51W9c0qw5i1/LlvAG9CIiYllBGmwvRejr6o5479WvtkW2crCIYp4gpc1UUZJeXh82hWXDHy4n1oAk21kaR0yIK4AcduPNZObu2p/EGZ3R8oqF/k/bKimbEi4XCPwSyawHcA/vu+qcozQ==
+X-Microsoft-Antispam-Message-Info: H6b/F3xXa8CoQVZzF1mxcG6/jy96enxSwrLT0Vz/37H4BGHVTPiS0Hv+TJo7C6+Ti8NbA1uaqGa0a3B9vMqXQMgPBRYw8MsqpbXzEglzYao/RH60yvhM1tRjY9ZoZpstQqfbK2Ssp3k34zzEyj6C66vPbbwsn2T0uF4FBvUaeh/QbJImRlAcfOspdIwBu2kiiaH4zIi6IV4MCdXeq2DeifCekgAxsaQt2Q5Noqv6uFqi0ebmNSJkXJxC2ZRVP1SsNLvT/CLPKCFuZ58LHt3XDibH09kGZaeLWMM9MQurk/GOxkc20rWAhH2zcyGSmzeABe47yWrBgPJZALGittJaoA==
 X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
  IPV:NLI; SFV:NSPM; H:CH2PR12MB4133.namprd12.prod.outlook.com; PTR:; CAT:NONE;
  SFS:(4636009)(39860400002)(346002)(376002)(366004)(396003)(136003)(54906003)(316002)(956004)(2616005)(1076003)(8936002)(6496006)(5660300002)(86362001)(52116002)(66556008)(2906002)(6666004)(6916009)(478600001)(66476007)(26005)(66946007)(16526019)(8676002)(186003)(6486002)(4326008)(44832011)(83380400001)(36756003);
  DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: CuF3pb/twRrROZ5jdvqCKGaisTtguL7JvQ0h0vBhL/k1pOGiPgofqF+gzgu9UVrJr1uRsr/jfN7bFAXbE5XHyPx6Mpm9cmT/KRQahxKQz7KeP8w5avITqK+wc4k1fPkUXtw2mIMf7ZUm2kIns2XRjx/zVOeQIy15p24Y4JFUIF4hY00cpWIY4LKBMtuvYSzTxz2AAJ0hIozPCMMZTRciW5pT9iaG7Fp2Eq4oXWX+hjqlwR7LZ2dgM7LlC3pRt/IDJbfAEQBKV2BqynXiPXLa/1vZdZS59ohkYstTx1KZsiNGLssJIZ6LbsV7ffjnpa00PwrESn+tsRKqKCQdjkeeLzI6xiIo6lJFvk5SaugujBjnA8Bx9GvGzBy5a6SPNSi/J+92tefirkcXyyb3f+ZWr7MHycvCCQvgB3Kj5yhu6iqY4h+h3gof36OQCb98oM4tCuqmdY+Mrju6ZsiyciILWntetweJYh8SrEN2xqUaj8P4p237xc9bj+s0aJxq8dGye/HmJHBRPs+AmcPlpj6zDRnp3RIqcaDCDHkRxvvKfOJUIJtZNo6ZsqX4KdrFHDO1EZQ6XvbY+7pOhmUB8ViBx4ZTZpZOHR5MLJKPf7cJcxV/sYvx+FU1i1s7vG5MVX3BLe8QCz9Siq5ANLVXQERfDA==
+X-MS-Exchange-AntiSpam-MessageData: pVqpyUBRredj446BWKMJvDA0lgzb8NZYJlXBoK9/lSSg/wz3V2Fj4cLmqPj5PZpuiNssIRrfMIbs3zwjyFnngg1n1OK9KKFGLYN/L3RrtvfT/aHVGmyn7Gtx1Grjy/mmuSL9UARkCNTx94tvYcuw2B1Y295JpeUraGGrSxkLDIdcauCZAxr6KO+GPqnkZsHpGYWR7/Uk0zCnbul36DaOWBApkf8Qh24+kyIrHVS7awQKIG/wuZBaxIr10QUGYYtean5+HYf4WsLd8Gt87CmsgprxmKFZs6uGI8FXv/lfIXF0it1k49bww8QpE2v9tPL86LT5ig1Kv92nncbbtjAdZfh+8I6yXcf3tzaROY7fpwsgPzKEKoD7BMnnQeuNFbKeUjTe77zhmFmiHfqVodcvgrISjiLNLGJuHKXxb5mbwpkT4VI5FXAbGQRu6cK0Jyz9t8LF85BvF2PYFpgKy2ar5NjtTtS1Reh6bBp/QBDfH0AT7+pUurAePI1PJzuMjFy2H+mGf4JzM9nz870Mtua/Wmig8OLCS+hvGNy31umyGFEeeJzu9B9paeSuPm7IJuRjaaM0B+/IvyY7VbzMS5WHGerHkv03Fe4APx1rSIXh8VcxpAo+PMfacEXKZCjFu6Fky+/csi20AXlDQHJav15tQA==
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 25bb597c-0e92-4c4a-9651-08d87a3ca97a
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74d81e74-9cd6-4429-4775-08d87a3cac0f
 X-MS-Exchange-CrossTenant-AuthSource: CH2PR12MB4133.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 05:53:43.5075 (UTC)
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 05:53:47.8115 (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: qTSombhVo62QXCeRG5n3d5hJaSqO4EfVzZUpajzC/HgZlrqfdF4L5/wuoycAi6wpE877S3Io88ciQxigRNy+ug==
+X-MS-Exchange-CrossTenant-UserPrincipalName: AGAAcIYpYAaasHzA47aBxmWSpUxgj25PQvALG0ivWv3Yi1ujO52xWqKWSsrqy0zhRMb3vYCntwobJJm3HEctaQ==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB5004
 Received-SPF: none client-ip=40.107.92.50; envelope-from=Michael.Roth@amd.com;
  helo=NAM10-BN7-obe.outbound.protection.outlook.com
@@ -118,7 +117,7 @@ X-Spam_report: (-0.9 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_NONE=0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
-X-Mailman-Approved-At: Tue, 27 Oct 2020 03:46:43 -0400
+X-Mailman-Approved-At: Tue, 27 Oct 2020 03:46:47 -0400
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
 Precedence: list
@@ -140,114 +139,72 @@ Sender: "Qemu-devel"
 
 From: Markus Armbruster <armbru@redhat.com>
 
-Member 'address' is union GuestDeviceAddress with a single branch
-GuestDeviceAddressPCI, containing PCI vendor ID and device ID.  This
-is not a PCI address.  Type GuestPCIAddress is.  Messed up in recent
-commit 2e4211cee4 "qga: add command guest-get-devices for reporting
-VirtIO devices".
+Simple unions are simpler than flat unions in the schema, but more
+complicated in C and on the QMP wire: there's extra indirection in C
+and extra nesting on the wire, both pointless.  They should be avoided
+in new code.
 
-Rename type GuestDeviceAddressPCI to GuestDeviceIdPCI, type
-GuestDeviceAddress to GuestDeviceId, and member 'address' to 'id'.
-
-Document the member properly while there.
+GuestDeviceId was recently added for guest-get-devices.  Convert it to
+a flat union.
 
 Signed-off-by: Markus Armbruster <armbru@redhat.com>
 Reviewed-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- qga/commands-win32.c | 16 ++++++++--------
- qga/qapi-schema.json | 17 +++++++++--------
- 2 files changed, 17 insertions(+), 16 deletions(-)
+ qga/commands-win32.c | 9 ++++-----
+ qga/qapi-schema.json | 8 ++++++++
+ 2 files changed, 12 insertions(+), 5 deletions(-)
 
 diff --git a/qga/commands-win32.c b/qga/commands-win32.c
-index 0c3c05484f..879b02b6c3 100644
+index 1efe3ba076..0c33d48aaa 100644
 --- a/qga/commands-win32.c
 +++ b/qga/commands-win32.c
-@@ -2390,22 +2390,22 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
-         }
-         for (j = 0; hw_ids[j] != NULL; j++) {
-             GMatchInfo *match_info;
--            GuestDeviceAddressPCI *address;
-+            GuestDeviceIdPCI *id;
-             if (!g_regex_match(device_pci_re, hw_ids[j], 0, &match_info)) {
-                 continue;
+@@ -2400,16 +2400,15 @@ GuestDeviceInfoList *qmp_guest_get_devices(Error **errp)
              }
              skip = false;
  
--            address = g_new0(GuestDeviceAddressPCI, 1);
-+            id = g_new0(GuestDeviceIdPCI, 1);
+-            id = g_new0(GuestDeviceIdPCI, 1);
              vendor_id = g_match_info_fetch(match_info, 1);
              device_id = g_match_info_fetch(match_info, 2);
--            address->vendor_id = g_ascii_strtoull(vendor_id, NULL, 16);
--            address->device_id = g_ascii_strtoull(device_id, NULL, 16);
+-            id->vendor_id = g_ascii_strtoull(vendor_id, NULL, 16);
+-            id->device_id = g_ascii_strtoull(device_id, NULL, 16);
+ 
+             device->id = g_new0(GuestDeviceId, 1);
+             device->has_id = true;
+-            device->id->type = GUEST_DEVICE_ID_KIND_PCI;
+-            device->id->u.pci.data = id;
++            device->id->type = GUEST_DEVICE_TYPE_PCI;
++            id = &device->id->u.pci;
 +            id->vendor_id = g_ascii_strtoull(vendor_id, NULL, 16);
 +            id->device_id = g_ascii_strtoull(device_id, NULL, 16);
- 
--            device->address = g_new0(GuestDeviceAddress, 1);
--            device->has_address = true;
--            device->address->type = GUEST_DEVICE_ADDRESS_KIND_PCI;
--            device->address->u.pci.data = address;
-+            device->id = g_new0(GuestDeviceId, 1);
-+            device->has_id = true;
-+            device->id->type = GUEST_DEVICE_ID_KIND_PCI;
-+            device->id->u.pci.data = id;
  
              g_match_info_free(match_info);
              break;
 diff --git a/qga/qapi-schema.json b/qga/qapi-schema.json
-index cec98c7e06..f2c81cda2b 100644
+index c7bfb8bf6a..fe10631e4c 100644
 --- a/qga/qapi-schema.json
 +++ b/qga/qapi-schema.json
-@@ -1257,26 +1257,26 @@
+@@ -1256,6 +1256,12 @@
+ { 'command': 'guest-get-osinfo',
    'returns': 'GuestOSInfo' }
  
++##
++# @GuestDeviceType:
++##
++{ 'enum': 'GuestDeviceType',
++  'data': [ 'pci' ] }
++
  ##
--# @GuestDeviceAddressPCI:
-+# @GuestDeviceIdPCI:
+ # @GuestDeviceIdPCI:
  #
- # @vendor-id: vendor ID
- # @device-id: device ID
- #
+@@ -1276,6 +1282,8 @@
  # Since: 5.2
  ##
--{ 'struct': 'GuestDeviceAddressPCI',
-+{ 'struct': 'GuestDeviceIdPCI',
-   'data': { 'vendor-id': 'uint16', 'device-id': 'uint16' } }
- 
- ##
--# @GuestDeviceAddress:
-+# @GuestDeviceId:
- #
--# Address of the device
--# - @pci: address of PCI device, since: 5.2
-+# Id of the device
-+# - @pci: PCI ID, since: 5.2
- #
- # Since: 5.2
- ##
--{ 'union': 'GuestDeviceAddress',
--  'data': { 'pci': 'GuestDeviceAddressPCI' } }
-+{ 'union': 'GuestDeviceId',
-+  'data': { 'pci': 'GuestDeviceIdPCI' } }
- 
- ##
- # @GuestDeviceInfo:
-@@ -1284,6 +1284,7 @@
- # @driver-name: name of the associated driver
- # @driver-date: driver release date in format YYYY-MM-DD
- # @driver-version: driver version
-+# @id: device ID
- #
- # Since: 5.2
- ##
-@@ -1292,7 +1293,7 @@
-       'driver-name': 'str',
-       '*driver-date': 'str',
-       '*driver-version': 'str',
--      '*address': 'GuestDeviceAddress'
-+      '*id': 'GuestDeviceId'
-   } }
+ { 'union': 'GuestDeviceId',
++  'base': { 'type': 'GuestDeviceType' },
++  'discriminator': 'type',
+   'data': { 'pci': 'GuestDeviceIdPCI' } }
  
  ##
 -- 
