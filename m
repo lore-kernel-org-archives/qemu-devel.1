@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A93BC55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:50:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6B6C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:51:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A02F9207C4
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:50:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CDB33207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:51:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PKeGZJWf"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A02F9207C4
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kvo0Z0fA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CDB33207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42326 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:47108 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXU2p-0003Wm-Of
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:50:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58124)
+	id 1kXU4N-0005ca-PZ
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:51:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58160)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTc1-0004O6-7j
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:25 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45597)
+ id 1kXTc3-0004RM-25
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35720)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbr-00033a-7P
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:24 -0400
+ id 1kXTbt-00033G-MZ
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603822932;
+ s=mimecast20190719; t=1603822930;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=NcQAwHF4xrWR9YT4+6Z4jO4463/XBqIyWpwhqOkwaAg=;
- b=PKeGZJWfK8RZ0fxdGvF8Ca8uTu/BvH/zjAEdvb+hXXvXRiyQ1U5SyrxlFDOTwS2FGIpEA/
- g3w5SWZTRcaOK6msHfvKFmM1rOn6i4FLx/CgJ9VjQyv8mJNnfl86cCcXWS2vzUBNZ3UNXi
- DvC39CkA0LmTM62BZa3kwBitHmIGNNI=
+ bh=fJPWZOb3Nybfh1vMEKfljpSCcGSwnpXztpPXo5K9aJ8=;
+ b=Kvo0Z0fAGkX2nmszG9bzquPAdNCa67OjIhBQbWWJ9XQ5RBUTg9SQnnVCWlSmC7jRTFrLst
+ A2J+R10A9hsmWekhJJYCWjs8WbKAEPLEYpJwWkgAE+N5C72LCRwS0ARl8vv/BJ+0alwRFZ
+ jb+cxO8NTWtIAOmzSOkFQwSF65b93Uc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-414-YXgU8CDaP5Wsa2ZzKBdY9w-1; Tue, 27 Oct 2020 14:22:09 -0400
-X-MC-Unique: YXgU8CDaP5Wsa2ZzKBdY9w-1
+ us-mta-82-TxbR7PkvNoeTCdJhoEBR9A-1; Tue, 27 Oct 2020 14:22:07 -0400
+X-MC-Unique: TxbR7PkvNoeTCdJhoEBR9A-1
 Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
  [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BF1C2EC1A0
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20AAF8030D1
  for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:55 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 8A9A750B44
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:55 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id E155F50B44
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:54 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 28/29] vl: remove separate preconfig main_loop
-Date: Tue, 27 Oct 2020 14:21:43 -0400
-Message-Id: <20201027182144.3315885-29-pbonzini@redhat.com>
+Subject: [PATCH 26/29] hmp: introduce cmd_available
+Date: Tue, 27 Oct 2020 14:21:41 -0400
+Message-Id: <20201027182144.3315885-27-pbonzini@redhat.com>
 In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
 References: <20201027182144.3315885-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -100,201 +100,80 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Move post-preconfig initialization to the x-exit-preconfig.  If preconfig
-is not requested, just exit preconfig mode immediately with the QMP
-command.
-
-As a result, the preconfig loop will run with accel_setup_post
-and os_setup_post restrictions (xen_restrict, chroot, etc.)
-already done.
+Combine the RUN_STATE_PRECONFIG and cmd_can_preconfig checks
+into a single function, to avoid repeating the same expression
+(or its negation after applying DeMorgan's rule) over and
+over again.
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- include/sysemu/runstate.h |  1 -
- monitor/qmp-cmds.c        |  9 ----
- softmmu/vl.c              | 94 +++++++++++++++++----------------------
- 3 files changed, 41 insertions(+), 63 deletions(-)
+ monitor/hmp.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/include/sysemu/runstate.h b/include/sysemu/runstate.h
-index f760094858..e557f470d4 100644
---- a/include/sysemu/runstate.h
-+++ b/include/sysemu/runstate.h
-@@ -41,7 +41,6 @@ typedef enum WakeupReason {
-     QEMU_WAKEUP_REASON_OTHER,
- } WakeupReason;
- 
--void qemu_exit_preconfig_request(void);
- void qemu_system_reset_request(ShutdownCause reason);
- void qemu_system_suspend_request(void);
- void qemu_register_suspend_notifier(Notifier *notifier);
-diff --git a/monitor/qmp-cmds.c b/monitor/qmp-cmds.c
-index 7c10b182e4..6680ba6c66 100644
---- a/monitor/qmp-cmds.c
-+++ b/monitor/qmp-cmds.c
-@@ -102,15 +102,6 @@ void qmp_system_powerdown(Error **errp)
-     qemu_system_powerdown_request();
+diff --git a/monitor/hmp.c b/monitor/hmp.c
+index c5cd9d372b..f13ef455e2 100644
+--- a/monitor/hmp.c
++++ b/monitor/hmp.c
+@@ -213,6 +213,11 @@ static bool cmd_can_preconfig(const HMPCommand *cmd)
+     return strchr(cmd->flags, 'p');
  }
  
--void qmp_x_exit_preconfig(Error **errp)
--{
--    if (qdev_hotplug) {
--        error_setg(errp, "The command is permitted only before machine initialization");
--        return;
--    }
--    qemu_exit_preconfig_request();
--}
--
- void qmp_cont(Error **errp)
- {
-     BlockBackend *blk;
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 68acd24d01..98666c0612 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -1313,7 +1313,6 @@ static pid_t shutdown_pid;
- static int powerdown_requested;
- static int debug_requested;
- static int suspend_requested;
--static bool preconfig_exit_requested = true;
- static WakeupReason wakeup_reason;
- static NotifierList powerdown_notifiers =
-     NOTIFIER_LIST_INITIALIZER(powerdown_notifiers);
-@@ -1400,11 +1399,6 @@ static int qemu_debug_requested(void)
-     return r;
- }
- 
--void qemu_exit_preconfig_request(void)
--{
--    preconfig_exit_requested = true;
--}
--
- /*
-  * Reset the VM. Issue an event unless @reason is SHUTDOWN_CAUSE_NONE.
-  */
-@@ -1626,10 +1620,6 @@ static bool main_loop_should_exit(void)
-     RunState r;
-     ShutdownCause request;
- 
--    if (preconfig_exit_requested) {
--        preconfig_exit_requested = false;
--        return true;
--    }
-     if (qemu_debug_requested()) {
-         vm_stop(RUN_STATE_DEBUG);
-     }
-@@ -3523,6 +3513,43 @@ static void qemu_machine_creation_done(void)
-     register_global_state();
- }
- 
-+void qmp_x_exit_preconfig(Error **errp)
++static bool cmd_available(const HMPCommand *cmd)
 +{
-+    if (qdev_hotplug) {
-+        error_setg(errp, "The command is permitted only before machine initialization");
-+        return;
-+    }
-+
-+    qemu_finish_machine_init();
-+    qemu_create_cli_devices();
-+    qemu_machine_creation_done();
-+
-+    if (loadvm) {
-+        Error *local_err = NULL;
-+        if (load_snapshot(loadvm, &local_err) < 0) {
-+            error_report_err(local_err);
-+            autostart = 0;
-+            exit(1);
-+        }
-+    }
-+    if (replay_mode != REPLAY_MODE_NONE) {
-+        replay_vmstate_init();
-+    }
-+
-+    if (incoming) {
-+        Error *local_err = NULL;
-+        if (strcmp(incoming, "defer") != 0) {
-+            qmp_migrate_incoming(incoming, &local_err);
-+            if (local_err) {
-+                error_reportf_err(local_err, "-incoming %s: ", incoming);
-+                exit(1);
-+            }
-+        }
-+    } else if (autostart) {
-+        qmp_cont(NULL);
-+    }
++    return !runstate_check(RUN_STATE_PRECONFIG) || cmd_can_preconfig(cmd);
 +}
 +
- void qemu_init(int argc, char **argv, char **envp)
+ static void help_cmd_dump_one(Monitor *mon,
+                               const HMPCommand *cmd,
+                               char **prefix_args,
+@@ -220,7 +225,7 @@ static void help_cmd_dump_one(Monitor *mon,
  {
-     QemuOpts *opts;
-@@ -4092,7 +4119,6 @@ void qemu_init(int argc, char **argv, char **envp)
-                 }
-                 break;
-             case QEMU_OPTION_preconfig:
--                preconfig_exit_requested = false;
-                 preconfig_requested = true;
-                 break;
-             case QEMU_OPTION_enable_kvm:
-@@ -4515,56 +4541,18 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_resolve_machine_memdev();
-     parse_numa_opts(current_machine);
+     int i;
  
--    if (preconfig_requested) {
--        qemu_init_displays();
--    }
--
--    /* do monitor/qmp handling at preconfig state if requested */
--    qemu_main_loop();
--    qemu_finish_machine_init();
--
--    qemu_create_cli_devices();
--
--    /* initialize displays after all errors have been reported */
--    if (!preconfig_requested) {
--        qemu_init_displays();
--    }
--    qemu_machine_creation_done();
--
--    if (loadvm) {
--        Error *local_err = NULL;
--        if (load_snapshot(loadvm, &local_err) < 0) {
--            error_report_err(local_err);
--            autostart = 0;
--            exit(1);
--        }
--    }
--    if (replay_mode != REPLAY_MODE_NONE) {
--        replay_vmstate_init();
--    }
--
-     if (vmstate_dump_file) {
-         /* dump and exit */
-         dump_vmstate_json_to_file(vmstate_dump_file);
-         exit(0);
+-    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
++    if (!cmd_available(cmd)) {
+         return;
      }
--    if (incoming) {
--        Error *local_err = NULL;
--        if (strcmp(incoming, "defer") != 0) {
--            qmp_migrate_incoming(incoming, &local_err);
--            if (local_err) {
--                error_reportf_err(local_err, "-incoming %s: ", incoming);
--                exit(1);
--            }
--        }
--    } else if (autostart) {
--        qmp_cont(NULL);
--    }
  
-+    if (!preconfig_requested) {
-+        qmp_x_exit_preconfig(&error_fatal);
-+    }
-+    qemu_init_displays();
-     accel_setup_post(current_machine);
-     os_setup_post();
--
--    return;
- }
- 
- void qemu_cleanup(void)
+@@ -248,8 +253,7 @@ static void help_cmd_dump(Monitor *mon, const HMPCommand *cmds,
+     /* Find one entry to dump */
+     for (cmd = cmds; cmd->name != NULL; cmd++) {
+         if (hmp_compare_cmd(args[arg_index], cmd->name) &&
+-            ((!runstate_check(RUN_STATE_PRECONFIG) ||
+-                cmd_can_preconfig(cmd)))) {
++            cmd_available(cmd)) {
+             if (cmd->sub_table) {
+                 /* continue with next arg */
+                 help_cmd_dump(mon, cmd->sub_table,
+@@ -653,7 +657,7 @@ static const HMPCommand *monitor_parse_command(MonitorHMP *hmp_mon,
+                        (int)(p - cmdp_start), cmdp_start);
+         return NULL;
+     }
+-    if (runstate_check(RUN_STATE_PRECONFIG) && !cmd_can_preconfig(cmd)) {
++    if (!cmd_available(cmd)) {
+         monitor_printf(mon, "Command '%.*s' not available with -preconfig "
+                             "until after exit_preconfig.\n",
+                        (int)(p - cmdp_start), cmdp_start);
+@@ -1225,8 +1229,7 @@ static void monitor_find_completion_by_table(MonitorHMP *mon,
+         }
+         readline_set_completion_index(mon->rs, strlen(cmdname));
+         for (cmd = cmd_table; cmd->name != NULL; cmd++) {
+-            if (!runstate_check(RUN_STATE_PRECONFIG) ||
+-                 cmd_can_preconfig(cmd)) {
++            if (cmd_available(cmd)) {
+                 cmd_completion(mon, cmdname, cmd->name);
+             }
+         }
+@@ -1234,8 +1237,7 @@ static void monitor_find_completion_by_table(MonitorHMP *mon,
+         /* find the command */
+         for (cmd = cmd_table; cmd->name != NULL; cmd++) {
+             if (hmp_compare_cmd(args[0], cmd->name) &&
+-                (!runstate_check(RUN_STATE_PRECONFIG) ||
+-                 cmd_can_preconfig(cmd))) {
++                cmd_available(cmd)) {
+                 break;
+             }
+         }
 -- 
 2.26.2
 
