@@ -2,83 +2,71 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA2D1C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:07:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C47B9C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:07:38 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3DE5F20657
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:07:28 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cfkrnUPT"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3DE5F20657
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 3AAA020720
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:07:38 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3AAA020720
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47244 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQZL-0003W8-6r
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:07:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48852)
+	id 1kXQZV-0003uw-7w
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:07:37 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54862)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXQBk-00088v-CZ
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:43:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49575)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXQBh-0002pt-NT
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:43:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603809780;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding;
- bh=txU5f1PJ63FXuEnM048tHdxp+doGnDMkZ2quhBu4XUA=;
- b=cfkrnUPTrtlbG7/PoFGzNSuXXuWgdYGR/WFKKRAADDdoj/13wSx1+BwxWGb3WyUkUmED0p
- ZWJgh/hpc0JdTftmvnQzfi5PsYybb170Iz+t+rzLU4yQ3xGEDANBh4Xo7/bfXGEn88mixM
- /Lv686vbccb+fykB8HJUkSyiNYUdH74=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-433-EGwMPzt-OQa28tqRIdvvvw-1; Tue, 27 Oct 2020 10:42:58 -0400
-X-MC-Unique: EGwMPzt-OQa28tqRIdvvvw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1820F8030D1;
- Tue, 27 Oct 2020 14:42:57 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 5611170596;
- Tue, 27 Oct 2020 14:42:56 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 0/3] Ide patches
-Date: Tue, 27 Oct 2020 10:42:52 -0400
-Message-Id: <20201027144255.77478-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXV-0001ow-PO
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:34 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:50292
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXS-000617-B2
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:32 -0400
+Received: from host86-148-103-79.range86-148.btcentralplus.com
+ ([86.148.103.79] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXU-0001Qg-Pg; Tue, 27 Oct 2020 15:05:37 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org,
+	kraxel@redhat.com,
+	samuel.thibault@ens-lyon.org
+Date: Tue, 27 Oct 2020 15:04:52 +0000
+Message-Id: <20201027150456.24606-5-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027150456.24606-1-mark.cave-ayland@ilande.co.uk>
+References: <20201027150456.24606-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.148.103.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PATCH v2 4/8] dev-serial: add trace-events for baud rate and data
+ parameters
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -91,40 +79,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit a95e0396c805735c491a049b01de6f5a713fb91b=
-:=0D
-=0D
-  Merge remote-tracking branch 'remotes/bonzini-gitlab/tags/for-upstream' i=
-nto staging (2020-10-26 15:49:11 +0000)=0D
-=0D
-are available in the Git repository at:=0D
-=0D
-  https://gitlab.com/jsnow/qemu.git tags/ide-pull-request=0D
-=0D
-for you to fetch changes up to 1a9925e3390b6adf1125e3abaa17c80ca012bede:=0D
-=0D
-  ide: clear SRST after SRST finishes (2020-10-27 10:39:06 -0400)=0D
-=0D
-----------------------------------------------------------------=0D
-IDE Pull request=0D
-=0D
-----------------------------------------------------------------=0D
-=0D
-John Snow (3):=0D
-  ide: run diagnostic after SRST=0D
-  ide: perform SRST as early as possible=0D
-  ide: clear SRST after SRST finishes=0D
-=0D
- hw/ide/core.c | 12 +++++-------=0D
- 1 file changed, 5 insertions(+), 7 deletions(-)=0D
-=0D
---=20=0D
-2.26.2=0D
-=0D
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+---
+ hw/usb/dev-serial.c | 3 +++
+ hw/usb/trace-events | 2 ++
+ 2 files changed, 5 insertions(+)
+
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index abc316c7bf..badf8785db 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -307,6 +307,7 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+         }
+ 
+         s->params.speed = (48000000 / 2) / (8 * divisor + subdivisor8);
++        trace_usb_serial_set_baud(bus->busnr, dev->addr, s->params.speed);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         break;
+     }
+@@ -340,6 +341,8 @@ static void usb_serial_handle_control(USBDevice *dev, USBPacket *p,
+             goto fail;
+         }
+ 
++        trace_usb_serial_set_data(bus->busnr, dev->addr, s->params.parity,
++                                  s->params.data_bits, s->params.stop_bits);
+         qemu_chr_fe_ioctl(&s->cs, CHR_IOCTL_SERIAL_SET_PARAMS, &s->params);
+         /* TODO: TX ON/OFF */
+         break;
+diff --git a/hw/usb/trace-events b/hw/usb/trace-events
+index 89f1c351e3..98ee1c5462 100644
+--- a/hw/usb/trace-events
++++ b/hw/usb/trace-events
+@@ -328,3 +328,5 @@ usb_serial_unsupported_parity(int bus, int addr, int value) "dev %d:%u unsupport
+ usb_serial_unsupported_stopbits(int bus, int addr, int value) "dev %d:%u unsupported stop bits %d"
+ usb_serial_unsupported_control(int bus, int addr, int request, int value) "dev %d:%u got unsupported/bogus control 0x%x, value 0x%x"
+ usb_serial_bad_token(int bus, int addr) "dev %d:%u bad token"
++usb_serial_set_baud(int bus, int addr, int baud) "dev %d:%u baud rate %d"
++usb_serial_set_data(int bus, int addr, int parity, int data, int stop) "dev %d:%u parity %c, data bits %d, stop bits %d"
+-- 
+2.20.1
 
 
