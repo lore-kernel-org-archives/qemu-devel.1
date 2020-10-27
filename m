@@ -7,80 +7,80 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D36FC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:18:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED343C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:19:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id EBF9620756
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:18:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7466821D7B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:19:37 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fc23+AEv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EBF9620756
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DwfNN7BE"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7466821D7B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXUU5-0007iy-Vd
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 15:18:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42404)
+	id 1kXUVM-0000HO-CQ
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 15:19:36 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kXUJT-0001Sl-LX
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 15:07:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60432)
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kXUJD-0001IQ-PM
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 15:07:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:43472)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kXUJI-0001Nw-Eo
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 15:07:19 -0400
+ (Exim 4.90_1) (envelope-from <mreitz@redhat.com>) id 1kXUJ7-0001Mv-64
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 15:07:02 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603825627;
+ s=mimecast20190719; t=1603825616;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=zUnCItJ2BtWYuSAxfqtGlqPLsevXuSSmKUUnYrlzcnc=;
- b=Fc23+AEvaWE1ic4wGKAGgRyNiOy8WHDQDdL3Z8UdXbxZruJ306l59O+V1qhe+kX+dR306x
- FPDKWnnqZ5pg1RoP7q02gjYW/HMxRXTlQM/09ogXyYodT4SJwlMxtRTSZBmmBCueiFt5Ee
- FxsF0dAqcW9W60NAzmUhYVrVUaOAwiU=
+ bh=8AiZdMXNF9kXkFvRLmLjBZjnDj1TSMvJGRi+PlnaGCs=;
+ b=DwfNN7BEBl0l3o3K2Mb1uWFkaX8j3WbIE2aJyKademMsBCXwP1+zGA6k91jWR5IEHkEEHd
+ KNCD/YIG9c4oRa4+VrcBPZwOAOcTqqbRuJINQCcgD3gIklSJL/39aRjPqqIZqUVcNIEM4b
+ eeFYgbFNDVQrYK7TZKYjDK5qu2Nmc3A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-435-oYs3MS7eNgGIUEAMhrSvCQ-1; Tue, 27 Oct 2020 15:07:05 -0400
-X-MC-Unique: oYs3MS7eNgGIUEAMhrSvCQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-594-ZYB1BAMePCKDrD1pa27IWw-1; Tue, 27 Oct 2020 15:06:54 -0400
+X-MC-Unique: ZYB1BAMePCKDrD1pa27IWw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 86E5E1009E41;
- Tue, 27 Oct 2020 19:07:04 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 75E7261181;
+ Tue, 27 Oct 2020 19:06:53 +0000 (UTC)
 Received: from localhost (unknown [10.40.193.195])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 07A515C1BB;
- Tue, 27 Oct 2020 19:07:00 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 711341992F;
+ Tue, 27 Oct 2020 19:06:49 +0000 (UTC)
 From: Max Reitz <mreitz@redhat.com>
 To: qemu-block@nongnu.org
-Subject: [PATCH for-6.0 v3 11/20] iotests: Derive image names from $TEST_IMG
-Date: Tue, 27 Oct 2020 20:05:51 +0100
-Message-Id: <20201027190600.192171-12-mreitz@redhat.com>
+Subject: [PATCH for-6.0 v3 09/20] iotests: Use convert -n in some cases
+Date: Tue, 27 Oct 2020 20:05:49 +0100
+Message-Id: <20201027190600.192171-10-mreitz@redhat.com>
 In-Reply-To: <20201027190600.192171-1-mreitz@redhat.com>
 References: <20201027190600.192171-1-mreitz@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mreitz@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mreitz@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mreitz@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,82 +99,92 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Avoid creating images with custom filenames in $TEST_DIR, because
-non-file protocols may want to keep $TEST_IMG (and all other test
-images) in some other directory.
+qemu-img convert (without -n) can often be replaced by a combination of
+_make_test_img + qemu-img convert -n.  Doing so allows converting to
+protocols that do not allow direct file creation, such as FUSE exports.
+The only problem is that for formats other than qcow2 and qed (qcow1 at
+least), this may lead to high disk usage for some reason, so we cannot
+do it everywhere.
+
+But we can do it in 028 and 089, so let us do that so they can run on
+FUSE exports.  Also, in 028 this allows us to remove a 9-line comment
+that used to explain why we cannot safely filter drive-backup's image
+creation output.
 
 Signed-off-by: Max Reitz <mreitz@redhat.com>
 Reviewed-by: Kevin Wolf <kwolf@redhat.com>
 ---
- tests/qemu-iotests/200     | 3 +--
- tests/qemu-iotests/200.out | 4 ++--
- tests/qemu-iotests/229     | 3 +--
- tests/qemu-iotests/229.out | 6 +++---
- 4 files changed, 7 insertions(+), 9 deletions(-)
+ tests/qemu-iotests/028     | 14 ++++----------
+ tests/qemu-iotests/028.out |  3 +++
+ tests/qemu-iotests/089     |  3 ++-
+ tests/qemu-iotests/089.out |  1 +
+ 4 files changed, 10 insertions(+), 11 deletions(-)
 
-diff --git a/tests/qemu-iotests/200 b/tests/qemu-iotests/200
-index 59f7854b9f..a7aabbd032 100755
---- a/tests/qemu-iotests/200
-+++ b/tests/qemu-iotests/200
-@@ -44,8 +44,7 @@ trap "_cleanup; exit \$status" 0 1 2 3 15
- _supported_fmt qcow2 qed
- _supported_proto file
+diff --git a/tests/qemu-iotests/028 b/tests/qemu-iotests/028
+index 6dd3ae09a3..864dc4a4e2 100755
+--- a/tests/qemu-iotests/028
++++ b/tests/qemu-iotests/028
+@@ -116,16 +116,10 @@ else
+     QEMU_COMM_TIMEOUT=1
+ fi
  
--BACKING_IMG="${TEST_DIR}/backing.img"
--TEST_IMG="${TEST_DIR}/test.img"
-+BACKING_IMG="$TEST_IMG.base"
+-# Silence output since it contains the disk image path and QEMU's readline
+-# character echoing makes it very hard to filter the output. Plus, there
+-# is no telling how many times the command will repeat before succeeding.
+-# (Note that creating the image results in a "Formatting..." message over
+-# stdout, which is the same channel the monitor uses.  We cannot reliably
+-# wait for it because the monitor output may interact with it in such a
+-# way that _timed_wait_for cannot read it.  However, once the block job is
+-# done, we know that the "Formatting..." message must have appeared
+-# already, so the output is still deterministic.)
+-silent=y _send_qemu_cmd $h "drive_backup disk ${TEST_IMG}.copy" "(qemu)"
++TEST_IMG="$TEST_IMG.copy" _make_test_img $image_size
++_send_qemu_cmd $h "drive_backup -n disk ${TEST_IMG}.copy" "(qemu)" \
++    | _filter_imgfmt
++
+ silent=y qemu_cmd_repeat=20 _send_qemu_cmd $h "info block-jobs" "No active jobs"
+ _send_qemu_cmd $h "info block-jobs" "No active jobs"
+ _send_qemu_cmd $h 'quit' ""
+diff --git a/tests/qemu-iotests/028.out b/tests/qemu-iotests/028.out
+index 5a68de5c46..e580488216 100644
+--- a/tests/qemu-iotests/028.out
++++ b/tests/qemu-iotests/028.out
+@@ -468,6 +468,9 @@ No errors were found on the image.
  
- TEST_IMG="$BACKING_IMG" _make_test_img 512M
- _make_test_img -F $IMGFMT -b "$BACKING_IMG" 512M
-diff --git a/tests/qemu-iotests/200.out b/tests/qemu-iotests/200.out
-index a6776070e4..5883f16ac3 100644
---- a/tests/qemu-iotests/200.out
-+++ b/tests/qemu-iotests/200.out
-@@ -1,6 +1,6 @@
- QA output created by 200
--Formatting 'TEST_DIR/backing.img', fmt=IMGFMT size=536870912
--Formatting 'TEST_DIR/test.img', fmt=IMGFMT size=536870912 backing_file=TEST_DIR/backing.img backing_fmt=IMGFMT
-+Formatting 'TEST_DIR/t.IMGFMT.base', fmt=IMGFMT size=536870912
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=536870912 backing_file=TEST_DIR/t.IMGFMT.base backing_fmt=IMGFMT
- wrote 314572800/314572800 bytes at offset 512
- 300 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ block-backup
  
-diff --git a/tests/qemu-iotests/229 b/tests/qemu-iotests/229
-index 89a5359f32..5f759fa587 100755
---- a/tests/qemu-iotests/229
-+++ b/tests/qemu-iotests/229
-@@ -51,8 +51,7 @@ _supported_os Linux
- _unsupported_imgopts data_file
++Formatting 'TEST_DIR/t.IMGFMT.copy', fmt=IMGFMT size=4294968832
++QEMU X.Y.Z monitor - type 'help' for more information
++(qemu) drive_backup -n disk TEST_DIR/t.IMGFMT.copy
+ (qemu) info block-jobs
+ No active jobs
+ === IO: pattern 195
+diff --git a/tests/qemu-iotests/089 b/tests/qemu-iotests/089
+index 66c5415abe..03a2ccf1e8 100755
+--- a/tests/qemu-iotests/089
++++ b/tests/qemu-iotests/089
+@@ -62,7 +62,8 @@ TEST_IMG="$TEST_IMG.base" _make_test_img $IMG_SIZE
+ $QEMU_IO -c 'write -P 42 0 512' -c 'write -P 23 512 512' \
+          -c 'write -P 66 1024 512' "$TEST_IMG.base" | _filter_qemu_io
  
+-$QEMU_IMG convert -f raw -O $IMGFMT "$TEST_IMG.base" "$TEST_IMG"
++_make_test_img $IMG_SIZE
++$QEMU_IMG convert -f raw -O $IMGFMT -n "$TEST_IMG.base" "$TEST_IMG"
  
--DEST_IMG="$TEST_DIR/d.$IMGFMT"
--TEST_IMG="$TEST_DIR/b.$IMGFMT"
-+DEST_IMG="$TEST_IMG.dest"
- BLKDEBUG_CONF="$TEST_DIR/blkdebug.conf"
- 
- _make_test_img 2M
-diff --git a/tests/qemu-iotests/229.out b/tests/qemu-iotests/229.out
-index 4de6dfaa28..7eed393013 100644
---- a/tests/qemu-iotests/229.out
-+++ b/tests/qemu-iotests/229.out
-@@ -1,6 +1,6 @@
- QA output created by 229
--Formatting 'TEST_DIR/b.IMGFMT', fmt=IMGFMT size=2097152
--Formatting 'TEST_DIR/d.IMGFMT', fmt=IMGFMT size=2097152
-+Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=2097152
-+Formatting 'TEST_DIR/t.IMGFMT.dest', fmt=IMGFMT size=2097152
- wrote 2097152/2097152 bytes at offset 0
- 2 MiB, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
- {'execute': 'qmp_capabilities'}
-@@ -8,7 +8,7 @@ wrote 2097152/2097152 bytes at offset 0
- 
- === Starting drive-mirror, causing error & stop  ===
- 
--{'execute': 'drive-mirror', 'arguments': {'device': 'testdisk', 'format': 'IMGFMT', 'target': 'blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/d.IMGFMT', 'sync': 'full', 'mode': 'existing', 'on-source-error': 'stop', 'on-target-error': 'stop' }}
-+{'execute': 'drive-mirror', 'arguments': {'device': 'testdisk', 'format': 'IMGFMT', 'target': 'blkdebug:TEST_DIR/blkdebug.conf:TEST_DIR/t.IMGFMT.dest', 'sync': 'full', 'mode': 'existing', 'on-source-error': 'stop', 'on-target-error': 'stop' }}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "created", "id": "testdisk"}}
- {"timestamp": {"seconds":  TIMESTAMP, "microseconds":  TIMESTAMP}, "event": "JOB_STATUS_CHANGE", "data": {"status": "running", "id": "testdisk"}}
- {"return": {}}
+ $QEMU_IO_PROG --cache $CACHEMODE --aio $AIOMODE \
+          -c 'read -P 42 0 512' -c 'read -P 23 512 512' \
+diff --git a/tests/qemu-iotests/089.out b/tests/qemu-iotests/089.out
+index 15682c2886..c53fc4823a 100644
+--- a/tests/qemu-iotests/089.out
++++ b/tests/qemu-iotests/089.out
+@@ -9,6 +9,7 @@ wrote 512/512 bytes at offset 512
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ wrote 512/512 bytes at offset 1024
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
++Formatting 'TEST_DIR/t.IMGFMT', fmt=IMGFMT size=67108864
+ read 512/512 bytes at offset 0
+ 512 bytes, X ops; XX:XX:XX.X (XXX YYY/sec and XXX ops/sec)
+ read 512/512 bytes at offset 512
 -- 
 2.26.2
 
