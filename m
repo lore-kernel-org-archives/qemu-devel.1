@@ -2,96 +2,87 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-6.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,HTML_MESSAGE,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97DC3C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:28:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B8B2C55178
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:28:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CC43221655
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:28:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6EF4B21655
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:28:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Hyn3wKIE"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC43221655
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XspB1kbw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6EF4B21655
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXO5T-0008GF-Ps
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:28:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48018)
+	id 1kXO5s-0000WK-5z
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:28:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35816)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXNBz-00016N-7d
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:31:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47877)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXNBw-0008Bz-TS
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:31:06 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603798264;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=0m6htpiM3fGaToIha04niVXVj4CdgMuZ3+mBXchWNmo=;
- b=Hyn3wKIElCwhMmdwWlXc79BapGQzv5pkmFFiC4qoXvmrHl88SWPiPf0GVOQdfFiRKcJMO7
- RRa3ptLT3anuNk/GeDFYdUYXR8qb4AvBKAsj0NMQCIRAceYggKRND65f2emeg4LwHsf3q6
- 3I00++yL0thw1knaUeemmDQOk35e9hA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-_Xat3cc6POG_h1dfniy_zg-1; Tue, 27 Oct 2020 07:31:02 -0400
-X-MC-Unique: _Xat3cc6POG_h1dfniy_zg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 079E01018F60;
- Tue, 27 Oct 2020 11:31:01 +0000 (UTC)
-Received: from redhat.com (ovpn-115-179.ams2.redhat.com [10.36.115.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0F91C1002382;
- Tue, 27 Oct 2020 11:30:54 +0000 (UTC)
-Date: Tue, 27 Oct 2020 07:30:51 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Marcel Apfelbaum <marcel.apfelbaum@gmail.com>
-Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
- not ready
-Message-ID: <20201027072814-mutt-send-email-mst@kernel.org>
-References: <20201022114026.31968-1-marcel.apfelbaum@gmail.com>
- <20201022080354-mutt-send-email-mst@kernel.org>
- <20201022235632.7f69ddc9@yekko.fritz.box>
- <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
- <20201022100028-mutt-send-email-mst@kernel.org>
- <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
- <20201022102857-mutt-send-email-mst@kernel.org>
- <CAC_L=vX0+H-SfQHneVPd-Mc3wFxHBSbkKHt3SpNOBOY_JsYDUA@mail.gmail.com>
- <20201022110016-mutt-send-email-mst@kernel.org>
- <CAC_L=vUgsh=08m8EEuEucRtdX73X5kw5ov4Ekg7jFjbHsU6f2w@mail.gmail.com>
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kXO3J-0007Bs-KF
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:26:13 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:37146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@gmail.com>)
+ id 1kXO3G-0002Om-UT
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:26:13 -0400
+Received: by mail-ed1-x541.google.com with SMTP id o18so1225343edq.4
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 05:26:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=evJLjU+QywP+uIgYJlGBlEyN0S7jCg60N7XVAHexTPU=;
+ b=XspB1kbw7NqKs8f6znDkwchBFiaye+IidK9ctmjO40uj979KwAMudffOM4fZkaf35D
+ JuNDEY3aerqCnvpWSRLXahs2lt6vL32/EZaRdMbZMK6HsYX1F0/dAMTSFR/bIjonK9Re
+ cVqNgXrk2iRs1XV0fu6t/+XItgX7PhVGnYUJBBsVJL66iVe4BYqDXFLlpT0G0l8pK6Ml
+ nKxDFcjh8nENyVufI5pMfhhg1CIQcbSrglNPt8rfu9tVgKult3ynM21TF+SQLZSf5k70
+ ZDdGZ46Mr2aCj2BtcEFwU7xvZFuLkWgqYfZsllgcevjw69j3FmT/H3dMT0I66XTDdm1o
+ pLTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=evJLjU+QywP+uIgYJlGBlEyN0S7jCg60N7XVAHexTPU=;
+ b=iRGUH5Vg8zEbELNRrq1VkalTzUFHhn0eUMzUWM3eBl06QpIlK1MJyK9CZK9Ceonxu3
+ HqJuTu+cZyxP+WAHjuwvTNovMJWp5AOGpxD6dNs75ZppbHVpqyzR1Krzal30ZUra04fb
+ LbTFBwOoiEe4B1X7n5lQGRktjsyxmsZJgrITkNxtTsJElthZD16mHWIu9XTaYp2UZjaC
+ F9K48+0QiyFlJ3djsOIx5IHD66WL21zZ8P7pcFt5xR/FSF8tJQi62Wc6dIqP5sa29+Jv
+ zLUzoKXyIrBPHvaMh6rqgIxeWQY7BUUo8GsV/WG3hPAzgRZNbw3G3GC5udToNEkqf21y
+ UgeA==
+X-Gm-Message-State: AOAM533pa+gP5esFSsJCKEuzX0rd853OJXxniEpXX74X9e7235JECv8m
+ c/5ARQ+bWBFCdBw5O343a5zLQgWz246aYz/TSmk=
+X-Google-Smtp-Source: ABdhPJzkUGiCri3KOopxkXaCxNcilY4GFZzLt38qHY3E/IZkIMpV12OuXTnVUUxQ6zz5TbgkB0Cegr60B1MebG+D4Ug=
+X-Received: by 2002:a05:6402:195:: with SMTP id
+ r21mr1948083edv.164.1603801561318; 
+ Tue, 27 Oct 2020 05:26:01 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <CAC_L=vUgsh=08m8EEuEucRtdX73X5kw5ov4Ekg7jFjbHsU6f2w@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=mst@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+References: <20201027121026.3025930-1-armbru@redhat.com>
+In-Reply-To: <20201027121026.3025930-1-armbru@redhat.com>
+From: =?UTF-8?B?TWFyYy1BbmRyw6kgTHVyZWF1?= <marcandre.lureau@gmail.com>
+Date: Tue, 27 Oct 2020 16:25:49 +0400
+Message-ID: <CAJ+F1CLfFWyWmAuN6g6qZ91Z-j6UJUHzfHK4JR19tfD2z9RZFA@mail.gmail.com>
+Subject: Re: [PATCH] docs/devel/qapi-code-gen: Fix up examples
+To: Markus Armbruster <armbru@redhat.com>
+Content-Type: multipart/alternative; boundary="0000000000005a4aec05b2a626b7"
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=marcandre.lureau@gmail.com; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ HTML_MESSAGE=0.001, RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,236 +95,142 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
+Cc: QEMU <qemu-devel@nongnu.org>, Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Fri, Oct 23, 2020 at 09:26:48AM +0300, Marcel Apfelbaum wrote:
-> Hi Michael,
-> 
-> On Thu, Oct 22, 2020 at 6:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> 
->     On Thu, Oct 22, 2020 at 05:50:51PM +0300, Marcel Apfelbaum wrote:
->     >
->     >
->     > On Thu, Oct 22, 2020 at 5:33 PM Michael S. Tsirkin <mst@redhat.com>
->     wrote:
->     >
->     >     On Thu, Oct 22, 2020 at 05:10:43PM +0300, Marcel Apfelbaum wrote:
->     >     >
->     >     >
->     >     > On Thu, Oct 22, 2020 at 5:01 PM Michael S. Tsirkin <mst@redhat.com>
->     >     wrote:
->     >     >
->     >     >     On Thu, Oct 22, 2020 at 04:55:10PM +0300, Marcel Apfelbaum
->     wrote:
->     >     >     > Hi David, Michael,
->     >     >     >
->     >     >     > On Thu, Oct 22, 2020 at 3:56 PM David Gibson <
->     dgibson@redhat.com>
->     >     wrote:
->     >     >     >
->     >     >     >     On Thu, 22 Oct 2020 08:06:55 -0400
->     >     >     >     "Michael S. Tsirkin" <mst@redhat.com> wrote:
->     >     >     >
->     >     >     >     > On Thu, Oct 22, 2020 at 02:40:26PM +0300, Marcel
->     Apfelbaum
->     >     wrote:
->     >     >     >     > > From: Marcel Apfelbaum <marcel@redhat.com>
->     >     >     >     > >
->     >     >     >     > > During PCIe Root Port's transition from Power-Off to
->     >     Power-ON (or
->     >     >     >     vice-versa)
->     >     >     >     > > the "Slot Control Register" has the "Power Indicator
->     >     Control"
->     >     >     >     > > set to "Blinking" expressing a "power transition"
->     mode.
->     >     >     >     > >
->     >     >     >     > > Any hotplug operation during the "power transition"
->     mode is
->     >     not
->     >     >     >     permitted
->     >     >     >     > > or at least not expected by the Guest OS leading to
->     strange
->     >     >     failures.
->     >     >     >     > >
->     >     >     >     > > Detect and refuse hotplug operations in such case.
->     >     >     >     > >
->     >     >     >     > > Signed-off-by: Marcel Apfelbaum <
->     marcel.apfelbaum@gmail.com
->     >     >
->     >     >     >     > > ---
->     >     >     >     > >  hw/pci/pcie.c | 7 +++++++
->     >     >     >     > >  1 file changed, 7 insertions(+)
->     >     >     >     > >
->     >     >     >     > > diff --git a/hw/pci/pcie.c b/hw/pci/pcie.c
->     >     >     >     > > index 5b48bae0f6..2fe5c1473f 100644
->     >     >     >     > > --- a/hw/pci/pcie.c
->     >     >     >     > > +++ b/hw/pci/pcie.c
->     >     >     >     > > @@ -410,6 +410,7 @@ void pcie_cap_slot_pre_plug_cb
->     >     (HotplugHandler
->     >     >     >     *hotplug_dev, DeviceState *dev,
->     >     >     >     > >      PCIDevice *hotplug_pdev = PCI_DEVICE
->     (hotplug_dev);
->     >     >     >     > >      uint8_t *exp_cap = hotplug_pdev->config +
->     >     hotplug_pdev->
->     >     >     >     exp.exp_cap;
->     >     >     >     > >      uint32_t sltcap = pci_get_word(exp_cap +
->     >     PCI_EXP_SLTCAP);
->     >     >     >     > > +    uint32_t sltctl = pci_get_word(exp_cap +
->     >     PCI_EXP_SLTCTL);
->     >     >     >     > > 
->     >     >     >     > >      /* Check if hot-plug is disabled on the slot */
->     >     >     >     > >      if (dev->hotplugged && (sltcap &
->     PCI_EXP_SLTCAP_HPC) =
->     >     = 0) {
->     >     >     >     > > @@ -418,6 +419,12 @@ void pcie_cap_slot_pre_plug_cb
->     >     >     (HotplugHandler
->     >     >     >     *hotplug_dev, DeviceState *dev,
->     >     >     >     > >          return;
->     >     >     >     > >      }
->     >     >     >     > > 
->     >     >     >     > > +    if ((sltctl & PCI_EXP_SLTCTL_PIC) ==
->     >     >     PCI_EXP_SLTCTL_PWR_IND_BLINK)
->     >     >     >     {
->     >     >     >     > > +        error_setg(errp, "Hot-plug failed: %s is in
->     Power
->     >     >     Transition",
->     >     >     >     > > +                   DEVICE(hotplug_pdev)->id);
->     >     >     >     > > +        return;
->     >     >     >     > > +    }
->     >     >     >     > > +
->     >     >     >     > >      pcie_cap_slot_plug_common(PCI_DEVICE
->     (hotplug_dev),
->     >     dev,
->     >     >     errp);
->     >     >     >     > >  } 
->     >     >     >     >
->     >     >     >     > Probably the only way to handle for existing machine
->     types.
->     >     >     >
->     >     >     >
->     >     >     > I agree
->     >     >     >  
->     >     >     >
->     >     >     >     > For new ones, can't we queue it in host memory
->     somewhere?
->     >     >     >
->     >     >     >
->     >     >     >
->     >     >     > I am not sure I understand what will be the flow.
->     >     >     >   - The user asks for a hotplug operation.
->     >     >     >   -  QEMU deferred operation.
->     >     >     > After that the operation may still fail, how would the user
->     know if
->     >     the
->     >     >     > operation
->     >     >     > succeeded or not?
->     >     >
->     >     >
->     >     >     How can it fail? It's just a button press ...
->     >     >
->     >     >
->     >     >
->     >     > Currently we have "Hotplug unsupported."
->     >     > With this change we have "Guest/System not ready"
->     >
->     >
->     >     Hotplug unsupported is not an error that can trigger with
->     >     a well behaved management such as libvirt.
->     >
->     >
->     >     >  
->     >     >
->     >     >     >  
->     >     >     >
->     >     >     >     I'm not actually convinced we can't do that even for
->     existing
->     >     machine
->     >     >     >     types. 
->     >     >     >
->     >     >     >
->     >     >     > Is a Guest visible change, I don't think we can do it.
->     >     >     >  
->     >     >     >
->     >     >     >     So I'm a bit hesitant to suggest going ahead with this
->     without
->     >     >     >     looking a bit closer at whether we can implement a
->     >     wait-for-ready in
->     >     >     >     qemu, rather than forcing every user of qemu (human or
->     machine)
->     >     to do
->     >     >     >     so.
->     >     >     >
->     >     >     >
->     >     >     > While I agree it is a pain from the usability point of view,
->     >     hotplug
->     >     >     operations
->     >     >     > are allowed to fail. This is not more than a corner case,
->     ensuring
->     >     the
->     >     >     right
->     >     >     > response (gracefully erroring out) may be enough.
->     >     >     >
->     >     >     > Thanks,
->     >     >     > Marcel
->     >     >     >
->     >     >
->     >     >
->     >     >     I don't think they ever failed in the past so management is
->     unlikely
->     >     >     to handle the failure by retrying ...
->     >     >
->     >     >
->     >     > That would require some management handling, yes.
->     >     > But even without a "retry", failing is better than strange OS
->     behavior.
->     >     >
->     >     > Trying a better alternative like deferring the operation for new
->     machines
->     >     > would make sense, however is out of the scope of this patch
->     >
->     >     Expand the scope please. The scope should be "solve a problem xx" not
->     >     "solve a problem xx by doing abc".
->     >
->     >
->     >
->     > The scope is detecting a hotplug error early instead
->     > passing to the Guest OS a hotplug operation that we know it will fail.
->     >
-> 
->     Right. After detecting just failing unconditionally it a bit too
->     simplistic IMHO.
-> 
-> 
-> 
-> Simplistic does not mean wrong or incorrect.
-> I fail to see why it is not enough.
+--0000000000005a4aec05b2a626b7
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The failure patch requires management to retry later.
-A more elaborate scheme will fix the bug without need for management
-changes.
+On Tue, Oct 27, 2020 at 4:22 PM Markus Armbruster <armbru@redhat.com> wrote=
+:
 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>
 
-> What QEMU can do better? Wait an unbounded time for the blinking to finish?
-> What if we have a buggy guest with a kernel stuck in blinking?
+Reviewed-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
 
-Then it won't see the new device ever but does it even matter? It's
-stuck ... I'd ack adding a query command to see what is going
-on with the device. Can be generic, implementable on top of ACPI too.
+---
+>  docs/devel/qapi-code-gen.txt | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt
+> index c6438c6aa9..6906a06ad2 100644
+> --- a/docs/devel/qapi-code-gen.txt
+> +++ b/docs/devel/qapi-code-gen.txt
+> @@ -393,7 +393,7 @@ is identical on the wire to:
+>   { 'enum': 'Enum', 'data': ['one', 'two'] }
+>   { 'struct': 'Branch1', 'data': { 'data': 'str' } }
+>   { 'struct': 'Branch2', 'data': { 'data': 'int' } }
+> - { 'union': 'Flat': 'base': { 'type': 'Enum' }, 'discriminator': 'type',
+> + { 'union': 'Flat', 'base': { 'type': 'Enum' }, 'discriminator': 'type',
+>     'data': { 'one': 'Branch1', 'two': 'Branch2' } }
+>
+>  The optional 'if' member specifies a conditional.  See "Configuring
+> @@ -590,6 +590,8 @@ When in doubt, do not implement OOB execution support=
+.
+>  Member 'allow-preconfig' declares whether the command is available
+>  before the machine is built.  It defaults to false.  For example:
+>
+> + { 'enum': 'QMPCapability',
+> +   'data': [ 'oob' ] }
+>   { 'command': 'qmp_capabilities',
+>     'data': { '*enable': [ 'QMPCapability' ] },
+>     'allow-preconfig': true }
+> @@ -824,7 +826,7 @@ Example: a struct with conditional feature
+> 'allow-negative-numbers'
+>  { 'struct': 'TestType',
+>    'data': { 'number': 'int' },
+>    'features': [ { 'name': 'allow-negative-numbers',
+> -                  'if' 'defined(IFCOND)' } ] }
+> +                  'if': 'defined(IFCOND)' } ] }
+>
+>  Please note that you are responsible to ensure that the C code will
+>  compile with an arbitrary combination of conditions, since the
+> --
+> 2.26.2
+>
+>
+>
 
-> Is QEMU's responsibility to emulate the operator itself? Because the operator
-> is the one who is supposed to wait.
+--=20
+Marc-Andr=C3=A9 Lureau
 
-I think these details are immaterial for users. They don't read pci
-spec.
+--0000000000005a4aec05b2a626b7
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Thanks,
-> Marcel
-> 
-> [...] 
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Tue, Oct 27, 2020 at 4:22 PM Marku=
+s Armbruster &lt;<a href=3D"mailto:armbru@redhat.com">armbru@redhat.com</a>=
+&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"margin:0px =
+0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">Sign=
+ed-off-by: Markus Armbruster &lt;<a href=3D"mailto:armbru@redhat.com" targe=
+t=3D"_blank">armbru@redhat.com</a>&gt;<br></blockquote><div><br></div><div>=
+Reviewed-by: Marc-Andr=C3=A9 Lureau &lt;<a href=3D"mailto:marcandre.lureau@=
+redhat.com">marcandre.lureau@redhat.com</a>&gt;</div><div> <br></div><block=
+quote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1=
+px solid rgb(204,204,204);padding-left:1ex">
+---<br>
+=C2=A0docs/devel/qapi-code-gen.txt | 6 ++++--<br>
+=C2=A01 file changed, 4 insertions(+), 2 deletions(-)<br>
+<br>
+diff --git a/docs/devel/qapi-code-gen.txt b/docs/devel/qapi-code-gen.txt<br=
+>
+index c6438c6aa9..6906a06ad2 100644<br>
+--- a/docs/devel/qapi-code-gen.txt<br>
++++ b/docs/devel/qapi-code-gen.txt<br>
+@@ -393,7 +393,7 @@ is identical on the wire to:<br>
+=C2=A0 { &#39;enum&#39;: &#39;Enum&#39;, &#39;data&#39;: [&#39;one&#39;, &#=
+39;two&#39;] }<br>
+=C2=A0 { &#39;struct&#39;: &#39;Branch1&#39;, &#39;data&#39;: { &#39;data&#=
+39;: &#39;str&#39; } }<br>
+=C2=A0 { &#39;struct&#39;: &#39;Branch2&#39;, &#39;data&#39;: { &#39;data&#=
+39;: &#39;int&#39; } }<br>
+- { &#39;union&#39;: &#39;Flat&#39;: &#39;base&#39;: { &#39;type&#39;: &#39=
+;Enum&#39; }, &#39;discriminator&#39;: &#39;type&#39;,<br>
++ { &#39;union&#39;: &#39;Flat&#39;, &#39;base&#39;: { &#39;type&#39;: &#39=
+;Enum&#39; }, &#39;discriminator&#39;: &#39;type&#39;,<br>
+=C2=A0 =C2=A0 &#39;data&#39;: { &#39;one&#39;: &#39;Branch1&#39;, &#39;two&=
+#39;: &#39;Branch2&#39; } }<br>
+<br>
+=C2=A0The optional &#39;if&#39; member specifies a conditional.=C2=A0 See &=
+quot;Configuring<br>
+@@ -590,6 +590,8 @@ When in doubt, do not implement OOB execution support.<=
+br>
+=C2=A0Member &#39;allow-preconfig&#39; declares whether the command is avai=
+lable<br>
+=C2=A0before the machine is built.=C2=A0 It defaults to false.=C2=A0 For ex=
+ample:<br>
+<br>
++ { &#39;enum&#39;: &#39;QMPCapability&#39;,<br>
++=C2=A0 =C2=A0&#39;data&#39;: [ &#39;oob&#39; ] }<br>
+=C2=A0 { &#39;command&#39;: &#39;qmp_capabilities&#39;,<br>
+=C2=A0 =C2=A0 &#39;data&#39;: { &#39;*enable&#39;: [ &#39;QMPCapability&#39=
+; ] },<br>
+=C2=A0 =C2=A0 &#39;allow-preconfig&#39;: true }<br>
+@@ -824,7 +826,7 @@ Example: a struct with conditional feature &#39;allow-n=
+egative-numbers&#39;<br>
+=C2=A0{ &#39;struct&#39;: &#39;TestType&#39;,<br>
+=C2=A0 =C2=A0&#39;data&#39;: { &#39;number&#39;: &#39;int&#39; },<br>
+=C2=A0 =C2=A0&#39;features&#39;: [ { &#39;name&#39;: &#39;allow-negative-nu=
+mbers&#39;,<br>
+-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;if&#39=
+; &#39;defined(IFCOND)&#39; } ] }<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 &#39;if&#39=
+;: &#39;defined(IFCOND)&#39; } ] }<br>
+<br>
+=C2=A0Please note that you are responsible to ensure that the C code will<b=
+r>
+=C2=A0compile with an arbitrary combination of conditions, since the<br>
+-- <br>
+2.26.2<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><br>-- <br><div dir=3D"ltr" class=3D"g=
+mail_signature">Marc-Andr=C3=A9 Lureau<br></div></div>
 
+--0000000000005a4aec05b2a626b7--
 
