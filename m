@@ -2,93 +2,91 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.1 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D4CCC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:59:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21F0BC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:59:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9A47F2076D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:59:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74E722076D
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:59:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TJSOgrtq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9A47F2076D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GGXF8EcZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74E722076D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42970 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44804 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOZM-0006yh-Lc
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:59:20 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52248)
+	id 1kXOZj-0007lj-CR
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:59:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39184)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPp-0001iy-Lq
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:25 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:38478)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPi-0004e0-0o
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:25 -0400
-Received: by mail-wm1-x330.google.com with SMTP id l15so1100662wmi.3
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=OAIbVQqU/rgLJ5CpM5U+V3TPMTDATGut/KaTHqdShlA=;
- b=TJSOgrtq7QlxUyEIlNPbrh4fk6df4dDyvc9dlspiNzeGTtZRW01milgML737vp/GSX
- +TvP8z+b/LmpS6g+q2G+zzNbhFda3+m6wn4qPzlhteuDbkW0Yupau1qnVq9cRBzMlO31
- HSw7MDX+1vFVioc3+qDfgegoh1PNeQMNb600BH+xnT7Y7ut3Gwuenz7ZY7i9qeoYWgW4
- aaq3hDo0rlOF3WoUVJ4BWIYAQdKslT9FpaqZ8toVXM4uvBAQOKusHrWPdTySNK5+kcbY
- ZD4p/VEkR3iNcwP9m5Kmm/OYH+SHf1CFH7E728MD0biqO9Lat7xorvZmLlJSL8l6czjN
- s2ZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=OAIbVQqU/rgLJ5CpM5U+V3TPMTDATGut/KaTHqdShlA=;
- b=EzXoWiWtz2RMO90HwPIBb79yCw0xoI+UqqHdlmb5AI9L7YX+LbM9DpHYBggqjMf7xf
- lRb2I64L45Iz6C0BEspoOtCNYxnBWNdmMeXe7HJVid6EQhrSdlptpVwh6ZPrOBetIbi8
- hXUq4FGFpIlCbXXjpcc/qNezPf4m4dxLqSwiCZG664ZjkXWPEMgNmWmMI7IjnUIOXAhm
- MgPCGtftfO7acYVGfx+S1PbQMSv+eQ/MdQ02pudryfkThCjYQa9e7sS8bu+cf2vuIuuI
- N3cGd9CrCP4mybRVEmKxqOtmP/Du+UedyOB5MpmNEYMfOChYGj61fuUHPKfxNyRQet+m
- qtKg==
-X-Gm-Message-State: AOAM533ehECnZwftMSNvD7pcyeKsYu5Y1Rgg/temt8gJ3OkSbeERLhxu
- drXqrlPUoklD7ewyOoMyvD9XKqfcDq2oMw==
-X-Google-Smtp-Source: ABdhPJySIloOD2DPJsKJYgQcy2VhKCET+bg5X2x9d8OuPJg4XbmyNERIfWvi2qHIYYgaj3i/xSyBIQ==
-X-Received: by 2002:a1c:980a:: with SMTP id a10mr362220wme.103.1603799116011; 
- Tue, 27 Oct 2020 04:45:16 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.15
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:45:15 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 28/48] hw/arm/raspi: Add the Raspberry Pi Zero machine
-Date: Tue, 27 Oct 2020 11:44:18 +0000
-Message-Id: <20201027114438.17662-29-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
-References: <20201027114438.17662-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1kXOEK-0000W2-5y
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:37:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34831)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <pkrempa@redhat.com>)
+ id 1kXOEI-0006J3-KS
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:37:35 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603802251;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=I4CQ/gRqaHWS9w1ZgjL38Gbe34d2H44d5ANCaz+72sk=;
+ b=GGXF8EcZe2QI1ZVBK3QyOUMIJ6K84U3H2v9x6RxNrhucuMXhZnj8t1pIMVsi0HvlndfAI9
+ nkEsMjdnX0hjaZe2KC7n0EzbQfhxuz8u+P7LcchAzvKohZVazafhPS2kOCrfCHAN9sCWxd
+ oTZ+5jciERSENgDqz2bg3h1ZHVJyhx0=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-37-jO-Y1oxNNmOaITuVgwX0nw-1; Tue, 27 Oct 2020 08:37:27 -0400
+X-MC-Unique: jO-Y1oxNNmOaITuVgwX0nw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 68D73108E1A1;
+ Tue, 27 Oct 2020 12:37:26 +0000 (UTC)
+Received: from angien.pipo.sk (unknown [10.40.208.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id D3CE260C11;
+ Tue, 27 Oct 2020 12:37:16 +0000 (UTC)
+Date: Tue, 27 Oct 2020 13:37:13 +0100
+From: Peter Krempa <pkrempa@redhat.com>
+To: Eric Blake <eblake@redhat.com>
+Subject: Re: [PATCH v6 04/11] nbd: Update qapi to support exporting multiple
+ bitmaps
+Message-ID: <20201027123713.GI727443@angien.pipo.sk>
+References: <20201027050556.269064-1-eblake@redhat.com>
+ <20201027050556.269064-5-eblake@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::330;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201027050556.269064-5-eblake@redhat.com>
+X-PGP-Key-ID: 0xD018682B
+X-PGP-Key-Fingerprint: D294 FF38 A6A2 BF40 6C75  5DEF 36EC 16AC D018 682B
+User-Agent: Mutt/1.14.6 (2020-07-11)
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pkrempa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=pkrempa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,75 +99,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, vsementsov@virtuozzo.com, qemu-block@nongnu.org,
+ "reviewer:Incompatible changes" <libvir-list@redhat.com>, armbru@redhat.com,
+ rjones@redhat.com, qemu-devel@nongnu.org, stefanha@redhat.com,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+On Tue, Oct 27, 2020 at 00:05:49 -0500, Eric Blake wrote:
+> Since 'block-export-add' is new to 5.2, we can still tweak the
+> interface; there, allowing 'bitmaps':['str'] is nicer than
+> 'bitmap':'str'.  This wires up the qapi and qemu-nbd changes to permit
+> passing multiple bitmaps as distinct metadata contexts that the NBD
+> client may request, but the actual support for more than one will
+> require a further patch to the server.
+> 
+> Note that there are no changes made to the existing deprecated
+> 'nbd-server-add' command; this required splitting the QAPI type
+> BlockExportOptionsNbd, which fortunately does not affect QMP
+> introspection.
+> 
+> Signed-off-by: Eric Blake <eblake@redhat.com>
+> ---
+>  docs/system/deprecated.rst |  3 ++-
+>  qapi/block-export.json     | 41 +++++++++++++++++++++++++++-----------
+>  blockdev-nbd.c             |  6 +++++-
+>  nbd/server.c               | 19 ++++++++++++------
+>  qemu-nbd.c                 | 18 ++++++++---------
+>  5 files changed, 58 insertions(+), 29 deletions(-)
 
-Similarly to the Pi A, the Pi Zero uses a BCM2835 SoC (ARMv6Z core).
-
-The only difference between the revision 1.2 and 1.3 is the latter
-exposes a CSI camera connector. As we do not implement the Unicam
-peripheral, there is no point in exposing a camera connector :)
-Therefore we choose to model the 1.2 revision.
-
-Example booting the machine using content from [*]:
-
-  $ qemu-system-arm -M raspi0 -serial stdio \
-      -kernel raspberrypi/firmware/boot/kernel.img \
-      -dtb raspberrypi/firmware/boot/bcm2708-rpi-zero.dtb \
-      -append 'printk.time=0 earlycon=pl011,0x20201000 console=ttyAMA0'
-  [    0.000000] Booting Linux on physical CPU 0x0
-  [    0.000000] Linux version 4.19.118+ (dom@buildbot) (gcc version 4.9.3 (crosstool-NG crosstool-ng-1.22.0-88-g8460611)) #1311 Mon Apr 27 14:16:15 BST 2020
-  [    0.000000] CPU: ARMv6-compatible processor [410fb767] revision 7 (ARMv7), cr=00c5387d
-  [    0.000000] CPU: VIPT aliasing data cache, unknown instruction cache
-  [    0.000000] OF: fdt: Machine model: Raspberry Pi Zero
-  ...
-
-[*] http://archive.raspberrypi.org/debian/pool/main/r/raspberrypi-firmware/raspberrypi-kernel_1.20200512-2_armhf.deb
-
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201024170127.3592182-9-f4bug@amsat.org
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/arm/raspi.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
-
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index 79fdd354603..0f5ea7e99b5 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -319,6 +319,15 @@ static void raspi_machine_class_common_init(MachineClass *mc,
-     mc->default_ram_id = "ram";
- };
- 
-+static void raspi0_machine_class_init(ObjectClass *oc, void *data)
-+{
-+    MachineClass *mc = MACHINE_CLASS(oc);
-+    RaspiMachineClass *rmc = RASPI_MACHINE_CLASS(oc);
-+
-+    rmc->board_rev = 0x920092; /* Revision 1.2 */
-+    raspi_machine_class_common_init(mc, rmc->board_rev);
-+};
-+
- static void raspi1ap_machine_class_init(ObjectClass *oc, void *data)
- {
-     MachineClass *mc = MACHINE_CLASS(oc);
-@@ -352,6 +361,10 @@ static void raspi3b_machine_class_init(ObjectClass *oc, void *data)
- 
- static const TypeInfo raspi_machine_types[] = {
-     {
-+        .name           = MACHINE_TYPE_NAME("raspi0"),
-+        .parent         = TYPE_RASPI_MACHINE,
-+        .class_init     = raspi0_machine_class_init,
-+    }, {
-         .name           = MACHINE_TYPE_NAME("raspi1ap"),
-         .parent         = TYPE_RASPI_MACHINE,
-         .class_init     = raspi1ap_machine_class_init,
--- 
-2.20.1
+Reviewed-by: Peter Krempa <pkrempa@redhat.com>
 
 
