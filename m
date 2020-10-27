@@ -2,75 +2,80 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F1CCC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 22:13:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A22FC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 22:19:59 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 26F4E21D24
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 22:13:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 97A6C206B2
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 22:19:58 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OeFAJn/9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 26F4E21D24
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ve1aEP6w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 97A6C206B2
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41846 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXXDf-0005JA-7F
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 18:13:31 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54740)
+	id 1kXXJt-0007a1-Md
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 18:19:57 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59368)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXX0M-0006rg-8k
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:59:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51639)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kXXIu-00071q-UK
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 18:18:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39876)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXX0G-0000jf-D9
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:59:45 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kXXIr-0003Qf-KL
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 18:18:56 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603835978;
+ s=mimecast20190719; t=1603837131;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=qlvrHiXxE3A77LSY/7Yqg7QEzlnCrF68W4ANyDXkHpQ=;
- b=OeFAJn/9gGN8koWQyiO+8ES3Jhiy6r/Sqv5E/eD0TBXZyIA8JOvvySiEzmGEG9V96PMJ1N
- BfrsJC2SwZ9f+yjXXa12nJsrO9mmtMa+4+zU3CCTfiDwlbP8mqAqIF3ZCzz0FQXwwbecqN
- 4kELhAxwBpUh8momzCVg11jLC3kqV0M=
+ bh=swW9lP82Q8asy0qDrjELoougrDMiLSkvR/ZZUsaCZ+s=;
+ b=Ve1aEP6whTsx8DHsFUN/NqlY+OBACQDAmVAzCT8omMtDfulVoJuOOVxTXUZlDbjkB1KR4b
+ +wxVavqua7bUDv4TklOXMdqqBwmG1QMkmDa8BUiOazFGX87YEl6zxHyyESgD6i284Efv82
+ IfrV3SQ4PxQOLCw624fIBvhygMlGt/4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-267-wc6gLvqtN4ODuaPkhfbHCg-1; Tue, 27 Oct 2020 17:59:36 -0400
-X-MC-Unique: wc6gLvqtN4ODuaPkhfbHCg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-487-WQ_YpJRBMn6h5JHzqHRUdA-1; Tue, 27 Oct 2020 18:18:49 -0400
+X-MC-Unique: WQ_YpJRBMn6h5JHzqHRUdA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41E7C1084D6E;
- Tue, 27 Oct 2020 21:59:35 +0000 (UTC)
-Received: from blue.redhat.com (ovpn-112-145.phx2.redhat.com [10.3.112.145])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B1E3B1002388;
- Tue, 27 Oct 2020 21:59:31 +0000 (UTC)
-From: Eric Blake <eblake@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PULL 10/12] block: Return depth level during bdrv_is_allocated_above
-Date: Tue, 27 Oct 2020 16:59:12 -0500
-Message-Id: <20201027215914.619460-11-eblake@redhat.com>
-In-Reply-To: <20201027215914.619460-1-eblake@redhat.com>
-References: <20201027215914.619460-1-eblake@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C92AA1009E23
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 22:18:48 +0000 (UTC)
+Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4918519C4F;
+ Tue, 27 Oct 2020 22:18:44 +0000 (UTC)
+Date: Tue, 27 Oct 2020 18:18:42 -0400
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH 03/12] qom: Make object_class_property_add_uint*_ptr()
+ get offset
+Message-ID: <20201027221842.GG5733@habkost.net>
+References: <20201009160122.1662082-1-ehabkost@redhat.com>
+ <20201009160122.1662082-4-ehabkost@redhat.com>
+ <20201021142408.72d2b92f@redhat.com>
+ <20201021133041.GT5733@habkost.net>
+ <20201023173314.6d46ada9@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+In-Reply-To: <20201023173314.6d46ada9@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=eblake@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -93,188 +98,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- "open list:Block Jobs" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>,
+ John Snow <jsnow@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-When checking for allocation across a chain, it's already easy to
-count the depth within the chain at which the allocation is found.
-Instead of throwing that information away, return it to the caller.
-Existing callers only cared about allocated/non-allocated, but having
-a depth available will be used by NBD in the next patch.
+On Fri, Oct 23, 2020 at 05:33:14PM +0200, Igor Mammedov wrote:
+> On Wed, 21 Oct 2020 09:30:41 -0400
+> Eduardo Habkost <ehabkost@redhat.com> wrote:
+[...]
+> > I don't love object*_property_add_*_ptr() either.  I consider the
+> > qdev property API better.  But we need a reasonable alternative,
+> > because the qdev API can't be used by non-device objects yet.
+> > I don't think object*_property_add() and
+> > object*_property_add_bool() are reasonable alternatives.
+> 
+> I also like old qdev API as it can be introspected (it's just data at
+> class level), very concise when used and has default values.
+> 
+> Instead of duplicating all that pointer arithmetic from qdev properties
+> in QOM API, it could be better to fix qdev properties so that they
+> would work for Object as well.
+> At least all that thrown away type safety would stay constrained/hidden
+> inside of qdev property macros, instead of being opencoded (offsets) all
+> over the place.
+> 
+> How hard it would be make qdev properties to work with Object and what
+> makes you duplicate ugly part of it in QOM instead of making them to
+> handle Object strait away?
 
-Signed-off-by: Eric Blake <eblake@redhat.com>
-Message-Id: <20201027050556.269064-9-eblake@redhat.com>
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
----
- block/coroutines.h |  6 ++++--
- block/io.c         | 29 ++++++++++++++++++++++-------
- block/commit.c     |  2 +-
- block/mirror.c     |  2 +-
- block/stream.c     |  2 +-
- 5 files changed, 29 insertions(+), 12 deletions(-)
+It is doable, but lots of work.  I'm working on this right now.
 
-diff --git a/block/coroutines.h b/block/coroutines.h
-index 1cb3128b942c..4cfb4946e65e 100644
---- a/block/coroutines.h
-+++ b/block/coroutines.h
-@@ -47,7 +47,8 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-                                   int64_t bytes,
-                                   int64_t *pnum,
-                                   int64_t *map,
--                                  BlockDriverState **file);
-+                                  BlockDriverState **file,
-+                                  int *depth);
- int generated_co_wrapper
- bdrv_common_block_status_above(BlockDriverState *bs,
-                                BlockDriverState *base,
-@@ -57,7 +58,8 @@ bdrv_common_block_status_above(BlockDriverState *bs,
-                                int64_t bytes,
-                                int64_t *pnum,
-                                int64_t *map,
--                               BlockDriverState **file);
-+                               BlockDriverState **file,
-+                               int *depth);
+> That would also result in huge removal of boiler plate of current QOM
+> properties.
 
- int coroutine_fn bdrv_co_readv_vmstate(BlockDriverState *bs,
-                                        QEMUIOVector *qiov, int64_t pos);
-diff --git a/block/io.c b/block/io.c
-index 02528b3823fe..7751cdb81948 100644
---- a/block/io.c
-+++ b/block/io.c
-@@ -2349,20 +2349,28 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-                                   int64_t bytes,
-                                   int64_t *pnum,
-                                   int64_t *map,
--                                  BlockDriverState **file)
-+                                  BlockDriverState **file,
-+                                  int *depth)
- {
-     int ret;
-     BlockDriverState *p;
-     int64_t eof = 0;
-+    int dummy;
+Yep.
 
-     assert(!include_base || base); /* Can't include NULL base */
+> 
+> That should suit your goal to make (most) properties introspectable
+> and statically described.
 
-+    if (!depth) {
-+        depth = &dummy;
-+    }
-+    *depth = 0;
-+
-     if (!include_base && bs == base) {
-         *pnum = bytes;
-         return 0;
-     }
+That's correct.  I just don't want a huge qdev refactor to be a
+reason to delay important work in other areas.
 
-     ret = bdrv_co_block_status(bs, want_zero, offset, bytes, pnum, map, file);
-+    ++*depth;
-     if (ret < 0 || *pnum == 0 || ret & BDRV_BLOCK_ALLOCATED || bs == base) {
-         return ret;
-     }
-@@ -2379,6 +2387,7 @@ bdrv_co_common_block_status_above(BlockDriverState *bs,
-     {
-         ret = bdrv_co_block_status(p, want_zero, offset, bytes, pnum, map,
-                                    file);
-+        ++*depth;
-         if (ret < 0) {
-             return ret;
-         }
-@@ -2437,7 +2446,7 @@ int bdrv_block_status_above(BlockDriverState *bs, BlockDriverState *base,
-                             int64_t *map, BlockDriverState **file)
- {
-     return bdrv_common_block_status_above(bs, base, false, true, offset, bytes,
--                                          pnum, map, file);
-+                                          pnum, map, file, NULL);
- }
-
- int bdrv_block_status(BlockDriverState *bs, int64_t offset, int64_t bytes,
-@@ -2455,7 +2464,7 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
-
-     ret = bdrv_common_block_status_above(bs, bs, true, false, offset,
-                                          bytes, pnum ? pnum : &dummy, NULL,
--                                         NULL);
-+                                         NULL, NULL);
-     if (ret < 0) {
-         return ret;
-     }
-@@ -2465,8 +2474,9 @@ int coroutine_fn bdrv_is_allocated(BlockDriverState *bs, int64_t offset,
- /*
-  * Given an image chain: ... -> [BASE] -> [INTER1] -> [INTER2] -> [TOP]
-  *
-- * Return 1 if (a prefix of) the given range is allocated in any image
-- * between BASE and TOP (BASE is only included if include_base is set).
-+ * Return a positive depth if (a prefix of) the given range is allocated
-+ * in any image between BASE and TOP (BASE is only included if include_base
-+ * is set).  Depth 1 is TOP, 2 is the first backing layer, and so forth.
-  * BASE can be NULL to check if the given offset is allocated in any
-  * image of the chain.  Return 0 otherwise, or negative errno on
-  * failure.
-@@ -2483,13 +2493,18 @@ int bdrv_is_allocated_above(BlockDriverState *top,
-                             bool include_base, int64_t offset,
-                             int64_t bytes, int64_t *pnum)
- {
-+    int depth;
-     int ret = bdrv_common_block_status_above(top, base, include_base, false,
--                                             offset, bytes, pnum, NULL, NULL);
-+                                             offset, bytes, pnum, NULL, NULL,
-+                                             &depth);
-     if (ret < 0) {
-         return ret;
-     }
-
--    return !!(ret & BDRV_BLOCK_ALLOCATED);
-+    if (ret & BDRV_BLOCK_ALLOCATED) {
-+        return depth;
-+    }
-+    return 0;
- }
-
- int coroutine_fn
-diff --git a/block/commit.c b/block/commit.c
-index 1e85c306cc41..71db7ba7472e 100644
---- a/block/commit.c
-+++ b/block/commit.c
-@@ -156,7 +156,7 @@ static int coroutine_fn commit_run(Job *job, Error **errp)
-         /* Copy if allocated above the base */
-         ret = bdrv_is_allocated_above(blk_bs(s->top), s->base_overlay, true,
-                                       offset, COMMIT_BUFFER_SIZE, &n);
--        copy = (ret == 1);
-+        copy = (ret > 0);
-         trace_commit_one_iteration(s, offset, n, ret);
-         if (copy) {
-             assert(n < SIZE_MAX);
-diff --git a/block/mirror.c b/block/mirror.c
-index 26acf4af6fb7..8e1ad6eceb57 100644
---- a/block/mirror.c
-+++ b/block/mirror.c
-@@ -846,7 +846,7 @@ static int coroutine_fn mirror_dirty_init(MirrorBlockJob *s)
-         }
-
-         assert(count);
--        if (ret == 1) {
-+        if (ret > 0) {
-             bdrv_set_dirty_bitmap(s->dirty_bitmap, offset, count);
-         }
-         offset += count;
-diff --git a/block/stream.c b/block/stream.c
-index 8ce6729a33da..236384f2f739 100644
---- a/block/stream.c
-+++ b/block/stream.c
-@@ -167,7 +167,7 @@ static int coroutine_fn stream_run(Job *job, Error **errp)
-                 n = len - offset;
-             }
-
--            copy = (ret == 1);
-+            copy = (ret > 0);
-         }
-         trace_stream_one_iteration(s, offset, n, ret);
-         if (copy) {
 -- 
-2.29.0
+Eduardo
 
 
