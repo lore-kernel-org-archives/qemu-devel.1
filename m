@@ -2,86 +2,90 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A378AC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:37:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C608C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:43:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B684820738
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:37:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6AF562080A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:43:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XSUEdsmA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B684820738
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wm1WRPOe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF562080A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37098 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXIc3-0001EZ-Fm
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 02:37:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40738)
+	id 1kXIhs-0002aY-Cl
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 02:43:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41802)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIaR-0000j1-K4
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:36:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:54926)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIgf-000285-E1
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:42:29 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25092)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIaP-0002sH-G6
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:36:02 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIgd-0005CI-Nr
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:42:29 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603780560;
+ s=mimecast20190719; t=1603780945;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=+Au584E7N3mFwH1OUWBuJsb1Mz6+5v4llX06uCnJh88=;
- b=XSUEdsmAFIsqVLVcFCZNPfMPE5idChXyLHdzYNX172wtLaH1jaw8Jm91hKZkTZhkyujOVZ
- IUaFBpdsr+7pFwDeIEkzKldFoB+AW6a5IIx7MIOQRFzkmTrWB2Nv0rmG5uG0CJNN40ysCK
- hC6GLPwgO+Fv/9Jx1mYGaCS3kkefa5k=
+ bh=bExxzAuVlPhwObzTQGdcaiSAX/GyNJ8NX7tlEnVqcU0=;
+ b=Wm1WRPOei1TiRG7kAsK2RQ9m52zxJ4JHFeRivznOx/t1Lgxb2pS9M9/P/QxKBKKKj5a/Qv
+ srHRx2jl1+YdlDvDpgaFhnWICtvH5JHyZdh7tB3GXbo33KHsHvzQYkvKBPWN8bM63KmCVT
+ fBvlIoFfw4PHhqu4h/T7lF+vXfjKNLQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-567-ANfDWEIDN_2Zr2kLe29LgA-1; Tue, 27 Oct 2020 02:35:58 -0400
-X-MC-Unique: ANfDWEIDN_2Zr2kLe29LgA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-308-H2DhLDzaOS6Bf6fv9MwTtQ-1; Tue, 27 Oct 2020 02:42:24 -0400
+X-MC-Unique: H2DhLDzaOS6Bf6fv9MwTtQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4461D6408A;
- Tue, 27 Oct 2020 06:35:57 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D84B1084D6A
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:42:23 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 733F055781;
- Tue, 27 Oct 2020 06:35:53 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id AB8F06EF62;
+ Tue, 27 Oct 2020 06:42:13 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 00562113865F; Tue, 27 Oct 2020 07:35:51 +0100 (CET)
+ id 32621113865F; Tue, 27 Oct 2020 07:42:12 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: mdroth@linux.vnet.ibm.com
-Subject: Re: [PATCH 0/4] qga: Fix several guest-get-devices issues
-References: <20201021071520.2168877-1-armbru@redhat.com>
-Date: Tue, 27 Oct 2020 07:35:51 +0100
-In-Reply-To: <20201021071520.2168877-1-armbru@redhat.com> (Markus Armbruster's
- message of "Wed, 21 Oct 2020 09:15:16 +0200")
-Message-ID: <87imaw18hk.fsf@dusky.pond.sub.org>
+To: marcandre.lureau@redhat.com
+Subject: Re: [PATCH 1/3] coroutine: let CoQueue wake up outside a coroutine
+References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
+ <20201010204106.1368710-2-marcandre.lureau@redhat.com>
+Date: Tue, 27 Oct 2020 07:42:12 +0100
+In-Reply-To: <20201010204106.1368710-2-marcandre.lureau@redhat.com> (marcandre
+ lureau's message of "Sun, 11 Oct 2020 00:41:04 +0400")
+Message-ID: <87eelk186z.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,17 +99,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: marcandre.lureau@redhat.com, tgolembi@redhat.com, philmd@redhat.com,
- qemu-devel@nongnu.org
+Cc: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
+ qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Mike,
+Kevin or Stefan, please review.
 
-This series addresses interface defects, and must go into 5.2.  It's
-fully reviewed.  Pull request in time for soft freeze would be ideal.
-If you can't make it, feel free to ask me.  I'll continue to push for
-the series even if it misses the soft freeze.
+marcandre.lureau@redhat.com writes:
+
+> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>
+> The assert() was added in commit b681a1c73e15 ("block: Repair the
+> throttling code."), when the qemu_co_queue_do_restart() function
+> required to be running in a coroutine. It was later made unnecessary in
+> commit a9d9235567e7 ("coroutine-lock: reschedule coroutine on the
+> AioContext it was running on").
+>
+> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+> ---
+>  util/qemu-coroutine-lock.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
+> index 36927b5f88..5816bf8900 100644
+> --- a/util/qemu-coroutine-lock.c
+> +++ b/util/qemu-coroutine-lock.c
+> @@ -85,15 +85,13 @@ static bool qemu_co_queue_do_restart(CoQueue *queue, =
+bool single)
+>      return true;
+>  }
+> =20
+> -bool coroutine_fn qemu_co_queue_next(CoQueue *queue)
+> +bool qemu_co_queue_next(CoQueue *queue)
+>  {
+> -    assert(qemu_in_coroutine());
+>      return qemu_co_queue_do_restart(queue, true);
+>  }
+> =20
+> -void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue)
+> +void qemu_co_queue_restart_all(CoQueue *queue)
+>  {
+> -    assert(qemu_in_coroutine());
+>      qemu_co_queue_do_restart(queue, false);
+>  }
 
 
