@@ -2,88 +2,108 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42107C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:42:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A552C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:43:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A9DB820760
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:42:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 6339720760
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:43:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a51q14/N"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A9DB820760
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UoPkBdKY"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6339720760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53382 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXTv8-0003yV-Nx
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:42:10 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58074)
+	id 1kXTw1-0004Z1-DO
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:43:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33130)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbz-0004JB-CE
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:30054)
+ id 1kXTpg-000523-Pa
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:36:33 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:24339)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbq-00032N-1V
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:22 -0400
+ id 1kXTpe-00054E-GV
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:36:31 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603822927;
+ s=mimecast20190719; t=1603823789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Nb4Lchzy1mUgpxcsyW/o+A9ekDcbx3nY58WD9QHeqtU=;
- b=a51q14/Nmedu+pWNh52wg9IDTN0qJ236s34rwLr94EGnPzzaLN+fethPb9lUygyE4439Ax
- 0quZ3n2GQZ+ss567i8mvOi3YUvRbMRPuotbXP+szQzBUqv2zWtWcpVFskyok1K2I6gwa/w
- liB3T4z8s4y0Bn7Ekzxwa5CFf59T6sQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-66-uL1rxgLuMeSPMvkMg20MXQ-1; Tue, 27 Oct 2020 14:22:03 -0400
-X-MC-Unique: uL1rxgLuMeSPMvkMg20MXQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B430681CAFD
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:49 +0000 (UTC)
-Received: from virtlab701.virt.lab.eng.bos.redhat.com
- (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 796325D9E8
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:49 +0000 (UTC)
+ bh=1sV4L9Hu6mkuUnpQGOW9h/Fvzhb0Ox6XCvDhYI2P8iw=;
+ b=UoPkBdKYyqjZUrbMlHY6st1fjnxpKMyHEcWMkWb2VB9xQTEvc2QLW8PL4ycNhgfk7fjom3
+ BMjPxyWbnC/WBzpEAtVNRK3PP53nTEYmX7UXt80WN1Xn2FgEPgEGMwJaokW5/8nSRiutM5
+ 9pUwQlOTXne3M1saCj352cY0hfqUcjU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-244-zKFDXi0yPTqWt8iqro6jEQ-1; Tue, 27 Oct 2020 14:36:25 -0400
+X-MC-Unique: zKFDXi0yPTqWt8iqro6jEQ-1
+Received: by mail-wr1-f72.google.com with SMTP id 33so1048140wrf.22
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 11:36:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=1sV4L9Hu6mkuUnpQGOW9h/Fvzhb0Ox6XCvDhYI2P8iw=;
+ b=NYehJN3QvhA+qZ9bpB6rRfCi6PqjJ5oHCml4jEx/9kegHqL2T+WwdaHeu7y8X3FNPq
+ XikLyAhA/dW+Cb6iywum/2kKH8XIGNzTI3i4q3Q0HocBAaVlZFTgTUzrYbvitHgdcYQK
+ zl35xV76qz6N/JfG4L9CGPk0SBxcacQVFNHX/FUEyXD9U09giNxBwwpCMvtV1/3nslMO
+ qnJ+/1J+3lRxpV78GtbI9JQqmvj0olm3KQGgUmVYQj1cXloL+XeoQnIB2cLK8R+eelaU
+ MDDC3dKVvpKGgJQk696ANABmkvyBagCZHxqJ/KosUCHTFxUHxfBkuypXLWOvKX/WBq+I
+ MoMg==
+X-Gm-Message-State: AOAM531jXPsi25HZNthuY0Qnpp0RKa0c4qgFSIE/V6EkoQodGQx7Ckf3
+ F04aNmAOl8McqqfRt8DRleU/xD6ziizniDPvI9quDmw+Pnb+zs4ME13ILqI08/qRzgvjJNCgr7k
+ vBf4y9zanBW0tNoE=
+X-Received: by 2002:adf:fc8b:: with SMTP id g11mr4438109wrr.300.1603823784471; 
+ Tue, 27 Oct 2020 11:36:24 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzywYMXiRcea6wICxJeKKV4OnMaknmqu9YhKsZlOV06yzXCPhisl5YM+lmzRGnxv8Lavc8QsQ==
+X-Received: by 2002:adf:fc8b:: with SMTP id g11mr4438085wrr.300.1603823784125; 
+ Tue, 27 Oct 2020 11:36:24 -0700 (PDT)
+Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
+ ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
+ by smtp.gmail.com with ESMTPSA id 30sm3087520wrs.84.2020.10.27.11.36.23
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 27 Oct 2020 11:36:23 -0700 (PDT)
+Subject: Re: [PATCH 0/4] qemu-storage-daemon: QAPIfy --chardev the stupid way
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20201026101005.2940615-1-armbru@redhat.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 12/29] vl: create "-net nic -net user" default earlier
-Date: Tue, 27 Oct 2020 14:21:27 -0400
-Message-Id: <20201027182144.3315885-13-pbonzini@redhat.com>
-In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
-References: <20201027182144.3315885-1-pbonzini@redhat.com>
+Message-ID: <d00ef574-b2c4-887c-6a37-79f6cf6eeae0@redhat.com>
+Date: Tue, 27 Oct 2020 19:36:22 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201026101005.2940615-1-armbru@redhat.com>
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,54 +116,29 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Create it together with other default backends, even though the processing is
-done later.
+On 26/10/20 11:10, Markus Armbruster wrote:
+> Kevin's "[PATCH v2 0/6] qemu-storage-daemon: QAPIfy --chardev"
+> involves surgery to the QAPI generator.  Some (most?) of it should go
+> away if we deprecate the "data" wrappers due to simple unions in QMP.
+> 
+> Do we really need to mess with the code generator to solve the problem
+> at hand?
+> 
+> 
+> Let's recapitulate the problem:
+> 
+> * We want to QAPIfy --chardev, i.e. define its argument as a QAPI
+>   type.
 
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- softmmu/vl.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+Considering that this is not 5.2 stuff at this point, I would like to
+suggest again moving chardevs to -object, and ask you to evaluate that
+option with the agreement that I do the work instead of you. :)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index 6749109b29..f643333f7e 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -4254,6 +4254,14 @@ void qemu_init(int argc, char **argv, char **envp)
-             monitor_parse("vc:80Cx24C", "readline", false);
-     }
- 
-+    if (default_net) {
-+        QemuOptsList *net = qemu_find_opts("net");
-+        qemu_opts_set(net, NULL, "type", "nic", &error_abort);
-+#ifdef CONFIG_SLIRP
-+        qemu_opts_set(net, NULL, "type", "user", &error_abort);
-+#endif
-+    }
-+
- #if defined(CONFIG_VNC)
-     if (!QTAILQ_EMPTY(&(qemu_find_opts("vnc")->head))) {
-         display_remote++;
-@@ -4389,14 +4397,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         semihosting_arg_fallback(kernel_filename, kernel_cmdline);
-     }
- 
--    if (default_net) {
--        QemuOptsList *net = qemu_find_opts("net");
--        qemu_opts_set(net, NULL, "type", "nic", &error_abort);
--#ifdef CONFIG_SLIRP
--        qemu_opts_set(net, NULL, "type", "user", &error_abort);
--#endif
--    }
--
-     if (net_init_clients(&err) < 0) {
-         error_report_err(err);
-         exit(1);
--- 
-2.26.2
-
+Paolo
 
 
