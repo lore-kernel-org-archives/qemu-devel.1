@@ -7,78 +7,80 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1F48C55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:41:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DD56C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:42:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2592A218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:41:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C9848218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:42:54 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PTPgxXfD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2592A218AC
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="XmdBuYLG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C9848218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59014 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33236 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOIW-0006DP-1b
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:41:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51810)
+	id 1kXOJR-0007Hg-KZ
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:42:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52470)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPa-0001NC-31
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:10 -0400
-Received: from mail-wm1-x32f.google.com ([2a00:1450:4864:20::32f]:54760)
+ id 1kXNPy-00021z-EX
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:34 -0400
+Received: from mail-wr1-x42c.google.com ([2a00:1450:4864:20::42c]:42537)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPU-0004Wa-MB
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:09 -0400
-Received: by mail-wm1-x32f.google.com with SMTP id w23so1061827wmi.4
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:04 -0700 (PDT)
+ id 1kXNPt-0004lU-Ey
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:34 -0400
+Received: by mail-wr1-x42c.google.com with SMTP id j7so1510781wrt.9
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=lBsNk8YvewCGmxMTIWE8jp4NijJomYEULld4UfO+fq8=;
- b=PTPgxXfDknCMvLOteaBn6xkInY8ofLbCfjk1TXy5TyBFvyDyDOEnTanKBNBO5/vvNc
- LmX5tge2GLg2u9xi52xpLgepUSzBPGvsnPTLrItczuIc/YsKO95e4kqhfr44iaVMXn8x
- gRrkfkjDM5CvZkS1IfFv1bS0pbVYBDGOd4vr1C7mOdpknxXx/CS6dC4tirO8m1eXH+7c
- +LyI+lK/t7cbC9fBWA4sdWy59POo+CrbBF8PfWa5UwfHmSiRezGOVuUehrVJLl3+SoDK
- +K+Y0oYQGFLsGRQ1UpWtyOdrBrvfWjBUXQeelVYvYGClHJkcPuYiqrAutGrqVku4qClF
- 1e3A==
+ bh=5F318VQce9jxLOpALrXTlZ2x/bb4+aO6Wok/6fUKBPA=;
+ b=XmdBuYLGjBTdtE+5Q8cU6/YS9P5IySvTv1blz3zByxSVnmW5v8s/K3IG3hCpLNdyk2
+ bYG8BbA8wPwUSwwiq24VGqXseuZU9fozWSMXMHvKDY1O7ziGirBqgzAgQKOCgXmxA5Uf
+ +qrNnLQQv7/Ci/+1vK5eudP0nvWkMrv200l70jpL+sETIvakvdGTxk4VBbQk3jzct8l0
+ 2V24VEVFEz683/XobsJQc4+JoDSW58a0P7aElRA+L/6MvLgabm+azvowuhb8mayfjlUZ
+ DuxNN/bnWwQvM1yAqFcG6dNgA+ID7f2VmskuqK31Rhr49Eaz3fn4R6UFpflFXFRREWyR
+ VKqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=lBsNk8YvewCGmxMTIWE8jp4NijJomYEULld4UfO+fq8=;
- b=b43F7zW6BNgtTwWIrXcafC8L/m6B9PAvfp6L2zZVLHmvw3RwqTvJkG5bAwUTiit/nu
- EtSTcaa/neaer7FV8e2g4LBrLLI6vYbC71S+mcV4IHCVWG+Hf4Kj/F3f53q2Fda9+QQN
- gIVLiFoxid39e1AMd2hczebm51Nak4n+fMnVpOIxnbU81SAYa3TwNcEWshnKCrwv6jRr
- 6Vmr3s3DKZUH4ixQhFoo9GHAv5VYQPeY5faQixa/NMh2bVBe4VRdoAtAczfwbpYA7QSV
- mAdsoRUs28Qhyoi7iwCwh1dD0lsT4LBPpdUGny2NMoc5URtYofx5eteK9YwnSyEDZSls
- Bh0Q==
-X-Gm-Message-State: AOAM531sZqd+doPk9T00hDZMpcxgL5KsvoP7kywqScde7RllAiCOkDEE
- 2Re9ik6DgKcU8cevOFZrZqybz5y+REXW3A==
-X-Google-Smtp-Source: ABdhPJzyYVXFRtqDDiy40EUKDFblJRvS0lbQovSXf8agZwTYXKZq5EvPPOjSdEtSMuZ5RPrlf0ZjCA==
-X-Received: by 2002:a1c:44e:: with SMTP id 75mr2307859wme.117.1603799102407;
- Tue, 27 Oct 2020 04:45:02 -0700 (PDT)
+ bh=5F318VQce9jxLOpALrXTlZ2x/bb4+aO6Wok/6fUKBPA=;
+ b=k8PReuSiAW7Qe2wd+YONv403iAERH8GDpUVPGTso68+WE2KWXV2bdNquRgXrjkL2Yu
+ vg5Lp2MDT4oM+u8B/SdoP8uY+7knrLqsgVmncC2DjgLrhxEQBTco1DmzZnBkEBeKvSzX
+ z6bL7sjB4SuGk5KOC/lvOhT27GPQ+JWCOvqGC9ccQE5cyx+1IQQ25zJYOmZMQ2stMHbV
+ dU7ZeurV4TcI9Qy7PGalhTfc2T2VUtS4xFXHJuYFPAlg07HpzcJhqXQL/Mlcn7wEmMtO
+ bUyfqx4USPZFxuLcgrobGmPWIeS41kL9OulVupctPpcrZttguDob/6WvQJeVsacEcRp7
+ SPjQ==
+X-Gm-Message-State: AOAM530hUivdCYXN2oHU5LP+Rl0/Dg2pwyN7jDVJCaInt0h1FZBh9O+3
+ gnD92bqeobuxCVvDXj0A1/4XiYEzEWpcCQ==
+X-Google-Smtp-Source: ABdhPJw/z5IE6cXX5igW8SYjygtuwLIKlocZ/JDuJiFehILFJ1cujkC5oRQ1VXBRgbh94szza9fzSg==
+X-Received: by 2002:adf:9f4c:: with SMTP id f12mr2415066wrg.108.1603799127517; 
+ Tue, 27 Oct 2020 04:45:27 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.01
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.25
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:45:01 -0700 (PDT)
+ Tue, 27 Oct 2020 04:45:26 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 17/48] hw/misc: Add npcm7xx random number generator
-Date: Tue, 27 Oct 2020 11:44:07 +0000
-Message-Id: <20201027114438.17662-18-peter.maydell@linaro.org>
+Subject: [PULL 37/48] hw/misc/bcm2835_cprman: add a PLL channel skeleton
+ implementation
+Date: Tue, 27 Oct 2020 11:44:27 +0000
+Message-Id: <20201027114438.17662-38-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
 References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::32f;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x32f.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42c;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42c.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,668 +106,494 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Havard Skinnemoen <hskinnemoen@google.com>
+From: Luc Michel <luc@lmichel.fr>
 
-The RNG module returns a byte of randomness when the Data Valid bit is
-set.
+PLLs are composed of multiple channels. Each channel outputs one clock
+signal. They are modeled as one device taking the PLL generated clock as
+input, and outputting a new clock.
 
-This implementation ignores the prescaler setting, and loads a new value
-into RNGD every time RNGCS is read while the RNG is enabled and random
-data is available.
+A channel shares the CM register with its parent PLL, and has its own
+A2W_CTRL register. A write to the CM register will trigger an update of
+the PLL and all its channels, while a write to an A2W_CTRL channel
+register will update the required channel only.
 
-A qtest featuring some simple randomness tests is included.
-
-Reviewed-by: Tyrone Ting <kfting@nuvoton.com>
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- docs/system/arm/nuvoton.rst    |   2 +-
- include/hw/arm/npcm7xx.h       |   2 +
- include/hw/misc/npcm7xx_rng.h  |  34 ++++
- hw/arm/npcm7xx.c               |   7 +-
- hw/misc/npcm7xx_rng.c          | 180 +++++++++++++++++++++
- tests/qtest/npcm7xx_rng-test.c | 278 +++++++++++++++++++++++++++++++++
- hw/misc/meson.build            |   1 +
- hw/misc/trace-events           |   4 +
- tests/qtest/meson.build        |   5 +-
- 9 files changed, 510 insertions(+), 3 deletions(-)
- create mode 100644 include/hw/misc/npcm7xx_rng.h
- create mode 100644 hw/misc/npcm7xx_rng.c
- create mode 100644 tests/qtest/npcm7xx_rng-test.c
+ include/hw/misc/bcm2835_cprman.h           |  44 ++++++
+ include/hw/misc/bcm2835_cprman_internals.h | 146 +++++++++++++++++++
+ hw/misc/bcm2835_cprman.c                   | 155 +++++++++++++++++++--
+ 3 files changed, 337 insertions(+), 8 deletions(-)
 
-diff --git a/docs/system/arm/nuvoton.rst b/docs/system/arm/nuvoton.rst
-index e3e1a3a3a73..4342434df4a 100644
---- a/docs/system/arm/nuvoton.rst
-+++ b/docs/system/arm/nuvoton.rst
-@@ -38,6 +38,7 @@ Supported devices
-  * DDR4 memory controller (dummy interface indicating memory training is done)
-  * OTP controllers (no protection features)
-  * Flash Interface Unit (FIU; no protection features)
-+ * Random Number Generator (RNG)
+diff --git a/include/hw/misc/bcm2835_cprman.h b/include/hw/misc/bcm2835_cprman.h
+index 5c442e6ff93..e1a1b33f8b8 100644
+--- a/include/hw/misc/bcm2835_cprman.h
++++ b/include/hw/misc/bcm2835_cprman.h
+@@ -31,6 +31,31 @@ typedef enum CprmanPll {
+     CPRMAN_NUM_PLL
+ } CprmanPll;
  
- Missing devices
- ---------------
-@@ -59,7 +60,6 @@ Missing devices
-  * Peripheral SPI controller (PSPI)
-  * Analog to Digital Converter (ADC)
-  * SD/MMC host
-- * Random Number Generator (RNG)
-  * PECI interface
-  * Pulse Width Modulation (PWM)
-  * Tachometer
-diff --git a/include/hw/arm/npcm7xx.h b/include/hw/arm/npcm7xx.h
-index 13106af2151..761f9b987ed 100644
---- a/include/hw/arm/npcm7xx.h
-+++ b/include/hw/arm/npcm7xx.h
-@@ -21,6 +21,7 @@
- #include "hw/mem/npcm7xx_mc.h"
- #include "hw/misc/npcm7xx_clk.h"
- #include "hw/misc/npcm7xx_gcr.h"
-+#include "hw/misc/npcm7xx_rng.h"
- #include "hw/nvram/npcm7xx_otp.h"
- #include "hw/timer/npcm7xx_timer.h"
- #include "hw/ssi/npcm7xx_fiu.h"
-@@ -75,6 +76,7 @@ typedef struct NPCM7xxState {
-     NPCM7xxOTPState     key_storage;
-     NPCM7xxOTPState     fuse_array;
-     NPCM7xxMCState      mc;
-+    NPCM7xxRNGState     rng;
-     NPCM7xxFIUState     fiu[2];
- } NPCM7xxState;
++typedef enum CprmanPllChannel {
++    CPRMAN_PLLA_CHANNEL_DSI0 = 0,
++    CPRMAN_PLLA_CHANNEL_CORE,
++    CPRMAN_PLLA_CHANNEL_PER,
++    CPRMAN_PLLA_CHANNEL_CCP2,
++
++    CPRMAN_PLLC_CHANNEL_CORE2,
++    CPRMAN_PLLC_CHANNEL_CORE1,
++    CPRMAN_PLLC_CHANNEL_PER,
++    CPRMAN_PLLC_CHANNEL_CORE0,
++
++    CPRMAN_PLLD_CHANNEL_DSI0,
++    CPRMAN_PLLD_CHANNEL_CORE,
++    CPRMAN_PLLD_CHANNEL_PER,
++    CPRMAN_PLLD_CHANNEL_DSI1,
++
++    CPRMAN_PLLH_CHANNEL_AUX,
++    CPRMAN_PLLH_CHANNEL_RCAL,
++    CPRMAN_PLLH_CHANNEL_PIX,
++
++    CPRMAN_PLLB_CHANNEL_ARM,
++
++    CPRMAN_NUM_PLL_CHANNEL,
++} CprmanPllChannel;
++
+ typedef struct CprmanPllState {
+     /*< private >*/
+     DeviceState parent_obj;
+@@ -48,6 +73,24 @@ typedef struct CprmanPllState {
+     Clock *out;
+ } CprmanPllState;
  
-diff --git a/include/hw/misc/npcm7xx_rng.h b/include/hw/misc/npcm7xx_rng.h
-new file mode 100644
-index 00000000000..5e85fd439d8
---- /dev/null
-+++ b/include/hw/misc/npcm7xx_rng.h
-@@ -0,0 +1,34 @@
-+/*
-+ * Nuvoton NPCM7xx Random Number Generator.
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
-+#ifndef NPCM7XX_RNG_H
-+#define NPCM7XX_RNG_H
++typedef struct CprmanPllChannelState {
++    /*< private >*/
++    DeviceState parent_obj;
 +
-+#include "hw/sysbus.h"
++    /*< public >*/
++    CprmanPllChannel id;
++    CprmanPll parent;
 +
-+typedef struct NPCM7xxRNGState {
-+    SysBusDevice parent;
++    uint32_t *reg_cm;
++    uint32_t hold_mask;
++    uint32_t load_mask;
++    uint32_t *reg_a2w_ctrl;
++    int fixed_divider;
 +
-+    MemoryRegion iomem;
++    Clock *pll_in;
++    Clock *out;
++} CprmanPllChannelState;
 +
-+    uint8_t rngcs;
-+    uint8_t rngd;
-+    uint8_t rngmode;
-+} NPCM7xxRNGState;
-+
-+#define TYPE_NPCM7XX_RNG "npcm7xx-rng"
-+#define NPCM7XX_RNG(obj) OBJECT_CHECK(NPCM7xxRNGState, (obj), TYPE_NPCM7XX_RNG)
-+
-+#endif /* NPCM7XX_RNG_H */
-diff --git a/hw/arm/npcm7xx.c b/hw/arm/npcm7xx.c
-index c341dcab8b3..cb4db41c542 100644
---- a/hw/arm/npcm7xx.c
-+++ b/hw/arm/npcm7xx.c
-@@ -44,6 +44,7 @@
- #define NPCM7XX_GCR_BA          (0xf0800000)
- #define NPCM7XX_CLK_BA          (0xf0801000)
- #define NPCM7XX_MC_BA           (0xf0824000)
-+#define NPCM7XX_RNG_BA          (0xf000b000)
+ struct BCM2835CprmanState {
+     /*< private >*/
+     SysBusDevice parent_obj;
+@@ -56,6 +99,7 @@ struct BCM2835CprmanState {
+     MemoryRegion iomem;
  
- /* Internal AHB SRAM */
- #define NPCM7XX_RAM3_BA         (0xc0008000)
-@@ -256,6 +257,7 @@ static void npcm7xx_init(Object *obj)
-     object_initialize_child(obj, "otp2", &s->fuse_array,
-                             TYPE_NPCM7XX_FUSE_ARRAY);
-     object_initialize_child(obj, "mc", &s->mc, TYPE_NPCM7XX_MC);
-+    object_initialize_child(obj, "rng", &s->rng, TYPE_NPCM7XX_RNG);
+     CprmanPllState plls[CPRMAN_NUM_PLL];
++    CprmanPllChannelState channels[CPRMAN_NUM_PLL_CHANNEL];
  
-     for (i = 0; i < ARRAY_SIZE(s->tim); i++) {
-         object_initialize_child(obj, "tim[*]", &s->tim[i], TYPE_NPCM7XX_TIMER);
-@@ -374,6 +376,10 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
-                        serial_hd(i), DEVICE_LITTLE_ENDIAN);
-     }
+     uint32_t regs[CPRMAN_NUM_REGS];
+     uint32_t xosc_freq;
+diff --git a/include/hw/misc/bcm2835_cprman_internals.h b/include/hw/misc/bcm2835_cprman_internals.h
+index 7aa46c6e188..7409ddb024b 100644
+--- a/include/hw/misc/bcm2835_cprman_internals.h
++++ b/include/hw/misc/bcm2835_cprman_internals.h
+@@ -13,9 +13,12 @@
+ #include "hw/misc/bcm2835_cprman.h"
  
-+    /* Random Number Generator. Cannot fail. */
-+    sysbus_realize(SYS_BUS_DEVICE(&s->rng), &error_abort);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->rng), 0, NPCM7XX_RNG_BA);
+ #define TYPE_CPRMAN_PLL "bcm2835-cprman-pll"
++#define TYPE_CPRMAN_PLL_CHANNEL "bcm2835-cprman-pll-channel"
+ 
+ DECLARE_INSTANCE_CHECKER(CprmanPllState, CPRMAN_PLL,
+                          TYPE_CPRMAN_PLL)
++DECLARE_INSTANCE_CHECKER(CprmanPllChannelState, CPRMAN_PLL_CHANNEL,
++                         TYPE_CPRMAN_PLL_CHANNEL)
+ 
+ /* Register map */
+ 
+@@ -100,6 +103,31 @@ REG32(A2W_PLLD_FRAC, 0x1240)
+ REG32(A2W_PLLH_FRAC, 0x1260)
+ REG32(A2W_PLLB_FRAC, 0x12e0)
+ 
++/* PLL channels */
++REG32(A2W_PLLA_DSI0, 0x1300)
++    FIELD(A2W_PLLx_CHANNELy, DIV, 0, 8)
++    FIELD(A2W_PLLx_CHANNELy, DISABLE, 8, 1)
++REG32(A2W_PLLA_CORE, 0x1400)
++REG32(A2W_PLLA_PER, 0x1500)
++REG32(A2W_PLLA_CCP2, 0x1600)
 +
-     /*
-      * Flash Interface Unit (FIU). Can fail if incorrect number of chip selects
-      * specified, but this is a programming error.
-@@ -412,7 +418,6 @@ static void npcm7xx_realize(DeviceState *dev, Error **errp)
-     create_unimplemented_device("npcm7xx.vdmx",         0xe0800000,   4 * KiB);
-     create_unimplemented_device("npcm7xx.pcierc",       0xe1000000,  64 * KiB);
-     create_unimplemented_device("npcm7xx.kcs",          0xf0007000,   4 * KiB);
--    create_unimplemented_device("npcm7xx.rng",          0xf000b000,   4 * KiB);
-     create_unimplemented_device("npcm7xx.adc",          0xf000c000,   4 * KiB);
-     create_unimplemented_device("npcm7xx.gfxi",         0xf000e000,   4 * KiB);
-     create_unimplemented_device("npcm7xx.gpio[0]",      0xf0010000,   4 * KiB);
-diff --git a/hw/misc/npcm7xx_rng.c b/hw/misc/npcm7xx_rng.c
-new file mode 100644
-index 00000000000..f650f3401f8
---- /dev/null
-+++ b/hw/misc/npcm7xx_rng.c
-@@ -0,0 +1,180 @@
-+/*
-+ * Nuvoton NPCM7xx Random Number Generator.
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
++REG32(A2W_PLLC_CORE2, 0x1320)
++REG32(A2W_PLLC_CORE1, 0x1420)
++REG32(A2W_PLLC_PER, 0x1520)
++REG32(A2W_PLLC_CORE0, 0x1620)
 +
-+#include "qemu/osdep.h"
++REG32(A2W_PLLD_DSI0, 0x1340)
++REG32(A2W_PLLD_CORE, 0x1440)
++REG32(A2W_PLLD_PER, 0x1540)
++REG32(A2W_PLLD_DSI1, 0x1640)
 +
-+#include "hw/misc/npcm7xx_rng.h"
-+#include "migration/vmstate.h"
-+#include "qemu/bitops.h"
-+#include "qemu/guest-random.h"
-+#include "qemu/log.h"
-+#include "qemu/module.h"
-+#include "qemu/units.h"
++REG32(A2W_PLLH_AUX, 0x1360)
++REG32(A2W_PLLH_RCAL, 0x1460)
++REG32(A2W_PLLH_PIX, 0x1560)
++REG32(A2W_PLLH_STS, 0x1660)
 +
-+#include "trace.h"
++REG32(A2W_PLLB_ARM, 0x13e0)
 +
-+#define NPCM7XX_RNG_REGS_SIZE   (4 * KiB)
+ /* misc registers */
+ REG32(CM_LOCK, 0x114)
+     FIELD(CM_LOCK, FLOCKH, 12, 1)
+@@ -173,4 +201,122 @@ static inline void set_pll_init_info(BCM2835CprmanState *s,
+     pll->reg_a2w_frac = &s->regs[PLL_INIT_INFO[id].a2w_frac_offset];
+ }
+ 
 +
-+#define NPCM7XX_RNGCS           (0x00)
-+#define NPCM7XX_RNGCS_CLKP(rv)      extract32(rv, 2, 4)
-+#define NPCM7XX_RNGCS_DVALID        BIT(1)
-+#define NPCM7XX_RNGCS_RNGE          BIT(0)
++/* PLL channel init info */
++typedef struct PLLChannelInitInfo {
++    const char *name;
++    CprmanPll parent;
++    size_t cm_offset;
++    uint32_t cm_hold_mask;
++    uint32_t cm_load_mask;
++    size_t a2w_ctrl_offset;
++    unsigned int fixed_divider;
++} PLLChannelInitInfo;
 +
-+#define NPCM7XX_RNGD            (0x04)
-+#define NPCM7XX_RNGMODE         (0x08)
-+#define NPCM7XX_RNGMODE_NORMAL      (0x02)
++#define FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_)            \
++    .parent = CPRMAN_ ## pll_,                                       \
++    .cm_offset = R_CM_ ## pll_,                                      \
++    .cm_load_mask = R_CM_ ## pll_ ## _ ## LOAD ## channel_ ## _MASK, \
++    .a2w_ctrl_offset = R_A2W_ ## pll_ ## _ ## channel_
 +
-+static bool npcm7xx_rng_is_enabled(NPCM7xxRNGState *s)
-+{
-+    return (s->rngcs & NPCM7XX_RNGCS_RNGE) &&
-+        (s->rngmode == NPCM7XX_RNGMODE_NORMAL);
-+}
++#define FILL_PLL_CHANNEL_INIT_INFO(pll_, channel_)                   \
++    FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_),               \
++    .cm_hold_mask = R_CM_ ## pll_ ## _ ## HOLD ## channel_ ## _MASK, \
++    .fixed_divider = 1
 +
-+static uint64_t npcm7xx_rng_read(void *opaque, hwaddr offset, unsigned size)
-+{
-+    NPCM7xxRNGState *s = opaque;
-+    uint64_t value = 0;
++#define FILL_PLL_CHANNEL_INIT_INFO_nohold(pll_, channel_) \
++    FILL_PLL_CHANNEL_INIT_INFO_common(pll_, channel_),    \
++    .cm_hold_mask = 0
 +
-+    switch (offset) {
-+    case NPCM7XX_RNGCS:
-+        /*
-+         * If the RNG is enabled, but we don't have any valid random data, try
-+         * obtaining some and update the DVALID bit accordingly.
-+         */
-+        if (!npcm7xx_rng_is_enabled(s)) {
-+            s->rngcs &= ~NPCM7XX_RNGCS_DVALID;
-+        } else if (!(s->rngcs & NPCM7XX_RNGCS_DVALID)) {
-+            uint8_t byte = 0;
++static PLLChannelInitInfo PLL_CHANNEL_INIT_INFO[] = {
++    [CPRMAN_PLLA_CHANNEL_DSI0] = {
++        .name = "plla-dsi0",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLA, DSI0),
++    },
++    [CPRMAN_PLLA_CHANNEL_CORE] = {
++        .name = "plla-core",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLA, CORE),
++    },
++    [CPRMAN_PLLA_CHANNEL_PER] = {
++        .name = "plla-per",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLA, PER),
++    },
++    [CPRMAN_PLLA_CHANNEL_CCP2] = {
++        .name = "plla-ccp2",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLA, CCP2),
++    },
 +
-+            if (qemu_guest_getrandom(&byte, sizeof(byte), NULL) == 0) {
-+                s->rngd = byte;
-+                s->rngcs |= NPCM7XX_RNGCS_DVALID;
-+            }
-+        }
-+        value = s->rngcs;
-+        break;
-+    case NPCM7XX_RNGD:
-+        if (npcm7xx_rng_is_enabled(s) && s->rngcs & NPCM7XX_RNGCS_DVALID) {
-+            s->rngcs &= ~NPCM7XX_RNGCS_DVALID;
-+            value = s->rngd;
-+            s->rngd = 0;
-+        }
-+        break;
-+    case NPCM7XX_RNGMODE:
-+        value = s->rngmode;
-+        break;
++    [CPRMAN_PLLC_CHANNEL_CORE2] = {
++        .name = "pllc-core2",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE2),
++    },
++    [CPRMAN_PLLC_CHANNEL_CORE1] = {
++        .name = "pllc-core1",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE1),
++    },
++    [CPRMAN_PLLC_CHANNEL_PER] = {
++        .name = "pllc-per",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLC, PER),
++    },
++    [CPRMAN_PLLC_CHANNEL_CORE0] = {
++        .name = "pllc-core0",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLC, CORE0),
++    },
 +
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: read from invalid offset 0x%" HWADDR_PRIx "\n",
-+                      DEVICE(s)->canonical_path, offset);
-+        break;
-+    }
++    [CPRMAN_PLLD_CHANNEL_DSI0] = {
++        .name = "plld-dsi0",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLD, DSI0),
++    },
++    [CPRMAN_PLLD_CHANNEL_CORE] = {
++        .name = "plld-core",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLD, CORE),
++    },
++    [CPRMAN_PLLD_CHANNEL_PER] = {
++        .name = "plld-per",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLD, PER),
++    },
++    [CPRMAN_PLLD_CHANNEL_DSI1] = {
++        .name = "plld-dsi1",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLD, DSI1),
++    },
 +
-+    trace_npcm7xx_rng_read(offset, value, size);
++    [CPRMAN_PLLH_CHANNEL_AUX] = {
++        .name = "pllh-aux",
++        .fixed_divider = 1,
++        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, AUX),
++    },
++    [CPRMAN_PLLH_CHANNEL_RCAL] = {
++        .name = "pllh-rcal",
++        .fixed_divider = 10,
++        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, RCAL),
++    },
++    [CPRMAN_PLLH_CHANNEL_PIX] = {
++        .name = "pllh-pix",
++        .fixed_divider = 10,
++        FILL_PLL_CHANNEL_INIT_INFO_nohold(PLLH, PIX),
++    },
 +
-+    return value;
-+}
-+
-+static void npcm7xx_rng_write(void *opaque, hwaddr offset, uint64_t value,
-+                              unsigned size)
-+{
-+    NPCM7xxRNGState *s = opaque;
-+
-+    trace_npcm7xx_rng_write(offset, value, size);
-+
-+    switch (offset) {
-+    case NPCM7XX_RNGCS:
-+        s->rngcs &= NPCM7XX_RNGCS_DVALID;
-+        s->rngcs |= value & ~NPCM7XX_RNGCS_DVALID;
-+        break;
-+    case NPCM7XX_RNGD:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: write to read-only register @ 0x%" HWADDR_PRIx "\n",
-+                      DEVICE(s)->canonical_path, offset);
-+        break;
-+    case NPCM7XX_RNGMODE:
-+        s->rngmode = value;
-+        break;
-+    default:
-+        qemu_log_mask(LOG_GUEST_ERROR,
-+                      "%s: write to invalid offset 0x%" HWADDR_PRIx "\n",
-+                      DEVICE(s)->canonical_path, offset);
-+        break;
-+    }
-+}
-+
-+static const MemoryRegionOps npcm7xx_rng_ops = {
-+    .read = npcm7xx_rng_read,
-+    .write = npcm7xx_rng_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+    .valid = {
-+        .min_access_size = 1,
-+        .max_access_size = 4,
-+        .unaligned = false,
++    [CPRMAN_PLLB_CHANNEL_ARM] = {
++        .name = "pllb-arm",
++        FILL_PLL_CHANNEL_INIT_INFO(PLLB, ARM),
 +    },
 +};
 +
-+static void npcm7xx_rng_enter_reset(Object *obj, ResetType type)
-+{
-+    NPCM7xxRNGState *s = NPCM7XX_RNG(obj);
++#undef FILL_PLL_CHANNEL_INIT_INFO_nohold
++#undef FILL_PLL_CHANNEL_INIT_INFO
++#undef FILL_PLL_CHANNEL_INIT_INFO_common
 +
-+    s->rngcs = 0;
-+    s->rngd = 0;
-+    s->rngmode = 0;
++static inline void set_pll_channel_init_info(BCM2835CprmanState *s,
++                                             CprmanPllChannelState *channel,
++                                             CprmanPllChannel id)
++{
++    channel->id = id;
++    channel->parent = PLL_CHANNEL_INIT_INFO[id].parent;
++    channel->reg_cm = &s->regs[PLL_CHANNEL_INIT_INFO[id].cm_offset];
++    channel->hold_mask = PLL_CHANNEL_INIT_INFO[id].cm_hold_mask;
++    channel->load_mask = PLL_CHANNEL_INIT_INFO[id].cm_load_mask;
++    channel->reg_a2w_ctrl = &s->regs[PLL_CHANNEL_INIT_INFO[id].a2w_ctrl_offset];
++    channel->fixed_divider = PLL_CHANNEL_INIT_INFO[id].fixed_divider;
 +}
 +
-+static void npcm7xx_rng_init(Object *obj)
-+{
-+    NPCM7xxRNGState *s = NPCM7XX_RNG(obj);
+ #endif
+diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+index 144bcc289d6..12fa78181b5 100644
+--- a/hw/misc/bcm2835_cprman.c
++++ b/hw/misc/bcm2835_cprman.c
+@@ -132,6 +132,69 @@ static const TypeInfo cprman_pll_info = {
+ };
+ 
+ 
++/* PLL channel */
 +
-+    memory_region_init_io(&s->iomem, obj, &npcm7xx_rng_ops, s, "regs",
-+                          NPCM7XX_RNG_REGS_SIZE);
-+    sysbus_init_mmio(&s->parent, &s->iomem);
++static void pll_channel_update(CprmanPllChannelState *channel)
++{
++    clock_update(channel->out, 0);
 +}
 +
-+static const VMStateDescription vmstate_npcm7xx_rng = {
-+    .name = "npcm7xx-rng",
-+    .version_id = 0,
-+    .minimum_version_id = 0,
++/* Update a PLL and all its channels */
++static void pll_update_all_channels(BCM2835CprmanState *s,
++                                    CprmanPllState *pll)
++{
++    size_t i;
++
++    pll_update(pll);
++
++    for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
++        CprmanPllChannelState *channel = &s->channels[i];
++        if (channel->parent == pll->id) {
++            pll_channel_update(channel);
++        }
++    }
++}
++
++static void pll_channel_pll_in_update(void *opaque)
++{
++    pll_channel_update(CPRMAN_PLL_CHANNEL(opaque));
++}
++
++static void pll_channel_init(Object *obj)
++{
++    CprmanPllChannelState *s = CPRMAN_PLL_CHANNEL(obj);
++
++    s->pll_in = qdev_init_clock_in(DEVICE(s), "pll-in",
++                                   pll_channel_pll_in_update, s);
++    s->out = qdev_init_clock_out(DEVICE(s), "out");
++}
++
++static const VMStateDescription pll_channel_vmstate = {
++    .name = TYPE_CPRMAN_PLL_CHANNEL,
++    .version_id = 1,
++    .minimum_version_id = 1,
 +    .fields = (VMStateField[]) {
-+        VMSTATE_UINT8(rngcs, NPCM7xxRNGState),
-+        VMSTATE_UINT8(rngd, NPCM7xxRNGState),
-+        VMSTATE_UINT8(rngmode, NPCM7xxRNGState),
-+        VMSTATE_END_OF_LIST(),
-+    },
++        VMSTATE_CLOCK(pll_in, CprmanPllChannelState),
++        VMSTATE_END_OF_LIST()
++    }
 +};
 +
-+static void npcm7xx_rng_class_init(ObjectClass *klass, void *data)
++static void pll_channel_class_init(ObjectClass *klass, void *data)
 +{
-+    ResettableClass *rc = RESETTABLE_CLASS(klass);
 +    DeviceClass *dc = DEVICE_CLASS(klass);
 +
-+    dc->desc = "NPCM7xx Random Number Generator";
-+    dc->vmsd = &vmstate_npcm7xx_rng;
-+    rc->phases.enter = npcm7xx_rng_enter_reset;
++    dc->vmsd = &pll_channel_vmstate;
 +}
 +
-+static const TypeInfo npcm7xx_rng_types[] = {
-+    {
-+        .name = TYPE_NPCM7XX_RNG,
-+        .parent = TYPE_SYS_BUS_DEVICE,
-+        .instance_size = sizeof(NPCM7xxRNGState),
-+        .class_init = npcm7xx_rng_class_init,
-+        .instance_init = npcm7xx_rng_init,
-+    },
++static const TypeInfo cprman_pll_channel_info = {
++    .name = TYPE_CPRMAN_PLL_CHANNEL,
++    .parent = TYPE_DEVICE,
++    .instance_size = sizeof(CprmanPllChannelState),
++    .class_init = pll_channel_class_init,
++    .instance_init = pll_channel_init,
 +};
-+DEFINE_TYPES(npcm7xx_rng_types);
-diff --git a/tests/qtest/npcm7xx_rng-test.c b/tests/qtest/npcm7xx_rng-test.c
-new file mode 100644
-index 00000000000..da6e639bf6f
---- /dev/null
-+++ b/tests/qtest/npcm7xx_rng-test.c
-@@ -0,0 +1,278 @@
-+/*
-+ * QTest testcase for the Nuvoton NPCM7xx Random Number Generator
-+ *
-+ * Copyright 2020 Google LLC
-+ *
-+ * This program is free software; you can redistribute it and/or modify it
-+ * under the terms of the GNU General Public License as published by the
-+ * Free Software Foundation; either version 2 of the License, or
-+ * (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful, but WITHOUT
-+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
-+ * FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
-+ * for more details.
-+ */
 +
-+#include "qemu/osdep.h"
 +
-+#include <math.h>
-+
-+#include "libqtest-single.h"
-+#include "qemu/bitops.h"
-+
-+#define RNG_BASE_ADDR   0xf000b000
-+
-+/* Control and Status Register */
-+#define RNGCS   0x00
-+# define DVALID     BIT(1)  /* Data Valid */
-+# define RNGE       BIT(0)  /* RNG Enable */
-+/* Data Register */
-+#define RNGD    0x04
-+/* Mode Register */
-+#define RNGMODE 0x08
-+# define ROSEL_NORMAL   (2) /* RNG only works in this mode */
-+
-+/* Number of bits to collect for randomness tests. */
-+#define TEST_INPUT_BITS  (128)
-+
-+static void rng_writeb(unsigned int offset, uint8_t value)
+ /* CPRMAN "top level" model */
+ 
+ static uint32_t get_cm_lock(const BCM2835CprmanState *s)
+@@ -174,8 +237,32 @@ static uint64_t cprman_read(void *opaque, hwaddr offset,
+     return r;
+ }
+ 
+-#define CASE_PLL_REGS(pll_)       \
+-    case R_CM_ ## pll_:           \
++static inline void update_pll_and_channels_from_cm(BCM2835CprmanState *s,
++                                                   size_t idx)
 +{
-+    writeb(RNG_BASE_ADDR + offset, value);
-+}
++    size_t i;
 +
-+static uint8_t rng_readb(unsigned int offset)
-+{
-+    return readb(RNG_BASE_ADDR + offset);
-+}
-+
-+/* Disable RNG and set normal ring oscillator mode. */
-+static void rng_reset(void)
-+{
-+    rng_writeb(RNGCS, 0);
-+    rng_writeb(RNGMODE, ROSEL_NORMAL);
-+}
-+
-+/* Reset RNG and then enable it. */
-+static void rng_reset_enable(void)
-+{
-+    rng_reset();
-+    rng_writeb(RNGCS, RNGE);
-+}
-+
-+/* Wait until Data Valid bit is set. */
-+static bool rng_wait_ready(void)
-+{
-+    /* qemu_guest_getrandom may fail. Assume it won't fail 10 times in a row. */
-+    int retries = 10;
-+
-+    while (retries-- > 0) {
-+        if (rng_readb(RNGCS) & DVALID) {
-+            return true;
++    for (i = 0; i < CPRMAN_NUM_PLL; i++) {
++        if (PLL_INIT_INFO[i].cm_offset == idx) {
++            pll_update_all_channels(s, &s->plls[i]);
++            return;
 +        }
 +    }
-+
-+    return false;
 +}
 +
-+/*
-+ * Perform a frequency (monobit) test, as defined by NIST SP 800-22, on the
-+ * sequence in buf and return the P-value. This represents the probability of a
-+ * truly random sequence having the same proportion of zeros and ones as the
-+ * sequence in buf.
-+ *
-+ * An RNG which always returns 0x00 or 0xff, or has some bits stuck at 0 or 1,
-+ * will fail this test. However, an RNG which always returns 0x55, 0xf0 or some
-+ * other value with an equal number of zeroes and ones will pass.
-+ */
-+static double calc_monobit_p(const uint8_t *buf, unsigned int len)
++static inline void update_channel_from_a2w(BCM2835CprmanState *s, size_t idx)
 +{
-+    unsigned int i;
-+    double s_obs;
-+    int sn = 0;
++    size_t i;
 +
-+    for (i = 0; i < len; i++) {
++    for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
++        if (PLL_CHANNEL_INIT_INFO[i].a2w_ctrl_offset == idx) {
++            pll_channel_update(&s->channels[i]);
++            return;
++        }
++    }
++}
++
++#define CASE_PLL_A2W_REGS(pll_) \
+     case R_A2W_ ## pll_ ## _CTRL: \
+     case R_A2W_ ## pll_ ## _ANA0: \
+     case R_A2W_ ## pll_ ## _ANA1: \
+@@ -200,29 +287,57 @@ static void cprman_write(void *opaque, hwaddr offset,
+     s->regs[idx] = value;
+ 
+     switch (idx) {
+-    CASE_PLL_REGS(PLLA) :
++    case R_CM_PLLA ... R_CM_PLLH:
++    case R_CM_PLLB:
 +        /*
-+         * Each 1 counts as 1, each 0 counts as -1.
-+         * s = cp - (8 - cp) = 2 * cp - 8
++         * A given CM_PLLx register is shared by both the PLL and the channels
++         * of this PLL.
 +         */
-+        sn += 2 * ctpop8(buf[i]) - 8;
-+    }
++        update_pll_and_channels_from_cm(s, idx);
++        break;
 +
-+    s_obs = abs(sn) / sqrt(len * BITS_PER_BYTE);
-+
-+    return erfc(s_obs / sqrt(2));
-+}
-+
-+/*
-+ * Perform a runs test, as defined by NIST SP 800-22, and return the P-value.
-+ * This represents the probability of a truly random sequence having the same
-+ * number of runs (i.e. uninterrupted sequences of identical bits) as the
-+ * sequence in buf.
-+ */
-+static double calc_runs_p(const unsigned long *buf, unsigned int nr_bits)
-+{
-+    unsigned int j;
-+    unsigned int k;
-+    int nr_ones = 0;
-+    int vn_obs = 0;
-+    double pi;
-+
-+    g_assert(nr_bits % BITS_PER_LONG == 0);
-+
-+    for (j = 0; j < nr_bits / BITS_PER_LONG; j++) {
-+        nr_ones += __builtin_popcountl(buf[j]);
-+    }
-+    pi = (double)nr_ones / nr_bits;
-+
-+    for (k = 0; k < nr_bits - 1; k++) {
-+        vn_obs += !(test_bit(k, buf) ^ test_bit(k + 1, buf));
-+    }
-+    vn_obs += 1;
-+
-+    return erfc(fabs(vn_obs - 2 * nr_bits * pi * (1.0 - pi))
-+                / (2 * sqrt(2 * nr_bits) * pi * (1.0 - pi)));
-+}
-+
-+/*
-+ * Verifies that DVALID is clear, and RNGD reads zero, when RNGE is cleared,
-+ * and DVALID eventually becomes set when RNGE is set.
-+ */
-+static void test_enable_disable(void)
-+{
-+    /* Disable: DVALID should not be set, and RNGD should read zero */
-+    rng_reset();
-+    g_assert_cmphex(rng_readb(RNGCS), ==, 0);
-+    g_assert_cmphex(rng_readb(RNGD), ==, 0);
-+
-+    /* Enable: DVALID should be set, but we can't make assumptions about RNGD */
-+    rng_writeb(RNGCS, RNGE);
-+    g_assert_true(rng_wait_ready());
-+    g_assert_cmphex(rng_readb(RNGCS), ==, DVALID | RNGE);
-+
-+    /* Disable: DVALID should not be set, and RNGD should read zero */
-+    rng_writeb(RNGCS, 0);
-+    g_assert_cmphex(rng_readb(RNGCS), ==, 0);
-+    g_assert_cmphex(rng_readb(RNGD), ==, 0);
-+}
-+
-+/*
-+ * Verifies that the RNG only produces data when RNGMODE is set to 'normal'
-+ * ring oscillator mode.
-+ */
-+static void test_rosel(void)
-+{
-+    rng_reset_enable();
-+    g_assert_true(rng_wait_ready());
-+    rng_writeb(RNGMODE, 0);
-+    g_assert_false(rng_wait_ready());
-+    rng_writeb(RNGMODE, ROSEL_NORMAL);
-+    g_assert_true(rng_wait_ready());
-+    rng_writeb(RNGMODE, 0);
-+    g_assert_false(rng_wait_ready());
-+}
-+
-+/*
-+ * Verifies that a continuous sequence of bits collected after enabling the RNG
-+ * satisfies a monobit test.
-+ */
-+static void test_continuous_monobit(void)
-+{
-+    uint8_t buf[TEST_INPUT_BITS / BITS_PER_BYTE];
-+    unsigned int i;
-+
-+    rng_reset_enable();
-+    for (i = 0; i < sizeof(buf); i++) {
-+        g_assert_true(rng_wait_ready());
-+        buf[i] = rng_readb(RNGD);
-+    }
-+
-+    g_assert_cmpfloat(calc_monobit_p(buf, sizeof(buf)), >, 0.01);
-+}
-+
-+/*
-+ * Verifies that a continuous sequence of bits collected after enabling the RNG
-+ * satisfies a runs test.
-+ */
-+static void test_continuous_runs(void)
-+{
-+    union {
-+        unsigned long l[TEST_INPUT_BITS / BITS_PER_LONG];
-+        uint8_t c[TEST_INPUT_BITS / BITS_PER_BYTE];
-+    } buf;
-+    unsigned int i;
-+
-+    rng_reset_enable();
-+    for (i = 0; i < sizeof(buf); i++) {
-+        g_assert_true(rng_wait_ready());
-+        buf.c[i] = rng_readb(RNGD);
-+    }
-+
-+    g_assert_cmpfloat(calc_runs_p(buf.l, sizeof(buf) * BITS_PER_BYTE), >, 0.01);
-+}
-+
-+/*
-+ * Verifies that the first data byte collected after enabling the RNG satisfies
-+ * a monobit test.
-+ */
-+static void test_first_byte_monobit(void)
-+{
-+    /* Enable, collect one byte, disable. Repeat until we have 100 bits. */
-+    uint8_t buf[TEST_INPUT_BITS / BITS_PER_BYTE];
-+    unsigned int i;
-+
-+    rng_reset();
-+    for (i = 0; i < sizeof(buf); i++) {
-+        rng_writeb(RNGCS, RNGE);
-+        g_assert_true(rng_wait_ready());
-+        buf[i] = rng_readb(RNGD);
-+        rng_writeb(RNGCS, 0);
-+    }
-+
-+    g_assert_cmpfloat(calc_monobit_p(buf, sizeof(buf)), >, 0.01);
-+}
-+
-+/*
-+ * Verifies that the first data byte collected after enabling the RNG satisfies
-+ * a runs test.
-+ */
-+static void test_first_byte_runs(void)
-+{
-+    /* Enable, collect one byte, disable. Repeat until we have 100 bits. */
-+    union {
-+        unsigned long l[TEST_INPUT_BITS / BITS_PER_LONG];
-+        uint8_t c[TEST_INPUT_BITS / BITS_PER_BYTE];
-+    } buf;
-+    unsigned int i;
-+
-+    rng_reset();
-+    for (i = 0; i < sizeof(buf); i++) {
-+        rng_writeb(RNGCS, RNGE);
-+        g_assert_true(rng_wait_ready());
-+        buf.c[i] = rng_readb(RNGD);
-+        rng_writeb(RNGCS, 0);
-+    }
-+
-+    g_assert_cmpfloat(calc_runs_p(buf.l, sizeof(buf) * BITS_PER_BYTE), >, 0.01);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+    int ret;
-+
-+    g_test_init(&argc, &argv, NULL);
-+    g_test_set_nonfatal_assertions();
-+
-+    qtest_add_func("npcm7xx_rng/enable_disable", test_enable_disable);
-+    qtest_add_func("npcm7xx_rng/rosel", test_rosel);
-+    qtest_add_func("npcm7xx_rng/continuous/monobit", test_continuous_monobit);
-+    qtest_add_func("npcm7xx_rng/continuous/runs", test_continuous_runs);
-+    qtest_add_func("npcm7xx_rng/first_byte/monobit", test_first_byte_monobit);
-+    qtest_add_func("npcm7xx_rng/first_byte/runs", test_first_byte_runs);
-+
-+    qtest_start("-machine npcm750-evb");
-+    ret = g_test_run();
-+    qtest_end();
-+
-+    return ret;
-+}
-diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-index 793d45b1dc4..7ffb44b587f 100644
---- a/hw/misc/meson.build
-+++ b/hw/misc/meson.build
-@@ -59,6 +59,7 @@ softmmu_ss.add(when: 'CONFIG_MAINSTONE', if_true: files('mst_fpga.c'))
- softmmu_ss.add(when: 'CONFIG_NPCM7XX', if_true: files(
-   'npcm7xx_clk.c',
-   'npcm7xx_gcr.c',
-+  'npcm7xx_rng.c',
- ))
- softmmu_ss.add(when: 'CONFIG_OMAP', if_true: files(
-   'omap_clk.c',
-diff --git a/hw/misc/trace-events b/hw/misc/trace-events
-index 6054f9adf35..b2f060ad774 100644
---- a/hw/misc/trace-events
-+++ b/hw/misc/trace-events
-@@ -118,6 +118,10 @@ npcm7xx_clk_write(uint64_t offset, uint32_t value) "offset: 0x%04" PRIx64 " valu
- npcm7xx_gcr_read(uint64_t offset, uint32_t value) " offset: 0x%04" PRIx64 " value: 0x%08" PRIx32
- npcm7xx_gcr_write(uint64_t offset, uint32_t value) "offset: 0x%04" PRIx64 " value: 0x%08" PRIx32
++    CASE_PLL_A2W_REGS(PLLA) :
+         pll_update(&s->plls[CPRMAN_PLLA]);
+         break;
  
-+# npcm7xx_rng.c
-+npcm7xx_rng_read(uint64_t offset, uint64_t value, unsigned size) "offset: 0x%04" PRIx64 " value: 0x%02" PRIx64 " size: %u"
-+npcm7xx_rng_write(uint64_t offset, uint64_t value, unsigned size) "offset: 0x%04" PRIx64 " value: 0x%02" PRIx64 " size: %u"
-+
- # stm32f4xx_syscfg.c
- stm32f4xx_syscfg_set_irq(int gpio, int line, int level) "Interupt: GPIO: %d, Line: %d; Level: %d"
- stm32f4xx_pulse_exti(int irq) "Pulse EXTI: %d"
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index 6c9d3426d1a..43e71a3d5ba 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -133,7 +133,10 @@ qtests_sparc64 = \
-   (config_all_devices.has_key('CONFIG_ISA_TESTDEV') ? ['endianness-test'] : []) +            \
-   ['prom-env-test', 'boot-serial-test']
+-    CASE_PLL_REGS(PLLC) :
++    CASE_PLL_A2W_REGS(PLLC) :
+         pll_update(&s->plls[CPRMAN_PLLC]);
+         break;
  
--qtests_npcm7xx = ['npcm7xx_timer-test', 'npcm7xx_watchdog_timer-test']
-+qtests_npcm7xx = \
-+  ['npcm7xx_rng-test',
-+   'npcm7xx_timer-test',
-+   'npcm7xx_watchdog_timer-test']
- qtests_arm = \
-   (config_all_devices.has_key('CONFIG_PFLASH_CFI02') ? ['pflash-cfi02-test'] : []) +         \
-   (config_all_devices.has_key('CONFIG_NPCM7XX') ? qtests_npcm7xx : []) + \
+-    CASE_PLL_REGS(PLLD) :
++    CASE_PLL_A2W_REGS(PLLD) :
+         pll_update(&s->plls[CPRMAN_PLLD]);
+         break;
+ 
+-    CASE_PLL_REGS(PLLH) :
++    CASE_PLL_A2W_REGS(PLLH) :
+         pll_update(&s->plls[CPRMAN_PLLH]);
+         break;
+ 
+-    CASE_PLL_REGS(PLLB) :
++    CASE_PLL_A2W_REGS(PLLB) :
+         pll_update(&s->plls[CPRMAN_PLLB]);
+         break;
++
++    case R_A2W_PLLA_DSI0:
++    case R_A2W_PLLA_CORE:
++    case R_A2W_PLLA_PER:
++    case R_A2W_PLLA_CCP2:
++    case R_A2W_PLLC_CORE2:
++    case R_A2W_PLLC_CORE1:
++    case R_A2W_PLLC_PER:
++    case R_A2W_PLLC_CORE0:
++    case R_A2W_PLLD_DSI0:
++    case R_A2W_PLLD_CORE:
++    case R_A2W_PLLD_PER:
++    case R_A2W_PLLD_DSI1:
++    case R_A2W_PLLH_AUX:
++    case R_A2W_PLLH_RCAL:
++    case R_A2W_PLLH_PIX:
++    case R_A2W_PLLB_ARM:
++        update_channel_from_a2w(s, idx);
++        break;
+     }
+ }
+ 
+-#undef CASE_PLL_REGS
++#undef CASE_PLL_A2W_REGS
+ 
+ static const MemoryRegionOps cprman_ops = {
+     .read = cprman_read,
+@@ -254,6 +369,10 @@ static void cprman_reset(DeviceState *dev)
+         device_cold_reset(DEVICE(&s->plls[i]));
+     }
+ 
++    for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
++        device_cold_reset(DEVICE(&s->channels[i]));
++    }
++
+     clock_update_hz(s->xosc, s->xosc_freq);
+ }
+ 
+@@ -268,6 +387,13 @@ static void cprman_init(Object *obj)
+         set_pll_init_info(s, &s->plls[i], i);
+     }
+ 
++    for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
++        object_initialize_child(obj, PLL_CHANNEL_INIT_INFO[i].name,
++                                &s->channels[i],
++                                TYPE_CPRMAN_PLL_CHANNEL);
++        set_pll_channel_init_info(s, &s->channels[i], i);
++    }
++
+     s->xosc = clock_new(obj, "xosc");
+ 
+     memory_region_init_io(&s->iomem, obj, &cprman_ops,
+@@ -289,6 +415,18 @@ static void cprman_realize(DeviceState *dev, Error **errp)
+             return;
+         }
+     }
++
++    for (i = 0; i < CPRMAN_NUM_PLL_CHANNEL; i++) {
++        CprmanPllChannelState *channel = &s->channels[i];
++        CprmanPll parent = PLL_CHANNEL_INIT_INFO[i].parent;
++        Clock *parent_clk = s->plls[parent].out;
++
++        clock_set_source(channel->pll_in, parent_clk);
++
++        if (!qdev_realize(DEVICE(channel), NULL, errp)) {
++            return;
++        }
++    }
+ }
+ 
+ static const VMStateDescription cprman_vmstate = {
+@@ -328,6 +466,7 @@ static void cprman_register_types(void)
+ {
+     type_register_static(&cprman_info);
+     type_register_static(&cprman_pll_info);
++    type_register_static(&cprman_pll_channel_info);
+ }
+ 
+ type_init(cprman_register_types);
 -- 
 2.20.1
 
