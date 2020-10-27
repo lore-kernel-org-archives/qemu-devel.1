@@ -2,105 +2,92 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E482C5517A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:24:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CAF4C55178
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:25:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 098CF2072D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:24:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E9DA12072D
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:25:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VRVbNQKu"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 098CF2072D
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NNnRSjDH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E9DA12072D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39046 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42250 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPuA-0002Jd-Tr
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:24:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35728)
+	id 1kXPv6-0003fo-H9
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:25:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPSk-0003BU-0b
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:56:35 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:59658)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPSe-0004IV-Bw
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:56:33 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603806987;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=WBWP7KBMIQI6YRPnFGQwZbxBBXEh8CIfDLyp5hJxrI0=;
- b=VRVbNQKuJJWBjmJ96IPkNvmBeYQW1qHE2ndaa47a2YlZ9+uZSG8EKe72X3ltONpU7jULOt
- 3zMW3kUEu4Glvfbi8fSOtIi4bLC3Q3U3f5ijjIPxHvsOZ1SjiYIOIDUTOzq9KH18lG0X+0
- iRcwxvfKRSA3oSIzZ2RZ+aJ2CfB/PVo=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-559-p_Pz2hkeMmW3O3ByINQU0w-1; Tue, 27 Oct 2020 09:56:24 -0400
-X-MC-Unique: p_Pz2hkeMmW3O3ByINQU0w-1
-Received: by mail-ed1-f71.google.com with SMTP id y8so730445edj.5
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:56:23 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kXPej-0007AX-1C; Tue, 27 Oct 2020 10:08:58 -0400
+Received: from mail-pg1-x541.google.com ([2607:f8b0:4864:20::541]:38487)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
+ id 1kXPeh-0006IL-4J; Tue, 27 Oct 2020 10:08:56 -0400
+Received: by mail-pg1-x541.google.com with SMTP id i26so856426pgl.5;
+ Tue, 27 Oct 2020 07:08:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=OVPJ9OkO7wG7zNrQOHCRpGMpBXnhHoydn8Z+MKwMPzM=;
+ b=NNnRSjDHvDNF6PvERkRmkUaEC3shqvWQ24rF4vOrV0AqVFdUbKypNJb9KQ/tjnTxd9
+ PNEIzveVgwksLyl3HGs97i1wQRw2fqPVbH4RGqKEEqP7qsgL2GwouXYxdfPEYf/XsVDp
+ 1KDTOFsFZLaR5N8Tz0VA9yQi76rBJTeln/CPMrrhdHsU+h6zBKDUFXh85fq0YCTnx4lo
+ iNlgTfYQdOfxm6HYTA6pf+XyDi1/6uCew4E2Jt1auBM80VvG5n3xvdNqPAVzadmRo6Og
+ MBUEel+zHGNVeEUaeUkIrTpOyJAaU8RlNn4PEPiv9Wb6qF0RN5R59MQUWyckuDAc0oHH
+ hMYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=WBWP7KBMIQI6YRPnFGQwZbxBBXEh8CIfDLyp5hJxrI0=;
- b=V/Y+BIP8C7iIX9DZJ4ovJjk/5SvGnPq6Y4aIlTr6H3P+EkDm1oQC6qotB9J64ZfSkE
- NhSjSG4f6t5Vbp5j8P4lRpAXbUEYBpW5+FbUBT4OaTBLNDMVPwx80atRoOC+I3nALp0U
- yNkX5wewNFl9pknWE3MvSlP46Mrtjk6l5K9mpE7xDiZJhZ2e9Ygu8JpfecYAOcEXLZoD
- 7ppDgAwMPhAM+knd+GUldThdfxsLC6Fmy2ywoSP7OmdGZ3n2fFEnmKYr6pJ8l14mKSvE
- a/u2w3HV8QH6FMwOS2wCh8IQEAyhvoGDQgTksS9/7R9nTfB4Iqt+AnloxJz+8+Bx+JPI
- g/wQ==
-X-Gm-Message-State: AOAM530nxIkmzeNRh0vCSJrZzFaDPQ1tNsIVF1C9EbbghXhI2mjmx3mG
- IdqjyxDTSYbUo8U8oIJR65QqnSPM0zoovQv1HwPCdHEe4bd6zL006XH0cFKjfj0GUZqS+cnfgvk
- AsHPMKF9w8N+v528=
-X-Received: by 2002:a17:906:5594:: with SMTP id
- y20mr2650653ejp.196.1603806982302; 
- Tue, 27 Oct 2020 06:56:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQSZcVQU+o3Hk7rvmzMGq3IlquhDlUEgCoHtlKGQdLsCnzA4YKsJOo+FZo8KxtT0R5NaJ0lA==
-X-Received: by 2002:a17:906:5594:: with SMTP id
- y20mr2650638ejp.196.1603806982089; 
- Tue, 27 Oct 2020 06:56:22 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id h15sm1088318ejf.50.2020.10.27.06.56.20
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=OVPJ9OkO7wG7zNrQOHCRpGMpBXnhHoydn8Z+MKwMPzM=;
+ b=erfax+iyh62X9F4ulhRFTBB0EGp5zLuEjexgEWkE8I2En98nDNV19G0tye9O9m2yYN
+ t8rhx5mdWZ13737FlLwLNq1zh8s1xCPGH0y6r1KYG8Ebj8zsL4vEMlgySzUIHFce5DsH
+ zFGkqzdjlcHZaamG7lE2bAbM/+JRXj/XxdKmgHi9iEy7VOIDouxQVDFQVUykwU4M+Nu6
+ oodJzZlF6hkoYCtFl34kIu7ycGBJP/gxwHwZ8uRumbnRVC3R+KWUT9rJ5UpR1OHWcOLf
+ r5ZOOSqRQdqWrpM0IZMp7JwPC/GLK534ua25fx2NoZQf77kB+7AsF2CBM+aZiXvI40IP
+ f/OA==
+X-Gm-Message-State: AOAM532Z13w3p6BxF4IjFWkPIFr55d5SiIGy/GwTPvCMjxqXhH8HINlM
+ VghCdtYhtNi1atNatO0YPw0=
+X-Google-Smtp-Source: ABdhPJynPJ0ZChMLMOQvGZjsMC3pgreGolsKpI/18whJqd42fU6apmpCBwZEDR16ZM4OqgtsYAWI9w==
+X-Received: by 2002:a62:8c81:0:b029:164:3789:5478 with SMTP id
+ m123-20020a628c810000b029016437895478mr2160178pfd.44.1603807732586; 
+ Tue, 27 Oct 2020 07:08:52 -0700 (PDT)
+Received: from i9-aorus-gtx1080.localdomain (144.168.56.201.16clouds.com.
+ [144.168.56.201])
+ by smtp.gmail.com with ESMTPSA id r22sm2540856pfg.51.2020.10.27.07.08.49
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 06:56:21 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 06/25] block/nvme: Improve nvme_free_req_queue_wait() trace
- information
-Date: Tue, 27 Oct 2020 14:55:28 +0100
-Message-Id: <20201027135547.374946-7-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201027135547.374946-1-philmd@redhat.com>
-References: <20201027135547.374946-1-philmd@redhat.com>
+ Tue, 27 Oct 2020 07:08:52 -0700 (PDT)
+From: Bin Meng <bmeng.cn@gmail.com>
+X-Google-Original-From: Bin Meng <bin.meng@windriver.com>
+To: Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
+ qemu-riscv@nongnu.org
+Subject: [PATCH 0/9] hw/riscv: microchip_pfsoc: Support factory HSS boot out
+ of the box
+Date: Tue, 27 Oct 2020 22:08:31 +0800
+Message-Id: <20201027140840.18030-1-bin.meng@windriver.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Received-SPF: pass client-ip=2607:f8b0:4864:20::541;
+ envelope-from=bmeng.cn@gmail.com; helo=mail-pg1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -113,51 +100,62 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Bin Meng <bin.meng@windriver.com>, Atish Patra <atish.patra@wdc.com>,
+ Anup Patel <anup.patel@wdc.com>, Ivan Griffin <ivan.griffin@emdalo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-What we want to trace is the block driver state and the queue index.
+At present the DDR memory controller is not modeled, hence the factory
+HSS firmware does not boot out of the box on QEMU. A modified HSS is
+required per the instructions on [1].
 
-Suggested-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c       | 2 +-
- block/trace-events | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+This series adds the missing DDR memory controller support to PolarFire
+SoC, as well as adding various misc models to support the DDR memory
+initialization done by HSS.
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 8d74401ae7a..29d2541b911 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -292,7 +292,7 @@ static NVMeRequest *nvme_get_free_req(NVMeQueuePair *q)
- 
-     while (q->free_req_head == -1) {
-         if (qemu_in_coroutine()) {
--            trace_nvme_free_req_queue_wait(q);
-+            trace_nvme_free_req_queue_wait(q->s, q->index);
-             qemu_co_queue_wait(&q->free_req_queue, &q->lock);
-         } else {
-             qemu_mutex_unlock(&q->lock);
-diff --git a/block/trace-events b/block/trace-events
-index 86292f3312b..cc5e2b55cb5 100644
---- a/block/trace-events
-+++ b/block/trace-events
-@@ -154,7 +154,7 @@ nvme_rw_done(void *s, int is_write, uint64_t offset, uint64_t bytes, int ret) "s
- nvme_dsm(void *s, uint64_t offset, uint64_t bytes) "s %p offset 0x%"PRIx64" bytes %"PRId64""
- nvme_dsm_done(void *s, uint64_t offset, uint64_t bytes, int ret) "s %p offset 0x%"PRIx64" bytes %"PRId64" ret %d"
- nvme_dma_map_flush(void *s) "s %p"
--nvme_free_req_queue_wait(void *q) "q %p"
-+nvme_free_req_queue_wait(void *s, unsigned q_index) "s %p q #%u"
- nvme_cmd_map_qiov(void *s, void *cmd, void *req, void *qiov, int entries) "s %p cmd %p req %p qiov %p entries %d"
- nvme_cmd_map_qiov_pages(void *s, int i, uint64_t page) "s %p page[%d] 0x%"PRIx64
- nvme_cmd_map_qiov_iov(void *s, int i, void *page, int pages) "s %p iov[%d] %p pages %d"
+With this series, the unmodified HSS image can boot on QEMU out of the
+box. The latest SD card image [2] released by Microchip was used for
+testing which includes the pre-built U-Boot, device tree blob and Linux
+kernel for the Icicle Kit. The instructions on [1] have been updated to
+include the information on HSS and SD card image.
+
+[1] https://wiki.qemu.org/Documentation/Platforms/RISCV#Microchip_PolarFire_SoC_Icicle_Kit
+[2] ftp://ftpsoc.microsemi.com/outgoing/core-image-minimal-dev-icicle-kit-es-sd-20201009141623.rootfs.wic.gz
+
+
+Bin Meng (9):
+  hw/misc: Add Microchip PolarFire SoC DDR Memory Controller support
+  hw/riscv: microchip_pfsoc: Connect DDR memory controller modules
+  hw/misc: Add Microchip PolarFire SoC IOSCB module support
+  hw/riscv: microchip_pfsoc: Connect the IOSCB module
+  hw/misc: Add Microchip PolarFire SoC SYSREG module support
+  hw/riscv: microchip_pfsoc: Connect the SYSREG module
+  hw/riscv: microchip_pfsoc: Map debug memory
+  hw/riscv: microchip_pfsoc: Correct DDR memory map
+  hw/riscv: microchip_pfsoc: Hook the I2C1 controller
+
+ MAINTAINERS                         |   6 +
+ hw/misc/Kconfig                     |   9 ++
+ hw/misc/mchp_pfsoc_dmc.c            | 216 +++++++++++++++++++++++++
+ hw/misc/mchp_pfsoc_ioscb.c          | 242 ++++++++++++++++++++++++++++
+ hw/misc/mchp_pfsoc_sysreg.c         |  99 ++++++++++++
+ hw/misc/meson.build                 |   3 +
+ hw/riscv/Kconfig                    |   3 +
+ hw/riscv/microchip_pfsoc.c          | 103 ++++++++++--
+ include/hw/misc/mchp_pfsoc_dmc.h    |  56 +++++++
+ include/hw/misc/mchp_pfsoc_ioscb.h  |  50 ++++++
+ include/hw/misc/mchp_pfsoc_sysreg.h |  39 +++++
+ include/hw/riscv/microchip_pfsoc.h  |  17 +-
+ 12 files changed, 828 insertions(+), 15 deletions(-)
+ create mode 100644 hw/misc/mchp_pfsoc_dmc.c
+ create mode 100644 hw/misc/mchp_pfsoc_ioscb.c
+ create mode 100644 hw/misc/mchp_pfsoc_sysreg.c
+ create mode 100644 include/hw/misc/mchp_pfsoc_dmc.h
+ create mode 100644 include/hw/misc/mchp_pfsoc_ioscb.h
+ create mode 100644 include/hw/misc/mchp_pfsoc_sysreg.h
+
 -- 
-2.26.2
+2.25.1
 
 
