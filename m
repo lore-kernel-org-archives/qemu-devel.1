@@ -2,98 +2,69 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C940C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:04:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2275C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:04:51 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B30A120747
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:04:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 389E520747
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:04:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jMZDo+75"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B30A120747
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZraPInGp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 389E520747
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38992 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39734 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQWg-00086Q-MN
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:04:42 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48468)
+	id 1kXQWo-0008RF-53
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:04:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51684)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXQ9g-0005M9-5I
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:40:56 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:39050)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXQ9e-0002d8-8c
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:40:55 -0400
-Received: by mail-ej1-x642.google.com with SMTP id bn26so2580153ejb.6
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 07:40:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=atrdn6JxvV9PBu2/vgtm5bG4A5IALlYh+S+gHEWuMw8=;
- b=jMZDo+75DD/cDFAnGvuYuUiclPjtqMkxX62nqCQFGxIRQiBg7wc54OccK3ZWBNsaFl
- p2K8Mdb/UK8nNmdLPBrdcSYZpooN4BvrY4CXPIRZSLkW+FsZvIyvFvQFD7n0nbAi24np
- UtDNsPM58EwTfBEtjvr3MwAGM+6ucYdrWApNrs3WzdN9ONmh2xz091sCKfjpovQMGBxB
- bTaqIPwvctUa9v2Yn2jKz9VJHYmdjwzWXauIe6ecX5da5z3//4rYhqNd/FBYPm7DCZLV
- Su5tdp/XxHsx1joq8XvpZGh3dKe6GCJBDxCk9yqnSOG8GcFsvvuDNbJjnjPczhc6lniK
- xnpQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=atrdn6JxvV9PBu2/vgtm5bG4A5IALlYh+S+gHEWuMw8=;
- b=kz72l+xz+2IMM3ThDuYo/AqNG7875GEK6Ej7TSm2PLqtx+bZUuFhOE1CSwIXfCsymp
- bZQ+UTPaWcBEH2C4BHqq7A0ej/AS2fB1mJxXcjsCpAoxQkLsinf9Gd6zJv/mt7uAkW68
- qi3HrN5SGLYRE8SDv9DWEvvpXKmqGjrXUiMZfpmchhV7frBgu3epz78wbyOPEj0v9agr
- lWeHos+cbft9pwfGdH07cuzmnMfEvIp5oEpJ3XSxjt86e8viRH8WZz5qlaiQSJMeWW+X
- Xg0cmNTBE+RSPreqj/cU3+g2PQT6WNTjSMPMSkAVUuDjzrjzkzTJ1H1qbspbcnbfs4HN
- uONg==
-X-Gm-Message-State: AOAM532+ks77WDqwKy/LjYILZZ3XaWELuttDDXHNbW6qaouRz7Jyjs0m
- /VPVTJhgamnREuRBtqmu8I+rwC2B7uI=
-X-Google-Smtp-Source: ABdhPJwx7aKjlVhlJDUQLrTmQtGhNyb/Hga4V0W+BS1opvOEMN2cN1iPUni3CS1TGvZKS9JX8wu+fw==
-X-Received: by 2002:a17:907:435b:: with SMTP id
- oc19mr2616706ejb.311.1603809652415; 
- Tue, 27 Oct 2020 07:40:52 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id d14sm1092294edx.53.2020.10.27.07.40.51
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 27 Oct 2020 07:40:51 -0700 (PDT)
-Subject: Re: [PATCH 08/15] mips: remove bios_name
-To: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
-References: <20201026143028.3034018-1-pbonzini@redhat.com>
- <20201026143028.3034018-9-pbonzini@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <c02ce052-aade-c596-40e6-0d841beb8308@amsat.org>
-Date: Tue, 27 Oct 2020 15:40:50 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kXQNC-00064R-A8; Tue, 27 Oct 2020 10:54:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38656)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kXQNA-0004Xt-MJ; Tue, 27 Oct 2020 10:54:53 -0400
+Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id CE9E122265;
+ Tue, 27 Oct 2020 14:54:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1603810490;
+ bh=ate7PseDEj2Dim5YksYRWjfAlSCjlZc9nwdeukKoCy4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZraPInGpafBaBtVzfxqHTQ9a5XIT8CpLkWvMtFaA8CBVdx8XiaOxYFTRP/9/lk97Q
+ jZb5weOXYXEMmCWPHxDBS9E7sDi8ZbjQonW3Z7BcCVLTALrm+PWUrrXvSV168LQZ7N
+ R/aypRR1W+yZdlet63kXWPwNKqfsQWbfosHtBzdw=
+Date: Tue, 27 Oct 2020 07:54:47 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 08/25] block/nvme: Simplify device reset
+Message-ID: <20201027145447.GB1942271@dhcp-10-100-145-180.wdc.com>
+References: <20201027135547.374946-1-philmd@redhat.com>
+ <20201027135547.374946-9-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201026143028.3034018-9-pbonzini@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20201027135547.374946-9-philmd@redhat.com>
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 10:45:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -107,49 +78,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/26/20 3:30 PM, Paolo Bonzini wrote:
-> Cc: Philippe Mathieu-Daud√© <philmd@redhat.com>
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  hw/mips/fuloong2e.c | 6 +++---
->  hw/mips/jazz.c      | 6 +++---
->  hw/mips/malta.c     | 6 +++---
->  hw/mips/mipssim.c   | 6 +++---
->  hw/mips/r4k.c       | 4 +---
->  5 files changed, 13 insertions(+), 15 deletions(-)
-...
-> diff --git a/hw/mips/r4k.c b/hw/mips/r4k.c
-> index 3830854342..b27be138a4 100644
-> --- a/hw/mips/r4k.c
-> +++ b/hw/mips/r4k.c
-> @@ -168,6 +168,7 @@ static const int sector_len = 32 * KiB;
->  static
->  void mips_r4k_init(MachineState *machine)
->  {
-> +    const char *bios_name = machine->firmware ?: BIOS_FILENAME;
-
-Don't we have a "redefinition of global variable" warning here?
-
-Anyway,
-Reviewed-by: Philippe Mathieu-Daud√© <f4bug@amsat.org>
-
->      const char *kernel_filename = machine->kernel_filename;
->      const char *kernel_cmdline = machine->kernel_cmdline;
->      const char *initrd_filename = machine->initrd_filename;
-> @@ -221,9 +222,6 @@ void mips_r4k_init(MachineState *machine)
->       * run.
->       */
->  
-> -    if (bios_name == NULL) {
-> -        bios_name = BIOS_FILENAME;
-> -    }
->      filename = qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
->      if (filename) {
->          bios_size = get_image_size(filename);
+On Tue, Oct 27, 2020 at 02:55:30PM +0100, Philippe Mathieu-DaudÈ wrote:
+> Avoid multiple endianess conversion by using device endianess.
 > 
+> Signed-off-by: Philippe Mathieu-DaudÈ <philmd@redhat.com>
+> ---
+>  block/nvme.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index e95d59d3126..be14350f959 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -755,7 +755,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>      timeout_ms = MIN(500 * NVME_CAP_TO(cap), 30000);
+>  
+>      /* Reset device to get a clean state. */
+> -    regs->cc = cpu_to_le32(le32_to_cpu(regs->cc) & 0xFE);
+> +    regs->cc &= const_le32(0xFE);
 
+This doesn't look right. The 'regs' is an MMIO address, correct? Memory
+mappings use the CPU native.
 
