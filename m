@@ -2,96 +2,119 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4591C55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:08:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66B30C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:13:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2EC7A2222C
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:08:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8696C21556
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:13:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gcZI999l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2EC7A2222C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bLeCgm7p"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8696C21556
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39674 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43156 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXRWa-0003M9-Bf
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:08:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43926)
+	id 1kXRbO-0005Fb-D5
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:13:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46124)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1kXRRa-0006sF-No; Tue, 27 Oct 2020 12:03:30 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:33399)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <xadimgnik@gmail.com>)
- id 1kXRRW-0006SK-UY; Tue, 27 Oct 2020 12:03:30 -0400
-Received: by mail-wr1-x443.google.com with SMTP id b8so2559687wrn.0;
- Tue, 27 Oct 2020 09:03:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:reply-to:to:cc:references:in-reply-to:subject:date:message-id
- :mime-version:content-transfer-encoding:content-language
- :thread-index; bh=sW8LqdsqvdTg1P+qAX5fXAdoffXOLpsCYzIzY0O/pGA=;
- b=gcZI999ljyPBSJJ2b3/mRDOgaSoj35K7lwmMxAHVIHVfxPuv+oxXtzDk/oPTag6DS+
- zUaA/VeT5uszZ2xR8Ys3KHYvNzZ+P7XwUdCiYiMLTuPLoo25t9HjpuZTeeOolgV8mW+C
- fjdr9Q/OXxKU0RNiQWexKRxQ7H7xZxzA25nAL32IyUK1rruihIEcNJyPi5Go7dP1MB3x
- 1QNxmqx0Kn3y2gSX5mFkYC6UGAhFeXSfoQ6MTNlrshFdLFi8q4aHMbnXRZeaTNe/8Uod
- +DI/moiyGJL8OlxfUfcgNVIHLIiwkJl/q3mQ4DhtPiHZPIJysr+Huug1HzlUJ5loVR1c
- F7Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:reply-to:to:cc:references:in-reply-to
- :subject:date:message-id:mime-version:content-transfer-encoding
- :content-language:thread-index;
- bh=sW8LqdsqvdTg1P+qAX5fXAdoffXOLpsCYzIzY0O/pGA=;
- b=s+wLYtRLIa1HRO9w8wc9PKcbEcmIeq/ejZAa8+xvnIWQKD9TLqCpo/YqfdhtK2u4PD
- C/TRdxiIUiBAt+MMaIcZVV9Xlj5ih1Z8TInME1sth5nhiho4B1xBMYZEw08erW4AqgOw
- CjTSWFy586fNgcPp294C7h5TWNz5u9C3qbaU6eXoSiREmwWwjBlTMILuFBMU50VFEo6l
- c1ouClKNSWoEQi7uAcyjRR/unAFf/aiqkiBCN3/aIbBVviHZXDbP0UJtSQe8wG+/Im4j
- dWXIgT+R+XGRqB4/twSa1wRGhntEiZITs7CYEwPvb09P+X5V/tEG776GX66hmGa3H0qC
- 6rIw==
-X-Gm-Message-State: AOAM532RuTUwY+GnkTT/OmdMVsnHuZmRxWmGvR1JvoXPsTwNtzpYQW+R
- 63X7ORO0zutAXomAMOEvRB8=
-X-Google-Smtp-Source: ABdhPJxRx+s3w1orl8e+NX2YRi1fvPtJThFsBNCiqU/JL7jI6rg1qhnHNvuU2J/wJ+z4sDVEG5mB8Q==
-X-Received: by 2002:adf:df03:: with SMTP id y3mr3657957wrl.70.1603814604096;
- Tue, 27 Oct 2020 09:03:24 -0700 (PDT)
-Received: from CBGR90WXYV0 (54-240-197-238.amazon.com. [54.240.197.238])
- by smtp.gmail.com with ESMTPSA id d2sm2424163wrq.34.2020.10.27.09.03.22
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Oct 2020 09:03:23 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: "Paul Durrant" <paul@xen.org>
-To: "'Anthony PERARD'" <anthony.perard@citrix.com>,
-	<qemu-devel@nongnu.org>
-References: <20201027154058.495112-1-anthony.perard@citrix.com>
-In-Reply-To: <20201027154058.495112-1-anthony.perard@citrix.com>
-Subject: RE: [PATCH v2] xen: rework pci_piix3_xen_ide_unplug
-Date: Tue, 27 Oct 2020 16:03:22 -0000
-Message-ID: <00a201d6ac7a$b2792640$176b72c0$@xen.org>
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kXRaZ-0004j4-QZ
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 12:12:47 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:17366)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <tobin@linux.ibm.com>)
+ id 1kXRaX-0007i5-Kh
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 12:12:47 -0400
+Received: from pps.filterd (m0098417.ppops.net [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com (8.16.0.42/8.16.0.42) with SMTP id
+ 09RG4Cm3142315; Tue, 27 Oct 2020 12:12:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com;
+ h=mime-version : date :
+ from : to : cc : subject : in-reply-to : references : message-id :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=x5PvE8cXbL3NjvDKZwNRvsAOba+yps1D1RmrDPnTtHc=;
+ b=bLeCgm7pro0y6yFD2tCDG3asU5iVqC1MK2y6IZnD1w9Dvek59cB9Dwh1Pj9yGHnJbRPQ
+ OzLmQJ6eZFrIUmgRhmKkEnptFoUvww3oezsj9g6QMT3nyYkrC6di5pkR9lUBBR+2xBIl
+ oYuQLue20qk+KxP4AGdLm3YaHeYCKiQ5Cn8al9WFgDgMXkJUKQa6urt3hBLsvEnhv4ot
+ vABBwQ7h2ayqOMxnQrFNNzwexP9n6ndbvIYyumU2suBwwKB2S5lyrTrJhrj9d/t1MGDe
+ TF/sjFBFQG6F9KlI6XRl+Y9exM+nhBJN9Glr1Dh6odRdqjBv/jijuU7erC4FTBjF9xP3 5A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ekqd8767-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 27 Oct 2020 12:12:39 -0400
+Received: from m0098417.ppops.net (m0098417.ppops.net [127.0.0.1])
+ by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 09RG4kXK145942;
+ Tue, 27 Oct 2020 12:12:39 -0400
+Received: from ppma03dal.us.ibm.com (b.bd.3ea9.ip4.static.sl-reverse.com
+ [169.62.189.11])
+ by mx0a-001b2d01.pphosted.com with ESMTP id 34ekqd875t-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 27 Oct 2020 12:12:39 -0400
+Received: from pps.filterd (ppma03dal.us.ibm.com [127.0.0.1])
+ by ppma03dal.us.ibm.com (8.16.0.42/8.16.0.42) with SMTP id 09RG4Kxw009566;
+ Tue, 27 Oct 2020 16:12:38 GMT
+Received: from b01cxnp22033.gho.pok.ibm.com (b01cxnp22033.gho.pok.ibm.com
+ [9.57.198.23]) by ppma03dal.us.ibm.com with ESMTP id 34cbw97cve-1
+ (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+ Tue, 27 Oct 2020 16:12:38 +0000
+Received: from b01ledav006.gho.pok.ibm.com (b01ledav006.gho.pok.ibm.com
+ [9.57.199.111])
+ by b01cxnp22033.gho.pok.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id
+ 09RGCb7053674426
+ (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+ Tue, 27 Oct 2020 16:12:38 GMT
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id D95BAAC05F;
+ Tue, 27 Oct 2020 16:12:37 +0000 (GMT)
+Received: from b01ledav006.gho.pok.ibm.com (unknown [127.0.0.1])
+ by IMSVA (Postfix) with ESMTP id 10966AC059;
+ Tue, 27 Oct 2020 16:12:37 +0000 (GMT)
+Received: from ltc.linux.ibm.com (unknown [9.16.170.189])
+ by b01ledav006.gho.pok.ibm.com (Postfix) with ESMTP;
+ Tue, 27 Oct 2020 16:12:36 +0000 (GMT)
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="us-ascii"
-Content-Transfer-Encoding: 7bit
-X-Mailer: Microsoft Outlook 16.0
-Content-Language: en-gb
-Thread-Index: AQIXyNIMV8JUNlnsXBQ3KKexs/tKsqkpYYpA
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=xadimgnik@gmail.com; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
+Date: Tue, 27 Oct 2020 12:12:36 -0400
+From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+To: Eduardo Habkost <ehabkost@redhat.com>
+Subject: Re: [PATCH v7] sev: add sev-inject-launch-secret
+In-Reply-To: <20201027133506.GC5733@habkost.net>
+References: <20201022053909.34123-1-tobin@linux.ibm.com>
+ <20201027133506.GC5733@habkost.net>
+Message-ID: <06d453ad1dc5866e42145a6d1dd3f764@linux.vnet.ibm.com>
+X-Sender: tobin@linux.ibm.com
+User-Agent: Roundcube Webmail/1.0.1
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
+ definitions=2020-10-27_08:2020-10-26,
+ 2020-10-27 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0
+ priorityscore=1501
+ impostorscore=0 mlxscore=0 adultscore=0 malwarescore=0 clxscore=1015
+ phishscore=0 lowpriorityscore=0 suspectscore=0 bulkscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2009150000 definitions=main-2010270097
+Received-SPF: pass client-ip=148.163.158.5; envelope-from=tobin@linux.ibm.com;
+ helo=mx0b-001b2d01.pphosted.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 12:12:42
+X-ACL-Warn: Detected OS   = Linux 3.x [generic]
+X-Spam_score_int: -19
+X-Spam_score: -2.0
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-2.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,99 +128,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: paul@xen.org
-Cc: 'Stefano Stabellini' <sstabellini@kernel.org>,
- 'John Snow' <jsnow@redhat.com>, qemu-block@nongnu.org
+Cc: thomas.lendacky@amd.com, brijesh.singh@amd.com, jejb@linux.ibm.com,
+ tobin@ibm.com, qemu-devel@nongnu.org, dgilbert@redhat.com, berrange@redhat.com,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-> -----Original Message-----
-> From: Anthony PERARD <anthony.perard@citrix.com>
-> Sent: 27 October 2020 15:41
-> To: qemu-devel@nongnu.org
-> Cc: Anthony PERARD <anthony.perard@citrix.com>; Paul Durrant <paul@xen.org>; Stefano Stabellini
-> <sstabellini@kernel.org>; John Snow <jsnow@redhat.com>; qemu-block@nongnu.org
-> Subject: [PATCH v2] xen: rework pci_piix3_xen_ide_unplug
+On 2020-10-27 09:35, Eduardo Habkost wrote:
+> On Thu, Oct 22, 2020 at 01:39:09AM -0400, tobin@linux.ibm.com wrote:
+>> From: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+>> 
+>> AMD SEV allows a guest owner to inject a secret blob
+>> into the memory of a virtual machine. The secret is
+>> encrypted with the SEV Transport Encryption Key and
+>> integrity is guaranteed with the Transport Integrity
+>> Key. Although QEMU facilitates the injection of the
+>> launch secret, it cannot access the secret.
+>> 
+>> Signed-off-by: Tobin Feldman-Fitzthum <tobin@linux.ibm.com>
+>> Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+>> Reviewed-by: Brijesh Singh <brijesh.singh@amd.com>
 > 
-> From: Anthony PERARD <anthony.perard@citrix.com>
+> I was going to queue it, but unfortunately it failed to build on some 
+> hosts:
 > 
-> This is to allow IDE disks to be unplugged when adding to QEMU via:
->     -drive file=/root/disk_file,if=none,id=ide-disk0,format=raw
->     -device ide-hd,drive=ide-disk0,bus=ide.0,unit=0
+> https://gitlab.com/ehabkost/qemu/-/jobs/814250096
 > 
-> as the current code only works for disk added with:
->     -drive file=/root/disk_file,if=ide,index=0,media=disk,format=raw
-> 
-> Since the code already have the IDE controller as `dev`, we don't need
-> to use the legacy DriveInfo to find all the drive we want to unplug.
-> We can simply use `blk` from the controller, as it kind of was already
-> assume to be the same, by setting it to NULL.
-> 
-> Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
-> 
+> [1892/5203] Compiling C object 
+> libqemu-alpha-softmmu.fa.p/monitor_misc.c.o
+> FAILED: libqemu-alpha-softmmu.fa.p/monitor_misc.c.o
+> arm-linux-gnueabi-gcc -Ilibqemu-alpha-softmmu.fa.p -I. -I..
+> -Itarget/alpha -I../target/alpha -I../capstone/include/capstone -Iqapi
+> -Itrace -Iui -Iui/shader -I/usr/include/libdrm -I/usr/include/pixman-1
+> -I/usr/include/glib-2.0 -I/usr/lib/arm-linux-gnueabi/glib-2.0/include
+> -fdiagnostics-color=auto -pipe -Wall -Winvalid-pch -Werror -std=gnu99
+> -O2 -g -U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
+> -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -Wstrict-prototypes
+> -Wredundant-decls -Wundef -Wwrite-strings -Wmissing-prototypes
+> -fno-strict-aliasing -fno-common -fwrapv -Wold-style-declaration
+> -Wold-style-definition -Wtype-limits -Wformat-security -Wformat-y2k
+> -Winit-self -Wignored-qualifiers -Wempty-body -Wnested-externs
+> -Wendif-labels -Wexpansion-to-defined -Wno-missing-include-dirs
+> -Wno-shift-negative-value -Wno-psabi -fstack-protector-strong
+> -DLEGACY_RDMA_REG_MR -isystem /builds/ehabkost/qemu/linux-headers
+> -isystem linux-headers -iquote /builds/ehabkost/qemu/tcg/arm -iquote .
+> -iquote /builds/ehabkost/qemu -iquote /builds/ehabkost/qemu/accel/tcg
+> -iquote /builds/ehabkost/qemu/include -iquote
+> /builds/ehabkost/qemu/disas/libvixl -pthread -fPIC
+> -isystem../linux-headers -isystemlinux-headers -DNEED_CPU_H
+> '-DCONFIG_TARGET="alpha-softmmu-config-target.h"'
+> '-DCONFIG_DEVICES="alpha-softmmu-config-devices.h"' -MD -MQ
+> libqemu-alpha-softmmu.fa.p/monitor_misc.c.o -MF
+> libqemu-alpha-softmmu.fa.p/monitor_misc.c.o.d -o
+> libqemu-alpha-softmmu.fa.p/monitor_misc.c.o -c ../monitor/misc.c
+> ../monitor/misc.c: In function 'gpa2hva':
+> ../monitor/misc.c:686:18: error: invalid operands to binary < (have
+> 'Int128' {aka 'struct Int128'} and 'uint64_t' {aka 'long long unsigned
+> int'})
+>      if (mrs.size < size) {
+>          ~~~~~~~~ ^
+> [1893/5203] Compiling C object 
+> libqemu-alpha-softmmu.fa.p/softmmu_physmem.c.o
+> ninja: build stopped: subcommand failed.
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+I am not easily able to replicate this (perhaps an issue for ARM only?).
 
-> ---
-> v2: coding style
-> 
-> CC: Paul Durrant <paul@xen.org>
-> CC: Stefano Stabellini <sstabellini@kernel.org>
-> ---
->  hw/ide/piix.c | 27 +++++++++++++--------------
->  1 file changed, 13 insertions(+), 14 deletions(-)
-> 
-> diff --git a/hw/ide/piix.c b/hw/ide/piix.c
-> index b402a936362b..b9860e35a5c4 100644
-> --- a/hw/ide/piix.c
-> +++ b/hw/ide/piix.c
-> @@ -164,30 +164,29 @@ static void pci_piix_ide_realize(PCIDevice *dev, Error **errp)
->  int pci_piix3_xen_ide_unplug(DeviceState *dev, bool aux)
->  {
->      PCIIDEState *pci_ide;
-> -    DriveInfo *di;
->      int i;
->      IDEDevice *idedev;
-> +    IDEBus *idebus;
-> +    BlockBackend *blk;
-> 
->      pci_ide = PCI_IDE(dev);
-> 
->      for (i = aux ? 1 : 0; i < 4; i++) {
-> -        di = drive_get_by_index(IF_IDE, i);
-> -        if (di != NULL && !di->media_cd) {
-> -            BlockBackend *blk = blk_by_legacy_dinfo(di);
-> -            DeviceState *ds = blk_get_attached_dev(blk);
-> +        idebus = &pci_ide->bus[i / 2];
-> +        blk = idebus->ifs[i % 2].blk;
-> 
-> -            blk_drain(blk);
-> -            blk_flush(blk);
-> -
-> -            if (ds) {
-> -                blk_detach_dev(blk, ds);
-> -            }
-> -            pci_ide->bus[di->bus].ifs[di->unit].blk = NULL;
-> +        if (blk && idebus->ifs[i % 2].drive_kind != IDE_CD) {
->              if (!(i % 2)) {
-> -                idedev = pci_ide->bus[di->bus].master;
-> +                idedev = idebus->master;
->              } else {
-> -                idedev = pci_ide->bus[di->bus].slave;
-> +                idedev = idebus->slave;
->              }
-> +
-> +            blk_drain(blk);
-> +            blk_flush(blk);
-> +
-> +            blk_detach_dev(blk, DEVICE(idedev));
-> +            idebus->ifs[i % 2].blk = NULL;
->              idedev->conf.blk = NULL;
->              monitor_remove_blk(blk);
->              blk_unref(blk);
-> --
-> Anthony PERARD
+Either way, I think it would be better to make size into an Int128
+and use the appropriate comparison function. I will submit a new 
+version.
+I can test this better with a bit more time. For now, up to you if you
+want to try building it.
 
-
+-Tobin
 
