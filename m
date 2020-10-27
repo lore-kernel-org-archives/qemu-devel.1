@@ -7,79 +7,79 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C685C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD0D1C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:38:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6A372076D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:37:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3B9C5218AC
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:38:25 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HV8y23Dj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A372076D
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qaXdeHsU"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3B9C5218AC
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46274 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48658 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOEc-0000ge-Sx
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:37:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51668)
+	id 1kXOF6-0001eF-6W
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:38:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52086)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPT-0001Iz-PS
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:04 -0400
-Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:37165)
+ id 1kXNPj-0001dJ-Kv
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:19 -0400
+Received: from mail-wr1-x429.google.com ([2a00:1450:4864:20::429]:45659)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPM-0004Pt-2K
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:03 -0400
-Received: by mail-wm1-x330.google.com with SMTP id c16so1105341wmd.2
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:44:47 -0700 (PDT)
+ id 1kXNPe-0004cW-GX
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:19 -0400
+Received: by mail-wr1-x429.google.com with SMTP id e17so1491984wru.12
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=vCYImrXrc9nFnzpQhO/BY3dTQ6xezRGFVG9rFx8Djes=;
- b=HV8y23Dj5943YRfmZ8WmSeYTgxC9N++rS/v40cV5XCJEWdxGgXBDtH/NCfCpX0iXce
- 733MPCHDRHNwVUPwgtMF1+tW6vkJBH361Sx+FndJSrBGR+92go8hCY2ivKh40fXHKblx
- m13tE1Kfx+BPftpyNtUPBYQNZl7yXDST6F4gM5oTPLjD0RpG+7fq71U6mWeVCGZjjc6+
- oJPIt1a9ku3RAvIKUSfP60v9ej0S6Z1cqLLc58ffP2IN37riBOmvFgt0KIBdIp9S/L4k
- QQWC6hAYHYN/YmQ/LwWSxrcRyENwAqscJpaYROinoHRehlAkT+7aH4IMLjoLDZonvJVX
- xaiA==
+ bh=Z0IGuHbFGwaxWrJpMKHNM34krP6abin3KFfFJns6pps=;
+ b=qaXdeHsUJjNm/iv89ZI3aHFwwfu9+7mlE270FaeyxUQ3Wv7HsRYmHYagrJ61O5dTKv
+ X/uQNQZ7nq/YOVwAOYcbs0iXUxhW9V/Si2jSLYrry91frTLFDSrfqVXB907iHQIEoDKX
+ FHNgS0cltcpCHB/imMNbkr9FBv7cmPnXXU6l0vVO1OEALK8Oogt3vWZB8Wv+w8psk8Nh
+ pHHPfNACI5rpS57zZ25bZG9Eib0LhqYqSBs01oAiIuOLWQoXuZyml/PcAEuGKoKVrLe5
+ +a7HynF5VsrvLLUIlTtvWiLoXHxWOb0vfMZlg6EeEaWFuUPXjVRPJixASswmIOZCY5e5
+ jxxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=vCYImrXrc9nFnzpQhO/BY3dTQ6xezRGFVG9rFx8Djes=;
- b=Kz0qWOUePaeTW4Y7kqsGA6fRWATZEwCSJKAdz6Gg3KKZDeaN5DF79ZUQh85HFc3xqr
- 4xUqd3Cs58ifmHdHgsPhpmEU/T+vUzhBTraDAYiG+Zn1UvNS9D+stzsENGwugPzcD5A/
- qruwgJxYVKxj8u0dRHWepCRq/fE007D7vv2+1Ybdhm+geVtZTGz2gz5kvLUInaXFMpCT
- us6GAKvFrP59BSRFb6vhmRLjHLMOBC4OxsBrrt9XNBkCTrsOPL815un+84in7/1UCzmg
- LUia/POZWwDU4EdgliBHSjZ7inbhq+XhXPUbN4UC997CsCgVHvYJZIECH6smc1hnFy0K
- 5MfA==
-X-Gm-Message-State: AOAM530ImLpefDwnD61nxY+G3jyQ1OnYVjgMYjYwxX6OblU/oTJZLdO7
- UDcHqOBxiKnpFUtoHwQl3s4aiLU0xk9fAQ==
-X-Google-Smtp-Source: ABdhPJwnYc4I1KffUNOypa/mpYIvZdQaEDhmJyaHa8kAECzb/MBGY07AuBzBw+wkRrYIpz61NHMHcA==
-X-Received: by 2002:a1c:2d8f:: with SMTP id t137mr2261604wmt.26.1603799085834; 
- Tue, 27 Oct 2020 04:44:45 -0700 (PDT)
+ bh=Z0IGuHbFGwaxWrJpMKHNM34krP6abin3KFfFJns6pps=;
+ b=ejC2ti3cnqsCBUeelz6cL1DjOdu25lO8/cznJSVO5s9yL372lma7LzObz+nINCv64e
+ xB6O8jfeSPrtb0IHnBDEUQ++v83iNKMefFH7r0qa4YxHaou/pXp+v0WO4aMISMqDm76n
+ s6+B6FY3+09WnGgL6+PwAbg2Bi1PfugzZBvs1u/wuU27le6DFbgzoc6OgZDc95nd0aGE
+ rQug6mLt2pvYEFDKTIN7NwJwqdAEq5olSVx7CAmQNPLUn01YflPFrfW7bgvlyVjGEzoY
+ d+pP0MCoKlq7gOlExVlQpZcJzTFUx/Nrb5Lr0nELb9rBn6204CczB2ahDnzm+NL2GDbU
+ p6Lg==
+X-Gm-Message-State: AOAM531t6r6K+/4xeFgt3ICLAAzQG/Cy2lLQsNRsy4+CzBXyxIKNFn9o
+ ouEB55D+0fSRFF0m9LDpkX/D1CJyiEEpBg==
+X-Google-Smtp-Source: ABdhPJyGeV+6b1uvq0qz69oj76bmw7Iso3/Q6zKaHpGGNM20Fqx0ZkEH4GsKymVnpEvCEDkTXwrx4Q==
+X-Received: by 2002:a5d:6845:: with SMTP id o5mr2273845wrw.87.1603799112634;
+ Tue, 27 Oct 2020 04:45:12 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.44
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.10
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:44:44 -0700 (PDT)
+ Tue, 27 Oct 2020 04:45:11 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 03/48] include/elf: Add defines related to GNU property notes
- for AArch64
-Date: Tue, 27 Oct 2020 11:43:53 +0000
-Message-Id: <20201027114438.17662-4-peter.maydell@linaro.org>
+Subject: [PULL 25/48] hw/arm/bcm2836: Split out common realize() code
+Date: Tue, 27 Oct 2020 11:44:15 +0000
+Message-Id: <20201027114438.17662-26-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
 References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::330;
- envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::429;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x429.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,64 +105,88 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Richard Henderson <richard.henderson@linaro.org>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-These are all of the defines required to parse
-GNU_PROPERTY_AARCH64_FEATURE_1_AND, copied from binutils.
-Other missing defines related to other GNU program headers
-and notes are elided for now.
+The realize() function is clearly composed of two parts,
+each described by a comment:
 
-Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20201021173749.111103-4-richard.henderson@linaro.org
+  void realize()
+  {
+     /* common peripherals from bcm2835 */
+     ...
+     /* bcm2836 interrupt controller (and mailboxes, etc.) */
+     ...
+   }
+
+Split the two part, so we can reuse the common part with other
+SoCs from this family.
+
+Reviewed-by: Luc Michel <luc.michel@greensocs.com>
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-id: 20201024170127.3592182-6-f4bug@amsat.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/elf.h | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ hw/arm/bcm2836.c | 22 ++++++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
 
-diff --git a/include/elf.h b/include/elf.h
-index c117a4d1ab0..10126ff809a 100644
---- a/include/elf.h
-+++ b/include/elf.h
-@@ -26,9 +26,13 @@ typedef int64_t  Elf64_Sxword;
- #define PT_NOTE    4
- #define PT_SHLIB   5
- #define PT_PHDR    6
-+#define PT_LOOS    0x60000000
-+#define PT_HIOS    0x6fffffff
- #define PT_LOPROC  0x70000000
- #define PT_HIPROC  0x7fffffff
+diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
+index fcb2c9c3e73..7d975cf2f53 100644
+--- a/hw/arm/bcm2836.c
++++ b/hw/arm/bcm2836.c
+@@ -52,7 +52,10 @@ static void bcm2836_init(Object *obj)
+         qdev_prop_set_uint32(DEVICE(obj), "enabled-cpus", bc->core_count);
+     }
  
-+#define PT_GNU_PROPERTY   (PT_LOOS + 0x474e553)
-+
- #define PT_MIPS_REGINFO   0x70000000
- #define PT_MIPS_RTPROC    0x70000001
- #define PT_MIPS_OPTIONS   0x70000002
-@@ -1657,6 +1661,24 @@ typedef struct elf64_shdr {
- #define NT_ARM_SYSTEM_CALL      0x404   /* ARM system call number */
- #define NT_ARM_SVE      0x405           /* ARM Scalable Vector Extension regs */
+-    object_initialize_child(obj, "control", &s->control, TYPE_BCM2836_CONTROL);
++    if (bc->ctrl_base) {
++        object_initialize_child(obj, "control", &s->control,
++                                TYPE_BCM2836_CONTROL);
++    }
  
-+/* Defined note types for GNU systems.  */
+     object_initialize_child(obj, "peripherals", &s->peripherals,
+                             TYPE_BCM2835_PERIPHERALS);
+@@ -62,12 +65,11 @@ static void bcm2836_init(Object *obj)
+                               "vcram-size");
+ }
+ 
+-static void bcm2836_realize(DeviceState *dev, Error **errp)
++static bool bcm283x_common_realize(DeviceState *dev, Error **errp)
+ {
+     BCM283XState *s = BCM283X(dev);
+     BCM283XClass *bc = BCM283X_GET_CLASS(dev);
+     Object *obj;
+-    int n;
+ 
+     /* common peripherals from bcm2835 */
+ 
+@@ -76,7 +78,7 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+     object_property_add_const_link(OBJECT(&s->peripherals), "ram", obj);
+ 
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->peripherals), errp)) {
+-        return;
++        return false;
+     }
+ 
+     object_property_add_alias(OBJECT(s), "sd-bus", OBJECT(&s->peripherals),
+@@ -84,6 +86,18 @@ static void bcm2836_realize(DeviceState *dev, Error **errp)
+ 
+     sysbus_mmio_map_overlap(SYS_BUS_DEVICE(&s->peripherals), 0,
+                             bc->peri_base, 1);
++    return true;
++}
 +
-+#define NT_GNU_PROPERTY_TYPE_0  5       /* Program property */
++static void bcm2836_realize(DeviceState *dev, Error **errp)
++{
++    BCM283XState *s = BCM283X(dev);
++    BCM283XClass *bc = BCM283X_GET_CLASS(dev);
++    int n;
 +
-+/* Values used in GNU .note.gnu.property notes (NT_GNU_PROPERTY_TYPE_0).  */
-+
-+#define GNU_PROPERTY_STACK_SIZE                 1
-+#define GNU_PROPERTY_NO_COPY_ON_PROTECTED       2
-+
-+#define GNU_PROPERTY_LOPROC                     0xc0000000
-+#define GNU_PROPERTY_HIPROC                     0xdfffffff
-+#define GNU_PROPERTY_LOUSER                     0xe0000000
-+#define GNU_PROPERTY_HIUSER                     0xffffffff
-+
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_AND      0xc0000000
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_BTI      (1u << 0)
-+#define GNU_PROPERTY_AARCH64_FEATURE_1_PAC      (1u << 1)
-+
- /*
-  * Physical entry point into the kernel.
-  *
++    if (!bcm283x_common_realize(dev, errp)) {
++        return;
++    }
+ 
+     /* bcm2836 interrupt controller (and mailboxes, etc.) */
+     if (!sysbus_realize(SYS_BUS_DEVICE(&s->control), errp)) {
 -- 
 2.20.1
 
