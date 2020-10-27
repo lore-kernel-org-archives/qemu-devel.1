@@ -2,103 +2,93 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BBE8C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C2FBC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:52:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 825CB207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:25 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 825CB207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id DFA69207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:52:00 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cpZnOg3e"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DFA69207C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50736 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57826 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNUe-0004GS-An
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:50:24 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38958)
+	id 1kXNWB-0007M5-JB
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:51:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51892)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYq-0000kz-DS; Tue, 27 Oct 2020 06:50:40 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:59067)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYo-0002Id-Bp; Tue, 27 Oct 2020 06:50:40 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 505C85C0193;
- Tue, 27 Oct 2020 06:50:05 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 27 Oct 2020 06:50:05 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-type:content-transfer-encoding; s=fm1; bh=
- WNLNg12g5/IfDUpfOYoxicB4wDKV6e3FwTaeuo1rUc0=; b=vZ1jmMQETUo8vOW6
- Lag7XQnFTIPJFhM5lQhBtv/AuXe2cGkIJdSg0UDGKQZwrzj7yXTodTkhmk9sy8o2
- AonQOEIIIrRi2h/qWCuEmWYL7RYjw6MRnkfRGIDXsFoCb6EgKx0R8n2ne19bq3aw
- AGdEATTy6k1QVajtn9HdTjlZVw7gIQczSnLTUY3c4DxPw8GpoA5HvT+2ONNK22zw
- N3BZmOPXcw2Sztg2WYDalU5JMlRRW1kdjL4iwi4Pwd4dHOTrO/WAgqedBm+2UM8Y
- QiQyY/7ab2x1W6h54p+EMMuCLskhpUpwRVHBrlIesCc/hGcCLFB6sDGAH3HHwqlV
- NS1jcQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:content-type
- :date:from:in-reply-to:message-id:mime-version:references
- :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
- :x-sasl-enc; s=fm1; bh=WNLNg12g5/IfDUpfOYoxicB4wDKV6e3FwTaeuo1rU
- c0=; b=QgD1KqfIWs1nWg/4GZwwC815Hzr9u0mRvEUJkuRdVaHNI35FtQe62UEQw
- v6eC46MQ1inX1+2p7f1xm9zvnEilwEAn96HhaV+P32InN7XswgLrwslttPs0Mzz2
- +XAqzFXcrvMKjy2w7rqL4dMzekEgtZBcTfQZUfO6tl+c151w7i9yqkxpwde1ff7j
- ++OZXMt8y75OIf5PgYYgccmlRQweTtMpO4l8rZNfPOINkB87j6tdvPJLGywIi0z2
- /WkUVJqLyX16MIpXDID49nZ8NycaprA3cyLF6X4ueAY6sSJVFmDPYzw6DBzwzlrl
- QCiS+haovCgL4kCQA2hF2IIk5Q79Q==
-X-ME-Sender: <xms:XfuXXyoWEaAdW5WGWiefk1XzEHEqbzSxY7lmkJ9crGGmHQdcMnyFAw>
- <xme:XfuXXwpI3qMolpcVzzp77M2IiFoTdei6TXF7VeV80sya73vDgF2HYjoZulJj8RASP
- eo_w5fARUOlWxtQOnw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrkeelgddvtdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefhvffufffkofgjfhggtgfgsehtkeertdertdejnecuhfhrohhmpefmlhgruhhs
- ucflvghnshgvnhcuoehithhssehirhhrvghlvghvrghnthdrughkqeenucggtffrrghtth
- gvrhhnpeetveeuudegveeiheegieelueeftedvtdekteefleegheduhfejueelvdfhffdt
- geenucfkphepkedtrdduieejrdelkedrudeltdenucevlhhushhtvghrufhiiigvpeejne
- curfgrrhgrmhepmhgrihhlfhhrohhmpehithhssehirhhrvghlvghvrghnthdrughk
-X-ME-Proxy: <xmx:XfuXX3MA9oaMQlhMeRETz-TEbDPFbMJIz0lydatPP0Bbt6UhmtDiiQ>
- <xmx:XfuXXx7vDOTPuMgiIFzEVFspEhGKw3I3yJEPoOzbeK10gqrgxD7b3A>
- <xmx:XfuXXx6IQmii35Q3hfk9icwSRouJVbNPyDt4P5GMkJXQr7g2GeEPHQ>
- <xmx:XfuXX_SV6QCf0KxTCIxtWj2WQ8vtEtCg1NNOkjx9oGW3LB9KJCJHhQ>
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id 0B3DC3280066;
- Tue, 27 Oct 2020 06:50:03 -0400 (EDT)
-From: Klaus Jensen <its@irrelevant.dk>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 26/30] hw/block/nvme: add trace event for requests with
- non-zero status code
-Date: Tue, 27 Oct 2020 11:49:28 +0100
-Message-Id: <20201027104932.558087-27-its@irrelevant.dk>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201027104932.558087-1-its@irrelevant.dk>
-References: <20201027104932.558087-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPc-0001Rr-U9
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:12 -0400
+Received: from mail-wm1-x335.google.com ([2a00:1450:4864:20::335]:54766)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPY-0004YA-Ji
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:12 -0400
+Received: by mail-wm1-x335.google.com with SMTP id w23so1062001wmi.4
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=X7IyXvhKZGt2O32lbsG5+Ml4uk7Ee2kIFAZnUq6AVe0=;
+ b=cpZnOg3eyOrPQB+WWUIV7oYiSjgoynU5Fb6VOr3fzYS3/k7EKKb/1R/cXnegfwz+pT
+ sfwU8IctznPqO2tBlGRijiNBF50pZZlu091t3esIdAA0PXKMDNO7KhisyN4S9OuOugRH
+ Qj4HRIwDI2jbBJOD034S2Lf34BDQU+zEy7uBXTG9IJrIaPOImPa9nu4QkHhVR0dRf6OE
+ Psmyjxq+gdZ2wEk1RYvbJIO44aoW00wbV0mVdIewh/+T7b0DhM5b7X5sVkb9SDfoy5Hc
+ 3cTgRow+HNDgwhoeXGsEzIrnFqQTLJPzIucD3nn01zVZVyp6LVK9qPtDsFpE4aHgGvn4
+ UJYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=X7IyXvhKZGt2O32lbsG5+Ml4uk7Ee2kIFAZnUq6AVe0=;
+ b=rvI8d8+gocAsxaVrkqut0ePlzcXJ19hrPtCGNc6OWa7cY/FIfTdJiBQN37319dNk7a
+ /wnDkFDofhr4kDoEoUSpftAKJHz2iX+mNFTVzy5+KOOfKbDp+VsTeo5ffQ8mGRzzxR40
+ b8CEGzkcn6QYe+a8WCz8Cn0CPksmCUNjvCUa+sZgBlR1WX/ks29svzzPy+npeDI6qhl6
+ 8hYX+7L+Bz9lYwULBKnQQK7D3UV2kdCTuO+PsI+oSq7TqI73iikbRmymIXx+chzGwoOS
+ WEad7ioTtCl/WCd+CKy7FzicrN3lGwP8aCM7I4b5mdcAp9BmqWM8Td8fSa5s1zK/m454
+ pT9w==
+X-Gm-Message-State: AOAM531OLa2qFROgj24DUcWfvHj4hxljirGONKzk9asML0Pgvy6P4Mvr
+ YJGoDpfO+0Re3ZOqdwJzSEqq9A6UkP0uSg==
+X-Google-Smtp-Source: ABdhPJycWvmssgjod7lxmgdq+MnM/G9G2u5UGJ48xOx3gsgTOW+N4uFlNHk2fYZonR3jCfsWgUtwqw==
+X-Received: by 2002:a7b:cc85:: with SMTP id p5mr2248023wma.24.1603799105868;
+ Tue, 27 Oct 2020 04:45:05 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.05
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 04:45:05 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 20/48] hw/arm/smmuv3: Set the restoration priority of the
+ vSMMUv3 explicitly
+Date: Tue, 27 Oct 2020 11:44:10 +0000
+Message-Id: <20201027114438.17662-21-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
+References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=66.111.4.26; envelope-from=its@irrelevant.dk;
- helo=out2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 06:49:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Received-SPF: pass client-ip=2a00:1450:4864:20::335;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x335.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,57 +101,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-block@nongnu.org, Dmitry Fomichev <dmitry.fomichev@wdc.com>,
- Klaus Jensen <k.jensen@samsung.com>, Keith Busch <kbusch@kernel.org>,
- Klaus Jensen <its@irrelevant.dk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Klaus Jensen <k.jensen@samsung.com>
+From: Zenghui Yu <yuzenghui@huawei.com>
 
-If a command results in a non-zero status code, trace it.
+Ensure the vSMMUv3 will be restored before all PCIe devices so that DMA
+translation can work properly during migration.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Dmitry Fomichev <dmitry.fomichev@wdc.com>
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
-Signed-off-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Zenghui Yu <yuzenghui@huawei.com>
+Message-id: 20201019091508.197-1-yuzenghui@huawei.com
+Acked-by: Eric Auger <eric.auger@redhat.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- hw/block/nvme.c       | 6 ++++++
- hw/block/trace-events | 1 +
- 2 files changed, 7 insertions(+)
+ hw/arm/smmuv3.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index 5fd5a45a281a..b8c6be63186f 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -777,6 +777,12 @@ static void nvme_enqueue_req_completion(NvmeCQueue *cq, NvmeRequest *req)
-     assert(cq->cqid == req->sq->cqid);
-     trace_pci_nvme_enqueue_req_completion(nvme_cid(req), cq->cqid,
-                                           req->status);
-+
-+    if (req->status) {
-+        trace_pci_nvme_err_req_status(nvme_cid(req), nvme_nsid(req->ns),
-+                                      req->status, req->cmd.opcode);
-+    }
-+
-     QTAILQ_REMOVE(&req->sq->out_req_list, req, entry);
-     QTAILQ_INSERT_TAIL(&cq->req_list, req, entry);
-     timer_mod(cq->timer, qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL) + 500);
-diff --git a/hw/block/trace-events b/hw/block/trace-events
-index 2dc85281dc33..cab9913b1f2d 100644
---- a/hw/block/trace-events
-+++ b/hw/block/trace-events
-@@ -88,6 +88,7 @@ pci_nvme_mmio_shutdown_cleared(void) "shutdown bit cleared"
- 
- # nvme traces for error conditions
- pci_nvme_err_mdts(uint16_t cid, size_t len) "cid %"PRIu16" len %zu"
-+pci_nvme_err_req_status(uint16_t cid, uint32_t nsid, uint16_t status, uint8_t opc) "cid %"PRIu16" nsid %"PRIu32" status 0x%"PRIx16" opc 0x%"PRIx8""
- pci_nvme_err_addr_read(uint64_t addr) "addr 0x%"PRIx64""
- pci_nvme_err_addr_write(uint64_t addr) "addr 0x%"PRIx64""
- pci_nvme_err_cfs(void) "controller fatal status"
+diff --git a/hw/arm/smmuv3.c b/hw/arm/smmuv3.c
+index 0122700e725..2017ba7a5a7 100644
+--- a/hw/arm/smmuv3.c
++++ b/hw/arm/smmuv3.c
+@@ -1440,6 +1440,7 @@ static const VMStateDescription vmstate_smmuv3 = {
+     .name = "smmuv3",
+     .version_id = 1,
+     .minimum_version_id = 1,
++    .priority = MIG_PRI_IOMMU,
+     .fields = (VMStateField[]) {
+         VMSTATE_UINT32(features, SMMUv3State),
+         VMSTATE_UINT8(sid_size, SMMUv3State),
 -- 
-2.29.1
+2.20.1
 
 
