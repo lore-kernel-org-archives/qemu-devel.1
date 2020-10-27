@@ -7,56 +7,58 @@ X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 638D2C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 02:08:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F47C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 02:09:31 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DF80C20790
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 02:08:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3CDFB20790
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 02:09:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="lqWUexAH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DF80C20790
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f8aoNFYp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3CDFB20790
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:37372 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXEPr-0002En-1Y
-	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 22:08:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:59218)
+	id 1kXEQU-0002gR-9A
+	for qemu-devel@archiver.kernel.org; Mon, 26 Oct 2020 22:09:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59868)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXEKw-0005sz-Kz; Mon, 26 Oct 2020 22:03:46 -0400
-Received: from ozlabs.org ([203.11.71.1]:41829)
+ id 1kXEOq-0001Q1-6z
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 22:07:48 -0400
+Received: from ozlabs.org ([203.11.71.1]:45991)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXEKr-0001Vx-7H; Mon, 26 Oct 2020 22:03:46 -0400
+ id 1kXEOo-00026G-1L
+ for qemu-devel@nongnu.org; Mon, 26 Oct 2020 22:07:47 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CKw3V6kBHz9sTf; Tue, 27 Oct 2020 13:03:34 +1100 (AEDT)
+ id 4CKw8D5jjHz9sT6; Tue, 27 Oct 2020 13:07:40 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1603764214;
- bh=U7Gt0HrrAcXBqZ9XQos1p0Yb2bBYxElVC2ehl+gNtfs=;
+ d=gibson.dropbear.id.au; s=201602; t=1603764460;
+ bh=efmqibXo9PrI3W3He+FnWbYvFpNi1vJXW7JgSOoFfBY=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=lqWUexAHneATPT+4hrIqn+bVTmTeZxz0k/dTG0+C0A03ROZDgzRW6oKqY/jvZhow1
- ocO1lwPcA6SeF1ixIokMa80H/ibW1SJsrplB9jGTerLNq7/eSQZGe0U4nPwEHi1gPK
- 81eNIfkMWvyOpNb3Mgnj4TFbNhvvsZEkQvecSu6U=
-Date: Tue, 27 Oct 2020 13:03:20 +1100
+ b=f8aoNFYp+5gWgzXz/m76sftnge1xxQWh/yn7ZSXUhrVoyIyUs8ze6ZkXcMS0DaJJC
+ W1qaMsBL4TG9g4YsGUbOw+WXuvLJIi1cgR6HyXNTJZjpp76eDjgjnLqClOIvMGj30O
+ 0UyOolvY1mdI2NVF9tvCkw31j8eS8K1hTVGVfL9o=
+Date: Tue, 27 Oct 2020 13:04:01 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH 4/4] spapr: Improve spapr_reallocate_hpt() error reporting
-Message-ID: <20201027020320.GE4671@yekko.fritz.box>
-References: <160371602625.305923.7832478283946753271.stgit@bahia.lan>
- <160371605460.305923.5890143959901241157.stgit@bahia.lan>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 10/15] ppc: remove bios_name
+Message-ID: <20201027020401.GF4671@yekko.fritz.box>
+References: <20201026143028.3034018-1-pbonzini@redhat.com>
+ <20201026143028.3034018-11-pbonzini@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="VUDLurXRWRKrGuMn"
+ protocol="application/pgp-signature"; boundary="5Mfx4RzfBqgnTE/w"
 Content-Disposition: inline
-In-Reply-To: <160371605460.305923.5890143959901241157.stgit@bahia.lan>
+In-Reply-To: <20201026143028.3034018-11-pbonzini@redhat.com>
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/26 22:03:34
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -75,137 +77,210 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-ppc@nongnu.org, qemu-devel@nongnu.org
+Cc: philmd@redhat.com, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---VUDLurXRWRKrGuMn
+--5Mfx4RzfBqgnTE/w
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 26, 2020 at 01:40:54PM +0100, Greg Kurz wrote:
-> spapr_reallocate_hpt() has three users, two of which pass &error_fatal
-> and the third one, htab_load(), passes &local_err, uses it to detect
-> failures and simply propagates -EINVAL up to vmstate_load(), which will
-> cause QEMU to exit. It is thus confusing that spapr_reallocate_hpt()
-> doesn't return right away when an error is detected in some cases. Also,
-> the comment suggesting that the caller is welcome to try to carry on
-> seems like a remnant in this respect.
->=20
-> This can be improved:
-> - change spapr_reallocate_hpt() to always report a negative errno on
->   failure, either as reported by KVM or -ENOSPC if the HPT is smaller
->   than what was asked,
-> - use that to detect failures in htab_load() which is preferred over
->   checking &local_err,
-> - propagate this negative errno to vmstate_load() because it is more
->   accurate than propagating -EINVAL for all possible errors.
->=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
+On Mon, Oct 26, 2020 at 10:30:23AM -0400, Paolo Bonzini wrote:
+> Cc: David Gibson <david@gibson.dropbear.id.au>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-Applied to ppc-for-5.2, thanks.
+Acked-by: David Gibson <david@gibson.dropbear.id.au>
 
 > ---
->  hw/ppc/spapr.c         |   18 ++++++++++--------
->  include/hw/ppc/spapr.h |    3 +--
->  2 files changed, 11 insertions(+), 10 deletions(-)
+>  hw/ppc/e500.c          | 4 ++--
+>  hw/ppc/mac_newworld.c  | 4 +---
+>  hw/ppc/mac_oldworld.c  | 4 +---
+>  hw/ppc/pnv.c           | 5 +----
+>  hw/ppc/ppc405_boards.c | 6 ++----
+>  hw/ppc/prep.c          | 4 +---
+>  hw/ppc/spapr.c         | 4 +---
+>  7 files changed, 9 insertions(+), 22 deletions(-)
 >=20
+> diff --git a/hw/ppc/e500.c b/hw/ppc/e500.c
+> index ae39b9358e..153a74c98c 100644
+> --- a/hw/ppc/e500.c
+> +++ b/hw/ppc/e500.c
+> @@ -1035,7 +1035,7 @@ void ppce500_init(MachineState *machine)
+>       * -kernel to users but allows them to run through u-boot as well.
+>       */
+>      kernel_as_payload =3D false;
+> -    if (bios_name =3D=3D NULL) {
+> +    if (machine->firmware =3D=3D NULL) {
+>          if (machine->kernel_filename) {
+>              payload_name =3D machine->kernel_filename;
+>              kernel_as_payload =3D true;
+> @@ -1043,7 +1043,7 @@ void ppce500_init(MachineState *machine)
+>              payload_name =3D "u-boot.e500";
+>          }
+>      } else {
+> -        payload_name =3D bios_name;
+> +        payload_name =3D machine->firmware;
+>      }
+> =20
+>      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, payload_name);
+> diff --git a/hw/ppc/mac_newworld.c b/hw/ppc/mac_newworld.c
+> index f9a1cc8944..61c63819df 100644
+> --- a/hw/ppc/mac_newworld.c
+> +++ b/hw/ppc/mac_newworld.c
+> @@ -109,6 +109,7 @@ static void ppc_core99_reset(void *opaque)
+>  static void ppc_core99_init(MachineState *machine)
+>  {
+>      ram_addr_t ram_size =3D machine->ram_size;
+> +    const char *bios_name =3D machine->firmware ?: PROM_FILENAME;
+>      const char *kernel_filename =3D machine->kernel_filename;
+>      const char *kernel_cmdline =3D machine->kernel_cmdline;
+>      const char *initrd_filename =3D machine->initrd_filename;
+> @@ -161,9 +162,6 @@ static void ppc_core99_init(MachineState *machine)
+>                             &error_fatal);
+>      memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
+> =20
+> -    if (!bios_name) {
+> -        bios_name =3D PROM_FILENAME;
+> -    }
+>      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>      if (filename) {
+>          /* Load OpenBIOS (ELF) */
+> diff --git a/hw/ppc/mac_oldworld.c b/hw/ppc/mac_oldworld.c
+> index 6c59aa5601..11623e8e67 100644
+> --- a/hw/ppc/mac_oldworld.c
+> +++ b/hw/ppc/mac_oldworld.c
+> @@ -83,6 +83,7 @@ static void ppc_heathrow_reset(void *opaque)
+>  static void ppc_heathrow_init(MachineState *machine)
+>  {
+>      ram_addr_t ram_size =3D machine->ram_size;
+> +    const char *bios_name =3D machine->firmware ?: PROM_FILENAME;
+>      const char *boot_device =3D machine->boot_order;
+>      PowerPCCPU *cpu =3D NULL;
+>      CPUPPCState *env =3D NULL;
+> @@ -130,9 +131,6 @@ static void ppc_heathrow_init(MachineState *machine)
+>                             &error_fatal);
+>      memory_region_add_subregion(get_system_memory(), PROM_BASE, bios);
+> =20
+> -    if (!bios_name) {
+> -        bios_name =3D PROM_FILENAME;
+> -    }
+>      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>      if (filename) {
+>          /* Load OpenBIOS (ELF) */
+> diff --git a/hw/ppc/pnv.c b/hw/ppc/pnv.c
+> index d9e52873ea..f2b1ee83d3 100644
+> --- a/hw/ppc/pnv.c
+> +++ b/hw/ppc/pnv.c
+> @@ -713,6 +713,7 @@ static void pnv_chip_power10_pic_print_info(PnvChip *=
+chip, Monitor *mon)
+> =20
+>  static void pnv_init(MachineState *machine)
+>  {
+> +    const char *bios_name =3D machine->firmware ?: FW_FILE_NAME;
+>      PnvMachineState *pnv =3D PNV_MACHINE(machine);
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+>      char *fw_filename;
+> @@ -739,10 +740,6 @@ static void pnv_init(MachineState *machine)
+>      pnv->pnor =3D PNV_PNOR(dev);
+> =20
+>      /* load skiboot firmware  */
+> -    if (bios_name =3D=3D NULL) {
+> -        bios_name =3D FW_FILE_NAME;
+> -    }
+> -
+>      fw_filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>      if (!fw_filename) {
+>          error_report("Could not find OPAL firmware '%s'", bios_name);
+> diff --git a/hw/ppc/ppc405_boards.c b/hw/ppc/ppc405_boards.c
+> index 4687715b15..c867e46330 100644
+> --- a/hw/ppc/ppc405_boards.c
+> +++ b/hw/ppc/ppc405_boards.c
+> @@ -141,6 +141,7 @@ static void ref405ep_fpga_init(MemoryRegion *sysmem, =
+uint32_t base)
+>  static void ref405ep_init(MachineState *machine)
+>  {
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> +    const char *bios_name =3D machine->firmware ?: BIOS_FILENAME;
+>      const char *kernel_filename =3D machine->kernel_filename;
+>      const char *kernel_cmdline =3D machine->kernel_cmdline;
+>      const char *initrd_filename =3D machine->initrd_filename;
+> @@ -206,8 +207,6 @@ static void ref405ep_init(MachineState *machine)
+>          memory_region_init_rom(bios, NULL, "ef405ep.bios", BIOS_SIZE,
+>                                 &error_fatal);
+> =20
+> -        if (bios_name =3D=3D NULL)
+> -            bios_name =3D BIOS_FILENAME;
+>          filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>          if (filename) {
+>              bios_size =3D load_image_size(filename,
+> @@ -425,6 +424,7 @@ static void taihu_cpld_init(MemoryRegion *sysmem, uin=
+t32_t base)
+>  static void taihu_405ep_init(MachineState *machine)
+>  {
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> +    const char *bios_name =3D machine->firmware ?: BIOS_FILENAME;
+>      const char *kernel_filename =3D machine->kernel_filename;
+>      const char *initrd_filename =3D machine->initrd_filename;
+>      char *filename;
+> @@ -475,8 +475,6 @@ static void taihu_405ep_init(MachineState *machine)
+>      } else
+>  #endif
+>      {
+> -        if (bios_name =3D=3D NULL)
+> -            bios_name =3D BIOS_FILENAME;
+>          bios =3D g_new(MemoryRegion, 1);
+>          memory_region_init_rom(bios, NULL, "taihu_405ep.bios", BIOS_SIZE,
+>                                 &error_fatal);
+> diff --git a/hw/ppc/prep.c b/hw/ppc/prep.c
+> index 4a0cb434a6..c6b9d1ddcb 100644
+> --- a/hw/ppc/prep.c
+> +++ b/hw/ppc/prep.c
+> @@ -237,6 +237,7 @@ static int prep_set_cmos_checksum(DeviceState *dev, v=
+oid *opaque)
+> =20
+>  static void ibm_40p_init(MachineState *machine)
+>  {
+> +    const char *bios_name =3D machine->firmware ?: "openbios-ppc";
+>      CPUPPCState *env =3D NULL;
+>      uint16_t cmos_checksum;
+>      PowerPCCPU *cpu;
+> @@ -271,9 +272,6 @@ static void ibm_40p_init(MachineState *machine)
+> =20
+>      /* PCI host */
+>      dev =3D qdev_new("raven-pcihost");
+> -    if (!bios_name) {
+> -        bios_name =3D "openbios-ppc";
+> -    }
+>      qdev_prop_set_string(dev, "bios-name", bios_name);
+>      qdev_prop_set_uint32(dev, "elf-machine", PPC_ELF_MACHINE);
+>      pcihost =3D SYS_BUS_DEVICE(dev);
 > diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-> index ff7de7da2875..12a012d9dd09 100644
+> index 63315f2d0f..667d59e5ad 100644
 > --- a/hw/ppc/spapr.c
 > +++ b/hw/ppc/spapr.c
-> @@ -1483,8 +1483,7 @@ void spapr_free_hpt(SpaprMachineState *spapr)
->      close_htab_fd(spapr);
->  }
-> =20
-> -void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
-> -                          Error **errp)
-> +int spapr_reallocate_hpt(SpaprMachineState *spapr, int shift, Error **er=
-rp)
->  {
->      ERRP_GUARD();
->      long rc;
-> @@ -1496,7 +1495,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr,=
- int shift,
-> =20
->      if (rc =3D=3D -EOPNOTSUPP) {
->          error_setg(errp, "HPT not supported in nested guests");
-> -        return;
-> +        return -EOPNOTSUPP;
->      }
-> =20
->      if (rc < 0) {
-> @@ -1504,8 +1503,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr,=
- int shift,
->          error_setg_errno(errp, errno, "Failed to allocate KVM HPT of ord=
-er %d",
->                           shift);
->          error_append_hint(errp, "Try smaller maxmem?\n");
-> -        /* This is almost certainly fatal, but if the caller really
-> -         * wants to carry on with shift =3D=3D 0, it's welcome to try */
-> +        return -errno;
->      } else if (rc > 0) {
->          /* kernel-side HPT allocated */
->          if (rc !=3D shift) {
-> @@ -1513,6 +1511,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr,=
- int shift,
->                         "Requested order %d HPT, but kernel allocated ord=
-er %ld",
->                         shift, rc);
->              error_append_hint(errp, "Try smaller maxmem?\n");
-> +            return -ENOSPC;
+> @@ -2647,6 +2647,7 @@ static void spapr_machine_init(MachineState *machin=
+e)
+>      SpaprMachineState *spapr =3D SPAPR_MACHINE(machine);
+>      SpaprMachineClass *smc =3D SPAPR_MACHINE_GET_CLASS(machine);
+>      MachineClass *mc =3D MACHINE_GET_CLASS(machine);
+> +    const char *bios_name =3D machine->firmware ?: FW_FILE_NAME;
+>      const char *kernel_filename =3D machine->kernel_filename;
+>      const char *initrd_filename =3D machine->initrd_filename;
+>      PCIHostState *phb;
+> @@ -2970,9 +2971,6 @@ static void spapr_machine_init(MachineState *machin=
+e)
 >          }
-> =20
->          spapr->htab_shift =3D shift;
-> @@ -1533,6 +1532,7 @@ void spapr_reallocate_hpt(SpaprMachineState *spapr,=
- int shift,
->      /* We're setting up a hash table, so that means we're not radix */
->      spapr->patb_entry =3D 0;
->      spapr_set_all_lpcrs(0, LPCR_HR | LPCR_UPRT);
-> +    return 0;
->  }
-> =20
->  void spapr_setup_hpt(SpaprMachineState *spapr)
-> @@ -2286,11 +2286,13 @@ static int htab_load(QEMUFile *f, void *opaque, i=
-nt version_id)
 >      }
 > =20
->      if (section_hdr) {
-> +        int ret;
-> +
->          /* First section gives the htab size */
-> -        spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-> -        if (local_err) {
-> +        ret =3D spapr_reallocate_hpt(spapr, section_hdr, &local_err);
-> +        if (ret < 0) {
->              error_report_err(local_err);
-> -            return -EINVAL;
-> +            return ret;
->          }
->          return 0;
->      }
-> diff --git a/include/hw/ppc/spapr.h b/include/hw/ppc/spapr.h
-> index bb47896f173b..2e89e36cfbdc 100644
-> --- a/include/hw/ppc/spapr.h
-> +++ b/include/hw/ppc/spapr.h
-> @@ -846,8 +846,7 @@ void spapr_hotplug_req_add_by_count_indexed(SpaprDrcT=
-ype drc_type,
->  void spapr_hotplug_req_remove_by_count_indexed(SpaprDrcType drc_type,
->                                                 uint32_t count, uint32_t =
-index);
->  int spapr_hpt_shift_for_ramsize(uint64_t ramsize);
-> -void spapr_reallocate_hpt(SpaprMachineState *spapr, int shift,
-> -                          Error **errp);
-> +int spapr_reallocate_hpt(SpaprMachineState *spapr, int shift, Error **er=
-rp);
->  void spapr_clear_pending_events(SpaprMachineState *spapr);
->  void spapr_clear_pending_hotplug_events(SpaprMachineState *spapr);
->  int spapr_max_server_number(SpaprMachineState *spapr);
->=20
->=20
+> -    if (bios_name =3D=3D NULL) {
+> -        bios_name =3D FW_FILE_NAME;
+> -    }
+>      filename =3D qemu_find_file(QEMU_FILE_TYPE_BIOS, bios_name);
+>      if (!filename) {
+>          error_report("Could not find LPAR firmware '%s'", bios_name);
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -213,25 +288,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---VUDLurXRWRKrGuMn
+--5Mfx4RzfBqgnTE/w
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+Xf+gACgkQbDjKyiDZ
-s5IhXA/9HnLgN6XPtZeV1H/gN4USAgEG5B3x+xAcsdB0jkAHk5QYO3MiU6qPsYrb
-0yX0k/ZOLr3Etih6hzeDaQJpUhDdwLU2RG+SpkLbfJ01Tip+ed3UIaHB8cw1plUN
-7cdPFEVwO3ZAsxoprkqcBqNbNUvPyJB9moFTohlwsHJqbjo/vJzuO/J95MuZBJXG
-DZXD7NQXLMY28NkjSdDL11+IAnsgOAFNg2eVg0KLQ94x+VuNbdomPnlvwf/7FwQc
-CLRGDxHvmn3A6b/2YC7nkC8Tk4cRl3M1g3WbPAf7+2m1rkjkVn2ontzBF7davIJq
-FtXvfCftWLxhGJKp4DKeatZIhwV5GkHXLrxJYClr2ASYNYCLCAz6xb5HWJlKE2SN
-dnxX2TRE0JSdoEzEgtvZczUGKlFMoAGtGvKgpmPNF/HGJmfEINkeQ5fXWqeshqM9
-dLPEYj84S+NKzBQ3Qlmyz8Pq2s87f4ydPVuuGMC5qo1Tw1PEnr4K6ve0hSM1Cjm/
-nItenK5FgoLwFcHyCAYUYSx/cbrUObSeILiatcsPsLR75oQIkTUMaUHvbFGBPicb
-OBT27bJj/46udPZDLJlDJlKy/cegrXDnZrOopTPprRLnajif9O0j09fU1BWG09r/
-3u21kydrt8O7ADQT2z5Qr4s+15zMJ5FbvEuma2NqeV7OvZcAYuY=
-=bmV2
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+XgBEACgkQbDjKyiDZ
+s5JoCw/7BxMPkFzA1vwxm490iygCAyeh24kyY7TYB0M0SEj28ugXHrAXQq8yWLbj
+MDV8a8ZDbcLetlCfUN2tXXD9E5XVSBoXvb/bdqJuX/7Eo/9FMeXfdlzIDmjGfMe3
+byIo92yQzclPS8iUWRBQedrvK1SftlIhI19u6+rbL0k1Ppqko8jYZcZ3OfgrDi7x
+xWZz9iYHFFTb5jObdwPb963pmpgyNmdOpVtgfDqNqHebsyUmJzz0uaczo9t+EQcF
+0cJ5M4XDHBGSLT05wsz9VcXMRxo0Hgqt92J0No6SfA1DELSTnEvNPWtlcuUf0ZHq
+NTEQfHbRhl2gnD1g5ttK8UvCA4T3jAa5Aii1z58UhEa7zXFSvCDdCUQGgqXqnl8Z
+5LYk9lj4GOn1ROHVEloXpc5w7S7jZZTXyC0Svs9Bpv9M0UKLjvmpWg/GvOByAk13
+BNm+pdTwIXg+ut4BDrWWVX7K+3VZOxSkiPKGTB9cYBeZiZTxzvh4p2AOJazS3ktT
+2lhqIlfD+x/tSNkUbTjWwnGq/aB2nWIb25I6sUVgCC5cc2QHkovlgkLX1RNLE6HT
+ynOEkhOt59v9a+2lKEYzKPO4ivAiFqpUKnWaVJUWAoR7HCwvVDDbKGSDvCMuiXZ9
+CMYX2npew4uzyWy07eCcIzu0WAVpiqn3lq7cFtYZ2zEX3b+1Ors=
+=D9he
 -----END PGP SIGNATURE-----
 
---VUDLurXRWRKrGuMn--
+--5Mfx4RzfBqgnTE/w--
 
