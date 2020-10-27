@@ -4,64 +4,102 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C7AC55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:36:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E05EC55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:37:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 50706207BB
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:36:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A93B622264
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:37:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="A/Slerx7"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 50706207BB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OeKM1+nq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A93B622264
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42306 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQ5U-00073t-8j
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:36:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42578)
+	id 1kXQ64-0007Xq-Dw
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:37:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXPnf-0002HX-Ql; Tue, 27 Oct 2020 10:18:12 -0400
-Received: from bilbo.ozlabs.org ([2401:3900:2:1::2]:47381 helo=ozlabs.org)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXPnd-0007cM-7r; Tue, 27 Oct 2020 10:18:11 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CLDLr35DBz9sj2; Wed, 28 Oct 2020 01:17:55 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1603808276;
- bh=WtBoWbnat7omboOd9VfCOxAcVAER/a/qECF3paGFwVw=;
- h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=A/Slerx7+mGLmb9MrRc0mq3IM8fBaOE0+nzvXzzyKHK7KJL9IE5GJw76PX1FJi3Ep
- EIJSKqJsB9lasIFx5+nELnKgS1wfYVNaLi5jc1uB+ojdMgtkhFHGVLs3YtI55zSMlK
- 6c161rTudOyhvWMlRkMyldG6jY7FYLdh3Y2I9wgY=
-From: David Gibson <david@gibson.dropbear.id.au>
-To: peter.maydell@linaro.org
-Subject: [PULL 14/18] spapr: Simplify error handling in spapr_memory_plug()
-Date: Wed, 28 Oct 2020 01:17:31 +1100
-Message-Id: <20201027141735.728821-15-david@gibson.dropbear.id.au>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPUE-0004Eh-EO
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:58:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:37994)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPUC-0004YD-Ks
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:58:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603807083;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=xm7DOhBe3iyYOLIHKljm0VOmYGJ+D2G+GQFpjtxbZOQ=;
+ b=OeKM1+nqEkXHzq9XnLfViWsIrbUzNNfSJGmPQfswKOFILRN3ZpXUFKVjSdkvmm+usxKh3i
+ lpGVcn7vtQ9mwq3xRO/SmiH01GbSEKeeLUPymiXhv0ovtFen+3qGN5pWI8IwBXjHyTJY7X
+ qursqU6kV3E+b4zEdIWHqR7HA49Uk/M=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-225-Yn09YSNgN3yxCmQUL7MaOA-1; Tue, 27 Oct 2020 09:58:01 -0400
+X-MC-Unique: Yn09YSNgN3yxCmQUL7MaOA-1
+Received: by mail-ej1-f72.google.com with SMTP id d12so880966ejr.19
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:58:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=xm7DOhBe3iyYOLIHKljm0VOmYGJ+D2G+GQFpjtxbZOQ=;
+ b=RQirgzKnk1bKLsk8sU5ojnZTI45Cvm0GAOynY2uBMydhhs9giCF9/hc3PSO24M+cit
+ r3jtlpiknQ2F+vLdxsumv4qP00eCkzMzDhdrHkYcm/Gls3zMblQrZR4za2dkCM0vT6Hi
+ WkvcsG8QjhmNW0RKszt9zwUf2e8ZHjqgSYTi507CPZCvfMt9RVOIlrshCxuOLEROc0Vs
+ nNxSAOXcIx4bvzhWX/S/iOQLMXvylW9TTUwz54PFhVImr+8sSTr+8NZvQUwkjoNZYXjS
+ vjDm4g1O08TGX3hY5R823C59ZOL2yNwLDDwMHInYgQNORUBa+KzIbAuJKBPE4ghV2rOl
+ USDQ==
+X-Gm-Message-State: AOAM532NOZXXtcA/AGW+ve0mB93qDMcHRLrJgwfPDIBBDVTOCc7kKgrT
+ MfBinu/JzNUWosA2FIfsTvkQde9TRLw54jBLq7wvhBAf0tNDmTQ9fcu6L/sAN5cCCCbf1fXkSgp
+ Vm7zboUjW8//h+uQ=
+X-Received: by 2002:a17:906:2dc7:: with SMTP id
+ h7mr2638991eji.546.1603807079522; 
+ Tue, 27 Oct 2020 06:57:59 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyWKxF53GuI7DB3LBnIlx/SCjKP14ed38wRlih8sAJZ/8YOthHVUwVuFSqQQTeiaC3xnaIDFw==
+X-Received: by 2002:a17:906:2dc7:: with SMTP id
+ h7mr2638968eji.546.1603807079354; 
+ Tue, 27 Oct 2020 06:57:59 -0700 (PDT)
+Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id e2sm1095439ejd.81.2020.10.27.06.57.57
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 06:57:58 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH 24/25] block/nvme: Align iov's va and size on host page size
+Date: Tue, 27 Oct 2020 14:55:46 +0100
+Message-Id: <20201027135547.374946-25-philmd@redhat.com>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201027141735.728821-1-david@gibson.dropbear.id.au>
-References: <20201027141735.728821-1-david@gibson.dropbear.id.au>
+In-Reply-To: <20201027135547.374946-1-philmd@redhat.com>
+References: <20201027135547.374946-1-philmd@redhat.com>
 MIME-Version: 1.0
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -74,141 +112,76 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
- qemu-devel@nongnu.org, groug@kaod.org
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Eric Auger <eric.auger@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Greg Kurz <groug@kaod.org>
+From: Eric Auger <eric.auger@redhat.com>
 
-As recommended in "qapi/error.h", add a bool return value to
-spapr_add_lmbs() and spapr_add_nvdimm(), and use them instead
-of local_err in spapr_memory_plug().
+Make sure iov's va and size are properly aligned on the
+host page size.
 
-This allows to get rid of the error propagation overhead.
-
-Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <160309734178.2739814.3488437759887793902.stgit@bahia.lan>
+Signed-off-by: Eric Auger <eric.auger@redhat.com>
 Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 ---
- hw/ppc/spapr.c                | 22 ++++++++++------------
- hw/ppc/spapr_nvdimm.c         |  5 +++--
- include/hw/ppc/spapr_nvdimm.h |  2 +-
- 3 files changed, 14 insertions(+), 15 deletions(-)
+ block/nvme.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
-diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
-index a5aef7a6ff..0cc19b5863 100644
---- a/hw/ppc/spapr.c
-+++ b/hw/ppc/spapr.c
-@@ -3382,7 +3382,7 @@ int spapr_lmb_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
-     return 0;
- }
+diff --git a/block/nvme.c b/block/nvme.c
+index e3626045565..c1c52bae44f 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -1018,11 +1018,12 @@ static coroutine_fn int nvme_cmd_map_qiov(BlockDriverState *bs, NvmeCmd *cmd,
+     for (i = 0; i < qiov->niov; ++i) {
+         bool retry = true;
+         uint64_t iova;
++        size_t len = QEMU_ALIGN_UP(qiov->iov[i].iov_len,
++                                   qemu_real_host_page_size);
+ try_map:
+         r = qemu_vfio_dma_map(s->vfio,
+                               qiov->iov[i].iov_base,
+-                              qiov->iov[i].iov_len,
+-                              true, &iova);
++                              len, true, &iova);
+         if (r == -ENOMEM && retry) {
+             retry = false;
+             trace_nvme_dma_flush_queue_wait(s);
+@@ -1166,8 +1167,9 @@ static inline bool nvme_qiov_aligned(BlockDriverState *bs,
+     BDRVNVMeState *s = bs->opaque;
  
--static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-+static bool spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-                            bool dedicated_hp_event_source, Error **errp)
- {
-     SpaprDrc *drc;
-@@ -3403,7 +3403,7 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-                                       addr / SPAPR_MEMORY_BLOCK_SIZE);
-                 spapr_drc_detach(drc);
-             }
--            return;
-+            return false;
-         }
-         if (!hotplugged) {
-             spapr_drc_reset(drc);
-@@ -3425,12 +3425,12 @@ static void spapr_add_lmbs(DeviceState *dev, uint64_t addr_start, uint64_t size,
-                                            nr_lmbs);
-         }
-     }
-+    return true;
- }
- 
- static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-                               Error **errp)
- {
--    Error *local_err = NULL;
-     SpaprMachineState *ms = SPAPR_MACHINE(hotplug_dev);
-     PCDIMMDevice *dimm = PC_DIMM(dev);
-     uint64_t size, addr;
-@@ -3444,26 +3444,24 @@ static void spapr_memory_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-     if (!is_nvdimm) {
-         addr = object_property_get_uint(OBJECT(dimm),
-                                         PC_DIMM_ADDR_PROP, &error_abort);
--        spapr_add_lmbs(dev, addr, size,
--                       spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT),
--                       &local_err);
-+        if (!spapr_add_lmbs(dev, addr, size,
-+                            spapr_ovec_test(ms->ov5_cas, OV5_HP_EVT), errp)) {
-+            goto out_unplug;
-+        }
-     } else {
-         slot = object_property_get_int(OBJECT(dimm),
-                                        PC_DIMM_SLOT_PROP, &error_abort);
-         /* We should have valid slot number at this point */
-         g_assert(slot >= 0);
--        spapr_add_nvdimm(dev, slot, &local_err);
--    }
+     for (i = 0; i < qiov->niov; ++i) {
+-        if (!QEMU_PTR_IS_ALIGNED(qiov->iov[i].iov_base, s->page_size) ||
+-            !QEMU_IS_ALIGNED(qiov->iov[i].iov_len, s->page_size)) {
++        if (!QEMU_PTR_IS_ALIGNED(qiov->iov[i].iov_base,
++                                 qemu_real_host_page_size) ||
++            !QEMU_IS_ALIGNED(qiov->iov[i].iov_len, qemu_real_host_page_size)) {
+             trace_nvme_qiov_unaligned(qiov, i, qiov->iov[i].iov_base,
+                                       qiov->iov[i].iov_len, s->page_size);
+             return false;
+@@ -1183,7 +1185,7 @@ static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
+     int r;
+     uint8_t *buf = NULL;
+     QEMUIOVector local_qiov;
 -
--    if (local_err) {
--        goto out_unplug;
-+        if (!spapr_add_nvdimm(dev, slot, errp)) {
-+            goto out_unplug;
-+        }
++    size_t len = QEMU_ALIGN_UP(bytes, qemu_real_host_page_size);
+     assert(QEMU_IS_ALIGNED(offset, s->page_size));
+     assert(QEMU_IS_ALIGNED(bytes, s->page_size));
+     assert(bytes <= s->max_transfer);
+@@ -1193,7 +1195,7 @@ static int nvme_co_prw(BlockDriverState *bs, uint64_t offset, uint64_t bytes,
      }
+     s->stats.unaligned_accesses++;
+     trace_nvme_prw_buffered(s, offset, bytes, qiov->niov, is_write);
+-    buf = qemu_try_memalign(s->page_size, bytes);
++    buf = qemu_try_memalign(qemu_real_host_page_size, len);
  
-     return;
- 
- out_unplug:
-     pc_dimm_unplug(dimm, MACHINE(ms));
--    error_propagate(errp, local_err);
- }
- 
- static void spapr_memory_pre_plug(HotplugHandler *hotplug_dev, DeviceState *dev,
-diff --git a/hw/ppc/spapr_nvdimm.c b/hw/ppc/spapr_nvdimm.c
-index 9e3d94071f..a833a63b5e 100644
---- a/hw/ppc/spapr_nvdimm.c
-+++ b/hw/ppc/spapr_nvdimm.c
-@@ -89,7 +89,7 @@ bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
- }
- 
- 
--void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp)
-+bool spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp)
- {
-     SpaprDrc *drc;
-     bool hotplugged = spapr_drc_hotplugged(dev);
-@@ -98,12 +98,13 @@ void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp)
-     g_assert(drc);
- 
-     if (!spapr_drc_attach(drc, dev, errp)) {
--        return;
-+        return false;
-     }
- 
-     if (hotplugged) {
-         spapr_hotplug_req_add_by_index(drc);
-     }
-+    return true;
- }
- 
- static int spapr_dt_nvdimm(SpaprMachineState *spapr, void *fdt,
-diff --git a/include/hw/ppc/spapr_nvdimm.h b/include/hw/ppc/spapr_nvdimm.h
-index 490b19a009..344582d2f5 100644
---- a/include/hw/ppc/spapr_nvdimm.h
-+++ b/include/hw/ppc/spapr_nvdimm.h
-@@ -30,6 +30,6 @@ int spapr_pmem_dt_populate(SpaprDrc *drc, SpaprMachineState *spapr,
- void spapr_dt_persistent_memory(SpaprMachineState *spapr, void *fdt);
- bool spapr_nvdimm_validate(HotplugHandler *hotplug_dev, NVDIMMDevice *nvdimm,
-                            uint64_t size, Error **errp);
--void spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
-+bool spapr_add_nvdimm(DeviceState *dev, uint64_t slot, Error **errp);
- 
- #endif
+     if (!buf) {
+         return -ENOMEM;
 -- 
 2.26.2
 
