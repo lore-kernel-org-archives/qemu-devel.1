@@ -2,77 +2,70 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81421C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B86CC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:54 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C287C2231B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CC69322202
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:53 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLJc8we2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C287C2231B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gi1og6oO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CC69322202
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57928 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60416 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOez-00051z-GQ
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:05:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46792)
+	id 1kXOfg-00068q-Js
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:05:52 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOd0-0003Kh-DX
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:03:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29970)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOWc-0004tV-HL
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:56:30 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45739)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOcy-0002yl-D8
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:03:06 -0400
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOWa-0001r4-JZ
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:56:30 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603803783;
+ s=mimecast20190719; t=1603803387;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=XmF1XQD9NTKFs4yV7GS1m3ixx//HvDyDC+aY7XD9WXU=;
- b=CLJc8we2HF7NMiRCrroVpFMLWkSAlE38Dg+pXuKw2uiugp4lhHs5nVMUCRrBuHakgng2Pw
- 8YKcxBiBonz8sR0eMe1vjbtnX+05l5arcb0lTjdGvRVUx1ygcnwxrxGyQTSxYPatx38hso
- ciiCKOYYkFj8ACp7iHoax6tm2VGH72U=
+ bh=fFCAvh84kUuCi3uUfZcQzgj6nr81o1ebXnM97gk5LpU=;
+ b=Gi1og6oO5CYp8HNbYmOEyUDMkqNHoxz5GVIDGLNpem8/iR1x26yY4ULOihRqTLbIHOvA8n
+ kOBGaiApvJ3dQJxI/4U9MQ1hyWNAfvf7a1/NO2WSWzB2oeVdtf/OUo1xQGLZWhYkhcxwH9
+ 2YaLnEzuyzRMYT600m60Yfibk4z/BJ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-152-lJ7eZOEyOkCOkRNVomymog-1; Tue, 27 Oct 2020 09:03:01 -0400
-X-MC-Unique: lJ7eZOEyOkCOkRNVomymog-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-316-m6h9jj-sMZu9u6ccy7vAZQ-1; Tue, 27 Oct 2020 08:56:23 -0400
+X-MC-Unique: m6h9jj-sMZu9u6ccy7vAZQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DF388F116
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:02:16 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4E651188C130;
+ Tue, 27 Oct 2020 12:56:22 +0000 (UTC)
 Received: from redhat.com (ovpn-115-179.ams2.redhat.com [10.36.115.179])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 237016EF50;
- Tue, 27 Oct 2020 13:02:10 +0000 (UTC)
-Date: Tue, 27 Oct 2020 09:02:06 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 8FA555D9E4;
+ Tue, 27 Oct 2020 12:56:16 +0000 (UTC)
+Date: Tue, 27 Oct 2020 08:56:12 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
- not ready
-Message-ID: <20201027085650-mutt-send-email-mst@kernel.org>
-References: <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
- <20201022100028-mutt-send-email-mst@kernel.org>
- <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
- <20201022102857-mutt-send-email-mst@kernel.org>
- <CAC_L=vX0+H-SfQHneVPd-Mc3wFxHBSbkKHt3SpNOBOY_JsYDUA@mail.gmail.com>
- <20201022110016-mutt-send-email-mst@kernel.org>
- <CAC_L=vUgsh=08m8EEuEucRtdX73X5kw5ov4Ekg7jFjbHsU6f2w@mail.gmail.com>
- <20201026174537.128a4173@yekko.fritz.box>
- <20201027072430-mutt-send-email-mst@kernel.org>
- <20201027135426.765dd19b@redhat.com>
+To: Felipe Franciosi <felipe@nutanix.com>
+Subject: Re: [PATCH] virtio: skip guest index check on device load
+Message-ID: <20201027085447-mutt-send-email-mst@kernel.org>
+References: <20201026151328.77611-1-felipe@nutanix.com>
+ <20201027113049.GH79063@stefanha-x1.localdomain>
+ <20201027082337-mutt-send-email-mst@kernel.org>
+ <12146644-5D22-4CAC-9B4F-F16E84ED56AE@nutanix.com>
 MIME-Version: 1.0
-In-Reply-To: <20201027135426.765dd19b@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <12146644-5D22-4CAC-9B4F-F16E84ED56AE@nutanix.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -102,95 +95,106 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
- qemu devel list <qemu-devel@nongnu.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Markus Armbruster <armbru@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, Oct 27, 2020 at 01:54:26PM +0100, Igor Mammedov wrote:
-> On Tue, 27 Oct 2020 07:26:44 -0400
-> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Tue, Oct 27, 2020 at 12:53:29PM +0000, Felipe Franciosi wrote:
 > 
-> > On Mon, Oct 26, 2020 at 05:45:37PM +1100, David Gibson wrote:
-> > > On Fri, 23 Oct 2020 09:26:48 +0300
-> > > Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
-> > >   
-> > > > Hi Michael,
-> > > > 
-> > > > On Thu, Oct 22, 2020 at 6:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > > 
-> > > >  [...]  
-> [...]
-> > > > Simplistic does not mean wrong or incorrect.
-> > > > I fail to see why it is not enough.
-> > > > 
-> > > > What QEMU can do better? Wait an unbounded time for the blinking to finish?  
-> > > 
-> > > It certainly shouldn't wait an unbounded time.  But a wait with timeout
-> > > seems worth investigating to me.  
-> racy, timeout is bound to break once it's in overcommited env.
 > 
-> > If it's helpful, I'd add a query to check state
-> > so management can figure out why doesn't guest see device yet.
-> that means mgmt would have to poll it and forward it to user
-> somehow.
-> 
-> > But otherwise just buffer the request until such time as
-> > we can deliver it to guest ...
-> I have more questions wrt the suggestion/workflow:
-> * at what place would you suggest buffering it?
-
-PCIESlot maybe?
-
-> * what would be the request in this case, i.e. create PCI device anyways
-> and try to signal hotplug event later?
-
-
-that was my idea, yes.
-
-> * what would baremethal do in such case?
-
-exactly the same, human would wait until blinking stops.
-
-> * what to do in case guest is never ready, what user should do in such case?
-
-As in guest is stuck? Do we care? It can't use the device.
-
-> * can be such device be removed?
-
-why not? device_del could complete immediately ...
-
-> not sure that all of this is worth of the effort and added complexity.
-> 
-> alternatively:
-> maybe ports can send QMP events about it's state changes, which end user would
-> be able to see + error like in this patch.
-> 
-> On top of it, mgmt could build a better UIx, like retry/notify logic if
-> that's what user really wishes for and configures (it would be up to user to
-> define behaviour).
-
-I'd say let's get expected behaviour for existing commands first.
-We can add events and stuff on top.
-
-> > > > What if we have a buggy guest with a kernel stuck in blinking?
-> > > > Is QEMU's responsibility to emulate the operator itself? Because the
-> > > > operator
-> > > > is the one who is supposed to wait.
-> > > > 
-> > > > 
-> > > > Thanks,
-> > > > Marcel
-> > > > 
-> > > > [...]  
-> > > 
-> > > 
-> > > -- 
-> > > David Gibson <dgibson@redhat.com>
-> > > Principal Software Engineer, Virtualization, Red Hat  
+> > On Oct 27, 2020, at 12:25 PM, Michael S. Tsirkin <mst@redhat.com> wrote:
 > > 
+> > On Tue, Oct 27, 2020 at 11:30:49AM +0000, Stefan Hajnoczi wrote:
+> >> On Mon, Oct 26, 2020 at 03:13:32PM +0000, Felipe Franciosi wrote:
+> >>> QEMU must be careful when loading device state off migration streams to
+> >>> prevent a malicious source from exploiting the emulator. Overdoing these
+> >>> checks has the side effect of allowing a guest to "pin itself" in cloud
+> >>> environments by messing with state which is entirely in its control.
+> >>> 
+> >>> Similarly to what f3081539 achieved in usb_device_post_load(), this
+> >>> commit removes such a check from virtio_load(). Worth noting, the result
+> >>> of a load without this check is the same as if a guest enables a VQ with
+> >>> invalid indexes to begin with. That is, the virtual device is set in a
+> >>> broken state (by the datapath handler) and must be reset.
+> >>> 
+> >>> Signed-off-by: Felipe Franciosi <felipe@nutanix.com>
+> >>> ---
+> >>> hw/virtio/virtio.c | 12 ------------
+> >>> 1 file changed, 12 deletions(-)
+> >>> 
+> >>> diff --git a/hw/virtio/virtio.c b/hw/virtio/virtio.c
+> >>> index 6f8f865aff..0561bdb857 100644
+> >>> --- a/hw/virtio/virtio.c
+> >>> +++ b/hw/virtio/virtio.c
+> >>> @@ -3136,8 +3136,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+> >>>     RCU_READ_LOCK_GUARD();
+> >>>     for (i = 0; i < num; i++) {
+> >>>         if (vdev->vq[i].vring.desc) {
+> >>> -            uint16_t nheads;
+> >>> -
+> >>>             /*
+> >>>              * VIRTIO-1 devices migrate desc, used, and avail ring addresses so
+> >>>              * only the region cache needs to be set up.  Legacy devices need
+> >>> @@ -3157,16 +3155,6 @@ int virtio_load(VirtIODevice *vdev, QEMUFile *f, int version_id)
+> >>>                 continue;
+> >>>             }
+> >>> 
+> >>> -            nheads = vring_avail_idx(&vdev->vq[i]) - vdev->vq[i].last_avail_idx;
+> >>> -            /* Check it isn't doing strange things with descriptor numbers. */
+> >>> -            if (nheads > vdev->vq[i].vring.num) {
+> >>> -                error_report("VQ %d size 0x%x Guest index 0x%x "
+> >>> -                             "inconsistent with Host index 0x%x: delta 0x%x",
+> >>> -                             i, vdev->vq[i].vring.num,
+> >>> -                             vring_avail_idx(&vdev->vq[i]),
+> >>> -                             vdev->vq[i].last_avail_idx, nheads);
+> >>> -                return -1;
+> >>> -            }
+> >> 
+> >> Michael, the commit that introduced this check seems to have been for
+> >> debugging rather than to prevent a QEMU crash, so this removing the
+> >> check may be safe:
+> >> 
+> >>  commit 258dc7c96bb4b7ca71d5bee811e73933310e168c
+> >>  Author: Michael S. Tsirkin <mst@redhat.com>
+> >>  Date:   Sun Oct 17 20:23:48 2010 +0200
+> >> 
+> >>      virtio: sanity-check available index
+> >> 
+> >>      Checking available index upon load instead of
+> >>      only when vm is running makes is easier to
+> >>      debug failures.
 > > 
+> > Agreed. Given this, let's keep the message around, just with
+> > LOG_GUEST_ERROR ?
+> 
+> I thought about it. Happy to send a v2 which keeps the check and logs
+> without throwing an error.
+> 
+> Separately, I'm thinking of hooking up QEMU with VRING_ERR so datapath
+> handlers can notify QEMU that something went broken and NEEDS_RESET
+> can be flipped on the status register, possibly along a configuration
+> interrupt. I can see libvhost-user supports that, but are there any
+> reasons QEMU doesn't do this already?
+
+Mostly because guest support isn't there. That in turn isn't easy,
+lots of synchronization is needed within guests.
+
+
 > > 
+> >> Felipe: Did you audit the code to make sure the invalid avail_idx value
+> >> and the fields it is propagated to (e.g. shadow_avail_idx) are always
+> >> used in a safe way?
+> > 
+> 
+> I did it briefly. I also wrote a mock userspace driver that creates
+> this condition in a very controlled way (so I can step half-way
+> through setting up VQs and trigger a migration, for example). But you
+> know how manual tests are... I may have missed something.
+> Your expert eyes are most welcome. :)
+> 
+> F.
 
 
