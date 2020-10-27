@@ -2,90 +2,85 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB5FBC5517A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:17:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D007C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:19:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 36EDE2231B
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:17:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5E95122202
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:19:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GCKpQyTA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 36EDE2231B
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FOLFbw/n"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5E95122202
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55988 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60130 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNv6-000633-VQ
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:17:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43806)
+	id 1kXNwR-0007m5-5i
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:19:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59426)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXMsv-0005XX-AE
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:11:25 -0400
-Received: from mail-ed1-x544.google.com ([2a00:1450:4864:20::544]:37376)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXMsq-0001Gp-M8
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:11:25 -0400
-Received: by mail-ed1-x544.google.com with SMTP id o18so997509edq.4
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:11:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=z0Sn1/klbwmGrH4EiwRl2FFYWHdN0vE5o4xE27RcLts=;
- b=GCKpQyTAmNshAwD6cw9uZDv88lOJMqdzzXTdX/hFzeLbvbqzbVAz3r742/4JYqbnYV
- jBdDvK5mfVRDNWIUJ9pHgEzyy7NrYfMk/e8Zij75c+CkZthrNpHB6kkaUBcZ5mkloodu
- myITSCrPQ+AzcRW9cZj8rzjN2m1CXRH4I7kYrp7wxrQuCjw3gks/lUHw41zK862UBwfs
- 0G7l0r/t7mfx/bCLw/F3uY9g2YUZ6xrFo+Lbe4kY+QUF6tpIefTUTGGS0b8BJ/h+az1+
- VxuHugxkghqjuO1UM6MHKBRp4Zjkw62hO46xnGXYh3I01k9/HHjIB83oS0OgZ0qC7ZnW
- 7hww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=z0Sn1/klbwmGrH4EiwRl2FFYWHdN0vE5o4xE27RcLts=;
- b=ZgcZ7Ln5xGeQ/mxG9SkuemODy8Vk5dDPS1cZPrW3uqk0ax+uU4GNO1P7hfY0Yb7tp5
- hJW/9AXkAsGsbB03lFQCol3mPVpXOippzC1Or/E35p7f4i2dwfr+Wl08ZtpxA3Dft4by
- SSXGgldyvdXY0g83NuIDgoq7YqD2Bswn9P0a2EhS3LL07gho7eEgkwInCnaXHCUDtVLA
- aEvwEclxI3HneyLUVlRj1g9X9hLByEllt7B2B/NvlQZZ/Y0ULDFLhWJ1+xlfOBqXez0E
- c1PTHWZenJFGE9R+mw32OkhB6YOlqEJGBEiP/LWa5qjF5UGrJP0YYNdv/l8mOVnonQUg
- VUsw==
-X-Gm-Message-State: AOAM533gI3Pg48DYZF88J6EwAEaT7nHCCfIeuH/u5Q61BTkgKxaGR5Zz
- BJG7WDRQktWUJcC8syo3zoDtKnjpGL/PM0PSPlCd6w==
-X-Google-Smtp-Source: ABdhPJyDCNml0cd3zWDKbxas4enfOvQcmNXJbhtrlNEdsxaAAjbPCmkPQoFct4lXuNXwvt2m7Wg0flBiFN5VSxWPa2M=
-X-Received: by 2002:aa7:c683:: with SMTP id n3mr1611636edq.146.1603797078712; 
- Tue, 27 Oct 2020 04:11:18 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXNk4-0005pz-Ge
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:06:21 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:20768)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXNjv-0003kg-R6
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:06:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603800370;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=CCuESzXyItdaK1FY775+nlmCw9gP46ukQY/shBFWhaA=;
+ b=FOLFbw/nkzp2qs1J9NzoE4bDTnrt6T3au9k3GmE1THkIAmo1cTHAUtlhxAgsXrexx9+P0Y
+ 53W2Zg7xmAzpv3TUhLiG4rbhq5QzwmRmBi4kU+pDIdlVxLXEHMxT0ddcoB/rbaqgF/oBng
+ oN7HSFux9+lblhA5boKkICpG2kbv+Kg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-df3VpbSiPZalFR3q5YjqHQ-1; Tue, 27 Oct 2020 08:06:08 -0400
+X-MC-Unique: df3VpbSiPZalFR3q5YjqHQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E269B801FC6
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 12:06:07 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8141B5D9DD;
+ Tue, 27 Oct 2020 12:06:04 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id B436E9D74; Tue, 27 Oct 2020 13:06:03 +0100 (CET)
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] modules: unbreak them on macos
+Date: Tue, 27 Oct 2020 13:06:03 +0100
+Message-Id: <20201027120603.3625-1-kraxel@redhat.com>
 MIME-Version: 1.0
-References: <20201010135759.437903-1-luc@lmichel.fr>
- <CAFEAcA-F5WCv6We3V=kCV8vH79ko=KGHYWKLaxNVEd9HjFES3Q@mail.gmail.com>
- <CAFEAcA9fHTO2f_KdCnFvqhEOwTzOwtMf=EhKY=9S_5twpabaCg@mail.gmail.com>
- <63d302c6-5cd8-e321-090f-7b1a5979788a@amsat.org>
-In-Reply-To: <63d302c6-5cd8-e321-090f-7b1a5979788a@amsat.org>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Oct 2020 11:11:07 +0000
-Message-ID: <CAFEAcA8whOBFTqEeOO_S9+G0O_dafQitvQxeghSfQT7ME8o-Ow@mail.gmail.com>
-Subject: Re: [PATCH v3 00/15] raspi: add the bcm2835 cprman clock manager
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <f4bug@amsat.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::544;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x544.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -98,58 +93,31 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Luc Michel <luc@lmichel.fr>, QEMU Developers <qemu-devel@nongnu.org>,
- Andrew Baumann <Andrew.Baumann@microsoft.com>,
- Paul Zimmerman <pauldzim@gmail.com>,
- Niek Linnenbank <nieklinnenbank@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
- Havard Skinnemoen <hskinnemoen@google.com>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 27 Oct 2020 at 08:55, Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>=
- wrote:
->
-> Hi Peter,
->
-> On 10/19/20 9:31 PM, Peter Maydell wrote:
-> > On Mon, 19 Oct 2020 at 16:45, Peter Maydell <peter.maydell@linaro.org> =
-wrote:
-> >>
-> >> On Sat, 10 Oct 2020 at 14:57, Luc Michel <luc@lmichel.fr> wrote:
-> >>>
-> >>> v2 -> v3:
-> >>>   - patch 03: moved clock_new definition to hw/core/clock.c [Phil]
-> >>>   - patch 03: commit message typo [Clement]
-> >>>   - patch 10: clarifications around the CM_CTL/CM_DIBV mux registers.
-> >>>               reg_cm replaced with reg_ctl and reg_div. Add some
-> >>>               comments for clarity. [Phil]
-> >>>   - patch 10: fixed update_mux_from_cm not matching the CM_DIV offset
-> >>>               correctly. [Phil]
-> >>>   - patch 11: replaced manual bitfield extraction with extract32 [Phi=
-l]
-> >>>   - patch 11: added a visual representation of CM_DIV for clarity [Ph=
-il]
-> >>>   - patch 11: added a missing return in clock_mux_update.
-> >>
-> >>
-> >>
-> >> Applied to target-arm.next, thanks.
-> >
-> > Dropped again due to segv in 'make check' when running with
-> > clang sanitizer, which I gather from irc that you're looking
-> > into.
->
-> The fix has been merged as commit a6e9b9123e7
-> ("hw/core/qdev-clock: add a reference on aliased clocks")
-> and the series also got:
-> Tested-by: Guenter Roeck <linux@roeck-us.net>
->
-> Hopefully it will make it for 5.2 :)
+Using the correct shared library suffix helps ;)
 
+Signed-off-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ configure | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/configure b/configure
+index 55e07c82dd93..6efae5fe129f 100755
+--- a/configure
++++ b/configure
+@@ -617,6 +617,7 @@ Darwin)
+   if test -z "$cpu" && test "$(sysctl -n hw.optional.x86_64)" = "1"; then
+     cpu="x86_64"
+   fi
++  HOST_DSOSUF=".dylib"
+   ;;
+ SunOS)
+   # $(uname -m) returns i86pc even on an x86_64 box, so default based on isainfo
+-- 
+2.27.0
 
-Applied to target-arm.next, thanks.
-
--- PMM
 
