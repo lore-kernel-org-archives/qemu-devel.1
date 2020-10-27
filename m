@@ -2,89 +2,95 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A6FC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A981C55178
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:26:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0D6E420759
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D5DB120759
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:26:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DpO8gs+l"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0D6E420759
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OYiDKB1q"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D5DB120759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45864 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46528 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOz8-0007fm-CN
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:25:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53180)
+	id 1kXOzG-0007zI-Q5
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:26:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40576)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kXOtw-0002Bu-5z
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:20:37 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34387)
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kXOJA-0007ch-KR
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:42:36 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:46902)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kXOtr-0005vU-Tj
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:20:34 -0400
+ (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kXOJ5-00085F-D7
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 08:42:33 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603804830;
+ s=mimecast20190719; t=1603802549;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=9PaCJToVpZdPWQqkAcZfAljvmvvDdHMuk7kEVH3P6wo=;
- b=DpO8gs+l4stznu5belH8w0DzJVRsBfsuAzqilmVcRYc+yZiPhOF3ZRcrmPJW9apcW4K23Z
- mnwMJf0e6f6haum9SjB7oPy3wnvlfOikHPDRkqHom1fUftEB/hJ7V+9iFXCiB8LLOCftOp
- YorekUZd/i0j+HeGURxjsRvEZsrOPc0=
+ bh=VVrkumddJw5A8ZlNP/GL80UYD91phxoaprkhLEa4Jyg=;
+ b=OYiDKB1qJ2g1cAre0hzM+AHS/5Hkej+FGRPpCdN2KrrX6fVUVl0IBHHo6+zmHmGdlNz/8h
+ fuDbb72658kdNvejPP8Gs8QJk7rEYB9aECAXOqB+49gwr6sFwJZORlMoUvX+6F8PnY+LBt
+ WCKqF+J4GbYu9fuBy0ZfNHGg4Gy973o=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-423-iXWnra9KM9iDtNMp0eQrWg-1; Tue, 27 Oct 2020 09:20:24 -0400
-X-MC-Unique: iXWnra9KM9iDtNMp0eQrWg-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
- [10.5.11.23])
+ us-mta-34-CxW1hdJjOcCf0DEO2DgVQQ-1; Tue, 27 Oct 2020 08:42:27 -0400
+X-MC-Unique: CxW1hdJjOcCf0DEO2DgVQQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D4A848030D6
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:20:23 +0000 (UTC)
-Received: from localhost.localdomain.com (ovpn-115-46.ams2.redhat.com
- [10.36.115.46])
- by smtp.corp.redhat.com (Postfix) with ESMTP id AE7DD1992F;
- Tue, 27 Oct 2020 13:20:22 +0000 (UTC)
-From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [qemu-web PATCH v2 03/16] make all links be relative to the root
-Date: Tue, 27 Oct 2020 13:20:02 +0000
-Message-Id: <20201027132015.621733-4-berrange@redhat.com>
-In-Reply-To: <20201027132015.621733-1-berrange@redhat.com>
-References: <20201027132015.621733-1-berrange@redhat.com>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 358D3108E1B5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 12:42:15 +0000 (UTC)
+Received: from [10.36.113.185] (ovpn-113-185.ams2.redhat.com [10.36.113.185])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 719D558826;
+ Tue, 27 Oct 2020 12:42:13 +0000 (UTC)
+Subject: Re: [PATCH RFC] memory: pause all vCPUs for the duration of memory
+ transactions
+To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
+References: <20201026084916.3103221-1-vkuznets@redhat.com>
+ <294a987d-b0ef-1b58-98ac-0d4d43075d6e@redhat.com>
+ <d7a20a33-0317-467e-6fc6-6528b3b46062@redhat.com>
+ <87imav26d8.fsf@vitty.brq.redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Organization: Red Hat GmbH
+Message-ID: <cb74d717-cfc1-a78b-cf80-eb8ebf1075fd@redhat.com>
+Date: Tue, 27 Oct 2020 13:42:12 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+In-Reply-To: <87imav26d8.fsf@vitty.brq.redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: 0
-X-Spam_score: -0.1
-X-Spam_bar: /
-X-Spam_report: (-0.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- PDS_OTHER_BAD_TLD=1.999, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
  RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,299 +103,155 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This enables the site to be hosted at URLs with different base
-directories. This is useful when viewing the site after being
-published as GitLab CI artifacts.
+On 27.10.20 13:36, Vitaly Kuznetsov wrote:
+> David Hildenbrand <david@redhat.com> writes:
+> 
+>> On 26.10.20 11:43, David Hildenbrand wrote:
+>>> On 26.10.20 09:49, Vitaly Kuznetsov wrote:
+>>>> Currently, KVM doesn't provide an API to make atomic updates to memmap when
+>>>> the change touches more than one memory slot, e.g. in case we'd like to
+>>>> punch a hole in an existing slot.
+>>>>
+>>>> Reports are that multi-CPU Q35 VMs booted with OVMF sometimes print something
+>>>> like
+>>>>
+>>>> !!!! X64 Exception Type - 0E(#PF - Page-Fault)  CPU Apic ID - 00000003 !!!!
+>>>> ExceptionData - 0000000000000010  I:1 R:0 U:0 W:0 P:0 PK:0 SS:0 SGX:0
+>>>> RIP  - 000000007E35FAB6, CS  - 0000000000000038, RFLAGS - 0000000000010006
+>>>> RAX  - 0000000000000000, RCX - 000000007E3598F2, RDX - 00000000078BFBFF
+>>>> ...
+>>>>
+>>>> The problem seems to be that TSEG manipulations on one vCPU are not atomic
+>>>> from other vCPUs views. In particular, here's the strace:
+>>>>
+>>>> Initial creation of the 'problematic' slot:
+>>>>
+>>>> 10085 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
+>>>>     memory_size=2146435072, userspace_addr=0x7fb89bf00000}) = 0
+>>>>
+>>>> ... and then the update (caused by e.g. mch_update_smram()) later:
+>>>>
+>>>> 10090 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
+>>>>     memory_size=0, userspace_addr=0x7fb89bf00000}) = 0
+>>>> 10090 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
+>>>>     memory_size=2129657856, userspace_addr=0x7fb89bf00000}) = 0
+>>>>
+>>>> In case KVM has to handle any event on a different vCPU in between these
+>>>> two calls the #PF will get triggered.
+>>>>
+>>>> An ideal solution to the problem would probably require KVM to provide a
+>>>> new API to do the whole transaction in one shot but as a band-aid we can
+>>>> just pause all vCPUs to make memory transations atomic.
+>>>>
+>>>> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>>> ---
+>>>> RFC: Generally, memap updates happen only a few times during guest boot but
+>>>> I'm not sure there are no scenarios when pausing all vCPUs is undesireable
+>>>> from performance point of view. Also, I'm not sure if kvm_enabled() check
+>>>> is needed.
+>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+>>>> ---
+>>>>   softmmu/memory.c | 11 +++++++++--
+>>>>   1 file changed, 9 insertions(+), 2 deletions(-)
+>>>>
+>>>> diff --git a/softmmu/memory.c b/softmmu/memory.c
+>>>> index fa280a19f7f7..0bf6f3f6d5dc 100644
+>>>> --- a/softmmu/memory.c
+>>>> +++ b/softmmu/memory.c
+>>>> @@ -28,6 +28,7 @@
+>>>>   
+>>>>   #include "exec/memory-internal.h"
+>>>>   #include "exec/ram_addr.h"
+>>>> +#include "sysemu/cpus.h"
+>>>>   #include "sysemu/kvm.h"
+>>>>   #include "sysemu/runstate.h"
+>>>>   #include "sysemu/tcg.h"
+>>>> @@ -1057,7 +1058,9 @@ static void address_space_update_topology(AddressSpace *as)
+>>>>   void memory_region_transaction_begin(void)
+>>>>   {
+>>>>       qemu_flush_coalesced_mmio_buffer();
+>>>> -    ++memory_region_transaction_depth;
+>>>> +    if ((++memory_region_transaction_depth == 1) && kvm_enabled()) {
+>>>> +        pause_all_vcpus();
+>>>> +    }
+>>>>   }
+>>>>   
+>>>>   void memory_region_transaction_commit(void)
+>>>> @@ -1087,7 +1090,11 @@ void memory_region_transaction_commit(void)
+>>>>               }
+>>>>               ioeventfd_update_pending = false;
+>>>>           }
+>>>> -   }
+>>>> +
+>>>> +        if (kvm_enabled()) {
+>>>> +            resume_all_vcpus();
+>>>> +        }
+>>>> +    }
+>>>>   }
+>>>>   
+>>>>   static void memory_region_destructor_none(MemoryRegion *mr)
+>>>>
+>>>
+>>> This is in general unsafe. pause_all_vcpus() will temporarily drop the
+>>> BQL, resulting in bad things happening to caller sites.
+> 
+> Oh, I see, thanks! I was expecting there's a reason we don't have this
+> simple fix in already :-)
+> 
+>>>
+>>> I studies the involved issues quite intensively when wanting to resize
+>>> memory regions from virtio-mem code. It's not that easy.
+>>>
+>>> Have a look at my RFC for resizing. You can apply something similar to
+>>> other operations.
+>>>
+>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg684979.html
+>>
+>> Oh, and I even mentioned the case you try to fix here back then
+>>
+>> "
+>> Instead of inhibiting during the region_resize(), we could inhibit for the
+>> hole memory transaction (from begin() to commit()). This could be nice,
+>> because also splitting of memory regions would be atomic (I remember there
+>> was a BUG report regarding that), however, I am not sure if that might
+>> impact any RT users.
+>> "
+>>
+>> The current patches live in
+>> https://github.com/davidhildenbrand/qemu/commits/virtio-mem-next
+>>
+>> Especially
+>>
+>> https://github.com/davidhildenbrand/qemu/commit/433fbb3abed20f15030e42f2b2bea7e6b9a15180
+>>
+>>
+> 
+> I'm not sure why we're focusing on ioctls here. I was debugging my case
+> quite some time ago but from what I remember it had nothing to do with
+> ioctls from QEMU. When we are removing a memslot any exit to KVM may
+> trigger an error condition as we'll see that vCPU or some of our
+> internal structures (e.g. VMCS for a nested guest) references
+> non-existent memory. I don't see a good solution other than making the
+> update fully atomic from *all* vCPUs point of view and this requires
+> stopping all CPUs -- either from QEMU or from KVM.
 
-Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
----
- _includes/assets.html        | 28 ++++++++++++++--------------
- _includes/copyright.html     |  2 +-
- _includes/footer.html        | 12 ++++++------
- _includes/nav.html           | 12 ++++++------
- _includes/relative_root.html | 12 ++++++++++++
- _includes/sidebar.html       |  6 +++---
- _layouts/archive.html        |  4 ++--
- _layouts/blog.html           |  3 ++-
- _layouts/home.html           |  1 +
- _layouts/page.html           |  1 +
- blog/index.html              |  4 ++--
- index.html                   |  5 +++--
- 12 files changed, 53 insertions(+), 37 deletions(-)
- create mode 100644 _includes/relative_root.html
+I cannot follow. My patch waits until *any* KVM ioctls are out of the 
+kernel. That includes VCPUs, but also other ioctls (because there are 
+some that require a consistent memory block state).
 
-diff --git a/_includes/assets.html b/_includes/assets.html
-index 826a50f..411a1ac 100644
---- a/_includes/assets.html
-+++ b/_includes/assets.html
-@@ -4,23 +4,23 @@
- 	<meta name="viewport" content="width=device-width">
- 	<link href='https://fonts.googleapis.com/css?family=Roboto+Mono:300,400%7cRoboto:300,400,500' rel='stylesheet' type='text/css'>
- 
--	<link rel="apple-touch-icon" sizes="180x180" href="/assets/favicons/apple-touch-icon.png">
--	<link rel="icon" type="image/png" sizes="32x32" href="/assets/favicons/favicon-32x32.png">
--	<link rel="icon" type="image/png" sizes="16x16" href="/assets/favicons/favicon-16x16.png">
--	<link rel="manifest" href="/assets/favicons/manifest.json">
--	<link rel="mask-icon" href="/assets/favicons/safari-pinned-tab.svg" color="#5bbad5">
--	<meta name="msapplication-config" content="/assets/favicons/browserconfig.xml">
-+	<link rel="apple-touch-icon" sizes="180x180" href="{{ relative_root }}/assets/favicons/apple-touch-icon.png">
-+	<link rel="icon" type="image/png" sizes="32x32" href="{{ relative_root }}/assets/favicons/favicon-32x32.png">
-+	<link rel="icon" type="image/png" sizes="16x16" href="{{ relative_root }}/assets/favicons/favicon-16x16.png">
-+	<link rel="manifest" href="{{ relative_root }}/assets/favicons/manifest.json">
-+	<link rel="mask-icon" href="{{ relative_root }}/assets/favicons/safari-pinned-tab.svg" color="#5bbad5">
-+	<meta name="msapplication-config" content="{{ relative_root }}/assets/favicons/browserconfig.xml">
- 	<meta name="theme-color" content="#ffffff">
- 
--	<link rel="stylesheet" href="/assets/css/normalize.css" />
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/normalize.css" />
- 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css" />
--	<link rel="stylesheet" href="/assets/css/skel-noscript.css" />
--	<link rel="stylesheet" href="/assets/css/style.css" />
--	<link rel="stylesheet" href="/assets/css/style-mobile.css" media="(max-width:699px)"/>
--	<link rel="stylesheet" href="/assets/css/style-desktop.css" media="(min-width:700px)" />
--	<link rel="alternate" title="QEMU Blog (Atom feed)" href="/feed.xml" type="application/atom+xml" />
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/skel-noscript.css" />
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/style.css" />
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/style-mobile.css" media="(max-width:699px)"/>
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/style-desktop.css" media="(min-width:700px)" />
-+	<link rel="alternate" title="QEMU Blog (Atom feed)" href="{{ relative_root }}/feed.xml" type="application/atom+xml" />
- 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
- 	{% if page.colorbox %}
--	<script src="/assets/js/jquery.colorbox.js"></script>
--	<link rel="stylesheet" href="/assets/css/colorbox.css" />
-+	<script src="{{ relative_root }}/assets/js/jquery.colorbox.js"></script>
-+	<link rel="stylesheet" href="{{ relative_root }}/assets/css/colorbox.css" />
- 	{% endif %}
-diff --git a/_includes/copyright.html b/_includes/copyright.html
-index 3e6e6a3..cdcd98f 100644
---- a/_includes/copyright.html
-+++ b/_includes/copyright.html
-@@ -2,7 +2,7 @@
- 	<div id="copyright-inner">
- 	  <div class="container">
- 	    This site is made available under the terms of
--	    <a href="/license.html">a number of licenses</a>.
-+	    <a href="{{ relative_root }}/license.html">a number of licenses</a>.
- 	  </div>
- 	</div>
- </div>
-diff --git a/_includes/footer.html b/_includes/footer.html
-index c8f1042..b614795 100644
---- a/_includes/footer.html
-+++ b/_includes/footer.html
-@@ -1,20 +1,20 @@
- <div id="footer">
- 	<div id="footer-inner">
- 		<ul class="style">
--			<li><a href="/">Home</a></li>
--			<li><a href="/download">Download</a></li>
--			<li><a href="/conservancy/">Conservancy / Committee</a></li>
-+			<li><a href="{{ relative_root }}/">Home</a></li>
-+			<li><a href="{{ relative_root }}/download">Download</a></li>
-+			<li><a href="{{ relative_root }}/conservancy/">Conservancy / Committee</a></li>
- 			<li><a href="http://qemu-advent-calendar.org">QEMU advent calendar</a></li>
- 		</ul>
- 		<ul class="style">
--			<li><a href="/contribute">Contribute</a></li>
--			<li><a href="/contribute/report-a-bug">Reporting a bug</a></li>
-+			<li><a href="{{ relative_root }}/contribute">Contribute</a></li>
-+			<li><a href="{{ relative_root }}/contribute/report-a-bug">Reporting a bug</a></li>
- 			<li><a href="https://wiki.qemu.org/Documentation/GettingStartedDevelopers">New contributors</a></li>
- 			<li><a href="https://wiki.qemu.org/Contribute/SubmitAPatch">Submitting a patch</a></li>
- 			<li><a href="https://wiki.qemu.org/Contribute/FAQ">Contributor FAQ</a></li>
- 		</ul>
- 		<ul class="style">
--			<li><a href="/documentation">Documentation</a></li>
-+			<li><a href="{{ relative_root }}/documentation">Documentation</a></li>
- 			<li><a href="https://www.qemu.org/docs/master/">Main docs</a></li>
- 			<li><a href="https://wiki.qemu.org/Category:Developer_documentation">Developer docs</a></li>
- 			<li><a href="https://wiki.qemu.org/">Wiki</a></li>
-diff --git a/_includes/nav.html b/_includes/nav.html
-index 0c81e24..58b6c5a 100644
---- a/_includes/nav.html
-+++ b/_includes/nav.html
-@@ -2,12 +2,12 @@
- 	<nav id="nav">
- 		<ul>
- 			{% assign current = page.url | downcase | split: '/' %}
--			<li class='{% if page.url == '/' %}not-desktop {%endif %}home'><a href="/">Home</a>
--			</li><li {% if current[1] == 'download' %}class='current'{% endif %}><a href="/download">Download</a>
--			</li><li {% if current[1] == 'support' %}class='current'{% endif %}><a href="/support">Support</a>
--			</li><li {% if current[1] == 'contribute' %}class='current'{% endif %}><a href="/contribute">Contribute</a>
--			</li><li {% if current[1] == 'documentation' %}class='current'{% endif %}><a href="/documentation">Documentation</a>
--			</li><li {% if current[1] == 'blog' %}class='current'{% endif %}><a href="/blog">Blog</a></li>
-+			<li class='{% if page.url == '/' %}not-desktop {%endif %}home'><a href="{{ relative_root }}/">Home</a>
-+			</li><li {% if current[1] == 'download' %}class='current'{% endif %}><a href="{{ relative_root }}/download">Download</a>
-+			</li><li {% if current[1] == 'support' %}class='current'{% endif %}><a href="{{ relative_root }}/support">Support</a>
-+			</li><li {% if current[1] == 'contribute' %}class='current'{% endif %}><a href="{{ relative_root }}/contribute">Contribute</a>
-+			</li><li {% if current[1] == 'documentation' %}class='current'{% endif %}><a href="{{ relative_root }}/documentation">Documentation</a>
-+			</li><li {% if current[1] == 'blog' %}class='current'{% endif %}><a href="{{ relative_root }}/blog">Blog</a></li>
- 		</ul>
- 	</nav>
- 
-diff --git a/_includes/relative_root.html b/_includes/relative_root.html
-new file mode 100644
-index 0000000..87c30e2
---- /dev/null
-+++ b/_includes/relative_root.html
-@@ -0,0 +1,12 @@
-+{% assign relative_root = '' %}
-+{% assign tempDepth = page.url | append: 'hackish-solution' | split: '/' | size | minus: 2 %}
-+{% for i in (1..tempDepth) %}
-+  {% if forloop.last %}
-+    {% assign relative_root = relative_root | append: ".." %}
-+  {% else %}
-+    {% assign relative_root = relative_root | append: "../" %}
-+  {% endif %}
-+{% endfor %}
-+{% if relative_root == '' %}
-+    {% assign relative_root = '.' %}
-+{% endif %}
-diff --git a/_includes/sidebar.html b/_includes/sidebar.html
-index 0dc3538..f0cec2a 100644
---- a/_includes/sidebar.html
-+++ b/_includes/sidebar.html
-@@ -9,7 +9,7 @@
- 		<ul class="style">
- 		{% for post in site.posts offset: 0 limit: 2 %}
- 			<li>
--				<a href="{{ site.prefix }}{{ post.url }}">{{ post.title }}</a><br/>
-+				<a href="{{ relative_root }}{{ post.url }}">{{ post.title }}</a><br/>
- 				<span class="posted">{{ post.date | date_to_string }}</span>
- 			</li>
- 		{% endfor %}
-@@ -31,12 +31,12 @@
- 		{% assign thisurl = post.date | date: "%Y/%m" %}
- 		{% assign thisdate = post.date | date: "%B %Y" %}
- 		{% if thisurl != prevurl and prevurl != "" %}
--		<li><a href="/blog/{{ prevurl }}/">{{ prevdate }} ({{ counter }})</a></li>
-+		<li><a href="{{ relative_root }}/blog/{{ prevurl }}/">{{ prevdate }} ({{ counter }})</a></li>
- 		{% assign counter = 0 %}
- 		{% endif %}
- 		{% assign counter = counter | plus: 1 %}
- 		{% endfor %}
--		<li><a href="/blog/{{ thisurl }}/">{{ thisdate }} ({{ counter }})</a></li>
-+		<li><a href="{{ relative_root }}/blog/{{ thisurl }}/">{{ thisdate }} ({{ counter }})</a></li>
- 		</ul>
- 	</section>
- </div>
-diff --git a/_layouts/archive.html b/_layouts/archive.html
-index 4e67749..a0be7b8 100644
---- a/_layouts/archive.html
-+++ b/_layouts/archive.html
-@@ -9,13 +9,13 @@ layout: blog
- 		{% for post in page.posts %}
- 		<article>
- 			<header>
--				<h2><a href="{{ site.prefix }}{{ post.url }}">{{ post.title }}</a></h2>
-+				<h2><a href="../../..{{ post.url }}">{{ post.title }}</a></h2>
- 				<div class="posted">{{ post.date | date_to_string }}{%
- 				if post.last_modified_at %} (Updated {{ post.last_modified_at | date_to_string }}) {%
- 				endif %}{% if post.author %} &mdash; by {{ post.author }}{% endif %}</div>
- 			</header>
- 		{{ post.excerpt }}
--		<a href="{{ site.prefix }}{{ post.url }}" class="button button-style1">Read More</a>
-+		<a href="../../..{{ post.url }}" class="button button-style1">Read More</a>
- 		</article>
- 		{% endfor %}
- 	</section>
-diff --git a/_layouts/blog.html b/_layouts/blog.html
-index 2dfb9c8..b300636 100644
---- a/_layouts/blog.html
-+++ b/_layouts/blog.html
-@@ -3,7 +3,8 @@
- Linear by TEMPLATED
- templated.co @templatedco
- Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
---->
-+  -->
-+{% include relative_root.html %}
- <html>
- <head>
- 	<title>{{ page.title }} - {{ site.title }}</title>
-diff --git a/_layouts/home.html b/_layouts/home.html
-index b96e391..d94c9b0 100644
---- a/_layouts/home.html
-+++ b/_layouts/home.html
-@@ -4,6 +4,7 @@ Linear by TEMPLATED
- templated.co @templatedco
- Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
- -->
-+{% include relative_root.html %}
- <html>
- <head>
- 	<title>{{ site.title }}</title>
-diff --git a/_layouts/page.html b/_layouts/page.html
-index 110ca97..d650054 100644
---- a/_layouts/page.html
-+++ b/_layouts/page.html
-@@ -4,6 +4,7 @@ Linear by TEMPLATED
- templated.co @templatedco
- Released for free under the Creative Commons Attribution 3.0 license (templated.co/license)
- -->
-+{% include relative_root.html %}
- <html>
- <head>
- 	<title>{{ page.title }} - {{ site.title }}</title>
-diff --git a/blog/index.html b/blog/index.html
-index 313b994..c7ceb0a 100644
---- a/blog/index.html
-+++ b/blog/index.html
-@@ -8,7 +8,7 @@ layout: blog
- 	<div class="row">
- 		<section>
- 			<header>
--				<h1><a href="{{ site.prefix }}{{ post.url }}">{{ post.title }}</a></h1>
-+				<h1><a href="{{ relative_root }}{{ post.url }}">{{ post.title }}</a></h1>
- 				<div class="posted">{{ post.date | date_to_string }}{%
- 				if post.last_modified_at %} (Updated {{ post.last_modified_at | date_to_string }}) {%
- 				endif %}{% if post.author %} &mdash; by {{ post.author }}{% endif %}</div>
-@@ -22,7 +22,7 @@ layout: blog
- 				</ul>
- 			{% else %}
- 				{{ post.excerpt }}
--				<a href="{{ site.prefix }}{{ post.url }}" class="button button-style1">Read More</a>
-+				<a href="{{ relative_root }}{{ post.url }}" class="button button-style1">Read More</a>
- 			{% endif %}
- 		</section>
- 	</div>
-diff --git a/index.html b/index.html
-index 4c65101..e52868d 100644
---- a/index.html
-+++ b/index.html
-@@ -3,6 +3,7 @@ title: QEMU
- layout: home
- colorbox: True
- ---
-+{% include relative_root.html %}
- 	<!-- Header -->
- 	<div id="header">
- 		<div class="container">
-@@ -38,7 +39,7 @@ colorbox: True
- 			{% include screenshot.html offset=3 limit=10 %}
- 			</section>
- 
--<script src="/assets/js/object-fit.js"></script>
-+<script src="{{ relative_root }}/assets/js/object-fit.js"></script>
- <script>
- window.hasColorBox = false;
- $(window).on("load resize", function() {
-@@ -62,7 +63,7 @@ $('.colorbox').on("click.random-namespace", function() {
- 
- 		</div>
- 		<hr>
--		<p>QEMU is a member of <a href="/conservancy/">Software Freedom Conservancy</a>.</p>
-+		<p>QEMU is a member of <a href="{{ relative_root }}/conservancy/">Software Freedom Conservancy</a>.</p>
- 	</div>
- </div>
- 
+So from a KVM point of view, the CPUs are stopped.
+
 -- 
-2.26.2
+Thanks,
+
+David / dhildenb
 
 
