@@ -2,84 +2,87 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 171D1C55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2700C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:01:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 899DE21D24
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:00:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2F0B822281
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:01:35 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="l5QDfoY6"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 899DE21D24
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Ct7+2tBs"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2F0B822281
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33830 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34440 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXLmf-0008Fw-Dk
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:00:53 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54286)
+	id 1kXLnJ-00006I-Tl
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:01:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54360)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXLla-0006ec-00
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:59:46 -0400
-Received: from mail-wr1-x432.google.com ([2a00:1450:4864:20::432]:39442)
+ id 1kXLle-0006mG-MK
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:59:50 -0400
+Received: from mail-wr1-x42f.google.com ([2a00:1450:4864:20::42f]:39440)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXLlW-0000Nf-Sd
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:59:45 -0400
-Received: by mail-wr1-x432.google.com with SMTP id y12so1151530wrp.6
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 02:59:42 -0700 (PDT)
+ id 1kXLld-0000Qd-07
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:59:50 -0400
+Received: by mail-wr1-x42f.google.com with SMTP id y12so1151878wrp.6
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 02:59:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KJqFwRz9gm+3prhZqia7bIKgqj8u4FMA676MUorTz74=;
- b=l5QDfoY6YTmtHRc9a7rSLnW41VYxmLWz8v9YqRmrA4nx22UbKSCnK95sfELWa5uwj1
- fq5YuEwbsM0F3fmMgYVi91bP9QFtOeDXVQV0TeicUIi2hwuYHQh4jvXKHfkexMWP4UxL
- t8L/ZC+Uum6y5pxwxH9eyhNxWpiAVQzbgDlP2Z5YUfw1Qg/zcM8ygij38i2HZcflARjo
- 6SEI3poFkMsv01J0bFYKFHTpk45JJSEcLrVa0YbF+Eyu+4i2wsbFomC5rNvQRVM3/fNq
- 96MBS3CQfurdN++tPdziHt2RFIEzYXYYrwqpPxvBRk0kyw4EyYgz4OyB7t1hO1Nk4IeN
- +GeQ==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=pFYczLPUBSOWDoLgSQqU1D7iJ2Ux4Pk/W6bbBdNtUg4=;
+ b=Ct7+2tBsgww9pDeT6nxCVMSbr128ISULjfNKKzxUk610GQdV7X7/sBX7mNRrbcyBWP
+ OFxgEmcmS5MiDc3GjYk7HoBc2556IS3UYeRu6iBpHvaV1VPSHigrHkYj5WEbQ/yljFia
+ dKJzt3Ks/yZZkXN04in3VMzHpZXkbyQwtPRC4VuvgjU2wBcSWijjRHbVyy6p95TYWx7j
+ lkWGtCN1ezqylEHwJCWtrcb0jPNvDm8EasgwGqqY55DESvc44U//kAioao/xdE4pxuB3
+ wYfm12GA2ODURgBOVPurv0nnlidNBoDV2/d8+oV8GSZQC8HAU03dx3Pwbj7BBXteuJin
+ Xq0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=KJqFwRz9gm+3prhZqia7bIKgqj8u4FMA676MUorTz74=;
- b=q5No94xilQjIyDaoGHl1jYF/5JfE6O+qUS3leH7RnSS6xR+fvPiVGbvJ9FWQMkzaYZ
- yZGYWYy3DAwKeHQqfDy7KxYkQm70BRgY/E2AlRHtKORkHIGWrSDa5M7YppxVtHm22AW+
- ZiAhm28IDTBPSHVm2CNTjE1FHz/fL2e8eVCJVEhmjsO8almDYt3HO3avX50NnVZtZ5/l
- nWVYVuPD86UOmR34w1OkFyoTENEe7PuvHSgfjuQKCDLGDutRiCd0STspFr69dvjHTro0
- IQaIpAHg98QWeJ8KbzB/SFDZ7eR5YWwUjeKR7PFYajGIVqqZmkNh3GuCzVTHK02/VO1W
- Ubjg==
-X-Gm-Message-State: AOAM532ylCE61jLdANua5SmP/V/ITkgtznBmgDpu9wLzS+fQRbHI2I/D
- /3i2czGGKcdk5/ld0jZ0NyFhdQ==
-X-Google-Smtp-Source: ABdhPJw23pkYhujeNv8vx5Z8rhQOrK0nZjUT/z48WvVTyqzRzWfgzdlo4QAXI1eYsVjGPrEsmc3TFw==
-X-Received: by 2002:a5d:4a82:: with SMTP id o2mr1918417wrq.10.1603792780678;
- Tue, 27 Oct 2020 02:59:40 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=pFYczLPUBSOWDoLgSQqU1D7iJ2Ux4Pk/W6bbBdNtUg4=;
+ b=DEzdqH8uufnKdwU2s1zCEL9jsX9+DYNG/KASjvm6ldu5Oq/vt6tdoH126GXGoxgQru
+ K/4Vt53PltbFJi6f049V2XIhGpz7ITo17waOuWnXC/uGjDuF2HU+eVDxAjIZEcXPbb14
+ 4Kxbr1hETstUHNI0A02AeMJCDb3BBK7kw6hVG+NWH0mkN4QpbrePzgjwXpSzoccBtwyo
+ hMfFuLFv8PexEFDKNb1hz1DQiCK4V1Pc8BLFxYpiB2b62gRTIP9lyzpJab3ghN8KdLrS
+ 3JKSTyL8NEv3i/j2ui7AqIRZNPyZ8kkEH3jn7u/OVPgT1fvzpkN7748xewB2NYlYkIlH
+ uFWg==
+X-Gm-Message-State: AOAM531YpD8BMznE60BSL7VdFYuWDyF3+cqSOtJtZ2O9Yl27fUrTwgd5
+ V7ZVpaW0BiJfhK72VfMrcAbVt04mUqxnlQ==
+X-Google-Smtp-Source: ABdhPJxsvH8adRARaW2rUJDpqL5rTOOQPdh2huG8s+Q2IBnCneiVl6jzr6Ca63sNH/OspTfPGu7bzw==
+X-Received: by 2002:adf:e444:: with SMTP id t4mr1981223wrm.58.1603792787571;
+ Tue, 27 Oct 2020 02:59:47 -0700 (PDT)
 Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id k16sm1263585wmi.5.2020.10.27.02.59.39
+ by smtp.gmail.com with ESMTPSA id i14sm1312564wml.24.2020.10.27.02.59.41
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 02:59:39 -0700 (PDT)
+ Tue, 27 Oct 2020 02:59:43 -0700 (PDT)
 Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id B85A81FF7E;
- Tue, 27 Oct 2020 09:59:38 +0000 (GMT)
+ by zen.linaroharston (Postfix) with ESMTP id 3A0A31FF91;
+ Tue, 27 Oct 2020 09:59:39 +0000 (GMT)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: peter.maydell@linaro.org
-Subject: [PULL 0/8] testing and misc (gitdm, gitlab, docker, make)
-Date: Tue, 27 Oct 2020 09:59:30 +0000
-Message-Id: <20201027095938.28673-1-alex.bennee@linaro.org>
+Subject: [PULL 5/8] scripts: fix error from checkpatch.pl when no commits are
+ found
+Date: Tue, 27 Oct 2020 09:59:35 +0000
+Message-Id: <20201027095938.28673-6-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027095938.28673-1-alex.bennee@linaro.org>
+References: <20201027095938.28673-1-alex.bennee@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::432;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x432.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::42f;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x42f.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -102,64 +105,35 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The following changes since commit 1dc887329a10903940501b43e8c0cc67af7c06d5:
+From: Daniel P. Berrangé <berrange@redhat.com>
 
-  Merge remote-tracking branch 'remotes/philmd-gitlab/tags/sd-next-20201026' into staging (2020-10-26 17:19:26 +0000)
+The error message was supposed to mention the input revision list start
+point, not the branch flag.
 
-are available in the Git repository at:
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Message-Id: <20201019143537.283094-3-berrange@redhat.com>
+Message-Id: <20201021163136.27324-6-alex.bennee@linaro.org>
 
-  https://github.com/stsquad/qemu.git tags/pull-testing-and-misc-271020-1
-
-for you to fetch changes up to c8e6cfba1291df2202bf406bb5137c9d365505d1:
-
-  makefile: handle -n / -k / -q correctly (2020-10-27 09:53:51 +0000)
-
-----------------------------------------------------------------
-Testing and gitdm updates
-
-  - add some more individual contributors
-  - include SDL2 in centos images
-  - skip checkpatch check when no commits found
-  - use random port for gdb reverse debugging
-  - make gitlab use it's own mirrors to clone
-  - fix detection of make -nqp
-
-----------------------------------------------------------------
-Alex Bennée (2):
-      contrib/gitdm: Add more individual contributors
-      tests/acceptance: pick a random gdb port for reverse debugging
-
-Ani Sinha (1):
-      Adding ani's email as an individual contributor
-
-Daniel P. Berrangé (2):
-      gitlab: skip checkpatch.pl checks if no commit delta on branch
-      scripts: fix error from checkpatch.pl when no commits are found
-
-Paolo Bonzini (1):
-      makefile: handle -n / -k / -q correctly
-
-Philippe Mathieu-Daudé (1):
-      gitlab-ci: Clone from GitLab itself
-
-Thomas Huth (1):
-      tests/docker/dockerfiles/centos: Use SDL2 instead of SDL1
-
- Makefile                                | 10 +++++++---
- .gitlab-ci.d/check-patch.py             |  8 ++++++++
- .gitlab-ci.yml                          |  1 +
- contrib/gitdm/group-map-individuals     |  6 ++++++
- scripts/checkpatch.pl                   |  2 +-
- tests/acceptance/reverse_debugging.py   | 12 +++++++-----
- tests/docker/dockerfiles/centos7.docker |  2 +-
- tests/docker/dockerfiles/centos8.docker |  2 +-
- 8 files changed, 32 insertions(+), 11 deletions(-)
-
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 6ed34970f9..88c858f67c 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -392,7 +392,7 @@ if ($chk_branch) {
+ 
+ 	close $HASH;
+ 
+-	die "$P: no revisions returned for revlist '$chk_branch'\n"
++	die "$P: no revisions returned for revlist '$ARGV[0]'\n"
+ 	    unless @patches;
+ 
+ 	my $i = 1;
 -- 
 2.20.1
 
