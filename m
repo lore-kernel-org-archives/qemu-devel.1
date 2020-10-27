@@ -2,85 +2,85 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8B51C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:10:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31937C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:18:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 391A720738
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:10:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 586E8221FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:18:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="o1zCS5bb"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 391A720738
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rDPWdgKw"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 586E8221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56070 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34486 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXWEP-0004vM-9O
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:10:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43160)
+	id 1kXWMH-0008Jj-4F
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:18:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45224)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kXWCW-0003Yy-Du; Tue, 27 Oct 2020 17:08:16 -0400
-Received: from mail-il1-x142.google.com ([2607:f8b0:4864:20::142]:44036)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXWKw-0007r1-ID
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:16:58 -0400
+Received: from mail-ed1-x52d.google.com ([2a00:1450:4864:20::52d]:46867)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kXWCU-0001vk-Nk; Tue, 27 Oct 2020 17:08:16 -0400
-Received: by mail-il1-x142.google.com with SMTP id z2so2790388ilh.11;
- Tue, 27 Oct 2020 14:08:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXWKu-0003P3-EI
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:16:57 -0400
+Received: by mail-ed1-x52d.google.com with SMTP id t11so336272edj.13
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 14:16:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=OFt45wZBSTHDWzJGnz4sMYVyBAla/d9gKrF9yfbNNFE=;
- b=o1zCS5bb8cd7rD4inxz5qnT8JDzudke29C0nwTR7nbalQ0+kximfE77/vIyHdXJ0/i
- mWi3RKZEGr5q9a8QDjMgmvYEbyqL9yVQ0u7dMyBpCclaOf50tMz6hBQ9NcNMC/oz9Mnq
- B0xcRUcjb4OWTr8r9mOP1x88T96Ii4UvZ0cD5sB8dsY6i/euiOpFQ1TV1Hc2+SwJGD4L
- VS1rnY9pzewJ/x5zIbv2kdKEEBcppQzv7Eo9ew5oItTbRjsztqydGfE7IpQC90YeFwG6
- LsRdfElgJW5DZmttrpdKU49WwUOJCP4lg0rJrREhJ8H7bPW3/TVFN+WVHwyw2XzJJXVy
- WDcQ==
+ :cc:content-transfer-encoding;
+ bh=9D/fc0zpPXzN1Od8PGJULxt44Z7QqmpM/OzHfJ5+w8o=;
+ b=rDPWdgKwEpYTPMdiveKwHWM0qHOAVXRSR1rFEkKCSwI7UF6oaBEg/NCg6Z9Z7tSKa1
+ TmeDe6G6XK4bIZ9mz3VzWSWxqKWbcBwGuKvISE3sZwpl9RF4J1iOyY3GWuN9ZAV7pwZg
+ 5kvHt+VQBZEYMVCLMLVKPSpsTWJgJBwS5ECf6FdVaDqwMF559LVnt9GzgYfRmtnifNFM
+ D18IJa/uvltUyJNyv8cgb6xthZFPS7ExHr5ZQYoFLSfuTKflCr9PZX90LwNNAho2Kt9B
+ Bf88AYaAIVH6iskNDJ1bkFP6F8pX46zZdYcsP4ieBXufsrECOV/2SZUuRXV1lg2qVot9
+ 6ibQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=OFt45wZBSTHDWzJGnz4sMYVyBAla/d9gKrF9yfbNNFE=;
- b=rwi8jR/eZQRNq9nQf57M+5Gkc5vBg01GW37XA50jzPUpAWeNB5xmpwN2cQPSXM83Ky
- ikcW4klzWhK6clA7QzMrObhfaEeTWlmNHFe0VjRURamnmNbUzAqRX2TtHd3wGxVp1WlF
- MH6JKu1USgUKTlAFeco7IpoSO21PYDQ3YblHeAy/M1krQt1IvQd4Cz8s4ayh2+HubvBX
- TUCb/9GYk3UUz1aWcJP5pNoZJ4BROw4zUwSl1IhcDD7EASbeOmzHy2edXWCFsPh+ACHx
- U5f0IsWjsJhR+IdSxX9b1SeCmg5n0om088FoN0hmdudMv5fNsZzv4NRgP5lbbk/Or0Pq
- U2EA==
-X-Gm-Message-State: AOAM531hfAHH9bQu4Sfav6k2tzgBxwSHIYdGKEYpOh2XyPGgllhQlgEt
- zvANz94aApfaPAUzOPqzdr0AUe+uQndi0tJ0Wm1NbAOKuNc=
-X-Google-Smtp-Source: ABdhPJxaXpJAM5KFQUXxUWrfD0VRlJ4oAy5elLMk5YSJhxXCPSqhaq7lN/QYLbJ5k+3rquZtEnWZZda1H7495Q6Wopc=
-X-Received: by 2002:a92:c5ce:: with SMTP id s14mr3622676ilt.40.1603832892910; 
- Tue, 27 Oct 2020 14:08:12 -0700 (PDT)
+ :message-id:subject:to:cc:content-transfer-encoding;
+ bh=9D/fc0zpPXzN1Od8PGJULxt44Z7QqmpM/OzHfJ5+w8o=;
+ b=TiBz+ci1ptUVPv860aiH/CSSyZmsM/C31c7Vo059mmDXlO/lnxaOGfFI5wDceqCuwP
+ h1I9IhhCFM3dR2Kw9tao8p/P3FVtblQ2v1XizjN3mB2BII702F/ImRLEAx4QwGJU+NhQ
+ D6q0duUSBzBEsrLc01NsLl5WSLI7Ck1VKnyE4nOUMvmpQLdiSNVYjkE1aXIjX/mNLzSc
+ epMFhmtJ+2eQJSmi3z5E+uvLVkLdedl+ZH9aTkeMBkS/9SESg9cG3ywNen2AbykU9NW6
+ OwghOHt0kneuQwYoIwIfdoQESeUWfjO95slzq9+RbOk1uEHmRTzIOKeWi+NGb0YSXLkU
+ Q5HA==
+X-Gm-Message-State: AOAM531e0a5Mp8MJEgGBp5Q7H6xY+AG1QLVmbaCHT0YqIxird8Lb+6Nk
+ 1TUjOJbyPc0G5hUsU8QtmQ9bAvTjqoh2Wu7qpgu14g==
+X-Google-Smtp-Source: ABdhPJwczRFAKMY3g0aobvVP8IQurlYA9St53R/ltqLPQn243yvE2X9GVp32FfKNLy1FS5hNUKzW6gbmtbc5ct6CABs=
+X-Received: by 2002:a50:f41a:: with SMTP id r26mr4244907edm.251.1603833414161; 
+ Tue, 27 Oct 2020 14:16:54 -0700 (PDT)
 MIME-Version: 1.0
-References: <CAKmqyKODEgnkw4zBbsNK1zQ7qaiKWEAZBpwhnHzEetjgWpxtzQ@mail.gmail.com>
- <20201016171000.21240-1-ivan.griffin@emdalo.com>
- <CAEUhbmV5V9gXeyn1Bp-u3L4FGwU_+m0CT-vomL7W8WGY9yt_nQ@mail.gmail.com>
-In-Reply-To: <CAEUhbmV5V9gXeyn1Bp-u3L4FGwU_+m0CT-vomL7W8WGY9yt_nQ@mail.gmail.com>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 27 Oct 2020 13:56:22 -0700
-Message-ID: <CAKmqyKPQf74rJfYrbWXV1HO=mevyg8DvMYc85dNgPkiaOCyOKA@mail.gmail.com>
-Subject: Re: [PATCH v2] hw/riscv: microchip_pfsoc: IOSCBCTRL memmap entry
-To: Bin Meng <bmeng.cn@gmail.com>
+References: <F25EAD5D-59A9-44D0-A3B3-455A725BCA14@gmx.de>
+In-Reply-To: <F25EAD5D-59A9-44D0-A3B3-455A725BCA14@gmx.de>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Oct 2020 21:16:43 +0000
+Message-ID: <CAFEAcA_oriYP9E6Yvi47a62=6y_OM9OuBgvfG6u3QSLArfNJdQ@mail.gmail.com>
+Subject: Re: QEMU and kvm on big.LITTLE aarch64
+To: Michal Schulz <michal.schulz@gmx.de>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::142;
- envelope-from=alistair23@gmail.com; helo=mail-il1-x142.google.com
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::52d;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52d.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -95,85 +95,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Trivial <qemu-trivial@nongnu.org>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Ivan Griffin <ivan.griffin@emdalo.com>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Sun, Oct 18, 2020 at 6:58 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+On Tue, 27 Oct 2020 at 20:28, Michal Schulz <michal.schulz@gmx.de> wrote:
+> Recently I have attempted to to run qemu-system-aarch64, version 5.1.0, o=
+n an aarch64 machine. It is Pinebook Pro with RK3399 big.LITTLE SOC, runnin=
+g Manjaro linux, kernel version 5.9.1-3. When using tcg everything works ju=
+st fine, but as slow as I would expect it. In order to give it some speed I=
+=E2=80=99ve attempted to enable kvm there. Unfortunately, all I get is foll=
+owing:
 >
-> Hi Ivan,
->
-> On Sat, Oct 17, 2020 at 1:10 AM Ivan Griffin <ivan.griffin@emdalo.com> wrote:
-> >
-> > Adding the PolarFire SoC IOSCBCTRL memory region to prevent QEMU
-> > reporting a STORE/AMO Access Fault.
-> >
-> > This region is used by the PolarFire SoC port of U-Boot to
-> > interact with the FPGA system controller.
-> >
-> > Signed-off-by: Ivan Griffin <ivan.griffin@emdalo.com>
-> > ---
-> >  hw/riscv/microchip_pfsoc.c         | 10 ++++++++++
-> >  include/hw/riscv/microchip_pfsoc.h |  1 +
-> >  2 files changed, 11 insertions(+)
-> >
-> > diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-> > index 4627179cd3..9aaa276ee2 100644
-> > --- a/hw/riscv/microchip_pfsoc.c
-> > +++ b/hw/riscv/microchip_pfsoc.c
-> > @@ -97,6 +97,7 @@ static const struct MemmapEntry {
-> >      [MICROCHIP_PFSOC_GPIO2] =           { 0x20122000,     0x1000 },
-> >      [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
-> >      [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
-> > +    [MICROCHIP_PFSOC_IOSCB_CTRL] =      { 0x37020000,     0x1000 },
-> >      [MICROCHIP_PFSOC_IOSCB_CFG] =       { 0x37080000,     0x1000 },
-> >      [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
-> >  };
-> > @@ -341,6 +342,15 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-> >      create_unimplemented_device("microchip.pfsoc.ioscb.cfg",
-> >          memmap[MICROCHIP_PFSOC_IOSCB_CFG].base,
-> >          memmap[MICROCHIP_PFSOC_IOSCB_CFG].size);
-> > +
-> > +    /* IOSCBCTRL
-> > +     *
-> > +     * These registers are not documented in the official documentation
-> > +     * but used by the polarfire-soc-bare-meta-library code
-> > +     */
-> > +    create_unimplemented_device("microchip.pfsoc.ioscb.ctrl",
-> > +        memmap[MICROCHIP_PFSOC_IOSCB_CTRL].base,
-> > +        memmap[MICROCHIP_PFSOC_IOSCB_CTRL].size);
-> >  }
-> >
-> >  static void microchip_pfsoc_soc_class_init(ObjectClass *oc, void *data)
-> > diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-> > index 8bfc7e1a85..3f1874b162 100644
-> > --- a/include/hw/riscv/microchip_pfsoc.h
-> > +++ b/include/hw/riscv/microchip_pfsoc.h
-> > @@ -95,6 +95,7 @@ enum {
-> >      MICROCHIP_PFSOC_ENVM_CFG,
-> >      MICROCHIP_PFSOC_ENVM_DATA,
-> >      MICROCHIP_PFSOC_IOSCB_CFG,
-> > +    MICROCHIP_PFSOC_IOSCB_CTRL,
-> >      MICROCHIP_PFSOC_DRAM,
-> >  };
->
-> Thank you for the patch!
->
-> I am currently adding the DDR controller modeling support to PolarFire
-> SoC which will cover this memory map. With my patch series, your patch
-> is no longer needed.
+> # qemu-system-aarch64 -M raspi3 -enable kvm
+> qmeu-system-aarch64: /build/qemu/src/qemu-5.1.0/exec.c:850: cpu_address_s=
+pace_init: Assertion `aside =3D=3D 0 || !kvm_enabled()` failed.
 
-I forgot to apply this, and Bin just sent his series. So if it's ok
-with you Ivan I'm just going to apply Bin's series instead. Sorry
-about that.
+This is an unhelpful message, so apologies for that, but the underlying
+cause is that the raspi3 machine model doesn't support KVM. You need to
+use the 'virt' model instead if you want to use KVM.
 
-Alistair
+(This is because the raspi3 machine needs to use a guest CPU
+which emulates EL3/TrustZone and EL2/Virtualization; KVM can't
+emulate CPUs with those features.)
 
->
-> Regards,
-> Bin
+> Of course, KVM is enabled in linux kernel. Please note that use of '-cpu =
+host' parameter does not change anything. Also, attempt to define the CPU a=
+ffinity for qemu using taskset tool has no influence on this behaviour.
+
+You will need to ensure (via taskset or otherwise) that all
+the threads for vCPUs end up on the same kind of CPU (if you
+don't do that then you'll run into that problem once you try
+with the 'virt' board, probably as a "kvm_init_vcpu failed" error).
+
+thanks
+-- PMM
 
