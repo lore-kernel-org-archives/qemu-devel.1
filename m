@@ -2,65 +2,110 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65119C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:50:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73A7CC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:54:26 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9226B207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:49:59 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9226B207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bwidawsk.net
+	by mail.kernel.org (Postfix) with ESMTPS id B17EF20678
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:54:25 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gy5x2BeN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B17EF20678
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38138 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43584 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXREU-0006id-IE
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:49:58 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39662)
+	id 1kXRIm-0000mG-DI
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:54:24 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ben@bwidawsk.net>) id 1kXR9t-0003QI-4G
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:45:13 -0400
-Received: from zangief.bwidawsk.net ([107.170.211.233]:47104
- helo=mail.bwidawsk.net)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <ben@bwidawsk.net>) id 1kXR9r-0003vM-Hq
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:45:12 -0400
-Received: by mail.bwidawsk.net (Postfix, from userid 5001)
- id 35F5F123937; Tue, 27 Oct 2020 08:45:09 -0700 (PDT)
-Received: from mail.bwidawsk.net (c-73-37-61-164.hsd1.or.comcast.net
- [73.37.61.164])
- (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
- key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest
- SHA256) (Client did not present a certificate)
- by mail.bwidawsk.net (Postfix) with ESMTPSA id B32B6123936;
- Tue, 27 Oct 2020 08:45:06 -0700 (PDT)
-Date: Tue, 27 Oct 2020 08:45:05 -0700
-From: Ben Widawsky <ben@bwidawsk.net>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 2/2] acpi/crs: Support ranges > 32b for hosts
-Message-ID: <20201027154505.346awd3dicockef7@mail.bwidawsk.net>
-References: <20201026193924.985014-1-ben.widawsky@intel.com>
- <20201026193924.985014-2-ben.widawsky@intel.com>
- <20201027153612.35e9faac@redhat.com>
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXRI6-0000Cd-2b
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:53:42 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:29215)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXRI3-0005ID-9h
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:53:40 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603814017;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=moFCITaKKL5ruFzOiJoou+0zMEh3FTr2+PXXsLvylxw=;
+ b=Gy5x2BeNYauuH9f5TiA09Os+x9pTpACPHusdxpzYjw+7O1g/ZgdBeElv/TolvJRvBbJOB+
+ TKLZj5VcEBoFKc9yrWyn82HuHP8SLL7OVhvB2ml3z2eiIiDeXcpkrVZfcGzgM4a7fuami8
+ p8d1ZeKF/YXFE+rF9e2QP5WdlRB0U3I=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-385-Fq8WPWwNOWKuP_H7-kpIwQ-1; Tue, 27 Oct 2020 11:53:35 -0400
+X-MC-Unique: Fq8WPWwNOWKuP_H7-kpIwQ-1
+Received: by mail-ed1-f70.google.com with SMTP id y8so880903edj.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 08:53:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=moFCITaKKL5ruFzOiJoou+0zMEh3FTr2+PXXsLvylxw=;
+ b=Yr0wqlH1kN6WBsxfAT0R8kWtsw4N8ezZoi9Pta1rckQJdTQtoKsFMpwWpARCNEBOPx
+ cCIRixskFhLKqX9OmXD5sfuNsAdDicoUVQIhgSNWqteaXwsvu6bKWOwWoL+hELTAHj2t
+ Y0rmoHFy76lHk/PTSZK+Hcg3XAZJU0X8EFZi1nYk7r5wP4YrLsQnWX2W38gCEZmh96vS
+ DiT2DrtMfIzSqicbkq0+4rsEfZ/26wMN8+FYkAKxtXaG1EL3KIQWoCJLdrFCZRav1Rhx
+ KidxXEKM/CC2yvtz6BTWe459ZCazSUmlbJJoSrZ9dDwOGvsahRoa5V8VTIX6bm+zNcZo
+ 0h/Q==
+X-Gm-Message-State: AOAM531R+AAUyeMQqBpL+NEZuGWsLwQgBGWFY/KfHSheFNqNLkHpG2aU
+ kUS3GR2obsKvV5kt0PL8sBDl/DfGxluPeTL/YZHcbpGae6CFzd6S/Ev68Z6zMxcPCRdDVXzzz5v
+ PjSCJ9PI/WL9cs4U=
+X-Received: by 2002:a17:906:1189:: with SMTP id
+ n9mr3214760eja.190.1603814013948; 
+ Tue, 27 Oct 2020 08:53:33 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwBNX5x04uPQz6eS0Cj6TuZRKwAvhTySuErpUQPodtoArRjq6hXNgfQNgGhVpUcXOfBpLKh4g==
+X-Received: by 2002:a17:906:1189:: with SMTP id
+ n9mr3214738eja.190.1603814013726; 
+ Tue, 27 Oct 2020 08:53:33 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id p1sm1298543ejd.33.2020.10.27.08.53.32
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Tue, 27 Oct 2020 08:53:32 -0700 (PDT)
+Subject: Re: [PATCH 08/25] block/nvme: Simplify device reset
+To: Keith Busch <kbusch@kernel.org>
+References: <20201027135547.374946-1-philmd@redhat.com>
+ <20201027135547.374946-9-philmd@redhat.com>
+ <20201027145831.GC1942271@dhcp-10-100-145-180.wdc.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <1bb84312-1c78-7e1a-058b-4ff6330076b1@redhat.com>
+Date: Tue, 27 Oct 2020 16:53:31 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20201027153612.35e9faac@redhat.com>
-Received-SPF: none client-ip=107.170.211.233; envelope-from=ben@bwidawsk.net;
- helo=mail.bwidawsk.net
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 11:45:09
+In-Reply-To: <20201027145831.GC1942271@dhcp-10-100-145-180.wdc.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, KHOP_HELO_FCRDNS=0.4,
- SPF_HELO_NONE=0.001, SPF_NONE=0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -73,79 +118,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, mst@redhat.com, jusual@redhat.com,
- qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
- Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 20-10-27 15:36:12, Igor Mammedov wrote:
-> On Mon, 26 Oct 2020 12:39:24 -0700
-> Ben Widawsky <ben.widawsky@intel.com> wrote:
+On 10/27/20 3:58 PM, Keith Busch wrote:
+> On Tue, Oct 27, 2020 at 02:55:30PM +0100, Philippe Mathieu-Daudé wrote:
+>> Avoid multiple endianess conversion by using device endianess.
+>>
+>> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+>> ---
+>>  block/nvme.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/block/nvme.c b/block/nvme.c
+>> index e95d59d3126..be14350f959 100644
+>> --- a/block/nvme.c
+>> +++ b/block/nvme.c
+>> @@ -755,7 +755,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>>      timeout_ms = MIN(500 * NVME_CAP_TO(cap), 30000);
+>>  
+>>      /* Reset device to get a clean state. */
+>> -    regs->cc = cpu_to_le32(le32_to_cpu(regs->cc) & 0xFE);
+>> +    regs->cc &= const_le32(0xFE);
 > 
-> > According to PCIe spec 5.0 Type 1 header space Base Address Registers
-> > are defined by 7.5.1.2.1 Base Address Registers (same as Type 0). The
-> > _CRS region should allow for the same range (up to 64b). Prior to this
-> > change, any host bridge utilizing more than 32b for the BAR would have
-> > the address truncated and likely lead to conflicts when the operating
-> > systems reads the _CRS object.
-> > 
-> > Signed-off-by: Ben Widawsky <ben.widawsky@intel.com>
-> 
-> Looks good to me, so
-> 
-> Reviewed-by: Igor Mammedov <imammedo@redhat.com>
-> 
-> 
-> CCing,
-> Michael to have a send pair of eyes on it 
-> 
-> but I wonder how/why ivshm (which might have quite large BAR) works.
+> This doesn't look right. The 'regs' is an MMIO address, correct? Memory
+> mappings use the CPU native access.
 
-I think this will only hit things that subclass TYPE_PCI_HOST_BRIDGE. AFAICT,
-ivshm is a regular TYPE_PCI_DEVICE. Is there a _CRS created for ivshm?
+cc is little-endian uint32_t.
 
-> 
-> PS:
-> please use git's --cover-letter option to create multi-patch series,
-> in the future
+on big-endian: const_le32(0xFE) = 0xfe000000;
+so: regs->cc &= 0xfe000000.
 
-Will do. I wasn't sure what the cutoff was, but the wiki is pretty clear that
-"multiple" is the cutoff and it's important to CI.
-> 
-> > 
-> > ---
-> > I don't think this effects any code currently in QEMU. You'd need to
-> > have a host bridge which has a BAR, and that BAR wants to be > 32b. I've
-> > hit this because I have a modified PXB device that does advertise a 64b
-> > BAR. Also, you'd need a platform that cares about ACPI, which, many do
-> > not.
-> > ---
-> >  hw/i386/acpi-build.c | 10 ++++++++--
-> >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/hw/i386/acpi-build.c b/hw/i386/acpi-build.c
-> > index df13abecf4..75604bdc74 100644
-> > --- a/hw/i386/acpi-build.c
-> > +++ b/hw/i386/acpi-build.c
-> > @@ -789,8 +789,14 @@ static Aml *build_crs(PCIHostState *host, CrsRangeSet *range_set)
-> >                  crs_range_insert(temp_range_set.io_ranges,
-> >                                   range_base, range_limit);
-> >              } else { /* "memory" */
-> > -                crs_range_insert(temp_range_set.mem_ranges,
-> > -                                 range_base, range_limit);
-> > +                uint64_t length = range_limit - range_base + 1;
-> > +                if (range_limit <= UINT32_MAX && length <= UINT32_MAX) {
-> > +                    crs_range_insert(temp_range_set.mem_ranges, range_base,
-> > +                                     range_limit);
-> > +                } else {
-> > +                    crs_range_insert(temp_range_set.mem_64bit_ranges,
-> > +                                     range_base, range_limit);
-> > +                }
-> >              }
-> >          }
-> >  
-> 
-> 
+Anyway this is an example of unproductive patch, as it makes
+things more confuse to you. Let's ignore it.
+
 
