@@ -2,96 +2,92 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E353BC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1415DC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:12:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7F02920829
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:11:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 84CA620709
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:12:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gP2/ReJq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7F02920829
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fSiQaMMA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 84CA620709
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43668 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOkv-0002n0-Cl
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:11:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48938)
+	id 1kXOmJ-00045B-Jv
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:12:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52500)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kXOj2-0001Kf-Br
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:09:20 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:42375)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <david@redhat.com>) id 1kXOiz-00045i-VR
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:09:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603804157;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=OUpRSTVxyxlttb9u/NAhRjLMMqc5boby3PLv/IPdtVQ=;
- b=gP2/ReJqo69CMkEsjBrX3c+t8q8aAn6RPm4q1JsxQpNBS1zsAPrWNZM796l0kImPsjIrn9
- RILXndTssgIyL8J343NhL7h/0gYBaHsBRXNzwwlGfFHfPtxGoNxGmNtaYsFYT5Ajj9+6SK
- ymqcyGnSkYHgYgdMDrL+WlvBklcdEY4=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-576-rm6SHvXDNNmC8EgdiAXilA-1; Tue, 27 Oct 2020 09:09:14 -0400
-X-MC-Unique: rm6SHvXDNNmC8EgdiAXilA-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2620F18FE883
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:08:54 +0000 (UTC)
-Received: from [10.36.113.185] (ovpn-113-185.ams2.redhat.com [10.36.113.185])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9506F10013C0;
- Tue, 27 Oct 2020 13:08:49 +0000 (UTC)
-Subject: Re: [PATCH RFC] memory: pause all vCPUs for the duration of memory
- transactions
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, qemu-devel@nongnu.org
-References: <20201026084916.3103221-1-vkuznets@redhat.com>
- <294a987d-b0ef-1b58-98ac-0d4d43075d6e@redhat.com>
- <d7a20a33-0317-467e-6fc6-6528b3b46062@redhat.com>
- <87imav26d8.fsf@vitty.brq.redhat.com>
- <cb74d717-cfc1-a78b-cf80-eb8ebf1075fd@redhat.com>
- <87a6w72565.fsf@vitty.brq.redhat.com>
-From: David Hildenbrand <david@redhat.com>
-Organization: Red Hat GmbH
-Message-ID: <e1d85d86-fb2f-d2a8-77ea-1e0d48c8fb67@redhat.com>
-Date: Tue, 27 Oct 2020 14:08:48 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.6.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNQ0-00023Z-FM
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:36 -0400
+Received: from mail-wm1-x329.google.com ([2a00:1450:4864:20::329]:56030)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPu-0004lr-M0
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:36 -0400
+Received: by mail-wm1-x329.google.com with SMTP id a72so1055401wme.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=04ZiDCtkLCgfzieeRxOwIUVKHsPUc/VFMmrqtzjq3w0=;
+ b=fSiQaMMAJ/LYHSOXNy9jiwP9y+erAJqgIEw38N9ObR38YqHMAsO3OC+PrBpOCRrF+O
+ sQtjg+9xIuaYR6GbF0b7g8T/wQtqMhtxwq9RrEINoED+u54sAdr1ae8NbnUQw8J80Tzj
+ g0I2bYHMudISuovWAotEm74iQQ/j8CoRxqAfUznlDqmLo/D8BbC+Yi7POg4dA80+HeBw
+ YpL5PZWP5je+MGiIyN1C17+AH7UD+ooJdXabW/JRbEhrJRLncLdtYmXQYitJlvm4/U+I
+ mynKS5YVdiYfdwHiaSu8hdaoLlAy0ldNNzOgE8ZVoBg5VISd0xZvDFH6GL74I0XGaMvl
+ 29vQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=04ZiDCtkLCgfzieeRxOwIUVKHsPUc/VFMmrqtzjq3w0=;
+ b=bOonEGSNxhsPdUvwiyymg2cspdq9/TcJDGn08htQM6RNPeSUjqKKutvkmETjEo/vQf
+ kSFnL5oiHRaANF6BNdi+9b0WNVBK16Z85kynLtPd1p4TWpbLLq9NiKMgJuGAzMjgtzQC
+ zVLe6onzThAdA24l87cYOYdNstlPoHQo2RSW7Onotrnpw6c6SdIXYGkT3imt2JEbrG8y
+ wbqE/pirSYXtwQETxwmBFx6vMfPzQKTXIXusWhn4sTcY5J2rF5/GAKCX1zA4YZ0J+rSn
+ asKgNTYJ5R8a9KnBtdYhZKQLGkiSCK59om1jD/wNEZKzvUj/Z9387u6xLNPRA1/kFeTm
+ HoFQ==
+X-Gm-Message-State: AOAM5316Hc+xAagDRUF0aECvT58l+urGWb24nyXM/R4zZkH7Wr5T5UrN
+ 3wH4/5enoZmYwDBSiniMnmpBfTBwYuxRNA==
+X-Google-Smtp-Source: ABdhPJyNjisFmzlDCZiQzQZ/XIYu/ciUDvV+f/D7nhMJAeRbt8fJezcY/Gjy0XBq2egvkVabzO5zcA==
+X-Received: by 2002:a1c:980a:: with SMTP id a10mr363152wme.103.1603799128944; 
+ Tue, 27 Oct 2020 04:45:28 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.27
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 04:45:27 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 38/48] hw/misc/bcm2835_cprman: implement PLL channels behaviour
+Date: Tue, 27 Oct 2020 11:44:28 +0000
+Message-Id: <20201027114438.17662-39-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
+References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-In-Reply-To: <87a6w72565.fsf@vitty.brq.redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=david@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=david@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::329;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x329.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,175 +101,72 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.10.20 14:02, Vitaly Kuznetsov wrote:
-> David Hildenbrand <david@redhat.com> writes:
-> 
->> On 27.10.20 13:36, Vitaly Kuznetsov wrote:
->>> David Hildenbrand <david@redhat.com> writes:
->>>
->>>> On 26.10.20 11:43, David Hildenbrand wrote:
->>>>> On 26.10.20 09:49, Vitaly Kuznetsov wrote:
->>>>>> Currently, KVM doesn't provide an API to make atomic updates to memmap when
->>>>>> the change touches more than one memory slot, e.g. in case we'd like to
->>>>>> punch a hole in an existing slot.
->>>>>>
->>>>>> Reports are that multi-CPU Q35 VMs booted with OVMF sometimes print something
->>>>>> like
->>>>>>
->>>>>> !!!! X64 Exception Type - 0E(#PF - Page-Fault)  CPU Apic ID - 00000003 !!!!
->>>>>> ExceptionData - 0000000000000010  I:1 R:0 U:0 W:0 P:0 PK:0 SS:0 SGX:0
->>>>>> RIP  - 000000007E35FAB6, CS  - 0000000000000038, RFLAGS - 0000000000010006
->>>>>> RAX  - 0000000000000000, RCX - 000000007E3598F2, RDX - 00000000078BFBFF
->>>>>> ...
->>>>>>
->>>>>> The problem seems to be that TSEG manipulations on one vCPU are not atomic
->>>>>> from other vCPUs views. In particular, here's the strace:
->>>>>>
->>>>>> Initial creation of the 'problematic' slot:
->>>>>>
->>>>>> 10085 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
->>>>>>      memory_size=2146435072, userspace_addr=0x7fb89bf00000}) = 0
->>>>>>
->>>>>> ... and then the update (caused by e.g. mch_update_smram()) later:
->>>>>>
->>>>>> 10090 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
->>>>>>      memory_size=0, userspace_addr=0x7fb89bf00000}) = 0
->>>>>> 10090 ioctl(13, KVM_SET_USER_MEMORY_REGION, {slot=6, flags=0, guest_phys_addr=0x100000,
->>>>>>      memory_size=2129657856, userspace_addr=0x7fb89bf00000}) = 0
->>>>>>
->>>>>> In case KVM has to handle any event on a different vCPU in between these
->>>>>> two calls the #PF will get triggered.
->>>>>>
->>>>>> An ideal solution to the problem would probably require KVM to provide a
->>>>>> new API to do the whole transaction in one shot but as a band-aid we can
->>>>>> just pause all vCPUs to make memory transations atomic.
->>>>>>
->>>>>> Reported-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
->>>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->>>>>> ---
->>>>>> RFC: Generally, memap updates happen only a few times during guest boot but
->>>>>> I'm not sure there are no scenarios when pausing all vCPUs is undesireable
->>>>>> from performance point of view. Also, I'm not sure if kvm_enabled() check
->>>>>> is needed.
->>>>>> Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
->>>>>> ---
->>>>>>    softmmu/memory.c | 11 +++++++++--
->>>>>>    1 file changed, 9 insertions(+), 2 deletions(-)
->>>>>>
->>>>>> diff --git a/softmmu/memory.c b/softmmu/memory.c
->>>>>> index fa280a19f7f7..0bf6f3f6d5dc 100644
->>>>>> --- a/softmmu/memory.c
->>>>>> +++ b/softmmu/memory.c
->>>>>> @@ -28,6 +28,7 @@
->>>>>>    
->>>>>>    #include "exec/memory-internal.h"
->>>>>>    #include "exec/ram_addr.h"
->>>>>> +#include "sysemu/cpus.h"
->>>>>>    #include "sysemu/kvm.h"
->>>>>>    #include "sysemu/runstate.h"
->>>>>>    #include "sysemu/tcg.h"
->>>>>> @@ -1057,7 +1058,9 @@ static void address_space_update_topology(AddressSpace *as)
->>>>>>    void memory_region_transaction_begin(void)
->>>>>>    {
->>>>>>        qemu_flush_coalesced_mmio_buffer();
->>>>>> -    ++memory_region_transaction_depth;
->>>>>> +    if ((++memory_region_transaction_depth == 1) && kvm_enabled()) {
->>>>>> +        pause_all_vcpus();
->>>>>> +    }
->>>>>>    }
->>>>>>    
->>>>>>    void memory_region_transaction_commit(void)
->>>>>> @@ -1087,7 +1090,11 @@ void memory_region_transaction_commit(void)
->>>>>>                }
->>>>>>                ioeventfd_update_pending = false;
->>>>>>            }
->>>>>> -   }
->>>>>> +
->>>>>> +        if (kvm_enabled()) {
->>>>>> +            resume_all_vcpus();
->>>>>> +        }
->>>>>> +    }
->>>>>>    }
->>>>>>    
->>>>>>    static void memory_region_destructor_none(MemoryRegion *mr)
->>>>>>
->>>>>
->>>>> This is in general unsafe. pause_all_vcpus() will temporarily drop the
->>>>> BQL, resulting in bad things happening to caller sites.
->>>
->>> Oh, I see, thanks! I was expecting there's a reason we don't have this
->>> simple fix in already :-)
->>>
->>>>>
->>>>> I studies the involved issues quite intensively when wanting to resize
->>>>> memory regions from virtio-mem code. It's not that easy.
->>>>>
->>>>> Have a look at my RFC for resizing. You can apply something similar to
->>>>> other operations.
->>>>>
->>>>> https://www.mail-archive.com/qemu-devel@nongnu.org/msg684979.html
->>>>
->>>> Oh, and I even mentioned the case you try to fix here back then
->>>>
->>>> "
->>>> Instead of inhibiting during the region_resize(), we could inhibit for the
->>>> hole memory transaction (from begin() to commit()). This could be nice,
->>>> because also splitting of memory regions would be atomic (I remember there
->>>> was a BUG report regarding that), however, I am not sure if that might
->>>> impact any RT users.
->>>> "
->>>>
->>>> The current patches live in
->>>> https://github.com/davidhildenbrand/qemu/commits/virtio-mem-next
->>>>
->>>> Especially
->>>>
->>>> https://github.com/davidhildenbrand/qemu/commit/433fbb3abed20f15030e42f2b2bea7e6b9a15180
->>>>
->>>>
->>>
->>> I'm not sure why we're focusing on ioctls here. I was debugging my case
->>> quite some time ago but from what I remember it had nothing to do with
->>> ioctls from QEMU. When we are removing a memslot any exit to KVM may
->>> trigger an error condition as we'll see that vCPU or some of our
->>> internal structures (e.g. VMCS for a nested guest) references
->>> non-existent memory. I don't see a good solution other than making the
->>> update fully atomic from *all* vCPUs point of view and this requires
->>> stopping all CPUs -- either from QEMU or from KVM.
->>
->> I cannot follow. My patch waits until *any* KVM ioctls are out of the
->> kernel. That includes VCPUs, but also other ioctls (because there are
->> some that require a consistent memory block state).
->>
->> So from a KVM point of view, the CPUs are stopped.
-> 
-> Sorry for not being clear: your patch looks good to me, what I tried to
-> say is that with the current KVM API the only way to guarantee atomicity
-> of the update is to make vCPUs stop (one way or another), kicking them
-> out and preventing new IOCTLs from being dispatched is one way
-> (temporary pausing them inside KVM would be another, for example -- but
-> that would require *new* API supplying the whole transaction and not one
-> memslot update).
+From: Luc Michel <luc@lmichel.fr>
 
-Ah, got it.
+A PLL channel is able to further divide the generated PLL frequency.
+The divider is given in the CTRL_A2W register. Some channels have an
+additional fixed divider which is always applied to the signal.
 
-Yes - and I briefly looked into resizing slots inside KVM atomically and 
-it already turned out to be a major pain. All that metadata that's 
-allocated for a memory slot based on the size is problematic.
+Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Luc Michel <luc@lmichel.fr>
+Tested-by: Guenter Roeck <linux@roeck-us.net>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/misc/bcm2835_cprman.c | 33 ++++++++++++++++++++++++++++++++-
+ 1 file changed, 32 insertions(+), 1 deletion(-)
 
-Same applies to all other kinds of operations (splitting, punching out, 
-...) as you also mentioned.
-
+diff --git a/hw/misc/bcm2835_cprman.c b/hw/misc/bcm2835_cprman.c
+index 12fa78181b5..71c1d7b9e7b 100644
+--- a/hw/misc/bcm2835_cprman.c
++++ b/hw/misc/bcm2835_cprman.c
+@@ -134,9 +134,40 @@ static const TypeInfo cprman_pll_info = {
+ 
+ /* PLL channel */
+ 
++static bool pll_channel_is_enabled(CprmanPllChannelState *channel)
++{
++    /*
++     * XXX I'm not sure of the purpose of the LOAD field. The Linux driver does
++     * not set it when enabling the channel, but does clear it when disabling
++     * it.
++     */
++    return !FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DISABLE)
++        && !(*channel->reg_cm & channel->hold_mask);
++}
++
+ static void pll_channel_update(CprmanPllChannelState *channel)
+ {
+-    clock_update(channel->out, 0);
++    uint64_t freq, div;
++
++    if (!pll_channel_is_enabled(channel)) {
++        clock_update(channel->out, 0);
++        return;
++    }
++
++    div = FIELD_EX32(*channel->reg_a2w_ctrl, A2W_PLLx_CHANNELy, DIV);
++
++    if (!div) {
++        /*
++         * It seems that when the divider value is 0, it is considered as
++         * being maximum by the hardware (see the Linux driver).
++         */
++        div = R_A2W_PLLx_CHANNELy_DIV_MASK;
++    }
++
++    /* Some channels have an additional fixed divider */
++    freq = clock_get_hz(channel->pll_in) / (div * channel->fixed_divider);
++
++    clock_update_hz(channel->out, freq);
+ }
+ 
+ /* Update a PLL and all its channels */
 -- 
-Thanks,
-
-David / dhildenb
+2.20.1
 
 
