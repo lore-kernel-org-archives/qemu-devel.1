@@ -2,79 +2,80 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFD4C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:37:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4734FC55178
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:40:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0513120747
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:37:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C313722275
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:40:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TkGios9n"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0513120747
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WlZsysPH"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C313722275
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55094 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57478 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXYWV-0003uM-0Y
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 19:37:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47092)
+	id 1kXYZT-0004zw-QN
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 19:40:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47494)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXYVv-0003Ta-Mq
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:36:27 -0400
-Received: from mail-ed1-x52a.google.com ([2a00:1450:4864:20::52a]:35419)
+ id 1kXYYA-0004Rz-JU
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:38:46 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:39402)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXYVt-0005aD-RR
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:36:27 -0400
-Received: by mail-ed1-x52a.google.com with SMTP id w25so3254748edx.2
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 16:36:25 -0700 (PDT)
+ id 1kXYY8-0005u3-1q
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:38:46 -0400
+Received: by mail-ej1-x642.google.com with SMTP id bn26so4653862ejb.6
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 16:38:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc:content-transfer-encoding;
- bh=xPMVz+q1e5vxoZ3+ssDeKFQl6Dt1tfMddMg0/h5c+Jw=;
- b=TkGios9nU+zN+ixtVuNSagh9QlFiXwrWLGw369+BjuX5A6CPzWWk10EkAawRoUlij8
- ttnt0i/F2zFyhb0AoiWZ6ojGhVV0l/UchLR/C97K7DIA3zVHEJFGbakMGxN4kuhspSYp
- 5gU9QDrIo4Rip57LkFkU3VKtofD38XCI6K0l7YHF+RGoxZh6DTmeGj/BxJ6pdcoqzvCB
- bhsCPI9gv3m22MRdL8Ic7Q5LNxwx0T2iOnpeK/8/0gZqx+0kTBUzK+PAHjFOqXZVdXmU
- tb+fHSXfljfPF4fybUJqcTlFiSoaTIRVkuTGl/EqnDEECV7csOgkdBPO+WcJHCNDRNrd
- G0aw==
+ :cc; bh=5kaHV0Pg1L9fG8vBTEC9pxRQfu8xlom6xDAxH6720ng=;
+ b=WlZsysPHj16bwCqkztRcvGGc6jMIJw3MO65fLLvBLbCYh/Hk+EhPwscEdJh/eLXqXc
+ 3lYrfDXvfqKT/qM09Pnoxr/xqXW+32sVeHKAPu838TcO9YrUknggoip7paI+kpxi4AUj
+ V/GyObWUoygT/G3PFA5iko6gpfokQyXypzZzMiPoAQNi/qNP1CTikx3IEMaJ0elcoYEb
+ tshii2Jg58Gfnnts+gaFKv/+q5wkLDTsJjcsTG+T5T3YYFpAzln8mpshqDizQq9SwTIG
+ spHq4XZ/xdqfH35O4KCPQWWDzo6XYYsHAoFHnJmKJRJHmvZHUbE6DkXRn5Ii664P5h6N
+ 8Y7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc:content-transfer-encoding;
- bh=xPMVz+q1e5vxoZ3+ssDeKFQl6Dt1tfMddMg0/h5c+Jw=;
- b=gdKLpDIUK5sQj70sDVAiMLw5XsO+8K16OYc/2hSN3O67TurK6TH4OHhFnyD2W5KpWD
- QNnLI/ZnAtP5Jf2km13w7ALoH+bkCEWhTXdWtCJjpGA4t183fIInDDVtey9uExlgtFXM
- O7/uAnp/IdunW6UMfJiz/okkfmtdGJSTn6VZi+JGwHDGFeCsG6ZA06VytuXXPfIM8mmW
- T1tJz4sfrXFjA/CHArkqyRpHCizOqudeJLYie0zkEdFt46bFV/Rw6QVUvs5FkLvXRbvi
- TG2AY5pHOMFCl75Ni0IX5pPPAXwcVq0/9YzHWTWyMXCDobw1T7OcaDtZ8uk6lsIvMOBb
- QS1g==
-X-Gm-Message-State: AOAM533PVXRfLYkGwV72iY6qVCqhjnmA4YRr7KD3lCdmY5kHboiklBOV
- Cjap9rAaWE88X/XFwk34XR5gEnUpIeiEx8E9wA8VbQ==
-X-Google-Smtp-Source: ABdhPJwnFV6oKhBWC0VUqoW65bVPeeJVXbOhvks/GPQz6imde2yUx9Z98fkvl0mKIQYL5kF7kSMbay20GUIdWb6pXLU=
-X-Received: by 2002:a05:6402:1482:: with SMTP id
- e2mr5028295edv.36.1603841783919; 
- Tue, 27 Oct 2020 16:36:23 -0700 (PDT)
+ :message-id:subject:to:cc;
+ bh=5kaHV0Pg1L9fG8vBTEC9pxRQfu8xlom6xDAxH6720ng=;
+ b=dwckJ5ze9u6FxrUW8ElxlyXf7ccb+G4S/1C7FoAIlL6Mk2mFHAO8TOlfMY6vHWwNyV
+ tPXvtUbOxvh3wZ3PehQh83pZIsfpQSYxrFv65ySD71SN7fUtfphlk/XeIb/qAROVGcUb
+ ZuQ06qlmwM1uZawQuiIrZD9lwmu8EWevC/cD2GQ2pkU7zhlZQyOO9nyxjgxdTwlC0jkW
+ cf9LAhnY8sn4/nuWA+usFbcZEYLrdtuZcmtyCfeNHHYAt2e605ID3teEjioKuJ6gv9/f
+ VVemT/Xm9VfJSkj4J4Bz+B1WxYcHpSHAn/3a7Rr3YclstthJw2V4ObOqHfTgNzMkvdV5
+ GYLA==
+X-Gm-Message-State: AOAM531mTc1ET/DJGsfuhjXEyywh4w8EeR9FyGVZAxwRaHxjlELtiUWP
+ CwQeNXxtducu4fU5FPnNTMGg2Z+IX6SX8EhypLLKSg==
+X-Google-Smtp-Source: ABdhPJyzZLlzajYITpFAF3sp5wYGumCP2Hqh0Tb1qdy+EaXYWdqgp359J3YfctqxyaJV0ewSlBJ0RSI8XDTigJg+Xxc=
+X-Received: by 2002:a17:906:c7d9:: with SMTP id
+ dc25mr4846557ejb.482.1603841921787; 
+ Tue, 27 Oct 2020 16:38:41 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201026190726.19515-1-philmd@redhat.com>
-In-Reply-To: <20201026190726.19515-1-philmd@redhat.com>
+References: <20201026212853.92880-1-keithp@keithp.com>
+ <20201026212853.92880-2-keithp@keithp.com>
+ <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
+ <87pn53e3ke.fsf@keithp.com>
+In-Reply-To: <87pn53e3ke.fsf@keithp.com>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Oct 2020 23:36:12 +0000
-Message-ID: <CAFEAcA96_PaYnwO2qc-ONQZB6=JTUPzwkWKWU6UYg1uUk1ePoQ@mail.gmail.com>
-Subject: Re: [PULL 0/4] Acceptance testing patches for 2020-10-26
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>
+Date: Tue, 27 Oct 2020 23:38:30 +0000
+Message-ID: <CAFEAcA8Sha5QYbO25dtzBZHoXUeiGVv8aojPFTMrst8nbVDAdg@mail.gmail.com>
+Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
+ directories
+To: Keith Packard <keithp@keithp.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::52a;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x52a.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -83,7 +84,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -96,49 +97,41 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: QEMU Developers <qemu-devel@nongnu.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-arm <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 at 19:09, Philippe Mathieu-Daud=C3=A9 <philmd@redhat.co=
-m> wrote:
+On Tue, 27 Oct 2020 at 21:56, Keith Packard <keithp@keithp.com> wrote:
 >
-> The following changes since commit a46e72710566eea0f90f9c673a0f02da0064ac=
-ce:
+> Peter Maydell <peter.maydell@linaro.org> writes:
 >
->   Merge remote-tracking branch 'remotes/cohuck/tags/s390x-20201026' into =
-stag=3D
-> ing (2020-10-26 14:50:03 +0000)
+> >> +specific_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
+> >
+> > I think this adds this file to the compilation for all TCG targets;
+> > you only want it for targets which have Arm-semihosting-ABI compatible
+> > semihosting. (Various other targets either don't have semihosting
+> > or have their own ABI.)
 >
-> are available in the Git repository at:
+> Right. These should have been target-specific source sets so that the
+> file was only added to those targets:
 >
->   https://gitlab.com/philmd/qemu.git tags/acceptance-testing-20201026
+>         arm_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
+>         riscv_ss.add(files('common-semi.c'))
 >
-> for you to fetch changes up to 4c9ac67230d2d8c12bfc0f3447ae353e67b43f7f:
->
->   docs/devel/testing.rst: Update outdated Avocado URLs (2020-10-26 18:20:=
-51 +=3D
-> 0100)
->
-> ----------------------------------------------------------------
-> Acceptance testing patches
->
-> - More ARM tests
-> - Documentation update
->
-> CI jobs results:
-> . https://cirrus-ci.com/build/5754555684093952
-> . https://gitlab.com/philmd/qemu/-/pipelines/207807648
-> ----------------------------------------------------------------
+> This appears to work in my testing (building arm, risc-v and x86_64
+> configs).
 
+I'm not a kconfig expert but it might be preferable to have
+a new CONFIG_ for arm-semihosting-ABI which the relevant
+targets enable. Somebody else may be able to advise.
 
-Applied, thanks.
-
-Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
-for any user-visible changes.
-
+thanks
 -- PMM
 
