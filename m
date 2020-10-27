@@ -4,101 +4,63 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA0E5C55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:23:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C643DC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:23:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1858520780
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:23:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 216F020773
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:23:47 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i09TGiX4"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1858520780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="Pf8158Cp"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 216F020773
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33480 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPsh-0008Uc-57
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:23:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36594)
+	id 1kXPt4-0000Wo-1D
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:23:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42374)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPUI-0004Ok-Sg
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:58:10 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:26038)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPUG-0004Yf-Ux
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:58:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603807088;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=MB1ipRfRNkXChQukvt9rriPJxQdgZRtBkWvpvX32y+s=;
- b=i09TGiX4NSbuJUVVPjg2N5LRP0nOJDJBET+6K/eAYx1NnYddhbnG6PQfz9enKf5PQ+fLxR
- sFBE1h9C5rk66G6C1fMKmRW7io+BWnhRNjGov/qUlrGZtov2B0ENzMrLClaFjW9WbZpMti
- 4VJdKlqEMFcsvRAjCkZrNlWjXtiPK8c=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-507-iDl1o-UCPiCMwBQYZ9o06A-1; Tue, 27 Oct 2020 09:58:06 -0400
-X-MC-Unique: iDl1o-UCPiCMwBQYZ9o06A-1
-Received: by mail-ed1-f70.google.com with SMTP id t7so743222edt.0
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:58:06 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=MB1ipRfRNkXChQukvt9rriPJxQdgZRtBkWvpvX32y+s=;
- b=mrLcJul10dTVfLCP6/NkjvkG2OI8Nls/BEffFQm5nWhpIDtocM1NuBuQ5E35QcDd32
- IEOyKR1oDeqZE0/vtD/gCFzs9Kbix8IA+B6sGWR0CjxZVS2QZ+QS9p43mptWNdr9K8Ow
- RdTHnf6iOIRGvCKDXojEPSYDq6rUZpjdMItIxLQzZfIZFQR1WlAgk18XgzEmJsaP1qtW
- tpkrrSZ8UFKq4ION9I7S72/kGGzxun0oMZPyqGYnvM6Q8Zb57gL4qHJA+BjJCGHo03ZM
- ff2/+LNoWAeKNrtA+U2mu1yInzHNImHzayUDuSAlH7JgjSXEJfgnuu+AV6USqzWLolJG
- fvFQ==
-X-Gm-Message-State: AOAM530IXBgNYZ8M1K6DOLK+0cf3zLgeVN2jSwlF43dC4oFkw4UTiQ0f
- 6/BqygaWE3qPN265s7LS0QExLJuQVf/IGTHSsrTefP2Wq6g1LFqj2tURWKTe1/vmoWtHbPOeawP
- klBMO9dnQGRaEMqc=
-X-Received: by 2002:a17:906:d89:: with SMTP id m9mr2683050eji.18.1603807084941; 
- Tue, 27 Oct 2020 06:58:04 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJymVc4dVnOkyLbfsI+Fr2X1rcFLIDMM9dqqTlvJbktlhH+2ZQuRpkw8vcWq5D7Ppx2VxD6+VA==
-X-Received: by 2002:a17:906:d89:: with SMTP id m9mr2683032eji.18.1603807084740; 
- Tue, 27 Oct 2020 06:58:04 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id 11sm1084734ejy.19.2020.10.27.06.58.03
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 06:58:04 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH 25/25] block/nvme: Fix use of write-only doorbells page on
- Aarch64 arch
-Date: Tue, 27 Oct 2020 14:55:47 +0100
-Message-Id: <20201027135547.374946-26-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kXPnR-0001rh-Dp; Tue, 27 Oct 2020 10:18:00 -0400
+Received: from ozlabs.org ([203.11.71.1]:47281)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kXPnP-0007aC-Hx; Tue, 27 Oct 2020 10:17:57 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4CLDLd1KN8z9shh; Wed, 28 Oct 2020 01:17:45 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1603808265;
+ bh=Q3owrk20jMIlyNpF7GnocBDJgbDjYtAgDaW/I9KCRQ0=;
+ h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+ b=Pf8158CpbEU37dkZgFLFS0CUnMVhvNtPY3MgDqNJjcZHzh63ukCUIj9PVsgYkYd6c
+ 3/qwhMn5OUx3fXU7qsDJ72qD9364yWlIE4uEVcNQuYhHQFs8fcFNlGyTOk9gg7vo7u
+ E6nHePCrU2naTYHrmKTnuOXkDADg7DWLJQoVlQhs=
+From: David Gibson <david@gibson.dropbear.id.au>
+To: peter.maydell@linaro.org
+Subject: [PULL 06/18] spapr: Unrealize vCPUs with qdev_unrealize()
+Date: Wed, 28 Oct 2020 01:17:23 +1100
+Message-Id: <20201027141735.728821-7-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201027135547.374946-1-philmd@redhat.com>
-References: <20201027135547.374946-1-philmd@redhat.com>
+In-Reply-To: <20201027141735.728821-1-david@gibson.dropbear.id.au>
+References: <20201027141735.728821-1-david@gibson.dropbear.id.au>
 MIME-Version: 1.0
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 10:17:43
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -111,68 +73,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: David Gibson <david@gibson.dropbear.id.au>, qemu-ppc@nongnu.org,
+ qemu-devel@nongnu.org, groug@kaod.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-qemu_vfio_pci_map_bar() calls mmap(), and mmap(2) states:
+From: Greg Kurz <groug@kaod.org>
 
-  'offset' must be a multiple of the page size as returned
-   by sysconf(_SC_PAGE_SIZE).
+Since we introduced CPU hot-unplug in sPAPR, we don't unrealize the
+vCPU objects explicitly. Instead, we let QOM handle that for us under
+object_property_del_all() when the CPU core object is finalized. The
+only thing we do is calling cpu_remove_sync() to tear the vCPU thread
+down.
 
-In commit f68453237b9 we started to use an offset of 4K which
-broke this contract on Aarch64 arch.
+This happens to work but it is ugly because:
+- we call qdev_realize() but the corresponding qdev_unrealize() is
+  buried deep in the QOM code
+- we call cpu_remove_sync() to undo qemu_init_vcpu() called by
+  ppc_cpu_realize() in target/ppc/translate_init.c.inc
+- the CPU init and teardown paths aren't really symmetrical
 
-Fix by mapping at offset 0, and and accessing doorbells at offset=4K.
+The latter didn't bite us so far but a future patch that greatly
+simplifies the CPU core realize path needs it to avoid a crash
+in QOM.
 
-Fixes: f68453237b9 ("block/nvme: Map doorbells pages write-only")
-Reported-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+For all these reasons, have ppc_cpu_unrealize() to undo the changes
+of ppc_cpu_realize() by calling cpu_remove_sync() at the right place,
+and have the sPAPR CPU core code to call qdev_unrealize().
+
+This requires to add a missing stub because translate_init.c.inc is
+also compiled for user mode.
+
+Signed-off-by: Greg Kurz <groug@kaod.org>
+Message-Id: <160279671236.1808373.14732005038172874990.stgit@bahia.lan>
+Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- block/nvme.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ accel/tcg/user-exec-stub.c      | 4 ++++
+ hw/ppc/spapr_cpu_core.c         | 4 ++--
+ target/ppc/translate_init.c.inc | 2 ++
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/block/nvme.c b/block/nvme.c
-index c1c52bae44f..ff645eefe6a 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -94,6 +94,7 @@ typedef struct {
- struct BDRVNVMeState {
-     AioContext *aio_context;
-     QEMUVFIOState *vfio;
-+    void *bar0_wo_map;
-     /* Memory mapped registers */
-     volatile struct {
-         uint32_t sq_tail;
-@@ -778,8 +779,10 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-         }
+diff --git a/accel/tcg/user-exec-stub.c b/accel/tcg/user-exec-stub.c
+index f6d8c8fb6f..b876f5c1e4 100644
+--- a/accel/tcg/user-exec-stub.c
++++ b/accel/tcg/user-exec-stub.c
+@@ -9,6 +9,10 @@ void cpu_resume(CPUState *cpu)
+ {
+ }
+ 
++void cpu_remove_sync(CPUState *cpu)
++{
++}
++
+ void qemu_init_vcpu(CPUState *cpu)
+ {
+ }
+diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
+index c552112145..e4aeb93c02 100644
+--- a/hw/ppc/spapr_cpu_core.c
++++ b/hw/ppc/spapr_cpu_core.c
+@@ -187,7 +187,7 @@ static void spapr_unrealize_vcpu(PowerPCCPU *cpu, SpaprCpuCore *sc)
+         vmstate_unregister(NULL, &vmstate_spapr_cpu_state, cpu->machine_data);
+     }
+     spapr_irq_cpu_intc_destroy(SPAPR_MACHINE(qdev_get_machine()), cpu);
+-    cpu_remove_sync(CPU(cpu));
++    qdev_unrealize(DEVICE(cpu));
+ }
+ 
+ /*
+@@ -255,7 +255,7 @@ static bool spapr_realize_vcpu(PowerPCCPU *cpu, SpaprMachineState *spapr,
+     kvmppc_set_papr(cpu);
+ 
+     if (spapr_irq_cpu_intc_create(spapr, cpu, errp) < 0) {
+-        cpu_remove_sync(CPU(cpu));
++        qdev_unrealize(DEVICE(cpu));
+         return false;
      }
  
--    s->doorbells = qemu_vfio_pci_map_bar(s->vfio, 0, sizeof(NvmeBar),
--                                         NVME_DOORBELL_SIZE, PROT_WRITE, errp);
-+    s->bar0_wo_map = qemu_vfio_pci_map_bar(s->vfio, 0, 0,
-+                                           sizeof(NvmeBar) + NVME_DOORBELL_SIZE,
-+                                           PROT_WRITE, errp);
-+    s->doorbells = (void *)((uintptr_t)s->bar0_wo_map + sizeof(NvmeBar));
-     if (!s->doorbells) {
-         ret = -EINVAL;
-         goto out;
-@@ -913,8 +916,8 @@ static void nvme_close(BlockDriverState *bs)
-                            &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
-                            false, NULL, NULL);
-     event_notifier_cleanup(&s->irq_notifier[MSIX_SHARED_IRQ_IDX]);
--    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->doorbells,
--                            sizeof(NvmeBar), NVME_DOORBELL_SIZE);
-+    qemu_vfio_pci_unmap_bar(s->vfio, 0, s->bar0_wo_map,
-+                            0, sizeof(NvmeBar) + NVME_DOORBELL_SIZE);
-     qemu_vfio_close(s->vfio);
+diff --git a/target/ppc/translate_init.c.inc b/target/ppc/translate_init.c.inc
+index bb66526280..d2a8204d60 100644
+--- a/target/ppc/translate_init.c.inc
++++ b/target/ppc/translate_init.c.inc
+@@ -10328,6 +10328,8 @@ static void ppc_cpu_unrealize(DeviceState *dev)
  
-     g_free(s->device);
+     pcc->parent_unrealize(dev);
+ 
++    cpu_remove_sync(CPU(cpu));
++
+     for (i = 0; i < PPC_CPU_OPCODES_LEN; i++) {
+         if (cpu->opcodes[i] == &invalid_handler) {
+             continue;
 -- 
 2.26.2
 
