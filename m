@@ -7,79 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 482ADC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D9CC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:25:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8CCD922447
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:25:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id ABD5622447
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:25:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="n0Zbg1pP"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8CCD922447
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VMxeyaQf"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org ABD5622447
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49082 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXO2k-0006FP-CA
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:25:38 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51686)
+	id 1kXO2u-0006ZZ-Pl
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:25:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51424)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPU-0001Jg-Rn
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:08 -0400
-Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:41488)
+ id 1kXNPG-0001BD-Tw
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:44:55 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:39774)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPM-0004Rh-V7
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:04 -0400
-Received: by mail-wr1-x442.google.com with SMTP id s9so1514300wro.8
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:44:51 -0700 (PDT)
+ id 1kXNPA-0004OM-FX
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:44:48 -0400
+Received: by mail-wm1-x330.google.com with SMTP id d3so1100831wma.4
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=RY/0B+cKSExVBa12aB38/wtYaK4XDoU9+twlxCjIWS8=;
- b=n0Zbg1pP3t50ZKg4KnGW8JY+wCB+LFZLiZlCF0slJ5KvlK5bcOHUEw9aei0w1igQTs
- BTyOInn/469ysYr5Cq/hYQOM/saG//cb3BDMTXDCMHCbnImLGTHM3xynSKiNAXkDNs2t
- Ty3U/RQU14sLfd7xEqKToCZCv7daCAFiEazoLEYZVvmMtY9RrUBAFylXjfE7rPJl2sk2
- +V3wg0VBlqatAqrJuZPN6tufcDPeD58J772WQS9BKZINOW3F2Sv8q/7GXYx27j3VC96b
- JrS9AnmUCTGo95fRdCbw9+kWy0nJzLtBH+5BdRvHVeCGpWGhdQT3aktZMvJBxeL1q5ix
- IT7Q==
+ bh=iTvc3T70pvdWTHtlfKDHy8YrwyuK0oy3wEHmDLwdEtk=;
+ b=VMxeyaQfzXVNlvzc+YS68zACmnDQ3ktx72vQTzuYrDaNzbRQUxydJoZpMXqiO95h3r
+ tKPZdqJVi5cD2SFw2n6qpIJhXs2D1tiCOPDB5WSvGNTYyeROybEht1TO09rcVMdoFad+
+ wmeFjd+kO69L2ZFF7hrSmY/nnfbBc7D+Ihctc59q/ZsOrI/eCRGLySCN9jKkbbTprtWK
+ W46R3YYuSQrz70G+6vaLpgY/qSV6PWI5zF6FSWcDCJg910/f2rXf2knd5f1+MaM2VITh
+ pqy8QxEm4ET/G/AuyMh+AyoveraukH/D9Lg4rB++8aaf8yyJIEuBNxiDH1gocEm5+1lh
+ qVxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=RY/0B+cKSExVBa12aB38/wtYaK4XDoU9+twlxCjIWS8=;
- b=PwodCfKzDsb7XaBeyKl/YMfH544hrEkgKUk6JfQNPIuOB9A2Kq4/KKEEu4w8I3VNkU
- OyJWfl74ElVQ7VejbFwrYKVrzQd2+F6rUPko5UOHbKlqNn11reBEH5bPpC6QzQ98+Csj
- NekR0q+mez+97USZReUZ9Ga7e8JhWaBUk5YsSNxuEdinB/9WyUa3WInZ24kUMKxTi5a4
- F0g19hsDvvQhvrFwLPKDPm3HQYvVPjCmKiwqP9+HWp66uJscy2KylRbWQmRDRGUFKqGr
- tqNql6cPt5DdjQXW0VTTHbJsawQKGPD/vFsoIVoGHVvAIHUwduR0cn6onT0BxX788rjD
- VMDw==
-X-Gm-Message-State: AOAM532uGPiHuawtMJtYw7WGNoLCeyC1FIkDwYe7CrID/xb+VNkgU0pY
- WD9//DKPqxZqS9SwFElt8cqqV6lVdO765g==
-X-Google-Smtp-Source: ABdhPJwU27afmNbV+UFFWlNiyu4wAhB7TxaGCGwIHeOG88OxHi5skcduw8KIwNKucn6d3QO6fmmVQA==
-X-Received: by 2002:adf:fc8b:: with SMTP id g11mr2415107wrr.300.1603799090335; 
- Tue, 27 Oct 2020 04:44:50 -0700 (PDT)
+ bh=iTvc3T70pvdWTHtlfKDHy8YrwyuK0oy3wEHmDLwdEtk=;
+ b=kwM2ire+hHwhZCcJFY/YJmocMu9r0iz2Dkjj2UKRQihgHt8hjs7PcTHaK+Rw1m86Cy
+ lsZwl6+lT7IZrZ8AyuwCYT8ZNikkCigWEM2XCwQy3fxXec8rKitm0RhMphBdVXKemf/b
+ 6WOGjElBvmiY1bw7ZjRNV3gnTntv9kB/JA2Gjr9uKMPlFjxw3tFqQ3/FsudTP39rRU/S
+ hW60UJne+6OFlaVc/yuL4Z3IUzilnPnHNXlaqj8KsbQ8em6AkVhlkb7Wk78waiJ2SB9I
+ Np+/g92oxmoVW0Uw3RgjBFWEV4U/XgdU8i2ci3xBzfSOcXc68MarRRghFt57nD1DpDpZ
+ N1Gg==
+X-Gm-Message-State: AOAM530eCxdc2VZoS0XuKz8Oj2TovO35zIIpfbYOyvkasVUNI9YQrJ+X
+ SrYuIzycIHz0CPiZkJLSWFgvPb5f1G+jJA==
+X-Google-Smtp-Source: ABdhPJyDBi6pK2J7hOZjIDLLLC56owkJnXWGdpLsxBlp0hzjqrz06rOBW2msrEHIKJnvixS+r0Rdmg==
+X-Received: by 2002:a7b:c387:: with SMTP id s7mr2266671wmj.52.1603799081931;
+ Tue, 27 Oct 2020 04:44:41 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.49
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.41
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:44:49 -0700 (PDT)
+ Tue, 27 Oct 2020 04:44:41 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 07/48] linux-user/elfload: Move PT_INTERP detection to first
- loop
-Date: Tue, 27 Oct 2020 11:43:57 +0000
-Message-Id: <20201027114438.17662-8-peter.maydell@linaro.org>
+Subject: [PULL 01/48] linux-user/aarch64: Reset btype for signals
+Date: Tue, 27 Oct 2020 11:43:51 +0000
+Message-Id: <20201027114438.17662-2-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
 References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::442;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x442.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::330;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,102 +106,39 @@ Sender: "Qemu-devel"
 
 From: Richard Henderson <richard.henderson@linaro.org>
 
-For BTI, we need to know if the executable is static or dynamic,
-which means looking for PT_INTERP earlier.
+The kernel sets btype for the signal handler as if for a call.
 
-Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
-Message-id: 20201021173749.111103-8-richard.henderson@linaro.org
 Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201021173749.111103-2-richard.henderson@linaro.org
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- linux-user/elfload.c | 60 +++++++++++++++++++++++---------------------
- 1 file changed, 31 insertions(+), 29 deletions(-)
+ linux-user/aarch64/signal.c | 10 ++++++++--
+ 1 file changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/linux-user/elfload.c b/linux-user/elfload.c
-index 210592aa90a..107a628a9ee 100644
---- a/linux-user/elfload.c
-+++ b/linux-user/elfload.c
-@@ -2421,8 +2421,10 @@ static void load_elf_image(const char *image_name, int image_fd,
- 
-     mmap_lock();
- 
--    /* Find the maximum size of the image and allocate an appropriate
--       amount of memory to handle that.  */
-+    /*
-+     * Find the maximum size of the image and allocate an appropriate
-+     * amount of memory to handle that.  Locate the interpreter, if any.
-+     */
-     loaddr = -1, hiaddr = 0;
-     info->alignment = 0;
-     for (i = 0; i < ehdr->e_phnum; ++i) {
-@@ -2438,6 +2440,33 @@ static void load_elf_image(const char *image_name, int image_fd,
-             }
-             ++info->nsegs;
-             info->alignment |= eppnt->p_align;
-+        } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
-+            g_autofree char *interp_name = NULL;
-+
-+            if (*pinterp_name) {
-+                errmsg = "Multiple PT_INTERP entries";
-+                goto exit_errmsg;
-+            }
-+            interp_name = g_malloc(eppnt->p_filesz);
-+            if (!interp_name) {
-+                goto exit_perror;
-+            }
-+
-+            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
-+                memcpy(interp_name, bprm_buf + eppnt->p_offset,
-+                       eppnt->p_filesz);
-+            } else {
-+                retval = pread(image_fd, interp_name, eppnt->p_filesz,
-+                               eppnt->p_offset);
-+                if (retval != eppnt->p_filesz) {
-+                    goto exit_perror;
-+                }
-+            }
-+            if (interp_name[eppnt->p_filesz - 1] != 0) {
-+                errmsg = "Invalid PT_INTERP entry";
-+                goto exit_errmsg;
-+            }
-+            *pinterp_name = g_steal_pointer(&interp_name);
-         }
+diff --git a/linux-user/aarch64/signal.c b/linux-user/aarch64/signal.c
+index d50c1ae5838..b591790c22e 100644
+--- a/linux-user/aarch64/signal.c
++++ b/linux-user/aarch64/signal.c
+@@ -506,10 +506,16 @@ static void target_setup_frame(int usig, struct target_sigaction *ka,
+             + offsetof(struct target_rt_frame_record, tramp);
      }
- 
-@@ -2590,33 +2619,6 @@ static void load_elf_image(const char *image_name, int image_fd,
-             if (vaddr_em > info->brk) {
-                 info->brk = vaddr_em;
-             }
--        } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
--            g_autofree char *interp_name = NULL;
--
--            if (*pinterp_name) {
--                errmsg = "Multiple PT_INTERP entries";
--                goto exit_errmsg;
--            }
--            interp_name = g_malloc(eppnt->p_filesz);
--            if (!interp_name) {
--                goto exit_perror;
--            }
--
--            if (eppnt->p_offset + eppnt->p_filesz <= BPRM_BUF_SIZE) {
--                memcpy(interp_name, bprm_buf + eppnt->p_offset,
--                       eppnt->p_filesz);
--            } else {
--                retval = pread(image_fd, interp_name, eppnt->p_filesz,
--                               eppnt->p_offset);
--                if (retval != eppnt->p_filesz) {
--                    goto exit_perror;
--                }
--            }
--            if (interp_name[eppnt->p_filesz - 1] != 0) {
--                errmsg = "Invalid PT_INTERP entry";
--                goto exit_errmsg;
--            }
--            *pinterp_name = g_steal_pointer(&interp_name);
- #ifdef TARGET_MIPS
-         } else if (eppnt->p_type == PT_MIPS_ABIFLAGS) {
-             Mips_elf_abiflags_v0 abiflags;
+     env->xregs[0] = usig;
+-    env->xregs[31] = frame_addr;
+     env->xregs[29] = frame_addr + fr_ofs;
+-    env->pc = ka->_sa_handler;
+     env->xregs[30] = return_addr;
++    env->xregs[31] = frame_addr;
++    env->pc = ka->_sa_handler;
++
++    /* Invoke the signal handler as if by indirect call.  */
++    if (cpu_isar_feature(aa64_bti, env_archcpu(env))) {
++        env->btype = 2;
++    }
++
+     if (info) {
+         tswap_siginfo(&frame->info, info);
+         env->xregs[1] = frame_addr + offsetof(struct target_rt_sigframe, info);
 -- 
 2.20.1
 
