@@ -7,83 +7,83 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7761AC55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 009EDC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:28:37 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 23EE22068E
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:26:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 71288206C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:28:36 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WqXM15sc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 23EE22068E
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G5lwmErN"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 71288206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59788 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39622 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXTg8-0000c9-56
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:26:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57846)
+	id 1kXThz-0003sx-At
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:28:35 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57790)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbj-0004Bf-LW
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:07 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:34958)
+ id 1kXTbh-00048T-C1
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:05 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35767)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbf-0002zs-9E
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:07 -0400
+ id 1kXTbe-0002zJ-MO
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603822922;
+ s=mimecast20190719; t=1603822921;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZdndMIdOYYEdSMnjBJRZlMR5v2AgTI3zsIRusut3b5Q=;
- b=WqXM15scmH0uycVC53e/QWu+JnBInLo3g2wiI9x28Ee8HvkMPTU4qRCtkcmGqOu9hn5yOk
- nZtFSj3qs1S61EYw7DayysgUTh5ciHpbLZyMm8va3q8emubDJyy4wSHndYFVgiFR2Brfro
- wnePofmTLiCoQHA7pbbzw3QoxDW6bk4=
+ bh=KLOyY5nlhA/QMXQpEmCW+Ixxk1BQnwpfB2ckOpD3XMM=;
+ b=G5lwmErNMGXaoIc+wz/GUBqeTHyg45+B6bGLWzw1NGUTdCUGfRbCCz9HoJhIIcFJT9egmW
+ LcTPIV+cl8TlS0GGQ/lUpZnhKKPwO0AjuGEX/NrdzoHghFgwOwSOoYerpctHkumXOE0HsA
+ IRF7lh89zHDpDlj7xP99y9Jjtw9vou4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-417-hW4ipLfUOGmwBlpKNLHjRQ-1; Tue, 27 Oct 2020 14:21:59 -0400
-X-MC-Unique: hW4ipLfUOGmwBlpKNLHjRQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-592-Jj9XHnDONNKeS7GakmIpCg-1; Tue, 27 Oct 2020 14:21:59 -0400
+X-MC-Unique: Jj9XHnDONNKeS7GakmIpCg-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 723D8107465E
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:49 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 20C60106BB36
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:47 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1DE1F5D9F1
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DA2AE60C07
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:46 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 11/29] vl: extract various command line desugaring snippets to
- a new function
-Date: Tue, 27 Oct 2020 14:21:26 -0400
-Message-Id: <20201027182144.3315885-12-pbonzini@redhat.com>
+Subject: [PATCH 06/29] vl: move various initialization routines out of
+ qemu_init
+Date: Tue, 27 Oct 2020 14:21:21 -0400
+Message-Id: <20201027182144.3315885-7-pbonzini@redhat.com>
 In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
 References: <20201027182144.3315885-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,111 +101,106 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Some very simple initialization routines can be nested in existing
+subsystem-level functions, do that to simplify qemu_init.
+
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 40 ++++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 18 deletions(-)
+ hw/core/machine.c      | 3 +++
+ include/hw/qdev-core.h | 8 --------
+ migration/migration.c  | 4 ++++
+ softmmu/qdev-monitor.c | 6 ------
+ softmmu/vl.c           | 5 -----
+ 5 files changed, 7 insertions(+), 19 deletions(-)
 
-diff --git a/softmmu/vl.c b/softmmu/vl.c
-index c2a5ee61f9..6749109b29 100644
---- a/softmmu/vl.c
-+++ b/softmmu/vl.c
-@@ -126,6 +126,7 @@ static const char *boot_once;
- static const char *incoming;
- static const char *loadvm;
- enum vga_retrace_method vga_retrace_method = VGA_RETRACE_DUMB;
-+int mem_prealloc; /* force preallocation of physical target memory */
- int display_opengl;
- const char* keyboard_layout = NULL;
- ram_addr_t ram_size;
-@@ -159,7 +160,7 @@ int fd_bootchk = 1;
- static int no_reboot;
- int no_shutdown = 0;
- int graphic_rotate = 0;
--const char *watchdog;
-+static const char *watchdog;
- QEMUOptionRom option_rom[MAX_OPTION_ROMS];
- int nb_option_roms;
- int old_param = 0;
-@@ -2910,6 +2911,25 @@ static void qemu_validate_options(void)
- #endif
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index baea4e8613..d84b84463c 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -872,6 +872,9 @@ static void machine_initfn(Object *obj)
+     MachineState *ms = MACHINE(obj);
+     MachineClass *mc = MACHINE_GET_CLASS(obj);
+ 
++    container_get(obj, "/peripheral");
++    container_get(obj, "/peripheral-anon");
++
+     ms->dump_guest_core = true;
+     ms->mem_merge = true;
+     ms->enable_graphics = true;
+diff --git a/include/hw/qdev-core.h b/include/hw/qdev-core.h
+index 868973319e..56ce7f2d7f 100644
+--- a/include/hw/qdev-core.h
++++ b/include/hw/qdev-core.h
+@@ -769,14 +769,6 @@ BusState *sysbus_get_default(void);
+ char *qdev_get_fw_dev_path(DeviceState *dev);
+ char *qdev_get_own_fw_dev_path_from_handler(BusState *bus, DeviceState *dev);
+ 
+-/**
+- * @qdev_machine_init
+- *
+- * Initialize platform devices before machine init.  This is a hack until full
+- * support for composition is added.
+- */
+-void qdev_machine_init(void);
+-
+ /**
+  * device_legacy_reset:
+  *
+diff --git a/migration/migration.c b/migration/migration.c
+index deb6005b8d..f48b03cac2 100644
+--- a/migration/migration.c
++++ b/migration/migration.c
+@@ -169,6 +169,10 @@ void migration_object_init(void)
+         error_report_err(err);
+         exit(1);
+     }
++
++    blk_mig_init();
++    ram_mig_init();
++    dirty_bitmap_mig_init();
  }
  
-+static void qemu_process_sugar_options(void)
-+{
-+    if (mem_prealloc) {
-+        char *val;
-+
-+        val = g_strdup_printf("%d",
-+                 (uint32_t) qemu_opt_get_number(qemu_find_opts_singleton("smp-opts"), "cpus", 1));
-+        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
-+        g_free(val);
-+        object_register_sugar_prop("memory-backend", "prealloc", "on");
-+    }
-+
-+    if (watchdog) {
-+        int i = select_watchdog(watchdog);
-+        if (i > 0)
-+            exit (i == 1 ? 1 : 0);
-+    }
-+}
-+
- static void qemu_process_early_options(void)
- {
-     char **dirs;
-@@ -3174,7 +3194,6 @@ static void qemu_machine_creation_done(void)
+ void migration_shutdown(void)
+diff --git a/softmmu/qdev-monitor.c b/softmmu/qdev-monitor.c
+index bcfb90a08f..bcfcbac181 100644
+--- a/softmmu/qdev-monitor.c
++++ b/softmmu/qdev-monitor.c
+@@ -943,12 +943,6 @@ BlockBackend *blk_by_qdev_id(const char *id, Error **errp)
+     return blk;
+ }
  
- void qemu_init(int argc, char **argv, char **envp)
- {
--    int i;
-     int snapshot = 0;
-     QemuOpts *opts, *machine_opts;
-     QemuOpts *icount_opts = NULL, *accel_opts = NULL;
-@@ -3193,7 +3212,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     bool have_custom_ram_size;
-     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-     QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
--    int mem_prealloc = 0; /* force preallocation of physical target memory */
- 
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
-@@ -4104,6 +4122,7 @@ void qemu_init(int argc, char **argv, char **envp)
-     loc_set_none();
- 
-     qemu_validate_options();
-+    qemu_process_sugar_options();
- 
-     /* These options affect everything else and should be processed
-      * before daemonizing.
-@@ -4155,15 +4174,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     machine_smp_parse(current_machine,
-         qemu_opts_find(qemu_find_opts("smp-opts"), NULL), &error_fatal);
- 
--    if (mem_prealloc) {
--        char *val;
+-void qdev_machine_init(void)
+-{
+-    qdev_get_peripheral_anon();
+-    qdev_get_peripheral();
+-}
 -
--        val = g_strdup_printf("%d", current_machine->smp.cpus);
--        object_register_sugar_prop("memory-backend", "prealloc-threads", val);
--        g_free(val);
--        object_register_sugar_prop("memory-backend", "prealloc", "on");
--    }
--
-     /*
-      * Get the default machine options from the machine if it is not already
-      * specified either by the configuration file or by the command line.
-@@ -4422,12 +4432,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         select_vgahw(machine_class, vga_model);
+ QemuOptsList qemu_device_opts = {
+     .name = "device",
+     .implied_opt_name = "driver",
+diff --git a/softmmu/vl.c b/softmmu/vl.c
+index 32880616e2..b05340802a 100644
+--- a/softmmu/vl.c
++++ b/softmmu/vl.c
+@@ -4275,10 +4275,6 @@ void qemu_init(int argc, char **argv, char **envp)
+         exit(1);
      }
  
--    if (watchdog) {
--        i = select_watchdog(watchdog);
--        if (i > 0)
--            exit (i == 1 ? 1 : 0);
--    }
+-    blk_mig_init();
+-    ram_mig_init();
+-    dirty_bitmap_mig_init();
 -
-     /* This checkpoint is required by replay to separate prior clock
+     qemu_opts_foreach(qemu_find_opts("mon"),
+                       mon_init_func, NULL, &error_fatal);
+ 
+@@ -4311,7 +4307,6 @@ void qemu_init(int argc, char **argv, char **envp)
         reading from the other reads, because timer polling functions query
         clock values from the log. */
+     replay_checkpoint(CHECKPOINT_INIT);
+-    qdev_machine_init();
+ 
+     current_machine->boot_order = boot_order;
+ 
 -- 
 2.26.2
 
