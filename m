@@ -7,66 +7,66 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 846F2C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:38:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 201FDC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:39:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1183320760
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:38:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9B0F420760
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:39:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Itu4kLz0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1183320760
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fe2xs172"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9B0F420760
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38702 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43566 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXTrh-0006xY-2H
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:38:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57808)
+	id 1kXTsb-0000Uf-Jf
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:39:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58048)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbi-00049a-0d
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:06 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60463)
+ id 1kXTby-0004GN-7L
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:49916)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbf-0002zk-2E
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:05 -0400
+ id 1kXTbp-00032I-Uq
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603822922;
+ s=mimecast20190719; t=1603822926;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=r07Z7SVldrBHmSG5kW/KBiuQ+QHUsQmr1p8Jz7fA1qc=;
- b=Itu4kLz02Ck54Q1eL5ZXv14OENC0J29Bu2EF7iIAL9Z5q5cD6ufJlOCYnIYVgYMZ/pkiHA
- VXNpk731EglIQnSliRZjR73FA8lO6cpGV80rkj5kijxaGkN0MaiDwwwOS5pxU+63r/GHQg
- CNAMgqaDKvAp8ECUACA6F6d6GrXnG2s=
+ bh=Up+gosc1jXTvnOZXsQKT0Wdpdzi58kR6SkUZKts8wVk=;
+ b=Fe2xs172lh9AL3ZjKgyFV8eOtZ7ZSEvSjNxuP0O8RAAc4KIgKISrwoufpw5PNqWEhB8l2O
+ jIGMKsZt21O9Ut5lNfuXfL53IHyllzuI2x1PcsLrLqg/FNlkRvIpGWJnrDfrhSii7jPgCb
+ pNpFbl49GYjF/1anzY3VEH0mNJbUC8w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-529-3sDNGJY3MH60j-hVZPOzIA-1; Tue, 27 Oct 2020 14:21:59 -0400
-X-MC-Unique: 3sDNGJY3MH60j-hVZPOzIA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
+ us-mta-343-Xf1ro3I_OQacqOZxWvNIQQ-1; Tue, 27 Oct 2020 14:22:03 -0400
+X-MC-Unique: Xf1ro3I_OQacqOZxWvNIQQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 7F728106BC7E
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:47 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CDCDC18FE864
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:53 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 4152B60C11
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:47 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9AF2B50B44
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:53 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 07/29] vl: extract qemu_init_subsystems
-Date: Tue, 27 Oct 2020 14:21:22 -0400
-Message-Id: <20201027182144.3315885-8-pbonzini@redhat.com>
+Subject: [PATCH 22/29] vl: initialize displays before preconfig loop
+Date: Tue, 27 Oct 2020 14:21:37 -0400
+Message-Id: <20201027182144.3315885-23-pbonzini@redhat.com>
 In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
 References: <20201027182144.3315885-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -100,183 +100,140 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Group a bunch of subsystem initializations that can be done right
-after command line parsing.  Remove initializations that can be done
-simply as global variable initializers.
+Displays should be available before the monitor starts, so that
+it is possible to use the graphical console to interact with
+the monitor itself.
+
+This patch is quite ugly, but all this is temporary.  The double
+call to qemu_init_displays will go away as soon we can unify machine
+initialization between the preconfig and "normal" flows, and so will
+the preconfig_exit_requested variable (that is only preconfig_requested
+remains).
 
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 94 ++++++++++++++++++++++++----------------------------
- 1 file changed, 43 insertions(+), 51 deletions(-)
+ softmmu/vl.c | 58 ++++++++++++++++++++++++++++++++--------------------
+ 1 file changed, 36 insertions(+), 22 deletions(-)
 
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index b05340802a..a086cd7066 100644
+index 1485aba8be..a46f1b9164 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -128,7 +128,7 @@ bool enable_mlock = false;
- bool enable_cpu_pm = false;
- int nb_nics;
- NICInfo nd_table[MAX_NICS];
--int autostart;
-+int autostart = 1;
- static enum {
-     RTC_BASE_UTC,
-     RTC_BASE_LOCALTIME,
-@@ -1228,7 +1228,8 @@ struct VMChangeStateEntry {
-     int priority;
- };
+@@ -137,6 +137,7 @@ static ram_addr_t maxram_size;
+ static uint64_t ram_slots;
+ static int display_remote;
+ static int snapshot;
++static bool preconfig_requested;
+ static QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
+ static BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
+ static bool nographic = false;
+@@ -3210,12 +3211,12 @@ static void qemu_validate_options(void)
+           }
+     }
  
--static QTAILQ_HEAD(, VMChangeStateEntry) vm_change_state_head;
-+static QTAILQ_HEAD(, VMChangeStateEntry) vm_change_state_head =
-+    QTAILQ_HEAD_INITIALIZER(vm_change_state_head);
- 
- /**
-  * qemu_add_vm_change_state_handler_prio:
-@@ -2965,11 +2966,45 @@ static void qemu_maybe_daemonize(const char *pid_file)
-     qemu_add_exit_notifier(&qemu_unlink_pidfile_notifier);
+-    if (loadvm && !preconfig_exit_requested) {
++    if (loadvm && preconfig_requested) {
+         error_report("'preconfig' and 'loadvm' options are "
+                      "mutually exclusive");
+         exit(EXIT_FAILURE);
+     }
+-    if (incoming && !preconfig_exit_requested) {
++    if (incoming && preconfig_requested) {
+         error_report("'preconfig' and 'incoming' options are "
+                      "mutually exclusive");
+         exit(EXIT_FAILURE);
+@@ -3381,6 +3382,28 @@ static void qemu_init_subsystems(void)
+     socket_init();
  }
  
-+static void qemu_init_subsystems(void)
++static void qemu_init_displays(void)
 +{
-+    Error *err;
++    DisplayState *ds;
 +
-+    os_set_line_buffering();
++    /* init local displays */
++    ds = init_displaystate();
++    qemu_display_init(ds, &dpy);
 +
-+    module_call_init(MODULE_INIT_TRACE);
++    /* must be after terminal init, SDL library changes signal handlers */
++    os_setup_signal_handling();
 +
-+    qemu_init_cpu_list();
-+    qemu_init_cpu_loop();
-+    qemu_mutex_lock_iothread();
++    /* init remote displays */
++#ifdef CONFIG_VNC
++    qemu_opts_foreach(qemu_find_opts("vnc"),
++                      vnc_init_func, NULL, &error_fatal);
++#endif
 +
-+    atexit(qemu_run_exit_notifiers);
-+
-+    module_call_init(MODULE_INIT_QOM);
-+    module_call_init(MODULE_INIT_MIGRATION);
-+
-+    runstate_init();
-+    precopy_infrastructure_init();
-+    postcopy_infrastructure_init();
-+    monitor_init_globals();
-+
-+    if (qcrypto_init(&err) < 0) {
-+        error_reportf_err(err, "cannot initialize crypto: ");
-+        exit(1);
++    if (using_spice) {
++        qemu_spice.display_init();
 +    }
-+
-+    os_setup_early_signal_handling();
-+
-+    bdrv_init_with_whitelist();
-+    page_size_init();
-+    socket_init();
 +}
++
+ /*
+  * Called after leaving preconfig state.  From here on runstate is
+  * RUN_STATE_PRELAUNCH or RUN_STATE_INMIGRATE.
+@@ -3449,8 +3472,6 @@ static void qemu_create_cli_devices(void)
  
- void qemu_init(int argc, char **argv, char **envp)
+ static void qemu_machine_creation_done(void)
  {
-     int i;
--    int snapshot, linux_boot;
-+    int snapshot = 0;
-+    int linux_boot;
-     const char *initrd_filename;
-     const char *kernel_filename, *kernel_cmdline;
-     const char *boot_order = NULL;
-@@ -2990,7 +3025,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     ram_addr_t maxram_size;
-     uint64_t ram_slots = 0;
-     FILE *vmstate_dump_file = NULL;
--    Error *main_loop_err = NULL;
-     Error *err = NULL;
-     const char *mem_path = NULL;
-     bool have_custom_ram_size;
-@@ -2998,22 +3032,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
-     int mem_prealloc = 0; /* force preallocation of physical target memory */
+-    DisplayState *ds;
+-
+     cpu_synchronize_all_post_init();
  
--    os_set_line_buffering();
--
--    error_init(argv[0]);
--    module_call_init(MODULE_INIT_TRACE);
--
--    qemu_init_cpu_list();
--    qemu_init_cpu_loop();
--
--    qemu_mutex_lock_iothread();
--
--    atexit(qemu_run_exit_notifiers);
--    qemu_init_exec_dir(argv[0]);
--
--    module_call_init(MODULE_INIT_QOM);
--    module_call_init(MODULE_INIT_MIGRATION);
--
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
-     qemu_add_drive_opts(&qemu_common_drive_opts);
-@@ -3048,27 +3066,10 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_add_opts(&qemu_fw_cfg_opts);
-     module_call_init(MODULE_INIT_OPTS);
+     /* Did we create any drives that we failed to create a device for? */
+@@ -3473,23 +3494,6 @@ static void qemu_machine_creation_done(void)
+         qemu_register_reset(restore_boot_order, g_strdup(boot_order));
+     }
  
--    runstate_init();
--    precopy_infrastructure_init();
--    postcopy_infrastructure_init();
--    monitor_init_globals();
+-    /* init local displays */
+-    ds = init_displaystate();
+-    qemu_display_init(ds, &dpy);
 -
--    if (qcrypto_init(&err) < 0) {
--        error_reportf_err(err, "cannot initialize crypto: ");
--        exit(1);
+-    /* must be after terminal init, SDL library changes signal handlers */
+-    os_setup_signal_handling();
+-
+-    /* init remote displays */
+-#ifdef CONFIG_VNC
+-    qemu_opts_foreach(qemu_find_opts("vnc"),
+-                      vnc_init_func, NULL, &error_fatal);
+-#endif
+-
+-    if (using_spice) {
+-        qemu_spice.display_init();
 -    }
 -
--    QTAILQ_INIT(&vm_change_state_head);
--    os_setup_early_signal_handling();
--
--    cpu_option = NULL;
--    snapshot = 0;
--
--    nb_nics = 0;
--
--    bdrv_init_with_whitelist();
-+    error_init(argv[0]);
-+    qemu_init_exec_dir(argv[0]);
- 
--    autostart = 1;
-+    qemu_init_subsystems();
- 
-     /* first pass of option parsing */
-     optind = 1;
-@@ -3947,13 +3948,10 @@ void qemu_init(int argc, char **argv, char **envp)
-     qemu_process_help_options();
-     qemu_maybe_daemonize(pid_file);
- 
--    if (qemu_init_main_loop(&main_loop_err)) {
--        error_report_err(main_loop_err);
--        exit(1);
--    }
-+    qemu_init_main_loop(&error_fatal);
-+    cpu_timers_init();
- 
-     user_register_global_props();
--
-     replay_configure(icount_opts);
- 
-     if (incoming && !preconfig_exit_requested) {
-@@ -4132,9 +4130,6 @@ void qemu_init(int argc, char **argv, char **envp)
+     if (foreach_device_config(DEV_GDB, gdbserver_start) < 0) {
          exit(1);
      }
+@@ -4094,6 +4098,7 @@ void qemu_init(int argc, char **argv, char **envp)
+                 break;
+             case QEMU_OPTION_preconfig:
+                 preconfig_exit_requested = false;
++                preconfig_requested = true;
+                 break;
+             case QEMU_OPTION_enable_kvm:
+                 olist = qemu_find_opts("machine");
+@@ -4515,11 +4520,20 @@ void qemu_init(int argc, char **argv, char **envp)
+     qemu_resolve_machine_memdev();
+     parse_numa_opts(current_machine);
  
--    page_size_init();
--    socket_init();
++    if (preconfig_requested) {
++        qemu_init_displays();
++    }
++
+     /* do monitor/qmp handling at preconfig state if requested */
+     qemu_main_loop();
 -
-     qemu_opts_foreach(qemu_find_opts("object"),
-                       user_creatable_add_opts_foreach,
-                       object_create_initial, &error_fatal);
-@@ -4251,9 +4246,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         semihosting_arg_fallback(kernel_filename, kernel_cmdline);
-     }
+     qemu_finish_machine_init();
++
+     qemu_create_cli_devices();
++
++    /* initialize displays after all errors have been reported */
++    if (!preconfig_requested) {
++        qemu_init_displays();
++    }
+     qemu_machine_creation_done();
  
--    /* initialize cpu timers and VCPU throttle modules */
--    cpu_timers_init();
--
-     if (default_net) {
-         QemuOptsList *net = qemu_find_opts("net");
-         qemu_opts_set(net, NULL, "type", "nic", &error_abort);
+     if (loadvm) {
 -- 
 2.26.2
 
