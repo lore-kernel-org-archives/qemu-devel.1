@@ -2,74 +2,81 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11762C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:30:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7332AC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:33:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 862852225E
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:30:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D62AB2225E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:33:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OUVRZvd0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 862852225E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OSGDDQHG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62AB2225E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56976 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60988 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQvh-0006ge-JA
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:30:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57336)
+	id 1kXQyI-000082-Rx
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:33:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59708)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXQg6-0004t2-48
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:14:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44970)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXQnb-0005tY-3X
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:22:11 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:51067)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXQg3-0007JB-RX
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:14:25 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXQnV-00006U-FO
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:22:08 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603811660;
+ s=mimecast20190719; t=1603812117;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type;
- bh=9puvHd+TppYeB2OtdvwcCuHfZmKJpXzcXqOoGDE7144=;
- b=OUVRZvd0lNbrTgzStwvwaYqLZ7kgC2/bsyF6eAaAMW8+IFdGr0e4KCZE50Kew9HGFH3msp
- M98uk0+aAZhFlL/ZhsmBHPjVx+Qp2UPkWBJPpZCnVWsLTca9HIHhO6rWHyqqEjmOReJI4K
- guYhKZubk6ugQQiC+PAu+XFBK301KQQ=
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=SAZza62aDz54XGQNhUyiYRiYYeS4S8kT5C9HJUxJu40=;
+ b=OSGDDQHGTR4gsAX2h7TiaijD0wedBWx2skv/XtyDOZsN3RA0VsZBJc51RNSL2QhzVmVoB6
+ RJb4WVvv+B3DuYO1GeEeKuPPi/xQKzudYL8P1J/tvzcHRR6Msn9F8i4WDfM8808gX68NHf
+ 16yqD87B41fR1J8tYndZBrWm41vpycY=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-240-i8ovsGeqNMGFnJ5qvlf8gw-1; Tue, 27 Oct 2020 11:14:15 -0400
-X-MC-Unique: i8ovsGeqNMGFnJ5qvlf8gw-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-182-jyM99pJROB-KmBYGAsJ5lQ-1; Tue, 27 Oct 2020 11:21:53 -0400
+X-MC-Unique: jyM99pJROB-KmBYGAsJ5lQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4A18610E21BE;
- Tue, 27 Oct 2020 15:14:14 +0000 (UTC)
-Received: from localhost (ovpn-115-166.ams2.redhat.com [10.36.115.166])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D639B55781;
- Tue, 27 Oct 2020 15:14:01 +0000 (UTC)
-Date: Tue, 27 Oct 2020 15:14:00 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: Out-of-Process Device Emulation session at KVM Forum 2020
-Message-ID: <20201027151400.GA138065@stefanha-x1.localdomain>
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CA81C1020904;
+ Tue, 27 Oct 2020 15:21:51 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 9203F5B4C6;
+ Tue, 27 Oct 2020 15:21:51 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id ADEF816E16; Tue, 27 Oct 2020 16:21:50 +0100 (CET)
+Date: Tue, 27 Oct 2020 16:21:50 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PULL 01/17] build: fix macOS --enable-modules build
+Message-ID: <20201027152150.dajghvf72l7ciahd@sirius.home.kraxel.org>
+References: <20201026135131.3006712-1-pbonzini@redhat.com>
+ <20201026135131.3006712-2-pbonzini@redhat.com>
+ <d87ec2b2-225e-353f-e561-e46c2d15b7b1@amsat.org>
+ <3f610856-6afe-d3ad-515e-dc736cea0995@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+In-Reply-To: <3f610856-6afe-d3ad-515e-dc736cea0995@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="gKMricLos+KVdGMg"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -92,55 +99,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>, john.g.johnson@oracle.com,
- "mst@redhat.com" <mtsirkin@redhat.com>, jag.raman@oracle.com, slp@redhat.com,
- =?iso-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
- kraxel@redhat.com, Felipe Franciosi <felipe@nutanix.com>,
- thanos.makatos@nutanix.com,
- Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Thomas Huth <thuth@redhat.com>, Emmanuel Blot <eblot.ml@gmail.com>,
+ Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---gKMricLos+KVdGMg
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, Oct 27, 2020 at 02:27:42PM +0100, Paolo Bonzini wrote:
+> On 27/10/20 10:27, Philippe Mathieu-Daudé wrote:
+> > I'm confused as this broke the catalina-xcode test:
+> > 
+> > PASS 5 qtest-aarch64/device-introspect-test
+> > /aarch64/device/introspect/abstract-interfaces
+> > missing object type 'virtio-gpu-device'
+> > Broken pipe
+> > ../tests/qtest/libqtest.c:176: kill_qemu() detected QEMU death from
+> > signal 6 (Abort trap: 6)
+> > ERROR qtest-aarch64/device-introspect-test - too few tests run (expected
+> > 6, got 5)
+> > gmake: *** [Makefile.mtest:905: run-test-111] Error 1
+> > 
+> 
+> It's showing that there is still a bug with macOS modules, Gerd was
+> looking at it (Emmanuel could so as well :)).
 
-There will be a birds-of-a-feather session at KVM Forum, a chance for
-us to get together and discuss Out-of-Process Device Emulation.
+Turned out to be simple.
 
-Please send suggestions for the agenda!
+https://patchwork.ozlabs.org/project/qemu-devel/patch/20201027120603.3625-1-kraxel@redhat.com/
 
-These sessions are a good opportunity to reach agreement on topics that
-are hard to discuss via mailing lists.
-
-Ideas:
- * How will we decide that the protocol is stable? Can third-party
-   applications like DPDK/SPDK use the protocol in the meantime?
- * QEMU build system requirements: how to configure and build device
-   emulator binaries?
- * Common sandboxing solution shared between C and Rust-based binaries?
-   minijail (https://github.com/google/minijail)? bubblewrap
-   (https://github.com/containers/bubblewrap)? systemd-run?
-
-Stefan
-
---gKMricLos+KVdGMg
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+YOTgACgkQnKSrs4Gr
-c8jwZAgAht/2ykkqq1RBgoAqIjcA4+CRwxXkL3euZLoB9Hk7SBS9bI5IMloQliiT
-dRu7pxOdpaaVlPu/9NS1V3vEIBMwpidIqWCZbkJ+oaYScj6rcUnto0t7hsHfnerz
-A3W2CSKUDRZqpX6wm2cW4RwyNlzbyXrLrBZckdn7MKnJaO2/oZzI/ls6VGa1WNaT
-9P3jNGQB9oIGHfPsy0KRUTaTKUW0ajorDYdaLm2IxBXaT6g0n5NVBphyxhrVpzgp
-ISO4fGtzqPQ/dvspRwMX3zByLYQJHTflbEJErtOCJgdFAGts1m2ERTAvjwRV5rtD
-MZTzks84lGG4A3h7C2RcOjCJaxk3Og==
-=z4Jr
------END PGP SIGNATURE-----
-
---gKMricLos+KVdGMg--
+take care,
+  Gerd
 
 
