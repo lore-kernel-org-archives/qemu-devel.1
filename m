@@ -2,88 +2,88 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29A74C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:43:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E94EFC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:51:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7B1E72225C
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:43:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1B88C20759
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:51:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CT/gNwxa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7B1E72225C
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S1/Lrhh/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1B88C20759
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40596 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXLW0-0006yo-Hh
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 05:43:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49830)
+	id 1kXLdj-0001gp-15
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 05:51:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXLUW-00063X-Ki
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:42:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52847)
+ id 1kXLcS-00010p-0v
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:50:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:52369)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXLUU-0002Uk-F1
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:42:07 -0400
+ id 1kXLcP-0005EV-AK
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:50:19 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603791725;
+ s=mimecast20190719; t=1603792215;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=JOh/abKDFW7cVfr4KzWq+f5JSLaYlYc7MPHuEB8b4k0=;
- b=CT/gNwxapTUAn/rknUWJAeW8GYqWC9sfTG5xoPZspQ8qp2wSjuNu1na0P/ea6b3oQh9H+u
- lE+9jiWEg1R12U1zkodKV7B7lSC0J+70PfheL1jRZ9WZ08LJyLpMMfkrwY73H9WhvUXHPd
- JyfwLBlKenlv4U1I9FWlrljoDM+8JME=
+ bh=cIwvlJs/2yZxodsBpYuoeYKPxurkE2mJL+HsRobXMfM=;
+ b=S1/Lrhh/7EKGDbgm1B7V744Nf6trU8zgXvmVYqD/KYdieVuPGhIyB2jWiVdibhy9YbAPqN
+ 0c/VTjRQDS3iXN4CEnGgzr/bcXV7EBuoeqlYwGkBsaSzZuayZpaUafoQdKOKvb8T/1/7XP
+ xu2HAyut2OL37HAhqE2+zGu8jQ2lUXk=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-189--uRyao25PAajNechn-qGJg-1; Tue, 27 Oct 2020 05:42:03 -0400
-X-MC-Unique: -uRyao25PAajNechn-qGJg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-304-KWkHohYuPmmn7bkDiIOSsA-1; Tue, 27 Oct 2020 05:50:12 -0400
+X-MC-Unique: KWkHohYuPmmn7bkDiIOSsA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0660A1006C9B;
- Tue, 27 Oct 2020 09:42:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id A2A7C1882FB7;
+ Tue, 27 Oct 2020 09:50:11 +0000 (UTC)
 Received: from localhost (ovpn-114-163.ams2.redhat.com [10.36.114.163])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B2E5E5D9DD;
- Tue, 27 Oct 2020 09:41:55 +0000 (UTC)
-Date: Tue, 27 Oct 2020 09:41:54 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 89A755B4BC;
+ Tue, 27 Oct 2020 09:50:05 +0000 (UTC)
+Date: Tue, 27 Oct 2020 09:50:04 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 04/19] block/nvme: Trace controller capabilities
-Message-ID: <20201027094154.GD79063@stefanha-x1.localdomain>
+Subject: Re: [PATCH v2 14/19] util/vfio-helpers: Pass minimum page size to
+ qemu_vfio_open_pci()
+Message-ID: <20201027095004.GE79063@stefanha-x1.localdomain>
 References: <20201026105504.4023620-1-philmd@redhat.com>
- <20201026105504.4023620-5-philmd@redhat.com>
+ <20201026105504.4023620-15-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201026105504.4023620-5-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201026105504.4023620-15-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="fXStkuK2IQBfcDe+"
+ protocol="application/pgp-signature"; boundary="Oiv9uiLrevHtW1RS"
 Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -104,79 +104,52 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---fXStkuK2IQBfcDe+
+--Oiv9uiLrevHtW1RS
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Oct 26, 2020 at 11:54:49AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Controllers have different capabilities and report them in the
-> CAP register. We are particularly interested by the page size
-> limits.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  block/nvme.c       | 10 ++++++++++
->  block/trace-events |  1 +
->  2 files changed, 11 insertions(+)
->=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 5abd7257cac..3b6d3972ec2 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -720,6 +720,16 @@ static int nvme_init(BlockDriverState *bs, const cha=
+On Mon, Oct 26, 2020 at 11:54:59AM +0100, Philippe Mathieu-Daud=E9 wrote:
+> @@ -737,6 +738,17 @@ static int nvme_init(BlockDriverState *bs, const cha=
 r *device, int namespace,
->       * Initialization". */
+>      }
 > =20
->      cap =3D le64_to_cpu(regs->cap);
-> +    trace_nvme_controller_capability("Maximum Queue Entries Supported",
-> +                                     NVME_CAP_MQES(cap));
-> +    trace_nvme_controller_capability("Contiguous Queues Required",
-> +                                     NVME_CAP_CQR(cap));
-> +    trace_nvme_controller_capability("Subsystem  Reset Supported",
-> +                                     NVME_CAP_NSSRS(cap));
-> +    trace_nvme_controller_capability("Memory Page Size Minimum",
-> +                                     NVME_CAP_MPSMIN(cap));
-> +    trace_nvme_controller_capability("Memory Page Size Maximum",
-> +                                     NVME_CAP_MPSMAX(cap));
+>      device_page_size_min =3D 1u << (12 + NVME_CAP_MPSMIN(cap));
+> +    device_page_size_max =3D 1u << (12 + NVME_CAP_MPSMAX(cap));
+> +    if (iommu_page_size_min > device_page_size_max) {
+> +        g_autofree char *iommu_page_size_s =3D size_to_str(iommu_page_si=
+ze_min);
+> +        g_autofree char *device_page_size_s =3D size_to_str(device_page_=
+size_max);
+> +
+> +        error_setg(errp, "IOMMU minimum page size (%s)"
+> +                         " too big for device (max %s)",
+> +                   iommu_page_size_s, device_page_size_s);
+> +        ret =3D -EINVAL;
+> +        goto out;
+> +    }
 
-This works well for printf-style tracing but it can be tedious to
-strcmp() or parse strings from SystemTap and other tracing scripts.
+I thought you and Eric worked on a solution to support smaller device
+pages on bigger IOMMU pages? For example, 4KB device page size on 64KB
+IOMMU page size.
 
-Another way of expressing these trace events is:
+Won't this check be removed again very soon? Why add it at all?
 
-  trace_nvme_controller_capabilities(NVME_CAP_MQES(cap),
-                                     NVME_CAP_CQR(cap),
-=09=09=09=09     ...);
-
-Or:
-
-  trace_nvme_controller_capability_mqes(NVME_CAP_MQES(cap));
-  trace_nvme_controller_capability_cqr(NVME_CAP_CQR(cap));
-
-One view is that tracing is like printf (the style used in this patch).
-Another view is that tracing produces records that scripts can process
-(the style I showed). Trace events defined in one style may be hard to
-use in the other style (i.e. less human-readable vs harder to process in
-a script).
-
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-
---fXStkuK2IQBfcDe+
+--Oiv9uiLrevHtW1RS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+X62IACgkQnKSrs4Gr
-c8gdwwgAnTn9dhfrX43z+3Gr8Hj54hRXlOX5RHmifqTBJ231m4PrY2VurTNHtdE/
-nLcTopBpo7Sos+4bhFOpsbG1yYm8aPFXFvh2QebNxuJ1cBiObUuXhczDeQBWWaOe
-2nLLVk4pafQGEAaLEz2YrMhm+gSKQXgfjz2Gcke63OIuvzMu/bqrzum3vrF1g+vw
-nKbivXOYjqBPlRkRWDd2gSoaV0aRdZqqVaSYcftILO0Go3bezZ8QaFRdSUoOAUtX
-NVKn/57HnFZ3h37ONfDCHwJxWkqoPNwjDhH4mCoB9fpNHzwuOlonh/5QURp8XCDJ
-uLiGRYOUTGC6WxiV8nP9SecCwIYdQg==
-=qOMY
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+X7UwACgkQnKSrs4Gr
+c8itNQf8DMwAN7rPn/1YBcJcT/bOv2kLVtG8fHCjSc3Mn5HJh3pDOfWqZXJAB7hI
+oudwRGzOVTmPTXAwEPDWPBdiOUKwOzRQDb62Xvsg+tsSiLOh+q8sgytoOGTwRfzn
+vyR8xNtJBUqjWS2vCvjqiDTIA965SiohSq9Ccp7EdGBQb+IyVXePquQa87if1Rt4
+RLKConsFvxncd9dVoT+9MUCjeIuLRswhnwCPFPrDxr32X4iRPiWD0+GpnEsw+aya
+FRyv9eZOLzE9fkHxjK/qPoepvfN6+xgM1+vE+Ln0xb1jbyDebLUpsVF4aYUvF9Ks
+V8SPy5GO5RyqUsoxB2r7w+vXJFNCIA==
+=0qG/
 -----END PGP SIGNATURE-----
 
---fXStkuK2IQBfcDe+--
+--Oiv9uiLrevHtW1RS--
 
 
