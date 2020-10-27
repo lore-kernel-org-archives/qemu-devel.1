@@ -2,86 +2,85 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2D98C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 164CDC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:22:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0AE39221FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 68C3A221FB
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:22:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hYBcoUpG"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0AE39221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ru1c9M3E"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68C3A221FB
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37556 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXWNt-0001F9-Tb
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:20:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45330)
+	id 1kXWQ4-0003Av-C4
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:22:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46204)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kXWLa-00086o-Vf
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:17:38 -0400
-Received: from mail-io1-xd41.google.com ([2607:f8b0:4864:20::d41]:41130)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXWOk-0002DF-Re
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:20:54 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:43502)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
- id 1kXWLX-0003SP-Rc
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:17:38 -0400
-Received: by mail-io1-xd41.google.com with SMTP id u62so3135176iod.8
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 14:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXWOi-0003wz-RW
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:20:54 -0400
+Received: by mail-ed1-x542.google.com with SMTP id dn5so2950534edb.10
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 14:20:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=ZSnAwrAd1wQA6wUgjxg+ZVGA606Y/TvmH9nSuMEtqZ0=;
- b=hYBcoUpGBrkkR1xyI6PyaULjEHLIZdPDB/ZRF84egA0eu2J2Q7XV+Hp85BuMwR9rCR
- D7kAAzuId8/I9+fzfjWFFe0OIdJR4YSjZ7rGUIKXXm5k7mZsbFdqP+36ppq9+jLRDrT9
- aKn5BtGOX+MetH9SUlUONfpf2y78o0PnaaZ9fXBovbYJsFJDxGOomKkkNaRQ6k0rwFa5
- hk6emA2/bh1AKmWqvG7zgG2ZVIABHNT6Mjacw6b0uXUHlgaMKPvRfLJzU0TAwKury3QI
- jf0orKfJaL/aDaiWVhnCn96OSHeGKPklVMSiC0o3Tv03TD4nXQvL1TB9fxyuZYZ3DnOK
- NwwQ==
+ :cc; bh=d0UbQvo8Vb3wDc/aJyL7VyV7Y6DvIzJ3l15+MRR+t/M=;
+ b=ru1c9M3EPVQKRU7OXH0NpPO9pQ7KwB+L4L/EQSJA3KWr8bk55h7RZD92/QoRflod6q
+ gLLU00LoyqQIP9A4dRp3Zbg/Jnp5XLqRzkdP8jm/5UOAUWadPM1h8m0d35uQBs9twpnD
+ MJcf1kI2ZVb4U6gx4jhvcHKMEevJm65bIpQBz99JYY+VwNW/SUnZLURbf9gbmotoMXLn
+ DM3s9dy4F8O9RtSZpMJHJRNbdnCNAKOEDVQlxJl560Dp7QQTVW1w1XrelLgF+NZgp3+s
+ LqbdMzsIkk43DwEWEGXqjF/1LaNhT6Rmz6Qh/olIUP/8DRxTFM77w3MAl0o8/I5+P8Ik
+ vAFA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=ZSnAwrAd1wQA6wUgjxg+ZVGA606Y/TvmH9nSuMEtqZ0=;
- b=SSewrLGfjvXf38oM5DtZeHS9ynGiEnSY76lviCDjzL1Mghg4VbxMIOPoNuCTLiYDVO
- 1YW/li3gdESg9QTdSnyxVGIIn96evNT2xb3QCuJzYF/0ZCubeAntvWRCfRPU57xrEhMK
- F+tXJczh/sWPIPhC3ZTP3396MSEzv97xDLrqMkvbuEN73YHhdpztNnDaHj6WfbI8HzyR
- WBhxwAYSBXbSJy+fAKlHV8whvl0aI3OJLDLcF7RSZV1FRgWOidWBJ+5FEsllxCNSnxGW
- 9IQDgWbJE7XENo9Z1Oo3HEV7+tclWQvIhNJZuQpxRalc0PqQv++mSf6fvpc6+w6U6paK
- a8Kw==
-X-Gm-Message-State: AOAM532eob0o8ip6P1beAEn1TVVbJzg7ox9g9HnYQE3CCitb5PTuIRJl
- C0Cwm6yKTpof3YONsicaGuPq499c78OvHfovhwI=
-X-Google-Smtp-Source: ABdhPJzlJf5hZuAxExFBRYvD3deOdu0wNMlBL/TsLjkcSv8ztMxj0e9UXBha16OlmTWwm6ssE9RmAEh+yeuVYSuS2ZA=
-X-Received: by 2002:a5d:9a8d:: with SMTP id c13mr3669679iom.176.1603833454016; 
- Tue, 27 Oct 2020 14:17:34 -0700 (PDT)
+ bh=d0UbQvo8Vb3wDc/aJyL7VyV7Y6DvIzJ3l15+MRR+t/M=;
+ b=ua2GgotlTot2VY/kG4k5Du296nUDCysKlRSGFI8OsDeGuIhU+ffp93dPxE4o54yIoQ
+ 9RBg7eb2wyvcZRS7/3ssTCbAeYBDeTTnJapC3ZJQ4m7Dw4Z9UPWVclVRDy+j5EZO/+hp
+ WX38kcCVXo0OZ7gtWUC5fL1fL1F+OM/w2fXs548tRb/uN+LxguUHTzv0SxWMO65W2grE
+ WnD1s+fitIkxy/TOjNgFRPf4ugJGkXeWSdv/M07K0g7NC1jRYaIiIjFFKOadQtkRh+Dh
+ v1azzZqK9OLP0X6VCGYwzNpZx5thNaeD47h+QDsAMQCW3//l5Pih1jXrW8qjPD5P16AU
+ mykg==
+X-Gm-Message-State: AOAM5336PPKgB3F4tygkKq17XK+SsD7c4bm9B2adG41fwW7jql5qWRFG
+ UZpZrQ/DRbKEXFAczr1ZzrVomUPYXHpqkenhgKUfWw==
+X-Google-Smtp-Source: ABdhPJxhKBsnrlh4qEzVXJOYba0Kccwr+goxR7w8UfSVC7voQImgwhCSMfw3fM3ek3Te8BbZ9eI+0eZquslGeeVBQEc=
+X-Received: by 2002:a50:f41a:: with SMTP id r26mr4258583edm.251.1603833651094; 
+ Tue, 27 Oct 2020 14:20:51 -0700 (PDT)
 MIME-Version: 1.0
-References: <20200827123859.81793-1-ysato@users.sourceforge.jp>
- <20200827123859.81793-2-ysato@users.sourceforge.jp>
-In-Reply-To: <20200827123859.81793-2-ysato@users.sourceforge.jp>
-From: Alistair Francis <alistair23@gmail.com>
-Date: Tue, 27 Oct 2020 14:05:44 -0700
-Message-ID: <CAKmqyKOi3a2+krV5v_gnedUcVB_37607UjkFa1r8ZTVUTZmVYA@mail.gmail.com>
-Subject: Re: [PATCH 01/20] loader.c: Add support Motrola S-record format.
-To: Yoshinori Sato <ysato@users.sourceforge.jp>
+References: <20201026212853.92880-1-keithp@keithp.com>
+ <20201026212853.92880-2-keithp@keithp.com>
+In-Reply-To: <20201026212853.92880-2-keithp@keithp.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 27 Oct 2020 21:20:39 +0000
+Message-ID: <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
+Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
+ directories
+To: Keith Packard <keithp@keithp.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::d41;
- envelope-from=alistair23@gmail.com; helo=mail-io1-xd41.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
@@ -96,271 +95,50 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>
+Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
+ Sagar Karandikar <sagark@eecs.berkeley.edu>,
+ Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
+ QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
+ qemu-arm <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>,
+ Alistair Francis <Alistair.Francis@wdc.com>,
+ =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, Aug 27, 2020 at 5:39 AM Yoshinori Sato
-<ysato@users.sourceforge.jp> wrote:
+On Mon, 26 Oct 2020 at 21:29, Keith Packard <keithp@keithp.com> wrote:
 >
-> Signed-off-by: Yoshinori Sato <ysato@users.sourceforge.jp>
+> This commit renames two files which provide ARM semihosting support so
+> that they can be shared by other architectures:
+>
+>  1. target/arm/arm-semi.c     -> hw/semihosting/common-semi.c
+>  2. linux-user/arm/semihost.c -> linux-user/semihost.c
+>
+> The build system was modified to reflect this change, but the contents
+> of the two files are unchanged.
+>
+> Signed-off-by: Keith Packard <keithp@keithp.com>
 > ---
->  include/hw/loader.h |  14 +++
->  hw/core/loader.c    | 208 ++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 222 insertions(+)
->
-> diff --git a/include/hw/loader.h b/include/hw/loader.h
-> index a9eeea3952..6f1fb62ded 100644
-> --- a/include/hw/loader.h
-> +++ b/include/hw/loader.h
-> @@ -55,6 +55,20 @@ int load_image_targphys_as(const char *filename,
->   */
->  int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as);
->
-> +/*
-> + * load_targphys_srec_as:
-> + * @filename: Path to the .hex file
-> + * @entry: Store the entry point given by the .hex file
-> + * @as: The AddressSpace to load the .hex file to. The value of
-> + *      address_space_memory is used if nothing is supplied here.
-> + *
-> + * Load a fixed .srec file into memory.
-> + *
-> + * Returns the size of the loaded .hex file on success, -1 otherwise.
-> + */
-> +int load_targphys_srec_as(const char *filename,
-> +                          hwaddr *entry, AddressSpace *as);
+> diff --git a/target/arm/arm-semi.c b/hw/semihosting/common-semi.c
+> similarity index 100%
+> rename from target/arm/arm-semi.c
+> rename to hw/semihosting/common-semi.c
+> diff --git a/hw/semihosting/meson.build b/hw/semihosting/meson.build
+> index f40ac574c4..fbd2841e59 100644
+> --- a/hw/semihosting/meson.build
+> +++ b/hw/semihosting/meson.build
+> @@ -2,3 +2,5 @@ specific_ss.add(when: 'CONFIG_SEMIHOSTING', if_true: files(
+>    'config.c',
+>    'console.c',
+>  ))
 > +
->  /** load_image_targphys:
->   * Same as load_image_targphys_as(), but doesn't allow the caller to specify
->   * an AddressSpace.
-> diff --git a/hw/core/loader.c b/hw/core/loader.c
-> index 8bbb1797a4..6964b04ec7 100644
-> --- a/hw/core/loader.c
-> +++ b/hw/core/loader.c
-> @@ -1618,3 +1618,211 @@ int load_targphys_hex_as(const char *filename, hwaddr *entry, AddressSpace *as)
->      g_free(hex_blob);
->      return total_size;
->  }
-> +
-> +typedef enum {
-> +    SREC_SOH,
-> +    SREC_TYPE,
-> +    SREC_LEN,
-> +    SREC_ADDR,
-> +    SREC_DATA,
-> +    SREC_SKIP,
-> +    SREC_SUM,
-> +} srec_state;
-> +
-> +typedef struct {
-> +    srec_state state;
-> +    int nibble;
-> +    int total_size;
-> +    uint32_t address;
-> +    uint32_t topaddr;
-> +    uint32_t bufremain;
-> +    int length;
-> +    int addr_len;
-> +    int record_type;
-> +    uint8_t byte;
-> +    uint8_t data[DATA_FIELD_MAX_LEN];
-> +    uint8_t *datap;
-> +    uint8_t *bufptr;
-> +    uint8_t sum;
-> +} SrecLine;
-> +
-> +static bool parse_srec_line(SrecLine *line, char c)
-> +{
-> +    if (!g_ascii_isxdigit(c)) {
-> +        return false;
-> +    }
-> +    line->byte <<= 4;
-> +    line->byte |= g_ascii_xdigit_value(c);
-> +    line->nibble++;
-> +    if (line->nibble == 2) {
-> +        line->nibble = 0;
-> +        line->length--;
-> +        line->sum += line->byte;
-> +        switch (line->state) {
-> +        case SREC_SOH:
-> +        case SREC_TYPE:
-> +            /* first 2chars ignore parse */
-> +            break;
-> +        case SREC_LEN:
-> +            line->sum = line->length = line->byte;
-> +            if (line->addr_len > 0) {
-> +                line->state = SREC_ADDR;
-> +                line->address = 0;
-> +            } else {
-> +                line->state = SREC_SKIP;
-> +            }
-> +            break;
-> +        case SREC_ADDR:
-> +            line->address <<= 8;
-> +            line->address |= line->byte;
-> +            if (--line->addr_len == 0) {
-> +                if (line->length > 1) {
-> +                    if (line->record_type != 0) {
-> +                        line->state = SREC_DATA;
-> +                    } else {
-> +                        line->state = SREC_SKIP;
-> +                    }
-> +                    line->datap = line->data;
-> +                } else {
-> +                    line->state = SREC_SUM;
-> +                }
-> +            }
-> +            break;
-> +        case SREC_DATA:
-> +            *line->datap++ = line->byte;
-> +            /* fail through */
+> +specific_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
 
-s/fail/fall/g
+I think this adds this file to the compilation for all TCG targets;
+you only want it for targets which have Arm-semihosting-ABI compatible
+semihosting. (Various other targets either don't have semihosting
+or have their own ABI.)
 
-> +        case SREC_SKIP:
-> +            if (line->length == 1) {
-> +                line->state = SREC_SUM;
-> +            }
-> +            break;
-> +        case SREC_SUM:
-> +            if ((line->sum & 0xff) != 0xff) {
-> +                return false;
-> +            }
-> +        }
-> +    }
-> +    return true;
-> +}
-> +
-> +#define SRECBUFSIZE 0x40000
-> +
-> +/* return size or -1 if error */
-> +static int parse_srec_blob(const char *filename, hwaddr *addr,
-> +                           uint8_t *hex_blob, size_t hex_blob_size,
-> +                           AddressSpace *as)
-> +{
-> +    SrecLine line;
-> +    size_t len;
-> +    int total_len = 0;
-> +    uint8_t *end = hex_blob + hex_blob_size;
-> +    rom_transaction_begin();
-> +    line.state = SREC_SOH;
-> +    line.bufptr = g_malloc(SRECBUFSIZE);
-> +    line.bufremain = SRECBUFSIZE;
-> +    line.topaddr = UINT32_MAX;
-> +    for (; hex_blob < end; ++hex_blob) {
-> +        switch (*hex_blob) {
-> +        case '\r':
-> +        case '\n':
-> +            if (line.state == SREC_SUM) {
-> +                switch (line.record_type) {
-
-What if a file starts with a new line, won't line.record_type be invalid?
-
-Alistair
-
-> +                case 1:
-> +                case 2:
-> +                case 3:
-> +                    len = line.datap - line.data;
-> +                    if (line.topaddr == UINT32_MAX) {
-> +                        line.topaddr = line.address;
-> +                    }
-> +                    if (line.bufremain < len || line.address < line.topaddr) {
-> +                        rom_add_blob_fixed_as(filename, line.bufptr,
-> +                                              SRECBUFSIZE - line.bufremain,
-> +                                              line.topaddr, as);
-> +                        line.topaddr = line.address;
-> +                        line.bufremain = SRECBUFSIZE;
-> +                    }
-> +                    memcpy(line.bufptr + (line.address  - line.topaddr),
-> +                           line.data, len);
-> +                    line.bufremain -= len;
-> +                    total_len += len;
-> +                    break;
-> +                case 7:
-> +                case 8:
-> +                case 9:
-> +                    *addr = line.address;
-> +                    break;
-> +                }
-> +                line.state = SREC_SOH;
-> +            }
-> +            break;
-> +        /* start of a new record. */
-> +        case 'S':
-> +            if (line.state != SREC_SOH) {
-> +                total_len = -1;
-> +                goto out;
-> +            }
-> +            line.state = SREC_TYPE;
-> +            break;
-> +        /* decoding lines */
-> +        default:
-> +            if (line.state == SREC_TYPE) {
-> +                if (g_ascii_isdigit(*hex_blob)) {
-> +                    line.record_type = g_ascii_digit_value(*hex_blob);
-> +                    switch (line.record_type) {
-> +                    case 1:
-> +                    case 2:
-> +                    case 3:
-> +                        line.addr_len = 1 + line.record_type;
-> +                        break;
-> +                    case 0:
-> +                    case 5:
-> +                        line.addr_len = 2;
-> +                        break;
-> +                    case 7:
-> +                    case 8:
-> +                    case 9:
-> +                        line.addr_len = 11 - line.record_type;
-> +                        break;
-> +                    default:
-> +                        line.addr_len = 0;
-> +                    }
-> +                }
-> +                line.state = SREC_LEN;
-> +                line.nibble = 0;
-> +            } else {
-> +                if (!parse_srec_line(&line, *hex_blob)) {
-> +                    total_len = -1;
-> +                    goto out;
-> +                }
-> +            }
-> +            break;
-> +        }
-> +    }
-> +    if (line.bufremain < SRECBUFSIZE) {
-> +        rom_add_blob_fixed_as(filename, line.bufptr,
-> +                              SRECBUFSIZE - line.bufremain,
-> +                              line.topaddr, as);
-> +    }
-> +out:
-> +    rom_transaction_end(total_len != -1);
-> +    g_free(line.bufptr);
-> +    return total_len;
-> +}
-> +
-> +/* return size or -1 if error */
-> +int load_targphys_srec_as(const char *filename, hwaddr *entry, AddressSpace *as)
-> +{
-> +    gsize hex_blob_size;
-> +    gchar *hex_blob;
-> +    int total_size = 0;
-> +
-> +    if (!g_file_get_contents(filename, &hex_blob, &hex_blob_size, NULL)) {
-> +        return -1;
-> +    }
-> +
-> +    total_size = parse_srec_blob(filename, entry, (uint8_t *)hex_blob,
-> +                                 hex_blob_size, as);
-> +
-> +    g_free(hex_blob);
-> +    return total_size;
-> +}
-> --
-> 2.20.1
->
->
+thanks
+-- PMM
 
