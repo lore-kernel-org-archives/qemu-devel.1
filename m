@@ -2,109 +2,89 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E188C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:44:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACEEBC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:46:06 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 068A9218AC
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:44:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1EC2221707
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:46:05 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EXBsY8yq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 068A9218AC
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E5kkk7MO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1EC2221707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44394 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:49118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPGv-0005yO-12
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:44:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56998)
+	id 1kXPIb-0007vF-2P
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:46:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXP5D-0006tR-6L
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:32:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:40267)
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kXOuY-0003U1-EH
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:21:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:55493)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXP57-0000On-Dd
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:32:14 -0400
+ (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
+ id 1kXOuW-0006BU-Dg
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:21:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603805526;
+ s=mimecast20190719; t=1603804871;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=TK8hPM7Ysvvb8/8WqhaE5vPte48P0JgSHSUZle0XYDo=;
- b=EXBsY8yqgj1Qz7Rxuy6BUC5/P5RXU7IURPyYLbwsXEOqSvy7rl9abm+f2QXBFyO6h59ZRs
- Op75FSedQsRmaNpZp2jsUBO0qZG8TgSh1xvem8MyAP5cxpF0HCoSqGx81J4zWXYMuO65mT
- pxH7OabZ++6eVXmtZOtx4A5yShRJtL8=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-378-UPG_lO7WNtmNdLiMkn7Bew-1; Tue, 27 Oct 2020 09:32:04 -0400
-X-MC-Unique: UPG_lO7WNtmNdLiMkn7Bew-1
-Received: by mail-wr1-f71.google.com with SMTP id t11so755272wrv.10
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:32:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=TK8hPM7Ysvvb8/8WqhaE5vPte48P0JgSHSUZle0XYDo=;
- b=GfBi6OR7h+njwebxcf9RFLCtT/ptwsY0AC2rMDgqUY6DlFDe4NQCwaA1QyILjvs6qI
- oItgJPtRvB3nuJdwdFb/I46cVqUM9PSWzL0Zat7jV7EEGKc7O+z+fhikVywDYt54Dqbs
- h4fGv4ktDAno3BAgrM+wfYpTZHoA8DLBFF0qTXH2bL9CwYg/XnIjVsKDIMNS6g20uhjK
- J3rlYdUZD+h/EvmSPGhICcLGfhjGm8ttZsquQB2NktkykRI4kLlzAIoyBs8q2Dqpkutw
- OX9u+dBG76IsRu7aSHHZz8Jg0N07/czG/RI5fzZdtpygaMAse/gytmBZsk/R4VPG1u+9
- ZdLQ==
-X-Gm-Message-State: AOAM533RDspl6UJfKnwB72JUeFYAqVJdV51dX7YAfgSU7JPj1pVjt8NV
- Pt+8LJt7Wf8zxa4EptHy1Va/jsklyu4gIC0xwaD/InGj3LMrur2s7a6a2tHkzSDQoEj/U2O1eBn
- etIceSEUSR9dyjWk=
-X-Received: by 2002:a5d:4282:: with SMTP id k2mr2844756wrq.270.1603805523522; 
- Tue, 27 Oct 2020 06:32:03 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJz3OcMI/Dys9klddA8DDl9dIFLbyXDGTqCdrw0fKamw/UOdRW7ZvI62Y4lxSv9JuKWO5IBt7w==
-X-Received: by 2002:a5d:4282:: with SMTP id k2mr2844742wrq.270.1603805523337; 
- Tue, 27 Oct 2020 06:32:03 -0700 (PDT)
-Received: from ?IPv6:2001:b07:6468:f312:c8dd:75d4:99ab:290a?
- ([2001:b07:6468:f312:c8dd:75d4:99ab:290a])
- by smtp.gmail.com with ESMTPSA id a15sm2224058wrp.90.2020.10.27.06.32.02
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 27 Oct 2020 06:32:02 -0700 (PDT)
-Subject: Re: [PATCH 01/22] semihosting: fix order of initialization functions
-To: =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
-References: <20201021205716.2359430-1-pbonzini@redhat.com>
- <20201021205716.2359430-2-pbonzini@redhat.com> <87sg9zex2k.fsf@linaro.org>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Message-ID: <78f5ab2b-bd6d-631e-4d19-be499a3b08a6@redhat.com>
-Date: Tue, 27 Oct 2020 14:32:02 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=PdW/AzfFSSKfvR/W0HSDFMYpjCcpdNKB9zfqWXqZL3c=;
+ b=E5kkk7MOm45vouog/pBQqhjWfQPSpcuoSZpOrqp6Bo1ulJe6Nl5ZOZ72T7WityjnQmkgO9
+ ajjocmJt6MiPE/LlwZDYJ7+FmTzDXwmahiimGMhwapBaT2xZMMYZSR5pPD9EFhtTIxu7L1
+ gzT4SWDvbK/icb1/bewdRHaEF28imwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-394-RLSNb24MPqa4MDm3ObhNqQ-1; Tue, 27 Oct 2020 09:21:08 -0400
+X-MC-Unique: RLSNb24MPqa4MDm3ObhNqQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 15C10101962E
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:21:07 +0000 (UTC)
+Received: from localhost.localdomain.com (ovpn-115-46.ams2.redhat.com
+ [10.36.115.46])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EB9C01972B;
+ Tue, 27 Oct 2020 13:21:05 +0000 (UTC)
+From: =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [qemu-web PATCH v2 11/16] Bring contribution links out of the footer
+ into the home page
+Date: Tue, 27 Oct 2020 13:20:10 +0000
+Message-Id: <20201027132015.621733-12-berrange@redhat.com>
+In-Reply-To: <20201027132015.621733-1-berrange@redhat.com>
+References: <20201027132015.621733-1-berrange@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <87sg9zex2k.fsf@linaro.org>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=berrange@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -117,30 +97,60 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, jsnow@redhat.com,
- ehabkost@redhat.com, imammedo@redhat.com
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?q?Daniel=20P=2E=20Berrang=C3=A9?= <berrange@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27/10/20 12:18, Alex Bennée wrote:
->>  
->> -    /* now chardevs have been created we may have semihosting to connect */
->> -    qemu_semihosting_connect_chardevs();
->> -
-> Move both here:
-> 
->     if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
->         exit(1);
-> 
->     /* now chardevs have been created we may have semihosting to connect */
->     qemu_semihosting_connect_chardevs();
->     qemu_semihosting_console_init();
-> 
-> 
+The selection of contribution links are important information to present
+to visitors to the site. They are best placed in a prominent position on
+the home page rather than in the footer
 
-Sounds good, thanks!
+Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+---
+ _includes/footer.html | 7 -------
+ index.html            | 8 ++++++++
+ 2 files changed, 8 insertions(+), 7 deletions(-)
 
-Paolo
+diff --git a/_includes/footer.html b/_includes/footer.html
+index 411ff55..07f7866 100644
+--- a/_includes/footer.html
++++ b/_includes/footer.html
+@@ -5,13 +5,6 @@
+ 			<li><a href="{{ relative_root }}/download">Download</a></li>
+ 			<li><a href="http://qemu-advent-calendar.org">QEMU advent calendar</a></li>
+ 		</ul>
+-		<ul class="style">
+-			<li><a href="{{ relative_root }}/contribute">Contribute</a></li>
+-			<li><a href="{{ relative_root }}/contribute/report-a-bug">Reporting a bug</a></li>
+-			<li><a href="https://wiki.qemu.org/Documentation/GettingStartedDevelopers">New contributors</a></li>
+-			<li><a href="https://wiki.qemu.org/Contribute/SubmitAPatch">Submitting a patch</a></li>
+-			<li><a href="https://wiki.qemu.org/Contribute/FAQ">Contributor FAQ</a></li>
+-		</ul>
+ 		<ul class="style">
+ 			<li><a href="{{ relative_root }}/documentation">Documentation</a></li>
+ 			<li><a href="https://www.qemu.org/docs/master/">Main docs</a></li>
+diff --git a/index.html b/index.html
+index d057a87..be1d210 100644
+--- a/index.html
++++ b/index.html
+@@ -27,6 +27,14 @@ bxslider: True
+ 			  <span><a href="{{ relative_root }}/download">Other releases</a></span>
+ 			</li>
+ {% endfor %}
++
++			<li><strong>Contribute</strong>
++			  <span><a href="{{ relative_root }}/contribute">Overview</a></span>
++			  <span><a href="{{ relative_root }}/contribute/report-a-bug">Reporting a bug</a></span>
++			  <span><a href="https://wiki.qemu.org/Documentation/GettingStartedDevelopers">New contributors</a></span>
++			  <span><a href="https://wiki.qemu.org/Contribute/SubmitAPatch">Submitting a patch</a></span>
++			  <span><a href="https://wiki.qemu.org/Contribute/FAQ">Contributor FAQ</a></span>
++			</li>
+ 		</ul>
+ 	</div>
+ </div>
+-- 
+2.26.2
 
 
