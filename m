@@ -2,81 +2,79 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C608C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A29F7C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:57:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 6AF562080A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:43:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id DDB7D20B1F
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 06:57:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wm1WRPOe"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6AF562080A
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GyGKCnXT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DDB7D20B1F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37098 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40522 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXIhs-0002aY-Cl
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 02:43:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41802)
+	id 1kXIvP-0004rL-Lq
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 02:57:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44284)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIgf-000285-E1
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:42:29 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25092)
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXIuM-0004NU-1T
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:56:38 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:53287)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXIgd-0005CI-Nr
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:42:29 -0400
+ (Exim 4.90_1) (envelope-from <kraxel@redhat.com>) id 1kXIuI-0001hG-TA
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 02:56:37 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603780945;
+ s=mimecast20190719; t=1603781792;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=bExxzAuVlPhwObzTQGdcaiSAX/GyNJ8NX7tlEnVqcU0=;
- b=Wm1WRPOei1TiRG7kAsK2RQ9m52zxJ4JHFeRivznOx/t1Lgxb2pS9M9/P/QxKBKKKj5a/Qv
- srHRx2jl1+YdlDvDpgaFhnWICtvH5JHyZdh7tB3GXbo33KHsHvzQYkvKBPWN8bM63KmCVT
- fBvlIoFfw4PHhqu4h/T7lF+vXfjKNLQ=
+ bh=cjJ+fnfLw0yG27JqRqzoRy45hsKEOPxRf3O0DmrIim4=;
+ b=GyGKCnXTy+0yyv8BiuVYfUKLyg8YMR5xnVJQURfjl3jLIoAH2zngPiNPp875KX2X0yQDKm
+ 0m6zmfc4OHrC0D8ofVXJnjMUjbDWys8RM22MSQf2oN0oOfp5Xh1Q8hJvCQSvNvRCOgtZGV
+ WsGcixz7+UFLFCWzfKjGkPHMHszdhl0=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-308-H2DhLDzaOS6Bf6fv9MwTtQ-1; Tue, 27 Oct 2020 02:42:24 -0400
-X-MC-Unique: H2DhLDzaOS6Bf6fv9MwTtQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-186-b4qFGpgfMM-cwR1dA7NmWw-1; Tue, 27 Oct 2020 02:56:30 -0400
+X-MC-Unique: b4qFGpgfMM-cwR1dA7NmWw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 3D84B1084D6A
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:42:23 +0000 (UTC)
-Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
- [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id AB8F06EF62;
- Tue, 27 Oct 2020 06:42:13 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 32621113865F; Tue, 27 Oct 2020 07:42:12 +0100 (CET)
-From: Markus Armbruster <armbru@redhat.com>
-To: marcandre.lureau@redhat.com
-Subject: Re: [PATCH 1/3] coroutine: let CoQueue wake up outside a coroutine
-References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
- <20201010204106.1368710-2-marcandre.lureau@redhat.com>
-Date: Tue, 27 Oct 2020 07:42:12 +0100
-In-Reply-To: <20201010204106.1368710-2-marcandre.lureau@redhat.com> (marcandre
- lureau's message of "Sun, 11 Oct 2020 00:41:04 +0400")
-Message-ID: <87eelk186z.fsf@dusky.pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D24D81006CA4;
+ Tue, 27 Oct 2020 06:56:28 +0000 (UTC)
+Received: from sirius.home.kraxel.org (ovpn-114-66.ams2.redhat.com
+ [10.36.114.66])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 2EF5E60FC2;
+ Tue, 27 Oct 2020 06:56:22 +0000 (UTC)
+Received: by sirius.home.kraxel.org (Postfix, from userid 1000)
+ id 50AF39D0D; Tue, 27 Oct 2020 07:56:21 +0100 (CET)
+Date: Tue, 27 Oct 2020 07:56:21 +0100
+From: Gerd Hoffmann <kraxel@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PATCH 0/8] arm/virt: add usb support
+Message-ID: <20201027065621.d7y7g2rtrdu3slyn@sirius.home.kraxel.org>
+References: <20201023071022.24916-1-kraxel@redhat.com>
+ <CAFEAcA-gEeHUJtuF9CX4XhXh6dnANNut-TJWz0nM8obAmMa3yA@mail.gmail.com>
+ <20201026070117.5ovcm4ep6iohjyfh@sirius.home.kraxel.org>
+ <CAFEAcA8vWzGQ3SG8bHzYwitqOat7fx71Kqs8tPQ8ZV6uWLHKXQ@mail.gmail.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <CAFEAcA8vWzGQ3SG8bHzYwitqOat7fx71Kqs8tPQ8ZV6uWLHKXQ@mail.gmail.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=kraxel@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=kraxel@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -99,51 +97,65 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Gerd Hoffmann <kraxel@redhat.com>,
- qemu-devel@nongnu.org, Stefan Hajnoczi <stefanha@redhat.com>, "Dr. David Alan
- Gilbert" <dgilbert@redhat.com>
+Cc: Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Sergio Lopez <slp@redhat.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Sai Pavan Boddu <sai.pavan.boddu@xilinx.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shannon Zhao <shannon.zhaosl@gmail.com>, qemu-arm <qemu-arm@nongnu.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Igor Mammedov <imammedo@redhat.com>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Kevin or Stefan, please review.
+  Hi,
 
-marcandre.lureau@redhat.com writes:
+> > Well, pci seems to come with some extra resource needs (see -M pc vs.
+> > -M q35 memory footprint differences discussed some months ago).  Thats
+> > why microvm started without pci support, and even now with pcie support
+> > added it is optional (and off by default).
+> 
+> I think PCI is too useful to discard.
 
-> From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
->
-> The assert() was added in commit b681a1c73e15 ("block: Repair the
-> throttling code."), when the qemu_co_queue_do_restart() function
-> required to be running in a coroutine. It was later made unnecessary in
-> commit a9d9235567e7 ("coroutine-lock: reschedule coroutine on the
-> AioContext it was running on").
->
-> Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
-> ---
->  util/qemu-coroutine-lock.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/util/qemu-coroutine-lock.c b/util/qemu-coroutine-lock.c
-> index 36927b5f88..5816bf8900 100644
-> --- a/util/qemu-coroutine-lock.c
-> +++ b/util/qemu-coroutine-lock.c
-> @@ -85,15 +85,13 @@ static bool qemu_co_queue_do_restart(CoQueue *queue, =
-bool single)
->      return true;
->  }
-> =20
-> -bool coroutine_fn qemu_co_queue_next(CoQueue *queue)
-> +bool qemu_co_queue_next(CoQueue *queue)
->  {
-> -    assert(qemu_in_coroutine());
->      return qemu_co_queue_do_restart(queue, true);
->  }
-> =20
-> -void coroutine_fn qemu_co_queue_restart_all(CoQueue *queue)
-> +void qemu_co_queue_restart_all(CoQueue *queue)
->  {
-> -    assert(qemu_in_coroutine());
->      qemu_co_queue_do_restart(queue, false);
->  }
+Discard is out of question of course.  I'd only add the option to
+disable it if not needed.
+
+> You can run anything you want (practically) via PCI. If we make it
+> optional then we're going to give ourselves the task of reimplementing
+> memory mapped versions of all the functionality it gives us,
+
+No.  Well, at least it would not be *my* plan to reach feature parity.
+I'm just trying to make available what we have.
+
+The mmio versions of usb host adapters are needed anyway to emulate some
+SoCs.  Describing them in device tree / ACPI is standardized so they
+just work without additional changes on the guest side.  So this is
+really just adding the device to the machine, adding a device tree node,
+adding a acpi dsdt entry (roughly a dozen lines of code each).
+
+Having virtio(-mmio) and usb is enough to cover alot of use cases.
+Especially on arm where virtio-gpu is the only display device option.
+
+> all of which is extra code and all of which adds to the
+> amount of stuff on the guest-to-QEMU security boundary.
+
+usb is off by default so it doesn't add anything unless you
+explicitly ask for it.
+
+Oh, and pci adds some non-trivial stuff to the guest-to-QEMU
+security boundary too ...
+
+> I think to be persuaded that no-PCI was a good idea I'd
+> want to at least see solid figures based on doing this
+> for Arm and on having put a lot of effort into slimming
+> down the PCI handling code/overhead in the guest and still
+> not being able to get near an MMIO setup. That is, try the
+> "improve the guest" approach first.
+
+Ok, fair enough.
+
+take care,
+  Gerd
 
 
