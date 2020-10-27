@@ -2,88 +2,73 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.4 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7803C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A0BC4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:35:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2935F2224E
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:34:10 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="asyKtitC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2935F2224E
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id C577F2224E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 09:35:31 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C577F2224E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:59944 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33900 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXLMn-0002h7-5S
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 05:34:09 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48012)
+	id 1kXLO6-0003hZ-IN
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 05:35:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48414)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXLLI-00021C-OI
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:32:36 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:37682)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXLLG-0007fN-FQ
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:32:35 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603791152;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=L4ZwX6X3rca5OxRZqv76z54dX8RADXL3JgbhPQOuS6o=;
- b=asyKtitCBcEoSmTVyuyfiP0+5wu0X3vJheEbgqWbc74312c4cWmAx5TsNLFA6Jo0jdTA6q
- x+txwrJMHGY4zjryl8rbLI0Afdf74B4WVT8Mdfd5QTSc1rP/T0NB/JhPTSe8fISGmH8fWP
- PsYdl/WhdMQJIP8p68hE3M6LzRNNBYQ=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-148-BNSX8si5MUCcxIGQ6RE9Vg-1; Tue, 27 Oct 2020 05:32:30 -0400
-X-MC-Unique: BNSX8si5MUCcxIGQ6RE9Vg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A9141084C9C;
- Tue, 27 Oct 2020 09:32:29 +0000 (UTC)
-Received: from localhost (ovpn-114-163.ams2.redhat.com [10.36.114.163])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B001D5C1BB;
- Tue, 27 Oct 2020 09:32:22 +0000 (UTC)
-Date: Tue, 27 Oct 2020 09:32:21 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH v2 03/19] block/nvme: Introduce device/iommu
- 'page_size_min' variables
-Message-ID: <20201027093221.GC79063@stefanha-x1.localdomain>
-References: <20201026105504.4023620-1-philmd@redhat.com>
- <20201026105504.4023620-4-philmd@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXLMl-0002qM-Pf
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:34:08 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:49400
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXLMi-00089O-F3
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 05:34:07 -0400
+Received: from host86-148-103-79.range86-148.btcentralplus.com
+ ([86.148.103.79] helo=[192.168.1.65])
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXLMi-00083t-Mn; Tue, 27 Oct 2020 09:34:09 +0000
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
+ qemu-devel@nongnu.org
+References: <20201021114300.11579-1-mark.cave-ayland@ilande.co.uk>
+ <24f4d006-f8b4-4eac-5319-67ad14b182b5@ilande.co.uk>
+ <4dc23e8c-8527-9334-477c-2aed648c621b@amsat.org>
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Message-ID: <e66f3460-903f-e427-a8e0-55c663e7f4e0@ilande.co.uk>
+Date: Tue, 27 Oct 2020 09:33:54 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
 MIME-Version: 1.0
-In-Reply-To: <20201026105504.4023620-4-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="/Uq4LBwYP4y1W6pO"
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+In-Reply-To: <4dc23e8c-8527-9334-477c-2aed648c621b@amsat.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 86.148.103.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: Re: [PATCH] sabre: use object_initialize_child() for iommu child
+ object
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -40
+X-Spam_score: -4.1
+X-Spam_bar: ----
+X-Spam_report: (-4.1 / 5.0 requ) BAYES_00=-1.9, NICE_REPLY_A=-2.167,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,78 +82,108 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Eric Auger <eric.auger@redhat.com>,
- Alex Williamson <alex.williamson@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---/Uq4LBwYP4y1W6pO
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 25/10/2020 11:41, Philippe Mathieu-Daudé wrote:
 
-On Mon, Oct 26, 2020 at 11:54:48AM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Introduce device/iommu 'page_size_min' variables to make
-> the code clearer.
->=20
-> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> ---
->  block/nvme.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->=20
-> diff --git a/block/nvme.c b/block/nvme.c
-> index aa290996679..5abd7257cac 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -690,6 +690,8 @@ static int nvme_init(BlockDriverState *bs, const char=
- *device, int namespace,
->      uint64_t deadline, now;
->      Error *local_err =3D NULL;
->      volatile NvmeBar *regs =3D NULL;
-> +    size_t device_page_size_min;
-> +    size_t iommu_page_size_min =3D 4096;
-> =20
->      qemu_co_mutex_init(&s->dma_map_lock);
->      qemu_co_queue_init(&s->dma_flush_queue);
-> @@ -724,7 +726,8 @@ static int nvme_init(BlockDriverState *bs, const char=
- *device, int namespace,
->          goto out;
->      }
-> =20
-> -    s->page_size =3D MAX(4096, 1u << (12 + NVME_CAP_MPSMIN(cap)));
-> +    device_page_size_min =3D 1u << (12 + NVME_CAP_MPSMIN(cap));
-> +    s->page_size =3D MAX(iommu_page_size_min, device_page_size_min);
+> On 10/25/20 12:11 PM, Mark Cave-Ayland wrote:
+>> On 21/10/2020 12:43, Mark Cave-Ayland wrote:
+>>
+>>> Store the child object directly within the sabre object rather than using
+>>> link properties.
+>>>
+>>> Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+>>> ---
+>>>   hw/pci-host/sabre.c         | 10 ++++------
+>>>   hw/sparc64/sun4u.c          |  8 +-------
+>>>   include/hw/pci-host/sabre.h |  2 +-
+>>>   3 files changed, 6 insertions(+), 14 deletions(-)
+>>>
+>>> diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
+>>> index f41a0cc301..aaa93acd6e 100644
+>>> --- a/hw/pci-host/sabre.c
+>>> +++ b/hw/pci-host/sabre.c
+>>> @@ -383,9 +383,10 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+>>>       pci_create_simple(phb->bus, 0, TYPE_SABRE_PCI_DEVICE);
+>>>       /* IOMMU */
+>>> +    sysbus_realize(SYS_BUS_DEVICE(&s->iommu), &error_fatal);
+>>>       memory_region_add_subregion_overlap(&s->sabre_config, 0x200,
+>>> -                    sysbus_mmio_get_region(SYS_BUS_DEVICE(s->iommu), 0), 1);
+>>> -    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, s->iommu);
+>>> +                    sysbus_mmio_get_region(SYS_BUS_DEVICE(&s->iommu), 0), 1);
+>>> +    pci_setup_iommu(phb->bus, sabre_pci_dma_iommu, &s->iommu);
+>>>       /* APB secondary busses */
+>>>       pci_dev = pci_new_multifunction(PCI_DEVFN(1, 0), true,
+>>> @@ -422,10 +423,7 @@ static void sabre_init(Object *obj)
+>>>       s->pci_irq_in = 0ULL;
+>>>       /* IOMMU */
+>>> -    object_property_add_link(obj, "iommu", TYPE_SUN4U_IOMMU,
+>>> -                             (Object **) &s->iommu,
+>>> -                             qdev_prop_allow_set_link_before_realize,
+>>> -                             0);
+>>> +    object_initialize_child(obj, "iommu", &s->iommu, TYPE_SUN4U_IOMMU);
+>>>       /* sabre_config */
+>>>       memory_region_init_io(&s->sabre_config, OBJECT(s), &sabre_config_ops, s,
+>>> diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+>>> index 2f8fc670cf..a33f1eccfd 100644
+>>> --- a/hw/sparc64/sun4u.c
+>>> +++ b/hw/sparc64/sun4u.c
+>>> @@ -562,7 +562,7 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>>>       PCIBus *pci_bus, *pci_busA, *pci_busB;
+>>>       PCIDevice *ebus, *pci_dev;
+>>>       SysBusDevice *s;
+>>> -    DeviceState *iommu, *dev;
+>>> +    DeviceState *dev;
+>>>       FWCfgState *fw_cfg;
+>>>       NICInfo *nd;
+>>>       MACAddr macaddr;
+>>> @@ -571,10 +571,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>>>       /* init CPUs */
+>>>       cpu = sparc64_cpu_devinit(machine->cpu_type, hwdef->prom_addr);
+>>> -    /* IOMMU */
+>>> -    iommu = qdev_new(TYPE_SUN4U_IOMMU);
+>>> -    sysbus_realize_and_unref(SYS_BUS_DEVICE(iommu), &error_fatal);
+>>> -
+>>>       /* set up devices */
+>>>       ram_init(0, machine->ram_size);
+>>> @@ -584,8 +580,6 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+>>>       sabre = SABRE(qdev_new(TYPE_SABRE));
+>>>       qdev_prop_set_uint64(DEVICE(sabre), "special-base", PBM_SPECIAL_BASE);
+>>>       qdev_prop_set_uint64(DEVICE(sabre), "mem-base", PBM_MEM_BASE);
+>>> -    object_property_set_link(OBJECT(sabre), "iommu", OBJECT(iommu),
+>>> -                             &error_abort);
+>>>       sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
+>>>       /* sabre_config */
+>>> diff --git a/include/hw/pci-host/sabre.h b/include/hw/pci-host/sabre.h
+>>> index 01190241bb..05bf741cde 100644
+>>> --- a/include/hw/pci-host/sabre.h
+>>> +++ b/include/hw/pci-host/sabre.h
+>>> @@ -34,7 +34,7 @@ struct SabreState {
+>>>       MemoryRegion pci_mmio;
+>>>       MemoryRegion pci_ioport;
+>>>       uint64_t pci_irq_in;
+>>> -    IOMMUState *iommu;
+>>> +    IOMMUState iommu;
+>>>       PCIBridge *bridgeA;
+>>>       PCIBridge *bridgeB;
+>>>       uint32_t pci_control[16];
+>>
+>> No further comments (and I'm happier that this is a better solution than having an 
+>> "optional" link property) so I've applied this to my qemu-sparc branch.
+> 
+> Sorry I had this patch tagged for review but am having trouble
+> managing that folder. This is certainly better, thanks for this
+> cleanup.
+> 
+> Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-It's not clear to me that the 4096 value is related to the IOMMU page
-size here. The MAX(4096) expression seems like a sanity-check to me. An
-MPS value of 0 is a 4KB page size, so it's never possible to express a
-smaller page size. I guess MAX() was used in case a device incorrectly
-reports MPSMIN.
+Looks like this patch exposes another issue related to QOM lifecycle, so I'm dropping 
+it from my qemu-sparc branch for now.
 
-I think introducing the concept of IOMMU page size is premature and
-maybe not the intention of the existing code, but the concept will be
-needed soon, so this patch is okay:
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+ATB,
 
---/Uq4LBwYP4y1W6pO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+X6SUACgkQnKSrs4Gr
-c8j81wf9E7unSIlvVheq4PZaz/enZFGv52I18A0fI6lj8Cm+8fEFwTXGqqD9h/FK
-4bGYdIAnIrvNdu8hOlIw6pjj8DRxFbULcnFnx59M4oH0isAeM1Em70c1hQIC5WSq
-sPnkkKA5A+h2/RNB4vqaXbRp2GUkTHPmw9m496Gtp9C0vwE54JBSlMrwhOAPrc6M
-U2PkXcCehX8LCZoCFb23ffzifljLOUMo6JvZwcVC1iBdBlu45xppDt/ZDQl6Sa36
-n5piiwYAA+NJtlMJhgzDFggTlMeJL2gSKj33AvsqblkDwHeXLorzG+zeGqbrSMCL
-hQEC21s8hWPKkZPODfHGw7fusFZwWA==
-=TgIg
------END PGP SIGNATURE-----
-
---/Uq4LBwYP4y1W6pO--
-
+Mark.
 
