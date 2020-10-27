@@ -2,94 +2,94 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE52C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81421C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:11 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 85ED520780
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C287C2231B
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:05:10 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O5qZs9Jo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 85ED520780
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CLJc8we2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C287C2231B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57196 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOer-0004i4-Fn
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:05:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52308)
+	id 1kXOez-00051z-GQ
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:05:09 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46792)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPs-0001pm-Fj
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:28 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:44420)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPp-0004gY-AX
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:27 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id t9so1499825wrq.11
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=31oB8adlz3FHMBAML1Jxi6tZhh8Z+m5TwWywAmM/pII=;
- b=O5qZs9Jon0x+5AL/5i2pTHgEiaQdyjo4cO2m/S5AzL3bMFR3wlxr4/62bDj1UgK1g8
- NJNA0zweuazvEVucJxrFLm8nuo2+3y2IPb9pA+z0pfRSlH57McyPx5/RvYOOvYLqaHbF
- j1Tz+d5CNYx96eah8RtuSK7sT2sGWlKtyT6tI7G246LhbvtVktKV9+0rV0UUl9MlZoei
- +niuoem4LtPMC7z9gntuvOD3oLL4pqq+U5wYzaOmEOJgyoYxbpJQrwiismMRNyS4BK3v
- C6uOO1Glbz1hjGmk4/+PTl91axveFYlsoz5d0duy4+Brcx891OqaTXjMOeEUj2NucGEO
- KEFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=31oB8adlz3FHMBAML1Jxi6tZhh8Z+m5TwWywAmM/pII=;
- b=teCg8dMdAUEhHTXQzKf/r0Wune1m8xJgre+hSt9pSwzyjGgCHKdfq7DqpmQ0q3djZJ
- JQ58G2KXTxIqNwyscd8WPq6Y5FfW367EbuoKBHi3b0VUoh8vVxd9QHrnjET/QmCxPGK5
- Nc/m+zVTWItYyEhJ3+U5DO1LumiMzfNOjUo3/X7Kd0CPVY5EkjeL5jfal3QZEFEKDhBL
- oeSj/tQtkNfqXapVxEBOmjHbmwH+2ZZd3KQMJ/54S6+2I9pFEu0qtNs6BcdOgd0Ldkmm
- 8hLkbqh9cQd5Ccjrwr1PmKr51Dq3x4o107+ZtCV2Wv8who8aN41+et877BR89L6CxIUP
- hNUQ==
-X-Gm-Message-State: AOAM530TJIepYDFPpPEkGGjUnGDs6hHqwIeaIguJgrlC1NEEtVyerrCJ
- uP1fHGNN4lV4Ls4j/h50MnFmU4+5whO+eg==
-X-Google-Smtp-Source: ABdhPJwM8O3i6VDD+69crFqAziMFR++dwgevBZgvQqD0hjNtU6wv/918KT0QL03Rxd4o6p+gnKFdEw==
-X-Received: by 2002:a05:6000:1051:: with SMTP id
- c17mr2278494wrx.290.1603799120368; 
- Tue, 27 Oct 2020 04:45:20 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.19
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:45:19 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 32/48] hw/core/clock: trace clock values in Hz instead of ns
-Date: Tue, 27 Oct 2020 11:44:22 +0000
-Message-Id: <20201027114438.17662-33-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
-References: <20201027114438.17662-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOd0-0003Kh-DX
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:03:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29970)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <mst@redhat.com>) id 1kXOcy-0002yl-D8
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:03:06 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603803783;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=XmF1XQD9NTKFs4yV7GS1m3ixx//HvDyDC+aY7XD9WXU=;
+ b=CLJc8we2HF7NMiRCrroVpFMLWkSAlE38Dg+pXuKw2uiugp4lhHs5nVMUCRrBuHakgng2Pw
+ 8YKcxBiBonz8sR0eMe1vjbtnX+05l5arcb0lTjdGvRVUx1ygcnwxrxGyQTSxYPatx38hso
+ ciiCKOYYkFj8ACp7iHoax6tm2VGH72U=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-152-lJ7eZOEyOkCOkRNVomymog-1; Tue, 27 Oct 2020 09:03:01 -0400
+X-MC-Unique: lJ7eZOEyOkCOkRNVomymog-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
+ [10.5.11.13])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8DF388F116
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:02:16 +0000 (UTC)
+Received: from redhat.com (ovpn-115-179.ams2.redhat.com [10.36.115.179])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 237016EF50;
+ Tue, 27 Oct 2020 13:02:10 +0000 (UTC)
+Date: Tue, 27 Oct 2020 09:02:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Igor Mammedov <imammedo@redhat.com>
+Subject: Re: [PATCH] pci: Refuse to hotplug PCI Devices when the Guest OS is
+ not ready
+Message-ID: <20201027085650-mutt-send-email-mst@kernel.org>
+References: <CAC_L=vVi6ngD6j0sZ2uLZ-NHF2WGzKfiOvmsHxOZaBRv6FuBug@mail.gmail.com>
+ <20201022100028-mutt-send-email-mst@kernel.org>
+ <CAC_L=vWctLK0Yjod_Vz=+xzFKFp4UoUdjSVa4jWeDm+g8en6wQ@mail.gmail.com>
+ <20201022102857-mutt-send-email-mst@kernel.org>
+ <CAC_L=vX0+H-SfQHneVPd-Mc3wFxHBSbkKHt3SpNOBOY_JsYDUA@mail.gmail.com>
+ <20201022110016-mutt-send-email-mst@kernel.org>
+ <CAC_L=vUgsh=08m8EEuEucRtdX73X5kw5ov4Ekg7jFjbHsU6f2w@mail.gmail.com>
+ <20201026174537.128a4173@yekko.fritz.box>
+ <20201027072430-mutt-send-email-mst@kernel.org>
+ <20201027135426.765dd19b@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::42b;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x42b.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+In-Reply-To: <20201027135426.765dd19b@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=mst@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=mst@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,72 +102,95 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: David Gibson <dgibson@redhat.com>, Julia Suvorova <jusual@redhat.com>,
+ qemu devel list <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Luc Michel <luc@lmichel.fr>
+On Tue, Oct 27, 2020 at 01:54:26PM +0100, Igor Mammedov wrote:
+> On Tue, 27 Oct 2020 07:26:44 -0400
+> "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> 
+> > On Mon, Oct 26, 2020 at 05:45:37PM +1100, David Gibson wrote:
+> > > On Fri, 23 Oct 2020 09:26:48 +0300
+> > > Marcel Apfelbaum <marcel.apfelbaum@gmail.com> wrote:
+> > >   
+> > > > Hi Michael,
+> > > > 
+> > > > On Thu, Oct 22, 2020 at 6:01 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > 
+> > > >  [...]  
+> [...]
+> > > > Simplistic does not mean wrong or incorrect.
+> > > > I fail to see why it is not enough.
+> > > > 
+> > > > What QEMU can do better? Wait an unbounded time for the blinking to finish?  
+> > > 
+> > > It certainly shouldn't wait an unbounded time.  But a wait with timeout
+> > > seems worth investigating to me.  
+> racy, timeout is bound to break once it's in overcommited env.
+> 
+> > If it's helpful, I'd add a query to check state
+> > so management can figure out why doesn't guest see device yet.
+> that means mgmt would have to poll it and forward it to user
+> somehow.
+> 
+> > But otherwise just buffer the request until such time as
+> > we can deliver it to guest ...
+> I have more questions wrt the suggestion/workflow:
+> * at what place would you suggest buffering it?
 
-The nanosecond unit greatly limits the dynamic range we can display in
-clock value traces, for values in the order of 1GHz and more. The
-internal representation can go way beyond this value and it is quite
-common for today's clocks to be within those ranges.
+PCIESlot maybe?
 
-For example, a frequency between 500MHz+ and 1GHz will be displayed as
-1ns. Beyond 1GHz, it will show up as 0ns.
+> * what would be the request in this case, i.e. create PCI device anyways
+> and try to signal hotplug event later?
 
-Replace nanosecond periods traces with frequencies in the Hz unit
-to have more dynamic range in the trace output.
 
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Damien Hedde <damien.hedde@greensocs.com>
-Signed-off-by: Luc Michel <luc@lmichel.fr>
-Tested-by: Guenter Roeck <linux@roeck-us.net>
-Tested-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
----
- hw/core/clock.c      | 6 +++---
- hw/core/trace-events | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+that was my idea, yes.
 
-diff --git a/hw/core/clock.c b/hw/core/clock.c
-index f866717a835..8c6af223e7c 100644
---- a/hw/core/clock.c
-+++ b/hw/core/clock.c
-@@ -54,8 +54,8 @@ bool clock_set(Clock *clk, uint64_t period)
-     if (clk->period == period) {
-         return false;
-     }
--    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_NS(clk->period),
--                    CLOCK_PERIOD_TO_NS(period));
-+    trace_clock_set(CLOCK_PATH(clk), CLOCK_PERIOD_TO_HZ(clk->period),
-+                    CLOCK_PERIOD_TO_HZ(period));
-     clk->period = period;
- 
-     return true;
-@@ -69,7 +69,7 @@ static void clock_propagate_period(Clock *clk, bool call_callbacks)
-         if (child->period != clk->period) {
-             child->period = clk->period;
-             trace_clock_update(CLOCK_PATH(child), CLOCK_PATH(clk),
--                               CLOCK_PERIOD_TO_NS(clk->period),
-+                               CLOCK_PERIOD_TO_HZ(clk->period),
-                                call_callbacks);
-             if (call_callbacks && child->callback) {
-                 child->callback(child->callback_opaque);
-diff --git a/hw/core/trace-events b/hw/core/trace-events
-index 1ac60ede6b7..360ddeb2c87 100644
---- a/hw/core/trace-events
-+++ b/hw/core/trace-events
-@@ -31,6 +31,6 @@ resettable_transitional_function(void *obj, const char *objtype) "obj=%p(%s)"
- # clock.c
- clock_set_source(const char *clk, const char *src) "'%s', src='%s'"
- clock_disconnect(const char *clk) "'%s'"
--clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', ns=%"PRIu64"->%"PRIu64
-+clock_set(const char *clk, uint64_t old, uint64_t new) "'%s', %"PRIu64"Hz->%"PRIu64"Hz"
- clock_propagate(const char *clk) "'%s'"
--clock_update(const char *clk, const char *src, uint64_t val, int cb) "'%s', src='%s', ns=%"PRIu64", cb=%d"
-+clock_update(const char *clk, const char *src, uint64_t hz, int cb) "'%s', src='%s', val=%"PRIu64"Hz cb=%d"
--- 
-2.20.1
+> * what would baremethal do in such case?
+
+exactly the same, human would wait until blinking stops.
+
+> * what to do in case guest is never ready, what user should do in such case?
+
+As in guest is stuck? Do we care? It can't use the device.
+
+> * can be such device be removed?
+
+why not? device_del could complete immediately ...
+
+> not sure that all of this is worth of the effort and added complexity.
+> 
+> alternatively:
+> maybe ports can send QMP events about it's state changes, which end user would
+> be able to see + error like in this patch.
+> 
+> On top of it, mgmt could build a better UIx, like retry/notify logic if
+> that's what user really wishes for and configures (it would be up to user to
+> define behaviour).
+
+I'd say let's get expected behaviour for existing commands first.
+We can add events and stuff on top.
+
+> > > > What if we have a buggy guest with a kernel stuck in blinking?
+> > > > Is QEMU's responsibility to emulate the operator itself? Because the
+> > > > operator
+> > > > is the one who is supposed to wait.
+> > > > 
+> > > > 
+> > > > Thanks,
+> > > > Marcel
+> > > > 
+> > > > [...]  
+> > > 
+> > > 
+> > > -- 
+> > > David Gibson <dgibson@redhat.com>
+> > > Principal Software Engineer, Virtualization, Red Hat  
+> > 
+> > 
+> > 
 
 
