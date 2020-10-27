@@ -7,45 +7,45 @@ X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6160DC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:28:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4DF8C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:30:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C689820754
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E593722258
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:30:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="e1h5uF/O"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C689820754
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f1K0L6ld"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E593722258
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51502 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPy5-0007UB-OO
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:28:57 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42436)
+	id 1kXPzv-0001PQ-Sz
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:30:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42308)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXPnX-0001zH-TS; Tue, 27 Oct 2020 10:18:03 -0400
-Received: from ozlabs.org ([203.11.71.1]:34313)
+ id 1kXPnL-0001fF-R1; Tue, 27 Oct 2020 10:17:51 -0400
+Received: from ozlabs.org ([203.11.71.1]:49399)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXPnV-0007aY-T5; Tue, 27 Oct 2020 10:18:03 -0400
+ id 1kXPnI-0007Yn-TA; Tue, 27 Oct 2020 10:17:51 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CLDLf5glcz9shm; Wed, 28 Oct 2020 01:17:45 +1100 (AEDT)
+ id 4CLDLZ5GjPz9sf8; Wed, 28 Oct 2020 01:17:41 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1603808266;
- bh=LxxlzQPzPW9/phU/w56M/4owvBfBJDEPVYgX6V5xpz4=;
+ d=gibson.dropbear.id.au; s=201602; t=1603808262;
+ bh=562dCV4MbH/MftQHrOS2/q+KhVYTpBSxvy39bn5/W4I=;
  h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
- b=e1h5uF/O7DnzE6Y0JH0sUxIzJyL2fMy5+Pmhti3sJFzvRAVaHLIyPd6Vt8VuFg5ly
- /7XXZlz199+pQ9ucbBy2YrcyPqetulOuPWOLq8nNiLzBCsmYOSjYqLAjCcKVwkjT2a
- xkxHAJir5G5a6B74K/XiQxyoN8juhnecmhmzzWx4=
+ b=f1K0L6ldgKqc/w4L2ol5e/PY/LzGYYW7jQhgcLdFLnWXrbC3xXnz/HtcTzdCaaA4s
+ YAlYQ4R+FWEi5/VRna23rXgGZsdxlaQ9CSM2DzKaTdQBWxMLS5yNt65L76Iw+/7JG2
+ qLR12x602ck/Qhnlqp4KcRE53nAAM2zC6QMBXPiY=
 From: David Gibson <david@gibson.dropbear.id.au>
 To: peter.maydell@linaro.org
-Subject: [PULL 07/18] spapr: Drop spapr_delete_vcpu() unused argument
-Date: Wed, 28 Oct 2020 01:17:24 +1100
-Message-Id: <20201027141735.728821-8-david@gibson.dropbear.id.au>
+Subject: [PULL 01/18] spapr: Clarify why DR connectors aren't user creatable
+Date: Wed, 28 Oct 2020 01:17:18 +1100
+Message-Id: <20201027141735.728821-2-david@gibson.dropbear.id.au>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201027141735.728821-1-david@gibson.dropbear.id.au>
 References: <20201027141735.728821-1-david@gibson.dropbear.id.au>
@@ -54,7 +54,7 @@ Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 10:17:43
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
 X-Spam_score_int: -17
 X-Spam_score: -1.8
 X-Spam_bar: -
@@ -81,45 +81,33 @@ Sender: "Qemu-devel"
 
 From: Greg Kurz <groug@kaod.org>
 
-The 'sc' argument is unused. Drop it.
+DR connector is a device that emulates a firmware abstraction used by PAPR
+compliant guests to manage hotplug/dynamic-reconfiguration of PHBs, PCI
+devices, memory, and CPUs.
+
+It is internally created by the spapr platform and requires to be owned by
+either the machine (PHBs, CPUs, memory) or by a PHB (PCI devices).
 
 Signed-off-by: Greg Kurz <groug@kaod.org>
-Message-Id: <160279671929.1808373.10333672533575251075.stgit@bahia.lan>
+Message-Id: <160250199940.765467.6896806997161856576.stgit@bahia.lan>
 Signed-off-by: David Gibson <david@gibson.dropbear.id.au>
 ---
- hw/ppc/spapr_cpu_core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ hw/ppc/spapr_drc.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/hw/ppc/spapr_cpu_core.c b/hw/ppc/spapr_cpu_core.c
-index e4aeb93c02..45eb212187 100644
---- a/hw/ppc/spapr_cpu_core.c
-+++ b/hw/ppc/spapr_cpu_core.c
-@@ -212,7 +212,7 @@ static void spapr_cpu_core_reset_handler(void *opaque)
-     spapr_cpu_core_reset(opaque);
- }
- 
--static void spapr_delete_vcpu(PowerPCCPU *cpu, SpaprCpuCore *sc)
-+static void spapr_delete_vcpu(PowerPCCPU *cpu)
- {
-     SpaprCpuState *spapr_cpu = spapr_cpu_state(cpu);
- 
-@@ -233,7 +233,7 @@ static void spapr_cpu_core_unrealize(DeviceState *dev)
-         spapr_unrealize_vcpu(sc->threads[i], sc);
-     }
-     for (i = 0; i < cc->nr_threads; i++) {
--        spapr_delete_vcpu(sc->threads[i], sc);
-+        spapr_delete_vcpu(sc->threads[i]);
-     }
-     g_free(sc->threads);
- }
-@@ -345,7 +345,7 @@ err_unrealize:
-     }
- err:
-     while (--i >= 0) {
--        spapr_delete_vcpu(sc->threads[i], sc);
-+        spapr_delete_vcpu(sc->threads[i]);
-     }
-     g_free(sc->threads);
+diff --git a/hw/ppc/spapr_drc.c b/hw/ppc/spapr_drc.c
+index 697b28c343..77718cde1f 100644
+--- a/hw/ppc/spapr_drc.c
++++ b/hw/ppc/spapr_drc.c
+@@ -586,7 +586,8 @@ static void spapr_dr_connector_class_init(ObjectClass *k, void *data)
+     dk->realize = realize;
+     dk->unrealize = unrealize;
+     /*
+-     * Reason: it crashes FIXME find and document the real reason
++     * Reason: DR connector needs to be wired to either the machine or to a
++     * PHB in spapr_dr_connector_new().
+      */
+     dk->user_creatable = false;
  }
 -- 
 2.26.2
