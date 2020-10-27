@@ -2,101 +2,93 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7EAA5C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:16:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 104ACC5517A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:18:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D568222E9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:16:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 89DB1206FA
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 14:18:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RidUPOMr"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D568222E9
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PEyAkk9W"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 89DB1206FA
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41946 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45848 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPmF-0008Sd-Sj
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:16:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:36250)
+	id 1kXPnv-0001ga-Kh
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 10:18:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41450)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPTh-0003dg-0O
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:57:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:30704)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXPkO-0006bH-J0
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:14:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56295)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXPTW-0004Ou-S5
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:57:28 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXPkJ-00078J-Ah
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:14:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603807034;
+ s=mimecast20190719; t=1603808081;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=CnKJRPL31xVnAcjJgHQjDndeYt6tVNjYfmSUE2zuN74=;
- b=RidUPOMrous0zB7xzqrwECzcHt+yKAYPHhtFcJrO78dNfPkVM8NnG2Ou1ADmi49KaarJ/y
- +bkl6ROCT8BAn2PhszGbFUDnrVuz90FR0FtoW5Ygoc+JzbH9hsp3xD36iTe23JihA2pZmZ
- 9eErogwPFBrTJDFCt6oGPjtjIYRwm0E=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-25-hTRvjjwwMY2ePrBrp66y-Q-1; Tue, 27 Oct 2020 09:57:13 -0400
-X-MC-Unique: hTRvjjwwMY2ePrBrp66y-Q-1
-Received: by mail-ej1-f70.google.com with SMTP id t1so870958ejb.21
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:57:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=CnKJRPL31xVnAcjJgHQjDndeYt6tVNjYfmSUE2zuN74=;
- b=kovX/GNq872S3EdvIjKZliKtaaZcSRS/nitSw9xntA4Xpbl9S5cwApAHYffUGyrEFa
- y9Y1HH3MX83XFFCFcshitLdnVG0yZ+lczc6GZqPFhT33FV6hh2ofG+cQmugyQrAlAk8N
- 1hx3iSBDUja6DmIqf4KjiG7NL59RNmnwRo/Gb0Wu77fbG4DEzpn/z8LK1Vq9yew0DEDk
- jHm1LzcufrGvo/raljgt3zoizQo/xDbm3xoMzsUo4IbSAYihuZF9Bw59xr6qvzV3ZOai
- FEQ/m6H83gUeWOZ3jI6aETFerDzQLBl5H0ge/4/E6uz0Dij2R0tB1XtdChtExSMVQKdk
- vpYQ==
-X-Gm-Message-State: AOAM531r2DGaQj2z4LLX3UP7RU0wwRwOLGRj3FqO+4ZsfYqN8ZeYqcEt
- MHtYgXUQRV6GcQ8YFxGjygcKadt+ki/3G+Wun3NTXxjd73Hz94C5hB7ajCNvtkt/Xa6Ln8kmhj3
- j41GDSz3q6mwT1Bk=
-X-Received: by 2002:aa7:cf0f:: with SMTP id a15mr2488090edy.3.1603807031579;
- Tue, 27 Oct 2020 06:57:11 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyvCUXDinGiPty4cyztZwsd74U8l4L82wkME6zZcbbfVNW3u/nxxKWmdV1QX7jPFSHS9y65PA==
-X-Received: by 2002:aa7:cf0f:: with SMTP id a15mr2488074edy.3.1603807031403;
- Tue, 27 Oct 2020 06:57:11 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id cw15sm1109814ejb.47.2020.10.27.06.57.09
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 06:57:10 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 15/25] block/nvme: Correctly initialize Admin Queue Attributes
-Date: Tue, 27 Oct 2020 14:55:37 +0100
-Message-Id: <20201027135547.374946-16-philmd@redhat.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20201027135547.374946-1-philmd@redhat.com>
-References: <20201027135547.374946-1-philmd@redhat.com>
+ bh=AGeB9oSplaxgvLPj0yAFvuTqgP3v8Vuunik/wjHt0aY=;
+ b=PEyAkk9Wz8OpmUUPwQC9G9Qg4Sgz5M3i7IDM6TscfzXN+HRpIr6CoIGaPXQmig/nMcoJO5
+ +VskKlta40VVEKDFB1ak+Ce+BAeKFLqcQTCYyNJapv5ixbQidlOQXsCJN3bZ9awZsoO8K9
+ VMsgivznAbBAzg5vjZ1+eFTKshBKSX8=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-510-KlQpddmVNNS71t4ZGPxskQ-1; Tue, 27 Oct 2020 10:14:38 -0400
+X-MC-Unique: KlQpddmVNNS71t4ZGPxskQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C6FAB1019657
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 14:14:15 +0000 (UTC)
+Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
+ [10.36.112.182])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 68AA560C11;
+ Tue, 27 Oct 2020 14:14:15 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+ id E4354113865F; Tue, 27 Oct 2020 15:14:13 +0100 (CET)
+From: Markus Armbruster <armbru@redhat.com>
+To: =?utf-8?Q?Marc-Andr=C3=A9?= Lureau <marcandre.lureau@redhat.com>
+Subject: Re: [PATCH 3/3] console: make QMP/HMP screendump run in coroutine
+References: <20201010204106.1368710-1-marcandre.lureau@redhat.com>
+ <20201010204106.1368710-4-marcandre.lureau@redhat.com>
+ <87o8koysb8.fsf@dusky.pond.sub.org>
+ <CAMxuvayGxrcCDV0wDVE1Pv=TeE26fief2eZfvva6AUsVT6wgGg@mail.gmail.com>
+Date: Tue, 27 Oct 2020 15:14:13 +0100
+In-Reply-To: <CAMxuvayGxrcCDV0wDVE1Pv=TeE26fief2eZfvva6AUsVT6wgGg@mail.gmail.com>
+ (=?utf-8?Q?=22Marc-Andr=C3=A9?= Lureau"'s message of "Tue, 27 Oct 2020
+ 16:07:09 +0400")
+Message-ID: <87a6w77o3u.fsf@dusky.pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=armbru@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -110,53 +102,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Eric Auger <eric.auger@redhat.com>,
- Max Reitz <mreitz@redhat.com>, Keith Busch <kbusch@kernel.org>,
- Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Gerd Hoffmann <kraxel@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ qemu-devel <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From the specification chapter 3.1.8 "AQA - Admin Queue Attributes"
-the Admin Submission Queue Size field is a 0’s based value:
+Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com> writes:
 
-  Admin Submission Queue Size (ASQS):
+> Hi
+>
+> On Tue, Oct 27, 2020 at 12:41 PM Markus Armbruster <armbru@redhat.com> wr=
+ote:
+>>
+>> marcandre.lureau@redhat.com writes:
+>>
+>> > From: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+>> >
+>> > Thanks to the monitors coroutine support, the screendump handler can
+>>
+>> monitors'
+>>
+>> Suggest to add (merge commit b7092cda1b3) right before the comma.
+>>
+>> > trigger a graphic_hw_update(), yield and let the main loop run until
+>> > update is done. Then the handler is resumed, and ppm_save() will write
+>> > the screen image to disk in the coroutine context (thus non-blocking).
+>> >
+>> > Potentially, during non-blocking write, some new graphic update could
+>> > happen, and thus the image may have some glitches. Whether that
+>> > behaviour is acceptable is discutable. Allocating new memory may not b=
+e
+>>
+>> s/discutable/debatable/
+>>
+>> > a good idea, as framebuffers can be quite large. Even then, QEMU may
+>> > become less responsive as it requires paging in etc.
+>>
+>> Tradeoff.  I'm okay with "simple & efficient, but might glitch".  It
+>> should be documented, though.  Followup patch is fine.
+>>
+>> > Related to:
+>> > https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
+>> >
+>> > Signed-off-by: Marc-Andr=C3=A9 Lureau <marcandre.lureau@redhat.com>
+[...]
+>> Let's revisit the experiment I did for v1: "observe the main loop keeps
+>> running while the screendump does its work".
+>>
+>> Message-ID: <87a74ueudt.fsf@dusky.pond.sub.org>
+>> https://lists.nongnu.org/archive/html/qemu-devel/2020-03/msg01235.html
+>>
+>> I repeated the first experiment "does the main loop continue to run when
+>> writing out the screendump blocks / would block?"  Same result: main
+>> loop remains blocked.
+>>
+>> Back then, you replied
+>>
+>>     Right, the goal was rather originally to fix rhbz#1230527. We got
+>>     coroutine IO by accident, and I was too optimistic about default
+>>     behaviour change ;) I will update the patch.
+>>
+>> I'm unsure what exactly the update is.  Is it the change from
+>>
+>>     Fixes:
+>>     https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
+>>
+>> to
+>>
+>>     Related to:
+>>     https://bugzilla.redhat.com/show_bug.cgi?id=3D1230527
+>>
+>> ?
+>
+> Right, qmp_screendump() calls qemu_open_old(filename, O_WRONLY |
+> O_CREAT | O_TRUNC | O_BINARY, 0666), so opened in blocking mode.
+>
+> So simply opening a FS file with O_NONBLOCK or calling
+> qemu_try_set_nonblock(fd) with the resulting fd doesn't really help to
+> check it's async (unless I am missing a trick to slow down disk IO
+> somehow...?)
+>
+> It's annoying that it also does O_TRUNC: even if you pass a
+> socket/pipe to add-fd, it will fail to ftruncate() (via the
+> "/dev/fdset" path). Furthermore, access mode check seems kinda
+> incomplete. Afaict, in monitor_fdset_dup_fd_add(), F_GETFL may return
+> O_RDWR which is different than O_RDONLY or O_WRONLY, yet should be
+> considered compatible for the caller I think..
+>
+> With some little hacks though, I could check passing a pipe does
+> indeed make PPM save async, and the main loop is reentered. I don't
+> know if it's enough to convince you it's not really the problem of
+> this code change though. We get coroutine IO by accident here, I think
+> we already said that.
 
-    Defines the size of the Admin Submission Queue in entries.
-    Enabling a controller while this field is cleared to 00h
-    produces undefined results. The minimum size of the Admin
-    Submission Queue is two entries. The maximum size of the
-    Admin Submission Queue is 4096 entries.
-    This is a 0’s based value.
+I'm okay with this patch "only" getting us closer to the goal of having
+screendump not block the main loop.  I just want the commit message to
+be clear on how close.
 
-This bug has never been hit because the device initialization
-uses a single command synchronously :)
+>> The commit message says "ppm_save() will write the screen image to disk
+>> in the coroutine context (thus non-blocking)."  Sure reads like a claim
+>> the main loop is no longer blocked.  It is blocked, at least for me.
+>> Please clarify.
+>
+> Let's clarify it by saying it's still blocking then, and tackle that
+> in a future change.
 
-Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
----
- block/nvme.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Works for me!
 
-diff --git a/block/nvme.c b/block/nvme.c
-index 2dfcf8c41d7..d5df30ec074 100644
---- a/block/nvme.c
-+++ b/block/nvme.c
-@@ -789,9 +789,9 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
-         goto out;
-     }
-     s->queue_count = 1;
--    QEMU_BUILD_BUG_ON(NVME_QUEUE_SIZE & 0xF000);
--    regs->aqa = cpu_to_le32((NVME_QUEUE_SIZE << AQA_ACQS_SHIFT) |
--                            (NVME_QUEUE_SIZE << AQA_ASQS_SHIFT));
-+    QEMU_BUILD_BUG_ON((NVME_QUEUE_SIZE - 1) & 0xF000);
-+    regs->aqa = cpu_to_le32(((NVME_QUEUE_SIZE - 1) << AQA_ACQS_SHIFT) |
-+                            ((NVME_QUEUE_SIZE - 1) << AQA_ASQS_SHIFT));
-     regs->asq = cpu_to_le64(s->queues[INDEX_ADMIN]->sq.iova);
-     regs->acq = cpu_to_le64(s->queues[INDEX_ADMIN]->cq.iova);
- 
--- 
-2.26.2
+>> Back then, I proposed a second experiment: "does the main loop continue
+>> to run while we wait for graphic_hw_update_done()?"  I don't know the
+>> result.  Do you?
+>>
+>> The commit message claims "the screendump handler can trigger a
+>> graphic_hw_update(), yield and let the main loop run until update is
+>> done."
+>
+> Isn't it clearly the case with the BH being triggered after main loop?
+
+Yes, but have you *tested* the main loop keeps running?
 
 
