@@ -2,100 +2,96 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 621A3C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:46:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD0C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B4265207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:46:17 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B4265207C3
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=irrelevant.dk
+	by mail.kernel.org (Postfix) with ESMTPS id C5AD0207C3
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:13 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WIijWV1C"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5AD0207C3
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44268 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNQe-0001Bx-Gh
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:46:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38834)
+	id 1kXNUS-0004lg-Ov
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:50:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45290)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYm-0000gN-88; Tue, 27 Oct 2020 06:50:36 -0400
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:48221)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <its@irrelevant.dk>)
- id 1kXMYk-0002Gb-74; Tue, 27 Oct 2020 06:50:35 -0400
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
- by mailout.nyi.internal (Postfix) with ESMTP id 0850F5C018C;
- Tue, 27 Oct 2020 06:49:59 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
- by compute4.internal (MEProxy); Tue, 27 Oct 2020 06:49:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=irrelevant.dk;
- h=from:to:cc:subject:date:message-id:in-reply-to:references
- :mime-version:content-transfer-encoding; s=fm1; bh=Hg2BWcsB+uhUy
- NoC8nYzdvSMxyge01KWtWaAw8dVPoQ=; b=xklxvv2Lx6NQXtO4r47TcSP7Lo8GL
- 7jL5G8UCrDl98CIpMhjfSBco5I8r6A/jY2T88liChIu7QFyemURzF0KYjfGKpbI+
- e6TBqA6TlwoV5c3kZBhyg/QdQma9eVsM5zNOMy7MbbzKnK2Z1WAf2mVDYGFhSeHY
- RBKXQ5KVjRWHO91ybitPaPxNS3aSHJRbqdT6a4sXTpjO+rRTmTyAiqa/gQ64OfTE
- 8x1s6UOxIJ00PoBluxZMzCdTGxFxWlkhSotg7blPcY3iGJd39dDXDqnJWgQGRJMd
- PTPA3Uy1iOFkaP+UFb914meDojLdDSMMEuU+F8KdF4lAgX/GMATEY2S8w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
- messagingengine.com; h=cc:content-transfer-encoding:date:from
- :in-reply-to:message-id:mime-version:references:subject:to
- :x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
- fm1; bh=Hg2BWcsB+uhUyNoC8nYzdvSMxyge01KWtWaAw8dVPoQ=; b=aR46wYVY
- ItwiVnd+DR+ObnSHkDS3/cmp8yBY83JVZn4NIOjz2a5k7pFDyg3XMwvF87pKBUvt
- HSMM/oZoPS5zX339I0Y/sMXefjm33qGQ/XOFZ9C+vawMYKHcfsRi7w+zW5MC4ztb
- 1SFi2BB2CEXE5b4jrCM1NK5bYdc+JlpVWismtva1vcJcNaGsrxd/uNkBD4pKcdri
- wC/QCRQT9nz0Txx2B/LNU0tO6YWl8X+45WOmawtqMDXO+TOrgExwrr4j6+XGFdh4
- AvlKX41hK0nGkKW1zIGCpxnSxlQvtMkSn3IK3NAD0e9uyPceClHcKZQbGi3CZTuc
- 2N70mN6TY9Dd7w==
-X-ME-Sender: <xms:VvuXX5RvrQUgA0-COLsqdSmjdmivDOhl3hzjGAYjc52NvIScj1XxVQ>
- <xme:VvuXXyyWfbnvxyChVk4za6fXooQQETsH0RWYF2d_JzriWyDRUfkaoauvGue7UIu4Q
- rnAhWbMG7OdHypuDx8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedujedrkeelgddvtdcutefuodetggdotefrodftvf
- curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
- uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
- fjughrpefhvffufffkofgjfhgggfestdekredtredttdenucfhrhhomhepmfhlrghushcu
- lfgvnhhsvghnuceoihhtshesihhrrhgvlhgvvhgrnhhtrdgukheqnecuggftrfgrthhtvg
- hrnhepueelteegieeuhffgkeefgfevjeeigfetkeeitdfgtdeifefhtdfhfeeuffevgfek
- necukfhppeektddrudeijedrleekrdduledtnecuvehluhhsthgvrhfuihiivgepieenuc
- frrghrrghmpehmrghilhhfrhhomhepihhtshesihhrrhgvlhgvvhgrnhhtrdgukh
-X-ME-Proxy: <xmx:VvuXX-3QVF8U128u_1mBqYFksoeu_fo3ndAcekXuRqFiJSzv3gyyPw>
- <xmx:VvuXXxBPMTA_ahTRbW2ywX9i828FOMQRDbiQmC-9YLFvoAW3U4BJQw>
- <xmx:VvuXXyjOCtF4GAXMHJFTyMIx5Rh56qfJOyJEnn7zJXakYBqXy2mDKA>
- <xmx:V_uXXzsKEvvDgpn7ziK7fb_4qTEEU1m-hGEqlujMWQiBvXwQeXGeSg>
-Received: from apples.local (80-167-98-190-cable.dk.customer.tdc.net
- [80.167.98.190])
- by mail.messagingengine.com (Postfix) with ESMTPA id F04403280066;
- Tue, 27 Oct 2020 06:49:57 -0400 (EDT)
-From: Klaus Jensen <its@irrelevant.dk>
-To: peter.maydell@linaro.org,
-	qemu-devel@nongnu.org
-Subject: [PULL 21/30] hw/block/nvme: support per-namespace smart log
-Date: Tue, 27 Oct 2020 11:49:23 +0100
-Message-Id: <20201027104932.558087-22-its@irrelevant.dk>
-X-Mailer: git-send-email 2.29.1
-In-Reply-To: <20201027104932.558087-1-its@irrelevant.dk>
-References: <20201027104932.558087-1-its@irrelevant.dk>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kXN06-0001gl-Oi
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:18:50 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40487)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kXN04-0003gC-7e
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:18:50 -0400
+Received: by mail-wr1-x444.google.com with SMTP id h5so1428465wrv.7
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:18:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=references:user-agent:from:to:cc:subject:in-reply-to:date
+ :message-id:mime-version:content-transfer-encoding;
+ bh=/JAMWTyJxknfjwX2Imb1ga8zIqZIhso4vz4zfe3br3s=;
+ b=WIijWV1CTQlUFL/rT+qNQri0YuvyHUzCh4NmfTMW1cHuhKO0bpnGBzTOKEndN2C1Xd
+ juznBQyPXYST6YTzeJsPTi9gBDRUcHFSyrT14cpIacXABBI3Gec9ZTWSPUjD7aEqAfY1
+ CzGI8gpMDwRY7klXFGFE59dtCWDd4x5YTqpRBfp+wcqfFjN8oXOojb/iESaSPyR9qY+a
+ Jy10WkmWwsgPFlpKKRqYby/O9dFl/33AA+YybLnTbCN6KlgxbDmuSozKodXobxbFSLAQ
+ 6IK7pu2xI+Mk0SfDlXDcnI3hVyYBNff5/0SD+oUe+m3XrUg+LjaoGSeQlkCYvbzsUEls
+ DeYg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:references:user-agent:from:to:cc:subject
+ :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
+ bh=/JAMWTyJxknfjwX2Imb1ga8zIqZIhso4vz4zfe3br3s=;
+ b=tvP9XfT+kD2Eep22VynBMxs1yNlf6271ooN2Pp82CSOF/b8BRyBAmDLwjmLwLT2kSC
+ lR+1rn8vvFyUZT287vqkBxm22Jr9aF4zya5f4BVzgx3KLC9NDdauZgWlGpLM4LWJB88V
+ QTg87l/j3knbNX7LmpmECQbbYJXMq2McUvSUn/uZet7jjQep9VOE+0sjxsIVQRsOtE9E
+ AgZ5U4rjwoGkAVer5OU4PU2QUgAg/o5PlopCM0THt3GkALKFOQbrrj/orXmkfIeoTEN0
+ USVtP/2st75TxkP1KR7qKq9FIX7EKDsJL0LN2l/2V1Bem7qlVlw1itBzhP7GQojl0cJv
+ KShQ==
+X-Gm-Message-State: AOAM5305oujcCoPpknsIbv4QodwoBDesSIb9Ge+E+yijcmEs0jucooYV
+ EB2CHjiyjp+GTHUDqdZ8FY7F1WG4XK4YQg==
+X-Google-Smtp-Source: ABdhPJwGVmUzNORg94z7kxwoCVA4gYJ5UEvDkfcYpUOGJkE+4TleVt537Pifcj9ytBajnu03VPcYAg==
+X-Received: by 2002:adf:f305:: with SMTP id i5mr2270910wro.346.1603797525510; 
+ Tue, 27 Oct 2020 04:18:45 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id n9sm1622150wrq.72.2020.10.27.04.18.44
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 04:18:44 -0700 (PDT)
+Received: from zen (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 9D3241FF7E;
+ Tue, 27 Oct 2020 11:18:43 +0000 (GMT)
+References: <20201021205716.2359430-1-pbonzini@redhat.com>
+ <20201021205716.2359430-2-pbonzini@redhat.com>
+User-agent: mu4e 1.5.6; emacs 28.0.50
+From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 01/22] semihosting: fix order of initialization functions
+In-reply-to: <20201021205716.2359430-2-pbonzini@redhat.com>
+Date: Tue, 27 Oct 2020 11:18:43 +0000
+Message-ID: <87sg9zex2k.fsf@linaro.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=66.111.4.26; envelope-from=its@irrelevant.dk;
- helo=out2-smtp.messagingengine.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 06:49:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -27
-X-Spam_score: -2.8
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_LOW=-0.7, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -108,137 +104,90 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Klaus Jensen <its@irrelevant.dk>, Keith Busch <kbusch@kernel.org>,
- qemu-block@nongnu.org, Klaus Jensen <k.jensen@samsung.com>
+Cc: qemu-devel@nongnu.org, berrange@redhat.com, jsnow@redhat.com,
+ ehabkost@redhat.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Keith Busch <kbusch@kernel.org>
 
-Let the user specify a specific namespace if they want to get access
-stats for a specific namespace.
+Paolo Bonzini <pbonzini@redhat.com> writes:
 
-Signed-off-by: Keith Busch <kbusch@kernel.org>
-Signed-off-by: Klaus Jensen <k.jensen@samsung.com>
----
- include/block/nvme.h |  1 +
- hw/block/nvme.c      | 63 +++++++++++++++++++++++++++-----------------
- 2 files changed, 40 insertions(+), 24 deletions(-)
+> qemu_semihosting_console_init uses semihosting.chardev which is set
+> by qemu_semihosting_connect_chardevs.  Thus qemu_semihosting_connect_char=
+devs
+> has to be called first.
 
-diff --git a/include/block/nvme.h b/include/block/nvme.h
-index 58647bcdad0b..868cf53f0b25 100644
---- a/include/block/nvme.h
-+++ b/include/block/nvme.h
-@@ -849,6 +849,7 @@ enum NvmeIdCtrlFrmw {
- };
- 
- enum NvmeIdCtrlLpa {
-+    NVME_LPA_NS_SMART = 1 << 0,
-     NVME_LPA_EXTENDED = 1 << 2,
- };
- 
-diff --git a/hw/block/nvme.c b/hw/block/nvme.c
-index aa725d1141b2..5a9ae699afab 100644
---- a/hw/block/nvme.c
-+++ b/hw/block/nvme.c
-@@ -1164,48 +1164,63 @@ static uint16_t nvme_create_sq(NvmeCtrl *n, NvmeRequest *req)
-     return NVME_SUCCESS;
- }
- 
-+struct nvme_stats {
-+    uint64_t units_read;
-+    uint64_t units_written;
-+    uint64_t read_commands;
-+    uint64_t write_commands;
-+};
-+
-+static void nvme_set_blk_stats(NvmeNamespace *ns, struct nvme_stats *stats)
-+{
-+    BlockAcctStats *s = blk_get_stats(ns->blkconf.blk);
-+
-+    stats->units_read += s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
-+    stats->units_written += s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
-+    stats->read_commands += s->nr_ops[BLOCK_ACCT_READ];
-+    stats->write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
-+}
-+
- static uint16_t nvme_smart_info(NvmeCtrl *n, uint8_t rae, uint32_t buf_len,
-                                 uint64_t off, NvmeRequest *req)
- {
-     uint32_t nsid = le32_to_cpu(req->cmd.nsid);
--
-+    struct nvme_stats stats = { 0 };
-+    NvmeSmartLog smart = { 0 };
-     uint32_t trans_len;
-+    NvmeNamespace *ns;
-     time_t current_ms;
--    uint64_t units_read = 0, units_written = 0;
--    uint64_t read_commands = 0, write_commands = 0;
--    NvmeSmartLog smart;
--
--    if (nsid && nsid != 0xffffffff) {
--        return NVME_INVALID_FIELD | NVME_DNR;
--    }
- 
-     if (off >= sizeof(smart)) {
-         return NVME_INVALID_FIELD | NVME_DNR;
-     }
- 
--    for (int i = 1; i <= n->num_namespaces; i++) {
--        NvmeNamespace *ns = nvme_ns(n, i);
-+    if (nsid != 0xffffffff) {
-+        ns = nvme_ns(n, nsid);
-         if (!ns) {
--            continue;
-+            return NVME_INVALID_NSID | NVME_DNR;
-         }
-+        nvme_set_blk_stats(ns, &stats);
-+    } else {
-+        int i;
- 
--        BlockAcctStats *s = blk_get_stats(ns->blkconf.blk);
--
--        units_read += s->nr_bytes[BLOCK_ACCT_READ] >> BDRV_SECTOR_BITS;
--        units_written += s->nr_bytes[BLOCK_ACCT_WRITE] >> BDRV_SECTOR_BITS;
--        read_commands += s->nr_ops[BLOCK_ACCT_READ];
--        write_commands += s->nr_ops[BLOCK_ACCT_WRITE];
-+        for (i = 1; i <= n->num_namespaces; i++) {
-+            ns = nvme_ns(n, i);
-+            if (!ns) {
-+                continue;
-+            }
-+            nvme_set_blk_stats(ns, &stats);
-+        }
-     }
- 
-     trans_len = MIN(sizeof(smart) - off, buf_len);
- 
--    memset(&smart, 0x0, sizeof(smart));
--
--    smart.data_units_read[0] = cpu_to_le64(DIV_ROUND_UP(units_read, 1000));
--    smart.data_units_written[0] = cpu_to_le64(DIV_ROUND_UP(units_written,
-+    smart.data_units_read[0] = cpu_to_le64(DIV_ROUND_UP(stats.units_read,
-+                                                        1000));
-+    smart.data_units_written[0] = cpu_to_le64(DIV_ROUND_UP(stats.units_written,
-                                                            1000));
--    smart.host_read_commands[0] = cpu_to_le64(read_commands);
--    smart.host_write_commands[0] = cpu_to_le64(write_commands);
-+    smart.host_read_commands[0] = cpu_to_le64(stats.read_commands);
-+    smart.host_write_commands[0] = cpu_to_le64(stats.write_commands);
- 
-     smart.temperature = cpu_to_le16(n->temperature);
- 
-@@ -2703,7 +2718,7 @@ static void nvme_init_ctrl(NvmeCtrl *n, PCIDevice *pci_dev)
-     id->acl = 3;
-     id->aerl = n->params.aerl;
-     id->frmw = (NVME_NUM_FW_SLOTS << 1) | NVME_FRMW_SLOT1_RO;
--    id->lpa = NVME_LPA_EXTENDED;
-+    id->lpa = NVME_LPA_NS_SMART | NVME_LPA_EXTENDED;
- 
-     /* recommended default value (~70 C) */
-     id->wctemp = cpu_to_le16(NVME_TEMPERATURE_WARNING);
--- 
-2.29.1
+It looks like this is reverting 619985e9 ("semihosting: defer
+connect_chardevs a little more to use serialx"). Looking back at the
+history it seems the two calls had different results:
 
+  Right - can confirm the difference between:
+
+    ./aarch64-softmmu/qemu-system-aarch64 -cpu max -serial mon:stdio -M vir=
+t -display none -semihosting -kernel ./tests/tcg/aarch64-softmmu/memory
+
+  and
+
+    ./aarch64-softmmu/qemu-system-aarch64 -cpu max -serial mon:stdio -M vir=
+t -display none -semihosting-config chardev=3Dserial0 -kernel ./tests/tcg/a=
+arch64-softmmu/memory
+
+With this patch applied it breaks the later invocation:
+
+  ./aarch64-softmmu/qemu-system-aarch64  -cpu max -serial mon:stdio -M virt=
+ -display none -semihosting-config chardev=3Dserial0 -kernel ./tests/tcg/aa=
+rch64-softmmu/memory
+  qemu-system-aarch64: semihosting chardev 'serial0' not found
+
+>
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  softmmu/vl.c | 6 ++----
+>  1 file changed, 2 insertions(+), 4 deletions(-)
+>
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 6f5b000f07..42314e6ff9 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -4288,7 +4288,8 @@ void qemu_init(int argc, char **argv, char **envp)
+>      qemu_opts_foreach(qemu_find_opts("mon"),
+>                        mon_init_func, NULL, &error_fatal);
+>=20=20
+> -    /* connect semihosting console input if requested */
+> +    /* now chardevs have been created we may have semihosting to connect=
+ */
+> +    qemu_semihosting_connect_chardevs();
+>      qemu_semihosting_console_init();
+
+Maybe instead of this we should:
+
+>=20=20
+>      if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
+> @@ -4298,9 +4299,6 @@ void qemu_init(int argc, char **argv, char **envp)
+>      if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+>          exit(1);
+>=20=20
+> -    /* now chardevs have been created we may have semihosting to connect=
+ */
+> -    qemu_semihosting_connect_chardevs();
+> -
+
+Move both here:
+
+    if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
+        exit(1);
+
+    /* now chardevs have been created we may have semihosting to connect */
+    qemu_semihosting_connect_chardevs();
+    qemu_semihosting_console_init();
+
+
+>      /* If no default VGA is requested, the default is "none".  */
+>      if (default_vga) {
+>          vga_model =3D get_default_vga_model(machine_class);
+
+
+--=20
+Alex Benn=C3=A9e
 
