@@ -7,72 +7,72 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C101C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:28:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 48056C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:29:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D401E206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A8BF4206C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:29:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dQGhbiuv"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D401E206C1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JYJAscNF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A8BF4206C1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39762 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42722 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXTi0-0003x0-Mn
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:28:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57902)
+	id 1kXTij-0005AS-NR
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:29:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbo-0004DO-Nw
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:13 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:35723)
+ id 1kXTbq-0004Dl-Ic
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:45978)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbg-00030Z-OE
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:11 -0400
+ id 1kXTbg-00030Y-Nn
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
  s=mimecast20190719; t=1603822923;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=jZZ0k71Ya+ZNqUqgfUXh8g5MPzr9WXuCNqKlg5WP5RQ=;
- b=dQGhbiuvCAumIEvkUGZhAjnEX7Q8XCdBFlNS5kjsFQeUG/SwV3/+ekKmaeP/wtgzqOlwNo
- Ex3ZkX2PIb5VtJ4MX0guH/tAb6axa1I8JCSJIBP8n2Dgrg61M4xgfY3z2kjnpgf2eBhz2v
- iWETkbETgn3eiElzDtR9pCNiwPfsl4Q=
+ bh=q/ntxoogpIBJG2Ygammh62juf0lSV6vtWVYBDWDr8rg=;
+ b=JYJAscNF4sVbIJo336b7Tbg/AEpVF+5OC395paCdSKNO8LMIoWvJ9GFOIEn5BLOSXeDoDa
+ uN4R9jUQua/XO14rQ5gItufINo1atoZZlyZ9JsmCs/u9GninrMt9QXkyef029ujijGkjYG
+ ceVgW+TkeQLsjYPvMuzSlrPdHu0bUMQ=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-570-m4-dWWzrOjy2xMwNkZKrzQ-1; Tue, 27 Oct 2020 14:22:01 -0400
-X-MC-Unique: m4-dWWzrOjy2xMwNkZKrzQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-6-YJZDJnVaPguHi5mydWAPrA-1; Tue, 27 Oct 2020 14:22:01 -0400
+X-MC-Unique: YJZDJnVaPguHi5mydWAPrA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2E8B18AE65E
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 023B7ACE91
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:46 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id D54715D9E8;
- Tue, 27 Oct 2020 18:21:49 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id BB9E660C07
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:45 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 13/29] vl: load plugins as late as possible
-Date: Tue, 27 Oct 2020 14:21:28 -0400
-Message-Id: <20201027182144.3315885-14-pbonzini@redhat.com>
+Subject: [PATCH 03/29] vl: extract validation of -smp to machine.c
+Date: Tue, 27 Oct 2020 14:21:18 -0400
+Message-Id: <20201027182144.3315885-4-pbonzini@redhat.com>
 In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
 References: <20201027182144.3315885-1-pbonzini@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=pbonzini@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
 Received-SPF: pass client-ip=63.128.21.124; envelope-from=pbonzini@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
@@ -96,65 +96,97 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-There is no need to load plugins in the middle of default device processing,
-move -plugin handling just before preconfig is entered.
+Once smp_parse is done, the validation operates on the MachineState.
+There is no reason for that code to be in vl.c.
 
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ hw/core/machine.c   | 23 +++++++++++++++++++++++
+ include/hw/boards.h |  1 +
+ softmmu/vl.c        | 20 ++------------------
+ 3 files changed, 26 insertions(+), 18 deletions(-)
 
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index c5e0e79e6d..baea4e8613 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -1072,6 +1072,29 @@ MemoryRegion *machine_consume_memdev(MachineState *machine,
+     return ret;
+ }
+ 
++bool machine_smp_parse(MachineState *ms, QemuOpts *opts, Error **errp)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++
++    mc->smp_parse(ms, opts);
++
++    /* sanity-check smp_cpus and max_cpus against mc */
++    if (ms->smp.cpus < mc->min_cpus) {
++        error_setg(errp, "Invalid SMP CPUs %d. The min CPUs "
++                   "supported by machine '%s' is %d",
++                   ms->smp.cpus,
++                   mc->name, mc->min_cpus);
++        return false;
++    } else if (ms->smp.max_cpus > mc->max_cpus) {
++        error_setg(errp, "Invalid SMP CPUs %d. The max CPUs "
++                   "supported by machine '%s' is %d",
++                   current_machine->smp.max_cpus,
++                   mc->name, mc->max_cpus);
++        return false;
++    }
++    return true;
++}
++
+ void machine_run_board_init(MachineState *machine)
+ {
+     MachineClass *machine_class = MACHINE_GET_CLASS(machine);
+diff --git a/include/hw/boards.h b/include/hw/boards.h
+index a49e3a6b44..4537cfb5c6 100644
+--- a/include/hw/boards.h
++++ b/include/hw/boards.h
+@@ -26,6 +26,7 @@ OBJECT_DECLARE_TYPE(MachineState, MachineClass, MACHINE)
+ extern MachineState *current_machine;
+ 
+ void machine_run_board_init(MachineState *machine);
++bool machine_smp_parse(MachineState *ms, QemuOpts *opts, Error **errp);
+ bool machine_usb(MachineState *machine);
+ int machine_phandle_start(MachineState *machine);
+ bool machine_dump_guest_core(MachineState *machine);
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index f643333f7e..53d53ef206 100644
+index b0ccfd750a..7f39ebdfee 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -125,6 +125,7 @@ static const char *boot_order;
- static const char *boot_once;
- static const char *incoming;
- static const char *loadvm;
-+static QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
- enum vga_retrace_method vga_retrace_method = VGA_RETRACE_DUMB;
- int mem_prealloc; /* force preallocation of physical target memory */
- int display_opengl;
-@@ -3076,7 +3077,11 @@ static void qemu_finish_machine_init(void)
-         create_default_memdev(current_machine, mem_path);
+@@ -3971,24 +3971,8 @@ void qemu_init(int argc, char **argv, char **envp)
+         exit(0);
      }
  
--    /* from here on runstate is RUN_STATE_PRELAUNCH */
-+    /* process plugin before CPUs are created, but once -smp has been parsed */
-+    if (qemu_plugin_load_list(&plugin_list)) {
-+        exit(1);
-+    }
-+
-     machine_run_board_init(current_machine);
- 
-     /*
-@@ -3211,7 +3216,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     Error *err = NULL;
-     bool have_custom_ram_size;
-     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
--    QemuPluginList plugin_list = QTAILQ_HEAD_INITIALIZER(plugin_list);
- 
-     qemu_add_opts(&qemu_drive_opts);
-     qemu_add_drive_opts(&qemu_legacy_drive_opts);
-@@ -4183,11 +4187,6 @@ void qemu_init(int argc, char **argv, char **envp)
-                                machine_class->default_machine_opts, 0);
-     }
- 
--    /* process plugin before CPUs are created, but once -smp has been parsed */
--    if (qemu_plugin_load_list(&plugin_list)) {
+-    machine_class->smp_parse(current_machine,
+-        qemu_opts_find(qemu_find_opts("smp-opts"), NULL));
+-
+-    /* sanity-check smp_cpus and max_cpus against machine_class */
+-    if (current_machine->smp.cpus < machine_class->min_cpus) {
+-        error_report("Invalid SMP CPUs %d. The min CPUs "
+-                     "supported by machine '%s' is %d",
+-                     current_machine->smp.cpus,
+-                     machine_class->name, machine_class->min_cpus);
 -        exit(1);
 -    }
--
-     qemu_opts_foreach(qemu_find_opts("device"),
-                       default_driver_check, NULL, NULL);
-     qemu_opts_foreach(qemu_find_opts("global"),
+-    if (current_machine->smp.max_cpus > machine_class->max_cpus) {
+-        error_report("Invalid SMP CPUs %d. The max CPUs "
+-                     "supported by machine '%s' is %d",
+-                     current_machine->smp.max_cpus,
+-                     machine_class->name, machine_class->max_cpus);
+-        exit(1);
+-    }
++    machine_smp_parse(current_machine,
++        qemu_opts_find(qemu_find_opts("smp-opts"), NULL), &error_fatal);
+ 
+     if (mem_prealloc) {
+         char *val;
 -- 
 2.26.2
 
