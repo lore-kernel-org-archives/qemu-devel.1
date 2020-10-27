@@ -2,80 +2,76 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-3.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4734FC55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:40:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AEC9C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:44:03 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C313722275
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 28583207C4
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 23:44:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WlZsysPH"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C313722275
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nnxNei85"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 28583207C4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57478 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59940 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXYZT-0004zw-QN
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 19:40:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:47494)
+	id 1kXYdF-0006IW-35
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 19:44:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:48226)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXYYA-0004Rz-JU
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:38:46 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:39402)
+ id 1kXYcS-0005pQ-KZ
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:43:12 -0400
+Received: from mail-ej1-x644.google.com ([2a00:1450:4864:20::644]:34893)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXYY8-0005u3-1q
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:38:46 -0400
-Received: by mail-ej1-x642.google.com with SMTP id bn26so4653862ejb.6
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 16:38:43 -0700 (PDT)
+ id 1kXYcQ-0006R3-Tf
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 19:43:12 -0400
+Received: by mail-ej1-x644.google.com with SMTP id p5so4687525ejj.2
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 16:43:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=5kaHV0Pg1L9fG8vBTEC9pxRQfu8xlom6xDAxH6720ng=;
- b=WlZsysPHj16bwCqkztRcvGGc6jMIJw3MO65fLLvBLbCYh/Hk+EhPwscEdJh/eLXqXc
- 3lYrfDXvfqKT/qM09Pnoxr/xqXW+32sVeHKAPu838TcO9YrUknggoip7paI+kpxi4AUj
- V/GyObWUoygT/G3PFA5iko6gpfokQyXypzZzMiPoAQNi/qNP1CTikx3IEMaJ0elcoYEb
- tshii2Jg58Gfnnts+gaFKv/+q5wkLDTsJjcsTG+T5T3YYFpAzln8mpshqDizQq9SwTIG
- spHq4XZ/xdqfH35O4KCPQWWDzo6XYYsHAoFHnJmKJRJHmvZHUbE6DkXRn5Ii664P5h6N
- 8Y7g==
+ :cc; bh=4AQKxe/3fYWR0gmt04iWkPsdYWVb7D+ilPUUb5GKqO8=;
+ b=nnxNei85e7SJmX9MDsMbRQqijTHBbFkj/cmuRBrLPm47tcOpCQgRrxX4esZGQDw8oY
+ MMMmhC3Z4Ke3DAf5eZ4e1UjdY4/DtjgXyuljVRuJl3PbB5zgN1TRBsxYxYVEvISoFbzF
+ sgl155guqvmvwJzF4U4qFiOK+n/WR0N7xavb/IQXyOQnl9WYLnPX/MsfpLeWLlOQAUAM
+ EJcchYv+16Ixiv0esdF0AJ0SOpzyDW/VuvplV5/pyzQCsZxYwLjOLqUzEYQoqm4aGyXW
+ yj3PCIh1CD7eIdKaWXcw4uLp7GLHDbyBjH9AQ8REmxnNurrl1LKt0UOPM+GIqUuajQKF
+ lamg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:mime-version:references:in-reply-to:from:date
  :message-id:subject:to:cc;
- bh=5kaHV0Pg1L9fG8vBTEC9pxRQfu8xlom6xDAxH6720ng=;
- b=dwckJ5ze9u6FxrUW8ElxlyXf7ccb+G4S/1C7FoAIlL6Mk2mFHAO8TOlfMY6vHWwNyV
- tPXvtUbOxvh3wZ3PehQh83pZIsfpQSYxrFv65ySD71SN7fUtfphlk/XeIb/qAROVGcUb
- ZuQ06qlmwM1uZawQuiIrZD9lwmu8EWevC/cD2GQ2pkU7zhlZQyOO9nyxjgxdTwlC0jkW
- cf9LAhnY8sn4/nuWA+usFbcZEYLrdtuZcmtyCfeNHHYAt2e605ID3teEjioKuJ6gv9/f
- VVemT/Xm9VfJSkj4J4Bz+B1WxYcHpSHAn/3a7Rr3YclstthJw2V4ObOqHfTgNzMkvdV5
- GYLA==
-X-Gm-Message-State: AOAM531mTc1ET/DJGsfuhjXEyywh4w8EeR9FyGVZAxwRaHxjlELtiUWP
- CwQeNXxtducu4fU5FPnNTMGg2Z+IX6SX8EhypLLKSg==
-X-Google-Smtp-Source: ABdhPJyzZLlzajYITpFAF3sp5wYGumCP2Hqh0Tb1qdy+EaXYWdqgp359J3YfctqxyaJV0ewSlBJ0RSI8XDTigJg+Xxc=
-X-Received: by 2002:a17:906:c7d9:: with SMTP id
- dc25mr4846557ejb.482.1603841921787; 
- Tue, 27 Oct 2020 16:38:41 -0700 (PDT)
+ bh=4AQKxe/3fYWR0gmt04iWkPsdYWVb7D+ilPUUb5GKqO8=;
+ b=VI8pM/eLrhSmVvnFPYfg4Ve+MVTProHKntyop6sF77E4BG0mLDlNYAzE5etScKVpts
+ BurCkv9mS6GJ491STNwSUiPan4BgEXEjaRDpltDtkEKNHrJXsSEBowrSYIx+jwslROI1
+ q9KUkhqb9h8mzLXFzd0xr9VmBEdTCzJzXAAPUsxRYTNJJZpXRvA+SQi9VeHzo/SWnHya
+ WMJ5bexQUsqDQ3gs+n4R7ZP2fiGeTT9wq+K1hHVTtGJKrpZJnNLDjYd9ZC/aJVS9sTpp
+ BaK72K+j+1XHiQpF7iz6yMShTfb9o8+GOUi/QP/EDvyIbtNHCcSCShbDETz2lmSRx2GB
+ rh0w==
+X-Gm-Message-State: AOAM530ib5nrsLCnx1hNq5PnEooVi2SUnH5zdD42pnUeKEKi5DB0idmt
+ 7f8Ft2tmJuqRXUhQrKPSB9C2eIqmdRFGkq2U8R8RMQ==
+X-Google-Smtp-Source: ABdhPJwZ95RXfRxElswmhyBD/1QxR1Kq1VPZ4/jLKXDeiNe/CifuuzZor3ggnvwZa3pZeVHbatUpFWOpMiHjRCZIFhs=
+X-Received: by 2002:a17:906:ce21:: with SMTP id
+ sd1mr4921343ejb.4.1603842189200; 
+ Tue, 27 Oct 2020 16:43:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20201026212853.92880-1-keithp@keithp.com>
- <20201026212853.92880-2-keithp@keithp.com>
- <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
- <87pn53e3ke.fsf@keithp.com>
-In-Reply-To: <87pn53e3ke.fsf@keithp.com>
+References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+In-Reply-To: <160374054442.22414.10832953989449611268.stgit@gimli.home>
 From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Oct 2020 23:38:30 +0000
-Message-ID: <CAFEAcA8Sha5QYbO25dtzBZHoXUeiGVv8aojPFTMrst8nbVDAdg@mail.gmail.com>
-Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
- directories
-To: Keith Packard <keithp@keithp.com>
+Date: Tue, 27 Oct 2020 23:42:57 +0000
+Message-ID: <CAFEAcA8yBrUH-Bqe7oNhBKqtyeUNw0xVA9aKm8DJFE-WLzLTwQ@mail.gmail.com>
+Subject: Re: [PULL 00/32] VFIO updates 2020-10-26 (for QEMU 5.2 soft-freeze)
+To: Alex Williamson <alex.williamson@redhat.com>, Max Reitz <mreitz@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x642.google.com
+Received-SPF: pass client-ip=2a00:1450:4864:20::644;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ej1-x644.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -84,7 +80,7 @@ X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
  RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,40 +93,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- qemu-arm <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Artem Polyakov <artemp@nvidia.com>, Zhengui li <lizhengui@huawei.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Neo Jia <cjia@nvidia.com>,
+ Amey Narkhede <ameynarkhede03@gmail.com>,
+ =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Tue, 27 Oct 2020 at 21:56, Keith Packard <keithp@keithp.com> wrote:
+On Mon, 26 Oct 2020 at 19:39, Alex Williamson
+<alex.williamson@redhat.com> wrote:
+> ----------------------------------------------------------------
+> VFIO update 2020-10-26
 >
-> Peter Maydell <peter.maydell@linaro.org> writes:
->
-> >> +specific_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
-> >
-> > I think this adds this file to the compilation for all TCG targets;
-> > you only want it for targets which have Arm-semihosting-ABI compatible
-> > semihosting. (Various other targets either don't have semihosting
-> > or have their own ABI.)
->
-> Right. These should have been target-specific source sets so that the
-> file was only added to those targets:
->
->         arm_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
->         riscv_ss.add(files('common-semi.c'))
->
-> This appears to work in my testing (building arm, risc-v and x86_64
-> configs).
+>  * Migration support (Kirti Wankhede)
+>  * s390 DMA limiting (Matthew Rosato)
+>  * zPCI hardware info (Matthew Rosato)
+>  * Lock guard (Amey Narkhede)
+>  * Print fixes (Zhengui li)
 
-I'm not a kconfig expert but it might be preferable to have
-a new CONFIG_ for arm-semihosting-ABI which the relevant
-targets enable. Somebody else may be able to advise.
+I get a conflict here in
+include/standard-headers/linux/fuse.h:
+
+++<<<<<<< HEAD
+ +#define FUSE_ATTR_FLAGS               (1 << 27)
+++=======
++ #define FUSE_SUBMOUNTS                (1 << 27)
+++>>>>>>> remotes/awilliam/tags/vfio-update-20201026.0
+
+I assume these should not both be trying to use the same value,
+so something has gone wrong somewhere. The conflicting commit
+now in master is Max's 97d741cc96dd08 ("linux/fuse.h: Pull in from Linux").
+
+Can you sort out the correct resolution between you, please?
+(My guess is that Max's commit is the erroneous one because
+it doesn't look like it was created via a standard update
+from the kernel headers.)
 
 thanks
 -- PMM
