@@ -7,58 +7,58 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C683C5DF9D
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:37:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E6032C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:37:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 52D2521655
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:37:28 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 52D2521655
+	by mail.kernel.org (Postfix) with ESMTPS id 055E12076A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:37:34 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 055E12076A
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=vivier.eu
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50928 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXRyR-0004oH-72
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:37:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50654)
+	id 1kXRyX-00054P-Uz
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:37:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kXRs5-00071I-5B; Tue, 27 Oct 2020 12:30:53 -0400
-Received: from mout.kundenserver.de ([217.72.192.73]:43965)
+ id 1kXRri-0006sv-E0; Tue, 27 Oct 2020 12:30:30 -0400
+Received: from mout.kundenserver.de ([217.72.192.74]:49435)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <laurent@vivier.eu>)
- id 1kXRri-0001bJ-AN; Tue, 27 Oct 2020 12:30:52 -0400
+ id 1kXRre-0001XT-SU; Tue, 27 Oct 2020 12:30:29 -0400
 Received: from localhost.localdomain ([82.252.139.38]) by
  mrelayeu.kundenserver.de (mreue107 [212.227.15.183]) with ESMTPSA (Nemesis)
- id 1MzQTm-1kBXKB19ua-00vOj1; Tue, 27 Oct 2020 17:30:23 +0100
+ id 1MUGNZ-1kydOp17Hn-00REtQ; Tue, 27 Oct 2020 17:30:20 +0100
 From: Laurent Vivier <laurent@vivier.eu>
 To: qemu-devel@nongnu.org
-Subject: [PULL 8/8] CHANGELOG: remove disused file
-Date: Tue, 27 Oct 2020 17:30:14 +0100
-Message-Id: <20201027163014.247336-9-laurent@vivier.eu>
+Subject: [PULL 4/8] io: Fix Lesser GPL version number
+Date: Tue, 27 Oct 2020 17:30:10 +0100
+Message-Id: <20201027163014.247336-5-laurent@vivier.eu>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20201027163014.247336-1-laurent@vivier.eu>
 References: <20201027163014.247336-1-laurent@vivier.eu>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:hu6uvjeVWs80Yi39JGX78lqJLJHufPxYF2xIpGqet7W4kuG/EFr
- L+u76SsAlVPrPsy1F10TaaewRZDDNXew600kReSEasqyyS5v4UgWV9ze7HmZFwxlW692rJH
- 4UmhZiXA1DEt8VEtgPFMU1vMnOArPxiK8P3GE5W3fzxAMGa7RxEGVXhG254isA9wDOpcRTj
- 7EIo6GhSlvr2sDono3XRw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:pnWctEgwPf0=:LihptksicTAg5GaAOALARK
- hCmiS3TQYv0g3v1+1fE2z+C49ZmQ8k4MzyB3chgRIvnRJDcomkVOCDSTFtycjs6SJPAebkSq2
- 30HThidsMdV97DJLnD60up+9aEwJPts3dR9iV7Q14DtuonEu4diCTXqNLf2AmoZSwioRhFiBG
- hCuNox81k1mVXMcLXdxtSIVkDT1HoRVyWydD3iKFb2AHh/cCoGS4iulOekEsve3xGrcENrHHr
- 0tfWbVyklWaawYuv0hA7ltMPQo9ZUGZvsSfWKsQxmbvpTtBTGz+sEdTd26s0PmHCsw+GufFp3
- YC/4SSpS3kCmFvpoSOuAZZhBMWx+omN+mGO2EwC5U/L0oqMRThbByF0SC6NpeL7EBS4VVSjrl
- EbDB8RUyDS/3KyHZWzX4OUCfnit77wxuDkN7luvZr79ES3FdKJ7Pc74yuOys6MeRykkZseAb+
- AaYMSbfjxQ==
-Received-SPF: none client-ip=217.72.192.73; envelope-from=laurent@vivier.eu;
+X-Provags-ID: V03:K1:KLcmXN1Xa5j9tgIfaI49+Boc1M5b3FtH+ySWdJeZ4MAY6cMV9Cp
+ D+6dXCxDmQit6Zdc+EzwQV2C5CRpgX+90Mg11VGB4hDU+k0G9urZeta7+dBxMbwpa1prNns
+ xXrvopP5zqIOeOYYvvwdt1o9jhRD+B8mRTeprKVWcN2DbUh234by5VkdrH7URoXrys5eTo6
+ 01OQjBNrVOCFBEIAkNRHw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:8R30D5dc4EE=:7kLc5LI1K0Ot6cRsdL7x0V
+ W2qKDFDuxjQxJTH60XHsg8gBsT7P5s7OhzBn+mFi0KXvN+8lnlWwf34p2SNZ/+fnewQaJH4OW
+ IBlRqXEKT3ldACFyQeTXBGH5qMIf67Yywzg25fYBE+zsU3hFod4RdZhHq9pX8lMY8dhc/HGB7
+ Zphm6Vs4RNtxcYTksIvYZT/wkR7KaCccwoohzG2LBtRREwhHabQAhwjNOYSsGeenFOY6ze4Ht
+ j7wFhkzwZ2gQWG5m3FtXR8VQSLdhYjDmwHc2gSxVPsK644oTZiJ6xrvBh+fPQO0cnb4jOj6gA
+ aKbuHzsijwsSG2BoWu7RrA+Q54sfdtDABjTDjha36QFz2nCNF83tzNgwiCjEkgITB+fk3PtnZ
+ LCphIAtDBFswqAMLgdSyaS6cBQkKMyWpbSKqOlhrIkPoozbSoTU8jv0XWlUw61H1bRnUrTrJ1
+ KH3Vxdbemg==
+Received-SPF: none client-ip=217.72.192.74; envelope-from=laurent@vivier.eu;
  helo=mout.kundenserver.de
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 12:30:26
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 12:30:25
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -18
 X-Spam_score: -1.9
@@ -78,637 +78,406 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>, qemu-trivial@nongnu.org,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+Cc: qemu-trivial@nongnu.org,
+ =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
  Michael Tokarev <mjt@tls.msk.ru>, Laurent Vivier <laurent@vivier.eu>,
- John Snow <jsnow@redhat.com>
+ Chetan Pant <chetan4windows@gmail.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: John Snow <jsnow@redhat.com>
+From: Chetan Pant <chetan4windows@gmail.com>
 
-There's no reason to keep this here; the versions described are
-ancient. Everything here is still mirrored on
-https://wiki.qemu.org/ChangeLog/old if anyone is curious; otherwise, use
-the git history.
+There is no "version 2" of the "Lesser" General Public License.
+It is either "GPL version 2.0" or "Lesser GPL version 2.1".
+This patch replaces all occurrences of "Lesser GPL version 2" with
+"Lesser GPL version 2.1" in comment section.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Reviewed-by: Thomas Huth <thuth@redhat.com>
-Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-Message-Id: <20201026195131.13848-1-jsnow@redhat.com>
+Signed-off-by: Chetan Pant <chetan4windows@gmail.com>
+Acked-by: Daniel P. Berrangé <berrange@redhat.com>
+Message-Id: <20201014134033.14095-1-chetan4windows@gmail.com>
 Signed-off-by: Laurent Vivier <laurent@vivier.eu>
 ---
- Changelog  | 580 -----------------------------------------------------
- README.rst |   8 +
- 2 files changed, 8 insertions(+), 580 deletions(-)
- delete mode 100644 Changelog
+ include/io/channel-buffer.h     | 2 +-
+ include/io/channel-command.h    | 2 +-
+ include/io/channel-file.h       | 2 +-
+ include/io/channel-socket.h     | 2 +-
+ include/io/channel-tls.h        | 2 +-
+ include/io/channel-util.h       | 2 +-
+ include/io/channel-watch.h      | 2 +-
+ include/io/channel-websock.h    | 2 +-
+ include/io/channel.h            | 2 +-
+ include/io/dns-resolver.h       | 2 +-
+ include/io/task.h               | 2 +-
+ io/channel-buffer.c             | 2 +-
+ io/channel-command.c            | 2 +-
+ io/channel-file.c               | 2 +-
+ io/channel-socket.c             | 2 +-
+ io/channel-tls.c                | 2 +-
+ io/channel-util.c               | 2 +-
+ io/channel-watch.c              | 2 +-
+ io/channel-websock.c            | 2 +-
+ io/channel.c                    | 2 +-
+ io/dns-resolver.c               | 2 +-
+ io/task.c                       | 2 +-
+ tests/test-io-channel-buffer.c  | 2 +-
+ tests/test-io-channel-command.c | 2 +-
+ tests/test-io-channel-file.c    | 2 +-
+ tests/test-io-channel-socket.c  | 2 +-
+ tests/test-io-task.c            | 2 +-
+ 27 files changed, 27 insertions(+), 27 deletions(-)
 
-diff --git a/Changelog b/Changelog
-deleted file mode 100644
-index f7e178ccc018..000000000000
---- a/Changelog
-+++ /dev/null
-@@ -1,580 +0,0 @@
--This file documents changes for QEMU releases 0.12 and earlier.
--For changelog information for later releases, see
--https://wiki.qemu.org/ChangeLog or look at the git history for
--more detailed information.
--
--
--version 0.12.0:
--
--  - Update to SeaBIOS 0.5.0
--  - e1000: fix device link status in Linux (Anthony Liguori)
--  - monitor: fix QMP for balloon command (Luiz Capitulino)
--  - QMP: Return an empty dict by default (Luiz Capitulino)
--  - QMP: Only handle converted commands (Luiz Capitulino)
--  - pci: support PCI based option rom loading (Gerd Hoffman/Anthony Liguori)
--  - Fix backcompat for hotplug of SCSI controllers (Daniel P. Berrange)
--  - fdc: fix migration from 0.11 (Juan Quintela)
--  - vmware-vga: fix segv on cursor resize. (Dave Airlie)
--  - vmware-vga: various fixes (Dave Airlie/Anthony Liguori)
--  - qdev: improve property error reporting. (Gerd Hoffmann)
--  - fix vga names in default_list (Gerd Hoffmann)
--  - usb-host: check mon before using it. (Gerd Hoffmann)
--  - usb-net: use qdev for -usbdevice (Gerd Hoffmann)
--  - monitor: Catch printing to non-existent monitor (Luiz Capitulino)
--  - Avoid permanently disabled QEMU monitor when UNIX migration fails (Daniel P. Berrange)
--  - Fix loading of ELF multiboot kernels (Kevin Wolf)
--  - qemu-io: Fix memory leak (Kevin Wolf)
--  - Fix thinko in linuxboot.S (Paolo Bonzini)
--  - target-i386: Fix evaluation of DR7 register (Jan Kiszka)
--  - vnc: hextile: do not generate ForegroundSpecified and SubrectsColoured tiles (Anthony Liguori)
--  - S390: Bail out without KVM (Alexander Graf)
--  - S390: Don't tell guest we're updating config space (Alexander Graf)
--  - target-s390: Fail on unknown instructions (Alexander Graf)
--  - osdep: Fix runtime failure on older Linux kernels (Andre Przywara)
--  - Fix a make -j race (Juergen Lock)
--  - target-alpha: Fix generic ctz64. (Richard Henderson)
--  - s390: Fix buggy assignment (Stefan Weil)
--  - target-mips: fix user-mode emulation startup (Nathan Froyd)
--  - target-i386: Update CPUID feature set for TCG (Andre Przywara)
--  - s390: fix build on 32 bit host (Michael S. Tsirkin)
--	
--version 0.12.0-rc2:
--
--  - v2: properly save kvm system time msr registers (Glauber Costa)
--  - convert more monitor commands to qmp (Luiz Capitulino)
--  - vnc: fix capslock tracking logic. (Gerd Hoffmann)
--  - QemuOpts: allow larger option values. (Gerd Hoffmann)
--  - scsi: fix drive hotplug. (Gerd Hoffmann)
--  - pci: don't hw_error() when no slot is available. (Gerd Hoffmann)
--  - pci: don't abort() when trying to hotplug with acpi off. (Gerd Hoffmann)
--  - allow default devices to be implemented in config file (Gerd Hoffman)
--  - vc: colorize chardev title line with blue background. (Gerd Hoffmann)
--  - chardev: make chardevs specified in config file work. (Gerd Hoffmann)
--  - qdev: also match bus name for global properties (Gerd Hoffmann)
--  - qdev: add command line option to set global defaults for properties. (Gerd Hoffmann)
--  - kvm: x86: Save/restore exception_index (Jan Kiszka)
--  - qdev: Replace device names containing whitespace (Markus Armbruster)
--  - fix rtc-td-hack on host without high-res timers (Gleb Natapov)
--  - virtio: verify features on load (Michael S. Tsirkin)
--  - vmware_vga: add rom file so that it boots. (Dave Airlie)
--  - Do not abort on qemu_malloc(0) in production builds (Anthony Liguori)
--  - Fix ARM userspace strex implementation. (Paul Brook)
--  - qemu: delete rule target on error (Michael S. Tsirkin)
--  - QMP: add human-readable description to error response (Markus Armbruster)
--  - convert more monitor commands to QError (Markus Armbruster)
--  - monitor: Fix double-prompt after "change vnc passwd BLA" (Markus Armbruster)
--  - monitor: do_cont(): Don't ask for passwords (Luiz Capitulino)
--  - monitor: Introduce 'block_passwd' command (Luiz Capitulino)
--  - pci: interrupt disable bit support (Michael S. Tsirkin)
--  - pci: interrupt status bit implementation (Michael S. Tsirkin)
--  - pci: prepare irq code for interrupt state (Michael S. Tsirkin)
--  - msix: function mask support (Michael S. Tsirkin)
--  - msix: macro rename for function mask support (Michael S. Tsirkin)
--  - cpuid: Fix multicore setup on Intel (Andre Przywara)
--  - kvm: x86: Fix initial kvm_has_msr_star (Jan Kiszka)
--  - Update OpenBIOS images to r640 (Aurelien Jarno)	
--
--version 0.10.2:
--
--  - fix savevm/loadvm (Anthony Liguori)
--  - live migration: fix dirty tracking windows (Glauber Costa)
--  - live migration: improve error propagation (Glauber Costa)
--  - qcow2: fix image creation for > ~2TB images (Chris Wright)
--  - hotplug: fix error handling for if= parameter (Eduardo Habkost)
--  - qcow2: fix data corruption (Nolan Leake)
--  - virtio: fix guest oops with 2.6.25 kernels (Rusty Russell)
--  - SH4: add support for -kernel (Takashi Yoshii, Aurelien Jarno)
--  - hotplug: fix closing of char devices (Jan Kiszka)
--  - hotplug: remove incorrect check for device name (Eduardo Habkost)
--  - enable -k on win32 (Herve Poussineau)
--  - configure: use LANG=C for grep (Andreas Faerber)
--  - fix VGA regression (malc)
--	
--version 0.10.1:
--
--  - virtio-net: check right return size on sg list (Alex Williamson)
--  - Make qemu_announce_self handle holes (live migration after hotplug)
--    (Marcelo Tosatti)
--  - Revert r6804-r6808 (qcow2 allocation info).  This series of changes added
--    a high cost to startup for large qcow2 images (Anthony Liguori)
--  - qemu-img: fix help message (Aurelien Jarno)
--  - Fix build for non-default installs of SDL (Anthony Liguori)
--  - Fix race condition in env->interrupt_request.  When using TCG and a dynticks
--    host timer, this condition could cause TCG to get stuck in an infinite
--    loop (Aurelien Jarno)
--  - Fix reading encrypted hard disk passwords during early startup (Jan Kiszka)
--  - Fix encrypted disk reporting in 'info block' (Jan Kiszka)
--  - Fix console size with tiny displays (MusicPal) (Jan Kiszka)
--  - Improve error handling in bdrv_open2 (Jan Kiszka)
--  - Avoid leaking data in mux'ed character devices (Jan Kiszka)
--  - Fix initial character device reset (no banner in monitor) (Jan Kiszka)
--  - Fix cpuid KVM crash on i386 host (Lubomir Rintel)
--  - Fix SLES10sp2 installation by adding ISTAT1 register to LSI SCSI emulation
--    (Ryan Harper)
--
--version 0.10.0:
--
--  - TCG support (No longer requires GCC 3.x)
--  - Kernel Virtual Machine acceleration support
--  - BSD userspace emulation
--  - Bluetooth emulation and host passthrough support
--  - GDB XML register description support
--  - Intel e1000 emulation
--  - HPET emulation
--  - VirtIO paravirtual device support
--  - Marvell 88w8618 / MusicPal emulation
--  - Nokia N-series tablet emulation / OMAP2 processor emulation
--  - PCI hotplug support
--  - Live migration and new save/restore formats
--  - Curses display support
--  - qemu-nbd utility to mount supported block formats
--  - Altivec support in PPC emulation and new firmware (OpenBIOS)
--  - Multiple VNC clients are now supported
--  - TLS encryption is now supported in VNC
--  - MIPS Magnum R4000 machine (Hervé Poussineau)
--  - Braille support (Samuel Thibault)
--  - Freecom MusicPal system emulation (Jan Kiszka)
--  - OMAP242x and Nokia N800, N810 machines (Andrzej Zaborowski)
--  - EsounD audio driver (Frederick Reeve)
--  - Gravis Ultrasound GF1 sound card (Tibor "TS" Schütz)
--  - Many, many, bug fixes and new features
--
--version 0.9.1:
--
--  - TFTP booting from host directory (Anthony Liguori, Erwan Velu)
--  - Tap device emulation for Solaris (Sittichai Palanisong)
--  - Monitor multiplexing to several I/O channels (Jason Wessel)
--  - ds1225y nvram support (Herve Poussineau)
--  - CPU model selection support (J. Mayer, Paul Brook, Herve Poussineau)
--  - Several Sparc fixes (Aurelien Jarno, Blue Swirl, Robert Reif)
--  - MIPS 64-bit FPU support (Thiemo Seufer)
--  - Xscale PDA emulation (Andrzej Zaborowski)
--  - ColdFire system emulation (Paul Brook)
--  - Improved SH4 support (Magnus Damm)
--  - MIPS64 support (Aurelien Jarno, Thiemo Seufer)
--  - Preliminary Alpha guest support (J. Mayer)
--  - Read-only support for Parallels disk images (Alex Beregszaszi)
--  - SVM (x86 virtualization) support (Alexander Graf)
--  - CRIS emulation (Edgar E. Iglesias)
--  - SPARC32PLUS execution support (Blue Swirl)
--  - MIPS mipssim pseudo machine (Thiemo Seufer)
--  - Strace for Linux userland emulation (Stuart Anderson, Thayne Harbaugh)
--  - OMAP310 MPU emulation plus Palm T|E machine (Andrzej Zaborowski)
--  - ARM v6, v7, NEON SIMD and SMP emulation (Paul Brook/CodeSourcery)
--  - Gumstix boards: connex and verdex emulation (Thorsten Zitterell)
--  - Intel mainstone II board emulation (Armin Kuster)
--  - VMware SVGA II graphics card support (Andrzej Zaborowski)
--
--version 0.9.0:
--
--  - Support for relative paths in backing files for disk images
--  - Async file I/O API
--  - New qcow2 disk image format
--  - Support of multiple VM snapshots
--  - Linux: specific host CDROM and floppy support
--  - SMM support
--  - Moved PCI init, MP table init and ACPI table init to Bochs BIOS
--  - Support for MIPS32 Release 2 instruction set (Thiemo Seufer)
--  - MIPS Malta system emulation (Aurelien Jarno, Stefan Weil)
--  - Darwin userspace emulation (Pierre d'Herbemont)
--  - m68k user support (Paul Brook)
--  - several x86 and x86_64 emulation fixes
--  - Mouse relative offset VNC extension (Anthony Liguori)
--  - PXE boot support (Anthony Liguori)
--  - '-daemonize' option (Anthony Liguori)
--
--version 0.8.2:
--
--  - ACPI support
--  - PC VGA BIOS fixes
--  - switch to OpenBios for SPARC targets (Blue Swirl)
--  - VNC server fixes
--  - MIPS FPU support (Marius Groeger)
--  - Solaris/SPARC host support (Juergen Keil)
--  - PPC breakpoints and single stepping (Jason Wessel)
--  - USB updates (Paul Brook)
--  - UDP/TCP/telnet character devices (Jason Wessel)
--  - Windows sparse file support (Frediano Ziglio)
--  - RTL8139 NIC TCP segmentation offloading (Igor Kovalenko)
--  - PCNET NIC support (Antony T Curtis)
--  - Support for variable frequency host CPUs
--  - Workaround for win32 SMP hosts
--  - Support for AMD Flash memories (Jocelyn Mayer)
--  - Audio capture to WAV files support (malc)
--
--version 0.8.1:
--
--  - USB tablet support (Brad Campbell, Anthony Liguori)
--  - win32 host serial support (Kazu)
--  - PC speaker support (Joachim Henke)
--  - IDE LBA48 support (Jens Axboe)
--  - SSE3 support
--  - Solaris port (Juergen Keil)
--  - Preliminary SH4 target (Samuel Tardieu)
--  - VNC server (Anthony Liguori)
--  - slirp fixes (Ed Swierk et al.)
--  - USB fixes
--  - ARM Versatile Platform Baseboard emulation (Paul Brook)
--
--version 0.8.0:
--
--  - ARM system emulation: Arm Integrator/CP board with an arm1026ej-s
--    cpu (Paul Brook)
--  - SMP support
--  - Mac OS X cocoa improvements (Mike Kronenberg)
--  - Mac OS X CoreAudio driver (Mike Kronenberg)
--  - DirectSound driver (malc)
--  - ALSA audio driver (malc)
--  - new audio options: '-soundhw' and '-audio-help' (malc)
--  - ES1370 PCI audio device (malc)
--  - Initial USB support
--  - Linux host serial port access
--  - Linux host low level parallel port access
--  - New network emulation code supporting VLANs.
--  - MIPS and MIPSel User Linux emulation
--  - MIPS fixes to boot Linux (Daniel Jacobowitz)
--  - NX bit support
--  - Initial SPARC SMP support (Blue Swirl)
--  - Major overhaul of the virtual FAT driver for read/write support
--    (Johannes Schindelin)
--
--version 0.7.2:
--
--  - x86_64 fixes (Win2000 and Linux 2.6 boot in 32 bit)
--  - merge self modifying code handling in dirty ram page mechanism.
--  - MIPS fixes (Ralf Baechle)
--  - better user net performances
--
--version 0.7.1:
--
--  - read-only Virtual FAT support (Johannes Schindelin)
--  - Windows 2000 install disk full hack (original idea from Vladimir
--    N. Oleynik)
--  - VMDK disk image creation (Filip Navara)
--  - SPARC64 progress (Blue Swirl)
--  - initial MIPS support (Jocelyn mayer)
--  - MIPS improvements (Ralf Baechle)
--  - 64 bit fixes in user networking (initial patch by Gwenole Beauchesne)
--  - IOAPIC support (Filip Navara)
--
--version 0.7.0:
--
--  - better BIOS translation and HDD geometry auto-detection
--  - user mode networking bug fix
--  - undocumented FPU ops support
--  - Cirrus VGA: support for 1280x1024x[8,15,16] modes
--  - 'pidfile' option
--  - .dmg disk image format support (Johannes Schindelin)
--  - keymaps support (initial patch by Johannes Schindelin)
--  - big endian ARM support (Lennert Buytenhek)
--  - added generic 64 bit target support
--  - x86_64 target support
--  - initial APIC support
--  - MMX/SSE/SSE2/PNI support
--  - PC parallel port support (Mark Jonckheere)
--  - initial SPARC64 support (Blue Swirl)
--  - SPARC target boots Linux (Blue Swirl)
--  - armv5te user mode support (Paul Brook)
--  - ARM VFP support (Paul Brook)
--  - ARM "Angel" semihosting syscalls (Paul Brook)
--  - user mode gdb stub support (Paul Brook)
--  - Samba 3 support
--  - initial Cocoa support (Pierre d'Herbemont)
--  - generic FPU emulation code
--  - Virtual PC read-only disk image support (Alex Beregszaszi)
--
--version 0.6.1:
--
--  - Mac OS X port (Pierre d'Herbemont)
--  - Virtual console support
--  - Better monitor line edition
--  - New block device layer
--  - New 'qcow' growable disk image support with AES encryption and
--    transparent decompression
--  - VMware 3 and 4 read-only disk image support (untested)
--  - Support for up to 4 serial ports
--  - TFTP server support (Magnus Damm)
--  - Port redirection support in user mode networking
--  - Support for not executable data sections
--  - Compressed loop disk image support (Johannes Schindelin)
--  - Level triggered IRQ fix (aka NE2000 PCI performance fix) (Steve
--    Wormley)
--  - Fixed Fedora Core 2 problems (now you can run qemu without any
--    LD_ASSUME_KERNEL tricks on FC2)
--  - DHCP fix for Windows (accept DHCPREQUEST alone)
--  - SPARC system emulation (Blue Swirl)
--  - Automatic Samba configuration for host file access from Windows.
--  - '-loadvm' and '-full-screen' options
--  - ne2000 savevm support (Johannes Schindelin)
--  - Ctrl-Alt is now the default grab key. Ctrl-Alt-[0-9] switches to
--    the virtual consoles.
--  - BIOS floppy fix for NT4 (Mike Nordell, Derek Fawcus, Volker Ruppert)
--  - Floppy fixes for NT4 and NT5 (Mike Nordell)
--  - NT4 IDE fixes (Ben Pfaf, Mike Nordell)
--  - SDL Audio support and SB16 fixes (malc)
--  - ENTER instruction bug fix (initial patch by Stefan Kisdaroczi)
--  - VGA font change fix
--  - VGA read-only CRTC register fix
--
--version 0.6.0:
--
--  - minimalist FPU exception support (NetBSD FPU probe fix)
--  - cr0.ET fix (Win95 boot)
--  - *BSD port (Markus Niemisto)
--  - I/O access fix (signaled by Mark Jonckheere)
--  - IDE drives serial number fix (Mike Nordell)
--  - int13 CDROM BIOS fix (aka Solaris x86 install CD fix)
--  - int15, ah=86 BIOS fix (aka Solaris x86 hardware probe hang up fix)
--  - BSR/BSF "undefined behaviour" fix
--  - vmdk2raw: convert VMware disk images to raw images
--  - PCI support
--  - NE2K PCI support
--  - dummy VGA PCI support
--  - VGA font selection fix (Daniel Serpell)
--  - PIC reset fix (Hidemi KAWAI)
--  - PIC spurious irq support (aka Solaris install bug)
--  - added '-localtime' option
--  - Cirrus CL-GD54xx VGA support (initial patch by Makoto Suzuki (suzu))
--  - APM and system shutdown support
--  - Fixed system reset
--  - Support for other PC BIOSes
--  - Initial PowerMac hardware emulation
--  - PowerMac/PREP OpenFirmware compatible BIOS (Jocelyn Mayer)
--  - initial IDE BMDMA support (needed for Darwin x86)
--  - Set the default memory size for PC emulation to 128 MB
--
--version 0.5.5:
--
--  - SDL full screen support (initial patch by malc)
--  - VGA support on PowerPC PREP
--  - VBE fixes (Matthew Mastracci)
--  - PIT fixes (aka Win98 hardware probe and "VGA slowness" bug)
--  - IDE master only fixes (aka Win98 CD-ROM probe bug)
--  - ARM load/store half word fix (Ulrich Hecht)
--  - FDC fixes for Win98
--
--version 0.5.4:
--
--  - qemu-fast fixes
--  - BIOS area protection fix (aka EMM386.EXE fix) (Mike Nordell)
--  - keyboard/mouse fix (Mike Nordell)
--  - IDE fixes (Linux did not recognized slave drivers)
--  - VM86 EIP masking fix (aka NT5 install fix) (Mike Nordell)
--  - QEMU can now boot a PowerPC Linux kernel (Jocelyn Mayer)
--  - User mode network stack
--  - imul imm8 fix + 0x82 opcode support (Hidemi KAWAI)
--  - precise self modifying code (aka BeOS install bug)
--
--version 0.5.3:
--
--  - added Bochs VESA VBE support
--  - VGA memory map mode 3 access fix (OS/2 install fix)
--  - IDE fixes (Jens Axboe)
--  - CPU interrupt fixes
--  - fixed various TLB invalidation cases (NT install)
--  - fixed cr0.WP semantics (XP install)
--  - direct chaining support for SPARC and PowerPC (faster)
--  - ARM NWFPE support (initial patch by Ulrich Hecht)
--  - added specific x86 to x86 translator (close to native performance
--    in qemu-i386 and qemu-fast)
--  - shm syscalls support (Paul McKerras)
--  - added accurate CR0.MP/ME/TS emulation
--  - fixed DMA memory write access (Win95 boot floppy fix)
--  - graphical x86 linux loader
--  - command line monitor
--  - generic removable device support
--  - support of CD-ROM change
--  - multiple network interface support
--  - initial x86-64 host support (Gwenole Beauchesne)
--  - lret to outer privilege fix (OS/2 install fix)
--  - task switch fixes (SkyOS boot)
--  - VM save/restore commands
--  - new timer API
--  - more precise RTC emulation (periodic timers + time updates)
--  - Win32 port (initial patch by Kazu)
--
--version 0.5.2:
--
--  - improved soft MMU speed (assembly functions and specializing)
--  - improved multitasking speed by avoiding flushing TBs when
--    switching tasks
--  - improved qemu-fast speed
--  - improved self modifying code handling (big performance gain in
--    softmmu mode).
--  - fixed IO checking
--  - fixed CD-ROM detection (win98 install CD)
--  - fixed addseg real mode bug (GRUB boot fix)
--  - added ROM memory support (win98 boot)
--  - fixed 'call Ev' in case of paging exception
--  - updated the script 'qemu-binfmt-conf.sh' to use QEMU automagically
--    when launching executables for the supported target CPUs.
--  - PowerPC system emulation update (Jocelyn Mayer)
--  - PC floppy emulation and DMA fixes (Jocelyn Mayer)
--  - polled mode for PIC (Jocelyn Mayer)
--  - fixed PTE dirty bit handling
--  - fixed xadd same reg bug
--  - fixed cmpxchg exception safeness
--  - access to virtual memory in gdb stub
--  - task gate and NT flag fixes
--  - eflags optimisation fix for string operations
--
--version 0.5.1:
--
--  - float access fixes when using soft mmu
--  - PC emulation support on PowerPC
--  - A20 support
--  - IDE CD-ROM emulation
--  - ARM fixes (Ulrich Hecht)
--  - SB16 emulation (malc)
--  - IRET and INT fixes in VM86 mode with IOPL=3
--  - Port I/Os use TSS io map
--  - Full task switching/task gate support
--  - added verr, verw, arpl, fcmovxx
--  - PowerPC target support (Jocelyn Mayer)
--  - Major SPARC target fixes (dynamically linked programs begin to work)
--
--version 0.5.0:
--
--  - full hardware level VGA emulation
--  - graphical display with SDL
--  - added PS/2 mouse and keyboard emulation
--  - popw (%esp) fix
--  - mov to/from segment data width fix
--  - added real mode support
--  - added Bochs BIOS and LGPL'ed VGA BIOS loader in qemu
--  - m68k host port (Richard Zidlicky)
--  - partial soft MMU support for memory mapped I/Os
--  - multi-target build
--  - fixed: no error code in hardware interrupts
--  - fixed: pop ss, mov ss, x and sti disable hardware irqs for the next insn
--  - correct single stepping through string operations
--  - preliminary SPARC target support (Thomas M. Ogrisegg)
--  - tun-fd option (Rusty Russell)
--  - automatic IDE geometry detection
--  - renamed 'vl' to qemu[-fast] and user qemu to qemu-{cpu}.
--  - added man page
--  - added full soft mmu mode to launch unpatched OSes.
--
--version 0.4.3:
--
--  - x86 exception fix in case of nop instruction.
--  - gcc 3.2.2 bug workaround (RedHat 9 fix)
--  - sparc and Alpha host fixes
--  - many ARM target fixes: 'ls' and 'bash' can be launched.
--
--version 0.4.2:
--
-- - many exception handling fixes (can compile a Linux kernel inside vl)
-- - IDE emulation support
-- - initial GDB stub support
-- - deferred update support for disk images (Rusty Russell)
-- - accept User Mode Linux Copy On Write disk images
-- - SMP kernels can at least be booted
--
--version 0.4.1:
--
-- - more accurate timer support in vl.
-- - more reliable NE2000 probe in vl.
-- - added 2.5.66 kernel in vl-test.
-- - added VLTMPDIR environment variable in vl.
--
--version 0.4:
--
-- - initial support for ring 0 x86 processor emulation
-- - fixed signal handling for correct dosemu DPMI emulation
-- - fast x86 MMU emulation with mmap()
-- - fixed popl (%esp) case
-- - Linux kernel can be executed by QEMU with the 'vl' command.
--
--version 0.3:
--
-- - initial support for ARM emulation
-- - added fnsave, frstor, fnstenv, fldenv FPU instructions
-- - added FPU register save in signal emulation
-- - initial ARM port
-- - Sparc and Alpha ports work on the regression test
-- - generic ioctl number conversion
-- - fixed ioctl type conversion
--
--version 0.2:
--
-- - PowerPC disassembly and ELF symbols output (Rusty Russell)
-- - flock support (Rusty Russell)
-- - ugetrlimit support (Rusty Russell)
-- - fstat64 fix (Rusty Russell)
-- - initial Alpha port (Falk Hueffner)
-- - initial IA64 port (Matt Wilson)
-- - initial Sparc and Sparc64 port (David S. Miller)
-- - added HLT instruction
-- - LRET instruction fix.
-- - added GPF generation for I/Os.
-- - added INT3 and TF flag support.
-- - SHL instruction C flag fix.
-- - mmap emulation for host page size > 4KB
-- - self-modifying code support
-- - better VM86 support (dosemu works on non trivial programs)
-- - precise exception support (EIP is computed correctly in most cases)
-- - more precise LDT/GDT/IDT emulation
-- - faster segment load in vm86 mode
-- - direct chaining of basic blocks (faster emulation)
--
--version 0.1.6:
--
-- - automatic library search system. QEMU can now work with unpatched
--   ELF dynamic loader and libc (Rusty Russell).
-- - ISO C warning fixes (Alistair Strachan)
-- - first self-virtualizable version (works only as long as the
--   translation cache is not flushed)
-- - RH9 fixes
--
--version 0.1.5:
--
-- - ppc64 support + personality() patch (Rusty Russell)
-- - first Alpha CPU patches (Falk Hueffner)
-- - removed bfd.h dependency
-- - fixed shrd, shld, idivl and divl on PowerPC.
-- - fixed buggy glibc PowerPC rint() function (test-i386 passes now on PowerPC).
--
--version 0.1.4:
--
-- - more accurate VM86 emulation (can launch small DOS 16 bit
--   executables in wine).
-- - fixed push/pop fs/gs
-- - added iret instruction.
-- - added times() syscall and SIOCATMARK ioctl.
--
--version 0.1.3:
--
-- - S390 support (Ulrich Weigand)
-- - glibc 2.3.x compile fix (Ulrich Weigand)
-- - socketcall endian fix (Ulrich Weigand)
-- - struct sockaddr endian fix (Ulrich Weigand)
-- - sendmsg/recvmsg endian fix (Ulrich Weigand)
-- - execve endian fix (Ulrich Weigand)
-- - fdset endian fix (Ulrich Weigand)
-- - partial setsockopt syscall support (Ulrich Weigand)
-- - more accurate pushf/popf emulation
-- - first partial vm86() syscall support (can be used with runcom example).
-- - added bound, cmpxchg8b, cpuid instructions
-- - added 16 bit addressing support/override for string operations
-- - poll() fix
--
--version 0.1.2:
--
-- - compile fixes
-- - xlat instruction
-- - xchg instruction memory lock
-- - added simple vm86 example (not working with QEMU yet). The 54 byte
--   DOS executable 'pi_10.com' program was released by Bertram
--   Felgenhauer (more information at http://www.boo.net/~jasonp/pipage.html).
--
--version 0.1.1:
--
-- - glibc 2.2 compilation fixes
-- - added -s and -L options
-- - binary distribution of x86 glibc and wine
-- - big endian fixes in ELF loader and getdents.
--
--version 0.1:
--
-- - initial public release.
-diff --git a/README.rst b/README.rst
-index 7497709291dc..58b9f2dc15c4 100644
---- a/README.rst
-+++ b/README.rst
-@@ -134,6 +134,14 @@ For additional information on bug reporting consult:
- * `<https://qemu.org/Contribute/ReportABug>`_
- 
- 
-+ChangeLog
-+=========
-+
-+For version history and release notes, please visit
-+`<https://wiki.qemu.org/ChangeLog/>`_ or look at the git history for
-+more detailed information.
-+
-+
- Contact
- =======
- 
+diff --git a/include/io/channel-buffer.h b/include/io/channel-buffer.h
+index 518c28f13f5c..c9463ee6551b 100644
+--- a/include/io/channel-buffer.h
++++ b/include/io/channel-buffer.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-command.h b/include/io/channel-command.h
+index 5556a38d7e67..27e42bdadc71 100644
+--- a/include/io/channel-command.h
++++ b/include/io/channel-command.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-file.h b/include/io/channel-file.h
+index c61d6e0ef7cb..50e8eb113868 100644
+--- a/include/io/channel-file.h
++++ b/include/io/channel-file.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-socket.h b/include/io/channel-socket.h
+index d07d67fab66e..e747e635147e 100644
+--- a/include/io/channel-socket.h
++++ b/include/io/channel-socket.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-tls.h b/include/io/channel-tls.h
+index 6dd1a3cd3c66..5672479e9eb6 100644
+--- a/include/io/channel-tls.h
++++ b/include/io/channel-tls.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-util.h b/include/io/channel-util.h
+index c0b79cf6036b..a5d720d9a04b 100644
+--- a/include/io/channel-util.h
++++ b/include/io/channel-util.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-watch.h b/include/io/channel-watch.h
+index 63bc4ae2d92a..a36aab8f8f2f 100644
+--- a/include/io/channel-watch.h
++++ b/include/io/channel-watch.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel-websock.h b/include/io/channel-websock.h
+index 9c40513e745d..e180827c57f1 100644
+--- a/include/io/channel-websock.h
++++ b/include/io/channel-websock.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/channel.h b/include/io/channel.h
+index 3c04f0edda7e..4d6fe45f63d8 100644
+--- a/include/io/channel.h
++++ b/include/io/channel.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/dns-resolver.h b/include/io/dns-resolver.h
+index 01d0bd7a428c..558ea517ded4 100644
+--- a/include/io/dns-resolver.h
++++ b/include/io/dns-resolver.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/include/io/task.h b/include/io/task.h
+index 6818dfedd005..beec4f5cfd1d 100644
+--- a/include/io/task.h
++++ b/include/io/task.h
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-buffer.c b/io/channel-buffer.c
+index 5402e0cced39..baa4e2b089f6 100644
+--- a/io/channel-buffer.c
++++ b/io/channel-buffer.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-command.c b/io/channel-command.c
+index 368dd62b7eda..b2a9e271382a 100644
+--- a/io/channel-command.c
++++ b/io/channel-command.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-file.c b/io/channel-file.c
+index 2ed3b75e8bf1..c4bf799a8023 100644
+--- a/io/channel-file.c
++++ b/io/channel-file.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-socket.c b/io/channel-socket.c
+index e1b46670874f..de259f7eed27 100644
+--- a/io/channel-socket.c
++++ b/io/channel-socket.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-tls.c b/io/channel-tls.c
+index 7ec8ceff2f01..388f01997725 100644
+--- a/io/channel-tls.c
++++ b/io/channel-tls.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-util.c b/io/channel-util.c
+index 423d79845a20..848a7a43d671 100644
+--- a/io/channel-util.c
++++ b/io/channel-util.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-watch.c b/io/channel-watch.c
+index 8640d1c46408..0289b3647c27 100644
+--- a/io/channel-watch.c
++++ b/io/channel-watch.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel-websock.c b/io/channel-websock.c
+index 47a0e941d9f6..bb545fa3271f 100644
+--- a/io/channel-websock.c
++++ b/io/channel-websock.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/channel.c b/io/channel.c
+index e4376eb0bc40..93d449dee261 100644
+--- a/io/channel.c
++++ b/io/channel.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/dns-resolver.c b/io/dns-resolver.c
+index b55d8cc3feae..743a0efc8767 100644
+--- a/io/dns-resolver.c
++++ b/io/dns-resolver.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/io/task.c b/io/task.c
+index 53c0bed68673..451f26f8b495 100644
+--- a/io/task.c
++++ b/io/task.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/test-io-channel-buffer.c b/tests/test-io-channel-buffer.c
+index 59d6c64b0431..9c6724dea419 100644
+--- a/tests/test-io-channel-buffer.c
++++ b/tests/test-io-channel-buffer.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/test-io-channel-command.c b/tests/test-io-channel-command.c
+index 3bc526612104..99056e07c023 100644
+--- a/tests/test-io-channel-command.c
++++ b/tests/test-io-channel-command.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/test-io-channel-file.c b/tests/test-io-channel-file.c
+index 0aa04775417f..29038e67b64d 100644
+--- a/tests/test-io-channel-file.c
++++ b/tests/test-io-channel-file.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/test-io-channel-socket.c b/tests/test-io-channel-socket.c
+index 743577d7449b..c49eec1f038a 100644
+--- a/tests/test-io-channel-socket.c
++++ b/tests/test-io-channel-socket.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
+diff --git a/tests/test-io-task.c b/tests/test-io-task.c
+index 85e7a98da50d..953a50ae66e3 100644
+--- a/tests/test-io-task.c
++++ b/tests/test-io-task.c
+@@ -6,7 +6,7 @@
+  * This library is free software; you can redistribute it and/or
+  * modify it under the terms of the GNU Lesser General Public
+  * License as published by the Free Software Foundation; either
+- * version 2 of the License, or (at your option) any later version.
++ * version 2.1 of the License, or (at your option) any later version.
+  *
+  * This library is distributed in the hope that it will be useful,
+  * but WITHOUT ANY WARRANTY; without even the implied warranty of
 -- 
 2.26.2
 
