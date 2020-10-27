@@ -2,108 +2,125 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F439C55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:09:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93759C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:10:53 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 19F6B21D24
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:09:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74AE821D24
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:10:52 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ffDHa7w9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 19F6B21D24
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="TQngzrS8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74AE821D24
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57102 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXLun-0001IG-4g
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:09:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56256)
+	id 1kXLwJ-000200-Cj
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:10:51 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56594)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXLrF-00054x-Lm
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:05:38 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:57585)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXLrA-0002OY-Qj
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:05:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603793131;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=5O5Uacq4GrAwMI+4S72+5ZRtO/m756IkZGfgtVKPhrA=;
- b=ffDHa7w9N0fQ8rXu3zNNP3QaDQx+1QpNNHrLwxKt3m7o7M4HRhU+/E5eBu6vRsFgKD4w7i
- NmU/AwiAD7Ild+SU9QneQwBst+3Lz5XaBL5YW/xJJxislb6vvCKmnCHRg5swg15N5iT+FZ
- C9PfHREfllHyWQzCN4jsq5X87uN/UHE=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-465-EKMZzY6qN9CJsu9Vq8lzew-1; Tue, 27 Oct 2020 06:05:23 -0400
-X-MC-Unique: EKMZzY6qN9CJsu9Vq8lzew-1
-Received: by mail-ej1-f71.google.com with SMTP id x12so642356eju.22
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 03:05:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:references:cc:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=5O5Uacq4GrAwMI+4S72+5ZRtO/m756IkZGfgtVKPhrA=;
- b=iYNS0D3KgHgMMB/TIqDx6v9DNoHS3PyJHB8x5tM0KDb+Dk4CwAGOReYYSuYkk9mtXg
- IWNPH+eP1VZkbNkQNhNtDQ8mW6cHlbKZtB+YJIs8DMW+botY+/lfyIoAJabW7Xov4sdE
- aAyiv7mRA3lzLjcaPHBUBjWZQzBcY18VCO7j33RmWaYLQhr+TG3x6vLAWBOAhfeQThiK
- ze8gKUihhlBDDHVnoyMxhaME2ABfyKxU00KiNOEHEoz9+LMb0AyA7cXjpV52v39AV74P
- PeZIiBlc4RB4JxCeFxSsMOREq7ZO6EGed4u5o8WhIN5/KQT1lg5+3tEtnXV5peVkMwF5
- vgRA==
-X-Gm-Message-State: AOAM531NoYFJ/tboyS481J92lISfSscSIYoxcj5RPTeFqOhbUAZn3pIU
- 1XishjdzmaZQwHDhQHhK9pyY+R2gcNwHyEm67W/XLALKUrH3gB9D0E9thl1eIdBs0Gx5h448AEr
- /OkOVB0DNTNMO73s=
-X-Received: by 2002:a17:906:cc18:: with SMTP id
- ml24mr1519234ejb.298.1603793122394; 
- Tue, 27 Oct 2020 03:05:22 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyYFjk/N3nBafC8Uwuw5BDEdtnlQDm88QzE7e8siRafqU1tDMCHULe9AwjcbrxMhZtX2IFWdQ==
-X-Received: by 2002:a17:906:cc18:: with SMTP id
- ml24mr1519219ejb.298.1603793122187; 
- Tue, 27 Oct 2020 03:05:22 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id p17sm656255edw.10.2020.10.27.03.05.21
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Tue, 27 Oct 2020 03:05:21 -0700 (PDT)
-Subject: Re: [PATCH] tests/vm: update openbsd to release 6.8
-To: Brad Smith <brad@comstyle.com>, qemu-devel@nongnu.org
-References: <20201027053048.GB64546@humpty.home.comstyle.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <cbae54c3-fa97-19e6-512c-7ac570f56b12@redhat.com>
-Date: Tue, 27 Oct 2020 11:05:20 +0100
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kXLsj-0006zj-1j; Tue, 27 Oct 2020 06:07:10 -0400
+Received: from mail-eopbgr80103.outbound.protection.outlook.com
+ ([40.107.8.103]:57929 helo=EUR04-VI1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kXLsf-0002wO-0Q; Tue, 27 Oct 2020 06:07:08 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ngZGPfJWXNYlyrhUru0oZMaRhRdH2J0KF7Js/fBnaGgtX3RQpGr1vS6EcpZJFy5ynFwGoFnkQm/V6ujUQCFZ28lNd3bexx8emhtSbo0bVjiSjocWGIRCayOYPXpZUq/MWGzd/0FEgyibVbr7NiZW8mKEw2UpI1PSojnX/g3/4iNlGeiwjIfP8sWKNKhFx09RCjzR//ryJ/nrA+b3eAFDHBDZpytOLX5nyi6NddtnalqOPpNOOANBBKrTvetPzy8tgzbDXGykkSbsCJyzHmBuutHhqjnJ0XCXjB6MJdX5KdiVaYa7Kczd7ZVKGf4bx/yXQ253+HEGVmZNHLHU4Ly2Mw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ieNWU50WgTWISN6GqAMDfspUHUTDjK7cljqBP8GEZwk=;
+ b=L5ViM1iIOuZYJWitwFMUwwLRgQIGyPd8l3ttjrTaks4S75TXsSNWrORGu82waUfireDsgWu7cpLrUkJwlJnkkdrfEJ6SwR2LDos/V3k6LumT3kbSPk818mmHhENcBMjkTjQcik5gOJiK2QxisbiqTaIlikJUwX2bg2v/eDHRU/cWTZQ30ePVzU5OfyG1X12LaU92v3J103CbPwI1STkRq07P/7KiTWnlBHaK6HTK9wsbZRPUchx35Ung3YlHYbWqyhhQwatLie9yavmrSZjjYLj2FYdF6sLZaRxL4H48o+uG8l9m5Tk0uxUDktnav3e9a5W/Xitgid9S/gLn3Hd19g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ieNWU50WgTWISN6GqAMDfspUHUTDjK7cljqBP8GEZwk=;
+ b=TQngzrS8pJNuJ6tKlucmIaM3O1AFwBZPsLSzUxMZbjtVnOO4PHwzRcefVLALPUj/64vaBdjONuKXv7OLvnJSrjjRJvmMwL0XiTiksS/pmPD6F4XAMk3+4R+YvqYCXzcJYsP/8lJcp+w/rXnJn8lTkosLDiWdX+fvkSpdVXGsFBY=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
+ by VI1PR0802MB2224.eurprd08.prod.outlook.com (2603:10a6:800:9f::11)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 27 Oct
+ 2020 10:07:00 +0000
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::c1ba:32cf:cd37:712c]) by VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::c1ba:32cf:cd37:712c%9]) with mapi id 15.20.3455.037; Tue, 27 Oct 2020
+ 10:07:00 +0000
+Subject: Re: [PATCH v6 01/11] block: Simplify QAPI_LIST_ADD
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, armbru@redhat.com,
+ rjones@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+References: <20201027050556.269064-1-eblake@redhat.com>
+ <20201027050556.269064-2-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <fb7663c3-6477-934a-4f09-800fec62f3a4@virtuozzo.com>
+Date: Tue, 27 Oct 2020 13:06:56 +0300
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
-MIME-Version: 1.0
-In-Reply-To: <20201027053048.GB64546@humpty.home.comstyle.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+ Thunderbird/78.4.0
+In-Reply-To: <20201027050556.269064-2-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.93]
+X-ClientProxiedBy: AM4PR0501CA0057.eurprd05.prod.outlook.com
+ (2603:10a6:200:68::25) To VI1PR08MB5503.eurprd08.prod.outlook.com
+ (2603:10a6:803:137::19)
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.93) by
+ AM4PR0501CA0057.eurprd05.prod.outlook.com (2603:10a6:200:68::25) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.23 via Frontend
+ Transport; Tue, 27 Oct 2020 10:06:59 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: dd4a5007-8069-401f-6e33-08d87a600b4f
+X-MS-TrafficTypeDiagnostic: VI1PR0802MB2224:
+X-Microsoft-Antispam-PRVS: <VI1PR0802MB22249CED92D8B04CD7634B97C1160@VI1PR0802MB2224.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:7691;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: GonQ08Fk6DpKWJepzhr+RCqX3PVMGgMfmpftHPfW5OdS+XcpTA5JW+rCYbUYS+HPEXfySFPIzMCGmXyWxtu5/Ky93oQYQWMCPGVBPtbPc9tkMZ1y8nUq8uDSkcsGYMi1RKpK0QpAGMDxSU036JDXWLOBOM37dUQ+g3Y4t/X6KzOcvMZ7hY7TwHaSiz7X4tGKoLrA7Ol5Gys2PBOROCkzIH6skuLwBC6KD/yVoGV/EtxbDEcSg7LWRCStpmVzMwelevpN8qiZSVqVUC+Zoj60tNzIjCfHjjKBeSNFcvJp/IhpucCNBbMedX7YMKa0ypFSa+/lCpAGcrNpshx7mjIfUMdyIZ7h82VDZpu+bjX8jNW9TIclLEdmASFiE8/VTvOF
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(39840400004)(366004)(396003)(136003)(376002)(346002)(26005)(16526019)(8936002)(8676002)(6486002)(478600001)(52116002)(4326008)(2616005)(186003)(66946007)(956004)(31696002)(66476007)(66556008)(31686004)(86362001)(316002)(2906002)(4744005)(16576012)(36756003)(6666004)(5660300002)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: 1QDymI9xZZ3evmspXC+vAPegpBYF5banUYnMGxdx0eP8cWmGxNvx9UYiSUplncSbaae3dWzj+nIlacPS7UNpYbkAIS9rgLfmIApAyzFOh8Pzm2p49NrfUviFSXn9zwK6egxZ4w5927EOpHgK5SZHsyfiHg8i7lxOytoV6zB0TZ1JaXsXj1yc6+7AFoyst7FDkdG97UYCjalSZitt49JL4xcax6stYT6dKu0S8jipyYIo5VZ+pz7SiZtpbpVEG+jiv4Cmj01g43qT3ENwezu5w0Wg9DXZWMlFCvTNa3gGLXMkOs1tBDG0sFyQGEgSMrgI8GPC6Xigtt7crd/wF4rImCFJzH/BEKsrY1JUOkCcttcLrHPaSH9DmfdFDwiZBOS6EKBEJNXslSG/F0DTe4byjWFmd4H1OmxBUxJe2Vmcdd6ttpTFEZHSCjZ6DQvMgB/M4+7wxTCqbjoPljNwgaQH6AvBCfTp2CJxZzuxeCyBHL8hjyPgIn4ymH/eqRpfrxpv1iOvUUZQ6TsUL4LkJovB5lPFm7djEdx182ozkLiEoFmlgQfSss/2cROKYmH5UXFga8IX1NatesXsnfBd7D+IFyfyxQZJtA7/sYuokg9+8SG/RwHl3fIbE/tr7PMx54bqoKalfff3LZwZcHb0PX/YCA==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dd4a5007-8069-401f-6e33-08d87a600b4f
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 10:07:00.0239 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: xDq5nd5+kd+jRQEX2ZGhy7czeEbWtyl5aPppW2w5kZ/2cnITivRoh5ABe53Cy5m/+qlieS2fRCzpYyhDuaLURqqPFftAx1HFVG1E0E+UuXI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR0802MB2224
+Received-SPF: pass client-ip=40.107.8.103;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR04-VI1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 06:07:01
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
 X-Spam_score_int: -42
 X-Spam_score: -4.3
 X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,61 +134,25 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gerd Hoffmann <kraxel@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/27/20 6:30 AM, Brad Smith wrote:
-> tests/vm: update openbsd to release 6.8
+27.10.2020 08:05, Eric Blake wrote:
+> There is no need to rely on the verbosity of the gcc/clang compiler
+> extension of g_new(typeof(X), 1) when we can instead use the standard
+> g_malloc(sizeof(X)).  In general, we like g_new over g_malloc for
+> returning type X rather than void* to let the compiler catch more
+> potential typing mistakes, but in this particular macro, our other use
+> of typeof on the same line already ensures we are getting correct
+> results.
 > 
-> A double dash at the end of a package name removes ambiguity
-> when the intent is to install a non-FLAVORed package.
-> 
-> Signed-off-by: Brad Smith <brad@comstyle.com>
-> Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
-> Tested-by: Gerd Hoffmann <kraxel@redhat.com>
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> Suggested-by: Markus Armbruster<armbru@redhat.com>
+> Signed-off-by: Eric Blake<eblake@redhat.com>
 
-I confirm Brad sent us this patch off-list, and
-- our review comments are addressed,
-- the tags are correct.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-The patch format itself seems broken... Like a copy/paste
-into an email client...
-
----
-
-> 
-> 
-> diff --git a/tests/vm/openbsd b/tests/vm/openbsd
-> index 8356646f21..5ffa4f1b37 100755
-> --- a/tests/vm/openbsd
-> +++ b/tests/vm/openbsd
-> @@ -22,8 +22,8 @@ class OpenBSDVM(basevm.BaseVM):
->      name = "openbsd"
->      arch = "x86_64"
->  
-> -    link = "https://cdn.openbsd.org/pub/OpenBSD/6.6/amd64/install66.iso"
-> -    csum = "b22e63df56e6266de6bbeed8e9be0fbe9ee2291551c5bc03f3cc2e4ab9436ee3"
-> +    link = "https://cdn.openbsd.org/pub/OpenBSD/6.8/amd64/install68.iso"
-> +    csum = "47e291fcc2d0c1a8ae0b66329f040b33af755b6adbd21739e20bb5ad56f62b6c"
->      size = "20G"
->      pkgs = [
->          # tools
-> @@ -36,10 +36,10 @@ class OpenBSDVM(basevm.BaseVM):
->          "bash",
->          "gmake",
->          "gsed",
-> -        "gettext",
-> +        "gettext-tools",
->  
->          # libs: usb
-> -        "libusb1",
-> +        "libusb1--",
->  
->          # libs: crypto
->          "gnutls",
-> 
-
+-- 
+Best regards,
+Vladimir
 
