@@ -2,86 +2,89 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 164CDC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A07D8C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:24:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 68C3A221FB
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id EEAD6207E8
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:24:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ru1c9M3E"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 68C3A221FB
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Co2JCVu9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org EEAD6207E8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41848 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44678 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXWQ4-0003Av-C4
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:46204)
+	id 1kXWS1-0004Ri-Tb
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:24:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:46600)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXWOk-0002DF-Re
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:20:54 -0400
-Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:43502)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXWOi-0003wz-RW
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:20:54 -0400
-Received: by mail-ed1-x542.google.com with SMTP id dn5so2950534edb.10
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 14:20:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=d0UbQvo8Vb3wDc/aJyL7VyV7Y6DvIzJ3l15+MRR+t/M=;
- b=ru1c9M3EPVQKRU7OXH0NpPO9pQ7KwB+L4L/EQSJA3KWr8bk55h7RZD92/QoRflod6q
- gLLU00LoyqQIP9A4dRp3Zbg/Jnp5XLqRzkdP8jm/5UOAUWadPM1h8m0d35uQBs9twpnD
- MJcf1kI2ZVb4U6gx4jhvcHKMEevJm65bIpQBz99JYY+VwNW/SUnZLURbf9gbmotoMXLn
- DM3s9dy4F8O9RtSZpMJHJRNbdnCNAKOEDVQlxJl560Dp7QQTVW1w1XrelLgF+NZgp3+s
- LqbdMzsIkk43DwEWEGXqjF/1LaNhT6Rmz6Qh/olIUP/8DRxTFM77w3MAl0o8/I5+P8Ik
- vAFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=d0UbQvo8Vb3wDc/aJyL7VyV7Y6DvIzJ3l15+MRR+t/M=;
- b=ua2GgotlTot2VY/kG4k5Du296nUDCysKlRSGFI8OsDeGuIhU+ffp93dPxE4o54yIoQ
- 9RBg7eb2wyvcZRS7/3ssTCbAeYBDeTTnJapC3ZJQ4m7Dw4Z9UPWVclVRDy+j5EZO/+hp
- WX38kcCVXo0OZ7gtWUC5fL1fL1F+OM/w2fXs548tRb/uN+LxguUHTzv0SxWMO65W2grE
- WnD1s+fitIkxy/TOjNgFRPf4ugJGkXeWSdv/M07K0g7NC1jRYaIiIjFFKOadQtkRh+Dh
- v1azzZqK9OLP0X6VCGYwzNpZx5thNaeD47h+QDsAMQCW3//l5Pih1jXrW8qjPD5P16AU
- mykg==
-X-Gm-Message-State: AOAM5336PPKgB3F4tygkKq17XK+SsD7c4bm9B2adG41fwW7jql5qWRFG
- UZpZrQ/DRbKEXFAczr1ZzrVomUPYXHpqkenhgKUfWw==
-X-Google-Smtp-Source: ABdhPJxhKBsnrlh4qEzVXJOYba0Kccwr+goxR7w8UfSVC7voQImgwhCSMfw3fM3ek3Te8BbZ9eI+0eZquslGeeVBQEc=
-X-Received: by 2002:a50:f41a:: with SMTP id r26mr4258583edm.251.1603833651094; 
- Tue, 27 Oct 2020 14:20:51 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXWQB-0003ZG-JY
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:22:23 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60146)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXWQ7-00046z-Vj
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:22:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603833738;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TLeGWvu+sbUhXFblVummAS//dJK0fym+6D/9hwOSXBY=;
+ b=Co2JCVu9ZasoQYKAokKeyijT2fo0+JF0RBYDHblV6BBRg4GTdrkTZg/xemWKdITbJ0JcRy
+ 98ynzNm6pbfRqr2R7BpN2O0DL6sjsvrITF9PPpcGFm8sdRtRjEZ1Frs2TnXYAMh4CJE0IZ
+ j5NGS+KL/Y4Ufrm62PgCOlYBgW3f5RM=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-327-Z0P1H38LMW2QqBtyHDUoMg-1; Tue, 27 Oct 2020 17:22:14 -0400
+X-MC-Unique: Z0P1H38LMW2QqBtyHDUoMg-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B1A248049E0;
+ Tue, 27 Oct 2020 21:22:13 +0000 (UTC)
+Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id EF4EA5B4A3;
+ Tue, 27 Oct 2020 21:22:09 +0000 (UTC)
+Subject: Re: [PATCH 1/9] qapi: replace List[str] by IfCond
+To: marcandre.lureau@redhat.com, qemu-devel@nongnu.org
+References: <20201015165255.1573897-1-marcandre.lureau@redhat.com>
+ <20201015165255.1573897-2-marcandre.lureau@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <b669f195-9440-16d7-5b41-c082f4cac9bb@redhat.com>
+Date: Tue, 27 Oct 2020 17:22:09 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-References: <20201026212853.92880-1-keithp@keithp.com>
- <20201026212853.92880-2-keithp@keithp.com>
-In-Reply-To: <20201026212853.92880-2-keithp@keithp.com>
-From: Peter Maydell <peter.maydell@linaro.org>
-Date: Tue, 27 Oct 2020 21:20:39 +0000
-Message-ID: <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
-Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
- directories
-To: Keith Packard <keithp@keithp.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2a00:1450:4864:20::542;
- envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x542.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+In-Reply-To: <20201015165255.1573897-2-marcandre.lureau@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -95,50 +98,126 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: "open list:RISC-V" <qemu-riscv@nongnu.org>,
- Sagar Karandikar <sagark@eecs.berkeley.edu>,
- Bastian Koppelmann <kbastian@mail.uni-paderborn.de>,
- QEMU Developers <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- qemu-arm <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Alistair Francis <Alistair.Francis@wdc.com>,
- =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
+Cc: Markus Armbruster <armbru@redhat.com>,
+ Michael Roth <mdroth@linux.vnet.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Mon, 26 Oct 2020 at 21:29, Keith Packard <keithp@keithp.com> wrote:
->
-> This commit renames two files which provide ARM semihosting support so
-> that they can be shared by other architectures:
->
->  1. target/arm/arm-semi.c     -> hw/semihosting/common-semi.c
->  2. linux-user/arm/semihost.c -> linux-user/semihost.c
->
-> The build system was modified to reflect this change, but the contents
-> of the two files are unchanged.
->
-> Signed-off-by: Keith Packard <keithp@keithp.com>
+On 10/15/20 12:52 PM, marcandre.lureau@redhat.com wrote:
+> From: Marc-André Lureau <marcandre.lureau@redhat.com>
+> 
+> Wrap the 'if' condition in a higher-level object. Not only this is
+> allows more type safety but also further refactoring without too much
+> chrun. The following patches will extend the syntax of 'if' and will
+> have some extra handling and types.
+> 
+
+Probably a good idea. Thanks for basing it on Pt6; I'll try to push 
+ahead as fast as I can -- though there are some more aggressive cleanups 
+in error, expr, and parser that we haven't discussed on list yet much 
+and are quite prone to change.
+
+Let me know if you have any comments or feedbacks regarding what you 
+found there!
+
+Pts 2 (introspect.py) and 3 (expr.py) are recently re-sent to list, if 
+you have specific critique in those areas.
+
+> Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
 > ---
-> diff --git a/target/arm/arm-semi.c b/hw/semihosting/common-semi.c
-> similarity index 100%
-> rename from target/arm/arm-semi.c
-> rename to hw/semihosting/common-semi.c
-> diff --git a/hw/semihosting/meson.build b/hw/semihosting/meson.build
-> index f40ac574c4..fbd2841e59 100644
-> --- a/hw/semihosting/meson.build
-> +++ b/hw/semihosting/meson.build
-> @@ -2,3 +2,5 @@ specific_ss.add(when: 'CONFIG_SEMIHOSTING', if_true: files(
->    'config.c',
->    'console.c',
->  ))
+>   docs/sphinx/qapidoc.py     |  2 +-
+>   scripts/qapi/commands.py   |  4 +-
+>   scripts/qapi/common.py     | 26 ++++++++---
+>   scripts/qapi/events.py     |  4 +-
+>   scripts/qapi/gen.py        |  9 ++--
+>   scripts/qapi/introspect.py | 21 ++++-----
+>   scripts/qapi/schema.py     | 91 ++++++++++++++++++++------------------
+>   scripts/qapi/types.py      | 11 ++---
+>   scripts/qapi/visit.py      |  9 ++--
+>   9 files changed, 102 insertions(+), 75 deletions(-)
+> 
+> diff --git a/docs/sphinx/qapidoc.py b/docs/sphinx/qapidoc.py
+> index 11e97839de..db9520f37f 100644
+> --- a/docs/sphinx/qapidoc.py
+> +++ b/docs/sphinx/qapidoc.py
+> @@ -116,7 +116,7 @@ class QAPISchemaGenRSTVisitor(QAPISchemaVisitor):
+>           the conditions are in literal-text and the commas are not.
+>           If with_if is False, we don't return the "(If: " and ")".
+>           """
+> -        condlist = intersperse([nodes.literal('', c) for c in ifcond],
+> +        condlist = intersperse([nodes.literal('', c) for c in ifcond.ifcond],
+>                                  nodes.Text(', '))
+>           if not with_if:
+>               return condlist
+> diff --git a/scripts/qapi/commands.py b/scripts/qapi/commands.py
+> index 50978090b4..03deac5fdd 100644
+> --- a/scripts/qapi/commands.py
+> +++ b/scripts/qapi/commands.py
+> @@ -20,7 +20,7 @@ from typing import (
+>       Set,
+>   )
+>   
+> -from .common import c_name, mcgen
+> +from .common import IfCond, c_name, mcgen
+>   from .gen import (
+>       QAPIGenC,
+>       QAPIGenCCode,
+> @@ -301,7 +301,7 @@ void %(c_prefix)sqmp_init_marshal(QmpCommandList *cmds);
+>       def visit_command(self,
+>                         name: str,
+>                         info: QAPISourceInfo,
+> -                      ifcond: List[str],
+> +                      ifcond: IfCond,
+>                         features: List[QAPISchemaFeature],
+>                         arg_type: Optional[QAPISchemaObjectType],
+>                         ret_type: Optional[QAPISchemaType],
+> diff --git a/scripts/qapi/common.py b/scripts/qapi/common.py
+> index 11b86beeab..59e6a400da 100644
+> --- a/scripts/qapi/common.py
+> +++ b/scripts/qapi/common.py
+> @@ -12,7 +12,7 @@
+>   # See the COPYING file in the top-level directory.
+>   
+>   import re
+> -from typing import Optional, Sequence
+> +from typing import Optional, Sequence, Union
+>   
+>   
+>   #: Magic string that gets removed along with all space to its right.
+> @@ -194,18 +194,34 @@ def guardend(name: str) -> str:
+>                    name=c_fname(name).upper())
+>   
+>   
+> -def gen_if(ifcond: Sequence[str]) -> str:
+> +class IfCond:
+> +    def __init__(self, ifcond: Optional[Sequence[str]] = None):
+> +        self.ifcond = ifcond or []
 > +
-> +specific_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
+> +    def __bool__(self) -> bool:
+> +        return bool(self.ifcond)
+> +
+> +    def __repr__(self) -> str:
+> +        return repr(self.ifcond)
+> +
+> +    def __eq__(self, other: object) -> bool:
+> +        if not isinstance(other, IfCond):
+> +            return NotImplemented
+> +        return self.ifcond == other.ifcond
+> +
 
-I think this adds this file to the compilation for all TCG targets;
-you only want it for targets which have Arm-semihosting-ABI compatible
-semihosting. (Various other targets either don't have semihosting
-or have their own ABI.)
+Haven't looked ahead yet, forgive me if this is a bad idea:
 
-thanks
--- PMM
+worth adding an __iter__ method here so that callers don't have to call 
+"for x in ifcond.ifcond" ?
+
+Maybe you refactor such that this is becomes pointless.
+
+Also; should we create an Ifcond object in schema.py instead in common, 
+as it's a generic representation of the #if conditionals, less tied to 
+the C generation?
+
+
+[...]
+
 
