@@ -2,75 +2,72 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.2 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE260C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:58:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F5D2C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:01:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0977420878
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:58:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4FA8A21556
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 19:01:55 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHCUSOVa"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0977420878
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TvWnWkUj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4FA8A21556
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33616 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38492 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXUAp-0003W8-2u
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:58:23 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35052)
+	id 1kXUEE-0005ur-8W
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 15:01:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:39982)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXTy0-0008Tb-6r
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:45:08 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:56012)
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXUC3-0004mH-2O
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:59:39 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:24522)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXTxv-00066k-2Z
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:45:05 -0400
+ (Exim 4.90_1) (envelope-from <eblake@redhat.com>) id 1kXUC0-0000Do-EZ
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:59:38 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603824302;
+ s=mimecast20190719; t=1603825174;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=ZryAnamgoYu55ZEggUKNyRi7qSTAnJ9xlJ3QRoHz0lI=;
- b=WHCUSOVatBfUzLrpwc3hRQPOpKSaedX5dg2g129gb1ZaxZKFurtO+PvMQu89/oSup8IaFQ
- QDPHnr/hA7F/4RgCqC3BkJNVbZGTjK5IDTjJL5GQ3zKeH0zdYukXjHgUGVC8OMuHDOXqJE
- uIePtXv9/WBxU6e5L5WLhVziM0IeMnY=
+ bh=11ORZMpUEWSBHa1uYN4H+eZV+XHwqGhMkm9lop9elQs=;
+ b=TvWnWkUjqgF1U5xf5fKPiL5FnEa1dVFHfzdPY0xG5qSYAoObVxEqw6Qn4cWPHC3bBf4iIW
+ lo1yQNWUhkcr932+3m/htta1J5ZVtg1NvPoWMC8dSI2fCPgKR+NeKfQNxK1L8DOaCEZzIE
+ fbnMHt0ZV+jx47OgHPZ4IlhH0lKVDRE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-387-voIATndjN1akTHjPflgleA-1; Tue, 27 Oct 2020 14:44:57 -0400
-X-MC-Unique: voIATndjN1akTHjPflgleA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-203-0nlVgyjJMGSmFh7YEOHh5w-1; Tue, 27 Oct 2020 14:59:31 -0400
+X-MC-Unique: 0nlVgyjJMGSmFh7YEOHh5w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 02CD964ACA;
- Tue, 27 Oct 2020 18:44:51 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DB32618C89C4;
+ Tue, 27 Oct 2020 18:59:30 +0000 (UTC)
 Received: from [10.3.112.145] (ovpn-112-145.phx2.redhat.com [10.3.112.145])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 4414B5B4BB;
- Tue, 27 Oct 2020 18:44:33 +0000 (UTC)
-Subject: Re: [PATCH v6 11/11] qapi: Use QAPI_LIST_ADD() where possible
-To: Markus Armbruster <armbru@redhat.com>
-References: <20201027050556.269064-1-eblake@redhat.com>
- <20201027050556.269064-12-eblake@redhat.com>
- <873620vv3i.fsf@dusky.pond.sub.org>
- <677f78ec-4897-558c-1f51-35b6215caf64@redhat.com>
- <87r1pj65pz.fsf@dusky.pond.sub.org>
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 26F5760C07;
+ Tue, 27 Oct 2020 18:59:27 +0000 (UTC)
+Subject: Re: [PATCH 4/4] qemu-storage-daemon: QAPIfy --chardev
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+References: <20201026101005.2940615-1-armbru@redhat.com>
+ <20201026101005.2940615-5-armbru@redhat.com>
 From: Eric Blake <eblake@redhat.com>
 Organization: Red Hat, Inc.
-Message-ID: <38da85cd-83db-ea6d-9ebc-5838d776467a@redhat.com>
-Date: Tue, 27 Oct 2020 13:44:32 -0500
+Message-ID: <d937d998-74d6-7f19-e21f-662a084f67b2@redhat.com>
+Date: Tue, 27 Oct 2020 13:59:26 -0500
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <87r1pj65pz.fsf@dusky.pond.sub.org>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+In-Reply-To: <20201026101005.2940615-5-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eblake@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -102,128 +99,169 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>, pkrempa@redhat.com,
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- qemu-devel@nongnu.org, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- rjones@redhat.com, Gerd Hoffmann <kraxel@redhat.com>, qemu-block@nongnu.org,
- Juan Quintela <quintela@redhat.com>, David Hildenbrand <david@redhat.com>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Christian Borntraeger <borntraeger@de.ibm.com>,
- =?UTF-8?Q?Marc-Andr=c3=a9_Lureau?= <marcandre.lureau@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>, Thomas Huth <thuth@redhat.com>,
- Jiri Pirko <jiri@resnulli.us>, Eduardo Habkost <ehabkost@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>,
- "open list:S390 KVM CPUs" <qemu-s390x@nongnu.org>,
- "open list:GLUSTER" <integration@gluster.org>, stefanha@redhat.com,
- Richard Henderson <rth@twiddle.net>, kwolf@redhat.com,
- vsementsov@virtuozzo.com,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Cornelia Huck <cohuck@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Max Reitz <mreitz@redhat.com>, "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>,
- "open list:PowerPC TCG CPUs" <qemu-ppc@nongnu.org>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/27/20 10:36 AM, Markus Armbruster wrote:
-> Eric Blake <eblake@redhat.com> writes:
+On 10/26/20 5:10 AM, Markus Armbruster wrote:
+> From: Kevin Wolf <kwolf@redhat.com>
 > 
->> On 10/27/20 5:09 AM, Markus Armbruster wrote:
->>> Eric Blake <eblake@redhat.com> writes:
->>>
->>>> Anywhere we create a list of just one item or by prepending items
->>>> (typically because order doesn't matter), we can use the now-public
->>>> macro.  But places where we must keep the list in order by appending
->>>> remain open-coded.
->>>
->>> Should we rename the macro to QAPI_LIST_PREPEND()?
->>
->> That would make sense if we add a counterpart QAPI_LIST_APPEND.
+> This removes the dependency on QemuOpts from the --chardev option of
+> the storage daemon.
 > 
-> It may make sense even if we don't.  QAPI_LIST_ADD() leaves the reader
-> guessing whether we prepend or append.
+> Help on option parameters is still wrong.  Marked FIXME.
+> 
+> There are quite a few differences between qemu-system-FOO -chardev,
+> QMP chardev-add, and qemu-storage-daemon --chardev:
+> 
+> * QMP chardev-add wraps arguments other than "id" in a "backend"
+>   object.  Parameters other than "type" are further wrapped in a
+>   "data" object.  Example:
+> 
+>         {"execute": "chardev-add",
+>          "arguments": {
+>              "id":"sock0",
+>              "backend": {
+>                  "type": "socket",
+>                  "data": {
+>                      "addr": {
+>                          "type": "inet",
+> 			 ...
+>         }}}}}
+> 
+>   qemu-system-FOO -chardev does not wrap.  Neither does
+>   qemu-storage-daemon --chardev.
+> 
+> * qemu-system-FOO -chardev parameter "backend" corresponds to QMP
+>   chardev-add "backend" member "type".  qemu-storage-daemon names it
+>   "backend".
+> 
+> * qemu-system-FOO -chardev parameter "backend" recognizes a few
+>   additional aliases for compatibility.  QMP chardev-add does not.
+>   Neither does qemu-storage-daemon --chardev.
+> 
+> * qemu-system-FOO -chardev' with types "serial", "parallel" and "pipe"
+>   parameter "path" corresponds to QMP chardev-add member "device".
+>   qemu-storage-daemon --chardev follows QMP.
+> 
+> * Backend type "socket":
+> 
+>   - Intentionally different defaults (documented as such):
+>     qemu-system-FOO -chardev defaults to server=false and
+>     wait=true (if server=true), but QMP chardev-add defaults to
+>     server=true and wait=false.  qemu-storage-daemon --chardev follows
+>     QMP.
+> 
+>   - Accidentally different defaults: qemu-system-FOO -chardev defaults
+>     to tight=true, QMP chardev-add defaults to tight=false in
+>     QMP (this is a bug in commit 776b97d3).  qemu-storage-daemon
+>     follows QMP.
 
-That's a strong enough argument for me to make the rename in patch 2/11,
-with minor rebase fallout in the rest of the series, and then this patch
-gets a major rewrite (but I'm already not trying to get this patch into
-5.2).
+Should we be fixing that bug for 5.2?
 
+> 
+>   - QMP chardev-add wraps socket address arguments "path", "host",
+>     "port", etc in a "data" object.  qemu-system-FOO -chardev does not
+>     wrap.  Neither does qemu-storage-daemon --chardev.
+> 
+>   - qemu-system-FOO -chardev parameter "delay" corresponds to QMP
+>     chardev-add member "nodelay" with the sense reversed.
+>     qemu-storage-daemon --chardev follows QMP.
+> 
+> * Backend type "udp":
+> 
+>   - QMP chardev-add wraps remote and local address arguments in a
+>     "remote" and a "local" object, respectively.  qemu-system-FOO
+>     -chardev does not wrap, but prefixes the local address parameter
+>     names with "local" instead.
+> 
+>   - QMP chardev-add wraps socket address arguments in a "data" object.
+>     qemu-system-FOO -chardev does not wrap.  Neither does
+>     qemu-storage-daemon --chardev.  Same as for type "socket".
+> 
+> * I'm not sure qemu-system-FOO -chardev supports everything QMP
+>   chardev-add does.  I am sure qemu-storage-daemon --chardev does.
 
->>>> @@ -1224,10 +1224,7 @@ GuestFilesystemInfoList *qmp_guest_get_fsinfo(Error **errp)
->>>>      QTAILQ_FOREACH(mount, &mounts, next) {
->>>>          g_debug("Building guest fsinfo for '%s'", mount->dirname);
->>>>
->>>> -        new = g_malloc0(sizeof(*ret));
->>>
->>> Ugh!  Glad you get rid of this.
->>
->> Yep, C++ reserved words as a C variable name is always awkward.  It was
->> fun cleaning that up (several places in this patch).
-> 
-> I don't give a rat's ass about C++, actually.  I'm glad you got rid of
-> the tacit "@new points to the same type as @ret does".
-> 
-> Clean:
-> 
->              new = g_malloc0(sizeof(*new));
->              new = g_new0(GuestFilesystemInfoList, 1);
-> 
-> Clean (but I'd use g_new0() instead):
-> 
->              new = g_malloc0(sizeof(GuestFilesystemInfoList));
-> 
-> Dirty:
-> 
->              new = g_malloc0(sizeof(X));
-> 
-> where X is anything else.
+Quite the list, but it is a good start for what remains to merge things
+in the correct direction for 6.0.
 
-Ah, I hadn't even spotted what you disliked, but yes, it makes total
-sense that allocating for assignment to one variable by utilizing the
-type from another puts unnecessary linkage that the two variables must
-have the same type.
-
-
->>> Did you miss the spot where we add to this list?
->>>
->>>        /* Go through each extent */
->>>        for (i = 0; i < extents->NumberOfDiskExtents; i++) {
->>>            disk = g_malloc0(sizeof(GuestDiskAddress));
->>>
->>>            /* Disk numbers directly correspond to numbers used in UNCs
->>>             *
->>>             * See documentation for DISK_EXTENT:
->>>             * https://docs.microsoft.com/en-us/windows/desktop/api/winioctl/ns-winioctl-_disk_extent
->>>             *
->>>             * See also Naming Files, Paths and Namespaces:
->>>             * https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file#win32-device-namespaces
->>>             */
->>>            disk->has_dev = true;
->>>            disk->dev = g_strdup_printf("\\\\.\\PhysicalDrive%lu",
->>>                                        extents->Extents[i].DiskNumber);
->>>
->>>            get_single_disk_info(extents->Extents[i].DiskNumber, disk, &local_err);
->>>            if (local_err) {
->>>                error_propagate(errp, local_err);
->>>                goto out;
->>>            }
->>>            cur_item = g_malloc0(sizeof(*list));
->>>            cur_item->value = disk;
->>>            disk = NULL;
->>>            cur_item->next = list;
->>> --->       list = cur_item;
->>>        }
->>
->> This is appending, not prepending.
 > 
-> One of us is blind, and it might be me :)
+> Signed-off-by: Kevin Wolf <kwolf@redhat.com>
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>  storage-daemon/qemu-storage-daemon.c | 37 +++++++++++++++++++++-------
+>  1 file changed, 28 insertions(+), 9 deletions(-)
+> 
+> diff --git a/storage-daemon/qemu-storage-daemon.c b/storage-daemon/qemu-storage-daemon.c
+> index e419ba9f19..f1f3bdc320 100644
+> --- a/storage-daemon/qemu-storage-daemon.c
+> +++ b/storage-daemon/qemu-storage-daemon.c
+> @@ -37,10 +37,13 @@
+>  #include "qapi/error.h"
+>  #include "qapi/qapi-visit-block-core.h"
+>  #include "qapi/qapi-visit-block-export.h"
+> +#include "qapi/qapi-visit-char.h"
+> +#include "qapi/qapi-visit-char.h"
 
-Oh, I indeed misread this.  Yes, this is prepending after all, so I'll
-use the macro here.
+Duplicate.
+
+>  #include "qapi/qapi-visit-control.h"
+>  #include "qapi/qmp/qdict.h"
+>  #include "qapi/qmp/qstring.h"
+>  #include "qapi/qobject-input-visitor.h"
+> +#include "qapi/qobject-output-visitor.h"
+>  
+>  #include "qemu-common.h"
+>  #include "qemu-version.h"
+> @@ -207,18 +210,34 @@ static void process_options(int argc, char *argv[])
+>              }
+>          case OPTION_CHARDEV:
+>              {
+> -                /* TODO This interface is not stable until we QAPIfy it */
+> -                QemuOpts *opts = qemu_opts_parse_noisily(&qemu_chardev_opts,
+> -                                                         optarg, true);
+> -                if (opts == NULL) {
+> -                    exit(EXIT_FAILURE);
+> -                }
+> +                QDict *args;
+> +                Visitor *v;
+> +                ChardevOptions *chr;
+> +                q_obj_chardev_add_arg *arg;
+> +                bool help;
+>  
+> -                if (!qemu_chr_new_from_opts(opts, NULL, &error_fatal)) {
+> -                    /* No error, but NULL returned means help was printed */
+> +                args = keyval_parse(optarg, "backend", &help, &error_fatal);
+> +                if (help) {
+> +                    if (qdict_haskey(args, "backend")) {
+> +                        /* FIXME wrong where QAPI differs from QemuOpts */
+> +                        qemu_opts_print_help(&qemu_chardev_opts, true);
+> +                    } else {
+> +                        qemu_chr_print_types();
+> +                    }
+>                      exit(EXIT_SUCCESS);
+>                  }
+> -                qemu_opts_del(opts);
+> +
+> +                v = qobject_input_visitor_new_keyval(QOBJECT(args));
+> +                visit_type_ChardevOptions(v, NULL, &chr, &error_fatal);
+> +                visit_free(v);
+> +
+> +                arg = chardev_options_crumple(chr);
+> +
+> +                qmp_chardev_add(arg->id, arg->backend, &error_fatal);
+> +                g_free(arg->id);
+> +                qapi_free_ChardevBackend(arg->backend);
+> +                qapi_free_ChardevOptions(chr);
+> +                qobject_unref(args);
+>                  break;
+>              }
+>          case OPTION_EXPORT:
+> 
+
+Reviewed-by: Eric Blake <eblake@redhat.com>
 
 -- 
 Eric Blake, Principal Software Engineer
