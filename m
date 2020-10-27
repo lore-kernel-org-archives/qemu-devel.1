@@ -2,87 +2,85 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68AD0C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA57FC5517A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5AD0207C3
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 2D02722263
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 11:50:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="WIijWV1C"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5AD0207C3
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HlCPsAQ4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2D02722263
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:51906 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52224 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNUS-0004lg-Ov
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:50:12 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45290)
+	id 1kXNUX-0004ui-8e
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 07:50:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51798)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXN06-0001gl-Oi
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:18:50 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:40487)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPZ-0001MG-KA
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:09 -0400
+Received: from mail-wm1-x341.google.com ([2a00:1450:4864:20::341]:39943)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXN04-0003gC-7e
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:18:50 -0400
-Received: by mail-wr1-x444.google.com with SMTP id h5so1428465wrv.7
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:18:47 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPR-0004UV-Dc
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:08 -0400
+Received: by mail-wm1-x341.google.com with SMTP id k18so1100115wmj.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=/JAMWTyJxknfjwX2Imb1ga8zIqZIhso4vz4zfe3br3s=;
- b=WIijWV1CTQlUFL/rT+qNQri0YuvyHUzCh4NmfTMW1cHuhKO0bpnGBzTOKEndN2C1Xd
- juznBQyPXYST6YTzeJsPTi9gBDRUcHFSyrT14cpIacXABBI3Gec9ZTWSPUjD7aEqAfY1
- CzGI8gpMDwRY7klXFGFE59dtCWDd4x5YTqpRBfp+wcqfFjN8oXOojb/iESaSPyR9qY+a
- Jy10WkmWwsgPFlpKKRqYby/O9dFl/33AA+YybLnTbCN6KlgxbDmuSozKodXobxbFSLAQ
- 6IK7pu2xI+Mk0SfDlXDcnI3hVyYBNff5/0SD+oUe+m3XrUg+LjaoGSeQlkCYvbzsUEls
- DeYg==
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=N2nDrwJVyehCGyLz8KWzuVOcysD0Qufd0lwzlgeBJ3E=;
+ b=HlCPsAQ4O0ByfQOuBEMv0sznze0wysx00252a0gWlHo22IwAcMvaRoJj2E2e13SSbJ
+ gwkOu6KLR/DEMKvvWIsrFiN4zDLByMNz2jQeAnSiAspwDxygEWa6RhlbqpzAovKHZQRB
+ NJR+9zSH4ptOMJGLBnYpWNbTW7o+naniQVyo+N+cSAOqcsQ0ngM4LPkcUCHiMQ//YofR
+ xreagZdj4O3SgpJbsfu50T0qqWC51RMndi43cVlsBO/ML0u9UCAUuJJuUDT1NR4Fq+2I
+ b1ZdJzo0HuIAzan7WzNgxHGXj+jyyXSR+bKPu3dEhdpN7AI3gfx6/zD23qWIiMTf6M4w
+ Y4Vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=/JAMWTyJxknfjwX2Imb1ga8zIqZIhso4vz4zfe3br3s=;
- b=tvP9XfT+kD2Eep22VynBMxs1yNlf6271ooN2Pp82CSOF/b8BRyBAmDLwjmLwLT2kSC
- lR+1rn8vvFyUZT287vqkBxm22Jr9aF4zya5f4BVzgx3KLC9NDdauZgWlGpLM4LWJB88V
- QTg87l/j3knbNX7LmpmECQbbYJXMq2McUvSUn/uZet7jjQep9VOE+0sjxsIVQRsOtE9E
- AgZ5U4rjwoGkAVer5OU4PU2QUgAg/o5PlopCM0THt3GkALKFOQbrrj/orXmkfIeoTEN0
- USVtP/2st75TxkP1KR7qKq9FIX7EKDsJL0LN2l/2V1Bem7qlVlw1itBzhP7GQojl0cJv
- KShQ==
-X-Gm-Message-State: AOAM5305oujcCoPpknsIbv4QodwoBDesSIb9Ge+E+yijcmEs0jucooYV
- EB2CHjiyjp+GTHUDqdZ8FY7F1WG4XK4YQg==
-X-Google-Smtp-Source: ABdhPJwGVmUzNORg94z7kxwoCVA4gYJ5UEvDkfcYpUOGJkE+4TleVt537Pifcj9ytBajnu03VPcYAg==
-X-Received: by 2002:adf:f305:: with SMTP id i5mr2270910wro.346.1603797525510; 
- Tue, 27 Oct 2020 04:18:45 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id n9sm1622150wrq.72.2020.10.27.04.18.44
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=N2nDrwJVyehCGyLz8KWzuVOcysD0Qufd0lwzlgeBJ3E=;
+ b=oEUNNyvIoeG7uGuGv/gYCgcUyhcvlVs3Y4kWFbznK+LRhc2/bvW53WoUuSAKZX0CHX
+ JyLmAAFYnfLXLs15Uu6jM3HnJilpdQM1s+KHkYlmmWujrcJumQGhBdAdEjzByjvuDzSa
+ tL0f9YgOoixbcVbAoFAFpT2LzKKXA31Rqc94GjgEqFDN/80UKgaPKoMHqW7c3lmgpqZA
+ cCDtKPUGOh/yBvT+8cxwxkYhWUT+2+86IBwLQOol4ln9nzV0lJPZ9hU5DIydc3GFIroo
+ 2ccXVggwN8J6rTy94U+3vAzsvU4OghkdVGBPAOWO82TVbzcqZ1u5UqwGmp4drDWiB1Ef
+ Dxug==
+X-Gm-Message-State: AOAM533lci9DwTsv04PlvASGnSSrKIJwRZrvniGDzRzFPXokmf1iS5Xb
+ FMVZXa87ylozQy9Ex14BBfbn85uMmOVFhA==
+X-Google-Smtp-Source: ABdhPJxXS9RVLCdfDKn5291eaz9lWrRpuHQlVapv2k2YcnIWnumIl270EjU1sgPConlf/1DkGiMk5w==
+X-Received: by 2002:a7b:cc85:: with SMTP id p5mr2247575wma.24.1603799099600;
+ Tue, 27 Oct 2020 04:44:59 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.58
+ for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:18:44 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 9D3241FF7E;
- Tue, 27 Oct 2020 11:18:43 +0000 (GMT)
-References: <20201021205716.2359430-1-pbonzini@redhat.com>
- <20201021205716.2359430-2-pbonzini@redhat.com>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [PATCH 01/22] semihosting: fix order of initialization functions
-In-reply-to: <20201021205716.2359430-2-pbonzini@redhat.com>
-Date: Tue, 27 Oct 2020 11:18:43 +0000
-Message-ID: <87sg9zex2k.fsf@linaro.org>
+ Tue, 27 Oct 2020 04:44:58 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 15/48] Move npcm7xx_timer_reached_zero call out of
+ npcm7xx_timer_pause
+Date: Tue, 27 Oct 2020 11:44:05 +0000
+Message-Id: <20201027114438.17662-16-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
+References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::341;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x341.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -104,90 +102,46 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org, berrange@redhat.com, jsnow@redhat.com,
- ehabkost@redhat.com, imammedo@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+From: Havard Skinnemoen <hskinnemoen@google.com>
 
-Paolo Bonzini <pbonzini@redhat.com> writes:
+This allows us to reuse npcm7xx_timer_pause for the watchdog timer.
 
-> qemu_semihosting_console_init uses semihosting.chardev which is set
-> by qemu_semihosting_connect_chardevs.  Thus qemu_semihosting_connect_char=
-devs
-> has to be called first.
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Havard Skinnemoen <hskinnemoen@google.com>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ hw/timer/npcm7xx_timer.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-It looks like this is reverting 619985e9 ("semihosting: defer
-connect_chardevs a little more to use serialx"). Looking back at the
-history it seems the two calls had different results:
+diff --git a/hw/timer/npcm7xx_timer.c b/hw/timer/npcm7xx_timer.c
+index 5703e43d404..2df9e3e4969 100644
+--- a/hw/timer/npcm7xx_timer.c
++++ b/hw/timer/npcm7xx_timer.c
+@@ -157,9 +157,6 @@ static void npcm7xx_timer_pause(NPCM7xxTimer *t)
+     timer_del(&t->qtimer);
+     now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
+     t->remaining_ns = t->expires_ns - now;
+-    if (t->remaining_ns <= 0) {
+-        npcm7xx_timer_reached_zero(t);
+-    }
+ }
+ 
+ /*
+@@ -239,6 +236,9 @@ static void npcm7xx_timer_write_tcsr(NPCM7xxTimer *t, uint32_t new_tcsr)
+         } else {
+             t->tcsr &= ~NPCM7XX_TCSR_CACT;
+             npcm7xx_timer_pause(t);
++            if (t->remaining_ns <= 0) {
++                npcm7xx_timer_reached_zero(t);
++            }
+         }
+     }
+ }
+-- 
+2.20.1
 
-  Right - can confirm the difference between:
-
-    ./aarch64-softmmu/qemu-system-aarch64 -cpu max -serial mon:stdio -M vir=
-t -display none -semihosting -kernel ./tests/tcg/aarch64-softmmu/memory
-
-  and
-
-    ./aarch64-softmmu/qemu-system-aarch64 -cpu max -serial mon:stdio -M vir=
-t -display none -semihosting-config chardev=3Dserial0 -kernel ./tests/tcg/a=
-arch64-softmmu/memory
-
-With this patch applied it breaks the later invocation:
-
-  ./aarch64-softmmu/qemu-system-aarch64  -cpu max -serial mon:stdio -M virt=
- -display none -semihosting-config chardev=3Dserial0 -kernel ./tests/tcg/aa=
-rch64-softmmu/memory
-  qemu-system-aarch64: semihosting chardev 'serial0' not found
-
->
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  softmmu/vl.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->
-> diff --git a/softmmu/vl.c b/softmmu/vl.c
-> index 6f5b000f07..42314e6ff9 100644
-> --- a/softmmu/vl.c
-> +++ b/softmmu/vl.c
-> @@ -4288,7 +4288,8 @@ void qemu_init(int argc, char **argv, char **envp)
->      qemu_opts_foreach(qemu_find_opts("mon"),
->                        mon_init_func, NULL, &error_fatal);
->=20=20
-> -    /* connect semihosting console input if requested */
-> +    /* now chardevs have been created we may have semihosting to connect=
- */
-> +    qemu_semihosting_connect_chardevs();
->      qemu_semihosting_console_init();
-
-Maybe instead of this we should:
-
->=20=20
->      if (foreach_device_config(DEV_SERIAL, serial_parse) < 0)
-> @@ -4298,9 +4299,6 @@ void qemu_init(int argc, char **argv, char **envp)
->      if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
->          exit(1);
->=20=20
-> -    /* now chardevs have been created we may have semihosting to connect=
- */
-> -    qemu_semihosting_connect_chardevs();
-> -
-
-Move both here:
-
-    if (foreach_device_config(DEV_DEBUGCON, debugcon_parse) < 0)
-        exit(1);
-
-    /* now chardevs have been created we may have semihosting to connect */
-    qemu_semihosting_connect_chardevs();
-    qemu_semihosting_console_init();
-
-
->      /* If no default VGA is requested, the default is "none".  */
->      if (default_vga) {
->          vga_model =3D get_default_vga_model(machine_class);
-
-
---=20
-Alex Benn=C3=A9e
 
