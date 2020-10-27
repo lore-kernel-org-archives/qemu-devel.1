@@ -2,67 +2,69 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A5C0C55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3030C388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:19:25 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BDDE620728
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:19:01 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDDE620728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
+	by mail.kernel.org (Postfix) with ESMTPS id 03E2421527
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:19:24 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=kernel.org header.i=@kernel.org header.b="jKN0rW82"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 03E2421527
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52544 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53604 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQkW-0001GB-NK
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:19:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:54718)
+	id 1kXQkt-0001gU-OM
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:19:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52834)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXQXD-0001Fz-0e
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:15 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:50260
- helo=mail.default.ilande.uk0.bigv.io)
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kXQQo-0002Dz-P0; Tue, 27 Oct 2020 10:58:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43290)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXQX9-0005ta-Ja
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:14 -0400
-Received: from host86-148-103-79.range86-148.btcentralplus.com
- ([86.148.103.79] helo=kentang.home)
- by mail.default.ilande.uk0.bigv.io with esmtpsa
- (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
- (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXQXB-0001Qg-Kz; Tue, 27 Oct 2020 15:05:18 +0000
-From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-To: qemu-devel@nongnu.org,
-	kraxel@redhat.com,
-	samuel.thibault@ens-lyon.org
-Date: Tue, 27 Oct 2020 15:04:48 +0000
-Message-Id: <20201027150456.24606-1-mark.cave-ayland@ilande.co.uk>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <kbusch@kernel.org>)
+ id 1kXQQm-00056b-Ue; Tue, 27 Oct 2020 10:58:38 -0400
+Received: from dhcp-10-100-145-180.wdc.com (unknown [199.255.45.60])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested)
+ by mail.kernel.org (Postfix) with ESMTPSA id 4BE2320780;
+ Tue, 27 Oct 2020 14:58:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+ s=default; t=1603810715;
+ bh=0qnf5kpG79tAjXFqCxjFM4Fu/tdvuoyBNvNUG1IPqF4=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=jKN0rW82wkfOaO2EUEkYbPXil2lyWpFJ+z39vLzaaX+n1EmntZx2mvwOc40L5AROj
+ KlG0rCQldqe4QHpXfGUIpycTTwqfAxN0NoNstLjfdElLEH16QlRKEbxjVWoYm0S377
+ xY59MjdYfJPlHZwfbJ7Ln/DbJRE0m9vL+plSgrxA=
+Date: Tue, 27 Oct 2020 07:58:31 -0700
+From: Keith Busch <kbusch@kernel.org>
+To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Subject: Re: [PATCH 08/25] block/nvme: Simplify device reset
+Message-ID: <20201027145831.GC1942271@dhcp-10-100-145-180.wdc.com>
+References: <20201027135547.374946-1-philmd@redhat.com>
+ <20201027135547.374946-9-philmd@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 86.148.103.79
-X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PATCH v2 0/8] dev-serial: minor fixes and improvements
-X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
-X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
-Received-SPF: pass client-ip=2001:41c9:1:41f::167;
- envelope-from=mark.cave-ayland@ilande.co.uk;
- helo=mail.default.ilande.uk0.bigv.io
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -18
-X-Spam_score: -1.9
-X-Spam_bar: -
-X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+In-Reply-To: <20201027135547.374946-9-philmd@redhat.com>
+Received-SPF: pass client-ip=198.145.29.99; envelope-from=kbusch@kernel.org;
+ helo=mail.kernel.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 10:45:26
+X-ACL-Warn: Detected OS   = Linux 3.11 and newer
+X-Spam_score_int: -70
+X-Spam_score: -7.1
+X-Spam_bar: -------
+X-Spam_report: (-7.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_HI=-5, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -76,46 +78,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Eric Auger <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This series comes from a client project that I have been working on over the
-past few months which involves communicating with serial hardware and
-associated simulators using the QEMU USB serial device.
+On Tue, Oct 27, 2020 at 02:55:30PM +0100, Philippe Mathieu-Daudé wrote:
+> Avoid multiple endianess conversion by using device endianess.
+> 
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+> ---
+>  block/nvme.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index e95d59d3126..be14350f959 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -755,7 +755,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>      timeout_ms = MIN(500 * NVME_CAP_TO(cap), 30000);
+>  
+>      /* Reset device to get a clean state. */
+> -    regs->cc = cpu_to_le32(le32_to_cpu(regs->cc) & 0xFE);
+> +    regs->cc &= const_le32(0xFE);
 
-With thanks to Craig Stevens at Renesas for giving permission for these
-patches to be upstreamed.
-
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-
-
-v2:
-- Rebase onto master
-- Drop patch 8 "dev-serial: fix FTDI_GET_MDM_ST response" as it is incorrect
-- Add R-B tags from Samuel
-- Change USB addr field from %d to %u as suggested by Philippe
-- Add R-B tags from Philippe
-- Change usb_attach() logic in patch 6 as suggested by Gerd
-
-
-Mark Cave-Ayland (8):
-  dev-serial: style changes to improve readability and checkpatch fixes
-  dev-serial: use USB_SERIAL QOM macro for USBSerialState assignments
-  dev-serial: convert from DPRINTF to trace-events
-  dev-serial: add trace-events for baud rate and data parameters
-  dev-serial: replace DeviceOutVendor/DeviceInVendor with equivalent
-    macros from usb.h
-  dev-serial: add always-plugged property to ensure USB device is always
-    attached
-  dev-serial: add support for setting data_bits in QEMUSerialSetParams
-  dev-serial: store flow control and xon/xoff characters
-
- hw/usb/dev-serial.c | 334 +++++++++++++++++++++++++++-----------------
- hw/usb/trace-events |  13 ++
- 2 files changed, 216 insertions(+), 131 deletions(-)
-
--- 
-2.20.1
-
+This doesn't look right. The 'regs' is an MMIO address, correct? Memory
+mappings use the CPU native access.
 
