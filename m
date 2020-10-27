@@ -2,92 +2,124 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA14AC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:09:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CADC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:10:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 4442C222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:09:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D7FE222C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:10:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EBG9tg3m"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4442C222C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ouzJo4sZ"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7FE222C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:42586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44106 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNnT-0008Rn-3a
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:09:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52736)
+	id 1kXNnx-0000fm-9q
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:10:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:42412)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNQC-0002D9-Hr
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:48 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:42730)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNQ8-0004w1-7k
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:47 -0400
-Received: by mail-wr1-x443.google.com with SMTP id j7so1511597wrt.9
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:subject:date:message-id:in-reply-to:references:mime-version
- :content-transfer-encoding;
- bh=EwpCEmpKwtw77BG7CwCJIWmARgA3vhFeuBv+0UYdPi4=;
- b=EBG9tg3mZumk2+wGz9fQ0Tmudc+O15up6R9j/SzYjLMNkYMRknRnvh6HPZX3erjMgQ
- k+2R3R6JMuvo2bRz7QA8xmTTrjpR9lOymqf0B13CvUHLa6Zgvh3qGk/4kRMMCwjKmLr+
- qI9MxdWihC+p/9eMSJqGvNsbOV2BxXlout2YIkYAGArFGbH8hUV7TEomhCKlARGJ3apH
- 3NTvTZ1xkYh/stvVtNk6/StbD2KNaVNjoedL4Ge8QceqHLHNSH/wQMFuX4IkuURiRJjA
- VsJjqJ5KRO8oxoImKJkgOzC24r9oQsOagwfO0Q6fyI/u+K5VZZvlZ5LR3LPFi6ViyC2S
- En4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
- :references:mime-version:content-transfer-encoding;
- bh=EwpCEmpKwtw77BG7CwCJIWmARgA3vhFeuBv+0UYdPi4=;
- b=TFSre8eKtEXu2kSdik8XJJUdJY4JTiBw2Z6xc50bHqR7vOO4CpSBpkXqAJjFPLzH5X
- UoOYypp92rH9iQedC1oUjAu3c/uJi/EU8VyoMliidTp5lz2EY9eBcpcZSTyx/VkRv8KF
- 64LK0ZaXIJp5hcVcH8a4wA4ZCrhaBvKBxZznWlzabjkMHi9y658QUgP5tYiVAdW2CHrd
- FdQRIRtgeCO6fTk6CmUdrfIV957rMH7GK5X+SSlPW16QwlZ6nENuPEqHy6nhZ2KztGPF
- 2LZyct63XWUyuLr70chFQrP+H32blbNo4P63VhQFXe6JshTsXXj6D2fPSHe+mh8mHDFI
- ODJQ==
-X-Gm-Message-State: AOAM530kzVIRQSntqWbOBtYcByP4HQXlEcTQ+5ykK9L9WvESmKNgcE7n
- KIpB5fEuvsPK+JKZpQa4+qH+lDqyRgopRA==
-X-Google-Smtp-Source: ABdhPJwRL+By0Lwr9sOU1NohfT1cTn+wIAuuCICfEbVqLuGyKI507aFH1Lj4hXO0wi2LUU8yt812BA==
-X-Received: by 2002:adf:9f4c:: with SMTP id f12mr2416159wrg.108.1603799141793; 
- Tue, 27 Oct 2020 04:45:41 -0700 (PDT)
-Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.40
- for <qemu-devel@nongnu.org>
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:45:41 -0700 (PDT)
-From: Peter Maydell <peter.maydell@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PULL 48/48] hw/timer/armv7m_systick: Rewrite to use ptimers
-Date: Tue, 27 Oct 2020 11:44:38 +0000
-Message-Id: <20201027114438.17662-49-peter.maydell@linaro.org>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
-References: <20201027114438.17662-1-peter.maydell@linaro.org>
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kXMlM-0008M5-L0; Tue, 27 Oct 2020 07:03:36 -0400
+Received: from mail-eopbgr140130.outbound.protection.outlook.com
+ ([40.107.14.130]:28605 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
+ id 1kXMlK-0006oQ-6u; Tue, 27 Oct 2020 07:03:36 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SX4BlFpHHGSR3OKmBaSnSighvJ89w6YM3rUPuTGKTLw/M1s8PmCG9qaY7mCDnKQEopdoXTTlEcaJxH0Rp060ahQLa313+6rq5/PZasEEp/ohCep8WlIMl3xgMmzWAvCyFDfWLt+vptcHxr6uQPv4z0Kjs9xoMHfoi/uTWuRixpcEwIiP9o9W2i0WonT4FKWBA8gbo/o9HRcWtk07XLSYnt1w6gMbBAxhhRma9TU5LhhZxcDb0o2Z6P3Z5+OkLRrlep5+3oyKk0yhoZg6nwuDYcT4SXL5ZB4uFSh9H+Njbk828mVWb03LR0F6sMywUTwWPkinFqTcqemTk3j3HWBvUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5JJ66aXiGSOJKQJgqB420uDQRBxfzYo92yaR7J1Ms1c=;
+ b=WaK/z2wVJYyV91Y5FAELjAiBsm4fxhWPlgmPM0N8UfZSSnbxypkTYxoEJZbuikmQZSN3Aj4brPKkfyczZEYDmc8bB1dWfzWZi8Hlx4bvjsyRUFAxFvLbasOlgy0XjAcG1qQceZtwSokbe/pr362WlVL9KhcW8plpir1dE6To0F9KGivlL0hOpMcEAHn0ax9D0B+7UVaoVzJv3d1We4J6pKAFP+Z30991YJoiD+o71jPkXHFgyvwdvloken+kACceIWozttuWMGQhVcfBysMnldnUZULQGrXZwcYGwMUmPvrpexJCwhG2nfWHCaJNfVzg+Ha0NGrvFNLr46C5BZXLgA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
+ header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=5JJ66aXiGSOJKQJgqB420uDQRBxfzYo92yaR7J1Ms1c=;
+ b=ouzJo4sZsPnjEnsPEsAQTXRWdEPDdn4gNz0uwPeQmKghSP+qo8JWY0obTgQvkfde8mjiN0LuyfF5PPrX482QidNpr0Qkz0RLM8S9ngZ5mSECDfhnFeBIc+4VxKvqzOMKadO6/lZ/tffRATxS/DZ3YN5FeQMmEgQCgoTYiq6UFco=
+Authentication-Results: redhat.com; dkim=none (message not signed)
+ header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
+ by VE1PR08MB5613.eurprd08.prod.outlook.com (2603:10a6:800:1a7::13)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 27 Oct
+ 2020 11:03:31 +0000
+Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::c1ba:32cf:cd37:712c]) by VI1PR08MB5503.eurprd08.prod.outlook.com
+ ([fe80::c1ba:32cf:cd37:712c%9]) with mapi id 15.20.3455.037; Tue, 27 Oct 2020
+ 11:03:31 +0000
+Subject: Re: [PATCH v6 10/11] nbd: Add 'qemu-nbd -A' to expose allocation depth
+To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
+Cc: kwolf@redhat.com, stefanha@redhat.com, armbru@redhat.com,
+ rjones@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
+References: <20201027050556.269064-1-eblake@redhat.com>
+ <20201027050556.269064-11-eblake@redhat.com>
+From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Message-ID: <68fa9282-4fc7-fa87-2599-f5cd65009cff@virtuozzo.com>
+Date: Tue, 27 Oct 2020 14:03:27 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.4.0
+In-Reply-To: <20201027050556.269064-11-eblake@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [185.215.60.93]
+X-ClientProxiedBy: AM3PR07CA0101.eurprd07.prod.outlook.com
+ (2603:10a6:207:7::11) To VI1PR08MB5503.eurprd08.prod.outlook.com
+ (2603:10a6:803:137::19)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from [192.168.100.5] (185.215.60.93) by
+ AM3PR07CA0101.eurprd07.prod.outlook.com (2603:10a6:207:7::11) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.3499.11 via Frontend Transport; Tue, 27 Oct 2020 11:03:29 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: ae54f622-dcf9-41f9-f9e3-08d87a67f063
+X-MS-TrafficTypeDiagnostic: VE1PR08MB5613:
+X-Microsoft-Antispam-PRVS: <VE1PR08MB5613CA5524C267AF08EF9A5CC1160@VE1PR08MB5613.eurprd08.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 4m4VXeTeMp5FuLixSWQCPXEIiHSC9qVxIgGp/vre0TVOhRE3GLEjxWtToxi9RTBO3p4cIxTAs8eoIWj1gmvDvx5urHG8NcIW9CFvHs6NzteojH0jlEc1hIxHlzdzeAelXgs/Gvqnr16RMJgXxSqdrcAdRV/RdWImA2kGy98+1KhjKqtPvWjO1OrP9Yb6HQ/V8Fnk9LcMCbpQZkOPUcxTJUjeQpIWOmmS159j1hmDLjy/TuTaHDxu2Ni+BSX4+WmjuoC+Jnoq2Ysaoa7J9wSJY6s5Qm5NfQkIiNU6P3kYvYCCbTlvYlQDuhdxO3jZuPgKR+e6+kI6mnVSZuXg24DMcwCOacZ2kXf4ME2iEYMoMfjdBqG07eKAmWygtyfYM9g7
+X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
+ IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
+ SFS:(4636009)(366004)(31696002)(2616005)(36756003)(26005)(956004)(498600001)(6486002)(52116002)(5660300002)(4326008)(186003)(16526019)(8676002)(86362001)(66556008)(2906002)(8936002)(16576012)(66946007)(31686004)(83380400001)(66476007)(43740500002);
+ DIR:OUT; SFP:1102; 
+X-MS-Exchange-AntiSpam-MessageData: fcVHvmBzQsXJV3wLBbZl/bHKPxt/z2lMPDJYxrJDG79b01J3Z3PRq1wXHS+UfaFfrhSX+Ga0QbVKPwCEG6t9AT42BT+/HtFqmLRZzAIblFDGf1zQh8r5euXajVoHSbVn7s5JCC/G7g3igUl0DbtDDN5F5/RWa5eLTHAN/ao2CtrDJnlslArv5sTqiv5mPD6BMKAnHto4a8Ysf5VYaNnXRuliWhg2OE8YPjloSPPeIVkRWsmuWVNrqLomMN8jC6Gp/CxXXebSMamBGSSdkPNHRASmlpHvckFgD5ohOMiXoe6BD1uW8F2iiTrzACW9RDMCH7vc3qBnlU7VPdc1GPCkUtTo84aTRvwWJa8ah5zqPoJS9kMW3D4LBkOiE8WSQkuw1vTessCQeadNZd60nmP06PxYGEmu5GVIKuMfbk7M3Nw7ubN8WKRh9d6uRyi/xYV6W4UiwnAp1QBxgLmbzlWGJuNiw+pQfHQjhcKK5yYgy909gGPiIOWeHAg+LS+8s2jvEKeNk0GkTt15QO2ttUuOVKWsTGj+8jgDcI1lMUC+XaOxnnaLgEztzS2xGYNGY+dhQM2/rOhyKp031++JayFaLVEDuO4QWnI/TukFek3YIZ6XPkrPMYyeNq1y9z10aHilZHfxg8vAe8+RrXYsVUUpuQ==
+X-OriginatorOrg: virtuozzo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae54f622-dcf9-41f9-f9e3-08d87a67f063
+X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 11:03:30.9156 (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rNbCyuA8MbDXOxGb1ka06XmIJ/vwQPn/i76gPdMNL3qL8FfHUwY2oBpBrcZxM3cZHw58vaCt7mPtN3MrryeljzS/i/GqXnY6QClvqwDNvzk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5613
+Received-SPF: pass client-ip=40.107.14.130;
+ envelope-from=vsementsov@virtuozzo.com;
+ helo=EUR01-VE1-obe.outbound.protection.outlook.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 07:03:31
+X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -105,256 +137,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The armv7m systick timer is a 24-bit decrementing, wrap-on-zero,
-clear-on-write counter. Our current implementation has various
-bugs and dubious workarounds in it (for instance see
-https://bugs.launchpad.net/qemu/+bug/1872237).
+27.10.2020 08:05, Eric Blake wrote:
+> Allow the server to expose an additional metacontext to be requested
+> by savvy clients.  qemu-nbd adds a new option -A to expose the
+> qemu:allocation-depth metacontext through NBD_CMD_BLOCK_STATUS; this
+> can also be set via QMP when using block-export-add.
+> 
+> qemu as client is hacked into viewing the key aspects of this new
+> context by abusing the already-experimental x-dirty-bitmap option to
+> collapse all depths greater than 2, which results in a tri-state value
+> visible in the output of 'qemu-img map --output=json' (yes, that means
+> x-dirty-bitmap is now a bit of a misnomer, but I didn't feel like
+> renaming it as it would introduce a needless break of back-compat,
+> even though we make no compat guarantees with x- members):
+> 
+> unallocated (depth 0) => "zero":false, "data":true
+> local (depth 1)       => "zero":false, "data":false
+> backing (depth 2+)    => "zero":true,  "data":true
+> 
+> libnbd as client is probably a nicer way to get at the information
+> without having to decipher such hacks in qemu as client.;)
+> 
+> Signed-off-by: Eric Blake<eblake@redhat.com>
 
-We have an implementation of a simple decrementing counter
-and we put a lot of effort into making sure it handles the
-interesting corner cases (like "spend a cycle at 0 before
-reloading") -- ptimer.
+Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
 
-Rewrite the systick timer to use a ptimer rather than
-a raw QEMU timer.
-
-Unfortunately this is a migration compatibility break,
-which will affect all M-profile boards.
-
-Among other bugs, this fixes
-https://bugs.launchpad.net/qemu/+bug/1872237 :
-now writes to SYST_CVR when the timer is enabled correctly
-do nothing; when the timer is enabled via SYST_CSR.ENABLE,
-the ptimer code will (because of POLICY_NO_IMMEDIATE_RELOAD)
-arrange that after one timer tick the counter is reloaded
-from SYST_RVR and then counts down from there, as the
-architecture requires.
-
-Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
-Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201015151829.14656-3-peter.maydell@linaro.org
----
- include/hw/timer/armv7m_systick.h |   3 +-
- hw/timer/armv7m_systick.c         | 124 +++++++++++++-----------------
- 2 files changed, 54 insertions(+), 73 deletions(-)
-
-diff --git a/include/hw/timer/armv7m_systick.h b/include/hw/timer/armv7m_systick.h
-index 97cb345ddb4..84496faaf96 100644
---- a/include/hw/timer/armv7m_systick.h
-+++ b/include/hw/timer/armv7m_systick.h
-@@ -14,6 +14,7 @@
- 
- #include "hw/sysbus.h"
- #include "qom/object.h"
-+#include "hw/ptimer.h"
- 
- #define TYPE_SYSTICK "armv7m_systick"
- 
-@@ -27,7 +28,7 @@ struct SysTickState {
-     uint32_t control;
-     uint32_t reload;
-     int64_t tick;
--    QEMUTimer *timer;
-+    ptimer_state *ptimer;
-     MemoryRegion iomem;
-     qemu_irq irq;
- };
-diff --git a/hw/timer/armv7m_systick.c b/hw/timer/armv7m_systick.c
-index a8cec7eb56b..2f192011eb0 100644
---- a/hw/timer/armv7m_systick.c
-+++ b/hw/timer/armv7m_systick.c
-@@ -39,26 +39,6 @@ static inline int64_t systick_scale(SysTickState *s)
-     }
- }
- 
--static void systick_reload(SysTickState *s, int reset)
--{
--    /* The Cortex-M3 Devices Generic User Guide says that "When the
--     * ENABLE bit is set to 1, the counter loads the RELOAD value from the
--     * SYST RVR register and then counts down". So, we need to check the
--     * ENABLE bit before reloading the value.
--     */
--    trace_systick_reload();
--
--    if ((s->control & SYSTICK_ENABLE) == 0) {
--        return;
--    }
--
--    if (reset) {
--        s->tick = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--    }
--    s->tick += (s->reload + 1) * systick_scale(s);
--    timer_mod(s->timer, s->tick);
--}
--
- static void systick_timer_tick(void *opaque)
- {
-     SysTickState *s = (SysTickState *)opaque;
-@@ -70,10 +50,12 @@ static void systick_timer_tick(void *opaque)
-         /* Tell the NVIC to pend the SysTick exception */
-         qemu_irq_pulse(s->irq);
-     }
--    if (s->reload == 0) {
--        s->control &= ~SYSTICK_ENABLE;
--    } else {
--        systick_reload(s, 0);
-+    if (ptimer_get_limit(s->ptimer) == 0) {
-+        /*
-+         * Timer expiry with SYST_RVR zero disables the timer
-+         * (but doesn't clear SYST_CSR.ENABLE)
-+         */
-+        ptimer_stop(s->ptimer);
-     }
- }
- 
-@@ -94,30 +76,11 @@ static MemTxResult systick_read(void *opaque, hwaddr addr, uint64_t *data,
-         s->control &= ~SYSTICK_COUNTFLAG;
-         break;
-     case 0x4: /* SysTick Reload Value.  */
--        val = s->reload;
-+        val = ptimer_get_limit(s->ptimer);
-         break;
-     case 0x8: /* SysTick Current Value.  */
--    {
--        int64_t t;
--
--        if ((s->control & SYSTICK_ENABLE) == 0) {
--            val = 0;
--            break;
--        }
--        t = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
--        if (t >= s->tick) {
--            val = 0;
--            break;
--        }
--        val = ((s->tick - (t + 1)) / systick_scale(s)) + 1;
--        /* The interrupt in triggered when the timer reaches zero.
--           However the counter is not reloaded until the next clock
--           tick.  This is a hack to return zero during the first tick.  */
--        if (val > s->reload) {
--            val = 0;
--        }
-+        val = ptimer_get_count(s->ptimer);
-         break;
--    }
-     case 0xc: /* SysTick Calibration Value.  */
-         val = 10000;
-         break;
-@@ -149,39 +112,50 @@ static MemTxResult systick_write(void *opaque, hwaddr addr,
-     switch (addr) {
-     case 0x0: /* SysTick Control and Status.  */
-     {
--        uint32_t oldval = s->control;
-+        uint32_t oldval;
- 
-+        ptimer_transaction_begin(s->ptimer);
-+        oldval = s->control;
-         s->control &= 0xfffffff8;
-         s->control |= value & 7;
-+
-         if ((oldval ^ value) & SYSTICK_ENABLE) {
--            int64_t now = qemu_clock_get_ns(QEMU_CLOCK_VIRTUAL);
-             if (value & SYSTICK_ENABLE) {
--                if (s->tick) {
--                    s->tick += now;
--                    timer_mod(s->timer, s->tick);
--                } else {
--                    systick_reload(s, 1);
--                }
-+                /*
-+                 * Always reload the period in case board code has
-+                 * changed system_clock_scale. If we ever replace that
-+                 * global with a more sensible API then we might be able
-+                 * to set the period only when it actually changes.
-+                 */
-+                ptimer_set_period(s->ptimer, systick_scale(s));
-+                ptimer_run(s->ptimer, 0);
-             } else {
--                timer_del(s->timer);
--                s->tick -= now;
--                if (s->tick < 0) {
--                    s->tick = 0;
--                }
-+                ptimer_stop(s->ptimer);
-             }
-         } else if ((oldval ^ value) & SYSTICK_CLKSOURCE) {
--            /* This is a hack. Force the timer to be reloaded
--               when the reference clock is changed.  */
--            systick_reload(s, 1);
-+            ptimer_set_period(s->ptimer, systick_scale(s));
-         }
-+        ptimer_transaction_commit(s->ptimer);
-         break;
-     }
-     case 0x4: /* SysTick Reload Value.  */
--        s->reload = value;
-+        ptimer_transaction_begin(s->ptimer);
-+        ptimer_set_limit(s->ptimer, value & 0xffffff, 0);
-+        ptimer_transaction_commit(s->ptimer);
-         break;
--    case 0x8: /* SysTick Current Value.  Writes reload the timer.  */
--        systick_reload(s, 1);
-+    case 0x8: /* SysTick Current Value. */
-+        /*
-+         * Writing any value clears SYST_CVR to zero and clears
-+         * SYST_CSR.COUNTFLAG. The counter will then reload from SYST_RVR
-+         * on the next clock edge unless SYST_RVR is zero.
-+         */
-+        ptimer_transaction_begin(s->ptimer);
-+        if (ptimer_get_limit(s->ptimer) == 0) {
-+            ptimer_stop(s->ptimer);
-+        }
-+        ptimer_set_count(s->ptimer, 0);
-         s->control &= ~SYSTICK_COUNTFLAG;
-+        ptimer_transaction_commit(s->ptimer);
-         break;
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR,
-@@ -210,10 +184,13 @@ static void systick_reset(DeviceState *dev)
-      */
-     assert(system_clock_scale != 0);
- 
-+    ptimer_transaction_begin(s->ptimer);
-     s->control = 0;
--    s->reload = 0;
--    s->tick = 0;
--    timer_del(s->timer);
-+    ptimer_stop(s->ptimer);
-+    ptimer_set_count(s->ptimer, 0);
-+    ptimer_set_limit(s->ptimer, 0, 0);
-+    ptimer_set_period(s->ptimer, systick_scale(s));
-+    ptimer_transaction_commit(s->ptimer);
- }
- 
- static void systick_instance_init(Object *obj)
-@@ -229,18 +206,21 @@ static void systick_instance_init(Object *obj)
- static void systick_realize(DeviceState *dev, Error **errp)
- {
-     SysTickState *s = SYSTICK(dev);
--    s->timer = timer_new_ns(QEMU_CLOCK_VIRTUAL, systick_timer_tick, s);
-+    s->ptimer = ptimer_init(systick_timer_tick, s,
-+                            PTIMER_POLICY_WRAP_AFTER_ONE_PERIOD |
-+                            PTIMER_POLICY_NO_COUNTER_ROUND_DOWN |
-+                            PTIMER_POLICY_NO_IMMEDIATE_RELOAD |
-+                            PTIMER_POLICY_TRIGGER_ONLY_ON_DECREMENT);
- }
- 
- static const VMStateDescription vmstate_systick = {
-     .name = "armv7m_systick",
--    .version_id = 1,
--    .minimum_version_id = 1,
-+    .version_id = 2,
-+    .minimum_version_id = 2,
-     .fields = (VMStateField[]) {
-         VMSTATE_UINT32(control, SysTickState),
--        VMSTATE_UINT32(reload, SysTickState),
-         VMSTATE_INT64(tick, SysTickState),
--        VMSTATE_TIMER_PTR(timer, SysTickState),
-+        VMSTATE_PTIMER(ptimer, SysTickState),
-         VMSTATE_END_OF_LIST()
-     }
- };
 -- 
-2.20.1
-
+Best regards,
+Vladimir
 
