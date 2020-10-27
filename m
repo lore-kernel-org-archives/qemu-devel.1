@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A376C388F9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 578B5C55178
 	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:23:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB862206E5
+	by mail.kernel.org (Postfix) with ESMTPS id C6EB820773
 	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 18:23:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J4u8ODGD"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB862206E5
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B2aVNRFF"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C6EB820773
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52050 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52074 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXTcq-0005kG-DG
+	id 1kXTcq-0005kn-M9
 	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 14:23:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57746)
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57890)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbg-00046l-M2
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:22367)
+ id 1kXTbn-0004DL-Gs
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:13 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32701)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <pbonzini@redhat.com>)
- id 1kXTbd-0002yg-J2
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:03 -0400
+ id 1kXTbf-0002zy-Sw
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 14:22:09 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603822919;
+ s=mimecast20190719; t=1603822922;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=u4lsc8+ablHA2gfwRQGBepSOa4KACyWcGMmLgzrR2Mw=;
- b=J4u8ODGDV7VHEiGo9GZCH81FMjRNSHSu2bWWauX3mR8cBPKad+Lnqf+33PtHxdxrMemCmo
- cfmR0FwFlrQf2M7Z93B3sHRN3AVCDd76m3N/NQyQJPtOoeYwFxm1y4XQl2ywYanhLknylU
- v1s/pjGVxL7kAgG39ESPZzQCngkMvjA=
+ bh=vsmORAYwHqn8OjIud8yqvJ0pXWs3HJUrLUXjhANPs/M=;
+ b=B2aVNRFFR13loyWUGAyaqsAMfgpn1znwVHk+mIjI1wIyJhxpyAryDTr77MCH5lhgoqd0Y0
+ LSvoFCcuXGsx0u0F1xYuiaV9LfwUjDlgfhZE5SNQoKvUW9jlnocjRet7i3PUJCqH3T9np4
+ 92kaYvvBf4o8a8KqVL3xNjRBprAxCEI=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-XcAx9bNkPb2rRWz5xXoDuQ-1; Tue, 27 Oct 2020 14:21:57 -0400
-X-MC-Unique: XcAx9bNkPb2rRWz5xXoDuQ-1
+ us-mta-487-x9vTrUuMN-iNlWVX3ras7Q-1; Tue, 27 Oct 2020 14:21:59 -0400
+X-MC-Unique: x9vTrUuMN-iNlWVX3ras7Q-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
  [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B9A981010BBE
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:46 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 41BCA18C9F71
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:48 +0000 (UTC)
 Received: from virtlab701.virt.lab.eng.bos.redhat.com
  (virtlab701.virt.lab.eng.bos.redhat.com [10.19.152.228])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 7EA2860C07
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:46 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0728E60C07
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 18:21:47 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 05/29] vl: split various early command line options to a
- separate function
-Date: Tue, 27 Oct 2020 14:21:20 -0400
-Message-Id: <20201027182144.3315885-6-pbonzini@redhat.com>
+Subject: [PATCH 09/29] vl: extract various command line validation snippets to
+ a new function
+Date: Tue, 27 Oct 2020 14:21:24 -0400
+Message-Id: <20201027182144.3315885-10-pbonzini@redhat.com>
 In-Reply-To: <20201027182144.3315885-1-pbonzini@redhat.com>
 References: <20201027182144.3315885-1-pbonzini@redhat.com>
 MIME-Version: 1.0
@@ -101,282 +101,169 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Various options affect the global state of QEMU including the rest of
-qemu_init, and they need to be called very early.  Group them together
-in a function that is called at the beginning.
-
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- softmmu/vl.c | 202 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 113 insertions(+), 89 deletions(-)
+ hw/core/machine.c |  1 +
+ softmmu/vl.c      | 78 +++++++++++++++++++++++------------------------
+ 2 files changed, 40 insertions(+), 39 deletions(-)
 
+diff --git a/hw/core/machine.c b/hw/core/machine.c
+index d84b84463c..f5e559c493 100644
+--- a/hw/core/machine.c
++++ b/hw/core/machine.c
+@@ -878,6 +878,7 @@ static void machine_initfn(Object *obj)
+     ms->dump_guest_core = true;
+     ms->mem_merge = true;
+     ms->enable_graphics = true;
++    ms->kernel_cmdline = g_strdup("");
+ 
+     if (mc->nvdimm_supported) {
+         Object *obj = OBJECT(ms);
 diff --git a/softmmu/vl.c b/softmmu/vl.c
-index dbb72e621e..32880616e2 100644
+index f9bae50c27..3316c5534c 100644
 --- a/softmmu/vl.c
 +++ b/softmmu/vl.c
-@@ -117,6 +117,7 @@
- 
- #define MAX_VIRTIO_CONSOLES 1
- 
-+static const char *cpu_option;
- static const char *data_dir[16];
- static int data_dir_idx;
+@@ -123,6 +123,7 @@ static int data_dir_idx;
+ static const char *mem_path;
+ static const char *boot_order;
+ static const char *boot_once;
++static const char *incoming;
  enum vga_retrace_method vga_retrace_method = VGA_RETRACE_DUMB;
-@@ -142,6 +143,9 @@ int vga_interface_type = VGA_NONE;
- static DisplayOptions dpy;
- static int num_serial_hds;
- static Chardev **serial_hds;
-+static const char *log_mask = NULL;
-+static const char *log_file = NULL;
-+static bool list_data_dirs = false;
- Chardev *parallel_hds[MAX_PARALLEL_PORTS];
- int win2k_install_hack = 0;
- int singlestep = 0;
-@@ -2862,6 +2866,106 @@ static char *find_datadir(void)
+ int display_opengl;
+ const char* keyboard_layout = NULL;
+@@ -2870,6 +2871,39 @@ static char *find_datadir(void)
      return get_relocated_path(CONFIG_QEMU_DATADIR);
  }
  
-+static void qemu_process_early_options(void)
++static void qemu_validate_options(void)
 +{
-+    char **dirs;
-+    int i;
++    QemuOpts *machine_opts = qemu_get_machine_opts();
++    const char *kernel_filename = qemu_opt_get(machine_opts, "kernel");
++    const char *initrd_filename = qemu_opt_get(machine_opts, "initrd");
++    const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
 +
-+#ifdef CONFIG_SECCOMP
-+    QemuOptsList *olist = qemu_find_opts_err("sandbox", NULL);
-+    if (olist) {
-+        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
++    if (kernel_filename == NULL) {
++         if (kernel_cmdline != NULL) {
++              error_report("-append only allowed with -kernel option");
++              exit(1);
++          }
++
++          if (initrd_filename != NULL) {
++              error_report("-initrd only allowed with -kernel option");
++              exit(1);
++          }
 +    }
-+#endif
 +
-+    qemu_opts_foreach(qemu_find_opts("name"),
-+                      parse_name, NULL, &error_fatal);
++    if (incoming && !preconfig_exit_requested) {
++        error_report("'preconfig' and 'incoming' options are "
++                     "mutually exclusive");
++        exit(EXIT_FAILURE);
++    }
 +
-+#ifndef _WIN32
-+    qemu_opts_foreach(qemu_find_opts("add-fd"),
-+                      parse_add_fd, NULL, &error_fatal);
-+
-+    qemu_opts_foreach(qemu_find_opts("add-fd"),
-+                      cleanup_add_fd, NULL, &error_fatal);
-+#endif
-+
-+    if (!trace_init_backends()) {
++#ifdef CONFIG_CURSES
++    if (is_daemonized() && dpy.type == DISPLAY_TYPE_CURSES) {
++        error_report("curses display cannot be used with -daemonize");
 +        exit(1);
 +    }
-+    trace_init_file();
-+
-+    /* Open the logfile at this point and set the log mask if necessary.
-+     */
-+    qemu_set_log_filename(log_file, &error_fatal);
-+    if (log_mask) {
-+        int mask;
-+        mask = qemu_str_to_log_mask(log_mask);
-+        if (!mask) {
-+            qemu_print_log_usage(stdout);
-+            exit(1);
-+        }
-+        qemu_set_log(mask);
-+    } else {
-+        qemu_set_log(0);
-+    }
-+
-+    /* add configured firmware directories */
-+    dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, G_SEARCHPATH_SEPARATOR_S, 0);
-+    for (i = 0; dirs[i] != NULL; i++) {
-+        qemu_add_data_dir(get_relocated_path(dirs[i]));
-+    }
-+    g_strfreev(dirs);
-+
-+    /* try to find datadir relative to the executable path */
-+    qemu_add_data_dir(find_datadir());
++#endif
 +}
 +
-+static void qemu_process_help_options(void)
-+{
-+    int i;
-+
-+    /*
-+     * Check for -cpu help and -device help before we call select_machine(),
-+     * which will return an error if the architecture has no default machine
-+     * type and the user did not specify one, so that the user doesn't need
-+     * to say '-cpu help -machine something'.
-+     */
-+    if (cpu_option && is_help_option(cpu_option)) {
-+        list_cpus(cpu_option);
-+        exit(0);
-+    }
-+
-+    if (qemu_opts_foreach(qemu_find_opts("device"),
-+                          device_help_func, NULL, NULL)) {
-+        exit(0);
-+    }
-+
-+    /* -L help lists the data directories and exits. */
-+    if (list_data_dirs) {
-+        for (i = 0; i < data_dir_idx; i++) {
-+            printf("%s\n", data_dir[i]);
-+        }
-+        exit(0);
-+    }
-+}
-+
-+static void qemu_maybe_daemonize(const char *pid_file)
-+{
-+    Error *err;
-+
-+    os_daemonize();
-+    rcu_disable_atfork();
-+
-+    if (pid_file && !qemu_write_pidfile(pid_file, &err)) {
-+        error_reportf_err(err, "cannot create PID file: ");
-+        exit(1);
-+    }
-+
-+    qemu_unlink_pidfile_notifier.notify = qemu_unlink_pidfile;
-+    qemu_add_exit_notifier(&qemu_unlink_pidfile_notifier);
-+}
-+
-+
- void qemu_init(int argc, char **argv, char **envp)
+ static void qemu_process_early_options(void)
+ {
+     char **dirs;
+@@ -3136,9 +3170,6 @@ void qemu_init(int argc, char **argv, char **envp)
  {
      int i;
-@@ -2878,21 +2982,16 @@ void qemu_init(int argc, char **argv, char **envp)
-     const char *optarg;
+     int snapshot = 0;
+-    int linux_boot;
+-    const char *initrd_filename;
+-    const char *kernel_filename, *kernel_cmdline;
+     QemuOpts *opts, *machine_opts;
+     QemuOpts *icount_opts = NULL, *accel_opts = NULL;
+     QemuOptsList *olist;
+@@ -3147,7 +3178,6 @@ void qemu_init(int argc, char **argv, char **envp)
      const char *loadvm = NULL;
      MachineClass *machine_class;
--    const char *cpu_option;
      const char *vga_model = NULL;
-     const char *incoming = NULL;
+-    const char *incoming = NULL;
      bool userconfig = true;
      bool nographic = false;
      int display_remote = 0;
--    const char *log_mask = NULL;
--    const char *log_file = NULL;
-     ram_addr_t maxram_size;
-     uint64_t ram_slots = 0;
-     FILE *vmstate_dump_file = NULL;
-     Error *main_loop_err = NULL;
-     Error *err = NULL;
--    bool list_data_dirs = false;
--    char **dirs;
-     const char *mem_path = NULL;
-     bool have_custom_ram_size;
-     BlockdevOptionsQueue bdo_queue = QSIMPLEQ_HEAD_INITIALIZER(bdo_queue);
-@@ -3840,20 +3939,17 @@ void qemu_init(int argc, char **argv, char **envp)
+@@ -4068,6 +4098,8 @@ void qemu_init(int argc, char **argv, char **envp)
       */
      loc_set_none();
  
--    /*
--     * Check for -cpu help and -device help before we call select_machine(),
--     * which will return an error if the architecture has no default machine
--     * type and the user did not specify one, so that the user doesn't need
--     * to say '-cpu help -machine something'.
-+    /* These options affect everything else and should be processed
-+     * before daemonizing.
-      */
--    if (cpu_option && is_help_option(cpu_option)) {
--        list_cpus(cpu_option);
--        exit(0);
--    }
-+    qemu_process_early_options();
- 
--    if (qemu_opts_foreach(qemu_find_opts("device"),
--                          device_help_func, NULL, NULL)) {
--        exit(0);
-+    qemu_process_help_options();
-+    qemu_maybe_daemonize(pid_file);
++    qemu_validate_options();
 +
-+    if (qemu_init_main_loop(&main_loop_err)) {
-+        error_report_err(main_loop_err);
-+        exit(1);
-     }
- 
+     /* These options affect everything else and should be processed
+      * before daemonizing.
+      */
+@@ -4082,12 +4114,6 @@ void qemu_init(int argc, char **argv, char **envp)
      user_register_global_props();
-@@ -3874,40 +3970,6 @@ void qemu_init(int argc, char **argv, char **envp)
-     have_custom_ram_size = set_memory_options(&ram_slots, &maxram_size,
-                                               machine_class);
+     replay_configure(icount_opts);
  
--    os_daemonize();
--    rcu_disable_atfork();
--
--    if (pid_file && !qemu_write_pidfile(pid_file, &err)) {
--        error_reportf_err(err, "cannot create PID file: ");
--        exit(1);
+-    if (incoming && !preconfig_exit_requested) {
+-        error_report("'preconfig' and 'incoming' options are "
+-                     "mutually exclusive");
+-        exit(EXIT_FAILURE);
 -    }
 -
--    qemu_unlink_pidfile_notifier.notify = qemu_unlink_pidfile;
--    qemu_add_exit_notifier(&qemu_unlink_pidfile_notifier);
--
--    if (qemu_init_main_loop(&main_loop_err)) {
--        error_report_err(main_loop_err);
--        exit(1);
--    }
--
--#ifdef CONFIG_SECCOMP
--    olist = qemu_find_opts_err("sandbox", NULL);
--    if (olist) {
--        qemu_opts_foreach(olist, parse_sandbox, NULL, &error_fatal);
--    }
--#endif
--
--    qemu_opts_foreach(qemu_find_opts("name"),
--                      parse_name, NULL, &error_fatal);
--
--#ifndef _WIN32
--    qemu_opts_foreach(qemu_find_opts("add-fd"),
--                      parse_add_fd, NULL, &error_fatal);
--
--    qemu_opts_foreach(qemu_find_opts("add-fd"),
--                      cleanup_add_fd, NULL, &error_fatal);
--#endif
--
-     current_machine = MACHINE(object_new_with_class(OBJECT_CLASS(machine_class)));
-     if (machine_help_func(qemu_get_machine_opts(), current_machine)) {
-         exit(0);
-@@ -3933,44 +3995,6 @@ void qemu_init(int argc, char **argv, char **envp)
-         qemu_set_hw_version(machine_class->hw_version);
-     }
+     configure_rtc(qemu_find_opts_singleton("rtc"));
  
--    if (!trace_init_backends()) {
--        exit(1);
--    }
--    trace_init_file();
--
--    /* Open the logfile at this point and set the log mask if necessary.
--     */
--    qemu_set_log_filename(log_file, &error_fatal);
--    if (log_mask) {
--        int mask;
--        mask = qemu_str_to_log_mask(log_mask);
--        if (!mask) {
--            qemu_print_log_usage(stdout);
+     machine_class = select_machine();
+@@ -4191,12 +4217,6 @@ void qemu_init(int argc, char **argv, char **envp)
+             error_report("-nographic cannot be used with -daemonize");
+             exit(1);
+         }
+-#ifdef CONFIG_CURSES
+-        if (dpy.type == DISPLAY_TYPE_CURSES) {
+-            error_report("curses display cannot be used with -daemonize");
 -            exit(1);
 -        }
--        qemu_set_log(mask);
--    } else {
--        qemu_set_log(0);
--    }
--
--    /* add configured firmware directories */
--    dirs = g_strsplit(CONFIG_QEMU_FIRMWAREPATH, G_SEARCHPATH_SEPARATOR_S, 0);
--    for (i = 0; dirs[i] != NULL; i++) {
--        qemu_add_data_dir(get_relocated_path(dirs[i]));
--    }
--    g_strfreev(dirs);
--
--    /* try to find datadir relative to the executable path */
--    qemu_add_data_dir(find_datadir());
--
--    /* -L help lists the data directories and exits. */
--    if (list_data_dirs) {
--        for (i = 0; i < data_dir_idx; i++) {
--            printf("%s\n", data_dir[i]);
--        }
--        exit(0);
--    }
--
-     machine_smp_parse(current_machine,
-         qemu_opts_find(qemu_find_opts("smp-opts"), NULL), &error_fatal);
+-#endif
+     }
  
+     if (nographic) {
+@@ -4327,11 +4347,6 @@ void qemu_init(int argc, char **argv, char **envp)
+         qtest_server_init(qtest_chrdev, qtest_log, &error_fatal);
+     }
+ 
+-    machine_opts = qemu_get_machine_opts();
+-    kernel_filename = qemu_opt_get(machine_opts, "kernel");
+-    initrd_filename = qemu_opt_get(machine_opts, "initrd");
+-    kernel_cmdline = qemu_opt_get(machine_opts, "append");
+-
+     opts = qemu_opts_find(qemu_find_opts("boot-opts"), NULL);
+     if (opts) {
+         boot_order = qemu_opt_get(opts, "order");
+@@ -4352,24 +4367,9 @@ void qemu_init(int argc, char **argv, char **envp)
+         boot_order = machine_class->default_boot_order;
+     }
+ 
+-    if (!kernel_cmdline) {
+-        kernel_cmdline = "";
+-        current_machine->kernel_cmdline = (char *)kernel_cmdline;
+-    }
+-
+-    linux_boot = (kernel_filename != NULL);
+-
+-    if (!linux_boot && *kernel_cmdline != '\0') {
+-        error_report("-append only allowed with -kernel option");
+-        exit(1);
+-    }
+-
+-    if (!linux_boot && initrd_filename != NULL) {
+-        error_report("-initrd only allowed with -kernel option");
+-        exit(1);
+-    }
+-
+-    if (semihosting_enabled() && !semihosting_get_argc() && kernel_filename) {
++    if (semihosting_enabled() && !semihosting_get_argc()) {
++        const char *kernel_filename = qemu_opt_get(machine_opts, "kernel");
++        const char *kernel_cmdline = qemu_opt_get(machine_opts, "append");
+         /* fall back to the -kernel/-append */
+         semihosting_arg_fallback(kernel_filename, kernel_cmdline);
+     }
 -- 
 2.26.2
 
