@@ -2,108 +2,87 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72C9BC55179
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:48:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9946C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:49:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1FCA821707
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:48:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 4016B21707
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 13:49:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Dodq91ZK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1FCA821707
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SJ1cCNTk"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 4016B21707
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56470 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:57370 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXPLI-0002l3-5m
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:48:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32990)
+	id 1kXPLk-00038V-5i
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 09:49:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58266)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kXPJt-00011u-M7
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:47:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:52085)
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kXP9l-0004jD-SK
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:36:57 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25388)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <vkuznets@redhat.com>)
- id 1kXPJr-0002yR-7U
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:47:24 -0400
+ (Exim 4.90_1) (envelope-from <marcandre.lureau@redhat.com>)
+ id 1kXP9k-0001KA-0g
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 09:36:57 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603806440;
+ s=mimecast20190719; t=1603805815;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=XfL4NYKjn0zvlyXug2SSgfn8pO1wrKL+CVH5RQcW9Tw=;
- b=Dodq91ZKoUdEIRZUjir9OxPbifSxUYw4yhPpaI61T4Tzcvpjyyyx9G6zO04+t1Nd6QwMfI
- 93fwKWgDdD+feTfvMnqVHtciitQxlj0N/a4Xqcic/WOnZiuPjYDb40JCftiNNeKNAVpjN7
- RVO300B/mi5dnFzkReKcBVsrL8zauIc=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-33-lXetS2PNOCmk33Fi9tA6EA-1; Tue, 27 Oct 2020 09:47:17 -0400
-X-MC-Unique: lXetS2PNOCmk33Fi9tA6EA-1
-Received: by mail-ej1-f72.google.com with SMTP id d13so913466ejz.6
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 06:47:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
- :message-id:mime-version;
- bh=XfL4NYKjn0zvlyXug2SSgfn8pO1wrKL+CVH5RQcW9Tw=;
- b=klc4ph6fb8k+f1jyHiqYhXd5zvD/DEkj5bjT38S1auGHrWVrNW+GhbtDj+048tIxIy
- es2WiR7kBZdD+3gOs7/Xi2OHqs9G3nzs6Mr/42p/xgx1iJ4KrL+kwGkx2t6XtGPrlDai
- C2D7ubB7CPAZtjlOnHk8igdfx0MyTQ4yJdBDWBDpHciqFmSJzMknnLQjx2ZronvYAD3w
- EBvLwWlMjUgp8BcEf8XBRLDI9j3sdK9ddLc5DYdDJY068Vbn3lt1IjPt74qRbpi2SkX4
- ejGRLrIh7v/yajXxmxS6XC8jfNHvCQHQMtSN7Mj7+Vc/LOFPItu0vM/0qs3aNPiSFFAJ
- dGOg==
-X-Gm-Message-State: AOAM532qsdWgUAUr/qNQGgUgPmys+SeHzjhFkLomVbX+r0UON+bGX6Tq
- AgNH21RxJzzWc97MhAzWvPMVk4/CBTDhNkYIDpy8VZtfK/ZtYQqUd1an5u8mUNkFl0qbYLqP7tU
- uc8v237jZ81BYmQA=
-X-Received: by 2002:aa7:c608:: with SMTP id h8mr2282565edq.16.1603806436674;
- Tue, 27 Oct 2020 06:47:16 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyPqRV36i/C9/ckpLJVzFMdJKt4cg5Xr50tcLBZrlxrX6hBeoaw1136OZBK8A4vlBQbJeaC9w==
-X-Received: by 2002:aa7:c608:: with SMTP id h8mr2282550edq.16.1603806436447;
- Tue, 27 Oct 2020 06:47:16 -0700 (PDT)
-Received: from vitty.brq.redhat.com (g-server-2.ign.cz. [91.219.240.2])
- by smtp.gmail.com with ESMTPSA id v18sm1139194ejj.10.2020.10.27.06.47.15
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 06:47:15 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: David Hildenbrand <david@redhat.com>, qemu-devel@nongnu.org
-Subject: Re: [PATCH RFC] memory: pause all vCPUs for the duration of memory
- transactions
-In-Reply-To: <219ac264-dcd4-70f0-244f-1bee601aded7@redhat.com>
-References: <20201026084916.3103221-1-vkuznets@redhat.com>
- <294a987d-b0ef-1b58-98ac-0d4d43075d6e@redhat.com>
- <d7a20a33-0317-467e-6fc6-6528b3b46062@redhat.com>
- <87imav26d8.fsf@vitty.brq.redhat.com>
- <cb74d717-cfc1-a78b-cf80-eb8ebf1075fd@redhat.com>
- <87a6w72565.fsf@vitty.brq.redhat.com>
- <e1d85d86-fb2f-d2a8-77ea-1e0d48c8fb67@redhat.com>
- <875z6v24e2.fsf@vitty.brq.redhat.com>
- <219ac264-dcd4-70f0-244f-1bee601aded7@redhat.com>
-Date: Tue, 27 Oct 2020 14:47:14 +0100
-Message-ID: <87wnzbzspp.fsf@vitty.brq.redhat.com>
+ bh=wxJHwQmUt1ptprRKBcFuqVmqeEIFTyIvWVyIfcstsk0=;
+ b=SJ1cCNTkF4rg1vPnV7LVldUq14V0ppmNJmHguzx7PApIWxBm8GX2kn0FmG9XsMHj01aMuR
+ u1VzFDC7+caNjkmZn5tsEWjvsjPFWqXB/s/96q2qs5c/Tb7gSi6EhCeYEDhR2Sc3CrB4BH
+ VG6EOSjn9X2ZZE8wYc5br9T9NiWggjA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-346-SxeaxA23N-yLHyMsag3APw-1; Tue, 27 Oct 2020 09:36:53 -0400
+X-MC-Unique: SxeaxA23N-yLHyMsag3APw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 78B96186DD51
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 13:36:52 +0000 (UTC)
+Received: from localhost (unknown [10.36.110.28])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id A287E76662;
+ Tue, 27 Oct 2020 13:36:32 +0000 (UTC)
+From: marcandre.lureau@redhat.com
+To: qemu-devel@nongnu.org
+Subject: [PATCH v2 2/3] console: modify ppm_save to take a pixman image ref
+Date: Tue, 27 Oct 2020 17:36:01 +0400
+Message-Id: <20201027133602.3038018-3-marcandre.lureau@redhat.com>
+In-Reply-To: <20201027133602.3038018-1-marcandre.lureau@redhat.com>
+References: <20201027133602.3038018-1-marcandre.lureau@redhat.com>
 MIME-Version: 1.0
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=vkuznets@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=marcandre.lureau@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=vkuznets@redhat.com;
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=marcandre.lureau@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,71 +96,109 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Laszlo Ersek <lersek@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Peter Xu <peterx@redhat.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ "Dr. David Alan Gilbert" <dgilbert@redhat.com>, kraxel@redhat.com,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ =?UTF-8?q?Marc-Andr=C3=A9=20Lureau?= <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-David Hildenbrand <david@redhat.com> writes:
+From: Marc-André Lureau <marcandre.lureau@redhat.com>
 
->>> Same applies to all other kinds of operations (splitting, punching out,
->>> ...) as you also mentioned.
->> 
->> One question from a QEMU newbie though: why do you put
->> kvm_ioctl_inhibit_begin()/kvm_ioctl_inhibit_end() to kvm_region_resize()
->> only and not taking it all the way up to
->> memory_region_transaction_begin()/memory_region_transaction_end() to
->> support atomicity for all kinds of updates right away?
->
-> The clean way to implement it for 
-> memory_region_transaction_begin()/memory_region_transaction_end() is by 
-> implementing
-> ->begin()
-> ->commit()
-> callbacks for the KVM MemoryListener, and doing it in there, in KVM code.
->
->
-> Now, I wasn't sure how this might affect real-time workloads, where you 
-> really don't want to kick CPUs out of KVM. You can make a lot of 
-> operations without requiring this handling like
->
-> 1. Adding regions (memory hotplug)
-> 2. Removing regions (memory hotunplug)
-> 3. Enabling/disabling dirty logging
->
-> Resize/split(/move/...) are the problematic operations where we would 
-> need that handling. Modifying the size/location of existing slots.
->
-> One way to tackle it would be to "sense" upfront if such "modifying" 
-> operations will be required, communicating that via "->begin()", and 
-> letting the KVM notifier decide based on that information whether to get 
-> everything out of KVM. Sounds feasible.
->
+The function is going to be called from a coroutine, and may yield.
+Let's ensure our image reference doesn't change over time (due to resize
+etc) by keeping a ref.
 
-I don't actually know if we have such use-cases but thinking about
-e.g. punching a hole in a middle of an existing slot requires:
-1) Resizing the existing slot to its first half
-2) Creating the hole
-3) Creating a new slot for the second half of the slot.
-In case we'd like to make this atomic, we need to cover the whole
-transaction. But again, I don't know if we have a use-case for it or
-not.
+Signed-off-by: Marc-André Lureau <marcandre.lureau@redhat.com>
+Reviewed-by: Markus Armbruster <armbru@redhat.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+---
+ ui/console.c    | 15 ++++++++-------
+ ui/trace-events |  2 +-
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
->> 
->> The second question is whether you plan to sumbit this any time soon)
->
-> Once we have an agreement on how to proceed, either I can try to 
-> dedicate some time, or if you have some time, you can pickup my work and 
-> make it also handle the other problematic cases (as discussed e.g., ^).
-
-Ok, I plan to test your patch in the nearby future and if it works we
-can start with just the 'resize' case as it seems to be causing real
-issues. The infrastructure you create with kvm_ioctl_inhibit_begin()/
-kvm_ioctl_inhibit_end() can be re-used later for other ops.
-
+diff --git a/ui/console.c b/ui/console.c
+index 820e408170..96dd212a5d 100644
+--- a/ui/console.c
++++ b/ui/console.c
+@@ -195,7 +195,6 @@ static void dpy_refresh(DisplayState *s);
+ static DisplayState *get_alloc_displaystate(void);
+ static void text_console_update_cursor_timer(void);
+ static void text_console_update_cursor(void *opaque);
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp);
+ 
+ static void gui_update(void *opaque)
+ {
+@@ -311,16 +310,16 @@ void graphic_hw_invalidate(QemuConsole *con)
+     }
+ }
+ 
+-static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
++static bool ppm_save(int fd, pixman_image_t *image, Error **errp)
+ {
+-    int width = pixman_image_get_width(ds->image);
+-    int height = pixman_image_get_height(ds->image);
++    int width = pixman_image_get_width(image);
++    int height = pixman_image_get_height(image);
+     g_autoptr(Object) ioc = OBJECT(qio_channel_file_new_fd(fd));
+     g_autofree char *header = NULL;
+     g_autoptr(pixman_image_t) linebuf = NULL;
+     int y;
+ 
+-    trace_ppm_save(fd, ds);
++    trace_ppm_save(fd, image);
+ 
+     header = g_strdup_printf("P6\n%d %d\n%d\n", width, height, 255);
+     if (qio_channel_write_all(QIO_CHANNEL(ioc),
+@@ -330,7 +329,7 @@ static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+ 
+     linebuf = qemu_pixman_linebuf_create(PIXMAN_BE_r8g8b8, width);
+     for (y = 0; y < height; y++) {
+-        qemu_pixman_linebuf_fill(linebuf, ds->image, width, 0, y);
++        qemu_pixman_linebuf_fill(linebuf, image, width, 0, y);
+         if (qio_channel_write_all(QIO_CHANNEL(ioc),
+                                   (char *)pixman_image_get_data(linebuf),
+                                   pixman_image_get_stride(linebuf), errp) < 0) {
+@@ -344,6 +343,7 @@ static bool ppm_save(int fd, DisplaySurface *ds, Error **errp)
+ void qmp_screendump(const char *filename, bool has_device, const char *device,
+                     bool has_head, int64_t head, Error **errp)
+ {
++    g_autoptr(pixman_image_t) image = NULL;
+     QemuConsole *con;
+     DisplaySurface *surface;
+     int fd;
+@@ -372,6 +372,7 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         error_setg(errp, "no surface");
+         return;
+     }
++    image = pixman_image_ref(surface->image);
+ 
+     fd = qemu_open_old(filename, O_WRONLY | O_CREAT | O_TRUNC | O_BINARY, 0666);
+     if (fd == -1) {
+@@ -380,7 +381,7 @@ void qmp_screendump(const char *filename, bool has_device, const char *device,
+         return;
+     }
+ 
+-    if (!ppm_save(fd, surface, errp)) {
++    if (!ppm_save(fd, image, errp)) {
+         qemu_unlink(filename);
+     }
+ }
+diff --git a/ui/trace-events b/ui/trace-events
+index b7d7270c02..0ffcdb4408 100644
+--- a/ui/trace-events
++++ b/ui/trace-events
+@@ -15,7 +15,7 @@ displaysurface_create_pixman(void *display_surface) "surface=%p"
+ displaysurface_free(void *display_surface) "surface=%p"
+ displaychangelistener_register(void *dcl, const char *name) "%p [ %s ]"
+ displaychangelistener_unregister(void *dcl, const char *name) "%p [ %s ]"
+-ppm_save(int fd, void *display_surface) "fd=%d surface=%p"
++ppm_save(int fd, void *image) "fd=%d image=%p"
+ 
+ # gtk-egl.c
+ # gtk-gl-area.c
 -- 
-Vitaly
+2.29.0
 
 
