@@ -2,93 +2,81 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC932C4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:24:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BAFBEC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:24:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2C30122264
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:24:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1370122263
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 10:24:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmBBi9QL"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2C30122264
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=comstyle.com header.i=@comstyle.com header.b="kqTTBhfG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1370122263
+Authentication-Results: mail.kernel.org; dmarc=fail (p=reject dis=none) header.from=comstyle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53026 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:54176 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXM9G-0003qo-2J
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:24:14 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60532)
+	id 1kXM9S-0004KL-2E
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 06:24:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60826)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXM6Z-0001Cj-Kk
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:21:27 -0400
-Received: from mail-ej1-x62a.google.com ([2a00:1450:4864:20::62a]:38627)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXM6Y-0008CA-09
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:21:27 -0400
-Received: by mail-ej1-x62a.google.com with SMTP id ce10so1429984ejc.5
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 03:21:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=VB3pvcv08zLKqhwsEcLdqgh9YzTbyGlkseYk/hYu3K8=;
- b=GmBBi9QLmTy5zfVUxgRvNaRgZ+uq+jdsFox2sYSi+N8xcKLfg0KHx7TZ+sosg9s/JT
- njU6oRMCA4+WVcGLLRCBhU9RPMLcX3Jp/Gh77nuvoj4hsGZrKSDn65rW8UF7AhKD4Qxi
- DAOT7gz8nZHANw3v448NoH7X4BNs8vhjixY1F6qEIjM2KIW0LJe44QqvNR5Ve91UKx6l
- 8eJfevRFlcna2Cz/VCXJFNSEJiOQps6KRn8Xt2hjwjsWnlu7Robd3VNh9rTlAhSpDrN3
- l1TQhAWvUKpRPhBv1/J9NIGEWzjVJD4gKiP4SFnWquVbi3gi1dmYz7DNv7R30AWu3vLd
- Xoqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=VB3pvcv08zLKqhwsEcLdqgh9YzTbyGlkseYk/hYu3K8=;
- b=dSV9oqs2ZtsvRT6mHkHOlvQ/kWHnrKPnHGNvraYWKoeasRzBA5EQRUHuD9SETENeVh
- fW0xEub8h9eh5qt1I43iz4uoiKUh+aKwzh2jZLB/ck+50dq/z5t+7ccEmkowJs7hmlQ0
- qVl0+WaTLC5beGKryEBsphMKpS+XrzzK4gSQO/jSk9pyeLs74ZPqOfHikbLIPJF/tgGM
- d1ALFy6Ds0mXKqS4aS519luzUb6frtvpaqMcxeMSWxd4hS8FklzLspdZX0Bal+SD3H8j
- P5P12nx7AUMf6UYY67DyWu1aeniXOoUk3n7W0dy78QYeBk8KzZutzTeEN5qs/MR9S87q
- S5Lw==
-X-Gm-Message-State: AOAM531/hdmBbqVoIOdY84b+G8bR0a+fRyIlwsql75Wyo2UYCgj5Gd/t
- NtV4wlu8ggtvnEb9fF9GqZSoAu2/aCw=
-X-Google-Smtp-Source: ABdhPJxpph3P7IGHArdaqyomTM5gTb+raHrgxPZvjLjJbok1Kxg7IWPFlALnB52POWC6VwynWkkL8g==
-X-Received: by 2002:a17:906:8610:: with SMTP id
- o16mr1568689ejx.209.1603794083546; 
- Tue, 27 Oct 2020 03:21:23 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id z20sm656327edq.90.2020.10.27.03.21.22
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 03:21:22 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [RFC PATCH v4 0/1] tests/vm: Add Haiku VM
-Date: Tue, 27 Oct 2020 11:21:20 +0100
-Message-Id: <20201027102121.264963-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <brad@comstyle.com>) id 1kXM7t-0002cO-R8
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:22:49 -0400
+Received: from speedy.comstyle.com ([2607:f938:3000:8::2]:3844
+ helo=mail.comstyle.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_CHACHA20_POLY1305:256)
+ (Exim 4.90_1) (envelope-from <brad@comstyle.com>) id 1kXM7r-0000C5-Sn
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 06:22:49 -0400
+Received: from mail.comstyle.com (localhost [127.0.0.1])
+ by mail.comstyle.com (Postfix) with ESMTP id 4CL79C0xFcz8PbN;
+ Tue, 27 Oct 2020 06:24:15 -0400 (EDT)
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=comstyle.com; h=date:from
+ :to:cc:subject:message-id:references:mime-version:content-type
+ :in-reply-to:content-transfer-encoding; s=default; bh=sxsgxfrY/2
+ 2BIUonF8tWGJP6oYo=; b=kqTTBhfG/zpUDFi5MZmfny8+9uln7ni7ObQe1NIqDu
+ 55fcmoEChDYRMCQkS5YodkHHriQfv4W9PEkzLM727bX+jR0S/fqnB9WEYv5xXLoh
+ LmYeqk3zhGqKTdS+ddFe03XWKEBYO3THPEMwKjdikvBQT3se/03FKfXUCu//FO7D
+ E=
+DomainKey-Signature: a=rsa-sha1; c=nofws; d=comstyle.com; h=date:from:to
+ :cc:subject:message-id:references:mime-version:content-type
+ :in-reply-to:content-transfer-encoding; q=dns; s=default; b=dJRN
+ bSu/Ap6vhhwVU8j3ihKkjSEAtb8k63hORF5euzG8QebDv57czkP9q4uqorI+8Lzi
+ bWGZaMlMQ2YlwyWEcQBZ0h+IS6gGKkUXXt1rTD4xw9R5fc1yUYttB68DJ7hueHTJ
+ /Jq6PeLtCGIaYl8jl9WvmUDIBceUUheFY0HkAGU=
+Received: from humpty.home.comstyle.com (unknown [142.114.120.158])
+ (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+ (No client certificate requested) (Authenticated sender: brad)
+ by mail.comstyle.com (Postfix) with ESMTPSA id 4CL79B5NwGz8PbK;
+ Tue, 27 Oct 2020 06:24:14 -0400 (EDT)
+Date: Tue, 27 Oct 2020 06:22:45 -0400
+From: Brad Smith <brad@comstyle.com>
+To: Philippe Mathieu-Daud?? <philmd@redhat.com>
+Cc: qemu-devel@nongnu.org, Gerd Hoffmann <kraxel@redhat.com>
+Subject: Re: [PATCH] tests/vm: update openbsd to release 6.8
+Message-ID: <20201027102245.GC64546@humpty.home.comstyle.com>
+References: <20201027053048.GB64546@humpty.home.comstyle.com>
+ <cbae54c3-fa97-19e6-512c-7ac570f56b12@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=unknown-8bit
+Content-Disposition: inline
+In-Reply-To: <cbae54c3-fa97-19e6-512c-7ac570f56b12@redhat.com>
 Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::62a;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x62a.google.com
+Received-SPF: pass client-ip=2607:f938:3000:8::2;
+ envelope-from=brad@comstyle.com; helo=mail.comstyle.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,40 +89,78 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Thomas Huth <thuth@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Gerd Hoffmann <kraxel@redhat.com>,
- =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Intent to not get Alexander's patch lost.=0D
-=0D
-Since v3:=0D
-- Grammar fix (eblake)=0D
-=0D
-Since v2:=0D
-- No change, posted as single patch=0D
-=0D
-Since v1:=0D
-- Addressed Thomas Huth review comments=0D
-=0D
-Alexander von Gluck IV (1):=0D
-  tests/vm: Add Haiku test based on their vagrant images=0D
-=0D
- tests/keys/vagrant        |  27 +++++++++=0D
- tests/keys/vagrant.pub    |   1 +=0D
- tests/vm/Makefile.include |   3 +-=0D
- tests/vm/basevm.py        |   5 +-=0D
- tests/vm/haiku.x86_64     | 116 ++++++++++++++++++++++++++++++++++++++=0D
- 5 files changed, 149 insertions(+), 3 deletions(-)=0D
- create mode 100644 tests/keys/vagrant=0D
- create mode 100644 tests/keys/vagrant.pub=0D
- create mode 100755 tests/vm/haiku.x86_64=0D
-=0D
--- =0D
-2.26.2=0D
-=0D
+On Tue, Oct 27, 2020 at 11:05:20AM +0100, Philippe Mathieu-Daud?? wrote:
+> On 10/27/20 6:30 AM, Brad Smith wrote:
+> > tests/vm: update openbsd to release 6.8
+> >=20
+> > A double dash at the end of a package name removes ambiguity
+> > when the intent is to install a non-FLAVORed package.
+> >=20
+> > Signed-off-by: Brad Smith <brad@comstyle.com>
+> > Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+> > Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+> > Reviewed-by: Philippe Mathieu-Daud?? <philmd@redhat.com>
+>=20
+> I confirm Brad sent us this patch off-list, and
+> - our review comments are addressed,
+> - the tags are correct.
+>=20
+> The patch format itself seems broken... Like a copy/paste
+> into an email client...
+
+Well, git diff vs a format-patch.
+
+
+Subject: [PATCH] tests/vm: update openbsd to release 6.8
+
+A double dash at the end of a package name removes ambiguity
+when the intent is to install a non-FLAVORed package.
+
+Signed-off-by: Brad Smith <brad@comstyle.com>
+Reviewed-by: Gerd Hoffmann <kraxel@redhat.com>
+Tested-by: Gerd Hoffmann <kraxel@redhat.com>
+Reviewed-by: Philippe Mathieu-Daud=C3=A9 <philmd@redhat.com>
+---
+ tests/vm/openbsd | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/tests/vm/openbsd b/tests/vm/openbsd
+index 8356646f21..5ffa4f1b37 100755
+--- a/tests/vm/openbsd
++++ b/tests/vm/openbsd
+@@ -22,8 +22,8 @@ class OpenBSDVM(basevm.BaseVM):
+     name =3D "openbsd"
+     arch =3D "x86_64"
+=20
+-    link =3D "https://cdn.openbsd.org/pub/OpenBSD/6.6/amd64/install66.is=
+o"
+-    csum =3D "b22e63df56e6266de6bbeed8e9be0fbe9ee2291551c5bc03f3cc2e4ab9=
+436ee3"
++    link =3D "https://cdn.openbsd.org/pub/OpenBSD/6.8/amd64/install68.is=
+o"
++    csum =3D "47e291fcc2d0c1a8ae0b66329f040b33af755b6adbd21739e20bb5ad56=
+f62b6c"
+     size =3D "20G"
+     pkgs =3D [
+         # tools
+@@ -36,10 +36,10 @@ class OpenBSDVM(basevm.BaseVM):
+         "bash",
+         "gmake",
+         "gsed",
+-        "gettext",
++        "gettext-tools",
+=20
+         # libs: usb
+-        "libusb1",
++        "libusb1--",
+=20
+         # libs: crypto
+         "gnutls",
+--=20
+2.28.0
+
 
