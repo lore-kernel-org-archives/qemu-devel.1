@@ -2,81 +2,99 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B7EFC4363A
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DA31C4363A
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:57:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10FE2206DB
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:42:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10FE2206DB
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 7223020759
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 21:57:16 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="cAx+ERVB";
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="cAx+ERVB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7223020759
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52418 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60010 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXWjs-00016B-VP
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:42:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50820)
+	id 1kXWxv-0005Ad-DE
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 17:57:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXWiA-0000B2-SS
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:40:58 -0400
-Received: from indium.canonical.com ([91.189.90.7]:43024)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXWi8-0006n7-LR
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 17:40:58 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kXWi5-0005Uv-Bt
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 21:40:53 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 514AC2E8030
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 21:40:53 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
+ id 1kXWww-0004GT-6g; Tue, 27 Oct 2020 17:56:14 -0400
+Received: from home.keithp.com ([63.227.221.253]:43966 helo=elaine.keithp.com)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
+ id 1kXWwt-0000PN-Gz; Tue, 27 Oct 2020 17:56:13 -0400
+Received: from localhost (localhost [127.0.0.1])
+ by elaine.keithp.com (Postfix) with ESMTP id D45213F2DD88;
+ Tue, 27 Oct 2020 14:56:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+ t=1603835762; bh=LFRed8aLrEhFr9/H0YfC2FHgLemVaokq/v9X3p0bp+M=;
+ h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+ b=cAx+ERVBgsVYaJnPv1wxQ10jPAhBgdInxCU9S6Dw0zhIeHuZd78D4Y3YcHRUDVrJ5
+ dVF4t29HTGEOm9UpWQBKqT/p4q0i63o1wizr80O0d7oCm/2U5Tq4sdfnvsjGSLJH42
+ T0qQpkbgiBvA+rmLU+kyeTLVQPigF8n4fdFmtjgM6kiAYM4WDAfUlsQmZp5w0vdrXQ
+ ZJ+1fFrsUuO7N0BzPofOaPjRyMqENXReCyBLDgm/D9ewYvt+C1IC7weuXWTMMck0Qj
+ ECsQTciR8kdTOB3c3YwVzqZ6pVoJBaOVXcdBntyzdeZ8bbi5E9XhlRZPrHOq1DnRB/
+ 5ZTbLTNGETOSg==
+X-Virus-Scanned: Debian amavisd-new at keithp.com
+Received: from elaine.keithp.com ([127.0.0.1])
+ by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
+ with LMTP id Q0jRHPqt_1AB; Tue, 27 Oct 2020 14:56:02 -0700 (PDT)
+Received: from keithp.com (koto.keithp.com [10.0.0.2])
+ by elaine.keithp.com (Postfix) with ESMTPSA id 6F4573F2DD87;
+ Tue, 27 Oct 2020 14:56:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
+ t=1603835762; bh=LFRed8aLrEhFr9/H0YfC2FHgLemVaokq/v9X3p0bp+M=;
+ h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+ b=cAx+ERVBgsVYaJnPv1wxQ10jPAhBgdInxCU9S6Dw0zhIeHuZd78D4Y3YcHRUDVrJ5
+ dVF4t29HTGEOm9UpWQBKqT/p4q0i63o1wizr80O0d7oCm/2U5Tq4sdfnvsjGSLJH42
+ T0qQpkbgiBvA+rmLU+kyeTLVQPigF8n4fdFmtjgM6kiAYM4WDAfUlsQmZp5w0vdrXQ
+ ZJ+1fFrsUuO7N0BzPofOaPjRyMqENXReCyBLDgm/D9ewYvt+C1IC7weuXWTMMck0Qj
+ ECsQTciR8kdTOB3c3YwVzqZ6pVoJBaOVXcdBntyzdeZ8bbi5E9XhlRZPrHOq1DnRB/
+ 5ZTbLTNGETOSg==
+Received: by keithp.com (Postfix, from userid 1000)
+ id 419C21582210; Tue, 27 Oct 2020 14:56:02 -0700 (PDT)
+To: Peter Maydell <peter.maydell@linaro.org>
+Cc: QEMU Developers <qemu-devel@nongnu.org>, Alex =?utf-8?Q?Benn=C3=A9e?=
+ <alex.bennee@linaro.org>, Laurent Vivier <laurent@vivier.eu>, qemu-arm
+ <qemu-arm@nongnu.org>, Palmer Dabbelt <palmer@dabbelt.com>, Alistair
+ Francis <Alistair.Francis@wdc.com>, Sagar Karandikar
+ <sagark@eecs.berkeley.edu>, Bastian Koppelmann
+ <kbastian@mail.uni-paderborn.de>, "open list:RISC-V"
+ <qemu-riscv@nongnu.org>
+Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
+ directories
+In-Reply-To: <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
+References: <20201026212853.92880-1-keithp@keithp.com>
+ <20201026212853.92880-2-keithp@keithp.com>
+ <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
+Date: Tue, 27 Oct 2020 14:56:01 -0700
+Message-ID: <87pn53e3ke.fsf@keithp.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 27 Oct 2020 21:30:39 -0000
-From: Alistair Francis <1898883@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=Invalid; importance=Undecided;
- assignee=None; 
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: alistair2323 azuk bmeng-cn rth
-X-Launchpad-Bug-Reporter: Azuk 443 (azuk)
-X-Launchpad-Bug-Modifier: Alistair Francis (alistair2323)
-References: <160208094339.8985.13177411264868514958.malonedeb@wampee.canonical.com>
-Message-Id: <160383423995.15500.3356063756276601276.malone@wampee.canonical.com>
-Subject: [Bug 1898883] Re: qemu-system-riscv64 failed to load binary kernel
- into memory
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: d9177695015805e896d67d62313889f4ba42283c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 17:40:53
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; boundary="=-=-=";
+ micalg=pgp-sha256; protocol="application/pgp-signature"
+Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
+ helo=elaine.keithp.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 17:56:03
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -85,52 +103,55 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1898883 <1898883@bugs.launchpad.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: "Keith Packard" <keithp@keithp.com>
+From: "Keith Packard" via <qemu-devel@nongnu.org>
 
-Just an update on this.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-You can use -bios to load your image, which will load it to address
-0x80000000.
+Peter Maydell <peter.maydell@linaro.org> writes:
 
-In QEMU 5.1 `-bios none -kernel Image` will load the Image to
-0x80020000/0x80040000 depending on XLEN.
+>> +specific_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
+>
+> I think this adds this file to the compilation for all TCG targets;
+> you only want it for targets which have Arm-semihosting-ABI compatible
+> semihosting. (Various other targets either don't have semihosting
+> or have their own ABI.)
 
-QEMU 5.2 will now correctly load the above mentioned Image to address
-0x80000000 if you don't load a firmware (`-bios none`).
+Right. These should have been target-specific source sets so that the
+file was only added to those targets:
 
--- =
+        arm_ss.add(when: 'CONFIG_TCG', if_true: files ('common-semi.c'))
+        riscv_ss.add(files('common-semi.c'))
 
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1898883
+This appears to work in my testing (building arm, risc-v and x86_64
+configs).
 
-Title:
-  qemu-system-riscv64 failed to load binary kernel into memory
+=2D-=20
+=2Dkeith
 
-Status in QEMU:
-  Invalid
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Bug description:
-  QEMU Version: 5.1.0
-  Compiled in Ubuntu 20.04 for riscv64, following the guide https://risc-v-=
-getting-started-guide.readthedocs.io/en/latest/linux-qemu.html.
+-----BEGIN PGP SIGNATURE-----
 
-  In qemu-system-riscv64, code at 0x80000000 will be executed by virtual CP=
-U.
-  For example, using `qemu-system-riscv64 -nographic -machine virt -bios no=
-ne -kernel vmlinux -S -s`, my homebrew kernel(ELF file) will load at 0x8000=
-0000. If I strip the kernel using `riscv64-linux-gnu-objcopy -O binary vmli=
-nux Image`, qemu-system-riscv64 will not load the binary machine code into =
-the riscv64 load address, but `-bios Image` will.
-
-  In `qemu-system-aarch64` compiled by Ubuntu team, I can use `qemu-
-  system-aarch64 -M raspi3 -kernel Image_aarch64 -S -s` to load a
-  specific machine code binary into 0x80000. And the elf kernel can be
-  loaded to that address, too.
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1898883/+subscriptions
+iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+Yl3IACgkQ2yIaaQAA
+ABF23hAAshIh90c2syeOD7e72vZAmKyR3UdxiwRRaobis2M5HEosF8bVTuuYoP+Z
+TOE4wV1NK5Z0V2tWcLQ9cJwqwG467Idw5ZGQxgXwe/4D1jf7x9QZZiXhqgqdcb8A
++4AUkGLjFVZMn/hoOt7MWLhLSmBIu2AeZmEfdxEwZN67sb5db8kj1nL429+2g8J5
+8bYpoOsbWSGkrYWvm30QbLNiyzndSau0rErgbLf5cRbFDna/saKTKu+t5S+zXt1R
+BVu1rFUAD7QgICp8eTOtdmBIt5coNGbk6oQMBlj/TRVatWPl57L34rA+6l1/mrWc
+fQjBwe8+BHYxjNaSRN6mMYs/5CxcaNlPNXUTFI2TLIpy9IS6DzzuY2IjHw6qoaz8
+y5krhOXkkBQ3Q4riz7zpF/VlH+MEn+Ipmc1wMAgTT+3OP8cKropWIwk//qF00HMy
+oAkJpZrYNfTvyMVfHGseg3HvrySxsomMWq6X8StXqSG9Y99f3jCOvpL1bF2UCX0m
+lsBNAfU2F3kFcv96lB21tMy+ED9SgagV6q/kVzgiDOarGlxDr9MwHs88LvI2J9JL
+61pV/LIQIp1RueHtExqxQ5427e9uEP0f/c57gFUY/J296pDiVqwhe7aGPjlpZ998
+SMkwmYTRz1N4SPnnd9Bd5THWOyVtM/znBBmWXAd2qGRf+oQHXlw=
+=/2q0
+-----END PGP SIGNATURE-----
+--=-=-=--
 
