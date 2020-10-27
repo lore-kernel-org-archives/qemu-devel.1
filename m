@@ -2,124 +2,93 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3CADC388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:10:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BE2C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:11:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3D7FE222C8
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:10:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id CB6ED222C8
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:11:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="ouzJo4sZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D7FE222C8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dgHDZgWv"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CB6ED222C8
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44106 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45694 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXNnx-0000fm-9q
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:10:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42412)
+	id 1kXNor-0001NY-R4
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:11:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51630)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kXMlM-0008M5-L0; Tue, 27 Oct 2020 07:03:36 -0400
-Received: from mail-eopbgr140130.outbound.protection.outlook.com
- ([40.107.14.130]:28605 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <vsementsov@virtuozzo.com>)
- id 1kXMlK-0006oQ-6u; Tue, 27 Oct 2020 07:03:36 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SX4BlFpHHGSR3OKmBaSnSighvJ89w6YM3rUPuTGKTLw/M1s8PmCG9qaY7mCDnKQEopdoXTTlEcaJxH0Rp060ahQLa313+6rq5/PZasEEp/ohCep8WlIMl3xgMmzWAvCyFDfWLt+vptcHxr6uQPv4z0Kjs9xoMHfoi/uTWuRixpcEwIiP9o9W2i0WonT4FKWBA8gbo/o9HRcWtk07XLSYnt1w6gMbBAxhhRma9TU5LhhZxcDb0o2Z6P3Z5+OkLRrlep5+3oyKk0yhoZg6nwuDYcT4SXL5ZB4uFSh9H+Njbk828mVWb03LR0F6sMywUTwWPkinFqTcqemTk3j3HWBvUg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5JJ66aXiGSOJKQJgqB420uDQRBxfzYo92yaR7J1Ms1c=;
- b=WaK/z2wVJYyV91Y5FAELjAiBsm4fxhWPlgmPM0N8UfZSSnbxypkTYxoEJZbuikmQZSN3Aj4brPKkfyczZEYDmc8bB1dWfzWZi8Hlx4bvjsyRUFAxFvLbasOlgy0XjAcG1qQceZtwSokbe/pr362WlVL9KhcW8plpir1dE6To0F9KGivlL0hOpMcEAHn0ax9D0B+7UVaoVzJv3d1We4J6pKAFP+Z30991YJoiD+o71jPkXHFgyvwdvloken+kACceIWozttuWMGQhVcfBysMnldnUZULQGrXZwcYGwMUmPvrpexJCwhG2nfWHCaJNfVzg+Ha0NGrvFNLr46C5BZXLgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5JJ66aXiGSOJKQJgqB420uDQRBxfzYo92yaR7J1Ms1c=;
- b=ouzJo4sZsPnjEnsPEsAQTXRWdEPDdn4gNz0uwPeQmKghSP+qo8JWY0obTgQvkfde8mjiN0LuyfF5PPrX482QidNpr0Qkz0RLM8S9ngZ5mSECDfhnFeBIc+4VxKvqzOMKadO6/lZ/tffRATxS/DZ3YN5FeQMmEgQCgoTYiq6UFco=
-Authentication-Results: redhat.com; dkim=none (message not signed)
- header.d=none;redhat.com; dmarc=none action=none header.from=virtuozzo.com;
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com (2603:10a6:803:137::19)
- by VE1PR08MB5613.eurprd08.prod.outlook.com (2603:10a6:800:1a7::13)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 27 Oct
- 2020 11:03:31 +0000
-Received: from VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::c1ba:32cf:cd37:712c]) by VI1PR08MB5503.eurprd08.prod.outlook.com
- ([fe80::c1ba:32cf:cd37:712c%9]) with mapi id 15.20.3455.037; Tue, 27 Oct 2020
- 11:03:31 +0000
-Subject: Re: [PATCH v6 10/11] nbd: Add 'qemu-nbd -A' to expose allocation depth
-To: Eric Blake <eblake@redhat.com>, qemu-devel@nongnu.org
-Cc: kwolf@redhat.com, stefanha@redhat.com, armbru@redhat.com,
- rjones@redhat.com, pkrempa@redhat.com, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
-References: <20201027050556.269064-1-eblake@redhat.com>
- <20201027050556.269064-11-eblake@redhat.com>
-From: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
-Message-ID: <68fa9282-4fc7-fa87-2599-f5cd65009cff@virtuozzo.com>
-Date: Tue, 27 Oct 2020 14:03:27 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.4.0
-In-Reply-To: <20201027050556.269064-11-eblake@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [185.215.60.93]
-X-ClientProxiedBy: AM3PR07CA0101.eurprd07.prod.outlook.com
- (2603:10a6:207:7::11) To VI1PR08MB5503.eurprd08.prod.outlook.com
- (2603:10a6:803:137::19)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPR-0001Gx-0Q
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:01 -0400
+Received: from mail-wm1-x330.google.com ([2a00:1450:4864:20::330]:34812)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXNPM-0004R3-Ca
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:00 -0400
+Received: by mail-wm1-x330.google.com with SMTP id k21so902031wmi.1
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:44:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+ :content-transfer-encoding;
+ bh=NehaV0T5jpi1H97RxmXskYUCuVVnNIGAcpGsWGzfotc=;
+ b=dgHDZgWvMoIESm4JuNYAzCF4AF/OMQw5nOY5UHpRzCU2cDdj1FFSb95A9XFgDmZDaH
+ QHJxudev+EjJ1puCGnWwms2ErZwnzWp4zJd8booKRl531mOqKMopeHd+2EBZjTAhAjYB
+ GkefPny21+Cgxad/OyFtMs49lD3ERq5CVdnbH9OBr6Ux0lY5blUIwlY/79pTQ1d/1d/g
+ euEmphIbD4W3cGQAlX1A0GbY080to2WyioEppmN9QU1yYd3Ya3je9oB6Vh3cNYjNzRo0
+ 79r6nD5YDdFb7E+ED82lPFJhJKOkBzjWhJU6n6X2WWWwpvPKsgIBMF+TVG159qKjBqof
+ hCxg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=NehaV0T5jpi1H97RxmXskYUCuVVnNIGAcpGsWGzfotc=;
+ b=VNHtVOw8+5VCpz9p7a7ChSO1+o5qhpm1cCqRQYWZ++/pGWe9L2NDF9vyuHSsvpOQW3
+ 9D4OHIWKrs6ip17KRW0K5HQZTC5tBMyu87iOlMTQKVFLzXqHT4q2WcDdpbhbR6naRw8Y
+ DX48KkP8jh9wLfFSCiQ5flIvOTFBEQPbS6GfkTbqDlRw0xkRtUHKZHtbmq0PIVe549Dl
+ qyMmn3fU+zGLdWUgM1cWSGPP2yt8J1NuQ8YQEH/6Z/bEXAJbj7IjGCV+xBhXIypTC/T1
+ EDn7Ns7V6UXvJu6f6fS/R7HcTbSSxb27X42c/8rSWz8H6QZtMcrUbsgPcXFztD2WW4wA
+ Uymw==
+X-Gm-Message-State: AOAM530bwpKF+AP9nycTFVxSy/Bc7/bdJkqNbCIKF2/8FFcsU9vHtV4/
+ 17vry3bN8KMAD6N3JAVfDFGzNnnGEnj0qQ==
+X-Google-Smtp-Source: ABdhPJxT+Yhf/SyDdMFk1iMgoj23iopOKM3/Zkoam4tNBPyCy02UwHoS+vSOGQN19/fdwOXxZbWcrA==
+X-Received: by 2002:a1c:44e:: with SMTP id 75mr2306810wme.117.1603799087009;
+ Tue, 27 Oct 2020 04:44:47 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.45
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 04:44:46 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PULL 04/48] linux-user/elfload: Avoid leaking interp_name using GLib
+ memory API
+Date: Tue, 27 Oct 2020 11:43:54 +0000
+Message-Id: <20201027114438.17662-5-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
+References: <20201027114438.17662-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from [192.168.100.5] (185.215.60.93) by
- AM3PR07CA0101.eurprd07.prod.outlook.com (2603:10a6:207:7::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.11 via Frontend Transport; Tue, 27 Oct 2020 11:03:29 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: ae54f622-dcf9-41f9-f9e3-08d87a67f063
-X-MS-TrafficTypeDiagnostic: VE1PR08MB5613:
-X-Microsoft-Antispam-PRVS: <VE1PR08MB5613CA5524C267AF08EF9A5CC1160@VE1PR08MB5613.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4m4VXeTeMp5FuLixSWQCPXEIiHSC9qVxIgGp/vre0TVOhRE3GLEjxWtToxi9RTBO3p4cIxTAs8eoIWj1gmvDvx5urHG8NcIW9CFvHs6NzteojH0jlEc1hIxHlzdzeAelXgs/Gvqnr16RMJgXxSqdrcAdRV/RdWImA2kGy98+1KhjKqtPvWjO1OrP9Yb6HQ/V8Fnk9LcMCbpQZkOPUcxTJUjeQpIWOmmS159j1hmDLjy/TuTaHDxu2Ni+BSX4+WmjuoC+Jnoq2Ysaoa7J9wSJY6s5Qm5NfQkIiNU6P3kYvYCCbTlvYlQDuhdxO3jZuPgKR+e6+kI6mnVSZuXg24DMcwCOacZ2kXf4ME2iEYMoMfjdBqG07eKAmWygtyfYM9g7
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:VI1PR08MB5503.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(31696002)(2616005)(36756003)(26005)(956004)(498600001)(6486002)(52116002)(5660300002)(4326008)(186003)(16526019)(8676002)(86362001)(66556008)(2906002)(8936002)(16576012)(66946007)(31686004)(83380400001)(66476007)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: fcVHvmBzQsXJV3wLBbZl/bHKPxt/z2lMPDJYxrJDG79b01J3Z3PRq1wXHS+UfaFfrhSX+Ga0QbVKPwCEG6t9AT42BT+/HtFqmLRZzAIblFDGf1zQh8r5euXajVoHSbVn7s5JCC/G7g3igUl0DbtDDN5F5/RWa5eLTHAN/ao2CtrDJnlslArv5sTqiv5mPD6BMKAnHto4a8Ysf5VYaNnXRuliWhg2OE8YPjloSPPeIVkRWsmuWVNrqLomMN8jC6Gp/CxXXebSMamBGSSdkPNHRASmlpHvckFgD5ohOMiXoe6BD1uW8F2iiTrzACW9RDMCH7vc3qBnlU7VPdc1GPCkUtTo84aTRvwWJa8ah5zqPoJS9kMW3D4LBkOiE8WSQkuw1vTessCQeadNZd60nmP06PxYGEmu5GVIKuMfbk7M3Nw7ubN8WKRh9d6uRyi/xYV6W4UiwnAp1QBxgLmbzlWGJuNiw+pQfHQjhcKK5yYgy909gGPiIOWeHAg+LS+8s2jvEKeNk0GkTt15QO2ttUuOVKWsTGj+8jgDcI1lMUC+XaOxnnaLgEztzS2xGYNGY+dhQM2/rOhyKp031++JayFaLVEDuO4QWnI/TukFek3YIZ6XPkrPMYyeNq1y9z10aHilZHfxg8vAe8+RrXYsVUUpuQ==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ae54f622-dcf9-41f9-f9e3-08d87a67f063
-X-MS-Exchange-CrossTenant-AuthSource: VI1PR08MB5503.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 11:03:30.9156 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: rNbCyuA8MbDXOxGb1ka06XmIJ/vwQPn/i76gPdMNL3qL8FfHUwY2oBpBrcZxM3cZHw58vaCt7mPtN3MrryeljzS/i/GqXnY6QClvqwDNvzk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR08MB5613
-Received-SPF: pass client-ip=40.107.14.130;
- envelope-from=vsementsov@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 07:03:31
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::330;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wm1-x330.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
  DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -137,32 +106,61 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-27.10.2020 08:05, Eric Blake wrote:
-> Allow the server to expose an additional metacontext to be requested
-> by savvy clients.  qemu-nbd adds a new option -A to expose the
-> qemu:allocation-depth metacontext through NBD_CMD_BLOCK_STATUS; this
-> can also be set via QMP when using block-export-add.
-> 
-> qemu as client is hacked into viewing the key aspects of this new
-> context by abusing the already-experimental x-dirty-bitmap option to
-> collapse all depths greater than 2, which results in a tri-state value
-> visible in the output of 'qemu-img map --output=json' (yes, that means
-> x-dirty-bitmap is now a bit of a misnomer, but I didn't feel like
-> renaming it as it would introduce a needless break of back-compat,
-> even though we make no compat guarantees with x- members):
-> 
-> unallocated (depth 0) => "zero":false, "data":true
-> local (depth 1)       => "zero":false, "data":false
-> backing (depth 2+)    => "zero":true,  "data":true
-> 
-> libnbd as client is probably a nicer way to get at the information
-> without having to decipher such hacks in qemu as client.;)
-> 
-> Signed-off-by: Eric Blake<eblake@redhat.com>
+From: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
-Reviewed-by: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>
+Fix an unlikely memory leak in load_elf_image().
 
+Fixes: bf858897b7 ("linux-user: Re-use load_elf_image for the main binary.")
+Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Message-id: 20201021173749.111103-5-richard.henderson@linaro.org
+Message-Id: <20201003174944.1972444-1-f4bug@amsat.org>
+Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+ linux-user/elfload.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/linux-user/elfload.c b/linux-user/elfload.c
+index f6022fd7049..1a3150df7c0 100644
+--- a/linux-user/elfload.c
++++ b/linux-user/elfload.c
+@@ -2584,13 +2584,13 @@ static void load_elf_image(const char *image_name, int image_fd,
+                 info->brk = vaddr_em;
+             }
+         } else if (eppnt->p_type == PT_INTERP && pinterp_name) {
+-            char *interp_name;
++            g_autofree char *interp_name = NULL;
+ 
+             if (*pinterp_name) {
+                 errmsg = "Multiple PT_INTERP entries";
+                 goto exit_errmsg;
+             }
+-            interp_name = malloc(eppnt->p_filesz);
++            interp_name = g_malloc(eppnt->p_filesz);
+             if (!interp_name) {
+                 goto exit_perror;
+             }
+@@ -2609,7 +2609,7 @@ static void load_elf_image(const char *image_name, int image_fd,
+                 errmsg = "Invalid PT_INTERP entry";
+                 goto exit_errmsg;
+             }
+-            *pinterp_name = interp_name;
++            *pinterp_name = g_steal_pointer(&interp_name);
+ #ifdef TARGET_MIPS
+         } else if (eppnt->p_type == PT_MIPS_ABIFLAGS) {
+             Mips_elf_abiflags_v0 abiflags;
+@@ -2961,7 +2961,7 @@ int load_elf_binary(struct linux_binprm *bprm, struct image_info *info)
+     if (elf_interpreter) {
+         info->load_bias = interp_info.load_bias;
+         info->entry = interp_info.entry;
+-        free(elf_interpreter);
++        g_free(elf_interpreter);
+     }
+ 
+ #ifdef USE_ELF_CORE_DUMP
 -- 
-Best regards,
-Vladimir
+2.20.1
+
 
