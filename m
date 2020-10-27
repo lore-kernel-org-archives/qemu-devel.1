@@ -2,130 +2,102 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,NICE_REPLY_A,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 273CBC55178
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:05:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23F3EC388F9
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:06:50 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 09A81206C1
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C344206C1
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 16:06:49 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=virtuozzo.com header.i=@virtuozzo.com header.b="CR9SZGcV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 09A81206C1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=quarantine dis=none) header.from=virtuozzo.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVXvaw2+"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C344206C1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34368 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36798 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXRTc-0000yc-Rw
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:05:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43256)
+	id 1kXRUm-00026f-FT
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 12:06:48 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44190)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kXRPW-0003yi-MN; Tue, 27 Oct 2020 12:01:23 -0400
-Received: from mail-eopbgr140123.outbound.protection.outlook.com
- ([40.107.14.123]:21294 helo=EUR01-VE1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <andrey.shinkevich@virtuozzo.com>)
- id 1kXRPS-0006GO-67; Tue, 27 Oct 2020 12:01:21 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kofgdjdyxyCAUP88CxPmLVIPKDoMUlR9kCpyGYByviYf3bK6/bErWm+RHCYHrvz7jpYkE/jHYgXevF2Bi6lf41RvrSpRKCPNAH1E1HcAq8VzVl0roQPBtNgdFVBrbEf4QV0L3Yafdq3T5g1f/voDOw9X2gx1H0rADuqRAfWKtZ8bNunKQ8cg+XFKvZjarI5aiS5yXB8AX3q8Zd8SUABn52CnoJSiuV3zm6/tFPt1fsdIwWcr2R/78IowoAj4qczGgwFy1y8yuuC3ocXhWZlUZ5cM+eFILRdzifp2bq8gMmky/LCli4re4c3M2EyJIjxL+kge3liOAqKPjCpmdn7qRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PeITrWJCd8QmUl9YjSgWiBw0/wQiS9SD7oYl8XSqDmc=;
- b=ELTB3+RRXXEJvXEgjCvfz2OumnHJ96+jtzCFBNQV3mTECRnyWGltjblEkKElHmiArLnlC/pPsL3R3vb9RzbcZJLaRrGwFY30FQM8+544xVsDmTxcHysRfpa2Ar85WTkSs7urZXYVuvyliubm7NfVPRqeYYJfrfqqYFNjxxFCHwakC20HbzvYiKdzoUmOy60NR3CCITnGoqrWdo2f+OQjob0vbPJQQAovqbtXh05ADxRo0J2HnvoheJ2/VB2ck5OdA6dNzmsyhxUqLSqK4GjBE52teLH00qQhegmIyh8rmn3mSwcui7f+firn1LhpAexEtwO0mcrKCpCib0wdaEqhWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=virtuozzo.com; dmarc=pass action=none
- header.from=virtuozzo.com; dkim=pass header.d=virtuozzo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=virtuozzo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PeITrWJCd8QmUl9YjSgWiBw0/wQiS9SD7oYl8XSqDmc=;
- b=CR9SZGcVGwOYirpHkhsttmsthhhUCo07IUf/abGNK7RbnAKieul0//uJaOEMwYFuet6BxIwyjQRn4Z1v0D3MlPn/pZ8zezMuCFIf5cWPh0Kq1nGpGj7SYb95el8Ao+qa17U8RTVnHKpdLsFM7LQ9KrDy07QmGXZDmu0dhfdzcaE=
-Authentication-Results: openvz.org; dkim=none (message not signed)
- header.d=none;openvz.org; dmarc=none action=none header.from=virtuozzo.com;
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com (2603:10a6:3:89::22)
- by HE1PR0801MB1769.eurprd08.prod.outlook.com (2603:10a6:3:7f::14)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.20; Tue, 27 Oct
- 2020 16:01:05 +0000
-Received: from HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036]) by HE1PR0801MB2124.eurprd08.prod.outlook.com
- ([fe80::fd10:fc33:1bb0:1036%6]) with mapi id 15.20.3477.028; Tue, 27 Oct 2020
- 16:01:05 +0000
-Subject: Re: [PATCH v12 13/14] stream: skip filters when writing backing file
- name to QCOW2 header
-To: Vladimir Sementsov-Ogievskiy <vsementsov@virtuozzo.com>,
- qemu-block@nongnu.org
-Cc: qemu-devel@nongnu.org, fam@euphon.net, stefanha@redhat.com,
- kwolf@redhat.com, mreitz@redhat.com, armbru@redhat.com, jsnow@redhat.com,
- eblake@redhat.com, den@openvz.org
-References: <1603390423-980205-1-git-send-email-andrey.shinkevich@virtuozzo.com>
- <1603390423-980205-14-git-send-email-andrey.shinkevich@virtuozzo.com>
- <4dadeb14-0744-1cbd-04c5-516ba509cc14@virtuozzo.com>
-From: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
-Message-ID: <fbcca331-9cca-12c8-d829-4fae360c8ef4@virtuozzo.com>
-Date: Tue, 27 Oct 2020 19:01:01 +0300
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:68.0)
- Gecko/20100101 Thunderbird/68.9.0
-In-Reply-To: <4dadeb14-0744-1cbd-04c5-516ba509cc14@virtuozzo.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [109.252.114.22]
-X-ClientProxiedBy: AM0PR08CA0034.eurprd08.prod.outlook.com
- (2603:10a6:208:d2::47) To HE1PR0801MB2124.eurprd08.prod.outlook.com
- (2603:10a6:3:89::22)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXRSO-0008UE-D1
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 12:04:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23666)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXRSI-0006YC-UV
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 12:04:20 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603814653;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=fxbpQEAHbX0or96GM6hC5X/mct/rAasK8lB74c4iv5g=;
+ b=EVXvaw2+ntEsqVzAMMPaER6drU9XMDq2ogdedktlI5gRGbLXZWz7byywg0U0nMmnhLa14y
+ Nfz+W27/6MTGhCxVrZBrGQjomuL0RIRh9uRF5+vtPxhM1TDO3CVyjblduSLqbV0pL0hX+5
+ 1tHjNJlPhWZYHq0JO/OIJhiRycNCzkU=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-252-qMuCexd0OgSg-i1053dHsQ-1; Tue, 27 Oct 2020 12:04:11 -0400
+X-MC-Unique: qMuCexd0OgSg-i1053dHsQ-1
+Received: by mail-ej1-f71.google.com with SMTP id d12so1027820ejr.19
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 09:04:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=fxbpQEAHbX0or96GM6hC5X/mct/rAasK8lB74c4iv5g=;
+ b=nrGsZZCn9UvKySbe9xU4fEE379AF/Sa8FVJa/72DASIN5oHiwjlRk1YFyWeWioEbh2
+ JPyAVQZTxvOKSHlnJro7QetpixINnd89RLm5/rlGsE3hg0kstl4KNwL88YtUTkuRlpzw
+ QPb8CcgfZZn1Kd4rUJOXKk3t4CxJnwmwAd0Lvm9y2PuihyHP0ikBOQsuMmtNq7IBx9uy
+ ZVY8kK+xW0fTIABgaP0eybcTUA9+tCQuDs4gYnRWAL4+NthVPrKYWv8jbsAqvVu7Byu6
+ LD7e6Nj3eh/L2OZ4bBxmpFwK46mUUWMD8uRdT3Y0dZuWVto/+k8dYzzHDuYOIxAJfO6x
+ 6Wxg==
+X-Gm-Message-State: AOAM530rMa2zN/PfMDj4mnWsT7q3NduF7oCyHjKKN0QFLe7RMrbX90Hq
+ ur9N9YX9dGkyMW3GN3HhCAlZixFsdSNl6B//Zv1L99B6ey7/CxseLT9AqKXcFkYH6+sfG0R/PFT
+ 3RDyuFFgavLVF07A=
+X-Received: by 2002:a17:906:715a:: with SMTP id
+ z26mr3104419ejj.300.1603814650104; 
+ Tue, 27 Oct 2020 09:04:10 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyCpWNAoohzquAZWXz2B+4CFzZ4g/AL9GzaiTeQwT58v/d+X/sdCVtZJKxpc52fg0lZAxrEqA==
+X-Received: by 2002:a17:906:715a:: with SMTP id
+ z26mr3104396ejj.300.1603814649868; 
+ Tue, 27 Oct 2020 09:04:09 -0700 (PDT)
+Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id u2sm1261486edr.70.2020.10.27.09.04.08
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Tue, 27 Oct 2020 09:04:08 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2] block/nvme: Fix nvme_submit_command() on big-endian
+ host
+Date: Tue, 27 Oct 2020 17:04:07 +0100
+Message-Id: <20201027160407.418423-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from Admins-MacBook-Pro.local (109.252.114.22) by
- AM0PR08CA0034.eurprd08.prod.outlook.com (2603:10a6:208:d2::47) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.3499.18 via Frontend Transport; Tue, 27 Oct 2020 16:01:03 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: e280f953-6c70-419c-02b1-08d87a91821b
-X-MS-TrafficTypeDiagnostic: HE1PR0801MB1769:
-X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <HE1PR0801MB1769034EE91512C880F4BA38F4160@HE1PR0801MB1769.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: I9FkigtEjaSE9cIzhryamRMBfiT8zTfhDOZ4VyrejNb/vvxrR/OzkbVlf+ptphsrD8pk9zyjf0zgNadegqsWa6BHbQpUfp1OBzDaKdcu+qHbA4fnDaGiExX7XbvR+RGWm97VZqL+6vW4lb9u+nQJwU+XkfgihmkohIcGXh1+5SBA/KzI8iaQxQxvYeiuJwRRg74vsBEKfTOX9a768BSH8nChpRm/ThWFnXQgSIgqrRYBDYn2O+ofzTi0iwMT/yUU6xJhXKs0kOpgorK5cJWDLF/XvKfebYHeS53KpUOF7+oUJP835gLxb1Pbz5r3AMVmhNK3rnDhxcWfacxRknDcYTAh9w57qv8uWiG6Ciux/YFYeJ1Ufo3fya6gAwVHo2Gv
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:HE1PR0801MB2124.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(4636009)(366004)(39830400003)(396003)(376002)(136003)(346002)(316002)(44832011)(107886003)(86362001)(478600001)(31686004)(6512007)(4326008)(36756003)(2906002)(16526019)(8676002)(6486002)(31696002)(5660300002)(52116002)(6506007)(83380400001)(186003)(66556008)(956004)(66476007)(26005)(2616005)(53546011)(66946007)(8936002)(43740500002);
- DIR:OUT; SFP:1102; 
-X-MS-Exchange-AntiSpam-MessageData: +SUIH0/lLufd5gQQTacjM5y2bdVQdQMvIYqIR8xbvL7sqCu+bNSVMOnEnDY3kRp7b63b39f2+oKl/Tl4b7x5tWzR92N1A61qOzoYCLI9x33b2/20xbSVCSpdQO6lcuARwZH9yXCYTH4Ny5dqLHsCh1e2JnFKCyjU+vJNwHj6fpiEM04zb6xRsSTC2byjPwDxfrbRBdQoBPfp7NADIp11y8k3ZWXNuHsCZkDvq4cCGEgW5rJKF57aL4cg+AUJZ50NVyJVh945EDDD1hO4gr98OPj6IjaUfgGMhVIGzuO3bOj4vp8Bo/qLT0qZ7K6ouvE8F+YHopAgC2INpXzlHdXfBECA9qFgbR83jO+wcaPMxUdOeBy8ndvzI34QE0dLVT+niISPcAfFesCnM7n1aeG/WSguJ6FOMWVdGRp0Jyv90hfqKisgOhdqjHeIqGCVuRX7Kd0zTUGadwWD7pV+t7ghUcMZuSG34WAQnBG/jkenVsavgeHIUTkmgPk/4n4u4rVqDA+4jrzlE7XZVYR6UHYAKtqULfzR3CVX6bR8y0NaLxCkcv9v6zO+6kWubemXM0O8ZWWgFGAtu1hqVt1dn7cNrWmXDubyueLBsDARHRoEUd86C16AXNxI2ykAJ6F5bqwl7NwH8kj/kBw3Ehi9ukhdmg==
-X-OriginatorOrg: virtuozzo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e280f953-6c70-419c-02b1-08d87a91821b
-X-MS-Exchange-CrossTenant-AuthSource: HE1PR0801MB2124.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Oct 2020 16:01:04.8268 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 0bc7f26d-0264-416e-a6fc-8352af79c58f
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MVIUtwpEjEy/v396V5pkbr2B73/y+FwEApLc/mbNsz6R0nIJBDH8jIsbVYm/rwXtdXJtFHToTyKvPSO51t8CH/JXdJNEueH8H8s7BEIOosk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: HE1PR0801MB1769
-Received-SPF: pass client-ip=40.107.14.123;
- envelope-from=andrey.shinkevich@virtuozzo.com;
- helo=EUR01-VE1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 12:01:07
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -49
-X-Spam_score: -5.0
-X-Spam_bar: -----
-X-Spam_report: (-5.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- MSGID_FROM_MTA_HEADER=0.001, NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:07
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -138,109 +110,67 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Eric Auger <eric.auger@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 27.10.2020 18:09, Vladimir Sementsov-Ogievskiy wrote:
-> 22.10.2020 21:13, Andrey Shinkevich wrote:
->> Avoid writing a filter JSON file name and a filter format name to QCOW2
->> image when the backing file is changed after the block stream job.
->> A user is still able to assign the 'backing-file' parameter for a
->> block-stream job keeping in mind the possible issue mentioned above.
->> If the user does not specify the 'backing-file' parameter, QEMU will
->> assign it automatically.
->>
->> Signed-off-by: Andrey Shinkevich <andrey.shinkevich@virtuozzo.com>
->> ---
->>   block/stream.c | 15 +++++++++++++--
->>   blockdev.c     |  9 ++-------
->>   2 files changed, 15 insertions(+), 9 deletions(-)
->>
->> diff --git a/block/stream.c b/block/stream.c
->> index e0540ee..1ba74ab 100644
->> --- a/block/stream.c
->> +++ b/block/stream.c
->> @@ -65,6 +65,7 @@ static int stream_prepare(Job *job)
->>       BlockDriverState *bs = blk_bs(bjob->blk);
->>       BlockDriverState *unfiltered_bs = bdrv_skip_filters(bs);
->>       BlockDriverState *base = bdrv_filter_or_cow_bs(s->above_base);
->> +    BlockDriverState *base_unfiltered = NULL;
->>       Error *local_err = NULL;
->>       int ret = 0;
->> @@ -75,8 +76,18 @@ static int stream_prepare(Job *job)
->>           const char *base_id = NULL, *base_fmt = NULL;
->>           if (base) {
->>               base_id = s->backing_file_str;
->> -            if (base->drv) {
->> -                base_fmt = base->drv->format_name;
->> +            if (base_id) {
->> +                if (base->drv) {
->> +                    base_fmt = base->drv->format_name;
-> 
-> hmm. this doesn't make real sense: so, we assume that user specified 
-> backing_file_str, which may not relate to base, but we use 
-> base->drv->format_name? But it may be name of the filter driver, which 
-> would be wrong..
-> 
-> Any ideas?
-> 
-> 1. we can use base_fmt=NULL, to provoke probing on next open of the 
-> qcow2 file..
+The Completion Queue Command Identifier is a 16-bit value,
+so nvme_submit_command() is unlikely to work on big-endian
+hosts, as the relevant bits are truncated.
 
-I would choose this item #1 but have to check the probing code logic... 
-Particularly, I do not remember now if the probing is able to recognize 
-a protocol.
-The logic for the format_name in the QEMU existent code (I has kept it 
-here in the patch) is a slippery way for an imprudent user. That's why I 
-staked on the backing_file_str deprication in the previous version.
+The "Completion Queue Entry: DW 2" describes it as:
 
-> 2. we can do probing now
-> 3. we can at least check, if backing_file_str == 
+  This identifier is assigned by host software when
+  the command is submitted to the Submission
 
-Not bad for the sanity check but we will search a node by the file name 
-again - not good ((
+As the is just an opaque cookie, it is pointless to byte-swap it.
 
-> base_unfiltered->filename, in this case we can use 
-> base_unfiltered->drv->format_name
-> 
-> 
->> +                }
->> +            } else {
->> +                base_unfiltered = bdrv_skip_filters(base);
->> +                if (base_unfiltered) {
->> +                    base_id = base_unfiltered->filename;
->> +                    if (base_unfiltered->drv) {
->> +                        base_fmt = base_unfiltered->drv->format_name;
->> +                    }
->> +                }
->>               }
->>           }
->>           bdrv_set_backing_hd(unfiltered_bs, base, &local_err);
->> diff --git a/blockdev.c b/blockdev.c
->> index c917625..0e9c783 100644
->> --- a/blockdev.c
->> +++ b/blockdev.c
+Fixes: bdd6a90a9e5 ("block: Add VFIO based NVMe driver")
+Reported-by: Keith Busch <kbusch@kernel.org>
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+Based-on: <20201027135547.374946-1-philmd@redhat.com>
+---
+ block/nvme.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-[...]
+diff --git a/block/nvme.c b/block/nvme.c
+index ff645eefe6a..d9b2245db40 100644
+--- a/block/nvme.c
++++ b/block/nvme.c
+@@ -343,7 +343,7 @@ static inline int nvme_translate_error(const NvmeCqe *c)
+         trace_nvme_error(le32_to_cpu(c->result),
+                          le16_to_cpu(c->sq_head),
+                          le16_to_cpu(c->sq_id),
+-                         le16_to_cpu(c->cid),
++                         c->cid,
+                          le16_to_cpu(status));
+     }
+     switch (status) {
+@@ -400,7 +400,7 @@ static bool nvme_process_completion(NVMeQueuePair *q)
+         if (!q->cq.head) {
+             q->cq_phase = !q->cq_phase;
+         }
+-        cid = le16_to_cpu(c->cid);
++        cid = c->cid;
+         if (cid == 0 || cid > NVME_QUEUE_SIZE) {
+             warn_report("NVMe: Unexpected CID in completion queue: %"PRIu32", "
+                         "queue size: %u", cid, NVME_QUEUE_SIZE);
+@@ -468,7 +468,7 @@ static void nvme_submit_command(NVMeQueuePair *q, NVMeRequest *req,
+     assert(!req->cb);
+     req->cb = cb;
+     req->opaque = opaque;
+-    cmd->cid = cpu_to_le32(req->cid);
++    cmd->cid = req->cid;
+ 
+     trace_nvme_submit_command(q->s, q->index, req->cid);
+     nvme_trace_command(cmd);
+-- 
+2.26.2
 
->> -    stream_start(has_job_id ? job_id : NULL, bs, base_bs, base_name,
->> +    stream_start(has_job_id ? job_id : NULL, bs, base_bs,
->> +                 has_backing_file ? backing_file : NULL,
-> 
-> backing_file should be NULL if has_backing_file is false, so you can use 
-> just backing_file instead of ternary operator.
-> 
-
-Yes, if reliable. I has kept the conformation with the ternary operator 
-at the first parameter above.
-
-Andrey
-
->>                    job_flags, has_speed ? speed : 0, on_error,
->>                    filter_node_name, &local_err);
->>       if (local_err) {
->>
-> 
-> 
 
