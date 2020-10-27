@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24F71C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:38:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D9E05C55179
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:39:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 927C321655
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 487C521655
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 12:39:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZT+Sm0iR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 927C321655
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="b4/SS01M"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 487C521655
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50614 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52660 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXOFU-0002SF-Iu
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:38:48 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:52126)
+	id 1kXOFy-0003HJ-5p
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 08:39:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51794)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPk-0001g5-Pl
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:20 -0400
-Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:34320)
+ id 1kXNPZ-0001LO-AW
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:09 -0400
+Received: from mail-wr1-x42b.google.com ([2a00:1450:4864:20::42b]:38741)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
- id 1kXNPf-0004cw-Ab
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:20 -0400
-Received: by mail-wr1-x42b.google.com with SMTP id i1so1562913wro.1
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:45:14 -0700 (PDT)
+ id 1kXNPQ-0004U4-L0
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 07:45:08 -0400
+Received: by mail-wr1-x42b.google.com with SMTP id n18so1537302wrs.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 04:44:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:subject:date:message-id:in-reply-to:references:mime-version
  :content-transfer-encoding;
- bh=sdjGX6xv31J1AJEP1OECkZCBJRmfrzAZBgvXrQVL0GE=;
- b=ZT+Sm0iRGCfLCoWeo2WYsgZQAzuNS1LuU674qRjrBNFdwVSgD9lPsfhuH8V+eurqcB
- guLL/hgX5MJDo2RiPswkGZOJP0a0UlpW8BjOeV4FXuk3j0VXRbUexSGt8MNHxEdyb3uq
- dsGzHeKqPcbKV9YdmJX2//TAQl3mQMEtLTnD7WxtsqLwS1yp+HpsfWNRGprpDUpgwJy+
- lYa/Cj520CEXtVVzsYdDo2zeGlVfTRSuywjOExFV+N527h208oK2mxAtbDxV1/kg+Ub9
- 59ONS1VkjXTrIxwLocx1TfJuOKJFDGJL8hJvuvcK1EkJHV7+rIssX4M4it3YYDVKi7h5
- B/OQ==
+ bh=O5Fi8dzQWj056a5kaTxdeFGMOF4n1yn3p2p22rp/J9w=;
+ b=b4/SS01MyKcHtGGMLjUbKCCT3U5jZhcV4O572BLC7gE2YP8Nkw7lNOsYNOT10f1hGC
+ 9WIVYsO532W9olGT8gZrWeS03ljXVo6MZJnY91y+UuSnCs4Ls/bOtFILDCAXcl2qIsoC
+ +a1TFMDjJn/f9VwOnhuij4WAAI56Wgx/yO4fhuKTwYmWKoRX8ish16OB0ho15Ik+Gk9C
+ vLs4xbyoGcfkpENrN9R9JdCsV26jBr9QN3Zfu1VRFTzDpHzucsk4MOi5S+JAQDwbm0uz
+ zeurR/xNxuecPu/QZgylIgSEtfMxG3XRGMt9ykuMQrIYclGqk4UFjiwPwoUPhZ2cUhlQ
+ cTOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=sdjGX6xv31J1AJEP1OECkZCBJRmfrzAZBgvXrQVL0GE=;
- b=by+/nrZ61AXd7z6eyrbZdo7AlJS/zHGx+Eyjsdy/1W1OxmrrKY5jAYp2iqSaHtb6BR
- qDogiTNLStDfQqWp784WnUEy5WyBqP2ouLjXzqKhkwLak/uL7Gl8HbVZREp4puasJ2pl
- QtWANj5nYL1pUjA2Aa32PRoIt6THPDwhnIfnSW21pFVhUrX3PimyCJ60SyI9qn2pvXFC
- tXcUlBcfNMAH5UeiN/hveuvJoSsG92eGlnhIkFacyGxqpQmCPBsa3kgj+kDjqMqV1vJg
- r8OmGG+Spvxz03zDJRmF2/iBcLaL6WFlCjBuhs5ogqqkkE0a/7DAziuviLU5s+w1XJNH
- o2Fw==
-X-Gm-Message-State: AOAM5302vdA0ssVbxajziBGiGI7MBD3DWNzr82ZjPnt4PivMlqcyYqxj
- Nf1jErHtDX1aSQUEHzr78zEOJOTLIAe14w==
-X-Google-Smtp-Source: ABdhPJxayeZs0KYCeYba6RD4Ku2EvVTf4E3v1rdTXc66pIdWH5cSqktYI7Q2W2K9nMATm6pWEHcPNA==
-X-Received: by 2002:adf:ce8a:: with SMTP id r10mr2512844wrn.188.1603799113692; 
- Tue, 27 Oct 2020 04:45:13 -0700 (PDT)
+ bh=O5Fi8dzQWj056a5kaTxdeFGMOF4n1yn3p2p22rp/J9w=;
+ b=ItMHtj+twvRIe+HZ7PDZoxn/e9sd3kIACAC6E6J2P1dW1mFzWlmEaFBzyt7iwJlmbH
+ XDXCiBi1bY0zV8F3D2Iuwsp8ZasJD4TlOczEi53S5dBDrHzd1GaWbhC5j87l9aWio9RM
+ WqGn1y71TaljiMhKVIZ7GXrxR3+hDI18rFsCf1e5aJEQD+kyYd12CorIyAGzK7srYjNY
+ jnpAW+uF108RaIegwOOn72hGP4VcBXXGOuLeivI3EGzIoqZ29YeAhZukw0Lw9IN6rYpL
+ 14onAnh5XBlhnb4k7tjkA5iot7NlsLFCA3PHZbTyAVWb+X/hn7JmGq3nhtEjAlivlfBs
+ K35Q==
+X-Gm-Message-State: AOAM533BK/9R0afr8F+TeU2LybqSvFSMMLoSZ4CG1Y7Y/MPKoCDjsZO5
+ +WPZ03XtmlvYDAVfOPnE2858qlv1GwnCsA==
+X-Google-Smtp-Source: ABdhPJwFjkTyPfGalkGyxXDNATe+oA2x7f4HOG4QmaoCACO0VGhUaieswbFu+QyZaRjI6GXQu+C/Og==
+X-Received: by 2002:a5d:4fcc:: with SMTP id h12mr2540815wrw.132.1603799098559; 
+ Tue, 27 Oct 2020 04:44:58 -0700 (PDT)
 Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
- by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.45.12
+ by smtp.gmail.com with ESMTPSA id 32sm1712203wro.31.2020.10.27.04.44.57
  for <qemu-devel@nongnu.org>
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 04:45:12 -0700 (PDT)
+ Tue, 27 Oct 2020 04:44:57 -0700 (PDT)
 From: Peter Maydell <peter.maydell@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PULL 26/48] hw/arm/bcm2836: Introduce the BCM2835 SoC
-Date: Tue, 27 Oct 2020 11:44:16 +0000
-Message-Id: <20201027114438.17662-27-peter.maydell@linaro.org>
+Subject: [PULL 14/48] hw/arm: fix min_cpus for xlnx-versal-virt platform
+Date: Tue, 27 Oct 2020 11:44:04 +0000
+Message-Id: <20201027114438.17662-15-peter.maydell@linaro.org>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201027114438.17662-1-peter.maydell@linaro.org>
 References: <20201027114438.17662-1-peter.maydell@linaro.org>
@@ -105,109 +105,33 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+From: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
 
-Reviewed-by: Luc Michel <luc.michel@greensocs.com>
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Message-id: 20201024170127.3592182-7-f4bug@amsat.org
+This patch sets min_cpus field for xlnx-versal-virt platform,
+because it always creates XLNX_VERSAL_NR_ACPUS cpus even with
+-smp 1 command line option.
+
+Signed-off-by: Pavel Dovgalyuk <pavel.dovgalyuk@ispras.ru>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Reviewed-by: Edgar E. Iglesias <edgar.iglesias@xilinx.com>
+Message-id: 160343854912.8460.17915238517799132371.stgit@pasha-ThinkPad-X280
 Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
 ---
- include/hw/arm/bcm2836.h |  1 +
- hw/arm/bcm2836.c         | 34 ++++++++++++++++++++++++++++++++++
- hw/arm/raspi.c           |  2 ++
- 3 files changed, 37 insertions(+)
+ hw/arm/xlnx-versal-virt.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/hw/arm/bcm2836.h b/include/hw/arm/bcm2836.h
-index 43e9f8cd0ef..6f90cabfa3a 100644
---- a/include/hw/arm/bcm2836.h
-+++ b/include/hw/arm/bcm2836.h
-@@ -26,6 +26,7 @@ OBJECT_DECLARE_TYPE(BCM283XState, BCM283XClass, BCM283X)
-  * them, code using these devices should always handle them via the
-  * BCM283x base class, so they have no BCM2836(obj) etc macros.
-  */
-+#define TYPE_BCM2835 "bcm2835"
- #define TYPE_BCM2836 "bcm2836"
- #define TYPE_BCM2837 "bcm2837"
+diff --git a/hw/arm/xlnx-versal-virt.c b/hw/arm/xlnx-versal-virt.c
+index 03e23201b1a..ee1282241e3 100644
+--- a/hw/arm/xlnx-versal-virt.c
++++ b/hw/arm/xlnx-versal-virt.c
+@@ -561,6 +561,7 @@ static void versal_virt_machine_class_init(ObjectClass *oc, void *data)
  
-diff --git a/hw/arm/bcm2836.c b/hw/arm/bcm2836.c
-index 7d975cf2f53..de7ade2878e 100644
---- a/hw/arm/bcm2836.c
-+++ b/hw/arm/bcm2836.c
-@@ -89,6 +89,25 @@ static bool bcm283x_common_realize(DeviceState *dev, Error **errp)
-     return true;
- }
- 
-+static void bcm2835_realize(DeviceState *dev, Error **errp)
-+{
-+    BCM283XState *s = BCM283X(dev);
-+
-+    if (!bcm283x_common_realize(dev, errp)) {
-+        return;
-+    }
-+
-+    if (!qdev_realize(DEVICE(&s->cpu[0].core), NULL, errp)) {
-+        return;
-+    }
-+
-+    /* Connect irq/fiq outputs from the interrupt controller. */
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 0,
-+            qdev_get_gpio_in(DEVICE(&s->cpu[0].core), ARM_CPU_IRQ));
-+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->peripherals), 1,
-+            qdev_get_gpio_in(DEVICE(&s->cpu[0].core), ARM_CPU_FIQ));
-+}
-+
- static void bcm2836_realize(DeviceState *dev, Error **errp)
- {
-     BCM283XState *s = BCM283X(dev);
-@@ -159,6 +178,17 @@ static void bcm283x_class_init(ObjectClass *oc, void *data)
-     dc->user_creatable = false;
- }
- 
-+static void bcm2835_class_init(ObjectClass *oc, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(oc);
-+    BCM283XClass *bc = BCM283X_CLASS(oc);
-+
-+    bc->cpu_type = ARM_CPU_TYPE_NAME("arm1176");
-+    bc->core_count = 1;
-+    bc->peri_base = 0x20000000;
-+    dc->realize = bcm2835_realize;
-+};
-+
- static void bcm2836_class_init(ObjectClass *oc, void *data)
- {
-     DeviceClass *dc = DEVICE_CLASS(oc);
-@@ -189,6 +219,10 @@ static void bcm2837_class_init(ObjectClass *oc, void *data)
- 
- static const TypeInfo bcm283x_types[] = {
-     {
-+        .name           = TYPE_BCM2835,
-+        .parent         = TYPE_BCM283X,
-+        .class_init     = bcm2835_class_init,
-+    }, {
-         .name           = TYPE_BCM2836,
-         .parent         = TYPE_BCM283X,
-         .class_init     = bcm2836_class_init,
-diff --git a/hw/arm/raspi.c b/hw/arm/raspi.c
-index b5b30f0f38f..30fafa59ecb 100644
---- a/hw/arm/raspi.c
-+++ b/hw/arm/raspi.c
-@@ -70,6 +70,7 @@ FIELD(REV_CODE, MEMORY_SIZE,       20, 3);
- FIELD(REV_CODE, STYLE,             23, 1);
- 
- typedef enum RaspiProcessorId {
-+    PROCESSOR_ID_BCM2835 = 0,
-     PROCESSOR_ID_BCM2836 = 1,
-     PROCESSOR_ID_BCM2837 = 2,
- } RaspiProcessorId;
-@@ -78,6 +79,7 @@ static const struct {
-     const char *type;
-     int cores_count;
- } soc_property[] = {
-+    [PROCESSOR_ID_BCM2835] = {TYPE_BCM2835, 1},
-     [PROCESSOR_ID_BCM2836] = {TYPE_BCM2836, BCM283X_NCPUS},
-     [PROCESSOR_ID_BCM2837] = {TYPE_BCM2837, BCM283X_NCPUS},
- };
+     mc->desc = "Xilinx Versal Virtual development board";
+     mc->init = versal_virt_init;
++    mc->min_cpus = XLNX_VERSAL_NR_ACPUS;
+     mc->max_cpus = XLNX_VERSAL_NR_ACPUS;
+     mc->default_cpus = XLNX_VERSAL_NR_ACPUS;
+     mc->no_cdrom = true;
 -- 
 2.20.1
 
