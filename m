@@ -2,86 +2,70 @@ Return-Path: <SRS0=gwGE=EC=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03DD8C388F9
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F871C55178
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:09:55 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5BE1E206E5
-	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:09:46 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ebpEZtP0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5BE1E206E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 6994C2072E
+	for <qemu-devel@archiver.kernel.org>; Tue, 27 Oct 2020 15:09:54 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 6994C2072E
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56138 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXQbZ-000739-B3
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:09:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48968)
+	id 1kXQbh-0007NN-9v
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 11:09:53 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54902)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXQBx-0008Uu-Hb
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:43:17 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47215)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXQBv-0002ri-RS
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 10:43:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603809795;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=jduw8ZOUndNkfMNXerU9fkPHDFjkVREPAS0BU5dvN6g=;
- b=ebpEZtP0vmD26QkO5U2lnd9IwBRbLL5yVRD2exKbMyONbaXulPp2eaRDsG8BB6w+kXfYF0
- 7+kIPuTta2fB/ovsvKB+gx+vLq6iIJKaIthIWmqhLrUJVu3ikh1kp/ltT1vM4TZX6hL7fs
- ZTMG05l00UnaQzePATZ9GQ0nmkoxlVE=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-83-K8SWLjMcPeOwQgDvPem3nQ-1; Tue, 27 Oct 2020 10:43:11 -0400
-X-MC-Unique: K8SWLjMcPeOwQgDvPem3nQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B00421009E57;
- Tue, 27 Oct 2020 14:43:08 +0000 (UTC)
-Received: from scv.redhat.com (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 38BD060C11;
- Tue, 27 Oct 2020 14:43:04 +0000 (UTC)
-From: John Snow <jsnow@redhat.com>
-To: Peter Maydell <peter.maydell@linaro.org>,
-	qemu-devel@nongnu.org
-Subject: [PULL 3/3] ide: clear SRST after SRST finishes
-Date: Tue, 27 Oct 2020 10:42:55 -0400
-Message-Id: <20201027144255.77478-4-jsnow@redhat.com>
-In-Reply-To: <20201027144255.77478-1-jsnow@redhat.com>
-References: <20201027144255.77478-1-jsnow@redhat.com>
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXe-0001qe-2U
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:42 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:50308
+ helo=mail.default.ilande.uk0.bigv.io)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXa-00062p-P4
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 11:05:40 -0400
+Received: from host86-148-103-79.range86-148.btcentralplus.com
+ ([86.148.103.79] helo=kentang.home)
+ by mail.default.ilande.uk0.bigv.io with esmtpsa
+ (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
+ (envelope-from <mark.cave-ayland@ilande.co.uk>)
+ id 1kXQXd-0001Qg-Mz; Tue, 27 Oct 2020 15:05:46 +0000
+From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+To: qemu-devel@nongnu.org,
+	kraxel@redhat.com,
+	samuel.thibault@ens-lyon.org
+Date: Tue, 27 Oct 2020 15:04:54 +0000
+Message-Id: <20201027150456.24606-7-mark.cave-ayland@ilande.co.uk>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201027150456.24606-1-mark.cave-ayland@ilande.co.uk>
+References: <20201027150456.24606-1-mark.cave-ayland@ilande.co.uk>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="US-ASCII"
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 01:06:06
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+X-SA-Exim-Connect-IP: 86.148.103.79
+X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
+Subject: [PATCH v2 6/8] dev-serial: add always-plugged property to ensure USB
+ device is always attached
+X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
+X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
+Received-SPF: pass client-ip=2001:41c9:1:41f::167;
+ envelope-from=mark.cave-ayland@ilande.co.uk;
+ helo=mail.default.ilande.uk0.bigv.io
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -18
+X-Spam_score: -1.9
+X-Spam_bar: -
+X-Spam_report: (-1.9 / 5.0 requ) BAYES_00=-1.9, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -94,41 +78,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- John Snow <jsnow@redhat.com>, qemu-block@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The SRST protocol states that after diagnostics are complete and the
-status is posted, we should clear the SRST bit if it should so happen to
-be set.
+Some operating systems will generate a new device ID when a USB device is unplugged
+and then replugged into the USB. If this is done whilst switching between multiple
+applications over a virtual serial port, the change of device ID requires going
+back into the OS/application to locate the new device accordingly.
 
-The reset method itself should handle this, but just in case -- make our
-intention explicit here.
+Add a new always-plugged property that if specified will ensure that the device
+always remains attached to the USB regardless of the state of the backend
+chardev.
 
-Signed-off-by: John Snow <jsnow@redhat.com>
-Tested-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-id: 20201020200242.1497705-4-jsnow@redhat.com
-Signed-off-by: John Snow <jsnow@redhat.com>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 ---
- hw/ide/core.c | 2 ++
- 1 file changed, 2 insertions(+)
+ hw/usb/dev-serial.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-diff --git a/hw/ide/core.c b/hw/ide/core.c
-index 98cea7ad4507..e85821637c96 100644
---- a/hw/ide/core.c
-+++ b/hw/ide/core.c
-@@ -2268,6 +2268,8 @@ static void ide_bus_perform_srst(void *opaque)
-         s = &bus->ifs[i];
-         ide_perform_srst(s);
-     }
-+
-+    bus->cmd &= ~IDE_CTRL_RESET;
- }
+diff --git a/hw/usb/dev-serial.c b/hw/usb/dev-serial.c
+index 92c35615eb..b9e308dca1 100644
+--- a/hw/usb/dev-serial.c
++++ b/hw/usb/dev-serial.c
+@@ -97,6 +97,7 @@ struct USBSerialState {
+     uint8_t event_chr;
+     uint8_t error_chr;
+     uint8_t event_trigger;
++    bool always_plugged;
+     QEMUSerialSetParams params;
+     int latency;        /* ms */
+     CharBackend cs;
+@@ -516,12 +517,12 @@ static void usb_serial_event(void *opaque, QEMUChrEvent event)
+         s->event_trigger |= FTDI_BI;
+         break;
+     case CHR_EVENT_OPENED:
+-        if (!s->dev.attached) {
++        if (!s->always_plugged && !s->dev.attached) {
+             usb_device_attach(&s->dev, &error_abort);
+         }
+         break;
+     case CHR_EVENT_CLOSED:
+-        if (s->dev.attached) {
++        if (!s->always_plugged && s->dev.attached) {
+             usb_device_detach(&s->dev);
+         }
+         break;
+@@ -556,7 +557,8 @@ static void usb_serial_realize(USBDevice *dev, Error **errp)
+                              usb_serial_event, NULL, s, NULL, true);
+     usb_serial_handle_reset(dev);
  
- void ide_ctrl_write(void *opaque, uint32_t addr, uint32_t val)
+-    if (qemu_chr_fe_backend_open(&s->cs) && !dev->attached) {
++    if ((s->always_plugged || qemu_chr_fe_backend_open(&s->cs)) &&
++        !dev->attached) {
+         usb_device_attach(dev, &error_abort);
+     }
+     s->intr = usb_ep_get(dev, USB_TOKEN_IN, 1);
+@@ -584,6 +586,7 @@ static const VMStateDescription vmstate_usb_serial = {
+ 
+ static Property serial_properties[] = {
+     DEFINE_PROP_CHR("chardev", USBSerialState, cs),
++    DEFINE_PROP_BOOL("always-plugged", USBSerialState, always_plugged, false),
+     DEFINE_PROP_END_OF_LIST(),
+ };
+ 
 -- 
-2.26.2
+2.20.1
 
 
