@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94F30C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:29:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B915AC388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:31:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id DD0B42242B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:29:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 0F3922242B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:31:30 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Vy9hnefq"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org DD0B42242B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wSsNrr2g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F3922242B
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56624 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:33578 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXc90-0007NR-QG
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:29:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33974)
+	id 1kXcBN-0001J5-1P
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:31:29 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33876)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXc7P-0005zV-8A
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:23 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42561)
+ id 1kXc7E-0005j4-2i
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:12 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:53609)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXc7N-0005qa-0u
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:22 -0400
-Received: by mail-pf1-x442.google.com with SMTP id x13so2106922pfa.9
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:27:20 -0700 (PDT)
+ id 1kXc7B-0005mZ-U8
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:11 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id m17so907381pjz.3
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:27:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=uf4fak4C9UMbnnxKzDyZfkBRd4fVzUYOKLBXjqeKuvM=;
- b=Vy9hnefqcNpIM3/uTlScELP349Wx1HRZEUcAH1aFx8REMZwpSCvR2SeF6+DWbW95As
- vedsrVuhVjjhQhaj+X/L8kS8Un21X3C3WNxyro9aNBzEGNemiFbgiu9uCqqG1bZMZlZm
- ZLjW1HTwzGtwal78E48b6wai9VIqgGwyO92VrhXAofaE7913+80Dc1+KjsZSYG7zXLld
- hJvmKogC5SG5UvEWys0Sjl3yDMwfRx/yLc7G8GfzQZ1JYcy5lc0GEm8Ml6itf8Jk83AN
- wBo4kBKf2fE4Bt9tzdO/gaiWqnD0mbChjh3K3g1PWtZv9neyThXkWUmHejJN/GQh6nxn
- FI3A==
+ bh=pKwAEGss07SFEqvTkuenDxl2hW2mchkMUugv+tWaYr8=;
+ b=wSsNrr2g87F9GYXP1g6yxqUuds8kkQcnpNqwgVZ1mPf5NTiSsorzJMXVjY9RK9Y6TU
+ 16hLID3vglwPXRga50sTPvPeViezo4SKGMndHjmuXrICfjnUtENCpH+BT74QCVPD3krM
+ UvxzNrt91fI7oTUY8fn+rbdBVGO/fMatZad54i/ftbaRuF6zpIPbonNdULz9yynHwTVu
+ yQK4LJXOVdtDkb+NKes1ZRz7J1o+vZjiw+wHalSlLtfLuLd1mUWfxTDvMTq63wClC0jo
+ 2/6HUpwUg/+x7XaoueoQ1YyoZaBC8kco2J7d356jZy3bhp42l0SPWIK8dcfw/3rQ3k1A
+ Zflw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=uf4fak4C9UMbnnxKzDyZfkBRd4fVzUYOKLBXjqeKuvM=;
- b=ZzIg9V8uLp5Sd5vumN4TcBEnKTnr2jm1zNmxs7lCC8mMqlxR0MaC5gq/WFzyoP3x73
- WlLmgQKGLf9I4useaQhYnS7GCQJPTSInsqlhRjX+drZTH7wbAvsXNKjoltqHgsog8a0k
- V8zYcqfFOXD9jMAUgSrTsPhOO4iUuzNUeAa8kdv0zMBwXW42/dhOzCIJNRBm+qyOfS7m
- inDsM+gWPJnAqaak0zx+1oEgKXuj2sB9vXQkA/aPDA1SxiXetlWga1Rl8EUndDqiW5Lz
- m2AFNEJwz1OEJUaljZJoJZjClgM1so5miiPg+37pnVWCbyI+/hYAXV+S/MMmvhMqc3Gk
- VYbg==
-X-Gm-Message-State: AOAM531FNRM+Vgdy1KNvHde1mPE7Y0xkeMjsDdab4mgVr+ov84mkKRA/
- mwU+HHkpZtQ1D0n5ubqcFQrvKjNP0H9NBw==
-X-Google-Smtp-Source: ABdhPJxRoCxan8L8XZ6CGH2CtLZqGl5nx3eIzgaBp0rcbueF9mIegXyCmQBqClHkmqSwxzL6gmiltQ==
-X-Received: by 2002:a62:8cd2:0:b029:163:b01f:405d with SMTP id
- m201-20020a628cd20000b0290163b01f405dmr5232507pfd.48.1603855639124; 
- Tue, 27 Oct 2020 20:27:19 -0700 (PDT)
+ bh=pKwAEGss07SFEqvTkuenDxl2hW2mchkMUugv+tWaYr8=;
+ b=ctWNeNgoVFZitiFjqSGi46S6GvT7fqSAZuhCfGLUUKEkZMQew0BpG5/Xxn6WOqoU6U
+ 4VtJxnPmEjkK4WHboF2/mI/irdhf8IX9cVPWKyz90likqRCZ3tQ1B3nDJvY0hNbKdW1C
+ 3gF9YvxLvXsXCQM8RaV6zM6vtQqBoTMeDYEsidh+qWlBAdG5qSlvaqQHvGhjHz4zvvtU
+ tiNxdkYj1AKco1SBn5E48UuJUaKjyogPEjOl6tHRo9d+tGFkEMUXRQ56fyjLqMcstDEV
+ 2F4Vj/KsVwxFqxM34G139jG1NHajAtBIw+MnXKgwaUAC/n6xe9XoK3WFQsLlCAqFcKeQ
+ o9wg==
+X-Gm-Message-State: AOAM533hdX99yGseaK2rV7jiuVT7iks58s5BlZqA1PaEfLHd6oqeoo7x
+ MRwb2W6QsQudQYeVVWRpcY+P7hi2k2vNOQ==
+X-Google-Smtp-Source: ABdhPJxk+1dZne93FjSdoxRBGDFP+uXQCCPsdSpOWh+nmXXimN8vrD3wk5F5vb1azLLTO9iVwpez6g==
+X-Received: by 2002:a17:90a:ab86:: with SMTP id
+ n6mr4972954pjq.82.1603855627591; 
+ Tue, 27 Oct 2020 20:27:07 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id d26sm3764413pfo.82.2020.10.27.20.27.18
+ by smtp.gmail.com with ESMTPSA id d26sm3764413pfo.82.2020.10.27.20.27.06
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 20:27:18 -0700 (PDT)
+ Tue, 27 Oct 2020 20:27:06 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 08/11] target/arm: Add read/write_neon_element64
-Date: Tue, 27 Oct 2020 20:27:00 -0700
-Message-Id: <20201028032703.201526-9-richard.henderson@linaro.org>
+Subject: [PATCH 01/11] target/arm: Introduce neon_full_reg_offset
+Date: Tue, 27 Oct 2020 20:26:53 -0700
+Message-Id: <20201028032703.201526-2-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201028032703.201526-1-richard.henderson@linaro.org>
 References: <20201028032703.201526-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=richard.henderson@linaro.org; helo=mail-pf1-x442.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,300 +105,176 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Replace all uses of neon_load/store_reg64 within translate-neon.c.inc.
+This function makes it clear that we're talking about the whole
+register, and not the 32-bit piece at index 0.  This fixes a bug
+when running on a big-endian host.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c          | 26 +++++++++
- target/arm/translate-neon.c.inc | 94 ++++++++++++++++-----------------
- 2 files changed, 73 insertions(+), 47 deletions(-)
+ target/arm/translate.c          |  8 ++++++
+ target/arm/translate-neon.c.inc | 44 ++++++++++++++++-----------------
+ target/arm/translate-vfp.c.inc  |  2 +-
+ 3 files changed, 31 insertions(+), 23 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 8491ab705b..4fb0a62200 100644
+index 38371db540..1b61e50f9c 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -1178,6 +1178,19 @@ static void read_neon_element32(TCGv_i32 dest, int reg, int ele, MemOp memop)
-     }
+@@ -1094,6 +1094,14 @@ static inline void gen_hlt(DisasContext *s, int imm)
+     unallocated_encoding(s);
  }
  
-+static void read_neon_element64(TCGv_i64 dest, int reg, int ele, MemOp memop)
++/*
++ * Return the offset of a "full" NEON Dreg.
++ */
++static long neon_full_reg_offset(unsigned reg)
 +{
-+    long off = neon_element_offset(reg, ele, memop);
-+
-+    switch (memop) {
-+    case MO_Q:
-+        tcg_gen_ld_i64(dest, cpu_env, off);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
++    return offsetof(CPUARMState, vfp.zregs[reg >> 1].d[reg & 1]);
 +}
 +
- static void write_neon_element32(TCGv_i32 src, int reg, int ele, MemOp memop)
+ static inline long vfp_reg_offset(bool dp, unsigned reg)
  {
-     long off = neon_element_offset(reg, ele, memop);
-@@ -1197,6 +1210,19 @@ static void write_neon_element32(TCGv_i32 src, int reg, int ele, MemOp memop)
-     }
- }
- 
-+static void write_neon_element64(TCGv_i64 src, int reg, int ele, MemOp memop)
-+{
-+    long off = neon_element_offset(reg, ele, memop);
-+
-+    switch (memop) {
-+    case MO_64:
-+        tcg_gen_st_i64(src, cpu_env, off);
-+        break;
-+    default:
-+        g_assert_not_reached();
-+    }
-+}
-+
- static TCGv_ptr vfp_reg_ptr(bool dp, int reg)
- {
-     TCGv_ptr ret = tcg_temp_new_ptr();
+     if (dp) {
 diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
-index 3f8a0bb88b..7a0269970c 100644
+index 4d1a292981..e259e24c05 100644
 --- a/target/arm/translate-neon.c.inc
 +++ b/target/arm/translate-neon.c.inc
-@@ -1265,9 +1265,9 @@ static bool do_2shift_env_64(DisasContext *s, arg_2reg_shift *a,
-     for (pass = 0; pass < a->q + 1; pass++) {
-         TCGv_i64 tmp = tcg_temp_new_i64();
- 
--        neon_load_reg64(tmp, a->vm + pass);
-+        read_neon_element64(tmp, a->vm, pass, MO_64);
-         fn(tmp, cpu_env, tmp, constimm);
--        neon_store_reg64(tmp, a->vd + pass);
-+        write_neon_element64(tmp, a->vd, pass, MO_64);
-         tcg_temp_free_i64(tmp);
+@@ -76,7 +76,7 @@ neon_element_offset(int reg, int element, MemOp size)
+         ofs ^= 8 - element_size;
      }
-     tcg_temp_free_i64(constimm);
-@@ -1375,8 +1375,8 @@ static bool do_2shift_narrow_64(DisasContext *s, arg_2reg_shift *a,
-     rd = tcg_temp_new_i32();
+ #endif
+-    return neon_reg_offset(reg, 0) + ofs;
++    return neon_full_reg_offset(reg) + ofs;
+ }
  
-     /* Load both inputs first to avoid potential overwrite if rm == rd */
--    neon_load_reg64(rm1, a->vm);
--    neon_load_reg64(rm2, a->vm + 1);
-+    read_neon_element64(rm1, a->vm, 0, MO_64);
-+    read_neon_element64(rm2, a->vm, 1, MO_64);
+ static void neon_load_element(TCGv_i32 var, int reg, int ele, MemOp mop)
+@@ -585,12 +585,12 @@ static bool trans_VLD_all_lanes(DisasContext *s, arg_VLD_all_lanes *a)
+              * We cannot write 16 bytes at once because the
+              * destination is unaligned.
+              */
+-            tcg_gen_gvec_dup_i32(size, neon_reg_offset(vd, 0),
++            tcg_gen_gvec_dup_i32(size, neon_full_reg_offset(vd),
+                                  8, 8, tmp);
+-            tcg_gen_gvec_mov(0, neon_reg_offset(vd + 1, 0),
+-                             neon_reg_offset(vd, 0), 8, 8);
++            tcg_gen_gvec_mov(0, neon_full_reg_offset(vd + 1),
++                             neon_full_reg_offset(vd), 8, 8);
+         } else {
+-            tcg_gen_gvec_dup_i32(size, neon_reg_offset(vd, 0),
++            tcg_gen_gvec_dup_i32(size, neon_full_reg_offset(vd),
+                                  vec_size, vec_size, tmp);
+         }
+         tcg_gen_addi_i32(addr, addr, 1 << size);
+@@ -691,9 +691,9 @@ static bool trans_VLDST_single(DisasContext *s, arg_VLDST_single *a)
+ static bool do_3same(DisasContext *s, arg_3same *a, GVecGen3Fn fn)
+ {
+     int vec_size = a->q ? 16 : 8;
+-    int rd_ofs = neon_reg_offset(a->vd, 0);
+-    int rn_ofs = neon_reg_offset(a->vn, 0);
+-    int rm_ofs = neon_reg_offset(a->vm, 0);
++    int rd_ofs = neon_full_reg_offset(a->vd);
++    int rn_ofs = neon_full_reg_offset(a->vn);
++    int rm_ofs = neon_full_reg_offset(a->vm);
  
-     shiftfn(rm1, rm1, constimm);
-     narrowfn(rd, cpu_env, rm1);
-@@ -1579,7 +1579,7 @@ static bool do_vshll_2sh(DisasContext *s, arg_2reg_shift *a,
-         tcg_gen_shli_i64(tmp, tmp, a->shift);
-         tcg_gen_andi_i64(tmp, tmp, ~widen_mask);
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+         return false;
+@@ -1177,8 +1177,8 @@ static bool do_vector_2sh(DisasContext *s, arg_2reg_shift *a, GVecGen2iFn *fn)
+ {
+     /* Handle a 2-reg-shift insn which can be vectorized. */
+     int vec_size = a->q ? 16 : 8;
+-    int rd_ofs = neon_reg_offset(a->vd, 0);
+-    int rm_ofs = neon_reg_offset(a->vm, 0);
++    int rd_ofs = neon_full_reg_offset(a->vd);
++    int rm_ofs = neon_full_reg_offset(a->vm);
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+         return false;
+@@ -1620,8 +1620,8 @@ static bool do_fp_2sh(DisasContext *s, arg_2reg_shift *a,
+ {
+     /* FP operations in 2-reg-and-shift group */
+     int vec_size = a->q ? 16 : 8;
+-    int rd_ofs = neon_reg_offset(a->vd, 0);
+-    int rm_ofs = neon_reg_offset(a->vm, 0);
++    int rd_ofs = neon_full_reg_offset(a->vd);
++    int rm_ofs = neon_full_reg_offset(a->vm);
+     TCGv_ptr fpst;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+@@ -1756,7 +1756,7 @@ static bool do_1reg_imm(DisasContext *s, arg_1reg_imm *a,
+         return true;
      }
--    neon_store_reg64(tmp, a->vd);
-+    write_neon_element64(tmp, a->vd, 0, MO_64);
  
-     widenfn(tmp, rm1);
-     tcg_temp_free_i32(rm1);
-@@ -1587,7 +1587,7 @@ static bool do_vshll_2sh(DisasContext *s, arg_2reg_shift *a,
-         tcg_gen_shli_i64(tmp, tmp, a->shift);
-         tcg_gen_andi_i64(tmp, tmp, ~widen_mask);
+-    reg_ofs = neon_reg_offset(a->vd, 0);
++    reg_ofs = neon_full_reg_offset(a->vd);
+     vec_size = a->q ? 16 : 8;
+     imm = asimd_imm_const(a->imm, a->cmode, a->op);
+ 
+@@ -2300,9 +2300,9 @@ static bool trans_VMULL_P_3d(DisasContext *s, arg_3diff *a)
+         return true;
      }
--    neon_store_reg64(tmp, a->vd + 1);
-+    write_neon_element64(tmp, a->vd, 1, MO_64);
-     tcg_temp_free_i64(tmp);
+ 
+-    tcg_gen_gvec_3_ool(neon_reg_offset(a->vd, 0),
+-                       neon_reg_offset(a->vn, 0),
+-                       neon_reg_offset(a->vm, 0),
++    tcg_gen_gvec_3_ool(neon_full_reg_offset(a->vd),
++                       neon_full_reg_offset(a->vn),
++                       neon_full_reg_offset(a->vm),
+                        16, 16, 0, fn_gvec);
      return true;
  }
-@@ -1822,7 +1822,7 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-     rm_64 = tcg_temp_new_i64();
+@@ -2445,8 +2445,8 @@ static bool do_2scalar_fp_vec(DisasContext *s, arg_2scalar *a,
+ {
+     /* Two registers and a scalar, using gvec */
+     int vec_size = a->q ? 16 : 8;
+-    int rd_ofs = neon_reg_offset(a->vd, 0);
+-    int rn_ofs = neon_reg_offset(a->vn, 0);
++    int rd_ofs = neon_full_reg_offset(a->vd);
++    int rn_ofs = neon_full_reg_offset(a->vn);
+     int rm_ofs;
+     int idx;
+     TCGv_ptr fpstatus;
+@@ -2477,7 +2477,7 @@ static bool do_2scalar_fp_vec(DisasContext *s, arg_2scalar *a,
+     /* a->vm is M:Vm, which encodes both register and index */
+     idx = extract32(a->vm, a->size + 2, 2);
+     a->vm = extract32(a->vm, 0, a->size + 2);
+-    rm_ofs = neon_reg_offset(a->vm, 0);
++    rm_ofs = neon_full_reg_offset(a->vm);
  
-     if (src1_wide) {
--        neon_load_reg64(rn0_64, a->vn);
-+        read_neon_element64(rn0_64, a->vn, 0, MO_64);
-     } else {
-         TCGv_i32 tmp = tcg_temp_new_i32();
-         read_neon_element32(tmp, a->vn, 0, MO_32);
-@@ -1841,7 +1841,7 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-      * avoid incorrect results if a narrow input overlaps with the result.
-      */
-     if (src1_wide) {
--        neon_load_reg64(rn1_64, a->vn + 1);
-+        read_neon_element64(rn1_64, a->vn, 1, MO_64);
-     } else {
-         TCGv_i32 tmp = tcg_temp_new_i32();
-         read_neon_element32(tmp, a->vn, 1, MO_32);
-@@ -1851,12 +1851,12 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
-     rm = tcg_temp_new_i32();
-     read_neon_element32(rm, a->vm, 1, MO_32);
- 
--    neon_store_reg64(rn0_64, a->vd);
-+    write_neon_element64(rn0_64, a->vd, 0, MO_64);
- 
-     widenfn(rm_64, rm);
-     tcg_temp_free_i32(rm);
-     opfn(rn1_64, rn1_64, rm_64);
--    neon_store_reg64(rn1_64, a->vd + 1);
-+    write_neon_element64(rn1_64, a->vd, 1, MO_64);
- 
-     tcg_temp_free_i64(rn0_64);
-     tcg_temp_free_i64(rn1_64);
-@@ -1928,15 +1928,15 @@ static bool do_narrow_3d(DisasContext *s, arg_3diff *a,
-     rd0 = tcg_temp_new_i32();
-     rd1 = tcg_temp_new_i32();
- 
--    neon_load_reg64(rn_64, a->vn);
--    neon_load_reg64(rm_64, a->vm);
-+    read_neon_element64(rn_64, a->vn, 0, MO_64);
-+    read_neon_element64(rm_64, a->vm, 0, MO_64);
- 
-     opfn(rn_64, rn_64, rm_64);
- 
-     narrowfn(rd0, rn_64);
- 
--    neon_load_reg64(rn_64, a->vn + 1);
--    neon_load_reg64(rm_64, a->vm + 1);
-+    read_neon_element64(rn_64, a->vn, 1, MO_64);
-+    read_neon_element64(rm_64, a->vm, 1, MO_64);
- 
-     opfn(rn_64, rn_64, rm_64);
- 
-@@ -2036,16 +2036,16 @@ static bool do_long_3d(DisasContext *s, arg_3diff *a,
-     /* Don't store results until after all loads: they might overlap */
-     if (accfn) {
-         tmp = tcg_temp_new_i64();
--        neon_load_reg64(tmp, a->vd);
-+        read_neon_element64(tmp, a->vd, 0, MO_64);
-         accfn(tmp, tmp, rd0);
--        neon_store_reg64(tmp, a->vd);
--        neon_load_reg64(tmp, a->vd + 1);
-+        write_neon_element64(tmp, a->vd, 0, MO_64);
-+        read_neon_element64(tmp, a->vd, 1, MO_64);
-         accfn(tmp, tmp, rd1);
--        neon_store_reg64(tmp, a->vd + 1);
-+        write_neon_element64(tmp, a->vd, 1, MO_64);
-         tcg_temp_free_i64(tmp);
-     } else {
--        neon_store_reg64(rd0, a->vd);
--        neon_store_reg64(rd1, a->vd + 1);
-+        write_neon_element64(rd0, a->vd, 0, MO_64);
-+        write_neon_element64(rd1, a->vd, 1, MO_64);
+     fpstatus = fpstatus_ptr(a->size == 1 ? FPST_STD_F16 : FPST_STD);
+     tcg_gen_gvec_3_ptr(rd_ofs, rn_ofs, rm_ofs, fpstatus,
+@@ -2923,7 +2923,7 @@ static bool trans_VDUP_scalar(DisasContext *s, arg_VDUP_scalar *a)
+         return true;
      }
  
-     tcg_temp_free_i64(rd0);
-@@ -2669,16 +2669,16 @@ static bool do_2scalar_long(DisasContext *s, arg_2scalar *a,
- 
-     if (accfn) {
-         TCGv_i64 t64 = tcg_temp_new_i64();
--        neon_load_reg64(t64, a->vd);
-+        read_neon_element64(t64, a->vd, 0, MO_64);
-         accfn(t64, t64, rn0_64);
--        neon_store_reg64(t64, a->vd);
--        neon_load_reg64(t64, a->vd + 1);
-+        write_neon_element64(t64, a->vd, 0, MO_64);
-+        read_neon_element64(t64, a->vd, 1, MO_64);
-         accfn(t64, t64, rn1_64);
--        neon_store_reg64(t64, a->vd + 1);
-+        write_neon_element64(t64, a->vd, 1, MO_64);
-         tcg_temp_free_i64(t64);
-     } else {
--        neon_store_reg64(rn0_64, a->vd);
--        neon_store_reg64(rn1_64, a->vd + 1);
-+        write_neon_element64(rn0_64, a->vd, 0, MO_64);
-+        write_neon_element64(rn1_64, a->vd, 1, MO_64);
-     }
-     tcg_temp_free_i64(rn0_64);
-     tcg_temp_free_i64(rn1_64);
-@@ -2812,10 +2812,10 @@ static bool trans_VEXT(DisasContext *s, arg_VEXT *a)
-         right = tcg_temp_new_i64();
-         dest = tcg_temp_new_i64();
- 
--        neon_load_reg64(right, a->vn);
--        neon_load_reg64(left, a->vm);
-+        read_neon_element64(right, a->vn, 0, MO_64);
-+        read_neon_element64(left, a->vm, 0, MO_64);
-         tcg_gen_extract2_i64(dest, right, left, a->imm * 8);
--        neon_store_reg64(dest, a->vd);
-+        write_neon_element64(dest, a->vd, 0, MO_64);
- 
-         tcg_temp_free_i64(left);
-         tcg_temp_free_i64(right);
-@@ -2831,21 +2831,21 @@ static bool trans_VEXT(DisasContext *s, arg_VEXT *a)
-         destright = tcg_temp_new_i64();
- 
-         if (a->imm < 8) {
--            neon_load_reg64(right, a->vn);
--            neon_load_reg64(middle, a->vn + 1);
-+            read_neon_element64(right, a->vn, 0, MO_64);
-+            read_neon_element64(middle, a->vn, 1, MO_64);
-             tcg_gen_extract2_i64(destright, right, middle, a->imm * 8);
--            neon_load_reg64(left, a->vm);
-+            read_neon_element64(left, a->vm, 0, MO_64);
-             tcg_gen_extract2_i64(destleft, middle, left, a->imm * 8);
-         } else {
--            neon_load_reg64(right, a->vn + 1);
--            neon_load_reg64(middle, a->vm);
-+            read_neon_element64(right, a->vn, 1, MO_64);
-+            read_neon_element64(middle, a->vm, 0, MO_64);
-             tcg_gen_extract2_i64(destright, right, middle, (a->imm - 8) * 8);
--            neon_load_reg64(left, a->vm + 1);
-+            read_neon_element64(left, a->vm, 1, MO_64);
-             tcg_gen_extract2_i64(destleft, middle, left, (a->imm - 8) * 8);
-         }
- 
--        neon_store_reg64(destright, a->vd);
--        neon_store_reg64(destleft, a->vd + 1);
-+        write_neon_element64(destright, a->vd, 0, MO_64);
-+        write_neon_element64(destleft, a->vd, 1, MO_64);
- 
-         tcg_temp_free_i64(destright);
-         tcg_temp_free_i64(destleft);
-@@ -3050,11 +3050,11 @@ static bool do_2misc_pairwise(DisasContext *s, arg_2misc *a,
- 
-         if (accfn) {
-             TCGv_i64 tmp64 = tcg_temp_new_i64();
--            neon_load_reg64(tmp64, a->vd + pass);
-+            read_neon_element64(tmp64, a->vd, pass, MO_64);
-             accfn(rd_64, tmp64, rd_64);
-             tcg_temp_free_i64(tmp64);
-         }
--        neon_store_reg64(rd_64, a->vd + pass);
-+        write_neon_element64(rd_64, a->vd, pass, MO_64);
-         tcg_temp_free_i64(rd_64);
-     }
+-    tcg_gen_gvec_dup_mem(a->size, neon_reg_offset(a->vd, 0),
++    tcg_gen_gvec_dup_mem(a->size, neon_full_reg_offset(a->vd),
+                          neon_element_offset(a->vm, a->index, a->size),
+                          a->q ? 16 : 8, a->q ? 16 : 8);
      return true;
-@@ -3252,9 +3252,9 @@ static bool do_vmovn(DisasContext *s, arg_2misc *a,
-     rd0 = tcg_temp_new_i32();
-     rd1 = tcg_temp_new_i32();
+@@ -3412,8 +3412,8 @@ static bool trans_VCVT_F32_F16(DisasContext *s, arg_2misc *a)
+ static bool do_2misc_vec(DisasContext *s, arg_2misc *a, GVecGen2Fn *fn)
+ {
+     int vec_size = a->q ? 16 : 8;
+-    int rd_ofs = neon_reg_offset(a->vd, 0);
+-    int rm_ofs = neon_reg_offset(a->vm, 0);
++    int rd_ofs = neon_full_reg_offset(a->vd);
++    int rm_ofs = neon_full_reg_offset(a->vm);
  
--    neon_load_reg64(rm, a->vm);
-+    read_neon_element64(rm, a->vm, 0, MO_64);
-     narrowfn(rd0, cpu_env, rm);
--    neon_load_reg64(rm, a->vm + 1);
-+    read_neon_element64(rm, a->vm, 1, MO_64);
-     narrowfn(rd1, cpu_env, rm);
-     write_neon_element32(rd0, a->vd, 0, MO_32);
-     write_neon_element32(rd1, a->vd, 1, MO_32);
-@@ -3324,10 +3324,10 @@ static bool trans_VSHLL(DisasContext *s, arg_2misc *a)
- 
-     widenfn(rd, rm0);
-     tcg_gen_shli_i64(rd, rd, 8 << a->size);
--    neon_store_reg64(rd, a->vd);
-+    write_neon_element64(rd, a->vd, 0, MO_64);
-     widenfn(rd, rm1);
-     tcg_gen_shli_i64(rd, rd, 8 << a->size);
--    neon_store_reg64(rd, a->vd + 1);
-+    write_neon_element64(rd, a->vd, 1, MO_64);
- 
-     tcg_temp_free_i64(rd);
-     tcg_temp_free_i32(rm0);
-@@ -3845,10 +3845,10 @@ static bool trans_VSWP(DisasContext *s, arg_2misc *a)
-     rm = tcg_temp_new_i64();
-     rd = tcg_temp_new_i64();
-     for (pass = 0; pass < (a->q ? 2 : 1); pass++) {
--        neon_load_reg64(rm, a->vm + pass);
--        neon_load_reg64(rd, a->vd + pass);
--        neon_store_reg64(rm, a->vd + pass);
--        neon_store_reg64(rd, a->vm + pass);
-+        read_neon_element64(rm, a->vm, pass, MO_64);
-+        read_neon_element64(rd, a->vd, pass, MO_64);
-+        write_neon_element64(rm, a->vd, pass, MO_64);
-+        write_neon_element64(rd, a->vm, pass, MO_64);
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+         return false;
+diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
+index a7ed9bc81b..368bae0a73 100644
+--- a/target/arm/translate-vfp.c.inc
++++ b/target/arm/translate-vfp.c.inc
+@@ -653,7 +653,7 @@ static bool trans_VDUP(DisasContext *s, arg_VDUP *a)
      }
-     tcg_temp_free_i64(rm);
-     tcg_temp_free_i64(rd);
+ 
+     tmp = load_reg(s, a->rt);
+-    tcg_gen_gvec_dup_i32(size, neon_reg_offset(a->vn, 0),
++    tcg_gen_gvec_dup_i32(size, neon_full_reg_offset(a->vn),
+                          vec_size, vec_size, tmp);
+     tcg_temp_free_i32(tmp);
+ 
 -- 
 2.25.1
 
