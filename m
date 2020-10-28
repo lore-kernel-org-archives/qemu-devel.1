@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D700BC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:27:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73B21C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:28:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 46CF924196
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:27:09 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46CF924196
+	by mail.kernel.org (Postfix) with ESMTPS id BFC73241A5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:28:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BFC73241A5
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=ilande.co.uk
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46868 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50850 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXgnU-0005uc-3h
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 04:27:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37572)
+	id 1kXgom-0007XX-PO
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 04:28:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37488)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXglc-00047M-4v
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:25:12 -0400
-Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:51726
+ id 1kXglI-0003QY-PH
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:24:52 -0400
+Received: from mail.ilande.co.uk ([2001:41c9:1:41f::167]:51686
  helo=mail.default.ilande.uk0.bigv.io)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXgla-0004JI-H7
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:25:11 -0400
+ id 1kXglH-0004D9-4v
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:24:52 -0400
 Received: from host81-158-111-11.range81-158.btcentralplus.com
  ([81.158.111.11] helo=kentang.home)
  by mail.default.ilande.uk0.bigv.io with esmtpsa
  (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256) (Exim 4.92)
  (envelope-from <mark.cave-ayland@ilande.co.uk>)
- id 1kXgle-0006Q8-BZ; Wed, 28 Oct 2020 08:25:19 +0000
+ id 1kXglJ-0006Q8-Ud; Wed, 28 Oct 2020 08:24:59 +0000
 From: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 To: peter.maydell@linaro.org,
 	qemu-devel@nongnu.org
-Date: Wed, 28 Oct 2020 08:23:57 +0000
-Message-Id: <20201028082358.23761-10-mark.cave-ayland@ilande.co.uk>
+Date: Wed, 28 Oct 2020 08:23:53 +0000
+Message-Id: <20201028082358.23761-6-mark.cave-ayland@ilande.co.uk>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20201028082358.23761-1-mark.cave-ayland@ilande.co.uk>
 References: <20201028082358.23761-1-mark.cave-ayland@ilande.co.uk>
@@ -52,7 +52,7 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 81.158.111.11
 X-SA-Exim-Mail-From: mark.cave-ayland@ilande.co.uk
-Subject: [PULL 09/10] hw/pci-host/sabre: Remove superfluous address range check
+Subject: [PULL 05/10] sabre: don't call sysbus_mmio_map() in sabre_realize()
 X-SA-Exim-Version: 4.2.1 (built Wed, 08 May 2019 21:11:16 +0000)
 X-SA-Exim-Scanned: Yes (on mail.default.ilande.uk0.bigv.io)
 Received-SPF: pass client-ip=2001:41c9:1:41f::167;
@@ -83,45 +83,57 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Philippe Mathieu-Daudé <f4bug@amsat.org>
+The device should not map itself but instead should be mapped to sysbus by the
+sun4u machine.
 
-The region is registered as 64KiB in sabre_init():
-
-    memory_region_init_io(&s->sabre_config, OBJECT(s), &sabre_config_ops, s,
-                          "sabre-config", 0x10000);
-
-Remove the superfluous check.
-
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
-Reviewed-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-Message-Id: <20201012170950.3491912-3-f4bug@amsat.org>
+Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
+Message-Id: <20200926140216.7368-7-mark.cave-ayland@ilande.co.uk>
 Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
 ---
- hw/pci-host/sabre.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ hw/pci-host/sabre.c | 8 --------
+ hw/sparc64/sun4u.c  | 7 +++++++
+ 2 files changed, 7 insertions(+), 8 deletions(-)
 
 diff --git a/hw/pci-host/sabre.c b/hw/pci-host/sabre.c
-index 0ee247e28f..f678a3eefc 100644
+index 5ac6283623..5394ad5cd0 100644
 --- a/hw/pci-host/sabre.c
 +++ b/hw/pci-host/sabre.c
-@@ -120,7 +120,7 @@ static void sabre_config_write(void *opaque, hwaddr addr,
+@@ -378,16 +378,8 @@ static void sabre_realize(DeviceState *dev, Error **errp)
+ {
+     SabreState *s = SABRE(dev);
+     PCIHostState *phb = PCI_HOST_BRIDGE(dev);
+-    SysBusDevice *sbd = SYS_BUS_DEVICE(s);
+     PCIDevice *pci_dev;
  
-     trace_sabre_config_write(addr, val);
+-    /* sabre_config */
+-    sysbus_mmio_map(sbd, 0, s->special_base);
+-    /* PCI configuration space */
+-    sysbus_mmio_map(sbd, 1, s->special_base + 0x1000000ULL);
+-    /* pci_ioport */
+-    sysbus_mmio_map(sbd, 2, s->special_base + 0x2000000ULL);
+-
+     memory_region_init(&s->pci_mmio, OBJECT(s), "pci-mmio", 0x100000000ULL);
+     memory_region_add_subregion(get_system_memory(), s->mem_base,
+                                 &s->pci_mmio);
+diff --git a/hw/sparc64/sun4u.c b/hw/sparc64/sun4u.c
+index 05e659c8a4..2f8fc670cf 100644
+--- a/hw/sparc64/sun4u.c
++++ b/hw/sparc64/sun4u.c
+@@ -588,6 +588,13 @@ static void sun4uv_init(MemoryRegion *address_space_mem,
+                              &error_abort);
+     sysbus_realize_and_unref(SYS_BUS_DEVICE(sabre), &error_fatal);
  
--    switch (addr & 0xffff) {
-+    switch (addr) {
-     case 0x30 ... 0x4f: /* DMA error registers */
-         /* XXX: not implemented yet */
-         break;
-@@ -197,7 +197,7 @@ static uint64_t sabre_config_read(void *opaque,
-     SabreState *s = opaque;
-     uint32_t val;
- 
--    switch (addr & 0xffff) {
-+    switch (addr) {
-     case 0x30 ... 0x4f: /* DMA error registers */
-         val = 0;
-         /* XXX: not implemented yet */
++    /* sabre_config */
++    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 0, PBM_SPECIAL_BASE);
++    /* PCI configuration space */
++    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 1, PBM_SPECIAL_BASE + 0x1000000ULL);
++    /* pci_ioport */
++    sysbus_mmio_map(SYS_BUS_DEVICE(sabre), 2, PBM_SPECIAL_BASE + 0x2000000ULL);
++
+     /* Wire up PCI interrupts to CPU */
+     for (i = 0; i < IVEC_MAX; i++) {
+         qdev_connect_gpio_out_named(DEVICE(sabre), "ivec-irq", i,
 -- 
 2.20.1
 
