@@ -2,91 +2,87 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8271DC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:04:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D24C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:04:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CD582247B1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:04:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B87B3247B1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:04:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="StHkXomd"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CD582247B1
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GoqbDGYB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B87B3247B1
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:54044 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56076 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXmzg-0002yq-De
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:04:08 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:40646)
+	id 1kXn0A-0003pU-J2
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:04:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:40874)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXmyT-0002AP-5c
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:02:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42792)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXmyR-0004Fv-1H
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:02:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603897370;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=HsHoFwCYMhqfouYd4VKOLPz33HrcuF0yHYd+KDlL1Ag=;
- b=StHkXomdvKKAP7DIgkOVWzTYjKtoEtBZPoPDL0KXiQOye6X0DnK3uVci14usQYBcpu+/Al
- KeWy7fKaqikLfQe11j0DHZ+E355XTu+WSqa+2Tkqtt5Z47i4mMxuW8W8nl9o4yudbn6KyW
- gg/8pMehc/IXMCTON7y7Zw1crcnfhdM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-337-ncZ-9MAoOOCVNFOluJTtaA-1; Wed, 28 Oct 2020 11:02:45 -0400
-X-MC-Unique: ncZ-9MAoOOCVNFOluJTtaA-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6A15E18B9F2C;
- Wed, 28 Oct 2020 15:02:11 +0000 (UTC)
-Received: from localhost (ovpn-114-6.ams2.redhat.com [10.36.114.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id DD6BA610F3;
- Wed, 28 Oct 2020 15:02:10 +0000 (UTC)
-Date: Wed, 28 Oct 2020 15:02:09 +0000
-From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH 08/25] block/nvme: Simplify device reset
-Message-ID: <20201028150209.GD231368@stefanha-x1.localdomain>
-References: <20201027135547.374946-1-philmd@redhat.com>
- <20201027135547.374946-9-philmd@redhat.com>
- <20201027145831.GC1942271@dhcp-10-100-145-180.wdc.com>
- <1bb84312-1c78-7e1a-058b-4ff6330076b1@redhat.com>
- <20201027165534.GA1942297@dhcp-10-100-145-180.wdc.com>
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kXmzG-0002jj-Uz; Wed, 28 Oct 2020 11:03:42 -0400
+Received: from mail-io1-xd44.google.com ([2607:f8b0:4864:20::d44]:43215)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kXmzF-0004LQ-6d; Wed, 28 Oct 2020 11:03:42 -0400
+Received: by mail-io1-xd44.google.com with SMTP id h21so5646937iob.10;
+ Wed, 28 Oct 2020 08:03:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=/2iRcRlGqky2TLFd0C5KAzKIRtplTwX92ZY/erxF9RI=;
+ b=GoqbDGYBaBiBKYYe6GXyJbzwE3XnLeogvKkHP+oJEUU0HcwUHbUBYwkaX/22J9rIdl
+ o1BVBCuKPkmxeS/uSUidcdb0CS2Xmc5L8cm4FFrSn24oPD//erZDw5op31GkrhYM/35N
+ pSP8qflSn6Sw9eq5ILQ76WBIVm+f3d3xC0q2juZz1LRxKqpP434uHufxdXMMuyQHZCwc
+ CRj2PsiNG+MSsKeZigdAJF0ix6MTK/H2qn6qnBMc0IUpYp39MJJ/Y0lSX94MOgX/Gjed
+ 9ESZJI+XG8x445G4XPPOWZ9qDv0w+9UuWj57kuRRKzKCjquFw/bHLT0jptIi+ihM2ap5
+ LW4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=/2iRcRlGqky2TLFd0C5KAzKIRtplTwX92ZY/erxF9RI=;
+ b=nxlQkcDjSoyQEmTn/CcppblCP/RzkU4Ifvd5btwHcJ8/NlJxjX0TvQGyvuafWtyIIl
+ VqoPEbJZsnRzuUXyO0BbOTyIGR8Wgcqazpcnx4M/Fb51LYLQWtgLC51J3/NZAMe/V4MI
+ W3l3YWxLu0ZFio4yopQjOI8iVgEur1uB2GZTb+6v1NGo0rq3Z0j6is/OOwmZCZj/e9XR
+ ygG+EdKdKKEKTdPxnJeo+Of/pXU4puG+EEhxkIZZuKy1q+Oz2jo+FdKHnEJBu5aO4EBs
+ o6ETGNgGRo/QlSzAsMiw6/Mq1FRReBsaQDaw+lKQQHfUBc/ePIDZ8SIfiatpB9jiYYzI
+ 2qCA==
+X-Gm-Message-State: AOAM530W5EvXUxjXhpiUR3urAE5Fxwse8C/1opUU5vNFYQO7u4VSQ90H
+ mvPs3Kr5smjvQ7ZllxHRTrFixQHvWK3qySbhbZM=
+X-Google-Smtp-Source: ABdhPJz42qV2JxKhO1Zhy7CanV3pS6cFURslhmGLwjzVJp29+ol1YjgcKigVjF38iiK7wWIwH3BftLGqv27Kswybrxk=
+X-Received: by 2002:a02:84c3:: with SMTP id f61mr7334749jai.8.1603897419776;
+ Wed, 28 Oct 2020 08:03:39 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201027165534.GA1942297@dhcp-10-100-145-180.wdc.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="u65IjBhB3TIa72Vp"
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+References: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
+ <1603863010-15807-9-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1603863010-15807-9-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 28 Oct 2020 07:51:48 -0700
+Message-ID: <CAKmqyKOcKsvbKcniZipe8qq4E=HAc3UAFYxkQRwdcfJyT-h2hg@mail.gmail.com>
+Subject: Re: [PATCH v2 08/10] hw/riscv: microchip_pfsoc: Map the reserved
+ memory at address 0
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d44;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd44.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,98 +95,91 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, qemu-devel@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Eric Auger <eric.auger@redhat.com>, Klaus Jensen <its@irrelevant.dk>,
- Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <anup.patel@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Ivan Griffin <ivan.griffin@emdalo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---u65IjBhB3TIa72Vp
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Tue, Oct 27, 2020 at 10:36 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> Somehow HSS needs to access address 0 [1] for the DDR calibration data
+> which is in the chipset's reserved memory. Let's map it.
+>
+> [1] See the config_copy() calls in various places in ddr_setup() in
+>     the HSS source codes.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-On Tue, Oct 27, 2020 at 09:55:34AM -0700, Keith Busch wrote:
-> On Tue, Oct 27, 2020 at 04:53:31PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> > On 10/27/20 3:58 PM, Keith Busch wrote:
-> > > On Tue, Oct 27, 2020 at 02:55:30PM +0100, Philippe Mathieu-Daud=E9 wr=
-ote:
-> > >> Avoid multiple endianess conversion by using device endianess.
-> > >>
-> > >> Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
-> > >> ---
-> > >>  block/nvme.c | 2 +-
-> > >>  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >>
-> > >> diff --git a/block/nvme.c b/block/nvme.c
-> > >> index e95d59d3126..be14350f959 100644
-> > >> --- a/block/nvme.c
-> > >> +++ b/block/nvme.c
-> > >> @@ -755,7 +755,7 @@ static int nvme_init(BlockDriverState *bs, const=
- char *device, int namespace,
-> > >>      timeout_ms =3D MIN(500 * NVME_CAP_TO(cap), 30000);
-> > >> =20
-> > >>      /* Reset device to get a clean state. */
-> > >> -    regs->cc =3D cpu_to_le32(le32_to_cpu(regs->cc) & 0xFE);
-> > >> +    regs->cc &=3D const_le32(0xFE);
-> > >=20
-> > > This doesn't look right. The 'regs' is an MMIO address, correct? Memo=
-ry
-> > > mappings use the CPU native access.
-> >=20
-> > cc is little-endian uint32_t.
->=20
-> Well, yes and no. PCI is defined as a little endian transport, so all
-> CPUs have to automatically convert from their native format when
-> accessing memory mapped addresses over that transport, so you always use
-> the arch native format from the host software.
->=20
-> This isn't just for CC. This includes all memory mapped registers, so
-> this driver's CSTS, AQA, doorbells, etc... shouldn't have any endian
-> swapping.
->=20
-> See also: every other nvme driver. :)
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-I don't see the opposite in Linux. The Linux NVMe drivers use byteswap
-instructions because readl()/writel() and friends perform little-endian
-memory accesses, not native endian memory accesses:
+Alistair
 
-  static int nvme_pci_reg_write32(struct nvme_ctrl *ctrl, u32 off, u32 val)
-  {
-  =09writel(val, to_nvme_dev(ctrl)->bar + off);
-  =09return 0;
-  }
-
-arch/arm/include/asm/io.h:
-
-  #define writel(v,c)     ({ __iowmb(); writel_relaxed(v,c); })
-
-where the byteswap happens here:
-
-  #define writel_relaxed(v,c) __raw_writel((__force u32) cpu_to_le32(v),c)
-
-The CPU is using explicit byteswaps, which matches what the QEMU driver
-is doing. Am I missing something?
-
-Stefan
-
---u65IjBhB3TIa72Vp
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+Zh/EACgkQnKSrs4Gr
-c8iKXgf9FA2PAdMUEC887tycwK4iALRUJazf93MboyUIz3C1/tNeNPpOemcjDSbK
-S9JpUF9TpT4QkyziQw52w9iv7TxWckNFu53hEoubmn6S+EVdpjB9eFSlXheFd9Q+
-byQGn2AFXd44t3mVGOIaWgNKht1nK3DVGWL11HlD4UI4mjre3zBf9MAfm7dRVaRC
-EHjLW2WDRf4OOHLuSZBeSS3f+zFWqFOySy2cdevGUCnhn2sknk1HkiitgHehqWbW
-XRdQ1R4Bm7iAQavlVjCohMGLjLM3CY37sWcURTQnaxSCo0/ezZMsaFGKytPGo18l
-UX8qlhwcj/Fk81b6StyRWpNyKS6B9Q==
-=ZmTO
------END PGP SIGNATURE-----
-
---u65IjBhB3TIa72Vp--
-
+>
+> ---
+>
+> Changes in v2:
+> - change to map the reserved memory at address 0 instead of debug memory
+>
+>  hw/riscv/microchip_pfsoc.c         | 11 ++++++++++-
+>  include/hw/riscv/microchip_pfsoc.h |  1 +
+>  2 files changed, 11 insertions(+), 1 deletion(-)
+>
+> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+> index bc908e0..44a8473 100644
+> --- a/hw/riscv/microchip_pfsoc.c
+> +++ b/hw/riscv/microchip_pfsoc.c
+> @@ -90,7 +90,8 @@ static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+>  } microchip_pfsoc_memmap[] = {
+> -    [MICROCHIP_PFSOC_DEBUG] =           {        0x0,     0x1000 },
+> +    [MICROCHIP_PFSOC_RSVD0] =           {        0x0,      0x100 },
+> +    [MICROCHIP_PFSOC_DEBUG] =           {      0x100,      0xf00 },
+>      [MICROCHIP_PFSOC_E51_DTIM] =        {  0x1000000,     0x2000 },
+>      [MICROCHIP_PFSOC_BUSERR_UNIT0] =    {  0x1700000,     0x1000 },
+>      [MICROCHIP_PFSOC_BUSERR_UNIT1] =    {  0x1701000,     0x1000 },
+> @@ -176,6 +177,7 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+>      MicrochipPFSoCState *s = MICROCHIP_PFSOC(dev);
+>      const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
+>      MemoryRegion *system_memory = get_system_memory();
+> +    MemoryRegion *rsvd0_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *e51_dtim_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *l2lim_mem = g_new(MemoryRegion, 1);
+>      MemoryRegion *envm_data = g_new(MemoryRegion, 1);
+> @@ -195,6 +197,13 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
+>      qdev_realize(DEVICE(&s->e_cluster), NULL, &error_abort);
+>      qdev_realize(DEVICE(&s->u_cluster), NULL, &error_abort);
+>
+> +    /* Reserved Memory at address 0 */
+> +    memory_region_init_ram(rsvd0_mem, NULL, "microchip.pfsoc.rsvd0_mem",
+> +                           memmap[MICROCHIP_PFSOC_RSVD0].size, &error_fatal);
+> +    memory_region_add_subregion(system_memory,
+> +                                memmap[MICROCHIP_PFSOC_RSVD0].base,
+> +                                rsvd0_mem);
+> +
+>      /* E51 DTIM */
+>      memory_region_init_ram(e51_dtim_mem, NULL, "microchip.pfsoc.e51_dtim_mem",
+>                             memmap[MICROCHIP_PFSOC_E51_DTIM].size, &error_fatal);
+> diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
+> index 245c82d..f34a6b3 100644
+> --- a/include/hw/riscv/microchip_pfsoc.h
+> +++ b/include/hw/riscv/microchip_pfsoc.h
+> @@ -74,6 +74,7 @@ typedef struct MicrochipIcicleKitState {
+>                   TYPE_MICROCHIP_ICICLE_KIT_MACHINE)
+>
+>  enum {
+> +    MICROCHIP_PFSOC_RSVD0,
+>      MICROCHIP_PFSOC_DEBUG,
+>      MICROCHIP_PFSOC_E51_DTIM,
+>      MICROCHIP_PFSOC_BUSERR_UNIT0,
+> --
+> 2.7.4
+>
+>
 
