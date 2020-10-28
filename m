@@ -7,78 +7,78 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D81FC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:36:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F791C55179
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:36:18 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C16132242B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:36:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 29C352242F
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:36:17 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qnyEiYjK"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C16132242B
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="GbKJ/Z4N"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29C352242F
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46464 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXcFz-0006nn-Km
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:36:15 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33968)
+	id 1kXcG0-0006oj-0H
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:36:16 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33946)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXc7O-0005yQ-Gh
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:22 -0400
-Received: from mail-pl1-x642.google.com ([2607:f8b0:4864:20::642]:33110)
+ id 1kXc7M-0005vn-TH
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:20 -0400
+Received: from mail-pj1-x1031.google.com ([2607:f8b0:4864:20::1031]:55637)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXc7L-0005ps-LF
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:22 -0400
-Received: by mail-pl1-x642.google.com with SMTP id b19so1816715pld.0
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:27:19 -0700 (PDT)
+ id 1kXc7I-0005oy-W7
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:27:20 -0400
+Received: by mail-pj1-x1031.google.com with SMTP id c17so1838403pjo.5
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:27:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=from:to:cc:subject:date:message-id:in-reply-to:references
  :mime-version:content-transfer-encoding;
- bh=bhlXbEbWYnNuol5HsH6fu3cqY3M1Y2WKuzmjH4v4ad4=;
- b=qnyEiYjKU2ZUQdIAJIbTXl58k29BJ9N2ORPXk+Gmj1xQrhPMTrnNk41OzkOOLQlIg8
- 7Tz9LeeVWjACegM3w6xTOC4wJ4+i6UCoyfyvvqvJm7EqBE6SYYb/LoUAJ4X+CINAP8hJ
- uMZcjYC/GD3QfljdwAL/l4V+S2ro8wEwC/cZR5Kp3JSFmMs5SclVEa+VLXG+cWxS8XpZ
- 5dHvmV1DV4flsOyOysbxbhYZWbx/6aIqtxCPA/xhYfg4QoZg+DFoDLMojORRkP6penzk
- KFsjuPK46+6JymMjXa1YTb6G+ITejHAF9EOfS18guU4SzsWOPDmHd+qeFp00nfBObhvA
- QwUw==
+ bh=O09AiNAMHQ639q4rE7lgjXhBjUkXojtW1+aHXGPZyuc=;
+ b=GbKJ/Z4NzCJloKeUsg2L7JzWRl9T5tdgdEbtOAz8F/8fXWwU1dG7HvuEGDMc2lMlJL
+ QXgqE0FeHyTdSXfyluwoY+xnaiHBtKcofQzdOxdpWn4f67m7qc6DKh9XWRnT1CmasMyB
+ 0mE+ty4z4DE4f4PMWZJH8tyuLzf72Oa0JquWi42445bWlmw1vMQDODnAGu0whSje3FSL
+ prP02O3eAhE12Ae/2LeMuueUJm08cTIrWvzLyaWha1z1W5DGy1/Q43sKWKJOomfZxynl
+ /56kwS75QZfaZ9kT6tfvmbFduDv/bkrPOb0sxfG6MduQn13E9ePAJp1Gzh7/Q+9hDpAg
+ JFMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bhlXbEbWYnNuol5HsH6fu3cqY3M1Y2WKuzmjH4v4ad4=;
- b=OPZu9Wu4QXZCXPqtJIShADEHGeydVXn+ghbnq1/BTab0cyTOw3pNZcdzvJFKN51cff
- cfkhHBTQ7JMfprUfKY+06l3mp2Cs+DWrFMBBpX7hbQKBrvZKa/3sh5YWpJYUSOOvFlu9
- jo0Y9oOvWXvphs7rlXuegkzPauAC8dv0JHe2/5mOWcMoo25kJLCWGOShtC7DGCDPNUQY
- HN4fue7kVNgiVKcmQoHTpHcmzw2VJwosBu1li1ywqQjcgK2wTKVLKqF7dbD0BaZR2yBQ
- zxcISwLyYHD4HDsNiqK8YO6TVWWBhevvIzG93MXjNJM6cl+Cp347/49aG5vbAeJal/+a
- gKTg==
-X-Gm-Message-State: AOAM531PtB+pKK6Y76LEuwJxgGaucheprrHIWECiMt2cL4ox6tdYBxRg
- w3uDbWBaXXohHRPTpRd/fvdkz6tmmXhm0Q==
-X-Google-Smtp-Source: ABdhPJzig9+9L5aTkiEfFCM7c4Aax2UnNsj0NefcDXxVqz0XN2GGEnhc3C2Fov7DG505M9r15WPCrA==
-X-Received: by 2002:a17:902:bc49:b029:d6:44c7:565f with SMTP id
- t9-20020a170902bc49b02900d644c7565fmr5468902plz.11.1603855637475; 
- Tue, 27 Oct 2020 20:27:17 -0700 (PDT)
+ bh=O09AiNAMHQ639q4rE7lgjXhBjUkXojtW1+aHXGPZyuc=;
+ b=nmcNND0xXYWiee70wIcIMEl5CS+Q8LkDphhFSZAbMM5i5e+P0RSp5+FG4E4qaFdEnW
+ 7oAjXG7VPsfRbR16ChnNDQk8uli3w7pR128uDmWBh1LdQFgAoR0EyPBpDpaktR/4elZ5
+ Hs9sqV14r8zvXqL1Tc6NwRY1ISCEELCjxajmVgIlhghjuFRo90vUFXVHujOg19hgKMs3
+ Grqg21AuW62gq2MqkLBu9OhJ6kNnN54UmA7VwkNzmADyDWrGaZBWRO+DLpfy/q/sfBMI
+ OuO2Dfw4ciM/EIii0OajGShrV1ESQlNvoYgUQsIGNv0bJbpKsNeehcHiBtQFefXas72H
+ e1mQ==
+X-Gm-Message-State: AOAM533paiGmSBl5Y0KcyV2Q6hPBgsBN2h8RQUFTLDfOiU+oys83D3b+
+ a11l8D7YzrT5wbR7HVZ6JH2HjKodQSyCiA==
+X-Google-Smtp-Source: ABdhPJwoAmQWeAq91/P5eGgJ2SjtG8y0ncSjuw8g2xM8nbo6/ckS34lBj/i2Bo/+Auec0xNHcYCOnA==
+X-Received: by 2002:a17:902:7606:b029:d3:d2dd:2b3b with SMTP id
+ k6-20020a1709027606b02900d3d2dd2b3bmr5453695pll.67.1603855634593; 
+ Tue, 27 Oct 2020 20:27:14 -0700 (PDT)
 Received: from localhost.localdomain ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id d26sm3764413pfo.82.2020.10.27.20.27.16
+ by smtp.gmail.com with ESMTPSA id d26sm3764413pfo.82.2020.10.27.20.27.13
  (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Tue, 27 Oct 2020 20:27:16 -0700 (PDT)
+ Tue, 27 Oct 2020 20:27:13 -0700 (PDT)
 From: Richard Henderson <richard.henderson@linaro.org>
 To: qemu-devel@nongnu.org
-Subject: [PATCH 07/11] target/arm: Rename neon_load_reg32 to vfp_load_reg32
-Date: Tue, 27 Oct 2020 20:26:59 -0700
-Message-Id: <20201028032703.201526-8-richard.henderson@linaro.org>
+Subject: [PATCH 05/11] target/arm: Add read/write_neon_element32
+Date: Tue, 27 Oct 2020 20:26:57 -0700
+Message-Id: <20201028032703.201526-6-richard.henderson@linaro.org>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20201028032703.201526-1-richard.henderson@linaro.org>
 References: <20201028032703.201526-1-richard.henderson@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::642;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x642.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1031;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1031.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -105,692 +105,604 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The only uses of this function are for loading VFP
-single-precision values, and nothing to do with NEON.
+Model these off the aa64 read/write_vec_element functions.
+Use it within translate-neon.c.inc.  The new functions do
+not allocate or free temps, so this rearranges the calling
+code a bit.
 
 Signed-off-by: Richard Henderson <richard.henderson@linaro.org>
 ---
- target/arm/translate.c         |   4 +-
- target/arm/translate-vfp.c.inc | 184 ++++++++++++++++-----------------
- 2 files changed, 94 insertions(+), 94 deletions(-)
+ target/arm/translate.c          |  26 ++++
+ target/arm/translate-neon.c.inc | 248 +++++++++++++++++++-------------
+ 2 files changed, 177 insertions(+), 97 deletions(-)
 
 diff --git a/target/arm/translate.c b/target/arm/translate.c
-index 55d5f4ed73..8491ab705b 100644
+index 88ded4ac2c..0ed9eab0b0 100644
 --- a/target/arm/translate.c
 +++ b/target/arm/translate.c
-@@ -1142,12 +1142,12 @@ static inline void neon_store_reg64(TCGv_i64 var, int reg)
-     tcg_gen_st_i64(var, cpu_env, vfp_reg_offset(1, reg));
- }
- 
--static inline void neon_load_reg32(TCGv_i32 var, int reg)
-+static inline void vfp_load_reg32(TCGv_i32 var, int reg)
- {
-     tcg_gen_ld_i32(var, cpu_env, vfp_reg_offset(false, reg));
- }
- 
--static inline void neon_store_reg32(TCGv_i32 var, int reg)
-+static inline void vfp_store_reg32(TCGv_i32 var, int reg)
- {
+@@ -1165,6 +1165,32 @@ static inline void neon_store_reg32(TCGv_i32 var, int reg)
      tcg_gen_st_i32(var, cpu_env, vfp_reg_offset(false, reg));
  }
-diff --git a/target/arm/translate-vfp.c.inc b/target/arm/translate-vfp.c.inc
-index 28f22f9872..d2a9b658bb 100644
---- a/target/arm/translate-vfp.c.inc
-+++ b/target/arm/translate-vfp.c.inc
-@@ -283,8 +283,8 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
-         frn = tcg_temp_new_i32();
-         frm = tcg_temp_new_i32();
-         dest = tcg_temp_new_i32();
--        neon_load_reg32(frn, rn);
--        neon_load_reg32(frm, rm);
-+        vfp_load_reg32(frn, rn);
-+        vfp_load_reg32(frm, rm);
-         switch (a->cc) {
-         case 0: /* eq: Z */
-             tcg_gen_movcond_i32(TCG_COND_EQ, dest, cpu_ZF, zero,
-@@ -315,7 +315,7 @@ static bool trans_VSEL(DisasContext *s, arg_VSEL *a)
-         if (sz == 1) {
-             tcg_gen_andi_i32(dest, dest, 0xffff);
-         }
--        neon_store_reg32(dest, rd);
-+        vfp_store_reg32(dest, rd);
-         tcg_temp_free_i32(frn);
-         tcg_temp_free_i32(frm);
-         tcg_temp_free_i32(dest);
-@@ -395,13 +395,13 @@ static bool trans_VRINT(DisasContext *s, arg_VRINT *a)
-         TCGv_i32 tcg_res;
-         tcg_op = tcg_temp_new_i32();
-         tcg_res = tcg_temp_new_i32();
--        neon_load_reg32(tcg_op, rm);
-+        vfp_load_reg32(tcg_op, rm);
-         if (sz == 1) {
-             gen_helper_rinth(tcg_res, tcg_op, fpst);
-         } else {
-             gen_helper_rints(tcg_res, tcg_op, fpst);
-         }
--        neon_store_reg32(tcg_res, rd);
-+        vfp_store_reg32(tcg_res, rd);
-         tcg_temp_free_i32(tcg_op);
-         tcg_temp_free_i32(tcg_res);
-     }
-@@ -470,7 +470,7 @@ static bool trans_VCVT(DisasContext *s, arg_VCVT *a)
-             gen_helper_vfp_tould(tcg_res, tcg_double, tcg_shift, fpst);
-         }
-         tcg_gen_extrl_i64_i32(tcg_tmp, tcg_res);
--        neon_store_reg32(tcg_tmp, rd);
-+        vfp_store_reg32(tcg_tmp, rd);
-         tcg_temp_free_i32(tcg_tmp);
-         tcg_temp_free_i64(tcg_res);
-         tcg_temp_free_i64(tcg_double);
-@@ -478,7 +478,7 @@ static bool trans_VCVT(DisasContext *s, arg_VCVT *a)
-         TCGv_i32 tcg_single, tcg_res;
-         tcg_single = tcg_temp_new_i32();
-         tcg_res = tcg_temp_new_i32();
--        neon_load_reg32(tcg_single, rm);
-+        vfp_load_reg32(tcg_single, rm);
-         if (sz == 1) {
-             if (is_signed) {
-                 gen_helper_vfp_toslh(tcg_res, tcg_single, tcg_shift, fpst);
-@@ -492,7 +492,7 @@ static bool trans_VCVT(DisasContext *s, arg_VCVT *a)
-                 gen_helper_vfp_touls(tcg_res, tcg_single, tcg_shift, fpst);
-             }
-         }
--        neon_store_reg32(tcg_res, rd);
-+        vfp_store_reg32(tcg_res, rd);
-         tcg_temp_free_i32(tcg_res);
-         tcg_temp_free_i32(tcg_single);
-     }
-@@ -776,14 +776,14 @@ static bool trans_VMOV_half(DisasContext *s, arg_VMOV_single *a)
-     if (a->l) {
-         /* VFP to general purpose register */
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vn);
-+        vfp_load_reg32(tmp, a->vn);
-         tcg_gen_andi_i32(tmp, tmp, 0xffff);
-         store_reg(s, a->rt, tmp);
-     } else {
-         /* general purpose register to VFP */
-         tmp = load_reg(s, a->rt);
-         tcg_gen_andi_i32(tmp, tmp, 0xffff);
--        neon_store_reg32(tmp, a->vn);
-+        vfp_store_reg32(tmp, a->vn);
-         tcg_temp_free_i32(tmp);
-     }
  
-@@ -805,7 +805,7 @@ static bool trans_VMOV_single(DisasContext *s, arg_VMOV_single *a)
-     if (a->l) {
-         /* VFP to general purpose register */
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vn);
-+        vfp_load_reg32(tmp, a->vn);
-         if (a->rt == 15) {
-             /* Set the 4 flag bits in the CPSR.  */
-             gen_set_nzcv(tmp);
-@@ -816,7 +816,7 @@ static bool trans_VMOV_single(DisasContext *s, arg_VMOV_single *a)
-     } else {
-         /* general purpose register to VFP */
-         tmp = load_reg(s, a->rt);
--        neon_store_reg32(tmp, a->vn);
-+        vfp_store_reg32(tmp, a->vn);
-         tcg_temp_free_i32(tmp);
-     }
++static void read_neon_element32(TCGv_i32 dest, int reg, int ele, MemOp size)
++{
++    long off = neon_element_offset(reg, ele, size);
++
++    switch (size) {
++    case MO_32:
++        tcg_gen_ld_i32(dest, cpu_env, off);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
++static void write_neon_element32(TCGv_i32 src, int reg, int ele, MemOp size)
++{
++    long off = neon_element_offset(reg, ele, size);
++
++    switch (size) {
++    case MO_32:
++        tcg_gen_st_i32(src, cpu_env, off);
++        break;
++    default:
++        g_assert_not_reached();
++    }
++}
++
+ static TCGv_ptr vfp_reg_ptr(bool dp, int reg)
+ {
+     TCGv_ptr ret = tcg_temp_new_ptr();
+diff --git a/target/arm/translate-neon.c.inc b/target/arm/translate-neon.c.inc
+index 96ab2248fc..3f8a0bb88b 100644
+--- a/target/arm/translate-neon.c.inc
++++ b/target/arm/translate-neon.c.inc
+@@ -956,18 +956,24 @@ static bool do_3same_pair(DisasContext *s, arg_3same *a, NeonGenTwoOpFn *fn)
+      * early. Since Q is 0 there are always just two passes, so instead
+      * of a complicated loop over each pass we just unroll.
+      */
+-    tmp = neon_load_reg(a->vn, 0);
+-    tmp2 = neon_load_reg(a->vn, 1);
++    tmp = tcg_temp_new_i32();
++    tmp2 = tcg_temp_new_i32();
++    tmp3 = tcg_temp_new_i32();
++
++    read_neon_element32(tmp, a->vn, 0, MO_32);
++    read_neon_element32(tmp2, a->vn, 1, MO_32);
+     fn(tmp, tmp, tmp2);
+-    tcg_temp_free_i32(tmp2);
  
-@@ -842,18 +842,18 @@ static bool trans_VMOV_64_sp(DisasContext *s, arg_VMOV_64_sp *a)
-     if (a->op) {
-         /* fpreg to gpreg */
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vm);
-+        vfp_load_reg32(tmp, a->vm);
-         store_reg(s, a->rt, tmp);
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vm + 1);
-+        vfp_load_reg32(tmp, a->vm + 1);
-         store_reg(s, a->rt2, tmp);
-     } else {
-         /* gpreg to fpreg */
-         tmp = load_reg(s, a->rt);
--        neon_store_reg32(tmp, a->vm);
-+        vfp_store_reg32(tmp, a->vm);
-         tcg_temp_free_i32(tmp);
-         tmp = load_reg(s, a->rt2);
--        neon_store_reg32(tmp, a->vm + 1);
-+        vfp_store_reg32(tmp, a->vm + 1);
-         tcg_temp_free_i32(tmp);
-     }
+-    tmp3 = neon_load_reg(a->vm, 0);
+-    tmp2 = neon_load_reg(a->vm, 1);
++    read_neon_element32(tmp3, a->vm, 0, MO_32);
++    read_neon_element32(tmp2, a->vm, 1, MO_32);
+     fn(tmp3, tmp3, tmp2);
+-    tcg_temp_free_i32(tmp2);
  
-@@ -885,18 +885,18 @@ static bool trans_VMOV_64_dp(DisasContext *s, arg_VMOV_64_dp *a)
-     if (a->op) {
-         /* fpreg to gpreg */
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vm * 2);
-+        vfp_load_reg32(tmp, a->vm * 2);
-         store_reg(s, a->rt, tmp);
-         tmp = tcg_temp_new_i32();
--        neon_load_reg32(tmp, a->vm * 2 + 1);
-+        vfp_load_reg32(tmp, a->vm * 2 + 1);
-         store_reg(s, a->rt2, tmp);
-     } else {
-         /* gpreg to fpreg */
-         tmp = load_reg(s, a->rt);
--        neon_store_reg32(tmp, a->vm * 2);
-+        vfp_store_reg32(tmp, a->vm * 2);
-         tcg_temp_free_i32(tmp);
-         tmp = load_reg(s, a->rt2);
--        neon_store_reg32(tmp, a->vm * 2 + 1);
-+        vfp_store_reg32(tmp, a->vm * 2 + 1);
-         tcg_temp_free_i32(tmp);
-     }
- 
-@@ -927,9 +927,9 @@ static bool trans_VLDR_VSTR_hp(DisasContext *s, arg_VLDR_VSTR_sp *a)
-     tmp = tcg_temp_new_i32();
-     if (a->l) {
-         gen_aa32_ld16u(s, tmp, addr, get_mem_index(s));
--        neon_store_reg32(tmp, a->vd);
-+        vfp_store_reg32(tmp, a->vd);
-     } else {
--        neon_load_reg32(tmp, a->vd);
-+        vfp_load_reg32(tmp, a->vd);
-         gen_aa32_st16(s, tmp, addr, get_mem_index(s));
-     }
-     tcg_temp_free_i32(tmp);
-@@ -961,9 +961,9 @@ static bool trans_VLDR_VSTR_sp(DisasContext *s, arg_VLDR_VSTR_sp *a)
-     tmp = tcg_temp_new_i32();
-     if (a->l) {
-         gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
--        neon_store_reg32(tmp, a->vd);
-+        vfp_store_reg32(tmp, a->vd);
-     } else {
--        neon_load_reg32(tmp, a->vd);
-+        vfp_load_reg32(tmp, a->vd);
-         gen_aa32_st32(s, tmp, addr, get_mem_index(s));
-     }
-     tcg_temp_free_i32(tmp);
-@@ -1066,10 +1066,10 @@ static bool trans_VLDM_VSTM_sp(DisasContext *s, arg_VLDM_VSTM_sp *a)
-         if (a->l) {
-             /* load */
-             gen_aa32_ld32u(s, tmp, addr, get_mem_index(s));
--            neon_store_reg32(tmp, a->vd + i);
-+            vfp_store_reg32(tmp, a->vd + i);
-         } else {
-             /* store */
--            neon_load_reg32(tmp, a->vd + i);
-+            vfp_load_reg32(tmp, a->vd + i);
-             gen_aa32_st32(s, tmp, addr, get_mem_index(s));
-         }
-         tcg_gen_addi_i32(addr, addr, offset);
-@@ -1285,15 +1285,15 @@ static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn,
-     fd = tcg_temp_new_i32();
-     fpst = fpstatus_ptr(FPST_FPCR);
- 
--    neon_load_reg32(f0, vn);
--    neon_load_reg32(f1, vm);
-+    vfp_load_reg32(f0, vn);
-+    vfp_load_reg32(f1, vm);
- 
-     for (;;) {
-         if (reads_vd) {
--            neon_load_reg32(fd, vd);
-+            vfp_load_reg32(fd, vd);
-         }
-         fn(fd, f0, f1, fpst);
--        neon_store_reg32(fd, vd);
-+        vfp_store_reg32(fd, vd);
- 
-         if (veclen == 0) {
-             break;
-@@ -1303,10 +1303,10 @@ static bool do_vfp_3op_sp(DisasContext *s, VFPGen3OpSPFn *fn,
-         veclen--;
-         vd = vfp_advance_sreg(vd, delta_d);
-         vn = vfp_advance_sreg(vn, delta_d);
--        neon_load_reg32(f0, vn);
-+        vfp_load_reg32(f0, vn);
-         if (delta_m) {
-             vm = vfp_advance_sreg(vm, delta_m);
--            neon_load_reg32(f1, vm);
-+            vfp_load_reg32(f1, vm);
-         }
-     }
- 
-@@ -1349,14 +1349,14 @@ static bool do_vfp_3op_hp(DisasContext *s, VFPGen3OpSPFn *fn,
-     fd = tcg_temp_new_i32();
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
- 
--    neon_load_reg32(f0, vn);
--    neon_load_reg32(f1, vm);
-+    vfp_load_reg32(f0, vn);
-+    vfp_load_reg32(f1, vm);
- 
-     if (reads_vd) {
--        neon_load_reg32(fd, vd);
-+        vfp_load_reg32(fd, vd);
-     }
-     fn(fd, f0, f1, fpst);
--    neon_store_reg32(fd, vd);
-+    vfp_store_reg32(fd, vd);
- 
-     tcg_temp_free_i32(f0);
-     tcg_temp_free_i32(f1);
-@@ -1489,11 +1489,11 @@ static bool do_vfp_2op_sp(DisasContext *s, VFPGen2OpSPFn *fn, int vd, int vm)
-     f0 = tcg_temp_new_i32();
-     fd = tcg_temp_new_i32();
- 
--    neon_load_reg32(f0, vm);
-+    vfp_load_reg32(f0, vm);
- 
-     for (;;) {
-         fn(fd, f0);
--        neon_store_reg32(fd, vd);
-+        vfp_store_reg32(fd, vd);
- 
-         if (veclen == 0) {
-             break;
-@@ -1503,7 +1503,7 @@ static bool do_vfp_2op_sp(DisasContext *s, VFPGen2OpSPFn *fn, int vd, int vm)
-             /* single source one-many */
-             while (veclen--) {
-                 vd = vfp_advance_sreg(vd, delta_d);
--                neon_store_reg32(fd, vd);
-+                vfp_store_reg32(fd, vd);
-             }
-             break;
-         }
-@@ -1512,7 +1512,7 @@ static bool do_vfp_2op_sp(DisasContext *s, VFPGen2OpSPFn *fn, int vd, int vm)
-         veclen--;
-         vd = vfp_advance_sreg(vd, delta_d);
-         vm = vfp_advance_sreg(vm, delta_m);
--        neon_load_reg32(f0, vm);
-+        vfp_load_reg32(f0, vm);
-     }
- 
-     tcg_temp_free_i32(f0);
-@@ -1545,9 +1545,9 @@ static bool do_vfp_2op_hp(DisasContext *s, VFPGen2OpSPFn *fn, int vd, int vm)
-     }
- 
-     f0 = tcg_temp_new_i32();
--    neon_load_reg32(f0, vm);
-+    vfp_load_reg32(f0, vm);
-     fn(f0, f0);
--    neon_store_reg32(f0, vd);
-+    vfp_store_reg32(f0, vd);
-     tcg_temp_free_i32(f0);
- 
-     return true;
-@@ -2037,20 +2037,20 @@ static bool do_vfm_hp(DisasContext *s, arg_VFMA_sp *a, bool neg_n, bool neg_d)
-     vm = tcg_temp_new_i32();
-     vd = tcg_temp_new_i32();
- 
--    neon_load_reg32(vn, a->vn);
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vn, a->vn);
-+    vfp_load_reg32(vm, a->vm);
-     if (neg_n) {
-         /* VFNMS, VFMS */
-         gen_helper_vfp_negh(vn, vn);
-     }
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
-     if (neg_d) {
-         /* VFNMA, VFNMS */
-         gen_helper_vfp_negh(vd, vd);
-     }
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     gen_helper_vfp_muladdh(vd, vn, vm, vd, fpst);
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
- 
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(vn);
-@@ -2102,20 +2102,20 @@ static bool do_vfm_sp(DisasContext *s, arg_VFMA_sp *a, bool neg_n, bool neg_d)
-     vm = tcg_temp_new_i32();
-     vd = tcg_temp_new_i32();
- 
--    neon_load_reg32(vn, a->vn);
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vn, a->vn);
-+    vfp_load_reg32(vm, a->vm);
-     if (neg_n) {
-         /* VFNMS, VFMS */
-         gen_helper_vfp_negs(vn, vn);
-     }
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
-     if (neg_d) {
-         /* VFNMA, VFNMS */
-         gen_helper_vfp_negs(vd, vd);
-     }
-     fpst = fpstatus_ptr(FPST_FPCR);
-     gen_helper_vfp_muladds(vd, vn, vm, vd, fpst);
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
- 
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(vn);
-@@ -2230,7 +2230,7 @@ static bool trans_VMOV_imm_hp(DisasContext *s, arg_VMOV_imm_sp *a)
-     }
- 
-     fd = tcg_const_i32(vfp_expand_imm(MO_16, a->imm));
--    neon_store_reg32(fd, a->vd);
-+    vfp_store_reg32(fd, a->vd);
-     tcg_temp_free_i32(fd);
+-    neon_store_reg(a->vd, 0, tmp);
+-    neon_store_reg(a->vd, 1, tmp3);
++    write_neon_element32(tmp, a->vd, 0, MO_32);
++    write_neon_element32(tmp3, a->vd, 1, MO_32);
++
++    tcg_temp_free_i32(tmp);
++    tcg_temp_free_i32(tmp2);
++    tcg_temp_free_i32(tmp3);
      return true;
  }
-@@ -2270,7 +2270,7 @@ static bool trans_VMOV_imm_sp(DisasContext *s, arg_VMOV_imm_sp *a)
-     fd = tcg_const_i32(vfp_expand_imm(MO_32, a->imm));
  
-     for (;;) {
--        neon_store_reg32(fd, vd);
-+        vfp_store_reg32(fd, vd);
+@@ -1275,7 +1281,7 @@ static bool do_2shift_env_32(DisasContext *s, arg_2reg_shift *a,
+      * 2-reg-and-shift operations, size < 3 case, where the
+      * helper needs to be passed cpu_env.
+      */
+-    TCGv_i32 constimm;
++    TCGv_i32 constimm, tmp;
+     int pass;
  
-         if (veclen == 0) {
-             break;
-@@ -2397,11 +2397,11 @@ static bool trans_VCMP_hp(DisasContext *s, arg_VCMP_sp *a)
-     vd = tcg_temp_new_i32();
-     vm = tcg_temp_new_i32();
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+@@ -1301,12 +1307,14 @@ static bool do_2shift_env_32(DisasContext *s, arg_2reg_shift *a,
+      * by immediate using the variable shift operations.
+      */
+     constimm = tcg_const_i32(dup_const(a->size, a->shift));
++    tmp = tcg_temp_new_i32();
  
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
-     if (a->z) {
-         tcg_gen_movi_i32(vm, 0);
-     } else {
--        neon_load_reg32(vm, a->vm);
-+        vfp_load_reg32(vm, a->vm);
+     for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
+-        TCGv_i32 tmp = neon_load_reg(a->vm, pass);
++        read_neon_element32(tmp, a->vm, pass, MO_32);
+         fn(tmp, cpu_env, tmp, constimm);
+-        neon_store_reg(a->vd, pass, tmp);
++        write_neon_element32(tmp, a->vd, pass, MO_32);
      }
- 
-     if (a->e) {
-@@ -2436,11 +2436,11 @@ static bool trans_VCMP_sp(DisasContext *s, arg_VCMP_sp *a)
-     vd = tcg_temp_new_i32();
-     vm = tcg_temp_new_i32();
- 
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
-     if (a->z) {
-         tcg_gen_movi_i32(vm, 0);
-     } else {
--        neon_load_reg32(vm, a->vm);
-+        vfp_load_reg32(vm, a->vm);
-     }
- 
-     if (a->e) {
-@@ -2519,7 +2519,7 @@ static bool trans_VCVT_f32_f16(DisasContext *s, arg_VCVT_f32_f16 *a)
-     /* The T bit tells us if we want the low or high 16 bits of Vm */
-     tcg_gen_ld16u_i32(tmp, cpu_env, vfp_f16_offset(a->vm, a->t));
-     gen_helper_vfp_fcvt_f16_to_f32(tmp, tmp, fpst, ahp_mode);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_i32(ahp_mode);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tmp);
-@@ -2583,7 +2583,7 @@ static bool trans_VCVT_f16_f32(DisasContext *s, arg_VCVT_f16_f32 *a)
-     ahp_mode = get_ahp_flag();
-     tmp = tcg_temp_new_i32();
- 
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp_mode);
-     tcg_gen_st16_i32(tmp, cpu_env, vfp_f16_offset(a->vd, a->t));
-     tcg_temp_free_i32(ahp_mode);
-@@ -2645,10 +2645,10 @@ static bool trans_VRINTR_hp(DisasContext *s, arg_VRINTR_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     gen_helper_rinth(tmp, tmp, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tmp);
-     return true;
-@@ -2668,10 +2668,10 @@ static bool trans_VRINTR_sp(DisasContext *s, arg_VRINTR_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR);
-     gen_helper_rints(tmp, tmp, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tmp);
-     return true;
-@@ -2724,13 +2724,13 @@ static bool trans_VRINTZ_hp(DisasContext *s, arg_VRINTZ_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     tcg_rmode = tcg_const_i32(float_round_to_zero);
-     gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-     gen_helper_rinth(tmp, tmp, fpst);
-     gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tcg_rmode);
-     tcg_temp_free_i32(tmp);
-@@ -2752,13 +2752,13 @@ static bool trans_VRINTZ_sp(DisasContext *s, arg_VRINTZ_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR);
-     tcg_rmode = tcg_const_i32(float_round_to_zero);
-     gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
-     gen_helper_rints(tmp, tmp, fpst);
-     gen_helper_set_rmode(tcg_rmode, tcg_rmode, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tcg_rmode);
-     tcg_temp_free_i32(tmp);
-@@ -2816,10 +2816,10 @@ static bool trans_VRINTX_hp(DisasContext *s, arg_VRINTX_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     gen_helper_rinth_exact(tmp, tmp, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tmp);
-     return true;
-@@ -2839,10 +2839,10 @@ static bool trans_VRINTX_sp(DisasContext *s, arg_VRINTX_sp *a)
-     }
- 
-     tmp = tcg_temp_new_i32();
--    neon_load_reg32(tmp, a->vm);
-+    vfp_load_reg32(tmp, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR);
-     gen_helper_rints_exact(tmp, tmp, fpst);
--    neon_store_reg32(tmp, a->vd);
-+    vfp_store_reg32(tmp, a->vd);
-     tcg_temp_free_ptr(fpst);
-     tcg_temp_free_i32(tmp);
-     return true;
-@@ -2900,7 +2900,7 @@ static bool trans_VCVT_sp(DisasContext *s, arg_VCVT_sp *a)
- 
-     vm = tcg_temp_new_i32();
-     vd = tcg_temp_new_i64();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
-     gen_helper_vfp_fcvtds(vd, vm, cpu_env);
-     neon_store_reg64(vd, a->vd);
-     tcg_temp_free_i32(vm);
-@@ -2930,7 +2930,7 @@ static bool trans_VCVT_dp(DisasContext *s, arg_VCVT_dp *a)
-     vm = tcg_temp_new_i64();
-     neon_load_reg64(vm, a->vm);
-     gen_helper_vfp_fcvtsd(vd, vm, cpu_env);
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
-     tcg_temp_free_i32(vd);
-     tcg_temp_free_i64(vm);
-     return true;
-@@ -2950,7 +2950,7 @@ static bool trans_VCVT_int_hp(DisasContext *s, arg_VCVT_int_sp *a)
-     }
- 
-     vm = tcg_temp_new_i32();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     if (a->s) {
-         /* i32 -> f16 */
-@@ -2959,7 +2959,7 @@ static bool trans_VCVT_int_hp(DisasContext *s, arg_VCVT_int_sp *a)
-         /* u32 -> f16 */
-         gen_helper_vfp_uitoh(vm, vm, fpst);
-     }
--    neon_store_reg32(vm, a->vd);
-+    vfp_store_reg32(vm, a->vd);
-     tcg_temp_free_i32(vm);
-     tcg_temp_free_ptr(fpst);
-     return true;
-@@ -2979,7 +2979,7 @@ static bool trans_VCVT_int_sp(DisasContext *s, arg_VCVT_int_sp *a)
-     }
- 
-     vm = tcg_temp_new_i32();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR);
-     if (a->s) {
-         /* i32 -> f32 */
-@@ -2988,7 +2988,7 @@ static bool trans_VCVT_int_sp(DisasContext *s, arg_VCVT_int_sp *a)
-         /* u32 -> f32 */
-         gen_helper_vfp_uitos(vm, vm, fpst);
-     }
--    neon_store_reg32(vm, a->vd);
-+    vfp_store_reg32(vm, a->vd);
-     tcg_temp_free_i32(vm);
-     tcg_temp_free_ptr(fpst);
-     return true;
-@@ -3015,7 +3015,7 @@ static bool trans_VCVT_int_dp(DisasContext *s, arg_VCVT_int_dp *a)
- 
-     vm = tcg_temp_new_i32();
-     vd = tcg_temp_new_i64();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
-     fpst = fpstatus_ptr(FPST_FPCR);
-     if (a->s) {
-         /* i32 -> f64 */
-@@ -3057,7 +3057,7 @@ static bool trans_VJCVT(DisasContext *s, arg_VJCVT *a)
-     vd = tcg_temp_new_i32();
-     neon_load_reg64(vm, a->vm);
-     gen_helper_vjcvt(vd, vm, cpu_env);
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
-     tcg_temp_free_i64(vm);
-     tcg_temp_free_i32(vd);
-     return true;
-@@ -3080,7 +3080,7 @@ static bool trans_VCVT_fix_hp(DisasContext *s, arg_VCVT_fix_sp *a)
-     frac_bits = (a->opc & 1) ? (32 - a->imm) : (16 - a->imm);
- 
-     vd = tcg_temp_new_i32();
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
- 
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     shift = tcg_const_i32(frac_bits);
-@@ -3115,7 +3115,7 @@ static bool trans_VCVT_fix_hp(DisasContext *s, arg_VCVT_fix_sp *a)
-         g_assert_not_reached();
-     }
- 
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
-     tcg_temp_free_i32(vd);
-     tcg_temp_free_i32(shift);
-     tcg_temp_free_ptr(fpst);
-@@ -3139,7 +3139,7 @@ static bool trans_VCVT_fix_sp(DisasContext *s, arg_VCVT_fix_sp *a)
-     frac_bits = (a->opc & 1) ? (32 - a->imm) : (16 - a->imm);
- 
-     vd = tcg_temp_new_i32();
--    neon_load_reg32(vd, a->vd);
-+    vfp_load_reg32(vd, a->vd);
- 
-     fpst = fpstatus_ptr(FPST_FPCR);
-     shift = tcg_const_i32(frac_bits);
-@@ -3174,7 +3174,7 @@ static bool trans_VCVT_fix_sp(DisasContext *s, arg_VCVT_fix_sp *a)
-         g_assert_not_reached();
-     }
- 
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
-     tcg_temp_free_i32(vd);
-     tcg_temp_free_i32(shift);
-     tcg_temp_free_ptr(fpst);
-@@ -3261,7 +3261,7 @@ static bool trans_VCVT_hp_int(DisasContext *s, arg_VCVT_sp_int *a)
- 
-     fpst = fpstatus_ptr(FPST_FPCR_F16);
-     vm = tcg_temp_new_i32();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
- 
-     if (a->s) {
-         if (a->rz) {
-@@ -3276,7 +3276,7 @@ static bool trans_VCVT_hp_int(DisasContext *s, arg_VCVT_sp_int *a)
-             gen_helper_vfp_touih(vm, vm, fpst);
-         }
-     }
--    neon_store_reg32(vm, a->vd);
-+    vfp_store_reg32(vm, a->vd);
-     tcg_temp_free_i32(vm);
-     tcg_temp_free_ptr(fpst);
-     return true;
-@@ -3297,7 +3297,7 @@ static bool trans_VCVT_sp_int(DisasContext *s, arg_VCVT_sp_int *a)
- 
-     fpst = fpstatus_ptr(FPST_FPCR);
-     vm = tcg_temp_new_i32();
--    neon_load_reg32(vm, a->vm);
-+    vfp_load_reg32(vm, a->vm);
- 
-     if (a->s) {
-         if (a->rz) {
-@@ -3312,7 +3312,7 @@ static bool trans_VCVT_sp_int(DisasContext *s, arg_VCVT_sp_int *a)
-             gen_helper_vfp_touis(vm, vm, fpst);
-         }
-     }
--    neon_store_reg32(vm, a->vd);
-+    vfp_store_reg32(vm, a->vd);
-     tcg_temp_free_i32(vm);
-     tcg_temp_free_ptr(fpst);
-     return true;
-@@ -3355,7 +3355,7 @@ static bool trans_VCVT_dp_int(DisasContext *s, arg_VCVT_dp_int *a)
-             gen_helper_vfp_touid(vd, vm, fpst);
-         }
-     }
--    neon_store_reg32(vd, a->vd);
-+    vfp_store_reg32(vd, a->vd);
-     tcg_temp_free_i32(vd);
-     tcg_temp_free_i64(vm);
-     tcg_temp_free_ptr(fpst);
-@@ -3468,10 +3468,10 @@ static bool trans_VINS(DisasContext *s, arg_VINS *a)
-     /* Insert low half of Vm into high half of Vd */
-     rm = tcg_temp_new_i32();
-     rd = tcg_temp_new_i32();
--    neon_load_reg32(rm, a->vm);
--    neon_load_reg32(rd, a->vd);
-+    vfp_load_reg32(rm, a->vm);
-+    vfp_load_reg32(rd, a->vd);
-     tcg_gen_deposit_i32(rd, rd, rm, 16, 16);
--    neon_store_reg32(rd, a->vd);
-+    vfp_store_reg32(rd, a->vd);
-     tcg_temp_free_i32(rm);
-     tcg_temp_free_i32(rd);
-     return true;
-@@ -3495,9 +3495,9 @@ static bool trans_VMOVX(DisasContext *s, arg_VINS *a)
- 
-     /* Set Vd to high half of Vm */
-     rm = tcg_temp_new_i32();
--    neon_load_reg32(rm, a->vm);
-+    vfp_load_reg32(rm, a->vm);
-     tcg_gen_shri_i32(rm, rm, 16);
--    neon_store_reg32(rm, a->vd);
-+    vfp_store_reg32(rm, a->vd);
-     tcg_temp_free_i32(rm);
++    tcg_temp_free_i32(tmp);
+     tcg_temp_free_i32(constimm);
      return true;
  }
+@@ -1364,21 +1372,21 @@ static bool do_2shift_narrow_64(DisasContext *s, arg_2reg_shift *a,
+     constimm = tcg_const_i64(-a->shift);
+     rm1 = tcg_temp_new_i64();
+     rm2 = tcg_temp_new_i64();
++    rd = tcg_temp_new_i32();
+ 
+     /* Load both inputs first to avoid potential overwrite if rm == rd */
+     neon_load_reg64(rm1, a->vm);
+     neon_load_reg64(rm2, a->vm + 1);
+ 
+     shiftfn(rm1, rm1, constimm);
+-    rd = tcg_temp_new_i32();
+     narrowfn(rd, cpu_env, rm1);
+-    neon_store_reg(a->vd, 0, rd);
++    write_neon_element32(rd, a->vd, 0, MO_32);
+ 
+     shiftfn(rm2, rm2, constimm);
+-    rd = tcg_temp_new_i32();
+     narrowfn(rd, cpu_env, rm2);
+-    neon_store_reg(a->vd, 1, rd);
++    write_neon_element32(rd, a->vd, 1, MO_32);
+ 
++    tcg_temp_free_i32(rd);
+     tcg_temp_free_i64(rm1);
+     tcg_temp_free_i64(rm2);
+     tcg_temp_free_i64(constimm);
+@@ -1428,10 +1436,14 @@ static bool do_2shift_narrow_32(DisasContext *s, arg_2reg_shift *a,
+     constimm = tcg_const_i32(imm);
+ 
+     /* Load all inputs first to avoid potential overwrite */
+-    rm1 = neon_load_reg(a->vm, 0);
+-    rm2 = neon_load_reg(a->vm, 1);
+-    rm3 = neon_load_reg(a->vm + 1, 0);
+-    rm4 = neon_load_reg(a->vm + 1, 1);
++    rm1 = tcg_temp_new_i32();
++    rm2 = tcg_temp_new_i32();
++    rm3 = tcg_temp_new_i32();
++    rm4 = tcg_temp_new_i32();
++    read_neon_element32(rm1, a->vm, 0, MO_32);
++    read_neon_element32(rm2, a->vm, 1, MO_32);
++    read_neon_element32(rm3, a->vm, 2, MO_32);
++    read_neon_element32(rm4, a->vm, 3, MO_32);
+     rtmp = tcg_temp_new_i64();
+ 
+     shiftfn(rm1, rm1, constimm);
+@@ -1441,7 +1453,8 @@ static bool do_2shift_narrow_32(DisasContext *s, arg_2reg_shift *a,
+     tcg_temp_free_i32(rm2);
+ 
+     narrowfn(rm1, cpu_env, rtmp);
+-    neon_store_reg(a->vd, 0, rm1);
++    write_neon_element32(rm1, a->vd, 0, MO_32);
++    tcg_temp_free_i32(rm1);
+ 
+     shiftfn(rm3, rm3, constimm);
+     shiftfn(rm4, rm4, constimm);
+@@ -1452,7 +1465,8 @@ static bool do_2shift_narrow_32(DisasContext *s, arg_2reg_shift *a,
+ 
+     narrowfn(rm3, cpu_env, rtmp);
+     tcg_temp_free_i64(rtmp);
+-    neon_store_reg(a->vd, 1, rm3);
++    write_neon_element32(rm3, a->vd, 1, MO_32);
++    tcg_temp_free_i32(rm3);
+     return true;
+ }
+ 
+@@ -1553,8 +1567,10 @@ static bool do_vshll_2sh(DisasContext *s, arg_2reg_shift *a,
+         widen_mask = dup_const(a->size + 1, widen_mask);
+     }
+ 
+-    rm0 = neon_load_reg(a->vm, 0);
+-    rm1 = neon_load_reg(a->vm, 1);
++    rm0 = tcg_temp_new_i32();
++    rm1 = tcg_temp_new_i32();
++    read_neon_element32(rm0, a->vm, 0, MO_32);
++    read_neon_element32(rm1, a->vm, 1, MO_32);
+     tmp = tcg_temp_new_i64();
+ 
+     widenfn(tmp, rm0);
+@@ -1808,11 +1824,13 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+     if (src1_wide) {
+         neon_load_reg64(rn0_64, a->vn);
+     } else {
+-        TCGv_i32 tmp = neon_load_reg(a->vn, 0);
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        read_neon_element32(tmp, a->vn, 0, MO_32);
+         widenfn(rn0_64, tmp);
+         tcg_temp_free_i32(tmp);
+     }
+-    rm = neon_load_reg(a->vm, 0);
++    rm = tcg_temp_new_i32();
++    read_neon_element32(rm, a->vm, 0, MO_32);
+ 
+     widenfn(rm_64, rm);
+     tcg_temp_free_i32(rm);
+@@ -1825,11 +1843,13 @@ static bool do_prewiden_3d(DisasContext *s, arg_3diff *a,
+     if (src1_wide) {
+         neon_load_reg64(rn1_64, a->vn + 1);
+     } else {
+-        TCGv_i32 tmp = neon_load_reg(a->vn, 1);
++        TCGv_i32 tmp = tcg_temp_new_i32();
++        read_neon_element32(tmp, a->vn, 1, MO_32);
+         widenfn(rn1_64, tmp);
+         tcg_temp_free_i32(tmp);
+     }
+-    rm = neon_load_reg(a->vm, 1);
++    rm = tcg_temp_new_i32();
++    read_neon_element32(rm, a->vm, 1, MO_32);
+ 
+     neon_store_reg64(rn0_64, a->vd);
+ 
+@@ -1922,9 +1942,11 @@ static bool do_narrow_3d(DisasContext *s, arg_3diff *a,
+ 
+     narrowfn(rd1, rn_64);
+ 
+-    neon_store_reg(a->vd, 0, rd0);
+-    neon_store_reg(a->vd, 1, rd1);
++    write_neon_element32(rd0, a->vd, 0, MO_32);
++    write_neon_element32(rd1, a->vd, 1, MO_32);
+ 
++    tcg_temp_free_i32(rd0);
++    tcg_temp_free_i32(rd1);
+     tcg_temp_free_i64(rn_64);
+     tcg_temp_free_i64(rm_64);
+ 
+@@ -1999,14 +2021,14 @@ static bool do_long_3d(DisasContext *s, arg_3diff *a,
+     rd0 = tcg_temp_new_i64();
+     rd1 = tcg_temp_new_i64();
+ 
+-    rn = neon_load_reg(a->vn, 0);
+-    rm = neon_load_reg(a->vm, 0);
++    rn = tcg_temp_new_i32();
++    rm = tcg_temp_new_i32();
++    read_neon_element32(rn, a->vn, 0, MO_32);
++    read_neon_element32(rm, a->vm, 0, MO_32);
+     opfn(rd0, rn, rm);
+-    tcg_temp_free_i32(rn);
+-    tcg_temp_free_i32(rm);
+ 
+-    rn = neon_load_reg(a->vn, 1);
+-    rm = neon_load_reg(a->vm, 1);
++    read_neon_element32(rn, a->vn, 1, MO_32);
++    read_neon_element32(rm, a->vm, 1, MO_32);
+     opfn(rd1, rn, rm);
+     tcg_temp_free_i32(rn);
+     tcg_temp_free_i32(rm);
+@@ -2308,16 +2330,16 @@ static void gen_neon_dup_high16(TCGv_i32 var)
+ 
+ static inline TCGv_i32 neon_get_scalar(int size, int reg)
+ {
+-    TCGv_i32 tmp;
+-    if (size == 1) {
+-        tmp = neon_load_reg(reg & 7, reg >> 4);
++    TCGv_i32 tmp = tcg_temp_new_i32();
++    if (size == MO_16) {
++        read_neon_element32(tmp, reg & 7, reg >> 4, MO_32);
+         if (reg & 8) {
+             gen_neon_dup_high16(tmp);
+         } else {
+             gen_neon_dup_low16(tmp);
+         }
+     } else {
+-        tmp = neon_load_reg(reg & 15, reg >> 4);
++        read_neon_element32(tmp, reg & 15, reg >> 4, MO_32);
+     }
+     return tmp;
+ }
+@@ -2331,7 +2353,7 @@ static bool do_2scalar(DisasContext *s, arg_2scalar *a,
+      * perform an accumulation operation of that result into the
+      * destination.
+      */
+-    TCGv_i32 scalar;
++    TCGv_i32 scalar, tmp;
+     int pass;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+@@ -2358,17 +2380,20 @@ static bool do_2scalar(DisasContext *s, arg_2scalar *a,
+     }
+ 
+     scalar = neon_get_scalar(a->size, a->vm);
++    tmp = tcg_temp_new_i32();
+ 
+     for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
+-        TCGv_i32 tmp = neon_load_reg(a->vn, pass);
++        read_neon_element32(tmp, a->vn, pass, MO_32);
+         opfn(tmp, tmp, scalar);
+         if (accfn) {
+-            TCGv_i32 rd = neon_load_reg(a->vd, pass);
++            TCGv_i32 rd = tcg_temp_new_i32();
++            read_neon_element32(rd, a->vd, pass, MO_32);
+             accfn(tmp, rd, tmp);
+             tcg_temp_free_i32(rd);
+         }
+-        neon_store_reg(a->vd, pass, tmp);
++        write_neon_element32(tmp, a->vd, pass, MO_32);
+     }
++    tcg_temp_free_i32(tmp);
+     tcg_temp_free_i32(scalar);
+     return true;
+ }
+@@ -2523,7 +2548,7 @@ static bool do_vqrdmlah_2sc(DisasContext *s, arg_2scalar *a,
+      * performs a kind of fused op-then-accumulate using a helper
+      * function that takes all of rd, rn and the scalar at once.
+      */
+-    TCGv_i32 scalar;
++    TCGv_i32 scalar, rn, rd;
+     int pass;
+ 
+     if (!arm_dc_feature(s, ARM_FEATURE_NEON)) {
+@@ -2554,14 +2579,17 @@ static bool do_vqrdmlah_2sc(DisasContext *s, arg_2scalar *a,
+     }
+ 
+     scalar = neon_get_scalar(a->size, a->vm);
++    rn = tcg_temp_new_i32();
++    rd = tcg_temp_new_i32();
+ 
+     for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
+-        TCGv_i32 rn = neon_load_reg(a->vn, pass);
+-        TCGv_i32 rd = neon_load_reg(a->vd, pass);
++        read_neon_element32(rn, a->vn, pass, MO_32);
++        read_neon_element32(rd, a->vd, pass, MO_32);
+         opfn(rd, cpu_env, rn, scalar, rd);
+-        tcg_temp_free_i32(rn);
+-        neon_store_reg(a->vd, pass, rd);
++        write_neon_element32(rd, a->vd, pass, MO_32);
+     }
++    tcg_temp_free_i32(rn);
++    tcg_temp_free_i32(rd);
+     tcg_temp_free_i32(scalar);
+ 
+     return true;
+@@ -2628,12 +2656,12 @@ static bool do_2scalar_long(DisasContext *s, arg_2scalar *a,
+     scalar = neon_get_scalar(a->size, a->vm);
+ 
+     /* Load all inputs before writing any outputs, in case of overlap */
+-    rn = neon_load_reg(a->vn, 0);
++    rn = tcg_temp_new_i32();
++    read_neon_element32(rn, a->vn, 0, MO_32);
+     rn0_64 = tcg_temp_new_i64();
+     opfn(rn0_64, rn, scalar);
+-    tcg_temp_free_i32(rn);
+ 
+-    rn = neon_load_reg(a->vn, 1);
++    read_neon_element32(rn, a->vn, 1, MO_32);
+     rn1_64 = tcg_temp_new_i64();
+     opfn(rn1_64, rn, scalar);
+     tcg_temp_free_i32(rn);
+@@ -2857,30 +2885,34 @@ static bool trans_VTBL(DisasContext *s, arg_VTBL *a)
+         return false;
+     }
+     n <<= 3;
++    tmp = tcg_temp_new_i32();
+     if (a->op) {
+-        tmp = neon_load_reg(a->vd, 0);
++        read_neon_element32(tmp, a->vd, 0, MO_32);
+     } else {
+-        tmp = tcg_temp_new_i32();
+         tcg_gen_movi_i32(tmp, 0);
+     }
+-    tmp2 = neon_load_reg(a->vm, 0);
++    tmp2 = tcg_temp_new_i32();
++    read_neon_element32(tmp2, a->vm, 0, MO_32);
+     ptr1 = vfp_reg_ptr(true, a->vn);
+     tmp4 = tcg_const_i32(n);
+     gen_helper_neon_tbl(tmp2, tmp2, tmp, ptr1, tmp4);
+-    tcg_temp_free_i32(tmp);
++
+     if (a->op) {
+-        tmp = neon_load_reg(a->vd, 1);
++        read_neon_element32(tmp, a->vd, 1, MO_32);
+     } else {
+-        tmp = tcg_temp_new_i32();
+         tcg_gen_movi_i32(tmp, 0);
+     }
+-    tmp3 = neon_load_reg(a->vm, 1);
++    tmp3 = tcg_temp_new_i32();
++    read_neon_element32(tmp3, a->vm, 1, MO_32);
+     gen_helper_neon_tbl(tmp3, tmp3, tmp, ptr1, tmp4);
++    tcg_temp_free_i32(tmp);
+     tcg_temp_free_i32(tmp4);
+     tcg_temp_free_ptr(ptr1);
+-    neon_store_reg(a->vd, 0, tmp2);
+-    neon_store_reg(a->vd, 1, tmp3);
+-    tcg_temp_free_i32(tmp);
++
++    write_neon_element32(tmp2, a->vd, 0, MO_32);
++    write_neon_element32(tmp3, a->vd, 1, MO_32);
++    tcg_temp_free_i32(tmp2);
++    tcg_temp_free_i32(tmp3);
+     return true;
+ }
+ 
+@@ -2939,8 +2971,11 @@ static bool trans_VREV64(DisasContext *s, arg_VREV64 *a)
+     for (pass = 0; pass < (a->q ? 2 : 1); pass++) {
+         TCGv_i32 tmp[2];
+ 
++        tmp[0] = tcg_temp_new_i32();
++        tmp[1] = tcg_temp_new_i32();
++
+         for (half = 0; half < 2; half++) {
+-            tmp[half] = neon_load_reg(a->vm, pass * 2 + half);
++            read_neon_element32(tmp[half], a->vm, pass * 2 + half, MO_32);
+             switch (a->size) {
+             case 0:
+                 tcg_gen_bswap32_i32(tmp[half], tmp[half]);
+@@ -2954,8 +2989,8 @@ static bool trans_VREV64(DisasContext *s, arg_VREV64 *a)
+                 g_assert_not_reached();
+             }
+         }
+-        neon_store_reg(a->vd, pass * 2, tmp[1]);
+-        neon_store_reg(a->vd, pass * 2 + 1, tmp[0]);
++        write_neon_element32(tmp[1], a->vd, pass * 2, MO_32);
++        write_neon_element32(tmp[0], a->vd, pass * 2 + 1, MO_32);
+     }
+     return true;
+ }
+@@ -3001,12 +3036,14 @@ static bool do_2misc_pairwise(DisasContext *s, arg_2misc *a,
+         rm0_64 = tcg_temp_new_i64();
+         rm1_64 = tcg_temp_new_i64();
+         rd_64 = tcg_temp_new_i64();
+-        tmp = neon_load_reg(a->vm, pass * 2);
++
++        tmp = tcg_temp_new_i32();
++        read_neon_element32(tmp, a->vm, pass * 2, MO_32);
+         widenfn(rm0_64, tmp);
+-        tcg_temp_free_i32(tmp);
+-        tmp = neon_load_reg(a->vm, pass * 2 + 1);
++        read_neon_element32(tmp, a->vm, pass * 2 + 1, MO_32);
+         widenfn(rm1_64, tmp);
+         tcg_temp_free_i32(tmp);
++
+         opfn(rd_64, rm0_64, rm1_64);
+         tcg_temp_free_i64(rm0_64);
+         tcg_temp_free_i64(rm1_64);
+@@ -3219,8 +3256,10 @@ static bool do_vmovn(DisasContext *s, arg_2misc *a,
+     narrowfn(rd0, cpu_env, rm);
+     neon_load_reg64(rm, a->vm + 1);
+     narrowfn(rd1, cpu_env, rm);
+-    neon_store_reg(a->vd, 0, rd0);
+-    neon_store_reg(a->vd, 1, rd1);
++    write_neon_element32(rd0, a->vd, 0, MO_32);
++    write_neon_element32(rd1, a->vd, 1, MO_32);
++    tcg_temp_free_i32(rd0);
++    tcg_temp_free_i32(rd1);
+     tcg_temp_free_i64(rm);
+     return true;
+ }
+@@ -3277,9 +3316,11 @@ static bool trans_VSHLL(DisasContext *s, arg_2misc *a)
+     }
+ 
+     rd = tcg_temp_new_i64();
++    rm0 = tcg_temp_new_i32();
++    rm1 = tcg_temp_new_i32();
+ 
+-    rm0 = neon_load_reg(a->vm, 0);
+-    rm1 = neon_load_reg(a->vm, 1);
++    read_neon_element32(rm0, a->vm, 0, MO_32);
++    read_neon_element32(rm1, a->vm, 1, MO_32);
+ 
+     widenfn(rd, rm0);
+     tcg_gen_shli_i64(rd, rd, 8 << a->size);
+@@ -3320,21 +3361,25 @@ static bool trans_VCVT_F16_F32(DisasContext *s, arg_2misc *a)
+ 
+     fpst = fpstatus_ptr(FPST_STD);
+     ahp = get_ahp_flag();
+-    tmp = neon_load_reg(a->vm, 0);
++    tmp = tcg_temp_new_i32();
++    read_neon_element32(tmp, a->vm, 0, MO_32);
+     gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
+-    tmp2 = neon_load_reg(a->vm, 1);
++    tmp2 = tcg_temp_new_i32();
++    read_neon_element32(tmp2, a->vm, 1, MO_32);
+     gen_helper_vfp_fcvt_f32_to_f16(tmp2, tmp2, fpst, ahp);
+     tcg_gen_shli_i32(tmp2, tmp2, 16);
+     tcg_gen_or_i32(tmp2, tmp2, tmp);
+-    tcg_temp_free_i32(tmp);
+-    tmp = neon_load_reg(a->vm, 2);
++    read_neon_element32(tmp, a->vm, 2, MO_32);
+     gen_helper_vfp_fcvt_f32_to_f16(tmp, tmp, fpst, ahp);
+-    tmp3 = neon_load_reg(a->vm, 3);
+-    neon_store_reg(a->vd, 0, tmp2);
++    tmp3 = tcg_temp_new_i32();
++    read_neon_element32(tmp3, a->vm, 3, MO_32);
++    write_neon_element32(tmp2, a->vd, 0, MO_32);
++    tcg_temp_free_i32(tmp2);
+     gen_helper_vfp_fcvt_f32_to_f16(tmp3, tmp3, fpst, ahp);
+     tcg_gen_shli_i32(tmp3, tmp3, 16);
+     tcg_gen_or_i32(tmp3, tmp3, tmp);
+-    neon_store_reg(a->vd, 1, tmp3);
++    write_neon_element32(tmp3, a->vd, 1, MO_32);
++    tcg_temp_free_i32(tmp3);
+     tcg_temp_free_i32(tmp);
+     tcg_temp_free_i32(ahp);
+     tcg_temp_free_ptr(fpst);
+@@ -3369,21 +3414,25 @@ static bool trans_VCVT_F32_F16(DisasContext *s, arg_2misc *a)
+     fpst = fpstatus_ptr(FPST_STD);
+     ahp = get_ahp_flag();
+     tmp3 = tcg_temp_new_i32();
+-    tmp = neon_load_reg(a->vm, 0);
+-    tmp2 = neon_load_reg(a->vm, 1);
++    tmp2 = tcg_temp_new_i32();
++    tmp = tcg_temp_new_i32();
++    read_neon_element32(tmp, a->vm, 0, MO_32);
++    read_neon_element32(tmp2, a->vm, 1, MO_32);
+     tcg_gen_ext16u_i32(tmp3, tmp);
+     gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
+-    neon_store_reg(a->vd, 0, tmp3);
++    write_neon_element32(tmp3, a->vd, 0, MO_32);
+     tcg_gen_shri_i32(tmp, tmp, 16);
+     gen_helper_vfp_fcvt_f16_to_f32(tmp, tmp, fpst, ahp);
+-    neon_store_reg(a->vd, 1, tmp);
+-    tmp3 = tcg_temp_new_i32();
++    write_neon_element32(tmp, a->vd, 1, MO_32);
++    tcg_temp_free_i32(tmp);
+     tcg_gen_ext16u_i32(tmp3, tmp2);
+     gen_helper_vfp_fcvt_f16_to_f32(tmp3, tmp3, fpst, ahp);
+-    neon_store_reg(a->vd, 2, tmp3);
++    write_neon_element32(tmp3, a->vd, 2, MO_32);
++    tcg_temp_free_i32(tmp3);
+     tcg_gen_shri_i32(tmp2, tmp2, 16);
+     gen_helper_vfp_fcvt_f16_to_f32(tmp2, tmp2, fpst, ahp);
+-    neon_store_reg(a->vd, 3, tmp2);
++    write_neon_element32(tmp2, a->vd, 3, MO_32);
++    tcg_temp_free_i32(tmp2);
+     tcg_temp_free_i32(ahp);
+     tcg_temp_free_ptr(fpst);
+ 
+@@ -3489,6 +3538,7 @@ DO_2M_CRYPTO(SHA256SU0, aa32_sha2, 2)
+ 
+ static bool do_2misc(DisasContext *s, arg_2misc *a, NeonGenOneOpFn *fn)
+ {
++    TCGv_i32 tmp;
+     int pass;
+ 
+     /* Handle a 2-reg-misc operation by iterating 32 bits at a time */
+@@ -3514,11 +3564,13 @@ static bool do_2misc(DisasContext *s, arg_2misc *a, NeonGenOneOpFn *fn)
+         return true;
+     }
+ 
++    tmp = tcg_temp_new_i32();
+     for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
+-        TCGv_i32 tmp = neon_load_reg(a->vm, pass);
++        read_neon_element32(tmp, a->vm, pass, MO_32);
+         fn(tmp, tmp);
+-        neon_store_reg(a->vd, pass, tmp);
++        write_neon_element32(tmp, a->vd, pass, MO_32);
+     }
++    tcg_temp_free_i32(tmp);
+ 
+     return true;
+ }
+@@ -3871,24 +3923,26 @@ static bool trans_VTRN(DisasContext *s, arg_2misc *a)
+         return true;
+     }
+ 
+-    if (a->size == 2) {
++    tmp = tcg_temp_new_i32();
++    tmp2 = tcg_temp_new_i32();
++    if (a->size == MO_32) {
+         for (pass = 0; pass < (a->q ? 4 : 2); pass += 2) {
+-            tmp = neon_load_reg(a->vm, pass);
+-            tmp2 = neon_load_reg(a->vd, pass + 1);
+-            neon_store_reg(a->vm, pass, tmp2);
+-            neon_store_reg(a->vd, pass + 1, tmp);
++            read_neon_element32(tmp, a->vm, pass, MO_32);
++            read_neon_element32(tmp2, a->vd, pass + 1, MO_32);
++            write_neon_element32(tmp2, a->vm, pass, MO_32);
++            write_neon_element32(tmp, a->vd, pass + 1, MO_32);
+         }
+     } else {
+         for (pass = 0; pass < (a->q ? 4 : 2); pass++) {
+-            tmp = neon_load_reg(a->vm, pass);
+-            tmp2 = neon_load_reg(a->vd, pass);
+-            if (a->size == 0) {
++            read_neon_element32(tmp, a->vm, pass, MO_32);
++            read_neon_element32(tmp2, a->vd, pass, MO_32);
++            if (a->size == MO_8) {
+                 gen_neon_trn_u8(tmp, tmp2);
+             } else {
+                 gen_neon_trn_u16(tmp, tmp2);
+             }
+-            neon_store_reg(a->vm, pass, tmp2);
+-            neon_store_reg(a->vd, pass, tmp);
++            write_neon_element32(tmp2, a->vm, pass, MO_32);
++            write_neon_element32(tmp, a->vd, pass, MO_32);
+         }
+     }
+     return true;
 -- 
 2.25.1
 
