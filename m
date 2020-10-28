@@ -2,108 +2,91 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-17.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C07BC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:52:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CEF5C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:02:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 9526C2467C
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:52:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AD21E2240C
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:02:21 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZ4iNF5w"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9526C2467C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="CAsGSlju"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AD21E2240C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:48780 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXhBd-0002yo-7s
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 04:52:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43326)
+	id 1kXhLY-0008Lq-I8
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:02:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45492)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhAd-0002NG-7X
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:51:03 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51452)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhAa-0005Bp-9y
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:51:02 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603875057;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iYQ91VMxT4Ba21psPiLhutxNa9aV21dNN/X7Awt2to0=;
- b=EZ4iNF5w++Xz1eoFtmired+S7p79gPO3WrX2LdLeQmg59egaubq1ZLw25IYzCKx59lUhgS
- yKMxqB2v42gfKQqQt6FiZ/6e57NME48s7rmw/X0cwAxRUfmhQ7FTz+0GQk9mf41MIsWCwq
- jqdEGw+o/j6K42uPN05aP8hbZZ53eWc=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-473-tz2YEcqeOOOigToi34frNw-1; Wed, 28 Oct 2020 04:50:55 -0400
-X-MC-Unique: tz2YEcqeOOOigToi34frNw-1
-Received: by mail-ej1-f71.google.com with SMTP id d13so1917629ejz.6
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 01:50:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
+ id 1kXhJ1-0007Nz-Ul
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:59:43 -0400
+Received: from mail-lj1-x242.google.com ([2a00:1450:4864:20::242]:46431)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <maxim.uvarov@linaro.org>)
+ id 1kXhIz-0008Ml-Te
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:59:43 -0400
+Received: by mail-lj1-x242.google.com with SMTP id 2so5127413ljj.13
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 01:59:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=9KzxZphh5qorAZCm7OOtB/tI3KN6E0kQQ+xEwkJpWxM=;
+ b=CAsGSljuJw3uvCLpvtA92Xycjxof9qcDxt2mv6LrlQ5QWNxzi0rwe7GoLD7Z9RQeoI
+ ge2CRd518VBBe704wYLGYwW/VvnbQqh+Pknt/sFcL7Mf8iSQVpTfindehsgJK98i4Cf5
+ 9l3uUNMMTBbAyy91UbDGTLo2rviLZE8P7ZmnLL9/p4aMxBOf+kfHKKCU9PvGulYGA6z/
+ wII+T1b5U/LdlCXwzZAS5DevaIoThhTpI+6GbLTu0Dx/4p68NeAFaupCWUFLWQKJM6yz
+ htamPTcxkhAhDHqnpiy5akCEdfo8hpl5yGiM2FVz/ZMkRLfB7wkVSUB1AUcahA7BcW7e
+ 205A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
  :content-transfer-encoding;
- bh=iYQ91VMxT4Ba21psPiLhutxNa9aV21dNN/X7Awt2to0=;
- b=DrSEi7/dZxRcvE9Vivgqj10CZuAZsdQ5aWn4ytTNesoB9c+T2ueHUe5VMuGw63pAHH
- AoPgRTwQ2w6k7IaLZkRFbrPzc2xHuTclcdru7vLhuQzHMbiAEibfIlwLUxik/h4n3xtS
- XMUar675I51gtdeluIy5u1NFvq+heWvLTAARU5OYNrx8qW5T20WEOj9pToeB8qtvA8Bd
- X4QFpvK1abZymlLgE5Bb9xMJh/fQu9m0waAW5bZp8JMLKKwhawdY6f2SQLUbnAFSVfVw
- nr9foO9geJ90Uqy+A/oMA7WU/kjFSaNYd9ag/98WYBy0VH5lFSSW9IFA0RxsGTweYqR0
- SnFg==
-X-Gm-Message-State: AOAM5338mvF87g8yMw2VHhGMXEBKy8E8PW9f1LSXKx6fNrUjQy+G5rfU
- XE+HY4gWol4rPgyImuKU6WlpjF4BNlANWOTcFJIwaxyXfSOx1uEXWo7LtJetpQhJi2Idx1Um4Gr
- ZLr1gtBqESwaTBDs=
-X-Received: by 2002:a17:906:3e4b:: with SMTP id
- t11mr6369394eji.420.1603875053860; 
- Wed, 28 Oct 2020 01:50:53 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwQtzN0Tl6t0+1Ad74NwMdysPVVnBVzYxhFBv0Rm2bdyWIvuP3Ej6F0VA/4r5ezABQtMHs4Gw==
-X-Received: by 2002:a17:906:3e4b:: with SMTP id
- t11mr6369377eji.420.1603875053666; 
- Wed, 28 Oct 2020 01:50:53 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id z23sm2524854ejj.52.2020.10.28.01.50.52
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 28 Oct 2020 01:50:52 -0700 (PDT)
-Subject: Re: [PATCH 2/5] python: add excluded dirs to flake8 config
-To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
-References: <20201027223815.159802-1-jsnow@redhat.com>
- <20201027223815.159802-3-jsnow@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <da8e8e7f-18cb-7fc1-955f-c3f73d9a3260@redhat.com>
-Date: Wed, 28 Oct 2020 09:50:51 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ bh=9KzxZphh5qorAZCm7OOtB/tI3KN6E0kQQ+xEwkJpWxM=;
+ b=bO9Y96hoqhuWej5GN3/H4VtZnECrSMB2db9UImSXRpD6z5Lp8oqDmVbiy2nkU+kDPv
+ JsMnprYG3RRDJWPpHtrYDwIkQtAxSrKZhW3wGAuwcZ2gCphV+P43t5DP+9Sq1ppuwpVE
+ kXR80m33K3q8QFwTYBaQOH/Skj6x2RyvF8SIkGDB49cX4mwiZR4cF0CUj1c1kj31mxhL
+ Z4TaHBYjYGll3Le27pjciI7sFvDIF6FzAkSRKZj115dClRvrCXoRXH8DPbC16BS98s42
+ 41r6Pw/OZRoKrOaFZyxenuRGo1xKNAXOlZpWOhzLdrnXokOZ81RH8EsrCnAWO/f8B62A
+ liWg==
+X-Gm-Message-State: AOAM532hyukduvbPYqYourAdNX4Qt9kY+LVqQEjV3+2JSYtZ2RtvRrQC
+ KV/1ho1M80OZYRv6apyJVE+HZw==
+X-Google-Smtp-Source: ABdhPJzWJrosHWaikvLP3KEh9e3UgnNGGsB3BhffeaUV0l4ZFay1uHHlUhy0/+IDIr9YQcIBzF2kdg==
+X-Received: by 2002:a2e:884d:: with SMTP id z13mr597254ljj.413.1603875578430; 
+ Wed, 28 Oct 2020 01:59:38 -0700 (PDT)
+Received: from localhost.localdomain (37-145-124-43.broadband.corbina.ru.
+ [37.145.124.43])
+ by smtp.gmail.com with ESMTPSA id l3sm521719lji.36.2020.10.28.01.59.36
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Oct 2020 01:59:37 -0700 (PDT)
+From: Maxim Uvarov <maxim.uvarov@linaro.org>
+To: qemu-arm@nongnu.org
+Subject: [RFC PATCH] hw/arm/virt: use sbsa-ec for reboot and poweroff in
+ secure mode
+Date: Wed, 28 Oct 2020 11:59:18 +0300
+Message-Id: <20201028085918.14580-1-maxim.uvarov@linaro.org>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-In-Reply-To: <20201027223815.159802-3-jsnow@redhat.com>
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+Received-SPF: pass client-ip=2a00:1450:4864:20::242;
+ envelope-from=maxim.uvarov@linaro.org; helo=mail-lj1-x242.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -117,45 +100,96 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: peter.maydell@linaro.org, francois.ozog@linaro.org, qemu-devel@nongnu.org,
+ Maxim Uvarov <maxim.uvarov@linaro.org>, tf-a@lists.trustedfirmware.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/27/20 11:38 PM, John Snow wrote:
-> Following patches make obvious that we ought to ignore certain
-> directories to avoid wildly erroneous flake8 output.
-> 
-> Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  python/setup.cfg | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/python/setup.cfg b/python/setup.cfg
-> index cb696291ba38..d0ad683b5148 100644
-> --- a/python/setup.cfg
-> +++ b/python/setup.cfg
-> @@ -30,6 +30,8 @@ devel =
->  
->  [flake8]
->  extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
-> +exclude = __pycache__,
-> +          .venv,
+If we're emulating EL3 then the EL3 guest firmware is responsible for
+providing the PSCI ABI, including reboot, core power down, etc.
+sbsa-ref machine has an embedded controller to do reboot, poweroff. Machine
+virt,secure=on can reuse this code to do reboot inside ATF.
 
-Can we make flake8 aware the files are in a git repository instead?
+Signed-off-by: Maxim Uvarov <maxim.uvarov@linaro.org>
+---
+ Hello,
 
-Anyway,
-Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+ This patch implements reboot for the secure machine inside ATF firmware. I.e. current qemu
+ patch should be used with [1] ATF patch. It looks like that Embedded Controller qemu
+ driver (sbsa-ec) can be common and widely used for other emulated machines. While if
+ there are plans to extend sbsa-ec then we might find some other solution.
 
->  
->  [mypy]
->  strict = True
-> 
+ So for the long term it looks like machine virt was used as an initial playground for secure
+ firmware.  While the original intent was a runner for kvm guests. Relation between kvm guest
+ and firmware  is not very clear now. If everyone agree it might be good solution to move secure
+ firmware things from virt machine to bsa-ref and make this machine reference for secure boot,
+ firmware updates  etc.
+
+ [1] https://github.com/muvarov/arm-trusted-firmware/commit/6d3339a0081f6f2b45d99bd7e1b67bcbce8f4e0e
+
+ Best regards,
+ Maxim.
+
+ hw/arm/virt.c         | 9 +++++++++
+ include/hw/arm/virt.h | 2 ++
+ 2 files changed, 11 insertions(+)
+
+diff --git a/hw/arm/virt.c b/hw/arm/virt.c
+index e465a988d6..6b77912f02 100644
+--- a/hw/arm/virt.c
++++ b/hw/arm/virt.c
+@@ -152,6 +152,7 @@ static const MemMapEntry base_memmap[] = {
+     [VIRT_ACPI_GED] =           { 0x09080000, ACPI_GED_EVT_SEL_LEN },
+     [VIRT_NVDIMM_ACPI] =        { 0x09090000, NVDIMM_ACPI_IO_LEN},
+     [VIRT_PVTIME] =             { 0x090a0000, 0x00010000 },
++    [VIRT_EC] =                 { 0x090c0000, 0x00001000 },
+     [VIRT_MMIO] =               { 0x0a000000, 0x00000200 },
+     /* ...repeating for a total of NUM_VIRTIO_TRANSPORTS, each of that size */
+     [VIRT_PLATFORM_BUS] =       { 0x0c000000, 0x02000000 },
+@@ -1729,6 +1730,13 @@ static void virt_cpu_post_init(VirtMachineState *vms, int max_cpus,
+     }
+ }
+ 
++static void init_ec_controller(VirtMachineState *vms)
++{
++    vms->ec = qdev_new("sbsa-ec");
++
++    sysbus_mmio_map(SYS_BUS_DEVICE(vms->ec), 0, vms->memmap[VIRT_EC].base);
++}
++
+ static void machvirt_init(MachineState *machine)
+ {
+     VirtMachineState *vms = VIRT_MACHINE(machine);
+@@ -1797,6 +1805,7 @@ static void machvirt_init(MachineState *machine)
+      */
+     if (vms->secure && firmware_loaded) {
+         vms->psci_conduit = QEMU_PSCI_CONDUIT_DISABLED;
++        init_ec_controller(vms);
+     } else if (vms->virt) {
+         vms->psci_conduit = QEMU_PSCI_CONDUIT_SMC;
+     } else {
+diff --git a/include/hw/arm/virt.h b/include/hw/arm/virt.h
+index aad6d69841..6f2ce4e4ff 100644
+--- a/include/hw/arm/virt.h
++++ b/include/hw/arm/virt.h
+@@ -85,6 +85,7 @@ enum {
+     VIRT_ACPI_GED,
+     VIRT_NVDIMM_ACPI,
+     VIRT_PVTIME,
++    VIRT_EC,
+     VIRT_LOWMEMMAP_LAST,
+ };
+ 
+@@ -163,6 +164,7 @@ struct VirtMachineState {
+     DeviceState *gic;
+     DeviceState *acpi_dev;
+     Notifier powerdown_notifier;
++    DeviceState *ec;
+ };
+ 
+ #define VIRT_ECAM_ID(high) (high ? VIRT_HIGH_PCIE_ECAM : VIRT_PCIE_ECAM)
+-- 
+2.17.1
 
 
