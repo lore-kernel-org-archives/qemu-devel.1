@@ -2,82 +2,113 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E62D6C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9C07BC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:52:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1D11624672
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:38:52 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1D11624672
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 9526C2467C
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 08:52:06 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EZ4iNF5w"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9526C2467C
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48780 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXgyp-0007Oc-OL
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 04:38:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38776)
+	id 1kXhBd-0002yo-7s
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 04:52:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43326)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXgrA-0002y4-FX
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:30:57 -0400
-Received: from indium.canonical.com ([91.189.90.7]:36004)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXgr8-0006Y7-01
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:30:56 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kXgr5-0004u3-Rc
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 08:30:51 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id A97102E8134
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 08:30:51 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhAd-0002NG-7X
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:51:03 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:51452)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhAa-0005Bp-9y
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 04:51:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603875057;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=iYQ91VMxT4Ba21psPiLhutxNa9aV21dNN/X7Awt2to0=;
+ b=EZ4iNF5w++Xz1eoFtmired+S7p79gPO3WrX2LdLeQmg59egaubq1ZLw25IYzCKx59lUhgS
+ yKMxqB2v42gfKQqQt6FiZ/6e57NME48s7rmw/X0cwAxRUfmhQ7FTz+0GQk9mf41MIsWCwq
+ jqdEGw+o/j6K42uPN05aP8hbZZ53eWc=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-473-tz2YEcqeOOOigToi34frNw-1; Wed, 28 Oct 2020 04:50:55 -0400
+X-MC-Unique: tz2YEcqeOOOigToi34frNw-1
+Received: by mail-ej1-f71.google.com with SMTP id d13so1917629ejz.6
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 01:50:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=iYQ91VMxT4Ba21psPiLhutxNa9aV21dNN/X7Awt2to0=;
+ b=DrSEi7/dZxRcvE9Vivgqj10CZuAZsdQ5aWn4ytTNesoB9c+T2ueHUe5VMuGw63pAHH
+ AoPgRTwQ2w6k7IaLZkRFbrPzc2xHuTclcdru7vLhuQzHMbiAEibfIlwLUxik/h4n3xtS
+ XMUar675I51gtdeluIy5u1NFvq+heWvLTAARU5OYNrx8qW5T20WEOj9pToeB8qtvA8Bd
+ X4QFpvK1abZymlLgE5Bb9xMJh/fQu9m0waAW5bZp8JMLKKwhawdY6f2SQLUbnAFSVfVw
+ nr9foO9geJ90Uqy+A/oMA7WU/kjFSaNYd9ag/98WYBy0VH5lFSSW9IFA0RxsGTweYqR0
+ SnFg==
+X-Gm-Message-State: AOAM5338mvF87g8yMw2VHhGMXEBKy8E8PW9f1LSXKx6fNrUjQy+G5rfU
+ XE+HY4gWol4rPgyImuKU6WlpjF4BNlANWOTcFJIwaxyXfSOx1uEXWo7LtJetpQhJi2Idx1Um4Gr
+ ZLr1gtBqESwaTBDs=
+X-Received: by 2002:a17:906:3e4b:: with SMTP id
+ t11mr6369394eji.420.1603875053860; 
+ Wed, 28 Oct 2020 01:50:53 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwQtzN0Tl6t0+1Ad74NwMdysPVVnBVzYxhFBv0Rm2bdyWIvuP3Ej6F0VA/4r5ezABQtMHs4Gw==
+X-Received: by 2002:a17:906:3e4b:: with SMTP id
+ t11mr6369377eji.420.1603875053666; 
+ Wed, 28 Oct 2020 01:50:53 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id z23sm2524854ejj.52.2020.10.28.01.50.52
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 28 Oct 2020 01:50:52 -0700 (PDT)
+Subject: Re: [PATCH 2/5] python: add excluded dirs to flake8 config
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20201027223815.159802-1-jsnow@redhat.com>
+ <20201027223815.159802-3-jsnow@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <da8e8e7f-18cb-7fc1-955f-c3f73d9a3260@redhat.com>
+Date: Wed, 28 Oct 2020 09:50:51 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Oct 2020 08:23:54 -0000
-From: Mark Cave-Ayland <1892540@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Tags: sparc testcase
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: gson laurent-vivier mark-cave-ayland mst-0 philmd
-X-Launchpad-Bug-Reporter: Andreas Gustafsson (gson)
-X-Launchpad-Bug-Modifier: Mark Cave-Ayland (mark-cave-ayland)
-References: <159803735569.2614.10182276398047269277.malonedeb@chaenomeles.canonical.com>
-Message-ID: <20201028082358.23761-7-mark.cave-ayland@ilande.co.uk>
-Subject: [Bug 1892540] [PULL 06/10] hw/display/tcx: Allow 64-bit accesses to
- framebuffer stippler and blitter
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: c3bef6ce400c8825a3be0e12dfacbb508bc59874
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 04:30:52
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.249, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201027223815.159802-3-jsnow@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -86,160 +117,45 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1892540 <1892540@bugs.launchpad.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Message-ID: <20201028082354.l5oUhT75d6H0a8r1fHCRp7llbx8r5t8c3pOAqa7g9aY@z>
 
-From: Philippe Mathieu-Daud=C3=A9 <1892540@bugs.launchpad.net>
+On 10/27/20 11:38 PM, John Snow wrote:
+> Following patches make obvious that we ought to ignore certain
+> directories to avoid wildly erroneous flake8 output.
+> 
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  python/setup.cfg | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/python/setup.cfg b/python/setup.cfg
+> index cb696291ba38..d0ad683b5148 100644
+> --- a/python/setup.cfg
+> +++ b/python/setup.cfg
+> @@ -30,6 +30,8 @@ devel =
+>  
+>  [flake8]
+>  extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
+> +exclude = __pycache__,
+> +          .venv,
 
-The S24/TCX datasheet is listed as "Unable to locate" on [1].
+Can we make flake8 aware the files are in a git repository instead?
 
-However the NetBSD revision 1.32 of the driver introduced
-64-bit accesses to the stippler and blitter [2]. It is safe
-to assume these memory regions are 64-bit accessible.
-QEMU implementation is 32-bit, so fill the 'impl' fields.
+Anyway,
+Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
 
-Michael Lorenz (author of the NetBSD code [2]) provided us with more
-information in [3]:
+>  
+>  [mypy]
+>  strict = True
+> 
 
-> IIRC the real hardware *requires* 64bit accesses for stipple and
-> blitter operations to work. For stipples you write a 64bit word into
-> STIP space, the address defines where in the framebuffer you want to
-> draw, the data contain a 32bit bitmask, foreground colour and a ROP.
-> BLIT space works similarly, the 64bit word contains an offset were to
-> read pixels from, and how many you want to copy.
->
-> One more thing since there seems to be some confusion - 64bit accesses
-> on the framebuffer are fine as well. TCX/S24 is *not* an SBus device,
-> even though its node says it is.
-> S24 is a card that plugs into a special slot on the SS5 mainboard,
-> which is shared with an SBus slot and looks a lot like a horizontal
-> UPA slot. Both S24 and TCX are accessed through the Micro/TurboSPARC's
-> AFX bus which is 64bit wide and intended for graphics.
-> Early FFB docs even mentioned connecting to both AFX and UPA,
-> no idea if that was ever realized in hardware though.
-
-[1] http://web.archive.org/web/20111209011516/http://wikis.sun.com/display/=
-FOSSdocs/Home
-[2] http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/dev/sbus/tcx.c.diff?r1=3D1.=
-31&r2=3D1.32
-[3] https://www.mail-archive.com/qemu-devel@nongnu.org/msg734928.html
-
-Cc: qemu-stable@nongnu.org
-Reported-by: Andreas Gustafsson <gson@gson.org>
-Buglink: https://bugs.launchpad.net/bugs/1892540
-Fixes: 55d7bfe2293 ("tcx: Implement hardware acceleration")
-Tested-by: Michael S. Tsirkin <mst@redhat.com>
-Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
-Tested-by: Andreas Gustafsson <gson@gson.org>
-Signed-off-by: Philippe Mathieu-Daud=C3=A9 <f4bug@amsat.org>
-Message-Id: <20201024205100.3623006-1-f4bug@amsat.org>
-Signed-off-by: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
----
- hw/display/tcx.c | 18 +++++++++++++++---
- 1 file changed, 15 insertions(+), 3 deletions(-)
-
-diff --git a/hw/display/tcx.c b/hw/display/tcx.c
-index c9d5e45cd1..878ecc8c50 100644
---- a/hw/display/tcx.c
-+++ b/hw/display/tcx.c
-@@ -549,20 +549,28 @@ static const MemoryRegionOps tcx_stip_ops =3D {
-     .read =3D tcx_stip_readl,
-     .write =3D tcx_stip_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
-
- static const MemoryRegionOps tcx_rstip_ops =3D {
-     .read =3D tcx_stip_readl,
-     .write =3D tcx_rstip_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
-
- static uint64_t tcx_blit_readl(void *opaque, hwaddr addr,
-@@ -651,10 +659,14 @@ static const MemoryRegionOps tcx_rblit_ops =3D {
-     .read =3D tcx_blit_readl,
-     .write =3D tcx_rblit_writel,
-     .endianness =3D DEVICE_NATIVE_ENDIAN,
--    .valid =3D {
-+    .impl =3D {
-         .min_access_size =3D 4,
-         .max_access_size =3D 4,
-     },
-+    .valid =3D {
-+        .min_access_size =3D 4,
-+        .max_access_size =3D 8,
-+    },
- };
- =
-
- static void tcx_invalidate_cursor_position(TCXState *s)
--- =
-
-2.20.1
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1892540
-
-Title:
-  qemu can no longer boot NetBSD/sparc
-
-Status in QEMU:
-  New
-
-Bug description:
-  Booting NetBSD/sparc in qemu no longer works.  It broke between qemu
-  version 5.0.0 and 5.1.0, and a bisection identified the following as
-  the offending commit:
-
-    [5d971f9e672507210e77d020d89e0e89165c8fc9] memory: Revert "memory:
-  accept mismatching sizes in memory_region_access_valid"
-
-  It's still broken as of 7fd51e68c34fcefdb4d6fd646ed3346f780f89f4.
-
-  To reproduce, run
-
-    wget http://ftp.netbsd.org/pub/NetBSD/NetBSD-9.0/images/NetBSD-9.0-spar=
-c.iso
-    qemu-system-sparc -nographic -cdrom NetBSD-9.0-sparc.iso -boot d
-
-  The expected behavior is that the guest boots to the prompt
-
-    Installation medium to load the additional utilities from:
-
-  The observed behavior is a panic:
-
-    [   1.0000050] system[0]: trap 0x29: pc=3D0xf0046b14 sfsr=3D0xb6 sfva=
-=3D0x54000000
-    [   1.0000050] cpu0: data fault: pc=3D0xf0046b14 addr=3D0x54000000 sfsr=
-=3D0xb6<PERR=3D0x0,LVL=3D0x0,AT=3D0x5,FT=3D0x5,FAV,OW>
-    [   1.0000050] panic: kernel fault
-    [   1.0000050] halted
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1892540/+subscriptions
 
