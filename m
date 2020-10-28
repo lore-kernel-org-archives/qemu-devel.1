@@ -2,85 +2,83 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA9CEC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:55:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F4F7C55179
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:55:34 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id CF1C2247A8
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:55:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F2024247AF
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:55:33 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="n80A/y59"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org CF1C2247A8
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="Svg8a8d2"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F2024247AF
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:35586 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35786 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXmrK-0003Sz-Eq
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:55:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38492)
+	id 1kXmrM-0003Y4-Uj
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:55:32 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38490)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=563b96974=alistair.francis@wdc.com>)
- id 1kXmpi-0001mO-5d; Wed, 28 Oct 2020 10:53:50 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:10513)
+ id 1kXmpi-0001mM-CX; Wed, 28 Oct 2020 10:53:50 -0400
+Received: from esa5.hgst.iphmx.com ([216.71.153.144]:10510)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1)
  (envelope-from <prvs=563b96974=alistair.francis@wdc.com>)
- id 1kXmpf-00035l-Mq; Wed, 28 Oct 2020 10:53:49 -0400
+ id 1kXmpe-00035L-T3; Wed, 28 Oct 2020 10:53:49 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
  d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603896827; x=1635432827;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=1m/uJoL+53mnBQz9EVIpdmTHpWP0VnXUqGjtcq/apck=;
- b=n80A/y59H/ARwEkKP1qXs4KWJB1o5heKNUzJkXf8EIWZM8J4pfum5yK0
- Zc3Of5EB5CtaSPlye0R6wv3QqXYLH3J0NRqaB1oxZGGFKAdHF6zv6d0g+
- 8QCZKErO30hT5B139Mag283zPrkoz0P30rkS5yvvF55Nbu1nAXJkC80LA
- 1rIwuvUZFkcKzCvIrPsWi06OcDKpiDcr0ftv93QSOb/s3h9GcnyczUEwt
- OLi/HslRrp11jCz1hUd3wy2LVRuw7558TUYr9cQTGfhMU1z2Rb/vAW4RN
- mIEH8druF7sqeyOWoycnH/N2I+XPB/h0951brUJeaAb7LQrXC3YKUwKp7 A==;
-IronPort-SDR: 8udSw06UGFWoPsjxlHJpJ0uJhPCC2syDuTCnvdWB2r4+wKKcTl41WjW9gbhLiw4J7TDbyu21CK
- 1EFRRGmsb61cAWHo0195TWjduK8LbNCZSFA4yzq39QoLuljSJsoqSnBojMBTR/5AVtxsL9mHfx
- TkQbn7c1frlOs7MWdZL3caLCVsvAhNU7MUl8mqSI7tgBadZIm+Ob5qOhhRzQrTDkkiAOa5zvW3
- pblBHizttmFithiLcSraQAt4OELq+8igg/o8tXCEhH/QdtoM9V8jETFj9YASPqkG49VmciEJG5
- dok=
-X-IronPort-AV: E=Sophos;i="5.77,426,1596470400"; d="scan'208";a="151200363"
+ t=1603896826; x=1635432826;
+ h=from:to:cc:subject:date:message-id:mime-version:
+ content-transfer-encoding;
+ bh=gqN1q0ztY/K8RVas54tv6M76H9c7ztlUkarYiaGvMjo=;
+ b=Svg8a8d2L6Sa/2qjFgTa+1COmhYpbcan/W2Ptc/w0Em/fdnNtC3ucAwy
+ 76seA/t7ABL9yIYb5NEqt29+YnpWZ27Ll/LGar+tS3qKVzNk/a0KDRWPe
+ nBX3vim7IR0+bhI+bnG1TqoZk0oL1M7S96SLYDRDtVRkvVeSDrgWtaBSD
+ PeVJBKQKEGQC44Sal9fv/Ae9xur8Gpq+fAz/a/WL4Seerf33Icna3NhHP
+ I0IzY0i/aOQa7W9A96sRBt2FWp4jvNgh+MDNWVqxqyTqlEK+RqM+0i5Xt
+ Xfl8zoKj/8U7yEJiu1XYHR3kNzvS4eGB90lt/dqTIbuixKDod8luUIPRT g==;
+IronPort-SDR: dpCxKSoAqB4F7oDtlCRpBPiMB5TWrwn7Us0W9O2QRsVacfj6kD0Ldmn00gLUqltbLAPO6AGZXo
+ JfFsjVsSmCoJqP55MoLAWE9Y+nvBKjPpM0lH6eghhCOdxYrbaRkfakSC1JBnG0MQgsShTQ9VfK
+ TRPwPCsao9GBaxgr5Fq4duQWt3vpKtZpsq/bYdIyqJvP8lqCxTUSdny02gY/fKzprikepSpWyR
+ iyp5gk0DJXixUMRlZblyykuuDXiVJIbZT4Q7poxoz1yG2qGfGJxIms0+xOhVofQSfbNu/q+dat
+ 1Rg=
+X-IronPort-AV: E=Sophos;i="5.77,426,1596470400"; d="scan'208";a="151200349"
 Received: from h199-255-45-15.hgst.com (HELO uls-op-cesaep02.wdc.com)
  ([199.255.45.15])
- by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2020 22:53:45 +0800
-IronPort-SDR: fh8lP5nth2vCp8GKJNJXxuH7Xz4BtD0v6QUZnssKtR8dEoxXE2vVLXdZCfsVbpFl2h43TiUiKi
- xtB14UaLEA9AHDB7tPh2fqASGxRlUsX/pNmm4CoeSu1un3+zKuqzMEPTuUvVONBUWmtc1VRgeZ
- /+KcAdwlCwVHLTr7E0E6nx7eKX/crxppJ+ad67zqyoJequg1JX72klNsYky7sMYWrgezmhkjfN
- m7tE7iw39JbL1W85+JjFHRuwaNgN6KTmTZhZNhrvpsfRa2hQ4bphOovV2mIpFs7htCUfQ/bDYb
- xkeeuAYffucymrfIcOWAWmG/
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
+ by ob1.hgst.iphmx.com with ESMTP; 28 Oct 2020 22:53:42 +0800
+IronPort-SDR: 0GDFh3BZkpsvrNTc3Pbvz4uvaQ4yP0PFCJIccg8/BqpBmsSwAllAKWc7iGA/9VNjqaXVwIBGqe
+ A/Zt5E9TvwKefy0MToKYhX3zGQ3AGaaV7RfVUdVM7dH2akl3xzBXbBedRQpWGNRn7xMUdgXg6T
+ iCG7AeRCkjLKqwDRv7l/7+mweWm0+9ut4piU3IAtO3o3mkdXWoX2mwjV1IatoLzHNpGf4blhoa
+ dB0TTuIZSy2C3mU5rWcgc+lxCZZDAhGIs0zZfX1qyqJv0xNoiilz0zo3lvmUb+Y+pkjYBgNVl6
+ roeQjp80sHjjWsHk8j47ELeK
+Received: from uls-op-cesaip02.wdc.com ([10.248.3.37])
  by uls-op-cesaep02.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 28 Oct 2020 07:38:55 -0700
-IronPort-SDR: iwf4uBidU2hz+jSOULmo4t82ScoJIbYFCa4BXbcO3CCsiVfBQqqAyGqDv8hPfzM+ek7aaoclpZ
- c4g4E57Xb/nDmI5tmHtdjKDdgTd3QxTeXVOMZuyvBrjXtpfG6qwQO8SYzPGQqYS4nLqdyHjfKC
- xTAnfEKqTAtsnLIlYEQbZffyNPLqv3ZUZW1ipFAGI3vuuJtJm7zM+Ru8xPRwOT25f00rNN6AXc
- cOEz4IZ+UYfccvHokVNYFAF4VAoB0fCOcxfI9hJVpe4uYpC0tosz+l6fZH18HOrgz40uAYv1HY
- vWk=
+ 28 Oct 2020 07:38:52 -0700
+IronPort-SDR: HVQq0fEz9xzhRh072atpqA3GVNB+QagwK7sUVP2+iD16oHMd4lrk5Z0NYT3VB0lSBehuTViCd6
+ jDC8hDi/wQ9eEqeanrR8kbwl2pbHJxy+3uHm+RwrLB7IUh2ewK5o80tDB4b2DhwzB9OfmURQfD
+ euJsiV8F2GlPXIodJEtLsARhvqea9P2Vxim/mmOkBFMRIz6s8A8bEFtMI3ANFEZzx0b3dvgUP2
+ 0V/YAocMHctfD1J0YjM0Ta+EQckLnzy96DzeZ3NMC1NV37/GCh7TRz8Xzvv/A6qRuXz7R+HtHe
+ oZ4=
 WDCIronportException: Internal
 Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
  ([10.86.60.131])
- by uls-op-cesaip01.wdc.com with ESMTP; 28 Oct 2020 07:53:45 -0700
+ by uls-op-cesaip02.wdc.com with ESMTP; 28 Oct 2020 07:53:43 -0700
 From: Alistair Francis <alistair.francis@wdc.com>
 To: qemu-devel@nongnu.org,
 	qemu-riscv@nongnu.org
-Subject: [PATCH v2 1/5] target/riscv: Add a virtualised MMU Mode
-Date: Wed, 28 Oct 2020 07:42:20 -0700
-Message-Id: <d0eeb9ea64462044a67f5b803d6cb62dd10e017a.1603896075.git.alistair.francis@wdc.com>
+Subject: [PATCH v2 0/5]  Fix the Hypervisor access functions
+Date: Wed, 28 Oct 2020 07:42:17 -0700
+Message-Id: <cover.1603896075.git.alistair.francis@wdc.com>
 X-Mailer: git-send-email 2.28.0
-In-Reply-To: <cover.1603896075.git.alistair.francis@wdc.com>
-References: <cover.1603896075.git.alistair.francis@wdc.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.71.153.144;
@@ -113,74 +111,32 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Add a new MMU mode that includes the current virt mode.
+Richard pointed out that the Hypervisor access functions don't work
+correctly, see:
+https://www.mail-archive.com/qemu-devel@nongnu.org/msg751540.html.
 
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
----
- target/riscv/cpu-param.h  | 10 +++++++++-
- target/riscv/cpu.h        |  4 +++-
- target/riscv/cpu_helper.c |  6 +++++-
- 3 files changed, 17 insertions(+), 3 deletions(-)
+This seris fixes them up by adding a new MMU index for the virtualised
+state.
 
-diff --git a/target/riscv/cpu-param.h b/target/riscv/cpu-param.h
-index 664fc1d371..0db6e23140 100644
---- a/target/riscv/cpu-param.h
-+++ b/target/riscv/cpu-param.h
-@@ -18,6 +18,14 @@
- # define TARGET_VIRT_ADDR_SPACE_BITS 32 /* sv32 */
- #endif
- #define TARGET_PAGE_BITS 12 /* 4 KiB Pages */
--#define NB_MMU_MODES 4
-+/*
-+ * The current MMU Modes are:
-+ *  - U  mode 0b000
-+ *  - S  mode 0b001
-+ *  - M  mode 0b011
-+ *  - HU mode 0b100
-+ *  - HS mode 0b101
-+ */
-+#define NB_MMU_MODES 6
- 
- #endif
-diff --git a/target/riscv/cpu.h b/target/riscv/cpu.h
-index 87b68affa8..5d8e54c426 100644
---- a/target/riscv/cpu.h
-+++ b/target/riscv/cpu.h
-@@ -363,7 +363,9 @@ void QEMU_NORETURN riscv_raise_exception(CPURISCVState *env,
- target_ulong riscv_cpu_get_fflags(CPURISCVState *env);
- void riscv_cpu_set_fflags(CPURISCVState *env, target_ulong);
- 
--#define TB_FLAGS_MMU_MASK   3
-+#define TB_FLAGS_MMU_MASK   7
-+#define TB_FLAGS_PRIV_MMU_MASK                3
-+#define TB_FLAGS_PRIV_HYP_ACCESS_MASK   (1 << 2)
- #define TB_FLAGS_MSTATUS_FS MSTATUS_FS
- 
- typedef CPURISCVState CPUArchState;
-diff --git a/target/riscv/cpu_helper.c b/target/riscv/cpu_helper.c
-index 3eb3a034db..453e4c6d8a 100644
---- a/target/riscv/cpu_helper.c
-+++ b/target/riscv/cpu_helper.c
-@@ -30,6 +30,10 @@ int riscv_cpu_mmu_index(CPURISCVState *env, bool ifetch)
- #ifdef CONFIG_USER_ONLY
-     return 0;
- #else
-+    if (riscv_cpu_virt_enabled(env)) {
-+        return env->priv | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
-+    }
-+
-     return env->priv;
- #endif
- }
-@@ -323,7 +327,7 @@ static int get_physical_address(CPURISCVState *env, hwaddr *physical,
-      * (riscv_cpu_do_interrupt) is correct */
-     MemTxResult res;
-     MemTxAttrs attrs = MEMTXATTRS_UNSPECIFIED;
--    int mode = mmu_idx;
-+    int mode = mmu_idx & TB_FLAGS_PRIV_MMU_MASK;
-     bool use_background = false;
- 
-     /*
+v2:
+ - Use only 6 MMU modes instead of 8
+
+Alistair Francis (5):
+  target/riscv: Add a virtualised MMU Mode
+  target/riscv: Set the virtualised MMU mode when doing hyp accesses
+  target/riscv: Remove the HS_TWO_STAGE flag
+  target/riscv: Remove the hyp load and store functions
+  target/riscv: Split the Hypervisor execute load helpers
+
+ target/riscv/cpu-param.h                |  10 +-
+ target/riscv/cpu.h                      |   7 +-
+ target/riscv/cpu_bits.h                 |   1 -
+ target/riscv/helper.h                   |   6 +-
+ target/riscv/cpu_helper.c               |  67 ++++++-------
+ target/riscv/op_helper.c                |  90 ++---------------
+ target/riscv/insn_trans/trans_rvh.c.inc | 127 +++++++-----------------
+ 7 files changed, 90 insertions(+), 218 deletions(-)
+
 -- 
 2.28.0
 
