@@ -2,94 +2,78 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07F97C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 02:26:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A12FCC388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:17 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32E7622282
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 02:26:18 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dYqCSFd0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32E7622282
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15CC12242B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15CC12242B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53126 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34526 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXbAH-0007Kw-1I
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 22:26:17 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51724)
+	id 1kXbpr-0005RB-LG
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:09:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58270)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kXb9H-0006mL-BT
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 22:25:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34027)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jasowang@redhat.com>)
- id 1kXb9D-0002qa-UW
- for qemu-devel@nongnu.org; Tue, 27 Oct 2020 22:25:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603851909;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=1aoic+wXbINFBD2qMcqBk9a+pdn+FHQKT7qahKwb+wQ=;
- b=dYqCSFd0E4oLK/Ye+jDWmHjqu5gHg05sd2bYjhEW7Ug4T9G0oGDgsZ+aBKcmEifjB9sY/e
- qy1Rc/7Rcn9XcDy6yne2RLDYvVt6612aK5ZOXELu5PaKN634agB3sTwD4+HFC9iGsu9a8m
- 5mYTiRvAYqjhNYVLTOMZhAL/ZDMya6E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-314-HYMUYYCTPVunwk0R6ul6PA-1; Tue, 27 Oct 2020 22:25:08 -0400
-X-MC-Unique: HYMUYYCTPVunwk0R6ul6PA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D1CA7804B6C;
- Wed, 28 Oct 2020 02:25:06 +0000 (UTC)
-Received: from [10.72.13.38] (ovpn-13-38.pek2.redhat.com [10.72.13.38])
- by smtp.corp.redhat.com (Postfix) with ESMTP id B31265B4BC;
- Wed, 28 Oct 2020 02:25:04 +0000 (UTC)
-Subject: Re: [PATCH v3] net: remove an assert call in eth_get_gso_type
-To: Peter Maydell <peter.maydell@linaro.org>, P J P <ppandit@redhat.com>
-References: <20201021060550.1652896-1-ppandit@redhat.com>
- <38575304-e5ff-c93e-c1e8-997d4148e579@redhat.com>
- <nycvar.YSQ.7.78.906.2010211440290.1506567@xnncv>
- <CAFEAcA-sSk+4v5XDUTapV8qKu-Lv2v87q7+_NUqtxoM50PQnAg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Message-ID: <6a57e243-fabb-0993-7cc6-ee4cdc261c86@redhat.com>
-Date: Wed, 28 Oct 2020 10:25:03 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
+ id 1kXbnn-0003d6-9r
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:07:07 -0400
+Received: from mail-pl1-f194.google.com ([209.85.214.194]:36264)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
+ id 1kXbnl-0006f5-IH
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:07:06 -0400
+Received: by mail-pl1-f194.google.com with SMTP id r10so1792931plx.3
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:07:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=vywBQM9toHTg0WEsn8QMmtssiGPBfo/CxQm9kSe/cM8=;
+ b=gdq8WZ+ischlomlY1oz6JecU7P+Ft7UmQdthFfzCwwPkE0rHzuqClB7EmQcSqSMqW+
+ FRQoH5pJc+yVOpIOhdJ9FpOAGHH6LNhniYL4wsVlc8nlHgHiApZfUVuGqYzMypYEmuo+
+ vUVA+oM+66sURvWT85UixvWFzeefn9RY0s2r+FMcHUvYT4X5D2P1ZT80B6/mc/Biv3Iz
+ tHMEfAQmuCM4AAz2Plhv4L7Dowhzyqxre6h/ih52iXCZQKBu1vMfiSHNLRn5d18TU/zt
+ A4Ch8UENJX6WSJ1Na9k/f3R2dfnwjYGg5+DvyKIz1oeqYRSEw8sM+zTXXMCz5FgX+ehB
+ IqpA==
+X-Gm-Message-State: AOAM53159hmaXMZuxZBYpR0CaifRUMYZxqfUvSGRGoXtgylHYF/psOkP
+ +LxTd+GhsYgs7FASSbMM8qd8C1OCI6Y=
+X-Google-Smtp-Source: ABdhPJwEzm3IbfIMgubg7VFAflRvn9h7UFUeMzUC91hZZdxI3Ldcd/G7Paco0l9GJuH4Gxj6JMF4+A==
+X-Received: by 2002:a17:90a:e698:: with SMTP id
+ s24mr4829035pjy.72.1603854423378; 
+ Tue, 27 Oct 2020 20:07:03 -0700 (PDT)
+Received: from localhost.localdomain ([73.93.155.93])
+ by smtp.gmail.com with ESMTPSA id n6sm3407219pjj.34.2020.10.27.20.07.02
+ for <qemu-devel@nongnu.org>
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 27 Oct 2020 20:07:02 -0700 (PDT)
+From: Joelle van Dyne <j@getutm.app>
+To: qemu-devel@nongnu.org
+Subject: [PATCH v3 0/7] iOS and Apple Silicon host support
+Date: Tue, 27 Oct 2020 20:06:54 -0700
+Message-Id: <20201028030701.14086-1-j@getutm.app>
+X-Mailer: git-send-email 2.28.0
 MIME-Version: 1.0
-In-Reply-To: <CAFEAcA-sSk+4v5XDUTapV8qKu-Lv2v87q7+_NUqtxoM50PQnAg@mail.gmail.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jasowang@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jasowang@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 22:00:32
+Received-SPF: pass client-ip=209.85.214.194;
+ envelope-from=osy86github@gmail.com; helo=mail-pl1-f194.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 23:07:04
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -42
-X-Spam_score: -4.3
-X-Spam_bar: ----
-X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_score_int: -13
+X-Spam_score: -1.4
+X-Spam_bar: -
+X-Spam_report: (-1.4 / 5.0 requ) BAYES_00=-1.9, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,43 +86,92 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Gaoning Pan <pgn@zju.edu.cn>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Based-on: 20201026191540.12434-1-j@getutm.app
+([PATCH RESEND 0/4] Mirror map JIT memory for TCG)
 
-On 2020/10/26 下午5:59, Peter Maydell wrote:
-> On Wed, 21 Oct 2020 at 10:23, P J P <ppandit@redhat.com> wrote:
->> +-- On Wed, 21 Oct 2020, Jason Wang wrote --+
->> | It should not be a guest error, since guest is allowed to send a packet
->> | other than IPV4(6).
->>
->> * Ah...sigh! :(
->>
->> * I very hesitantly used guest_error mask, since it was g_assert-ing before.
->>    To me both guest_error and log_unimp seem mismatching. Because no GSO is
->>    also valid IIUC. That's why in patch v2 I used plain qemu_log(). But plain
->>    qemu_log is also not good it seems.
-> Well, as I said last time round, the right function depends on what
-> is going on here. If this is "the fallback code path is fine, it
-> might just be a bit inefficient", then either no logging or use
-> a tracepoint. If this is "the guest is allowed to send this packet
-> but we're going to mishandle it" then use LOG_UNIMP.
+These set of changes brings QEMU TCG to iOS devices and future Apple Silicon
+devices. They were originally developed last year and have been working in the
+UTM app. Recently, we ported the changes to master, re-wrote a lot of the build
+script changes for meson, and broke up the patches into more distinct units.
 
+A summary of the changes:
 
-Ok, rethink about this. I think at least 802.1Q is a valid option for GSO.
+* `CONFIG_IOS` defined when building for iOS and iOS specific changes (as well
+  as unsupported code) are gated behind it.
+* A new dependency, libucontext is added since iOS does not have native ucontext
+  and broken support for sigaltstack. libucontext is available as a new option
+  for coroutine backend.
+* On stock iOS devices, there is a workaround for running JIT code without
+  any special entitlement. It requires the JIT region to be mirror mapped with
+  one region RW and another one RX. To support this style of JIT, TCG is changed
+  to support writing to a different code_ptr. This change is submitted in a
+  different patch set and this one depends on it.
+* For (recent) jailbroken iOS devices as well as upcoming Apple Silicon devices,
+  there are new rules for applications supporting JIT (with the proper
+  entitlement). These rules are implemented as well.
 
-So I decide to apply the path with LOG_UNIMP.
+Since v3:
 
-Thanks
+* Moved mirror JIT support to a different patch set.
+* Removed dependency on `pthread_jit_write_protect_np` because it was redundent
+  and also crashes if called on a non-jailbroken iOS device.
+* Removed `--enable-cross-compile` option
+* Fixed checkpatch errors
+* Fixed iOS build on master due to new test recently added which calls system()
 
+Since v2:
 
->
-> thanks
-> -- PMM
->
+* Changed getting mirror pointer from a macro to inline functions
+* Split constification of TCG code pointers to separate patch
+* Removed slirp updates (will send future patch once slirp changes are in)
+* Removed shared library patch (will send future patch)
+
+-j
+
+Joelle van Dyne (7):
+  configure: option to disable host block devices
+  configure: cross-compiling with empty cross_prefix
+  qemu: add support for iOS host
+  coroutine: add libucontext as external library
+  slirp: update build flags for iOS resolv fix
+  tcg: implement JIT for iOS and Apple Silicon
+  block: check availablity for preadv/pwritev on mac
+
+ docs/devel/index.rst           |   1 +
+ docs/devel/ios.rst             |  39 ++++++++++++
+ configure                      |  77 ++++++++++++++++++++++--
+ meson.build                    |  34 ++++++++++-
+ include/exec/exec-all.h        |   2 +
+ include/tcg/tcg-apple-jit.h    | 106 +++++++++++++++++++++++++++++++++
+ include/tcg/tcg.h              |   3 +
+ tcg/aarch64/tcg-target.h       |   7 +++
+ accel/tcg/cpu-exec-common.c    |   2 +
+ accel/tcg/cpu-exec.c           |   2 +
+ accel/tcg/translate-all.c      |  87 ++++++++++++++++++++++++++-
+ block.c                        |   2 +-
+ block/file-posix.c             |  51 ++++++++++++----
+ net/slirp.c                    |  16 ++---
+ qga/commands-posix.c           |   6 ++
+ target/arm/arm-semi.c          |   2 +
+ target/m68k/m68k-semi.c        |   2 +
+ target/nios2/nios2-semi.c      |   2 +
+ tcg/tcg.c                      |   4 ++
+ tests/qtest/libqos/virtio-9p.c |   8 +++
+ util/coroutine-ucontext.c      |   9 +++
+ .gitmodules                    |   3 +
+ libucontext                    |   1 +
+ meson_options.txt              |   2 +
+ tests/qtest/meson.build        |   7 +--
+ 25 files changed, 440 insertions(+), 35 deletions(-)
+ create mode 100644 docs/devel/ios.rst
+ create mode 100644 include/tcg/tcg-apple-jit.h
+ create mode 160000 libucontext
+
+-- 
+2.28.0
 
 
