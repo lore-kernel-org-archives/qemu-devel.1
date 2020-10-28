@@ -2,93 +2,88 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 688E4C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:23:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 480FEC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:33:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BB6B024813
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:23:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 74C792475A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:33:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hEw0364Y"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BB6B024813
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UfnCPE3L"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 74C792475A
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45018 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51638 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXr2d-0001xZ-PU
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 15:23:27 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37954)
+	id 1kXrCY-0005DY-B3
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 15:33:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:41384)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXr1e-0001M6-9s
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:22:26 -0400
-Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:37736)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXr1c-0008N6-IY
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:22:26 -0400
-Received: by mail-ej1-x642.google.com with SMTP id p9so500181eji.4
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 12:22:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=9SFWGQzy7DoB1AdG6aiIW/5zMdxght220eg1eHdpHZg=;
- b=hEw0364YT8MS769kJhqX7csgHNHKztfhxQKgq9tyxcWwwCICKY/eoA7BSHw9nk6OsK
- IihoUkMlqmhh5mWLgdeDMdn+S2yCjn7N8SHrtrEwBgyGcR/AcK+k1v636RQZj3U1cUIb
- ianRqi8IesJCC6Y3DzScHekasBhau+KnO3dOM9AKdn8bjUUzKuSmA2OQdAZTTzhC9q1i
- L6PSP39QJSX4U2Ap8jll4S6x01ztuZrUyLJgIq/y2V9xRiZCtwwg7SglNCIHUKVr2r+1
- khXGCE5pyJ11JJ5itPWoFbRBJE9d+hJ+G7rd4/wy+z7zvDHtRvtYWU0Rm8RW21cIpDM2
- w/Hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
- :mime-version:content-transfer-encoding;
- bh=9SFWGQzy7DoB1AdG6aiIW/5zMdxght220eg1eHdpHZg=;
- b=mnPDQuhTY/DuGuMW4yYe1JpAEp4rUp0J4frHXGotMTBM40l0jhBxIlJ8Sapenwt5zD
- wcgUfACoWWsDeZcy04yK1h1exwn8x7jA2ylQGkj8bl3z/1WflniPDyCqUyRnWUA+8Ren
- 94cgRKGl4fQ2/XkiLYcqV0AKZx7KKtRcEqdD933+E2AI3NIpSj4N+aySSCoZHpxXbL09
- F17seODemwATpkKqu0+xDR2f3rl+dzXTMKGyhBHmeGIJyJ6Keq5Z6qv1L2kFdflgfCcq
- Ebse5fDW9/fLR+uoIZ0U47jnWU+pweS1CVbkf8aKou4ujAJ8ByBn3ZxmDxxKkt8fcjcC
- FMkw==
-X-Gm-Message-State: AOAM531B668b9h2C0tEcpMAxQb7x4hI88I1+tdDjp50Bcp0UkIfPaKVw
- L/tgyDeSmRKpjS0hwYV54jfTYK9Wias=
-X-Google-Smtp-Source: ABdhPJzANS6EnXd/CrETXjKkkFmD9ebZiU5CoU49iSmrmJJqdAZ62X8y94HNczhZu9jExuwxi2lYIA==
-X-Received: by 2002:a17:906:22c6:: with SMTP id
- q6mr574072eja.433.1603912941651; 
- Wed, 28 Oct 2020 12:22:21 -0700 (PDT)
-Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id u18sm227058ejn.122.2020.10.28.12.22.20
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Oct 2020 12:22:20 -0700 (PDT)
-From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH-for-5.2] hw/rx/rx-gdbsim: Fix memory leak
-Date: Wed, 28 Oct 2020 20:22:19 +0100
-Message-Id: <20201028192219.833329-1-f4bug@amsat.org>
-X-Mailer: git-send-email 2.26.2
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kXrBc-0004Le-S1
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:32:45 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:32960)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <imammedo@redhat.com>)
+ id 1kXrBY-0001bi-AO
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:32:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603913556;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=j9Oj3NUyv1Fdn2Esk9wgs8kE2p+tG8WRRAdj6lrp5LM=;
+ b=UfnCPE3LcU3JKdbVW3qD1ul3EWMByQ3X+sDwjyJx85UA6ClF3NDTKUWptPD1PszkHK6cd9
+ ZoUmSomDYzTmKHQwM7PnVHtnuhuWTAl8Hs5ShwOvWGeYzeRwC2E1LBveRU9FCWt58UYzt6
+ cM0Jj9KvktDfgYem35jhBnHR5gY1jzQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-466-ulpzf5fwNkSlp8do4GYzDQ-1; Wed, 28 Oct 2020 15:32:34 -0400
+X-MC-Unique: ulpzf5fwNkSlp8do4GYzDQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4067CFF27
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 19:32:33 +0000 (UTC)
+Received: from localhost (unknown [10.40.208.5])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id DDA935D9EF;
+ Wed, 28 Oct 2020 19:32:32 +0000 (UTC)
+Date: Wed, 28 Oct 2020 20:32:31 +0100
+From: Igor Mammedov <imammedo@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Subject: Re: [PATCH 04/29] vl: remove bogus check
+Message-ID: <20201028203231.137095ff@redhat.com>
+In-Reply-To: <20201027182144.3315885-5-pbonzini@redhat.com>
+References: <20201027182144.3315885-1-pbonzini@redhat.com>
+ <20201027182144.3315885-5-pbonzini@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::642;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -14
-X-Spam_score: -1.5
-X-Spam_bar: -
-X-Spam_report: (-1.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=imammedo@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=imammedo@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,49 +96,47 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
- Markus Armbruster <armbru@redhat.com>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Richard Henderson <rth@twiddle.net>
+Cc: qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-As load_device_tree() returns allocated memory,
-we need to free it.
+On Tue, 27 Oct 2020 14:21:19 -0400
+Paolo Bonzini <pbonzini@redhat.com> wrote:
 
-Cc: Yoshinori Sato <ysato@users.sourceforge.jp>
-Fixes: bda19d7bb56 ("hw/rx: Add RX GDB simulator")
-Reported-by: Coverity (CID 1432307: RESOURCE_LEAK)
-Signed-off-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
----
-Peter mentioned this issue almost 2 months ago:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg737946.html
+> There is no reason to prevent -preconfig -daemonize.  Of course if
+> no monitor is defined there will be no way to start the VM,
+> but that is a user error.
 
-Having helped Yoshinori to get his code merged, I feel the
-reponsibility of fixing this before the release. I know I am
-wrong, but since he is not responding to the review comments
-and we are in soft-freeze, I prefer to do the dirty laundry
-before we release.
----
- hw/rx/rx-gdbsim.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+looking some more at the current code, this piece is currently
+somewhat broken, so it would indeed exit but 'after' fork
+and output error message to nowhere. It happens since
+os_daemonize() where moved before it later on, given no
+one actually complained since then we probably do not care about it.
 
-diff --git a/hw/rx/rx-gdbsim.c b/hw/rx/rx-gdbsim.c
-index 417ec0564b3..67c413f9de2 100644
---- a/hw/rx/rx-gdbsim.c
-+++ b/hw/rx/rx-gdbsim.c
-@@ -122,7 +122,7 @@ static void rx_gdbsim_init(MachineState *machine)
-         if (dtb_filename) {
-             ram_addr_t dtb_offset;
-             int dtb_size;
--            void *dtb;
-+            g_autofree void *dtb;
- 
-             dtb = load_device_tree(dtb_filename, &dtb_size);
-             if (dtb == NULL) {
--- 
-2.26.2
+Reviewed-by: Igor Mammedov <imammedo@redhat.com>
+
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  softmmu/vl.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/softmmu/vl.c b/softmmu/vl.c
+> index 7f39ebdfee..dbb72e621e 100644
+> --- a/softmmu/vl.c
+> +++ b/softmmu/vl.c
+> @@ -4027,12 +4027,6 @@ void qemu_init(int argc, char **argv, char **envp)
+>      }
+>  
+>      if (is_daemonized()) {
+> -        if (!preconfig_exit_requested) {
+> -            error_report("'preconfig' and 'daemonize' options are "
+> -                         "mutually exclusive");
+> -            exit(EXIT_FAILURE);
+> -        }
+> -
+>          /* According to documentation and historically, -nographic redirects
+>           * serial port, parallel port and monitor to stdio, which does not work
+>           * with -daemonize.  We can redirect these to null instead, but since
 
 
