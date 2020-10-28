@@ -2,104 +2,80 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96244C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:22:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B304C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:25:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 988CB24747
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C42AD2474A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:25:00 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fzf2s4Hm"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 988CB24747
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hHKY9hGD"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C42AD2474A
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:55308 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59608 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXlP6-0006bB-FY
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:22:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44106)
+	id 1kXlRj-0008SB-LV
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:24:59 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:44578)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXlO3-00061z-5t
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:21:11 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36827)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXlQa-0007Vd-Fe
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:23:49 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39561)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXlNx-0007Qa-M1
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:21:10 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXlQX-0007gF-Jc
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:23:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603891263;
+ s=mimecast20190719; t=1603891424;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=Y4ovk9gT8cvismcR1zGM4VS/fHyqbXv8sGCpiPK5xcc=;
- b=Fzf2s4Hm63I/BBjKyJTx3UZ57zj+dO6p5wbkfoAdfCDJKXkmbk9dPDmsBJhhYBmLguk3N+
- NzPNpqX+3sazxx3271Rq9LVcUruAqqfz9rn9se7+HSmhmY+eI9RHUO5rCXJnE5EtD0D5KF
- vK2gZuEV2uSgDnThK0orfEoyev+9FQ4=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-99-PIeK_ofMM9mANOAbPcXnKg-1; Wed, 28 Oct 2020 09:21:00 -0400
-X-MC-Unique: PIeK_ofMM9mANOAbPcXnKg-1
-Received: by mail-ej1-f72.google.com with SMTP id b17so2123421ejb.20
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 06:21:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=Y4ovk9gT8cvismcR1zGM4VS/fHyqbXv8sGCpiPK5xcc=;
- b=MluVLA2PcxFuB3c0RAp7iz/rvWWHSdRMnJVlWsj/pd5qWwqQtq72VgUvOVYn3TE3kJ
- j8KolninSfnmqfzoKynQqKLYGdLPEIzdNmL1KNEGriT4NXK/lBeHdxiZlDzkS228Xjkc
- 6+SZeQC6Zffg/lKiAOs/bwhTdR5yLVLDlydpWDnWPgWrs9FxdUJyfQwZhkVBSkXCxDiF
- A+LkIRimv/LhQKKQ6wONaHQQqQ9B7aLrbucPyamBw7AvpIat+ir3p8QlVX+jdrbPMR0u
- pJiF+ugHpI2bDYpBV4+FJV1glfDaLPnT0jCZ/RjfP3bGkPAcgfD3COKMO1cYDM8tQAIs
- iGnw==
-X-Gm-Message-State: AOAM532qEzdHVWhZGup402eJ2YBiVrCZQ/yQRIt5z1rqveqWQE32Pv0q
- B862OcNHgBBVLP936CSV65gUjVOq+TPZFr0FeRPd+RshnwngM7a6aNfxAKZYJezxZcWqfUjJfD7
- DZFJ5N8+Cse8KBlk=
-X-Received: by 2002:a05:6402:1d8b:: with SMTP id
- dk11mr3688503edb.102.1603891259524; 
- Wed, 28 Oct 2020 06:20:59 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwzDAiP3j7V1osvdE0xtPzb0R02Dc/sASqSviRhkenTeEbbwcJCfvbiyMUQbGDx0FQv4hiBJA==
-X-Received: by 2002:a05:6402:1d8b:: with SMTP id
- dk11mr3688466edb.102.1603891259207; 
- Wed, 28 Oct 2020 06:20:59 -0700 (PDT)
-Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
- [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id se12sm2946823ejb.37.2020.10.28.06.20.57
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 28 Oct 2020 06:20:58 -0700 (PDT)
-Subject: Re: [PATCH 1/9] target/i386: silence the compiler warnings in
- gen_shiftd_rm_T1
-To: Thomas Huth <thuth@redhat.com>, Chen Qun <kuhn.chenqun@huawei.com>,
- qemu-devel@nongnu.org, qemu-trivial@nongnu.org,
- Richard Henderson <richard.henderson@linaro.org>,
- Tony Nguyen <tony.nguyen@bt.com>
-References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
- <20201028041819.2169003-2-kuhn.chenqun@huawei.com>
- <30ca9af0-dfc2-e236-5575-068cec679508@redhat.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
-Message-ID: <b868a495-4c11-bf59-3ba5-9fa4bc6fe8a1@redhat.com>
-Date: Wed, 28 Oct 2020 14:20:56 +0100
+ bh=AjU+Z1t1z9OvCaEm7HkPNbfZvyd9kI9jwGKE3wiWDKM=;
+ b=hHKY9hGDSyU5juh+D1mneCNCbJP4yO4JrX1hecd30BlJg6zmNyIJeHleHNlU44M9KK0xJA
+ xoBm1JuLHZAhf+AZXGs9Zl6gTSiolHPvbQZNIC95RRBgBWJxUB+5z5Z0l0WTOYmslyiDcE
+ oi1Hpr4OXPHas9OV/vVMt29mO5PKYDA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-499-k22oHER8NpKu_NMfvnpJdA-1; Wed, 28 Oct 2020 09:23:39 -0400
+X-MC-Unique: k22oHER8NpKu_NMfvnpJdA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6926B1030986;
+ Wed, 28 Oct 2020 13:23:38 +0000 (UTC)
+Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 40B3719C4F;
+ Wed, 28 Oct 2020 13:23:33 +0000 (UTC)
+Subject: Re: [PATCH 1/5] python: add pytest and tests
+To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
+References: <20201027223815.159802-1-jsnow@redhat.com>
+ <20201027223815.159802-2-jsnow@redhat.com>
+ <7440abdc-b01e-ba5e-5238-a6e4573f88b5@redhat.com>
+From: John Snow <jsnow@redhat.com>
+Message-ID: <c85597c2-a9b3-e8ff-7208-c3f16002f40b@redhat.com>
+Date: Wed, 28 Oct 2020 09:23:32 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <30ca9af0-dfc2-e236-5575-068cec679508@redhat.com>
+In-Reply-To: <7440abdc-b01e-ba5e-5238-a6e4573f88b5@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=philmd@redhat.com;
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -123,65 +99,71 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Eduardo Habkost <ehabkost@redhat.com>, zhang.zhanghailiang@huawei.com,
- ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
+ =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ Markus Armbruster <armbru@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-+Tony
-
-On 10/28/20 1:57 PM, Thomas Huth wrote:
-> On 28/10/2020 05.18, Chen Qun wrote:
->> The current "#ifdef TARGET_X86_64" statement affects
->> the compiler's determination of fall through.
+On 10/28/20 2:19 AM, Thomas Huth wrote:
+> On 27/10/2020 23.38, John Snow wrote:
+>> Try using pytest to manage our various tests; even though right now
+>> they're only invoking binaries and not really running any python-native
+>> code.
 >>
->> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
->> target/i386/translate.c: In function ‘gen_shiftd_rm_T1’:
->> target/i386/translate.c:1773:12: warning: this statement may fall through [-Wimplicit-fallthrough=]
->>          if (is_right) {
->>             ^
->> target/i386/translate.c:1782:5: note: here
->>      case MO_32:
->>      ^~~~
+>> Create tests/, and add test_lint.py which calls out to mypy, flake8,
+>> pylint and isort to enforce the standards in this directory.
 >>
->> Reported-by: Euler Robot <euler.robot@huawei.com>
->> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+>> Add pytest to the setup.cfg development dependencies; add a pytest
+>> configuration section as well; run it in verbose mode.
+>>
+>> Finally, add pytest to the Pipfile environment and lock the new
+>> dependencies. (Note, this also updates an unrelated dependency; but the
+>> only way to avoid this is to pin that dependency at a lower version --
+>> which there is no reason to do at present.)
+>>
+>> Provided you have the right development dependencies (mypy, flake8,
+>> isort, pylint, and now pytest) You should be able to run "pytest" from
+>> the python folder to run all of these linters with the correct
+>> arguments.
+>>
+>> Signed-off-by: John Snow <jsnow@redhat.com>
 >> ---
->> Cc: Paolo Bonzini <pbonzini@redhat.com>
->> Cc: Richard Henderson <richard.henderson@linaro.org>
->> Cc: Eduardo Habkost <ehabkost@redhat.com>
->> ---
->>  target/i386/translate.c | 4 ++--
->>  1 file changed, 2 insertions(+), 2 deletions(-)
+>>   python/Pipfile.lock       | 71 ++++++++++++++++++++++++++++++++++++---
+>>   python/setup.cfg          |  5 +++
+>>   python/tests/test_lint.py | 28 +++++++++++++++
+>>   3 files changed, 99 insertions(+), 5 deletions(-)
+>>   create mode 100644 python/tests/test_lint.py
 >>
->> diff --git a/target/i386/translate.c b/target/i386/translate.c
->> index caea6f5fb1..4c353427d7 100644
->> --- a/target/i386/translate.c
->> +++ b/target/i386/translate.c
->> @@ -1777,9 +1777,9 @@ static void gen_shiftd_rm_T1(DisasContext *s, MemOp ot, int op1,
->>          } else {
->>              tcg_gen_deposit_tl(s->T1, s->T0, s->T1, 16, 16);
->>          }
->> -        /* FALLTHRU */
->> -#ifdef TARGET_X86_64
->> +        /* fall through */
->>      case MO_32:
->> +#ifdef TARGET_X86_64
->>          /* Concatenate the two 32-bit values and use a 64-bit shift.  */
->>          tcg_gen_subi_tl(s->tmp0, count, 1);
->>          if (is_right) {
+>> diff --git a/python/Pipfile.lock b/python/Pipfile.lock
+>> index 05077475d750..105ffbc09a8e 100644
+>> --- a/python/Pipfile.lock
+>> +++ b/python/Pipfile.lock
+>> @@ -30,6 +30,14 @@
+>>               "markers": "python_version >= '3.5'",
+>>               "version": "==2.4.2"
+>>           },
+>> +        "attrs": {
+>> +            "hashes": [
+>> +                "sha256:26b54ddbbb9ee1d34d5d3668dd37d6cf74990ab23c828c2888dccdceee395594",
+>> +                "sha256:fce7fc47dfc976152e82d53ff92fa0407700c21acd20886a13777a0d20e655dc"
+>> +            ],
+>> +            "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
 > 
-> The whole code here looks a little bit fishy to me ... in case TARGET_X86_64
-> is defined, the MO_16 code falls through to MO_32 ... but in case it is not
-> defined, it falls through to the default case that comes after the #ifdef
-> block? Is this really the right thing here? If so, I think there should be
-> some additional comments explaining this behavior.
+> Can't you simply use "python_version >= '3.6'" instead?
 > 
-> Richard, maybe you could help to judge what is right here...?
+>   Thomas
+> 
 
-I think the previous discussion is this thread:
-https://www.mail-archive.com/qemu-devel@nongnu.org/msg632245.html
+This file is generated; I don't really actually know what these markers 
+mean or to whom. I can't edit it because it's checksummed.
+
+--js
 
 
