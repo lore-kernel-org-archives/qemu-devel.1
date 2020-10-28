@@ -2,94 +2,87 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
+	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB101C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:20:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0698C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:22:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 61DA924734
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:20:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E00B9246E5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:22:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fttiWVdh"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 61DA924734
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IvPzTn2g"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E00B9246E5
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34900 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39178 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXmJo-0003G3-96
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:20:52 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58242)
+	id 1kXmLX-00058o-BS
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:22:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kXmGv-0000Q1-TY
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:17:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58570)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kXmGt-0006fA-Ta
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:17:53 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603894671;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=62JVuhzdIH6XOxwQKaCDlgo9zyc/fAJDynBxzcmc84M=;
- b=fttiWVdhzX0CIzd6t0HvtMvQri4kFUfO4N5RSe9dJdAje3AXX9ekmP4/sdVEz7NMl1tGCl
- /ICDHvTuQjsG22DyMpRbzgeT8TUsefgk7gJEhuyKwK5M7viMALteJ/rVY35+749uPflW4f
- FX2VQVPwaOkvBM3NuPL50DlAtYFK8QA=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-185-JMIs9db2MHeSRR-bZ8ucVA-1; Wed, 28 Oct 2020 10:17:47 -0400
-X-MC-Unique: JMIs9db2MHeSRR-bZ8ucVA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id D2BB81882FD3;
- Wed, 28 Oct 2020 14:17:45 +0000 (UTC)
-Received: from [10.36.112.194] (ovpn-112-194.ams2.redhat.com [10.36.112.194])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 9D5306EF54;
- Wed, 28 Oct 2020 14:17:40 +0000 (UTC)
-Subject: Re: [PATCH 14/25] block/nvme: Use definitions instead of magic values
- in add_io_queue()
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201027135547.374946-1-philmd@redhat.com>
- <20201027135547.374946-15-philmd@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <79eac65b-2404-495f-013b-7ce28b5056c9@redhat.com>
-Date: Wed, 28 Oct 2020 15:17:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kXmIE-0001tX-B1; Wed, 28 Oct 2020 10:19:14 -0400
+Received: from mail-io1-xd43.google.com ([2607:f8b0:4864:20::d43]:35291)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alistair23@gmail.com>)
+ id 1kXmIB-0006j9-99; Wed, 28 Oct 2020 10:19:13 -0400
+Received: by mail-io1-xd43.google.com with SMTP id k6so5505421ior.2;
+ Wed, 28 Oct 2020 07:19:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=bSgEQ8rqHi5Q5mtm1n6ven7ZPrARrwvFnMnbHSoiGmc=;
+ b=IvPzTn2gNhJ2XITZUWPZPi+kJpUgINPS1fbPc0RCBosTLCSf577pB/591R6HoSXAwv
+ Fu2kO4kM7cgsSf3Ize/T5Fp7qCoCeNfxcVGHbVsl0ToO/XnDI/oUwMoHsutWCmiR8kQg
+ M0sXMbTwhtALvfM8V7uSFlBsONaQfX3eBj55MmFKWHfLMZSvnCeW+CIRTyJgo9O5lebz
+ V/iNBawKqfoHCKRe0apJY/73p/e+DXCh8V24wMGXXfqXbhkxtibZ7YFRopMjl6Rjmnwp
+ SefKvUfoFuLd85Sg5nTlxJbGsXwhXRv/g1TdnDpcrCvuMwF519NF7KFJgiEVbpyH7VdG
+ tbng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=bSgEQ8rqHi5Q5mtm1n6ven7ZPrARrwvFnMnbHSoiGmc=;
+ b=MlBNLK9mIEJ48zA/9X3abqEKidHT6XnpwWFpDBP/qsjw8vVO3594PfGuM5WWoQpEQ3
+ 5AoCX8sHjL4knRAi6BvJ3mMDFLqV53s6GUVUh6dL1AynVKCMGrLlKvR2+b07F38qvAj2
+ QKzewB2nEQkiBwuZSTh/DnKUYMyv2tE++3uRStiYHEn9quAJtu0nn4DJZH23eDVZ8A9Z
+ lr9x2tu3gPOieExBz1tD3rD892DkwyMBzw5SU3kKXEZ6s1AT15VJ/eZoHWeZvWaOX93W
+ pl01nbYZ+bt1StYFWdTmM7cfUspE5znhNph8IKcp2CHH8nu+uq6GR9fJb2JRRKEuQujh
+ dIdQ==
+X-Gm-Message-State: AOAM531GxQhSoQFD+ouJy4WUk5rG6zM/h75lHOnTVtzWj53zfmhsUNof
+ 8YE0/VPDpvomTBPgjnDy5apc0eYLwGPXSez0Wu8=
+X-Google-Smtp-Source: ABdhPJzDAuFR5YC1KS/MNG/cp2gk/kiND753CrhInPIJiLUuJPw+BmBi3z1WQStemfD+ByYJQkS4MOHWv9XGWtqe8KQ=
+X-Received: by 2002:a6b:8ec7:: with SMTP id q190mr6285321iod.42.1603894749376; 
+ Wed, 28 Oct 2020 07:19:09 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201027135547.374946-15-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
+References: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
+ <1603863010-15807-2-git-send-email-bmeng.cn@gmail.com>
+In-Reply-To: <1603863010-15807-2-git-send-email-bmeng.cn@gmail.com>
+From: Alistair Francis <alistair23@gmail.com>
+Date: Wed, 28 Oct 2020 07:07:18 -0700
+Message-ID: <CAKmqyKNLThFvp8CuueC7L7bcEdN6QS62k54ZRitTrcZdpvR-9w@mail.gmail.com>
+Subject: Re: [PATCH v2 01/10] hw/riscv: microchip_pfsoc: Document where to
+ look at the SoC memory maps
+To: Bin Meng <bmeng.cn@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2607:f8b0:4864:20::d43;
+ envelope-from=alistair23@gmail.com; helo=mail-io1-xd43.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -102,63 +95,70 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>
+Cc: Bin Meng <bin.meng@windriver.com>,
+ "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <anup.patel@wdc.com>,
+ "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
+ Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
+ Ivan Griffin <ivan.griffin@emdalo.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Philippe,
+On Tue, Oct 27, 2020 at 10:31 PM Bin Meng <bmeng.cn@gmail.com> wrote:
+>
+> From: Bin Meng <bin.meng@windriver.com>
+>
+> It is not easy to find out the memory map for a specific component
+> in the PolarFire SoC as the information is scattered in different
+> documents. Add some comments so that people can know where to get
+> such information from the Microchip website.
+>
+> Signed-off-by: Bin Meng <bin.meng@windriver.com>
 
-On 10/27/20 2:55 PM, Philippe Mathieu-Daudé wrote:
-> Replace magic values by definitions, and simplifiy since the
-> number of queues will never reach 64K.
-> 
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
-Eric
+Alistair
 
+>
 > ---
->  block/nvme.c | 9 +++++----
->  1 file changed, 5 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/nvme.c b/block/nvme.c
-> index 9324f0bfdc4..2dfcf8c41d7 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -651,6 +651,7 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
->      NvmeCmd cmd;
->      unsigned queue_size = NVME_QUEUE_SIZE;
->  
-> +    assert(n <= UINT16_MAX);
->      q = nvme_create_queue_pair(s, bdrv_get_aio_context(bs),
->                                 n, queue_size, errp);
->      if (!q) {
-> @@ -659,8 +660,8 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
->      cmd = (NvmeCmd) {
->          .opcode = NVME_ADM_CMD_CREATE_CQ,
->          .dptr.prp1 = cpu_to_le64(q->cq.iova),
-> -        .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-> -        .cdw11 = cpu_to_le32(0x3),
-> +        .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | n),
-> +        .cdw11 = cpu_to_le32(NVME_CQ_IEN | NVME_CQ_PC),
->      };
->      if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
->          error_setg(errp, "Failed to create CQ io queue [%u]", n);
-> @@ -669,8 +670,8 @@ static bool nvme_add_io_queue(BlockDriverState *bs, Error **errp)
->      cmd = (NvmeCmd) {
->          .opcode = NVME_ADM_CMD_CREATE_SQ,
->          .dptr.prp1 = cpu_to_le64(q->sq.iova),
-> -        .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | (n & 0xFFFF)),
-> -        .cdw11 = cpu_to_le32(0x1 | (n << 16)),
-> +        .cdw10 = cpu_to_le32(((queue_size - 1) << 16) | n),
-> +        .cdw11 = cpu_to_le32(NVME_SQ_PC | (n << 16)),
->      };
->      if (nvme_cmd_sync(bs, s->queues[INDEX_ADMIN], &cmd)) {
->          error_setg(errp, "Failed to create SQ io queue [%u]", n);
-> 
-
+>
+> Changes in v2:
+> - new patch: Document where to look at the PolarFire SoC memory maps
+>
+>  hw/riscv/microchip_pfsoc.c | 18 ++++++++++++++++++
+>  1 file changed, 18 insertions(+)
+>
+> diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
+> index 4627179..6aac849 100644
+> --- a/hw/riscv/microchip_pfsoc.c
+> +++ b/hw/riscv/microchip_pfsoc.c
+> @@ -66,6 +66,24 @@
+>  /* GEM version */
+>  #define GEM_REVISION    0x0107010c
+>
+> +/*
+> + * The complete description of the whole PolarFire SoC memory map is scattered
+> + * in different documents. There are several places to look at for memory maps:
+> + *
+> + * 1 Chapter 11 "MSS Memory Map", in the doc "UG0880: PolarFire SoC FPGA
+> + *   Microprocessor Subsystem (MSS) User Guide", which can be downloaded from
+> + *   https://www.microsemi.com/document-portal/doc_download/
+> + *   1244570-ug0880-polarfire-soc-fpga-microprocessor-subsystem-mss-user-guide,
+> + *   describes the whole picture of the PolarFire SoC memory map.
+> + *
+> + * 2 A zip file for PolarFire soC memory map, which can be downloaded from
+> + *   https://www.microsemi.com/document-portal/doc_download/
+> + *   1244581-polarfire-soc-register-map, contains the following 2 major parts:
+> + *   - Register Map/PF_SoC_RegMap_V1_1/pfsoc_regmap.htm
+> + *     describes the complete integrated peripherals memory map
+> + *   - Register Map/PF_SoC_RegMap_V1_1/MPFS250T/mpfs250t_ioscb_memmap_dri.htm
+> + *     describes the complete IOSCB modules memory maps
+> + */
+>  static const struct MemmapEntry {
+>      hwaddr base;
+>      hwaddr size;
+> --
+> 2.7.4
+>
+>
 
