@@ -2,91 +2,69 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06C32C4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:12:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7219BC4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:38:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 500A72072C
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:12:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 90FAA2076B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:38:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1lHiAm2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 500A72072C
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f9Qn1FTB"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90FAA2076B
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXvYA-0006FM-CM
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 20:12:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55396)
+	id 1kXvxf-0000yh-H2
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 20:38:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXvX9-0005kb-LT
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 20:11:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:38782)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXvX6-00066z-JZ
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 20:11:15 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603930271;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=VoivitNSSZpeS9QA/0OjoQT36yUdsgnIAWqL1gLDJ/Y=;
- b=h1lHiAm2U9DQRQXg6g3quTdQoJ7iZUHswDR6OSRryt1fEz8Al2zd3LJmj5exlrK+hg2TBB
- asymAReyYGYIrxOFtgNtdgnnVd7XFMYwn1mQ3rEnkXYw7J7cn/Awti51zTtbqigxQlkKqF
- p6N1ENQ0RPdq6rSlZsBsFc/ToIjpkng=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-108-9Il2jwUHMwG7ANHIyr71lg-1; Wed, 28 Oct 2020 20:11:07 -0400
-X-MC-Unique: 9Il2jwUHMwG7ANHIyr71lg-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
- [10.5.11.12])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8FE338BF762;
- Thu, 29 Oct 2020 00:11:06 +0000 (UTC)
-Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 23CE560BF1;
- Thu, 29 Oct 2020 00:10:59 +0000 (UTC)
-Subject: Re: [PATCH v3 15/15] python/qemu: add qemu package itself to pipenv
-To: Cleber Rosa <crosa@redhat.com>
-References: <20201020193555.1493936-1-jsnow@redhat.com>
- <20201020193555.1493936-16-jsnow@redhat.com>
- <20201028225948.GH2549351@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <06231fbc-b210-37a0-ba81-5c084ae6862c@redhat.com>
-Date: Wed, 28 Oct 2020 20:10:58 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kXvww-0000Co-J3; Wed, 28 Oct 2020 20:37:54 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:35627)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kXvwt-0000yg-1l; Wed, 28 Oct 2020 20:37:53 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4CM63R0MW0z9sTr; Thu, 29 Oct 2020 11:37:39 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1603931859;
+ bh=azraLuprZ5AORMP7clpuyB6bLghQnLorCzcmGs/9tsw=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=f9Qn1FTBJVWcbYh/WR0JA26qVjL7hHAPqaoyIAxfLaL1s4Vgdh9gt4Tb6UPZ43bLF
+ qzdqKmDy16s9bBzfvl0Kt45xYGBFI50gMUq2JonA7wRTdlIAM09gFwcSVHQB2O874p
+ 9HJGZnPvTgnfUFhkTBOsZS1A/HBil2bO9G4oG+bA=
+Date: Thu, 29 Oct 2020 10:38:35 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Thomas Huth <thuth@redhat.com>
+Subject: Re: [PATCH 7/9] ppc: silence the compiler warnings
+Message-ID: <20201028233835.GG5604@yekko.fritz.box>
+References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
+ <20201028041819.2169003-8-kuhn.chenqun@huawei.com>
+ <20201028042900.GC5604@yekko.fritz.box>
+ <ddcb887d-42ec-2021-1785-a6fb0d13d6b9@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201028225948.GH2549351@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="2NLGdgz3UMHa/lqP"
+Content-Disposition: inline
+In-Reply-To: <ddcb887d-42ec-2021-1785-a6fb0d13d6b9@redhat.com>
+Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.25,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -99,52 +77,99 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Ben Widawsky <ben@bwidawsk.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- Rohit Shinde <rohit.shinde12194@gmail.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
+ qemu-devel@nongnu.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
+ ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>,
+ Chen Qun <kuhn.chenqun@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 6:59 PM, Cleber Rosa wrote:
-> On Tue, Oct 20, 2020 at 03:35:55PM -0400, John Snow wrote:
->> This adds the python qemu packages themselves to the pipenv manifest.
->> 'pipenv sync' will create a virtual environment sufficient to use the SDK.
->> 'pipenv sync --dev' will create a virtual environment sufficient to use
->> and test the SDK (with pylint, mypy, isort, flake8, etc.)
->>
->> The qemu packages are installed in 'editable' mode; all changes made to
->> the python package inside the git tree will be reflected in the
->> installed package without reinstallation. This includes changes made
->> via git pull and so on.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
-> 
-> Reviewed-by: Cleber Rosa <crosa@redhat.com>
-> Tested-by: Cleber Rosa <crosa@redhat.com>
-> 
 
-Thanks! It looks like the major questions remaining are:
+--2NLGdgz3UMHa/lqP
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-- Seriously, how should we lay the files out, and what should the 
-package names be?
-- Do we want to use something besides pipenv?
+On Wed, Oct 28, 2020 at 03:42:31PM +0100, Thomas Huth wrote:
+> On 28/10/2020 05.29, David Gibson wrote:
+> > On Wed, Oct 28, 2020 at 12:18:17PM +0800, Chen Qun wrote:
+> >> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed w=
+arning:
+> >> hw/ppc/ppc.c: In function =E2=80=98ppc6xx_set_irq=E2=80=99:
+> >> hw/ppc/ppc.c:118:16: warning: this statement may fall through [-Wimpli=
+cit-fallthrough=3D]
+> >>   118 |             if (level) {
+> >>       |                ^
+> >> hw/ppc/ppc.c:123:9: note: here
+> >>   123 |         case PPC6xx_INPUT_INT:
+> >>       |         ^~~~
+> >>
+> >> Add the corresponding "fall through" comment to fix it.
+> >>
+> >> Reported-by: Euler Robot <euler.robot@huawei.com>
+> >> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> >=20
+> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
+> >=20
+> >> ---
+> >> Cc: David Gibson <david@gibson.dropbear.id.au>
+> >> ---
+> >>  hw/ppc/ppc.c | 1 +
+> >>  1 file changed, 1 insertion(+)
+> >>
+> >> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+> >> index 4a11fb1640..f9eb8f21b4 100644
+> >> --- a/hw/ppc/ppc.c
+> >> +++ b/hw/ppc/ppc.c
+> >> @@ -120,6 +120,7 @@ static void ppc6xx_set_irq(void *opaque, int pin, =
+int level)
+> >>              } else {
+> >>                  cpu_ppc_tb_stop(env);
+> >>              }
+> >> +            /* fall through */
+> >>          case PPC6xx_INPUT_INT:
+> >>              /* Level sensitive - active high */
+> >>              LOG_IRQ("%s: set the external IRQ state to %d\n",
+> >=20
+>=20
+> Is that fall through actually really the right thing to do here? I'd rath=
+er
+> expect to see a PPC_INTERRUPT_DECR instead of a PPC_INTERRUPT_EXT in case
+> someone messes with the TBEN pin? So I assume this is likely rather bug a=
+nd
+> we should a "break" statement here instead?
 
-And from the CI series, a whole heap of other questions ;)
+Oh.. good catch, I think I misread this.  I thought the change was
+correct, because DECRs look somewhat like external interrupts.  But
+this is TBEN, not a DECR interrupt per se.  So, yes, I think this was
+a bug and it should be a break instead.
 
-Thanks for taking a look and testing. It took a non-trivial amount of 
-time to get all of this corralled together in precisely the right way to 
-make it work in a variety of environments, so I am hoping it's "close" 
-to something that's going to work for everyone.
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
 
---js
+--2NLGdgz3UMHa/lqP
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+aAPgACgkQbDjKyiDZ
+s5L0Zg/9H66EWh7BUIZMOR8b7po1ImYycuFZ+YZ/VBmSQU0G1qUZUnucFiFW9IxC
+GgNIkI7INJ+F6900usbJ8NpYTg2vhf9HV3RJGf48FS29zuPfdOT1ywrB0Te4EBun
+fjVxHBvKmYjf/iqcBIS3WHfItG6SZ/xBQWCmVEEQ2kjzOEJcjlTVBGzUNCsAocrK
+mxwD9KTkBZzkbn0a81qdCXXzh0RfoUfN24ERroAlDUXuxXXMNG+kO7j3UnQLTker
+r84vuU04J3xxGh1ZdzYzX839kPE0wCCjuuYIijEHeqB+pzea3w8Pq+DiKtMPC+q8
+i8NK0oTA6x4dx9H6E4SGH9/7HzTEy5Iab16+xeRTZwaB60MkwByHlOEikIbP3Axa
+lVO+3hjpzeGYKuy9f2lYcojfbiaODCTKjjVJeCfEnCoel6FneTFEoqLFShCVS9rH
+3ACkfBQy+tGx6GrLQNhSPvm1gZymmhcRsCL0Cmfoja04JZ4ig+VK+aTHlHaF+6bC
+BUrcNtjR93sSED5DULcZ50wY9tcWxCLv2FABtSLHdJ2hJc6v5QUlUhzasW2V5HTC
+wfKQSMPgU0CkW8pQk8d/B+EGjswkdgyHTiPykxT/y9MvL6fQ4S9zGTwgKuQGuyo9
+DMUGCR0HiANkVw+z3OqcFZ7XNXe1UAqZx8KL6zEDx/qgkh67msA=
+=LH4S
+-----END PGP SIGNATURE-----
+
+--2NLGdgz3UMHa/lqP--
 
