@@ -2,90 +2,85 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F30BC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 20:28:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A1BEC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 20:33:42 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D8C3B247FE
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 20:28:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1BC324801
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 20:33:41 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zgob1qxR"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D8C3B247FE
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rk18SVW1"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1BC324801
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56210 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:59374 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXs3O-0007eO-GG
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 16:28:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53384)
+	id 1kXs8a-0000tk-SU
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 16:33:40 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXs1u-00071u-BX
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 16:26:46 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:47977)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXs1q-0000PZ-6W
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 16:26:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603916799;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=BY0foAQx9B1yolHepWieCq0wOk4/Sp6DOgStVXn1jbU=;
- b=Zgob1qxRdJ8JKPXQE7rW4iFy/JWIbV979RrPYQ4WQ0MO20xow1kd++Q0Ty9tbxt9f/EWN7
- YW5P5SWklDAm0hsQJnDoWUw5tmrrnV6lVe/04trqaB3pikppadMk5vfENPC4XGPt+OSnoC
- MWiw5Sd/wGzQPlYzR9BPX/SAnl50pSU=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-402-w4XSZxwzNQi5qEAAy0c9mA-1; Wed, 28 Oct 2020 16:26:37 -0400
-X-MC-Unique: w4XSZxwzNQi5qEAAy0c9mA-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 18D2F10E218F;
- Wed, 28 Oct 2020 20:25:59 +0000 (UTC)
-Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 160A66EF49;
- Wed, 28 Oct 2020 20:25:53 +0000 (UTC)
-Subject: Re: [PATCH v3 02/15] python: add qemu package installer
-To: Cleber Rosa <crosa@redhat.com>
-References: <20201020193555.1493936-1-jsnow@redhat.com>
- <20201020193555.1493936-3-jsnow@redhat.com>
- <20201028194905.GF2201333@localhost.localdomain>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <feb3a1d8-fe92-561c-d3d0-1f8c31e6edd0@redhat.com>
-Date: Wed, 28 Oct 2020 16:25:53 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXs72-000083-Nn
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 16:32:04 -0400
+Received: from mail-ed1-x541.google.com ([2a00:1450:4864:20::541]:43142)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXs6s-00019A-JB
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 16:31:59 -0400
+Received: by mail-ed1-x541.google.com with SMTP id dn5so824808edb.10
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 13:31:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=A60WitzBwUcQrRVGfN8Ljoa+Za+envdNm8g+RcTq0wc=;
+ b=rk18SVW1Dyv/PrlgmyN0i32GHExFumZ8sA099ubn7lYjDWtdamg0pJZ374nCSSP5ed
+ JZU4bRQdHG+vim7lH7r1uYcxdsyTCBmwCgnszdZq1R3+76JHt8x0wYmoGenkyK1/ttdv
+ V2lgjq/Eb0ddw384MrRumbzH97Ue1APrsLpNjboJXgefRrX5OnSjWCXlYU314F5c5s3T
+ oWkzQKVE8A26Hr2wnemM6NiTyuYQVVqbxBWslZCU8gpxfWOB4NtBPxe3neU4ujDs7z7h
+ tYuuB/mc1RYM5PoF/5hZSH/q2TUCJ5fGWJDPysFsIDjMUo7x5LPMAsyvJELYnmuZ7Xr/
+ oIYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=A60WitzBwUcQrRVGfN8Ljoa+Za+envdNm8g+RcTq0wc=;
+ b=kbqvxv1rqKv1oSAwQL5SBbxflP9JF6rfi0fdD5AeJ3+cQQcWs0nfGfwsnDgaUAmrg1
+ nDAk/u24oZVzrh7bVrPmKB9Y7ICBR5lsHTa5xrF9fn6R2x38Jc9l15t4b+wmy1iWj4A5
+ QgCrs+yaBgfX5kL0GsrMiZ9ejniWubE4T/06s4jHncCqROQhxJ8vkI0I1rdGziZ+7cgw
+ 1RjO12dVXHlqQjCLUfFR3/Cq9x9+cR9EFWp8oOCjo9ldm9VhKUGwMidm4QnUPnssbOBH
+ TTIpqf+EtKJnQtDKB8lbzvrW6xIHOYaayIVGgUayU4qAtSKwYp5HetTuIqbBTR9lNu6J
+ rhhw==
+X-Gm-Message-State: AOAM531oz1R6xGfPgMeYpNj4y/Sx+zF5NhiXS3UGKu/XAj3K3VITNmM7
+ nTj0fWeXT9fJwlBKGg0u4KUfwZOOpyYLnnk8rs+62g==
+X-Google-Smtp-Source: ABdhPJwwIKJMx2tZ4n5Rkg/lublCZPSSofsVCjPpMXpK7qqonz7mCPT8/2jpCBOSuH3f1XenfIILCGTQZAoK6gp0L0g=
+X-Received: by 2002:a50:f41a:: with SMTP id r26mr666265edm.251.1603917112827; 
+ Wed, 28 Oct 2020 13:31:52 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201028194905.GF2201333@localhost.localdomain>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201028085918.14580-1-maxim.uvarov@linaro.org>
+In-Reply-To: <20201028085918.14580-1-maxim.uvarov@linaro.org>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Oct 2020 20:31:41 +0000
+Message-ID: <CAFEAcA8_1w=4qdE_AJxUP-uPoFL=Fsg9hy62Lw7bLDjKzL9Vvg@mail.gmail.com>
+Subject: Re: [RFC PATCH] hw/arm/virt: use sbsa-ec for reboot and poweroff in
+ secure mode
+To: Maxim Uvarov <maxim.uvarov@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::541;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x541.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,50 +94,79 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
- Ben Widawsky <ben@bwidawsk.net>,
- =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Andrea Bolognani <abologna@redhat.com>,
- Rohit Shinde <rohit.shinde12194@gmail.com>,
- Willian Rampazzo <wrampazz@redhat.com>, Max Reitz <mreitz@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Graeme Gregory <graeme@nuviainc.com>,
+ =?UTF-8?Q?Fran=C3=A7ois_Ozog?= <francois.ozog@linaro.org>,
+ Radoslaw Biernacki <rad@semihalf.com>, QEMU Developers <qemu-devel@nongnu.org>,
+ tf-a@lists.trustedfirmware.org, qemu-arm <qemu-arm@nongnu.org>,
+ Leif Lindholm <leif@nuviainc.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 3:49 PM, Cleber Rosa wrote:
-> On Tue, Oct 20, 2020 at 03:35:42PM -0400, John Snow wrote:
->> Add setup.cfg and setup.py, necessary for installing a package via
->> pip. Add a rst document explaining the basics of what this package is
->> for and who to contact for more information. This document will be used
->> as the landing page for the package on PyPI.
->>
->> I am not yet using a pyproject.toml style package manifest, because
->> using pyproject.toml (and PEP-517) style packages means that pip is not
->> able to install in "editable" or "develop" mode, which I consider
->> necessary for the development of this package.
->>
->> Use a light-weight setup.py instead.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   python/PACKAGE.rst | 26 ++++++++++++++++++++++++++
->>   python/setup.cfg   | 18 ++++++++++++++++++
->>   python/setup.py    | 23 +++++++++++++++++++++++
->>   3 files changed, 67 insertions(+)
->>   create mode 100644 python/PACKAGE.rst
->>   create mode 100755 python/setup.cfg
-> 
-> I missed this earlier: setup.cfg does not need to have the execute bit
-> on.
-> 
-> - Cleber.
-> 
+On Wed, 28 Oct 2020 at 08:59, Maxim Uvarov <maxim.uvarov@linaro.org> wrote:
+>
+> If we're emulating EL3 then the EL3 guest firmware is responsible for
+> providing the PSCI ABI, including reboot, core power down, etc.
+> sbsa-ref machine has an embedded controller to do reboot, poweroff. Machine
+> virt,secure=on can reuse this code to do reboot inside ATF.
+>
+> Signed-off-by: Maxim Uvarov <maxim.uvarov@linaro.org>
 
-Fixed this locally already; it came along when I ran 'cp setup.py 
-setup.cfg', obviously!
+(I've cc'd the sbsa-ref machine maintainers.)
 
+> ---
+>  Hello,
+>
+>  This patch implements reboot for the secure machine inside ATF firmware. I.e. current qemu
+>  patch should be used with [1] ATF patch. It looks like that Embedded Controller qemu
+>  driver (sbsa-ec) can be common and widely used for other emulated machines. While if
+>  there are plans to extend sbsa-ec then we might find some other solution.
+>
+>  So for the long term it looks like machine virt was used as an initial playground for secure
+>  firmware.  While the original intent was a runner for kvm guests. Relation between kvm guest
+>  and firmware  is not very clear now. If everyone agree it might be good solution to move secure
+>  firmware things from virt machine to bsa-ref and make this machine reference for secure boot,
+>  firmware updates  etc.
+>
+>  [1] https://github.com/muvarov/arm-trusted-firmware/commit/6d3339a0081f6f2b45d99bd7e1b67bcbce8f4e0e
+
+
+Thanks for this patch. It is definitely a missing
+bit of functionality that we intend to allow virt to run
+EL3 guest code but don't provide a trigger-shutdown/reboot
+device that works in that setup.
+
+I think the key question here is whether we want to implement
+this by:
+(1) providing the sbsa-ec device in the virt board
+(2) some other mechanism, eg a secure-only pl061 GPIO
+some of whose output pins can trigger shutdown or reboot
+
+The sbsa-ec device has the advantage of doing the
+shutdown/reboot functionality at the moment. The question
+I have for the sbsa-ref board folks is: what are your future
+plans for that device? If the idea is that it's going to end
+up stuffed full of sbsa-ref specific functionality that we
+wouldn't want to try to expose in the virt board, then we
+should probably go with the pl061 approach instead. But if
+it's not likely to grow new functionality then it might be
+simpler...
+
+A couple of notes on this patch if we do go down that route:
+ * we would need to arrange to only add the new device for
+   new versions of the virt board (that is, the "virt-5.0"
+   machine must not have this device because it must look
+   like the version of "virt" that shipped with QEMU 5.0)
+ * the device needs to be mapped into the Secure address
+   space only, because Secure firmware wants control over
+   it and doesn't want to allow NS code to reboot the system
+   without asking the firmware
+ * it would need to be described in the DTB (and maybe also
+   ACPI tables? I forget whether we need to describe Secure-only
+  devices there)
+
+But let's find out if that's the route we want to take first.
+
+thanks
+-- PMM
 
