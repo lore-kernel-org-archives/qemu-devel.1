@@ -7,92 +7,103 @@ X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
 	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79593C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:52:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF6EDC56201
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:57:57 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id BEC2724650
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:52:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D54F9246A7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:57:56 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joUOM70K"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BEC2724650
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="G6/39xS/"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D54F9246A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34144 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXi8L-0001FN-J6
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:52:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:56680)
+	id 1kXiDL-0003Q6-Ro
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:57:55 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57682)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXi77-00008p-41; Wed, 28 Oct 2020 05:51:29 -0400
-Received: from mail-ed1-x543.google.com ([2a00:1450:4864:20::543]:36208)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
- id 1kXi75-0002JX-Bf; Wed, 28 Oct 2020 05:51:28 -0400
-Received: by mail-ed1-x543.google.com with SMTP id l16so4447915eds.3;
- Wed, 28 Oct 2020 02:51:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=sender:subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=m/atS6S/QMVltX7VWGQurXqA6xg/vo3rgTsJT1dTn3c=;
- b=joUOM70KKonhCJhH6rXkXPC2C1KIxcM4K9Ptzp4QpkoF/F4p4liN5pfKJKKEGRuxek
- L6NRfJg7zyJ8ElRMpvk1dnMf2zKD8F1b/Ow6RrzNXsiK6HK1M3LNXhXTEzFhHG9DoD1R
- +EsnUaa+Nn+3Wz9lUJCjbw1+IvhewUVoHGcJxepvGK1jKYR8E+mrfaI7CHc3fD2X+CDP
- qacrhIDW7TUrV/Xbsj2KioNhB31EPwzqQhOw2pm6hcG5OaO03/x9A5iFM/metsyRfWcH
- YVvmRENtE27BtTazchrNdutJtBot4GK4+N6qk1E7DiKOA0IgPWXL6KjfDLeGK3LSBGvA
- dyBQ==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXiCM-0002f2-23
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:56:54 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28795)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXiCK-0004FL-F0
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:56:53 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603879011;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=VmWqhfUdjE1b1F+NtHcflN2U1YXzDlDg+55f/0RKfzM=;
+ b=G6/39xS/HI0+FjxQDyAjOWThehj0t+g6UZvXZtah32zyXGkC3YNUbRXbLbp3vtUO7q3Wd4
+ HZl8MALoKbmvIe4k3tYmyuJFs+/ez4qRd+xUU+kplzWz1fwPyzokYUs0BlxppWl4d/3A56
+ WjIA9V5/ACRouuKjest0nhOTkff97wk=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-2-XVPSd_L1M1iLVn03YuMzpQ-1; Wed, 28 Oct 2020 05:56:49 -0400
+X-MC-Unique: XVPSd_L1M1iLVn03YuMzpQ-1
+Received: by mail-ej1-f70.google.com with SMTP id d12so1935118ejr.19
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 02:56:49 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
- :date:user-agent:mime-version:in-reply-to:content-language
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=m/atS6S/QMVltX7VWGQurXqA6xg/vo3rgTsJT1dTn3c=;
- b=g30Am60RCTIAdil4N8WTK/SP/LeZ98bj1pHp3+cjnCyTCdtbbIJaBcr5ysDD+FkDI/
- xsPrP1i3YoP+kR1WK777jl/Nzx0J6SqLQD2cryIYQL+Kk3EsGNw7Z5e/6mzx6g2/7CM/
- xnQX9bDW7/Ao+IZFrJHWKT+wDsZy2hlToXLK2m+saTvCOO8TbhEy54exa0ydaS9Thf6c
- K0GXl8v3qywdYUN7Bzi5yPfwqU8wZ8z/P7FQjhnDOmd4NnSJh1zOBzAd7J7RRHwIXRXO
- jfkskYVxWY4geHgZ3VozurdvD4/kgexKi0JlcMBnNAJq8/4V+xoS+Z/kBCIM6m5JLRnp
- 93jQ==
-X-Gm-Message-State: AOAM533S1d6vE0/jJlWF2f3uhSYxeranf6AecIpsnhNbunRy6xt6wtF2
- Yyqi/x3rFzHHuVXXjKnVL/596t6yu/E=
-X-Google-Smtp-Source: ABdhPJz/ZGfc4EDOfyeguddpqup8qPXfbrFIkgiGBXEO8S57w5gDr6RpicYcdgqTnJ+2OaRgk3t1Hg==
-X-Received: by 2002:aa7:c358:: with SMTP id j24mr6850808edr.265.1603878685620; 
- Wed, 28 Oct 2020 02:51:25 -0700 (PDT)
+ bh=VmWqhfUdjE1b1F+NtHcflN2U1YXzDlDg+55f/0RKfzM=;
+ b=ZU7nXUYiqplnuU6/T5Br24XyzKMuEv+FZkPxI1sbMJmeU1UsJFVZgJT7dy0S2gz6ni
+ K213xXBx2Y5RMwdg51pspo/GWwIuJCrB6c1qZa9vCAEYvqFSPxSS+WPVorKIS2j5q0ge
+ 9R0YUDss1mIXyA/zASTou9kb/Styo6kCmq7xA/f139c8AFqjCThPIAIM/sRloG2HXtX3
+ uHB4vHovMR3nnBZBTtB+OAX3IItOyuacB/MOhVIwcwFA4/UZLj2RL6t5ytIW3o0302Xt
+ FbFAmGLErL8/922kYznKOvw924VoBcgydDs++6fOEngDUsfOrTQjhMa8yYv0+AkHH0xN
+ bn9Q==
+X-Gm-Message-State: AOAM5323nZBlsdakjfibs7zOU1mTOemtnnSKX3uI/9rxr2Q9UrDu1YeW
+ VbOli67Yby9Gh9RqY+vD26Nv2qi8gPlccM07X2JoaUia9CtTLipX9T/fHYB3Ddts03irlluKhh9
+ 5Nf9tSql/RQh4CUo=
+X-Received: by 2002:aa7:c704:: with SMTP id i4mr1049085edq.51.1603879007579;
+ Wed, 28 Oct 2020 02:56:47 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyR/i+MBh3XeFcPndAalgCgvJeDxpjOBl1Vrgn5ZFKaJ6yE0slhYP8muPoz4q1H0k7NYR/WVw==
+X-Received: by 2002:aa7:c704:: with SMTP id i4mr1049064edq.51.1603879007392;
+ Wed, 28 Oct 2020 02:56:47 -0700 (PDT)
 Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
  [88.18.140.237])
- by smtp.gmail.com with ESMTPSA id yw17sm2626966ejb.97.2020.10.28.02.51.24
+ by smtp.gmail.com with ESMTPSA id g23sm2566746edp.33.2020.10.28.02.56.46
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 28 Oct 2020 02:51:25 -0700 (PDT)
-Subject: Re: [PATCH 6/9] target/sparc/win_helper: silence the compiler warnings
+ Wed, 28 Oct 2020 02:56:46 -0700 (PDT)
+Subject: Re: [PATCH 8/9] target/ppc: silence the compiler warnings
 To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
  qemu-trivial@nongnu.org
 References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
- <20201028041819.2169003-7-kuhn.chenqun@huawei.com>
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
-Message-ID: <9fad34a2-56e1-9c67-bb8a-205640b92544@amsat.org>
-Date: Wed, 28 Oct 2020 10:51:23 +0100
+ <20201028041819.2169003-9-kuhn.chenqun@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <77fb89c5-daa2-0039-bdba-cce0f9895195@redhat.com>
+Date: Wed, 28 Oct 2020 10:56:45 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <20201028041819.2169003-7-kuhn.chenqun@huawei.com>
+In-Reply-To: <20201028041819.2169003-9-kuhn.chenqun@huawei.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::543;
- envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x543.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -36
-X-Spam_score: -3.7
-X-Spam_bar: ---
-X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
- FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -105,50 +116,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
- Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
- zhang.zhanghailiang@huawei.com, ganqixin@huawei.com,
- Euler Robot <euler.robot@huawei.com>
+Cc: Euler Robot <euler.robot@huawei.com>, zhang.zhanghailiang@huawei.com,
+ ganqixin@huawei.com, David Gibson <david@gibson.dropbear.id.au>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/28/20 5:18 AM, Chen Qun wrote:
 > When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
-> target/sparc/win_helper.c: In function ‘get_gregset’:
-> target/sparc/win_helper.c:304:9: warning: this statement may fall through [-Wimplicit-fallthrough=]
->   304 |         trace_win_helper_gregset_error(pstate);
->       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> target/sparc/win_helper.c:306:5: note: here
->   306 |     case 0:
->       |     ^~~~
+> target/ppc/mmu_helper.c: In function ‘dump_mmu’:
+> target/ppc/mmu_helper.c:1351:12: warning: this statement may fall through [-Wimplicit-fallthrough=]
+>  1351 |         if (ppc64_v3_radix(env_archcpu(env))) {
+>       |            ^
+> target/ppc/mmu_helper.c:1358:5: note: here
+>  1358 |     default:
+>       |     ^~~~~~~
 > 
 > Add the corresponding "fall through" comment to fix it.
 > 
 > Reported-by: Euler Robot <euler.robot@huawei.com>
 > Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 > ---
-> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
-> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> Cc: David Gibson <david@gibson.dropbear.id.au>
 > ---
->  target/sparc/win_helper.c | 1 +
+>  target/ppc/mmu_helper.c | 1 +
 >  1 file changed, 1 insertion(+)
 > 
-> diff --git a/target/sparc/win_helper.c b/target/sparc/win_helper.c
-> index 8290a21142..32eacc05e6 100644
-> --- a/target/sparc/win_helper.c
-> +++ b/target/sparc/win_helper.c
-> @@ -303,6 +303,7 @@ static inline uint64_t *get_gregset(CPUSPARCState *env, uint32_t pstate)
->      default:
->          trace_win_helper_gregset_error(pstate);
->          /* pass through to normal set of global registers */
+> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> index 8972714775..51749b62df 100644
+> --- a/target/ppc/mmu_helper.c
+> +++ b/target/ppc/mmu_helper.c
+> @@ -1355,6 +1355,7 @@ void dump_mmu(CPUPPCState *env)
+>              break;
+>          }
+>  #endif
 > +        /* fall through */
 
-Can you keep the comment, doing s/pass/fall/?
+I'm surprise the compiler emit a warning for missing comment,
+but don't emit one for superfluous and confusing ones (when
+building a ppc32-only target). You'd need to put this before
+the #endif.
 
->      case 0:
->          return env->bgregs;
->      case PS_AG:
+But instead of this band-aid to silent warning, replace the
+TODO by a LOG_UNIMP call, and add a break before the #endif.
+
+>      default:
+>          qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
+>      }
 > 
 
 
