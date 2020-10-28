@@ -2,67 +2,92 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
+	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
+	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35C57C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:32:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2501AC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:33:46 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 33CF12087E
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:32:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 993E9208C7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:33:45 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="b6ecA95q"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 33CF12087E
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYlZlm9z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 993E9208C7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43520 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45856 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXd8f-0007r9-7n
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:32:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:45272)
+	id 1kXd9c-0000MP-N1
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:33:44 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43878)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXd6O-00067q-Tn; Wed, 28 Oct 2020 00:30:25 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:46829)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXd6K-0002aT-Tl; Wed, 28 Oct 2020 00:30:24 -0400
-Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CLbGH2BJjz9sWF; Wed, 28 Oct 2020 15:30:14 +1100 (AEDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
- d=gibson.dropbear.id.au; s=201602; t=1603859415;
- bh=YEK+OIuUCuCqCeM5hVVFu0/MG7lO3tkM0JLhdsC4ENQ=;
- h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=b6ecA95qxjpKKGdAs5mpgR8ZY03dDyndUy/5UNbNMUa5bg7yQExBu6dEqvKgmbEFG
- BDEY4PhMLkRQ9Cua+0dsGMmjGugQcKneFUWS9LQdS7Ob4z0x/n/jANza3VwyB9Cw7P
- uGKKjtF/HyZOuontlixyhY5UjUETU/NscBbWx0+4=
-Date: Wed, 28 Oct 2020 15:29:00 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Chen Qun <kuhn.chenqun@huawei.com>
-Subject: Re: [PATCH 7/9] ppc: silence the compiler warnings
-Message-ID: <20201028042900.GC5604@yekko.fritz.box>
-References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
- <20201028041819.2169003-8-kuhn.chenqun@huawei.com>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="kfjH4zxOES6UT95V"
-Content-Disposition: inline
-In-Reply-To: <20201028041819.2169003-8-kuhn.chenqun@huawei.com>
-Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
- helo=ozlabs.org
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kXcwv-0003Z4-Cj
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:20:37 -0400
+Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:34591)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
+ id 1kXcwt-00083M-Jy
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:20:36 -0400
+Received: by mail-pj1-x1043.google.com with SMTP id i3so852124pju.1
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 21:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references;
+ bh=6Vj7rJ1HbGvjo2klZQHezr8aeMv8wuLNCnIvPj2MkoI=;
+ b=DYlZlm9zvvdTHTn6hCOuiSokSvZA1RNhqwuamEq37BgYpp4/txOeG19hCPw4QKkqMI
+ Oc5zAxi8rgeqmV+M22nn3TG2bEx4jVyV/HJcRlbmlJaCk3j8ok32+tnxuOHS8uT79BGa
+ ukbXZTXEagBb48hIvEjMg0xSmJ5zq+utmtJfiHmFU+0HfOxVeavug2r9Govg7INxtzC+
+ 9yQBqR2h7z04h0ba7HrQsyWIr0MMTK64Gp3pGtVInCRgRBby3hpaRNlboLDZM6jPvC70
+ c7EmrUe1HRIHC++KdLCQK/1lqOQLEITtwphfCANnPpeeR4rZd2B9OnTHQZ8RI1JMriru
+ u4ZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references;
+ bh=6Vj7rJ1HbGvjo2klZQHezr8aeMv8wuLNCnIvPj2MkoI=;
+ b=nrJrB4AYRVsqcoJRpGPv7Y7x0rtwYfs9OI0ci+gVLJzxkuFjgXZFwYBDrBUPGACpu4
+ ZgW2rxDL5OiCYmUUNwSPgTdflxYCVNlcxDmegXkwSn6suYucBYFJs1Aa/TT79ETIfsJr
+ SgBWnjSGmUM/bynWSiJRp2gYXmt5AlLF+7EkbThZkaq3BFf4M2Xkb60rOFAopkvjyGLk
+ PWcM1dyin3PDNNlGcYE6YzUsDx0UCz96I+aeOph49Sqf2ArL6dt9H4y/V9FMW7kA0th+
+ ECncgIKh6LXgT35QwQf2DMB4qvFqN2CAzl3T0jCPnYrcoX92uxSR4va3eNotdeZz0/kT
+ Gyaw==
+X-Gm-Message-State: AOAM530CnMtVwg55DnhMc31AfVDCCUbYDUCmvVNTW3Z416t5uReYHFvz
+ fm46ljPlORN5iBwe/3/Yh6s=
+X-Google-Smtp-Source: ABdhPJyvy/xnbgAIiyB9+pwKW/W3R3odnbhj+vJ4+GHka0nE/s2enF+GaSrNJ0qnIeKAqaFfjwBZzA==
+X-Received: by 2002:a17:90a:c207:: with SMTP id
+ e7mr3594002pjt.161.1603858834226; 
+ Tue, 27 Oct 2020 21:20:34 -0700 (PDT)
+Received: from software.domain.org ([45.77.13.216])
+ by smtp.gmail.com with ESMTPSA id x10sm3882040pfc.88.2020.10.27.21.20.30
+ (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+ Tue, 27 Oct 2020 21:20:33 -0700 (PDT)
+From: Huacai Chen <zltjiangshi@gmail.com>
+X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
+To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
+Subject: [PATCH V15 6/6] docs/system: Update MIPS machine documentation
+Date: Wed, 28 Oct 2020 12:18:04 +0800
+Message-Id: <1603858685-30701-7-git-send-email-chenhc@lemote.com>
+X-Mailer: git-send-email 2.7.0
+In-Reply-To: <1603858685-30701-1-git-send-email-chenhc@lemote.com>
+References: <1603858685-30701-1-git-send-email-chenhc@lemote.com>
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pj1-x1043.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
-X-Spam_score_int: -17
-X-Spam_score: -1.8
-X-Spam_bar: -
-X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
- SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -75,82 +100,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, Euler Robot <euler.robot@huawei.com>,
- qemu-devel@nongnu.org, ganqixin@huawei.com, zhang.zhanghailiang@huawei.com
+Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
+ Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
+ Aurelien Jarno <aurelien@aurel32.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+Update MIPS machine documentation to add Loongson-3 based machine description.
 
---kfjH4zxOES6UT95V
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Signed-off-by: Huacai Chen <chenhc@lemote.com>
+---
+ docs/system/target-mips.rst | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-On Wed, Oct 28, 2020 at 12:18:17PM +0800, Chen Qun wrote:
-> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warn=
-ing:
-> hw/ppc/ppc.c: In function =E2=80=98ppc6xx_set_irq=E2=80=99:
-> hw/ppc/ppc.c:118:16: warning: this statement may fall through [-Wimplicit=
--fallthrough=3D]
->   118 |             if (level) {
->       |                ^
-> hw/ppc/ppc.c:123:9: note: here
->   123 |         case PPC6xx_INPUT_INT:
->       |         ^~~~
->=20
-> Add the corresponding "fall through" comment to fix it.
->=20
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+diff --git a/docs/system/target-mips.rst b/docs/system/target-mips.rst
+index cd2a931..138441b 100644
+--- a/docs/system/target-mips.rst
++++ b/docs/system/target-mips.rst
+@@ -84,6 +84,16 @@ The Fuloong 2E emulation supports:
+ 
+ -  RTL8139D as a network card chipset
+ 
++The Loongson-3 virtual platform emulation supports:
++
++-  Loongson 3A CPU
++
++-  LIOINTC as interrupt controller
++
++-  GPEX and virtio as peripheral devices
++
++-  Both KVM and TCG supported
++
+ The mipssim pseudo board emulation provides an environment similar to
+ what the proprietary MIPS emulator uses for running Linux. It supports:
+ 
+-- 
+2.7.0
 
-Acked-by: David Gibson <david@gibson.dropbear.id.au>
-
-> ---
-> Cc: David Gibson <david@gibson.dropbear.id.au>
-> ---
->  hw/ppc/ppc.c | 1 +
->  1 file changed, 1 insertion(+)
->=20
-> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> index 4a11fb1640..f9eb8f21b4 100644
-> --- a/hw/ppc/ppc.c
-> +++ b/hw/ppc/ppc.c
-> @@ -120,6 +120,7 @@ static void ppc6xx_set_irq(void *opaque, int pin, int=
- level)
->              } else {
->                  cpu_ppc_tb_stop(env);
->              }
-> +            /* fall through */
->          case PPC6xx_INPUT_INT:
->              /* Level sensitive - active high */
->              LOG_IRQ("%s: set the external IRQ state to %d\n",
-
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
-
---kfjH4zxOES6UT95V
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+Y84wACgkQbDjKyiDZ
-s5KCmg//Xw+dYi7q/5oUJq/i75cK1O3nI3waMTrHt5zU4OelZwAQUb/7fB1pdBQP
-mC7VEoQLNMt73BpalW0BZFk5nZTmE8N2Vi7rwTdNZ2RP0Y+drQs6Now9xF3pTXpR
-rToN/5vvmfQDABR3QFZVckuXvOatJUHu80bgfMvZCZOB2in3hF4g3v7VHppgSuy+
-LqkLhkVk8n4Biy0zUVKNGbYpDiSSRT8qiED4QZoVmKpWbAERN/ZnddxUXHa5SqBD
-ZNM20Z4N/88mcKLDld4iKbnbaXSQ5GsMglW7f08fGnWKmz60qQqDgzfhZul6E5vP
-qfx8AA7oSdZY8m/Zpm0sUMfMP8PzwesgGR175/+l0nAVTzfn+wX3wnkgkHkAwHCM
-JKAPrnsXQqPKPychCpI54L9lDmLfS9vs7ItoSkzPHXfTc/E5AROouIQXwdW4cipw
-vqNBxI2UvMFVAP8XZ6UrQu/R96N+DUqZe/x1ViZEtCZh+ZGL8cDZK54Dh/dZdz2B
-gfBZReJBMQMIouk2KqsXqA+DYqJWRvfIgL5Pbk2RaXNptNvCSzyijaMAJs1F3Elp
-uHNwQd62ieoblzH/DSLyU+iBSnYj8wl7Dy85SePOkBEjtklmrGVAsa8AUndHHsZ1
-6lX/N3V3NNlrxMTDbeqALzm6+Ec3u/d1FDpzOCfidPQpdxO3UnE=
-=8AAK
------END PGP SIGNATURE-----
-
---kfjH4zxOES6UT95V--
 
