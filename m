@@ -2,66 +2,66 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C69DC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:50:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C1D4C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:51:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D62F4246CD
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:50:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 78706246CD
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:51:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FSCQsvVz"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D62F4246CD
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A4muBICe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 78706246CD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36890 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:39568 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXoei-0000sj-Q2
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:50:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38614)
+	id 1kXofK-00023S-AR
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:51:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38162)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoXs-0000gK-Mt
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:43:32 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:29465)
+ id 1kXoWC-0006vf-Up
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:48 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:33589)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoXp-0001V3-7X
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:43:31 -0400
+ id 1kXoWB-0001Ic-1W
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:48 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603903408;
+ s=mimecast20190719; t=1603903306;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=RTxBmygDERd7u6ZWhe5+4M837aOgBWgoLyLRTNOBCUw=;
- b=FSCQsvVzMlW5aAUAVH2MDsoIQz0o5IGN7F5T89PUTlKONQucbkMfH5eYMyaZwlwhVEwOR7
- keLHFgQqEItUM8RBm1/hmX1gMtj9X4JSEAbd/YblzkpmDyg+c2Laer+Jer3J+DmkKxBWM/
- QWok8Zfdw0DrTbukvStHCUrAuhLhqWo=
+ bh=1VuDH+bfx+yzW1y7TVTjB+B26TLJtti5CA1M9047muU=;
+ b=A4muBICe+2W/3O4kDJGEp+0KX7nM+QQyC82zxcl3GpZDtBgTONotxKN0DX6CIlPf2E3Xg+
+ fypdoyBGnTUkRhiftGQgYHLIaagNNwOa9eHk2npsuLv8oGMblqyGFuD5qCP49VSwtwPbz+
+ YEnL58Xamb9IRqECsfdy9qbg6F0Ml8I=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-236-GAzqObn5ODqzSu7GrwHrwg-1; Wed, 28 Oct 2020 12:43:25 -0400
-X-MC-Unique: GAzqObn5ODqzSu7GrwHrwg-1
+ us-mta-55-fTnY2P1kNfO6sRHWB_b8SA-1; Wed, 28 Oct 2020 12:41:41 -0400
+X-MC-Unique: fTnY2P1kNfO6sRHWB_b8SA-1
 Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
  [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87412E06BC;
- Wed, 28 Oct 2020 16:43:24 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B4A2A8EBA04;
+ Wed, 28 Oct 2020 16:41:39 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 29C3A1001281;
- Wed, 28 Oct 2020 16:43:21 +0000 (UTC)
-Subject: [PULL v2 26/32] s390x/pci: use a PCI Group structure
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 4B44210013C1;
+ Wed, 28 Oct 2020 16:41:36 +0000 (UTC)
+Subject: [PULL v2 14/32] vfio: Dirty page tracking when vIOMMU is enabled
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Oct 2020 10:43:21 -0600
-Message-ID: <160390340089.12234.12567690658804671370.stgit@gimli.home>
+Date: Wed, 28 Oct 2020 10:41:36 -0600
+Message-ID: <160390329612.12234.6184919772225463675.stgit@gimli.home>
 In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
@@ -73,17 +73,17 @@ X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124;
+Received-SPF: pass client-ip=216.205.24.124;
  envelope-from=alex.williamson@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
  SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -97,173 +97,166 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
- Pierre Morel <pmorel@linux.ibm.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, Yan Zhao <yan.y.zhao@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Pierre Morel <pmorel@linux.ibm.com>
+From: Kirti Wankhede <kwankhede@nvidia.com>
 
-We use a S390PCIGroup structure to hold the information related to a
-zPCI Function group.
+When vIOMMU is enabled, register MAP notifier from log_sync when all
+devices in container are in stop and copy phase of migration. Call replay
+and get dirty pages from notifier callback.
 
-This allows us to be ready to support multiple groups and to retrieve
-the group information from the host.
-
-Signed-off-by: Pierre Morel <pmorel@linux.ibm.com>
-Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Suggested-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/s390x/s390-pci-bus.c         |   42 +++++++++++++++++++++++++++++++++++++++
- hw/s390x/s390-pci-inst.c        |   23 +++++++++++++--------
- include/hw/s390x/s390-pci-bus.h |   10 +++++++++
- 3 files changed, 66 insertions(+), 9 deletions(-)
+ hw/vfio/common.c     |   88 +++++++++++++++++++++++++++++++++++++++++++++++---
+ hw/vfio/trace-events |    1 +
+ 2 files changed, 83 insertions(+), 6 deletions(-)
 
-diff --git a/hw/s390x/s390-pci-bus.c b/hw/s390x/s390-pci-bus.c
-index 218717397ae1..4c7f06d5cf95 100644
---- a/hw/s390x/s390-pci-bus.c
-+++ b/hw/s390x/s390-pci-bus.c
-@@ -738,6 +738,46 @@ static void s390_pci_iommu_free(S390pciState *s, PCIBus *bus, int32_t devfn)
-     object_unref(OBJECT(iommu));
+diff --git a/hw/vfio/common.c b/hw/vfio/common.c
+index 2b1455e78089..32d536e32507 100644
+--- a/hw/vfio/common.c
++++ b/hw/vfio/common.c
+@@ -442,8 +442,8 @@ static bool vfio_listener_skipped_section(MemoryRegionSection *section)
  }
  
-+static S390PCIGroup *s390_group_create(int id)
+ /* Called with rcu_read_lock held.  */
+-static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+-                           bool *read_only)
++static bool vfio_get_xlat_addr(IOMMUTLBEntry *iotlb, void **vaddr,
++                               ram_addr_t *ram_addr, bool *read_only)
+ {
+     MemoryRegion *mr;
+     hwaddr xlat;
+@@ -474,8 +474,17 @@ static bool vfio_get_vaddr(IOMMUTLBEntry *iotlb, void **vaddr,
+         return false;
+     }
+ 
+-    *vaddr = memory_region_get_ram_ptr(mr) + xlat;
+-    *read_only = !writable || mr->readonly;
++    if (vaddr) {
++        *vaddr = memory_region_get_ram_ptr(mr) + xlat;
++    }
++
++    if (ram_addr) {
++        *ram_addr = memory_region_get_ram_addr(mr) + xlat;
++    }
++
++    if (read_only) {
++        *read_only = !writable || mr->readonly;
++    }
+ 
+     return true;
+ }
+@@ -485,7 +494,6 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     VFIOGuestIOMMU *giommu = container_of(n, VFIOGuestIOMMU, n);
+     VFIOContainer *container = giommu->container;
+     hwaddr iova = iotlb->iova + giommu->iommu_offset;
+-    bool read_only;
+     void *vaddr;
+     int ret;
+ 
+@@ -501,7 +509,9 @@ static void vfio_iommu_map_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
+     rcu_read_lock();
+ 
+     if ((iotlb->perm & IOMMU_RW) != IOMMU_NONE) {
+-        if (!vfio_get_vaddr(iotlb, &vaddr, &read_only)) {
++        bool read_only;
++
++        if (!vfio_get_xlat_addr(iotlb, &vaddr, NULL, &read_only)) {
+             goto out;
+         }
+         /*
+@@ -899,11 +909,77 @@ err_out:
+     return ret;
+ }
+ 
++typedef struct {
++    IOMMUNotifier n;
++    VFIOGuestIOMMU *giommu;
++} vfio_giommu_dirty_notifier;
++
++static void vfio_iommu_map_dirty_notify(IOMMUNotifier *n, IOMMUTLBEntry *iotlb)
 +{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
++    vfio_giommu_dirty_notifier *gdn = container_of(n,
++                                                vfio_giommu_dirty_notifier, n);
++    VFIOGuestIOMMU *giommu = gdn->giommu;
++    VFIOContainer *container = giommu->container;
++    hwaddr iova = iotlb->iova + giommu->iommu_offset;
++    ram_addr_t translated_addr;
 +
-+    group = g_new0(S390PCIGroup, 1);
-+    group->id = id;
-+    QTAILQ_INSERT_TAIL(&s->zpci_groups, group, link);
-+    return group;
-+}
++    trace_vfio_iommu_map_dirty_notify(iova, iova + iotlb->addr_mask);
 +
-+S390PCIGroup *s390_group_find(int id)
-+{
-+    S390PCIGroup *group;
-+    S390pciState *s = s390_get_phb();
++    if (iotlb->target_as != &address_space_memory) {
++        error_report("Wrong target AS \"%s\", only system memory is allowed",
++                     iotlb->target_as->name ? iotlb->target_as->name : "none");
++        return;
++    }
 +
-+    QTAILQ_FOREACH(group, &s->zpci_groups, link) {
-+        if (group->id == id) {
-+            return group;
++    rcu_read_lock();
++    if (vfio_get_xlat_addr(iotlb, NULL, &translated_addr, NULL)) {
++        int ret;
++
++        ret = vfio_get_dirty_bitmap(container, iova, iotlb->addr_mask + 1,
++                                    translated_addr);
++        if (ret) {
++            error_report("vfio_iommu_map_dirty_notify(%p, 0x%"HWADDR_PRIx", "
++                         "0x%"HWADDR_PRIx") = %d (%m)",
++                         container, iova,
++                         iotlb->addr_mask + 1, ret);
 +        }
 +    }
-+    return NULL;
++    rcu_read_unlock();
 +}
 +
-+static void s390_pci_init_default_group(void)
-+{
-+    S390PCIGroup *group;
-+    ClpRspQueryPciGrp *resgrp;
-+
-+    group = s390_group_create(ZPCI_DEFAULT_FN_GRP);
-+    resgrp = &group->zpci_group;
-+    resgrp->fr = 1;
-+    stq_p(&resgrp->dasm, 0);
-+    stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
-+    stw_p(&resgrp->mui, DEFAULT_MUI);
-+    stw_p(&resgrp->i, 128);
-+    stw_p(&resgrp->maxstbl, 128);
-+    resgrp->version = 0;
-+}
-+
- static void s390_pcihost_realize(DeviceState *dev, Error **errp)
+ static int vfio_sync_dirty_bitmap(VFIOContainer *container,
+                                   MemoryRegionSection *section)
  {
-     PCIBus *b;
-@@ -766,7 +806,9 @@ static void s390_pcihost_realize(DeviceState *dev, Error **errp)
-     QTAILQ_INIT(&s->pending_sei);
-     QTAILQ_INIT(&s->zpci_devs);
-     QTAILQ_INIT(&s->zpci_dma_limit);
-+    QTAILQ_INIT(&s->zpci_groups);
+     ram_addr_t ram_addr;
  
-+    s390_pci_init_default_group();
-     css_register_io_adapters(CSS_IO_ADAPTER_PCI, true, false,
-                              S390_ADAPTER_SUPPRESSIBLE, errp);
- }
-diff --git a/hw/s390x/s390-pci-inst.c b/hw/s390x/s390-pci-inst.c
-index 4eadd9e79416..c25b2a67efe0 100644
---- a/hw/s390x/s390-pci-inst.c
-+++ b/hw/s390x/s390-pci-inst.c
-@@ -298,21 +298,25 @@ int clp_service_call(S390CPU *cpu, uint8_t r2, uintptr_t ra)
-         stq_p(&resquery->edma, ZPCI_EDMA_ADDR);
-         stl_p(&resquery->fid, pbdev->fid);
-         stw_p(&resquery->pchid, 0);
--        stw_p(&resquery->ug, 1);
-+        stw_p(&resquery->ug, ZPCI_DEFAULT_FN_GRP);
-         stl_p(&resquery->uid, pbdev->uid);
-         stw_p(&resquery->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-     case CLP_QUERY_PCI_FNGRP: {
-         ClpRspQueryPciGrp *resgrp = (ClpRspQueryPciGrp *)resh;
--        resgrp->fr = 1;
--        stq_p(&resgrp->dasm, 0);
--        stq_p(&resgrp->msia, ZPCI_MSI_ADDR);
--        stw_p(&resgrp->mui, DEFAULT_MUI);
--        stw_p(&resgrp->i, 128);
--        stw_p(&resgrp->maxstbl, 128);
--        resgrp->version = 0;
- 
-+        ClpReqQueryPciGrp *reqgrp = (ClpReqQueryPciGrp *)reqh;
-+        S390PCIGroup *group;
++    if (memory_region_is_iommu(section->mr)) {
++        VFIOGuestIOMMU *giommu;
 +
-+        group = s390_group_find(reqgrp->g);
-+        if (!group) {
-+            /* We do not allow access to unknown groups */
-+            /* The group must have been obtained with a vfio device */
-+            stw_p(&resgrp->hdr.rsp, CLP_RC_QUERYPCIFG_PFGID);
-+            goto out;
++        QLIST_FOREACH(giommu, &container->giommu_list, giommu_next) {
++            if (MEMORY_REGION(giommu->iommu) == section->mr &&
++                giommu->n.start == section->offset_within_region) {
++                Int128 llend;
++                vfio_giommu_dirty_notifier gdn = { .giommu = giommu };
++                int idx = memory_region_iommu_attrs_to_index(giommu->iommu,
++                                                       MEMTXATTRS_UNSPECIFIED);
++
++                llend = int128_add(int128_make64(section->offset_within_region),
++                                   section->size);
++                llend = int128_sub(llend, int128_one());
++
++                iommu_notifier_init(&gdn.n,
++                                    vfio_iommu_map_dirty_notify,
++                                    IOMMU_NOTIFIER_MAP,
++                                    section->offset_within_region,
++                                    int128_get64(llend),
++                                    idx);
++                memory_region_iommu_replay(giommu->iommu, &gdn.n);
++                break;
++            }
 +        }
-+        memcpy(resgrp, &group->zpci_group, sizeof(ClpRspQueryPciGrp));
-         stw_p(&resgrp->hdr.rsp, CLP_RC_OK);
-         break;
-     }
-@@ -787,7 +791,8 @@ int pcistb_service_call(S390CPU *cpu, uint8_t r1, uint8_t r3, uint64_t gaddr,
-     }
-     /* Length must be greater than 8, a multiple of 8 */
-     /* and not greater than maxstbl */
--    if ((len <= 8) || (len % 8) || (len > pbdev->maxstbl)) {
-+    if ((len <= 8) || (len % 8) ||
-+        (len > pbdev->pci_group->zpci_group.maxstbl)) {
-         goto specification_error;
-     }
-     /* Do not cross a 4K-byte boundary */
-diff --git a/include/hw/s390x/s390-pci-bus.h b/include/hw/s390x/s390-pci-bus.h
-index 5f339e57fb68..869c0f254b7f 100644
---- a/include/hw/s390x/s390-pci-bus.h
-+++ b/include/hw/s390x/s390-pci-bus.h
-@@ -316,6 +316,14 @@ typedef struct ZpciFmb {
- } ZpciFmb;
- QEMU_BUILD_BUG_MSG(offsetof(ZpciFmb, fmt0) != 48, "padding in ZpciFmb");
- 
-+#define ZPCI_DEFAULT_FN_GRP 0x20
-+typedef struct S390PCIGroup {
-+    ClpRspQueryPciGrp zpci_group;
-+    int id;
-+    QTAILQ_ENTRY(S390PCIGroup) link;
-+} S390PCIGroup;
-+S390PCIGroup *s390_group_find(int id);
++        return 0;
++    }
 +
- struct S390PCIBusDevice {
-     DeviceState qdev;
-     PCIDevice *pdev;
-@@ -333,6 +341,7 @@ struct S390PCIBusDevice {
-     uint16_t noi;
-     uint16_t maxstbl;
-     uint8_t sum;
-+    S390PCIGroup *pci_group;
-     S390MsixInfo msix;
-     AdapterRoutes routes;
-     S390PCIIOMMU *iommu;
-@@ -358,6 +367,7 @@ struct S390pciState {
-     QTAILQ_HEAD(, SeiContainer) pending_sei;
-     QTAILQ_HEAD(, S390PCIBusDevice) zpci_devs;
-     QTAILQ_HEAD(, S390PCIDMACount) zpci_dma_limit;
-+    QTAILQ_HEAD(, S390PCIGroup) zpci_groups;
- };
+     ram_addr = memory_region_get_ram_addr(section->mr) +
+                section->offset_within_region;
  
- S390pciState *s390_get_phb(void);
+diff --git a/hw/vfio/trace-events b/hw/vfio/trace-events
+index dd991bd8f265..c0e75f24b76d 100644
+--- a/hw/vfio/trace-events
++++ b/hw/vfio/trace-events
+@@ -164,3 +164,4 @@ vfio_load_state(const char *name, uint64_t data) " (%s) data 0x%"PRIx64
+ vfio_load_state_device_data(const char *name, uint64_t data_offset, uint64_t data_size) " (%s) Offset 0x%"PRIx64" size 0x%"PRIx64
+ vfio_load_cleanup(const char *name) " (%s)"
+ vfio_get_dirty_bitmap(int fd, uint64_t iova, uint64_t size, uint64_t bitmap_size, uint64_t start) "container fd=%d, iova=0x%"PRIx64" size= 0x%"PRIx64" bitmap_size=0x%"PRIx64" start=0x%"PRIx64
++vfio_iommu_map_dirty_notify(uint64_t iova_start, uint64_t iova_end) "iommu dirty @ 0x%"PRIx64" - 0x%"PRIx64
 
 
