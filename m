@@ -6,69 +6,68 @@ X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F8EEC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D8B2C55178
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:20:21 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E6A0224690
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:18:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8C8B724690
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:20:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jPi+I2nc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E6A0224690
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KJvvqUiR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8C8B724690
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45764 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXhbN-0006U3-Gh
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:18:41 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49346)
+	id 1kXhcw-0007Sv-JM
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:20:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49888)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXhZb-0005l1-9b
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:16:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:31231)
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXhbb-0006vu-V5
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:18:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:25042)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXhZX-0006cB-SR
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:16:49 -0400
+ (Exim 4.90_1) (envelope-from <armbru@redhat.com>) id 1kXhba-0007En-Bf
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:18:55 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603876602;
+ s=mimecast20190719; t=1603876733;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=xVSCG+/ECq59ouyGq86qjT/QK+yC8lxnYBjdavMkJEI=;
- b=jPi+I2nc6cv3GBaaebztIWoIjQ57X3dQhxj/xJfyw9JiImACiWQHRXs07penYMuYLCA1Hp
- etCKft+uph39gVMHlCJyMAxOd1YvoqOGNszsVTG/fx2Jo1pSHaF8BKK/Xy4SOtSHYkx4Dy
- 81+ibpA+awvkLUyAEwjxH5Z1lTT7u0w=
+ bh=OwODio9QtbutypCfLRX3TMkLq9nj2hreOcfN+gYtXgI=;
+ b=KJvvqUiR0VD+VjD2kX9L8YXLx8+kTHT68T/cGpStdxau34BanT43XgM12eown/gGA08k4d
+ FRJlVnx+Zw8xTysf9jicbbLh5ETvjcZmmuMzLaPAIrnp1UvGsS+xy7kwrGuPK9uk4Q7G4D
+ 9G40eJJ90U/RnkF9qQpevAQhJ31Vp1E=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-147-urrdCb0aMWyoCYMbjixs6g-1; Wed, 28 Oct 2020 05:16:40 -0400
-X-MC-Unique: urrdCb0aMWyoCYMbjixs6g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
+ us-mta-589-KlKFwwoCPyaTPxW8YY6sIQ-1; Wed, 28 Oct 2020 05:18:52 -0400
+X-MC-Unique: KlKFwwoCPyaTPxW8YY6sIQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 8C9548070F0;
- Wed, 28 Oct 2020 09:16:39 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id EDD6DCFF2C;
+ Wed, 28 Oct 2020 09:18:50 +0000 (UTC)
 Received: from blackfin.pond.sub.org (ovpn-112-182.ams2.redhat.com
  [10.36.112.182])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 026161002C39;
- Wed, 28 Oct 2020 09:16:35 +0000 (UTC)
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 7133C5B4C5;
+ Wed, 28 Oct 2020 09:18:47 +0000 (UTC)
 Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
- id 8B4C7113865F; Wed, 28 Oct 2020 10:16:33 +0100 (CET)
+ id E3B1F113865F; Wed, 28 Oct 2020 10:18:45 +0100 (CET)
 From: Markus Armbruster <armbru@redhat.com>
-To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 4/5] python: add .gitignore
-References: <20201027223815.159802-1-jsnow@redhat.com>
- <20201027223815.159802-5-jsnow@redhat.com>
- <f9ea6ce1-f464-0376-29ac-6071f680e63b@redhat.com>
-Date: Wed, 28 Oct 2020 10:16:33 +0100
-In-Reply-To: <f9ea6ce1-f464-0376-29ac-6071f680e63b@redhat.com> (Thomas Huth's
- message of "Wed, 28 Oct 2020 09:13:10 +0100")
-Message-ID: <871rhi1zim.fsf@dusky.pond.sub.org>
+To: qemu-devel@nongnu.org
+Subject: Re: [PATCH 4/4] qemu-storage-daemon: QAPIfy --chardev
+References: <20201026101005.2940615-1-armbru@redhat.com>
+ <20201026101005.2940615-5-armbru@redhat.com>
+Date: Wed, 28 Oct 2020 10:18:45 +0100
+In-Reply-To: <20201026101005.2940615-5-armbru@redhat.com> (Markus Armbruster's
+ message of "Mon, 26 Oct 2020 11:10:05 +0100")
+Message-ID: <87wnzazp1m.fsf@dusky.pond.sub.org>
 User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/27.1 (gnu/linux)
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=armbru@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,29 +96,33 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- "Daniel P . =?utf-8?Q?Berrang=C3=A9?=" <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, qemu-devel@nongnu.org,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
- Cleber Rosa <crosa@redhat.com>, John Snow <jsnow@redhat.com>
+Cc: kwolf@redhat.com, marcandre.lureau@redhat.com, qemu-block@nongnu.org,
+ pbonzini@redhat.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Thomas Huth <thuth@redhat.com> writes:
+Markus Armbruster <armbru@redhat.com> writes:
 
-> On 27/10/2020 23.38, John Snow wrote:
->> Ignore build and package output (build, dist, qemu.egg-info);
->> effectively these are "in-tree" builds of a kind.
+> From: Kevin Wolf <kwolf@redhat.com>
 >
-> Since we recently moved away from in-tree builds, could these also be made
-> out-of-tree only?
+> This removes the dependency on QemuOpts from the --chardev option of
+> the storage daemon.
+>
+> Help on option parameters is still wrong.  Marked FIXME.
+>
+> There are quite a few differences between qemu-system-FOO -chardev,
+> QMP chardev-add, and qemu-storage-daemon --chardev:
+[...]
+> * Backend type "socket":
+[...]
+>   - Accidentally different defaults: qemu-system-FOO -chardev defaults
+>     to tight=true, QMP chardev-add defaults to tight=false in
+>     QMP (this is a bug in commit 776b97d3).  qemu-storage-daemon
+>     follows QMP.
 
-The build should only write to the per-build spaces: the build tree,
-per-build scratch in /tmp, ...  Writing to shared space such as the
-source tree can break parallel independent builds.  I consider that a
-bug.
+It's even worse than that.  I'll start a new thread.
+
+[...]
 
 
