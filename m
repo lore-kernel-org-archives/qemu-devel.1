@@ -8,76 +8,81 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D79C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED337C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:21:01 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id F37E22076C
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:19:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5CFF52076C
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:21:01 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMKYuOzA"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F37E22076C
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GFLEkcWq"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5CFF52076C
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:37606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:41210 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXcvu-0001Xv-VA
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:19:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43230)
+	id 1kXcxI-0003Cp-C4
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:21:00 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43404)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kXcuJ-0000Av-Co
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:17:55 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:42979)
+ id 1kXcvF-0001JI-4P
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:18:53 -0400
+Received: from mail-pg1-x544.google.com ([2607:f8b0:4864:20::544]:35520)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <zltjiangshi@gmail.com>)
- id 1kXcuH-0007Cc-FG
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:17:55 -0400
-Received: by mail-pf1-x442.google.com with SMTP id x13so2166092pfa.9
- for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 21:17:53 -0700 (PDT)
+ id 1kXcvD-0007VQ-AB
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 00:18:52 -0400
+Received: by mail-pg1-x544.google.com with SMTP id f38so2032510pgm.2
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 21:18:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=4mqcm/qscydasRVS0/uiBGxQMYSJ1QP1CS0Djhkp5ck=;
- b=SMKYuOzAKkNQU1bCDbIlalcZrHENaIjFDyWeUdLgLw5jnkPHtyz0Y4yNkxwXdQJCug
- 1M2u8RBCL2qjokaX3l1SC38bGjoA6bNHZpuENLcBf2Uj2PNLZLiGn+mj1O6ymIXQ8fKg
- SjVPiMujJ5oclw/SQ8f2i2MyKEPbCm6/0IsZL+XnCEzywlLtjURHDQAmXq6BYTHt9MvW
- ePCaGVqK/CilaV/cMsuBx4QFuKip/JgHUqSxpFd6utC+mlApEyuxEvI0EWzUxpsRKqK2
- SVWEV6pCPABQAh13vOR7fHmDTH+6Ty9DwQWNHsZPtJsdNtCySEkSqsG3K6S07JyitPnc
- hPzw==
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=7be69Z9NET5kIBJ2AmfgWFxcd4F4ui4S0AZTNTd2Vu4=;
+ b=GFLEkcWqvIhCfftJhAYIocmUKkn5HXtoFRC5Jk+PVOes60Qa4Sw/ez3ieTqwL1P8xx
+ icHQ0bZJwFtMNsIQERJZSOJnJUZwyG7xfBlKAIRuuWv64OujX2PzbzJo5ClI/efq17bH
+ 6E3OvIUXHObx85ZDKTNLXLFgADO3IVIyJ5WO1kgnDJ2bnpmzsy2Rn9b+NmvslUlyswg6
+ kqUqX79eqFtx6iPIqm1F1gj23oIQcV9dgGhaK8t3Hsuo3oC++aDYpqztDRUhxCQay382
+ qg9RhkarjOWrOghx8tbUkzN1NXSxWhYGCRH3Yry+/xXpstA3Kt3OQXeePEHHPfVMAlh+
+ fTqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=4mqcm/qscydasRVS0/uiBGxQMYSJ1QP1CS0Djhkp5ck=;
- b=JlIMnT2iVW2tqMlFAagBJ8SXFHC0R8SRQtDClLyIkK8QnnvRx5T/QtoHY1w56r++1Q
- 1naH7BmO/a4oWq3A6RuxF53oVuvfpwIFZMWk4ht3OrENwELvHlH63bzi5ZuWTclVkpfH
- S/BwGsvrQyBs92GDD8QizyCYMLPiCKRqB25Qa5Hh6UxqRs0b1+sJEwtV5qW4Wc1SsfYB
- c7cjawBsF9ZQAI/q3aaYEjTfvCknWJDdizQNDhuXxbJeeIst6JOc2m1JYPUauDVnYASB
- DdJLeEZz3ZLYrI9Am0D3g9ZfJXRoHQ0NbKWnCv/xzSzE/WTxl0K4kEaM0W1RszzDGVUw
- 3SxA==
-X-Gm-Message-State: AOAM531O+NwYG6NkLokZnklbYICYah0MrhLN+eFf/PlBcL9kkyecJM2R
- SdSO6ihykOHKmInC4hXRUmc=
-X-Google-Smtp-Source: ABdhPJw6Li5XbgWy+2IhA5u60C67ktUqfMg3sBOs9oIMkp0iM9X/9qACJWry2aHAjcN0HI26pIWEOg==
-X-Received: by 2002:a63:b516:: with SMTP id y22mr4679818pge.154.1603858671998; 
- Tue, 27 Oct 2020 21:17:51 -0700 (PDT)
+ :references:mime-version:content-transfer-encoding;
+ bh=7be69Z9NET5kIBJ2AmfgWFxcd4F4ui4S0AZTNTd2Vu4=;
+ b=KGwGIyV2UE61zJIo0fBQuZq+/RYabHUq702aRtVLi1Ff/odEcLJi/p+9PwES9WuljT
+ 2pnktbcUF3QMYFIeJ4LzLC8z+XJ0vgnxRburI01zmdsTxK6o/vbZwRtgSyko9Ngmoezv
+ jFMEjO3ZEt0EHyY5VdsRSFRvOR7OqUxcmHS3AL2HUHObNQf+DSNWCR1dQvDzgQFsffPJ
+ dtOYEC98wiMBH5xNVqWRcP/sCBWeHhftebeq6Olfbx9l5mh85B1RvhwRzTRIjZagio4x
+ mmGtpo83KI4/qlQJCNJRl9QQvlL0EC16fVUzf/rkyY4duw0urkC/nXNHGLbYRnQz62Gh
+ pPAA==
+X-Gm-Message-State: AOAM530USv6OOdmhOFok7V/aspnxO9r1Q+pctHy5oPJJQFsm52Er24Gx
+ wv48hkMIZBRN3P/Z2RqBBMk=
+X-Google-Smtp-Source: ABdhPJyhch0wDGFlmeg8QTVNZ6Wi6BdteWX4snUQowdEJwsOWOJB0QItPLi71DNiSp75rEJLrO2PpA==
+X-Received: by 2002:aa7:9a44:0:b029:155:8201:c61c with SMTP id
+ x4-20020aa79a440000b02901558201c61cmr5612727pfj.31.1603858729946; 
+ Tue, 27 Oct 2020 21:18:49 -0700 (PDT)
 Received: from software.domain.org ([45.77.13.216])
- by smtp.gmail.com with ESMTPSA id x10sm3882040pfc.88.2020.10.27.21.17.47
+ by smtp.gmail.com with ESMTPSA id x10sm3882040pfc.88.2020.10.27.21.18.46
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Oct 2020 21:17:51 -0700 (PDT)
+ Tue, 27 Oct 2020 21:18:49 -0700 (PDT)
 From: Huacai Chen <zltjiangshi@gmail.com>
 X-Google-Original-From: Huacai Chen <chenhc@lemote.com>
 To: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
  Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-Subject: [PATCH V15 1/6] target/mips: Fix PageMask with variable page size
-Date: Wed, 28 Oct 2020 12:17:59 +0800
-Message-Id: <1603858685-30701-2-git-send-email-chenhc@lemote.com>
+Subject: [PATCH V15 3/6] hw/mips: Implement fw_cfg_arch_key_name()
+Date: Wed, 28 Oct 2020 12:18:01 +0800
+Message-Id: <1603858685-30701-4-git-send-email-chenhc@lemote.com>
 X-Mailer: git-send-email 2.7.0
 In-Reply-To: <1603858685-30701-1-git-send-email-chenhc@lemote.com>
 References: <1603858685-30701-1-git-send-email-chenhc@lemote.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::442;
- envelope-from=zltjiangshi@gmail.com; helo=mail-pf1-x442.google.com
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2607:f8b0:4864:20::544;
+ envelope-from=zltjiangshi@gmail.com; helo=mail-pg1-x544.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -20
@@ -107,78 +112,98 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Implement fw_cfg_arch_key_name(), which returns the name of a
+mips-specific key.
 
-Our current code assumed the target page size is always 4k
-when handling PageMask and VPN2, however, variable page size
-was just added to mips target and that's no longer true.
-
-Fixes: ee3863b9d414 ("target/mips: Support variable page size")
-Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 Signed-off-by: Huacai Chen <chenhc@lemote.com>
+Co-developed-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
+Signed-off-by: Jiaxun Yang <jiaxun.yang@flygoat.com>
 ---
- target/mips/cp0_helper.c | 36 +++++++++++++++++++++++++++++-------
- target/mips/cpu.h        |  1 +
- 2 files changed, 30 insertions(+), 7 deletions(-)
+ hw/mips/fw_cfg.c    | 35 +++++++++++++++++++++++++++++++++++
+ hw/mips/fw_cfg.h    | 19 +++++++++++++++++++
+ hw/mips/meson.build |  2 +-
+ 3 files changed, 55 insertions(+), 1 deletion(-)
+ create mode 100644 hw/mips/fw_cfg.c
+ create mode 100644 hw/mips/fw_cfg.h
 
-diff --git a/target/mips/cp0_helper.c b/target/mips/cp0_helper.c
-index 12143ac..d90ddd9 100644
---- a/target/mips/cp0_helper.c
-+++ b/target/mips/cp0_helper.c
-@@ -892,13 +892,35 @@ void helper_mtc0_memorymapid(CPUMIPSState *env, target_ulong arg1)
- 
- void update_pagemask(CPUMIPSState *env, target_ulong arg1, int32_t *pagemask)
- {
--    uint64_t mask = arg1 >> (TARGET_PAGE_BITS + 1);
--    if (!(env->insn_flags & ISA_MIPS32R6) || (arg1 == ~0) ||
--        (mask == 0x0000 || mask == 0x0003 || mask == 0x000F ||
--         mask == 0x003F || mask == 0x00FF || mask == 0x03FF ||
--         mask == 0x0FFF || mask == 0x3FFF || mask == 0xFFFF)) {
--        env->CP0_PageMask = arg1 & (0x1FFFFFFF & (TARGET_PAGE_MASK << 1));
-+    unsigned long mask;
-+    int maskbits;
+diff --git a/hw/mips/fw_cfg.c b/hw/mips/fw_cfg.c
+new file mode 100644
+index 0000000..67c4a74
+--- /dev/null
++++ b/hw/mips/fw_cfg.c
+@@ -0,0 +1,35 @@
++/*
++ * QEMU fw_cfg helpers (MIPS specific)
++ *
++ * Copyright (c) 2020 Lemote, Inc.
++ *
++ * Author:
++ *   Huacai Chen (chenhc@lemote.com)
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory.
++ */
 +
-+    if (env->insn_flags & ISA_MIPS32R6) {
-+        return;
++#include "qemu/osdep.h"
++#include "hw/mips/fw_cfg.h"
++#include "hw/nvram/fw_cfg.h"
++
++const char *fw_cfg_arch_key_name(uint16_t key)
++{
++    static const struct {
++        uint16_t key;
++        const char *name;
++    } fw_cfg_arch_wellknown_keys[] = {
++        {FW_CFG_MACHINE_VERSION, "machine_version"},
++        {FW_CFG_CPU_FREQ, "cpu_frequency"},
++    };
++
++    for (size_t i = 0; i < ARRAY_SIZE(fw_cfg_arch_wellknown_keys); i++) {
++        if (fw_cfg_arch_wellknown_keys[i].key == key) {
++            return fw_cfg_arch_wellknown_keys[i].name;
++        }
 +    }
-+    /* Don't care MASKX as we don't support 1KB page */
-+    mask = extract32((uint32_t)arg1, CP0PM_MASK, 16);
-+    maskbits = find_first_zero_bit(&mask, 32);
++    return NULL;
++}
+diff --git a/hw/mips/fw_cfg.h b/hw/mips/fw_cfg.h
+new file mode 100644
+index 0000000..e317d5b
+--- /dev/null
++++ b/hw/mips/fw_cfg.h
+@@ -0,0 +1,19 @@
++/*
++ * QEMU fw_cfg helpers (MIPS specific)
++ *
++ * Copyright (c) 2020 Huacai Chen
++ *
++ * SPDX-License-Identifier: MIT
++ */
 +
-+    /* Ensure no more set bit after first zero */
-+    if (mask >> maskbits) {
-+        goto invalid;
-+    }
-+    /* We don't support VTLB entry smaller than target page */
-+    if ((maskbits + 12) < TARGET_PAGE_BITS) {
-+        goto invalid;
-     }
-+    env->CP0_PageMask = mask << CP0PM_MASK;
++#ifndef HW_MIPS_FW_CFG_H
++#define HW_MIPS_FW_CFG_H
 +
-+    return;
++#include "hw/boards.h"
++#include "hw/nvram/fw_cfg.h"
 +
-+invalid:
-+    /*
-+     * When invalid, ensure the value is bigger than or equal to
-+     * the minimal but smaller than or equal to the maxium.
-+     */
-+    maskbits = MIN(16, MAX(maskbits, TARGET_PAGE_BITS - 12));
-+    env->CP0_PageMask = ((1 << (16 + 1)) - 1) << CP0PM_MASK;
- }
- 
- void helper_mtc0_pagemask(CPUMIPSState *env, target_ulong arg1)
-diff --git a/target/mips/cpu.h b/target/mips/cpu.h
-index d41579d..23f8c6f 100644
---- a/target/mips/cpu.h
-+++ b/target/mips/cpu.h
-@@ -619,6 +619,7 @@ struct CPUMIPSState {
-  * CP0 Register 5
-  */
-     int32_t CP0_PageMask;
-+#define CP0PM_MASK 13
-     int32_t CP0_PageGrain_rw_bitmask;
-     int32_t CP0_PageGrain;
- #define CP0PG_RIE 31
++/* Data for BIOS to identify machine */
++#define FW_CFG_MACHINE_VERSION  (FW_CFG_ARCH_LOCAL + 0)
++#define FW_CFG_CPU_FREQ         (FW_CFG_ARCH_LOCAL + 1)
++
++#endif
+diff --git a/hw/mips/meson.build b/hw/mips/meson.build
+index 46294b7..c98391c 100644
+--- a/hw/mips/meson.build
++++ b/hw/mips/meson.build
+@@ -1,5 +1,5 @@
+ mips_ss = ss.source_set()
+-mips_ss.add(files('addr.c', 'mips_int.c'))
++mips_ss.add(files('addr.c', 'mips_int.c', 'fw_cfg.c'))
+ mips_ss.add(when: 'CONFIG_FULOONG', if_true: files('fuloong2e.c'))
+ mips_ss.add(when: 'CONFIG_JAZZ', if_true: files('jazz.c'))
+ mips_ss.add(when: 'CONFIG_MALTA', if_true: files('gt64xxx_pci.c', 'malta.c'))
 -- 
 2.7.0
 
