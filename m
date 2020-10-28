@@ -2,90 +2,73 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
-	DKIM_ADSP_CUSTOM_MED,DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,
-	FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C74DDC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:38:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54E2C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:45:22 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 2194922267
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:38:37 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FKYYpslc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 2194922267
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	by mail.kernel.org (Postfix) with ESMTPS id BDB5E22267
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:45:21 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BDB5E22267
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33404 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40120 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXeAM-0005k3-Kh
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 01:38:36 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32772)
+	id 1kXeGt-0000Zc-TC
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 01:45:20 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:35000)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXe2o-0005Jg-32; Wed, 28 Oct 2020 01:30:46 -0400
-Received: from mail-pg1-x533.google.com ([2607:f8b0:4864:20::533]:44924)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXe2l-0000dQ-4P; Wed, 28 Oct 2020 01:30:45 -0400
-Received: by mail-pg1-x533.google.com with SMTP id o3so2098760pgr.11;
- Tue, 27 Oct 2020 22:30:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=j/5zRvyDLwKSrISeiJ/ESPnFS4E7AXqsSOBYVI0H/Sk=;
- b=FKYYpslcxzc1kBmChAPP4fSsbnMeOQtDhrtZ6XK1ptd1i3CHGEfIPZgI75L5y7VEK9
- 08gWFkX7v+eEp/iIeTFsaiwlDJ0PPtmCNyl/ieuyzWFv1lFvrO94VDksuKg6UvUVnhcz
- iXRvFZWKLd0af6AWcV/QXK9+hCue2MNGPGcUnx3uJqhv+oycRO+C3dZ67vqM4n2adnIM
- zvU650Wgkb66ERofJKlnyEr4mI65MGdbPpzC8u2hqymyuszD4zd/LPekcHbgsTwJmclA
- xdyYq/kjSXti9wq7/k6b/tf2IBKIqNHqrER/cX8GcFtblygTi/wLHLWQcH4gQVD8X05J
- 2HpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
- :references;
- bh=j/5zRvyDLwKSrISeiJ/ESPnFS4E7AXqsSOBYVI0H/Sk=;
- b=Pe8m+fChWFQN98MO7z+6+dANxQcLKvm1x6HTI/Y20mEAXBwL0szzN+nAbNIagJfX9C
- iHe5vo5TBwBGQIUp1oMsxPhrPbJ/9LCNvLI4K4dejanZrs8MNkRn3qT3mDd+GpZ3QSrE
- 16GQriTaKeVX02YsipwSc+R8LPzrUuiwoJOj+EkMgPKIGTqgG+s6ZSw/fKsj9OC2c422
- KGOxo9JgrBlJ6MOtie6hWkXMFCM9b+l967hKX3FzQNBUyMmurKSx+tmuDUFUWns4P0qT
- 31XxbSok3dMLFrXPpVpTqVNYBeuuL2WV22IhVWrMi9YpWgDxVBtdn46Ai8L9ceV07A4E
- d1zQ==
-X-Gm-Message-State: AOAM53129JgDjWfPoOnen5DnD0YP3MfHDpO9ZaDZjs9e2ykXMFoAwF6n
- qdl8H5ya94RIC8pTzmt5aRvmGlVZzhA=
-X-Google-Smtp-Source: ABdhPJzY6oAimbXq56bJfsWNrIgjte6x0P1Hq6ftRjk4z483JdrfMIDyYfpDuuJwV7HDt+osAjuVKg==
-X-Received: by 2002:aa7:9905:0:b029:155:73b6:6f7d with SMTP id
- z5-20020aa799050000b029015573b66f7dmr5932305pff.78.1603863040745; 
- Tue, 27 Oct 2020 22:30:40 -0700 (PDT)
-Received: from pek-vx-bsp2.wrs.com (unknown-224-80.windriver.com.
- [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id 9sm5031887pjs.1.2020.10.27.22.30.37
- (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Oct 2020 22:30:40 -0700 (PDT)
-From: Bin Meng <bmeng.cn@gmail.com>
-To: Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
- qemu-riscv@nongnu.org
-Subject: [PATCH v2 06/10] hw/misc: Add Microchip PolarFire SoC SYSREG module
- support
-Date: Wed, 28 Oct 2020 13:30:06 +0800
-Message-Id: <1603863010-15807-7-git-send-email-bmeng.cn@gmail.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
-References: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
-Received-SPF: pass client-ip=2607:f8b0:4864:20::533;
- envelope-from=bmeng.cn@gmail.com; helo=mail-pg1-x533.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kXeFl-0008PT-1n; Wed, 28 Oct 2020 01:44:09 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2110)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
+ id 1kXeFh-0004uE-Si; Wed, 28 Oct 2020 01:44:08 -0400
+Received: from DGGEMM403-HUB.china.huawei.com (unknown [172.30.72.55])
+ by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4CLcvN2HVHz4xQk;
+ Wed, 28 Oct 2020 13:44:00 +0800 (CST)
+Received: from DGGEMM423-HUB.china.huawei.com (10.1.198.40) by
+ DGGEMM403-HUB.china.huawei.com (10.3.20.211) with Microsoft SMTP Server (TLS)
+ id 14.3.487.0; Wed, 28 Oct 2020 13:43:56 +0800
+Received: from DGGEMM531-MBX.china.huawei.com ([169.254.5.225]) by
+ dggemm423-hub.china.huawei.com ([10.1.198.40]) with mapi id 14.03.0487.000;
+ Wed, 28 Oct 2020 13:43:47 +0800
+From: "Chenqun (kuhn)" <kuhn.chenqun@huawei.com>
+To: David Gibson <david@gibson.dropbear.id.au>
+Subject: RE: [PATCH] target/ppc/excp_helper: Add a missing break for
+ POWERPC_EXCP_HISI
+Thread-Topic: [PATCH] target/ppc/excp_helper: Add a missing break for
+ POWERPC_EXCP_HISI
+Thread-Index: AQHWrOEhDVQBenQ31E2N25gfU+hXv6mr5Y4AgACauqA=
+Date: Wed, 28 Oct 2020 05:43:46 +0000
+Message-ID: <7412CDE03601674DA8197E2EBD8937E83BA0AE06@dggemm531-mbx.china.huawei.com>
+References: <20201028041620.2168707-1-kuhn.chenqun@huawei.com>
+ <20201028042758.GB5604@yekko.fritz.box>
+In-Reply-To: <20201028042758.GB5604@yekko.fritz.box>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.174.185.149]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+MIME-Version: 1.0
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.188;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga02-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:43:58
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -99,227 +82,58 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>, Atish Patra <atish.patra@wdc.com>,
- Anup Patel <anup.patel@wdc.com>, Ivan Griffin <ivan.griffin@emdalo.com>
+Cc: Zhanghailiang <zhang.zhanghailiang@huawei.com>,
+ "qemu-trivial@nongnu.org" <qemu-trivial@nongnu.org>,
+ "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "clg@kaod.org" <clg@kaod.org>,
+ ganqixin <ganqixin@huawei.com>, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
-
-This creates a minimum model for Microchip PolarFire SoC SYSREG
-module. It only implements the ENVM_CR register to tell guest
-software that eNVM is running at the configured divider rate.
-
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
----
-
-(no changes since v1)
-
- MAINTAINERS                         |  2 +
- hw/misc/Kconfig                     |  3 ++
- hw/misc/mchp_pfsoc_sysreg.c         | 99 +++++++++++++++++++++++++++++++++++++
- hw/misc/meson.build                 |  1 +
- include/hw/misc/mchp_pfsoc_sysreg.h | 39 +++++++++++++++
- 5 files changed, 144 insertions(+)
- create mode 100644 hw/misc/mchp_pfsoc_sysreg.c
- create mode 100644 include/hw/misc/mchp_pfsoc_sysreg.h
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ebbc62a..e82f2b3 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -1328,10 +1328,12 @@ F: hw/riscv/microchip_pfsoc.c
- F: hw/char/mchp_pfsoc_mmuart.c
- F: hw/misc/mchp_pfsoc_dmc.c
- F: hw/misc/mchp_pfsoc_ioscb.c
-+F: hw/misc/mchp_pfsoc_sysreg.c
- F: include/hw/riscv/microchip_pfsoc.h
- F: include/hw/char/mchp_pfsoc_mmuart.h
- F: include/hw/misc/mchp_pfsoc_dmc.h
- F: include/hw/misc/mchp_pfsoc_ioscb.h
-+F: include/hw/misc/mchp_pfsoc_sysreg.h
- 
- RX Machines
- -----------
-diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
-index 3db15e0..546e2fa 100644
---- a/hw/misc/Kconfig
-+++ b/hw/misc/Kconfig
-@@ -140,6 +140,9 @@ config MCHP_PFSOC_DMC
- config MCHP_PFSOC_IOSCB
-     bool
- 
-+config MCHP_PFSOC_SYSREG
-+    bool
-+
- config SIFIVE_TEST
-     bool
- 
-diff --git a/hw/misc/mchp_pfsoc_sysreg.c b/hw/misc/mchp_pfsoc_sysreg.c
-new file mode 100644
-index 0000000..248a313
---- /dev/null
-+++ b/hw/misc/mchp_pfsoc_sysreg.c
-@@ -0,0 +1,99 @@
-+/*
-+ * Microchip PolarFire SoC SYSREG module emulation
-+ *
-+ * Copyright (c) 2020 Wind River Systems, Inc.
-+ *
-+ * Author:
-+ *   Bin Meng <bin.meng@windriver.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#include "qemu/osdep.h"
-+#include "qemu/bitops.h"
-+#include "qemu/log.h"
-+#include "qapi/error.h"
-+#include "hw/hw.h"
-+#include "hw/sysbus.h"
-+#include "hw/misc/mchp_pfsoc_sysreg.h"
-+
-+#define ENVM_CR         0xb8
-+
-+static uint64_t mchp_pfsoc_sysreg_read(void *opaque, hwaddr offset,
-+                                       unsigned size)
-+{
-+    uint32_t val = 0;
-+
-+    switch (offset) {
-+    case ENVM_CR:
-+        /* Indicate the eNVM is running at the configured divider rate */
-+        val = BIT(6);
-+        break;
-+    default:
-+        qemu_log_mask(LOG_UNIMP, "%s: unimplemented device read "
-+                      "(size %d, offset 0x%" HWADDR_PRIx ")\n",
-+                      __func__, size, offset);
-+        break;
-+    }
-+
-+    return val;
-+}
-+
-+static void mchp_pfsoc_sysreg_write(void *opaque, hwaddr offset,
-+                                    uint64_t value, unsigned size)
-+{
-+    qemu_log_mask(LOG_UNIMP, "%s: unimplemented device write "
-+                  "(size %d, value 0x%" PRIx64
-+                  ", offset 0x%" HWADDR_PRIx ")\n",
-+                  __func__, size, value, offset);
-+}
-+
-+static const MemoryRegionOps mchp_pfsoc_sysreg_ops = {
-+    .read = mchp_pfsoc_sysreg_read,
-+    .write = mchp_pfsoc_sysreg_write,
-+    .endianness = DEVICE_LITTLE_ENDIAN,
-+};
-+
-+static void mchp_pfsoc_sysreg_realize(DeviceState *dev, Error **errp)
-+{
-+    MchpPfSoCSysregState *s = MCHP_PFSOC_SYSREG(dev);
-+
-+    memory_region_init_io(&s->sysreg, OBJECT(dev),
-+                          &mchp_pfsoc_sysreg_ops, s,
-+                          "mchp.pfsoc.sysreg",
-+                          MCHP_PFSOC_SYSREG_REG_SIZE);
-+    sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->sysreg);
-+}
-+
-+static void mchp_pfsoc_sysreg_class_init(ObjectClass *klass, void *data)
-+{
-+    DeviceClass *dc = DEVICE_CLASS(klass);
-+
-+    dc->desc = "Microchip PolarFire SoC SYSREG module";
-+    dc->realize = mchp_pfsoc_sysreg_realize;
-+}
-+
-+static const TypeInfo mchp_pfsoc_sysreg_info = {
-+    .name          = TYPE_MCHP_PFSOC_SYSREG,
-+    .parent        = TYPE_SYS_BUS_DEVICE,
-+    .instance_size = sizeof(MchpPfSoCSysregState),
-+    .class_init    = mchp_pfsoc_sysreg_class_init,
-+};
-+
-+static void mchp_pfsoc_sysreg_register_types(void)
-+{
-+    type_register_static(&mchp_pfsoc_sysreg_info);
-+}
-+
-+type_init(mchp_pfsoc_sysreg_register_types)
-diff --git a/hw/misc/meson.build b/hw/misc/meson.build
-index 6d3c1a3..8ed7525 100644
---- a/hw/misc/meson.build
-+++ b/hw/misc/meson.build
-@@ -24,6 +24,7 @@ softmmu_ss.add(when: 'CONFIG_MOS6522', if_true: files('mos6522.c'))
- # RISC-V devices
- softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_DMC', if_true: files('mchp_pfsoc_dmc.c'))
- softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_IOSCB', if_true: files('mchp_pfsoc_ioscb.c'))
-+softmmu_ss.add(when: 'CONFIG_MCHP_PFSOC_SYSREG', if_true: files('mchp_pfsoc_sysreg.c'))
- softmmu_ss.add(when: 'CONFIG_SIFIVE_TEST', if_true: files('sifive_test.c'))
- softmmu_ss.add(when: 'CONFIG_SIFIVE_E_PRCI', if_true: files('sifive_e_prci.c'))
- softmmu_ss.add(when: 'CONFIG_SIFIVE_U_OTP', if_true: files('sifive_u_otp.c'))
-diff --git a/include/hw/misc/mchp_pfsoc_sysreg.h b/include/hw/misc/mchp_pfsoc_sysreg.h
-new file mode 100644
-index 0000000..546ba68
---- /dev/null
-+++ b/include/hw/misc/mchp_pfsoc_sysreg.h
-@@ -0,0 +1,39 @@
-+/*
-+ * Microchip PolarFire SoC SYSREG module emulation
-+ *
-+ * Copyright (c) 2020 Wind River Systems, Inc.
-+ *
-+ * Author:
-+ *   Bin Meng <bin.meng@windriver.com>
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 or
-+ * (at your option) version 3 of the License.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License along
-+ * with this program; if not, see <http://www.gnu.org/licenses/>.
-+ */
-+
-+#ifndef MCHP_PFSOC_SYSREG_H
-+#define MCHP_PFSOC_SYSREG_H
-+
-+#define MCHP_PFSOC_SYSREG_REG_SIZE  0x2000
-+
-+typedef struct MchpPfSoCSysregState {
-+    SysBusDevice parent;
-+    MemoryRegion sysreg;
-+} MchpPfSoCSysregState;
-+
-+#define TYPE_MCHP_PFSOC_SYSREG "mchp.pfsoc.sysreg"
-+
-+#define MCHP_PFSOC_SYSREG(obj) \
-+    OBJECT_CHECK(MchpPfSoCSysregState, (obj), \
-+                 TYPE_MCHP_PFSOC_SYSREG)
-+
-+#endif /* MCHP_PFSOC_SYSREG_H */
--- 
-2.7.4
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBEYXZpZCBHaWJzb24gW21haWx0
+bzpkYXZpZEBnaWJzb24uZHJvcGJlYXIuaWQuYXVdDQo+IFNlbnQ6IFdlZG5lc2RheSwgT2N0b2Jl
+ciAyOCwgMjAyMCAxMjoyOCBQTQ0KPiBUbzogQ2hlbnF1biAoa3VobikgPGt1aG4uY2hlbnF1bkBo
+dWF3ZWkuY29tPg0KPiBDYzogcWVtdS1kZXZlbEBub25nbnUub3JnOyBxZW11LXRyaXZpYWxAbm9u
+Z251Lm9yZzsgY2xnQGthb2Qub3JnOw0KPiBaaGFuZ2hhaWxpYW5nIDx6aGFuZy56aGFuZ2hhaWxp
+YW5nQGh1YXdlaS5jb20+OyBnYW5xaXhpbg0KPiA8Z2FucWl4aW5AaHVhd2VpLmNvbT47IEV1bGVy
+IFJvYm90IDxldWxlci5yb2JvdEBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIXSB0
+YXJnZXQvcHBjL2V4Y3BfaGVscGVyOiBBZGQgYSBtaXNzaW5nIGJyZWFrIGZvcg0KPiBQT1dFUlBD
+X0VYQ1BfSElTSQ0KPiANCj4gT24gV2VkLCBPY3QgMjgsIDIwMjAgYXQgMTI6MTY6MjBQTSArMDgw
+MCwgQ2hlbiBRdW4gd3JvdGU6DQo+ID4gV2hlbiB1c2luZyAtV2ltcGxpY2l0LWZhbGx0aHJvdWdo
+IGluIG91ciBDRkxBR1MsIHRoZSBjb21waWxlciBzaG93ZWQNCj4gd2FybmluZzoNCj4gPiAuLi90
+YXJnZXQvcHBjL2V4Y3BfaGVscGVyLmM6IEluIGZ1bmN0aW9uIOKAmHBvd2VycGNfZXhjcOKAmToN
+Cj4gPiAuLi90YXJnZXQvcHBjL2V4Y3BfaGVscGVyLmM6NTI5OjEzOiB3YXJuaW5nOiB0aGlzIHN0
+YXRlbWVudCBtYXkgZmFsbCB0aHJvdWdoDQo+IFstV2ltcGxpY2l0LWZhbGx0aHJvdWdoPV0NCj4g
+PiAgIDUyOSB8ICAgICAgICAgbXNyIHw9IGVudi0+ZXJyb3JfY29kZTsNCj4gPiAgICAgICB8ICAg
+ICAgICAgfn5+fl5+fn5+fn5+fn5+fn5+fn5+fg0KPiA+IC4uL3RhcmdldC9wcGMvZXhjcF9oZWxw
+ZXIuYzo1MzA6NTogbm90ZTogaGVyZQ0KPiA+ICAgNTMwIHwgICAgIGNhc2UgUE9XRVJQQ19FWENQ
+X0hERUNSOiAgICAgLyogSHlwZXJ2aXNvcg0KPiBkZWNyZW1lbnRlciBleGNlcHRpb24gICAgICAg
+ICAqLw0KPiA+ICAgICAgIHwgICAgIF5+fn4NCj4gPg0KPiA+IEEgYnJlYWsgc3RhdGVtZW50IG1h
+eSBiZSByZXF1aXJlZCB0byBlbnRlciB0aGlzIGV4Y2VwdGlvbi4NCj4gPg0KPiA+IFJlcG9ydGVk
+LWJ5OiBFdWxlciBSb2JvdCA8ZXVsZXIucm9ib3RAaHVhd2VpLmNvbT4NCj4gPiBTaWduZWQtb2Zm
+LWJ5OiBDaGVuIFF1biA8a3Vobi5jaGVucXVuQGh1YXdlaS5jb20+DQo+IA0KPiBUaGlzIGNoYW5n
+ZSBpcyBpbmNvcnJlY3QuICBXZSBkZWZpbml0ZWx5IG5lZWQgdGhlIGZhbGx0aHJvdWdoIHRvIHNl
+dCBzcnJbMDFdDQo+IHByb3Blcmx5LiAgU28gdGhlIGNvcnJlY3QgZml4IGlzIHRvIGFubm90YXRl
+IHRoZSBmYWxsdGhyb3VnaCwgbm90IHJlbW92ZSBpdC4NCj4gDQpPSywgSSdsbCBtb2RpZnkgaXQg
+bGF0ZXIuDQonDQpUaGFua3MsDQpDaGVuIFF1bg0KPiA+DQo+ID4gLS0tDQo+ID4gSSBndWVzcyB0
+aGVyZSdzIGEgYnJlYWsgbWlzc2luZyBpbiAnUE9XRVJQQ19FWENQX0hJU0knIGJyYW5jaCwganVz
+dA0KPiA+IGxpa2UgdGhlICdQT1dFUlBDX0VYQ1BfSVNJJyBicmFuY2guDQo+ID4gLS0tDQo+ID4g
+IHRhcmdldC9wcGMvZXhjcF9oZWxwZXIuYyB8IDEgKw0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBp
+bnNlcnRpb24oKykNCj4gPg0KPiA+IGRpZmYgLS1naXQgYS90YXJnZXQvcHBjL2V4Y3BfaGVscGVy
+LmMgYi90YXJnZXQvcHBjL2V4Y3BfaGVscGVyLmMgaW5kZXgNCj4gPiBhOTg4YmExNWY0Li41ZTY5
+YWMxYjMzIDEwMDY0NA0KPiA+IC0tLSBhL3RhcmdldC9wcGMvZXhjcF9oZWxwZXIuYw0KPiA+ICsr
+KyBiL3RhcmdldC9wcGMvZXhjcF9oZWxwZXIuYw0KPiA+IEBAIC01MjcsNiArNTI3LDcgQEAgc3Rh
+dGljIGlubGluZSB2b2lkIHBvd2VycGNfZXhjcChQb3dlclBDQ1BVICpjcHUsDQo+IGludCBleGNw
+X21vZGVsLCBpbnQgZXhjcCkNCj4gPiAgICAgICAgICBicmVhazsNCj4gPiAgICAgIGNhc2UgUE9X
+RVJQQ19FWENQX0hJU0k6ICAgICAgLyogSHlwZXJ2aXNvciBpbnN0cnVjdGlvbiBzdG9yYWdlDQo+
+IGV4Y2VwdGlvbiAqLw0KPiA+ICAgICAgICAgIG1zciB8PSBlbnYtPmVycm9yX2NvZGU7DQo+ID4g
+KyAgICAgICAgYnJlYWs7DQo+ID4gICAgICBjYXNlIFBPV0VSUENfRVhDUF9IREVDUjogICAgIC8q
+IEh5cGVydmlzb3IgZGVjcmVtZW50ZXINCj4gZXhjZXB0aW9uICAgICAgICAgKi8NCj4gPiAgICAg
+IGNhc2UgUE9XRVJQQ19FWENQX0hEU0k6ICAgICAgLyogSHlwZXJ2aXNvciBkYXRhIHN0b3JhZ2UN
+Cj4gZXhjZXB0aW9uICAgICAgICAqLw0KPiA+ICAgICAgY2FzZSBQT1dFUlBDX0VYQ1BfSERTRUc6
+ICAgICAvKiBIeXBlcnZpc29yIGRhdGEgc2VnbWVudA0KPiBleGNlcHRpb24gICAgICAgICovDQo+
+IA0KPiAtLQ0KPiBEYXZpZCBHaWJzb24JCQl8IEknbGwgaGF2ZSBteSBtdXNpYyBiYXJvcXVlLCBh
+bmQgbXkgY29kZQ0KPiBkYXZpZCBBVCBnaWJzb24uZHJvcGJlYXIuaWQuYXUJfCBtaW5pbWFsaXN0
+LCB0aGFuayB5b3UuICBOT1QgX3RoZV8NCj4gX290aGVyXw0KPiAJCQkJfCBfd2F5XyBfYXJvdW5k
+XyENCj4gaHR0cDovL3d3dy5vemxhYnMub3JnL35kZ2lic29uDQo=
 
