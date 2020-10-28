@@ -2,75 +2,75 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C090C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:11:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF203C56202
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:23:32 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id AB0E024724
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:11:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 279AD206F4
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:23:31 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1/HBOe8"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0E024724
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HBYGQkGG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 279AD206F4
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53260 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56188 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXtfJ-0003rc-Kp
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 18:11:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53662)
+	id 1kXtqs-00065X-I1
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 18:23:30 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57598)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtZO-0002Td-Au
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:05:26 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44026)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtpr-0005V9-Qq
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:22:27 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28856)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtZL-0006HL-B7
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:05:25 -0400
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtpm-00008n-8f
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:22:26 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603922721;
+ s=mimecast20190719; t=1603923740;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=2eQQYmaunyts0zzxsk8nGRaDD/EXMlUZ0KVursFhNOE=;
- b=I1/HBOe8lPzscI2bA6vTypDwTvchn+vomDfK/jgGXevpnqRxVbh2BsU/PwhHt0S25f66mF
- mErbILuDRvJik/OTxnQGTeqLXNB7CXIzG9iHvhVWrETC/egPx4RLkUNVKDuB7d09NGq5zF
- V8yKjD7fYC0M098GSG2aezy9WeQGPVo=
+ bh=hqhuxkV8eTk0bg8J3CYz3TrDkcrIkOFQRqx2YfiB49Y=;
+ b=HBYGQkGGaF3YcbZI8jCFntyi4kh2Oq599kyFCLmvgJ/ZfqmUEp0kPgKhJCPudEt1wdr1qP
+ 1PFSBITfKkt5XCcdoLDWhzX0GEnA04t0bJPK5ZkKqEzfwQEcnAK7tNmEG8Scq6xgG9K9mo
+ tkHm491oFMMWe4Bjy++wyLwPygbLq5w=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-461-Ap_aeQVhNe2cQAIy4NjAwA-1; Wed, 28 Oct 2020 18:05:17 -0400
-X-MC-Unique: Ap_aeQVhNe2cQAIy4NjAwA-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
+ us-mta-277-PZ-LSx8YPiareAzDNQv2mQ-1; Wed, 28 Oct 2020 18:22:18 -0400
+X-MC-Unique: PZ-LSx8YPiareAzDNQv2mQ-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E27758030DE;
- Wed, 28 Oct 2020 22:05:15 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BB3571007464;
+ Wed, 28 Oct 2020 22:22:16 +0000 (UTC)
 Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
  [10.10.119.55])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 563845D9EF;
- Wed, 28 Oct 2020 22:05:11 +0000 (UTC)
-Date: Wed, 28 Oct 2020 18:05:09 -0400
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 13D2A19D7C;
+ Wed, 28 Oct 2020 22:22:11 +0000 (UTC)
+Date: Wed, 28 Oct 2020 18:22:10 -0400
 From: Cleber Rosa <crosa@redhat.com>
 To: John Snow <jsnow@redhat.com>
-Subject: Re: [PATCH v3 04/15] python: add directory structure README.rst files
-Message-ID: <20201028220509.GH2201333@localhost.localdomain>
+Subject: Re: [PATCH v3 05/15] python: Add pipenv support
+Message-ID: <20201028222210.GI2201333@localhost.localdomain>
 References: <20201020193555.1493936-1-jsnow@redhat.com>
- <20201020193555.1493936-5-jsnow@redhat.com>
+ <20201020193555.1493936-6-jsnow@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201020193555.1493936-5-jsnow@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+In-Reply-To: <20201020193555.1493936-6-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="LZFKeWUZP29EKQNE"
+ protocol="application/pgp-signature"; boundary="2xeD/fx0+7k8I/QN"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -109,125 +109,67 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---LZFKeWUZP29EKQNE
+--2xeD/fx0+7k8I/QN
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 20, 2020 at 03:35:44PM -0400, John Snow wrote:
-> Add short readmes to python/, python/qemu/, python/qemu/machine, and
-> python/qemu/machine that explain the directory hierarchy. These readmes
-> are visible when browsing the source on e.g. gitlab/github and are
-> designed to help new developers/users quickly make sense of the source
-> tree.
+On Tue, Oct 20, 2020 at 03:35:45PM -0400, John Snow wrote:
+> pipenv is a tool used for managing virtual environments with pinned,
+> explicit dependencies. It is used for precisely recreating python
+> virtual environments.
 >=20
-> They are not designed for inclusion in a published manual.
+> pipenv uses two files to do this:
+>=20
+> (1) Pipfile, which is similar in purpose and scope to what setup.py
+> lists. It specifies the requisite minimum to get a functional
+> environment for using this package.
+>=20
+> (2) Pipfile.lock, which is similar in purpose to `pip freeze >
+> requirements.txt`. It specifies a canonical virtual environment used for
+> deployment or testing. This ensures that all users have repeatable
+> results.
+>=20
+> The primary benefit of using this tool is to ensure repeatable CI
+> results with a known set of packages. Although I endeavor to support as
+> many versions as I can, the fluid nature of the Python toolchain often
+> means tailoring code for fairly specific versions.
+>=20
+> Note that pipenv is *not* required to install or use this module; this is
+> purely for the sake of repeatable testing by CI or developers.
+>=20
+> Here, a "blank" pipfile is added with no dependencies, but specifies
+> Python 3.6 for the virtual environment.
+>=20
+> Pipfile will specify our version minimums, while Pipfile.lock specifies
+> an exact loudout of packages that were known to operate correctly. This
+> latter file provides the real value for easy setup of container images
+> and CI environments.
 >=20
 > Signed-off-by: John Snow <jsnow@redhat.com>
-> ---
->  python/README.rst              | 27 +++++++++++++++++++++++++++
->  python/qemu/README.rst         |  8 ++++++++
->  python/qemu/machine/README.rst |  9 +++++++++
->  python/qemu/qmp/README.rst     |  9 +++++++++
->  4 files changed, 53 insertions(+)
->  create mode 100644 python/README.rst
->  create mode 100644 python/qemu/README.rst
->  create mode 100644 python/qemu/machine/README.rst
->  create mode 100644 python/qemu/qmp/README.rst
->=20
-> diff --git a/python/README.rst b/python/README.rst
-> new file mode 100644
-> index 0000000000..ff40e4c931
-> --- /dev/null
-> +++ b/python/README.rst
-> @@ -0,0 +1,27 @@
-> +QEMU Python Tooling
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This directory houses Python tooling used by the QEMU project to build,
-> +configure, and test QEMU. It is organized by namespace (``qemu``), and
-> +then by package (``qemu/machine``, ``qemu/qmp``).
-> +
-> +``setup.py`` is used by ``pip`` to install this tooling to the current
-> +environment. You will generally invoke it by doing one of the following:
-> +
-> +1. ``pip3 install .`` will install these packages to your current
-> +   environment. If you are inside a virtual environment, they will
-> +   install there. If you are not, it will attempt to install to the
-> +   global environment, which is not recommended.
-> +
-> +2. ``pip3 install --user .`` will install these packages to your user's
-> +   local python packages. If you are inside of a virtual environment,
-> +   this will fail.
-> +
-> +If you amend the ``-e`` argument, pip will install in "editable" mode;
-> +which installs a version of the package that uses symlinks to these
-> +files, such that the package always reflects the latest version in your
-> +git tree.
-> +
 
-It actually uses *egg-link* files, which are not what people will
-understand by "symlinks".
+Reviewed-by: Cleber Rosa <crosa@redhat.com>
 
-> +See `Installing packages using pip and virtual environments
-> +<https://packaging.python.org/guides/installing-using-pip-and-virtual-en=
-vironments/>`_
-> +for more information.
-> diff --git a/python/qemu/README.rst b/python/qemu/README.rst
-> new file mode 100644
-> index 0000000000..31209c80a5
-> --- /dev/null
-> +++ b/python/qemu/README.rst
-> @@ -0,0 +1,8 @@
-> +QEMU Python Namespace
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This directory serves as the root of a `Python PEP 420 implicit
-> +namespace package <<https://www.python.org/dev/peps/pep-0420/>`_.
-> +
-> +Each directory below is assumed to be an installable Python package that
-> +is available under the ``qemu.<package>`` namespace.
-> diff --git a/python/qemu/machine/README.rst b/python/qemu/machine/README.=
-rst
-> new file mode 100644
-> index 0000000000..73ad23c501
-> --- /dev/null
-> +++ b/python/qemu/machine/README.rst
-> @@ -0,0 +1,9 @@
-> +qemu.machine Package
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +
-> +This package provides core utilities used for testing and debugging
-> +QEMU. It is used by the iotests, vm tests, and several other utilities
-> +in the ./scripts directory. It is not a fully-fledged SDK and it is
-> +subject to change at any time.
-> +
-
-I'm not sure if you intend to list all test types that use this, but
-the acceptance tests also do use them.
-
-- Cleber.
-
---LZFKeWUZP29EKQNE
+--2xeD/fx0+7k8I/QN
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+Z6xMACgkQZX6NM6Xy
-CfPudA/8D/RfPTOD1900XV3miQshFGXzuYeXKFwKw5Rygw5vmH3f78krlx7wx7a9
-l1aYGT/32vSeJbrFCEKhQM5QnqM/i7aJEjwDQomV9mCn2IxnRTRXv89fkNHIpl5k
-lhdCsZz08bEKOxo3q0Mhvq5v6VsspZDK/02Xl1CJkT3tL/opiz64lQefQsNOA5w1
-dkyUiC97dDx6PcPC32eEoUrzVvRt5nf93mP9iVO5rNXzIRcLMufoZvJga3Mf53xI
-nSiJuNEGHfWa6pUR5eUInUCRNF2i0Ji4dccYoebsyeV0Yt1dCzsR+T1GHNddnfEq
-ApLPW3DldHZ6T2d0YglIjEOIei166/ivWlMPs4sNIpWo8EADX05Lk6m+SNcVceUI
-yXJTwowSk6cDwjdJDEA8KvZthwZ/UmRqh+TUUOklJpFfSUWz9B6AbutzkX4/5GKj
-KkaNoO8DmuoNoFHNV+ILaK4xAupW5qisJGNVatzR7Adj6A7LICl0Pv0AsE/ebqWD
-+EopkvPvlDMyV4TpfR+v833KdZPsg3+fX4/AVFTjASlI0atDyqZtk6oNpvCWzel2
-F3juG0/b7o8boOOsJvOxPWiN9k57ar51kjmjZM6h6ckLEhOu5g7DVSy+EhOEmuQQ
-gy5i2/DKEyr73W2A3NB6dBzNHY0TD0UnaNZikZhG6NtgI+te4xc=
-=dIkL
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+Z7w8ACgkQZX6NM6Xy
+CfOUEA/8CZoSk4SZjbB92Jgf0QOKdWiaO34yaGBQfZChpYEedltkBjxbheVHQyE2
+c789nTdGF1rsWi2/dchETjzTbFzqDb3mpre9PDdIAgm1jWlV/hynvjyzayoHHI/T
+PtCHiAuj0GAGnP0cV2kQmOkOp5OuEBTCAuVo0bZ0mP4+SjCUHyrNS5mTUIvhXaHg
+k/I8IKZ04dw8zFIXlQxNLVnGrM4c+TQbbtGmkuqTyiUiHUZo1ig6bozBU0I7JjZb
+/bKw/9TfKbo3xGm0iNGcNVsVqib0MlTEs3xlbAXTI9Ak3c7uxwHbxEv4IrKHSUJP
+Y/SmeX3OM701K8c7UtjvgBS3MP2HoFqu6v4K+gjfiV9hmMzWpu1f4t9KFifXrBnH
+1R4yv6LG1Nj676+e9e8PIa+H0XW6vfHNupjGXOCtJrtyPARM+h3ckQsXjb//Y0fj
+Hjvo55OWDPhS5FSuvvOohDQNCJA3oKsD3OHGKgcRrenhXxlYLBRXSJUXiqZXCJAS
+K57kx80y9vdtEf6oQ45+VzZKOjNq5VbP+OoSpX5U1r/q9TthQcLq0zrNugF0x6Nv
+7V3bfeCErAztq1LKsdmB9I6n0j0hNYZJVHxFUnGU0+LwgKzbQF3XbRx8ZM49yJ1u
+N83kxAOk+Z91ryoHFQRONhQdW3Wf+5Hk0QCsk5OOAH6Wq0KilMk=
+=FrR1
 -----END PGP SIGNATURE-----
 
---LZFKeWUZP29EKQNE--
+--2xeD/fx0+7k8I/QN--
 
 
