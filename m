@@ -2,79 +2,81 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F215DC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:35:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D32C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:40:45 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 3505C24808
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:35:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D1A6C24810
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:40:44 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i1Y/aKa0"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3505C24808
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9ZMVdlO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A6C24810
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33290 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36904 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXqHm-000555-6W
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 14:35:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:48574)
+	id 1kXqNH-0006vT-Ji
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 14:40:43 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50340)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqGS-0003wg-Tu
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:33:41 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:28927)
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqKw-0006LZ-Pg
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:38:18 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44688)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqGP-0000wM-DZ
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:33:40 -0400
+ (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqKu-0001j0-Hu
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:38:17 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603910015;
+ s=mimecast20190719; t=1603910295;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=nX5r7eLcHAN3NDKRqSULbN2vVjWfNdn5akVdS3bgzP0=;
- b=i1Y/aKa0TuSwgfYWa4Z4OLD/cgng5J0O29SlCv5aXlMj0Yil9TtR3GO1aDjN0ZRZiDjaku
- YW4qVLLWfv7E0GPagB2H5LNI+flacdaHVCC3I1Z2pPtUNDal6ZwA8kCUVIY9Ro5DP4iJta
- 8iWuozafEqC++yhmnYEo3oyyvB1x/T4=
+ bh=iBWCYQlqpYXHjwNgV8bKluvsfvCM7dA+7SS94pUVobE=;
+ b=U9ZMVdlOcKOaLpbUQh30XiPAP+QHRoVhjh/2MV71+9MmZPfAqgwvhTMZDzaYk7eESjrk61
+ 1mTxxkd0gkGlQfC7ND+5If56bqwtIHqSjIaiOM8fm9AunGWpROWGWuyzRjUOcPoDspevuE
+ /zuLKQP06wkibrqzEc8sziUp3ODfh/A=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-44yg39H5OB6EaKoasUa0QQ-1; Wed, 28 Oct 2020 14:33:33 -0400
-X-MC-Unique: 44yg39H5OB6EaKoasUa0QQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-289-cS8WJv__NW-DkeLEe4RB6g-1; Wed, 28 Oct 2020 14:38:13 -0400
+X-MC-Unique: cS8WJv__NW-DkeLEe4RB6g-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
+ [10.5.11.22])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 092741019625;
- Wed, 28 Oct 2020 18:33:32 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE6D9803F4D;
+ Wed, 28 Oct 2020 18:38:11 +0000 (UTC)
 Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id C96AE5C1D7;
- Wed, 28 Oct 2020 18:33:27 +0000 (UTC)
-Subject: Re: [PATCH 4/5] python: add .gitignore
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 66B1D10013D0;
+ Wed, 28 Oct 2020 18:38:04 +0000 (UTC)
+Subject: Re: [PATCH 1/5] python: add pytest and tests
 To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
 References: <20201027223815.159802-1-jsnow@redhat.com>
- <20201027223815.159802-5-jsnow@redhat.com>
- <f9ea6ce1-f464-0376-29ac-6071f680e63b@redhat.com>
+ <20201027223815.159802-2-jsnow@redhat.com>
+ <7440abdc-b01e-ba5e-5238-a6e4573f88b5@redhat.com>
+ <c85597c2-a9b3-e8ff-7208-c3f16002f40b@redhat.com>
+ <b412ee07-d274-4e0d-bb1c-81b53653cbb2@redhat.com>
 From: John Snow <jsnow@redhat.com>
-Message-ID: <3c46ae21-c8fe-41ff-ac42-7e42524c857d@redhat.com>
-Date: Wed, 28 Oct 2020 14:33:27 -0400
+Message-ID: <46f7ec6b-0e15-f311-2890-635df64d4200@redhat.com>
+Date: Wed, 28 Oct 2020 14:38:04 -0400
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
  Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <f9ea6ce1-f464-0376-29ac-6071f680e63b@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <b412ee07-d274-4e0d-bb1c-81b53653cbb2@redhat.com>
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
@@ -102,217 +104,91 @@ List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
 Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
  =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
  Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
  Markus Armbruster <armbru@redhat.com>,
  Wainer dos Santos Moschetta <wainersm@redhat.com>,
  Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 4:13 AM, Thomas Huth wrote:
-> On 27/10/2020 23.38, John Snow wrote:
->> Ignore build and package output (build, dist, qemu.egg-info);
->> effectively these are "in-tree" builds of a kind.
+On 10/28/20 10:54 AM, Thomas Huth wrote:
+> On 28/10/2020 14.23, John Snow wrote:
+>> On 10/28/20 2:19 AM, Thomas Huth wrote:
+>>> On 27/10/2020 23.38, John Snow wrote:
+>>>> Try using pytest to manage our various tests; even though right now
+>>>> they're only invoking binaries and not really running any python-native
+>>>> code.
+>>>>
+>>>> Create tests/, and add test_lint.py which calls out to mypy, flake8,
+>>>> pylint and isort to enforce the standards in this directory.
+>>>>
+>>>> Add pytest to the setup.cfg development dependencies; add a pytest
+>>>> configuration section as well; run it in verbose mode.
+>>>>
+>>>> Finally, add pytest to the Pipfile environment and lock the new
+>>>> dependencies. (Note, this also updates an unrelated dependency; but the
+>>>> only way to avoid this is to pin that dependency at a lower version --
+>>>> which there is no reason to do at present.)
+>>>>
+>>>> Provided you have the right development dependencies (mypy, flake8,
+>>>> isort, pylint, and now pytest) You should be able to run "pytest" from
+>>>> the python folder to run all of these linters with the correct
+>>>> arguments.
+>>>>
+>>>> Signed-off-by: John Snow <jsnow@redhat.com>
+>>>> ---
+>>>>    python/Pipfile.lock       | 71 ++++++++++++++++++++++++++++++++++++---
+>>>>    python/setup.cfg          |  5 +++
+>>>>    python/tests/test_lint.py | 28 +++++++++++++++
+>>>>    3 files changed, 99 insertions(+), 5 deletions(-)
+>>>>    create mode 100644 python/tests/test_lint.py
+>>>>
+>>>> diff --git a/python/Pipfile.lock b/python/Pipfile.lock
+>>>> index 05077475d750..105ffbc09a8e 100644
+>>>> --- a/python/Pipfile.lock
+>>>> +++ b/python/Pipfile.lock
+>>>> @@ -30,6 +30,14 @@
+>>>>                "markers": "python_version >= '3.5'",
+>>>>                "version": "==2.4.2"
+>>>>            },
+>>>> +        "attrs": {
+>>>> +            "hashes": [
+>>>> +
+>>>> "sha256:26b54ddbbb9ee1d34d5d3668dd37d6cf74990ab23c828c2888dccdceee395594",
+>>>> +
+>>>> "sha256:fce7fc47dfc976152e82d53ff92fa0407700c21acd20886a13777a0d20e655dc"
+>>>> +            ],
+>>>> +            "markers": "python_version >= '2.7' and python_version not
+>>>> in '3.0, 3.1, 3.2, 3.3'",
+>>>
+>>> Can't you simply use "python_version >= '3.6'" instead?
+>>>
+>>>    Thomas
+>>>
+>>
+>> This file is generated; I don't really actually know what these markers mean
+>> or to whom. I can't edit it because it's checksummed.
 > 
-> Since we recently moved away from in-tree builds, could these also be made
-> out-of-tree only?
-> 
->   Thomas
-> 
+> If the file is only generated, why do we need that in the repository? ...
+> that only calls for trouble if other people try to apply changes here...
 
-# Summary
+Because it is generated with respect to a given point in time; this 
+specifies the exact loadout of packages that will be used to run the linter.
 
-This wound up being controversial, so let's go over exactly what 
-artifacts I have ignored here, and why I have done so. This email gets 
-long, but please stick with me for at least this first Summary section.
+If you remove it, every time you run "pipenv lock" again, it will use 
+newer and newer packages each time ... which defeats the purpose of 
+having a lockfile to begin wtih.
 
-One thing I would like to immediately clear up is that these artifacts 
-are not related to a "QEMU build" in any way, shape or form; i.e., 
-building QEMU does not cause these artifacts to exist.
+The intention is that this lockfile only gets updated as an intentional 
+action; using newer dependencies and so on for the test environment is a 
+conscious action.
 
-For clarity: neither "make" nor "make check" from the root nor the build 
-root will cause any changes to the ./python source tree. These artifacts 
-come from explicit actions taken during manual testing/development in 
-the ./python directory.
-
-I use a Makefile in the ./python directory to canonize the expected 
-invocations for a few common operations I anticipate developers wanting 
-to take; these actions occur outside of "the QEMU build".
-
-
-Those actions, and the expected artifacts they create, are:
-
-- Running 'make check' inside ./python; AKA
-   running 'pytest' (no arguments.)
-   (.mypy_cache, .pytest_cache, __pycache__, possibly *.pyc)
-
-- Running 'make venv' inside ./python; AKA
-   running PIPENV_VENV_IN_PROJECT=1 pipenv sync --dev --keep-outdated
-   (.venv, qemu.egg-info/, build/)
-
-- Running 'make venv-check' inside ./python; AKA
-   running 'make venv; pipenv run make check'
-   (All of the above from both categories)
-
-- Running various PyPI distribution commands; not in the Makefile
-   (e.g. python3 setup.py sdist bdist_wheel)
-   (build/, dist/)
-
-- Using the Pycharm IDE to edit, run, or test python files:
-   (.idea/)
-
-
-While these do not happen during a (QEMU) make/make check, they DO 
-happen as a result of my gitlab job, which simply does the dumbest 
-possible thing and navigates to the source ./python directory and runs 
-"make venv-check".
-
-This was presumed "safe", because the gitlab output is not committed 
-back into the container, does not affect the subsequent build, and has 
-its output discarded after the job completes.
-
-Read on below for more detailed information on what each file is, what 
-creates it, what it's useful for, and why you might come to have these 
-files in your source tree during development.
-
-
-
-# make check
-
-running "make check" here simply invokes "pytest". This causes 
-.pytest_cache to exist where you ran it. The tests located in tests/ 
-will run mypy (.mypy_cache), flake8, pylint and isort.
-
-The act of running or importing files here may or may not cause 
-__pycache__ and *.pyc files to exist based on the caller's environment.
-
-All of the files created by running the linter are normal confetti you 
-might expect to incur from running such programs; i.e. if you run mypy 
-or pytest separately, of your own volition, you will encounter these 
-files being made for you.
-
-It is normal and expected for developers to want to run the linters 
-during development to ensure adherence to the coding standards, so it is 
-normal and expected to see these files being created in the source tree 
--- not during a build, but during development.
-
-We ignore __pycache__ and *.pyc in the root tree too, this is just 
-extending the concept to more python tooling that may litter the tree.
-
-
-# make venv
-
-This is an alias for "pipenv sync --dev", which uses the pipenv tool to 
-actualize a very specific virtual environment based on the contents in 
-Pipfile.lock.
-
-It normally creates a virtual environment somewhere like:
-  /home/jsnow/.local/share/virtualenvs/python-Z09Et8eW
-
-but you can configure it to look in $CWD/.venv instead. There are no 
-other options I am aware of! Your $CWD must include the Pipfile.lock file.
-
-Let's assume that we will want to create a venv in two distinct contexts:
-
-(1) For the purposes of iterative development; as an object we want to 
-keep long-term (conjured explicitly by the developer), and
-
-(2) For the purposes of a continuous integration check; a build check, 
-or some other automatic invocation not explicitly conjured by the developer.
-
-For the first, it's okay to store in ~/.local/share/ etc, and it's okay 
-to store it in the source tree too -- in both cases, you'll have one 
-venv per source tree. No problem. (And reminder, because this python 
-virtual environment is tied to the python *source* and has no 
-relationship whatsoever to a configuration of a QEMU build, a 1:1 
-relationship from venv:source is OK. We do not need (or want) a 1:1 
-relationship with configurations.)
-
-For the second, it would be best if we didn't taint the user's 
-environment. In this case, constraining it to where the the venv was 
-requested is the best choice available. There are no hooks in this patch 
-series that will invoke the creation of this venv in the source tree 
-when a user types "make" or "make check" in their root or their build root.
-
-So: ignoring .venv is for the sake of the python developer, but does not 
-imply this file will exist for those not developing python.
-
-Lastly, The qemu.egg-info file is an artifact of installing the source 
-package itself into the virtual environment in "editable" mode. This is 
-an expected artifact of development, but won't occur during a build.
-
-A trick I explicitly support is `cd ~/src/qemu/python; pip install -e .` 
--- this installs a python package to your current environment (wherever 
-it is; It can be one of your explicit creation) that simply installs 
-symlinks to your git source tree -- this is a feature -- so that while 
-updating the python source, your installed package always reflects the 
-latest version without having to "re-install" the package to test it.
-
-Therefore, it's reasonable and expected to have a 'qemu.egg-info/' 
-folder in your source tree: it means you've installed this package 
-somewhere. This doesn't happen by accident!
-
-
-# make venv-check
-
-This is a hook that runs both things: it creates a venv, then runs the 
-tests inside that venv. It will create all of the confetti from both 
-above processes.
-
-If you made a build directory and configured QEMU, the configuration 
-script will have copied the python directory into the build directory. 
-You can run "make venv-check" from in there to avoid disturbing your 
-source tree.
-
-However, since running configure isn't necessary to check the python 
-code, you can just run it straight from the source tree.
-
-
-# .idea
-
-This is the pycharm IDE folder for managing project settings. If you use 
-pycharm to edit the Python code (and I encourage you to try if you wish 
-to contribute Python code), you will see this directory created.
-
-
-# build
-
-This directory will be created as a result of engaging with pipenv.
-
-It will show up under any of the following:
-
-pipenv sync
-pipenv lock
-pipenv install
-
-I believe this happens as a side-effect of installing the qemu package 
-in editable mode, however:
-
-`pip install -e .` does not create such a directory. I'm not sure which 
-step is creating it and what it's used for, to be crassly honest. It 
-appears safe to delete afterwards.
-
-Actually, you can even create a read-only build directory owned by root, 
-and pipenv will ... work the same, and never write into that directory. 
-What's going on? Someone else's bug, I guess.
-
-(It also shows up if you were to type "python3 setup.py bdist_wheel", 
-which is a packaging step you would only type if you were preparing to 
-build and package this code to upload it to PyPI.)
-
-
-# dist
-
-Only shows up if you type 'python3 setup.py sdist'. No reason to do this 
-unless you're building a source distribution of the Python package alone 
-to upload to somewhere else. Intentional developer action.
-
-
-So ... long story short: I think these files are legitimate; I am sorry 
-to have alarmed people by calling it an "in-tree build", they're not 
-related to the QEMU build.
+You are free to use the latest and greatest packages yourself if you 
+choose; just skip the venv step -- but then you're on your own for 
+making sure that environment works. *this* environment receives my 
+full-throated support. The tests will and must pass on *this* environment.
 
 --js
 
