@@ -2,99 +2,93 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7354DC4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:16:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8D91C55179
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:19:02 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B8EE724817
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:16:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 37C4124814
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 19:19:02 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="dLey65VJ";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=keithp.com header.i=@keithp.com header.b="dLey65VJ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B8EE724817
-Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="e5Wv2uGm"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 37C4124814
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:58734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35494 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXqvm-0004AF-Oa
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 15:16:22 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:35254)
+	id 1kXqyL-0006Ib-1t
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 15:19:01 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:36060)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kXquY-0003NL-6e; Wed, 28 Oct 2020 15:15:06 -0400
-Received: from home.keithp.com ([63.227.221.253]:47664 helo=elaine.keithp.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <keithp@keithp.com>)
- id 1kXquU-0007BB-MW; Wed, 28 Oct 2020 15:15:05 -0400
-Received: from localhost (localhost [127.0.0.1])
- by elaine.keithp.com (Postfix) with ESMTP id 9DCB43F2DDAC;
- Wed, 28 Oct 2020 12:14:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603912497; bh=15AVrp7vyPKovp+JUmmgOjjbkG5b36Rdgg5pRySikf4=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=dLey65VJwjuSS+DXkhpBWfbyHvLyQiOAeGulUDSP+Mang9Lldm3/qbzWrUha60GBY
- cAVHpxeU6fQSkLwWJpx2CiahvXOE1w3C/VBIiSjQv0ba0lnLe/u4SZiVEksGrw51FG
- UqgD6Bwy9gE3O2x9vo3OIE6ZEQI/1FpGWoA4y6pOmd8RmgO8l1lJSfN9YWeeNbXgZD
- T8NwO9c5N43A8DrmNZUtJXVcRvo6p5J1QXgFnPhBqONqaCBIVvm9yB4yY8+fTo2P5J
- /YRh77kr4eQ4SKCfWJtOfI3rRCHZBEmk1dlOJ34cCpGNu9Tb5fZfQm5cRbUjwB+iC/
- gLevWNNJeVIrQ==
-X-Virus-Scanned: Debian amavisd-new at keithp.com
-Received: from elaine.keithp.com ([127.0.0.1])
- by localhost (elaine.keithp.com [127.0.0.1]) (amavisd-new, port 10024)
- with LMTP id UGHBryi3ZMdv; Wed, 28 Oct 2020 12:14:57 -0700 (PDT)
-Received: from keithp.com (koto.keithp.com [10.0.0.2])
- by elaine.keithp.com (Postfix) with ESMTPSA id 37F213F2DDAA;
- Wed, 28 Oct 2020 12:14:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=keithp.com; s=mail;
- t=1603912497; bh=15AVrp7vyPKovp+JUmmgOjjbkG5b36Rdgg5pRySikf4=;
- h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
- b=dLey65VJwjuSS+DXkhpBWfbyHvLyQiOAeGulUDSP+Mang9Lldm3/qbzWrUha60GBY
- cAVHpxeU6fQSkLwWJpx2CiahvXOE1w3C/VBIiSjQv0ba0lnLe/u4SZiVEksGrw51FG
- UqgD6Bwy9gE3O2x9vo3OIE6ZEQI/1FpGWoA4y6pOmd8RmgO8l1lJSfN9YWeeNbXgZD
- T8NwO9c5N43A8DrmNZUtJXVcRvo6p5J1QXgFnPhBqONqaCBIVvm9yB4yY8+fTo2P5J
- /YRh77kr4eQ4SKCfWJtOfI3rRCHZBEmk1dlOJ34cCpGNu9Tb5fZfQm5cRbUjwB+iC/
- gLevWNNJeVIrQ==
-Received: by keithp.com (Postfix, from userid 1000)
- id 074E41582210; Wed, 28 Oct 2020 12:14:57 -0700 (PDT)
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: Peter Maydell <peter.maydell@linaro.org>, QEMU Developers
- <qemu-devel@nongnu.org>, Laurent Vivier <laurent@vivier.eu>,
- "qemu-arm@nongnu.org" <qemu-arm@nongnu.org>, Palmer Dabbelt
- <palmer@dabbelt.com>, Alistair
- Francis <Alistair.Francis@wdc.com>, Sagar Karandikar
- <sagark@eecs.berkeley.edu>, Bastian Koppelmann
- <kbastian@mail.uni-paderborn.de>, "open list:RISC-V"
- <qemu-riscv@nongnu.org>
-Subject: Re: [PATCH 1/4] semihosting: Move ARM semihosting code to shared
- directories
-In-Reply-To: <87lffqmwi6.fsf@linaro.org>
-References: <20201026212853.92880-1-keithp@keithp.com>
- <20201026212853.92880-2-keithp@keithp.com>
- <CAFEAcA-0_WLMP1Y1sgcu7Ng+0w8Ovt9DVWzYU8ZA_FA2+bwcUw@mail.gmail.com>
- <87pn53e3ke.fsf@keithp.com>
- <CAFEAcA8Sha5QYbO25dtzBZHoXUeiGVv8aojPFTMrst8nbVDAdg@mail.gmail.com>
- <87k0vbdthq.fsf@keithp.com> <87lffqmwi6.fsf@linaro.org>
-Date: Wed, 28 Oct 2020 12:14:56 -0700
-Message-ID: <87pn52cgcv.fsf@keithp.com>
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXqwo-0004id-FY
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:17:27 -0400
+Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:44591)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXqwi-0007aH-1S
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 15:17:26 -0400
+Received: by mail-wr1-x444.google.com with SMTP id t9so245914wrq.11
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 12:17:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:in-reply-to:references
+ :mime-version:content-transfer-encoding;
+ bh=U8T+0Mhujpk/WaABXyjdAKtr18CEtiJsfJ83860ndlw=;
+ b=e5Wv2uGmUQoaPNakhRk+lH2Cndq0TGY1ZNc2JfsHuR9bCyrh/u5UhZms9GZpnhBrrC
+ f0B9EK3ToMmKqQjGYX84NcOUJG+FN2NtUA4iH9+CE/chQEOpwPSRcTrbmpNYXgiSRS2Z
+ A+AnhqzxGFFlfh2yurriIzhFKF+9O+M2KbnKldNOgPWN/OW0y1EiMCcs+06+wE7PwFaB
+ Mqmm1f/mbuG8r6OgNd/LFPx7xf66YC72crcKMs8XHqFMZVSrgX4RAY6ntu1ydZGjUSYs
+ rJyMzSeR8vmJSJi7pXv4QppPKl1SV5rGd2vgvXgPPEHK8Ccl2W+Ht5h/HdDNuxPHqJpM
+ 3YsQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+ :references:mime-version:content-transfer-encoding;
+ bh=U8T+0Mhujpk/WaABXyjdAKtr18CEtiJsfJ83860ndlw=;
+ b=oCANLtrN+UxWnuD5cyN114SXlqi1qMIv+Gl19R9B+75L1JiplA4CmzALpCZ3MHbdqB
+ /8DzUnAVU9BsOCI6ng9BdfQZXGB2LQGiLW4sgnSXqyhJNvNwnEKOeCWkpTH85QiTyJaP
+ k7c8rf4SB73uxdxcl/QQjP5wXu6h8AlS3vGE8S6hdsVamv3de4/oe3nbi5BxMeCFBrBg
+ OMWHzw57V6xQ8wh8k6IytJBGsojtgtIMfNwwFf7hdM1zuwWAdyApOwHvPGLuqKTfoQX1
+ s/XQWNcyiIKUj+x1LVMMBCwB3Vg3BzOT4ctRVwWjQ7JlLllV0u2o2PVtjHZATIrUqNZV
+ 0nJw==
+X-Gm-Message-State: AOAM533obG/lOdjfFwdg3veTMLh5whA3vodGFELaMUJaauJkbfjn6mLM
+ R7EYtwWik8NEXHuLbrbd6FZDdUnE9zIgCQ==
+X-Google-Smtp-Source: ABdhPJz/5GHCh+7rQCfI91dSLSrxJfjyLApSHMcoPEIC1Fq7svZiPB3xgJSRQXmO1ji+S1fck1Zw6Q==
+X-Received: by 2002:a05:6000:1051:: with SMTP id
+ c17mr931493wrx.290.1603912637519; 
+ Wed, 28 Oct 2020 12:17:17 -0700 (PDT)
+Received: from orth.archaic.org.uk (orth.archaic.org.uk. [81.2.115.148])
+ by smtp.gmail.com with ESMTPSA id l16sm743953wrx.5.2020.10.28.12.17.16
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Oct 2020 12:17:16 -0700 (PDT)
+From: Peter Maydell <peter.maydell@linaro.org>
+To: qemu-arm@nongnu.org,
+	qemu-devel@nongnu.org
+Subject: [PATCH 2/2] target/arm: Fix VUDOT/VSDOT (scalar) on big-endian hosts
+Date: Wed, 28 Oct 2020 19:17:12 +0000
+Message-Id: <20201028191712.4910-3-peter.maydell@linaro.org>
+X-Mailer: git-send-email 2.20.1
+In-Reply-To: <20201028191712.4910-1-peter.maydell@linaro.org>
+References: <20201028191712.4910-1-peter.maydell@linaro.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
- micalg=pgp-sha256; protocol="application/pgp-signature"
-Received-SPF: pass client-ip=63.227.221.253; envelope-from=keithp@keithp.com;
- helo=elaine.keithp.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 14:57:36
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::444;
+ envelope-from=peter.maydell@linaro.org; helo=mail-wr1-x444.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
 X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,48 +101,53 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
+Cc: Richard Henderson <richard.henderson@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
-Reply-to: "Keith Packard" <keithp@keithp.com>
-From: "Keith Packard" via <qemu-devel@nongnu.org>
 
---=-=-=
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The helper functions for performing the udot/sdot operations against
+a scalar were not using an address-swizzling macro when converting
+the index of the scalar element into a pointer into the vm array.
+This had no effect on little-endian hosts but meant we generated
+incorrect results on big-endian hosts.
 
-Alex Benn=C3=A9e <alex.bennee@linaro.org> writes:
+For these insns, the index is indexing over group of 4 8-bit values,
+so 32 bits per indexed entity, and H4() is therefore what we want.
+(For Neon the only possible input indexes are 0 and 1.)
 
->   specific_ss.add(when: 'CONFIG_ARM_STYLE_SEMIHOSTING',
->                   if_true: files ('common-semi.c'))
+Signed-off-by: Peter Maydell <peter.maydell@linaro.org>
+---
+I believe that gvec_udot_idx_h and gvec_sdot_idx_h are OK
+because the index there is over groups of 4*16-bit values,
+which are 64 bits each.
+---
+ target/arm/vec_helper.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-I've sent another version of the series using this plan. It does look a
-bit nicer as the only changes required when adding support to another
-target is to place this option in the config file.
+diff --git a/target/arm/vec_helper.c b/target/arm/vec_helper.c
+index 30d76d05beb..0f33127c4c4 100644
+--- a/target/arm/vec_helper.c
++++ b/target/arm/vec_helper.c
+@@ -293,7 +293,7 @@ void HELPER(gvec_sdot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
+     intptr_t index = simd_data(desc);
+     uint32_t *d = vd;
+     int8_t *n = vn;
+-    int8_t *m_indexed = (int8_t *)vm + index * 4;
++    int8_t *m_indexed = (int8_t *)vm + H4(index) * 4;
+ 
+     /* Notice the special case of opr_sz == 8, from aa64/aa32 advsimd.
+      * Otherwise opr_sz is a multiple of 16.
+@@ -324,7 +324,7 @@ void HELPER(gvec_udot_idx_b)(void *vd, void *vn, void *vm, uint32_t desc)
+     intptr_t index = simd_data(desc);
+     uint32_t *d = vd;
+     uint8_t *n = vn;
+-    uint8_t *m_indexed = (uint8_t *)vm + index * 4;
++    uint8_t *m_indexed = (uint8_t *)vm + H4(index) * 4;
+ 
+     /* Notice the special case of opr_sz == 8, from aa64/aa32 advsimd.
+      * Otherwise opr_sz is a multiple of 16.
+-- 
+2.20.1
 
-Thanks for the suggestion, and thanks for helping review this patch!
-
-=2D-=20
-=2Dkeith
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEw4O3eCVWE9/bQJ2R2yIaaQAAABEFAl+ZwzAACgkQ2yIaaQAA
-ABFKfRAAoNNSBmk9FrsTXQWVoNV5Lee3o2z3Azr2etFFYs/2piRt9f0ewsZPJNn4
-sZKOI/G1ShBYsPKulb/JBWPsdh6uN7+8cr9GE8MGr7VIRsDZOxKJNh1cDSACVhva
-yxu8A4r4tjNDfTG4L/J8HPpOlTpqM459F3fAwEQoPkOtwOp7J9mMHKKcPgCCVoUe
-QzZHZZoDrrK3VQSvzgZPjVuBeFqrWrIyy9LETeMD6PYl7gwz+EJmjm+1/VbKU8dO
-pJ70JO7tECiF4ZMw/AjZKtPkl4HDaXvbn8ajyyJuUnKTpP0uywtw9vHyQl5za7ep
-b/2QzJF+HxircBU5t5VtPj6xT2C40KetqJBOB1ADroAQ2Xp5DJsQhKf+jxVulBv+
-qGIR/pK6ToGYnvUFxTP345dywInUp8WOcZ022ElnhFEdDLMz7iZUeCxTdg+QxXr4
-2GJewp5ij+bU8E4Py51+4r5MzuVVJwVnfQtt/RW0u2c78fj3Zzuk26yj4T1KkFQc
-3K+W9pqmxsJWlPbAto6OYz+ek/+VeG3wSu28KPclCmJE66Qmp3IEG6cPBamvcb2R
-cC6K3QEPpTjT2/nYSLRVisy+zsuWcjLD5OnLIhg/HS90Ge050r7pSWY3qmLUfPVA
-hbPUAb9QadLefOnbkjRhXbproOGEd90NJX+8gI+bqlYTltWhZxs=
-=pnGw
------END PGP SIGNATURE-----
---=-=-=--
 
