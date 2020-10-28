@@ -2,99 +2,90 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 941E2C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:00:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 862EBC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:04:30 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E875B247CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:00:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D21DA24798
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:04:29 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bGZMD0Dc"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E875B247CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RbGGdFUG"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D21DA24798
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41348 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:48318 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXoof-0005yl-AR
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:00:54 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:39884)
+	id 1kXos8-0000im-GS
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:04:28 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:38484)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXocW-0007kg-FH
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:48:20 -0400
-Received: from mail-pl1-x641.google.com ([2607:f8b0:4864:20::641]:43573)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXocU-00026V-Ab
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:48:20 -0400
-Received: by mail-pl1-x641.google.com with SMTP id o9so2751372plx.10
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 09:48:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=subject:to:cc:references:from:message-id:date:user-agent
- :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=GRkJ6ewUhlRgRtdm7clVBC/5/nY3C+Wa4vVmYnkeyHA=;
- b=bGZMD0DcaQe5jnPacKfpj+3N7ub4ZY0e7qdTt8TC9o+VgGJE6OuyBX/dYTTxuUAogu
- rnRNC4/hUa7fYMbOukmKSYsn5k9USJ1N+TGSYEszbu8uQIAFlxLRK6yYLC9UTDTZ+nAQ
- +fLHOCYTAqCUCz/NeMZ5ULBUnCAPKIG6K9Oosd7kT0Aw+uVqiFKKM2qYLQbCU/XeEfh9
- HWqFSznnGFbJy/78nGkPyWZ4cWHcUZc2mm1tHhrHuMhH4zgZwx5sQALA9acTlTf7Z67s
- g7p+KJJgSfLjS21Vwzz4RVUmL0EQ84FobZhV6AtPQEuWb+pdDaKtoF6PCEXq4b+cyCWS
- Nm8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:subject:to:cc:references:from:message-id:date
- :user-agent:mime-version:in-reply-to:content-language
- :content-transfer-encoding;
- bh=GRkJ6ewUhlRgRtdm7clVBC/5/nY3C+Wa4vVmYnkeyHA=;
- b=MHB2wWWMrQmCcIYYMSEwA+Rtso5m9PL+5UB3uBXa118Y8LBSHoA1oTdImhn6b74kUc
- eJFAix0QJEFIRVx/CDL/fHjP7gm0VXKzv8WJI/JCZdhslQUy0r1/G2adZQKqxxmBuJV4
- ow+p5G8K8flLQpnE4V6gF9vgBIBeCayCfKg0VM6Nhr43md0esaOObWAAb1ApgbWritNI
- Uw+S2I9j2q7jElzJ1+zKgggb5uebaflwf9GxDfVbHY80OWkbcpqCQ6bRccAKKmPNgUTA
- HkJ9dSJDdmzMDjklkWSXaWnQLKgklGzdb+oskdLmL9q1MkcPj221mHEs5D5V2n5Q3bz4
- sT0Q==
-X-Gm-Message-State: AOAM531DEUZZhatwMF5qnEEJW7+y9gjEE1VgwO2FtkRsswErsh0pHPZf
- aCUJOhE4HnMPJ2O+D1gejVzN8A==
-X-Google-Smtp-Source: ABdhPJzQYRtrHrssIYRGVXE7HuReeaZL0MArak82qutCXzj40sM0mVrwe1gUIaFmJ3wD/HD2JW1xsg==
-X-Received: by 2002:a17:902:c412:b029:d6:2939:1b75 with SMTP id
- k18-20020a170902c412b02900d629391b75mr8496330plk.80.1603903696944; 
- Wed, 28 Oct 2020 09:48:16 -0700 (PDT)
-Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id u13sm114626pfl.162.2020.10.28.09.48.15
- (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 28 Oct 2020 09:48:16 -0700 (PDT)
-Subject: Re: [PATCH V15 1/6] target/mips: Fix PageMask with variable page size
-To: Huacai Chen <zltjiangshi@gmail.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>,
- Aleksandar Markovic <aleksandar.qemu.devel@gmail.com>
-References: <1603858685-30701-1-git-send-email-chenhc@lemote.com>
- <1603858685-30701-2-git-send-email-chenhc@lemote.com>
-From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <11b935d9-e701-099d-1082-adb0613116d5@linaro.org>
-Date: Wed, 28 Oct 2020 09:48:14 -0700
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.10.0
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kXoXP-0000Gz-5Z
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:43:04 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:48137)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kXoXM-0001TT-6Z
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:43:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603903379;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=TrW/iXAG2s9ENGArfq6oI14QfPgCFFI6F13qb4HLRMs=;
+ b=RbGGdFUG7grT4mby3navhv0AA5+mYxp9Gq24Wd6gv91bcOUQJcoZrk8OqD95ORbwt+qJsA
+ iTkAtRT0sCDfhH+UCYjTqoDyHHSrnoU7x1yKPH48SxEYwpf7CWPXi/n7XiF6wk7XFATvDV
+ VZxWHgOBB9kCldQPV/LO+i2hatvK1ho=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-243-9Fv3gBBuMBm0751HujpmmA-1; Wed, 28 Oct 2020 12:42:55 -0400
+X-MC-Unique: 9Fv3gBBuMBm0751HujpmmA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C2C10107465F;
+ Wed, 28 Oct 2020 16:42:54 +0000 (UTC)
+Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 7E2295B4B2;
+ Wed, 28 Oct 2020 16:42:51 +0000 (UTC)
+Subject: [PULL v2 23/32] s390x/pci: Add routine to get the vfio dma
+ available count
+From: Alex Williamson <alex.williamson@redhat.com>
+To: qemu-devel@nongnu.org
+Date: Wed, 28 Oct 2020 10:42:50 -0600
+Message-ID: <160390337083.12234.15438165466296141369.stgit@gimli.home>
+In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
+References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
+User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-In-Reply-To: <1603858685-30701-2-git-send-email-chenhc@lemote.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::641;
- envelope-from=richard.henderson@linaro.org; helo=mail-pl1-x641.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, NICE_REPLY_A=-0.921,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -107,25 +98,122 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Aleksandar Rikalo <aleksandar.rikalo@syrmia.com>,
- Huacai Chen <chenhuacai@gmail.com>, qemu-devel@nongnu.org,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhc@lemote.com>,
- Aurelien Jarno <aurelien@aurel32.net>
+Cc: Cornelia Huck <cohuck@redhat.com>, Matthew Rosato <mjrosato@linux.ibm.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/27/20 9:17 PM, Huacai Chen wrote:
-> +invalid:
-> +    /*
-> +     * When invalid, ensure the value is bigger than or equal to
-> +     * the minimal but smaller than or equal to the maxium.
-> +     */
-> +    maskbits = MIN(16, MAX(maskbits, TARGET_PAGE_BITS - 12));
-> +    env->CP0_PageMask = ((1 << (16 + 1)) - 1) << CP0PM_MASK;
+From: Matthew Rosato <mjrosato@linux.ibm.com>
 
-maskbits is unused.  Did you mean to use it?
+Create new files for separating out vfio-specific work for s390
+pci. Add the first such routine, which issues VFIO_IOMMU_GET_INFO
+ioctl to collect the current dma available count.
 
+Signed-off-by: Matthew Rosato <mjrosato@linux.ibm.com>
+Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+---
+ hw/s390x/meson.build             |    1 +
+ hw/s390x/s390-pci-vfio.c         |   54 ++++++++++++++++++++++++++++++++++++++
+ include/hw/s390x/s390-pci-vfio.h |   17 ++++++++++++
+ 3 files changed, 72 insertions(+)
+ create mode 100644 hw/s390x/s390-pci-vfio.c
+ create mode 100644 include/hw/s390x/s390-pci-vfio.h
 
-r~
+diff --git a/hw/s390x/meson.build b/hw/s390x/meson.build
+index 948ceae7a7b3..3ee4594760ac 100644
+--- a/hw/s390x/meson.build
++++ b/hw/s390x/meson.build
+@@ -10,6 +10,7 @@ s390x_ss.add(files(
+   's390-ccw.c',
+   's390-pci-bus.c',
+   's390-pci-inst.c',
++  's390-pci-vfio.c',
+   's390-skeys.c',
+   's390-stattrib.c',
+   's390-virtio-hcall.c',
+diff --git a/hw/s390x/s390-pci-vfio.c b/hw/s390x/s390-pci-vfio.c
+new file mode 100644
+index 000000000000..cb3f4d98adf8
+--- /dev/null
++++ b/hw/s390x/s390-pci-vfio.c
+@@ -0,0 +1,54 @@
++/*
++ * s390 vfio-pci interfaces
++ *
++ * Copyright 2020 IBM Corp.
++ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#include <sys/ioctl.h>
++
++#include "qemu/osdep.h"
++#include "hw/s390x/s390-pci-vfio.h"
++#include "hw/vfio/vfio-common.h"
++
++/*
++ * Get the current DMA available count from vfio.  Returns true if vfio is
++ * limiting DMA requests, false otherwise.  The current available count read
++ * from vfio is returned in avail.
++ */
++bool s390_pci_update_dma_avail(int fd, unsigned int *avail)
++{
++    g_autofree struct vfio_iommu_type1_info *info;
++    uint32_t argsz;
++
++    assert(avail);
++
++    argsz = sizeof(struct vfio_iommu_type1_info);
++    info = g_malloc0(argsz);
++
++    /*
++     * If the specified argsz is not large enough to contain all capabilities
++     * it will be updated upon return from the ioctl.  Retry until we have
++     * a big enough buffer to hold the entire capability chain.
++     */
++retry:
++    info->argsz = argsz;
++
++    if (ioctl(fd, VFIO_IOMMU_GET_INFO, info)) {
++        return false;
++    }
++
++    if (info->argsz > argsz) {
++        argsz = info->argsz;
++        info = g_realloc(info, argsz);
++        goto retry;
++    }
++
++    /* If the capability exists, update with the current value */
++    return vfio_get_info_dma_avail(info, avail);
++}
++
+diff --git a/include/hw/s390x/s390-pci-vfio.h b/include/hw/s390x/s390-pci-vfio.h
+new file mode 100644
+index 000000000000..2a5a261cc9b1
+--- /dev/null
++++ b/include/hw/s390x/s390-pci-vfio.h
+@@ -0,0 +1,17 @@
++/*
++ * s390 vfio-pci interfaces
++ *
++ * Copyright 2020 IBM Corp.
++ * Author(s): Matthew Rosato <mjrosato@linux.ibm.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or (at
++ * your option) any later version. See the COPYING file in the top-level
++ * directory.
++ */
++
++#ifndef HW_S390_PCI_VFIO_H
++#define HW_S390_PCI_VFIO_H
++
++bool s390_pci_update_dma_avail(int fd, unsigned int *avail);
++
++#endif
+
 
