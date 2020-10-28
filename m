@@ -2,136 +2,100 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 89FB3C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 10:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF861C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 10:11:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D99E4246A7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 10:08:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id F108A246A7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 10:11:06 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=nutanix.com header.i=@nutanix.com header.b="T+7sxXHV"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D99E4246A7
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=nutanix.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cPA2FxlR"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org F108A246A7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44528 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:46924 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXiNY-0006L3-P9
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 06:08:28 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60126)
+	id 1kXiQ5-0007UY-Sj
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 06:11:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60516)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
- id 1kXiMv-0005vW-KW
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 06:07:49 -0400
-Received: from mx0a-002c1b01.pphosted.com ([148.163.151.68]:50820)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <thanos.makatos@nutanix.com>)
- id 1kXiMr-0008An-HX
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 06:07:48 -0400
-Received: from pps.filterd (m0127837.ppops.net [127.0.0.1])
- by mx0a-002c1b01.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id
- 09S9vqgv029015; Wed, 28 Oct 2020 03:07:34 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nutanix.com;
- h=from : to : cc :
- subject : date : message-id : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=proofpoint20171006;
- bh=crJcYz8adUqu00EbYlmfbHIWAUaeD4MaTxdD+A9BXaM=;
- b=T+7sxXHVi29HwN9ijjM/7qpNvrd2zZjfOFVzESYLo5rrDkPYJF6+TNyx94WLrfA5Ycwy
- Kjpm2rOw8sHwtKen05v+ulDR9ohMcnW5IMKF438G4VlJFecfV9KpEtrA5myjhfg5+DrF
- RsKFWH5qqfs0RU3xWD0MJNaJIMgN/iOY8bPXuw0rFQnJ6+E6JF1p0iiF5sS/toTrv3+j
- NObbStXv0i9yELmhDvL3PhHqsgLAFbn7TntL+1i6gwWA3MBnT42fOmV9Yz/DraW8varU
- y6EMhutdQVt+xRTVt6gSAbyRliAXTCzXJrMA1POJQyQObBDznwBOD4tt0xhbwquHsWx1 mQ== 
-Received: from nam10-mw2-obe.outbound.protection.outlook.com
- (mail-mw2nam10lp2107.outbound.protection.outlook.com [104.47.55.107])
- by mx0a-002c1b01.pphosted.com with ESMTP id 34cg678ar3-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
- Wed, 28 Oct 2020 03:07:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mRc53z5NPTvpb5lxFxiXUzWs20j8YwXWgyzlOmGIkCJ/qZd3Y0HVMcw2phcmMKyGI+Gl7+HeK7RTSD7UQtayYziGcMku2bXAkjImSEHqnrYuKysUnWOtY+nJ39Jrmal3VS5TNsSnOon6m6kegf9JywORQHNr7BH1dzQdknSnqVkMiJ8MUBu6w8OIl1bHghqVDo+TtguV63OlRp+SceIzTbeb5UPSs85VSM5SERLxLonOL5G66EPrjTsTUjJOd8f9aFBEC0kLYkeLWzU+BVN6WlxewBIqb7Bosu//b4DqYfrsOAMBJQaq0kvXJIA9Q6HkV/6nVvjTuRCHcZe+Sc7LGA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=crJcYz8adUqu00EbYlmfbHIWAUaeD4MaTxdD+A9BXaM=;
- b=EatODBesuT2vRRldORrJC/FfWddtYEYvaWrX8peSheINWJIjSIF/XbDhvgcnN1KRmbkSlAdyzbraX9MGVRfi+AmiRZGRrsM7gwYm0gDkOCimkuEnQJrEGWXgrh5Pb63j+8Mg3EJfIWyWXboKvpRqzNoNnMX1KVi6MUG59KW7YLOAD5GfA1knYSaL3c5G5rjgr7wqerQ6K/hDN/ZW5FhLanSSAiejTJxiIzLJNcBcK1a6TbFQihbjH1MP3oMCTjsnLzxy6CtJb94KnGMB9dBZQVnom8EbEdSPrgOyKVle1IAIPJ29AEtquLTPZA9uy97tRUQ6TdVC85hpwX1P3cAFqw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nutanix.com; dmarc=pass action=none header.from=nutanix.com;
- dkim=pass header.d=nutanix.com; arc=none
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32)
- by MW2PR02MB3723.namprd02.prod.outlook.com (2603:10b6:907:2::32) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.27; Wed, 28 Oct
- 2020 10:07:30 +0000
-Received: from MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::81cb:c77a:ef0:84e0]) by MW2PR02MB3723.namprd02.prod.outlook.com
- ([fe80::81cb:c77a:ef0:84e0%5]) with mapi id 15.20.3477.028; Wed, 28 Oct 2020
- 10:07:30 +0000
-From: Thanos Makatos <thanos.makatos@nutanix.com>
-To: Thanos Makatos <thanos.makatos@nutanix.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>
-Subject: RE: Out-of-Process Device Emulation session at KVM Forum 2020
-Thread-Topic: Out-of-Process Device Emulation session at KVM Forum 2020
-Thread-Index: AQHWrHPc6iSycZlvN0m0r0GCbG+HcamsvrSQgAAMavA=
-Date: Wed, 28 Oct 2020 10:07:29 +0000
-Message-ID: <MW2PR02MB37236F19438C743E4BC63A8B8B170@MW2PR02MB3723.namprd02.prod.outlook.com>
-References: <20201027151400.GA138065@stefanha-x1.localdomain>
- <MW2PR02MB3723F97DA47F8747CB92E4418B170@MW2PR02MB3723.namprd02.prod.outlook.com>
-In-Reply-To: <MW2PR02MB3723F97DA47F8747CB92E4418B170@MW2PR02MB3723.namprd02.prod.outlook.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: nutanix.com; dkim=none (message not signed)
- header.d=none;nutanix.com; dmarc=none action=none header.from=nutanix.com;
-x-originating-ip: [78.149.9.252]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: d09dabf3-73f3-4762-0bce-08d87b2947cc
-x-ms-traffictypediagnostic: MW2PR02MB3723:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <MW2PR02MB372353545000F7D4927B9C368B170@MW2PR02MB3723.namprd02.prod.outlook.com>
-x-proofpoint-crosstenant: true
-x-ms-oob-tlc-oobclassifiers: OLM:561;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: QAnA4eCDgfMVSHgxXAbfNl12K0r6+E96PA8r0Rcwymzt1IK8E6DGG6+MDVQlFgUt7mksiAKAiBbOR/tRQ7ogkya5UN+cTm95iT7WhMOr7urSutD+slmo5Evs9lQ0xqr2NzAULE5kzDT3o/0GRDzgTo8qSJTta+TT9p9nP47Tc2bWMWWf2y0j8RU7m5NBlQGWGGzBsqw3NjEwvqQngi3l/o0l+dKkvdROZ7OO331SWQk6UNIX4eHcvH7QcO/zqo7BL6VYPu2zyJVjxx0m+Sm0L3N++dYgTBjgF91jtGjdeEjYrBwdBxVygXeTOkzqFsRYo/EvPY6DlHZ24ejfSM9fbaw9YL12kvp2tEQ1nCc4UKNaKFgReJJ+Kc8nxcExVl0llDFhHUAqhv01vyqOIrvgjg==
-x-forefront-antispam-report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:MW2PR02MB3723.namprd02.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(136003)(366004)(346002)(39860400002)(396003)(376002)(64756008)(4326008)(44832011)(66556008)(2940100002)(2906002)(86362001)(6506007)(26005)(55236004)(53546011)(7696005)(76116006)(66476007)(5660300002)(7416002)(186003)(9686003)(83380400001)(478600001)(52536014)(316002)(71200400001)(33656002)(66946007)(8676002)(55016002)(54906003)(110136005)(19627235002)(66446008)(8936002);
- DIR:OUT; SFP:1102; 
-x-ms-exchange-antispam-messagedata: 8/y0PYR5/ympsR36MWdLHupQNSTqKXQiO8JqGcHPzDBAWhaqJS0lLILTe8UEu60IqAqqoXZH9O5Q6yGBRp7UDj7WyDGLhUlhtiGI9bSy0UzVZP22D8UU+fiH6L+wTF0RJpAaE93zoTslKLlxLJkrnwoA0cdhnR+/OIIqWt1TXOOQZCBkhudaydZ0kd+MhCgd8MCfr6qxY5RBfmAdWPteBUwocpvjJ/dUl7oTDHLAKEu6vKhz8QaiHbrINGxw9HINgiFHznTggqkwBHehqeRSDuKUDV9xzFWZBau/m6UN6p8Kl6y3RMzItElhEcg20rakCt8xeCPzgXlBlHsPRVf8ntPjwCBZDLhFupUWP8dD9EJ3mUagI7K4K9igmbPNpBm6M4gIV6ZwybkY4lT29ROl8fN9nsPwp6JuylryH4sjM14EQ5aiC5ODwy+2nx8txjaypyoXuOvyxSpwIfZ8Sl4+ujxTX85ZCmvPL0CpNGX8E1ml70ckRGI1hRZgYtTNlTPVFLELi7CCLabNrDZ4591J7L6KT+qQjjYIhy86o7feKeYHeKuoH7OwcItxLgsSYmKl6D+6OgBuImsQC5ulQL/Ftegq6j5NLpZmEVzukpcoMvzBxWmU3PFPAD0XsKqwyqaClPAoUyL3OQ2Dt2fX7SAl6Q==
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kXiPK-0006sb-6V; Wed, 28 Oct 2020 06:10:18 -0400
+Received: from mail-ej1-x642.google.com ([2a00:1450:4864:20::642]:33754)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kXiPG-0000dj-NZ; Wed, 28 Oct 2020 06:10:17 -0400
+Received: by mail-ej1-x642.google.com with SMTP id 7so1826895ejm.0;
+ Wed, 28 Oct 2020 03:10:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=QEAzeUyNs1F1/pvHzDxAem6fMq+K4gGbZFMucbeBMLo=;
+ b=cPA2FxlRT8QANVB+FnbXw8bx6PrRntzlQlP7Usp3EWPZacEPm1HbgU6Pp600RA6Poo
+ KNcMLu+19TmRd0wQKmGTsYLR8Z5djVJVaHdi8QoOF/z6X7UJdMWZeFu3jsrJNzzGKhY/
+ 76Z2wrynkQUcgT4Srz5P2Wm30Vw5M5pnwZbjwmkFWku4YNm51ZD1MKUMHFhQW0J/Ccsj
+ yVw5PH9KNj/htMZMN1pH2SWLjOvxhb9M7Jt4+XV12q/H1lZZlXZEFJEfWbNnZTYrtFjO
+ h2y/7a75izJcQb5yM9RXZOzi/en4s9uCWWEW+g6wr0vvBvWCmZMkKg3YdXrsL2O6fY6x
+ hnDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=QEAzeUyNs1F1/pvHzDxAem6fMq+K4gGbZFMucbeBMLo=;
+ b=VastoQa3+DRf6odOhWIFjeX+WJkZA3MznbX2/v8lJvR1MxFIrNjGFYbN382+8FkXoG
+ Xjcm17WqmpPD9IWutXGqkOWeBK7r5wTxBlu6r8jvtJN85GA4DiWXzmEltRWmP0ywmAfq
+ YAcSHP+Hk33R3KyxScwPaavWJX5JlkBYHBw9oCsTpORH9xsI86v7g6SsVHbPFGcJUckJ
+ nWW40SHRhvWDJC2RpAoG7uBXfPehdVH3oH84YySoaA4Zz7BX/KgzNP75UIsV90KP4H9s
+ 6+TiQuKeUx81+uoD43a3bN9uzVsZCR6G3KJaPegHx4drjmbZzlUbg7AOHxmUUKpdJWLE
+ tzGg==
+X-Gm-Message-State: AOAM531ObAxxYQyy4R5PAv/qQw2F9Hg+FpUXZPoO9I7vQclRI+6DpM2R
+ uHHdj9yFFbxkDYOIetUGzDVnSv6X8JI=
+X-Google-Smtp-Source: ABdhPJynLeD2VoMMb3SlFX9L6ZGK0zS+H/2vvp6hOvNe25IhGpSkQjE26nrRmkaCIHSuziQ2op1Fiw==
+X-Received: by 2002:a17:906:4306:: with SMTP id
+ j6mr7005265ejm.523.1603879812076; 
+ Wed, 28 Oct 2020 03:10:12 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id j24sm2549765edq.29.2020.10.28.03.10.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 28 Oct 2020 03:10:11 -0700 (PDT)
+Subject: Re: [PATCH] hw/sd: Zero out function selection fields before being
+ populated
+To: Bin Meng <bmeng.cn@gmail.com>, Niek Linnenbank <nieklinnenbank@gmail.com>
+References: <20201024014954.21330-1-bmeng.cn@gmail.com>
+ <1e4c44aa-7d2a-e773-fe8e-47b858137896@amsat.org>
+ <CAPan3WqM1VGRB_K4AsBynrhzm-+DN9x2G7oOKHujSj-A1yH3Sg@mail.gmail.com>
+ <CAEUhbmV_z1mtK2PCVjrXhQtg48HgeAhuJAxdEoms+wFttLeg6g@mail.gmail.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <422514ca-27e9-8fea-bf10-e3d5a11525fd@amsat.org>
+Date: Wed, 28 Oct 2020 11:10:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-X-OriginatorOrg: nutanix.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW2PR02MB3723.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d09dabf3-73f3-4762-0bce-08d87b2947cc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2020 10:07:30.0116 (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: bb047546-786f-4de1-bd75-24e5b6f79043
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZZX88lNvMqRj4fr9TM8CGuFJZOW+/DxojkkNMg66C5Soey8cxMVwgKW2RfOr3MHeW/d90AiDORGT4FhP/TCe+Q8l+rX8GzeQwDhsQlzd6mg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW2PR02MB3723
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.312, 18.0.737
- definitions=2020-10-28_04:2020-10-26,
- 2020-10-28 signatures=0
-X-Proofpoint-Spam-Reason: safe
-Received-SPF: pass client-ip=148.163.151.68;
- envelope-from=thanos.makatos@nutanix.com; helo=mx0a-002c1b01.pphosted.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 06:07:43
-X-ACL-Warn: Detected OS   = Linux 3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <CAEUhbmV_z1mtK2PCVjrXhQtg48HgeAhuJAxdEoms+wFttLeg6g@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::642;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ej1-x642.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -144,103 +108,117 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>,
- "john.g.johnson@oracle.com" <john.g.johnson@oracle.com>,
- "mst@redhat.com" <mtsirkin@redhat.com>,
- "jag.raman@oracle.com" <jag.raman@oracle.com>,
- "slp@redhat.com" <slp@redhat.com>, "kraxel@redhat.com" <kraxel@redhat.com>,
- Felipe Franciosi <felipe@nutanix.com>,
- =?iso-8859-1?Q?Marc-Andr=E9_Lureau?= <marcandre.lureau@redhat.com>,
- =?iso-8859-1?Q?Alex_Benn=E9e?= <alex.bennee@linaro.org>,
- David Gibson <david@gibson.dropbear.id.au>
+Cc: Bin Meng <bin.meng@windriver.com>, Michael Roth <mdroth@linux.vnet.ibm.com>,
+ Qemu-block <qemu-block@nongnu.org>, QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/28/20 2:36 AM, Bin Meng wrote:
+> Hi Niek,
+> 
+> On Wed, Oct 28, 2020 at 3:55 AM Niek Linnenbank
+> <nieklinnenbank@gmail.com> wrote:
+>>
+>> Hello Philippe, Bin,
+>>
+>> Thanks for your support on this. I've just tried this patch and unfortunately it doesn't seem to
+>> resolve the issue, at least on my machine. This is the output that I get when running the avocado test for NetBSD9.0:
+>>
+>>  (5/5) tests/acceptance/boot_linux_console.py:BootLinuxConsole.test_arm_orangepi_uboot_netbsd9: |console: U-Boot SPL 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000)
+>> console: DRAM: 1024 MiB
+>> console: Failed to set core voltage! Can't set CPU frequency
+>> console: Trying to boot from MMC1
+>> console: U-Boot 2020.01+dfsg-1 (Jan 08 2020 - 08:19:44 +0000) Allwinner Technology
+>> console: CPU:   Allwinner H3 (SUN8I 0000)
+>> ...
+>> console: [   1.2957642] sdmmc0: SD card status: 4-bit, C0
+>> console: [   1.3094731] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
+>> console: [   1.3159383] ld0: 1024 MB, 1040 cyl, 32 head, 63 sec, 512 bytes/sect x 2097152 sectors
 
+Same problem as before.
 
-> -----Original Message-----
-> From: Qemu-devel <qemu-devel-
-> bounces+thanos.makatos=3Dnutanix.com@nongnu.org> On Behalf Of Thanos
-> Makatos
-> Sent: 28 October 2020 09:32
-> To: Stefan Hajnoczi <stefanha@redhat.com>; qemu-devel@nongnu.org
-> Cc: Elena Ufimtseva <elena.ufimtseva@oracle.com>;
-> john.g.johnson@oracle.com; mst@redhat.com <mtsirkin@redhat.com>;
-> jag.raman@oracle.com; slp@redhat.com; kraxel@redhat.com; Felipe
-> Franciosi <felipe@nutanix.com>; Marc-Andr=E9 Lureau
-> <marcandre.lureau@redhat.com>; Alex Benn=E9e <alex.bennee@linaro.org>;
-> David Gibson <david@gibson.dropbear.id.au>
-> Subject: RE: Out-of-Process Device Emulation session at KVM Forum 2020
->=20
-> > -----Original Message-----
-> > From: Stefan Hajnoczi <stefanha@redhat.com>
-> > Sent: 27 October 2020 15:14
-> > To: qemu-devel@nongnu.org
-> > Cc: Alex Benn=E9e <alex.bennee@linaro.org>; mst@redhat.com
-> > <mtsirkin@redhat.com>; john.g.johnson@oracle.com; Elena Ufimtseva
-> > <elena.ufimtseva@oracle.com>; kraxel@redhat.com;
-> > jag.raman@oracle.com; Thanos Makatos <thanos.makatos@nutanix.com>;
-> > Felipe Franciosi <felipe@nutanix.com>; Marc-Andr=E9 Lureau
-> > <marcandre.lureau@redhat.com>; slp@redhat.com; David Gibson
-> > <david@gibson.dropbear.id.au>
-> > Subject: Out-of-Process Device Emulation session at KVM Forum 2020
-> >
-> > There will be a birds-of-a-feather session at KVM Forum, a chance for
-> > us to get together and discuss Out-of-Process Device Emulation.
-> >
-> > Please send suggestions for the agenda!
-> >
-> > These sessions are a good opportunity to reach agreement on topics that
-> > are hard to discuss via mailing lists.
-> >
-> > Ideas:
-> >  * How will we decide that the protocol is stable? Can third-party
-> >    applications like DPDK/SPDK use the protocol in the meantime?
-> >  * QEMU build system requirements: how to configure and build device
-> >    emulator binaries?
-> >  * Common sandboxing solution shared between C and Rust-based
-> binaries?
-> >    minijail (https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> 3A__github.com_google_minijail-29-
-> 3F&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6ogtti46a
-> tk736SI4vgsJiUKIyDE&m=3DhPc4ln1oFnCIYCRna-
-> C027BO06__al6zPJhAs0_KcP8&s=3DdqqLRGO3GvV4gAEqkMXzbhm5TtOHqLGQ
-> d_0SBlzubp0&e=3D  bubblewrap
-> >    (https://urldefense.proofpoint.com/v2/url?u=3Dhttps-
-> 3A__github.com_containers_bubblewrap-29-
-> 3F&d=3DDwIFAw&c=3Ds883GpUCOChKOHiocYtGcg&r=3DXTpYsh5Ps2zJvtw6ogtti46a
-> tk736SI4vgsJiUKIyDE&m=3DhPc4ln1oFnCIYCRna-
-> C027BO06__al6zPJhAs0_KcP8&s=3DRnd-
-> 6YVz2xrg0Vrm6ukannwt3kmbQ8L7upVLrEc227g&e=3D  systemd-run?
-> >
-> > Stefan
->=20
-> Here are a couple of issues we'd also like to talk about:
->=20
-> Fast switching from polling to interrupt-based notifications: when a sing=
-le
-> process is emulating multiple devices then it might be more efficient to =
-poll
-> instead of relying on interrupts for notifications. However, during perio=
-ds
-> when
-> the guests are mostly idle, polling might unnecessary, so we'd like to be=
- able
-> switch to interrupt-based notifications at a low cost.
+>> console: [   1.3763222] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
+>> console: [   2.0592109] WARNING: 4 errors while detecting hardware; check system log.
+>> console: [   2.0693403] boot device: ld0
+>> console: [   2.0798960] root on ld0a dumps on ld0b
+>> console: [   2.0994141] vfs_mountroot: can't open root device
+>> console: [   2.0994141] cannot mount root, error = 6
+>> <FREEZE>
+>>
+>> When starting NetBSD 9.0 manually, it shows clearly that the SD card is recognized with 1GiB size, also from U-Boot:
+>> $ qemu-system-arm -M orangepi-pc -nographic -nic user -sd ./armv7.img
+>> WARNING: Image format was not specified for './armv7.img' and probing guessed raw.
+>>          Automatically detecting the format is dangerous for raw images, write operations on block 0 will be restricted.
+>>          Specify the 'raw' format explicitly to remove the restrictions.
+>>
+>> U-Boot SPL 2020.07-00610-g610e1487c8 (Jul 11 2020 - 22:31:58 +0200)
+>> DRAM: 1024 MiB
+>> Failed to set core voltage! Can't set CPU frequency
+>> Trying to boot from MMC1
+>>
+>> U-Boot 2020.07-00610-g610e1487c8 (Jul 11 2020 - 22:31:58 +0200) Allwinner Technology
+>>
+>> CPU:   Allwinner H3 (SUN8I 0000)
+>> Model: Xunlong Orange Pi PC
+>> DRAM:  1 GiB
+>> MMC:   mmc@1c0f000: 0
+>> ...
+>> Hit any key to stop autoboot:  0
+>> => mmc info
+>> Device: mmc@1c0f000
+>> Manufacturer ID: aa
+>> OEM: 5859
+>> Name: QEMU!
+>> Bus Speed: 50000000
+>> Mode: SD High Speed (50MHz)
+>> Rd Block Len: 512
+>> SD version 2.0
+>> High Capacity: No
+>> Capacity: 1 GiB
+>> Bus Width: 4-bit
+>> Erase Group Size: 512 Bytes
+>> =>
+>> => boot
+>> 8846552 bytes read in 931 ms (9.1 MiB/s)
+>> ...
+>> [   1.3447558] sdmmc0: SD card status: 4-bit, C0
+>> [   1.3546801] ld0 at sdmmc0: <0xaa:0x5859:QEMU!:0x01:0xdeadbeef:0x062>
+>> [   1.3647790] ld0: 1024 MB, 1040 cyl, 32 head, 63 sec, 512 bytes/sect x 2097152 sectors
+>> [   1.4150230] ld0: 4-bit width, High-Speed/SDR25, 50.000 MHz
+>> [   2.0800893] WARNING: 4 errors while detecting hardware; check system log.
+>> [   2.0800893] boot device: ld0
+>> [   2.0900792] root on ld0a dumps on ld0b
+>> [   2.1004160] vfs_mountroot: can't open root device
+>> [   2.1004160] cannot mount root, error = 6
+>> [   2.1004160] root device (default ld0a):
+>> <FREEZE>
+>>
+>> Note that the image has been resized to 2GiB with qemu-img:
+>> $ ls -alh armv7.img
+>> -rw-rw-r-- 1 user user 2,0G okt 28 22:45 armv7.img
+>>
+>> The previous patch proposed by Bin did resolve the error ("hw/sd: Fix 2GiB card CSD register values" ):
+>>  https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg07318.html
+> 
+> Correct. The patch above has not been applied yet, and only this patch
+> is now in mainline, so you will still see errors in the NetBSD 9.0
+> test.
 
-Correction: there are no interrupts involved here, just guest to device not=
-ifications.
+Yesterday was "feature freeze" but we still have time to do more testing
+and fix bugs :)
+I didn't want to rush and squeeze this fix too quickly. I kept it for
+the next pull request so I have time to review and think about it more.
 
->=20
-> Device throttling during live migration: a device can easily dirty huge a=
-mounts
-> of guest RAM which results in live migration taking too long or making it=
- hard
-> to estimate progress. Ideally, we'd like to be able to instruct an out-of=
--
-> process
-> device emulator to make sure it won't dirty too many guest pages during a
-> specified window of time.
+Thanks for the testing!
 
+> 
+>>
+>> Although I see that this patch is now in master (89c6700fe7eed9195f10055751edbc6d5e7ab940),
+>> can you please confirm that the issue is still present when testing this on your machine as well?
+>>
+> 
+> Regards,
+> Bin
+> 
 
