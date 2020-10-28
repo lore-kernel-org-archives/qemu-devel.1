@@ -2,92 +2,85 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7D32C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:40:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3715FC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:48:40 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id D1A6C24810
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:40:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 5357D24810
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 18:48:39 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U9ZMVdlO"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D1A6C24810
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=web.de header.i=@web.de header.b="RajHddji"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5357D24810
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=web.de
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36904 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43756 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXqNH-0006vT-Ji
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 14:40:43 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50340)
+	id 1kXqUw-0001t8-3Z
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 14:48:38 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqKw-0006LZ-Pg
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:38:18 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44688)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXqKu-0001j0-Hu
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 14:38:17 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603910295;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=iBWCYQlqpYXHjwNgV8bKluvsfvCM7dA+7SS94pUVobE=;
- b=U9ZMVdlOcKOaLpbUQh30XiPAP+QHRoVhjh/2MV71+9MmZPfAqgwvhTMZDzaYk7eESjrk61
- 1mTxxkd0gkGlQfC7ND+5If56bqwtIHqSjIaiOM8fm9AunGWpROWGWuyzRjUOcPoDspevuE
- /zuLKQP06wkibrqzEc8sziUp3ODfh/A=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-289-cS8WJv__NW-DkeLEe4RB6g-1; Wed, 28 Oct 2020 14:38:13 -0400
-X-MC-Unique: cS8WJv__NW-DkeLEe4RB6g-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id DE6D9803F4D;
- Wed, 28 Oct 2020 18:38:11 +0000 (UTC)
-Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 66B1D10013D0;
- Wed, 28 Oct 2020 18:38:04 +0000 (UTC)
-Subject: Re: [PATCH 1/5] python: add pytest and tests
-To: Thomas Huth <thuth@redhat.com>, qemu-devel@nongnu.org
-References: <20201027223815.159802-1-jsnow@redhat.com>
- <20201027223815.159802-2-jsnow@redhat.com>
- <7440abdc-b01e-ba5e-5238-a6e4573f88b5@redhat.com>
- <c85597c2-a9b3-e8ff-7208-c3f16002f40b@redhat.com>
- <b412ee07-d274-4e0d-bb1c-81b53653cbb2@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <46f7ec6b-0e15-f311-2890-635df64d4200@redhat.com>
-Date: Wed, 28 Oct 2020 14:38:04 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kXqRl-0008PH-SD; Wed, 28 Oct 2020 14:45:24 -0400
+Received: from mout.web.de ([217.72.192.78]:60595)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <lukasstraub2@web.de>)
+ id 1kXqRj-0003BN-J9; Wed, 28 Oct 2020 14:45:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=dbaedf251592; t=1603910711;
+ bh=gY7i10TEaU2/eOKJP/udGrOIdMye9+sBU1/d7gcanJc=;
+ h=X-UI-Sender-Class:Date:From:To:Cc:Subject;
+ b=RajHddjiiFG3l6G6PUkgKOXYYbCkeE6WrbzYcUJBeRuo51ZkbPXdkpnd3tulE3wOE
+ qM7T3cLVcK2ldZ9Lnkg66GLwR3MHLd+4c+JG0QQuFAoPXwLlAfU2MDVpqUHx6B5ZFR
+ bptrNNvgTpf9+p3O1KcdwSKTVsoEe4nDhswakUw4=
+X-UI-Sender-Class: c548c8c5-30a9-4db5-a2e7-cb6cb037b8f9
+Received: from luklap ([94.134.180.124]) by smtp.web.de (mrweb106
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MLzit-1kpEs22E0P-00Hx9d; Wed, 28
+ Oct 2020 19:45:11 +0100
+Date: Wed, 28 Oct 2020 19:45:09 +0100
+From: Lukas Straub <lukasstraub2@web.de>
+To: qemu-devel <qemu-devel@nongnu.org>
+Subject: [PATCH v9 0/8] Introduce 'yank' oob qmp command to recover from
+ hanging qemu
+Message-ID: <cover.1603909658.git.lukasstraub2@web.de>
 MIME-Version: 1.0
-In-Reply-To: <b412ee07-d274-4e0d-bb1c-81b53653cbb2@redhat.com>
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
+Content-Type: multipart/signed; boundary="Sig_/_oPfq+.m_5Lj0FzweqS5Yxi";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Provags-ID: V03:K1:/s/RacI4fl1qMJ0VaH2npnWHP0WTk0xRU27MrMq7WvDDpBnPdwj
+ ipjzzceEokmZ4poXMwLeoAKZku2R7IKcslCPygYLFea2FMw+rgwQDNjQ6R3rXDWZOfQx2mo
+ UaewMn13jRSWX6Aq0adsSJ8U9sRPVYzMMgE8Hv2otJAXK/vFiZY3dpkmrv/UChEZrPh7RlN
+ 1Tl2rX7qTy9bOA0eguLDg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:qSohH+QEI9I=:TOyVKACfAr4zd7CK3NGN4i
+ l9jE6R534yNQUpFcTAD61cKBm3V7hRETLMabXpFZBep9XPj0c+LuCKgH9OWDF5WtG9YkLAc+K
+ JEuWgML94u8kesdb7hbwWUxsUY+cfdudsb9dMbavWY5waYJ2/ChvL6sRVrzd65nLBqoBnWffJ
+ cnfXCEq3Vw6hKD/cD82E/gLaVlMNG87KDjVuiA/TIZjq9llz90whWx7oBTNpQWjTVB14P06jm
+ fbvSIrjbBMaCrYeABjZwVZv1soHzgvyrJeBDJHCnPd6tKXmSKgihbZ0a+ak7/bV77tbYGaM6c
+ 6/3HxrUzmpDNP1aKaVitiF2zwBAEQ40YeEnqurLf5Pi7/sdWPxpG6x4cg9rLRD9/17rYbmynM
+ NwKTpsTIi//yabGAxRjZ1cLNQO4QmVOvUbYXFrXELIW3VzbtH8pNhmq0GkseYz/uPgW6+LjO/
+ aXUmt3Gx33B+srIWvGS6i0ugLl87Krdly+SBASBDVHS3pDr4AERqc6UxWW8ZN/HB3uL+mX96p
+ X3o/nElJ76jVQti8C6+sDwqG7e/QTnCRGlE8aKUDROqnwMcHXUeAkpQYIgKfcLRVm2DnxbZHS
+ 6ppInP6NGCgaYm7h7Z3wMguZnfXDu+3Nk1GxS/dit2dkUD0KXqv/K0iU3hltY82R8Ifpi0PxG
+ R4cQvVr+mojJXA2B7PzmuXcSFtsQH5VLmQp3LXSz3tFYlnJmK5BKpvDd+H0sW4/Bksjr4d9a3
+ kGrpgbjkEMH4nwcu/SmIixsx6G2u8rHHl4Y9LbX6GgOguNUvGkPDfuWRa12K/qjRKlcwI5Ox2
+ n+fknuUEFT3nGZoDHXOkF735fjeneuR+jSw6gAK9WKZxG2DeTPIw51040CyHPnRoU8ezTzDn/
+ 5v59fvD5LFRrxy1cGAVw==
+Received-SPF: pass client-ip=217.72.192.78; envelope-from=lukasstraub2@web.de;
+ helo=mout.web.de
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 13:12:59
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+X-Spam_score_int: -24
+X-Spam_score: -2.5
+X-Spam_bar: --
+X-Spam_report: (-2.5 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ FREEMAIL_ENVFROM_END_DIGIT=0.25, FREEMAIL_FROM=0.001, RCVD_IN_DNSWL_LOW=-0.7,
+ RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -101,95 +94,152 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: Kevin Wolf <kwolf@redhat.com>,
+ "Daniel P. =?UTF-8?B?QmVycmFuZ8Op?=" <berrange@redhat.com>,
+ qemu-block <qemu-block@nongnu.org>, Juan Quintela <quintela@redhat.com>,
+ Markus Armbruster <armbru@redhat.com>, "Dr. David Alan
+ Gilbert" <dgilbert@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ =?UTF-8?B?TWFyYy1BbmRy?= =?UTF-8?B?w6k=?= Lureau <marcandre.lureau@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 10:54 AM, Thomas Huth wrote:
-> On 28/10/2020 14.23, John Snow wrote:
->> On 10/28/20 2:19 AM, Thomas Huth wrote:
->>> On 27/10/2020 23.38, John Snow wrote:
->>>> Try using pytest to manage our various tests; even though right now
->>>> they're only invoking binaries and not really running any python-native
->>>> code.
->>>>
->>>> Create tests/, and add test_lint.py which calls out to mypy, flake8,
->>>> pylint and isort to enforce the standards in this directory.
->>>>
->>>> Add pytest to the setup.cfg development dependencies; add a pytest
->>>> configuration section as well; run it in verbose mode.
->>>>
->>>> Finally, add pytest to the Pipfile environment and lock the new
->>>> dependencies. (Note, this also updates an unrelated dependency; but the
->>>> only way to avoid this is to pin that dependency at a lower version --
->>>> which there is no reason to do at present.)
->>>>
->>>> Provided you have the right development dependencies (mypy, flake8,
->>>> isort, pylint, and now pytest) You should be able to run "pytest" from
->>>> the python folder to run all of these linters with the correct
->>>> arguments.
->>>>
->>>> Signed-off-by: John Snow <jsnow@redhat.com>
->>>> ---
->>>>    python/Pipfile.lock       | 71 ++++++++++++++++++++++++++++++++++++---
->>>>    python/setup.cfg          |  5 +++
->>>>    python/tests/test_lint.py | 28 +++++++++++++++
->>>>    3 files changed, 99 insertions(+), 5 deletions(-)
->>>>    create mode 100644 python/tests/test_lint.py
->>>>
->>>> diff --git a/python/Pipfile.lock b/python/Pipfile.lock
->>>> index 05077475d750..105ffbc09a8e 100644
->>>> --- a/python/Pipfile.lock
->>>> +++ b/python/Pipfile.lock
->>>> @@ -30,6 +30,14 @@
->>>>                "markers": "python_version >= '3.5'",
->>>>                "version": "==2.4.2"
->>>>            },
->>>> +        "attrs": {
->>>> +            "hashes": [
->>>> +
->>>> "sha256:26b54ddbbb9ee1d34d5d3668dd37d6cf74990ab23c828c2888dccdceee395594",
->>>> +
->>>> "sha256:fce7fc47dfc976152e82d53ff92fa0407700c21acd20886a13777a0d20e655dc"
->>>> +            ],
->>>> +            "markers": "python_version >= '2.7' and python_version not
->>>> in '3.0, 3.1, 3.2, 3.3'",
->>>
->>> Can't you simply use "python_version >= '3.6'" instead?
->>>
->>>    Thomas
->>>
->>
->> This file is generated; I don't really actually know what these markers mean
->> or to whom. I can't edit it because it's checksummed.
-> 
-> If the file is only generated, why do we need that in the repository? ...
-> that only calls for trouble if other people try to apply changes here...
+--Sig_/_oPfq+.m_5Lj0FzweqS5Yxi
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Because it is generated with respect to a given point in time; this 
-specifies the exact loadout of packages that will be used to run the linter.
+Hello Everyone,
+I finally found time again to work on this, so here is v9 with the new qmp =
+api.
+We still need ACKs from NBD and chardev maintainers.
 
-If you remove it, every time you run "pipenv lock" again, it will use 
-newer and newer packages each time ... which defeats the purpose of 
-having a lockfile to begin wtih.
+Changes:
 
-The intention is that this lockfile only gets updated as an intentional 
-action; using newer dependencies and so on for the test environment is a 
-conscious action.
+v9:
+ -rebase onto master
+ -implemented new qmp api as proposed by Markus
 
-You are free to use the latest and greatest packages yourself if you 
-choose; just skip the venv step -- but then you're on your own for 
-making sure that environment works. *this* environment receives my 
-full-throated support. The tests will and must pass on *this* environment.
+v8:
+ -add Reviewed-by and Acked-by tags
+ -rebase onto master
+  -minor change to migration
+  -convert to meson
+ -change "Since:" to 5.2
+ -varios code style fixes (Markus Armbruster)
+ -point to oob restrictions in comment to yank_register_function
+  (Markus Armbruster)
+ -improve qmp documentation (Markus Armbruster)
+ -document oob suitability of qio_channel and io_shutdown (Markus Armbruste=
+r)
 
---js
+v7:
+ -yank_register_instance now returns error via Error **errp instead of abor=
+ting
+ -dropped "chardev/char.c: Check for duplicate id before  creating chardev"
 
+v6:
+ -add Reviewed-by and Acked-by tags
+ -rebase on master
+ -lots of changes in nbd due to rebase
+ -only take maintainership of util/yank.c and include/qemu/yank.h (Daniel P=
+. Berrang=C3=A9)
+ -fix a crash discovered by the newly added chardev test
+ -fix the test itself
+
+v5:
+ -move yank.c to util/
+ -move yank.h to include/qemu/
+ -add license to yank.h
+ -use const char*
+ -nbd: use atomic_store_release and atomic_load_aqcuire
+ -io-channel: ensure thread-safety and document it
+ -add myself as maintainer for yank
+
+v4:
+ -fix build errors...
+
+v3:
+ -don't touch softmmu/vl.c, use __contructor__ attribute instead (Paolo Bon=
+zini)
+ -fix build errors
+ -rewrite migration patch so it actually passes all tests
+
+v2:
+ -don't touch io/ code anymore
+ -always register yank functions
+ -'yank' now takes a list of instances to yank
+ -'query-yank' returns a list of yankable instances
+
+Overview:
+Hello Everyone,
+In many cases, if qemu has a network connection (qmp, migration, chardev, e=
+tc.)
+to some other server and that server dies or hangs, qemu hangs too.
+These patches introduce the new 'yank' out-of-band qmp command to recover f=
+rom
+these kinds of hangs. The different subsystems register callbacks which get
+executed with the yank command. For example the callback can shutdown() a
+socket. This is intended for the colo use-case, but it can be used for other
+things too of course.
+
+Regards,
+Lukas Straub
+
+Lukas Straub (8):
+  Introduce yank feature
+  block/nbd.c: Add yank feature
+  chardev/char-socket.c: Add yank feature
+  migration: Add yank feature
+  io/channel-tls.c: make qio_channel_tls_shutdown thread-safe
+  io: Document qmp oob suitability of qio_channel_shutdown and
+    io_shutdown
+  MAINTAINERS: Add myself as maintainer for yank feature
+  tests/test-char.c: Wait for the chardev to connect in
+    char_socket_client_dupid_test
+
+ MAINTAINERS                   |   6 +
+ block/nbd.c                   | 154 ++++++++++++++----------
+ chardev/char-socket.c         |  35 ++++++
+ include/io/channel.h          |   5 +-
+ include/qemu/yank.h           |  95 +++++++++++++++
+ io/channel-tls.c              |   6 +-
+ migration/channel.c           |  13 +++
+ migration/migration.c         |  25 ++++
+ migration/multifd.c           |  10 ++
+ migration/qemu-file-channel.c |   7 ++
+ migration/savevm.c            |   6 +
+ qapi/misc.json                | 106 +++++++++++++++++
+ tests/test-char.c             |   1 +
+ util/meson.build              |   1 +
+ util/yank.c                   | 213 ++++++++++++++++++++++++++++++++++
+ 15 files changed, 619 insertions(+), 64 deletions(-)
+ create mode 100644 include/qemu/yank.h
+ create mode 100644 util/yank.c
+
+--
+2.20.1
+
+--Sig_/_oPfq+.m_5Lj0FzweqS5Yxi
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEg/qxWKDZuPtyYo+kNasLKJxdslgFAl+ZvDUACgkQNasLKJxd
+sljedRAAqKeVF32TpQoDDDz7a1z2pKzwH+Gj3AgoerwA+Pny0qmwnI/pOttBIuYi
+LpTArSjsq/jlL2iAaaZjK/pRLzWV2l//3E8Q9w2/v4TY3PFR0I1qUB1XB5fdhCQW
+0l9LiLJhxb3lQE5q34MumL/McDyFlMEo+ouF8CiAzWZxkotkHYdzy1peYMTH54Nw
+y14sIorH8jPP7LPfCvcKKIglzpE6zyAqWCX6UI2yYO4d+3/vP+kQMDnd9pBb6bGk
+wUzKY86rC/Dj27BEh2XXKBOJw6PPh8QHQyW/PdgHOB87bihi9Q2QllGgxQ2u/ljB
+L7/Re+gYkHpXYTkHbIv6AtWUby1dC0EHG+l1ERot8JLTVcqJHbtuQKZyFOEfi0UE
+V8HogptyjXlwpBzobebAOK5E57mmEmNGBAfcnt+Bd+T7+XJjB9mGoKtii4iKv1q4
+W/rX8Z7xnxAILQA7D5DSLHUKxJsPAZVS4So09anszIkOO2IbAdAeKHPWCJ1lBM7q
+JBVvZkzELjzmfXBXEu9l91l9T49kYCjrmUNQSMngm75C5goBSu54pKSIEOYvXWux
+Fg1FGDo4yDw30IUFUAt+i/f3Vt9G7oIBMq13/6iLJFmLx24K7qTttT6n3izMg/RS
+BIzJX7NKTizLVa66bJF8Kzw7PvVCRnG5lenMqLCbA43LmvlCX40=
+=FaIK
+-----END PGP SIGNATURE-----
+
+--Sig_/_oPfq+.m_5Lj0FzweqS5Yxi--
 
