@@ -2,75 +2,74 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71779C55178
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:25:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41279C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:27:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B561724726
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:25:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 7056524726
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:27:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5vWDPLj"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B561724726
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S3ZDxT86"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7056524726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40118 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43452 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXkVy-0001qE-Jp
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 08:25:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60764)
+	id 1kXkXt-0003KK-Cf
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 08:27:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60746)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXkTy-0000lR-RH
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41046)
+ id 1kXkTx-0000kr-Rw
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:14 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:42955)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXkTu-0006Ot-6c
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:14 -0400
+ id 1kXkTs-0006Nr-Rt
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:12 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603887789;
+ s=mimecast20190719; t=1603887787;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=MXQO6TN//k8jfeTrEZyn8Ixy+M4HQxU/AsAODf+lPQI=;
- b=W5vWDPLjRjOIdx2O3QIUhvXdSwy/6cOQaA8u9BSwSO2tvWrqya5uHHGn/ewuRFMwuoIjaZ
- JGLVssS88+a1wCehhMTO5/MdtYXmEz6K2M4OBN/ILHT5ku/pxQ/vS2Ic/sZzJIS4yUjzid
- 7yDYhhk+KOYRLBko8tbQijOSzBpTo3Y=
+ bh=0c5jaeqAvJsqOLHk0lDGUfMD/ynsKF4v7cKOINcz95E=;
+ b=S3ZDxT86Z+MTlc05dnWRqazOr5JhdlkiftQfQYTnLoIXsSg28d/2UsHM1ZL59CRTxBASHa
+ 9bbs6kG1t2KAee0hLp/cjheYgCOvaeC+GqMIT2Ma4zP9KVlLoDDRhAgzS/k02hiLosdgSC
+ EuoPpWgE6pkt56yEjypjIGx8tos2RJ4=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-431-dL1Gm537PbaGD-5KbL8Q5Q-1; Wed, 28 Oct 2020 08:23:06 -0400
-X-MC-Unique: dL1Gm537PbaGD-5KbL8Q5Q-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-303-MuybuRicNhaN5883EcisdA-1; Wed, 28 Oct 2020 08:23:05 -0400
+X-MC-Unique: MuybuRicNhaN5883EcisdA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
+ [10.5.11.11])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93D371009E22;
- Wed, 28 Oct 2020 12:23:05 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 1E005640AA;
+ Wed, 28 Oct 2020 12:23:04 +0000 (UTC)
 Received: from localhost (ovpn-115-29.ams2.redhat.com [10.36.115.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3567A5C1D7;
- Wed, 28 Oct 2020 12:23:05 +0000 (UTC)
-Date: Wed, 28 Oct 2020 12:23:00 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B519C5B4C5;
+ Wed, 28 Oct 2020 12:23:03 +0000 (UTC)
+Date: Wed, 28 Oct 2020 12:05:34 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Greg Kurz <groug@kaod.org>
-Subject: Re: [PATCH] block: Move bdrv_drain_all_end_quiesce() to block_int.h
-Message-ID: <20201028122300.GA231368@stefanha-x1.localdomain>
-References: <160387245480.131299.13430357162209598411.stgit@bahia>
+To: Joelle van Dyne <j@getutm.app>
+Subject: Re: [PATCH v3 0/7] iOS and Apple Silicon host support
+Message-ID: <20201028120534.GL221115@stefanha-x1.localdomain>
+References: <20201028030701.14086-1-j@getutm.app>
 MIME-Version: 1.0
-In-Reply-To: <160387245480.131299.13430357162209598411.stgit@bahia>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201028030701.14086-1-j@getutm.app>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
+ protocol="application/pgp-signature"; boundary="6CXocAQn8Xbegyxo"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -95,49 +94,74 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
- Max Reitz <mreitz@redhat.com>
+Cc: Peter Maydell <peter.maydell@linaro.org>, qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---BXVAT5kNtrzKuDFl
+--6CXocAQn8Xbegyxo
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 28, 2020 at 09:07:34AM +0100, Greg Kurz wrote:
-> This function is really an internal helper for bdrv_close(). Update its
-> doc comment to make this clear and make the function private.
+On Tue, Oct 27, 2020 at 08:06:54PM -0700, Joelle van Dyne wrote:
+> Based-on: 20201026191540.12434-1-j@getutm.app
+> ([PATCH RESEND 0/4] Mirror map JIT memory for TCG)
 >=20
-> Signed-off-by: Greg Kurz <groug@kaod.org>
-> ---
+> These set of changes brings QEMU TCG to iOS devices and future Apple Sili=
+con
+> devices. They were originally developed last year and have been working i=
+n the
+> UTM app. Recently, we ported the changes to master, re-wrote a lot of the=
+ build
+> script changes for meson, and broke up the patches into more distinct uni=
+ts.
 >=20
-> As suggested by Stefan here:
+> A summary of the changes:
 >=20
-> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg08235.html
-> ---
->  include/block/block.h     |    6 ------
->  include/block/block_int.h |    9 +++++++++
->  2 files changed, 9 insertions(+), 6 deletions(-)
+> * `CONFIG_IOS` defined when building for iOS and iOS specific changes (as=
+ well
+>   as unsupported code) are gated behind it.
+> * A new dependency, libucontext is added since iOS does not have native u=
+context
+>   and broken support for sigaltstack. libucontext is available as a new o=
+ption
+>   for coroutine backend.
+> * On stock iOS devices, there is a workaround for running JIT code withou=
+t
+>   any special entitlement. It requires the JIT region to be mirror mapped=
+ with
+>   one region RW and another one RX. To support this style of JIT, TCG is =
+changed
+>   to support writing to a different code_ptr. This change is submitted in=
+ a
+>   different patch set and this one depends on it.
+> * For (recent) jailbroken iOS devices as well as upcoming Apple Silicon d=
+evices,
+>   there are new rules for applications supporting JIT (with the proper
+>   entitlement). These rules are implemented as well.
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+These patches are in pretty good shape. I have posted comments, the main
+request is to add a ./MAINTAINERS file entry and to look into continuous
+integration support.
 
---BXVAT5kNtrzKuDFl
+Stefan
+
+--6CXocAQn8Xbegyxo
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+ZYqQACgkQnKSrs4Gr
-c8jeKgf/dA86Xawj0UsWY72G7d0LNKTckQ6O14he8w1uGXZ4wbFfQu3KDylCG/UV
-ciO2crCLYbbPk5rUJqzCb60spBnYL/lXKmV49+wAY1z5VvujbBGNoqhWkmBRZGZk
-NAtHlmOyvVYoDhP/H9g1+tIQ1TQZdmr3p6MvxQx8SRJUZIzp2m6yFQceOEfKOHM3
-X3R3KmVM6dDTLyMfIJugErdR0ox/JFim2huNVZB7dis/YNtBzOdeE2xo9rMfxMyr
-e3b2gXlv4rW1GfY9H4Mk9peun8K34KhqvepeufKs/b67I1m4y23eiZDrbfde0GhD
-0hYNoIDTDt+v56+KGPiaPLAn7sCNcQ==
-=kCfw
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+ZXo4ACgkQnKSrs4Gr
+c8h7/QgAhOzqJ/XbcYPXtM4++GUU+mzrdPHDtR+7oJsl8l4hQLSpOSdbwdj8VX8A
+1sBDiqfh/V+YX9LsxDZqDfu8+brE2nw78tHeCaF4MV0wQa96cvoKycHqz8+wRNH8
+cy0PnjVl24OeOIvNaJttd0Ig70ntWXIwag3RfZNDudOb8lzEoxgKlF9LQyLv345Y
+Y0nXHKm1a3hq+M28AdgBwRaJTuUHAVdiU5WngNjbPT7LMoiIWIODEEPQUZqgnnMS
+5MWWzXc80fSTYxW5PnllhUdW6IdkYYgHc5fe9jDBqJobKxfMkmtIELXI10/u4hyJ
+5MdNSI3ExWzo/zc6PJLm6dblL2pcRQ==
+=x2kV
 -----END PGP SIGNATURE-----
 
---BXVAT5kNtrzKuDFl--
+--6CXocAQn8Xbegyxo--
 
 
