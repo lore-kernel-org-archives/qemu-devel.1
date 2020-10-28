@@ -2,91 +2,62 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E39BC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:44:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD891C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:47:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6B7F24724
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:44:40 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hczUT6Ud"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6B7F24724
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	by mail.kernel.org (Postfix) with ESMTPS id 15F4524724
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:47:16 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 15F4524724
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47164 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:50634 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXlkl-0007zP-LG
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:44:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49124)
+	id 1kXlnG-0001AO-WA
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:47:15 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49738)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXliy-0006kQ-4T
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:42:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39238)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <jsnow@redhat.com>) id 1kXliv-0001pn-Vr
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:42:47 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603892564;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=12IiGUK/zrgChLFiT0P+1O+RKcH9s2ZYxRZ9De0Ud+c=;
- b=hczUT6UdSXOrWw1oCk2muvxbdTQdh8BhOole/gszASCpRq+tLwBKgqmv9qCPnC3XH3ugY3
- oPlLCbWC81e/GwR2P/4H2FA0pbhCkEz8gCgZ4pT91WKNar8wRDAvWY+mJ9KMim0EN9OFYq
- a7ttze6GiRIXjCfQ22ZUjRgfh62XMJk=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-591-KPb27sq5PfqiBcAATs56Sg-1; Wed, 28 Oct 2020 09:42:42 -0400
-X-MC-Unique: KPb27sq5PfqiBcAATs56Sg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
- [10.5.11.14])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6E03764152;
- Wed, 28 Oct 2020 13:42:41 +0000 (UTC)
-Received: from [10.10.118.238] (ovpn-118-238.rdu2.redhat.com [10.10.118.238])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 3B0F15D9EF;
- Wed, 28 Oct 2020 13:42:37 +0000 (UTC)
-Subject: Re: [PATCH 2/5] python: add excluded dirs to flake8 config
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201027223815.159802-1-jsnow@redhat.com>
- <20201027223815.159802-3-jsnow@redhat.com>
- <da8e8e7f-18cb-7fc1-955f-c3f73d9a3260@redhat.com>
-From: John Snow <jsnow@redhat.com>
-Message-ID: <4efc2369-0dbe-238e-a4c4-8897a75e76ca@redhat.com>
-Date: Wed, 28 Oct 2020 09:42:36 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.3.1
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kXllc-0008WC-5H; Wed, 28 Oct 2020 09:45:32 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2305)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <alex.chen@huawei.com>)
+ id 1kXllZ-00026S-BG; Wed, 28 Oct 2020 09:45:31 -0400
+Received: from DGGEMS406-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CLqZq4VKHzkXqQ;
+ Wed, 28 Oct 2020 21:45:23 +0800 (CST)
+Received: from [10.174.187.138] (10.174.187.138) by
+ DGGEMS406-HUB.china.huawei.com (10.3.19.206) with Microsoft SMTP Server id
+ 14.3.487.0; Wed, 28 Oct 2020 21:45:11 +0800
+Message-ID: <5F9975E7.6030509@huawei.com>
+Date: Wed, 28 Oct 2020 21:45:11 +0800
+From: AlexChen <alex.chen@huawei.com>
+User-Agent: Mozilla/5.0 (Windows NT 6.2; WOW64;
+ rv:17.0) Gecko/20130509 Thunderbird/17.0.6
 MIME-Version: 1.0
-In-Reply-To: <da8e8e7f-18cb-7fc1-955f-c3f73d9a3260@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=jsnow@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=jsnow@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+To: <alex.bennee@linaro.org>, <mjt@tls.msk.ru>, Laurent Vivier
+ <laurent@vivier.eu>
+Subject: [PATCH 1/2] plugins: Fix resource leak in connect_socket()
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.187.138]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190; envelope-from=alex.chen@huawei.com;
+ helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 09:45:22
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
+X-Spam_bar: ----
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -100,58 +71,32 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>,
- =?UTF-8?Q?Daniel_P_=2e_Berrang=c3=a9?= <berrange@redhat.com>,
- Eduardo Habkost <ehabkost@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Cleber Rosa <crosa@redhat.com>,
- =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
+Cc: qemu-trivial@nongnu.org, zhengchuan@huawei.com, qemu-devel@nongnu.org,
+ zhang.zhanghailiang@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On 10/28/20 4:50 AM, Philippe Mathieu-Daudé wrote:
-> On 10/27/20 11:38 PM, John Snow wrote:
->> Following patches make obvious that we ought to ignore certain
->> directories to avoid wildly erroneous flake8 output.
->>
->> Signed-off-by: John Snow <jsnow@redhat.com>
->> ---
->>   python/setup.cfg | 2 ++
->>   1 file changed, 2 insertions(+)
->>
->> diff --git a/python/setup.cfg b/python/setup.cfg
->> index cb696291ba38..d0ad683b5148 100644
->> --- a/python/setup.cfg
->> +++ b/python/setup.cfg
->> @@ -30,6 +30,8 @@ devel =
->>   
->>   [flake8]
->>   extend-ignore = E722  # Prefer pylint's bare-except checks to flake8's
->> +exclude = __pycache__,
->> +          .venv,
-> 
-> Can we make flake8 aware the files are in a git repository instead?
-> 
+Close the fd when connect() fails.
 
-Long story short, no.
+Reported-by: Euler Robot <euler.robot@huawei.com>
+Signed-off-by: AlexChen <alex.chen@huawei.com>
+---
+ contrib/plugins/lockstep.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Python tooling copies source out of git for many reasons -- during 
-installation, packaging, etc -- and it loses git metadata.
+diff --git a/contrib/plugins/lockstep.c b/contrib/plugins/lockstep.c
+index a696673dff..319bd44b83 100644
+--- a/contrib/plugins/lockstep.c
++++ b/contrib/plugins/lockstep.c
+@@ -292,6 +292,7 @@ static bool connect_socket(const char *path)
 
-This is why I have a VERSION file in this directory, too. I have no 
-access to the git tags from within the python packaging ecosystem.
+     if (connect(fd, (struct sockaddr *)&sockaddr, sizeof(sockaddr)) < 0) {
+         perror("failed to connect");
++        close(fd);
+         return false;
+     }
 
---js
-
-> Anyway,
-> Reviewed-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-> 
->>   
->>   [mypy]
->>   strict = True
->>
-> 
-
+-- 
+2.19.1
 
