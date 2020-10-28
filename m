@@ -2,89 +2,93 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7735DC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:25:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 064D7C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:45:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7DDBA247F8
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:25:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 1E038247E4
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:45:24 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bTdcAyfC"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7DDBA247F8
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zeafB7Z4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1E038247E4
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:45640 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:58738 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXpCU-000730-Ae
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:25:30 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:41556)
+	id 1kXpVj-0005gI-Hc
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:45:23 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56422)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kXokA-0008Df-Vt
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:56:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38547)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <berrange@redhat.com>)
- id 1kXok9-00036A-1g
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:56:14 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603904172;
- h=from:from:reply-to:reply-to:subject:subject:date:date:
- message-id:message-id:to:to:cc:cc:mime-version:mime-version:
- content-type:content-type:in-reply-to:in-reply-to:  references:references;
- bh=q7TZAehIrdCEJ9+4mHgX3xlBDF7paRK7s0Codndu2Vc=;
- b=bTdcAyfCKbjlayChYD07EO++5bg4lTcAbiRXg+xtVyFEarVvjznHZMr4v49ytNQDnLQFvl
- iKX+mmlCijXRcULKfvboF7gEbWqIHJs82UcI7c81qpU+hSsaDc8gi34sMYob5r4nNA2eNZ
- War653go2Z7FZcGorvCWooDzBReGxu0=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-425-LiVxcT87NrO1UQ2bSiDDdQ-1; Wed, 28 Oct 2020 12:56:05 -0400
-X-MC-Unique: LiVxcT87NrO1UQ2bSiDDdQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 13B5D8DBCD2
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 16:55:42 +0000 (UTC)
-Received: from redhat.com (ovpn-114-125.ams2.redhat.com [10.36.114.125])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id 0861E73661;
- Wed, 28 Oct 2020 16:55:40 +0000 (UTC)
-Date: Wed, 28 Oct 2020 16:55:38 +0000
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Igor Mammedov <imammedo@redhat.com>
-Subject: Re: [PATCH 04/29] vl: remove bogus check
-Message-ID: <20201028165538.GB4208@redhat.com>
-References: <20201027182144.3315885-1-pbonzini@redhat.com>
- <20201027182144.3315885-5-pbonzini@redhat.com>
- <20201028174857.59e2242e@redhat.com>
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kXpUf-0005Cs-7X
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 13:44:17 -0400
+Received: from mail-wr1-x442.google.com ([2a00:1450:4864:20::442]:43101)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
+ id 1kXpUc-0001UE-OZ
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 13:44:16 -0400
+Received: by mail-wr1-x442.google.com with SMTP id g12so6608259wrp.10
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 10:44:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YAl0tecVsURCuewdLjQ48RaCrF96ohlsENSIUfpsU+w=;
+ b=zeafB7Z4qJnIB81bJuKqrWyMO9ds5lDP45CKMEw/pVonwKm9jJoDyipd2H3Vc+mIDd
+ 2TKaS8P/pMN1ta1Letyd3LaSmJzn9UmePXvDdcM9gP7wyfaCO0OoNAqNi7MhEYY2hvlE
+ wn2dugs4oD/TNrUzhgBHo79XxSxR+3Fme57x5yWtFr3WksdfLEeu3SK5r6xrVaUnA+Ij
+ rXw2stqIYJj813rwwTXgDnkGdUyC2/vQFSSecLN2D6JQwTuhLJDvU7/T0PwbBnDpaz5x
+ FdHjmjsQkKB3lBqpPZJz4p3gQXTawl7x3qiYhlwGLR031uQS5i3qtFFCh8LpzPDPpwoy
+ JPMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=YAl0tecVsURCuewdLjQ48RaCrF96ohlsENSIUfpsU+w=;
+ b=MwwUwjR0SC9J7+RgAn3sy2WyMK2S1XE/KzASAiPom09i63anoSumoueWJmlfgLrQKE
+ alUBIc7/l1TIxXR2/sSpB36DI8z5d0eNRVjfQ3eqfIbcyAmXS4HHoBpwgllaQYYq+I7K
+ UxMSYXqw1BNtybZTKgb9thZQlQHawfKPjD0FKLeJpfxnMcts/md2+GdF1yNgjX4E0hq2
+ Dx0T+wGDVhlimkLOWXo/Ts1ZesadpmiBvA9XlF8AnBZ6FtMexm2UUlXTsrTBmQfagiuR
+ JKw3rZJ0pmC4Uv5bZJyFUum9HznJ3JK6TPjX8e9HBnu0WeLSU1gK2rAgRRQB3HhuUCv/
+ AGvA==
+X-Gm-Message-State: AOAM532v4n3QRTDlKoq8kOHV3zGlwfK2z4wCQPrhk/dk4hnAC8pp7N6U
+ hYQcMOeLGnv0XzWpyFQv90F4uQ==
+X-Google-Smtp-Source: ABdhPJxtamYIDVXm4aGyKgQ9cjhesv/FKnN4U2mpSB4roy/h9H0baZIpnVLxCyBEEchu2j6Kvww+UA==
+X-Received: by 2002:a5d:4051:: with SMTP id w17mr531965wrp.24.1603907050586;
+ Wed, 28 Oct 2020 10:44:10 -0700 (PDT)
+Received: from zen.linaroharston ([51.148.130.216])
+ by smtp.gmail.com with ESMTPSA id f13sm438798wrp.12.2020.10.28.10.44.09
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Oct 2020 10:44:09 -0700 (PDT)
+Received: from zen.lan (localhost [127.0.0.1])
+ by zen.linaroharston (Postfix) with ESMTP id 5827D1FF7E;
+ Wed, 28 Oct 2020 17:44:08 +0000 (GMT)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Subject: [PATCH] meson.build: fix building of Xen support for aarch64
+Date: Wed, 28 Oct 2020 17:44:06 +0000
+Message-Id: <20201028174406.23424-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
-In-Reply-To: <20201028174857.59e2242e@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=berrange@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Received-SPF: pass client-ip=216.205.24.124; envelope-from=berrange@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::442;
+ envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x442.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,59 +101,43 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-devel@nongnu.org
+Cc: Stefano Stabellini <sstabellini@kernel.org>,
+ Masami Hiramatsu <masami.hiramatsu@linaro.org>, Paul Durrant <paul@xen.org>,
+ Anthony Perard <anthony.perard@citrix.com>, xen-devel@lists.xenproject.org,
+ =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Wed, Oct 28, 2020 at 05:48:57PM +0100, Igor Mammedov wrote:
-> On Tue, 27 Oct 2020 14:21:19 -0400
-> Paolo Bonzini <pbonzini@redhat.com> wrote:
-> 
-> > There is no reason to prevent -preconfig -daemonize.  Of course if
-> > no monitor is defined there will be no way to start the VM,
-> > but that is a user error.
-> 
-> it was related to how libvirt starts QEMU but I don't recall why anymore,
-> CCing Daniel
+Xen is supported on aarch64 although weirdly using the i386-softmmu
+model. Checking based on the host CPU meant we never enabled Xen
+support. It would be nice to enable CONFIG_XEN for aarch64-softmmu to
+make it not seem weird but that will require further build surgery.
 
-Libvirt didn't request this to best of my knowledge.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Masami Hiramatsu <masami.hiramatsu@linaro.org>
+Cc: Stefano Stabellini <sstabellini@kernel.org>
+Cc: Anthony Perard <anthony.perard@citrix.com>
+Cc: Paul Durrant <paul@xen.org>
+Fixes: 8a19980e3f ("configure: move accelerator logic to meson")
+---
+ meson.build | 2 ++
+ 1 file changed, 2 insertions(+)
 
-We don't even use -daemonize, so have no reason to ask to forbid
--preconfig with -daemonize.
-
-> 
-> > 
-> > Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> > ---
-> >  softmmu/vl.c | 6 ------
-> >  1 file changed, 6 deletions(-)
-> > 
-> > diff --git a/softmmu/vl.c b/softmmu/vl.c
-> > index 7f39ebdfee..dbb72e621e 100644
-> > --- a/softmmu/vl.c
-> > +++ b/softmmu/vl.c
-> > @@ -4027,12 +4027,6 @@ void qemu_init(int argc, char **argv, char **envp)
-> >      }
-> >  
-> >      if (is_daemonized()) {
-> > -        if (!preconfig_exit_requested) {
-> > -            error_report("'preconfig' and 'daemonize' options are "
-> > -                         "mutually exclusive");
-> > -            exit(EXIT_FAILURE);
-> > -        }
-> > -
-> >          /* According to documentation and historically, -nographic redirects
-> >           * serial port, parallel port and monitor to stdio, which does not work
-> >           * with -daemonize.  We can redirect these to null instead, but since
-> 
-
-Regards,
-Daniel
+diff --git a/meson.build b/meson.build
+index 835424999d..f1fcbfed4c 100644
+--- a/meson.build
++++ b/meson.build
+@@ -81,6 +81,8 @@ if cpu in ['x86', 'x86_64']
+     'CONFIG_HVF': ['x86_64-softmmu'],
+     'CONFIG_WHPX': ['i386-softmmu', 'x86_64-softmmu'],
+   }
++elif cpu in [ 'arm', 'aarch64' ]
++  accelerator_targets += { 'CONFIG_XEN': ['i386-softmmu'] }
+ endif
+ 
+ ##################
 -- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+2.20.1
 
 
