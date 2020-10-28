@@ -2,89 +2,97 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AA22C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:48:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3760BC4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:52:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5271B2469F
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:48:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 46F66246A2
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:52:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KVS8xL/3"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5271B2469F
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRFJaOMi"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 46F66246A2
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=amsat.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:56148 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:32962 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXi3n-0006nK-15
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:48:03 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:55272)
+	id 1kXi7m-0000kQ-PE
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:52:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:56430)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kXi1Z-0005pe-N7
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:45:45 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:34103)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <dgilbert@redhat.com>)
- id 1kXi1X-0000C2-Mh
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:45:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603878342;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- in-reply-to:in-reply-to:references:references;
- bh=kluqitdk8MnQSNGDbj7PupNJGFcy8YFHvTQBgYrAtt0=;
- b=KVS8xL/3mLnGeONnqcMTv5C5BXLM1BIhFrzBivbL0k1vqwqYfValEFCAMwKbyHzSnLNcct
- 2vTfESjSB+os9gS+T5sEiNFHRdB/SbiOHwBHPi61/fr7cHfas5fYRSvbyCuuhDYB47Nrvz
- jQTFU05WIo10CNjD+wD+/elCP37nNJo=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-336-9aM1Ru_UN3CeXIE3KE19HQ-1; Wed, 28 Oct 2020 05:45:40 -0400
-X-MC-Unique: 9aM1Ru_UN3CeXIE3KE19HQ-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 888791005513;
- Wed, 28 Oct 2020 09:45:39 +0000 (UTC)
-Received: from work-vm (ovpn-114-240.ams2.redhat.com [10.36.114.240])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id DD8342C31E;
- Wed, 28 Oct 2020 09:45:30 +0000 (UTC)
-Date: Wed, 28 Oct 2020 09:45:28 +0000
-From: "Dr. David Alan Gilbert" <dgilbert@redhat.com>
-To: Max Reitz <mreitz@redhat.com>
-Subject: Re: [PATCH] Revert series: virtiofsd: Announce submounts to the guest
-Message-ID: <20201028094528.GC3701@work-vm>
-References: <160385090886.20017.13382256442750027666.stgit@gimli.home>
- <20201028075519.GB221115@stefanha-x1.localdomain>
- <4edc7be0-cc34-6ea1-c88b-3b9888089fe2@redhat.com>
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kXi6P-00086M-D3; Wed, 28 Oct 2020 05:50:46 -0400
+Received: from mail-ed1-x542.google.com ([2a00:1450:4864:20::542]:37314)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <philippe.mathieu.daude@gmail.com>)
+ id 1kXi6L-0001zn-DL; Wed, 28 Oct 2020 05:50:45 -0400
+Received: by mail-ed1-x542.google.com with SMTP id o18so4444914edq.4;
+ Wed, 28 Oct 2020 02:50:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
+ h=sender:subject:to:cc:references:from:message-id:date:user-agent
+ :mime-version:in-reply-to:content-language:content-transfer-encoding;
+ bh=7rcqOUgGpPWm5Nn7fhEiGwGbSvogxqhTXe49HW3eu0A=;
+ b=eRFJaOMiRcsTdp2+mrI1pT6j2PrdLz3Of5nKsIaFPYf2yA/tDG1xlzYstYEOlg25JR
+ 7LLpdWD0biBNs6sfOsd7S0Gdj3JLVBUyw2ZnFNdeyIiOwomfetAUMusA+rKdRy3ChxqF
+ MmqejvC7D+ZgKnl/HEQW7d/AFIbKmH3BvDO4mJOsxDpLcmnNUcWcXw0CH8aTdpwf8FXL
+ dHZoNEmZtAq4rm8lRpZ0jHI3mAmDooL4UBIj7wx0hI101BKX1lBpsE/5oS97C+sehSlk
+ RAOn6bl9eiGDs+x9Fly46BZeImxZ+3jQZ6egsFujbtAE2IecY/LDplc9OO6YQsxNlbUH
+ k/oQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:sender:subject:to:cc:references:from:message-id
+ :date:user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=7rcqOUgGpPWm5Nn7fhEiGwGbSvogxqhTXe49HW3eu0A=;
+ b=jv7P9OThdi+B1bCexpPHSEJpTTnY7idN8OnyYrnap1sbBztMtSpjv8lX/5i7AlRnN2
+ hImkH5eW3iIjyPb7iq7MQzcJ4CgIhTCJbtCktZTFCuqMrxqxdb+4K6klvJ/7mR30HJNC
+ e9iH3m/+dFIAg187eT7zwDtgv42I2w1XeJRjBGJ2kbYlSSaILwpY09l7FSsQTTNGVOoZ
+ 5vPe8awlQdD0uDmYFjOwoXTob6xDil9VfMQLaZ7QS4lizotZRmofmakfDheytTZQjOLy
+ DsYQ2MaPOhJKUyCKPRGL0iS/QptOyy17ceAGUKOlaHYOhGLA8pQPjGFk3IBTEWpTsRUp
+ yAnA==
+X-Gm-Message-State: AOAM532VjYeFkAwQ62uQFvXCPL4RKxcUIQFBfv7yc7M7gHaeDpad5dEk
+ OCjQS/t2iZbpUkpXNckZs24=
+X-Google-Smtp-Source: ABdhPJyCSlrwJ6lm2qE1mtTsdLCT3ebz6wpXO8+Kzk/PLCvI0hibJmRiWZm5BO3rRdlnmQkNgAHHfA==
+X-Received: by 2002:aa7:c2c4:: with SMTP id m4mr7165061edp.172.1603878637406; 
+ Wed, 28 Oct 2020 02:50:37 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id k1sm2568021edl.0.2020.10.28.02.50.35
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 28 Oct 2020 02:50:36 -0700 (PDT)
+Subject: Re: [PATCH 5/9] target/sparc/translate: silence the compiler warnings
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
+ <20201028041819.2169003-6-kuhn.chenqun@huawei.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <f4bug@amsat.org>
+Message-ID: <83258829-a9c8-cf82-1e1b-0ce2129701d4@amsat.org>
+Date: Wed, 28 Oct 2020 10:50:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
-In-Reply-To: <4edc7be0-cc34-6ea1-c88b-3b9888089fe2@redhat.com>
-User-Agent: Mutt/1.14.6 (2020-07-11)
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=dgilbert@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=dgilbert@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201028041819.2169003-6-kuhn.chenqun@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=2a00:1450:4864:20::542;
+ envelope-from=philippe.mathieu.daude@gmail.com; helo=mail-ed1-x542.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -36
+X-Spam_score: -3.7
+X-Spam_bar: ---
+X-Spam_report: (-3.7 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FORGED_FROMDOMAIN=0.25,
+ FREEMAIL_FROM=0.001, HEADER_FROM_DIFFERENT_DOMAINS=0.249, NICE_REPLY_A=-2.167,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,53 +105,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: peter.maydell@linaro.org, cjia@nvidia.com, mjrosato@linux.ibm.com,
- Alex Williamson <alex.williamson@redhat.com>, qemu-devel@nongnu.org,
- kwankhede@nvidia.com, Stefan Hajnoczi <stefanha@redhat.com>
+Cc: Artyom Tarasenko <atar4qemu@gmail.com>,
+ Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+ zhang.zhanghailiang@huawei.com, ganqixin@huawei.com,
+ Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-* Max Reitz (mreitz@redhat.com) wrote:
-> On 28.10.20 08:55, Stefan Hajnoczi wrote:
-> > On Tue, Oct 27, 2020 at 08:13:28PM -0600, Alex Williamson wrote:
-> >> This reverts the following commits due to their basis on a bogus
-> >> linux kernel header update:
-> > 
-> > What was the issue? Did the sub-mounts series include kernel header
-> > changes that haven't landed in Linux yet?
+On 10/28/20 5:18 AM, Chen Qun wrote:
+> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
+> target/sparc/translate.c: In function ‘gen_st_asi’:
+> target/sparc/translate.c:2320:12: warning: this statement may fall through [-Wimplicit-fallthrough=]
+>  2320 |         if (!(dc->def->features & CPU_FEATURE_HYPV)) {
+>       |            ^
+> target/sparc/translate.c:2329:5: note: here
+>  2329 |     case GET_ASI_DIRECT:
+>       |     ^~~~
 > 
-> Yes.
+> The "fall through" statement place is not correctly identified by the compiler.
 > 
-> The kernel series was applied, however, Miklos fixed some things in the
-> process, and then Dave applied the virtiofsd series assuming that it
-> would be OK now that the kernel series is in.
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> Cc: Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>
+> Cc: Artyom Tarasenko <atar4qemu@gmail.com>
+> ---
+>  target/sparc/translate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> So what could have gone better is e.g.:
+> diff --git a/target/sparc/translate.c b/target/sparc/translate.c
+> index 1a4efd4ed6..a3d9aaa46b 100644
+> --- a/target/sparc/translate.c
+> +++ b/target/sparc/translate.c
+> @@ -2324,8 +2324,8 @@ static void gen_st_asi(DisasContext *dc, TCGv src, TCGv addr,
+>          }
+>          /* in OpenSPARC T1+ CPUs TWINX ASIs in store instructions
+>           * are ST_BLKINIT_ ASIs */
+> -        /* fall through */
+>  #endif
+> +        /* fall through */
+>      case GET_ASI_DIRECT:
+>          gen_address_mask(dc, addr);
+>          tcg_gen_qemu_st_tl(src, addr, da.mem_idx, da.memop);
 > 
-> (1) I could have marked the virtiofsd series as RFC until I know the
-> definitive state of the kernel series.
-> 
-> (2) I could have given an explicit NAK to the virtiofsd series once I
-> noted that I need to write a v2, and not bury that somewhere deep in the
-> kernel side thread (https://marc.info/?l=fuse-devel&m=160087601428180).
 
-Yeh that one would have been useful.
-Unfortunately Miklos's changes were such that it didn't break your code;
-I did give it a smoke test with 5.10-rc1 and saw that it was doing the submounts OK.
-
-Dave
-
-> (3) I should have noticed Dave applying the virtiofsd series (Monday
-> evening) and intervened.  But my inbox full from PTO plus trying to
-> perhaps get the FUSE export series done for 5.2 led to me just not noticing.
-> 
-> Max
-> 
-
-
-
--- 
-Dr. David Alan Gilbert / dgilbert@redhat.com / Manchester, UK
+Reviewed-by: Philippe Mathieu-Daudé <f4bug@amsat.org>
 
 
