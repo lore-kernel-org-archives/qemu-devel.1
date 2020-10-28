@@ -2,87 +2,89 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C45EEC388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 01:45:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8AB9AC388F9
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 02:03:04 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E00ED22202
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 01:45:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B74202242E
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 02:03:03 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drDiAbTU"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E00ED22202
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bv8B2Kja"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B74202242E
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44746 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60670 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXaWP-00078A-AS
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 21:45:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:42970)
+	id 1kXanm-0006Bu-Dg
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 22:03:02 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47114)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXaVK-0006aY-Cz; Tue, 27 Oct 2020 21:43:58 -0400
-Received: from mail-yb1-xb44.google.com ([2607:f8b0:4864:20::b44]:41112)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXaVI-0005p3-2r; Tue, 27 Oct 2020 21:43:58 -0400
-Received: by mail-yb1-xb44.google.com with SMTP id c129so2921598yba.8;
- Tue, 27 Oct 2020 18:43:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=M1V7yTmf01n72tWMAPoF7C/PVSHWxT2o5lfXqxy5Y0w=;
- b=drDiAbTUHIesFv3cMDUl1WWLhH3LkszjSyLyFhiuho1Ze9BaSG0usrrjjPKPCxmT82
- VWKHMm/O621cBy7H+4mjhsYQUoylzUXKxNDJ1Sl5sM3Via5zBrUo8WyIq1+vftSrYWOS
- roiAhUwc1LygHFBCTRdzZymbkOFLyJ2KBjvz5eLLcAKxlBHYxRLRVIOReQ0a7r3o5Nm+
- b4EmLHp1uB/uBYbSm33B6Jl3B/PvB2VSNWMKTK/OxF3j+zASb+f4+nnxJbQ2lRGi/+Xh
- 3LGwpoI/Ko+DaUmk8XimvIg/wtAbJYCnRr8x0x3tWtF9uFZvqDzLkrcgd3i65PXWS/j/
- Npjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=M1V7yTmf01n72tWMAPoF7C/PVSHWxT2o5lfXqxy5Y0w=;
- b=uB6HcBcvbuU6rJKf3x4WvOPaK5DIlNLpDkjsl2bC7e2BWzHs5XfeeGSn1i3lIZ+Atm
- 3XriknSAg5dv26qYD/8FMR842RxV+PGNFwi/3xDU1AU+HFGHHbzdk0sGWdv4jzbGXySN
- LSbHzESfAPRE7XxHoYbIXGVEBvkj7NbsWt8kRrT8xGep81/82n0KJ0hNYOCbEKgN0bTZ
- DDF+1nPDogkwk4PB7ifdDNrFlPGEH/LHRld5mrtm0OFpsYjBknUi+Q88NNOAP+HZztcO
- bmi2427q0p2eFhmi3UlPKpJYjC7nMKX/AqktaMi1hriOJ1AJoQbuHXcvoChhYmu9afxE
- pgog==
-X-Gm-Message-State: AOAM533DI9Q3dlS//yOIMjDH6E9nJdacxBqtvnV4aeXIxp468s8tMYU3
- wB3EhsXRfzt5vSs9CLZsr1IqOgG1mtERRHPoLoU=
-X-Google-Smtp-Source: ABdhPJzD8sg6kUVWOXrqbIEibHH/UIbA74pZDUl8AH4e/4UbZFuJgW0Bq0nPHKq9a5m0pb2dhfRjDx4zNY91us7I+pY=
-X-Received: by 2002:a25:386:: with SMTP id 128mr7131481ybd.122.1603849434625; 
- Tue, 27 Oct 2020 18:43:54 -0700 (PDT)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kXalT-0003d7-Rk
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 22:00:40 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:31781)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
+ id 1kXalP-0008BH-GR
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 22:00:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603850432;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=pRhEUO5Ihz6qP77sB3vxN1DiM0gFDTeZGt2DR5rUP3U=;
+ b=bv8B2Kjaef6AOJDYwCDY+VRMgolpYwUBwybQfrVciNksQ+hbVccVcv2QahdTXSq/fDwtPF
+ BeXVp+3hVFXaIRbhpK89mvo6yKijFk3EGQ/sg2b+xN0bHTxBEKEFfD4pTqAya+mGYUdkRH
+ o74YQ7aKWtoSlWBCkuZqhrnnvifKoEg=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-590-BgTsJ7CaMEiNhCF7snsE0Q-1; Tue, 27 Oct 2020 22:00:29 -0400
+X-MC-Unique: BgTsJ7CaMEiNhCF7snsE0Q-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F33C761240;
+ Wed, 28 Oct 2020 02:00:26 +0000 (UTC)
+Received: from x1.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71A9019C4F;
+ Wed, 28 Oct 2020 02:00:22 +0000 (UTC)
+Date: Tue, 27 Oct 2020 20:00:21 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Peter Maydell <peter.maydell@linaro.org>
+Subject: Re: [PULL 00/32] VFIO updates 2020-10-26 (for QEMU 5.2 soft-freeze)
+Message-ID: <20201027200021.00fac851@x1.home>
+In-Reply-To: <CAFEAcA8yBrUH-Bqe7oNhBKqtyeUNw0xVA9aKm8DJFE-WLzLTwQ@mail.gmail.com>
+References: <160374054442.22414.10832953989449611268.stgit@gimli.home>
+ <CAFEAcA8yBrUH-Bqe7oNhBKqtyeUNw0xVA9aKm8DJFE-WLzLTwQ@mail.gmail.com>
+Organization: Red Hat
 MIME-Version: 1.0
-References: <20201027141740.18336-1-bmeng.cn@gmail.com>
- <20201027141740.18336-3-bmeng.cn@gmail.com>
- <CAKmqyKMyHCZCLZOqVVZ4n4C0_rAY-WO5-J+Y=dqi0qtZsLXjpw@mail.gmail.com>
-In-Reply-To: <CAKmqyKMyHCZCLZOqVVZ4n4C0_rAY-WO5-J+Y=dqi0qtZsLXjpw@mail.gmail.com>
-From: Bin Meng <bmeng.cn@gmail.com>
-Date: Wed, 28 Oct 2020 09:43:42 +0800
-Message-ID: <CAEUhbmWqoP71uKYRhYdmb=Hxx=FNOYcfL6EkEChn9x1Qq9CddQ@mail.gmail.com>
-Subject: Re: [RESEND PATCH 2/9] hw/riscv: microchip_pfsoc: Connect DDR memory
- controller modules
-To: Alistair Francis <alistair23@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::b44;
- envelope-from=bmeng.cn@gmail.com; helo=mail-yb1-xb44.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124;
+ envelope-from=alex.williamson@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 22:00:32
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -95,84 +97,77 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Bin Meng <bin.meng@windriver.com>,
- "open list:RISC-V" <qemu-riscv@nongnu.org>, Anup Patel <anup.patel@wdc.com>,
- "qemu-devel@nongnu.org Developers" <qemu-devel@nongnu.org>,
- Atish Patra <atish.patra@wdc.com>, Alistair Francis <Alistair.Francis@wdc.com>,
- Ivan Griffin <ivan.griffin@emdalo.com>
+Cc: Artem Polyakov <artemp@nvidia.com>, Zhengui li <lizhengui@huawei.com>,
+ Yan Zhao <yan.y.zhao@intel.com>, Zhi Wang <zhi.wang.linux@gmail.com>,
+ Pierre Morel <pmorel@linux.ibm.com>, Cornelia Huck <cohuck@redhat.com>,
+ Matthew Rosato <mjrosato@linux.ibm.com>,
+ QEMU Developers <qemu-devel@nongnu.org>,
+ Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+ Max Reitz <mreitz@redhat.com>, Eric Auger <eric.auger@redhat.com>,
+ Kirti Wankhede <kwankhede@nvidia.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ Neo Jia <cjia@nvidia.com>, Amey Narkhede <ameynarkhede03@gmail.com>,
+ Philippe =?UTF-8?B?TWF0aGlldS1EYXVkw6k=?= <philmd@redhat.com>, "Dr. David
+ Alan Gilbert" <dgilbert@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi Alistair,
+On Tue, 27 Oct 2020 23:42:57 +0000
+Peter Maydell <peter.maydell@linaro.org> wrote:
 
-On Wed, Oct 28, 2020 at 1:49 AM Alistair Francis <alistair23@gmail.com> wrote:
->
-> On Tue, Oct 27, 2020 at 7:46 AM Bin Meng <bmeng.cn@gmail.com> wrote:
+> On Mon, 26 Oct 2020 at 19:39, Alex Williamson
+> <alex.williamson@redhat.com> wrote:
+> > ----------------------------------------------------------------
+> > VFIO update 2020-10-26
 > >
-> > From: Bin Meng <bin.meng@windriver.com>
-> >
-> > Connect DDR SGMII PHY module and CFG module to the PolarFire SoC.
-> >
-> > Signed-off-by: Bin Meng <bin.meng@windriver.com>
-> > ---
-> >
-> >  hw/riscv/Kconfig                   |  1 +
-> >  hw/riscv/microchip_pfsoc.c         | 18 ++++++++++++++++++
-> >  include/hw/riscv/microchip_pfsoc.h |  5 +++++
-> >  3 files changed, 24 insertions(+)
-> >
-> > diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-> > index 2df978fe8d..c8e50bde99 100644
-> > --- a/hw/riscv/Kconfig
-> > +++ b/hw/riscv/Kconfig
-> > @@ -4,6 +4,7 @@ config IBEX
-> >  config MICROCHIP_PFSOC
-> >      bool
-> >      select CADENCE_SDHCI
-> > +    select MCHP_PFSOC_DMC
-> >      select MCHP_PFSOC_MMUART
-> >      select MSI_NONBROKEN
-> >      select SIFIVE_CLINT
-> > diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-> > index 4627179cd3..85be2bcde8 100644
-> > --- a/hw/riscv/microchip_pfsoc.c
-> > +++ b/hw/riscv/microchip_pfsoc.c
-> > @@ -15,6 +15,7 @@
-> >   * 4) Cadence eMMC/SDHC controller and an SD card connected to it
-> >   * 5) SiFive Platform DMA (Direct Memory Access Controller)
-> >   * 6) GEM (Gigabit Ethernet MAC Controller)
-> > + * 7) DMC (DDR Memory Controller)
-> >   *
-> >   * This board currently generates devicetree dynamically that indicates at least
-> >   * two harts and up to five harts.
-> > @@ -85,7 +86,9 @@ static const struct MemmapEntry {
-> >      [MICROCHIP_PFSOC_MMUART0] =         { 0x20000000,     0x1000 },
-> >      [MICROCHIP_PFSOC_SYSREG] =          { 0x20002000,     0x2000 },
-> >      [MICROCHIP_PFSOC_MPUCFG] =          { 0x20005000,     0x1000 },
-> > +    [MICROCHIP_PFSOC_DDR_SGMII_PHY] =   { 0x20007000,     0x1000 },
-> >      [MICROCHIP_PFSOC_EMMC_SD] =         { 0x20008000,     0x1000 },
-> > +    [MICROCHIP_PFSOC_DDR_CFG] =         { 0x20080000,    0x40000 },
->
-> Neither of these are documented....
+> >  * Migration support (Kirti Wankhede)
+> >  * s390 DMA limiting (Matthew Rosato)
+> >  * zPCI hardware info (Matthew Rosato)
+> >  * Lock guard (Amey Narkhede)
+> >  * Print fixes (Zhengui li)  
+> 
+> I get a conflict here in
+> include/standard-headers/linux/fuse.h:
+> 
+> ++<<<<<<< HEAD
+>  +#define FUSE_ATTR_FLAGS               (1 << 27)
+> ++=======
+> + #define FUSE_SUBMOUNTS                (1 << 27)
+> ++>>>>>>> remotes/awilliam/tags/vfio-update-20201026.0  
+> 
+> I assume these should not both be trying to use the same value,
+> so something has gone wrong somewhere. The conflicting commit
+> now in master is Max's 97d741cc96dd08 ("linux/fuse.h: Pull in from Linux").
+> 
+> Can you sort out the correct resolution between you, please?
+> (My guess is that Max's commit is the erroneous one because
+> it doesn't look like it was created via a standard update
+> from the kernel headers.)
 
-It's documented in the "Register
-Map/PF_SoC_RegMap_V1_1/pfsoc_regmap.htm" in
-https://www.microsemi.com/document-portal/doc_download/1244581-polarfire-soc-register-map
+So as near as I can tell, QEMU commit 97d741cc96dd ("linux/fuse.h: Pull
+in from Linux") is fantasy land.  The only thing I can find of this
+FUSE_ATTR_FLAGS outside Max's QEMU series is this[1] posting where the
+fuse maintainer announces that he's replaced FUSE_ATTR_FLAGS with
+FUSE_SUBMOUNTS, but the usage is "slightly different".  Reading that
+thread, it seems that virtiofsd probably needed an update but I can't
+see that it ever happened.
 
->
-> Maybe just add a single comment above the memory layout clarifying
-> that this is not what is documented from the SoC but is instead based
-> on what guests do?
->
+I'm not comfortable trying to update Max's series to try to determine
+if FUSE_SUBMOUNTS can be interchanged with FUSE_ATTR_FLAGS, where the
+latter appears to be used to express the new field in struct fuse_attr
+exists, but the former appears to be a feature.  My guess would be that
+maybe FUSE_KERNEL_MINOR_VERSION needs to be tested instead for this new
+field??
 
-I can add a link to the Microchip website that documents the memory
-map above the memory layout.
+Anyway, I hate to pull the big hammer, but I think Max's series is
+bogus.  The only thing I can propose is to revert it in its entirety,
+after which this series applies cleanly.  I'll post a patch to do that
+as I think the code currently in master is on pretty shaky ground with
+respect to interpreting flag bits differently from those the kernel
+defines.  Thanks,
 
-> It seems to be a constant problem with this board, unless I am really
-> misreading the memory map.
->
+Alex
 
-Regards,
-Bin
+[1] https://marc.info/?l=fuse-devel&m=160069539811247
+
 
