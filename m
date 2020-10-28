@@ -8,69 +8,70 @@ X-Spam-Status: No, score=-12.3 required=3.0 tests=BAYES_00,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE9C3C55179
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:35:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD8ADC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:38:08 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 5DC4E22267
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:35:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 087ED22267
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 05:38:07 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="rwvHIMb+"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 5DC4E22267
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BPlu3OCe"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 087ED22267
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53808 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:60750 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXe7j-0002OP-CG
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 01:35:51 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:32856)
+	id 1kXe9u-0005OB-Qa
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 01:38:06 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:32844)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXe2z-0005V0-Mf; Wed, 28 Oct 2020 01:30:57 -0400
-Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:39216)
+ id 1kXe2w-0005Ry-RW; Wed, 28 Oct 2020 01:30:54 -0400
+Received: from mail-pf1-x442.google.com ([2607:f8b0:4864:20::442]:44864)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <bmeng.cn@gmail.com>)
- id 1kXe2y-0000jr-2h; Wed, 28 Oct 2020 01:30:57 -0400
-Received: by mail-pf1-x442.google.com with SMTP id e15so2258406pfh.6;
- Tue, 27 Oct 2020 22:30:55 -0700 (PDT)
+ id 1kXe2u-0000hK-WC; Wed, 28 Oct 2020 01:30:54 -0400
+Received: by mail-pf1-x442.google.com with SMTP id 133so2250642pfx.11;
+ Tue, 27 Oct 2020 22:30:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
  h=from:to:cc:subject:date:message-id:in-reply-to:references;
- bh=XybP5xo4qhD8pmZoNkGDTq4nka9pB/45dbl0jm7hTcE=;
- b=rwvHIMb+jQmHAbC/mmzpp1QjH/Wgp0exoRb9q0YL8ObrkizvxGIz1Nkz89RyosUdPT
- AemxRnj7wyJEgixbRsS4FUkGWLjEaLk/GfLF8SJznOM3WjfCxMIpxccZj31WuZt3KdTL
- peoyM/nsadH6Gxl22oZ8Oh+KVjnuNEcCrPMZVNhifcGYuuH7VOFxLuqxslD7ohbuekSE
- kMS3JAUprFQp//5FYNfFe3HCfBuytpA5xyWPi7ZWPQ2cMGre/KyVanyN+wiNHzgtpxco
- KZi6G5fpiAk/SXgfK9pC2RcCyFwxYvmgOfKFWLDKbO6TI6oeF1R4SjnTLeYAy6l2CZz9
- BiFw==
+ bh=cJk2PXs3ei+fFNnPhvTIpdLrXC2ZlfbAh2JlEFUrplA=;
+ b=BPlu3OCevRu9f17xYyd6mt8eCE84NjJFKPylSwJuKggX9GN1c9DYO51qqfYiJFEf2p
+ v4INKjNtvbNSXo7MeJp7g1LPssw6Ib5iUOr21IoA4TxZk/NdYnO2B5CdtHodGJROfAQ3
+ ynu/cRg3slSUvE8StDITc8T6sdgWy7/BfEgumKPfoIt/ps7/ZP513vn9gqW86hme5jFH
+ 2bpfXPymdfVQ3q7GAOa+hNhPxSxlHZwj/f9hBhS93yVcH7Q/7gt6UzzFm7JaLexFpuQc
+ +RVG6TZGnTh4bXxaK+6dDYCj3PhCF8qepw+KxXb9nv+FsJWJ/B1xJcC2hhGe/MAhdDi2
+ ZyWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references;
- bh=XybP5xo4qhD8pmZoNkGDTq4nka9pB/45dbl0jm7hTcE=;
- b=qAI/cS7IPrgcuKRSYMsexRH3jsVFHWEbcGRWDa7elYx+PP1tdSeY/pBwd9vwrTTCFA
- DiYwiOhtTsSqVUWV1Yev2FAXNy92Qp2vfQnJzx6QjPDsmMBbet/fhN1WDY3VjmxBFGiV
- Cj97qU2Id9HoEUdKtqcHIWKVhFAOowY/MQ3almE1M4oFkdmU/x8W+dNZEHY4ecSaYLLN
- oiAIQuz5MQLLTkRC17TPqjMr//mNVxP2hQivWHRvzK9tEJSEz+w/zfJKTKz1ktGsXLMJ
- WBqP0+yjzqdAvNtXpE1AHTIpUeL62Wqp/xbfX/pSXOTb61ILQTa/PRC0qFLwLafzVgBR
- F1Xg==
-X-Gm-Message-State: AOAM533FmbUZTFr6luet9kWwVM5OcKxnCJlsDg44Bof06Bgz19a+7Lba
- eJUKcISVzAYhu80NIjtOVXk=
-X-Google-Smtp-Source: ABdhPJyDWu07WXxcw0JVjxl2C5q4uUCQ2V28paxYmv57bbbz+ijWrqvdioaq4vKEwasPHPWDJnHBpw==
-X-Received: by 2002:a63:530c:: with SMTP id h12mr5036918pgb.424.1603863054654; 
- Tue, 27 Oct 2020 22:30:54 -0700 (PDT)
+ bh=cJk2PXs3ei+fFNnPhvTIpdLrXC2ZlfbAh2JlEFUrplA=;
+ b=fbSEJ4lYmUSQc6QkoBvP0i+tV5FIzMBEVQgv5Uc/2nyRjzYVxymtf4/M0QzIewBH6V
+ eAA+yp2rxhyVFwp1oE6I6VA7ECTaghGAbIgu4wtJs2E7YS4HYFqpnxk9TluE3k4ChB2G
+ LF3PrE1yp/etMiOO5ZlL4kOpmq/OZWVOj51EH++5umUNatGovmTXuu+HI0SWxbmrktZt
+ hU3BhkUxZboeSVrryzbJSyOP5GiqVEdTVjf3rnJLPsCKcD3XMUzFomiBI4F/bAk2vJp4
+ QqpEWDX94wNNsFsA+HcKBOBS4+4Vs5rDGHlTvh+/wvVVd/aW3vt0573mVxMp1H1gfq4C
+ 6ReA==
+X-Gm-Message-State: AOAM533+dOpPgcREQmBT9OR8NusEJi0hpx3P8EyYq30F39HBl3P54ycq
+ Ji/7qHy/d8VswglP6uHZTko=
+X-Google-Smtp-Source: ABdhPJxSEqFLM7thyQmeD4JjWBkdcul7xB7nj5Vv0vQ9UanUgfsuJcfuhK4JLpV7Lrp8rhSH6f65Pg==
+X-Received: by 2002:a62:7609:0:b029:152:b31e:6aed with SMTP id
+ r9-20020a6276090000b0290152b31e6aedmr5827855pfc.10.1603863051386; 
+ Tue, 27 Oct 2020 22:30:51 -0700 (PDT)
 Received: from pek-vx-bsp2.wrs.com (unknown-224-80.windriver.com.
  [147.11.224.80])
- by smtp.gmail.com with ESMTPSA id 9sm5031887pjs.1.2020.10.27.22.30.51
+ by smtp.gmail.com with ESMTPSA id 9sm5031887pjs.1.2020.10.27.22.30.48
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Oct 2020 22:30:54 -0700 (PDT)
+ Tue, 27 Oct 2020 22:30:50 -0700 (PDT)
 From: Bin Meng <bmeng.cn@gmail.com>
 To: Alistair Francis <Alistair.Francis@wdc.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
-Subject: [PATCH v2 10/10] hw/riscv: microchip_pfsoc: Hook the I2C1 controller
-Date: Wed, 28 Oct 2020 13:30:10 +0800
-Message-Id: <1603863010-15807-11-git-send-email-bmeng.cn@gmail.com>
+Subject: [PATCH v2 09/10] hw/riscv: microchip_pfsoc: Correct DDR memory map
+Date: Wed, 28 Oct 2020 13:30:09 +0800
+Message-Id: <1603863010-15807-10-git-send-email-bmeng.cn@gmail.com>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
 References: <1603863010-15807-1-git-send-email-bmeng.cn@gmail.com>
@@ -105,63 +106,127 @@ Sender: "Qemu-devel"
 
 From: Bin Meng <bin.meng@windriver.com>
 
-The latest SD card image [1] released by Microchip ships a Linux
-kernel with built-in PolarFire SoC I2C driver support. The device
-tree file includes the description for the I2C1 node hence kernel
-tries to probe the I2C1 device during boot.
+When system memory is larger than 1 GiB (high memory), PolarFire SoC
+maps it at address 0x10_0000_0000. Address 0xC000_0000 and above is
+aliased to the same 1 GiB low memory with different cache attributes.
 
-It is enough to create an unimplemented device for I2C1 to allow
-the kernel to continue booting to the shell.
-
-[1] ftp://ftpsoc.microsemi.com/outgoing/core-image-minimal-dev-icicle-kit-es-sd-20201009141623.rootfs.wic.gz
+At present QEMU maps the system memory contiguously from 0x8000_0000.
+This corrects the wrong QEMU logic. Note address 0x14_0000_0000 is
+the alias to the high memory, and even physical memory is only 1 GiB,
+the HSS codes still tries to probe the high memory alias address.
+It seems there is no issue on the real hardware, so we will have to
+take that into the consideration in our emulation. Due to this, we
+we increase the default system memory size to 2 GiB so that user gets
+notified an error when less than 2 GiB is specified.
 
 Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
 
 ---
 
-(no changes since v1)
+Changes in v2:
+- Increase the default memory size to 2 GiB
 
- hw/riscv/microchip_pfsoc.c         | 6 ++++++
- include/hw/riscv/microchip_pfsoc.h | 1 +
- 2 files changed, 7 insertions(+)
+ hw/riscv/microchip_pfsoc.c         | 48 +++++++++++++++++++++++++++++++++-----
+ include/hw/riscv/microchip_pfsoc.h |  5 +++-
+ 2 files changed, 46 insertions(+), 7 deletions(-)
 
 diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 5e31b84..d13d6ba 100644
+index 44a8473..5e31b84 100644
 --- a/hw/riscv/microchip_pfsoc.c
 +++ b/hw/riscv/microchip_pfsoc.c
-@@ -113,6 +113,7 @@ static const struct MemmapEntry {
-     [MICROCHIP_PFSOC_MMUART2] =         { 0x20102000,     0x1000 },
-     [MICROCHIP_PFSOC_MMUART3] =         { 0x20104000,     0x1000 },
-     [MICROCHIP_PFSOC_MMUART4] =         { 0x20106000,     0x1000 },
-+    [MICROCHIP_PFSOC_I2C1] =            { 0x2010b000,     0x1000 },
-     [MICROCHIP_PFSOC_GEM0] =            { 0x20110000,     0x2000 },
-     [MICROCHIP_PFSOC_GEM1] =            { 0x20112000,     0x2000 },
-     [MICROCHIP_PFSOC_GPIO0] =           { 0x20120000,     0x1000 },
-@@ -343,6 +344,11 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-         qdev_get_gpio_in(DEVICE(s->plic), MICROCHIP_PFSOC_MMUART4_IRQ),
-         serial_hd(4));
+@@ -121,7 +121,10 @@ static const struct MemmapEntry {
+     [MICROCHIP_PFSOC_ENVM_CFG] =        { 0x20200000,     0x1000 },
+     [MICROCHIP_PFSOC_ENVM_DATA] =       { 0x20220000,    0x20000 },
+     [MICROCHIP_PFSOC_IOSCB] =           { 0x30000000, 0x10000000 },
+-    [MICROCHIP_PFSOC_DRAM] =            { 0x80000000,        0x0 },
++    [MICROCHIP_PFSOC_DRAM_LO] =         { 0x80000000, 0x40000000 },
++    [MICROCHIP_PFSOC_DRAM_LO_ALIAS] =   { 0xc0000000, 0x40000000 },
++    [MICROCHIP_PFSOC_DRAM_HI] =       { 0x1000000000,        0x0 },
++    [MICROCHIP_PFSOC_DRAM_HI_ALIAS] = { 0x1400000000,        0x0 },
+ };
  
-+    /* I2C1 */
-+    create_unimplemented_device("microchip.pfsoc.i2c1",
-+        memmap[MICROCHIP_PFSOC_I2C1].base,
-+        memmap[MICROCHIP_PFSOC_I2C1].size);
+ static void microchip_pfsoc_soc_instance_init(Object *obj)
+@@ -424,7 +427,11 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
+     const struct MemmapEntry *memmap = microchip_pfsoc_memmap;
+     MicrochipIcicleKitState *s = MICROCHIP_ICICLE_KIT_MACHINE(machine);
+     MemoryRegion *system_memory = get_system_memory();
+-    MemoryRegion *main_mem = g_new(MemoryRegion, 1);
++    MemoryRegion *mem_low = g_new(MemoryRegion, 1);
++    MemoryRegion *mem_low_alias = g_new(MemoryRegion, 1);
++    MemoryRegion *mem_high = g_new(MemoryRegion, 1);
++    MemoryRegion *mem_high_alias = g_new(MemoryRegion, 1);
++    uint64_t mem_high_size;
+     DriveInfo *dinfo = drive_get_next(IF_SD);
+ 
+     /* Sanity check on RAM size */
+@@ -441,10 +448,39 @@ static void microchip_icicle_kit_machine_init(MachineState *machine)
+     qdev_realize(DEVICE(&s->soc), NULL, &error_abort);
+ 
+     /* Register RAM */
+-    memory_region_init_ram(main_mem, NULL, "microchip.icicle.kit.ram",
+-                           machine->ram_size, &error_fatal);
++    memory_region_init_ram(mem_low, NULL, "microchip.icicle.kit.ram_low",
++                           memmap[MICROCHIP_PFSOC_DRAM_LO].size,
++                           &error_fatal);
++    memory_region_init_alias(mem_low_alias, NULL,
++                             "microchip.icicle.kit.ram_low.alias",
++                             mem_low, 0,
++                             memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].size);
++    memory_region_add_subregion(system_memory,
++                                memmap[MICROCHIP_PFSOC_DRAM_LO].base,
++                                mem_low);
++    memory_region_add_subregion(system_memory,
++                                memmap[MICROCHIP_PFSOC_DRAM_LO_ALIAS].base,
++                                mem_low_alias);
 +
-     /* GEMs */
++    /*
++     * Map 1 GiB high memory because HSS will do memory test against the high
++     * memory address range regardless of physical memory installed.
++     *
++     * See memory_tests() in mss_ddr.c in the HSS source code.
++     */
++    mem_high_size = machine->ram_size - 1 * GiB;
++
++    memory_region_init_ram(mem_high, NULL, "microchip.icicle.kit.ram_high",
++                           mem_high_size, &error_fatal);
++    memory_region_init_alias(mem_high_alias, NULL,
++                             "microchip.icicle.kit.ram_high.alias",
++                             mem_high, 0, mem_high_size);
++    memory_region_add_subregion(system_memory,
++                                memmap[MICROCHIP_PFSOC_DRAM_HI].base,
++                                mem_high);
+     memory_region_add_subregion(system_memory,
+-                                memmap[MICROCHIP_PFSOC_DRAM].base, main_mem);
++                                memmap[MICROCHIP_PFSOC_DRAM_HI_ALIAS].base,
++                                mem_high_alias);
  
-     nd = &nd_table[0];
+     /* Load the firmware */
+     riscv_find_and_load_firmware(machine, BIOS_FILENAME, RESET_VECTOR, NULL);
+@@ -470,7 +506,7 @@ static void microchip_icicle_kit_machine_class_init(ObjectClass *oc, void *data)
+                    MICROCHIP_PFSOC_COMPUTE_CPU_COUNT;
+     mc->min_cpus = MICROCHIP_PFSOC_MANAGEMENT_CPU_COUNT + 1;
+     mc->default_cpus = mc->min_cpus;
+-    mc->default_ram_size = 1 * GiB;
++    mc->default_ram_size = 2 * GiB;
+ }
+ 
+ static const TypeInfo microchip_icicle_kit_machine_typeinfo = {
 diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index db77e9c..51d4463 100644
+index f34a6b3..db77e9c 100644
 --- a/include/hw/riscv/microchip_pfsoc.h
 +++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -97,6 +97,7 @@ enum {
-     MICROCHIP_PFSOC_MMUART2,
-     MICROCHIP_PFSOC_MMUART3,
-     MICROCHIP_PFSOC_MMUART4,
-+    MICROCHIP_PFSOC_I2C1,
-     MICROCHIP_PFSOC_GEM0,
-     MICROCHIP_PFSOC_GEM1,
-     MICROCHIP_PFSOC_GPIO0,
+@@ -105,7 +105,10 @@ enum {
+     MICROCHIP_PFSOC_ENVM_CFG,
+     MICROCHIP_PFSOC_ENVM_DATA,
+     MICROCHIP_PFSOC_IOSCB,
+-    MICROCHIP_PFSOC_DRAM,
++    MICROCHIP_PFSOC_DRAM_LO,
++    MICROCHIP_PFSOC_DRAM_LO_ALIAS,
++    MICROCHIP_PFSOC_DRAM_HI,
++    MICROCHIP_PFSOC_DRAM_HI_ALIAS
+ };
+ 
+ enum {
 -- 
 2.7.4
 
