@@ -2,79 +2,95 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0693C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:52:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA050C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:54:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1930824728
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:52:36 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1930824728
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=bugs.launchpad.net
+	by mail.kernel.org (Postfix) with ESMTPS id 0F0B324728
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 13:54:26 +0000 (UTC)
+Authentication-Results: mail.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IikmPX6G"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0F0B324728
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:33588 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38242 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXlsQ-0005xk-W2
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:52:35 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50812)
+	id 1kXluE-0007z8-1f
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 09:54:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:51366)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXlqY-0004iT-Ov
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:50:38 -0400
-Received: from indium.canonical.com ([91.189.90.7]:60138)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <bounces@canonical.com>)
- id 1kXlqW-0002lC-IC
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:50:38 -0400
-Received: from loganberry.canonical.com ([91.189.90.37])
- by indium.canonical.com with esmtp (Exim 4.86_2 #2 (Debian))
- id 1kXlqU-0007XH-AV
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 13:50:34 +0000
-Received: from loganberry.canonical.com (localhost [127.0.0.1])
- by loganberry.canonical.com (Postfix) with ESMTP id 495452E811E
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 13:50:34 +0000 (UTC)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kXlsf-0006fN-CB
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:52:50 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:22923)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <thuth@redhat.com>) id 1kXlsa-00032u-1r
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 09:52:47 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603893161;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=rNvzqX5KVEi8Csbn2WcBjdN+iAa/DhQITXe9Z3hiTZQ=;
+ b=IikmPX6GmiMQI2JcoO30hfKjvf1+YcN9d2Ey1RdP9Ii0XSduEzcMOpFn0IzEdrf2pZqAh/
+ Hsw4JHBjxx70+RyP3Q4G8s4+SFK0NFwQRaUnrPhC+Q4TSSj/gN1SkcIBFbLoSEAt7uRScY
+ AS2QYov1Bo4jkUkugQOOGucReTLcwbU=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-168-YLlU56crMEOE382ZguFihA-1; Wed, 28 Oct 2020 09:52:39 -0400
+X-MC-Unique: YLlU56crMEOE382ZguFihA-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 5ACF510866A0;
+ Wed, 28 Oct 2020 13:52:37 +0000 (UTC)
+Received: from thuth.remote.csb (ovpn-112-124.ams2.redhat.com [10.36.112.124])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 82E9A5C1D7;
+ Wed, 28 Oct 2020 13:52:35 +0000 (UTC)
+Subject: Re: [PATCH 3/9] accel/tcg/user-exec: silence the compiler warnings
+To: Chen Qun <kuhn.chenqun@huawei.com>, qemu-devel@nongnu.org,
+ qemu-trivial@nongnu.org
+References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
+ <20201028041819.2169003-4-kuhn.chenqun@huawei.com>
+From: Thomas Huth <thuth@redhat.com>
+Message-ID: <e2a3548e-d36c-3338-f298-150cce3c3d47@redhat.com>
+Date: Wed, 28 Oct 2020 14:52:34 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.6.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-Date: Wed, 28 Oct 2020 13:40:55 -0000
-From: Pablo Schandin <1901892@bugs.launchpad.net>
-To: qemu-devel@nongnu.org
-X-Launchpad-Notification-Type: bug
-X-Launchpad-Bug: product=qemu; status=New; importance=Undecided; assignee=None;
-X-Launchpad-Bug-Information-Type: Public
-X-Launchpad-Bug-Private: no
-X-Launchpad-Bug-Security-Vulnerability: no
-X-Launchpad-Bug-Commenters: rq23a
-X-Launchpad-Bug-Reporter: Pablo Schandin (rq23a)
-X-Launchpad-Bug-Modifier: Pablo Schandin (rq23a)
-Message-Id: <160389245558.14992.8062184889310483170.malonedeb@wampee.canonical.com>
-Subject: [Bug 1901892] [NEW] qemu-img create corrupts the qcow2 if the file
- already exists
-X-Launchpad-Message-Rationale: Subscriber (QEMU) @qemu-devel-ml
-X-Launchpad-Message-For: qemu-devel-ml
-Precedence: bulk
-X-Generated-By: Launchpad (canonical.com);
- Revision="96ff31b88b65a0d0ea73b89333fe7c4a2669d8fb"; Instance="production"
-X-Launchpad-Hash: 6161d98a7e26d18f3388485ac13fe23bb459f96c
-Received-SPF: none client-ip=91.189.90.7; envelope-from=bounces@canonical.com;
- helo=indium.canonical.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 09:50:34
-X-ACL-Warn: Detected OS   = Linux 3.11 and newer [fuzzy]
-X-Spam_score_int: -65
-X-Spam_score: -6.6
-X-Spam_bar: ------
-X-Spam_report: (-6.6 / 5.0 requ) BAYES_00=-1.9,
- HEADER_FROM_DIFFERENT_DOMAINS=0.25, RCVD_IN_DNSWL_HI=-5,
- RCVD_IN_MSPIKE_H3=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
- SPF_NONE=0.001 autolearn=ham autolearn_force=no
+In-Reply-To: <20201028041819.2169003-4-kuhn.chenqun@huawei.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=thuth@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=thuth@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
+Precedence: list
 List-Id: <qemu-devel.nongnu.org>
 List-Unsubscribe: <https://lists.nongnu.org/mailman/options/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=unsubscribe>
@@ -83,152 +99,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Reply-To: Bug 1901892 <1901892@bugs.launchpad.net>
+Cc: zhang.zhanghailiang@huawei.com, Riku Voipio <riku.voipio@iki.fi>,
+ Richard Henderson <richard.henderson@linaro.org>, ganqixin@huawei.com,
+ Euler Robot <euler.robot@huawei.com>, Paolo Bonzini <pbonzini@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Public bug reported:
+On 28/10/2020 05.18, Chen Qun wrote:
+> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
+> ../accel/tcg/user-exec.c: In function ‘handle_cpu_signal’:
+> ../accel/tcg/user-exec.c:169:13: warning: this statement may fall through [-Wimplicit-fallthrough=]
+>   169 |             cpu_exit_tb_from_sighandler(cpu, old_set);
+>       |             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> ../accel/tcg/user-exec.c:172:9: note: here
+>   172 |         default:
+> 
+> This exception branch fall through the 'default' branch and run the 'g_assert_not_reached' statement.
+> So we could use "fall through" instead of "NORETURN" here.
+> 
+> Reported-by: Euler Robot <euler.robot@huawei.com>
+> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
+> ---
+> Cc: Riku Voipio <riku.voipio@iki.fi>
+> Cc: Richard Henderson <richard.henderson@linaro.org>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> ---
+>  accel/tcg/user-exec.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/accel/tcg/user-exec.c b/accel/tcg/user-exec.c
+> index 4ebe25461a..330468e990 100644
+> --- a/accel/tcg/user-exec.c
+> +++ b/accel/tcg/user-exec.c
+> @@ -167,7 +167,7 @@ static inline int handle_cpu_signal(uintptr_t pc, siginfo_t *info,
+>               */
+>              clear_helper_retaddr();
+>              cpu_exit_tb_from_sighandler(cpu, old_set);
+> -            /* NORETURN */
+> +            /* fall through */
 
-When creating a disk using qemu-img create command, if the destination
-path of the qcow2 file already exists, it will show the error saying
-that it cannot get a lock so it exits with exit status 1 but it will
-corrupt the qcow2 file anyway.
+There should not be a fall through here since the previous function should
+never return. Does the warning go away if you mark the
+cpu_exit_tb_from_sighandler() function with QEMU_NORETURN ? If so, I think
+that would be the better fix.
 
-Steps to reproduce:
-1. Have a guest running with a root (vda) and a second device (vdc).
-In my case is a clean Ubuntu 16.04 image with kernel 4.4.0-190-generic x86_=
-64
-vdc disk is called testadddisk-3.qcow2
-2. vdc is an xfs over lvm.
-pvcreacte /dev/vdc
-vgcreate myVg /dev/vdc
-lvcreate -l+100%FREE -n myLv myVg
-mkfs.xfs /dev/mapper/myVg-myLv
-mount /dev/mapper/myVg-myLv /mnt
-3. Create disk IO on that device in the guest.
-while true ; do dd if=3D/dev/zero of=3D/mnt/testfile bs=3D1024 count=3D1000=
- ; sleep 1; done
-4. Execute the command to create a new device but use the same name of the =
-device attached:
-sudo qemu-img create -f qcow2 testadddisk-3.qcow2 20G
-The output of the command is this:
-Formatting 'testadddisk-3.qcow2', fmt=3Dqcow2 size=3D21474836480 cluster_si=
-ze=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-qemu-img: testadddisk-3.qcow2: Failed to get "write" lock
-Is another process using the image?
+ Thomas
 
-The write continues in the guest but when it is shutdown, when it is powere=
-d on again you get this:
-error: Failed to start domain testadddisk
-error: internal error: process exited while connecting to monitor: 2020-10-=
-27T22:00:51.628374Z qemu-system-x86_64: -drive file=3D/var/lib/vmImages/tes=
-tadddisk-3.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk2: Image is=
- not in qcow2 format
-
-I run the qemu-img create command with an strace and I believe that
-first it tries to open the file in write mode, then does a truncate on
-it and after that says it cannot get a lock. The output is in the file
-attached. As well as the guest xml just in case.
-
-The host: =
-
-Ubuntu 18.04.5 LTS
-4.15.0-112-generic x86_64
-qemu packages installed:
-ii  qemu-block-extra:amd64                 1:2.11+dfsg-1ubuntu7.32         =
-                amd64        extra block backend modules for qemu-system an=
-d qemu-utils
-ii  qemu-kvm                               1:2.11+dfsg-1ubuntu7.31         =
-                amd64        QEMU Full virtualization on x86 hardware
-ii  qemu-system-common                     1:2.11+dfsg-1ubuntu7.32         =
-                amd64        QEMU full system emulation binaries (common fi=
-les)
-ii  qemu-system-x86                        1:2.11+dfsg-1ubuntu7.31         =
-                amd64        QEMU full system emulation binaries (x86)
-ii  qemu-utils                             1:2.11+dfsg-1ubuntu7.32         =
-                amd64        QEMU utilities
-
-** Affects: qemu
-     Importance: Undecided
-         Status: New
-
-** Attachment added: "testadddisk-strace-dumxml.txt"
-   https://bugs.launchpad.net/bugs/1901892/+attachment/5428520/+files/testa=
-dddisk-strace-dumxml.txt
-
--- =
-
-You received this bug notification because you are a member of qemu-
-devel-ml, which is subscribed to QEMU.
-https://bugs.launchpad.net/bugs/1901892
-
-Title:
-  qemu-img create corrupts the qcow2 if the file already exists
-
-Status in QEMU:
-  New
-
-Bug description:
-  When creating a disk using qemu-img create command, if the destination
-  path of the qcow2 file already exists, it will show the error saying
-  that it cannot get a lock so it exits with exit status 1 but it will
-  corrupt the qcow2 file anyway.
-
-  Steps to reproduce:
-  1. Have a guest running with a root (vda) and a second device (vdc).
-  In my case is a clean Ubuntu 16.04 image with kernel 4.4.0-190-generic x8=
-6_64
-  vdc disk is called testadddisk-3.qcow2
-  2. vdc is an xfs over lvm.
-  pvcreacte /dev/vdc
-  vgcreate myVg /dev/vdc
-  lvcreate -l+100%FREE -n myLv myVg
-  mkfs.xfs /dev/mapper/myVg-myLv
-  mount /dev/mapper/myVg-myLv /mnt
-  3. Create disk IO on that device in the guest.
-  while true ; do dd if=3D/dev/zero of=3D/mnt/testfile bs=3D1024 count=3D10=
-00 ; sleep 1; done
-  4. Execute the command to create a new device but use the same name of th=
-e device attached:
-  sudo qemu-img create -f qcow2 testadddisk-3.qcow2 20G
-  The output of the command is this:
-  Formatting 'testadddisk-3.qcow2', fmt=3Dqcow2 size=3D21474836480 cluster_=
-size=3D65536 lazy_refcounts=3Doff refcount_bits=3D16
-  qemu-img: testadddisk-3.qcow2: Failed to get "write" lock
-  Is another process using the image?
-
-  The write continues in the guest but when it is shutdown, when it is powe=
-red on again you get this:
-  error: Failed to start domain testadddisk
-  error: internal error: process exited while connecting to monitor: 2020-1=
-0-27T22:00:51.628374Z qemu-system-x86_64: -drive file=3D/var/lib/vmImages/t=
-estadddisk-3.qcow2,format=3Dqcow2,if=3Dnone,id=3Ddrive-virtio-disk2: Image =
-is not in qcow2 format
-
-  I run the qemu-img create command with an strace and I believe that
-  first it tries to open the file in write mode, then does a truncate on
-  it and after that says it cannot get a lock. The output is in the file
-  attached. As well as the guest xml just in case.
-
-  The host: =
-
-  Ubuntu 18.04.5 LTS
-  4.15.0-112-generic x86_64
-  qemu packages installed:
-  ii  qemu-block-extra:amd64                 1:2.11+dfsg-1ubuntu7.32       =
-                  amd64        extra block backend modules for qemu-system =
-and qemu-utils
-  ii  qemu-kvm                               1:2.11+dfsg-1ubuntu7.31       =
-                  amd64        QEMU Full virtualization on x86 hardware
-  ii  qemu-system-common                     1:2.11+dfsg-1ubuntu7.32       =
-                  amd64        QEMU full system emulation binaries (common =
-files)
-  ii  qemu-system-x86                        1:2.11+dfsg-1ubuntu7.31       =
-                  amd64        QEMU full system emulation binaries (x86)
-  ii  qemu-utils                             1:2.11+dfsg-1ubuntu7.32       =
-                  amd64        QEMU utilities
-
-To manage notifications about this bug go to:
-https://bugs.launchpad.net/qemu/+bug/1901892/+subscriptions
 
