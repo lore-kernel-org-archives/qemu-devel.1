@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D833CC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:29:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07491C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:30:07 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 745AD207DE
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:29:14 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745AD207DE
+	by mail.kernel.org (Postfix) with ESMTPS id 7801A207DE
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:30:06 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7801A207DE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36422 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38306 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXd5F-0004jF-J4
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:29:13 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43620)
+	id 1kXd65-0005WW-Jy
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:30:05 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43616)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kXcvk-0001rm-FE; Wed, 28 Oct 2020 00:19:24 -0400
-Received: from szxga07-in.huawei.com ([45.249.212.35]:2112)
+ id 1kXcvi-0001pF-Fs; Wed, 28 Oct 2020 00:19:22 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:2113)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kXcve-0007cw-Ke; Wed, 28 Oct 2020 00:19:24 -0400
+ id 1kXcve-0007cx-If; Wed, 28 Oct 2020 00:19:22 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CLb1f0MMlz6y4W;
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CLb1f0d8mz6y74;
  Wed, 28 Oct 2020 12:19:18 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS401-HUB.china.huawei.com
  (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Wed, 28 Oct 2020
- 12:19:06 +0800
+ 12:19:04 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH 8/9] target/ppc: silence the compiler warnings
-Date: Wed, 28 Oct 2020 12:18:18 +0800
-Message-ID: <20201028041819.2169003-9-kuhn.chenqun@huawei.com>
+Subject: [PATCH 7/9] ppc: silence the compiler warnings
+Date: Wed, 28 Oct 2020 12:18:17 +0800
+Message-ID: <20201028041819.2169003-8-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
 References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
@@ -79,13 +79,13 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
-target/ppc/mmu_helper.c: In function ‘dump_mmu’:
-target/ppc/mmu_helper.c:1351:12: warning: this statement may fall through [-Wimplicit-fallthrough=]
- 1351 |         if (ppc64_v3_radix(env_archcpu(env))) {
-      |            ^
-target/ppc/mmu_helper.c:1358:5: note: here
- 1358 |     default:
-      |     ^~~~~~~
+hw/ppc/ppc.c: In function ‘ppc6xx_set_irq’:
+hw/ppc/ppc.c:118:16: warning: this statement may fall through [-Wimplicit-fallthrough=]
+  118 |             if (level) {
+      |                ^
+hw/ppc/ppc.c:123:9: note: here
+  123 |         case PPC6xx_INPUT_INT:
+      |         ^~~~
 
 Add the corresponding "fall through" comment to fix it.
 
@@ -94,21 +94,21 @@ Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
 Cc: David Gibson <david@gibson.dropbear.id.au>
 ---
- target/ppc/mmu_helper.c | 1 +
+ hw/ppc/ppc.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
-index 8972714775..51749b62df 100644
---- a/target/ppc/mmu_helper.c
-+++ b/target/ppc/mmu_helper.c
-@@ -1355,6 +1355,7 @@ void dump_mmu(CPUPPCState *env)
-             break;
-         }
- #endif
-+        /* fall through */
-     default:
-         qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
-     }
+diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
+index 4a11fb1640..f9eb8f21b4 100644
+--- a/hw/ppc/ppc.c
++++ b/hw/ppc/ppc.c
+@@ -120,6 +120,7 @@ static void ppc6xx_set_irq(void *opaque, int pin, int level)
+             } else {
+                 cpu_ppc_tb_stop(env);
+             }
++            /* fall through */
+         case PPC6xx_INPUT_INT:
+             /* Level sensitive - active high */
+             LOG_IRQ("%s: set the external IRQ state to %d\n",
 -- 
 2.27.0
 
