@@ -2,120 +2,87 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MSGID_FROM_MTA_HEADER,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B87E8C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 21:54:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C090C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:11:35 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E26D524724
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 21:54:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AB0E024724
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 22:11:34 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=nonterra01.onmicrosoft.com header.i=@nonterra01.onmicrosoft.com header.b="tftKvGs2"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E26D524724
-Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=nonterra.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I1/HBOe8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AB0E024724
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:47772 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53260 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXtP2-0008Rv-KD
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 17:54:44 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51084)
+	id 1kXtfJ-0003rc-Kp
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 18:11:33 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53662)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobias.koch@nonterra.com>)
- id 1kXtO9-0007vn-5h
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 17:53:49 -0400
-Received: from mail-vi1eur05on2046.outbound.protection.outlook.com
- ([40.107.21.46]:35297 helo=EUR05-VI1-obe.outbound.protection.outlook.com)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <tobias.koch@nonterra.com>)
- id 1kXtO5-0004qG-VR
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 17:53:48 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oDkMTwrvLaSDsKX2pKD6gAGn4ZESjaGoXsMjFsm9duNzQ8M8DrMb04LZ4t8HlNnE1fUcBYV46QOETX/h3ulYc7h+bPUeb/olhDgZp0ae0wVR9GQrpkRWg9i5QWj5qQf4AptZp5lUgh6YSdVRW0EzVPBBWX67IcXMWAEROuO+LPikMYolcUWKhhRee/sIpofaDaDblfuuA3nr4KO7zjmOOkboGFplg8BHzkrHW/uNUtJXXRYBVwiJoSfrfbH7eicTUKtGE6u4tvTUubrdCdO+LpasLdahqEeeDG2Sg2rQavc6s9qVUMt9ecIj/Th/p9hqSWd508qyHw71IImznwAbeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com; 
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b+eIZUjxY2zBeFZIbgiEJcHjY+K8CO9AznyrDIzuqww=;
- b=nYzwXinAp7QSqMp+PfZbfli2DvuEq2oZ/VUfGvGaZEgL4Ta1ohWTEwpp3CKeH4SfLQm3PxIUV93Iw0VBk9Z11LRQYqInoS4wDTWBNYjN/06WH386OkOylavSfPwK/alBl84vm875cr/rel5VyhPTbddgBSK7ICarwPerwXBuHzKHOzMiA2Pqj3yJ8+ACTGF8pjBj4Lo+csCX7/7T8x4G5opU0aDOrU9XR9LiATjoYN/Tltsw8OkQ75S3YSvEwKtUEhkvPX7Y0UZdiB54NMYjPryOySDK7UM8G6wZv6REiJ7OaVNYiIaYbetNL2TvHu8K0nNlbc0npJ9CMjTIaphkkg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nonterra.com; dmarc=pass action=none header.from=nonterra.com;
- dkim=pass header.d=nonterra.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=nonterra01.onmicrosoft.com; s=selector2-nonterra01-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b+eIZUjxY2zBeFZIbgiEJcHjY+K8CO9AznyrDIzuqww=;
- b=tftKvGs2CZx+rXsGpuXFKsAyvFZQNbYRM396e++hIuf+ksACffvjxl1QDJ9Gm6G+RGmz+0N45K0qYb0kHtqotKqDPlgwuu80LsbIcf8JOQs8XhHvxA5POm+/1nbsrcbMZdBDEpQCBbN4LbSX6lDizWvO6P5VwoSoceOBqHsDCag=
-Authentication-Results: nongnu.org; dkim=none (message not signed)
- header.d=none;nongnu.org; dmarc=none action=none header.from=nonterra.com;
-Received: from AM0PR08MB3300.eurprd08.prod.outlook.com (2603:10a6:208:65::14)
- by AM0PR08MB3297.eurprd08.prod.outlook.com (2603:10a6:208:66::28)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3477.24; Wed, 28 Oct
- 2020 21:38:40 +0000
-Received: from AM0PR08MB3300.eurprd08.prod.outlook.com
- ([fe80::cc58:8f3a:963:bfe0]) by AM0PR08MB3300.eurprd08.prod.outlook.com
- ([fe80::cc58:8f3a:963:bfe0%5]) with mapi id 15.20.3477.029; Wed, 28 Oct 2020
- 21:38:40 +0000
-From: Tobias Koch <tobias.koch@nonterra.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] linux-user/mmap.c: check range of mremap result in target
- address space
-Date: Wed, 28 Oct 2020 22:38:33 +0100
-Message-Id: <20201028213833.26592-1-tobias.koch@nonterra.com>
-X-Mailer: git-send-email 2.20.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [95.217.122.90]
-X-ClientProxiedBy: AM0PR10CA0007.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:17c::17) To AM0PR08MB3300.eurprd08.prod.outlook.com
- (2603:10a6:208:65::14)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtZO-0002Td-Au
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:05:26 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44026)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <crosa@redhat.com>) id 1kXtZL-0006HL-B7
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 18:05:25 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603922721;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ in-reply-to:in-reply-to:references:references;
+ bh=2eQQYmaunyts0zzxsk8nGRaDD/EXMlUZ0KVursFhNOE=;
+ b=I1/HBOe8lPzscI2bA6vTypDwTvchn+vomDfK/jgGXevpnqRxVbh2BsU/PwhHt0S25f66mF
+ mErbILuDRvJik/OTxnQGTeqLXNB7CXIzG9iHvhVWrETC/egPx4RLkUNVKDuB7d09NGq5zF
+ V8yKjD7fYC0M098GSG2aezy9WeQGPVo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-461-Ap_aeQVhNe2cQAIy4NjAwA-1; Wed, 28 Oct 2020 18:05:17 -0400
+X-MC-Unique: Ap_aeQVhNe2cQAIy4NjAwA-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com
+ [10.5.11.14])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E27758030DE;
+ Wed, 28 Oct 2020 22:05:15 +0000 (UTC)
+Received: from localhost.localdomain (ovpn-119-55.rdu2.redhat.com
+ [10.10.119.55])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 563845D9EF;
+ Wed, 28 Oct 2020 22:05:11 +0000 (UTC)
+Date: Wed, 28 Oct 2020 18:05:09 -0400
+From: Cleber Rosa <crosa@redhat.com>
+To: John Snow <jsnow@redhat.com>
+Subject: Re: [PATCH v3 04/15] python: add directory structure README.rst files
+Message-ID: <20201028220509.GH2201333@localhost.localdomain>
+References: <20201020193555.1493936-1-jsnow@redhat.com>
+ <20201020193555.1493936-5-jsnow@redhat.com>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from build.nonterra.com (95.217.122.90) by
- AM0PR10CA0007.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:208:17c::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3499.18 via Frontend
- Transport; Wed, 28 Oct 2020 21:38:40 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 7b3c90bb-252f-492c-716b-08d87b89d605
-X-MS-TrafficTypeDiagnostic: AM0PR08MB3297:
-X-Microsoft-Antispam-PRVS: <AM0PR08MB3297D31548C2929823A3764089170@AM0PR08MB3297.eurprd08.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:4125;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: oLQ3VDrYCRP3/h+nj72fzCTl8x64gvBp1QXPJ4ra4vbhAAmH0y7+CH4iKaiOWAyuF9GngtpsYoiFXzBBvrTCKnevQIzk8G/flmZg5pACc2nYPmnB3eKEb6FkqcVq2lAnI5vR/+7B0nywOzYPC/ZqEN5BGgiR96gZaX7aC0c6es2gst7l0yyMInYp2IpjX6oly4pn8TXb4PRwXY755MZsjF6gb2gvji/rKsHApAZkK4AFYT9E77fJcrPpBalYgeC53SDM41qjNsKGstLA7y+n6Y2nOmyAfANkinpdlWWSSRdKAogfdo/4AfkOGF4APLGJYZDXiuUCAClmgs0ZPgFQTw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255; CTRY:; LANG:en; SCL:1; SRV:;
- IPV:NLI; SFV:NSPM; H:AM0PR08MB3300.eurprd08.prod.outlook.com; PTR:; CAT:NONE;
- SFS:(366004)(39830400003)(136003)(346002)(376002)(396003)(52116002)(66556008)(956004)(6916009)(1076003)(7696005)(66946007)(66476007)(2616005)(86362001)(44832011)(6666004)(36756003)(478600001)(4326008)(316002)(2906002)(6486002)(16526019)(5660300002)(26005)(186003)(83380400001)(8936002)(8676002);
- DIR:OUT; SFP:1101; 
-X-MS-Exchange-AntiSpam-MessageData: tw7O70n1e5aNa8wgeGG8j7PsUMpcAXZCqMeuAD3ofAtus8lq7nTSZCOtcDubDTrqtEJGts/mHht5CMMDgbkfvQG+xNeVUip2b8foDaB9a7MCl0dwSq/mMRlmN9Ij9gTfAaz44G5qU4skryxEIiUZGDkcHLTWE/hTH3JMUyIv2S5FCuHtMLQHM2t4QqpqODHySJnZhJS9xKwAyT+6ASwYihu5L073kbdSNPdNCWfUywOz3XOZdrOs9qDzHnKv18pz0Q7v9wnwQ45NudHQAG3ayKAsgyUzXougqyhW14jx9Yb/7a0sBA99vTnUjf4TzrAjUAtpRIDug4lEE6pUrMmC9QWxDcu5gmDcqn4Q5E2hNKr669JDC6uJtRpWnxZ8ZozeJtf0rZ1w9ihOhLxi2dt01rye5ngAmjpyN5K8vM3yGcKbMIMb3B3Gz9sJx42E55S3OIZdS0N8CyWYth7uFIDih1BhlOTGv2pNme3q9ESLyZosCrhZHb/N7LE1fcbZZG7sr1arXNCLQA5zV66z+Oc0S1cor7aUDJtFQ10LMQOwmCUnC6clpHssOxLtGreojCLlBbHvIVgq4VAJxumgijSxwFu+BDWQRpdy5c9+fmrb1HKSUT3oIvo6C6Ztf3VUdIxWcguWdqMYWxsHRCOFl8jvLg==
-X-OriginatorOrg: nonterra.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7b3c90bb-252f-492c-716b-08d87b89d605
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR08MB3300.eurprd08.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2020 21:38:40.6550 (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 76ec9478-ab84-4eac-917c-c1a3242376a3
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: hDna9rU1LgpeHp/tWDfFa367ddg2wNA0P7p27iAC5dVpzdmeyuBriIY8jFhvq6ZsMKsPAj7uXouY4b49uqN77OSC3Z7SYEs0bcxXMuE+kts=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0PR08MB3297
-Received-SPF: pass client-ip=40.107.21.46;
- envelope-from=tobias.koch@nonterra.com;
- helo=EUR05-VI1-obe.outbound.protection.outlook.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 17:53:43
-X-ACL-Warn: Detected OS   = Windows NT kernel [generic] [fuzzy]
-X-Spam_score_int: -25
-X-Spam_score: -2.6
+In-Reply-To: <20201020193555.1493936-5-jsnow@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=crosa@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="LZFKeWUZP29EKQNE"
+Content-Disposition: inline
+Received-SPF: pass client-ip=216.205.24.124; envelope-from=crosa@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -20
+X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.6 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, MSGID_FROM_MTA_HEADER=0.001, RCVD_IN_DNSWL_LOW=-0.7,
- RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -128,64 +95,139 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: laurent@vivier.eu
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Ben Widawsky <ben@bwidawsk.net>,
+ Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org, Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Andrea Bolognani <abologna@redhat.com>,
+ Rohit Shinde <rohit.shinde12194@gmail.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Max Reitz <mreitz@redhat.com>,
+ Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-If mremap succeeds, an additional check is performed to ensure that the
-new address range fits into the target address space. This check was
-previously perfomed in host address space, with the upper bound fixed to
-abi_ulong.
+--LZFKeWUZP29EKQNE
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-This patch replaces the static check with a call to `guest_range_valid`,
-performing the range check against the actual size of the target address
-space. It also moves the corresponding block to prevent it from being
-called incorrectly when the mapping itself fails.
+On Tue, Oct 20, 2020 at 03:35:44PM -0400, John Snow wrote:
+> Add short readmes to python/, python/qemu/, python/qemu/machine, and
+> python/qemu/machine that explain the directory hierarchy. These readmes
+> are visible when browsing the source on e.g. gitlab/github and are
+> designed to help new developers/users quickly make sense of the source
+> tree.
+>=20
+> They are not designed for inclusion in a published manual.
+>=20
+> Signed-off-by: John Snow <jsnow@redhat.com>
+> ---
+>  python/README.rst              | 27 +++++++++++++++++++++++++++
+>  python/qemu/README.rst         |  8 ++++++++
+>  python/qemu/machine/README.rst |  9 +++++++++
+>  python/qemu/qmp/README.rst     |  9 +++++++++
+>  4 files changed, 53 insertions(+)
+>  create mode 100644 python/README.rst
+>  create mode 100644 python/qemu/README.rst
+>  create mode 100644 python/qemu/machine/README.rst
+>  create mode 100644 python/qemu/qmp/README.rst
+>=20
+> diff --git a/python/README.rst b/python/README.rst
+> new file mode 100644
+> index 0000000000..ff40e4c931
+> --- /dev/null
+> +++ b/python/README.rst
+> @@ -0,0 +1,27 @@
+> +QEMU Python Tooling
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +This directory houses Python tooling used by the QEMU project to build,
+> +configure, and test QEMU. It is organized by namespace (``qemu``), and
+> +then by package (``qemu/machine``, ``qemu/qmp``).
+> +
+> +``setup.py`` is used by ``pip`` to install this tooling to the current
+> +environment. You will generally invoke it by doing one of the following:
+> +
+> +1. ``pip3 install .`` will install these packages to your current
+> +   environment. If you are inside a virtual environment, they will
+> +   install there. If you are not, it will attempt to install to the
+> +   global environment, which is not recommended.
+> +
+> +2. ``pip3 install --user .`` will install these packages to your user's
+> +   local python packages. If you are inside of a virtual environment,
+> +   this will fail.
+> +
+> +If you amend the ``-e`` argument, pip will install in "editable" mode;
+> +which installs a version of the package that uses symlinks to these
+> +files, such that the package always reflects the latest version in your
+> +git tree.
+> +
 
-Signed-off-by: Tobias Koch <tobias.koch@nonterra.com>
----
- linux-user/mmap.c | 21 ++++++++++++---------
- 1 file changed, 12 insertions(+), 9 deletions(-)
+It actually uses *egg-link* files, which are not what people will
+understand by "symlinks".
 
-diff --git a/linux-user/mmap.c b/linux-user/mmap.c
-index f261563420..101bd013a1 100644
---- a/linux-user/mmap.c
-+++ b/linux-user/mmap.c
-@@ -751,20 +751,23 @@ abi_long target_mremap(abi_ulong old_addr, abi_ulong old_size,
-         }
-         if (prot == 0) {
-             host_addr = mremap(g2h(old_addr), old_size, new_size, flags);
--            if (host_addr != MAP_FAILED && reserved_va && old_size > new_size) {
--                mmap_reserve(old_addr + old_size, old_size - new_size);
-+
-+            if (host_addr != MAP_FAILED) {
-+                /* Check if address fits target address space */
-+                if (!guest_range_valid(h2g(host_addr), new_size)) {
-+                    /* Revert mremap() changes */
-+                    host_addr = mremap(g2h(old_addr), new_size, old_size,
-+                                       flags);
-+                    errno = ENOMEM;
-+                    host_addr = MAP_FAILED;
-+                } else if (reserved_va && old_size > new_size) {
-+                    mmap_reserve(old_addr + old_size, old_size - new_size);
-+                }
-             }
-         } else {
-             errno = ENOMEM;
-             host_addr = MAP_FAILED;
-         }
--        /* Check if address fits target address space */
--        if ((unsigned long)host_addr + new_size > (abi_ulong)-1) {
--            /* Revert mremap() changes */
--            host_addr = mremap(g2h(old_addr), new_size, old_size, flags);
--            errno = ENOMEM;
--            host_addr = MAP_FAILED;
--        }
-     }
- 
-     if (host_addr == MAP_FAILED) {
--- 
-2.20.1
+> +See `Installing packages using pip and virtual environments
+> +<https://packaging.python.org/guides/installing-using-pip-and-virtual-en=
+vironments/>`_
+> +for more information.
+> diff --git a/python/qemu/README.rst b/python/qemu/README.rst
+> new file mode 100644
+> index 0000000000..31209c80a5
+> --- /dev/null
+> +++ b/python/qemu/README.rst
+> @@ -0,0 +1,8 @@
+> +QEMU Python Namespace
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +This directory serves as the root of a `Python PEP 420 implicit
+> +namespace package <<https://www.python.org/dev/peps/pep-0420/>`_.
+> +
+> +Each directory below is assumed to be an installable Python package that
+> +is available under the ``qemu.<package>`` namespace.
+> diff --git a/python/qemu/machine/README.rst b/python/qemu/machine/README.=
+rst
+> new file mode 100644
+> index 0000000000..73ad23c501
+> --- /dev/null
+> +++ b/python/qemu/machine/README.rst
+> @@ -0,0 +1,9 @@
+> +qemu.machine Package
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +
+> +This package provides core utilities used for testing and debugging
+> +QEMU. It is used by the iotests, vm tests, and several other utilities
+> +in the ./scripts directory. It is not a fully-fledged SDK and it is
+> +subject to change at any time.
+> +
+
+I'm not sure if you intend to list all test types that use this, but
+the acceptance tests also do use them.
+
+- Cleber.
+
+--LZFKeWUZP29EKQNE
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEeruW64tGuU1eD+m7ZX6NM6XyCfMFAl+Z6xMACgkQZX6NM6Xy
+CfPudA/8D/RfPTOD1900XV3miQshFGXzuYeXKFwKw5Rygw5vmH3f78krlx7wx7a9
+l1aYGT/32vSeJbrFCEKhQM5QnqM/i7aJEjwDQomV9mCn2IxnRTRXv89fkNHIpl5k
+lhdCsZz08bEKOxo3q0Mhvq5v6VsspZDK/02Xl1CJkT3tL/opiz64lQefQsNOA5w1
+dkyUiC97dDx6PcPC32eEoUrzVvRt5nf93mP9iVO5rNXzIRcLMufoZvJga3Mf53xI
+nSiJuNEGHfWa6pUR5eUInUCRNF2i0Ji4dccYoebsyeV0Yt1dCzsR+T1GHNddnfEq
+ApLPW3DldHZ6T2d0YglIjEOIei166/ivWlMPs4sNIpWo8EADX05Lk6m+SNcVceUI
+yXJTwowSk6cDwjdJDEA8KvZthwZ/UmRqh+TUUOklJpFfSUWz9B6AbutzkX4/5GKj
+KkaNoO8DmuoNoFHNV+ILaK4xAupW5qisJGNVatzR7Adj6A7LICl0Pv0AsE/ebqWD
++EopkvPvlDMyV4TpfR+v833KdZPsg3+fX4/AVFTjASlI0atDyqZtk6oNpvCWzel2
+F3juG0/b7o8boOOsJvOxPWiN9k57ar51kjmjZM6h6ckLEhOu5g7DVSy+EhOEmuQQ
+gy5i2/DKEyr73W2A3NB6dBzNHY0TD0UnaNZikZhG6NtgI+te4xc=
+=dIkL
+-----END PGP SIGNATURE-----
+
+--LZFKeWUZP29EKQNE--
 
 
