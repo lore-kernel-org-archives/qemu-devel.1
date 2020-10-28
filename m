@@ -7,85 +7,85 @@ X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A25E3C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:25:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DB51C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:26:23 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id C5E58247C3
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:25:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id A2F5E247C3
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:26:22 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ZkB+ARPx"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C5E58247C3
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="k7O0G0RA"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A2F5E247C3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:52204 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:55052 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXnKP-0000db-Ib
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:25:33 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44892)
+	id 1kXnLB-0001vY-K8
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:26:21 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:45942)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXnDh-0001l1-4X
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:18:41 -0400
-Received: from mail-pj1-x1043.google.com ([2607:f8b0:4864:20::1043]:50932)
+ id 1kXnHZ-0005RD-Mn
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:22:39 -0400
+Received: from mail-pj1-x1041.google.com ([2607:f8b0:4864:20::1041]:55199)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <richard.henderson@linaro.org>)
- id 1kXnDf-0006IW-4M
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:18:36 -0400
-Received: by mail-pj1-x1043.google.com with SMTP id p21so2712699pju.0
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 08:18:32 -0700 (PDT)
+ id 1kXnHX-0006of-F2
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:22:37 -0400
+Received: by mail-pj1-x1041.google.com with SMTP id az3so2711653pjb.4
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 08:22:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
  h=subject:to:cc:references:from:message-id:date:user-agent
  :mime-version:in-reply-to:content-language:content-transfer-encoding;
- bh=Hmt0eMVnOApsZe864FbdLsRBKwDMNvLVNFCzZm8tFlk=;
- b=ZkB+ARPxAgfYzNE07EeqhjYYaxwfWsql0e/r/VGnNtZfLnQXhO+G3o2dtPZiYLx8WH
- p2kBInRvcOh97fbrU6qhc40+7596JHx9P3yABICwMK/tRvj5m78vgiAGjmzD49SIx+jE
- Pp8LMon5QF7U9ZLotazGPTArhUTbN/gV6JPhC+jmZZGN7zGFy7UoEAewIWDNhUOJwzxK
- xFy1U4MJ+9jeawI97/fivLgGhcj/GcIQBpIpwYOYctedBWkQMYwGHsJRYc1gZ7cvWShy
- lXWGEgrfop9hXWrfCyxLxX6ryDvBI6PjVmaPYLQCYl5UJtSAHEG1eNFwFJciZkPNp4xu
- bzhw==
+ bh=tRIDLUSNGtzNRczBIMOLPFujWfWDdVx3YveTpcJNWtM=;
+ b=k7O0G0RA7AqV94Hsj0RGZLrOkr4At7CjF9r+g92yXDlTNkZluUfKrfF4vWRldNlQi3
+ sxmUEko6X5/RmhnTIisgswF1j0ipRPg7KRt+2DFeTxytUJX/8c1T0X+i2vMFaYcJ/yvE
+ Wz76NwcHMse+23GTsnaQk13iprrN/9wBmvtoQaFd8JBN+VFbeUnfVCyw/XKxMvagFPY2
+ jsR+RzjPIspsvN4ULsDJOEMX3V0MPCxbRfewvlkqBR8xMCMbXV7EPLzXLVQ2/dtWNsvU
+ Z8P7eO4v/77KU5VHHxanWkv8Rvinjk8Dw2FzNm3eF7kB4R9UqPxEIiogx6Zr85w73btB
+ 58Gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:subject:to:cc:references:from:message-id:date
  :user-agent:mime-version:in-reply-to:content-language
  :content-transfer-encoding;
- bh=Hmt0eMVnOApsZe864FbdLsRBKwDMNvLVNFCzZm8tFlk=;
- b=jdaxa4awx2vsxNlag+jzXL4an9HsXKrntFjEaYjp+jl8K5cDnCyaY+QvtBgnBL+dom
- z6r2oDDhgbGrCWgvxtDydqaB75iZcidTn5zb0pddy8XmngCdPpRKybJ2loSTHuNgkkme
- HOlzAz1gLzHzEIFgKQXJDD9WgAs/Y2VqiWXF9JUG/UYkhYrWNydWS9TfI4CdZmoa+nV+
- LGiDuc6gasbpyGAcCpXrD6PBc8M8yfFn978mO4CibfohoWoe3lu5Sb99AHu5ZckkS8ik
- cyKzdmApiyWqDPwl/4WPABgRYYgbtaFW+J6+GVe4mTNNBOSYfrlPBhdiFjzYGzi2gXS7
- N8tA==
-X-Gm-Message-State: AOAM530FETytgZn3UTq8rnH05/B6DfUtyvjWMN1jo/LDdvDpiPelGMc0
- kEIV/E/IMsK8UM9C764F6XNefQ==
-X-Google-Smtp-Source: ABdhPJzImGz/Gl+Thm5KsKY/TQA34pjDzoxjBhETLRyrwDYLbQFl+1bQ1SuwzYEhBrnccDh/yObrfw==
-X-Received: by 2002:a17:902:7c14:b029:d4:d894:7eed with SMTP id
- x20-20020a1709027c14b02900d4d8947eedmr8150255pll.81.1603898311102; 
- Wed, 28 Oct 2020 08:18:31 -0700 (PDT)
+ bh=tRIDLUSNGtzNRczBIMOLPFujWfWDdVx3YveTpcJNWtM=;
+ b=DBHxPNnE3HAjkmZ6FnUCCQehNTGGXg/xq9dpuyoLvMsPEIEmQ4ysg7lLRQt84Ty7/D
+ X0flyZqfQxcog9gMUGLOAFdcsqcHERMEc2RxNstSGuFNyR1e/0WkQ3ZpdtSpS6bEphcS
+ q4SzHIAqnzKJmAIiM24hm/FTTl5pUdTWnuz7y2iuwx/tBQaFeTYFqaGUh/OJmZlJaqCX
+ 3Z3Hk/zqQ7ughkQRn1jQr8Jc7InjUwEseFry7AoeA4j2z1eiRUD5bKbDIGyvQYSCyvJh
+ Q+PCjvXGiS5z5Ra8ELIG3zXDc2PjjUj+T9AUNJRrSPiMSzFLfRHJOp6IAEOAe0JyVoQc
+ qRVw==
+X-Gm-Message-State: AOAM533mfibGYjiXnSy2+rqgGBdDYFYiiFOi2VBMZYnddbSB3KHpQ1lD
+ puianQ3IYnSWQv9oXom6O6vgjQ==
+X-Google-Smtp-Source: ABdhPJyO5/l8nv6NTA272Ev3cLxUsAufqrjF4MeoWRLMNOYgOaaQ3xxwcA2UDEPGzlhtKajVNXCbKw==
+X-Received: by 2002:a17:90a:4684:: with SMTP id
+ z4mr7132020pjf.97.1603898552258; 
+ Wed, 28 Oct 2020 08:22:32 -0700 (PDT)
 Received: from [192.168.1.11] ([71.212.141.89])
- by smtp.gmail.com with ESMTPSA id h4sm5745057pgc.13.2020.10.28.08.18.29
+ by smtp.gmail.com with ESMTPSA id f4sm6263037pfc.63.2020.10.28.08.22.31
  (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
- Wed, 28 Oct 2020 08:18:29 -0700 (PDT)
-Subject: Re: [PATCH v2 4/5] target/riscv: Remove the hyp load and store
- functions
+ Wed, 28 Oct 2020 08:22:31 -0700 (PDT)
+Subject: Re: [PATCH v2 5/5] target/riscv: Split the Hypervisor execute load
+ helpers
 To: Alistair Francis <alistair.francis@wdc.com>, qemu-devel@nongnu.org,
  qemu-riscv@nongnu.org
 References: <cover.1603896075.git.alistair.francis@wdc.com>
- <5ead43dea141994823a113a2e7f1494df12d32dd.1603896076.git.alistair.francis@wdc.com>
+ <a88d9bdcebe49ada0d0a69b37ac532124971c91c.1603896076.git.alistair.francis@wdc.com>
 From: Richard Henderson <richard.henderson@linaro.org>
-Message-ID: <8706b460-7a44-2b89-d736-c0e0274f77c1@linaro.org>
-Date: Wed, 28 Oct 2020 08:18:27 -0700
+Message-ID: <66b758d2-395f-142c-aa66-ba197c926364@linaro.org>
+Date: Wed, 28 Oct 2020 08:22:29 -0700
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
  Thunderbird/68.10.0
 MIME-Version: 1.0
-In-Reply-To: <5ead43dea141994823a113a2e7f1494df12d32dd.1603896076.git.alistair.francis@wdc.com>
+In-Reply-To: <a88d9bdcebe49ada0d0a69b37ac532124971c91c.1603896076.git.alistair.francis@wdc.com>
 Content-Type: text/plain; charset=utf-8
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=2607:f8b0:4864:20::1043;
- envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1043.google.com
+Received-SPF: pass client-ip=2607:f8b0:4864:20::1041;
+ envelope-from=richard.henderson@linaro.org; helo=mail-pj1-x1041.google.com
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
  That's all we know.
 X-Spam_score_int: -29
@@ -113,21 +113,43 @@ Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 On 10/28/20 7:42 AM, Alistair Francis wrote:
-> +void helper_hyp_access_check(CPURISCVState *env)
+> +target_ulong helper_hyp_hlvx_hu(CPURISCVState *env, target_ulong address)
 >  {
 >      if (env->priv == PRV_M ||
 >          (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
 >          (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
 >              get_field(env->hstatus, HSTATUS_HU))) {
->          return;
+> +        int mmu_idx = cpu_mmu_index(env, true) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+> +
+> +        return cpu_lduw_mmuidx_ra(env, address, mmu_idx, GETPC());
+> +    }
+> +
+> +    if (riscv_cpu_virt_enabled(env)) {
+> +        riscv_raise_exception(env, RISCV_EXCP_VIRT_INSTRUCTION_FAULT, GETPC());
+> +    } else {
+> +        riscv_raise_exception(env, RISCV_EXCP_ILLEGAL_INST, GETPC());
+> +    }
+> +    return 0;
+> +}
+> +
+> +target_ulong helper_hyp_hlvx_wu(CPURISCVState *env, target_ulong address)
+> +{
+> +    if (env->priv == PRV_M ||
+> +        (env->priv == PRV_S && !riscv_cpu_virt_enabled(env)) ||
+> +        (env->priv == PRV_U && !riscv_cpu_virt_enabled(env) &&
+> +            get_field(env->hstatus, HSTATUS_HU))) {
+> +        int mmu_idx = cpu_mmu_index(env, true) | TB_FLAGS_PRIV_HYP_ACCESS_MASK;
+>  
+> +        return cpu_ldl_mmuidx_ra(env, address, mmu_idx, GETPC());
 >      }
 
-While this works, I think it would be better to compute this into one bit of
-TBFLAGS.  Then you can test it during translate and do not need an external
-helper at all for the data accesses.
+Do not replicate the PRV tests.
 
-It also means that patch 5 can be simplified...
+My first suggestion is to compute this into TBFLAGS and test it at translate
+time, so that these functions just become the one cpu_ld* call.
 
+But failing that, at least split out the test + exception into a common helper
+function.
 
 r~
 
