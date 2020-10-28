@@ -2,101 +2,93 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FFBBC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:25:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CAFC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:27:44 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 08C2624772
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B04622466D
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:27:43 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="AlBlEHph"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 08C2624772
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtGEVzi4"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B04622466D
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:46212 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52354 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXmOS-0008BO-1F
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:25:40 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58144)
+	id 1kXmQQ-0002UZ-Jm
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:27:42 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:59848)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mihai.carabas@oracle.com>)
- id 1kXmGj-0008RL-3y
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:17:41 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:36382)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <mihai.carabas@oracle.com>)
- id 1kXmGb-0006aJ-M6
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:17:40 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEEXpT001634;
- Wed, 28 Oct 2020 14:17:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
- h=from : to : cc :
- subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
- bh=3uD8IMggnjwIH0LXsTMabe1CBa8Yw4FbKDN++7eZpT4=;
- b=AlBlEHph+j6LcvJ89UYvOXtcaBiOxNZJE20gfj0zZ5W8Xeo4HZ9j6L5zIeC0iRMJQW5v
- qzyzIKmGZBy0johc3moaTH87Ara4WUNwuEKkuvTNRKiwW1nF0JLiQb8dFGsDpPGAoVvS
- L5WKYfnBzCgUO1qTOUnWh6iopIITE73+tV5qaeK6QXwDArKaS63GW/2dokazIfHxmHGh
- rbW7bSeropICCiE+GxqE0J4DKYd3uFO3G616PvfHBo0Pdd+XJQHuTXj9Ytt7ssMweKGU
- 0lSNYe1Hs07unUE5ZpFw39t+Kr3xnSZ2fPRibBVyx3oLLWfldx5eGygKmrsfa4sE01g1 Ow== 
-Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
- by userp2120.oracle.com with ESMTP id 34dgm4593a-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL);
- Wed, 28 Oct 2020 14:17:29 +0000
-Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
- by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEBMwt196158;
- Wed, 28 Oct 2020 14:15:29 GMT
-Received: from userv0122.oracle.com (userv0122.oracle.com [156.151.31.75])
- by userp3030.oracle.com with ESMTP id 34cx6x9epd-1
- (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
- Wed, 28 Oct 2020 14:15:28 +0000
-Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by userv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 09SEFSmV007785;
- Wed, 28 Oct 2020 14:15:28 GMT
-Received: from mihai.localdomain (/10.153.73.25)
- by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 28 Oct 2020 07:15:28 -0700
-From: Mihai Carabas <mihai.carabas@oracle.com>
-To: qemu-devel@nongnu.org
-Subject: [PATCH 5/6] pvpanic : update pvpanic document
-Date: Wed, 28 Oct 2020 15:32:58 +0200
-Message-Id: <1603891979-11961-6-git-send-email-mihai.carabas@oracle.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1603891979-11961-1-git-send-email-mihai.carabas@oracle.com>
-References: <1603891979-11961-1-git-send-email-mihai.carabas@oracle.com>
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0
- phishscore=0 spamscore=0
- bulkscore=0 malwarescore=0 mlxlogscore=999 mlxscore=0 suspectscore=2
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010280097
-X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787
- signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0
- lowpriorityscore=0 impostorscore=0
- adultscore=0 bulkscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- suspectscore=2 clxscore=1015 mlxscore=0 malwarescore=0 priorityscore=1501
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2010280097
-Received-SPF: pass client-ip=156.151.31.85;
- envelope-from=mihai.carabas@oracle.com; helo=userp2120.oracle.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 10:15:30
-X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
-X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kXmOw-0000iV-Qh
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:26:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39367)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
+ id 1kXmOr-0007if-0I
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:26:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603895164;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=S6tc/RRpKDA0RDKYI/5bfG7Z+6SY4Rb1OrbnJtQhG5c=;
+ b=CtGEVzi4gB+OpkZ00GxuqMEmv02FVVqgBsxdg0XQyxuo2fa1jb76WuD32q0F6NNBH2O4iw
+ 1upMGUxwMU0CI9jcSJ226YhwoSJUHyOSXJnGBNDiE0JFi3ZSoejrAdu4sBLelJchzY8OjZ
+ 0DNBe9qNBOuYkA/mdbbNg0rz3Vh1mwA=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-495-0mVe-mDgNruJda8SI0uG0g-1; Wed, 28 Oct 2020 10:25:57 -0400
+X-MC-Unique: 0mVe-mDgNruJda8SI0uG0g-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
+ (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+ (No client certificate requested)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 0A58C9CC29;
+ Wed, 28 Oct 2020 14:25:55 +0000 (UTC)
+Received: from [10.36.112.194] (ovpn-112-194.ams2.redhat.com [10.36.112.194])
+ by smtp.corp.redhat.com (Postfix) with ESMTPS id 31CEC5F9D6;
+ Wed, 28 Oct 2020 14:25:51 +0000 (UTC)
+Subject: Re: [PATCH 16/25] block/nvme: Simplify ADMIN queue access
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
+References: <20201027135547.374946-1-philmd@redhat.com>
+ <20201027135547.374946-17-philmd@redhat.com>
+From: Auger Eric <eric.auger@redhat.com>
+Message-ID: <71e33050-c690-7c0e-9b83-3b6aff3d6c50@redhat.com>
+Date: Wed, 28 Oct 2020 15:25:50 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.5.0
+MIME-Version: 1.0
+In-Reply-To: <20201027135547.374946-17-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=216.205.24.124;
+ envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -29
+X-Spam_score: -3.0
+X-Spam_bar: ---
+X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H2=-0.001, SPF_HELO_PASS=-0.001,
- SPF_PASS=-0.001, UNPARSEABLE_RELAY=0.001 autolearn=ham autolearn_force=no
+ NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -109,59 +101,68 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Mihai Carabas <mihai.carabas@oracle.com>, Peng Hao <peng.hao2@zte.com.cn>
+Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
+ qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
+ Keith Busch <kbusch@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
+ Klaus Jensen <its@irrelevant.dk>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Peng Hao <peng.hao2@zte.com.cn>
 
-Add mmio mode as a pci device support info in docs/specs/pvpanic.txt.
 
-Signed-off-by: Peng Hao <peng.hao2@zte.com.cn>
-Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
----
- docs/specs/pvpanic.txt | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+On 10/27/20 2:55 PM, Philippe Mathieu-Daudé wrote:
+> We don't need to dereference from BDRVNVMeState each time.
+> Use a NVMeQueuePair pointer to the admin queue and use it.
+double "use"
+> The nvme_init() becomes easier to review, matching the style
+> of nvme_add_io_queue().>
+> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 
-diff --git a/docs/specs/pvpanic.txt b/docs/specs/pvpanic.txt
-index a90fbca..4258922 100644
---- a/docs/specs/pvpanic.txt
-+++ b/docs/specs/pvpanic.txt
-@@ -1,7 +1,7 @@
- PVPANIC DEVICE
- ==============
- 
--pvpanic device is a simulated ISA device, through which a guest panic
-+pvpanic device is a simulated device, through which a guest panic
- event is sent to qemu, and a QMP event is generated. This allows
- management apps (e.g. libvirt) to be notified and respond to the event.
- 
-@@ -9,6 +9,9 @@ The management app has the option of waiting for GUEST_PANICKED events,
- and/or polling for guest-panicked RunState, to learn when the pvpanic
- device has fired a panic event.
- 
-+The pvpanic device can be implemented as an ISA device (using IOPORT),
-+or, since qemu 4.0, as a PCI device.
-+
- ISA Interface
- -------------
- 
-@@ -24,6 +27,13 @@ bit 1: a guest panic has happened and will be handled by the guest;
-        the host should record it or report it, but should not affect
-        the execution of the guest.
- 
-+PCI Interface
-+-------------
-+
-+The PCI interface is similar to the ISA interface except that it uses an MMIO
-+address space provided by its BAR0. For example, the arm virt machine may
-+enable a pvpanic device by adding '-device pvpanic-pci' to the command line.
-+
- ACPI Interface
- --------------
- 
--- 
-1.8.3.1
+Eric
+
+> ---
+>  block/nvme.c | 12 ++++++------
+>  1 file changed, 6 insertions(+), 6 deletions(-)
+> 
+> diff --git a/block/nvme.c b/block/nvme.c
+> index d5df30ec074..2d3648694b0 100644
+> --- a/block/nvme.c
+> +++ b/block/nvme.c
+> @@ -699,6 +699,7 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>                       Error **errp)
+>  {
+>      BDRVNVMeState *s = bs->opaque;
+> +    NVMeQueuePair *q;
+>      AioContext *aio_context = bdrv_get_aio_context(bs);
+>      int ret;
+>      uint64_t cap;
+> @@ -781,19 +782,18 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
+>  
+>      /* Set up admin queue. */
+>      s->queues = g_new(NVMeQueuePair *, 1);
+> -    s->queues[INDEX_ADMIN] = nvme_create_queue_pair(s, aio_context, 0,
+> -                                                          NVME_QUEUE_SIZE,
+> -                                                          errp);
+> -    if (!s->queues[INDEX_ADMIN]) {
+> +    q = nvme_create_queue_pair(s, aio_context, 0, NVME_QUEUE_SIZE, errp);
+> +    if (!q) {
+>          ret = -EINVAL;
+>          goto out;
+>      }
+> +    s->queues[INDEX_ADMIN] = q;
+>      s->queue_count = 1;
+>      QEMU_BUILD_BUG_ON((NVME_QUEUE_SIZE - 1) & 0xF000);
+>      regs->aqa = cpu_to_le32(((NVME_QUEUE_SIZE - 1) << AQA_ACQS_SHIFT) |
+>                              ((NVME_QUEUE_SIZE - 1) << AQA_ASQS_SHIFT));
+> -    regs->asq = cpu_to_le64(s->queues[INDEX_ADMIN]->sq.iova);
+> -    regs->acq = cpu_to_le64(s->queues[INDEX_ADMIN]->cq.iova);
+> +    regs->asq = cpu_to_le64(q->sq.iova);
+> +    regs->acq = cpu_to_le64(q->cq.iova);
+>  
+>      /* After setting up all control registers we can enable device now. */
+>      regs->cc = cpu_to_le32((ctz32(NVME_CQ_ENTRY_BYTES) << CC_IOCQES_SHIFT) |
+> 
 
 
