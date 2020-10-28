@@ -2,93 +2,84 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PULL_REQUEST,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E267C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3C1EC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:26:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7C800247E5
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C7BAA247E7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:26:11 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jJSWaMKo"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7C800247E5
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="xz+2Az0Z"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C7BAA247E7
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:44490 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:51732 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXo5a-0003bQ-8o
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:14:18 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58484)
+	id 1kXoH4-0007ZN-Aa
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:26:10 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33518)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kXo4U-00035W-0y
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:13:12 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47747)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <eric.auger@redhat.com>)
- id 1kXo4P-0005U8-3S
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:13:08 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603901584;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=pz8w8EzTVQRD33Rkm9s8A51L2sbdizJ/PWLZ/f2Arbg=;
- b=jJSWaMKoymmNPH7+/chgRLhW1WzYPnXRBSeB9ip7bQa9DQ9+ikzCs3Dpg/wVn6XJ5Gq0es
- 1eLA+dSEjZFaOCurjAaGoSb2VheceWW6Y0bAutBglOD0bFH66ETyzmH9V1l63wSz3LDe6n
- Hf31KRsEj5Ml3P+BPSJnW/AOusieBXM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-509-lmoLxr_UNCGFyO404MoXng-1; Wed, 28 Oct 2020 12:13:01 -0400
-X-MC-Unique: lmoLxr_UNCGFyO404MoXng-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 020ED879536;
- Wed, 28 Oct 2020 16:13:00 +0000 (UTC)
-Received: from [10.36.112.194] (ovpn-112-194.ams2.redhat.com [10.36.112.194])
- by smtp.corp.redhat.com (Postfix) with ESMTPS id ACC7175121;
- Wed, 28 Oct 2020 16:12:54 +0000 (UTC)
-Subject: Re: [RFC PATCH 25/25] block/nvme: Fix use of write-only doorbells
- page on Aarch64 arch
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>,
- qemu-devel@nongnu.org
-References: <20201027135547.374946-1-philmd@redhat.com>
- <20201027135547.374946-26-philmd@redhat.com>
-From: Auger Eric <eric.auger@redhat.com>
-Message-ID: <03cf4e49-33f8-76a5-046d-db0f7b896bcb@redhat.com>
-Date: Wed, 28 Oct 2020 17:12:53 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXoGS-00074E-Hw
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:25:32 -0400
+Received: from mail-ed1-x531.google.com ([2a00:1450:4864:20::531]:41643)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+ (Exim 4.90_1) (envelope-from <peter.maydell@linaro.org>)
+ id 1kXoGQ-000765-Ln
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:25:32 -0400
+Received: by mail-ed1-x531.google.com with SMTP id l24so26355edj.8
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 09:25:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
+ h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+ :cc; bh=IO0m4MFjawOmyny8FMRrRgHyEgrTqbbdAcC0TJHdsao=;
+ b=xz+2Az0Z1j2qUUMTpKIhynL793rSO4HE0YdVU5I/dEkZ7cWYg0PT1Wt4Wv9OukRNSC
+ EMmUJDTJ65Bo3x+RBCHStQ4lHStkWqn8O9c75dLZVVPU2Gt/F4MGRTCDEVlmvk2Nf+r0
+ //oInKIb+6uYEKZjls/Ggr27sSnY5+bpXkIalMvjgj+kwbzOYWo/FQJ6VeDxzhtl799j
+ yliPuOfy3uIiorieYluvs9KvBLFOgfA9DyiEwdOxhl9pyVYpxULVc97eKJnD6NXkusRr
+ yj90/uYy6ZGm++PQiw/hfvz3oUolNOjy8353hHC69YyytxmIP+DWnVe4+TF1xzI6Eb5S
+ qBAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=1e100.net; s=20161025;
+ h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+ :message-id:subject:to:cc;
+ bh=IO0m4MFjawOmyny8FMRrRgHyEgrTqbbdAcC0TJHdsao=;
+ b=g1iv0mlD33RRx2zcmOqPVugJiudvLCDFnl+tF2Mx+s0WDqgL+n9Ux3UFRwRm4RA0jD
+ vaeOOC4eAPwH3bBb6iCm1iO3YCh0oIbrYzhqPOLqvFmtqbeOZAfKXi/PyfkHLdMILezq
+ JMBHrBbA2uxBZoiM6a6SCSVzlmRAHXOFfeC9LuYqcsjJQhIt8+Rc+U0ktNzE585z2X44
+ /VsqiDOLkWiqUjTgUIkXN1KJR524YlaZzCcffiqN8YaKxYdc5i2hZ4cVwj5HNsI0qOqm
+ ZcKPcesFct1f0evcdDmBx7BjZXWFdaPolsuFxe4ttDIBNzRCIM3UdEO4ZAJdidfDXnUS
+ l9pA==
+X-Gm-Message-State: AOAM533ULKnGSAR1jS8n24rHO73et/7jxkQhIkrZJxKrZvbgibtJhc7A
+ 8Kci3+qz+YhtDZvxD8ZrnTqfLyZNLBiBCu/acZ/dPw==
+X-Google-Smtp-Source: ABdhPJyHSI25HNsaPRDr9qncZjo4u+Z0lKDaOK2DXAafKZVYq4pPxw2yB9R6nIPSdIvknR0W2BI9tM8c0wJNm+meWrc=
+X-Received: by 2002:aa7:c683:: with SMTP id n3mr8412420edq.146.1603902328839; 
+ Wed, 28 Oct 2020 09:25:28 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <20201027135547.374946-26-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=eric.auger@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=eric.auger@redhat.com; helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -29
-X-Spam_score: -3.0
-X-Spam_bar: ---
-X-Spam_report: (-3.0 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
- DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- NICE_REPLY_A=-0.921, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001,
- RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+References: <20201026220339.195790-1-laurent@vivier.eu>
+In-Reply-To: <20201026220339.195790-1-laurent@vivier.eu>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Wed, 28 Oct 2020 16:25:17 +0000
+Message-ID: <CAFEAcA8_yGmAQgdy9VoLmStKUDrmsxb6aVOYJ-HvttXN4171-g@mail.gmail.com>
+Subject: Re: [PULL 0/8] Linux user for 5.2 patches
+To: Laurent Vivier <laurent@vivier.eu>
+Content-Type: text/plain; charset="UTF-8"
+Received-SPF: pass client-ip=2a00:1450:4864:20::531;
+ envelope-from=peter.maydell@linaro.org; helo=mail-ed1-x531.google.com
+X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
+ That's all we know.
+X-Spam_score_int: -20
+X-Spam_score: -2.1
+X-Spam_bar: --
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -102,74 +93,36 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Fam Zheng <fam@euphon.net>, Kevin Wolf <kwolf@redhat.com>,
- qemu-block@nongnu.org, Max Reitz <mreitz@redhat.com>,
- Keith Busch <kbusch@kernel.org>, Stefan Hajnoczi <stefanha@redhat.com>,
- Klaus Jensen <its@irrelevant.dk>
+Cc: QEMU Developers <qemu-devel@nongnu.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Hi,
+On Mon, 26 Oct 2020 at 22:12, Laurent Vivier <laurent@vivier.eu> wrote:
+>
+> The following changes since commit 4c5b97bfd0dd54dc27717ae8d1cd10e14eef1430:
+>
+>   Merge remote-tracking branch 'remotes/kraxel/tags/modules-20201022-pull-req=
+> uest' into staging (2020-10-22 12:33:21 +0100)
+>
+> are available in the Git repository at:
+>
+>   git://github.com/vivier/qemu.git tags/linux-user-for-5.2-pull-request
+>
+> for you to fetch changes up to ab97f0505bec6280c5455009b7678daf5c9278bc:
+>
+>   target/xtensa: enable all coprocessors for linux-user (2020-10-26 12:07:19 =
+> +0100)
+>
+> ----------------------------------------------------------------
+> Update syscall numbers to 5.9-rc7
+> Fixes for prctl(), accept4() and xtensa
+>
 
-On 10/27/20 2:55 PM, Philippe Mathieu-Daudé wrote:
-> qemu_vfio_pci_map_bar() calls mmap(), and mmap(2) states:
-> 
->   'offset' must be a multiple of the page size as returned
->    by sysconf(_SC_PAGE_SIZE).
-> 
-> In commit f68453237b9 we started to use an offset of 4K which
-> broke this contract on Aarch64 arch.
-> 
-> Fix by mapping at offset 0, and and accessing doorbells at offset=4K.
-> 
-> Fixes: f68453237b9 ("block/nvme: Map doorbells pages write-only")
-> Reported-by: Eric Auger <eric.auger@redhat.com>
-> Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
+Applied, thanks.
 
-Eric
+Please update the changelog at https://wiki.qemu.org/ChangeLog/5.2
+for any user-visible changes.
 
-> ---
->  block/nvme.c | 11 +++++++----
->  1 file changed, 7 insertions(+), 4 deletions(-)
-> 
-> diff --git a/block/nvme.c b/block/nvme.c
-> index c1c52bae44f..ff645eefe6a 100644
-> --- a/block/nvme.c
-> +++ b/block/nvme.c
-> @@ -94,6 +94,7 @@ typedef struct {
->  struct BDRVNVMeState {
->      AioContext *aio_context;
->      QEMUVFIOState *vfio;
-> +    void *bar0_wo_map;
->      /* Memory mapped registers */
->      volatile struct {
->          uint32_t sq_tail;
-> @@ -778,8 +779,10 @@ static int nvme_init(BlockDriverState *bs, const char *device, int namespace,
->          }
->      }
->  
-> -    s->doorbells = qemu_vfio_pci_map_bar(s->vfio, 0, sizeof(NvmeBar),
-> -                                         NVME_DOORBELL_SIZE, PROT_WRITE, errp);
-> +    s->bar0_wo_map = qemu_vfio_pci_map_bar(s->vfio, 0, 0,
-> +                                           sizeof(NvmeBar) + NVME_DOORBELL_SIZE,
-> +                                           PROT_WRITE, errp);
-> +    s->doorbells = (void *)((uintptr_t)s->bar0_wo_map + sizeof(NvmeBar));
->      if (!s->doorbells) {
->          ret = -EINVAL;
->          goto out;
-> @@ -913,8 +916,8 @@ static void nvme_close(BlockDriverState *bs)
->                             &s->irq_notifier[MSIX_SHARED_IRQ_IDX],
->                             false, NULL, NULL);
->      event_notifier_cleanup(&s->irq_notifier[MSIX_SHARED_IRQ_IDX]);
-> -    qemu_vfio_pci_unmap_bar(s->vfio, 0, (void *)s->doorbells,
-> -                            sizeof(NvmeBar), NVME_DOORBELL_SIZE);
-> +    qemu_vfio_pci_unmap_bar(s->vfio, 0, s->bar0_wo_map,
-> +                            0, sizeof(NvmeBar) + NVME_DOORBELL_SIZE);
->      qemu_vfio_close(s->vfio);
->  
->      g_free(s->device);
-> 
-
+-- PMM
 
