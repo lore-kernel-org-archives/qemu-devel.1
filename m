@@ -2,76 +2,76 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B567DC55179
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:21:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 400BBC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:21:09 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 10163247BD
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:21:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id AEDC9247BD
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:21:08 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cb9OmHDY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 10163247BD
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FyxOZOAy"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org AEDC9247BD
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:38458 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:38796 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXnG1-0003L3-UL
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:21:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:44556)
+	id 1kXnG7-0003TX-IA
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:21:07 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43110)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXnBw-0000N4-AG
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:16:48 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:36312)
+ id 1kXn6g-0002eh-9B
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:11:22 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:53810)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXnBu-0006Ah-IC
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:16:47 -0400
+ id 1kXn6e-0005Qi-O4
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:11:21 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603898205;
+ s=mimecast20190719; t=1603897880;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=upKLzD+0+gUwH7FeM0cC5thMgXHjfHCysCUPXcW6gP8=;
- b=cb9OmHDYMkACQKHlRmLo2zDq+9iI0i2Z9/Vo/JfphYoMYzAD3pCiC0I+XGvHlbtfub93FU
- kqxuSdylo7R7WAoeH1c8JRcHRLLEGA38x2RyZbARmYlna5RTx9guAJVh+nxPtBSSpk0DkX
- Dkmg2dppmUVAqoX2r3GOArHVK+HcVUo=
+ bh=o53lvpFN04VJAzZUi36jL6pq1VnvnidN4DT26ZN8O5Q=;
+ b=FyxOZOAytp7ZSG4DzVW5d170UoeC3OKW52OLOAUYL2vw1jcGIvNJQbwN5B6NWFpMWlzBkP
+ BQ/nxKQNexiJKhv1tA+tR/yH6IiPUJpYELwZk0BXaKytIhCIO8ob1Q3wg/xklr+3o0VzBY
+ KaDKQCBwBxjup7hXACtKieagoMFoYbA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-333-HjBDVkQBMnujBV-m2Za4jg-1; Wed, 28 Oct 2020 11:16:40 -0400
-X-MC-Unique: HjBDVkQBMnujBV-m2Za4jg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-525-sxyEN2BdPNeq-3A4zqSjcw-1; Wed, 28 Oct 2020 11:11:15 -0400
+X-MC-Unique: sxyEN2BdPNeq-3A4zqSjcw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
+ [10.5.11.15])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 87FBC80365F;
- Wed, 28 Oct 2020 15:16:38 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 69D5410E2185;
+ Wed, 28 Oct 2020 15:11:14 +0000 (UTC)
 Received: from localhost (ovpn-114-6.ams2.redhat.com [10.36.114.6])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 9EBC25C1D7;
- Wed, 28 Oct 2020 15:16:34 +0000 (UTC)
-Date: Wed, 28 Oct 2020 15:16:33 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 0E8416266E;
+ Wed, 28 Oct 2020 15:11:13 +0000 (UTC)
+Date: Wed, 28 Oct 2020 15:11:12 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
 To: Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
-Subject: Re: [PATCH 13/25] block/nvme: Introduce Completion Queue definitions
-Message-ID: <20201028151633.GH231368@stefanha-x1.localdomain>
+Subject: Re: [PATCH 12/25] block/nvme: Make nvme_init_queue() return boolean
+ indicating error
+Message-ID: <20201028151112.GG231368@stefanha-x1.localdomain>
 References: <20201027135547.374946-1-philmd@redhat.com>
- <20201027135547.374946-14-philmd@redhat.com>
+ <20201027135547.374946-13-philmd@redhat.com>
 MIME-Version: 1.0
-In-Reply-To: <20201027135547.374946-14-philmd@redhat.com>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+In-Reply-To: <20201027135547.374946-13-philmd@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="ik0NlRzMGhMnxrMX"
+ protocol="application/pgp-signature"; boundary="gm5TwAJMO0F2iVRz"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -104,81 +104,39 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---ik0NlRzMGhMnxrMX
+--gm5TwAJMO0F2iVRz
 Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 27, 2020 at 02:55:35PM +0100, Philippe Mathieu-Daud=E9 wrote:
-> Rename Submission Queue flags with 'Sq' and introduce
-> Completion Queue flag definitions.
+On Tue, Oct 27, 2020 at 02:55:34PM +0100, Philippe Mathieu-Daud=E9 wrote:
+> Just for consistency, following the example documented since
+> commit e3fe3988d7 ("error: Document Error API usage rules"),
+> return a boolean value indicating an error is set or not.
+> This simplifies a bit nvme_create_queue_pair().
 >=20
 > Signed-off-by: Philippe Mathieu-Daud=E9 <philmd@redhat.com>
 > ---
->  include/block/nvme.h | 17 +++++++++++------
->  1 file changed, 11 insertions(+), 6 deletions(-)
->=20
-> diff --git a/include/block/nvme.h b/include/block/nvme.h
-> index 65e68a82c89..079f884a2d3 100644
-> --- a/include/block/nvme.h
-> +++ b/include/block/nvme.h
-> @@ -491,6 +491,11 @@ typedef struct QEMU_PACKED NvmeCreateCq {
->  #define NVME_CQ_FLAGS_PC(cq_flags)  (cq_flags & 0x1)
->  #define NVME_CQ_FLAGS_IEN(cq_flags) ((cq_flags >> 1) & 0x1)
-> =20
-> +enum NvmeFlagsCq {
-> +    NVME_CQ_PC          =3D 1,
-> +    NVME_CQ_IEN         =3D 2,
-> +};
-> +
->  typedef struct QEMU_PACKED NvmeCreateSq {
->      uint8_t     opcode;
->      uint8_t     flags;
-> @@ -508,12 +513,12 @@ typedef struct QEMU_PACKED NvmeCreateSq {
->  #define NVME_SQ_FLAGS_PC(sq_flags)      (sq_flags & 0x1)
->  #define NVME_SQ_FLAGS_QPRIO(sq_flags)   ((sq_flags >> 1) & 0x3)
-> =20
-> -enum NvmeQueueFlags {
-> -    NVME_Q_PC           =3D 1,
-> -    NVME_Q_PRIO_URGENT  =3D 0,
-> -    NVME_Q_PRIO_HIGH    =3D 1,
-> -    NVME_Q_PRIO_NORMAL  =3D 2,
-> -    NVME_Q_PRIO_LOW     =3D 3,
-> +enum NvmeFlagsSq {
-> +    NVME_SQ_PC          =3D 1,
-> +    NVME_SQ_PRIO_URGENT =3D 0,
-> +    NVME_SQ_PRIO_HIGH   =3D 1,
-> +    NVME_SQ_PRIO_NORMAL =3D 2,
-> +    NVME_SQ_PRIO_LOW    =3D 3,
->  };
+>  block/nvme.c | 15 ++++++---------
+>  1 file changed, 6 insertions(+), 9 deletions(-)
 
-There is also:
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-  #define NVME_SQ_FLAGS_PC(sq_flags)      (sq_flags & 0x1)
-  #define NVME_SQ_FLAGS_QPRIO(sq_flags)   ((sq_flags >> 1) & 0x3)
-
-These macros should use the new constants.
-
-I didn't check if there are additional magic numbers in hw/block/nvme.c
-that should be converted.
-
-Stefan
-
---ik0NlRzMGhMnxrMX
+--gm5TwAJMO0F2iVRz
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+Zi1EACgkQnKSrs4Gr
-c8iqIQf9E1/BKTRpVc1VP2CGiQzLlJauc56imKv4hG2L5JYWZ+3dM6oyHhZ/AbCI
-qh0158wyelBHPLEjY37kLwSvkFX8SRlFPcci/1GEx2GUmiADac4yLgFzUDfvnTZy
-GWSFhc3ZTQc7y1uU2EfxbC7EnTSI5KPF5Jy2EdGn1jP1feuSJZreHmvyY108md1T
-AcOhSUyGQaVQ1rqUOHbe0R8iqNN+qCKf6xgeekG09wUg9oyI1tPLI0qSVAp9syZP
-DUfNZs38PUAkEdHwV13w/+bLpuae93El0vEDEtOaDiqhQ0mLFFf/cetafvjCsRZN
-zvCwPjh2lOBGJYo8CkyQYAqrdUlGkA==
-=1ZqZ
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+ZihAACgkQnKSrs4Gr
+c8hw3wf/ckQaLdkVhI6FY2ynM0FpT/8Io+Wjll+q+Pp0KrsUOOhy4xRkDbzLrQJT
+mM1BWEdu3dv9VDVHEom1eGmkWo7dLsq6uaPoBRhXsnvDp80Q11BqP+VpUNIXSGtd
+uO/R0L861n5vW0R2v97lmI3iAQ+FM8JUoaFiBB28Ul9XPZvcJSDAAnRqH1vIXzfo
+Ldy8W4kwqxcnLOo7kKzxlToy9qgKcwUilr5lRGmdcMuhPmUtGbM9wK7eD2c7KL2k
+ZRZXSTUPPJSz9q9GRnKA7G1uc7H6Z1futMQ3VJw3gx16YCinCLnjJl3Gdxp6o+dX
+A/G9wzN3raQqqAsAARlUoHtx4osMtg==
+=yZUF
 -----END PGP SIGNATURE-----
 
---ik0NlRzMGhMnxrMX--
+--gm5TwAJMO0F2iVRz--
 
 
