@@ -2,82 +2,81 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B80D6C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:17:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F05AC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:17:10 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 1409D2475E
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:17:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id BD8082475E
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 14:17:09 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UL9kOO8s"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 1409D2475E
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="XOKIHCzK"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org BD8082475E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=oracle.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:53566 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:53600 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXmG8-0007io-VT
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:17:05 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:57742)
+	id 1kXmGC-0007jZ-Ni
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 10:17:08 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:57740)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mihai.carabas@oracle.com>)
- id 1kXmEh-0006ku-AT
+ id 1kXmEh-0006kt-8y
  for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:15:35 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:34812)
+Received: from userp2120.oracle.com ([156.151.31.85]:34816)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <mihai.carabas@oracle.com>)
- id 1kXmEf-0006Hc-5B
+ id 1kXmEf-0006Hd-90
  for qemu-devel@nongnu.org; Wed, 28 Oct 2020 10:15:34 -0400
 Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
- by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEEmhL001761
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:28 GMT
+ by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEEXSY001651
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:29 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com;
  h=from : to : cc :
- subject : date : message-id : mime-version : content-type :
- content-transfer-encoding; s=corp-2020-01-29;
- bh=G8z/Iz/lhYF2LNYIGT6KwQiRJ6oZD6FEy8iWCcApOJQ=;
- b=UL9kOO8sAaes6Nky2ElmkumQuR0/dqvpOIZebftkNmZxHdHaOwzct2AzBVfP8AK5kfPW
- ZWSZAQYlHxXiVVzEwZ1nTPo1ujCzO8vA95FuzBXizNwp0X2cFf9euagOjQQj0N2ikLK4
- pDEE7z91MXjwR3i8M6lpFkiamAzZfvhwZzrOPeSFU0d2pcTKEjGDs4GBBCeuhv78hCE6
- zV7J2dxKj2aXzdT1R858xMwmU4MRZgCwjX/dBCiTqEW6z152ZTQ7wwpIrJpEz2BC8lkn
- XQWtyK2RNEkAG1B0nNmKaLeH8lR9TKTzsiaSvek8TT2CIsG16DxFudHhlvDu5bGauar0 ww== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
- by userp2120.oracle.com with ESMTP id 34dgm458sb-1
+ subject : date : message-id : in-reply-to : references; s=corp-2020-01-29;
+ bh=l812kBoC7zLblWSR96zqNQEIbS3y9E16/eX8r+rPHCI=;
+ b=XOKIHCzKqG/ToOUKAJSUBWylZoskppHtqjUoKdIWi885YRq04iwJl5aNPDuuQQnOA0Qh
+ f5me4xujI0D92IwP8e5eKm54GhzDBhJdOkpy5rJ0f3VcsHKUraDEupslsejvgFfgbsw5
+ RzEKT0ettLO7wKJZ2OHsuqNXVZWEH8+TIF3qwTeIen6z+Q2j8XE/OMO4VXJLExAQ5IZb
+ mwfuXIeGg0G7GTpiR7aJ/9JhGkhMF754OD4evgOxhF2d89CoBhZsFBD5NLPQ2TDtNnAQ
+ oq/GsM22KSwxU7AuYDAjt4dETMCWlBzQ849uVJRF3pIg3817lHPVAOY/9KjXz224JTNH Dw== 
+Received: from userp3020.oracle.com (userp3020.oracle.com [156.151.31.79])
+ by userp2120.oracle.com with ESMTP id 34dgm458se-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=FAIL)
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:28 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
- by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEATdw007291
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:27 GMT
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:29 +0000
+Received: from pps.filterd (userp3020.oracle.com [127.0.0.1])
+ by userp3020.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 09SEAMHT004433
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:29 GMT
 Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
- by aserp3030.oracle.com with ESMTP id 34cwunn27p-1
+ by userp3020.oracle.com with ESMTP id 34cx1s1dqy-1
  (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:27 +0000
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:29 +0000
 Received: from abhmp0014.oracle.com (abhmp0014.oracle.com [141.146.116.20])
- by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09SEFQIm012058
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:27 GMT
+ by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 09SEFSvi012067
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 14:15:28 GMT
 Received: from mihai.localdomain (/10.153.73.25)
  by default (Oracle Beehive Gateway v4.0)
- with ESMTP ; Wed, 28 Oct 2020 07:15:26 -0700
+ with ESMTP ; Wed, 28 Oct 2020 07:15:28 -0700
 From: Mihai Carabas <mihai.carabas@oracle.com>
 To: qemu-devel@nongnu.org
-Subject: [PATCH] Add support for pvpanic pci device
-Date: Wed, 28 Oct 2020 15:32:53 +0200
-Message-Id: <1603891979-11961-1-git-send-email-mihai.carabas@oracle.com>
+Subject: [PATCH 6/6] pvpanic: break dependency on ISA_BUS adding PCI
+Date: Wed, 28 Oct 2020 15:32:59 +0200
+Message-Id: <1603891979-11961-7-git-send-email-mihai.carabas@oracle.com>
 X-Mailer: git-send-email 1.8.3.1
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <1603891979-11961-1-git-send-email-mihai.carabas@oracle.com>
+References: <1603891979-11961-1-git-send-email-mihai.carabas@oracle.com>
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787
  signatures=668682
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0
- mlxscore=0 bulkscore=0
- spamscore=0 adultscore=0 malwarescore=0 mlxlogscore=999 suspectscore=1
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0
+ phishscore=0 bulkscore=0
+ suspectscore=1 malwarescore=0 mlxlogscore=999 mlxscore=0 adultscore=0
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
  definitions=main-2010280097
 X-Proofpoint-Virus-Version: vendor=nai engine=6000 definitions=9787
@@ -116,40 +115,58 @@ Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This patchset adds support for pvpanic pci device. The patchset was assembled
-from chuncks from some old patches [1] from 2018 which were left unmerged and
-some additions from me.
+pvpanic is supported on ARM VIRT MACHINE as an PCI device, no need for an ISA
+bus.
 
-How to test this:
-/usr/bin/qemu-system-aarch64 \
-        -machine virt,gic-version=3 -device pvpanic-pci
+Signed-off-by: Mihai Carabas <mihai.carabas@oracle.com>
+---
+ hw/misc/Kconfig   | 2 +-
+ hw/misc/pvpanic.c | 4 ++++
+ 2 files changed, 5 insertions(+), 1 deletion(-)
 
-After that you need to run a Linux kernel as guest, but you have to also apply
-the patches I will send for adding pci support for the pvpanic driver.
-
-[1] http://patchwork.ozlabs.org/project/qemu-devel/cover/1544095560-70807-1-git-send-email-peng.hao2@zte.com.cn/
-
-Mihai Carabas (1):
-  pvpanic: break dependency on ISA_BUS adding PCI
-
-Peng Hao (3):
-  hw/misc/pvpanic: Add the PCI interface
-  hw/arm/virt: Use the pvpanic pci device
-  pvpanic : update pvpanic document
-
-Philippe Mathieu-Daudé (2):
-  hw/misc/pvpanic: Build the pvpanic device for any machine
-  hw/misc/pvpanic: Cosmetic renaming
-
- default-configs/devices/arm-softmmu.mak |  1 +
- docs/specs/pvpanic.txt                  | 12 ++++-
- hw/misc/Kconfig                         |  2 +-
- hw/misc/meson.build                     |  2 +-
- hw/misc/pvpanic.c                       | 96 +++++++++++++++++++++++++++------
- include/hw/misc/pvpanic.h               |  3 +-
- include/hw/pci/pci.h                    |  1 +
- 7 files changed, 97 insertions(+), 20 deletions(-)
-
+diff --git a/hw/misc/Kconfig b/hw/misc/Kconfig
+index 3185456..b650982 100644
+--- a/hw/misc/Kconfig
++++ b/hw/misc/Kconfig
+@@ -117,7 +117,7 @@ config IOTKIT_SYSINFO
+ 
+ config PVPANIC
+     bool
+-    depends on ISA_BUS
++    depends on ISA_BUS || PCI
+ 
+ config AUX
+     bool
+diff --git a/hw/misc/pvpanic.c b/hw/misc/pvpanic.c
+index b0bf7d4..f80cf6c 100644
+--- a/hw/misc/pvpanic.c
++++ b/hw/misc/pvpanic.c
+@@ -106,6 +106,7 @@ static const MemoryRegionOps pvpanic_ops = {
+     },
+ };
+ 
++#ifdef CONFIG_ISA_BUS
+ static void pvpanic_isa_initfn(Object *obj)
+ {
+     PVPanicISAState *s = PVPANIC_ISA_DEVICE(obj);
+@@ -153,6 +154,7 @@ static TypeInfo pvpanic_isa_info = {
+     .instance_init = pvpanic_isa_initfn,
+     .class_init    = pvpanic_isa_class_init,
+ };
++#endif
+ 
+ /* pvpanic pci device*/
+ 
+@@ -193,7 +195,9 @@ static TypeInfo pvpanic_pci_info = {
+ 
+ static void pvpanic_register_types(void)
+ {
++#ifdef CONFIG_ISA_BUS
+     type_register_static(&pvpanic_isa_info);
++#endif
+     type_register_static(&pvpanic_pci_info);
+ }
+ 
 -- 
 1.8.3.1
 
