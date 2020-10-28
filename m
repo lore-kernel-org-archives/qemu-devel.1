@@ -7,54 +7,54 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7219BC4363A
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:38:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61EE6C388F7
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:40:41 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 90FAA2076B
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:38:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id C56052076B
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 00:40:40 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="f9Qn1FTB"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 90FAA2076B
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="gCBaI9Kn"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org C56052076B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:43724 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:45858 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXvxf-0000yh-H2
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 20:38:39 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:33378)
+	id 1kXvzb-0001sx-MK
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 20:40:39 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:33388)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXvww-0000Co-J3; Wed, 28 Oct 2020 20:37:54 -0400
-Received: from ozlabs.org ([2401:3900:2:1::2]:35627)
+ id 1kXvwy-0000Cv-Fq; Wed, 28 Oct 2020 20:37:56 -0400
+Received: from ozlabs.org ([2401:3900:2:1::2]:60413)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
- id 1kXvwt-0000yg-1l; Wed, 28 Oct 2020 20:37:53 -0400
+ id 1kXvwu-0000ye-NO; Wed, 28 Oct 2020 20:37:55 -0400
 Received: by ozlabs.org (Postfix, from userid 1007)
- id 4CM63R0MW0z9sTr; Thu, 29 Oct 2020 11:37:39 +1100 (AEDT)
+ id 4CM63R1VD1z9sTq; Thu, 29 Oct 2020 11:37:39 +1100 (AEDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
  d=gibson.dropbear.id.au; s=201602; t=1603931859;
- bh=azraLuprZ5AORMP7clpuyB6bLghQnLorCzcmGs/9tsw=;
+ bh=QoaRcCy7Nhh4pgDVKXYYG6RiNuQyYN25m0w6Hf9XN9g=;
  h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
- b=f9Qn1FTBJVWcbYh/WR0JA26qVjL7hHAPqaoyIAxfLaL1s4Vgdh9gt4Tb6UPZ43bLF
- qzdqKmDy16s9bBzfvl0Kt45xYGBFI50gMUq2JonA7wRTdlIAM09gFwcSVHQB2O874p
- 9HJGZnPvTgnfUFhkTBOsZS1A/HBil2bO9G4oG+bA=
-Date: Thu, 29 Oct 2020 10:38:35 +1100
+ b=gCBaI9Kn60zDvXgI5AcGMMRLxA9WbBhqq4HK3Z3kozPi+uwt2zM52IRZcSzd9Zm6B
+ QGvcqgeaoX6X0bv4ySjDlaC69NFIUV7foQbdjEMSOmp+D+Tkb1qH0R3fzj/NAKanK4
+ biC6OVbgy3PYVFQAHySx/nXwOCpJ6ZhjGDDy4NdE=
+Date: Thu, 29 Oct 2020 10:39:10 +1100
 From: David Gibson <david@gibson.dropbear.id.au>
 To: Thomas Huth <thuth@redhat.com>
-Subject: Re: [PATCH 7/9] ppc: silence the compiler warnings
-Message-ID: <20201028233835.GG5604@yekko.fritz.box>
+Subject: Re: [PATCH 8/9] target/ppc: silence the compiler warnings
+Message-ID: <20201028233910.GH5604@yekko.fritz.box>
 References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
- <20201028041819.2169003-8-kuhn.chenqun@huawei.com>
- <20201028042900.GC5604@yekko.fritz.box>
- <ddcb887d-42ec-2021-1785-a6fb0d13d6b9@redhat.com>
+ <20201028041819.2169003-9-kuhn.chenqun@huawei.com>
+ <77fb89c5-daa2-0039-bdba-cce0f9895195@redhat.com>
+ <c8255814-80ff-8937-938f-158ff924bb91@redhat.com>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="2NLGdgz3UMHa/lqP"
+ protocol="application/pgp-signature"; boundary="YrlhzR9YrZtruaFS"
 Content-Disposition: inline
-In-Reply-To: <ddcb887d-42ec-2021-1785-a6fb0d13d6b9@redhat.com>
+In-Reply-To: <c8255814-80ff-8937-938f-158ff924bb91@redhat.com>
 Received-SPF: pass client-ip=2401:3900:2:1::2; envelope-from=dgibson@ozlabs.org;
  helo=ozlabs.org
 X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
@@ -78,72 +78,66 @@ List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
 Cc: zhang.zhanghailiang@huawei.com, qemu-trivial@nongnu.org,
- qemu-devel@nongnu.org, "qemu-ppc@nongnu.org" <qemu-ppc@nongnu.org>,
- ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>,
- Chen Qun <kuhn.chenqun@huawei.com>
+ qemu-devel@nongnu.org, ganqixin@huawei.com,
+ Euler Robot <euler.robot@huawei.com>, Chen Qun <kuhn.chenqun@huawei.com>,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 
---2NLGdgz3UMHa/lqP
+--YrlhzR9YrZtruaFS
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 28, 2020 at 03:42:31PM +0100, Thomas Huth wrote:
-> On 28/10/2020 05.29, David Gibson wrote:
-> > On Wed, Oct 28, 2020 at 12:18:17PM +0800, Chen Qun wrote:
+On Wed, Oct 28, 2020 at 04:06:03PM +0100, Thomas Huth wrote:
+> On 28/10/2020 10.56, Philippe Mathieu-Daud=C3=A9 wrote:
+> > On 10/28/20 5:18 AM, Chen Qun wrote:
 > >> When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed w=
 arning:
-> >> hw/ppc/ppc.c: In function =E2=80=98ppc6xx_set_irq=E2=80=99:
-> >> hw/ppc/ppc.c:118:16: warning: this statement may fall through [-Wimpli=
-cit-fallthrough=3D]
-> >>   118 |             if (level) {
-> >>       |                ^
-> >> hw/ppc/ppc.c:123:9: note: here
-> >>   123 |         case PPC6xx_INPUT_INT:
-> >>       |         ^~~~
+> >> target/ppc/mmu_helper.c: In function =E2=80=98dump_mmu=E2=80=99:
+> >> target/ppc/mmu_helper.c:1351:12: warning: this statement may fall thro=
+ugh [-Wimplicit-fallthrough=3D]
+> >>  1351 |         if (ppc64_v3_radix(env_archcpu(env))) {
+> >>       |            ^
+> >> target/ppc/mmu_helper.c:1358:5: note: here
+> >>  1358 |     default:
+> >>       |     ^~~~~~~
 > >>
 > >> Add the corresponding "fall through" comment to fix it.
 > >>
 > >> Reported-by: Euler Robot <euler.robot@huawei.com>
 > >> Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
-> >=20
-> > Acked-by: David Gibson <david@gibson.dropbear.id.au>
-> >=20
 > >> ---
 > >> Cc: David Gibson <david@gibson.dropbear.id.au>
 > >> ---
-> >>  hw/ppc/ppc.c | 1 +
+> >>  target/ppc/mmu_helper.c | 1 +
 > >>  1 file changed, 1 insertion(+)
 > >>
-> >> diff --git a/hw/ppc/ppc.c b/hw/ppc/ppc.c
-> >> index 4a11fb1640..f9eb8f21b4 100644
-> >> --- a/hw/ppc/ppc.c
-> >> +++ b/hw/ppc/ppc.c
-> >> @@ -120,6 +120,7 @@ static void ppc6xx_set_irq(void *opaque, int pin, =
-int level)
-> >>              } else {
-> >>                  cpu_ppc_tb_stop(env);
-> >>              }
-> >> +            /* fall through */
-> >>          case PPC6xx_INPUT_INT:
-> >>              /* Level sensitive - active high */
-> >>              LOG_IRQ("%s: set the external IRQ state to %d\n",
+> >> diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+> >> index 8972714775..51749b62df 100644
+> >> --- a/target/ppc/mmu_helper.c
+> >> +++ b/target/ppc/mmu_helper.c
+> >> @@ -1355,6 +1355,7 @@ void dump_mmu(CPUPPCState *env)
+> >>              break;
+> >>          }
+> >>  #endif
+> >> +        /* fall through */
 > >=20
+> > I'm surprise the compiler emit a warning for missing comment,
+> > but don't emit one for superfluous and confusing ones (when
+> > building a ppc32-only target). You'd need to put this before
+> > the #endif.
+> >=20
+> > But instead of this band-aid to silent warning, replace the
+> > TODO by a LOG_UNIMP call, and add a break before the #endif.
 >=20
-> Is that fall through actually really the right thing to do here? I'd rath=
-er
-> expect to see a PPC_INTERRUPT_DECR instead of a PPC_INTERRUPT_EXT in case
-> someone messes with the TBEN pin? So I assume this is likely rather bug a=
-nd
-> we should a "break" statement here instead?
+> +1 for replacing the TODO with a LOG_UNIMP call and adding a break instea=
+d,
+> that would look way less messy than the current code.
 
-Oh.. good catch, I think I misread this.  I thought the change was
-correct, because DECRs look somewhat like external interrupts.  But
-this is TBEN, not a DECR interrupt per se.  So, yes, I think this was
-a bug and it should be a break instead.
+True, that would be a better approach.
 
 --=20
 David Gibson			| I'll have my music baroque, and my code
@@ -151,25 +145,25 @@ david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
 				| _way_ _around_!
 http://www.ozlabs.org/~dgibson
 
---2NLGdgz3UMHa/lqP
+--YrlhzR9YrZtruaFS
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+aAPgACgkQbDjKyiDZ
-s5L0Zg/9H66EWh7BUIZMOR8b7po1ImYycuFZ+YZ/VBmSQU0G1qUZUnucFiFW9IxC
-GgNIkI7INJ+F6900usbJ8NpYTg2vhf9HV3RJGf48FS29zuPfdOT1ywrB0Te4EBun
-fjVxHBvKmYjf/iqcBIS3WHfItG6SZ/xBQWCmVEEQ2kjzOEJcjlTVBGzUNCsAocrK
-mxwD9KTkBZzkbn0a81qdCXXzh0RfoUfN24ERroAlDUXuxXXMNG+kO7j3UnQLTker
-r84vuU04J3xxGh1ZdzYzX839kPE0wCCjuuYIijEHeqB+pzea3w8Pq+DiKtMPC+q8
-i8NK0oTA6x4dx9H6E4SGH9/7HzTEy5Iab16+xeRTZwaB60MkwByHlOEikIbP3Axa
-lVO+3hjpzeGYKuy9f2lYcojfbiaODCTKjjVJeCfEnCoel6FneTFEoqLFShCVS9rH
-3ACkfBQy+tGx6GrLQNhSPvm1gZymmhcRsCL0Cmfoja04JZ4ig+VK+aTHlHaF+6bC
-BUrcNtjR93sSED5DULcZ50wY9tcWxCLv2FABtSLHdJ2hJc6v5QUlUhzasW2V5HTC
-wfKQSMPgU0CkW8pQk8d/B+EGjswkdgyHTiPykxT/y9MvL6fQ4S9zGTwgKuQGuyo9
-DMUGCR0HiANkVw+z3OqcFZ7XNXe1UAqZx8KL6zEDx/qgkh67msA=
-=LH4S
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+aAR0ACgkQbDjKyiDZ
+s5LCeQ//aVNlIvG4AKUL0rgLA/GUnfHxNQp7LeMjUq1xT25Y3Vjm2Gjck3igWXqX
+Mlz+P7bLQ/yVhN0g0LuHl8efjlyoDdDOOyqQ68hlZj/mYnNlJ3VBz4nE6buOqXkC
+aU0cl/3b3HMdZlHT/4z3tLCmVXd0PpVCXGsH+mAJO4cnrN0hjNj97zDKTM19Uhwa
+mEIvepeNcF/viNiRz0uSy0tK1ve4eVdOvzB4rcoy1mhnM9NRWuGsfwIyxKNrgAPU
+Lk+nAnUyUTcid2pUcME64DA5iovPDXar8IsyLLShsfsdMi5g6LN7Svp04ZWz6Ag0
+mMzKam7IywS2ldYmCmnTVjg3maagPohh5P3PySvJDa8V8BtKYOdcpbdvE7Ijv+1O
+tnGWXVSwAwrmt0o93zc6CWvAbJxXbf6ThTqlXdET/jDLMa/JCQ6k9qAT690LWllr
+Nb7G9M8425jzIhhbu9P1WPztpmT0ksVqSMAcN9iJ9xOXUZs7IcxWACzMYYA7nzPX
+qcxYnxfZwhPOTNckBnas4KB/QdX8qZxk6RyrcvJdsotsTZflYjVnzn9qT77n+BEF
+L7/C20AFi9pzHSJOmBrnRSTDKwc4iA0JL5geB9Ccpn/zekCCFKr3h0uLXTrweEgi
+y5EtCXu2JhZViZtR3WE9ZIG/UMv2nb/zZnUz3OfPSxLy2NYsfKs=
+=oLrI
 -----END PGP SIGNATURE-----
 
---2NLGdgz3UMHa/lqP--
+--YrlhzR9YrZtruaFS--
 
