@@ -7,65 +7,67 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDFF3C388F9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD31DC55178
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:47 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 29D402242B
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:46 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 29D402242B
+	by mail.kernel.org (Postfix) with ESMTPS id 56D7F2242B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 03:09:47 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 56D7F2242B
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=getutm.app
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:36346 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36434 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXbqL-0006Ch-47
-	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:09:45 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:58312)
+	id 1kXbqM-0006Ev-D7
+	for qemu-devel@archiver.kernel.org; Tue, 27 Oct 2020 23:09:46 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:58348)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kXbns-0003iV-I8; Tue, 27 Oct 2020 23:07:12 -0400
-Received: from mail-pl1-f193.google.com ([209.85.214.193]:46829)
+ id 1kXbnw-0003pn-1c
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:07:16 -0400
+Received: from mail-pj1-f54.google.com ([209.85.216.54]:50829)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
  (Exim 4.90_1) (envelope-from <osy86github@gmail.com>)
- id 1kXbnq-0006gU-D4; Tue, 27 Oct 2020 23:07:12 -0400
-Received: by mail-pl1-f193.google.com with SMTP id p17so40331pli.13;
- Tue, 27 Oct 2020 20:07:09 -0700 (PDT)
+ id 1kXbnt-0006ia-L5
+ for qemu-devel@nongnu.org; Tue, 27 Oct 2020 23:07:15 -0400
+Received: by mail-pj1-f54.google.com with SMTP id p21so1830977pju.0
+ for <qemu-devel@nongnu.org>; Tue, 27 Oct 2020 20:07:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
  h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
  :references:mime-version:content-transfer-encoding;
- bh=bB3P4E1QnUB61642KGjjlF4nIL/mJBmxJiEctt/oBV0=;
- b=tvrpOocTzp5DshS5UO4oMhffBS/985F6tdYTgEsISf3ED7dPXodC5ChjfHMrZtDYcf
- NV8bOeuBxgzgke+j8oi9ZuJrXeDbGNBJD4Zd/droFCZuJfrbxAy5aOCNwhLHk1EwXuAM
- 0A5dryi7Cf3nyYVPguBFSpCLCqvykBxHXXC18JXsqQu7pscrgJkd6KqZK2srRGG+aiNM
- Utnbz9HFyvk6/n4Y3R4VPyxfBJyQhA0ViJnRQCkYFxJdo3LyksUdKjdJj5KtywKFFQdz
- H9EZCUbc/ctPXwDGd4sraWW3VUuCFNQJR3zRmzMofQ1emOOZRB1caFG3Oe/PwcexWcYB
- c6AQ==
-X-Gm-Message-State: AOAM532F5VeOe2ITzS1w6l6U2+luNZfDmGg0YpubNdXW023+ouJamJjY
- /Cu6145zMA4J+M7UsWKUokCtQZLPYps=
-X-Google-Smtp-Source: ABdhPJw63cIQu9gKAYn1j4Ps/8rIbow2bUIwb5heY+TmDpSYQzSgtw0EWj/v8LpYKOAQRuJy2fCZhQ==
-X-Received: by 2002:a17:902:8eca:b029:d2:4276:1b2d with SMTP id
- x10-20020a1709028ecab02900d242761b2dmr5265696plo.17.1603854427943; 
- Tue, 27 Oct 2020 20:07:07 -0700 (PDT)
+ bh=DT49rni35hFVEyMORzS9ppHUHIUpQbYd1D7RYdXKZaU=;
+ b=nKxq1nXd/HVYMC4WsqLvi1Q0q4k9mm2loJqWf/UPeJyVvyBG+YwzouOAwzZU0vf6p8
+ n1ShfG5TzI1eaadMf3hLwCAfToYO4hsc+yRvPDH4sMtERNCShyz4lWc8qUb1pdQjjtL/
+ gV+ocikmm3UfqnGaawG7LE0uRZEj4xK7QAXHn4qY6Usq0qFm/gJpbyQJdzlrrLQZpVI7
+ YaxxP+YuTaJ+vppFULOvDnwhZ6+p8muW+zGqNrdvxoe8fEEK1gzisYad2yOfww/JuxB2
+ 3rfd2XibLEtI34ldy8ttLsg0uQt49MqH4d6D1Whctg3CPCRn/sP97+pkuOf1VJ2+etN6
+ Bi7A==
+X-Gm-Message-State: AOAM531En3BmIpBI5lvd/9cgdjTHJW9L+RjvDnFCyzssBgxwxbStyD32
+ WJq2SLXt8+hALh9ZQpbpn0YYvsEXydA=
+X-Google-Smtp-Source: ABdhPJwAMN4uB7a77ySNws+RYpmTGD40J0zjoQ+lYMcsw7KhvcdB0Q4yZ8lYRTCrOQRiYi/0NoYHuQ==
+X-Received: by 2002:a17:90a:3804:: with SMTP id
+ w4mr4858485pjb.171.1603854431721; 
+ Tue, 27 Oct 2020 20:07:11 -0700 (PDT)
 Received: from localhost.localdomain ([73.93.155.93])
- by smtp.gmail.com with ESMTPSA id n6sm3407219pjj.34.2020.10.27.20.07.06
+ by smtp.gmail.com with ESMTPSA id n6sm3407219pjj.34.2020.10.27.20.07.10
  (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
- Tue, 27 Oct 2020 20:07:07 -0700 (PDT)
+ Tue, 27 Oct 2020 20:07:11 -0700 (PDT)
 From: Joelle van Dyne <j@getutm.app>
 To: qemu-devel@nongnu.org
-Subject: [PATCH v3 3/7] qemu: add support for iOS host
-Date: Tue, 27 Oct 2020 20:06:57 -0700
-Message-Id: <20201028030701.14086-4-j@getutm.app>
+Subject: [PATCH v3 6/7] tcg: implement JIT for iOS and Apple Silicon
+Date: Tue, 27 Oct 2020 20:07:00 -0700
+Message-Id: <20201028030701.14086-7-j@getutm.app>
 X-Mailer: git-send-email 2.28.0
 In-Reply-To: <20201028030701.14086-1-j@getutm.app>
 References: <20201028030701.14086-1-j@getutm.app>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=209.85.214.193;
- envelope-from=osy86github@gmail.com; helo=mail-pl1-f193.google.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 23:07:08
+Received-SPF: pass client-ip=209.85.216.54; envelope-from=osy86github@gmail.com;
+ helo=mail-pj1-f54.google.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/27 23:07:12
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -13
 X-Spam_score: -1.4
@@ -86,462 +88,457 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Thomas Huth <thuth@redhat.com>, Marek Vasut <marex@denx.de>,
- "open list:Block layer core" <qemu-block@nongnu.org>,
- Jason Wang <jasowang@redhat.com>, Chris Wulff <crwulff@gmail.com>,
- Richard Henderson <richard.henderson@linaro.org>,
- Michael Roth <mdroth@linux.vnet.ibm.com>, Max Reitz <mreitz@redhat.com>,
- "open list:ARM TCG CPUs" <qemu-arm@nongnu.org>, Joelle van Dyne <j@getutm.app>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Samuel Thibault <samuel.thibault@ens-lyon.org>,
- Laurent Vivier <laurent@vivier.eu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Joelle van Dyne <j@getutm.app>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-This introduces support for building for iOS hosts. When the correct Xcode
-toolchain is used, iOS host will be detected automatically.
+On iOS, we cannot allocate RWX pages without special entitlements. As a
+workaround, we can allocate a RX region and then mirror map it to a separate
+RX region. Then we can write to one region and execute from the other one.
 
-block: disable features not supported by iOS sandbox
-slirp: disable SMB features for iOS
-target: disable system() calls for iOS
-tcg: use sys_icache_invalidate() instead of GCC builtin for iOS
-tests: disable tests on iOS which uses system()
+When entitlements are available (macOS or jailbroken iOS), a hardware
+feature called APRR exists on newer Apple Silicon that can cheaply mark JIT
+pages as either RX or RW. Reverse engineered functions from
+libsystem_pthread.dylib are implemented to handle this.
+
+The following rules apply for JIT write protect:
+  * JIT write-protect is enabled before tcg_qemu_tb_exec()
+  * JIT write-protect is disabled after tcg_qemu_tb_exec() returns
+  * JIT write-protect is disabled inside do_tb_phys_invalidate() but if it
+    is called inside of tcg_qemu_tb_exec() then write-protect will be
+    enabled again before returning.
+  * JIT write-protect is disabled by cpu_loop_exit() for interrupt handling.
+  * JIT write-protect is disabled everywhere else.
+
+Reference:
+https://developer.apple.com/documentation/apple_silicon/porting_just-in-time_compilers_to_apple_silicon
 Signed-off-by: Joelle van Dyne <j@getutm.app>
 ---
- configure                      | 43 +++++++++++++++++++++++++++++++++-
- meson.build                    |  2 +-
- tcg/aarch64/tcg-target.h       |  7 ++++++
- block.c                        |  2 +-
- block/file-posix.c             | 31 ++++++++++++++----------
- net/slirp.c                    | 16 ++++++-------
- qga/commands-posix.c           |  6 +++++
- target/arm/arm-semi.c          |  2 ++
- target/m68k/m68k-semi.c        |  2 ++
- target/nios2/nios2-semi.c      |  2 ++
- tests/qtest/libqos/virtio-9p.c |  8 +++++++
- tests/qtest/meson.build        |  7 +++---
- 12 files changed, 101 insertions(+), 27 deletions(-)
+ docs/devel/index.rst        |   1 +
+ docs/devel/ios.rst          |  39 +++++++++++++
+ configure                   |   1 +
+ include/exec/exec-all.h     |   2 +
+ include/tcg/tcg-apple-jit.h | 106 ++++++++++++++++++++++++++++++++++++
+ include/tcg/tcg.h           |   3 +
+ accel/tcg/cpu-exec-common.c |   2 +
+ accel/tcg/cpu-exec.c        |   2 +
+ accel/tcg/translate-all.c   |  87 ++++++++++++++++++++++++++++-
+ tcg/tcg.c                   |   4 ++
+ 10 files changed, 246 insertions(+), 1 deletion(-)
+ create mode 100644 docs/devel/ios.rst
+ create mode 100644 include/tcg/tcg-apple-jit.h
 
+diff --git a/docs/devel/index.rst b/docs/devel/index.rst
+index 77baae5c77..a46740929f 100644
+--- a/docs/devel/index.rst
++++ b/docs/devel/index.rst
+@@ -34,3 +34,4 @@ Contents:
+    clocks
+    qom
+    block-coroutine-wrapper
++   ios
+diff --git a/docs/devel/ios.rst b/docs/devel/ios.rst
+new file mode 100644
+index 0000000000..3cfa588e72
+--- /dev/null
++++ b/docs/devel/ios.rst
+@@ -0,0 +1,39 @@
++===========
++iOS Support
++===========
++
++To run qemu on the iOS platform, some modifications were required. Most of the
++modifications are conditioned on the ``CONFIG_IOS`` and configuration variable.
++
++Build support
++-------------
++
++For the code to compile, certain changes in the block driver and the slirp
++driver had to be made. There is no ``system()`` call, so code requiring it had
++to be disabled.
++
++``ucontext`` support is broken on iOS. The implementation from ``libucontext``
++is used instead.
++
++Because ``fork()`` is not allowed on iOS apps, the option to build qemu and the
++utilities as shared libraries is added. Note that because qemu does not perform
++resource cleanup in most cases (open files, allocated memory, etc), it is
++advisable that the user implements a proxy layer for syscalls so resources can
++be kept track by the app that uses qemu as a shared library.
++
++JIT support
++-----------
++
++On iOS, allocating RWX pages require special entitlements not usually granted to
++apps. However, it is possible to use `bulletproof JIT`_ with a development
++certificate. This means that we need to allocate one chunk of memory with RX
++permissions and then mirror map the same memory with RW permissions. We generate
++code to the mirror mapping and execute the original mapping.
++
++With ``CONFIG_MIRROR_JIT`` defined, we store inside the TCG context the
++difference between the two mappings. Then, we make sure that any writes to JIT
++memory is done to the pointer + the difference (in order to get a pointer to the
++mirror mapped space). Additionally, we make sure to flush the data cache before
++we invalidate the instruction cache so the changes are seen in both mappings.
++
++.. _bulletproof JIT: https://www.blackhat.com/docs/us-16/materials/us-16-Krstic.pdf
 diff --git a/configure b/configure
-index e211d11971..7fbaefc255 100755
+index 0fef867a9c..a250fe7e8e 100755
 --- a/configure
 +++ b/configure
-@@ -557,6 +557,19 @@ EOF
-   compile_object
- }
+@@ -797,6 +797,7 @@ iOS)
+   bsd="yes"
+   darwin="yes"
+   ios="yes"
++  mirror_jit="yes"
+   if [ "$cpu" = "x86_64" ] ; then
+     QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
+     QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
+diff --git a/include/exec/exec-all.h b/include/exec/exec-all.h
+index 921767a51b..7823a75a30 100644
+--- a/include/exec/exec-all.h
++++ b/include/exec/exec-all.h
+@@ -557,6 +557,8 @@ TranslationBlock *tb_htable_lookup(CPUState *cpu, target_ulong pc,
+                                    target_ulong cs_base, uint32_t flags,
+                                    uint32_t cf_mask);
+ void tb_set_jmp_target(TranslationBlock *tb, int n, uintptr_t addr);
++void tb_exec_lock(void);
++void tb_exec_unlock(void);
  
-+check_ios() {
-+  cat > $TMPC <<EOF
-+#ifdef __APPLE__
-+#import "TargetConditionals.h"
-+#if !TARGET_OS_IPHONE
-+#error TARGET_OS_IPHONE not true
+ /* GETPC is the true target of the return instruction that we'll execute.  */
+ #if defined(CONFIG_TCG_INTERPRETER)
+diff --git a/include/tcg/tcg-apple-jit.h b/include/tcg/tcg-apple-jit.h
+new file mode 100644
+index 0000000000..703a53da4a
+--- /dev/null
++++ b/include/tcg/tcg-apple-jit.h
+@@ -0,0 +1,106 @@
++/*
++ * Apple Silicon functions for JIT handling
++ *
++ * Copyright (c) 2020 osy
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library; if not, see <http://www.gnu.org/licenses/>.
++ */
++
++#ifndef TCG_APPLE_JIT_H
++#define TCG_APPLE_JIT_H
++
++/*
++ * Mirror mapping JIT region for older SoCs ("bulletproof JIT")
++ */
++
++#if defined(CONFIG_DARWIN)
++#include <mach/mach.h>
++extern kern_return_t mach_vm_remap(vm_map_t target_task,
++                                   mach_vm_address_t *target_address,
++                                   mach_vm_size_t size,
++                                   mach_vm_offset_t mask,
++                                   int flags,
++                                   vm_map_t src_task,
++                                   mach_vm_address_t src_address,
++                                   boolean_t copy,
++                                   vm_prot_t *cur_protection,
++                                   vm_prot_t *max_protection,
++                                   vm_inherit_t inheritance
++                                  );
 +#endif
-+#endif
-+int main(void) { return 0; }
-+EOF
-+  compile_object
++
++/*
++ * APRR handling
++ * Credits to: https://siguza.github.io/APRR/
++ * Reversed from /usr/lib/system/libsystem_pthread.dylib
++ */
++
++#if defined(__aarch64__) && defined(CONFIG_DARWIN)
++
++#define _COMM_PAGE_START_ADDRESS        (0x0000000FFFFFC000ULL) /* In TTBR0 */
++#define _COMM_PAGE_APRR_SUPPORT         (_COMM_PAGE_START_ADDRESS + 0x10C)
++#define _COMM_PAGE_APPR_WRITE_ENABLE    (_COMM_PAGE_START_ADDRESS + 0x110)
++#define _COMM_PAGE_APRR_WRITE_DISABLE   (_COMM_PAGE_START_ADDRESS + 0x118)
++
++static __attribute__((__always_inline__)) bool jit_write_protect_supported(void)
++{
++    /* Access shared kernel page at fixed memory location. */
++    uint8_t aprr_support = *(volatile uint8_t *)_COMM_PAGE_APRR_SUPPORT;
++    return aprr_support > 0;
 +}
 +
- check_include() {
- cat > $TMPC <<EOF
- #include <$1>
-@@ -599,7 +612,11 @@ elif check_define __DragonFly__ ; then
- elif check_define __NetBSD__; then
-   targetos='NetBSD'
- elif check_define __APPLE__; then
--  targetos='Darwin'
-+  if check_ios ; then
-+    targetos='iOS'
-+  else
-+    targetos='Darwin'
-+  fi
- else
-   # This is a fatal error, but don't report it yet, because we
-   # might be going to just print the --help text, or it might
-@@ -776,6 +793,22 @@ Darwin)
-   # won't work when we're compiling with gcc as a C compiler.
-   QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
- ;;
-+iOS)
-+  bsd="yes"
-+  darwin="yes"
-+  ios="yes"
-+  if [ "$cpu" = "x86_64" ] ; then
-+    QEMU_CFLAGS="-arch x86_64 $QEMU_CFLAGS"
-+    QEMU_LDFLAGS="-arch x86_64 $QEMU_LDFLAGS"
-+  fi
-+  host_block_device_support="no"
-+  audio_drv_list=""
-+  audio_possible_drivers=""
-+  QEMU_LDFLAGS="-framework CoreFoundation $QEMU_LDFLAGS"
-+  # Disable attempts to use ObjectiveC features in os/object.h since they
-+  # won't work when we're compiling with gcc as a C compiler.
-+  QEMU_CFLAGS="-DOS_OBJECT_USE_OBJC=0 $QEMU_CFLAGS"
-+;;
- SunOS)
-   solaris="yes"
-   make="${MAKE-gmake}"
-@@ -5956,6 +5989,10 @@ if test "$darwin" = "yes" ; then
-   echo "CONFIG_DARWIN=y" >> $config_host_mak
- fi
- 
-+if test "$ios" = "yes" ; then
-+  echo "CONFIG_IOS=y" >> $config_host_mak
-+fi
-+
- if test "$solaris" = "yes" ; then
-   echo "CONFIG_SOLARIS=y" >> $config_host_mak
- fi
-@@ -6924,6 +6961,7 @@ echo "cpp_link_args = [${LDFLAGS:+$(meson_quote $LDFLAGS)}]" >> $cross
- echo "[binaries]" >> $cross
- echo "c = [$(meson_quote $cc)]" >> $cross
- test -n "$cxx" && echo "cpp = [$(meson_quote $cxx)]" >> $cross
-+test -n "$objcc" && echo "objc = [$(meson_quote $objcc)]" >> $cross
- echo "ar = [$(meson_quote $ar)]" >> $cross
- echo "nm = [$(meson_quote $nm)]" >> $cross
- echo "pkgconfig = [$(meson_quote $pkg_config_exe)]" >> $cross
-@@ -6942,6 +6980,9 @@ if test "$cross_compile" = "yes"; then
-     if test "$linux" = "yes" ; then
-         echo "system = 'linux'" >> $cross
-     fi
-+    if test "$darwin" = "yes" ; then
-+        echo "system = 'darwin'" >> $cross
-+    fi
-     case "$ARCH" in
-         i386|x86_64)
-             echo "cpu_family = 'x86'" >> $cross
-diff --git a/meson.build b/meson.build
-index e880274b7c..48c95150fe 100644
---- a/meson.build
-+++ b/meson.build
-@@ -176,7 +176,7 @@ if targetos == 'windows'
-                                       include_directories: include_directories('.'))
- elif targetos == 'darwin'
-   coref = dependency('appleframeworks', modules: 'CoreFoundation')
--  iokit = dependency('appleframeworks', modules: 'IOKit')
-+  iokit = dependency('appleframeworks', modules: 'IOKit', required: 'CONFIG_IOS' not in config_host)
-   cocoa = dependency('appleframeworks', modules: 'Cocoa', required: get_option('cocoa'))
- elif targetos == 'sunos'
-   socket = [cc.find_library('socket'),
-diff --git a/tcg/aarch64/tcg-target.h b/tcg/aarch64/tcg-target.h
-index f605257ed5..6b5b3216fa 100644
---- a/tcg/aarch64/tcg-target.h
-+++ b/tcg/aarch64/tcg-target.h
-@@ -149,12 +149,19 @@ typedef enum {
- #define TCG_TARGET_HAS_MEMORY_BSWAP     1
- 
- #if defined(__APPLE__)
-+void sys_icache_invalidate(void *start, size_t len);
- void sys_dcache_flush(void *start, size_t len);
- #endif
- 
- static inline void flush_icache_range(uintptr_t start, uintptr_t stop)
- {
-+#if defined(__APPLE__)
-+    sys_icache_invalidate((char *)start, stop - start);
-+#elif defined(__GNUC__)
-     __builtin___clear_cache((char *)start, (char *)stop);
-+#else
-+#error "Missing builtin to flush instruction cache"
-+#endif
- }
- 
- void tb_target_set_jmp_target(uintptr_t, uintptr_t, uintptr_t, uintptr_t);
-diff --git a/block.c b/block.c
-index 430edf79bb..5d49869d02 100644
---- a/block.c
-+++ b/block.c
-@@ -53,7 +53,7 @@
- #ifdef CONFIG_BSD
- #include <sys/ioctl.h>
- #include <sys/queue.h>
--#ifndef __DragonFly__
-+#if !defined(__DragonFly__) && !defined(CONFIG_IOS)
- #include <sys/disk.h>
- #endif
- #endif
-diff --git a/block/file-posix.c b/block/file-posix.c
-index 52f7c20525..5560fd20ac 100644
---- a/block/file-posix.c
-+++ b/block/file-posix.c
-@@ -181,7 +181,17 @@ typedef struct BDRVRawReopenState {
-     bool check_cache_dropped;
- } BDRVRawReopenState;
- 
--static int fd_open(BlockDriverState *bs);
-+static int fd_open(BlockDriverState *bs)
++/* write protect enable = write disable */
++static __attribute__((__always_inline__)) void jit_write_protect(int enabled)
 +{
-+    BDRVRawState *s = bs->opaque;
-+
-+    /* this is just to ensure s->fd is sane (its called by io ops) */
-+    if (s->fd >= 0) {
-+        return 0;
++    /* Access shared kernel page at fixed memory location. */
++    uint8_t aprr_support = *(volatile uint8_t *)_COMM_PAGE_APRR_SUPPORT;
++    if (aprr_support == 0 || aprr_support > 3) {
++        return;
++    } else if (aprr_support == 1) {
++        __asm__ __volatile__ (
++            "mov x0, %0\n"
++            "ldr x0, [x0]\n"
++            "msr S3_4_c15_c2_7, x0\n"
++            "isb sy\n"
++            :: "r" (enabled ? _COMM_PAGE_APRR_WRITE_DISABLE
++                            : _COMM_PAGE_APPR_WRITE_ENABLE)
++            : "memory", "x0"
++        );
++    } else {
++        __asm__ __volatile__ (
++            "mov x0, %0\n"
++            "ldr x0, [x0]\n"
++            "msr S3_6_c15_c1_5, x0\n"
++            "isb sy\n"
++            :: "r" (enabled ? _COMM_PAGE_APRR_WRITE_DISABLE
++                            : _COMM_PAGE_APPR_WRITE_ENABLE)
++            : "memory", "x0"
++        );
 +    }
-+    return -EIO;
 +}
 +
- static int64_t raw_getlength(BlockDriverState *bs);
- 
- typedef struct RawPosixAIOData {
-@@ -252,6 +262,12 @@ static int raw_normalize_devicepath(const char **filename, Error **errp)
- }
- #endif
- 
-+#if defined(CONFIG_IOS)
-+static int probe_logical_blocksize(int fd, unsigned int *sector_size_p)
++#else /* defined(__aarch64__) && defined(CONFIG_DARWIN) */
++
++static __attribute__((__always_inline__)) bool jit_write_protect_supported(void)
 +{
-+    return -ENOTSUP; /* not supported on iOS */
++    return false;
 +}
-+#else /* CONFIG_IOS */
- /*
-  * Get logical block size via ioctl. On success store it in @sector_size_p.
-  */
-@@ -284,6 +300,7 @@ static int probe_logical_blocksize(int fd, unsigned int *sector_size_p)
- 
-     return success ? 0 : -errno;
- }
-+#endif /* !CONFIG_IOS */
- 
- /**
-  * Get physical block size of @fd.
-@@ -2306,7 +2323,7 @@ again:
-         }
-         if (size == 0)
- #endif
--#if defined(__APPLE__) && defined(__MACH__)
-+#if !defined(CONFIG_IOS) && defined(__APPLE__) && defined(__MACH__)
-         {
-             uint64_t sectors = 0;
-             uint32_t sector_size = 0;
-@@ -3541,16 +3558,6 @@ hdev_co_ioctl(BlockDriverState *bs, unsigned long int req, void *buf)
- }
- #endif /* linux */
- 
--static int fd_open(BlockDriverState *bs)
--{
--    BDRVRawState *s = bs->opaque;
--
--    /* this is just to ensure s->fd is sane (its called by io ops) */
--    if (s->fd >= 0)
--        return 0;
--    return -EIO;
--}
--
- static coroutine_fn int
- hdev_co_pdiscard(BlockDriverState *bs, int64_t offset, int bytes)
- {
-diff --git a/net/slirp.c b/net/slirp.c
-index 77042e6df7..8413042c09 100644
---- a/net/slirp.c
-+++ b/net/slirp.c
-@@ -27,7 +27,7 @@
- #include "net/slirp.h"
- 
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- #include <pwd.h>
- #include <sys/wait.h>
- #endif
-@@ -90,7 +90,7 @@ typedef struct SlirpState {
-     Slirp *slirp;
-     Notifier poll_notifier;
-     Notifier exit_notifier;
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     gchar *smb_dir;
- #endif
-     GSList *fwd;
-@@ -103,7 +103,7 @@ static QTAILQ_HEAD(, SlirpState) slirp_stacks =
- static int slirp_hostfwd(SlirpState *s, const char *redir_str, Error **errp);
- static int slirp_guestfwd(SlirpState *s, const char *config_str, Error **errp);
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- static int slirp_smb(SlirpState *s, const char *exported_dir,
-                      struct in_addr vserver_addr, Error **errp);
- static void slirp_smb_cleanup(SlirpState *s);
-@@ -368,7 +368,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-     struct in6_addr ip6_prefix;
-     struct in6_addr ip6_host;
-     struct in6_addr ip6_dns;
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     struct in_addr smbsrv = { .s_addr = 0 };
- #endif
-     NetClientState *nc;
-@@ -478,7 +478,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-         return -1;
-     }
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     if (vsmbserver && !inet_aton(vsmbserver, &smbsrv)) {
-         error_setg(errp, "Failed to parse SMB address");
-         return -1;
-@@ -593,7 +593,7 @@ static int net_slirp_init(NetClientState *peer, const char *model,
-             }
-         }
-     }
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
-     if (smb_export) {
-         if (slirp_smb(s, smb_export, smbsrv, errp) < 0) {
-             goto error;
-@@ -785,7 +785,7 @@ void hmp_hostfwd_add(Monitor *mon, const QDict *qdict)
- 
- }
- 
--#ifndef _WIN32
-+#if !defined(_WIN32) && !defined(CONFIG_IOS)
- 
- /* automatic user mode samba server configuration */
- static void slirp_smb_cleanup(SlirpState *s)
-@@ -900,7 +900,7 @@ static int slirp_smb(SlirpState* s, const char *exported_dir,
-     return 0;
- }
- 
--#endif /* !defined(_WIN32) */
-+#endif /* !defined(_WIN32) && !defined(CONFIG_IOS) */
- 
- static int guestfwd_can_read(void *opaque)
- {
-diff --git a/qga/commands-posix.c b/qga/commands-posix.c
-index 3bffee99d4..ebb63b2188 100644
---- a/qga/commands-posix.c
-+++ b/qga/commands-posix.c
-@@ -34,6 +34,12 @@
- 
- #ifndef CONFIG_HAS_ENVIRON
- #ifdef __APPLE__
-+#include "TargetConditionals.h"
-+#if !TARGET_OS_IPHONE && !TARGET_IPHONE_SIMULATOR
-+#define APPLE_USE_CRT_EXTERNS
++
++static __attribute__((__always_inline__)) void jit_write_protect(int enabled)
++{
++}
++
 +#endif
++
++#endif /* define TCG_APPLE_JIT_H */
+diff --git a/include/tcg/tcg.h b/include/tcg/tcg.h
+index a76c259d1b..8a210542bc 100644
+--- a/include/tcg/tcg.h
++++ b/include/tcg/tcg.h
+@@ -631,6 +631,9 @@ struct TCGContext {
+     int code_gen_buffer_fd;
+     ptrdiff_t code_rw_mirror_diff;
+ #endif
++#if defined(CONFIG_DARWIN) && !defined(CONFIG_TCG_INTERPRETER)
++    bool code_gen_locked; /* on Darwin each thread tracks W^X flags */
 +#endif
-+#ifdef APPLE_USE_CRT_EXTERNS
- #include <crt_externs.h>
- #define environ (*_NSGetEnviron())
- #else
-diff --git a/target/arm/arm-semi.c b/target/arm/arm-semi.c
-index 8718fd0194..3704f19df6 100644
---- a/target/arm/arm-semi.c
-+++ b/target/arm/arm-semi.c
-@@ -891,6 +891,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-         return clock() / (CLOCKS_PER_SEC / 100);
-     case TARGET_SYS_TIME:
-         return set_swi_errno(env, time(NULL));
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case TARGET_SYS_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -907,6 +908,7 @@ target_ulong do_arm_semihosting(CPUARMState *env)
-             unlock_user(s, arg0, 0);
-             return ret;
-         }
-+#endif /* CONFIG_IOS */
-     case TARGET_SYS_ERRNO:
-         return get_swi_errno(env);
-     case TARGET_SYS_GET_CMDLINE:
-diff --git a/target/m68k/m68k-semi.c b/target/m68k/m68k-semi.c
-index 8e5fbfc8fa..6b8941839e 100644
---- a/target/m68k/m68k-semi.c
-+++ b/target/m68k/m68k-semi.c
-@@ -402,6 +402,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
-             result = isatty(arg0);
-         }
-         break;
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case HOSTED_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -420,6 +421,7 @@ void do_m68k_semihosting(CPUM68KState *env, int nr)
-             }
-         }
-         break;
-+#endif /* CONFIG_IOS */
-     case HOSTED_INIT_SIM:
+ 
+     /* Threshold to flush the translated code buffer.  */
+     void *code_gen_highwater;
+diff --git a/accel/tcg/cpu-exec-common.c b/accel/tcg/cpu-exec-common.c
+index 12c1e3e974..f1eb767b02 100644
+--- a/accel/tcg/cpu-exec-common.c
++++ b/accel/tcg/cpu-exec-common.c
+@@ -64,6 +64,8 @@ void cpu_reloading_memory_map(void)
+ 
+ void cpu_loop_exit(CPUState *cpu)
+ {
++    /* Unlock JIT write protect if applicable. */
++    tb_exec_unlock();
+     /* Undo the setting in cpu_tb_exec.  */
+     cpu->can_do_io = 1;
+     siglongjmp(cpu->jmp_env, 1);
+diff --git a/accel/tcg/cpu-exec.c b/accel/tcg/cpu-exec.c
+index f7eb6fcd77..f720fbd358 100644
+--- a/accel/tcg/cpu-exec.c
++++ b/accel/tcg/cpu-exec.c
+@@ -175,7 +175,9 @@ static inline tcg_target_ulong cpu_tb_exec(CPUState *cpu, TranslationBlock *itb)
+     }
+ #endif /* DEBUG_DISAS */
+ 
++    tb_exec_lock();
+     ret = tcg_qemu_tb_exec(env, tb_ptr);
++    tb_exec_unlock();
+     cpu->can_do_io = 1;
+     last_tb = (TranslationBlock *)(ret & ~TB_EXIT_MASK);
+     tb_exit = ret & TB_EXIT_MASK;
+diff --git a/accel/tcg/translate-all.c b/accel/tcg/translate-all.c
+index 2144433024..ad41d2c817 100644
+--- a/accel/tcg/translate-all.c
++++ b/accel/tcg/translate-all.c
+@@ -27,6 +27,9 @@
+ #include "disas/disas.h"
+ #include "exec/exec-all.h"
+ #include "tcg/tcg.h"
++#if defined(CONFIG_DARWIN)
++#include "tcg/tcg-apple-jit.h"
++#endif
  #if defined(CONFIG_USER_ONLY)
-         {
-diff --git a/target/nios2/nios2-semi.c b/target/nios2/nios2-semi.c
-index d7a80dd303..bb029070d3 100644
---- a/target/nios2/nios2-semi.c
-+++ b/target/nios2/nios2-semi.c
-@@ -426,6 +426,7 @@ void do_nios2_semihosting(CPUNios2State *env)
-             result = isatty(arg0);
-         }
-         break;
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
-     case HOSTED_SYSTEM:
-         GET_ARG(0);
-         GET_ARG(1);
-@@ -444,6 +445,7 @@ void do_nios2_semihosting(CPUNios2State *env)
-             }
-         }
-         break;
-+#endif
-     default:
-         qemu_log_mask(LOG_GUEST_ERROR, "nios2-semihosting: unsupported "
-                       "semihosting syscall %d\n", nr);
-diff --git a/tests/qtest/libqos/virtio-9p.c b/tests/qtest/libqos/virtio-9p.c
-index d43647b3b7..cc7fb1bbbf 100644
---- a/tests/qtest/libqos/virtio-9p.c
-+++ b/tests/qtest/libqos/virtio-9p.c
-@@ -54,6 +54,7 @@ static void create_local_test_dir(void)
- }
+ #include "qemu.h"
+ #if defined(__FreeBSD__) || defined(__FreeBSD_kernel__)
+@@ -61,6 +64,9 @@
+ #include "sysemu/tcg.h"
+ #include "qemu/memfd.h"
  
- /* Deletes directory previously created by create_local_test_dir(). */
-+#if !defined(CONFIG_IOS) /* iOS does not have system() */
- static void remove_local_test_dir(void)
- {
-     g_assert(local_test_path != NULL);
-@@ -64,6 +65,13 @@ static void remove_local_test_dir(void)
++static bool tb_exec_is_locked(void);
++static void tb_exec_change(bool locked);
++
+ /* #define DEBUG_TB_INVALIDATE */
+ /* #define DEBUG_TB_FLUSH */
+ /* make various TB consistency checks */
+@@ -1093,6 +1099,12 @@ static inline void *alloc_code_gen_buffer(bool mirror_jit)
+         prot |= PROT_WRITE;
+         flags |= MAP_ANONYMOUS | MAP_PRIVATE;
      }
-     g_free(cmd);
++#elif defined(CONFIG_DARWIN) /* both iOS and macOS (Apple Silicon) applicable */
++    if (!mirror_jit) {
++        prot |= PROT_WRITE;
++        flags |= MAP_JIT;
++    }
++    flags |= MAP_ANONYMOUS | MAP_PRIVATE;
+ #else /* defined(CONFIG_LINUX) */
+ #error "Mirror JIT unimplemented for this platform."
+ #endif /* defined(CONFIG_LINUX) */
+@@ -1164,9 +1176,42 @@ static inline void *alloc_jit_rw_mirror(void)
+ 
+     return buf;
  }
-+#else
-+static void remove_local_test_dir(void)
++#elif defined(CONFIG_DARWIN)
++static inline void *alloc_jit_rw_mirror(void)
 +{
-+    fprintf(stderr, "Test not implemented for iOS\n");
-+    g_assert(0);
++    void *base = tcg_ctx->code_gen_buffer;
++    size_t size = tcg_ctx->code_gen_buffer_size;
++    kern_return_t ret;
++    mach_vm_address_t mirror;
++    vm_prot_t cur_prot, max_prot;
++
++    mirror = 0;
++    ret = mach_vm_remap(mach_task_self(),
++                        &mirror,
++                        size,
++                        0,
++                        VM_FLAGS_ANYWHERE | VM_FLAGS_RANDOM_ADDR,
++                        mach_task_self(),
++                        (mach_vm_address_t)base,
++                        false,
++                        &cur_prot,
++                        &max_prot,
++                        VM_INHERIT_NONE
++                       );
++    if (ret != KERN_SUCCESS) {
++        return NULL;
++    }
++
++    if (mprotect((void *)mirror, size, PROT_READ | PROT_WRITE) != 0) {
++        munmap((void *)mirror, size);
++        return NULL;
++    }
++
++    return (void *)mirror;
 +}
+ #else
+ #error "Mirror JIT unimplemented for this platform."
+-#endif /* CONFIG_IOS */
++#endif /* CONFIG_DARWIN */
+ #endif /* CONFIG_MIRROR_JIT */
+ 
+ static inline void code_gen_alloc(size_t tb_size, bool mirror_jit)
+@@ -1230,6 +1275,7 @@ void tcg_exec_init(unsigned long tb_size, bool mirror_jit)
+     page_init();
+     tb_htable_init();
+     code_gen_alloc(tb_size, mirror_jit);
++    tb_exec_unlock();
+ #if defined(CONFIG_SOFTMMU)
+     /* There's no guest base to take into account, so go ahead and
+        initialize the prologue now.  */
+@@ -1506,8 +1552,11 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+     PageDesc *p;
+     uint32_t h;
+     tb_page_addr_t phys_pc;
++    bool code_gen_locked;
+ 
+     assert_memory_lock();
++    code_gen_locked = tb_exec_is_locked();
++    tb_exec_unlock();
+ 
+     /* make sure no further incoming jumps will be chained to this TB */
+     qemu_spin_lock(&tb->jmp_lock);
+@@ -1520,6 +1569,7 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+                      tb->trace_vcpu_dstate);
+     if (!(tb->cflags & CF_NOCACHE) &&
+         !qht_remove(&tb_ctx.htable, tb, h)) {
++        tb_exec_change(code_gen_locked);
+         return;
+     }
+ 
+@@ -1552,6 +1602,8 @@ static void do_tb_phys_invalidate(TranslationBlock *tb, bool rm_from_page_list)
+ 
+     qatomic_set(&tcg_ctx->tb_phys_invalidate_count,
+                tcg_ctx->tb_phys_invalidate_count + 1);
++
++    tb_exec_change(code_gen_locked);
+ }
+ 
+ static void tb_phys_invalidate__locked(TranslationBlock *tb)
+@@ -2792,3 +2844,36 @@ void tcg_flush_softmmu_tlb(CPUState *cs)
+     tlb_flush(cs);
+ #endif
+ }
++
++#if defined(CONFIG_DARWIN) && !defined(CONFIG_TCG_INTERPRETER)
++static bool tb_exec_is_locked(void)
++{
++    return tcg_ctx->code_gen_locked;
++}
++
++static void tb_exec_change(bool locked)
++{
++    if (jit_write_protect_supported()) {
++        jit_write_protect(locked);
++    }
++    tcg_ctx->code_gen_locked = locked;
++}
++#else /* not needed on non-Darwin platforms */
++static bool tb_exec_is_locked(void)
++{
++    return false;
++}
++
++static void tb_exec_change(bool locked) {}
 +#endif
- 
- char *virtio_9p_test_path(const char *path)
++
++void tb_exec_lock(void)
++{
++    /* assumes sys_icache_invalidate already called */
++    tb_exec_change(true);
++}
++
++void tb_exec_unlock(void)
++{
++    tb_exec_change(false);
++}
+diff --git a/tcg/tcg.c b/tcg/tcg.c
+index 085bc73063..ef64c0d3b1 100644
+--- a/tcg/tcg.c
++++ b/tcg/tcg.c
+@@ -781,6 +781,8 @@ static void alloc_tcg_plugin_context(TCGContext *s)
+ void tcg_register_thread(void)
  {
-diff --git a/tests/qtest/meson.build b/tests/qtest/meson.build
-index ba8ebeead6..20bfbb69c2 100644
---- a/tests/qtest/meson.build
-+++ b/tests/qtest/meson.build
-@@ -46,12 +46,11 @@ qtests_i386 = \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-test'] : []) +              \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_ISA') ? ['tpm-tis-swtpm-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_RTL8139_PCI') ? ['rtl8139-test'] : []) +              \
-+  (not config_host.has_key('CONFIG_IOS') ? ['bios-tables-test', 'hd-geo-test'] : []) +      \
-   qtests_pci +                                                                              \
-   ['fdc-test',
-    'ide-test',
--   'hd-geo-test',
-    'boot-order-test',
--   'bios-tables-test',
-    'rtc-test',
-    'i440fx-test',
-    'fuzz-test',
-@@ -144,9 +143,9 @@ qtests_arm = \
-    'boot-serial-test',
-    'hexloader-test']
+     tcg_ctx = &tcg_init_ctx;
++
++    tb_exec_unlock();
+ }
+ #else
+ void tcg_register_thread(void)
+@@ -815,6 +817,8 @@ void tcg_register_thread(void)
+     err = tcg_region_initial_alloc__locked(tcg_ctx);
+     g_assert(!err);
+     qemu_mutex_unlock(&region.lock);
++
++    tb_exec_unlock();
+ }
+ #endif /* !CONFIG_USER_ONLY */
  
--# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional
-+# TODO: once aarch64 TCG is fixed on ARM 32 bit host, make bios-tables-test unconditional (except on iOS)
- qtests_aarch64 = \
--  (cpu != 'arm' ? ['bios-tables-test'] : []) +                                                  \
-+  (cpu != 'arm' and not config_host.has_key('CONFIG_IOS') ? ['bios-tables-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-test'] : []) +        \
-   (config_all_devices.has_key('CONFIG_TPM_TIS_SYSBUS') ? ['tpm-tis-device-swtpm-test'] : []) +  \
-   ['arm-cpu-features',
 -- 
 2.28.0
 
