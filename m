@@ -7,66 +7,67 @@ X-Spam-Status: No, score=-9.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1684EC388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:42:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B37C388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:43:19 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 81809247F1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:42:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 8E95B247F1
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:43:18 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FncuyZCi"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 81809247F1
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="copx8BaO"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8E95B247F1
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39792 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:42570 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXoWV-00075N-Ct
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:42:07 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:37574)
+	id 1kXoXd-0008CO-Du
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:43:17 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37914)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoUR-0005GT-M8
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:40:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:38605)
+ id 1kXoVW-0006UX-Ma
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:06 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:47150)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoUN-0000q5-Kg
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:39:57 -0400
+ id 1kXoVU-000191-PS
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:06 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603903194;
+ s=mimecast20190719; t=1603903263;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=w3tsDtWPjtAI09YsN6kV8JC84S7nvj4OSZL0BEYfi6Q=;
- b=FncuyZCiJCvlZY7qJ2Fgq2kvG52elfx6aNkZ23tri854UEMzgrQP+DNbIb/ZyHuOvPLUZZ
- pKBV6B4do1+SKqFmGk/+SJ2ujiQVOjhfy3XKyV/mED1MYCyebqpSYt1bkzGZy9essC+i1G
- ZLX74IJTGLR+p52uT9FBoij+KhB2yoQ=
+ bh=zBRHBpjkbyR+y1/CD6O88imk1wWikP0Bg09sygU/oso=;
+ b=copx8BaOAuQfocbQtG8vGklvg+htoFaUBu8deJ6VkCCFFBgbddYEjscj98CeJAIAHZwJ09
+ zEQ3qSIwCYcf6JVWsruA08pVc9Jah2gtnsh8jYwK2y2MqVGb/h3EPhMQ3FgiU/sNPnWLc4
+ yzTr72wXkj8oj/fTMuG0VM16mb+aUuA=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-169-6iMT46yQMva_nLtXvF7KnQ-1; Wed, 28 Oct 2020 12:39:52 -0400
-X-MC-Unique: 6iMT46yQMva_nLtXvF7KnQ-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com
- [10.5.11.11])
+ us-mta-271--Z8RNEFwNjKKjdoX8lnJEA-1; Wed, 28 Oct 2020 12:41:00 -0400
+X-MC-Unique: -Z8RNEFwNjKKjdoX8lnJEA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F19ED5F9C4;
- Wed, 28 Oct 2020 16:39:50 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 154455F9C6;
+ Wed, 28 Oct 2020 16:40:59 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A39035B4B2;
- Wed, 28 Oct 2020 16:39:47 +0000 (UTC)
-Subject: [PULL v2 02/32] vfio: Add vfio_get_object callback to VFIODeviceOps
+ by smtp.corp.redhat.com (Postfix) with ESMTP id B8E7560BF1;
+ Wed, 28 Oct 2020 16:40:55 +0000 (UTC)
+Subject: [PULL v2 10/32] memory: Set DIRTY_MEMORY_MIGRATION when IOMMU is
+ enabled
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Oct 2020 10:39:47 -0600
-Message-ID: <160390318735.12234.15740924420870441265.stgit@gimli.home>
+Date: Wed, 28 Oct 2020 10:40:55 -0600
+Message-ID: <160390325499.12234.15952466871554359833.stgit@gimli.home>
 In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -97,60 +98,40 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>, Cornelia Huck <cohuck@redhat.com>,
- Neo Jia <cjia@nvidia.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Kirti Wankhede <kwankhede@nvidia.com>,
+ Yan Zhao <yan.y.zhao@intel.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Kirti Wankhede <kwankhede@nvidia.com>
 
-Hook vfio_get_object callback for PCI devices.
+mr->ram_block is NULL when mr->is_iommu is true, then fr.dirty_log_mask
+wasn't set correctly due to which memory listener's log_sync doesn't
+get called.
+This patch returns log_mask with DIRTY_MEMORY_MIGRATION set when
+IOMMU is enabled.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Neo Jia <cjia@nvidia.com>
-Suggested-by: Cornelia Huck <cohuck@redhat.com>
-Reviewed-by: Cornelia Huck <cohuck@redhat.com>
+Reviewed-by: Yan Zhao <yan.y.zhao@intel.com>
+Acked-by: Paolo Bonzini <pbonzini@redhat.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/pci.c                 |    8 ++++++++
- include/hw/vfio/vfio-common.h |    1 +
- 2 files changed, 9 insertions(+)
+ softmmu/memory.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
-index 0d83eb0e47bb..bffd5bfe3b78 100644
---- a/hw/vfio/pci.c
-+++ b/hw/vfio/pci.c
-@@ -2394,10 +2394,18 @@ static void vfio_pci_compute_needs_reset(VFIODevice *vbasedev)
+diff --git a/softmmu/memory.c b/softmmu/memory.c
+index ee4a6bc16859..21d533d8ed84 100644
+--- a/softmmu/memory.c
++++ b/softmmu/memory.c
+@@ -1806,7 +1806,7 @@ bool memory_region_is_ram_device(MemoryRegion *mr)
+ uint8_t memory_region_get_dirty_log_mask(MemoryRegion *mr)
+ {
+     uint8_t mask = mr->dirty_log_mask;
+-    if (global_dirty_log && mr->ram_block) {
++    if (global_dirty_log && (mr->ram_block || memory_region_is_iommu(mr))) {
+         mask |= (1 << DIRTY_MEMORY_MIGRATION);
      }
- }
- 
-+static Object *vfio_pci_get_object(VFIODevice *vbasedev)
-+{
-+    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
-+
-+    return OBJECT(vdev);
-+}
-+
- static VFIODeviceOps vfio_pci_ops = {
-     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
-     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
-     .vfio_eoi = vfio_intx_eoi,
-+    .vfio_get_object = vfio_pci_get_object,
- };
- 
- int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
-diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
-index dc95f527b583..fe99c36a693a 100644
---- a/include/hw/vfio/vfio-common.h
-+++ b/include/hw/vfio/vfio-common.h
-@@ -119,6 +119,7 @@ struct VFIODeviceOps {
-     void (*vfio_compute_needs_reset)(VFIODevice *vdev);
-     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
-     void (*vfio_eoi)(VFIODevice *vdev);
-+    Object *(*vfio_get_object)(VFIODevice *vdev);
- };
- 
- typedef struct VFIOGroup {
+     return mask;
 
 
