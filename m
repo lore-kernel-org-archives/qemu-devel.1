@@ -7,71 +7,70 @@ X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C6A3C4363A
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71779C55178
 	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:25:20 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 521DC24721
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:25:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id B561724726
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 12:25:19 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H3RewhIt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 521DC24721
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W5vWDPLj"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B561724726
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:39986 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:40118 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXkVw-0001mg-2h
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 08:25:16 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:60742)
+	id 1kXkVy-0001qE-Jp
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 08:25:18 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:60764)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXkTx-0000ko-TH
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:14 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58061)
+ id 1kXkTy-0000lR-RH
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41046)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <stefanha@redhat.com>)
- id 1kXkTr-0006NJ-GI
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:10 -0400
+ id 1kXkTu-0006Ot-6c
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 08:23:14 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603887786;
+ s=mimecast20190719; t=1603887789;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  in-reply-to:in-reply-to:references:references;
- bh=6gaHJZRy8gfqPmBN2ROSS5+K8U+avFvNOzVWmlwWJD8=;
- b=H3RewhItbVCIULeZZhbdsueTwSgbfiCoHuX/c02+Lz4ZdItY+Y3TTgh0b0Z5AGzofTLfRJ
- l0juoLbvVKFtCmUjo9T4EoWQ7QQby/hCFQVvGU3PccuWLEIar/xMUwslVHXbEeFsqHgt9o
- BPa4+bXOIXT9aQg172SibZS9JpingD8=
+ bh=MXQO6TN//k8jfeTrEZyn8Ixy+M4HQxU/AsAODf+lPQI=;
+ b=W5vWDPLjRjOIdx2O3QIUhvXdSwy/6cOQaA8u9BSwSO2tvWrqya5uHHGn/ewuRFMwuoIjaZ
+ JGLVssS88+a1wCehhMTO5/MdtYXmEz6K2M4OBN/ILHT5ku/pxQ/vS2Ic/sZzJIS4yUjzid
+ 7yDYhhk+KOYRLBko8tbQijOSzBpTo3Y=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-251-bM4ecxw3NB26PpTkqGGL7g-1; Wed, 28 Oct 2020 08:23:03 -0400
-X-MC-Unique: bM4ecxw3NB26PpTkqGGL7g-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com
- [10.5.11.13])
+ us-mta-431-dL1Gm537PbaGD-5KbL8Q5Q-1; Wed, 28 Oct 2020 08:23:06 -0400
+X-MC-Unique: dL1Gm537PbaGD-5KbL8Q5Q-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
+ [10.5.11.16])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 6DADE802B6D;
- Wed, 28 Oct 2020 12:23:02 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 93D371009E22;
+ Wed, 28 Oct 2020 12:23:05 +0000 (UTC)
 Received: from localhost (ovpn-115-29.ams2.redhat.com [10.36.115.29])
- by smtp.corp.redhat.com (Postfix) with ESMTP id EAA226EF62;
- Wed, 28 Oct 2020 12:23:01 +0000 (UTC)
-Date: Wed, 28 Oct 2020 11:59:46 +0000
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 3567A5C1D7;
+ Wed, 28 Oct 2020 12:23:05 +0000 (UTC)
+Date: Wed, 28 Oct 2020 12:23:00 +0000
 From: Stefan Hajnoczi <stefanha@redhat.com>
-To: Joelle van Dyne <j@getutm.app>
-Subject: Re: [PATCH v3 7/7] block: check availablity for preadv/pwritev on mac
-Message-ID: <20201028115946.GK221115@stefanha-x1.localdomain>
-References: <20201028030701.14086-1-j@getutm.app>
- <20201028030701.14086-8-j@getutm.app>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH] block: Move bdrv_drain_all_end_quiesce() to block_int.h
+Message-ID: <20201028122300.GA231368@stefanha-x1.localdomain>
+References: <160387245480.131299.13430357162209598411.stgit@bahia>
 MIME-Version: 1.0
-In-Reply-To: <20201028030701.14086-8-j@getutm.app>
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <160387245480.131299.13430357162209598411.stgit@bahia>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=stefanha@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
 Content-Type: multipart/signed; micalg=pgp-sha256;
- protocol="application/pgp-signature"; boundary="NhBACjNc9vV+/oop"
+ protocol="application/pgp-signature"; boundary="BXVAT5kNtrzKuDFl"
 Content-Disposition: inline
 Received-SPF: pass client-ip=216.205.24.124; envelope-from=stefanha@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
@@ -96,49 +95,49 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org,
- "open list:raw" <qemu-block@nongnu.org>, Max Reitz <mreitz@redhat.com>
+Cc: Kevin Wolf <kwolf@redhat.com>, qemu-devel@nongnu.org, qemu-block@nongnu.org,
+ Max Reitz <mreitz@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
---NhBACjNc9vV+/oop
+--BXVAT5kNtrzKuDFl
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 27, 2020 at 08:07:01PM -0700, Joelle van Dyne wrote:
-> macOS 11/iOS 14 added preadv/pwritev APIs. Due to weak linking, configure
-> will succeed with CONFIG_PREADV even when targeting a lower OS version. W=
-e
-> therefore need to check at run time if we can actually use these APIs.
+On Wed, Oct 28, 2020 at 09:07:34AM +0100, Greg Kurz wrote:
+> This function is really an internal helper for bdrv_close(). Update its
+> doc comment to make this clear and make the function private.
 >=20
-> Signed-off-by: Joelle van Dyne <j@getutm.app>
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 > ---
->  block/file-posix.c | 12 ++++++++++++
->  1 file changed, 12 insertions(+)
+>=20
+> As suggested by Stefan here:
+>=20
+> https://lists.gnu.org/archive/html/qemu-devel/2020-10/msg08235.html
+> ---
+>  include/block/block.h     |    6 ------
+>  include/block/block_int.h |    9 +++++++++
+>  2 files changed, 9 insertions(+), 6 deletions(-)
 
-What happens when preadv() is called prior to macOS 11/iOS 14?
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
 
-If I understand correctly the runtime check is preferrable because
-otherwise a binary compiled on recent macOS/iOS would ship with preadv()
-support but fail when executed on an older macOS/iOS?
-
---NhBACjNc9vV+/oop
+--BXVAT5kNtrzKuDFl
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+ZXTIACgkQnKSrs4Gr
-c8hxLwf9GYcJUXHDRWtCbwGBR1b0nE/LpEA/p8H/oPWCN7CstGtSA7TZBHZkHy9o
-73PoYwEOsCt5+LlNYB34yycwfOu4/C1zU5HPSSsdhGgWeELBsZl9AxqQxHMPIFLi
-cw/Z16Ux0PUpTegeHvYPaO8HJ17ViUUd7HjVcHQ4YL2KXS9Yje+xvt8rrTpWSBfI
-V+/PuNVFr8fi7W94S/sZdtZ2xgxsd6KbC9F49QcaI6ukDinvqdU4EwnLRdVRXDlf
-cK43LXfCtLYJL/pDpsznZoRRzQ/svBumF8daXRntH0WogtLurgq+OZLPRTwDcff3
-z+Hui3kFTuvb8Nfw5zLUXYGw5tfzYg==
-=EcPK
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAl+ZYqQACgkQnKSrs4Gr
+c8jeKgf/dA86Xawj0UsWY72G7d0LNKTckQ6O14he8w1uGXZ4wbFfQu3KDylCG/UV
+ciO2crCLYbbPk5rUJqzCb60spBnYL/lXKmV49+wAY1z5VvujbBGNoqhWkmBRZGZk
+NAtHlmOyvVYoDhP/H9g1+tIQ1TQZdmr3p6MvxQx8SRJUZIzp2m6yFQceOEfKOHM3
+X3R3KmVM6dDTLyMfIJugErdR0ox/JFim2huNVZB7dis/YNtBzOdeE2xo9rMfxMyr
+e3b2gXlv4rW1GfY9H4Mk9peun8K34KhqvepeufKs/b67I1m4y23eiZDrbfde0GhD
+0hYNoIDTDt+v56+KGPiaPLAn7sCNcQ==
+=kCfw
 -----END PGP SIGNATURE-----
 
---NhBACjNc9vV+/oop--
+--BXVAT5kNtrzKuDFl--
 
 
