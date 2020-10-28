@@ -2,89 +2,79 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DCF7C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:19:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BBDAC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:20:52 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id A6839247CC
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:19:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 3D881247D5
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 17:20:51 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g0Jgd0Yt"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org A6839247CC
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=citrix.com header.i=@citrix.com header.b="JTKO4jEc"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 3D881247D5
+Authentication-Results: mail.kernel.org; dmarc=pass (p=none dis=none) header.from=nongnu.org
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:57248 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:35248 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXp6C-0008CH-JQ
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:19:00 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38922)
+	id 1kXp7y-0002Ww-84
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 13:20:50 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:47812)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoYh-0002Fy-8h
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:44:23 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:44510)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoYf-0001aY-Jl
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:44:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603903461;
- h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
- to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=FX1n4R8Iv7bnRZz+JKR/7t1VpAKvtbsVHEIJkkFofes=;
- b=g0Jgd0YtvTiM9xNJjJfPqLvp6yUbmB7nhhs3UV8dXvKvWcaj7ORGLx4CSMbevv15n0m6fl
- ThEugRncuwgn+OdtUjKnSq5RuyX86R6UU9VQf61hjscqXYCMdHlNsVp2BSnDDcN/TuQ9Jn
- 4sezaKMNMHLJv9zeef/NpFN8uTcEuUY=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-117-JYdFkrTrMD6yoik6jfEnkg-1; Wed, 28 Oct 2020 12:44:16 -0400
-X-MC-Unique: JYdFkrTrMD6yoik6jfEnkg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.phx2.redhat.com
- [10.5.11.22])
- (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
- (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 53ACE1009E35;
- Wed, 28 Oct 2020 16:44:15 +0000 (UTC)
-Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 1A6EC10013C1;
- Wed, 28 Oct 2020 16:44:15 +0000 (UTC)
-Subject: [PULL v2 32/32] vfio: fix incorrect print type
-From: Alex Williamson <alex.williamson@redhat.com>
-To: qemu-devel@nongnu.org
-Date: Wed, 28 Oct 2020 10:44:14 -0600
-Message-ID: <160390345472.12234.994534306376896981.stgit@gimli.home>
-In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
-References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
-User-Agent: StGit/0.21-dirty
+ (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
+ id 1kXp6r-0000qd-Tx; Wed, 28 Oct 2020 13:19:41 -0400
+Received: from esa2.hc3370-68.iphmx.com ([216.71.145.153]:59598)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <anthony.perard@citrix.com>)
+ id 1kXp6p-0006Lo-AW; Wed, 28 Oct 2020 13:19:41 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+ d=citrix.com; s=securemail; t=1603905579;
+ h=date:from:to:cc:subject:message-id:references:
+ mime-version:in-reply-to;
+ bh=Npeg9RZb1Tly7Z0t91E59nEXfv/QG3/W/1wUJKzHhIE=;
+ b=JTKO4jEcrO5AKwh+wTfjnB3g3HrjTzz9/4f+SmcIHcD2yI1t7NkLFK6T
+ Dxm/UpvwBnKdhaNPx+MHz4IwtoR35D47kcTn9ZWGozNnRnOT+Azh3uZqm
+ JfzZMoF+6SNTqlm5T+4+hbCJYWu4G/RdHuj9kFb6xGqpp4BGi9nKmaNSJ E=;
+Authentication-Results: esa2.hc3370-68.iphmx.com;
+ dkim=none (message not signed) header.i=none
+IronPort-SDR: iikfO2KoDd/NeTU9BHnPy8TnuxMH8CB0Pvk8lnQMskI0bps4u3MRBem7FcFDB4fa1t+IP5iYMR
+ mwt12iQolkNS/K/QMyznQrunRasdA+g9bMIBY2Hs3w1UbQAKHAMfHE3ApVQd8oZ33Y5dU0RTSQ
+ mcibb7/JQZ+BJTSs1Kxp5LFGwIsQOMVoVcYjiHje2BS3bWsnnDc4cIXagPTYdgQXqJKoKhHjte
+ Kw7xYzmbBOTkWzsiskSwLT+o7sqpPd5WFhgXltylaVxwiE/J8cSoZ0g90UTlh4aIy6MNCUPrhY
+ ZDY=
+X-SBRS: None
+X-MesageID: 29999047
+X-Ironport-Server: esa2.hc3370-68.iphmx.com
+X-Remote-IP: 162.221.158.21
+X-Policy: $RELAYED
+X-IronPort-AV: E=Sophos;i="5.77,427,1596513600"; d="scan'208";a="29999047"
+Date: Wed, 28 Oct 2020 17:19:26 +0000
+To: John Snow <jsnow@redhat.com>
+CC: <qemu-devel@nongnu.org>, Paul Durrant <paul@xen.org>, Stefano Stabellini
+ <sstabellini@kernel.org>, <qemu-block@nongnu.org>
+Subject: Re: [PATCH v2] xen: rework pci_piix3_xen_ide_unplug
+Message-ID: <20201028171926.GF2214@perard.uk.xensource.com>
+References: <20201027154058.495112-1-anthony.perard@citrix.com>
+ <e7d2fef8-a697-398e-4b3b-bf247aac01a5@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.22
-Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=216.205.24.124;
- envelope-from=alex.williamson@redhat.com;
- helo=us-smtp-delivery-124.mimecast.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:50:00
-X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <e7d2fef8-a697-398e-4b3b-bf247aac01a5@redhat.com>
+Received-SPF: pass client-ip=216.71.145.153;
+ envelope-from=anthony.perard@citrix.com; helo=esa2.hc3370-68.iphmx.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 13:19:35
+X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
+X-Spam_score_int: -43
+X-Spam_score: -4.4
+X-Spam_bar: ----
+X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
  DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
- SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+ RCVD_IN_DNSWL_MED=-2.3, RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -97,43 +87,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Zhengui li <lizhengui@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
+Reply-to: Anthony PERARD <anthony.perard@citrix.com>
+From: Anthony PERARD via <qemu-devel@nongnu.org>
 
-From: Zhengui li <lizhengui@huawei.com>
+On Tue, Oct 27, 2020 at 01:33:32PM -0400, John Snow wrote:
+> On 10/27/20 11:40 AM, Anthony PERARD wrote:
+> > From: Anthony PERARD <anthony.perard@citrix.com>
+> > 
+> > This is to allow IDE disks to be unplugged when adding to QEMU via:
+> >      -drive file=/root/disk_file,if=none,id=ide-disk0,format=raw
+> >      -device ide-hd,drive=ide-disk0,bus=ide.0,unit=0
+> > 
+> > as the current code only works for disk added with:
+> >      -drive file=/root/disk_file,if=ide,index=0,media=disk,format=raw
+> > 
+> > Since the code already have the IDE controller as `dev`, we don't need
+> > to use the legacy DriveInfo to find all the drive we want to unplug.
+> > We can simply use `blk` from the controller, as it kind of was already
+> > assume to be the same, by setting it to NULL.
+> > 
+> > Signed-off-by: Anthony PERARD <anthony.perard@citrix.com>
+> 
+> Acked-by: John Snow <jsnow@redhat.com>
+> 
+> Do you need me to send a PR for this?
 
-The type of input variable is unsigned int
-while the printer type is int. So fix incorrect print type.
+No, that's fine, I can do the PR since it's all xen code.
 
-Signed-off-by: Zhengui li <lizhengui@huawei.com>
-Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
----
- hw/vfio/common.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Thanks,
 
-diff --git a/hw/vfio/common.c b/hw/vfio/common.c
-index 60217c20f9ff..65fe484f3cf7 100644
---- a/hw/vfio/common.c
-+++ b/hw/vfio/common.c
-@@ -205,7 +205,7 @@ void vfio_region_write(void *opaque, hwaddr addr,
-         buf.qword = cpu_to_le64(data);
-         break;
-     default:
--        hw_error("vfio: unsupported write size, %d bytes", size);
-+        hw_error("vfio: unsupported write size, %u bytes", size);
-         break;
-     }
- 
-@@ -262,7 +262,7 @@ uint64_t vfio_region_read(void *opaque,
-         data = le64_to_cpu(buf.qword);
-         break;
-     default:
--        hw_error("vfio: unsupported read size, %d bytes", size);
-+        hw_error("vfio: unsupported read size, %u bytes", size);
-         break;
-     }
- 
-
+-- 
+Anthony PERARD
 
