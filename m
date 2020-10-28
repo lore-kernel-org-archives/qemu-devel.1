@@ -7,67 +7,66 @@ X-Spam-Status: No, score=-9.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5BE9C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:45:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8C2EC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:47:16 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 32507247F1
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:45:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id E634A247F3
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 16:47:15 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I6zu/DwY"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 32507247F1
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="coobkHbh"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E634A247F3
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:50990 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:56048 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXoZJ-0003Ic-V3
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:45:02 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:38072)
+	id 1kXobS-0005Wa-N5
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 12:47:14 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:37588)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoVt-0006d0-0y
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:30 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:28868)
+ id 1kXoUb-0005JU-Bc
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:40:10 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:23225)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
  (Exim 4.90_1) (envelope-from <alex.williamson@redhat.com>)
- id 1kXoVq-0001Dw-UA
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:41:28 -0400
+ id 1kXoUV-0000qQ-Ta
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 12:40:07 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1603903285;
+ s=mimecast20190719; t=1603903203;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
  content-transfer-encoding:content-transfer-encoding:
  in-reply-to:in-reply-to:references:references;
- bh=YIEqP5aCBlkgA+SoSrywyTB8VENVOtpiIo/ajSQpXG8=;
- b=I6zu/DwYJuznBO+Qctbrou+QUOb99cXSGT9lGFkPJW4cxVdiyCi00mcW17ja44+OYYpVII
- L3owteEPgNHS/0RuhLDy/pp4QG2YIZSA0FD8vK0uzPD6tJiuiCh5mMMXv1aSHOg4Fi+5Vr
- nlGKEUX+xY69stVqsToqgsLrhHLJBKQ=
+ bh=0EnfaRYuFDwhG4EBnAKMEEhTLIBrGqWdIZhqwhCjUSs=;
+ b=coobkHbhSsWWQHDkNMMJBdNiUDfqfb23e1ZqXO/smBWI7LyitxL77pgdDUn+tWuH+eGPDC
+ EnYHWSEWIumXqKzoeVv2t156dL6AYjY2BU3HFTwnmrBFwjyfYnJBDdczlknGtXzzzRKQP/
+ k9uB+Mzpgg3r1nBDkNgeaREozgSWnxE=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-380-IsJwIvPdMkeJDj8axPuh3w-1; Wed, 28 Oct 2020 12:41:23 -0400
-X-MC-Unique: IsJwIvPdMkeJDj8axPuh3w-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com
- [10.5.11.16])
+ us-mta-216-t9wnz9q1NHaw7OuRaeZrMA-1; Wed, 28 Oct 2020 12:40:00 -0400
+X-MC-Unique: t9wnz9q1NHaw7OuRaeZrMA-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com
+ [10.5.11.23])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 50D2518B9F00;
- Wed, 28 Oct 2020 16:41:22 +0000 (UTC)
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B66318EBA04;
+ Wed, 28 Oct 2020 16:39:59 +0000 (UTC)
 Received: from gimli.home (ovpn-112-213.phx2.redhat.com [10.3.112.213])
- by smtp.corp.redhat.com (Postfix) with ESMTP id A6EFD5C1D7;
- Wed, 28 Oct 2020 16:41:18 +0000 (UTC)
-Subject: [PULL v2 12/32] vfio: Add function to start and stop dirty pages
- tracking
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 71BEC19D61;
+ Wed, 28 Oct 2020 16:39:56 +0000 (UTC)
+Subject: [PULL v2 03/32] vfio: Add save and load functions for VFIO PCI devices
 From: Alex Williamson <alex.williamson@redhat.com>
 To: qemu-devel@nongnu.org
-Date: Wed, 28 Oct 2020 10:41:18 -0600
-Message-ID: <160390327829.12234.7519541558193490393.stgit@gimli.home>
+Date: Wed, 28 Oct 2020 10:39:56 -0600
+Message-ID: <160390319605.12234.17079402968224211955.stgit@gimli.home>
 In-Reply-To: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 References: <160390309510.12234.8858324597971641979.stgit@gimli.home>
 User-Agent: StGit/0.21-dirty
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
+X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
 Authentication-Results: relay.mimecast.com;
  auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=alex.williamson@redhat.com
 X-Mimecast-Spam-Score: 0
@@ -98,88 +97,110 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Kirti Wankhede <kwankhede@nvidia.com>,
- "Dr. David Alan Gilbert" <dgilbert@redhat.com>
+Cc: Kirti Wankhede <kwankhede@nvidia.com>, Neo Jia <cjia@nvidia.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 From: Kirti Wankhede <kwankhede@nvidia.com>
 
-Call VFIO_IOMMU_DIRTY_PAGES ioctl to start and stop dirty pages tracking
-for VFIO devices.
+Added functions to save and restore PCI device specific data,
+specifically config space of PCI device.
 
 Signed-off-by: Kirti Wankhede <kwankhede@nvidia.com>
-Reviewed-by: Dr. David Alan Gilbert <dgilbert@redhat.com>
+Reviewed-by: Neo Jia <cjia@nvidia.com>
 Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
 ---
- hw/vfio/migration.c |   36 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 36 insertions(+)
+ hw/vfio/pci.c                 |   51 +++++++++++++++++++++++++++++++++++++++++
+ include/hw/vfio/vfio-common.h |    2 ++
+ 2 files changed, 53 insertions(+)
 
-diff --git a/hw/vfio/migration.c b/hw/vfio/migration.c
-index 39503b49e33d..a248effb3786 100644
---- a/hw/vfio/migration.c
-+++ b/hw/vfio/migration.c
-@@ -11,6 +11,7 @@
- #include "qemu/main-loop.h"
- #include "qemu/cutils.h"
- #include <linux/vfio.h>
-+#include <sys/ioctl.h>
+diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+index bffd5bfe3b78..e27c88be6d85 100644
+--- a/hw/vfio/pci.c
++++ b/hw/vfio/pci.c
+@@ -41,6 +41,7 @@
+ #include "trace.h"
+ #include "qapi/error.h"
+ #include "migration/blocker.h"
++#include "migration/qemu-file.h"
  
- #include "sysemu/runstate.h"
- #include "hw/vfio/vfio-common.h"
-@@ -391,10 +392,40 @@ static int vfio_load_device_config_state(QEMUFile *f, void *opaque)
-     return qemu_file_get_error(f);
+ #define TYPE_VFIO_PCI_NOHOTPLUG "vfio-pci-nohotplug"
+ 
+@@ -2401,11 +2402,61 @@ static Object *vfio_pci_get_object(VFIODevice *vbasedev)
+     return OBJECT(vdev);
  }
  
-+static int vfio_set_dirty_page_tracking(VFIODevice *vbasedev, bool start)
++static bool vfio_msix_present(void *opaque, int version_id)
 +{
-+    int ret;
-+    VFIOMigration *migration = vbasedev->migration;
-+    VFIOContainer *container = vbasedev->group->container;
-+    struct vfio_iommu_type1_dirty_bitmap dirty = {
-+        .argsz = sizeof(dirty),
-+    };
++    PCIDevice *pdev = opaque;
 +
-+    if (start) {
-+        if (migration->device_state & VFIO_DEVICE_STATE_SAVING) {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_START;
-+        } else {
-+            return -EINVAL;
-+        }
-+    } else {
-+            dirty.flags = VFIO_IOMMU_DIRTY_PAGES_FLAG_STOP;
-+    }
-+
-+    ret = ioctl(container->fd, VFIO_IOMMU_DIRTY_PAGES, &dirty);
-+    if (ret) {
-+        error_report("Failed to set dirty tracking flag 0x%x errno: %d",
-+                     dirty.flags, errno);
-+        return -errno;
-+    }
-+    return ret;
++    return msix_present(pdev);
 +}
 +
- static void vfio_migration_cleanup(VFIODevice *vbasedev)
- {
-     VFIOMigration *migration = vbasedev->migration;
- 
-+    vfio_set_dirty_page_tracking(vbasedev, false);
++const VMStateDescription vmstate_vfio_pci_config = {
++    .name = "VFIOPCIDevice",
++    .version_id = 1,
++    .minimum_version_id = 1,
++    .fields = (VMStateField[]) {
++        VMSTATE_PCI_DEVICE(pdev, VFIOPCIDevice),
++        VMSTATE_MSIX_TEST(pdev, VFIOPCIDevice, vfio_msix_present),
++        VMSTATE_END_OF_LIST()
++    }
++};
 +
-     if (migration->region.mmaps) {
-         vfio_region_unmap(&migration->region);
-     }
-@@ -435,6 +466,11 @@ static int vfio_save_setup(QEMUFile *f, void *opaque)
-         return ret;
-     }
- 
-+    ret = vfio_set_dirty_page_tracking(vbasedev, true);
++static void vfio_pci_save_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++
++    vmstate_save_state(f, &vmstate_vfio_pci_config, vdev, NULL);
++}
++
++static int vfio_pci_load_config(VFIODevice *vbasedev, QEMUFile *f)
++{
++    VFIOPCIDevice *vdev = container_of(vbasedev, VFIOPCIDevice, vbasedev);
++    PCIDevice *pdev = &vdev->pdev;
++    int ret;
++
++    ret = vmstate_load_state(f, &vmstate_vfio_pci_config, vdev, 1);
 +    if (ret) {
 +        return ret;
 +    }
 +
-     qemu_put_be64(f, VFIO_MIG_FLAG_END_OF_STATE);
++    vfio_pci_write_config(pdev, PCI_COMMAND,
++                          pci_get_word(pdev->config + PCI_COMMAND), 2);
++
++    if (msi_enabled(pdev)) {
++        vfio_msi_enable(vdev);
++    } else if (msix_enabled(pdev)) {
++        vfio_msix_enable(vdev);
++    }
++
++    return ret;
++}
++
+ static VFIODeviceOps vfio_pci_ops = {
+     .vfio_compute_needs_reset = vfio_pci_compute_needs_reset,
+     .vfio_hot_reset_multi = vfio_pci_hot_reset_multi,
+     .vfio_eoi = vfio_intx_eoi,
+     .vfio_get_object = vfio_pci_get_object,
++    .vfio_save_config = vfio_pci_save_config,
++    .vfio_load_config = vfio_pci_load_config,
+ };
  
-     ret = qemu_file_get_error(f);
+ int vfio_populate_vga(VFIOPCIDevice *vdev, Error **errp)
+diff --git a/include/hw/vfio/vfio-common.h b/include/hw/vfio/vfio-common.h
+index fe99c36a693a..ba6169cd926e 100644
+--- a/include/hw/vfio/vfio-common.h
++++ b/include/hw/vfio/vfio-common.h
+@@ -120,6 +120,8 @@ struct VFIODeviceOps {
+     int (*vfio_hot_reset_multi)(VFIODevice *vdev);
+     void (*vfio_eoi)(VFIODevice *vdev);
+     Object *(*vfio_get_object)(VFIODevice *vdev);
++    void (*vfio_save_config)(VFIODevice *vdev, QEMUFile *f);
++    int (*vfio_load_config)(VFIODevice *vdev, QEMUFile *f);
+ };
+ 
+ typedef struct VFIOGroup {
 
 
