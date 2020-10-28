@@ -2,84 +2,99 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.3 required=3.0 tests=BAYES_00,DKIM_ADSP_CUSTOM_MED,
-	DKIM_INVALID,DKIM_SIGNED,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51525C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:44:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED66AC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:44:27 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9EE0247C9
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:44:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 59692247C9
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 15:44:27 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LrHvKXcM"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9EE0247C9
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=gmail.com
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FDX4Jrg9"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 59692247C9
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41554 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44080 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXncH-0003cO-In
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:44:01 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:50588)
+	id 1kXncg-0004cM-Cs
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 11:44:26 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:50486)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kXnZ9-0007wP-Qn; Wed, 28 Oct 2020 11:40:47 -0400
-Received: from mail-oo1-xc41.google.com ([2607:f8b0:4864:20::c41]:33110)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <raphael.s.norwitz@gmail.com>)
- id 1kXnZ7-000198-WA; Wed, 28 Oct 2020 11:40:47 -0400
-Received: by mail-oo1-xc41.google.com with SMTP id u5so1270726oot.0;
- Wed, 28 Oct 2020 08:40:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmail.com; s=20161025;
- h=mime-version:references:in-reply-to:from:date:message-id:subject:to
- :cc; bh=xLxievp7hffuJOG/AbosdmuZHIAKJRbI1YEXMb4NUmA=;
- b=LrHvKXcMIqIxsZEhCj7jWSHIPkca9uNazW4Hnk7CGNI7tcznjA1k7pu95WTgNmax6r
- Y00tOKrxi8J24VJybhoPoyG7V7bnQCSMy++a0CpGXHwr3XrkxjwQsahnHAyEFP3lCfjb
- JTYFotXEhP4RLZt2tBfC758F2DqbKt20X60U96zXliEud429aXExuX2+xC4G2nIkgh+5
- ZFAOP8HBzcny8i9iyPaNbsR6jH80t32a6/cbTujmUKPttD4PVDBfrXoEpOB8wYhUX3Tr
- eQvHgCYuYd6SnoxwO1cpcJo8FDymlh645W5YgWoNPUBoM1LYO19r1xdRyYm7WiuRkoHI
- JjpA==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXnYd-0007Ic-Cw
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:40:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:36816)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXnYb-0000yO-Kn
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 11:40:15 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603899612;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding;
+ bh=S7XMAb8q6l78gUQIvYp6GLhZjM50wNjwAwcC2omOytM=;
+ b=FDX4Jrg9xB4JQk8M6e2e3JvNAopKREv1Gw6ImY2Mpsx8Xb/cM5UAJjwhNVbgqcqKZinzTc
+ berhC29MVy72DXjsJzRx4cVTugMymPA/DD2z/wY9Vq+3LId5fyzljfwl/nwflV2f3lJzNq
+ 0PSY6IQeUWEMMmRobqwhOxUFF/4rXWw=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-432-lC8aU0vxOAa1Vi3Wx7YTLw-1; Wed, 28 Oct 2020 11:40:11 -0400
+X-MC-Unique: lC8aU0vxOAa1Vi3Wx7YTLw-1
+Received: by mail-ed1-f72.google.com with SMTP id dn20so2288140edb.14
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 08:40:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:mime-version:references:in-reply-to:from:date
- :message-id:subject:to:cc;
- bh=xLxievp7hffuJOG/AbosdmuZHIAKJRbI1YEXMb4NUmA=;
- b=a4RxMd5m2nAeeDSy0kqHz9Id9YOdVm7bL75nt5MLJ3wPIt5F1gX8kIO2njRBmxXGxl
- 0aKlScZXOcwpulw01GzM7CBp14+PvLvwIL4+gUJvZedkl/8pACqMin8xPJAMe/z33gPi
- IMK2mLKWlE61M+gikXRNlo5wImn241xa6JMwUzuu8oZT7RAKItsK9GzfSRU+xrpoJQu5
- tYjqgkspVTF3VksGdrhb+QFprN9inUkUJKbaEZY44GpWIbryEdtdH2NW2dLzS7iRCMiE
- kDvEtIdp717+Y+pb4U9AsnIqo6KkSraLKrt3JT6ZhU/OP6WRdNwGKzn+95z6hDin4o4b
- FvbQ==
-X-Gm-Message-State: AOAM531l0wfSS3oKMLpQGC1aynVGYFaKKjQoiXA4dqAFCP7iBF3Cx3h9
- a35Lz62nyw2xxw40qRBFH8kV5+u/TzboYZRAvYY=
-X-Google-Smtp-Source: ABdhPJxEO/jRz9J6fA/4orU+fhlX25q3D6ejVdGqeEpin7H81CWLZbmJLkSdY3y2sCYen7ohr6WL/OVDXGhj/fztWd4=
-X-Received: by 2002:a4a:b601:: with SMTP id z1mr6205975oon.83.1603899643907;
- Wed, 28 Oct 2020 08:40:43 -0700 (PDT)
+ h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+ :content-transfer-encoding;
+ bh=S7XMAb8q6l78gUQIvYp6GLhZjM50wNjwAwcC2omOytM=;
+ b=jQpOcmddeCx10ACblUE6VEM6JJMTL+VlZrIqwI41ts3YRWVouk4L73YOZCAHTYrAnY
+ jcdn+VjghWRzOThHyGB4taV0AdnWbZYKybb/j9eDCBcGLPv5USRL8K/MG6JhcXcjov5c
+ HOXMo8OJ33+5gceTcHWYKAyswlKFRXo+6mIL2jalQtezvoZiMftGE64ifVfqaAstrFea
+ paRxcTIo4GIqwj5UFKcfj5tP/aiV/gQdehTBIvHNdcXR3NZSTVOV5jxYtvPnBoPzRPXw
+ XqJYZcHVaNZvC3k9qopF+WpSs0fK95E0c88FxhpPj648qLBI6qQ3iRworwk6LTSMknyq
+ s0JQ==
+X-Gm-Message-State: AOAM530OqYQCpxaIbfhEwwOONo70tMXnLnMG2XCGlQwlfsyEYedzMuRY
+ BMAiqt6/n/qhw0b9NKNPBGIHEWqo83S4qTGRo3gKM3eYUveSiS8PRGpggrMASRSTMJvKXVDoGQ+
+ xCU1lHO9sQ92t+Fg=
+X-Received: by 2002:a50:b224:: with SMTP id o33mr8008708edd.21.1603899606678; 
+ Wed, 28 Oct 2020 08:40:06 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJz97zqvyCfMpYpLLwbFxHJo5uu2Ub8hwEv6Ah7TqqGTANoF/PKugYknikNL4Y34M2OaGxRCYg==
+X-Received: by 2002:a50:b224:: with SMTP id o33mr8008685edd.21.1603899606456; 
+ Wed, 28 Oct 2020 08:40:06 -0700 (PDT)
+Received: from x1w.redhat.com (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id sa23sm1341377ejb.80.2020.10.28.08.40.05
+ (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+ Wed, 28 Oct 2020 08:40:05 -0700 (PDT)
+From: =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH-for-5.2] hw/virtio/vhost-vdpa: Fix Coverity CID 1432864
+Date: Wed, 28 Oct 2020 16:40:04 +0100
+Message-Id: <20201028154004.776760-1-philmd@redhat.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-References: <5F997B84.9040900@huawei.com>
-In-Reply-To: <5F997B84.9040900@huawei.com>
-From: Raphael Norwitz <raphael.s.norwitz@gmail.com>
-Date: Wed, 28 Oct 2020 11:40:33 -0400
-Message-ID: <CAFubqFv0m9BeAvmCCkv9iEMvUXfHP2z+HJ8ffkOG4KONig2LHQ@mail.gmail.com>
-Subject: Re: [PATCH] vhost-user-blk: Fix two resource leaks
-To: AlexChen <alex.chen@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
-Received-SPF: pass client-ip=2607:f8b0:4864:20::c41;
- envelope-from=raphael.s.norwitz@gmail.com; helo=mail-oo1-xc41.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
 X-Spam_score_int: -20
 X-Spam_score: -2.1
 X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1, FREEMAIL_FROM=0.001,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001, RCVD_IN_MSPIKE_WL=0.001,
+ SPF_HELO_NONE=0.001, SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -92,55 +107,51 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-trivial@nongnu.org, QEMU <qemu-devel@nongnu.org>,
- Raphael Norwitz <raphael.norwitz@nutanix.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@redhat.com>,
+ Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-The change looks good but I'm not sure I'd call it resource leak in
-either case since the failure case kills vhost-user-blk/scsi. In the
-commit message maybe rather say "vhost-user-blk/scsi: fix broken error
-handling for socket call"?
+Fix uninitialized value issues reported by Coverity:
 
-On Wed, Oct 28, 2020 at 10:10 AM AlexChen <alex.chen@huawei.com> wrote:
->
-> When socket() fails, it returns -1, 0 is the normal return value and should not return
->
-> Reported-by: Euler Robot <euler.robot@huawei.com>
-> Signed-off-by: AlexChen <alex.chen@huawei.com>
-> ---
->  contrib/vhost-user-blk/vhost-user-blk.c   | 2 +-
->  contrib/vhost-user-scsi/vhost-user-scsi.c | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/contrib/vhost-user-blk/vhost-user-blk.c b/contrib/vhost-user-blk/vhost-user-blk.c
-> index 25eccd02b5..40a2dfc544 100644
-> --- a/contrib/vhost-user-blk/vhost-user-blk.c
-> +++ b/contrib/vhost-user-blk/vhost-user-blk.c
-> @@ -474,7 +474,7 @@ static int unix_sock_new(char *unix_fn)
->      assert(unix_fn);
->
->      sock = socket(AF_UNIX, SOCK_STREAM, 0);
-> -    if (sock <= 0) {
-> +    if (sock < 0) {
->          perror("socket");
->          return -1;
->      }
-> diff --git a/contrib/vhost-user-scsi/vhost-user-scsi.c b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> index 3c912384e9..0f9ba4b2a2 100644
-> --- a/contrib/vhost-user-scsi/vhost-user-scsi.c
-> +++ b/contrib/vhost-user-scsi/vhost-user-scsi.c
-> @@ -320,7 +320,7 @@ static int unix_sock_new(char *unix_fn)
->      assert(unix_fn);
->
->      sock = socket(AF_UNIX, SOCK_STREAM, 0);
-> -    if (sock <= 0) {
-> +    if (sock < 0) {
->          perror("socket");
->          return -1;
->      }
-> --
-> 2.19.1
->
+  Field 'msg.reserved' is uninitialized when calling write().
+
+Fixes: a5bd05800f8 ("vhost-vdpa: batch updating IOTLB mappings")
+Reported-by: Coverity (CID 1432864: UNINIT)
+Signed-off-by: Philippe Mathieu-Daudé <philmd@redhat.com>
+---
+Cc: Cindy Lu <lulu@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>
+Cc: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/virtio/vhost-vdpa.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/hw/virtio/vhost-vdpa.c b/hw/virtio/vhost-vdpa.c
+index 4f1039910af..01d2101d097 100644
+--- a/hw/virtio/vhost-vdpa.c
++++ b/hw/virtio/vhost-vdpa.c
+@@ -90,7 +90,7 @@ static void vhost_vdpa_listener_begin(MemoryListener *listener)
+ {
+     struct vhost_vdpa *v = container_of(listener, struct vhost_vdpa, listener);
+     struct vhost_dev *dev = v->dev;
+-    struct vhost_msg_v2 msg;
++    struct vhost_msg_v2 msg = {};
+     int fd = v->device_fd;
+ 
+     if (!(dev->backend_cap & (0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH))) {
+@@ -110,7 +110,7 @@ static void vhost_vdpa_listener_commit(MemoryListener *listener)
+ {
+     struct vhost_vdpa *v = container_of(listener, struct vhost_vdpa, listener);
+     struct vhost_dev *dev = v->dev;
+-    struct vhost_msg_v2 msg;
++    struct vhost_msg_v2 msg = {};
+     int fd = v->device_fd;
+ 
+     if (!(dev->backend_cap & (0x1ULL << VHOST_BACKEND_F_IOTLB_BATCH))) {
+-- 
+2.26.2
+
 
