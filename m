@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F6A7C388F7
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:28:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D833CC388F7
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:29:14 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id B9441207DE
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:28:38 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org B9441207DE
+	by mail.kernel.org (Postfix) with ESMTPS id 745AD207DE
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 04:29:14 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 745AD207DE
 Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34294 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:36422 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXd4f-0003p9-4O
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:28:37 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:43594)
+	id 1kXd5F-0004jF-J4
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 00:29:13 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:43620)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kXcvg-0001nD-2o; Wed, 28 Oct 2020 00:19:20 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:2052)
+ id 1kXcvk-0001rm-FE; Wed, 28 Oct 2020 00:19:24 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:2112)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
  (Exim 4.90_1) (envelope-from <kuhn.chenqun@huawei.com>)
- id 1kXcvZ-0007bW-A0; Wed, 28 Oct 2020 00:19:19 -0400
+ id 1kXcve-0007cw-Ke; Wed, 28 Oct 2020 00:19:24 -0400
 Received: from DGGEMS401-HUB.china.huawei.com (unknown [172.30.72.59])
- by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4CLb1Y3Xw2zhc6K;
- Wed, 28 Oct 2020 12:19:13 +0800 (CST)
+ by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4CLb1f0MMlz6y4W;
+ Wed, 28 Oct 2020 12:19:18 +0800 (CST)
 Received: from huawei.com (10.175.104.175) by DGGEMS401-HUB.china.huawei.com
  (10.3.19.201) with Microsoft SMTP Server id 14.3.487.0; Wed, 28 Oct 2020
- 12:18:59 +0800
+ 12:19:06 +0800
 From: Chen Qun <kuhn.chenqun@huawei.com>
 To: <qemu-devel@nongnu.org>, <qemu-trivial@nongnu.org>
-Subject: [PATCH 4/9] linux-user/mips/cpu_loop: silence the compiler warnings
-Date: Wed, 28 Oct 2020 12:18:14 +0800
-Message-ID: <20201028041819.2169003-5-kuhn.chenqun@huawei.com>
+Subject: [PATCH 8/9] target/ppc: silence the compiler warnings
+Date: Wed, 28 Oct 2020 12:18:18 +0800
+Message-ID: <20201028041819.2169003-9-kuhn.chenqun@huawei.com>
 X-Mailer: git-send-email 2.23.0
 In-Reply-To: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
 References: <20201028041819.2169003-1-kuhn.chenqun@huawei.com>
@@ -49,9 +49,9 @@ Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
 X-Originating-IP: [10.175.104.175]
 X-CFilter-Loop: Reflected
-Received-SPF: pass client-ip=45.249.212.32;
- envelope-from=kuhn.chenqun@huawei.com; helo=szxga06-in.huawei.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 00:19:09
+Received-SPF: pass client-ip=45.249.212.35;
+ envelope-from=kuhn.chenqun@huawei.com; helo=szxga07-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 00:19:14
 X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
 X-Spam_score_int: -41
 X-Spam_score: -4.2
@@ -71,71 +71,44 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Chen Qun <kuhn.chenqun@huawei.com>, Laurent
- Vivier <laurent@vivier.eu>, zhang.zhanghailiang@huawei.com, ganqixin@huawei.com,
- Euler Robot <euler.robot@huawei.com>
+Cc: Chen Qun <kuhn.chenqun@huawei.com>,
+ David Gibson <david@gibson.dropbear.id.au>, zhang.zhanghailiang@huawei.com,
+ ganqixin@huawei.com, Euler Robot <euler.robot@huawei.com>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
 When using -Wimplicit-fallthrough in our CFLAGS, the compiler showed warning:
-linux-user/mips/cpu_loop.c: In function ‘cpu_loop’:
-linux-user/mips/cpu_loop.c:104:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
-  104 |                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
-      |                        ^
-linux-user/mips/cpu_loop.c:107:17: note: here
-  107 |                 case 7:
-      |                 ^~~~
-linux-user/mips/cpu_loop.c:108:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
-  108 |                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
-      |                        ^
-linux-user/mips/cpu_loop.c:111:17: note: here
-  111 |                 case 6:
-      |                 ^~~~
-linux-user/mips/cpu_loop.c:112:24: warning: this statement may fall through [-Wimplicit-fallthrough=]
-  112 |                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
-      |                        ^
-linux-user/mips/cpu_loop.c:115:17: note: here
-  115 |                 case 5:
-      |                 ^~~~
+target/ppc/mmu_helper.c: In function ‘dump_mmu’:
+target/ppc/mmu_helper.c:1351:12: warning: this statement may fall through [-Wimplicit-fallthrough=]
+ 1351 |         if (ppc64_v3_radix(env_archcpu(env))) {
+      |            ^
+target/ppc/mmu_helper.c:1358:5: note: here
+ 1358 |     default:
+      |     ^~~~~~~
 
 Add the corresponding "fall through" comment to fix it.
 
 Reported-by: Euler Robot <euler.robot@huawei.com>
 Signed-off-by: Chen Qun <kuhn.chenqun@huawei.com>
 ---
-Cc: Laurent Vivier <laurent@vivier.eu>
+Cc: David Gibson <david@gibson.dropbear.id.au>
 ---
- linux-user/mips/cpu_loop.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ target/ppc/mmu_helper.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/linux-user/mips/cpu_loop.c b/linux-user/mips/cpu_loop.c
-index 553e8ca7f5..cfe7ba5c47 100644
---- a/linux-user/mips/cpu_loop.c
-+++ b/linux-user/mips/cpu_loop.c
-@@ -104,18 +104,22 @@ void cpu_loop(CPUMIPSState *env)
-                     if ((ret = get_user_ual(arg8, sp_reg + 28)) != 0) {
-                         goto done_syscall;
-                     }
-+                    /* fall through */
-                 case 7:
-                     if ((ret = get_user_ual(arg7, sp_reg + 24)) != 0) {
-                         goto done_syscall;
-                     }
-+                    /* fall through */
-                 case 6:
-                     if ((ret = get_user_ual(arg6, sp_reg + 20)) != 0) {
-                         goto done_syscall;
-                     }
-+                    /* fall through */
-                 case 5:
-                     if ((ret = get_user_ual(arg5, sp_reg + 16)) != 0) {
-                         goto done_syscall;
-                     }
-+                    /* fall through */
-                 default:
-                     break;
-                 }
+diff --git a/target/ppc/mmu_helper.c b/target/ppc/mmu_helper.c
+index 8972714775..51749b62df 100644
+--- a/target/ppc/mmu_helper.c
++++ b/target/ppc/mmu_helper.c
+@@ -1355,6 +1355,7 @@ void dump_mmu(CPUPPCState *env)
+             break;
+         }
+ #endif
++        /* fall through */
+     default:
+         qemu_log_mask(LOG_UNIMP, "%s: unimplemented\n", __func__);
+     }
 -- 
 2.27.0
 
