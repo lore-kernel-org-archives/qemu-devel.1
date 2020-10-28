@@ -2,98 +2,109 @@ Return-Path: <SRS0=Un+l=ED=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SIGNED_OFF_BY,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF918C4363A
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72CC5C4363A
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:38:29 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id E340324687
-	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:36:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id D09442469B
+	for <qemu-devel@archiver.kernel.org>; Wed, 28 Oct 2020 09:38:28 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jHx2Zwth"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org E340324687
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KAzBNQGa"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org D09442469B
+Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:41878 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:44220 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kXht2-0000Ts-TM
-	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:36:56 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53316)
+	id 1kXhuV-0001Sy-B0
+	for qemu-devel@archiver.kernel.org; Wed, 28 Oct 2020 05:38:27 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:53720)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXhrq-00087h-PR
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:35:42 -0400
-Received: from mail-wr1-x444.google.com ([2a00:1450:4864:20::444]:41959)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kXhro-0004yT-IW
- for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:35:42 -0400
-Received: by mail-wr1-x444.google.com with SMTP id s9so4899248wro.8
- for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 02:35:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=references:user-agent:from:to:cc:subject:in-reply-to:date
- :message-id:mime-version:content-transfer-encoding;
- bh=H7ja72fsG2KRjgiaDcXgg2Jb6FVep+1I/8n3yg9cM5Q=;
- b=jHx2ZwthHWToEMIbu2q3ZI+gtSrkHDc/GM1h7aeP5Endu19jBB96DT+UE41ruzDB7u
- N4t4Yd9iLpbqkk/g682z1WhHUudPPeRAupsQvWi1CmCXV5seEqE6b58Hc6ooeuyQMNmT
- 0CM1u/GbWcGFYTevVKEP+Dw9zH1gjPlvVXCaLZO61sxAmantHwS4Wtq9IjeElHcEqoFG
- DAQTSsQg6bIh+8/0QfKS9GCDfXzqiC/J7nD4VOfEdrxVAXe+Wxp08lMAqYtJiI3mr6en
- 7L0Jh1VX0eAZtD02zq1ts3VvUUNQ33U7V1zofsMAKEnQh/cGd+P96GvbzBXxV/Nwa+oF
- rBGg==
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhtQ-0000w9-6H
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:37:20 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:44700)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
+ (Exim 4.90_1) (envelope-from <philmd@redhat.com>) id 1kXhtO-0005aL-Nk
+ for qemu-devel@nongnu.org; Wed, 28 Oct 2020 05:37:19 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+ s=mimecast20190719; t=1603877837;
+ h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+ to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+ content-transfer-encoding:content-transfer-encoding:
+ in-reply-to:in-reply-to:references:references;
+ bh=89VSdAifurFlyQUsobFcZhvG9WX4iJap4NxTYl0tMvY=;
+ b=KAzBNQGahO5w6doU4H87Vt6CESr4v72RDVTsPtl6jCBOzLjuCkhvMjCmSIYvJcfrqhRdWG
+ uUUuSemcJzD5YHOSftTNmUrEjIsxo5uEN8UXwjik41ENi4cl89GxPtZnKUHxBK7gudFGUs
+ kA1cRCg+OO3okp1lUYyKktIZxttdNW0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-82-xruDIsjjP2S4LnFsDyaK0g-1; Wed, 28 Oct 2020 05:37:13 -0400
+X-MC-Unique: xruDIsjjP2S4LnFsDyaK0g-1
+Received: by mail-ed1-f72.google.com with SMTP id t7so1908709edt.0
+ for <qemu-devel@nongnu.org>; Wed, 28 Oct 2020 02:37:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=1e100.net; s=20161025;
- h=x-gm-message-state:references:user-agent:from:to:cc:subject
- :in-reply-to:date:message-id:mime-version:content-transfer-encoding;
- bh=H7ja72fsG2KRjgiaDcXgg2Jb6FVep+1I/8n3yg9cM5Q=;
- b=LlyG8c7iUZUdJzDbUhak8G7M3lwcJNHLqhG2EsXBa0pH1/SRis+YmOkLXScq1aqjmv
- Imdy8MHgE+HUwWT1TgWBx/skLsXFchEprwxNqdf/Z+/t07h1U9d3xDlRO6FeeEMV3wok
- gC7vQ+S+lsBurfV24gF8KfgXItDk7E9oCr2V45nR6FV6h/xoe833LBpo1omlUDpnsn11
- 5uUJP+O+sA+kHhomNGvrYF27zb4+xEsBBoCmuo2KWU/oJJP6911XPNMUk3wx5UqlDLAC
- PLcfIeVujLj5oWyW6TkktLtGiPP2vXFa+eC13YlxQWfSo2LDlZkbdhsmJtcsufBeMiOB
- gsxA==
-X-Gm-Message-State: AOAM530zhQvgbewggj1aL4fcHVVXG+tDfHqoXaX/1MYFL+VfA1GI3UWR
- XcxQ7Ai3GCAeUDtZsEmVIoi3sw==
-X-Google-Smtp-Source: ABdhPJxLL1qFtoUJVbZ4TDg6G7eCu2rX8t6mozLbSibSEnFVDOnL1pD1adubqu8JDoGgQ6kAWKw46A==
-X-Received: by 2002:adf:9150:: with SMTP id j74mr8286794wrj.57.1603877738429; 
- Wed, 28 Oct 2020 02:35:38 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id 30sm6233306wrr.35.2020.10.28.02.35.36
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Wed, 28 Oct 2020 02:35:37 -0700 (PDT)
-Received: from zen (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 529461FF7E;
- Wed, 28 Oct 2020 09:35:36 +0000 (GMT)
-References: <20201023200645.1055-1-dbuono@linux.vnet.ibm.com>
- <20201023200645.1055-4-dbuono@linux.vnet.ibm.com>
- <7aa00aba-ff8c-252a-899a-45ef4db7cc6e@redhat.com>
- <20201026155006.GE496050@redhat.com>
- <756e6060-394f-fe4a-47f2-2601b6e54a45@linux.vnet.ibm.com>
-User-agent: mu4e 1.5.6; emacs 28.0.50
-From: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Daniele Buono <dbuono@linux.vnet.ibm.com>
-Subject: Re: [PATCH v2 3/6] configure: add option to enable LTO
-In-reply-to: <756e6060-394f-fe4a-47f2-2601b6e54a45@linux.vnet.ibm.com>
-Date: Wed, 28 Oct 2020 09:35:36 +0000
-Message-ID: <87h7qeelqv.fsf@linaro.org>
+ h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+ :user-agent:mime-version:in-reply-to:content-language
+ :content-transfer-encoding;
+ bh=89VSdAifurFlyQUsobFcZhvG9WX4iJap4NxTYl0tMvY=;
+ b=L666GhtdkZaczPLF0KdVBvIOFX9qeHrpYffu16kcPeL7tjuI4iOcEIduTrtioe68Hy
+ qwBUEH2dvay72GUEeWDPqR810Qez2j8oQAdPdhrWULBu/3XKbdUiBx7eqW5NUkTi+azA
+ dlajpcVIcTwEVaDkd6FPVK0Hn+ILd3tLTbJxtPsksUhf+eB2tM66lYr/oVj56gVU0Hd7
+ 8Yc8MvlGeK1A8ySYWbD3L5cEIrBkO4q6FljmryFtuwgqMbJ/pcdlIP6QrdNvwh1iU49+
+ Fc0nTH75ubt+a1HoICcEwFee2cyX7U0uT4hxRi+gGrlUrGKt2/kbKL8/f8OGfGymyDsi
+ tbLA==
+X-Gm-Message-State: AOAM531Z4URLb9Rh3oVN9xvdwD0ApwG9NA2QCpjXb6MpqC9AvzQegWbU
+ hyqHdjTnm0iMrYQ+nmOxSVQvZ2OQ3yIyrOOQhy2eiWehnOTKpdm8DmZq/LLHpMtRr2uiRCRriPv
+ cWdljN2/V+fdytys=
+X-Received: by 2002:a17:906:c293:: with SMTP id
+ r19mr6371286ejz.63.1603877832144; 
+ Wed, 28 Oct 2020 02:37:12 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzyRs/eZOGK2cEw05+VCR6areGUaBVkVma/PO3pV6amOHQFCIAI27TarRl2a5777vSqdORydg==
+X-Received: by 2002:a17:906:c293:: with SMTP id
+ r19mr6371265ejz.63.1603877831890; 
+ Wed, 28 Oct 2020 02:37:11 -0700 (PDT)
+Received: from [192.168.1.36] (237.red-88-18-140.staticip.rima-tde.net.
+ [88.18.140.237])
+ by smtp.gmail.com with ESMTPSA id s25sm2484178ejc.29.2020.10.28.02.37.10
+ (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+ Wed, 28 Oct 2020 02:37:11 -0700 (PDT)
+Subject: Re: [PATCH v3 00/15] python: create installable package
+To: John Snow <jsnow@redhat.com>, qemu-devel@nongnu.org
+References: <20201020193555.1493936-1-jsnow@redhat.com>
+ <e1289328-d372-0eaa-7128-8cb4867ef4c0@redhat.com>
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=c3=a9?= <philmd@redhat.com>
+Message-ID: <fe94bba9-b3b7-4973-7378-d3dc95e18d86@redhat.com>
+Date: Wed, 28 Oct 2020 10:37:09 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.3.1
 MIME-Version: 1.0
+In-Reply-To: <e1289328-d372-0eaa-7128-8cb4867ef4c0@redhat.com>
+Authentication-Results: relay.mimecast.com;
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=philmd@redhat.com
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: redhat.com
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Received-SPF: pass client-ip=2a00:1450:4864:20::444;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x444.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=philmd@redhat.com;
+ helo=us-smtp-delivery-124.mimecast.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/28 01:51:10
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
+X-Spam_score_int: -42
+X-Spam_score: -4.3
+X-Spam_bar: ----
+X-Spam_report: (-4.3 / 5.0 requ) BAYES_00=-1.9, DKIMWL_WL_HIGH=-0.001,
+ DKIM_SIGNED=0.1, DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
+ NICE_REPLY_A=-2.167, RCVD_IN_DNSWL_NONE=-0.0001, RCVD_IN_MSPIKE_H5=0.001,
+ RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
+ SPF_PASS=-0.001 autolearn=unavailable autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -106,83 +117,35 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: Thomas Huth <thuth@redhat.com>,
- =?utf-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- qemu-devel@nongnu.org, Alexander Bulekov <alxndr@bu.edu>,
- Paolo Bonzini <pbonzini@redhat.com>, Richard Henderson <rth@twiddle.net>
+Cc: Kevin Wolf <kwolf@redhat.com>, Fam Zheng <fam@euphon.net>,
+ Ben Widawsky <ben@bwidawsk.net>,
+ =?UTF-8?Q?Daniel_P=2e_Berrang=c3=a9?= <berrange@redhat.com>,
+ Eduardo Habkost <ehabkost@redhat.com>, qemu-block@nongnu.org,
+ Andrea Bolognani <abologna@redhat.com>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>,
+ Max Reitz <mreitz@redhat.com>, Rohit Shinde <rohit.shinde12194@gmail.com>,
+ Willian Rampazzo <wrampazz@redhat.com>, Cleber Rosa <crosa@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=c3=a9e?= <alex.bennee@linaro.org>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
+On 10/27/20 11:08 PM, John Snow wrote:
+> Ping O:-)
+> 
+> Looking for feedback from at least Cleber and Eduardo before I barge
+> ahead and send a PR to include this on master. Additional packaging and
+> versioning feedback from Dan would be nice.
+> 
+> (I know we have a very busy two weeks here; I will continue pinging, but
+> I have every intention of merging this prior to 5.2.)
 
-Daniele Buono <dbuono@linux.vnet.ibm.com> writes:
+Too pythonic for me, so I'll defer that to Python experts.
 
-> In terms of ar and linker, if you don't have the right mix it will just
-> stop at link time with an error.
->
-> In terms of using gcc the errors may be a bit more subtle, similar to
-> what Daniel mentioned. Succesfully compiling but then showing issues at
-> runtime or in the test suite.
->
-> I'm using ubuntu 18.04 and the stock compiler (based on gcc 7.5) issues
-> a bunch of warnings but compile succesfully with LTO.
-> However, the tcg binary for sparc64 is broken.
+It would be nice to have this in 5.2 indeed...
 
-sparc64-linux-user? I think that might be in a bit of a bit rotted state
-- we had to disable running check-tcg on it in CI because of instability
-so I wouldn't be surprised if messing around with LTO has dug up even
-more gremlins.
+Regards,
 
-> System-wide emulation
-> stops in OpenFirmware with an exception. User emulation triggers a
-> segmentation fault in some of the test cases. If I compile QEMU with
-> --enable-debug the tests magically work.
+Phil.
 
-Breakage in both system and linux-user emulation probably points at
-something in the instruction decode being broken. Shame we don't have a
-working risu setup for sparc64 to give the instruction handling a proper
-work out.
-
->
-> I briefly tested with gcc-9 and that seemed to work ok, buy your mileage
-> may vary
->
-> On 10/26/2020 11:50 AM, Daniel P. Berrang=C3=A9 wrote:
->> On Mon, Oct 26, 2020 at 10:51:43AM +0100, Paolo Bonzini wrote:
->>> On 23/10/20 22:06, Daniele Buono wrote:
->>>> This patch allows to compile QEMU with link-time optimization (LTO).
->>>> Compilation with LTO is handled directly by meson. This patch adds che=
-cks
->>>> in configure to make sure the toolchain supports LTO.
->>>>
->>>> Currently, allow LTO only with clang, since I have found a couple of i=
-ssues
->>>> with gcc-based LTO.
->>>>
->>>> In case fuzzing is enabled, automatically switch to llvm's linker (lld=
-).
->>>> The standard bfd linker has a bug where function wrapping (used by the=
- fuzz*
->>>> targets) is used in conjunction with LTO.
->>>>
->>>> Tested with all major versions of clang from 6 to 12
->>>>
->>>> Signed-off-by: Daniele Buono <dbuono@linux.vnet.ibm.com>
->>>
->>> What are the problems like if you have GCC or you ar/linker are not up
->>> to the job?  I wouldn't mind omitting the tests since this has to be
->>> enabled explicitly by the user.
->>=20
->> We temporarily disabled LTO in Fedora rawhide due to GCC bugs causing
->> wierd test suite asserts. Those were pre-release versions of GCC/binutils
->> though. I've just tested again and LTO works correctly, so I've enabled
->> LTO once again.
->>=20
->> Regards,
->> Daniel
->>=20
-
-
---=20
-Alex Benn=C3=A9e
 
