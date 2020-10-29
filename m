@@ -2,93 +2,66 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70568C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:16:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DF248C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:18:13 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 8839C206FA
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:16:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 269F220639
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:18:13 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UOV8RhnZ"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8839C206FA
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=linaro.org
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="ZAkQOBtT"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 269F220639
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:49448 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:52514 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYELN-0005vi-25
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 16:16:21 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:49094)
+	id 1kYENA-0007NM-2u
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 16:18:12 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:49536)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kYEK5-0005TO-4S
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:15:01 -0400
-Received: from mail-wr1-x443.google.com ([2a00:1450:4864:20::443]:36173)
- by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
- (Exim 4.90_1) (envelope-from <alex.bennee@linaro.org>)
- id 1kYEK3-0001QA-DU
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:15:00 -0400
-Received: by mail-wr1-x443.google.com with SMTP id x7so4166313wrl.3
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 13:14:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linaro.org; s=google;
- h=from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7N7oKZMwd7h1K49wSrhLl7yGC+wR7WCLzITb/p/R9xc=;
- b=UOV8RhnZAzVbGCjC9OOpQib6M+caAmjkx5e+9OyXTLSwtalN1ygE3+2lXVfumUCkNi
- I9MrsLOkvQiwBzdC6pj+msnWC9Aq6PfgSrR2iK3sV7hThXx97PDTt8BcPAvRA0ofaLyO
- rnLw6q2Q678C1BlgzL/2U9CRyo/bEUdwPeoBd7CvWI3yfEntuA1yaCqqbLqRhjIDqJlC
- lQsFDzW8LqbjR/U2GsVJQlKsvSJuYLeUlH9MKedg6tkaM3piLrJedr73dFIIDz5m/BY4
- ITnQir4Y/uea0wc2XiadWXmrJxut+di+7XVmykniz/Cxo7n5S8emvZgyvfSsV7+gzxM0
- I+Cg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=1e100.net; s=20161025;
- h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
- :content-transfer-encoding;
- bh=7N7oKZMwd7h1K49wSrhLl7yGC+wR7WCLzITb/p/R9xc=;
- b=SdukAQPNvSHXnQE1pgaH7hLHEokAgFkhbNZbrHNfhbzlq4wji8IHsTTqbKUeU5vj5k
- 3z+UuA9xZzNszrAa7n91V2/QUtrI9Y+Gn26JBwgdmbmkcVmeQSCMjexfQgar0FYZZaA+
- qvlYAnAkMNj0Ur9pfGWKoKdT1dQRke3y8Nj87LCPchsAN2gb2Y7wMszD2sb3zMyDVYJf
- FNpSBHyqVQIJAe5zp/ck6v7zlQugz//kFFUA7SNrnjDujAUKFGxgjSQ9V0tGdXZuxJNF
- ctGeyEVacEMDZB+qiV54cuIbN0sZm2FhfaW0Wq/jq40N7gm8KP5f0KZXAErkvm/vRTAZ
- HsoA==
-X-Gm-Message-State: AOAM533hxhFq8S3cxRgHwCUtyH2EW200JH1Z32/Q2JAZ2ar94wIHWxro
- stjriH25HPGbGtr8QI9aIHAcFQ==
-X-Google-Smtp-Source: ABdhPJxJXGYpLenaSR5JIekMh73ATWJ56+lIqn4NJSb0Okk7NE/v+bN/siwjIq3UlXgxidS4NpUNNQ==
-X-Received: by 2002:a5d:6110:: with SMTP id v16mr8423758wrt.219.1604002497505; 
- Thu, 29 Oct 2020 13:14:57 -0700 (PDT)
-Received: from zen.linaroharston ([51.148.130.216])
- by smtp.gmail.com with ESMTPSA id i126sm1716685wmi.0.2020.10.29.13.14.56
- (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
- Thu, 29 Oct 2020 13:14:56 -0700 (PDT)
-Received: from zen.lan (localhost [127.0.0.1])
- by zen.linaroharston (Postfix) with ESMTP id 76F381FF7E;
- Thu, 29 Oct 2020 20:14:55 +0000 (GMT)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: qemu-devel@nongnu.org
-Subject: [PATCH] configure: surface deprecated targets in the help output
-Date: Thu, 29 Oct 2020 20:14:49 +0000
-Message-Id: <20201029201449.6926-1-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.20.1
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kYEMR-0006pf-Ts; Thu, 29 Oct 2020 16:17:27 -0400
+Received: from ozlabs.org ([203.11.71.1]:54737)
+ by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
+ (Exim 4.90_1) (envelope-from <dgibson@ozlabs.org>)
+ id 1kYEMP-0001pc-PV; Thu, 29 Oct 2020 16:17:27 -0400
+Received: by ozlabs.org (Postfix, from userid 1007)
+ id 4CMcDc1CWPz9sRk; Fri, 30 Oct 2020 07:17:20 +1100 (AEDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+ d=gibson.dropbear.id.au; s=201602; t=1604002640;
+ bh=6ZGZICXvUG+nvPbUHQrxtL6nOV3n+/pW644qEk6tJBU=;
+ h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+ b=ZAkQOBtTr1vXx6qohnUP7PQAtEIlgpZFcqit8Qkdqazw5i7NeVlIx1TYtph21cuV8
+ W0SBJN8DoX2gjqyLA63wyAUfo7vEgkHH5Kyhoo33dcU6wSNQp8spLfLYUfzpAjpOAu
+ UY4O0YmXo3MEmNGzcXNeCKVaRCErKRjOcmD24yqM=
+Date: Fri, 30 Oct 2020 07:11:49 +1100
+From: David Gibson <david@gibson.dropbear.id.au>
+To: Greg Kurz <groug@kaod.org>
+Subject: Re: [PATCH 1/2] spapr: Drop dead code in spapr_reallocate_hpt()
+Message-ID: <20201029201149.GL5604@yekko.fritz.box>
+References: <160398562892.32380.15006707861753544263.stgit@bahia.lan>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=2a00:1450:4864:20::443;
- envelope-from=alex.bennee@linaro.org; helo=mail-wr1-x443.google.com
-X-detected-operating-system: by eggs.gnu.org: No matching host in p0f cache.
- That's all we know.
-X-Spam_score_int: -20
-X-Spam_score: -2.1
-X-Spam_bar: --
-X-Spam_report: (-2.1 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_NONE=-0.0001, SPF_HELO_NONE=0.001,
- SPF_PASS=-0.001 autolearn=ham autolearn_force=no
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature"; boundary="Z1OTrj3C7qypP14j"
+Content-Disposition: inline
+In-Reply-To: <160398562892.32380.15006707861753544263.stgit@bahia.lan>
+Received-SPF: pass client-ip=203.11.71.1; envelope-from=dgibson@ozlabs.org;
+ helo=ozlabs.org
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 16:17:21
+X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic]
+X-Spam_score_int: -17
+X-Spam_score: -1.8
+X-Spam_bar: -
+X-Spam_report: (-1.8 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
+ DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, HEADER_FROM_DIFFERENT_DOMAINS=0.249,
+ SPF_HELO_PASS=-0.001, SPF_PASS=-0.001 autolearn=no autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
 X-Mailman-Version: 2.1.23
@@ -101,36 +74,84 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: thuth@redhat.com, =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-ppc@nongnu.org,
+ Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@redhat.com>,
+ qemu-devel@nongnu.org
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-Show the targets but keep them separate from the main list.
 
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
----
- configure | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+--Z1OTrj3C7qypP14j
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-diff --git a/configure b/configure
-index 55e07c82dd..6c2e9ff37c 100755
---- a/configure
-+++ b/configure
-@@ -1644,9 +1644,11 @@ Standard options:
-   --prefix=PREFIX          install in PREFIX [$prefix]
-   --interp-prefix=PREFIX   where to find shared libraries, etc.
-                            use %M for cpu name [$interp_prefix]
--  --target-list=LIST       set target list (default: build everything)
-+  --target-list=LIST       set target list (default: build all non-deprecated)
- $(echo Available targets: $default_target_list | \
-   fold -s -w 53 | sed -e 's/^/                           /')
-+$(echo Deprecated targets: $deprecated_targets_list | \
-+  fold -s -w 53 | sed -e 's/^/                           /')
-   --target-list-exclude=LIST exclude a set of targets from the default target-list
- 
- Advanced options (experts only):
--- 
-2.20.1
+On Thu, Oct 29, 2020 at 04:33:48PM +0100, Greg Kurz wrote:
+> Sometimes QEMU needs to allocate the HPT in userspace, namely with TCG
+> or PR KVM. This is performed with qemu_memalign() because of alignment
+> requirements. Like glib's allocators, its behaviour is to abort on OOM
+> instead of returning NULL.
+>=20
+> This could be changed to qemu_try_memalign(), but in the specific case
+> of spapr_reallocate_hpt(), the outcome would be to terminate QEMU anyway
+> since no HPT means no MMU for the guest. Drop the dead code instead.
+>=20
+> Signed-off-by: Greg Kurz <groug@kaod.org>
 
+Series applied to ppc-for-5.2.
+
+> ---
+>  hw/ppc/spapr.c |    6 ------
+>  1 file changed, 6 deletions(-)
+>=20
+> diff --git a/hw/ppc/spapr.c b/hw/ppc/spapr.c
+> index 227075103e9a..12a012d9dd09 100644
+> --- a/hw/ppc/spapr.c
+> +++ b/hw/ppc/spapr.c
+> @@ -1522,12 +1522,6 @@ int spapr_reallocate_hpt(SpaprMachineState *spapr,=
+ int shift, Error **errp)
+>          int i;
+> =20
+>          spapr->htab =3D qemu_memalign(size, size);
+> -        if (!spapr->htab) {
+> -            error_setg_errno(errp, errno,
+> -                             "Could not allocate HPT of order %d", shift=
+);
+> -            return -ENOMEM;
+> -        }
+> -
+>          memset(spapr->htab, 0, size);
+>          spapr->htab_shift =3D shift;
+> =20
+>=20
+>=20
+
+--=20
+David Gibson			| I'll have my music baroque, and my code
+david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
+				| _way_ _around_!
+http://www.ozlabs.org/~dgibson
+
+--Z1OTrj3C7qypP14j
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEdfRlhq5hpmzETofcbDjKyiDZs5IFAl+bIgMACgkQbDjKyiDZ
+s5IY1Q//bsZB8mpQ1CgQeN5qdZ77nHbjX25ZVP+lE7500CIUoiCpGU2H5hM2TFbt
+T2nzO5V7xRq8lY+v3V2uuFxgqV5lP1+fPzNFJvaiPMSPiwfsmmeoH78Loo0nakSp
+h1sSx4+DalC/bM2c67qGML5ztRcsi6fJzU8YG5xRNl/OxXG5Or3DM9daQZUFyvRc
+TibyayesFKsABwaGM5l2huCdAbED/Vhu6ySUYh9QModTfl7igh5zciM+KwduRDc8
+7pZwuMK4WM7vKyH9vLiQkeAFTCUNn4yVyaY7s8vcc5jX08T9ZAGx0K89dyLNJOuB
+Xn5DX6crMbOmJYM8N+lVEgamsjCLA0LHkKJOQ3AWjXkNTVCP+m9OKASukCBy55xt
+U9zvLeVtiwnjde80UElyKB0Yr9XXgb1ZXQYuf9/R+oBmuqAbz7Jv8FxZP7QkqL0U
+mnwdwy69b07Qu3uCDjoASAH4vijGgaDfXYKd8p+SfQI0XVbM4a6V2gDMz80Q5oT8
+qMK0R5OgYkLOkGFQqhsizpYuiHankaNVOG/Im26VTCRqOXozuK82qF5Y7d7+T6Fc
+ZO10ym/6+wNiWKAkLVlM05SKmofaPjZSz9Kw+bVubib2u9VWA3bQboRbOHFl0AFY
+N/i9oHVTSHsJEfIEs3SIAKGc+KmXWNeZeqGLQpB6kuYzF5OnWwo=
+=HeXc
+-----END PGP SIGNATURE-----
+
+--Z1OTrj3C7qypP14j--
 
