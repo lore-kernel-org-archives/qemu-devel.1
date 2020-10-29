@@ -2,78 +2,74 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC2D6C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:35:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A25C2D0A3
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:40:00 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 0DE172072E
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:35:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTPS id 9320F2076E
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 20:39:59 +0000 (UTC)
 Authentication-Results: mail.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DT4cIav9"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 0DE172072E
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FFi3Cym8"
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 9320F2076E
 Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=redhat.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:40734 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:43462 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kYEdP-0006mR-TC
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 16:34:59 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:53964)
+	id 1kYEiE-0008BZ-Cq
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 16:39:58 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:54960)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kYEcT-0005ye-F1
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:34:01 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:50259)
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kYEhI-0007kU-8b
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:39:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:25025)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_CBC_SHA1:256)
- (Exim 4.90_1) (envelope-from <cohuck@redhat.com>) id 1kYEcR-00041w-J6
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:34:01 -0400
+ (Exim 4.90_1) (envelope-from <ehabkost@redhat.com>)
+ id 1kYEhG-0004ZJ-Kx
+ for qemu-devel@nongnu.org; Thu, 29 Oct 2020 16:38:59 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
- s=mimecast20190719; t=1604003638;
+ s=mimecast20190719; t=1604003937;
  h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
  to:to:cc:cc:mime-version:mime-version:content-type:content-type:
- content-transfer-encoding:content-transfer-encoding:
- in-reply-to:in-reply-to:references:references;
- bh=xMM07s/XzQOr9AckEe5RbTIbT88JZzQ4ldqH5S7flC4=;
- b=DT4cIav9kLiLmPb2zFB5rS5sRxBS+4WRNR1jQgvJ6XIjBDqID4nKkSpWdE1nY4qWS7YrGU
- tTy0Y1IE6eQKHawWg55eDsczDRv7zvlnwVPYAaPbL4HKTmD0/EgMNN+9HIMo+PecNn9OxX
- jCWexu68n/coKBgZRF/ZDV/mRzIPBg0=
+ content-transfer-encoding:content-transfer-encoding;
+ bh=ITZEyfTufM6yph/cQFJmHy3gwpiBWSNlLSZFFry1i1U=;
+ b=FFi3Cym8kW6JbEeinVpPS92Ju7Lb/3Z15+6L+Uf+jpdesxufIJ6LE4bmCsuYKUO7tagZxQ
+ wB3iVSmc3OjNSeTb7TvSsQ/fiY5Sz3BrE/qkhmcFBj73oOIBjSVWoCYwsTJlJcNI1FFhPW
+ wBFgI48AO9LuiZ/VXuw6Unoy8U0hdns=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-12-Qz-q0MqHNMONb8Jx3YWwAA-1; Thu, 29 Oct 2020 16:33:55 -0400
-X-MC-Unique: Qz-q0MqHNMONb8Jx3YWwAA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.phx2.redhat.com
- [10.5.11.15])
+ us-mta-520-AJf2Kf0_Oeyn60wIWVni-Q-1; Thu, 29 Oct 2020 16:38:53 -0400
+X-MC-Unique: AJf2Kf0_Oeyn60wIWVni-Q-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com
+ [10.5.11.12])
  (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
  (No client certificate requested)
- by mimecast-mx01.redhat.com (Postfix) with ESMTPS id C38FF8015F8
- for <qemu-devel@nongnu.org>; Thu, 29 Oct 2020 20:33:54 +0000 (UTC)
-Received: from gondolin (ovpn-112-55.ams2.redhat.com [10.36.112.55])
- by smtp.corp.redhat.com (Postfix) with ESMTP id 0452455764;
- Thu, 29 Oct 2020 20:33:53 +0000 (UTC)
-Date: Thu, 29 Oct 2020 21:33:43 +0100
-From: Cornelia Huck <cohuck@redhat.com>
-To: John Snow <jsnow@redhat.com>
-Subject: Re: Migrating to the gitlab issue tracker
-Message-ID: <20201029213343.2a2f063e.cohuck@redhat.com>
-In-Reply-To: <2fecc4a0-7aec-16db-1150-50fc0463d6ac@redhat.com>
-References: <bda4f471-8ed6-3832-29ac-279a6d3bb7cc@redhat.com>
- <20201029174114.47e2b351.cohuck@redhat.com>
- <2fecc4a0-7aec-16db-1150-50fc0463d6ac@redhat.com>
-Organization: Red Hat GmbH
+ by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 00536801FC6;
+ Thu, 29 Oct 2020 20:38:52 +0000 (UTC)
+Received: from localhost (ovpn-114-68.rdu2.redhat.com [10.10.114.68])
+ by smtp.corp.redhat.com (Postfix) with ESMTP id 8459C60C17;
+ Thu, 29 Oct 2020 20:38:51 +0000 (UTC)
+From: Eduardo Habkost <ehabkost@redhat.com>
+To: qemu-devel@nongnu.org
+Subject: [PATCH for-5.2] util/cutils: Fix bounds check at freq_to_str()
+Date: Thu, 29 Oct 2020 16:38:50 -0400
+Message-Id: <20201029203850.434351-1-ehabkost@redhat.com>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.15
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Authentication-Results: relay.mimecast.com;
- auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=cohuck@redhat.com
+ auth=pass smtp.auth=CUSA124A263 smtp.mailfrom=ehabkost@redhat.com
 X-Mimecast-Spam-Score: 0
 X-Mimecast-Originator: redhat.com
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Received-SPF: pass client-ip=63.128.21.124; envelope-from=cohuck@redhat.com;
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="US-ASCII"
+Received-SPF: pass client-ip=63.128.21.124; envelope-from=ehabkost@redhat.com;
  helo=us-smtp-delivery-124.mimecast.com
 X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 01:47:28
 X-ACL-Warn: Detected OS   = Linux 2.2.x-3.x [generic] [fuzzy]
@@ -96,84 +92,38 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+ Alistair Francis <alistair.francis@wdc.com>, Luc Michel <luc@lmichel.fr>,
+ =?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <f4bug@amsat.org>,
+ Richard Henderson <rth@twiddle.net>
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-On Thu, 29 Oct 2020 14:04:04 -0400
-John Snow <jsnow@redhat.com> wrote:
+Fix bounds check for idx at freq_to_str(), to actually ensure idx
+never goes beyond the last element of the suffixes array.
 
-> On 10/29/20 12:41 PM, Cornelia Huck wrote:
-> > On Thu, 29 Oct 2020 12:01:27 -0400
-> > John Snow <jsnow@redhat.com> wrote:
-> >   
-> >> If you're in the CC list, it's because you are listed in MAINTAINERS.  
-> > 
-> > <cleared the cc: list except for qemu-devel :)>
-> >   
-> >>
-> >> Paolo's QEMU keynote this morning mentioned the possible use of the
-> >> Gitlab issue tracker instead of using Launchpad.
-> >>
-> >> I'm quite fond of the gitlab issue tracker, I think it works quite well
-> >> and it has pretty good and uncomplicated API access to it in order to
-> >> customize your workflow if you'd really like to.
-> >>
-> >> In experimenting with my mirror on gitlab though, I was unable to find a
-> >> way to configure it to send issue tracker notifications to the email
-> >> list. A move to gitlab would likely mean, then:
-> >>
-> >> 1. The cessation of (automatic) issue tracker mails to the list
-> >> 2. The loss of the ability to update the issue tracker by replying to
-> >> said emails
-> >> 3. Anyone listed in MAINTAINERS would be expected to have a gitlab
-> >> account in order to interact with the issue tracker.  
-> > 
-> > The gitlab issue tracker is almost certainly is an improvement over
-> > launchpad (and I do have a gitlab account); but not being able to
-> > interact via email is at least annoying. I expect that not only
-> > maintainers will want to interact with bug reports?
-> >   
-> 
-> Nothing stopping reviewers or contributors from signing up and 
-> subscribing to labels or issues they care about... It will just be more 
-> opaque to the ebb and flow of the list.
-> 
-> There are still perhaps things we could do; a bot that generates weekly 
-> bug report summaries might be a solution.
+Reported-by: Coverity (CID 1435957: OVERRUN)
+Suggested-by: Peter Maydell <peter.maydell@linaro.org>
+Signed-off-by: Eduardo Habkost <ehabkost@redhat.com>
+---
+ util/cutils.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-That might be useful. TBH, I'm not sure how many random people that are
-not either the reporter or a maintainer anyway typically interact with
-launchpad bugs, so requiring a gitlab account might not be that bad on
-the whole (especially since people can still write an email to the
-list).
-
-> 
-> >>
-> >> However, once you have a gitlab account, you DO gain the ability to
-> >> receive emails for issues; possibly only those tagged with labels that
-> >> you cared about -- giving a nice filtering mechanism to receive only
-> >> bugs you care about.
-> >>
-> >> Gitlab also does support individual accounts updating issues using a
-> >> generated personalized email address, so if the email workflow is
-> >> crucial to you, it is still available.  
-> > 
-> > You mean that I can update via email, provided it's an address
-> > associated with my account?
-> >   
-> 
-> https://gitlab.com/qemu-project/qemu
-> 
-> Click the "bell" icon, choose "custom", and you can subscribe to issues 
-> project-wide if you'd like. (Reopen, New, Closed, Reassigned).
-> 
-> I started experimenting with using the gitlab issue tracker for my 
-> Python library project, I'll use it as an example here:
-
-[nice instructions stripped]
-
-Thanks, that is helpful; I'll play with it a bit when I find some time.
+diff --git a/util/cutils.c b/util/cutils.c
+index c395974fab..0d9261e1e5 100644
+--- a/util/cutils.c
++++ b/util/cutils.c
+@@ -891,7 +891,7 @@ char *freq_to_str(uint64_t freq_hz)
+     double freq = freq_hz;
+     size_t idx = 0;
+ 
+-    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes)) {
++    while (freq >= 1000.0 && idx < ARRAY_SIZE(suffixes) - 1) {
+         freq /= 1000.0;
+         idx++;
+     }
+-- 
+2.28.0
 
 
