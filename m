@@ -2,100 +2,63 @@ Return-Path: <SRS0=EqPw=EE=nongnu.org=qemu-devel-bounces+qemu-devel=archiver.ker
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SIGNED_OFF_BY,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SIGNED_OFF_BY,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15674C2D0A3
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:38:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E0C0C4363A
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:38:56 +0000 (UTC)
 Received: from lists.gnu.org (lists.gnu.org [209.51.188.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.kernel.org (Postfix) with ESMTPS id 7863920838
-	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:38:52 +0000 (UTC)
-Authentication-Results: mail.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=wdc.com header.i=@wdc.com header.b="q11QULw/"
-DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 7863920838
-Authentication-Results: mail.kernel.org; dmarc=fail (p=none dis=none) header.from=wdc.com
+	by mail.kernel.org (Postfix) with ESMTPS id 8126A20838
+	for <qemu-devel@archiver.kernel.org>; Thu, 29 Oct 2020 14:38:55 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 mail.kernel.org 8126A20838
+Authentication-Results: mail.kernel.org; dmarc=none (p=none dis=none) header.from=huawei.com
 Authentication-Results: mail.kernel.org; spf=pass smtp.mailfrom=qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
-Received: from localhost ([::1]:34606 helo=lists1p.gnu.org)
+Received: from localhost ([::1]:34916 helo=lists1p.gnu.org)
 	by lists.gnu.org with esmtp (Exim 4.90_1)
 	(envelope-from <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>)
-	id 1kY94k-000379-SP
-	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:38:50 -0400
-Received: from eggs.gnu.org ([2001:470:142:3::10]:51708)
+	id 1kY94o-0003EP-Br
+	for qemu-devel@archiver.kernel.org; Thu, 29 Oct 2020 10:38:54 -0400
+Received: from eggs.gnu.org ([2001:470:142:3::10]:52178)
  by lists.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sU-0001uf-Uj
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:26:11 -0400
-Received: from esa5.hgst.iphmx.com ([216.71.153.144]:42881)
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kY8tw-0004PH-1Y; Thu, 29 Oct 2020 10:27:40 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:2312)
  by eggs.gnu.org with esmtps (TLS1.2:ECDHE_RSA_AES_256_GCM_SHA384:256)
- (Exim 4.90_1)
- (envelope-from <prvs=56447669b=alistair.francis@wdc.com>)
- id 1kY8sS-0005fG-RB
- for qemu-devel@nongnu.org; Thu, 29 Oct 2020 10:26:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
- d=wdc.com; i=@wdc.com; q=dns/txt; s=dkim.wdc.com;
- t=1603981568; x=1635517568;
- h=from:to:cc:subject:date:message-id:in-reply-to:
- references:mime-version:content-transfer-encoding;
- bh=2q5eaqHnasSx88RF++/1bEt2K4A/LzHypBeMeKb6C/M=;
- b=q11QULw/jliQDRrBWiRmEZCSExxLzyt6IP1aROmIbCrRG099+L5Um3hQ
- gRE/gmyS3aOUW7Z+grBCG7AaG1OZzkS82SruNaFXkWMmXrg3rTrdQCJge
- MyKgGIBvsXyysvNOk5q8Gf/RpEFtuFsW84imw2iHWJnO905Cw7Uy2IQ2s
- RdhQ4ksD9+uh0PNT056veKog7xhxPVJrMPSJI9VyTPj0gkAQZiNKuIBmT
- gwHhrnbTWoFO7bSS5zTKCWFCcL6Q/cf9ipIx+rB0tx4HZhKiXqsNFqZZC
- U556MwJi2nQum51ThD9PStNpOYfxPuXND5ecG5djA89T9ox3hLAqpyHc3 w==;
-IronPort-SDR: Re2wDyGlEE1V+zhRpFR6o1inOP6LR8rktdEdQiU1QLb1hKCri+jyEHwwqpFyBJhky2hDMj3zLc
- oFsE25d5EiVTUeXvqgCpycCaGJjapIeU0EijgYnzbDJNyRt/muBdy4a3xepmx8xsP5CygKHyp9
- n6uc2zCTszy+kt+3zSpn4FQD8ccT4Ee2jZFURYs+CeTRAr9YyitYiMaNYngZSuzh1BWoJCHVqr
- pOpK4r8s8yooyJumb1AlzmcGri4J1rZ/LlSII3M1DNFPUwwJnp3L5egJqDEERgYm7n/9ff+l2y
- OHg=
-X-IronPort-AV: E=Sophos;i="5.77,430,1596470400"; d="scan'208";a="151317898"
-Received: from uls-op-cesaip01.wdc.com (HELO uls-op-cesaep01.wdc.com)
- ([199.255.45.14])
- by ob1.hgst.iphmx.com with ESMTP; 29 Oct 2020 22:25:29 +0800
-IronPort-SDR: myBVfEWP1g2ggPmepO89DgLpYbzugyreMQ7nrQ4aJAJtBUFiDxk7eBCjr2i+i7tUIs7jw+jdOz
- a1jqDS5tUPMVprnwb9cPZQ741TUEajfakP8E6WlJVWCPzsU1wdFIz1VWwe16JA2TaiVxZqYa0A
- Oh/MtD7po/aDehlUXxWOwBgAAv4Aj/wq4CYmydXeCCh89PeO7zZpYMtvR8MnglN1/RO11P19DU
- Hzi8XPgfUJRvpZHW/6gmQ7vP1Fdl6FlyFiu3s1A/zPeO9Z1GGmut6QOkIizfCMcd17BvrQ5s23
- H34jA5DAV+3L6BaL+5Bs98ha
-Received: from uls-op-cesaip01.wdc.com ([10.248.3.36])
- by uls-op-cesaep01.wdc.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384;
- 29 Oct 2020 07:11:45 -0700
-IronPort-SDR: NLDyq9gk4p51h9PTqA8DJAKJ7kkZfZq43RGCFGPC5LX6gio9jaumrsBTen1NQuT9lW5HMMrN5E
- rwoLUipgYwdCG+yZ0NYB5q9a/JevP/gt1riWFFe3McUN+INuw+f6HLLX58Vq9M7GeQwatv779C
- c+KQ6J0Ge2AcBFv85Nx2MH95bn+PKsNhrjtWbXbtot6Vwld0LTBhA9w+N4HofU9TF4To6bNW1+
- LeXk+zfxofpxeBl4y4toOniKltGxxjwEqQ9SsfwvySNshuaxwqwaPvrXtJdPYEC1ML0FgoorvL
- lCc=
-WDCIronportException: Internal
-Received: from usa003000.ad.shared (HELO risc6-mainframe.hgst.com)
- ([10.86.60.131])
- by uls-op-cesaip01.wdc.com with ESMTP; 29 Oct 2020 07:25:31 -0700
-From: Alistair Francis <alistair.francis@wdc.com>
-To: qemu-devel@nongnu.org,
-	peter.maydell@linaro.org
-Subject: [PULL 15/18] hw/riscv: microchip_pfsoc: Connect the SYSREG module
-Date: Thu, 29 Oct 2020 07:13:55 -0700
-Message-Id: <20201029141358.3102636-16-alistair.francis@wdc.com>
-X-Mailer: git-send-email 2.28.0
-In-Reply-To: <20201029141358.3102636-1-alistair.francis@wdc.com>
-References: <20201029141358.3102636-1-alistair.francis@wdc.com>
+ (Exim 4.90_1) (envelope-from <zhangxinhao1@huawei.com>)
+ id 1kY8tt-00064C-MV; Thu, 29 Oct 2020 10:27:39 -0400
+Received: from DGGEMS414-HUB.china.huawei.com (unknown [172.30.72.60])
+ by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4CMST02y61zkc5K;
+ Thu, 29 Oct 2020 22:27:32 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by DGGEMS414-HUB.china.huawei.com
+ (10.3.19.214) with Microsoft SMTP Server id 14.3.487.0; Thu, 29 Oct 2020
+ 22:27:22 +0800
+From: jokenzhang <zhangxinhao1@huawei.com>
+To: <qemu-devel@nongnu.org>
+Subject: [PATCH v2 2/3] hw/9pfs : open brace '{' following struct go on the
+ same line
+Date: Thu, 29 Oct 2020 22:26:18 +0800
+Message-ID: <20201029142619.1309649-2-zhangxinhao1@huawei.com>
+X-Mailer: git-send-email 2.29.0-rc1
+In-Reply-To: <20201029142619.1309649-1-zhangxinhao1@huawei.com>
+References: <20201029142619.1309649-1-zhangxinhao1@huawei.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Received-SPF: pass client-ip=216.71.153.144;
- envelope-from=prvs=56447669b=alistair.francis@wdc.com;
- helo=esa5.hgst.iphmx.com
-X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 10:25:26
-X-ACL-Warn: Detected OS   = FreeBSD 9.x or newer [fuzzy]
-X-Spam_score_int: -43
-X-Spam_score: -4.4
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-CFilter-Loop: Reflected
+Received-SPF: pass client-ip=45.249.212.190;
+ envelope-from=zhangxinhao1@huawei.com; helo=szxga04-in.huawei.com
+X-detected-operating-system: by eggs.gnu.org: First seen = 2020/10/29 09:43:35
+X-ACL-Warn: Detected OS   = Linux 3.1-3.10 [fuzzy]
+X-Spam_score_int: -41
+X-Spam_score: -4.2
 X-Spam_bar: ----
-X-Spam_report: (-4.4 / 5.0 requ) BAYES_00=-1.9, DKIM_SIGNED=0.1,
- DKIM_VALID=-0.1, DKIM_VALID_AU=-0.1, DKIM_VALID_EF=-0.1,
- RCVD_IN_DNSWL_MED=-2.3, SPF_HELO_PASS=-0.001,
+X-Spam_report: (-4.2 / 5.0 requ) BAYES_00=-1.9, RCVD_IN_DNSWL_MED=-2.3,
+ RCVD_IN_MSPIKE_H4=0.001, RCVD_IN_MSPIKE_WL=0.001, SPF_HELO_NONE=0.001,
  SPF_PASS=-0.001 autolearn=ham autolearn_force=no
 X-Spam_action: no action
 X-BeenThere: qemu-devel@nongnu.org
@@ -109,87 +72,56 @@ List-Post: <mailto:qemu-devel@nongnu.org>
 List-Help: <mailto:qemu-devel-request@nongnu.org?subject=help>
 List-Subscribe: <https://lists.nongnu.org/mailman/listinfo/qemu-devel>,
  <mailto:qemu-devel-request@nongnu.org?subject=subscribe>
-Cc: alistair23@gmail.com, Bin Meng <bin.meng@windriver.com>,
- Alistair Francis <alistair.francis@wdc.com>
+Cc: alex.chen@huawei.com, qemu-trivial@nongnu.org, qemu_oss@crudebyte.com,
+ groug@kaod.org, dengkai1@huawei.com
 Errors-To: qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org
 Sender: "Qemu-devel"
  <qemu-devel-bounces+qemu-devel=archiver.kernel.org@nongnu.org>
 
-From: Bin Meng <bin.meng@windriver.com>
+Fix code style. Open braces for struct should go on the same line.
 
-Previously SYSREG was created as an unimplemented device. Now that
-we have a simple SYSREG module, connect it.
-
-Signed-off-by: Bin Meng <bin.meng@windriver.com>
-Reviewed-by: Alistair Francis <alistair.francis@wdc.com>
-Message-id: 1603863010-15807-8-git-send-email-bmeng.cn@gmail.com
-Signed-off-by: Alistair Francis <alistair.francis@wdc.com>
+Signed-off-by: jokenzhang <zhangxinhao1@huawei.com>
+Signed-off-by: Kai Deng <dengkai1@huawei.com>
+Reported-by: Euler Robot <euler.robot@huawei.com>
 ---
- include/hw/riscv/microchip_pfsoc.h | 2 ++
- hw/riscv/microchip_pfsoc.c         | 9 ++++++---
- hw/riscv/Kconfig                   | 1 +
- 3 files changed, 9 insertions(+), 3 deletions(-)
+ hw/9pfs/9p.h | 9 +++------
+ 1 file changed, 3 insertions(+), 6 deletions(-)
 
-diff --git a/include/hw/riscv/microchip_pfsoc.h b/include/hw/riscv/microchip_pfsoc.h
-index a244ae6d39..245c82db61 100644
---- a/include/hw/riscv/microchip_pfsoc.h
-+++ b/include/hw/riscv/microchip_pfsoc.h
-@@ -26,6 +26,7 @@
- #include "hw/dma/sifive_pdma.h"
- #include "hw/misc/mchp_pfsoc_dmc.h"
- #include "hw/misc/mchp_pfsoc_ioscb.h"
-+#include "hw/misc/mchp_pfsoc_sysreg.h"
- #include "hw/net/cadence_gem.h"
- #include "hw/sd/cadence_sdhci.h"
+diff --git a/hw/9pfs/9p.h b/hw/9pfs/9p.h
+index 3dd1b50b1a..32df81f360 100644
+--- a/hw/9pfs/9p.h
++++ b/hw/9pfs/9p.h
+@@ -143,8 +143,7 @@ typedef struct {
+  */
+ QEMU_BUILD_BUG_ON(sizeof(P9MsgHeader) != 7);
  
-@@ -47,6 +48,7 @@ typedef struct MicrochipPFSoCState {
-     MchpPfSoCMMUartState *serial2;
-     MchpPfSoCMMUartState *serial3;
-     MchpPfSoCMMUartState *serial4;
-+    MchpPfSoCSysregState sysreg;
-     SiFivePDMAState dma;
-     CadenceGEMState gem0;
-     CadenceGEMState gem1;
-diff --git a/hw/riscv/microchip_pfsoc.c b/hw/riscv/microchip_pfsoc.c
-index 438e0c464d..bc908e07d9 100644
---- a/hw/riscv/microchip_pfsoc.c
-+++ b/hw/riscv/microchip_pfsoc.c
-@@ -153,6 +153,9 @@ static void microchip_pfsoc_soc_instance_init(Object *obj)
-     object_initialize_child(obj, "dma-controller", &s->dma,
-                             TYPE_SIFIVE_PDMA);
+-struct V9fsPDU
+-{
++struct V9fsPDU {
+     uint32_t size;
+     uint16_t tag;
+     uint8_t id;
+@@ -270,8 +269,7 @@ union V9fsFidOpenState {
+     void *private;
+ };
  
-+    object_initialize_child(obj, "sysreg", &s->sysreg,
-+                            TYPE_MCHP_PFSOC_SYSREG);
-+
-     object_initialize_child(obj, "ddr-sgmii-phy", &s->ddr_sgmii_phy,
-                             TYPE_MCHP_PFSOC_DDR_SGMII_PHY);
-     object_initialize_child(obj, "ddr-cfg", &s->ddr_cfg,
-@@ -280,9 +283,9 @@ static void microchip_pfsoc_soc_realize(DeviceState *dev, Error **errp)
-     }
+-struct V9fsFidState
+-{
++struct V9fsFidState {
+     int fid_type;
+     int32_t fid;
+     V9fsPath path;
+@@ -338,8 +336,7 @@ typedef struct {
+     uint64_t path;
+ } QpfEntry;
  
-     /* SYSREG */
--    create_unimplemented_device("microchip.pfsoc.sysreg",
--        memmap[MICROCHIP_PFSOC_SYSREG].base,
--        memmap[MICROCHIP_PFSOC_SYSREG].size);
-+    sysbus_realize(SYS_BUS_DEVICE(&s->sysreg), errp);
-+    sysbus_mmio_map(SYS_BUS_DEVICE(&s->sysreg), 0,
-+                    memmap[MICROCHIP_PFSOC_SYSREG].base);
- 
-     /* MPUCFG */
-     create_unimplemented_device("microchip.pfsoc.mpucfg",
-diff --git a/hw/riscv/Kconfig b/hw/riscv/Kconfig
-index 8f043e38e0..facb0cbacc 100644
---- a/hw/riscv/Kconfig
-+++ b/hw/riscv/Kconfig
-@@ -7,6 +7,7 @@ config MICROCHIP_PFSOC
-     select MCHP_PFSOC_DMC
-     select MCHP_PFSOC_IOSCB
-     select MCHP_PFSOC_MMUART
-+    select MCHP_PFSOC_SYSREG
-     select MSI_NONBROKEN
-     select SIFIVE_CLINT
-     select SIFIVE_PDMA
+-struct V9fsState
+-{
++struct V9fsState {
+     QLIST_HEAD(, V9fsPDU) free_list;
+     QLIST_HEAD(, V9fsPDU) active_list;
+     V9fsFidState *fid_list;
 -- 
-2.28.0
+2.29.0-rc1
 
 
